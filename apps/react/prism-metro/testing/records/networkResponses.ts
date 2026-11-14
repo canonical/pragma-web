@@ -57,13 +57,14 @@ export default [
                   _meta: {
                     title: "Circle Line",
                     curie: "metro:circle-line",
-                    definition: null,
                     type: {
+                      visibility: "PROMINENT",
+                      uri: "https://metro.example/onto#Line",
                       _meta: {
                         title: "Line",
                       },
-                      uri: "https://metro.example/onto#Line",
                     },
+                    definition: null,
                   },
                   __isNode: "Line",
                   servedBy: [
@@ -102,14 +103,15 @@ export default [
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition:
+                                "The busiest transfer point on the network.",
                             },
                             uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
@@ -154,13 +156,14 @@ export default [
                             _meta: {
                               title: "Kilnwood",
                               curie: "metro:kilnwood",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#kilnwood",
                             diagramPosition: {
@@ -187,13 +190,14 @@ export default [
                             _meta: {
                               title: "Quarry Hill",
                               curie: "metro:quarry-hill",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#quarry-hill",
                             diagramPosition: {
@@ -220,13 +224,14 @@ export default [
                             _meta: {
                               title: "Tannery Lane",
                               curie: "metro:tannery-lane",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#tannery-lane",
                             diagramPosition: {
@@ -266,13 +271,14 @@ export default [
                             _meta: {
                               title: "Willowbank",
                               curie: "metro:willowbank",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#willowbank",
                             diagramPosition: {
@@ -299,13 +305,14 @@ export default [
                             _meta: {
                               title: "Riverside Junction",
                               curie: "metro:riverside-junction",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#riverside-junction",
                             diagramPosition: {
@@ -348,14 +355,15 @@ export default [
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition:
+                                "The busiest transfer point on the network.",
                             },
                             uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
@@ -400,13 +408,14 @@ export default [
                             _meta: {
                               title: "Riverside Junction",
                               curie: "metro:riverside-junction",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#riverside-junction",
                             diagramPosition: {
@@ -440,13 +449,14 @@ export default [
                             _meta: {
                               title: "Willowbank",
                               curie: "metro:willowbank",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#willowbank",
                             diagramPosition: {
@@ -473,13 +483,14 @@ export default [
                             _meta: {
                               title: "Tannery Lane",
                               curie: "metro:tannery-lane",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#tannery-lane",
                             diagramPosition: {
@@ -519,13 +530,14 @@ export default [
                             _meta: {
                               title: "Quarry Hill",
                               curie: "metro:quarry-hill",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#quarry-hill",
                             diagramPosition: {
@@ -552,13 +564,14 @@ export default [
                             _meta: {
                               title: "Kilnwood",
                               curie: "metro:kilnwood",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#kilnwood",
                             diagramPosition: {
@@ -586,8 +599,8 @@ export default [
                       },
                     },
                   ],
-                  code: "2",
                   colour: "#f2b705",
+                  code: "2",
                 },
               },
               {
@@ -597,13 +610,14 @@ export default [
                   _meta: {
                     title: "Coastal Line",
                     curie: "metro:coastal-line",
-                    definition: null,
                     type: {
+                      visibility: "PROMINENT",
+                      uri: "https://metro.example/onto#Line",
                       _meta: {
                         title: "Line",
                       },
-                      uri: "https://metro.example/onto#Line",
                     },
+                    definition: null,
                   },
                   __isNode: "Line",
                   servedBy: [
@@ -642,14 +656,15 @@ export default [
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition:
+                                "The busiest transfer point on the network.",
                             },
                             uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
@@ -694,13 +709,14 @@ export default [
                             _meta: {
                               title: "Riverside Junction",
                               curie: "metro:riverside-junction",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#riverside-junction",
                             diagramPosition: {
@@ -734,13 +750,14 @@ export default [
                             _meta: {
                               title: "Harbourside",
                               curie: "metro:harbourside",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#harbourside",
                             diagramPosition: {
@@ -772,13 +789,14 @@ export default [
                             _meta: {
                               title: "Saltford",
                               curie: "metro:saltford",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#saltford",
                             diagramPosition: {
@@ -810,13 +828,14 @@ export default [
                             _meta: {
                               title: "Greenhithe",
                               curie: "metro:greenhithe",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#greenhithe",
                             diagramPosition: {
@@ -843,13 +862,14 @@ export default [
                             _meta: {
                               title: "Eastcliff",
                               curie: "metro:eastcliff",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#eastcliff",
                             diagramPosition: {
@@ -890,13 +910,14 @@ export default [
                             _meta: {
                               title: "Eastcliff",
                               curie: "metro:eastcliff",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#eastcliff",
                             diagramPosition: {
@@ -928,13 +949,14 @@ export default [
                             _meta: {
                               title: "Greenhithe",
                               curie: "metro:greenhithe",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#greenhithe",
                             diagramPosition: {
@@ -961,13 +983,14 @@ export default [
                             _meta: {
                               title: "Saltford",
                               curie: "metro:saltford",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#saltford",
                             diagramPosition: {
@@ -999,13 +1022,14 @@ export default [
                             _meta: {
                               title: "Harbourside",
                               curie: "metro:harbourside",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#harbourside",
                             diagramPosition: {
@@ -1037,13 +1061,14 @@ export default [
                             _meta: {
                               title: "Riverside Junction",
                               curie: "metro:riverside-junction",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#riverside-junction",
                             diagramPosition: {
@@ -1077,14 +1102,15 @@ export default [
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition:
+                                "The busiest transfer point on the network.",
                             },
                             uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
@@ -1130,8 +1156,8 @@ export default [
                       },
                     },
                   ],
-                  code: "3",
                   colour: "#0072ce",
+                  code: "3",
                 },
               },
               {
@@ -1141,14 +1167,15 @@ export default [
                   _meta: {
                     title: "Lowland Line",
                     curie: "metro:lowland-line",
-                    definition:
-                      "Tannery Lane to Eastwick Cross through the valley; with the Upland Line it closes the eastern ring.",
                     type: {
+                      visibility: "PROMINENT",
+                      uri: "https://metro.example/onto#Line",
                       _meta: {
                         title: "Line",
                       },
-                      uri: "https://metro.example/onto#Line",
                     },
+                    definition:
+                      "Tannery Lane to Eastwick Cross through the valley; with the Upland Line it closes the eastern ring.",
                   },
                   __isNode: "Line",
                   servedBy: [
@@ -1179,13 +1206,14 @@ export default [
                             _meta: {
                               title: "Tannery Lane",
                               curie: "metro:tannery-lane",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#tannery-lane",
                             diagramPosition: {
@@ -1225,13 +1253,14 @@ export default [
                             _meta: {
                               title: "Millford",
                               curie: "metro:millford",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#millford",
                             diagramPosition: {
@@ -1258,13 +1287,14 @@ export default [
                             _meta: {
                               title: "Reedmere",
                               curie: "metro:reedmere",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#reedmere",
                             diagramPosition: {
@@ -1291,13 +1321,14 @@ export default [
                             _meta: {
                               title: "Eastwick Cross",
                               curie: "metro:eastwick-cross",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#eastwick-cross",
                             diagramPosition: {
@@ -1340,13 +1371,14 @@ export default [
                             _meta: {
                               title: "Eastwick Cross",
                               curie: "metro:eastwick-cross",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#eastwick-cross",
                             diagramPosition: {
@@ -1380,13 +1412,14 @@ export default [
                             _meta: {
                               title: "Reedmere",
                               curie: "metro:reedmere",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#reedmere",
                             diagramPosition: {
@@ -1413,13 +1446,14 @@ export default [
                             _meta: {
                               title: "Millford",
                               curie: "metro:millford",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#millford",
                             diagramPosition: {
@@ -1446,13 +1480,14 @@ export default [
                             _meta: {
                               title: "Tannery Lane",
                               curie: "metro:tannery-lane",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#tannery-lane",
                             diagramPosition: {
@@ -1493,8 +1528,8 @@ export default [
                       },
                     },
                   ],
-                  code: "5",
                   colour: "#8e3ba3",
+                  code: "5",
                 },
               },
               {
@@ -1504,13 +1539,14 @@ export default [
                   _meta: {
                     title: "North Line",
                     curie: "metro:north-line",
-                    definition: "Northgate to Marsh End, via the old cutting.",
                     type: {
+                      visibility: "PROMINENT",
+                      uri: "https://metro.example/onto#Line",
                       _meta: {
                         title: "Line",
                       },
-                      uri: "https://metro.example/onto#Line",
                     },
+                    definition: "Northgate to Marsh End, via the old cutting.",
                   },
                   __isNode: "Line",
                   servedBy: [
@@ -1545,13 +1581,14 @@ export default [
                             _meta: {
                               title: "Northgate",
                               curie: "metro:northgate",
-                              definition: "The northern terminus.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: "The northern terminus.",
                             },
                             uri: "https://metro.example/onto#northgate",
                             diagramPosition: {
@@ -1583,13 +1620,14 @@ export default [
                             _meta: {
                               title: "Verge Park",
                               curie: "metro:verge-park",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#verge-park",
                             diagramPosition: {
@@ -1616,13 +1654,14 @@ export default [
                             _meta: {
                               title: "Foundry Row",
                               curie: "metro:foundry-row",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#foundry-row",
                             diagramPosition: {
@@ -1649,14 +1688,15 @@ export default [
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition:
+                                "The busiest transfer point on the network.",
                             },
                             uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
@@ -1701,13 +1741,14 @@ export default [
                             _meta: {
                               title: "Marsh End",
                               curie: "metro:marsh-end",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#marsh-end",
                             diagramPosition: {
@@ -1743,13 +1784,14 @@ export default [
                             _meta: {
                               title: "Marsh End",
                               curie: "metro:marsh-end",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#marsh-end",
                             diagramPosition: {
@@ -1776,14 +1818,15 @@ export default [
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition:
+                                "The busiest transfer point on the network.",
                             },
                             uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
@@ -1828,13 +1871,14 @@ export default [
                             _meta: {
                               title: "Foundry Row",
                               curie: "metro:foundry-row",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#foundry-row",
                             diagramPosition: {
@@ -1861,13 +1905,14 @@ export default [
                             _meta: {
                               title: "Verge Park",
                               curie: "metro:verge-park",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#verge-park",
                             diagramPosition: {
@@ -1894,13 +1939,14 @@ export default [
                             _meta: {
                               title: "Northgate",
                               curie: "metro:northgate",
-                              definition: "The northern terminus.",
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: "The northern terminus.",
                             },
                             uri: "https://metro.example/onto#northgate",
                             diagramPosition: {
@@ -1933,8 +1979,8 @@ export default [
                       },
                     },
                   ],
-                  code: "1",
                   colour: "#c8102e",
+                  code: "1",
                 },
               },
               {
@@ -1944,13 +1990,14 @@ export default [
                   _meta: {
                     title: "Ringway Anticlockwise",
                     curie: "metro:ringway-anticlockwise",
-                    definition: "The southern ring, run anticlockwise only.",
                     type: {
+                      visibility: "PROMINENT",
+                      uri: "https://metro.example/onto#Line",
                       _meta: {
                         title: "Line",
                       },
-                      uri: "https://metro.example/onto#Line",
                     },
+                    definition: "The southern ring, run anticlockwise only.",
                   },
                   __isNode: "Line",
                   servedBy: [
@@ -1989,13 +2036,14 @@ export default [
                             _meta: {
                               title: "Dyers Green",
                               curie: "metro:dyers-green",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#dyers-green",
                             diagramPosition: {
@@ -2028,13 +2076,14 @@ export default [
                             _meta: {
                               title: "Ropewalk",
                               curie: "metro:ropewalk",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#ropewalk",
                             diagramPosition: {
@@ -2067,13 +2116,14 @@ export default [
                             _meta: {
                               title: "Pinfold",
                               curie: "metro:pinfold",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#pinfold",
                             diagramPosition: {
@@ -2106,13 +2156,14 @@ export default [
                             _meta: {
                               title: "Orchard Gate",
                               curie: "metro:orchard-gate",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#orchard-gate",
                             diagramPosition: {
@@ -2145,13 +2196,14 @@ export default [
                             _meta: {
                               title: "Nettlebed",
                               curie: "metro:nettlebed",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#nettlebed",
                             diagramPosition: {
@@ -2184,13 +2236,14 @@ export default [
                             _meta: {
                               title: "Fernside",
                               curie: "metro:fernside",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#fernside",
                             diagramPosition: {
@@ -2222,8 +2275,8 @@ export default [
                       reverse: null,
                     },
                   ],
-                  code: "R2",
                   colour: "#7a4b2a",
+                  code: "R2",
                 },
               },
               {
@@ -2233,13 +2286,14 @@ export default [
                   _meta: {
                     title: "Ringway Clockwise",
                     curie: "metro:ringway-clockwise",
-                    definition: "The southern ring, run clockwise only.",
                     type: {
+                      visibility: "PROMINENT",
+                      uri: "https://metro.example/onto#Line",
                       _meta: {
                         title: "Line",
                       },
-                      uri: "https://metro.example/onto#Line",
                     },
+                    definition: "The southern ring, run clockwise only.",
                   },
                   __isNode: "Line",
                   servedBy: [
@@ -2278,13 +2332,14 @@ export default [
                             _meta: {
                               title: "Dyers Green",
                               curie: "metro:dyers-green",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#dyers-green",
                             diagramPosition: {
@@ -2317,13 +2372,14 @@ export default [
                             _meta: {
                               title: "Fernside",
                               curie: "metro:fernside",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#fernside",
                             diagramPosition: {
@@ -2356,13 +2412,14 @@ export default [
                             _meta: {
                               title: "Nettlebed",
                               curie: "metro:nettlebed",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#nettlebed",
                             diagramPosition: {
@@ -2395,13 +2452,14 @@ export default [
                             _meta: {
                               title: "Orchard Gate",
                               curie: "metro:orchard-gate",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#orchard-gate",
                             diagramPosition: {
@@ -2434,13 +2492,14 @@ export default [
                             _meta: {
                               title: "Pinfold",
                               curie: "metro:pinfold",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#pinfold",
                             diagramPosition: {
@@ -2473,13 +2532,14 @@ export default [
                             _meta: {
                               title: "Ropewalk",
                               curie: "metro:ropewalk",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#ropewalk",
                             diagramPosition: {
@@ -2511,8 +2571,8 @@ export default [
                       reverse: null,
                     },
                   ],
-                  code: "R1",
                   colour: "#c46a2b",
+                  code: "R1",
                 },
               },
               {
@@ -2522,14 +2582,15 @@ export default [
                   _meta: {
                     title: "Upland Line",
                     curie: "metro:upland-line",
-                    definition:
-                      "Tannery Lane to Eastwick Cross over the hills; with the Lowland Line it closes the eastern ring.",
                     type: {
+                      visibility: "PROMINENT",
+                      uri: "https://metro.example/onto#Line",
                       _meta: {
                         title: "Line",
                       },
-                      uri: "https://metro.example/onto#Line",
                     },
+                    definition:
+                      "Tannery Lane to Eastwick Cross over the hills; with the Lowland Line it closes the eastern ring.",
                   },
                   __isNode: "Line",
                   servedBy: [
@@ -2560,13 +2621,14 @@ export default [
                             _meta: {
                               title: "Tannery Lane",
                               curie: "metro:tannery-lane",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#tannery-lane",
                             diagramPosition: {
@@ -2606,13 +2668,14 @@ export default [
                             _meta: {
                               title: "Larkrise",
                               curie: "metro:larkrise",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#larkrise",
                             diagramPosition: {
@@ -2639,13 +2702,14 @@ export default [
                             _meta: {
                               title: "Highmoor",
                               curie: "metro:highmoor",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#highmoor",
                             diagramPosition: {
@@ -2672,13 +2736,14 @@ export default [
                             _meta: {
                               title: "Eastwick Cross",
                               curie: "metro:eastwick-cross",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#eastwick-cross",
                             diagramPosition: {
@@ -2721,13 +2786,14 @@ export default [
                             _meta: {
                               title: "Eastwick Cross",
                               curie: "metro:eastwick-cross",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#eastwick-cross",
                             diagramPosition: {
@@ -2761,13 +2827,14 @@ export default [
                             _meta: {
                               title: "Highmoor",
                               curie: "metro:highmoor",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#highmoor",
                             diagramPosition: {
@@ -2794,13 +2861,14 @@ export default [
                             _meta: {
                               title: "Larkrise",
                               curie: "metro:larkrise",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Station",
                                 _meta: {
                                   title: "Station",
                                 },
-                                uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#larkrise",
                             diagramPosition: {
@@ -2827,13 +2895,14 @@ export default [
                             _meta: {
                               title: "Tannery Lane",
                               curie: "metro:tannery-lane",
-                              definition: null,
                               type: {
+                                visibility: "PROMINENT",
+                                uri: "https://metro.example/onto#Interchange",
                                 _meta: {
                                   title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Interchange",
                               },
+                              definition: null,
                             },
                             uri: "https://metro.example/onto#tannery-lane",
                             diagramPosition: {
@@ -2874,8 +2943,8 @@ export default [
                       },
                     },
                   ],
-                  code: "4",
                   colour: "#00843d",
+                  code: "4",
                 },
               },
             ],

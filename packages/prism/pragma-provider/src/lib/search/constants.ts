@@ -13,12 +13,13 @@ export const TYPED_SUBJECTS_QUERY =
   "SELECT DISTINCT ?s WHERE { ?s a ?type FILTER(isIRI(?s)) }";
 
 /**
- * What the index reads of one candidate, through the compiled schema
- * itself, so an entry holds exactly what `_meta` serves: its title and
- * definition in the default language, and its CURIE.
+ * What the index reads of one candidate, through the served schema itself,
+ * so an entry holds exactly what `_meta` serves: its title and definition in
+ * the default language, and its CURIE; and its class's visibility, since an
+ * instance of a hidden class is a value and never a search result.
  */
 export const SEARCH_ENTRY_QUERY =
-  "query SearchEntry($id: ID!) { node(id: $id) { uri _meta { curie title definition } } }";
+  "query SearchEntry($id: ID!) { node(id: $id) { uri _meta { curie title definition type { visibility } } } }";
 
 /**
  * The fields of a search entry that text search reads, best first. A

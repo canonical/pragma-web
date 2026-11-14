@@ -460,6 +460,28 @@ of the same names on purpose. This package depends on the contract and `graphql`
 nothing of pragma's, so that it stays an independent second implementation; sharing the
 ranking would make the two providers agree by construction rather than by test.
 
+## The type lens and class edges
+
+The contract's lens fields (`visibility`, `glyph`, `pluralLabel` on classes; `group`,
+`order`, `role`, `visibility` on a class's fields; plural and inverse labels on
+properties) are served from `src/lib/provider/siteLens.ts`, the metro's site lens. It has
+the shape of a Turtle lens (property groups, lens entries per class, `prism:` terms), so
+moving it into an ontology is a data move. `indexSiteLens` from `@canonical/prism-contract`
+resolves it against `outlineDataset(dataset)`: a class without a value takes its nearest
+declaring ancestor's, so an interchange is prominent because a station is, and reorders one
+of a station's fields. A relation with a declared partner (`servesLine` and `servedBy`,
+`inZone` and `stops`) reads backwards with its partner's label. Fare zones are hidden:
+their instances are values a station points at. `createExampleProvider(dataset, lens)`
+takes a purpose-built lens as its second parameter.
+
+`Query.classEdges` weighs the edges between classes. `declareClassEdges` reads one
+declaration per object property with a domain and a class range; `observeClassEdges`
+counts the statements the dataset stores, nested values included (routes, calls, unit and
+car positions), each under its subject's and its object's class. Inverses the provider
+reads backwards (`servedBy`, `stops`, `stock`, `lines`) are not stored, so their declared
+edges are served with count 0. `formations` has no domain, so its statements are served
+as undeclared edges.
+
 ---
 
 ## Running it

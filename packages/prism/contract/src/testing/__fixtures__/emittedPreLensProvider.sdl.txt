@@ -1,0 +1,122 @@
+# The shape a ke-graphql that predates the type lens emits for the same
+# one-class ontology: no lens fields, no lens types. Against the contract it
+# fails by exactly the lens fields, the three lens types and Query.classEdges,
+# which is why a provider on such a compiler adds the lens itself.
+# ke-graphql · canonical SDL
+# graphql-schema-spec: 1
+# provider: fixture
+# mode: annotated
+# validated-store: false
+# revision: 0
+# prefixing: none
+
+type Query {
+  ontologies: [Ontology!]!
+  ontology(prefix: String!): Ontology
+  ontologyClass(uri: String!): OntologyClass
+  ontologyProperty(uri: String!): OntologyProperty
+  node(id: ID!): Node
+  thing(uri: String!): Thing
+  things(first: Int, after: String, last: Int, before: String): ThingConnection!
+}
+
+type Ontology {
+  prefix: String!
+  namespace: String!
+  label: String
+  classes: [OntologyClass!]!
+  properties: [OntologyProperty!]!
+}
+
+type OntologyClass implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  label: String
+  definition: String
+  superclass: OntologyClass
+  superclasses: [OntologyClass!]!
+  subclasses: [OntologyClass!]!
+  properties: [ClassProperty!]!
+  instances(first: Int, after: String, last: Int, before: String): NodeConnection!
+  instanceCount: Int!
+  isAbstract: Boolean!
+  namespace: String!
+}
+
+interface Node {
+  uri: ID!
+  _meta: EntityMeta!
+}
+
+type EntityMeta {
+  curie: String!
+  title(lang: String = "en"): String!
+  label(lang: String = "en"): String
+  comment(lang: String = "en"): String
+  definition(lang: String = "en"): String
+  type: OntologyClass!
+  field(name: String!): ClassProperty
+  fields: [ClassProperty!]!
+}
+
+type ClassProperty {
+  name: String!
+  property: OntologyProperty!
+  required: Boolean!
+  singular: Boolean!
+  inherited: Boolean!
+}
+
+type OntologyProperty {
+  uri: ID!
+  label: String
+  definition: String
+  domain: OntologyClass
+  range: String!
+  kind: PropertyKind!
+  functional: Boolean!
+  inverse: OntologyProperty
+  acceptanceCriteria: String
+  completionGuidance: String
+  namespace: String!
+}
+
+enum PropertyKind {
+  DATATYPE
+  OBJECT
+  ANNOTATION
+}
+
+type NodeConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type NodeEdge {
+  node: Node!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type Thing implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  count: Int
+}
+
+type ThingConnection {
+  edges: [ThingEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ThingEdge {
+  node: Thing!
+  cursor: String!
+}

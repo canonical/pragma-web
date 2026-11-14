@@ -352,7 +352,9 @@ reference implementation a site copies.
 `Node` spreads the card and the row composites, and each node renders as a
 row in the `table` renderer and as a card in the `cards` renderer, through
 its type's arm. It keeps no renderer of its own: the lens reads it from
-the page's address (`as=`) and passes its name with the empty line.
+the page's address (`as=`) and passes its name with the empty line. A node
+whose type the graph's type lens hides (`_meta.type.visibility` is
+`HIDDEN`) is a value, never an entity, so the list skips it.
 
 ```tsx
 <NodeList

@@ -730,6 +730,7 @@
         "@canonical/design-system-docs": "^0.44.1",
         "@canonical/ke": "0.43.0",
         "@canonical/ke-graphql": "0.43.0",
+        "@canonical/prism-contract": "^0.44.1",
         "@canonical/surface": "^0.44.1",
         "graphql": "17.0.0-rc.0",
         "mdast-util-from-markdown": "^2.0.3",
@@ -737,7 +738,6 @@
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.43.0",
-        "@canonical/prism-contract": "^0.44.1",
         "@canonical/typescript-config": "0.43.0",
         "@canonical/webarchitect": "0.43.0",
         "@types/bun": "^1.3.10",
