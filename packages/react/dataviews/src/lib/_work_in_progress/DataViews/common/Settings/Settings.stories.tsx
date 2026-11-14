@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
@@ -73,7 +73,7 @@ function Collection({
  * always shown; the last column shown can never be hidden.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
@@ -87,7 +87,7 @@ export const Default: Story = {
  * Nothing is asked of the source: the rows are the same rows.
  */
 export const HideAColumn: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
@@ -118,7 +118,7 @@ export const HideAColumn: Story = {
  * Hide; Reset table settings returns the declared arrangement.
  */
 export const ArrangedByTheViewer: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({

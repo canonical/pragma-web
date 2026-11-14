@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
@@ -69,7 +69,7 @@ function SortedCollection({
  * key, and it is deliberately rough: its design comes later.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.setSort([
@@ -113,7 +113,7 @@ export const Default: Story = {
  * rather than showing an empty list.
  */
 export const NothingStated: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews"],
     render: `<DataViews provider={provider}>
   <DataViews.SortPanel />

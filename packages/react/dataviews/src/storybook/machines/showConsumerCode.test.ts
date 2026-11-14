@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { consumerCode } from "./consumerCode.js";
+import showConsumerCode from "./showConsumerCode.js";
 
 /** The code a story's panel shows for the given consumer. */
-const readCode = (config: Parameters<typeof consumerCode>[0]): string =>
-  consumerCode(config).docs.source.code;
+const readCode = (config: Parameters<typeof showConsumerCode>[0]): string =>
+  showConsumerCode(config).docs.source.code;
 
-describe("consumerCode", () => {
+describe("showConsumerCode", () => {
   it("shows tsx", () => {
     expect(
-      consumerCode({ parts: ["DataTable"], render: "<DataTable />" }).docs
+      showConsumerCode({ parts: ["DataTable"], render: "<DataTable />" }).docs
         .source.language,
     ).toBe("tsx");
   });

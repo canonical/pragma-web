@@ -3,9 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import type { DataChartProps } from "../DataChart/index.js";
@@ -93,7 +93,7 @@ function MachineChartWithTable({
  */
 export const Default: Story = {
   render: () => <MachineChartWithTable chart={statusCounts} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["type DataTableColumn"],
     imports: prototypeImports,
     facets: ["status", "cores"],
@@ -134,7 +134,7 @@ export const RangeOrTable: Story = {
       chart={{ type: "range", field: "cores", label: "Machines by cores" }}
     />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["type DataTableColumn"],
     imports: prototypeImports,
     facets: ["status", "cores"],
@@ -183,7 +183,7 @@ function BesideFiltersMachines(): ReactElement {
  */
 export const BesideFilters: Story = {
   render: () => <BesideFiltersMachines />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress prototype: not yet exported from the package root.

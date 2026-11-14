@@ -7,7 +7,7 @@ import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
@@ -101,7 +101,7 @@ const searchingAna = "q=ex:a";
  * every machine shows.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     render: composition,
@@ -125,7 +125,7 @@ export const Default: Story = {
  * it — there is no second query to apply or keep in step.
  */
 export const SearchApplied: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     query: searchingAna,
@@ -149,7 +149,7 @@ export const SearchApplied: Story = {
  * and nothing else.
  */
 export const SearchInTheUrl: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, waitFor } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
@@ -67,7 +67,7 @@ const onlyFailed = "status=failed&page=1&size=5";
  * provider.
  */
 export const InAComposition: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     query: "page=1&size=5",
@@ -90,7 +90,7 @@ export const InAComposition: Story = {
  * fill. The total it shows is always the current query's.
  */
 export const AFilteredTotal: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     query: onlyFailed,

@@ -12,9 +12,9 @@ import {
   SERVER_BACKED_FACETS,
   SERVER_BACKED_RENDER_CODE,
 } from "../../../storybook/machines/constants.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
 import ServerBackedMachines from "../../../storybook/machines/ServerBackedMachines.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createGraphQLMachineSource } from "../../../storybook/machines/sources/index.js";
 import Component from "./Provider.js";
 
@@ -36,7 +36,7 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** The consumer code every story here shows: the endpoint through Relay. */
-const code = consumerCode({
+const code = showConsumerCode({
   parts: ["DataViews", "type DataTableColumn"],
   core: ["createRelaySource", "declareCapabilities", "readSlice"],
   imports: `import { createOperationDescriptor } from "relay-runtime";

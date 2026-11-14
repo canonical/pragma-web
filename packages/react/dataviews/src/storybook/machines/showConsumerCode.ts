@@ -63,7 +63,7 @@ const indent = (text: string, depth: number): string =>
     .join("\n");
 
 /** The provider, built once in state, with the commands issued once it is. */
-const providerState = ({
+const spellProviderState = ({
   source,
   query,
   prepare,
@@ -109,7 +109,7 @@ ${config.map((line) => indent(line, 6)).join("\n")}
 };
 
 /** The story parameters that show the consumer code for one story. */
-export const consumerCode = ({
+export default function showConsumerCode({
   parts,
   core: coreFunctions = [],
   coreTypes = [],
@@ -123,7 +123,7 @@ export const consumerCode = ({
   facets,
   hooks = [],
   render,
-}: ConsumerCode) => {
+}: ConsumerCode) {
   const core = [
     ...(source.includes("createArraySource(") ? ["createArraySource"] : []),
     "createDataViewsProvider",
@@ -144,7 +144,7 @@ ${imports ?? `import { machineCollection, machines } from "./machines.js";`}`,
           store ? viewStore : undefined,
           declarations,
           `export function Machines() {
-${providerState({ source, query, prepare, store, location, facets })}
+${spellProviderState({ source, query, prepare, store, location, facets })}
   return (
 ${indent(render, 4)}
   );
@@ -155,4 +155,4 @@ ${indent(render, 4)}
       },
     },
   };
-};
+}

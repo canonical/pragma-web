@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import useStoryViewStore from "../../../storybook/machines/useStoryViewStore.js";
@@ -103,7 +103,7 @@ const failedMachines: ViewDraft = {
  * the store follow the provider, which owns both loops.
  */
 export const ConnectedParts: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
@@ -173,7 +173,7 @@ function QueryInTheLocation({
 }
 
 /** The code the stories of a query in the URL show. */
-const queryInTheUrlCode = consumerCode({
+const queryInTheUrlCode = showConsumerCode({
   parts: ["DataViews", "type DataTableColumn"],
   core: ["createPlatformLocation"],
   imports: `import { machineCollection, machines } from "./machines.js";

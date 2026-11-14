@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import { useDataViewsValue } from "../../hooks/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
@@ -40,7 +40,7 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
  * table and its pagination. Neither takes a provider; both read the root.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     imports: `import { machineCollection, machines } from "./machines.js";`,
     declarations: columnsCode,
@@ -74,7 +74,7 @@ function MachineCount(): ReactElement {
  * table that shows them.
  */
 export const OwnChild: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [
       "DataViews",
       "type DataTableColumn",

@@ -15,7 +15,7 @@ import {
 } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import useStoryViewStore from "../../../../../storybook/machines/useStoryViewStore.js";
@@ -61,7 +61,7 @@ const failedMachines: ViewDraft = {
 };
 
 /** The store's scope as every story's consumer code declares it. */
-const parameters = consumerCode({
+const parameters = showConsumerCode({
   parts: ["DataTable", "DataViews", "type DataTableColumn"],
   declarations: columnsCode,
   query: "page=1&size=5",
@@ -375,7 +375,7 @@ function QueryInTheLocation({
  * in the link; the view itself stays in this browser.
  */
 export const WithTheQueryInTheUrl: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";

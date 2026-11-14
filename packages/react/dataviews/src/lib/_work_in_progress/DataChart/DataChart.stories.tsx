@@ -4,9 +4,9 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
 import { SERVER_BACKED_FACETS } from "../../../storybook/machines/constants.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
 import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
@@ -86,7 +86,7 @@ export const StatusCounts: Story = {
   render: ({ type, field, label }) => (
     <MachineChart type={type} field={field} label={label} />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     // A prototype: nothing of it is exported from the package root to name.
     parts: [],
     imports: prototypeImports,
@@ -112,7 +112,7 @@ export const CoresRange: Story = {
   render: ({ type, field, label }) => (
     <MachineChart type={type} field={field} label={label} />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [],
     imports: prototypeImports,
     facets: ["cores"],
@@ -159,7 +159,7 @@ function CountsBesideFiltersMachines({
  */
 export const CountsBesideFilters: Story = {
   render: ({ label }) => <CountsBesideFiltersMachines label={label} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     imports: connectedImports,
     query: "page=1&size=5",
@@ -221,7 +221,7 @@ function RangeBesideFiltersMachines({
 export const RangeBesideFilters: Story = {
   args: { type: "range", field: "cores", label: "Cores" },
   render: ({ label }) => <RangeBesideFiltersMachines label={label} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews"],
     imports: connectedImports,
     facets: ["status", "cores"],

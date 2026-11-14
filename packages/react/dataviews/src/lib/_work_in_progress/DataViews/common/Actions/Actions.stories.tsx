@@ -8,12 +8,12 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import {
   machineCollection,
   machines,
 } from "../../../../../storybook/machines/fixtures.js";
 import readHostName from "../../../../../storybook/machines/readHostName.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { Machine } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import { useDataViewsValue } from "../../../../hooks/index.js";
@@ -165,7 +165,7 @@ const spellActionsCode = ({
   readonly indicator?: string | undefined;
   readonly declarations?: string | undefined;
 } = {}) =>
-  consumerCode({
+  showConsumerCode({
     parts: [
       "DataTable",
       "DataViews",

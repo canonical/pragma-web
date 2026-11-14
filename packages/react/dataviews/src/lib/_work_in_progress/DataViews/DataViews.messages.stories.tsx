@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
-import { FRENCH } from "../../../storybook/locales/fr.js";
+import fr from "../../../storybook/locales/fr.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "../DataTable/index.js";
 import { PaginationBar } from "../PaginationBar/index.js";
@@ -80,7 +80,7 @@ export const FrenchLocale: Story = {
     const provider = useMachineProvider({ query: "page=1&size=5" });
     return (
       <div lang="fr">
-        <Component provider={provider} messages={FRENCH}>
+        <Component provider={provider} messages={fr}>
           <Component.Search />
           <Component.Filters labels={{ status: "État", cores: "Cœurs" }} />
           <Component.DataTable
@@ -118,9 +118,9 @@ export const StandaloneParts: Story = {
           provider={provider}
           columns={frenchColumns}
           label="Machines"
-          messages={FRENCH}
+          messages={fr}
         />
-        <PaginationBar provider={provider} sizes={[5, 10]} messages={FRENCH} />
+        <PaginationBar provider={provider} sizes={[5, 10]} messages={fr} />
       </div>
     );
   },

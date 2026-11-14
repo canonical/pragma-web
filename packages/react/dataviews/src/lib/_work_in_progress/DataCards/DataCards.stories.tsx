@@ -3,13 +3,13 @@ import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import readHostName from "../../../storybook/machines/readHostName.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
 import type {
   Machine,
@@ -107,7 +107,7 @@ function MachineCards({
  */
 export const Default: Story = {
   render: (args) => <MachineCards {...args} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["type DisplayField"],
     imports: spikeImports,
     declarations: fieldsCode,
@@ -127,7 +127,7 @@ export const Default: Story = {
 export const Selectable: Story = {
   args: { selectable: true },
   render: (args) => <MachineCards {...args} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["type DisplayField"],
     imports: spikeImports,
     declarations: fieldsCode,
@@ -176,7 +176,7 @@ export const CustomCell: Story = {
       ]}
     />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [
       "useDataViewsCell",
       "useDataViewsValue",
@@ -267,7 +267,7 @@ function SortedAndPagedMachines({
  */
 export const SortedAndPaged: Story = {
   render: ({ label }) => <SortedAndPagedMachines label={label} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
@@ -342,7 +342,7 @@ function TableOrCardsMachines({
  */
 export const TableOrCards: Story = {
   render: ({ label }) => <TableOrCardsMachines label={label} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // Internal to the package and not exported: shown for their shape.

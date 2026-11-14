@@ -6,7 +6,6 @@ import {
   withFrame,
 } from "../../../storybook/decorators/index.js";
 import buildMachines from "../../../storybook/machines/buildMachines.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
 import createForbiddingSource from "../../../storybook/machines/createForbiddingSource.js";
@@ -15,6 +14,7 @@ import createOneTermSource from "../../../storybook/machines/createOneTermSource
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import readHostName from "../../../storybook/machines/readHostName.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type {
   Machine,
   MachineFields,
@@ -242,7 +242,7 @@ const measureWidth = (element: HTMLElement): number =>
  * takes the ghost fill under the pointer.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     render: tableCode,
@@ -263,7 +263,7 @@ export const Default: Story = {
  * nothing to activate.
  */
 export const Sortable: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     render: tableCode,
@@ -278,7 +278,7 @@ export const Sortable: Story = {
  * machines of one status keep the source's order among themselves.
  */
 export const SortedAscending: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     prepare: `provider.setSort([{ field: "status", direction: "asc" }]);`,
@@ -331,7 +331,7 @@ export const SortedAscending: Story = {
  * at ascending.
  */
 export const SortedDescending: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     prepare: `provider.setSort([{ field: "cores", direction: "desc" }]);`,
@@ -363,7 +363,7 @@ export const SortedDescending: Story = {
  * Shift still sorts by that column alone.
  */
 export const SortLimitedToOneTerm: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     render: tableCode,
@@ -391,7 +391,7 @@ const sortByStatusThenCores = (provider: MachineProvider): void => {
  * one heading ever claims it.
  */
 export const SortedByTwoTerms: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     prepare: `provider.setSort([
@@ -424,7 +424,7 @@ export const SortedByTwoTerms: Story = {
  * own; clearing it returns to this.
  */
 export const DefaultOrdering: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [...tableParts, "createArraySource"],
     declarations: `const source = createArraySource({
   rows: machines,
@@ -462,7 +462,7 @@ ${sortableColumnsCode}`,
  * two cannot disagree. A selected row takes the information tint.
  */
 export const Selectable: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     render: selectableTableCode,
@@ -499,7 +499,7 @@ export const Selectable: Story = {
  * alone. It never reaches a row the reader cannot see.
  */
 export const SelectAllActsOnDisplayedRows: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     query: "page=1&size=5",
@@ -533,7 +533,7 @@ export const SelectAllActsOnDisplayedRows: Story = {
  * column is ever squeezed below its minimum to make room.
  */
 export const FixedAndFlexibleColumns: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
     render: spellFramedTableCode("48rem"),
@@ -550,7 +550,7 @@ export const FixedAndFlexibleColumns: Story = {
  * column when scrolled.
  */
 export const HorizontalScroll: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
     render: spellFramedTableCode("24rem"),
@@ -560,7 +560,7 @@ export const HorizontalScroll: Story = {
 };
 
 /** The code a resizable table's stories show. */
-const resizableCode = consumerCode({
+const resizableCode = showConsumerCode({
   parts: tableParts,
   declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
@@ -608,7 +608,7 @@ export const Resizable: Story = {
  * control appears exactly where a column may be resized, and nowhere else.
  */
 export const MixedResizableColumns: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", resizable: true },
@@ -734,7 +734,7 @@ const boundedColumns: readonly DataTableColumn[] = [
  * width is left.
  */
 export const ResizeWithinBounds: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 } },
@@ -769,7 +769,7 @@ export const ResizeWithinBounds: Story = {
  * scrolls.
  */
 export const ResizePastTheContainer: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
@@ -829,7 +829,7 @@ const fixedColumns: readonly DataTableColumn[] = [
  * take it, up to its own maximum.
  */
 export const SpaceAfterFixedColumns: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", resizable: true, sizing: { kind: "fixed", px: 200 } },
@@ -884,7 +884,7 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
  * caller authoring any other header, row or cell.
  */
 export const CustomCellRenderer: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "type DisplayFieldCellProps", "type DataTableColumn"],
     declarations: `const statusDisplay: Record<string, { label: string; tone: string }> = {
   running: { label: "Running", tone: "var(--color-icon-success)" },
@@ -959,7 +959,7 @@ const scopedColumns: readonly DataTableColumn[] = [
  * cells, and every other row, stay as they are.
  */
 export const CellReadingItsScope: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [
       "DataTable",
       "type DisplayFieldCellProps",
@@ -1005,7 +1005,7 @@ const columns: readonly DataTableColumn[] = [
  * know yet.
  */
 export const Loading: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1029,7 +1029,7 @@ export const Loading: Story = {
  * nothing.
  */
 export const Failed: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1057,7 +1057,7 @@ export const Failed: Story = {
  * malfunctioned. A change of filter or search asks again.
  */
 export const NoAccess: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1082,7 +1082,7 @@ export const NoAccess: Story = {
  * matched nothing — there is nothing here to find.
  */
 export const EmptyCollection: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1104,7 +1104,7 @@ export const EmptyCollection: Story = {
  * collection is empty.
  */
 export const NoMatch: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     prepare: `provider.setSearch("quartz");`,
@@ -1125,7 +1125,7 @@ export const NoMatch: Story = {
  * technology reads and what a copy selects.
  */
 export const LongValues: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "fixed", px: 176 } },
@@ -1175,7 +1175,7 @@ const showVirtualizedCode = (
   columns: string,
   parts: readonly string[] = tableParts,
 ): NonNullable<Story["parameters"]> =>
-  consumerCode({
+  showConsumerCode({
     parts,
     imports: `import { virtualizeRows } from "@canonical/dataviews-react/virtualization";
 import { machineCollection, machines } from "./machines.js";`,
