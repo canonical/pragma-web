@@ -18,7 +18,6 @@ export default defineConfig({
         "testing/createCountedRows.ts",
         "testing/createCountingViewStore.ts",
         "testing/createDeferred.ts",
-        "testing/createStandInStores.ts",
         "testing/flushPresentation.ts",
         "testing/observeUntilFinished.ts",
         "testing/openIndexedDBTab.ts",
