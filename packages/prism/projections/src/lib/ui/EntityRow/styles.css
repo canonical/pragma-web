@@ -6,10 +6,12 @@
   /* One entry of an index, whose height comes from `lines` alone: one
    * 24px line of the context's primary text with 4px above and below it,
    * 32px, which never wraps; a two-line row adds the summary as its only
-   * second line, with no space between the lines: 56px. The identity takes
-   * the free width, so the facts, the meta and the status end the row as
-   * one group. It may be narrower than its content, so a long identity
-   * never widens the track that holds it. */
+   * second line, with no space between the lines: 56px. The title yields
+   * last: the identity keeps its content's width while the facts and the
+   * meta give theirs up first, down to nothing, and the status keeps its
+   * own; whatever width is left over sets the facts, the meta and the
+   * status at the row's end as one group. The row may be narrower than its
+   * content, so a long identity never widens the track that holds it. */
   .ds.entity-row {
     --entity-row-gap: var(--grid-gutter);
     --entity-row-line-gap: var(--space-0);
@@ -34,6 +36,9 @@
     /* The second line spans the row, after every slot of the first. */
     --entity-row-summary-basis: 100%;
     --entity-row-summary-order: 1;
+    /* How much faster than the facts and the meta the identity takes the
+     * free width of a two-line row, where it cannot keep a content basis. */
+    --entity-row-identity-grow-weight: 1000;
     /* The ring sits inside the title, since the identity clips. */
     --entity-row-focus-ring-width: 2px;
     --entity-row-focus-ring-offset: -2px;
@@ -51,17 +56,20 @@
     line-height: var(--entity-row-line-height);
   }
 
-  /* The identity takes the free width and never wraps: a title longer
-   * than its line ends in an ellipsis. It clips only along its line, so a
-   * chip in it keeps its whole pill. */
+  /* The identity's basis is its content and it never wraps: it shrinks
+   * only once the facts and the meta, whose basis is nothing, have none
+   * left to give, and then its title ends in an ellipsis. The width left
+   * over falls after it, so what follows it ends the row. It clips only
+   * along its line, so a chip in it keeps its whole pill. */
   .ds.entity-row .identity {
     display: flex;
-    flex-grow: 1;
+    flex-grow: 0;
     flex-shrink: 1;
-    flex-basis: 0;
+    flex-basis: auto;
     align-items: center;
     overflow-x: clip;
     min-width: 0;
+    margin-inline-end: auto;
     white-space: nowrap;
   }
 
@@ -109,9 +117,14 @@
     line-height: var(--entity-row-identifier-line-height);
   }
 
-  /* The meta stays on the row's line and clips at its end when the row
-   * is too narrow; the whole word stays in the text. */
+  /* The meta stays on the row's line. Its basis is nothing and it grows
+   * up to its content from the width the identity leaves, so it gives way
+   * before the title, ending in an ellipsis, down to nothing; the whole
+   * word stays in the text. */
   .ds.entity-row .meta {
+    flex-grow: 1;
+    flex-basis: 0;
+    max-width: max-content;
     color: var(--entity-row-meta-color);
     text-align: end;
     white-space: nowrap;
@@ -145,12 +158,22 @@
     text-overflow: ellipsis;
   }
 
+  /* The facts give way before the title as the meta does, one line of
+   * text that ends in an ellipsis. */
   .ds.entity-row .facts {
-    display: flex;
-    column-gap: var(--entity-row-gap);
+    display: block;
+    flex-grow: 1;
+    flex-basis: 0;
+    max-width: max-content;
     overflow-x: clip;
     min-width: 0;
     white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* A fact after the first stands the row's gap from the one before. */
+  .ds.entity-row .fact.is-later {
+    margin-inline-start: var(--entity-row-gap);
   }
 
   .ds.entity-row .term {
@@ -164,9 +187,17 @@
   }
 
   /* A two-line row: the summary is the only slot that leaves the first
-   * line. */
+   * line. A wrapping line is broken by its items' bases, so the identity's
+   * is nothing here and it takes the free width, up to its content, before
+   * the facts and the meta take any: the first line never breaks. */
   .ds.entity-row:has(> .summary) {
     flex-wrap: wrap;
+  }
+
+  .ds.entity-row:has(> .summary) > .identity {
+    flex-grow: var(--entity-row-identity-grow-weight);
+    flex-basis: 0;
+    max-width: max-content;
   }
 
   /* Below two groups the first line keeps the first fact alone. */

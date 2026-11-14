@@ -21,15 +21,29 @@
 # line never wraps, so a one-line row is 32px whatever its width, and the
 # summary is the only second line, rendered only when lines="two" (56px):
 # a row that holds one wraps (`:has(> .summary)`), and only it.
-# The identity is a flex line that takes the free width (flex 1 1 0) and
-# never wraps: the title gives way first and ends in an ellipsis, while
-# the mark, the prefix and the kind keep their widths. The facts, the
-# meta and the status follow it, so they end the row as one group. Below
-# two groups (the shell's container query at 912px) the facts after the
-# first leave, so the first line keeps its first fact alone. The meta
-# clips at its end when the row is too narrow; the whole word stays in
+# In a row the title yields last. The identity is a flex line whose basis
+# is its content (flex 0 1 auto) and which never wraps. The facts and the
+# meta have no basis: each grows up to its content (max-width:
+# max-content) from the width the identity leaves, so when the row is
+# narrow they give way first, ending in an ellipsis, down to nothing; only
+# then does the identity shrink, and its title ends in an ellipsis while
+# the mark, the prefix and the kind keep their widths. The status keeps its
+# width. The width left over is the identity's end margin (auto), so the
+# facts, the meta and the status end the row as one group. Below two
+# groups (the shell's container query at 912px) the facts after the first
+# leave, so the first line keeps its first fact alone. The facts are one
+# line of text (a block, so it can end in an ellipsis), a fact after the
+# first standing the gutter from the one before; the whole word stays in
 # the text. Everything clips along its line only, so a chip in the title
 # keeps its whole 28px pill and its line grows to hold it.
+#
+# A two-line row wraps, and a wrapping flex line is broken by its items'
+# bases: an identity with a content basis wider than the row less the
+# status would push the status onto a line of its own and the summary
+# onto a third. So in a two-line row (`:has(> .summary)`, a reflow) the
+# identity's basis is 0, it grows up to its content, and it takes the free
+# width a thousand times faster than the facts and the meta, which is the
+# same order of yielding: the first line holds every slot but the summary.
 #
 # The row may be narrower than its content (`size.min.width: 0`): as a
 # grid item or flex item its minimum would otherwise be its content's, so a
@@ -95,6 +109,13 @@
 #   label and value; grid.gutter between facts.
 #   @container shell (width < 912px)   below two groups: the facts after
 #                                      the first leave the line.
+#   --entity-row-identity-grow-weight: 1000   literal: in a two-line row
+#                                      the identity takes the free width
+#                                      before the facts and the meta (a
+#                                      number, read only by the reflow).
+#   layout.flex.basis auto and 0, layout.flex.grow 0 and 1,
+#   size.max.width max-content, spacing.external.inline.end auto:
+#   keywords and numbers of the yielding order.
 node:
   uri: prism.component.entity_row
   styles:
@@ -114,12 +135,13 @@ node:
         role: identity
         styles:
           layout.type: flex
-          layout.flex.grow: 1
+          layout.flex.grow: 0
           layout.flex.shrink: 1
-          layout.flex.basis: 0
+          layout.flex.basis: auto
           layout.align: center
           layout.overflow.inline: clip
           size.min.width: 0
+          spacing.external.inline.end: auto
           typography.whiteSpace: nowrap
         edges:
           - node:
@@ -187,11 +209,14 @@ node:
     - node:
         role: facts
         styles:
-          layout.type: flex
-          spacing.gap.inline: grid.gutter
+          layout.type: block
+          layout.flex.grow: 1
+          layout.flex.basis: 0
+          size.max.width: max-content
           layout.overflow.inline: clip
           size.min.width: 0
           typography.whiteSpace: nowrap
+          typography.overflow: ellipsis
         edges:
           - switch:
               on: internal
@@ -214,11 +239,16 @@ node:
                 - node:
                     role: later fact (.is-later)
                     attributes: { data-property: "{property}" }
+                    styles:
+                      spacing.external.inline.start: grid.gutter
             relation: { cardinality: "1..*", slotName: fact }
       relation: { cardinality: "0..1", slotName: facts }
     - node:
         role: meta
         styles:
+          layout.flex.grow: 1
+          layout.flex.basis: 0
+          size.max.width: max-content
           typography.color: color.text.muted
           typography.align: end
           typography.whiteSpace: nowrap

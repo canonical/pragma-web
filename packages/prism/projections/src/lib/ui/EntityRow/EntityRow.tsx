@@ -10,8 +10,10 @@ const componentCssClassName = "ds entity-row";
  * The list entry of an entity: one 32px row of an index, its mark,
  * namespace prefix and title on the left and its facts, meta and status
  * ending the row. Its height comes from `lines` alone: the first line
- * never wraps, so a title longer than its line ends in an ellipsis, and
- * below two groups only the first fact stays on it.
+ * never wraps, and below two groups only the first fact stays on it. The
+ * title yields last: the facts and the meta give way first, ending in an
+ * ellipsis, down to nothing, the status keeps its width, and only then
+ * does a title longer than what is left end in an ellipsis.
  * With an `href` the title links to the entity's home through
  * `LinkComponent`; without one it is inert text.
  *
