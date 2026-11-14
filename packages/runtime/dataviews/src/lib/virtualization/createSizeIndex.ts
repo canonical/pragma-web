@@ -46,6 +46,10 @@ export default function createSizeIndex(sizes: readonly number[]): SizeIndex {
       }
     },
     offset(position) {
+      // Past either end there is no entry to start: a broken caller.
+      if (!Number.isInteger(position) || position < 0 || position > count) {
+        throw new RangeError(`no offset at position ${position} of ${count}`);
+      }
       let sum = 0;
       for (let node = position; node > 0; node -= node & -node) {
         sum += tree[node] as number;

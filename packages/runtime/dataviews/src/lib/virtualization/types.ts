@@ -112,7 +112,7 @@ export type SizeIndex = {
   /**
    * The summed size of every entry before one position: where it starts.
    * At the sequence's length, the whole: read from the same tree, so it
-   * never drifts from the offsets beside it.
+   * never drifts from the offsets beside it. Throws outside `0..length`.
    */
   readonly offset: (position: number) => number;
   /**
