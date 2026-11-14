@@ -7,6 +7,7 @@ import {
   greetingCatalogs,
   localeConfig,
 } from "../../../../testing/fixtures.js";
+import type { UseProviderStateProps } from "./types.js";
 import useProviderState from "./useProviderState.js";
 
 const base = { config: localeConfig, catalogs: emptyCatalogs };
@@ -36,6 +37,24 @@ describe("useProviderState", () => {
     expect(document.documentElement.dir).toBe("rtl");
   });
 
+  it("creates its own source on the first render without an external one", () => {
+    const source = createLocaleSource(localeConfig, {
+      persist: false,
+      initial: "ar",
+    });
+    const initialProps: UseProviderStateProps = { ...base, source };
+    const { result, rerender } = renderHook(
+      (props: UseProviderStateProps) => useProviderState(props),
+      { initialProps },
+    );
+    expect(document.documentElement.lang).toBe("ar");
+    rerender({ ...base, locale: "fr" });
+    expect(result.current.source).not.toBe(source);
+    expect(result.current.source.get()).toBe("fr");
+    expect(document.documentElement.lang).toBe("fr");
+    expect(document.documentElement.dir).toBe("ltr");
+  });
+
   it("uses an external source when one is given", () => {
     const source = createLocaleSource(localeConfig, {
       ...effectsOff,
@@ -43,6 +62,17 @@ describe("useProviderState", () => {
     });
     const { result } = renderHook(() => useProviderState({ ...base, source }));
     expect(result.current.source).toBe(source);
+  });
+
+  it("leaves the document as an external source reflected it", () => {
+    const source = createLocaleSource(localeConfig, {
+      persist: false,
+      initial: "ar",
+    });
+    expect(document.documentElement.lang).toBe("ar");
+    renderHook(() => useProviderState({ ...base, source }));
+    expect(document.documentElement.lang).toBe("ar");
+    expect(document.documentElement.dir).toBe("rtl");
   });
 
   it("passes on the catalogs it is given", () => {
