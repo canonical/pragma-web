@@ -11,13 +11,13 @@
 # Names — one per part, the same in the design, the DOM and here:
 #   pagination bar  design "Table pagination"   graph "DataTable.PaginationBar"
 #                                         DOM `ds data-table-pagination-bar`
-#   leading group   design "Frame 1062"   DOM `.leading`
+#   sizing group    design "Frame 1062"   DOM `.sizing`
 #   page size       design "Items per page:" + "Pagination dropdown"
 #                                         DOM `.page-size`, a GET form
 #   divider         design "Rectangle 1"  DOM `.divider`
 #   result summary  design "Table pagination item indicator"
 #                                         DOM `.summary`
-#   trailing group  design "Frame 1067"   DOM `.trailing`
+#   paging group    design "Frame 1067"   DOM `.paging`
 #   page control    design "Pagination dropdown" + "Total page amount wrapper"
 #                                         DOM `.page`, a GET form
 #   submit          —                     DOM `.submit`, one per form
@@ -174,7 +174,7 @@ node:
     appearance.border.top.color: color/border/muted
   edges:
     - node:
-        role: leading group
+        role: sizing group
         styles:
           layout.type: stack
           layout.direction: row
@@ -215,7 +215,7 @@ node:
       relation:
         cardinality: "1"
     - node:
-        role: trailing group
+        role: paging group
         styles:
           layout.type: stack
           layout.direction: row

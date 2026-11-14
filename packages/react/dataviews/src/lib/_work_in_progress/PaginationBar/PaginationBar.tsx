@@ -186,7 +186,7 @@ export default function PaginationBar<
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-hydrated={hydrated ? "" : undefined}
     >
-      <div className="leading">
+      <div className="sizing">
         <form method="get" className="page-size" onSubmit={interceptSubmit}>
           <label htmlFor={sizeId}>{messages.rowsPerPage}</label>
           <SelectInput
@@ -220,7 +220,7 @@ export default function PaginationBar<
           {describeSummary(facts, messages)}
         </span>
       </div>
-      <div className="trailing">
+      <div className="paging">
         <form method="get" className="page" onSubmit={interceptSubmit}>
           <SelectInput
             ref={pageSelect}

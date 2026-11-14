@@ -87,6 +87,10 @@ The summary is a polite status. It names the rows on screen — "Showing 6–10 
 
 With a location, every page the bar can reach is a link the provider's encoder spelled, carrying the whole query and the location's other parameters, so paging works before any script runs and a page opens in a new tab like any other link. Pass your router's `Link` as `LinkComponent` and the links render through it, against the design system's shared link contract; the router navigates, and the provider hears the move through its location port. The page size and the page select each sit in a GET form beside hidden controls carrying the rest of the query, with a submit control that is hidden once the page hydrates. Once scripting is enabled, a plain click or a submission moves the window in place through the provider instead of navigating; a modified click is left to the browser. Without a location there is no destination a link could lead to, and the page controls are buttons only the enhancement drives, hidden until it runs.
 
+## Regions
+
+The bar holds two regions, named by what they do: `.sizing` holds the page size and the summary, and `.paging` holds the page select and the page controls.
+
 ## Sticky at the bottom
 
 The bar holds to the bottom edge of whatever scrolls it and paints the surface it sits on, so the rows scrolling beneath it never show through. A sticky element cannot leave its parent's box, so make the bar a direct child of the scrolling container, beside the table — not the only child of a wrapper its own height.

@@ -87,51 +87,51 @@
     --form-input-background: var(--color-foreground-ghost);
     --form-input-border-color: transparent;
 
-    & > .leading,
-    & > .trailing {
+    & > .sizing,
+    & > .paging {
       display: flex;
       align-items: center;
       gap: var(--data-table-pagination-bar-gap);
     }
 
-    & > .leading > .page-size,
-    & > .trailing > .page {
+    & > .sizing > .page-size,
+    & > .paging > .page {
       display: flex;
       align-items: center;
       gap: var(--data-table-pagination-bar-gap-control);
       white-space: nowrap;
     }
 
-    & > .trailing > .page {
+    & > .paging > .page {
       padding-inline-end: var(--data-table-pagination-bar-inset-inline);
     }
 
-    & > .leading > .summary {
+    & > .sizing > .summary {
       padding-inline-start: var(--data-table-pagination-bar-inset-inline);
       white-space: nowrap;
     }
 
-    & > .leading > .divider,
-    & > .trailing > .divider {
+    & > .sizing > .divider,
+    & > .paging > .divider {
       inline-size: var(--data-table-pagination-bar-divider-inline-size);
       block-size: var(--data-table-pagination-bar-divider-block-size);
       background-color: var(--data-table-pagination-bar-divider-color);
     }
 
     /* The input chrome fills its container; in a bar it takes its content. */
-    & > .leading > .page-size > .ds.input.select,
-    & > .trailing > .page > .ds.input.select {
+    & > .sizing > .page-size > .ds.input.select,
+    & > .paging > .page > .ds.input.select {
       inline-size: auto;
     }
 
-    & > .trailing > .navigation {
+    & > .paging > .navigation {
       display: flex;
       align-items: center;
     }
 
     /* Icon-only Buttons collapse without a label. Each is held to a square
        one row tall, its icon centred and its side padding equal. */
-    & > .trailing > .navigation > .ds.button {
+    & > .paging > .navigation > .ds.button {
       --button-padding-inline-end: var(
         --data-table-pagination-bar-control-padding-inline-end
       );
@@ -145,29 +145,29 @@
        turned towards the edge the control goes to. The icon slot is the
        control's own child, so the turn reaches it without descending into
        the Icon. */
-    & > .trailing > .navigation > .first > .icon {
+    & > .paging > .navigation > .first > .icon {
       rotate: -90deg;
     }
 
-    & > .trailing > .navigation > .last > .icon {
+    & > .paging > .navigation > .last > .icon {
       rotate: 90deg;
     }
 
     /* A control only the enhancement can drive waits for scripting; the
        baseline's submit controls leave only once the page has hydrated, so
        a page whose script never runs keeps a way to page. */
-    & > .trailing > .navigation > .scripted {
+    & > .paging > .navigation > .scripted {
       display: none;
     }
 
     @media (scripting: enabled) {
-      & > .trailing > .navigation > .scripted {
+      & > .paging > .navigation > .scripted {
         display: inline-flex;
       }
     }
 
-    &[data-hydrated] > .leading > .page-size > .submit,
-    &[data-hydrated] > .trailing > .page > .submit {
+    &[data-hydrated] > .sizing > .page-size > .submit,
+    &[data-hydrated] > .paging > .page > .submit {
       display: none;
     }
   }
