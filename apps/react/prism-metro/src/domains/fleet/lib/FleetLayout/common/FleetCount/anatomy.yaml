@@ -8,8 +8,6 @@
 # Token ledger: none.
 node:
   uri: metro.subcomponent.fleet_count
-  projection:
-    on: Query
   edges:
     - node:
         uri: prism.component.count_line

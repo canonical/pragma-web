@@ -1,5 +1,5 @@
-import type { FleetIndexQuery$data } from "#relay/__generated__/FleetIndexQuery.graphql.js";
 import type { GraphQLTaggedNode, OperationType } from "relay-runtime";
+import type { FleetIndexQuery$data } from "#relay/__generated__/FleetIndexQuery.graphql.js";
 
 /** An operation that reads one node by its absolute IRI, as `id`. */
 export interface FleetNodeOperation extends OperationType {

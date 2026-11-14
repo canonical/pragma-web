@@ -27,7 +27,10 @@ describe("NetworkStationPage", () => {
       <RenderersProvider
         defaults={{
           list: [],
-          page: [PROBE, { name: "turtle", label: "Turtle", render: () => null }],
+          page: [
+            PROBE,
+            { name: "turtle", label: "Turtle", render: () => null },
+          ],
         }}
         extensions={[]}
       >

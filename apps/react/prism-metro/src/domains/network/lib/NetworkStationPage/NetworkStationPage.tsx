@@ -74,21 +74,21 @@ const StationMain = ({
           station.routes.length === 0 ? (
             <section className="status">
               <p>{t("network.station.unrouted", { title: station.title })}</p>
-        <p>
-          <a
-            href={router.buildPath("stationsEntity", {
-              params: { uri: station.curie },
-            })}
-          >
-            {t("network.station.unrouted.link")}
-          </a>
-        </p>
-        <p>
-          <a href={router.buildPath("network")}>
-            {t("network.station.unrouted.map")}
-          </a>
-        </p>
-      </section>
+              <p>
+                <a
+                  href={router.buildPath("stationsEntity", {
+                    params: { uri: station.curie },
+                  })}
+                >
+                  {t("network.station.unrouted.link")}
+                </a>
+              </p>
+              <p>
+                <a href={router.buildPath("network")}>
+                  {t("network.station.unrouted.map")}
+                </a>
+              </p>
+            </section>
           ) : (
             <StationPanel station={station} />
           ),

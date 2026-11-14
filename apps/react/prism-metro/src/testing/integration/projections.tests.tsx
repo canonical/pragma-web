@@ -62,7 +62,9 @@ const readPairs = (card: Element): (string | null)[][] =>
 const readVitals = (card: Element): (string | null)[] =>
   [...card.querySelectorAll(".vital")].map((vital) => vital.textContent);
 
-describe("the stations lens's cards", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
+describe("the stations lens's cards", {
+  timeout: LENS_PAGE_TEST_TIMEOUT_MS,
+}, () => {
   it("card every station as a station and every interchange as one", async () => {
     const { container } = renderLensPage("/stations?as=cards", graph.url);
     await waitFor(() => {
@@ -86,7 +88,9 @@ describe("the stations lens's cards", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, ()
   });
 });
 
-describe("the lines lens's rows", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
+describe("the lines lens's rows", {
+  timeout: LENS_PAGE_TEST_TIMEOUT_MS,
+}, () => {
   it("row every line as a line, each ending in its stops", async () => {
     const { container } = renderLensPage("/lines", graph.url);
     await waitFor(() => {

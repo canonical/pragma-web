@@ -61,7 +61,8 @@ export const fleetRoutes = {
     content: ({ params }: NodeRouteProps): ReactElement => (
       <FormationPage address={readUriParam(params)} />
     ),
-    warm: (params, search) => warmFleetNode(formationPageQueryNode, params, search),
+    warm: (params, search) =>
+      warmFleetNode(formationPageQueryNode, params, search),
   }),
   fleetUnit: route({
     url: "/fleet/units/:uri",
@@ -77,6 +78,7 @@ export const fleetRoutes = {
     content: ({ params }: NodeRouteProps): ReactElement => (
       <CarTypePage address={readUriParam(params)} />
     ),
-    warm: (params, search) => warmFleetNode(carTypePageQueryNode, params, search),
+    warm: (params, search) =>
+      warmFleetNode(carTypePageQueryNode, params, search),
   }),
 } as const;
