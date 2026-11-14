@@ -131,4 +131,54 @@
       outline-offset: var(--query-chip-ring-offset, var(--dimension-025));
     }
   }
+
+  /* Joined: the body's fill is the line between the parts, 1 px wide, and
+     the chip is one target for hover, selection and fault. */
+  .ds.query-chip.joined {
+    /* No symbol declares the reference design's line colour, or the 26 px
+       height. */
+    & > .body {
+      gap: var(
+        --query-chip-joined-gap,
+        var(--dimension-stroke-thickness-medium)
+      );
+      min-block-size: var(--query-chip-joined-min-height, 1.625rem);
+      border-width: var(
+        --query-chip-joined-border-width,
+        var(--dimension-stroke-thickness-medium)
+      );
+      border-color: var(--query-chip-line-color, #c5c5c5);
+      background: var(--query-chip-line-color, #c5c5c5);
+    }
+
+    /* Hover never hides a fault: the chip shows it as one target. */
+    & > .body:not(:has(> [data-invalid])):has(> button:enabled:hover) {
+      --query-chip-segment-state-background: var(
+        --query-chip-segment-background-hover,
+        var(--color-foreground-secondary-hover)
+      );
+    }
+
+    /* A fault wins over the selected fill, focused or not. */
+    & > .body:has(> [data-invalid]),
+    & > .body:focus-within:has(> [data-invalid]) {
+      --query-chip-segment-state-background: var(
+        --query-chip-segment-background-invalid,
+        var(--color-foreground-secondary-error)
+      );
+      --query-chip-segment-state-text: var(
+        --query-chip-segment-text-invalid,
+        var(--color-text-onForegroundSecondary-error)
+      );
+
+      border-color: var(
+        --query-chip-line-color-invalid,
+        var(--color-border-error)
+      );
+      background: var(
+        --query-chip-line-color-invalid,
+        var(--color-border-error)
+      );
+    }
+  }
 }
