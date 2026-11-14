@@ -16,7 +16,7 @@ type Story = StoryObj<typeof Component>;
 /** The explorer: the lens alone. */
 export const Explorer: Story = { decorators: [withLens()] };
 
-/** A term view: the lens, then the term. */
+/** A term view: the trail ends at the lens, linked back to the explorer. */
 export const Term: Story = {
   decorators: [withLens({ url: "/definitions/ds%3AUIBlock" })],
 };

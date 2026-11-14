@@ -11,9 +11,10 @@ const LensContext = makeLensContext({
 
 /**
  * The strip's `context` tenant: the breadcrumb trail. `Definitions` on the
- * explorer, `Definitions / <term>` on a term view. The term crumb is the
- * `:term` route param (the prefixed URI), read off the URL, so the trail reads
- * no query and needs no `SocketGuard`.
+ * explorer; on a term view the trail ends at the parent, `Definitions`
+ * linked back to the explorer, since the term's prefixed URI is not a name.
+ * It reads the URL alone, so the trail reads no query and needs no
+ * `SocketGuard`.
  *
  * `import { Trail } from "./common/Trail/index.js";`
  *
