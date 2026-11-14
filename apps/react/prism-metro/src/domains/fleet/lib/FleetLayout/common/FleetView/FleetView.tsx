@@ -3,18 +3,21 @@
 import { RendererSwitch, useRenderers } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { FLEET_RENDERERS } from "../../../../constants.js";
+import type { FleetViewProps } from "./types.js";
 
 /**
- * The strip's view tenant on the fleet's index: its renderers, the table
- * and the cards, as core's switch of links, the one the address names
- * current.
+ * The strip's view tenant on the fleet's pages: the renderers of the kind
+ * it is given, the index's table and cards or a node page's page and
+ * Turtle, as core's switch of links, the one the address names current.
  *
  * `import { FleetView } from "./common/index.js";`
  *
  * @implements metro.subcomponent.fleet_view
  * @note Impure: reads the site's renderers and the address.
  */
-export default function FleetView(): ReactElement {
-  const { offered, active } = useRenderers("list", FLEET_RENDERERS.list);
+export default function FleetView({ kind }: FleetViewProps): ReactElement {
+  const list = useRenderers("list", FLEET_RENDERERS.list);
+  const page = useRenderers("page", FLEET_RENDERERS.page);
+  const { offered, active } = kind === "list" ? list : page;
   return <RendererSwitch active={active.name} renderers={offered} />;
 }

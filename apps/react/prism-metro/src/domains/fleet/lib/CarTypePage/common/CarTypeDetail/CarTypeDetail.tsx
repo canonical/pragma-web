@@ -1,9 +1,13 @@
+import { useRenderers } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
 import type { CarTypePageQuery } from "#relay/__generated__/CarTypePageQuery.graphql.js";
 import carTypePageQueryNode from "#relay/__generated__/CarTypePageQuery.graphql.js";
-import { REFERENCE_TRAIN_LENGTH } from "../../../../constants.js";
+import {
+  FLEET_RENDERERS,
+  REFERENCE_TRAIN_LENGTH,
+} from "../../../../constants.js";
 import { useFleetNode } from "../../../../hooks/index.js";
 import { FormationSideView } from "../../../FormationSideView/index.js";
 import findScaleLength from "../../../findScaleLength.js";
@@ -15,11 +19,17 @@ import type { CarTypeDetailProps } from "./types.js";
  * side view, the car drawn alone against a long train's length, its cab
  * at the front when it has one. An address naming no car type says
  * nothing lives there.
+ *
+ * Under its title the page renders through the active page renderer:
+ * these sections for the page, or the node's Turtle source for `as=turtle`.
+ *
+ * @note Impure: reads the Relay store, the translator and the address.
  */
 export default function CarTypeDetail({
   address,
 }: CarTypeDetailProps): ReactElement {
   const t = useMessages();
+  const { active } = useRenderers("page", FLEET_RENDERERS.page);
   const { node } = useFleetNode<CarTypePageQuery>({
     query: carTypePageQueryNode,
     address,
@@ -46,11 +56,19 @@ export default function CarTypeDetail({
     <>
       <Head title={node._meta.title} />
       <h1 className="title">{node._meta.title}</h1>
-      <FormationSideView
-        cars={orientCars([{ reversed: false, cars: [car] }])}
-        className="side-view"
-        scale={findScaleLength([REFERENCE_TRAIN_LENGTH, car.length])}
-      />
+      {active.render({
+        uri: node.uri,
+        title: node._meta.title,
+        children: (
+          <>
+            <FormationSideView
+              cars={orientCars([{ reversed: false, cars: [car] }])}
+              className="side-view"
+              scale={findScaleLength([REFERENCE_TRAIN_LENGTH, car.length])}
+            />
+          </>
+        ),
+      })}
     </>
   );
 }

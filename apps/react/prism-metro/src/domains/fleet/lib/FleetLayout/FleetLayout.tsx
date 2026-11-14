@@ -40,8 +40,8 @@ function selectFacts(
 
 /**
  * The fleet lens's layout, on the document archetype: the metro rail, the
- * fleet trail and, on the index, its renderers (the table and the cards) in
- * the mode strip, the routed page in the canvas and, on a
+ * fleet trail and the page's renderers (the index's table and cards, a
+ * node page's page and Turtle) in the mode strip, the routed page in the canvas and, on a
  * node's page, its facts in the aside, the canvas's last three columns.
  * The strip's rule bleeds one gutter west, so it meets the rail's border.
  *
@@ -68,8 +68,10 @@ const FleetLayout = ({
         <ModeStrip
           trail={<FleetTrail lensLabel={t("lens.fleet")} />}
           view={
-            match?.kind === "route" && match.name === FLEET_ROUTES.index ? (
-              <FleetView />
+            match?.kind === "route" ? (
+              <FleetView
+                kind={match.name === FLEET_ROUTES.index ? "list" : "page"}
+              />
             ) : null
           }
         />

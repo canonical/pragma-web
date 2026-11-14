@@ -7,7 +7,7 @@ import FleetView from "./FleetView.js";
 
 describe("FleetView", () => {
   it("offers the fleet's table and cards, the address's current", () => {
-    renderWithSite(<FleetView />, "/fleet?as=cards");
+    renderWithSite(<FleetView kind="list" />, "/fleet?as=cards");
     const tabs = within(screen.getByRole("navigation", { name: "Show as" }));
     expect(tabs.getByRole("link", { name: "Cards" })).toHaveAttribute(
       "aria-current",
@@ -16,6 +16,22 @@ describe("FleetView", () => {
     expect(tabs.getByRole("link", { name: "Table" })).toHaveAttribute(
       "href",
       "/fleet",
+    );
+  });
+
+  it("offers a node page's page and Turtle, the address's current", () => {
+    renderWithSite(
+      <FleetView kind="page" />,
+      "/fleet/metro%3Aseries-70?as=turtle",
+    );
+    const tabs = within(screen.getByRole("navigation", { name: "Show as" }));
+    expect(tabs.getByRole("link", { name: "Turtle" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(tabs.getByRole("link", { name: "Page" })).toHaveAttribute(
+      "href",
+      "/fleet/metro%3Aseries-70",
     );
   });
 });

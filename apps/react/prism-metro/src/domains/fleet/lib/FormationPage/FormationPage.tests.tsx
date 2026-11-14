@@ -2,11 +2,11 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { render, screen, within } from "@testing-library/react";
-import { RelayEnvironmentProvider } from "react-relay";
+import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SERIES_90_SIX_CAR_CURIE } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
+import renderWithSite from "../../../../../testing/renderWithSite.js";
 import FormationPage from "./FormationPage.js";
 
 afterEach(() => {
@@ -18,14 +18,10 @@ const url = `/fleet/formations/${encodeURIComponent(SERIES_90_SIX_CAR_CURIE)}`;
 
 /** Render the page alone, over an environment answering with `response`. */
 const renderWithAnswer = (response: Promise<unknown>) =>
-  render(
-    <RelayEnvironmentProvider
-      environment={createEnvironment({
-        fetchFn: vi.fn().mockReturnValue(response),
-      })}
-    >
-      <FormationPage address={SERIES_90_SIX_CAR_CURIE} />
-    </RelayEnvironmentProvider>,
+  renderWithSite(
+    <FormationPage address={SERIES_90_SIX_CAR_CURIE} />,
+    "/fleet",
+    createEnvironment({ fetchFn: vi.fn().mockReturnValue(response) }),
   );
 
 describe("FormationPage", () => {

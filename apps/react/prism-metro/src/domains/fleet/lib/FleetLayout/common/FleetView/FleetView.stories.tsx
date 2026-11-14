@@ -17,5 +17,11 @@ const meta: Meta<typeof FleetView> = {
 export default meta;
 type Story = StoryObj<typeof FleetView>;
 
-/** The fleet's renderers: the table and the cards. */
-export const Default: Story = {};
+/** The index's renderers: the table and the cards. */
+export const Default: Story = { args: { kind: "list" } };
+
+/** A node page's renderers: the page and its Turtle source. */
+export const Page: Story = {
+  args: { kind: "page" },
+  decorators: [withRouter({ url: "/fleet/metro%3Aseries-70" })],
+};

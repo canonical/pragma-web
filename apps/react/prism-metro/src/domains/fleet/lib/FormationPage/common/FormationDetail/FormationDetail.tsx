@@ -1,9 +1,11 @@
+import { useRenderers } from "@canonical/prism-core";
 import { ChipProjection } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useId } from "react";
 import { useMessages } from "#i18n";
 import type { FormationPageQuery } from "#relay/__generated__/FormationPageQuery.graphql.js";
 import formationPageQueryNode from "#relay/__generated__/FormationPageQuery.graphql.js";
+import { FLEET_RENDERERS } from "../../../../constants.js";
 import { useFleetNode } from "../../../../hooks/index.js";
 import assertFragment from "../../../assertFragment.js";
 import { FormationSideView } from "../../../FormationSideView/index.js";
@@ -21,11 +23,17 @@ import type { FormationDetailProps } from "./types.js";
  * units in order, each by its place and its chip, then its fit at the platforms of
  * every line it runs on, each line named by its chip. An address
  * naming no formation says nothing lives there.
+ *
+ * Under its title the page renders through the active page renderer:
+ * these sections for the page, or the node's Turtle source for `as=turtle`.
+ *
+ * @note Impure: reads the Relay store, the translator and the address.
  */
 export default function FormationDetail({
   address,
 }: FormationDetailProps): ReactElement {
   const t = useMessages();
+  const { active } = useRenderers("page", FLEET_RENDERERS.page);
   const unitsId = useId();
   const fitId = useId();
   const { node } = useFleetNode<FormationPageQuery>({
@@ -58,46 +66,60 @@ export default function FormationDetail({
     <>
       <Head title={node._meta.title} />
       <h1 className="title">{node._meta.title}</h1>
-      <p className="entry">
-        <ChipProjection node={node.stock} />
-      </p>
-      <FormationSideView
-        cars={orientCars(
-          readFormationTrain(
-            assertFragment(
-              node.readFormationTrain_formation,
-              "readFormationTrain_formation",
-            ),
-          ),
-        )}
-        className="side-view"
-        fits={fits}
-      />
-      <section aria-labelledby={unitsId} className="section">
-        <h2 id={unitsId}>{t("fleet.units")}</h2>
-        <ol className="list">
-          {units.map(({ position, reversed, unit }) => (
-            <li className="entry" key={position}>
-              <span className="vital">{t("fleet.unit", { position })}</span>
-              <ChipProjection node={unit} />
-              <span className="vital">{formatLength(unit.length)}</span>
-              {reversed ? (
-                <span className="vital">{t("fleet.reversed")}</span>
-              ) : null}
-            </li>
-          ))}
-        </ol>
-      </section>
-      <section aria-labelledby={fitId} className="section">
-        <h2 id={fitId}>{t("fleet.platformFit")}</h2>
-        <PlatformFit
-          fits={fits}
-          renderName={({ code, title }) => {
-            const line = lines.get(code);
-            return line === undefined ? title : <ChipProjection node={line} />;
-          }}
-        />
-      </section>
+      {active.render({
+        uri: node.uri,
+        title: node._meta.title,
+        children: (
+          <>
+            <p className="entry">
+              <ChipProjection node={node.stock} />
+            </p>
+            <FormationSideView
+              cars={orientCars(
+                readFormationTrain(
+                  assertFragment(
+                    node.readFormationTrain_formation,
+                    "readFormationTrain_formation",
+                  ),
+                ),
+              )}
+              className="side-view"
+              fits={fits}
+            />
+            <section aria-labelledby={unitsId} className="section">
+              <h2 id={unitsId}>{t("fleet.units")}</h2>
+              <ol className="list">
+                {units.map(({ position, reversed, unit }) => (
+                  <li className="entry" key={position}>
+                    <span className="vital">
+                      {t("fleet.unit", { position })}
+                    </span>
+                    <ChipProjection node={unit} />
+                    <span className="vital">{formatLength(unit.length)}</span>
+                    {reversed ? (
+                      <span className="vital">{t("fleet.reversed")}</span>
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
+            </section>
+            <section aria-labelledby={fitId} className="section">
+              <h2 id={fitId}>{t("fleet.platformFit")}</h2>
+              <PlatformFit
+                fits={fits}
+                renderName={({ code, title }) => {
+                  const line = lines.get(code);
+                  return line === undefined ? (
+                    title
+                  ) : (
+                    <ChipProjection node={line} />
+                  );
+                }}
+              />
+            </section>
+          </>
+        ),
+      })}
     </>
   );
 }

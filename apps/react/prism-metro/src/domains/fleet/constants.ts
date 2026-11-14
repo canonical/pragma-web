@@ -64,11 +64,12 @@ export const COUNT_FORMAT = new Intl.NumberFormat(LOCALE);
 /**
  * The renderers the fleet's pages offer over the site's defaults: the index
  * as a table, the default, or as cards, whose sidecars draw each stock's
- * formations; a node's page as the page.
+ * formations; a node's page as the page, the default, or as its Turtle
+ * source while the site's provider serves `source`.
  */
 export const FLEET_RENDERERS: LensRenderers = {
   list: ["table", "cards"],
-  page: ["page"],
+  page: ["page", "turtle"],
 };
 
 // The side view's drawing constants, in the drawing's own space: whole

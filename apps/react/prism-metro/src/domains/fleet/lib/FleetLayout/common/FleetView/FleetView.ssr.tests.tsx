@@ -17,10 +17,25 @@ describe("FleetView SSR", () => {
         })}
       >
         <SiteRenderers>
-          <FleetView />
+          <FleetView kind="list" />
         </SiteRenderers>
       </RouterProvider>,
     );
     expect(html).toContain('href="/fleet?as=cards"');
+  });
+
+  it("renders a node page's renderers as anchors on the server", () => {
+    const html = renderToString(
+      <RouterProvider
+        router={createRouter(appRoutes, {
+          adapter: createMemoryAdapter("/fleet/metro%3Aseries-70"),
+        })}
+      >
+        <SiteRenderers>
+          <FleetView kind="page" />
+        </SiteRenderers>
+      </RouterProvider>,
+    );
+    expect(html).toContain('href="/fleet/metro%3Aseries-70?as=turtle"');
   });
 });

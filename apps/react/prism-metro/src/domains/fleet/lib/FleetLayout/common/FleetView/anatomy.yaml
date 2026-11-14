@@ -1,7 +1,8 @@
 ---
-# FleetView — the strip's view tenant on the fleet's index: its renderers
-# (the table and the cards) as core's renderer switch, whose own anatomy
-# owns the markup, so it binds no style.
+# FleetView — the strip's view tenant on the fleet's pages: the index's
+# renderers (the table and the cards) or a node page's (the page and its
+# Turtle) as core's renderer switch, whose own anatomy owns the markup, so
+# it binds no style.
 node:
   uri: metro.subcomponent.fleet_view
   edges:

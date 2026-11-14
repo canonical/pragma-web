@@ -2,11 +2,11 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { render, screen, within } from "@testing-library/react";
-import { RelayEnvironmentProvider } from "react-relay";
+import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SERIES_90_UNIT_CURIE } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
+import renderWithSite from "../../../../../testing/renderWithSite.js";
 import UnitPage from "./UnitPage.js";
 
 afterEach(() => {
@@ -18,14 +18,10 @@ const url = `/fleet/units/${encodeURIComponent(SERIES_90_UNIT_CURIE)}`;
 
 /** Render the page alone, over an environment answering with `response`. */
 const renderWithAnswer = (response: Promise<unknown>) =>
-  render(
-    <RelayEnvironmentProvider
-      environment={createEnvironment({
-        fetchFn: vi.fn().mockReturnValue(response),
-      })}
-    >
-      <UnitPage address={SERIES_90_UNIT_CURIE} />
-    </RelayEnvironmentProvider>,
+  renderWithSite(
+    <UnitPage address={SERIES_90_UNIT_CURIE} />,
+    "/fleet",
+    createEnvironment({ fetchFn: vi.fn().mockReturnValue(response) }),
   );
 
 describe("UnitPage", () => {

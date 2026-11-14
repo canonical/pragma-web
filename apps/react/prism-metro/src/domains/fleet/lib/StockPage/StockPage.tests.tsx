@@ -2,11 +2,11 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { render, screen, waitFor, within } from "@testing-library/react";
-import { RelayEnvironmentProvider } from "react-relay";
+import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SERIES_90_CURIE } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
+import renderWithSite from "../../../../../testing/renderWithSite.js";
 import StockPage from "./StockPage.js";
 
 afterEach(() => {
@@ -18,14 +18,10 @@ const url = `/fleet/${encodeURIComponent(SERIES_90_CURIE)}`;
 
 /** Render the page alone, over an environment answering with `response`. */
 const renderWithAnswer = (response: Promise<unknown>) =>
-  render(
-    <RelayEnvironmentProvider
-      environment={createEnvironment({
-        fetchFn: vi.fn().mockReturnValue(response),
-      })}
-    >
-      <StockPage address={SERIES_90_CURIE} />
-    </RelayEnvironmentProvider>,
+  renderWithSite(
+    <StockPage address={SERIES_90_CURIE} />,
+    "/fleet",
+    createEnvironment({ fetchFn: vi.fn().mockReturnValue(response) }),
   );
 
 describe("StockPage", () => {
@@ -78,6 +74,19 @@ describe("StockPage", () => {
     await within(facts).findByText("Formations");
     expect(facts).toHaveTextContent("107.2 m");
     expect(facts).not.toHaveTextContent(" to ");
+  });
+
+  it("draws its Turtle source in place of its sections at as=turtle", async () => {
+    renderMetroPage(`${url}?as=turtle`);
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Series 90" }),
+    ).toBeInTheDocument();
+    const source = await screen.findByRole("figure");
+    await waitFor(() => expect(source).toHaveTextContent("@prefix"));
+    expect(source).toHaveTextContent("Series 90");
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Formations" }),
+    ).not.toBeInTheDocument();
   });
 
   it("says nothing of its type lives at an address that names none", async () => {
