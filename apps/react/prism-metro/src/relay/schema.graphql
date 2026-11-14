@@ -40,6 +40,20 @@
 #     .completionGuidance. Annotation-derived, provider-specific — extensions,
 #     not base.
 #
+# The type lens IS in the contract: how prominently a class, a property or a
+# class's field is shown (TermVisibility), the role a field's values play
+# (PropertyRole), the sections a class's fields fall into (PropertyGroup), a
+# class's glyph, and the plural and inverse labels. Every lens field is
+# nullable, so a provider whose ontology declares no lens answers null and
+# still conforms. The fields and their descriptions are the ones a
+# ke-graphql that reads the type lens emits on its TBox types, so the lens
+# has one shape across the compiler, this contract and every provider.
+#
+# `Query.classEdges` IS in the contract too: the edges between classes, each
+# weighed by the instance statements it covers. No compiler emits it; a
+# provider computes it from its store and its declarations, which is why it is
+# a root field and not a TBox field.
+#
 # EntityMeta IS in the contract: `Node` selects it through `_meta`, and the
 # compiler puts `_meta: EntityMeta!` on every generated type, so no provider
 # can omit the type.
@@ -145,6 +159,21 @@ type OntologyClass implements Node {
   instanceCount: Int!
   isAbstract: Boolean!
   namespace: String!
+
+  """
+  prism:visibility of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  visibility: TermVisibility
+
+  """
+  prism:glyph of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  glyph: String
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); never inherited; null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
 }
 
 """
@@ -170,6 +199,26 @@ type ClassProperty {
   required: Boolean!
   singular: Boolean!
   inherited: Boolean!
+
+  """
+  sh:group of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  group: PropertyGroup
+
+  """
+  sh:order of the lens shape targeting this class, else of its nearest ancestor's that declares one, ascending; null when none does.
+  """
+  order: Float
+
+  """
+  shui:propertyRole of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  role: PropertyRole
+
+  """
+  prism:visibility on this class: the lens shape's, else the property's own; null when neither declares one.
+  """
+  visibility: TermVisibility
 }
 
 "A property in the TBox. Not a Node — it has identity but no `_meta`."
@@ -183,6 +232,31 @@ type OntologyProperty {
   functional: Boolean!
   inverse: OntologyProperty
   namespace: String!
+
+  """
+  prism:visibility of the property; null when undeclared.
+  """
+  visibility: TermVisibility
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseLabel, else the declared inverse property's asserted rdfs:label; null when neither exists.
+  """
+  inverseLabel(lang: String = "en"): String
+
+  """
+  prism:inversePluralLabel, else the declared inverse property's prism:pluralLabel; null when neither exists.
+  """
+  inversePluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseVisibility, else the declared inverse property's prism:visibility; null when neither exists.
+  """
+  inverseVisibility: TermVisibility
 }
 
 "How a property relates its subject to its object."
@@ -190,6 +264,67 @@ enum PropertyKind {
   DATATYPE
   OBJECT
   ANNOTATION
+}
+
+"""
+How prominently a term is shown: prominent leads, normal is listed, hidden is a value and never an entity (prism:visibility).
+"""
+enum TermVisibility {
+  PROMINENT
+  NORMAL
+  HIDDEN
+}
+
+"""
+The role a property's values play for their subject (SHACL UI shui:propertyRole).
+"""
+enum PropertyRole {
+  LABEL
+  DESCRIPTION
+  DEPICTION
+  ICON
+  CLASSIFICATION
+}
+
+"""
+A sh:PropertyGroup: a named, ordered section of a class's properties.
+"""
+type PropertyGroup {
+  """
+  The group's IRI.
+  """
+  uri: ID!
+
+  """
+  rdfs:label in `lang` (exact tag, else untagged); null when undeclared.
+  """
+  label(lang: String = "en"): String
+
+  """
+  sh:order: the group's position among a class's groups, ascending; null when undeclared.
+  """
+  order: Float
+}
+
+"""
+An edge between two classes through one property, weighed by the instance
+statements it covers. A declared edge comes from the property's domain and
+range and counts the statements whose subject is an instance of the domain or
+a subclass and whose object is an instance of the range or a subclass; it is
+served with count 0 when none exists. An undeclared edge is a pair of classes
+the store links through the property that no declaration covers.
+"""
+type ClassEdge {
+  "The property's IRI."
+  property: ID!
+  "The IRI of the class the statements start from: the domain when declared."
+  subjectClass: ID!
+  "The IRI of the class the statements point to: the range when declared."
+  objectClass: ID!
+  "The number of instance statements the edge covers; 0 when none."
+  count: Int!
+  "Whether the ontology declares the edge through the property's domain and range."
+  declared: Boolean!
 }
 
 """
@@ -201,6 +336,9 @@ as the absolute IRI, and live client operations already declare
 `$uri: String!` — promoting the argument to `ID!` would invalidate them
 (String is not a subtype of ID). `node(id:)` is the strict lookup: its
 argument keeps Relay's name `id` and its value is the absolute IRI.
+
+`classEdges` is a provider computation over its whole store, not a TBox
+field: no compiler emits it.
 """
 type Query {
   node(id: ID!): Node
@@ -208,6 +346,8 @@ type Query {
   ontology(prefix: String!): Ontology
   ontologyClass(uri: String!): OntologyClass
   ontologyProperty(uri: String!): OntologyProperty
+  "Every edge between classes, sorted by property, subject class and object class."
+  classEdges: [ClassEdge!]!
   "The prose authored for the entity `uri` names (an absolute IRI), or null when it has none."
   prose(uri: ID!): Prose
   "Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en."
