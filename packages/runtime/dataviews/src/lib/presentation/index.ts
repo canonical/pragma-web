@@ -6,6 +6,7 @@ export {
   WRITE_DEADLINE,
   WRITE_DELAY,
 } from "./constants.js";
+export { default as createMemoryPresentationStore } from "./createMemoryPresentationStore.js";
 export { default as createPresentation } from "./createPresentation.js";
 export { default as diffPresentations } from "./diffPresentations.js";
 export { default as hideColumn } from "./hideColumn.js";
