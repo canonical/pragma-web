@@ -1,25 +1,21 @@
-import type { I18nConfig, Locale, Messages } from "@canonical/i18n-core";
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import I18nProvider from "../I18nProvider/Provider.js";
+import {
+  localeConfig as config,
+  greetingCatalogs,
+} from "../../../testing/fixtures.js";
+import { I18nProvider } from "../I18nProvider/index.js";
 import useLocale from "./useLocale.js";
 import useTranslation from "./useTranslation.js";
 
-const config: I18nConfig = {
-  locales: ["en", "fr", "ar"],
-  defaultLocale: "en",
-  rtlLocales: ["ar"],
-};
-
-const catalogs: Record<Locale, Messages> = {
-  en: { greeting: "Hello, {name}!" },
-  fr: { greeting: "Bonjour, {name} !" },
-};
-
-function wrapper({ children }: { children: ReactNode }): React.ReactElement {
+function WithProvider({
+  children,
+}: {
+  children: ReactNode;
+}): React.ReactElement {
   return (
-    <I18nProvider config={config} catalogs={catalogs}>
+    <I18nProvider config={config} catalogs={greetingCatalogs}>
       {children}
     </I18nProvider>
   );
@@ -27,7 +23,9 @@ function wrapper({ children }: { children: ReactNode }): React.ReactElement {
 
 describe("useTranslation", () => {
   it("translates for the active locale", () => {
-    const { result } = renderHook(() => useTranslation(), { wrapper });
+    const { result } = renderHook(() => useTranslation(), {
+      wrapper: WithProvider,
+    });
     expect(result.current.t("greeting", { name: "Ada" })).toBe("Hello, Ada!");
     expect(result.current.locale).toBe("en");
     expect(result.current.direction).toBe("ltr");
@@ -36,7 +34,7 @@ describe("useTranslation", () => {
   it("re-translates when the locale changes", () => {
     const { result } = renderHook(
       () => ({ translation: useTranslation(), locale: useLocale() }),
-      { wrapper },
+      { wrapper: WithProvider },
     );
     expect(result.current.translation.t("greeting", { name: "Ada" })).toBe(
       "Hello, Ada!",
@@ -50,7 +48,7 @@ describe("useTranslation", () => {
   it("returns the key (and RTL) for a locale with no catalog", () => {
     const { result } = renderHook(
       () => ({ translation: useTranslation(), locale: useLocale() }),
-      { wrapper },
+      { wrapper: WithProvider },
     );
     act(() => result.current.locale.setLocale("ar"));
     expect(result.current.translation.t("greeting")).toBe("greeting");

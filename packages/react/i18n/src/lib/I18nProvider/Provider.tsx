@@ -1,7 +1,7 @@
-import { createLocaleSource } from "@canonical/i18n-core";
-import { type ReactElement, useMemo, useState } from "react";
-import I18nContext from "./Context.js";
-import type { I18nContextValue, I18nProviderProps } from "./types.js";
+import type { ReactElement } from "react";
+import Context from "./Context.js";
+import { useProviderState } from "./hooks/index.js";
+import type { I18nProviderProps } from "./types.js";
 
 /**
  * Provide the i18n runtime to the `useTranslation`, `useLocale`, and
@@ -11,23 +11,19 @@ import type { I18nContextValue, I18nProviderProps } from "./types.js";
  * Pass the SSR-negotiated `locale` so the server and first client render agree.
  * Supply an external `source` only to share one locale value across frameworks;
  * otherwise the provider owns it.
+ *
+ * `import { I18nProvider } from "@canonical/i18n-react";`
+ *
+ * @note - This function is impure - its first render creates the provider's
+ * own locale source, which in the browser writes `<html lang dir>`.
+ * @implements ds:global.provider.i18n
  */
-export default function I18nProvider({
+export default function Provider({
   children,
-  config,
-  catalogs,
-  locale,
-  source,
+  ...props
 }: I18nProviderProps): ReactElement {
-  const [ownSource] = useState(() =>
-    createLocaleSource(config, { initial: locale ?? config.defaultLocale }),
-  );
-  const activeSource = source ?? ownSource;
-
-  const value = useMemo<I18nContextValue>(
-    () => ({ source: activeSource, config, catalogs }),
-    [activeSource, config, catalogs],
-  );
-
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  const value = useProviderState(props);
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 }
+
+Provider.displayName = "I18nProvider";

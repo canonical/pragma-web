@@ -1,25 +1,13 @@
-import {
-  createLocaleSource,
-  type I18nConfig,
-  type Locale,
-  type Messages,
-} from "@canonical/i18n-core";
+import { createLocaleSource, type Locale } from "@canonical/i18n-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import useLocale from "../hooks/useLocale.js";
-import useTranslation from "../hooks/useTranslation.js";
+import {
+  greetingCatalogs as catalogs,
+  localeConfig as config,
+  effectsOff,
+} from "../../../testing/fixtures.js";
+import { useLocale, useTranslation } from "../hooks/index.js";
 import I18nProvider from "./Provider.js";
-
-const config: I18nConfig = {
-  locales: ["en", "fr", "ar"],
-  defaultLocale: "en",
-  rtlLocales: ["ar"],
-};
-
-const catalogs: Record<Locale, Messages> = {
-  en: { greeting: "Hello, {name}!" },
-  fr: { greeting: "Bonjour, {name} !" },
-};
 
 function Greeting(): React.ReactElement {
   const { t } = useTranslation();
@@ -41,6 +29,10 @@ function SwitchTo({ locale }: { locale: Locale }): React.ReactElement {
 }
 
 describe("I18nProvider", () => {
+  it("shows as I18nProvider in React DevTools and component stacks", () => {
+    expect(I18nProvider.displayName).toBe("I18nProvider");
+  });
+
   it("renders translated content for the default locale", () => {
     render(
       <I18nProvider config={config} catalogs={catalogs}>
@@ -61,9 +53,8 @@ describe("I18nProvider", () => {
 
   it("binds to an external locale source when provided", () => {
     const source = createLocaleSource(config, {
+      ...effectsOff,
       initial: "fr",
-      persist: false,
-      reflect: false,
     });
     render(
       <I18nProvider config={config} catalogs={catalogs} source={source}>
@@ -74,29 +65,28 @@ describe("I18nProvider", () => {
   });
 
   it("keeps a runtime locale switch across provider re-renders", () => {
-    const ui = (locale: Locale): React.ReactElement => (
+    const buildApp = (locale: Locale): React.ReactElement => (
       <I18nProvider config={config} catalogs={catalogs} locale={locale}>
         <Greeting />
         <ShowLocale />
         <SwitchTo locale="fr" />
       </I18nProvider>
     );
-    const { rerender } = render(ui("en"));
+    const { rerender } = render(buildApp("en"));
     fireEvent.click(screen.getByText("switch-fr"));
     expect(screen.getByText("Bonjour, Ada !")).toBeTruthy();
 
     // A parent re-render — even one passing a different `locale` prop — must
     // not clobber the runtime choice: the prop is the SSR-negotiated initial.
-    rerender(ui("ar"));
+    rerender(buildApp("ar"));
     expect(screen.getByText("fr")).toBeTruthy();
     expect(screen.getByText("Bonjour, Ada !")).toBeTruthy();
   });
 
   it("propagates a shared external source switch to every provider tree", () => {
     const source = createLocaleSource(config, {
+      ...effectsOff,
       initial: "en",
-      persist: false,
-      reflect: false,
     });
     render(
       <>
