@@ -127,12 +127,12 @@ describe("createDataViewsProvider", () => {
       "clear",
       "collection",
       "issues",
+      "listRefusals",
       "navigateWindow",
       "observe",
       "presentation",
       "readSnapshot",
       "refresh",
-      "refusals",
       "reset",
       "rows",
       "runAction",
@@ -151,8 +151,8 @@ describe("createDataViewsProvider", () => {
       "fields",
       "schema",
       "types",
-      "applicability",
-      "recordType",
+      "readApplicability",
+      "readRecordType",
       "invokeAction",
       "rotateScope",
     ]) {
@@ -868,7 +868,7 @@ describe("createDataViewsProvider refresh", () => {
     const { source, calls } = createManualSource<Machine>({
       capabilities: permissive,
       // The source's own check: what a declaration cannot say.
-      refusals: () => [
+      listRefusals: () => [
         {
           part: "window",
           code: "unreachable-page",
@@ -990,7 +990,7 @@ describe("createDataViewsProvider commands", () => {
   it("collects the source's own refusals behind the declaration's", () => {
     const { source } = createManualSource<Machine>({
       capabilities: permissive,
-      refusals: (query) =>
+      listRefusals: (query) =>
         query.slice.search === null
           ? []
           : [
@@ -1005,7 +1005,7 @@ describe("createDataViewsProvider commands", () => {
     });
     const provider = createDataViewsProvider({ collection: machines, source });
     const search: Slice = { ...EMPTY_SLICE, search: "yak" };
-    const refused = provider.refusals({
+    const refused = provider.listRefusals({
       slice: search,
       window: DEFAULT_WINDOW,
     });
@@ -1015,7 +1015,7 @@ describe("createDataViewsProvider commands", () => {
     expect(Object.isFrozen(refused)).toBe(true);
     // The declaration's refusal answers alone: the source is not asked.
     expect(
-      provider.refusals({
+      provider.listRefusals({
         slice: { ...search, sort: [{ field: "name", direction: "asc" }] },
         window: DEFAULT_WINDOW,
       }),
@@ -1459,7 +1459,7 @@ describe("createDataViewsProvider rows", () => {
     const { provider, host } = machineProvider();
     host.complete(host.refresh(), delivered([{ id: "m-1" }, { id: "m-2" }]));
     expect(provider.rows.get().ids).toEqual(["m-1", "m-2"]);
-    expect(provider.rows.get().byId("m-2")).toEqual({ id: "m-2" });
+    expect(provider.rows.get().findRecord("m-2")).toEqual({ id: "m-2" });
   });
 
   it("carries the model across a republication of the same records", () => {
@@ -1789,11 +1789,13 @@ describe("createDataViewsProvider record types", () => {
 
   it("answers whether a field applies to a row", () => {
     const { host } = instanceProvider();
-    expect(host.applicability("secureboot", machine("v-1"))).toBe("applies");
-    expect(host.applicability("secureboot", container("c-1"))).toBe(
+    expect(host.readApplicability("secureboot", machine("v-1"))).toBe(
+      "applies",
+    );
+    expect(host.readApplicability("secureboot", container("c-1"))).toBe(
       "not-applicable",
     );
-    expect(host.applicability("type", container("c-1"))).toBe("applies");
+    expect(host.readApplicability("type", container("c-1"))).toBe("applies");
   });
 
   it("fails a completion carrying a row of an undeclared type", () => {
@@ -1845,15 +1847,15 @@ describe("createDataViewsProvider record types", () => {
     );
     provider.selection.set(["v-1", "c-1"]);
     host.complete(host.refresh(), delivered([machine("v-2")]));
-    expect(provider.rows.get().byId("v-1")).toBeUndefined();
-    expect(host.recordType("v-1")).toBe("virtual-machine");
-    expect(host.recordType("c-1")).toBe("container");
+    expect(provider.rows.get().findRecord("v-1")).toBeUndefined();
+    expect(host.readRecordType("v-1")).toBe("virtual-machine");
+    expect(host.readRecordType("c-1")).toBe("container");
   });
 
   it("knows no type for a selection restored over rows it never saw", () => {
     const { provider, host } = instanceProvider();
     provider.selection.set(["unseen"]);
-    expect(host.recordType("unseen")).toBeNull();
+    expect(host.readRecordType("unseen")).toBeNull();
   });
 
   it("forgets every remembered type on reset", () => {
@@ -1861,10 +1863,10 @@ describe("createDataViewsProvider record types", () => {
     host.complete(host.refresh(), delivered([machine("v-1")]));
     provider.selection.set(["v-1"]);
     host.complete(host.refresh(), delivered([]));
-    expect(host.recordType("v-1")).toBe("virtual-machine");
+    expect(host.readRecordType("v-1")).toBe("virtual-machine");
     provider.reset();
     provider.selection.set(["v-1"]);
-    expect(host.recordType("v-1")).toBeNull();
+    expect(host.readRecordType("v-1")).toBeNull();
   });
 });
 
@@ -1877,9 +1879,9 @@ describe("createDataViewsProvider monomorphic collection", () => {
     expect(provider.collection.types).toBeNull();
     host.complete(host.refresh(), delivered([{ id: "m-1" }]));
     provider.selection.set(["m-1"]);
-    expect(host.recordType("m-1")).toBeNull();
-    expect(host.applicability("status", { id: "m-1" })).toBe("applies");
-    expect(host.applicability("anything", { id: "m-1" })).toBe("applies");
+    expect(host.readRecordType("m-1")).toBeNull();
+    expect(host.readApplicability("status", { id: "m-1" })).toBe("applies");
+    expect(host.readApplicability("anything", { id: "m-1" })).toBe("applies");
   });
 
   it("leaves a scoped field applying to every row", () => {
@@ -1896,7 +1898,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
     // has nothing to exclude and the scoping never fires.
     expect(scoped.types).toBeNull();
     expect(
-      readProviderHost(provider).applicability("secureboot", { id: "m-1" }),
+      readProviderHost(provider).readApplicability("secureboot", { id: "m-1" }),
     ).toBe("applies");
   });
 
@@ -1922,6 +1924,6 @@ describe("createDataViewsProvider monomorphic collection", () => {
     expect(host.complete(host.refresh(), delivered([record]))).toBe(true);
     expect(provider.state.get().result.status).toBe("ready");
     provider.selection.set(["m-1"]);
-    expect(host.recordType("m-1")).toBeNull();
+    expect(host.readRecordType("m-1")).toBeNull();
   });
 });

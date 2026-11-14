@@ -345,16 +345,16 @@ describe("createQuerySource over @tanstack/query-core", () => {
   });
 
   it("carries the refusals the declaration cannot express", () => {
-    const refusals = vi.fn().mockReturnValue([]);
+    const listRefusals = vi.fn().mockReturnValue([]);
     const built = createQuerySource({
       capabilities: endpoint,
       queryKey: ["machines"],
       fetchPage: () => Promise.resolve(page([], 0)),
       createObserver: (query) => new TanStackObserver(client(), query),
-      refusals,
+      listRefusals,
     });
-    expect(built.refusals?.(request())).toEqual([]);
-    expect(refusals).toHaveBeenCalledTimes(1);
+    expect(built.listRefusals?.(request())).toEqual([]);
+    expect(listRefusals).toHaveBeenCalledTimes(1);
   });
 
   it("carries the application's row operations", async () => {

@@ -39,7 +39,7 @@ const mount = (props: Partial<SelectionCellProps<Machine>> = {}) => {
         provider={provider}
         channels={scopes.readRow("m-1")}
         selected={false}
-        rowLabel={(row) => row.name}
+        getRowLabel={(row) => row.name}
         {...props}
       />
     </BodyRow>,

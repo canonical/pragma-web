@@ -165,7 +165,7 @@ export type DataViewsProvider<
    * source's own check. Empty means executable. What a control reads before
    * offering a destination.
    */
-  readonly refusals: (query: Query) => readonly SourceRefusal[];
+  readonly listRefusals: (query: Query) => readonly SourceRefusal[];
   /**
    * Run one declared action over the given identities, or over the
    * selection when none are given. Resolves with the settled run once every
@@ -357,7 +357,7 @@ export type ProviderHost<
   TRow extends object = RowRecord,
 > = Pick<
   DataViewsProvider<TFields, TRow>,
-  "collection" | "capabilities" | "state" | "refusals"
+  "collection" | "capabilities" | "state" | "listRefusals"
 > & {
   /**
    * Replace the conjunct at `nth` of the predicate's address, 0 when left
@@ -462,21 +462,21 @@ export type ProviderHost<
    * The body cell reads this: a not-applicable cell is the third state
    * beside value and empty.
    */
-  readonly applicability: (field: string, row: TRow) => Applicability;
+  readonly readApplicability: (field: string, row: TRow) => Applicability;
   /**
    * The type remembered for a selected identity, or null when the provider
    * never modelled it while it was selected — a selection restored by a host
    * over rows this provider has not seen. A remembered type is let go when
    * the rows are next replaced after its identity leaves the selection, so
    * one reselected before then answers as before. It answers from the row on
-   * display whenever there is one, so it never contradicts `applicability`,
+   * display whenever there is one, so it never contradicts `readApplicability`,
    * and it changes only with a `rows` or a `selection` publication: watching
    * those is watching this.
    *
    * `useDataViewsAction` reads this to decide whether an action applies to
    * records selected on an earlier page.
    */
-  readonly recordType: (id: string) => string | null;
+  readonly readRecordType: (id: string) => string | null;
 };
 
 /** Configuration of one collection's record typing. */
@@ -495,11 +495,11 @@ export type RecordTypingConfig<
 /** One collection's record typing: what the provider answers about types. */
 export type RecordTyping<TRow extends object = RowRecord> = {
   /** Why a model cannot be displayed, or null when every row is typed. */
-  readonly rejectionOf: (model: RowModel<TRow>) => string | null;
+  readonly readRejection: (model: RowModel<TRow>) => string | null;
   /** Whether a schema field applies to a row. */
-  readonly applicability: (field: string, row: TRow) => Applicability;
+  readonly readApplicability: (field: string, row: TRow) => Applicability;
   /** The remembered type of a selected identity. */
-  readonly recordType: (id: string) => string | null;
+  readonly readRecordType: (id: string) => string | null;
   /** Take the type of every selected row of a model about to be replaced. */
   readonly remember: (model: RowModel<TRow>) => void;
   /** Drop the memory: the generation moved, so nothing displayed survives. */
@@ -598,7 +598,7 @@ export type PortsObservationConfig = {
   /** The ports, in the order they start; they stop in reverse. */
   readonly ports: readonly PortRun[];
   /** Runs once the first observer has started every port. */
-  readonly afterStart: () => void;
+  readonly runAfterStart: () => void;
 };
 
 /** Configuration of the provider's query path. */
@@ -622,14 +622,14 @@ export type QueryCommandsConfig<TRow extends object = RowRecord> = {
  */
 export type QueryCommands = Pick<
   ProviderHost,
-  "refusals" | "adopt" | "refresh"
+  "listRefusals" | "adopt" | "refresh"
 > & {
   /**
    * Apply one command at the boundary; the refusals it incurs, empty when
    * applied. Given `history`, its transition enters history that way rather
    * than as the policy says.
    */
-  readonly command: (
+  readonly applyCommand: (
     command: QueryCommand,
     history?: HistoryMode,
   ) => readonly SourceRefusal[];

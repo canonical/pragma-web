@@ -24,7 +24,9 @@ export default function createManualSource<TRow extends object = RowRecord>(
   const { answer } = config;
   const source: Source<TRow> = {
     capabilities: config.capabilities ?? NOTHING_DECLARED,
-    ...(config.refusals === undefined ? {} : { refusals: config.refusals }),
+    ...(config.listRefusals === undefined
+      ? {}
+      : { listRefusals: config.listRefusals }),
     ...(config.runAction === undefined ? {} : { runAction: config.runAction }),
     ...(answer === undefined
       ? {}
@@ -56,6 +58,6 @@ export default function createManualSource<TRow extends object = RowRecord>(
     source,
     calls,
     callAt,
-    latest: () => callAt(calls.length - 1),
+    readLatest: () => callAt(calls.length - 1),
   };
 }

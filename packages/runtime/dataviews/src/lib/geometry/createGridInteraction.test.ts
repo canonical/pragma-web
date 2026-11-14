@@ -82,7 +82,7 @@ describe("createGridInteraction", () => {
     interaction.preview(650);
     interaction.commit();
     expect(interaction.state.get()).toEqual({ status: "idle" });
-    expect(layout.effective("name")).toEqual({
+    expect(layout.readEffective("name")).toEqual({
       kind: "fixed",
       px: 250,
     });
@@ -94,7 +94,7 @@ describe("createGridInteraction", () => {
     interaction.preview(650);
     interaction.cancel();
     expect(interaction.state.get()).toEqual({ status: "idle" });
-    expect(layout.effective("name")).toEqual({
+    expect(layout.readEffective("name")).toEqual({
       kind: "flex",
       weight: 2,
       minPx: 100,

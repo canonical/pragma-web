@@ -42,7 +42,7 @@ const findPortRejection = <TRow extends object>(
   }
   if (
     capabilities.pagination.kind === "cursor" &&
-    source.refusals === undefined
+    source.listRefusals === undefined
   ) {
     // Only the source knows which pages its tokens reach, so a cursor
     // source that refuses nothing would be asked for pages it cannot serve.
@@ -270,7 +270,7 @@ export default function runSource<
    * one check both an execution and a read within the call make first.
    */
   const refuseUnsupported = (query: Query, requestId: string): boolean => {
-    const refusals = host.refusals(query);
+    const refusals = host.listRefusals(query);
     if (refusals.length === 0) {
       return false;
     }

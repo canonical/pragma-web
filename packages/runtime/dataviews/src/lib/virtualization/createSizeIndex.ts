@@ -32,7 +32,7 @@ export default function createSizeIndex(sizes: readonly number[]): SizeIndex {
   return {
     // A position outside the sequence has no size: the caller asked about
     // an entry that is not there, and NaN says so where zero would lie.
-    size: (position) =>
+    readSize: (position) =>
       Number.isInteger(position) && position >= 0
         ? (own.at(position) ?? Number.NaN)
         : Number.NaN,
@@ -52,7 +52,7 @@ export default function createSizeIndex(sizes: readonly number[]): SizeIndex {
           assertInvariant(tree.at(node), "the loop holds the node") + delta;
       }
     },
-    offset(position) {
+    readOffset(position) {
       // Past either end there is no entry to start: a broken caller.
       if (!Number.isInteger(position) || position < 0 || position > count) {
         throw new RangeError(`no offset at position ${position} of ${count}`);
@@ -63,7 +63,7 @@ export default function createSizeIndex(sizes: readonly number[]): SizeIndex {
       }
       return sum;
     },
-    at(offset) {
+    findPosition(offset) {
       // Descend from the top, taking every whole node that still ends at
       // or before the offset: what is left is the entry covering it.
       let position = 0;

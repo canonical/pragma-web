@@ -327,7 +327,7 @@ export type Schema<TFields extends readonly SchemaFieldDefinition[]> = {
    * operators, the operator's grammar arity, and schema semantics beyond
    * the generic grammar: option membership, numeric range and date format.
    */
-  readonly predicateFor: (
+  readonly buildPredicate: (
     name: string,
     operator: PredicateOperator,
     operands: readonly PredicateOperand[],

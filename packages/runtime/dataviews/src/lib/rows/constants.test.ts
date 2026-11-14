@@ -5,7 +5,7 @@ describe("EMPTY_ROW_MODEL", () => {
   it("holds no entries and addresses no identity", () => {
     expect(EMPTY_ROW_MODEL.entries).toEqual([]);
     expect(EMPTY_ROW_MODEL.ids).toEqual([]);
-    expect(EMPTY_ROW_MODEL.byId("anything")).toBeUndefined();
+    expect(EMPTY_ROW_MODEL.findRecord("anything")).toBeUndefined();
   });
 
   it("is frozen, so the collections sharing it cannot change it", () => {

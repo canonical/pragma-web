@@ -320,7 +320,7 @@ const statusOf = (slice: Slice): readonly string[] | null => {
   return predicate === undefined ? null : predicate.operands.map(String);
 };
 
-const operation = (page: RelayPageRequest) =>
+const buildOperation = (page: RelayPageRequest) =>
   createOperationDescriptor(MachinesQuery, {
     first: page.first,
     after: page.after,
@@ -337,8 +337,8 @@ const source = (
   createRelaySource<MachinesOperation>({
     capabilities: overrides.capabilities ?? connectionCapabilities,
     environment,
-    operation,
-    connection: (data: MachinesData) => data.machines,
+    buildOperation,
+    readConnection: (data: MachinesData) => data.machines,
     ...(overrides.isForbidden === undefined
       ? {}
       : { isForbidden: overrides.isForbidden }),
@@ -366,11 +366,11 @@ const readRefusals = (
   adapter: Source,
   overrides: Partial<Query> = {},
 ): readonly SourceRefusal[] => {
-  const { refusals } = adapter;
-  if (refusals === undefined) {
+  const { listRefusals } = adapter;
+  if (listRefusals === undefined) {
     throw new Error("expected a source declaring which pages it cannot reach");
   }
-  return refusals({ slice: emptySlice, window: paged(), ...overrides });
+  return listRefusals({ slice: emptySlice, window: paged(), ...overrides });
 };
 
 const unreachable = (page: number): SourceRefusal => ({
@@ -510,7 +510,7 @@ describe("createRelaySource over relay-runtime", () => {
 
   it("hands the operation builder the query, the page size and the cursor", () => {
     const { environment } = relay();
-    const build = vi.fn(operation);
+    const build = vi.fn(buildOperation);
     const filtered: Slice = {
       ...emptySlice,
       filter: [{ field: "status", operator: "isAny", operands: ["failed"] }],
@@ -518,8 +518,8 @@ describe("createRelaySource over relay-runtime", () => {
     createRelaySource<MachinesOperation>({
       capabilities: connectionCapabilities,
       environment,
-      operation: build,
-      connection: (data: MachinesData) => data.machines,
+      buildOperation: build,
+      readConnection: (data: MachinesData) => data.machines,
     }).execute(request({ slice: filtered }), delivery());
     expect(build).toHaveBeenCalledWith({
       slice: filtered,
@@ -1165,13 +1165,13 @@ describe("createRelaySource over relay-runtime", () => {
     const adapter = createRelaySource<MachinesOperation>({
       capabilities: connectionCapabilities,
       environment,
-      operation: (page) =>
+      buildOperation: (page) =>
         createOperationDescriptor(merging, {
           first: page.first,
           after: page.after,
           status: null,
         }),
-      connection: (data: MachinesData) => data.machines,
+      readConnection: (data: MachinesData) => data.machines,
     });
     expect(() => adapter.execute(request(), delivery())).toThrow(
       "a query paging through @connection merges its pages",
@@ -1191,13 +1191,13 @@ describe("createRelaySource over relay-runtime", () => {
     createRelaySource<MachinesOperation>({
       capabilities: connectionCapabilities,
       environment,
-      operation: (page) =>
+      buildOperation: (page) =>
         createOperationDescriptor(otherHandle, {
           first: page.first,
           after: page.after,
           status: null,
         }),
-      connection: (data: MachinesData) => data.machines,
+      readConnection: (data: MachinesData) => data.machines,
     }).execute(request(), delivery());
     expect(fetches).toHaveLength(1);
   });
@@ -1212,13 +1212,13 @@ describe("createRelaySource over relay-runtime", () => {
     createRelaySource<MachinesOperation>({
       capabilities: connectionCapabilities,
       environment,
-      operation: (page) =>
+      buildOperation: (page) =>
         createOperationDescriptor(rowsWithLists, {
           first: page.first,
           after: page.after,
           status: null,
         }),
-      connection: (data: MachinesData) => data.machines,
+      readConnection: (data: MachinesData) => data.machines,
     }).execute(request(), delivery());
     expect(fetches).toHaveLength(1);
   });
@@ -1233,13 +1233,13 @@ describe("createRelaySource over relay-runtime", () => {
       capabilities: connectionCapabilities,
       environment,
       // One page size stands for a query paging through @connection.
-      operation: (page) =>
+      buildOperation: (page) =>
         createOperationDescriptor(page.first === 99 ? merging : MachinesQuery, {
           first: page.first,
           after: page.after,
           status: null,
         }),
-      connection: (data: MachinesData) => data.machines,
+      readConnection: (data: MachinesData) => data.machines,
     });
     adapter.execute(request(), delivery());
     fetchAt(0).respond();
@@ -1281,8 +1281,8 @@ describe("createRelaySource over relay-runtime", () => {
     createRelaySource<MachinesOperation>({
       capabilities: connectionCapabilities,
       environment,
-      operation,
-      connection: () => {
+      buildOperation,
+      readConnection: () => {
         throw thrown;
       },
     }).execute(request(), deliver);
@@ -1304,8 +1304,8 @@ describe("createRelaySource over relay-runtime", () => {
     createRelaySource<MachinesOperation>({
       capabilities: connectionCapabilities,
       environment,
-      operation,
-      connection: (data: MachinesData) => {
+      buildOperation,
+      readConnection: (data: MachinesData) => {
         reads += 1;
         if (reads > 1) {
           throw new Error("the renamed field is not a machine");
@@ -1357,8 +1357,8 @@ describe("createRelaySource over relay-runtime", () => {
     const adapter = createRelaySource<MachinesOperation>({
       capabilities: connectionCapabilities,
       environment,
-      operation,
-      connection: (data: MachinesData) => data.machines,
+      buildOperation,
+      readConnection: (data: MachinesData) => data.machines,
       runAction,
     });
     expect(adapter.runAction).toBe(runAction);

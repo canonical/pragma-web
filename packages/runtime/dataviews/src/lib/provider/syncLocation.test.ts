@@ -111,7 +111,7 @@ const delivered = (rows: readonly RowRecord[]): Completion => ({
  * own, which a cursor declaration requires it to say.
  */
 const sourceOf = (capabilities: SourceCapabilities = permissive) =>
-  createManualSource({ capabilities, refusals: () => [] });
+  createManualSource({ capabilities, listRefusals: () => [] });
 
 /** A provider over the machines, started from `query` when one is given. */
 const createMachinesProvider = (
@@ -1065,7 +1065,7 @@ describe("syncLocation", () => {
     // decode cannot see.
     const source: Source = {
       ...createArraySource({ rows: fleet, collection: machines }),
-      refusals: (query) =>
+      listRefusals: (query) =>
         query.slice.sort.some((term) => term.field === "cpu")
           ? [CPU_UNSORTABLE]
           : [],

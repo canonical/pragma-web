@@ -318,7 +318,7 @@ describe('DataChart of type "bar"', () => {
       provider.setSearch("alp");
     });
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: { reason: "offline", cause: null, transient: null },
       });

@@ -71,7 +71,7 @@ export default function createRowModel<TRow extends object>(
     model: Object.freeze({
       entries: Object.freeze(entries),
       ids: Object.freeze(ids),
-      byId: (id: string): TRow | undefined => index.get(id),
+      findRecord: (id: string): TRow | undefined => index.get(id),
     }),
   };
 }

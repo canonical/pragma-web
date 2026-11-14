@@ -115,7 +115,7 @@ export default function createRelaySource<
 
   return {
     capabilities,
-    refusals(query: Query): readonly SourceRefusal[] {
+    listRefusals(query: Query): readonly SourceRefusal[] {
       if (findCursor(query) !== undefined) {
         return [];
       }
@@ -140,7 +140,7 @@ export default function createRelaySource<
         // the source itself still gets a reason rather than a wrong page.
         throw new Error(describeUnreachable(window.page));
       }
-      const operation = config.operation({
+      const operation = config.buildOperation({
         slice,
         first: window.size,
         after,
@@ -200,7 +200,7 @@ export default function createRelaySource<
         try {
           // The operation's fragment reads exactly the query's response,
           // as Relay's own hooks type it.
-          connection = config.connection(data as TQuery["response"]);
+          connection = config.readConnection(data as TQuery["response"]);
         } catch (error) {
           fail(data, describeError(error), error);
           return;

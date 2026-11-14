@@ -99,7 +99,7 @@ describe("ScopedRecordList", () => {
     let refusing = true;
     const { provider } = createMachineProvider({
       rows,
-      refusals: (query: Query) =>
+      listRefusals: (query: Query) =>
         refusing && query.slice.sort.length > 0 ? [rebuilding] : [],
     });
     renderList({ sortBy: { field: "name", label: "Sort by name" } }, provider);
@@ -118,13 +118,15 @@ describe("ScopedRecordList", () => {
     const { provider, source } = createMachineProvider();
     renderList({}, provider);
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: { reason: "offline", cause: null, transient: null },
       });

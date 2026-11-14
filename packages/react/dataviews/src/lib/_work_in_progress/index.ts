@@ -7,7 +7,7 @@ export type {
 } from "./DataTable/index.js";
 export { DataTable } from "./DataTable/index.js";
 export type {
-  DataViewsActionsProps,
+  DataViewsActionBarProps,
   DataViewsDataTableProps,
   DataViewsFiltersProps,
   DataViewsPaginationProps,

@@ -94,7 +94,7 @@ describe("regression 0041 — server-owned options vanished while pending", () =
       </DataViews>,
     );
     act(() => {
-      manual.latest().deliver({
+      manual.readLatest().deliver({
         status: "succeeded",
         page: createPage({
           rows: [],

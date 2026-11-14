@@ -257,7 +257,7 @@ describe("DataViews.Filters", () => {
     // range — the check a declaration cannot express.
     const source = createManualSource<Row>({
       capabilities: everything,
-      refusals: (query) =>
+      listRefusals: (query) =>
         query.slice.filter.some(
           (predicate) =>
             predicate.field === "cpu" && Number(predicate.operands[0]) > 32,
@@ -630,7 +630,7 @@ describe("DataViews.Filters", () => {
         collection,
         source: createManualSource<Row>({
           capabilities: withText,
-          refusals: ({ slice }) =>
+          listRefusals: ({ slice }) =>
             slice.filter.some(({ operator }) => operator === "contains")
               ? [
                   {
@@ -757,7 +757,7 @@ describe("DataViews.Filters", () => {
         collection,
         source: createManualSource<Row>({
           capabilities: withText,
-          refusals: ({ slice }) =>
+          listRefusals: ({ slice }) =>
             slice.filter.some(({ operator }) => operator === "contains")
               ? [
                   {
@@ -1060,7 +1060,7 @@ describe("DataViews.Filters", () => {
         </DataViews>,
       );
       act(() => {
-        manual.latest().deliver({
+        manual.readLatest().deliver({
           status: "succeeded",
           page: createPage({
             rows: [],
@@ -1078,7 +1078,7 @@ describe("DataViews.Filters", () => {
       });
       fireEvent.click(screen.getByRole("checkbox", { name: "eu" }));
       act(() => {
-        manual.latest().deliver({
+        manual.readLatest().deliver({
           status: "failed",
           failure: { reason: "offline", cause: null, transient: null },
         });

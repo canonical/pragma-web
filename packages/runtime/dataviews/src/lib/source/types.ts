@@ -289,7 +289,7 @@ export type Source<TRow extends object = RowRecord> = {
    * the request is executable. Required of a cursor source, which alone
    * knows which pages its tokens reach.
    */
-  readonly refusals?: (query: Query) => readonly SourceRefusal[];
+  readonly listRefusals?: (query: Query) => readonly SourceRefusal[];
   /**
    * Begin executing one request. `deliver` may be called synchronously and
    * more than once: every later call is an external change to the same
@@ -582,7 +582,9 @@ export type QuerySourceConfig<TRow extends object = RowRecord> = {
    * Refusals the declaration cannot express, such as a search this endpoint
    * cannot combine with a filter. Pure and synchronous; no round trip.
    */
-  readonly refusals?: ((query: Query) => readonly SourceRefusal[]) | undefined;
+  readonly listRefusals?:
+    | ((query: Query) => readonly SourceRefusal[])
+    | undefined;
   /** Stable prefix of the query key; the query's own key is appended. */
   readonly queryKey: readonly unknown[];
   /**
@@ -702,9 +704,9 @@ export type RelaySourceConfig<
    * Build one page's operation, for example
    * `(page) => createOperationDescriptor(MachinesQuery, variablesOf(page))`.
    */
-  readonly operation: (page: RelayPageRequest) => RelayOperation;
+  readonly buildOperation: (page: RelayPageRequest) => RelayOperation;
   /** The connection within the query's data. */
-  readonly connection: (
+  readonly readConnection: (
     data: TQuery["response"],
   ) => RelayConnection<TRow> | null | undefined;
   /**

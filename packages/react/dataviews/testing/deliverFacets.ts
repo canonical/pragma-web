@@ -15,7 +15,7 @@ export default function deliverFacets(
   facets: Readonly<Record<string, Facet>>,
 ): void {
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "succeeded",
       page: createPage({
         rows: [buildMachine("m-1", "alpha")],

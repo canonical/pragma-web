@@ -54,7 +54,7 @@ export default function createRecordTyping<
   let remembered = new Map<string, string>();
 
   return {
-    rejectionOf(model: RowModel<TRow>): string | null {
+    readRejection(model: RowModel<TRow>): string | null {
       for (const entry of model.entries) {
         const value = readField(entry.record, discriminator);
         if (typeof value !== "string" || !declared.has(value)) {
@@ -63,7 +63,7 @@ export default function createRecordTyping<
       }
       return null;
     },
-    applicability(field: string, row: TRow): Applicability {
+    readApplicability(field: string, row: TRow): Applicability {
       const scope = scopes.get(field);
       if (scope === undefined) {
         return "applies";
@@ -71,7 +71,7 @@ export default function createRecordTyping<
       const type = readTypeName(row);
       return type !== null && scope.has(type) ? "applies" : "not-applicable";
     },
-    recordType(id: string): string | null {
+    readRecordType(id: string): string | null {
       // Memory is of identities while they are selected: an identity that
       // left the selection is not one an action can be decided for.
       if (!selection.state.get().ids.has(id)) {
@@ -80,8 +80,8 @@ export default function createRecordTyping<
       // A row on display is the answer; memory answers for the rows that
       // are not. Reading it the other way round would let a remembered
       // type outlive the record it was taken from and contradict what
-      // `applicability` reads off that same record.
-      const record = rows.get().byId(id);
+      // `readApplicability` reads off that same record.
+      const record = rows.get().findRecord(id);
       return record === undefined
         ? (remembered.get(id) ?? null)
         : readTypeName(record);
@@ -91,7 +91,7 @@ export default function createRecordTyping<
       // to leave the display is the pass that drops the deselected ones.
       const next = new Map<string, string>();
       for (const id of selection.state.get().ids) {
-        const record = model.byId(id);
+        const record = model.findRecord(id);
         const name =
           record === undefined
             ? (remembered.get(id) ?? null)

@@ -27,7 +27,7 @@ describe("useAppliedSearch", () => {
     const { source, hook, readRenders } = mount();
     const renders = readRenders();
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "a")]),
       });

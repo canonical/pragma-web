@@ -14,6 +14,11 @@
    */
   .ds.data-table-action-bar {
     display: inline-flex;
+    /* A fieldset's own frame and floor go: the bar draws none. */
+    min-inline-size: 0;
+    margin: 0;
+    border: 0;
+    padding: 0;
     align-items: center;
     color: var(--surface-color-text, var(--color-text));
     font-family: var(--typography-text-primary-font-family);

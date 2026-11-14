@@ -15,7 +15,7 @@ export default function answerFacetValues<TRow extends object>(
   values: readonly FacetValue[],
 ): void {
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "succeeded",
       page: createPage({
         rows: [],

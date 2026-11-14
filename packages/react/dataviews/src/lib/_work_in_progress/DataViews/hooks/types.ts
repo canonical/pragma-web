@@ -100,7 +100,7 @@ export type UseDestinationProps = {
   /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
   /** The destination's query, from the applied state; held by identity. */
-  readonly destinationOf: (state: DataViewsState<object>) => Query;
+  readonly readDestination: (state: DataViewsState<object>) => Query;
 };
 
 /** What the destination hook returns: the spelled parameters, or null without a location. */
@@ -135,7 +135,7 @@ export type UseDataViewsResult<
   | "setGroup"
   | "setCollapsed"
   | "refresh"
-  | "refusals"
+  | "listRefusals"
   | "runAction"
 > & {
   /** This root's filter handles, one per field and legal operator. */

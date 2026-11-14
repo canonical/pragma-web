@@ -106,7 +106,7 @@ export type VirtualRange = ReadonlyChannel<MountedRange> & {
 /** The sizes of one sequence of entries, summed in logarithmic time. */
 export type SizeIndex = {
   /** The size of the entry at one position. */
-  readonly size: (position: number) => number;
+  readonly readSize: (position: number) => number;
   /** Replace the size of the entry at one position. */
   readonly set: (position: number, size: number) => void;
   /**
@@ -114,10 +114,10 @@ export type SizeIndex = {
    * At the sequence's length, the whole: read from the same tree, so it
    * never drifts from the offsets beside it. Throws outside `0..length`.
    */
-  readonly offset: (position: number) => number;
+  readonly readOffset: (position: number) => number;
   /**
    * The position of the entry covering one offset: the last whose start is
    * at or before it, held to the sequence. An empty sequence answers 0.
    */
-  readonly at: (offset: number) => number;
+  readonly findPosition: (offset: number) => number;
 };

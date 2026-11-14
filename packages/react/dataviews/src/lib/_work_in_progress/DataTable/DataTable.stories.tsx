@@ -41,7 +41,7 @@ const meta = {
   argTypes: {
     provider: { control: false },
     columns: { control: false },
-    rowLabel: { control: false },
+    getRowLabel: { control: false },
     renderStatus: { control: false },
     virtualization: { control: false },
   },
@@ -53,7 +53,7 @@ type Story = StoryObj<typeof Component>;
 /** The table's own props, less the ones a story's collection supplies. */
 type StoryTableProps = Omit<
   DataTableProps<MachineFields, Machine>,
-  "provider" | "columns" | "rowLabel"
+  "provider" | "columns" | "getRowLabel"
 >;
 
 /** The table over a provider bound to the story's own source. */
@@ -71,7 +71,7 @@ function MachinesTable({
       {...args}
       provider={provider}
       columns={columns}
-      rowLabel={readHostName}
+      getRowLabel={readHostName}
     />
   );
 }
@@ -187,7 +187,7 @@ const selectableTableCode = `<DataTable
   columns={columns}
   label="Machines"
   selectable
-  rowLabel={(row) => row.name}
+  getRowLabel={(row) => row.name}
 />`;
 
 /** The table inside a frame of the given width. */
@@ -1190,7 +1190,7 @@ ${columns}`,
   columns={columns}
   label="Machines"
   selectable
-  rowLabel={(row) => row.name}
+  getRowLabel={(row) => row.name}
   virtualization={virtualization}
   style={{ maxBlockSize: "24rem" }}
 />`,

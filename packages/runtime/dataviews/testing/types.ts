@@ -41,7 +41,9 @@ export type ManualSourceConfig<TRow extends object = RowRecord> = {
   /** What the source declares; nothing executable by default. */
   readonly capabilities?: SourceCapabilities | undefined;
   /** Refusals the declaration cannot express. */
-  readonly refusals?: ((query: Query) => readonly SourceRefusal[]) | undefined;
+  readonly listRefusals?:
+    | ((query: Query) => readonly SourceRefusal[])
+    | undefined;
   /** The action runner, when the declaration names actions. */
   readonly runAction?: SourceActionRunner | undefined;
   /**
@@ -64,7 +66,7 @@ export type ManualSource<TRow extends object = RowRecord> = {
   /** The nth execution, or a failure rather than a skipped assertion. */
   readonly callAt: (index: number) => ManualCall<TRow>;
   /** The latest execution, or a failure when none was asked for. */
-  readonly latest: () => ManualCall<TRow>;
+  readonly readLatest: () => ManualCall<TRow>;
 };
 
 /** A counting store, and the number of listeners it holds. */

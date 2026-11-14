@@ -43,7 +43,7 @@ const createRebuildingSource = (): Source<Machine> => {
   };
   return {
     ...createMachineSource(),
-    refusals: (query) => (query.slice.sort.length > 0 ? [refusal] : []),
+    listRefusals: (query) => (query.slice.sort.length > 0 ? [refusal] : []),
   };
 };
 
@@ -163,7 +163,7 @@ function ConnectedMachines(): ReactElement {
         columns={columns}
         label="Machine table"
         selectable
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
     </>

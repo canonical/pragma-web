@@ -22,7 +22,7 @@ const mountDestination = (href: string) => {
     ...renderInRoot(
       "useDestination test",
       (provider) =>
-        useDestination({ provider, destinationOf: leadToFirstPage }),
+        useDestination({ provider, readDestination: leadToFirstPage }),
       { rows: [], location },
     ),
   };
@@ -33,7 +33,7 @@ describe("useDestination", () => {
     const { hook } = renderInRoot(
       "useDestination test",
       (provider) =>
-        useDestination({ provider, destinationOf: leadToFirstPage }),
+        useDestination({ provider, readDestination: leadToFirstPage }),
       { rows: [] },
     );
     expect(hook.result.current).toBeNull();

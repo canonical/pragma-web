@@ -24,52 +24,56 @@ const pseudoRandomSizes = (count: number, seed: number): number[] => {
 describe("createSizeIndex", () => {
   it("answers an empty sequence with nothing", () => {
     const index = createSizeIndex([]);
-    expect(index.offset(0)).toBe(0);
-    expect(index.at(100)).toBe(0);
+    expect(index.readOffset(0)).toBe(0);
+    expect(index.findPosition(100)).toBe(0);
   });
 
   it("finds where each entry starts and which entry covers an offset", () => {
     const index = createSizeIndex([10, 20, 30]);
-    expect([0, 1, 2, 3].map(index.offset)).toEqual([0, 10, 30, 60]);
-    expect([0, 9.5, 10, 29, 30, 59].map(index.at)).toEqual([0, 0, 1, 1, 2, 2]);
+    expect([0, 1, 2, 3].map(index.readOffset)).toEqual([0, 10, 30, 60]);
+    expect([0, 9.5, 10, 29, 30, 59].map(index.findPosition)).toEqual([
+      0, 0, 1, 1, 2, 2,
+    ]);
   });
 
   it("holds an offset outside the sequence to its ends", () => {
     const index = createSizeIndex([10, 20, 30]);
-    expect(index.at(-5)).toBe(0);
-    expect(index.at(1000)).toBe(2);
+    expect(index.findPosition(-5)).toBe(0);
+    expect(index.findPosition(1000)).toBe(2);
   });
 
   it("skips an entry that covers nothing", () => {
-    expect(createSizeIndex([10, 0, 10]).at(10)).toBe(2);
+    expect(createSizeIndex([10, 0, 10]).findPosition(10)).toBe(2);
   });
 
   it("replaces one size and moves every offset after it", () => {
     const index = createSizeIndex([10, 20, 30]);
     index.set(1, 5);
-    expect(index.size(1)).toBe(5);
-    expect([1, 2, 3].map(index.offset)).toEqual([10, 15, 45]);
-    expect(index.at(15)).toBe(2);
+    expect(index.readSize(1)).toBe(5);
+    expect([1, 2, 3].map(index.readOffset)).toEqual([10, 15, 45]);
+    expect(index.findPosition(15)).toBe(2);
   });
 
   it("refuses an offset outside the sequence", () => {
     const index = createSizeIndex([10, 20]);
-    expect(() => index.offset(3)).toThrow("no offset at position 3 of 2");
-    expect(() => index.offset(-1)).toThrow("no offset at position -1 of 2");
-    expect(() => index.offset(0.5)).toThrow("no offset at position 0.5 of 2");
-    expect(() => index.offset(Number.NaN)).toThrow(
+    expect(() => index.readOffset(3)).toThrow("no offset at position 3 of 2");
+    expect(() => index.readOffset(-1)).toThrow("no offset at position -1 of 2");
+    expect(() => index.readOffset(0.5)).toThrow(
+      "no offset at position 0.5 of 2",
+    );
+    expect(() => index.readOffset(Number.NaN)).toThrow(
       "no offset at position NaN of 2",
     );
   });
 
   it("has no size for a position outside the sequence, and sets none", () => {
     const index = createSizeIndex([10, 20]);
-    expect(index.size(2)).toBeNaN();
-    expect(index.size(-1)).toBeNaN();
+    expect(index.readSize(2)).toBeNaN();
+    expect(index.readSize(-1)).toBeNaN();
     index.set(2, 5);
     index.set(-1, 5);
-    expect(index.offset(2)).toBe(30);
-    expect([0, 1].map(index.size)).toEqual([10, 20]);
+    expect(index.readOffset(2)).toBe(30);
+    expect([0, 1].map(index.readSize)).toEqual([10, 20]);
   });
 
   it("agrees with a running sum through any series of replacements", () => {
@@ -82,13 +86,13 @@ describe("createSizeIndex", () => {
     }
     const offsets = runningOffsets(sizes);
     for (let position = 0; position <= sizes.length; position += 1) {
-      expect(index.offset(position)).toBe(offsets[position]);
+      expect(index.readOffset(position)).toBe(offsets[position]);
     }
     for (let position = 0; position < sizes.length; position += 1) {
       const from = offsets[position] ?? Number.NaN;
       const to = offsets[position + 1] ?? Number.NaN;
-      expect(index.at(from)).toBe(position);
-      expect(index.at(to - 0.5)).toBe(position);
+      expect(index.findPosition(from)).toBe(position);
+      expect(index.findPosition(to - 0.5)).toBe(position);
     }
   });
 });

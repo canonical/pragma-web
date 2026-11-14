@@ -61,7 +61,7 @@ const Provider = Object.assign(
     );
   },
   {
-    Actions: ActionBar,
+    ActionBar,
     DataTable,
     Filters,
     Pagination,

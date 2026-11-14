@@ -34,7 +34,7 @@ describe("SERVER_BACKED_RENDER_CODE", () => {
   <DataViews.DataTable
     columns={columns}
     label="Machines"
-    rowLabel={(row) => String(row["name"])}
+    getRowLabel={(row) => String(row["name"])}
   />
   <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`);

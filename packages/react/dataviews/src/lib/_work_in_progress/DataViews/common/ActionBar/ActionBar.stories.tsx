@@ -25,7 +25,7 @@ import Pagination from "../Pagination/Pagination.js";
 import Component from "./ActionBar.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Actions",
+  title: "_work_in_progress/DataViews/ActionBar",
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<typeof Component>;
@@ -113,7 +113,7 @@ function ManagedMachines({
         columns={columns}
         label="Machines"
         selectable
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <Component indicator={indicator}>
         <SelectionAction action="archive">Archive</SelectionAction>
@@ -197,14 +197,14 @@ import { archiveMachines, machineCollection, machines } from "./machines.js";`,
     columns={columns}
     label="Machines"
     selectable
-    rowLabel={(row) => row.name}
+    getRowLabel={(row) => row.name}
   />
-  <DataViews.Actions${indicator}>
+  <DataViews.ActionBar${indicator}>
     <SelectionAction action="archive">Archive</SelectionAction>
     <SelectionAction action="delete" anticipation="destructive" icon="delete">
       Delete
     </SelectionAction>
-  </DataViews.Actions>
+  </DataViews.ActionBar>
   <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`,
   });

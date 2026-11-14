@@ -93,14 +93,14 @@ const deliver = (
   rows: readonly Machine[],
 ): void => {
   act(() => {
-    source.latest().deliver(page(rows));
+    source.readLatest().deliver(page(rows));
   });
 };
 
 /** Fail the source's latest request. */
 const fail = (source: ManualSource<Machine>, reason: string): void => {
   act(() => {
-    source.latest().deliver(failure(reason));
+    source.readLatest().deliver(failure(reason));
   });
 };
 
@@ -1611,7 +1611,7 @@ describe("DataTable", () => {
   it("offers a real checkbox per row, named after the record", () => {
     const { provider } = loadedTable(
       [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
-      { selectable: true, rowLabel: (row) => row.name },
+      { selectable: true, getRowLabel: (row) => row.name },
     );
     const checkbox = screen.getByRole("checkbox", { name: "Select alpha" });
     expect(screen.getAllByRole("row")[1]).toHaveAttribute(
@@ -1854,7 +1854,7 @@ describe("DataTable", () => {
     );
     view.unmount();
     // The last observer left, so the source was released with it.
-    expect(source.latest().releases).toBe(1);
+    expect(source.readLatest().releases).toBe(1);
     renders.length = 0;
     // Rows fed to the unobserved provider by hand, and a selection change:
     // nothing is mounted to render either.
@@ -2315,7 +2315,7 @@ describe("DataTable", () => {
         1,
       );
       act(() => {
-        source.latest().deliver(page([buildMachine("m-2", "beta")]));
+        source.readLatest().deliver(page([buildMachine("m-2", "beta")]));
       });
       expect(screen.getByRole("cell", { name: "beta" })).toBeInTheDocument();
       unmount();
@@ -2383,7 +2383,7 @@ describe("DataTable", () => {
     }
     // One mount leaving keeps the source running for the other.
     standalone.unmount();
-    expect(source.latest().releases).toBe(0);
+    expect(source.readLatest().releases).toBe(0);
     expect(screen.getByRole("table", { name: "Inside" })).toBeInTheDocument();
     act(() => {
       provider.setSearch("alpha");
@@ -2783,7 +2783,7 @@ describe("DataTable", () => {
     // between never renders.
     act(() => {
       provider.setSearch("gamma");
-      source.latest().deliver(failure("timed out"));
+      source.readLatest().deliver(failure("timed out"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows do not match the current query: timed out",
@@ -2800,7 +2800,7 @@ describe("DataTable", () => {
       provider.refresh();
     });
     // The refresh is out and the source has not answered it.
-    expect(source.latest().releases).toBe(0);
+    expect(source.readLatest().releases).toBe(0);
     expect(screen.getByRole("table", { name: "Machines" })).toHaveAttribute(
       "aria-busy",
       "true",

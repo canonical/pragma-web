@@ -38,7 +38,7 @@ describe("a page of records replaced by equal ones", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m-1", "alpha")]),
       });
@@ -51,7 +51,7 @@ describe("a page of records replaced by equal ones", () => {
     });
     act(() => {
       // The same machine, in a new object: nothing a card shows has moved.
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m-1", "alpha")]),
       });

@@ -47,7 +47,7 @@ const componentCssClassName = "ds data-views-filters";
  * filter, which the controls submit themselves, from the first page, as a
  * filter command would leave it.
  */
-const destinationOf = ({ slice, window }: DataViewsState<object>): Query => ({
+const readDestination = ({ slice, window }: DataViewsState<object>): Query => ({
   slice: { ...slice, filter: [] },
   window: { ...window, page: 1, cursor: null },
 });
@@ -354,7 +354,7 @@ const renderControl = (
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
- * @implements ds:apps.subcomponent.data_table-filters
+ * @implements ds:apps.subcomponent.data_views-filters
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -516,7 +516,7 @@ export default function Filters({
       />
       <HiddenQueryFields
         provider={provider}
-        destinationOf={destinationOf}
+        readDestination={readDestination}
         omit={refused}
       />
       <Button type="submit" importance="secondary" className="submit">

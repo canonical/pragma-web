@@ -34,7 +34,7 @@ export default function createGridInteraction(
   };
 
   const clamp = (columnId: string, width: number): number => {
-    const sizing = layout.effective(columnId);
+    const sizing = layout.readEffective(columnId);
     let next = Math.max(0, width);
     if (sizing.kind === "flex") {
       next = Math.max(sizing.minPx, next);
@@ -51,7 +51,7 @@ export default function createGridInteraction(
   const handleLayoutChange = (): void => {
     const state = channel.get();
     if (state.status === "resizing" && resizingBaseline !== null) {
-      const current = layout.effective(state.columnId);
+      const current = layout.readEffective(state.columnId);
       if (!areSizingsEqual(current, resizingBaseline)) {
         resizingBaseline = null;
         publish({ status: "idle" });
@@ -62,7 +62,7 @@ export default function createGridInteraction(
   return {
     state: protectChannel(channel),
     startResize(columnId: string, originX: number, startWidth: number): void {
-      resizingBaseline = layout.effective(columnId);
+      resizingBaseline = layout.readEffective(columnId);
       publish({
         status: "resizing",
         columnId,

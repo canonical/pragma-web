@@ -183,7 +183,7 @@ describe("DataCards", () => {
   it("names a card's checkbox by the caller's label over its title", () => {
     loadedCards(rows, {
       selectable: true,
-      rowLabel: (row, rowId) => `${row.name} (${rowId})`,
+      getRowLabel: (row, rowId) => `${row.name} (${rowId})`,
     });
     expect(
       screen.getByRole("checkbox", { name: "Select alpha (m-1)" }),
@@ -255,14 +255,14 @@ describe("DataCards", () => {
           title="name"
           label="Machines"
           selectable
-          rowLabel={(row) => row.name}
+          getRowLabel={(row) => row.name}
         />
         <DataTable
           provider={provider}
           columns={fields}
           label="Machine table"
           selectable
-          rowLabel={(row) => row.name}
+          getRowLabel={(row) => row.name}
         />
       </>,
     );
@@ -303,7 +303,7 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(failure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows could not be loaded: the inventory is unreachable",
@@ -326,13 +326,15 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(failure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows do not match the current query: the inventory is unreachable",
@@ -364,7 +366,7 @@ describe("DataCards", () => {
       provider.setSearch("nothing-at-all");
     });
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage([]) });
+      source.readLatest().deliver({ status: "succeeded", page: buildPage([]) });
     });
     expect(screen.getByRole("status")).toHaveTextContent("nothing: no-results");
   });
@@ -380,13 +382,15 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(failure("the inventory is unreachable"));
     });
     // The cards still answer the query the reader asked, so they stay.
     expect(screen.getByRole("status")).toHaveTextContent(
@@ -410,13 +414,15 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(failure("the inventory is unreachable"));
     });
     const said = screen.getByRole("status");
     // A re-render while the same status stands keeps the element it stands
@@ -507,13 +513,15 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
     });
     act(() => {
-      source.latest().deliver(failure("the inventory is unreachable"));
+      source.readLatest().deliver(failure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toBeInTheDocument();
     await expectNoAxeViolations(view.container);

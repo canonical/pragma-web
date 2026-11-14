@@ -198,7 +198,7 @@ describe("runSource ports", () => {
       capabilities: declare({
         pagination: { kind: "cursor", backward: true, durable: true },
       }),
-      refusals: () => [],
+      listRefusals: () => [],
     });
     expect(() =>
       createDataViewsProvider({ collection, source: source.source }),
@@ -338,7 +338,8 @@ describe("runSource refusals", () => {
     };
     const source = createManualSource({
       capabilities: permissive,
-      refusals: (request) => (request.slice.search === null ? [] : [refusal]),
+      listRefusals: (request) =>
+        request.slice.search === null ? [] : [refusal],
     });
     const { host, release } = running(source.source);
     host.refresh();
@@ -458,7 +459,7 @@ describe("runSource", () => {
     });
     provider.setSearch("web");
     provider.navigateWindow({ page: 2, size: 10 });
-    const last = source.latest().request;
+    const last = source.readLatest().request;
     expect(last.slice).toEqual({
       filter: [{ field: "status", operator: "isAny", operands: ["failed"] }],
       search: "web",
@@ -837,8 +838,8 @@ describe("runSource", () => {
     // The replaced request never ran; the newer one ran once, although the
     // run heard the older publication after it had started the newer one.
     expect(source.calls).toHaveLength(1);
-    expect(source.latest().request.slice.search).toBe("web");
-    expect(source.latest().request.requestId).toBe(
+    expect(source.readLatest().request.slice.search).toBe("web");
+    expect(source.readLatest().request.requestId).toBe(
       host.state.get().pendingRequestId,
     );
     release();
@@ -861,7 +862,7 @@ describe("runSource", () => {
 
     const pending = host.state.get().pendingRequestId;
     expect(pending).not.toBeNull();
-    expect(source.latest().request.requestId).toBe(pending);
+    expect(source.readLatest().request.requestId).toBe(pending);
     release();
   });
 
@@ -1047,12 +1048,12 @@ describe("runSource take-up", () => {
     const run = runSource({ host: liar, source: source.source, facets: [] });
     const release = run.observe();
     host.refresh();
-    source.latest().deliver(succeeded(rows));
+    source.readLatest().deliver(succeeded(rows));
     expect(host.state.get().result.status).toBe("ready");
     lying = true;
     const published = vi.fn();
     const stop = host.state.subscribe(published);
-    source.latest().deliver(succeeded(rows));
+    source.readLatest().deliver(succeeded(rows));
     expect(published).toHaveBeenCalled();
     expect(host.state.get().result.status).toBe("ready");
     stop();

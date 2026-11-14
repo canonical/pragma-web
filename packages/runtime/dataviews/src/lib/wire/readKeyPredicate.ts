@@ -95,7 +95,7 @@ export default function readKeyPredicate(
     // — its presence is the predicate, never a truthiness test on its value
     // — and a kind that filters without a text input has none to parse: the
     // schema answers for the operator alone.
-    return settle(schema.predicateFor(field, operator, []), filled);
+    return settle(schema.buildPredicate(field, operator, []), filled);
   }
   const operands: PredicateOperand[] = [];
   const read: number[] = [];
@@ -130,7 +130,7 @@ export default function readKeyPredicate(
     });
   }
   return settle(
-    schema.predicateFor(
+    schema.buildPredicate(
       field,
       operator,
       isSet ? operands : operands.slice(0, 1),

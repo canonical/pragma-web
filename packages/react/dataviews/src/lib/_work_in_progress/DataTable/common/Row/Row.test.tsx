@@ -39,7 +39,7 @@ const mountRow = ({
       channels={scopes.readRow("m-1")}
       columns={COLUMNS}
       selectable={selectable}
-      rowLabel={(row) => row.name}
+      getRowLabel={(row) => row.name}
       position={position}
       ref={ref}
     />,

@@ -18,18 +18,19 @@ type OwnProps = {
 };
 
 /**
- * Props of the connected action bar. The root is a `div` grouping the
- * selection's commands, so it extends native div props. `role` is excluded,
- * since the group role is the bar's own, and so are `aria-label` and
- * `aria-labelledby`, which would override the name it takes from `label`.
+ * Props of the connected action bar. The root is a `fieldset` grouping the
+ * selection's commands, so it extends native fieldset props. `role` is
+ * excluded, since the group role is the fieldset's own, and so are
+ * `aria-label` and `aria-labelledby`, which would override the name it takes
+ * from `label`.
  * `ref` is merged with the bar's own, which it holds to hand the focus back
  * when it leaves.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type DataViewsActionsProps = OwnProps &
+export type DataViewsActionBarProps = OwnProps &
   Omit<
-    ComponentProps<"div">,
+    ComponentProps<"fieldset">,
     keyof OwnProps | "role" | "aria-label" | "aria-labelledby"
   >;

@@ -20,7 +20,7 @@ describe("createManualSource", () => {
       delivered.push(delivery);
     });
     expect(manual.calls).toHaveLength(1);
-    expect(manual.latest().request).toBe(REQUEST);
+    expect(manual.readLatest().request).toBe(REQUEST);
     manual.callAt(0).deliver({ status: "succeeded", page: buildPage([]) });
     expect(delivered).toHaveLength(1);
     release();
@@ -32,7 +32,7 @@ describe("createManualSource", () => {
     const { source } = createManualSource();
     expect(source.capabilities).toBe(NOTHING_DECLARED);
     expect(source.readDelivery).toBeUndefined();
-    expect(source.refusals).toBeUndefined();
+    expect(source.listRefusals).toBeUndefined();
     expect(source.runAction).toBeUndefined();
   });
 
@@ -48,17 +48,19 @@ describe("createManualSource", () => {
     });
   });
 
-  it("passes the refusals and the action runner through", () => {
-    const refusals = () => [];
+  it("passes the refusal lister and the action runner through", () => {
+    const listRefusals = () => [];
     const runAction = async () => [];
-    const { source } = createManualSource({ refusals, runAction });
-    expect(source.refusals).toBe(refusals);
+    const { source } = createManualSource({ listRefusals, runAction });
+    expect(source.listRefusals).toBe(listRefusals);
     expect(source.runAction).toBe(runAction);
   });
 
   it("fails rather than skipping when no execution is there", () => {
     const manual = createManualSource();
     expect(() => manual.callAt(0)).toThrow("expected an execution at index 0");
-    expect(() => manual.latest()).toThrow("expected an execution at index -1");
+    expect(() => manual.readLatest()).toThrow(
+      "expected an execution at index -1",
+    );
   });
 });

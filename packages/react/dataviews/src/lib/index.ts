@@ -4,7 +4,7 @@ export type {
   DataTableColumn,
   DataTableProps,
   DataTableVirtualization,
-  DataViewsActionsProps,
+  DataViewsActionBarProps,
   DataViewsDataTableProps,
   DataViewsFiltersProps,
   DataViewsPaginationProps,

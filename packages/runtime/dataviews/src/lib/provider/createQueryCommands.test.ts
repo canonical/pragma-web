@@ -36,7 +36,7 @@ const refusedStatus: QueryIssue = {
 const setup = (
   options: {
     readonly capabilities?: SourceCapabilities;
-    readonly refusals?: (query: Query) => readonly SourceRefusal[];
+    readonly listRefusals?: (query: Query) => readonly SourceRefusal[];
     readonly initial?: Query;
     readonly withheld?: readonly QueryIssue[];
   } = {},
@@ -47,7 +47,7 @@ const setup = (
   });
   const source = createManualSource({
     capabilities: options.capabilities ?? statusOnly,
-    refusals: options.refusals,
+    listRefusals: options.listRefusals,
   });
   const publish = vi.fn();
   const transitions = createChannel<Transition | null>(null);
@@ -65,11 +65,11 @@ const setup = (
 };
 
 describe("createQueryCommands", () => {
-  describe("refusals", () => {
+  describe("listRefusals", () => {
     it("answers with the declared refusals before asking the source", () => {
       const own = vi.fn(() => []);
-      const { commands } = setup({ refusals: own });
-      const refused = commands.refusals(
+      const { commands } = setup({ listRefusals: own });
+      const refused = commands.listRefusals(
         query({
           filter: [{ field: "cpu", operator: "gte", operands: [4] }],
         }),
@@ -89,8 +89,8 @@ describe("createQueryCommands", () => {
           reason: "not with a search",
         },
       ];
-      const { commands } = setup({ refusals: () => own });
-      const refused = commands.refusals(query());
+      const { commands } = setup({ listRefusals: () => own });
+      const refused = commands.listRefusals(query());
       expect(refused).toEqual(own);
       expect(refused).not.toBe(own);
       expect(Object.isFrozen(refused)).toBe(true);
@@ -98,10 +98,10 @@ describe("createQueryCommands", () => {
 
     it("answers one frozen empty list when nothing is refused", () => {
       const { commands } = setup();
-      const none = commands.refusals(query());
+      const none = commands.listRefusals(query());
       expect(none).toEqual([]);
       expect(Object.isFrozen(none)).toBe(true);
-      expect(commands.refusals(query())).toBe(none);
+      expect(commands.listRefusals(query())).toBe(none);
     });
   });
 
@@ -112,7 +112,7 @@ describe("createQueryCommands", () => {
       publish.mockImplementation(() => order.push("publish"));
       transitions.subscribe(() => order.push("transition"));
       expect(
-        commands.command({ kind: "setPredicate", predicate: failedOnly }),
+        commands.applyCommand({ kind: "setPredicate", predicate: failedOnly }),
       ).toEqual([]);
       expect(coordinator.state.slice.filter).toEqual([failedOnly]);
       expect(coordinator.state.pendingRequestId).not.toBeNull();
@@ -127,7 +127,7 @@ describe("createQueryCommands", () => {
     it("refuses a command that incurs a refusal, and moves nothing", () => {
       const { coordinator, commands, publish, transitions } = setup();
       const before = coordinator.state;
-      const refused = commands.command({
+      const refused = commands.applyCommand({
         kind: "setPredicate",
         predicate: { field: "cpu", operator: "gte", operands: [4] },
       });
@@ -143,14 +143,14 @@ describe("createQueryCommands", () => {
         initial: query({ filter: [cpu] }),
       });
       expect(
-        commands.command({ kind: "setPredicate", predicate: failedOnly }),
+        commands.applyCommand({ kind: "setPredicate", predicate: failedOnly }),
       ).toEqual([]);
       expect(coordinator.state.slice.filter).toEqual([cpu, failedOnly]);
     });
 
     it("answers a command that moves nothing with no refusal and no move", () => {
       const { commands, publish } = setup();
-      expect(commands.command({ kind: "setSort", sort: [] })).toEqual([]);
+      expect(commands.applyCommand({ kind: "setSort", sort: [] })).toEqual([]);
       expect(publish).not.toHaveBeenCalled();
     });
 
@@ -162,7 +162,7 @@ describe("createQueryCommands", () => {
       expect(coordinator.state.result.problem).toMatchObject({
         status: "refused",
       });
-      commands.command({
+      commands.applyCommand({
         kind: "removePredicate",
         field: "status",
         operator: "isAny",
@@ -175,13 +175,13 @@ describe("createQueryCommands", () => {
     it("throws on a command the grammar rejects", () => {
       const { commands } = setup();
       expect(() =>
-        commands.command({ kind: "navigateWindow", page: 0 }),
+        commands.applyCommand({ kind: "navigateWindow", page: 0 }),
       ).toThrow();
     });
 
     it("enters history as the command asks, over the policy", () => {
       const { commands, transitions } = setup();
-      commands.command(
+      commands.applyCommand(
         { kind: "setPredicate", predicate: failedOnly },
         "replace",
       );

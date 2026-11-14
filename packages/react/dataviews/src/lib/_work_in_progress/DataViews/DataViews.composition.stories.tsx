@@ -74,9 +74,9 @@ function Collection({
         selectable
         // The connected table's records are the widest shape; a typed
         // label goes through the standalone table, or a cell's collection.
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
-      <Component.Actions />
+      <Component.ActionBar />
       <Component.Pagination sizes={[5, 10, 25]} />
     </Component>
   );
@@ -120,9 +120,9 @@ import { platform } from "./router.js";`,
     columns={columns}
     label="Machines"
     selectable
-    rowLabel={(row) => String(row["name"])}
+    getRowLabel={(row) => String(row["name"])}
   />
-  <DataViews.Actions />
+  <DataViews.ActionBar />
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
   }),
@@ -190,9 +190,9 @@ import { platform } from "./router.js";`,
     columns={columns}
     label="Machines"
     selectable
-    rowLabel={(row) => String(row["name"])}
+    getRowLabel={(row) => String(row["name"])}
   />
-  <DataViews.Actions />
+  <DataViews.ActionBar />
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
 });

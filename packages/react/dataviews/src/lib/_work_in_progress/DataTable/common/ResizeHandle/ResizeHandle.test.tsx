@@ -197,7 +197,7 @@ describe("ResizeHandle", () => {
     // The authority is untouched while the preview is live.
     expect(layout.state.get().overrides["name"]).toBeUndefined();
     releasePointer("pointerUp");
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 160 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 160 });
     expect(interaction.state.get().status).toBe("idle");
   });
 
@@ -217,7 +217,7 @@ describe("ResizeHandle", () => {
     movePointer(1000);
     flushFrames();
     releasePointer("pointerUp");
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 300 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 300 });
   });
 
   it("abandons the drag when the pointer is cancelled", () => {
@@ -272,9 +272,9 @@ describe("ResizeHandle", () => {
   it("resizes from the keyboard through the same commands", () => {
     const { layout, handle } = mount();
     fireEvent.keyDown(handle, { key: "ArrowRight" });
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 116 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 116 });
     fireEvent.keyDown(handle, { key: "ArrowLeft" });
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 84 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 84 });
   });
 
   it.each([
@@ -285,7 +285,7 @@ describe("ResizeHandle", () => {
     (key, px) => {
       const { layout, handle } = mount({ direction: "rtl" });
       fireEvent.keyDown(handle, { key });
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px });
     },
   );
 
@@ -296,7 +296,7 @@ describe("ResizeHandle", () => {
     flushFrames();
     expect(interaction.state.get()).toMatchObject({ previewWidth: 160 });
     releasePointer("pointerUp");
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 160 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 160 });
   });
 
   it("commits where a drag let go, though no frame ran before the release", () => {
@@ -304,7 +304,7 @@ describe("ResizeHandle", () => {
     fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
     movePointer(150);
     releasePointer("pointerUp");
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 150 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 150 });
   });
 
   it("commits nothing for a drag let go where it started", () => {
@@ -388,26 +388,26 @@ describe("ResizeHandle", () => {
     fireEvent.keyDown(handle, { key: "ArrowRight" });
     // The first resize committed a fixed override, which carries no bounds
     // of its own: the declared ones must still hold every later drag.
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 116 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 116 });
     fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
     movePointer(1000);
     flushFrames();
     releasePointer("pointerUp");
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 300 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 300 });
     fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
     movePointer(-1000);
     flushFrames();
     releasePointer("pointerUp");
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 50 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 50 });
   });
 
   it("steps no further than a bound, after an override too", () => {
     const { layout, handle } = mount({ width: 290 });
     fireEvent.keyDown(handle, { key: "ArrowLeft" });
     // The column now carries a fixed override with no bounds of its own.
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 274 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 274 });
     fireEvent.keyDown(handle, { key: "ArrowRight" });
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 300 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 300 });
   });
 
   it("commits nothing at a bound, and still owns the key", () => {
@@ -474,7 +474,7 @@ describe("ResizeHandle", () => {
       });
       expect(handle.parentElement).not.toHaveAttribute("data-mode");
       // No frame ran; the release still commits where it let go.
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px: 108 });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 108 });
     });
 
     it("moves the edge to the second press, clamped, without sorting", () => {
@@ -486,7 +486,7 @@ describe("ResizeHandle", () => {
       });
       fireEvent.click(button);
       expect(sort).not.toHaveBeenCalled();
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px: 160 });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 160 });
       expect(handle.parentElement).not.toHaveAttribute("data-mode");
       // The press was consumed once: the next click is the control's own.
       fireEvent.click(button);
@@ -502,7 +502,7 @@ describe("ResizeHandle", () => {
           clientX: 900,
         });
       });
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px: 300 });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 300 });
     });
 
     it("measures from the cell's right edge right to left", () => {
@@ -514,7 +514,7 @@ describe("ResizeHandle", () => {
           clientX: 60,
         });
       });
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px: 150 });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 150 });
     });
 
     it("commits nothing for a second press where the edge already is", () => {
@@ -640,7 +640,7 @@ describe("ResizeHandle", () => {
       const { layout, handle, rerender } = mount();
       pressHandle(handle);
       fireEvent.keyDown(handle, { key: "ArrowRight" });
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px: 116 });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 116 });
       rerender(116);
       // The cell starts at 10: a press at 110 puts the edge back at 100.
       act(() => {
@@ -649,7 +649,7 @@ describe("ResizeHandle", () => {
           clientX: 110,
         });
       });
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px: 100 });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 100 });
     });
 
     it("keeps placing while the window, not the column, loses focus", () => {
@@ -716,7 +716,7 @@ describe("ResizeHandle", () => {
       act(() => {
         releasePointer("pointerUp");
       });
-      expect(layout.effective("name")).toEqual({ kind: "fixed", px: 104 });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 104 });
       expect(handle.parentElement).not.toHaveAttribute("data-mode");
     });
 
@@ -864,7 +864,7 @@ describe("ResizeHandle in a table, a press then a press", () => {
         clientY: 16,
       });
     });
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 240 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 240 });
   });
 
   it("places nothing for a press in the table below the header row", () => {

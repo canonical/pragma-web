@@ -109,7 +109,7 @@ describe("DataViews root", () => {
     // The rehearsal observed and released; the kept mount observes again.
     expect(live(source)).toHaveLength(1);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "alpha")]),
       });
@@ -136,7 +136,7 @@ describe("DataViews root", () => {
     expect(live(second.source)).toHaveLength(1);
     // The parts now read the new provider.
     act(() => {
-      second.source.latest().deliver({
+      second.source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "alpha")]),
       });
@@ -163,7 +163,7 @@ describe("DataViews root", () => {
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
     expect(live(source)).toHaveLength(1);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m2", "beta")]),
       });

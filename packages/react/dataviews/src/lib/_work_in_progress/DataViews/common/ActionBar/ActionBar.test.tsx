@@ -9,13 +9,16 @@ import createMachineProvider from "../../../../../../testing/createMachineProvid
 import type { MachineProvider } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import ActionBar from "./ActionBar.js";
-import type { DataViewsActionsProps } from "./types.js";
+import type { DataViewsActionBarProps } from "./types.js";
 
 /** A provider whose source answers every request at once with no rows. */
 const makeProvider = (): MachineProvider =>
   createMachineProvider({ rows: [] }).provider;
 
-const mount = (provider: MachineProvider, props: DataViewsActionsProps = {}) =>
+const mount = (
+  provider: MachineProvider,
+  props: DataViewsActionBarProps = {},
+) =>
   render(
     <DataViews provider={provider}>
       <ActionBar {...props} />
@@ -30,14 +33,14 @@ const select = (provider: MachineProvider, ids: string[]): void => {
 
 const bar = () => screen.getByRole("group", { name: "Selection actions" });
 
-describe("DataViews.Actions", () => {
-  it("is reachable as the composition's Actions part", () => {
-    expect(DataViews.Actions).toBe(ActionBar);
+describe("DataViews.ActionBar", () => {
+  it("is reachable as the composition's ActionBar part", () => {
+    expect(DataViews.ActionBar).toBe(ActionBar);
   });
 
   it("fails clearly outside a DataViews root", () => {
     expect(() => render(<ActionBar />)).toThrow(
-      "DataViews.Actions must be used inside a DataViews root",
+      "DataViews.ActionBar must be used inside a DataViews root",
     );
   });
 
@@ -263,7 +266,7 @@ describe("DataViews.Actions", () => {
 
   it("merges the caller's ref with the one it holds, in both forms", () => {
     const provider = makeProvider();
-    const held = createRef<HTMLDivElement>();
+    const held = createRef<HTMLFieldSetElement>();
     const view = mount(provider, { ref: held });
     select(provider, ["m1"]);
     expect(held.current).toBe(bar());
@@ -272,7 +275,7 @@ describe("DataViews.Actions", () => {
     // to hand the focus back from.
     expect(held.current).toBe(null);
 
-    const seen: (HTMLDivElement | null)[] = [];
+    const seen: (HTMLFieldSetElement | null)[] = [];
     const second = makeProvider();
     const callback = mount(second, {
       ref: (node) => {

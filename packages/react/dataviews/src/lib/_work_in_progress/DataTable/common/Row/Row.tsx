@@ -12,7 +12,7 @@ function Row<TRow extends object>({
   channels,
   columns,
   selectable,
-  rowLabel,
+  getRowLabel,
   position,
   ref,
 }: RowProps<TRow>): ReactElement {
@@ -36,7 +36,7 @@ function Row<TRow extends object>({
           provider={provider}
           channels={channels}
           selected={selected}
-          rowLabel={rowLabel}
+          getRowLabel={getRowLabel}
         />
       ) : null}
       {columns.map((column) => (

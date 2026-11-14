@@ -18,7 +18,7 @@ export type RowProps<TRow extends object> = {
   readonly channels: RowChannels<TRow>;
   readonly columns: readonly DataTableColumn[];
   readonly selectable: boolean;
-  readonly rowLabel: (row: TRow, rowId: string) => string;
+  readonly getRowLabel: (row: TRow, rowId: string) => string;
   /** The row's logical position, reported only by a virtualized table. */
   readonly position?: number | undefined;
   /** The row element, for a virtualized table to measure. */

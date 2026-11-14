@@ -57,7 +57,7 @@ describe("useProviderState", () => {
     const hook = renderHook(() => useProviderState({ provider }));
     expect(source.calls).toHaveLength(1);
     hook.unmount();
-    expect(source.latest().releases).toBe(1);
+    expect(source.readLatest().releases).toBe(1);
   });
 
   it("speaks the words it is handed, over English", () => {

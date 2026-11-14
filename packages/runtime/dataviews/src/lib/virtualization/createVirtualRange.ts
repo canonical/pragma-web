@@ -70,12 +70,12 @@ export default function createVirtualRange(
   // No anchor at the very top: new entries there are shown, not scrolled
   // past, as the browser's own scroll anchoring leaves them.
   const anchorAt = (offset: number): void => {
-    const position = sizes.at(offset);
+    const position = sizes.findPosition(offset);
     const entry = entries.at(position);
     anchor =
       entry === undefined || offset <= 0
         ? null
-        : { id: entry.id, within: offset - sizes.offset(position) };
+        : { id: entry.id, within: offset - sizes.readOffset(position) };
   };
 
   // Move the viewport by however far the sizes or entries before its
@@ -85,7 +85,7 @@ export default function createVirtualRange(
     const moved =
       anchor === null || position === undefined
         ? 0
-        : sizes.offset(position) + anchor.within - start;
+        : sizes.readOffset(position) + anchor.within - start;
     start += moved;
     return moved;
   };
@@ -95,8 +95,11 @@ export default function createVirtualRange(
     if (count === 0) {
       return emptyRange;
     }
-    const mainStart = Math.max(0, sizes.at(start) - overscan);
-    const mainEnd = Math.min(count, sizes.at(start + size) + 1 + overscan);
+    const mainStart = Math.max(0, sizes.findPosition(start) - overscan);
+    const mainEnd = Math.min(
+      count,
+      sizes.findPosition(start + size) + 1 + overscan,
+    );
     const main: [number, number] = [mainStart, mainEnd];
     const spans: [number, number][] = [main];
     const kept = retained === null ? undefined : positions.get(retained);
@@ -118,14 +121,14 @@ export default function createVirtualRange(
         Object.freeze({
           start: first,
           end,
-          before: sizes.offset(first) - sizes.offset(reached),
+          before: sizes.readOffset(first) - sizes.readOffset(reached),
         }),
       );
       reached = end;
     }
     return Object.freeze({
       runs: Object.freeze(runs),
-      after: sizes.offset(count) - sizes.offset(reached),
+      after: sizes.readOffset(count) - sizes.readOffset(reached),
     });
   };
 
@@ -198,7 +201,7 @@ export default function createVirtualRange(
           continue;
         }
         measured.set(id, measuredSize);
-        if (sizes.size(position) !== measuredSize) {
+        if (sizes.readSize(position) !== measuredSize) {
           sizes.set(position, measuredSize);
           changed = true;
         }
@@ -222,7 +225,7 @@ export default function createVirtualRange(
           "positions are built from the entries they index",
         );
         const estimate = config.estimates[entry.kind];
-        if (sizes.size(position) !== estimate) {
+        if (sizes.readSize(position) !== estimate) {
           sizes.set(position, estimate);
           changed = true;
         }

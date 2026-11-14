@@ -33,7 +33,7 @@ const SearchForm = () => {
     <form aria-label="Search" method="get">
       <HiddenQueryFields
         provider={provider}
-        destinationOf={leadToSearch}
+        readDestination={leadToSearch}
         omit={OMIT}
       />
     </form>

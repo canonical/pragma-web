@@ -42,7 +42,9 @@ export default function createQuerySource<TRow extends object = RowRecord>(
   const forbidden = new Set<string>();
   return {
     capabilities,
-    ...(config.refusals === undefined ? {} : { refusals: config.refusals }),
+    ...(config.listRefusals === undefined
+      ? {}
+      : { listRefusals: config.listRefusals }),
     execute(request, deliver) {
       const key = spellQueryKey(request);
       /** The forbidden mark this request's query is kept under. */

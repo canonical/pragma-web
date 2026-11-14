@@ -154,7 +154,7 @@ describe("useDataViews", () => {
     expect(provider.state.get().slice.filter).toEqual([
       { field: "status", operator: "isAny", operands: ["failed"] },
     ]);
-    expect(source.latest().request.slice.search).toBe("alpha");
+    expect(source.readLatest().request.slice.search).toBe("alpha");
   });
 
   it("runs a declared action over the selection through the source", async () => {

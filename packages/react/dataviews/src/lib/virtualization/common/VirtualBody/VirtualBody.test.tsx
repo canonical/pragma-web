@@ -132,14 +132,14 @@ const load = (
   rows: readonly Machine[],
 ): void => {
   act(() => {
-    source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+    source.readLatest().deliver({ status: "succeeded", page: buildPage(rows) });
   });
 };
 
 /** Fail the source's live request. */
 const fail = (source: ManualSource<Machine>, reason: string): void => {
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "failed",
       failure: { reason, cause: null, transient: null },
     });
@@ -853,7 +853,7 @@ describe("virtualized DataTable", () => {
     // client, is taken up under the request they answer — no new request,
     // so the table never turns busy.
     expect(source.calls).toHaveLength(1);
-    expect(source.latest().request.requestId).toBe(
+    expect(source.readLatest().request.requestId).toBe(
       provider.state.get().result.provenance?.requestId,
     );
     expect(provider.state.get().result.status).toBe("ready");

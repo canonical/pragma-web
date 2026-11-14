@@ -92,7 +92,7 @@ type MachinesOperation = {
 
 /** The page one operation is built for. */
 type PageRequest = Parameters<
-  RelaySourceConfig<MachinesOperation, Machine>["operation"]
+  RelaySourceConfig<MachinesOperation, Machine>["buildOperation"]
 >[0];
 
 /** One page's variables, read from the query by field. */
@@ -209,8 +209,8 @@ export default function createGraphQLMachineSource(
   return createRelaySource<MachinesOperation, Machine>({
     capabilities: GRAPHQL_CAPABILITIES,
     environment,
-    operation: (page) =>
+    buildOperation: (page) =>
       createOperationDescriptor(MachinesQuery, readVariables(page)),
-    connection: (data) => data.machines,
+    readConnection: (data) => data.machines,
   });
 }

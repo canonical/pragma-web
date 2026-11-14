@@ -107,7 +107,7 @@ export type DataViewsComponent = (<
    * @experimental Pre-release: the whole surface is still settling, and this
    * name may change or move before the first release.
    */
-  readonly Actions: typeof ActionBar;
+  readonly ActionBar: typeof ActionBar;
   /**
    * The collection's rows, bound to this root.
    *

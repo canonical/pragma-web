@@ -85,15 +85,15 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
       // answer for.
       return declared;
     }
-    const own = source.refusals?.(query) ?? NO_REFUSALS;
+    const own = source.listRefusals?.(query) ?? NO_REFUSALS;
     // Copied for the same reason a delivered page is: what a source hands
     // over reaches published state, and must not move under it afterwards.
     return own.length === 0 ? NO_REFUSALS : Object.freeze([...own]);
   };
 
   return {
-    refusals: listRefusals,
-    command(
+    listRefusals,
+    applyCommand(
       next: QueryCommand,
       history?: HistoryMode,
     ): readonly SourceRefusal[] {

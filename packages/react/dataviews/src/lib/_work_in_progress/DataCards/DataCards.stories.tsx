@@ -44,7 +44,7 @@ const meta = {
   argTypes: {
     provider: { control: false },
     fields: { control: false },
-    rowLabel: { control: false },
+    getRowLabel: { control: false },
     renderStatus: { control: false },
   },
   // The REST-backed story's endpoint, served through the Storybook MSW
@@ -59,7 +59,7 @@ type Story = StoryObj<typeof Component>;
 /** The cards' own props, less the ones a story's collection supplies. */
 type StoryCardsProps = Omit<
   DataCardsProps<MachineFields, Machine>,
-  "provider" | "fields" | "rowLabel"
+  "provider" | "fields" | "getRowLabel"
 >;
 
 const fields: readonly DisplayField[] = [
@@ -98,7 +98,7 @@ function MachineCards({
       {...args}
       provider={provider}
       fields={cardFields}
-      rowLabel={readHostName}
+      getRowLabel={readHostName}
     />
   );
 }
@@ -140,7 +140,7 @@ export const Selectable: Story = {
   title="name"
   label="Machines"
   selectable
-  rowLabel={(machine) => machine.name}
+  getRowLabel={(machine) => machine.name}
 />`,
   }),
   play: async ({ canvas }) => {
@@ -255,7 +255,7 @@ function SortedAndPagedMachines({
         title="name"
         label={label}
         selectable
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
     </>
@@ -312,7 +312,7 @@ function TableOrCardsMachines({
                 columns={fields}
                 label={label}
                 selectable
-                rowLabel={(row) => String(row["name"])}
+                getRowLabel={(row) => String(row["name"])}
               />
             ),
           },
@@ -325,7 +325,7 @@ function TableOrCardsMachines({
                 title="name"
                 label={label}
                 selectable
-                rowLabel={(row) => String(row["name"])}
+                getRowLabel={(row) => String(row["name"])}
               />
             ),
           },
@@ -404,7 +404,7 @@ function RestBackedMachines({
         fields={fields}
         title="name"
         label={label}
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
     </>

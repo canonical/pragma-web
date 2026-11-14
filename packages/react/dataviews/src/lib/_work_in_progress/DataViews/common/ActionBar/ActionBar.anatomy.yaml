@@ -6,11 +6,9 @@
 # review against the DSL's JSON schema. Pinned props on a named node
 # (`props:`) are 0.3.0's; older schemas refuse them. The root carries the
 # design-system graph's IRI. It is rendered by the connected part
-# `DataViews.Actions`, which keeps the composition's name; the graph's block
-# is the design of that part's default UI.
-#
-# The component is `ActionBar`, after the graph's block; the composition's
-# member keeps its name, `DataViews.Actions`.
+# `DataViews.ActionBar`; the graph's block is the design of its default UI.
+# Its root is a `fieldset`, the group its label names, with the platform's
+# frame removed.
 #
 # Names — one per part, the same in the design, the DOM and here:
 #   action bar           design "Action bar"   graph "DataTable.ActionBar"

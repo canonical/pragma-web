@@ -51,7 +51,7 @@ describe("regression 0002 — stale rows reported ready", () => {
       <DataTable provider={provider} columns={columns} label="Machines" />,
     );
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m-1", "alpha")]),
       });
@@ -60,7 +60,7 @@ describe("regression 0002 — stale rows reported ready", () => {
     // The ordering issued a second request, which the source fails.
     expect(source.calls).toHaveLength(2);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: {
           reason: "the inventory is unreachable",

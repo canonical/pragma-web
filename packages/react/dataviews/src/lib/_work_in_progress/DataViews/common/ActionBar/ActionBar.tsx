@@ -2,7 +2,7 @@ import { Button } from "@canonical/react-ds-global";
 import { type FocusEvent, type ReactElement, useCallback, useRef } from "react";
 import { useDataViewsValue, useMergedRef } from "../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
-import type { DataViewsActionsProps } from "./types.js";
+import type { DataViewsActionBarProps } from "./types.js";
 import "./styles.css";
 
 /**
@@ -23,8 +23,8 @@ const componentCssClassName = "ds data-table-action-bar contrasted";
  *
  * That is the design system's description of the block. What this
  * implementation covers: how much is selected, the actions a caller
- * places, and a button that clears the selection, grouped under the name
- * its label gives. The bar reads the enclosing root's selection and takes
+ * places, and a button that clears the selection, grouped in a `fieldset`
+ * the label names. The bar reads the enclosing root's selection and takes
  * no copy of it. It is absent while nothing is selected. The count is the
  * whole selection, across pages, not the rows on screen.
  *
@@ -49,9 +49,8 @@ export default function ActionBar({
   onFocus,
   ref,
   ...rest
-}: DataViewsActionsProps): ReactElement | null {
-  // The public member keeps the composition's name, Actions.
-  const { provider, messages } = useDataViewsRoot("Actions");
+}: DataViewsActionBarProps): ReactElement | null {
+  const { provider, messages } = useDataViewsRoot("ActionBar");
   const { selection } = provider;
   const count = useDataViewsValue(selection.state).ids.size;
 
@@ -60,7 +59,7 @@ export default function ActionBar({
   // find the focus there and hand it back.
   const origin = useRef<HTMLElement | null>(null);
   const returnFocus = useCallback(
-    (bar: HTMLDivElement) => () => {
+    (bar: HTMLFieldSetElement) => () => {
       if (
         bar.contains(bar.ownerDocument.activeElement) &&
         origin.current?.isConnected
@@ -75,7 +74,7 @@ export default function ActionBar({
   // released.
   const attach = useMergedRef(ref, returnFocus);
 
-  const handleFocus = (event: FocusEvent<HTMLDivElement>): void => {
+  const handleFocus = (event: FocusEvent<HTMLFieldSetElement>): void => {
     const from = event.relatedTarget;
     if (!event.currentTarget.contains(from)) {
       origin.current = from instanceof HTMLElement ? from : null;
@@ -87,11 +86,9 @@ export default function ActionBar({
     return null;
   }
   return (
-    // biome-ignore lint/a11y/useSemanticElements: a fieldset groups form controls under a legend; this groups commands under the name its label gives it
-    <div
+    <fieldset
       {...rest}
       ref={attach}
-      role="group"
       aria-label={label ?? messages.selectionActions}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       onFocus={handleFocus}
@@ -114,6 +111,6 @@ export default function ActionBar({
           selection.clear();
         }}
       />
-    </div>
+    </fieldset>
   );
 }

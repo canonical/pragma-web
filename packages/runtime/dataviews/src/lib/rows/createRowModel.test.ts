@@ -43,8 +43,8 @@ describe("createRowModel", () => {
   it("addresses records by identity, not position", () => {
     const rows = [machine("m-1"), machine("m-2")];
     const model = built({ identify: byId, rows });
-    expect(model.byId("m-2")).toBe(rows[1]);
-    expect(model.byId("absent")).toBeUndefined();
+    expect(model.findRecord("m-2")).toBe(rows[1]);
+    expect(model.findRecord("absent")).toBeUndefined();
   });
 
   it("freezes the entries, the identities and each entry", () => {

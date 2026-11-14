@@ -25,8 +25,8 @@ const wasReplaced = (
   after: RowModel<object>,
   rowId: string,
 ): boolean => {
-  const record = before.byId(rowId);
-  return record !== undefined && record !== after.byId(rowId);
+  const record = before.findRecord(rowId);
+  return record !== undefined && record !== after.findRecord(rowId);
 };
 
 /**
@@ -147,7 +147,7 @@ export default function useVirtualRows({
 
   // One ref per mounted entry, held for as long as its row is mounted so a
   // memoised row is never rendered again for a new one.
-  const refFor = useMemo(() => {
+  const readRowRef = useMemo(() => {
     const refs = new Map<string, EntryPlacement["ref"]>();
     return (id: string): EntryPlacement["ref"] => {
       const known = refs.get(id);
@@ -287,5 +287,5 @@ export default function useVirtualRows({
     }
   });
 
-  return { mounted, body, refFor, onFocus, onBlur };
+  return { mounted, body, readRowRef, onFocus, onBlur };
 }

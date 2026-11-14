@@ -18,7 +18,7 @@ export default function SelectionCell<TRow extends object>({
   provider,
   channels,
   selected,
-  rowLabel,
+  getRowLabel,
   className,
   ...rest
 }: SelectionCellProps<TRow>): ReactElement {
@@ -33,7 +33,7 @@ export default function SelectionCell<TRow extends object>({
     >
       <CheckboxInput
         checked={selected}
-        aria-label={messages.selectRow(rowLabel(record, channels.id))}
+        aria-label={messages.selectRow(getRowLabel(record, channels.id))}
         onChange={() => {
           provider.selection.toggle(channels.id);
         }}

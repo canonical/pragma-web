@@ -83,7 +83,7 @@ function MachineChartWithTable({
       tableProps={{
         columns,
         label: "Machines",
-        rowLabel: (row) => String(row["name"]),
+        getRowLabel: (row) => String(row["name"]),
       }}
     />
   );
@@ -167,7 +167,7 @@ function BesideFiltersMachines(): ReactElement {
         tableProps={{
           columns,
           label: "Machines",
-          rowLabel: (row) => String(row["name"]),
+          getRowLabel: (row) => String(row["name"]),
         }}
       />
       <DataViews.Pagination sizes={[5, 10]} />

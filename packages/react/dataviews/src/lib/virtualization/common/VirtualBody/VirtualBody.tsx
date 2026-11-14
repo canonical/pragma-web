@@ -24,7 +24,7 @@ function VirtualBody({
   tracks,
 }: VirtualBodyProps): ReactElement {
   const model = useDataViewsValue(rowModel);
-  const { mounted, body, refFor, onFocus, onBlur } = useVirtualRows({
+  const { mounted, body, readRowRef, onFocus, onBlur } = useVirtualRows({
     entries,
     estimatedRowHeight,
     model,
@@ -40,7 +40,10 @@ function VirtualBody({
     for (const entry of entries.slice(run.start, run.end)) {
       rows.push(
         <Fragment key={entry.id}>
-          {renderEntry(entry, { ref: refFor(entry.id), position: entry.index })}
+          {renderEntry(entry, {
+            ref: readRowRef(entry.id),
+            position: entry.index,
+          })}
         </Fragment>,
       );
     }

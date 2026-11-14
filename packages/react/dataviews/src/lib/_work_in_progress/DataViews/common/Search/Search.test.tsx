@@ -133,7 +133,7 @@ describe("DataViews.Search", () => {
     const mounted = rendered.mock.calls.length;
     // Three publications that move no search: rows, a refresh, more rows.
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "alder")]),
       });
@@ -142,7 +142,7 @@ describe("DataViews.Search", () => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m2", "birch")]),
       });

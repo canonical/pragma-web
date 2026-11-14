@@ -33,7 +33,7 @@ import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCar
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
-import * as actionsStories from "../../lib/_work_in_progress/DataViews/common/ActionBar/ActionBar.stories.js";
+import * as actionBarStories from "../../lib/_work_in_progress/DataViews/common/ActionBar/ActionBar.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as paginationStories from "../../lib/_work_in_progress/DataViews/common/Pagination/Pagination.stories.js";
 import * as savedViewsStories from "../../lib/_work_in_progress/DataViews/common/SavedViews/SavedViews.stories.js";
@@ -81,7 +81,7 @@ const parts = {
   Composition: composeStories(compositionStories),
   "REST API": composeStories(restStories),
   "GraphQL API": composeStories(graphqlStories),
-  Actions: composeStories(actionsStories),
+  ActionBar: composeStories(actionBarStories),
   Filters: composeStories(filtersStories),
   Pagination: composeStories(paginationStories),
   SavedViews: composeStories(savedViewsStories),
@@ -103,7 +103,7 @@ const AUTHORED_ANYWHERE: readonly string[] = ["Search machines"];
 
 /** What one part's stories write themselves, beside the text every story may. */
 const AUTHORED: Readonly<Record<string, readonly string[]>> = {
-  Actions: ["Delete", "machines selected"],
+  ActionBar: ["Delete", "machines selected"],
   // The root's own story places a child that counts the page's rows.
   DataViews: ["machines on this page"],
   // The cards' stories place a switch of their own, named the same way, and

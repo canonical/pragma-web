@@ -35,7 +35,7 @@ describe("DataViews.DataTable", () => {
     // The root observed the provider, which asked the source for its page.
     expect(source.calls).toHaveLength(1);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "alpha")]),
       });

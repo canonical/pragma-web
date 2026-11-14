@@ -56,7 +56,7 @@ export default function useDataViews<
       setGroup: provider.setGroup,
       setCollapsed: provider.setCollapsed,
       refresh: provider.refresh,
-      refusals: provider.refusals,
+      listRefusals: provider.listRefusals,
       runAction: provider.runAction,
     }),
     [provider, filters],

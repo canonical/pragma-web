@@ -118,7 +118,7 @@ export type ColumnLayout = {
   /** The declared sizing of one column, which every column of the layout has. */
   readonly readDeclared: (id: string) => ColumnSizing;
   /** The effective sizing of one column: its override, else its declared sizing. */
-  readonly effective: (id: string) => ColumnSizing;
+  readonly readEffective: (id: string) => ColumnSizing;
   /** Write a fixed width to the presentation (a resize commit). */
   readonly setOverride: (id: string, sizing: FixedSizing) => void;
 };

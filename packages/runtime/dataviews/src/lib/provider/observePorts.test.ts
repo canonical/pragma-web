@@ -14,10 +14,10 @@ const createLoggingPort = (name: string, log: string[]) => ({
 describe("observePorts", () => {
   it("starts every port in order for the first observer and stops them in reverse for the last", () => {
     const log: string[] = [];
-    const afterStart = vi.fn(() => log.push("started"));
+    const runAfterStart = vi.fn(() => log.push("started"));
     const observation = observePorts({
       ports: [createLoggingPort("a", log), createLoggingPort("b", log)],
-      afterStart,
+      runAfterStart,
     });
     const first = observation.observe();
     const second = observation.observe();
@@ -28,14 +28,14 @@ describe("observePorts", () => {
     second();
     expect(observation.observers).toBe(0);
     expect(log).toEqual(["start a", "start b", "started", "stop b", "stop a"]);
-    expect(afterStart).toHaveBeenCalledTimes(1);
+    expect(runAfterStart).toHaveBeenCalledTimes(1);
   });
 
   it("counts each release once, however often it is called", () => {
     const log: string[] = [];
     const observation = observePorts({
       ports: [createLoggingPort("a", log)],
-      afterStart: () => {},
+      runAfterStart: () => {},
     });
     const first = observation.observe();
     observation.observe();
@@ -47,7 +47,7 @@ describe("observePorts", () => {
 
   it("stops the ports started before one that cannot start, and holds nothing", () => {
     const log: string[] = [];
-    const afterStart = vi.fn();
+    const runAfterStart = vi.fn();
     const observation = observePorts({
       ports: [
         createLoggingPort("a", log),
@@ -57,11 +57,11 @@ describe("observePorts", () => {
           },
         },
       ],
-      afterStart,
+      runAfterStart,
     });
     expect(() => observation.observe()).toThrow("write refused");
     expect(observation.observers).toBe(0);
     expect(log).toEqual(["start a", "stop a"]);
-    expect(afterStart).not.toHaveBeenCalled();
+    expect(runAfterStart).not.toHaveBeenCalled();
   });
 });

@@ -54,7 +54,7 @@ describe("public surface", () => {
       source,
     });
     expect(
-      provider.refusals({
+      provider.listRefusals({
         slice: EMPTY_SLICE,
         window: dataviews.DEFAULT_WINDOW,
       }),

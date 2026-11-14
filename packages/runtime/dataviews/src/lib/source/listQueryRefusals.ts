@@ -16,7 +16,7 @@ import type { SourceCapabilities } from "./types.js";
  * Sort and group are all-or-nothing over their terms: an ordering carrying
  * one unsupported term is refused whole, never truncated. What a
  * declaration cannot express — which cursor pages are reachable, which
- * combinations one endpoint rejects — is the source's own `refusals`, and
+ * combinations one endpoint rejects — is the source's own `listRefusals`, and
  * the binding runs both.
  */
 export default function listQueryRefusals(

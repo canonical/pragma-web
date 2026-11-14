@@ -50,7 +50,7 @@ export type RowModel<TRow extends object = RowRecord> = {
   readonly entries: readonly RowEntry<TRow>[];
   readonly ids: readonly string[];
   /** The record for one identity, or undefined when the row is not modelled. */
-  readonly byId: (id: string) => TRow | undefined;
+  readonly findRecord: (id: string) => TRow | undefined;
 };
 
 /**

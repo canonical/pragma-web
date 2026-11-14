@@ -14,10 +14,10 @@ import type { HiddenQueryFieldsProps } from "./types.js";
  */
 export default function HiddenQueryFields({
   provider,
-  destinationOf,
+  readDestination,
   omit,
 }: HiddenQueryFieldsProps): ReactElement {
-  const spelled = useDestination({ provider, destinationOf });
+  const spelled = useDestination({ provider, readDestination });
   const fields = useMemo(
     () =>
       listHiddenFields(

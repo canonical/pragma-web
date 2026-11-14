@@ -87,9 +87,9 @@ export const FrenchLocale: Story = {
             columns={frenchColumns}
             label="Machines"
             selectable
-            rowLabel={(row) => String(row["name"])}
+            getRowLabel={(row) => String(row["name"])}
           />
-          <Component.Actions />
+          <Component.ActionBar />
           <Component.Pagination sizes={[5, 10]} />
         </Component>
       </div>

@@ -53,7 +53,7 @@ describe("useDataViewsFilter", () => {
     expect(provider.state.get().slice.filter).toEqual([
       { field: "cores", operator: "gte", operands: [4] },
     ]);
-    expect(machineProvider.source.latest().request.slice.filter).toEqual([
+    expect(machineProvider.source.readLatest().request.slice.filter).toEqual([
       { field: "cores", operator: "gte", operands: [4] },
     ]);
   });

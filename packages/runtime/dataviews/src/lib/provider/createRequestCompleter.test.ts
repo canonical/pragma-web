@@ -23,9 +23,9 @@ const succeeded = (page: readonly RowRecord[]): Completion => ({
 
 /** A typing that rejects every model with the given reason, or none. */
 const typing = (rejection: string | null): RecordTyping => ({
-  rejectionOf: () => rejection,
-  applicability: () => "applies",
-  recordType: () => null,
+  readRejection: () => rejection,
+  readApplicability: () => "applies",
+  readRecordType: () => null,
   remember: vi.fn(),
   forget: vi.fn(),
 });

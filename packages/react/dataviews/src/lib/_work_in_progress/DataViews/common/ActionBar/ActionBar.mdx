@@ -3,9 +3,9 @@ import * as Stories from "./ActionBar.stories";
 
 <Meta of={Stories} name="Recipes" />
 
-# DataViews.Actions recipes
+# DataViews.ActionBar recipes
 
-`DataViews.Actions` is the action bar: how much is selected, the actions that apply to it, and a button that clears it. It reads the enclosing root's selection and takes no copy of it, and it is absent while nothing is selected.
+`DataViews.ActionBar` is the action bar: how much is selected, the actions that apply to it, and a button that clears it. It reads the enclosing root's selection and takes no copy of it, and it is absent while nothing is selected.
 
 It renders on the design system's contrasted surface — its root carries `.contrasted`, from `@canonical/styles` — so it paints no colour of its own. Place it in the collection's footer beside the pagination bar.
 
@@ -83,14 +83,14 @@ export function Machines() {
         columns={columns}
         label="Machines"
         selectable
-        rowLabel={(row) => row.name}
+        getRowLabel={(row) => row.name}
       />
-      <DataViews.Actions>
+      <DataViews.ActionBar>
         <SelectionAction action="archive">Archive</SelectionAction>
         <SelectionAction action="delete" anticipation="destructive" icon="delete">
           Delete
         </SelectionAction>
-      </DataViews.Actions>
+      </DataViews.ActionBar>
       <DataViews.Pagination sizes={[5, 10]} />
     </DataViews>
   );
@@ -128,9 +128,9 @@ function MachinesSelected() {
   );
 }
 
-<DataViews.Actions indicator={<MachinesSelected />}>
+<DataViews.ActionBar indicator={<MachinesSelected />}>
   {/* the actions */}
-</DataViews.Actions>;
+</DataViews.ActionBar>;
 ```
 
 <Canvas of={Stories.CustomIndicator} sourceState="none" />

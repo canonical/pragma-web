@@ -72,7 +72,7 @@ const load = (
         ? { kind: "exact", value: count }
         : count;
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "succeeded",
       page: {
         rows,
@@ -406,7 +406,7 @@ describe("PaginationBar", () => {
       provider.setSearch("m1");
     });
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: { reason: "offline", cause: null, transient: null },
       });
@@ -483,7 +483,7 @@ describe("PaginationBar", () => {
     // The rehearsal mount released its hold; the live execution is the
     // one the real mount started, for the same request.
     expect(source.callAt(0).releases).toBe(1);
-    expect(source.latest().releases).toBe(0);
+    expect(source.readLatest().releases).toBe(0);
     load(source, machines(2), 5);
     expect(summary()).toHaveTextContent(/^Showing 1–2 out of 5 rows$/);
     fireEvent.click(next());
@@ -504,11 +504,11 @@ describe("PaginationBar", () => {
         counts: { pageable: "exact" },
         pagination: { kind: "cursor", backward: false, durable: false },
       }),
-      refusals: () => [],
+      listRefusals: () => [],
     });
     mount(provider);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: {
           rows: machines(2),
@@ -533,7 +533,7 @@ describe("PaginationBar", () => {
       cursor: "c:m1",
     });
     // And the source is asked for the page the token names.
-    expect(source.latest().request.window.cursor).toBe("c:m1");
+    expect(source.readLatest().request.window.cursor).toBe("c:m1");
   });
 
   it("hides the controls only the enhancement can drive until scripting is enabled", () => {

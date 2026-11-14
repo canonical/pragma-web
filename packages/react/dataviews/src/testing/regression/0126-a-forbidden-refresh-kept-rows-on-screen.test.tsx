@@ -36,7 +36,7 @@ describe("regression 0126 — a forbidden refresh kept rows on screen", () => {
     );
     // More rows match than one page shows, so the bar offers the next one.
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: createPage({
           rows: [buildMachine("m-1", "alpha")],
@@ -53,7 +53,9 @@ describe("regression 0126 — a forbidden refresh kept rows on screen", () => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver({ status: "forbidden", cause: new Error("403") });
+      source
+        .readLatest()
+        .deliver({ status: "forbidden", cause: new Error("403") });
     });
     expect(screen.queryByText("alpha")).toBeNull();
     const table = screen.getByRole("table", { name: "Machines" });

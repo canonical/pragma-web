@@ -94,8 +94,6 @@ const renderVirtualizedBody = (
  * however many tables it places. Its private cells and menus read the words
  * from the context it installs over them.
  *
- * `import { DataTable } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.pattern.data_table
  */
 export default function ScopedDataTable<
@@ -106,7 +104,7 @@ export default function ScopedDataTable<
   columns,
   label,
   selectable = false,
-  rowLabel = defaultRowLabel,
+  getRowLabel = defaultRowLabel,
   renderStatus,
   virtualization,
   settings,
@@ -257,7 +255,7 @@ export default function ScopedDataTable<
   // Held behind one identity apiece: the README's own examples pass these
   // as lambdas, and a new function per render would re-render every row
   // and every cell of the body for nothing.
-  const nameRow = useStableCallback(rowLabel);
+  const nameRow = useStableCallback(getRowLabel);
   // The messages' words for a status, unless the caller renders its own.
   const describe = useCallback(
     (shown: DisplayStatus) => describeStatus(shown, messages),
@@ -288,7 +286,7 @@ export default function ScopedDataTable<
           channels={scopes.readRow(entry.rowId)}
           columns={rendered}
           selectable={selectable}
-          rowLabel={nameRow}
+          getRowLabel={nameRow}
         />
       ),
     [renderer, provider, scopes, rendered, selectable, nameRow],

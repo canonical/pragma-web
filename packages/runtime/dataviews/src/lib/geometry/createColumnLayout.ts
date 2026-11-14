@@ -144,7 +144,7 @@ export default function createColumnLayout(
       },
     }),
     readDeclared: readDeclaredSizing,
-    effective(id: string): ColumnSizing {
+    readEffective(id: string): ColumnSizing {
       return readOverride(id) ?? readDeclaredSizing(id);
     },
     setOverride(id: string, sizing: FixedSizing): void {

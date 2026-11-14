@@ -41,7 +41,7 @@ describe("regression 0064 — only the first reason was read", () => {
       rows: [buildMachine("m-1", "alpha")],
       // The declaration refuses nothing: the source answers for itself.
       capabilities: declareMachineOrdering(2),
-      refusals: (query) =>
+      listRefusals: (query) =>
         query.slice.sort.length === 0
           ? []
           : [

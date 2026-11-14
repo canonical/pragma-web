@@ -83,30 +83,32 @@ describe("createRecordTyping", () => {
   describe("applicability", () => {
     it("applies an unscoped field to every type", () => {
       const { record } = typing();
-      expect(record.applicability("type", container("c-1"))).toBe("applies");
-      expect(record.applicability("type", machine("v-1"))).toBe("applies");
+      expect(record.readApplicability("type", container("c-1"))).toBe(
+        "applies",
+      );
+      expect(record.readApplicability("type", machine("v-1"))).toBe("applies");
     });
 
     it("applies a field the schema does not describe at all", () => {
       // A column showing something outside the schema has no scoping, and
       // absent scoping is every type.
-      expect(typing().record.applicability("uptime", container("c-1"))).toBe(
-        "applies",
-      );
+      expect(
+        typing().record.readApplicability("uptime", container("c-1")),
+      ).toBe("applies");
     });
 
     it("withholds a scoped field from a row of another type", () => {
       const { record } = typing();
-      expect(record.applicability("secureboot", machine("v-1"))).toBe(
+      expect(record.readApplicability("secureboot", machine("v-1"))).toBe(
         "applies",
       );
-      expect(record.applicability("secureboot", container("c-1"))).toBe(
+      expect(record.readApplicability("secureboot", container("c-1"))).toBe(
         "not-applicable",
       );
-      expect(record.applicability("processes", container("c-1"))).toBe(
+      expect(record.readApplicability("processes", container("c-1"))).toBe(
         "applies",
       );
-      expect(record.applicability("processes", machine("v-1"))).toBe(
+      expect(record.readApplicability("processes", machine("v-1"))).toBe(
         "not-applicable",
       );
     });
@@ -114,7 +116,7 @@ describe("createRecordTyping", () => {
     it("withholds a scoped field from a row carrying no declared type", () => {
       const { record } = typing();
       const untyped = { id: "x", type: "sandbox" } as unknown as Instance;
-      expect(record.applicability("secureboot", untyped)).toBe(
+      expect(record.readApplicability("secureboot", untyped)).toBe(
         "not-applicable",
       );
     });
@@ -123,14 +125,14 @@ describe("createRecordTyping", () => {
   describe("rejectionOf", () => {
     it("accepts a model whose every row carries a declared type", () => {
       const { record } = typing();
-      expect(record.rejectionOf(modelOf([container("c-1"), machine("v-1")]))) //
+      expect(record.readRejection(modelOf([container("c-1"), machine("v-1")]))) //
         .toBeNull();
     });
 
     it("names the row and the value a model cannot be displayed for", () => {
       const { record } = typing();
       const rogue = { id: "x-1", type: "sandbox" } as unknown as Instance;
-      expect(record.rejectionOf(modelOf([container("c-1"), rogue]))).toBe(
+      expect(record.readRejection(modelOf([container("c-1"), rogue]))).toBe(
         'record type "sandbox" of row "x-1" is not declared',
       );
     });
@@ -138,7 +140,7 @@ describe("createRecordTyping", () => {
     it("names a row carrying no discriminator value at all", () => {
       const { record } = typing();
       const rogue = { id: "x-1" } as unknown as Instance;
-      expect(record.rejectionOf(modelOf([rogue]))).toBe(
+      expect(record.readRejection(modelOf([rogue]))).toBe(
         'record type undefined of row "x-1" is not declared',
       );
     });
@@ -148,12 +150,12 @@ describe("createRecordTyping", () => {
     it("reads a selected row's type from the rows on display", () => {
       const { record, selection } = typing(modelOf([machine("v-1")]));
       selection.set(["v-1"]);
-      expect(record.recordType("v-1")).toBe("virtual-machine");
+      expect(record.readRecordType("v-1")).toBe("virtual-machine");
     });
 
     it("knows no type for an identity that is not selected", () => {
       const { record } = typing(modelOf([machine("v-1")]));
-      expect(record.recordType("v-1")).toBeNull();
+      expect(record.readRecordType("v-1")).toBeNull();
     });
 
     it("knows no type for a selected identity it never modelled", () => {
@@ -164,8 +166,8 @@ describe("createRecordTyping", () => {
       selection.set(["gone", "v-1"]);
       record.remember(displayed);
       rows.set(EMPTY_ROW_MODEL);
-      expect(record.recordType("gone")).toBeNull();
-      expect(record.recordType("v-1")).toBe("virtual-machine");
+      expect(record.readRecordType("gone")).toBeNull();
+      expect(record.readRecordType("v-1")).toBe("virtual-machine");
     });
 
     it("keeps a selected row's type once its page is replaced", () => {
@@ -174,8 +176,8 @@ describe("createRecordTyping", () => {
       selection.set(["v-1", "c-1"]);
       record.remember(first);
       rows.set(modelOf([machine("v-2")]));
-      expect(record.recordType("v-1")).toBe("virtual-machine");
-      expect(record.recordType("c-1")).toBe("container");
+      expect(record.readRecordType("v-1")).toBe("virtual-machine");
+      expect(record.readRecordType("c-1")).toBe("container");
     });
 
     it("takes the type of a row selected on the page being left", () => {
@@ -185,7 +187,7 @@ describe("createRecordTyping", () => {
       // No read while it was displayed: the memory is taken on the way out.
       record.remember(first);
       rows.set(EMPTY_ROW_MODEL);
-      expect(record.recordType("v-1")).toBe("virtual-machine");
+      expect(record.readRecordType("v-1")).toBe("virtual-machine");
     });
 
     it("answers from the row on display, never from an older memory", () => {
@@ -196,7 +198,7 @@ describe("createRecordTyping", () => {
       // The identity comes back as a record of another type. Memory is for
       // the rows that are not displayed; it never overrules one that is.
       rows.set(modelOf([container("v-1")]));
-      expect(record.recordType("v-1")).toBe("container");
+      expect(record.readRecordType("v-1")).toBe("container");
     });
 
     it("re-takes the memory from the row displayed now", () => {
@@ -208,7 +210,7 @@ describe("createRecordTyping", () => {
       rows.set(second);
       record.remember(second);
       rows.set(EMPTY_ROW_MODEL);
-      expect(record.recordType("v-1")).toBe("container");
+      expect(record.readRecordType("v-1")).toBe("container");
     });
 
     it("carries a remembered type through the pages that follow", () => {
@@ -222,7 +224,7 @@ describe("createRecordTyping", () => {
       // model that never held it, it is carried.
       record.remember(second);
       rows.set(EMPTY_ROW_MODEL);
-      expect(record.recordType("v-1")).toBe("virtual-machine");
+      expect(record.readRecordType("v-1")).toBe("virtual-machine");
     });
 
     it("drops the type of an identity that left the selection", () => {
@@ -232,11 +234,11 @@ describe("createRecordTyping", () => {
       record.remember(first);
       rows.set(EMPTY_ROW_MODEL);
       selection.remove(["v-1"]);
-      expect(record.recordType("v-1")).toBeNull();
+      expect(record.readRecordType("v-1")).toBeNull();
       // And the deselected identity is not carried into the next memory.
       record.remember(EMPTY_ROW_MODEL);
       selection.set(["v-1"]);
-      expect(record.recordType("v-1")).toBeNull();
+      expect(record.readRecordType("v-1")).toBeNull();
     });
 
     it("remembers nothing for a row whose type is not declared", () => {
@@ -246,7 +248,7 @@ describe("createRecordTyping", () => {
       selection.set(["x-1"]);
       record.remember(first);
       rows.set(EMPTY_ROW_MODEL);
-      expect(record.recordType("x-1")).toBeNull();
+      expect(record.readRecordType("x-1")).toBeNull();
     });
 
     it("forgets everything when reset begins the next generation", () => {
@@ -256,7 +258,7 @@ describe("createRecordTyping", () => {
       record.remember(first);
       rows.set(EMPTY_ROW_MODEL);
       record.forget();
-      expect(record.recordType("v-1")).toBeNull();
+      expect(record.readRecordType("v-1")).toBeNull();
     });
   });
 });
