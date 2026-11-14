@@ -31,7 +31,11 @@ type OwnProps = {
   readonly LinkComponent?: LinkComponent;
   /** The entity's type, opening the second line. */
   readonly kind?: ReactNode;
-  /** Where the entity is defined, on the second line. */
+  /**
+   * Where the entity is defined, on the second line.
+   *
+   * @deprecated Use `prefix`.
+   */
   readonly location?: ReactNode;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;

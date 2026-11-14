@@ -18,9 +18,17 @@ type OwnProps = {
   readonly prefix?: ReactNode;
   /** The entity's name: the mention's text, and its link when linked. */
   readonly title?: ReactNode;
-  /** The key the value is filed under, shown before the catalog's separator. */
+  /**
+   * The key the value is filed under, shown before the catalog's separator.
+   *
+   * @deprecated A mention names no key; name the entity in `title`.
+   */
   readonly lead?: ReactNode;
-  /** The mention's text, when no `title` is given. */
+  /**
+   * The mention's text, when no `title` is given.
+   *
+   * @deprecated Use `title`.
+   */
   readonly value?: ReactNode;
   /**
    * The entity's home: with one the value links to it, without one the value
@@ -39,11 +47,23 @@ type OwnProps = {
    * is open, so a lazy query in it runs only when a reader asks.
    */
   readonly peek?: ReactNode;
-  /** A count beside the value: a published `Badge`. */
+  /**
+   * A count beside the value: a published `Badge`.
+   *
+   * @deprecated Use `status`.
+   */
   readonly badge?: ReactNode;
-  /** A status glyph after the badge: a published `Icon`. */
+  /**
+   * A status glyph after the badge: a published `Icon`.
+   *
+   * @deprecated Use `status`.
+   */
   readonly icon?: ReactNode;
-  /** Whether the chip ends in the disclosure chevron. */
+  /**
+   * Whether the chip ends in the disclosure chevron.
+   *
+   * @deprecated Use `status`; a mention discloses nothing.
+   */
   readonly chevron?: boolean;
   /** The entity's status after the title, such as a published `Badge`. */
   readonly status?: ReactNode;
