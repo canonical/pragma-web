@@ -231,29 +231,26 @@ const EXPECTED_SWITCH_CURRENT: Readonly<Record<string, readonly string[]>> = {
  *
  * The trail is URL-DERIVED, which is exactly why this can be pinned without
  * pinning a graph count: an INDEX page is one current crumb (the lens name);
- * an ENTITY page is the lens crumb (a router link back to the index) plus
- * the current crumb, whose text is the ROUTE PARAM (a prefixed URI/slug),
- * not a fetched display name — so the assertion stays stable across ontology
- * edits, and a wrong trail fails here. A guide's page shows the guides'
- * crumb and the guide's slug, as an entity page shows its lens and its
- * address.
+ * an ENTITY page ends the trail at the parent: the lens crumb alone, a
+ * router link back to the index, its address never drawn as a crumb — so
+ * the assertion stays stable across ontology edits, and a wrong trail fails
+ * here. A guide's page shows the guides' crumb alone, as an entity page
+ * shows its lens.
  */
 
 /** Build the exact breadcrumb markup a `LensBreadcrumbs` renders in the
- * strip. An `entity` present ⇒ the ENTITY shape (linked lens crumb + current
- * terminal crumb); absent ⇒ the INDEX shape (the lens crumb IS current). */
-const trail = (
-  lensLabel: string,
-  entity?: { readonly lensHref: string; readonly current: string },
-): string => {
+ * strip. A `lensHref` present ⇒ the ENTITY shape (the linked lens crumb
+ * alone); absent ⇒ the INDEX shape (the lens crumb IS current). */
+const trail = (lensLabel: string, lensHref?: string): string => {
   const nav = (inner: string): string =>
     `<nav class="ds breadcrumbs ds lens-breadcrumbs" aria-label="Breadcrumb"><ol class="list p">${inner}</ol></nav>`;
   const sep = '<span class="separator" aria-hidden="true">/</span>';
   const currentCrumb = (label: string): string =>
-    `<li class="ds breadcrumbs-item current">${sep}<span class="link" aria-current="page">${label}</span></li>`;
-  if (entity === undefined) return nav(currentCrumb(lensLabel));
-  const linkCrumb = `<li class="ds breadcrumbs-item">${sep}<a class="link" href="${entity.lensHref}">${lensLabel}</a></li>`;
-  return nav(linkCrumb + currentCrumb(entity.current));
+    `<li class="ds breadcrumbs-item current lens">${sep}<span class="link" aria-current="page">${label}</span></li>`;
+  if (lensHref === undefined) return nav(currentCrumb(lensLabel));
+  return nav(
+    `<li class="ds breadcrumbs-item lens">${sep}<a class="link" href="${lensHref}">${lensLabel}</a></li>`,
+  );
 };
 
 const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
@@ -266,38 +263,24 @@ const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
   "/standards": trail("Standards"),
   "/journeys": trail("Journeys"),
   "/guides": trail("Guides"),
-  // Entity pages: the lens crumb links back to the index, the terminal
-  // crumb is the ROUTE PARAM (percent-decoded), never a live display name.
-  [BUTTON_ENTITY_URL]: trail("Components", {
-    lensHref: "/components",
-    current: "ds:global.component.button",
-  }),
-  [DEFINITIONS_TERM_URL]: trail("Definitions", {
-    lensHref: "/definitions",
-    current: "ds:UIBlock",
-  }),
-  [STANDARD_READING_URL]: trail("Standards", {
-    lensHref: "/standards",
-    current: LINK_COMPONENT_URI,
-  }),
-  [JOURNEYS_JOB_URL]: trail("Journeys", {
-    lensHref: "/journeys",
-    current: "sem://design-system-docs#job.l3",
-  }),
+  // Entity pages: the trail ends at the lens crumb, a link back to the
+  // index; the page's address is never drawn as a crumb.
+  [BUTTON_ENTITY_URL]: trail("Components", "/components"),
+  [DEFINITIONS_TERM_URL]: trail("Definitions", "/definitions"),
+  [STANDARD_READING_URL]: trail("Standards", "/standards"),
+  [JOURNEYS_JOB_URL]: trail("Journeys", "/journeys"),
   // The playground and the account pages render under their own layouts,
   // each naming its single address as one current crumb.
   "/playground": trail("Playground"),
   [ACCOUNT_URL]: trail("Account"),
   "/login": trail("Login"),
-  [GUIDE_URL]: trail("Guides", {
-    lensHref: "/guides",
-    current: "getting-started",
-  }),
+  [GUIDE_URL]: trail("Guides", "/guides"),
 };
 
 /** Per-URL count of `aria-current="page"` carried INSIDE the strip trail
- * slot: the breadcrumb trail's terminal (current) crumb carries exactly one,
- * on every URL, since every layout renders a trail. The aria-current census
+ * slot: the breadcrumb trail's current crumb carries exactly one on an
+ * index or a single address, and none below an index, where the trail ends
+ * at the parent's link. The aria-current census
  * below adds this to the rail's anchor count, because the current crumb is a
  * `<span>`, invisible to the anchor-scoped href model but real to a total
  * count over the whole chrome. */
@@ -308,11 +291,12 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
   "/standards": 1,
   "/journeys": 1,
   "/guides": 1,
-  [BUTTON_ENTITY_URL]: 1,
-  [DEFINITIONS_TERM_URL]: 1,
-  [STANDARD_READING_URL]: 1,
-  [JOURNEYS_JOB_URL]: 1,
+  [BUTTON_ENTITY_URL]: 0,
+  [DEFINITIONS_TERM_URL]: 0,
+  [STANDARD_READING_URL]: 0,
+  [JOURNEYS_JOB_URL]: 0,
   ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, 1])),
+  [GUIDE_URL]: 0,
 };
 
 /**
@@ -638,9 +622,9 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     // that gap — any extra carrier on any element breaks it.
     //
     // The total is the rail's exact-match anchors PLUS the strip
-    // breadcrumb's terminal (current) crumb — a `<span aria-current="page">`
-    // the anchor model above cannot see, present on every URL that claims a
-    // Context (all but the pages with no trail). Both carriers are modelled, so an
+    // breadcrumb's current crumb — a `<span aria-current="page">` the
+    // anchor model above cannot see, present on every index and single
+    // address (not below an index, where the trail ends at its link). Both carriers are modelled, so an
     // unaccounted-for third would break this.
     for (const [url, { chrome }] of getPages()) {
       expect(

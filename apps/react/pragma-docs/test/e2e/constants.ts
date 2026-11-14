@@ -39,9 +39,8 @@ export const JOURNEYS_PATHS = [
 /**
  * Pages on the document archetype: the lobby, whose canvas scrolls at a
  * phone's width; the Components catalog and the Standards index, whose
- * columns must fit four grid columns; a standard's entity page, whose
- * current crumb is the standard's IRI, an identifier with no break
- * opportunity; two components' pages, whose identifiers, anatomy trees and
+ * columns must fit four grid columns; a standard's entity page, addressed
+ * by the standard's IRI, an identifier with no break opportunity; two components' pages, whose identifiers, anatomy trees and
  * properties tables are wider than a phone; the not-found page; and the
  * pages of prose, the sign-in and account pages, the guides and a guide,
  * and the playground, whose sections must span the main column like every
