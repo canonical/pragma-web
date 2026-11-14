@@ -22,8 +22,10 @@
 # Token ledger:
 #   layout.stack 1: over the canvas's in-flow content; no semantic stacking
 #     symbol exists.
-#   size.width, size.max.width, size.max.height 100%: fills the viewport
-#     (unthemable).
+#   size.width, size.height, size.max.width, size.max.height 100%: fills
+#     the viewport (unthemable); the dialog's own fit-content height is
+#     replaced, so the open sheet covers the page beneath, border-box so
+#     its padding stays inside it.
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)  below two groups: the open sheet is a
@@ -42,7 +44,9 @@ node:
     layout.offset.bottom: 0
     layout.offset.left: 0
     layout.stack: 1
+    layout.boxSizing: border-box
     size.width: 100%
+    size.height: 100%
     size.max.width: 100%
     size.max.height: 100%
     spacing.external.block.start: 0
@@ -87,5 +91,6 @@ node:
           layout.direction: column
           spacing.gap: grid.gutter
           layout.overflow.block: auto
+          layout.flex.grow: 1
           size.min.block: 0
       relation: { cardinality: "1", slotName: content }
