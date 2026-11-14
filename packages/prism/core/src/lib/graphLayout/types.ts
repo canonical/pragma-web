@@ -197,6 +197,88 @@ export interface LayeredOptions {
   readonly crossPorts?: ReadonlyMap<string, CrossPort>;
 }
 
+/** One relation drawn in a bundle, as the labels name it. */
+export interface LabelledRelation extends LayeredRelation {
+  /** The predicate's label. */
+  readonly label: string;
+}
+
+/** The relations between one pair of nodes, as the labels read them. */
+export interface LabelledBundle extends LayeredBundle {
+  /** The bundled relations. */
+  readonly relations: readonly LabelledRelation[];
+  /** Whether relations run both ways. */
+  readonly opposite: boolean;
+}
+
+/** A node laid out in the graph, as the label placer reads it. */
+export interface LabelledNode {
+  /** The node's id: its full IRI. */
+  readonly uri: string;
+  /** The column in its region. */
+  readonly col: number;
+  /** The region the node sits in. */
+  readonly region: string;
+  /** The box's top-left corner and size in the graph. */
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+  /** The loop's extent above and right of the box. */
+  readonly loopExtent: number;
+}
+
+/** An edge laid out in the graph, as the label placer reads it. */
+export interface LabelledEdge {
+  readonly id: string;
+  readonly kind: "subclass" | "relation";
+  readonly from: string;
+  readonly to: readonly string[];
+  /** The path's SVG data. */
+  readonly d: string;
+  readonly bundle?: LabelledBundle;
+  readonly self?: boolean;
+  readonly arc?: boolean;
+  /** The loop's or the arc's outermost point. */
+  readonly apex?: Point;
+}
+
+/** A region laid out in the graph, as the label placer reads it. */
+export interface LabelledRegion {
+  readonly prefix: string;
+  readonly ids: readonly string[];
+  readonly x: number;
+  readonly y: number;
+}
+
+/** A graph laid out, as far as its edge labels need: the placer's input. */
+export interface LabelledLayout {
+  readonly nodes: ReadonlyMap<string, LabelledNode>;
+  readonly edges: readonly LabelledEdge[];
+  readonly regions: readonly LabelledRegion[];
+  /** The box the labels must stay inside. */
+  readonly viewBox: Rect;
+}
+
+/** An edge label placed for the focus node. */
+export interface PlacedLabel {
+  readonly edge: string;
+  readonly lines: readonly string[];
+  readonly box: Rect;
+  /** The label's centre. */
+  readonly cx: number;
+  readonly cy: number;
+}
+
+/** The labels placed for a focus node, and those that found no place. */
+export interface LabelPlacement {
+  readonly placed: readonly PlacedLabel[];
+  readonly omitted: readonly {
+    readonly edge: string;
+    readonly lines: readonly string[];
+  }[];
+}
+
 /**
  * A graph engine's layout: a pure function of its nodes, edges and options
  * to positions and routes, so the same input always gives the same result.

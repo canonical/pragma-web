@@ -5,6 +5,7 @@
  */
 
 import {
+  COLLISION_MARGIN,
   containsPoint,
   findCentredBaseline,
   flattenPath,
@@ -16,16 +17,15 @@ import {
   type Point,
   parsePathData,
   REGION_LABEL_GAP,
+  REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
   type Rect,
   samplePath,
 } from "@canonical/prism-core";
 import {
   BOX_INSET,
-  COLLISION_MARGIN,
   DESIGN_CANVAS,
   PHONE,
-  REGION_LABEL_ROW,
   WRAPPED_BASELINES,
 } from "../src/lib/classGraph/constants.js";
 import type {

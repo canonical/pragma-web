@@ -1,9 +1,9 @@
 import {
+  COLLISION_MARGIN,
   measurePathBounds,
   type Rect,
   uniteRects,
 } from "@canonical/prism-core";
-import { COLLISION_MARGIN } from "../../../../classGraph/constants.js";
 import layOutClassGraph from "../../../../classGraph/layOutClassGraph.js";
 import type { ClassGraphLayout } from "../../../../classGraph/types.js";
 import type { Translate } from "../../../../i18n/index.js";

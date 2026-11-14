@@ -44,6 +44,38 @@ export const LABEL_SIZE = 14;
 /** The type size of a region's prefix, in px. */
 export const REGION_LABEL_SIZE = 16;
 
+/** The height of a region's label row, in px. */
+export const REGION_LABEL_ROW = 32;
+
+/** The margin of a collision box around its box, in px. */
+export const COLLISION_MARGIN = 4;
+
+/** The pitch of an edge label's stacked lines, in px. */
+export const LABEL_LINE_PITCH = 16;
+
+/** The halo around an edge label's text, in px. */
+export const LABEL_HALO = 3;
+
+/** How far above or below its anchor an edge label may sit, in px. */
+export const LABEL_OFFSET = 12;
+
+/** The fractions along an edge where its label is tried centred, in order. */
+export const LABEL_CENTRED_AT: readonly number[] = [0.5, 0.35, 0.65];
+
+/** The fractions along an edge where its label is tried above or below. */
+export const LABEL_BESIDE_AT: readonly number[] = [0.5, 0.35, 0.65, 0.2, 0.8];
+
+/** A self-loop shows at most this many predicates before "+n". */
+export const LOOP_LABEL_LINES = 3;
+
+/** The arrows an opposite pair's predicates carry. */
+export const DIRECTION_ARROWS = {
+  right: "→",
+  left: "←",
+  down: "↓",
+  up: "↑",
+} as const;
+
 /**
  * The port spacings a side tries in turn: 4px apart, 8px from the corners
  * and 8px from the subclass tick; on a hub 4px from the tick. A side that

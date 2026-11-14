@@ -2,8 +2,11 @@
 
 import {
   findCentredBaseline,
+  LABEL_HALO,
+  LABEL_LINE_PITCH,
   LABEL_SIZE,
   REGION_LABEL_GAP,
+  REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
   requireDefined,
   requireEntry,
@@ -12,11 +15,6 @@ import {
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
-import {
-  LABEL_HALO,
-  LABEL_LINE_PITCH,
-  REGION_LABEL_ROW,
-} from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";

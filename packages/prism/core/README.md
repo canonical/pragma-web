@@ -415,7 +415,9 @@ site's own catalog, and the factory holds no reader-facing string.
   of their input: `layoutLayered` (a region of nodes as layered columns,
   root at the left, on the contract), `layOutRegion`, the lengths it places
   by `LATTICE`, `BUS_OFFSET`, `ARC_BASE`, `ARC_NEST`, `LABEL_SIZE`,
-  `REGION_LABEL_SIZE`, `REGION_LABEL_GAP`, and the geometry it shares
+  `REGION_LABEL_SIZE`, `REGION_LABEL_GAP`, `REGION_LABEL_ROW`, `COLLISION_MARGIN`,
+  `LABEL_LINE_PITCH`, `LABEL_HALO`, `DIRECTION_ARROWS`, the label placer
+  `placeEdgeLabels` with `formatEdgeLabelLines`, and the geometry it shares
   `measureTextWidth`, `measureTextBox`, `measureRegionLabelWidth`,
   `findCentredBaseline`, `ceilTo`, `roundTo`, `formatPathData`,
   `parsePathData`, `buildArrowhead`, `flattenPath`, `samplePath`,
@@ -424,7 +426,9 @@ site's own catalog, and the factory holds no reader-facing string.
   `requireEntry`, `requireDefined`; types `GraphLayout`, `GraphDraw`,
   `LayeredNode`, `LayeredNodes`, `LayeredRelation`, `LayeredBundle`,
   `LayeredEdges`, `LayeredModel`, `LayeredOptions`, `RegionNode`,
-  `RegionEdge`, `RegionLayout`, `CrossPort`, `Rect`, `Point`,
+  `RegionEdge`, `RegionLayout`, `CrossPort`, `LabelledLayout`,
+  `LabelledNode`, `LabelledEdge`, `LabelledRegion`, `LabelledBundle`,
+  `LabelledRelation`, `LabelPlacement`, `PlacedLabel`, `Rect`, `Point`,
   `PathCommand`, `FontFace`.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,

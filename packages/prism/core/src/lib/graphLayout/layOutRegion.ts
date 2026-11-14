@@ -69,7 +69,7 @@ interface StackItem {
  * box's collision box.
  *
  * @param model - The nodes and edges to lay out.
- * @param ids - The region's classes, by IRI.
+ * @param ids - The region's nodes, by id.
  * @param channel - The gap between columns, in px.
  * @param sweeps - How many barycentre sweeps run.
  * @param crossPorts - The side and ideal offset of each end of a relation to

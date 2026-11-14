@@ -1,6 +1,7 @@
 import {
   LATTICE,
   measureRegionLabelWidth,
+  REGION_LABEL_ROW,
   type Rect,
   requireDefined,
   requireEntry,
@@ -8,7 +9,7 @@ import {
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../testing/createClassGraphSetup.js";
 import { CROSS_REGION_GRAPH } from "../../../testing/fixtures.js";
-import { MIN_FIT, REGION_LABEL_ROW } from "./constants.js";
+import { MIN_FIT } from "./constants.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
 import layOutClassGraph from "./layOutClassGraph.js";
 

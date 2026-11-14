@@ -1,9 +1,10 @@
 import {
   type GraphBox,
   measureRegionLabelWidth,
+  REGION_LABEL_ROW,
   uniteRects,
 } from "@canonical/prism-core";
-import { REGION_LABEL_ROW, VIEW_MARGIN } from "../../classGraph/constants.js";
+import { VIEW_MARGIN } from "../../classGraph/constants.js";
 import type { ClassGraphLayout } from "../../classGraph/types.js";
 
 /**

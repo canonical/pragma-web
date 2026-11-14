@@ -1,6 +1,6 @@
 import type {
   FontFace,
-  LayeredBundle,
+  LabelledBundle,
   Point,
   Rect,
 } from "@canonical/prism-core";
@@ -74,7 +74,7 @@ export interface ClassModel extends GraphClassInput {
 }
 
 /** Every relation between one unordered pair of classes, drawn as one path. */
-export interface Bundle extends LayeredBundle {
+export interface Bundle extends LabelledBundle {
   /** The bundled relations, by label. */
   readonly relations: readonly DrawnRelation[];
   /** Whether relations run both ways. */
@@ -219,25 +219,6 @@ export interface ClassGraphLayout {
   /** Every rule the layout could not keep, in words. */
   readonly findings: readonly string[];
   readonly phone: PhoneLayout;
-}
-
-/** An edge label placed for the focus node. */
-export interface PlacedLabel {
-  readonly edge: string;
-  readonly lines: readonly string[];
-  readonly box: Rect;
-  /** The label's centre. */
-  readonly cx: number;
-  readonly cy: number;
-}
-
-/** The labels placed for a focus node, and those that found no place. */
-export interface LabelPlacement {
-  readonly placed: readonly PlacedLabel[];
-  readonly omitted: readonly {
-    readonly edge: string;
-    readonly lines: readonly string[];
-  }[];
 }
 
 /** What a legible window frames, beyond the graph and the canvas. */

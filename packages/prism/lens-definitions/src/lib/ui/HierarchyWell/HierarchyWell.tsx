@@ -4,6 +4,8 @@ import {
   type GraphBox,
   GraphCanvas,
   type GraphTransform,
+  type LabelPlacement,
+  placeEdgeLabels,
   requireEntry,
 } from "@canonical/prism-core";
 import {
@@ -15,8 +17,7 @@ import {
   useState,
 } from "react";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
-import placeEdgeLabels from "../../classGraph/placeEdgeLabels.js";
-import type { LabelPlacement, NodeNavigation } from "../../classGraph/types.js";
+import type { NodeNavigation } from "../../classGraph/types.js";
 import { useMessages } from "../../i18n/index.js";
 import { ClassGraph } from "../ClassGraph/index.js";
 import classifyClasses from "./classifyClasses.js";

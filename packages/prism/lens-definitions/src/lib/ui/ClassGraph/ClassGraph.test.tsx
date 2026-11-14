@@ -1,10 +1,9 @@
-import { requireEntry } from "@canonical/prism-core";
+import { placeEdgeLabels, requireEntry } from "@canonical/prism-core";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
-import placeEdgeLabels from "../../classGraph/placeEdgeLabels.js";
 import ClassGraph from "./ClassGraph.js";
 import type { ClassGraphProps } from "./types.js";
 

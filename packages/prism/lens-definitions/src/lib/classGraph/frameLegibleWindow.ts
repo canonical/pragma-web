@@ -2,13 +2,13 @@ import {
   intersectsRect,
   LATTICE,
   measureRegionLabelWidth,
+  REGION_LABEL_ROW,
   type Rect,
 } from "@canonical/prism-core";
 import {
   CLEAN_EDGE_ZOOM,
   LEGIBLE_MARGIN,
   MIN_FIT,
-  REGION_LABEL_ROW,
   VIEW_MARGIN,
 } from "./constants.js";
 import type { ClassGraphLayout, LegibleWindowOptions } from "./types.js";

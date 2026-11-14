@@ -48,9 +48,6 @@ export const CROSS_CHANNEL_OFFSET = BUS_OFFSET + LATTICE / 2;
 /** The gap between two regions, on a shelf and between shelves, in px. */
 export const SHELF_GAP = 48;
 
-/** The height of a region's label row, in px. */
-export const REGION_LABEL_ROW = 32;
-
 /** The margin the viewBox adds around the graph's bounds, in px. */
 export const VIEW_MARGIN = 16;
 
@@ -106,9 +103,6 @@ export const LOOP_EXTENT = 16;
 /** A hub's self-loop's extent above and right of its box, in px. */
 export const HUB_LOOP_EXTENT = 32;
 
-/** The margin of a collision box around its box, in px. */
-export const COLLISION_MARGIN = 4;
-
 /** How many barycentre sweeps order the columns. */
 export const SWEEPS = 4;
 
@@ -123,24 +117,6 @@ export const ROUTE_STEP = 4;
 
 /** The type size of a hub's label, in px. */
 export const HUB_LABEL_SIZE = 16;
-
-/** The pitch of an edge label's stacked lines, in px. */
-export const LABEL_LINE_PITCH = 16;
-
-/** The halo around an edge label's text, in px. */
-export const LABEL_HALO = 3;
-
-/** How far above or below its anchor an edge label may sit, in px. */
-export const LABEL_OFFSET = 12;
-
-/** The fractions along an edge where its label is tried centred, in order. */
-export const LABEL_CENTRED_AT: readonly number[] = [0.5, 0.35, 0.65];
-
-/** The fractions along an edge where its label is tried above or below. */
-export const LABEL_BESIDE_AT: readonly number[] = [0.5, 0.35, 0.65, 0.2, 0.8];
-
-/** A self-loop shows at most this many predicates before "+n". */
-export const LOOP_LABEL_LINES = 3;
 
 /**
  * The phone view: a 288px column, the well's width at 390 by 844 beside
@@ -157,12 +133,4 @@ export const PHONE = {
   inPort: 8,
   outPort: 24,
   loop: 16,
-} as const;
-
-/** The arrows an opposite pair's predicates carry. */
-export const DIRECTION_ARROWS = {
-  right: "→",
-  left: "←",
-  down: "↓",
-  up: "↑",
 } as const;

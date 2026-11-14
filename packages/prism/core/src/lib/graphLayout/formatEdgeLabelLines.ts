@@ -1,11 +1,7 @@
-import {
-  compareText,
-  orderBy,
-  requireDefined,
-  requireEntry,
-} from "@canonical/prism-core";
 import { DIRECTION_ARROWS, LOOP_LABEL_LINES } from "./constants.js";
-import type { ClassGraphLayout, LaidOutEdge } from "./types.js";
+import { compareText, orderBy } from "./geometry.js";
+import { requireDefined, requireEntry } from "./require.js";
+import type { LabelledEdge, LabelledLayout } from "./types.js";
 
 /**
  * Write a relation edge's label as its lines: one predicate; the two
@@ -13,14 +9,14 @@ import type { ClassGraphLayout, LaidOutEdge } from "./types.js";
  * end that is its range; "‹n› relations" for three or more; a self-loop's
  * predicates stacked, three at most and then "+‹n›".
  *
- * @param layout - The class graph's layout.
+ * @param layout - The layout the edge sits in.
  * @param edge - A relation edge.
  * @param formatCount - How "‹n› relations" reads, from the catalog.
  * @returns The label's lines.
  */
 export default function formatEdgeLabelLines(
-  layout: ClassGraphLayout,
-  edge: LaidOutEdge,
+  layout: LabelledLayout,
+  edge: LabelledEdge,
   formatCount: (count: number) => string,
 ): string[] {
   const bundle = requireDefined(edge.bundle, "bundle for a relation edge");

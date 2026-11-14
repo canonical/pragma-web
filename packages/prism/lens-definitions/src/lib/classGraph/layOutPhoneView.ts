@@ -2,6 +2,7 @@ import {
   ARC_BASE,
   ARC_NEST,
   buildArrowhead,
+  COLLISION_MARGIN,
   compareText,
   containsPoint,
   formatPathData,
@@ -14,12 +15,7 @@ import {
   requireEntry,
   samplePath,
 } from "@canonical/prism-core";
-import {
-  BOX_HEIGHT,
-  COLLISION_MARGIN,
-  PHONE,
-  ROUTE_STEP,
-} from "./constants.js";
+import { BOX_HEIGHT, PHONE, ROUTE_STEP } from "./constants.js";
 import type {
   ClassGraphModel,
   LaidOutEdge,
