@@ -3,7 +3,9 @@ import {
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
 import { screen, waitFor, within } from "@testing-library/react";
+import type { FetchFunction, GraphQLResponse } from "relay-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import createMetroFetch from "../../../../../testing/createMetroFetch.js";
 import { SERIES_90_CURIE } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
 import renderWithSite from "../../../../../testing/renderWithSite.js";
@@ -94,6 +96,33 @@ describe("StockPage", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Nothing in the fleet lives at metro:northgate.",
     );
+  });
+
+  it("says so when no formation runs the stock, and lists no car type", async () => {
+    const metroFetch = createMetroFetch();
+    // The graph's stocks all run formations, so the page's answer drops
+    // them, as a stock not yet in service would read.
+    const fetchFn: FetchFunction = async (params, variables, ...rest) => {
+      const response = (await metroFetch(
+        params,
+        variables,
+        ...rest,
+      )) as GraphQLResponse & {
+        data?: { node?: { formations?: unknown[] } };
+      };
+      if (params.name === "StockPageQuery" && response.data?.node) {
+        response.data.node.formations = [];
+      }
+      return response;
+    };
+    renderWithSite(
+      <StockPage address={SERIES_90_CURIE} />,
+      "/fleet",
+      createEnvironment({ fetchFn }),
+    );
+    const section = await screen.findByRole("region", { name: "Formations" });
+    expect(section).toHaveTextContent("No formation runs this stock.");
+    expect(screen.queryByRole("region", { name: "Car types" })).toBeNull();
   });
 
   it("says so while its data is on its way", () => {
