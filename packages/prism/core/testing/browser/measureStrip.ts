@@ -16,12 +16,16 @@ import type { StripMeasure } from "./types.js";
  * group that spills toward the start shows over its neighbour even though
  * the strip itself does not overflow. Each crumb is its list item's own
  * text, without the separator the item hides from assistive technology.
+ * A count that is not displayed has no end. The facet bar overflows when
+ * it, or its controls, is narrower than its content; its controls end
+ * where the rightmost box inside them does, so controls that spill past
+ * the band on one line are seen even though the bar keeps its height.
  *
  * @returns The strip's height, the bar's, its groups' extents, where its
  *   content ends, the count's end, the search's width, whether it
  *   overflows, whether the count is clipped, which groups are painted over
- *   one another, the trail's crumbs, and the hrefs that still carry
- *   `view=`.
+ *   one another, the trail's crumbs, the hrefs that still carry `view=`,
+ *   whether the bar overflows and where its controls end.
  * @note Impure: reads the page's document and its computed styles.
  */
 export default function measureStrip(): StripMeasure {
@@ -43,6 +47,11 @@ export default function measureStrip(): StripMeasure {
   const search = strip?.querySelector('[data-slot="search"]');
   const count = strip?.querySelector('[data-slot="count"]');
   const barBox = bar?.getBoundingClientRect();
+  const controls = bar?.querySelector<HTMLElement>(":scope > .controls");
+  const controlRights = [...(controls?.querySelectorAll("*") ?? [])]
+    .map((element) => element.getBoundingClientRect())
+    .filter((box) => box.width > 0 && box.height > 0)
+    .map((box) => box.right);
   const clipping = ["auto", "scroll", "hidden", "clip"];
   const readPainted = (name: string) => {
     const group = strip?.querySelector<HTMLElement>(
@@ -99,7 +108,7 @@ export default function measureStrip(): StripMeasure {
     },
     contentEnd: stripBox === undefined ? null : stripBox.right - endPadding,
     countRight:
-      count === null || count === undefined
+      count === null || count === undefined || count.getClientRects().length === 0
         ? null
         : count.getBoundingClientRect().right,
     searchWidth:
@@ -128,5 +137,13 @@ export default function measureStrip(): StripMeasure {
     viewHrefs: [...document.querySelectorAll("a[href]")]
       .map((anchor) => anchor.getAttribute("href") ?? "")
       .filter((href) => /[?&]view=/.test(href)),
+    barOverflow: [bar, controls].some(
+      (element) =>
+        element !== null &&
+        element !== undefined &&
+        element.scrollWidth > element.clientWidth,
+    ),
+    controlsRight:
+      controlRights.length === 0 ? null : Math.max(...controlRights),
   };
 }

@@ -26,7 +26,10 @@ export interface StripMeasure {
   };
   /** The strip's content end: its right edge less its end padding. */
   readonly contentEnd: number | null;
-  /** The count slot's right edge; `null` when the strip counts nothing. */
+  /**
+   * The count slot's right edge; `null` when the strip counts nothing or
+   * its count is not displayed.
+   */
   readonly countRight: number | null;
   /** The search slot's width; `null` when the strip has no search. */
   readonly searchWidth: number | null;
@@ -50,6 +53,16 @@ export interface StripMeasure {
   readonly crumbs: readonly string[];
   /** The hrefs on the page that carry the retired `view=` parameter. */
   readonly viewHrefs: readonly string[];
+  /**
+   * Whether the facet bar, or its controls, is narrower than its content;
+   * `false` on a page with no bar.
+   */
+  readonly barOverflow: boolean;
+  /**
+   * The right edge of the rightmost box inside the facet bar's controls;
+   * `null` when the bar is absent or not displayed.
+   */
+  readonly controlsRight: number | null;
 }
 
 /** A theme a layout is measured in. */
