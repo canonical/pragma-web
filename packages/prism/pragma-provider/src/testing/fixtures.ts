@@ -3934,3 +3934,22 @@ export const TURTLE_DS_LENS: readonly LensReadingClass[] = [
     ],
   },
 ];
+
+/**
+ * The namespaces of the ref packages installed from npm, which are not this
+ * repository's to edit: design-system, code-standards and anatomy-dsl.
+ */
+export const NPM_REF_NAMESPACES: readonly string[] = [
+  "https://ds.canonical.com/",
+  "http://pragma.canonical.com/codestandards#",
+  "https://anatomy.canonical.com/",
+];
+
+/**
+ * The terms of the npm ref packages the provider serves without a
+ * description, sorted: the report for upstream. A term that loses its
+ * description fails the coverage check until it is listed here, and a listed
+ * term that gains one fails it until it is removed. Empty while every
+ * installed release describes every term.
+ */
+export const UNDESCRIBED_REF_TERMS: readonly string[] = [];

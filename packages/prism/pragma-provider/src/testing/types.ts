@@ -74,3 +74,20 @@ export interface LensReadingClass {
   readonly pluralLabel: string | null;
   readonly properties: readonly LensReadingField[];
 }
+
+/** A term as `Query.ontologies` serves it, with its description. */
+export interface ServedTerm {
+  readonly uri: string;
+  readonly definition: string | null;
+}
+
+/** A property as `Query.ontologies` serves it, with its relation's other side. */
+export interface ServedProperty extends ServedTerm {
+  readonly inverse: ServedTerm | null;
+}
+
+/** An ontology's classes and properties as `Query.ontologies` serves them. */
+export interface ServedOntology {
+  readonly classes: readonly ServedTerm[];
+  readonly properties: readonly ServedProperty[];
+}
