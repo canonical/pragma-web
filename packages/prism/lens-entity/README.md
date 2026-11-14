@@ -2,8 +2,9 @@
 
 The class-bound docs view of a Prism documentation site. For each class a
 site binds, the lens gives two pages: an index of the class's instances in
-the shared list view of `@canonical/prism-projections`, as rows or cards,
-with a search over the loaded entries, and a page per instance with its
+the shared list view of `@canonical/prism-projections`, in the renderers
+the lens declares (the table and the cards by default), with a search over
+the loaded entries, and a page per instance, as a page or as Turtle, with its
 title, its definition and comment, its class, and the fields and the
 relations its class declares, as key values on the page's grid.
 
@@ -76,17 +77,22 @@ search box and the index.
 
 The layout is core's `DocumentLayout`, the document archetype: the site's
 rail, the mode strip, the routed page in the canvas, the one region that
-scrolls, and the colophon in the band under it. On the index the strip
-carries the search box and the count of the entries shown. The layout
+scrolls, and the colophon in the band under it. The strip carries the
+trail and the page's renderers; on the index, the search box and the count
+of the entries shown (or, with `filters: "panel"`, a panel beside the
+list holds them), and below two groups the fold that opens the filter
+sheet. The layout
 renders no element of its own; its native props reach the document layout's
 root.
 
-The index keeps its view in its route's `view` search parameter
-(`/stations?view=cards`; the rows view, the default, carries none): the list
-view's toggle writes it, replacing the history entry, so a view survives a
-reload, travels with a link, and is the view the server renders. The index
-route declares the parameter's search schema, so a site's register carries
-the key.
+The address carries the view's state: the renderer in `as`
+(`/stations?as=cards`, `/stations/metro%3Anorthgate?as=turtle`; the default
+renderer carries none) and the search text in `q`, which the strip's search
+box writes, replacing the history entry. A view survives a reload, travels
+with a link, and is the view the server renders. Both routes declare
+core's `viewSearch`, so a site's register carries the keys. The Turtle
+renderer asks the provider's source extension on the client, so the
+server renders its loading line.
 
 On the server, a site prepares the store through each route's `warm`, which
 fetches the route's operations into the published prefetch environment; the

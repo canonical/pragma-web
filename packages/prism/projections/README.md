@@ -65,11 +65,11 @@ lays the five representations of each type out as one matrix, under
   title's line, and the graph's encodings: `hollow` (an abstract class),
   `prominent` (a hub) and `showText` (off when zoomed out), for a graph to
   place with a transform inside its `<svg>`.
-- **`EntityList`**: the shared list view of an index: a toolbar with the
-  count line and the cards and rows toggle, then its children as cards in
-  the published `Cards` group (two columns each) or as rows in an ordered
-  list, or one line when it has none. It keeps no view of its own: its
-  consumer passes `view` and takes the reader's pick from `onViewChange`.
+- **`EntityList`**: the shared list view of an index: its children as
+  rows in an ordered list (the `table` renderer, the default) or as cards
+  in the published `Cards` group, two columns each (the `cards` renderer),
+  or one line when it has none. It has no toolbar: the lens's strip
+  switches the renderer and counts the entries.
 
 ## Installation
 
@@ -350,17 +350,14 @@ reference implementation a site copies.
 
 `NodeList` renders an index of nodes as `EntityList`: a plural fragment on
 `Node` spreads the card and the row composites, and each node renders as a
-card in the cards view and as a row in the rows view, through its type's
-arm. It keeps no view of its own: the lens holds the view in the page's
-address and passes it back with the count line and the empty line.
+row in the `table` renderer and as a card in the `cards` renderer, through
+its type's arm. It keeps no renderer of its own: the lens reads it from
+the page's address (`as=`) and passes its name with the empty line.
 
 ```tsx
 <NodeList
-  count={data.instanceCount}
-  kind={t("index.kind")}
   nodes={data.instances.edges.map(({ node }) => node)}
-  onViewChange={setView}
-  view={view}
+  renderer={active.name === "cards" ? "cards" : "table"}
 />
 ```
 
@@ -417,7 +414,10 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityCommand`, `EntityGraphNode`, `EntityList`; types
   `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
   `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
-  `EntityListProps`, `EntityListView`.
+  `EntityListProps`, `EntityListRenderer`.
+- List renderers: `useListRenderers` (the table and the cards, the list
+  renderers a site gives its indexes), `ENTITY_LIST_RENDERERS`,
+  `DEFAULT_ENTITY_LIST_RENDERER`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`, `useProjectionLink`,
   `renderArm`, `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
   `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,

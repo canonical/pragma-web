@@ -4,12 +4,14 @@ import { WorkspaceLayout } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { MetroRail } from "#domains/lenses";
 import { NetworkInspector } from "../NetworkInspector/index.js";
+import { NetworkStrip } from "../NetworkStrip/index.js";
 import type { NetworkLayoutProps } from "./types.js";
 
 /**
- * The network lens's workspace: the metro rail, the routed map in the
- * canvas, and the network's lines and stations in the inspector region,
- * which the archetype turns into a drawer below three groups of columns.
+ * The network lens's workspace: the metro rail, the strip with the network
+ * trail, the routed map in the canvas, and the network's lines and stations
+ * in the inspector region, which the archetype turns into a drawer below
+ * three groups of columns.
  *
  * `import { NetworkLayout } from "./NetworkLayout/index.js";`
  *
@@ -19,7 +21,11 @@ export default function NetworkLayout({
   children,
 }: NetworkLayoutProps): ReactElement {
   return (
-    <WorkspaceLayout inspector={<NetworkInspector />} rail={<MetroRail />}>
+    <WorkspaceLayout
+      inspector={<NetworkInspector />}
+      rail={<MetroRail />}
+      strip={<NetworkStrip />}
+    >
       {children}
     </WorkspaceLayout>
   );

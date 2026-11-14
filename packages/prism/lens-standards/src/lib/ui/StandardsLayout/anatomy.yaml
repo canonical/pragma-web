@@ -21,7 +21,10 @@ node:
               edges:
                 - node:
                     uri: prism.subcomponent.trail
-                  relation: { cardinality: "1", slotName: context }
+                  relation: { cardinality: "1", slotName: trail }
+                - node:
+                    uri: prism.subcomponent.standards_view
+                  relation: { cardinality: "0..1", slotName: view }
             relation: { cardinality: "1", slotName: strip }
           - node:
               role: routed page (the index or a reading page)

@@ -5,16 +5,17 @@ import { describe, expect, it } from "vitest";
 import ModeStrip from "./ModeStrip.js";
 
 describe("ModeStrip SSR", () => {
-  it("renders the empty sockets on the server", () => {
+  it("renders the three empty groups on the server", () => {
     const html = renderToString(<ModeStrip />);
     expect(html).toContain("ds mode-strip");
-    expect(html).toContain('data-slot="context"');
-    expect(html).toContain('data-slot="controls"');
-    expect(html).toContain('data-slot="status"');
+    expect(html).toContain('data-slot="trail"');
+    expect(html).toContain('data-slot="view"');
+    expect(html).toContain('data-slot="filtering"');
   });
 
-  it("renders claimed socket content on the server", () => {
-    const html = renderToString(<ModeStrip context="Definitions" />);
-    expect(html).toContain("Definitions");
+  it("renders claimed group content on the server", () => {
+    const html = renderToString(<ModeStrip count="4 lines" trail="Lines" />);
+    expect(html).toContain("Lines");
+    expect(html).toContain('data-slot="count"');
   });
 });

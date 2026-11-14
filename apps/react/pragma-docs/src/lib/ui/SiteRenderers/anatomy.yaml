@@ -1,0 +1,11 @@
+---
+# SiteRenderers — the site's renderers: core's renderers provider over the
+# projections' list renderers, core's page renderers and the extensions the
+# site's provider serves. A context provider: it renders no element and
+# binds no style.
+node:
+  uri: docs.component.site_renderers
+  edges:
+    - node:
+        role: routed content
+      relation: { cardinality: "1", slotName: default }

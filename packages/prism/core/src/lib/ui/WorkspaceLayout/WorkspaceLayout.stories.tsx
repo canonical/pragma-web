@@ -24,7 +24,7 @@ const meta: Meta<typeof WorkspaceLayout> = {
         entries={collectLenses(STORY_ROUTES)}
       />
     ),
-    strip: <ModeStrip context="Catalog" status="128 entries" />,
+    strip: <ModeStrip trail="Catalog" count="128 entries" />,
     // A page places itself on the canvas's page grid: this one spans it.
     children: (
       <p style={{ gridColumn: "1 / -1" }}>

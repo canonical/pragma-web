@@ -164,7 +164,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
   });
 
   it("renders the fleet index as cards, each drawing its formations", async () => {
-    const { status, html } = await fetchPage(script, "/fleet");
+    const { status, html } = await fetchPage(script, "/fleet?as=cards");
     expect(status).toBe(200);
     const cards = html
       .split('class="ds card ds entity-card ds rolling-stock-card"')
@@ -181,8 +181,8 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     ).toEqual(["0 0 120000 3600", "0 0 120000 3600"]);
   });
 
-  it("renders the fleet index as rows when the address asks", async () => {
-    const { status, html } = await fetchPage(script, "/fleet?view=rows");
+  it("renders the fleet index as rows in the table, by default", async () => {
+    const { status, html } = await fetchPage(script, "/fleet");
     expect(status).toBe(200);
     expect(html).toMatch(
       /<li [^>]*class="ds entity-row ds rolling-stock-row"[^>]*>.*?Series 90/s,

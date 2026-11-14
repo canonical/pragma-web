@@ -78,15 +78,18 @@ const [standards, standardEntity] = group(standardsLayout, [
 ```
 
 The layout is core's `DocumentLayout`, the document archetype: the site's
-rail, the mode strip carrying the lens's breadcrumb trail, the routed page in
-the canvas, the one region that scrolls, and the colophon in the band under
-it. The layout renders no element of its own; its native props reach the
+rail, the mode strip carrying the lens's breadcrumb trail and, on a reading
+page, the page's renderers (the page and its Turtle, `?as=turtle`), the
+routed page in the canvas, the one region that scrolls, and the colophon in
+the band under it. The layout renders no element of its own; its native props reach the
 document layout's root.
 
 The lens renders inside the site's provider nest: `HeadProvider`,
 `RelayEnvironmentProvider`, `RouterProvider`, and inside the router
-`HomesProvider` and `ProjectionsProvider`, which the prose's chips read their
-homes and arms from. The prose takes its space from the typography layer of
+`HomesProvider`, `ProjectionsProvider`, which the prose's chips read their
+homes and arms from, and core's `RenderersProvider`, which the reading page's
+renderers resolve against; Turtle is offered only when the site's provider
+serves the source extension. The prose takes its space from the typography layer of
 `@canonical/styles`: it carries `.editorial` and `.content-flow`, so a site
 that mounts the lens loads that layer, or its prose has no paragraph
 spacing.

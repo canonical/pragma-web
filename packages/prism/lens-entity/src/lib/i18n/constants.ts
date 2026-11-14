@@ -19,9 +19,9 @@ export const MESSAGES = {
   "index.more": "Load more",
   "controls.search.label": "Filter entries",
   "controls.search.placeholder": "Search entries…",
-  "status.count": {
-    one: "{visible} of {count} entry",
-    other: "{visible} of {count} entries",
+  "status.kind": {
+    one: "entry",
+    other: "entries",
   },
   "page.title.entity": "{title} — {lens}",
   "page.loading": "Loading the entry…",

@@ -60,6 +60,7 @@ export default function readStationView(
     }),
   );
   return {
+    uri: node.uri,
     card: node,
     curie: node._meta.curie,
     title: node._meta.title,

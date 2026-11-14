@@ -11,19 +11,18 @@ import {
 import EntityIndex from "./EntityIndex.js";
 
 describe("EntityIndex on the server", () => {
-  it("renders the view the address names", {
+  it("renders the renderer the address names", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
     const html = renderToString(
       createEntitySite({
-        url: "/stations?view=cards",
+        url: "/stations?as=cards",
         environment,
         children: <EntityIndex binding={STATIONS_BINDING} />,
       }),
     );
-    expect(html).toContain('class="ds entity-index" data-view="cards"');
+    expect(html).toContain('class="ds entity-index" data-renderer="cards"');
     expect(html).toContain('class="ds cards subgrid"');
-    expect(html).toContain('aria-pressed="true"');
   });
 });

@@ -29,7 +29,7 @@ describe("server rendering", () => {
       STATION_COUNT,
     );
     expect(html).toContain('href="/stations/metro%3Anorthgate"');
-    expect(html).toMatch(/data-slot="entity-status">16 of 16 entries</);
+    expect(html).toMatch(/data-slot="entity-status"[^>]*>16 of 16 entries</);
     expect(requestsAfterWarm).toBe(0);
   });
 

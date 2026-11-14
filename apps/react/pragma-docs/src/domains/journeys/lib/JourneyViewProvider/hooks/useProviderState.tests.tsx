@@ -25,7 +25,7 @@ describe("useProviderState", () => {
   });
 
   it("reads the view the address names, so the server and the client agree", () => {
-    const { result } = renderAt("/journeys/job?view=graph");
+    const { result } = renderAt("/journeys/job?as=graph");
     expect(result.current.view).toBe("graph");
   });
 
@@ -35,7 +35,7 @@ describe("useProviderState", () => {
       result.current.setView("graph");
     });
     await waitFor(() => expect(result.current.view).toBe("graph"));
-    expect(router.getState().location.href).toBe("/journeys?view=graph");
+    expect(router.getState().location.href).toBe("/journeys?as=graph");
     act(() => {
       result.current.setView("table");
     });

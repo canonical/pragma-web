@@ -1,6 +1,6 @@
 ---
 # StationPanel — a station's place on the network, the main column of its
-# page: its title and kind, its facts (fare zone, platforms, transfer time
+# page under the page's title: its kind, its facts (fare zone, platforms, transfer time
 # at an interchange), and for every route of every line serving it the stop
 # before and the stop after it. A subgrid of the page over every column, so
 # each fact and each route aligns to the grid's lines: the term or the line
@@ -25,7 +25,7 @@ node:
   edges:
     - node:
         role: header
-        # the station's title (<h1>) and its kind
+        # the station's kind
         styles:
           layout.grid.column: "1 / -1"
       relation: { cardinality: "1", slotName: header }

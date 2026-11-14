@@ -1,7 +1,69 @@
-import type { THEMES, VIEWPORTS } from "./constants.js";
+import type { STRIP_VIEWPORTS, THEMES, VIEWPORTS } from "./constants.js";
 
 /** A viewport a layout is measured at. */
 export type Viewport = (typeof VIEWPORTS)[number];
+
+/** A viewport the strip is measured at. */
+export type StripViewport = (typeof STRIP_VIEWPORTS)[number];
+
+/** Where one group of the strip starts and ends, in viewport pixels. */
+export interface StripGroupBox {
+  readonly x: number;
+  readonly right: number;
+}
+
+/** What the strip of one page measures to. */
+export interface StripMeasure {
+  /** The strip's border-box height; `null` on a page with no strip. */
+  readonly height: number | null;
+  /** The facet bar's border-box height; `null` on a page with no bar. */
+  readonly bar: number | null;
+  /** The strip's three groups; each `null` when the strip is absent. */
+  readonly groups: {
+    readonly trail: StripGroupBox | null;
+    readonly view: StripGroupBox | null;
+    readonly filtering: StripGroupBox | null;
+  };
+  /** The strip's content end: its right edge less its end padding. */
+  readonly contentEnd: number | null;
+  /**
+   * The count slot's right edge; `null` when the strip counts nothing or
+   * its count is not displayed.
+   */
+  readonly countRight: number | null;
+  /** The search slot's width; `null` when the strip has no search. */
+  readonly searchWidth: number | null;
+  /** Whether the strip's content is wider than the strip. */
+  readonly overflow: boolean;
+  /**
+   * Whether the count, or an element inside it, is narrower than its text,
+   * which then ends in an ellipsis; `false` when the strip counts nothing.
+   */
+  readonly countClipped: boolean;
+  /**
+   * The groups painted over one another, each pair as `first/second
+   * shared`, the width they share in pixels; a group is painted where its
+   * descendants are, cut by what clips them inside the group.
+   */
+  readonly overlaps: readonly string[];
+  /**
+   * The trail's crumbs, each by its own text without the separator, from
+   * the first to the last.
+   */
+  readonly crumbs: readonly string[];
+  /** The hrefs on the page that carry the retired `view=` parameter. */
+  readonly viewHrefs: readonly string[];
+  /**
+   * Whether the facet bar, or its controls, is narrower than its content;
+   * `false` on a page with no bar.
+   */
+  readonly barOverflow: boolean;
+  /**
+   * The right edge of the rightmost box inside the facet bar's controls;
+   * `null` when the bar is absent or not displayed.
+   */
+  readonly controlsRight: number | null;
+}
 
 /** A theme a layout is measured in. */
 export type Theme = (typeof THEMES)[number];
@@ -122,8 +184,8 @@ export interface LayoutMeasure {
   }[];
   /**
    * Each lens's breadcrumb trail: how many rows its crumbs take, where the
-   * current crumb's text is painted to, its extent cut by every element of
-   * the trail that clips or scrolls it (-1 with no current crumb), and the
+   * last crumb's text is painted to, its extent cut by every element of
+   * the trail that clips or scrolls it (-1 with no crumb), and the
    * trail's own inline end, in pixels.
    */
   readonly trails: readonly {

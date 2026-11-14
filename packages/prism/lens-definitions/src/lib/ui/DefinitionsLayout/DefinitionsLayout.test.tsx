@@ -34,7 +34,7 @@ describe("DefinitionsLayout", () => {
     expect(screen.queryByRole("contentinfo")).toBeNull();
   });
 
-  it("claims all three strip sockets: the trail, the chips and the figure", () => {
+  it("claims the strip's trail, fold and figure, and the bar's chips", () => {
     const { container } = render(
       createDefinitionsLayout({
         url: "/definitions",
@@ -47,14 +47,39 @@ describe("DefinitionsLayout", () => {
 
     expect(
       within(
-        container.querySelector('[data-slot="context"]') as HTMLElement,
+        container.querySelector('[data-slot="trail"]') as HTMLElement,
       ).getByText("Definitions"),
     ).toBeInTheDocument();
     expect(
-      container.querySelector('[data-slot="explorer-controls"]'),
+      container.querySelector(
+        '.strip > .ds.filter-bar [data-slot="explorer-controls"]',
+      ),
     ).not.toBeNull();
     expect(
-      container.querySelector('[data-slot="explorer-status"]'),
+      container.querySelector(
+        '.ds.mode-strip [data-slot="count"] [data-slot="explorer-status"]',
+      ),
+    ).not.toBeNull();
+    expect(
+      container.querySelector('.ds.mode-strip [data-slot="fold"] a'),
+    ).toHaveAttribute("href", "/definitions?sheet=filter");
+    expect(container.querySelector("dialog")).not.toHaveAttribute("open");
+  });
+
+  it("opens the filter sheet with the chips when the address asks", () => {
+    const { container } = render(
+      createDefinitionsLayout({
+        url: "/definitions?sheet=filter",
+        records: definitionsExplorerRecords,
+        fetchFn: createFetchSpy(),
+        rail: null,
+        children: null,
+      }),
+    );
+    const sheet = container.querySelector("dialog");
+    expect(sheet).toHaveAttribute("open");
+    expect(
+      sheet?.querySelector('[data-slot="explorer-controls"]'),
     ).not.toBeNull();
   });
 

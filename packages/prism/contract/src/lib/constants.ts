@@ -46,3 +46,15 @@ export const SOURCE_LAYOUT_PREFIX = "../..";
 
 /** From dist/esm/lib/ (the published tsc build) it is three levels up. */
 export const BUILD_LAYOUT_PREFIX = "../../..";
+
+/**
+ * The provider extensions a site may rely on: root fields outside the
+ * contract that a provider serves or leaves out, each with the one signature
+ * a reader selects it by. A provider serves an extension only when its
+ * `Query` declares the field with exactly these arguments, in this order,
+ * and this return type.
+ */
+export const PROVIDER_EXTENSIONS = {
+  /** One entity's statements as Turtle, or null when the graph holds none. */
+  source: { args: [["uri", "ID!"]], type: "String" },
+} as const;

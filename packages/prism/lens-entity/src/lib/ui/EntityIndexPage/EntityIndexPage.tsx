@@ -12,8 +12,9 @@ const componentCssClassName = "ds entity-index-page";
 
 /**
  * The lens's index route content (`/${id}`, the binding's own route name):
- * the bound class's instances, as rows or cards, filtered by the strip's
- * search.
+ * the bound class's instances, in the renderer and narrowed by the search
+ * text the address names, its filters in the strip or in a panel as the
+ * lens places them.
  *
  * The page uses the whole main column, a subgrid of the canvas's page
  * grid. The heading names the lens in the site's own words (`label`) and
@@ -30,6 +31,8 @@ export default function EntityIndexPage({
   binding,
   className,
   label,
+  renderers,
+  filters,
   ...props
 }: EntityIndexPageProps): ReactElement {
   const t = useMessages();
@@ -52,7 +55,11 @@ export default function EntityIndexPage({
         }
       >
         <Suspense fallback={<p className="status">{t("index.loading")}</p>}>
-          <EntityIndex binding={binding} />
+          <EntityIndex
+            binding={binding}
+            filters={filters}
+            renderers={renderers}
+          />
         </Suspense>
       </ErrorBoundary>
     </section>

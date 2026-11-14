@@ -34,9 +34,10 @@ describe("EntityLayout on the server", () => {
 
     expect(html).toContain('class="ds document-layout"');
     expect(html).toContain('aria-label="Site rail"');
-    expect(html).toContain('data-slot="entity-controls"');
+    expect(html).toContain('data-slot="entity-search"');
+    expect(html).toContain('data-slot="fold"');
     // React separates adjacent text nodes with `<!-- -->` markers.
-    expect(html).toMatch(/data-slot="entity-status">16 of 16 entries</);
+    expect(html).toMatch(/data-slot="entity-status"[^>]*>16 of 16 entries</);
     expect(html).toContain('class="ds entity-index-page"');
     expect(html).toContain("<footer>Colophon</footer>");
     expect(fetchFn).not.toHaveBeenCalled();

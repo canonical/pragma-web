@@ -58,7 +58,7 @@ describe("satisfiesContract(readProviderSdl())", () => {
 });
 
 describe("the extension is a superset, not a redefinition", () => {
-  it("keeps every contract root field reachable and adds only prose and search", () => {
+  it("keeps every contract root field reachable and adds only prose, search and source", () => {
     const { schema } = createExampleProvider();
     expect(
       Object.keys(schema.getQueryType()?.getFields() ?? {}).sort(),
@@ -70,6 +70,7 @@ describe("the extension is a superset, not a redefinition", () => {
       "ontologyProperty",
       "prose",
       "search",
+      "source",
     ]);
   });
 

@@ -1,9 +1,13 @@
+import { useRenderers } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
 import type { UnitPageQuery } from "#relay/__generated__/UnitPageQuery.graphql.js";
 import unitPageQueryNode from "#relay/__generated__/UnitPageQuery.graphql.js";
-import { REFERENCE_TRAIN_LENGTH } from "../../../../constants.js";
+import {
+  FLEET_RENDERERS,
+  REFERENCE_TRAIN_LENGTH,
+} from "../../../../constants.js";
 import { useFleetNode } from "../../../../hooks/index.js";
 import assertFragment from "../../../assertFragment.js";
 import { FormationSideView } from "../../../FormationSideView/index.js";
@@ -17,9 +21,15 @@ import type { UnitDetailProps } from "./types.js";
  * view, the unit drawn as a train of its own against a long train's
  * length, front first. An address naming no unit says nothing lives
  * there.
+ *
+ * Under its title the page renders through the active page renderer:
+ * these sections for the page, or the node's Turtle source for `as=turtle`.
+ *
+ * @note Impure: reads the Relay store, the translator and the address.
  */
 export default function UnitDetail({ address }: UnitDetailProps): ReactElement {
   const t = useMessages();
+  const { active } = useRenderers("page", FLEET_RENDERERS.page);
   const { node } = useFleetNode<UnitPageQuery>({
     query: unitPageQueryNode,
     address,
@@ -47,14 +57,22 @@ export default function UnitDetail({ address }: UnitDetailProps): ReactElement {
     <>
       <Head title={node._meta.title} />
       <h1 className="title">{node._meta.title}</h1>
-      <FormationSideView
-        cars={cars}
-        className="side-view"
-        scale={findScaleLength([
-          REFERENCE_TRAIN_LENGTH,
-          cars.reduce((sum, car) => sum + car.length, 0),
-        ])}
-      />
+      {active.render({
+        uri: node.uri,
+        title: node._meta.title,
+        children: (
+          <>
+            <FormationSideView
+              cars={cars}
+              className="side-view"
+              scale={findScaleLength([
+                REFERENCE_TRAIN_LENGTH,
+                cars.reduce((sum, car) => sum + car.length, 0),
+              ])}
+            />
+          </>
+        ),
+      })}
     </>
   );
 }

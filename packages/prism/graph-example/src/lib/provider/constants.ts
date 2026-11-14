@@ -108,3 +108,38 @@ export const REFERENCE_IRI = /^[A-Za-z][A-Za-z0-9+.-]*:[^\s<>"{}|\\^`]+$/;
  * definition match (tier 2), so reordering the list reorders every result.
  */
 export const SEARCH_FIELDS = ["title", "curie", "definition"] as const;
+
+/**
+ * The vocabularies a Turtle source may name by prefix beside the dataset's
+ * own ontologies.
+ */
+export const TURTLE_STANDARD_PREFIXES: ReadonlyMap<string, string> = new Map([
+  ["owl", "http://www.w3.org/2002/07/owl#"],
+  ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
+  ["skos", "http://www.w3.org/2004/02/skos/core#"],
+  ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+]);
+
+/**
+ * The record keys a Turtle source writes through the ontology's properties,
+ * by local name, in the order a record lists them; the identity, the type
+ * and the descriptive maps are written apart, and prose is not a statement.
+ */
+export const TURTLE_RECORD_KEYS: readonly string[] = [
+  "code",
+  "colour",
+  "platformCount",
+  "platformLength",
+  "transferMinutes",
+  "hasCab",
+  "length",
+  "capacity",
+  "servesLine",
+  "inZone",
+  "location",
+  "diagramPosition",
+  "formations",
+  "routes",
+  "units",
+  "cars",
+];

@@ -61,12 +61,19 @@ export const BREADCRUMBS_STYLESHEETS = [
 ] as const;
 
 /**
- * An absolute IRI, the current crumb of an entity page whose address has
- * no prefix: an identifier with no break opportunity, wider than the strip
- * at a phone's width.
+ * An absolute IRI, the address of an entity page with no prefix: an
+ * identifier with no break opportunity, which the trail never draws.
  */
 export const ABSOLUTE_IRI =
   "http://pragma.canonical.com/codestandards#code.api.stability";
+
+/**
+ * A lens's name with no break opportunity, wider than the trail at every
+ * width: the one crumb of a trail that ends at the parent, which must end
+ * in an ellipsis rather than wrap or reach past the strip.
+ */
+export const LONG_LENS_LABEL =
+  "Codestandardsandconventionsforeverypackageofthedesignsystem";
 
 /**
  * The site-level rules a shell carries: the intrinsic grid's narrow column

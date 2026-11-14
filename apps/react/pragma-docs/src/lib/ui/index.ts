@@ -10,4 +10,5 @@ export * from "./SiteColophon/index.js";
 export * from "./SiteCommandProjection/index.js";
 export * from "./SiteGraphNodeProjection/index.js";
 export * from "./SiteRail/index.js";
+export * from "./SiteRenderers/index.js";
 export * from "./SiteRowProjection/index.js";

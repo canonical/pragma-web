@@ -9,7 +9,7 @@
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
  * viewport or past its region, a strip's crumb included, at 390px too,
- * a strip's trail on one line with its current crumb's text clipped by
+ * a strip's trail on one line with its last crumb's text clipped by
  * the crumb,
  * on a station's page, a term's page and a station or term addressed by
  * its absolute IRI; twelve columns at 1440px and
@@ -61,12 +61,11 @@ const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
 /**
  * Pages on the document archetype: the station index in both its views and
  * a station's page, under their lens's strip, by its compact address and by
- * its absolute IRI, whose crumb is wider than the strip at a phone's width,
- * and the landing and the not-found page, which have no strip.
+ * its absolute IRI, and the landing and the not-found page, which have no strip.
  */
 const DOCUMENT_PATHS = [
   "/stations",
-  "/stations?view=cards",
+  "/stations?as=cards",
   STATION_PATH,
   STATION_IRI_PATH,
   "/",
@@ -133,8 +132,7 @@ function measureFieldKeys(): {
 
 /**
  * Pages on the workspace archetype: the Definitions explorer, and a term's
- * page addressed by its absolute IRI, whose crumb is wider than the strip
- * at a phone's width.
+ * page addressed by its absolute IRI.
  */
 const WORKSPACE_PATHS = [WORKSPACE_PATH, TERM_IRI_PATH];
 
@@ -272,7 +270,7 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
           1,
         );
       }
-      // A lens's trail keeps to one line, its current crumb's text painted
+      // A lens's trail keeps to one line, its last crumb's text painted
       // no further than the trail's end, clipped by the crumb itself.
       for (const trail of layout.trails) {
         expect(trail.rows, `${theme} ${trail.element}`).toBe(1);

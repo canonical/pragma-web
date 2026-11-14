@@ -31,6 +31,8 @@ export interface RouteNeighbourView {
 
 /** A station as its page shows it. */
 export interface StationView extends NodeRef {
+  /** The station's absolute IRI, which its Turtle source is asked by. */
+  readonly uri: string;
   /** The station's key, which its card projects. */
   readonly card: CardProjection_node$key;
   readonly kind: "Station" | "Interchange";

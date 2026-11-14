@@ -42,7 +42,7 @@ const NodeListSsrTestNodes = (): ReactElement => {
   if (!edges) {
     throw new Error("the mock environment resolved no instances");
   }
-  return <NodeList nodes={edges.map(({ node }) => node)} view="rows" />;
+  return <NodeList nodes={edges.map(({ node }) => node)} />;
 };
 
 describe("NodeList SSR", () => {

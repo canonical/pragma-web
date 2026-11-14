@@ -78,7 +78,7 @@ describe("the schema", () => {
     expect(provider.sdl).toContain("type Station implements Node");
   });
 
-  it("adds two root fields, prose and search, to the contract's five", () => {
+  it("adds three root fields, prose, search and source, to the contract's five", () => {
     const query = provider.schema.getQueryType();
     expect(Object.keys(query?.getFields() ?? {}).sort()).toEqual([
       "node",
@@ -88,6 +88,7 @@ describe("the schema", () => {
       "ontologyProperty",
       "prose",
       "search",
+      "source",
     ]);
   });
 

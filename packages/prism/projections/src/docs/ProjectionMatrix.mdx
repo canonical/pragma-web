@@ -152,10 +152,11 @@ subgrid two columns wider than its own span.
 
 ## The shared list view
 
-An index of entities renders through `EntityList`: the count line and the
-view toggle, then the entities as cards or as rows.
+An index of entities renders through `EntityList`: the entities as a table
+of rows or as cards, with no toolbar of its own. The lens's strip switches
+the renderer and carries the count.
 
-<Canvas of={ListStories.Toggle} sourceState="none" />
+<Canvas of={ListStories.Cards} sourceState="none" />
 
 ## Projections
 

@@ -43,7 +43,7 @@ export default function PlaygroundLayout({
       rail={<SiteRail />}
       strip={
         <ModeStrip
-          context={<PlaygroundContext lensLabel={t("playground.title")} />}
+          trail={<PlaygroundContext lensLabel={t("playground.title")} />}
         />
       }
     >

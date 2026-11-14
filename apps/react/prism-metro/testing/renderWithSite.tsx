@@ -14,6 +14,7 @@ import type { Environment } from "relay-runtime";
 import { metroProjectionMaps } from "#domains/metro";
 import formatDocumentTitle from "../src/formatDocumentTitle.js";
 import { homes } from "../src/homes.js";
+import { SiteRenderers } from "../src/lib/ui/SiteRenderers/index.js";
 import { appRoutes, notFoundRoute } from "../src/routes.js";
 import createMetroFetch from "./createMetroFetch.js";
 
@@ -50,7 +51,7 @@ export default function renderWithSite(
               LinkComponent={RouterLink}
               maps={metroProjectionMaps}
             >
-              {ui}
+              <SiteRenderers>{ui}</SiteRenderers>
             </ProjectionsProvider>
           </HomesProvider>
         </RouterProvider>

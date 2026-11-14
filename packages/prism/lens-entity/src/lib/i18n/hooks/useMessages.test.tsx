@@ -24,12 +24,8 @@ describe("useMessages", () => {
 
   it("selects a plural record's branch by count", () => {
     const { result } = renderHook(() => useMessages());
-    expect(result.current("status.count", { visible: 1, count: 1 })).toBe(
-      "1 of 1 entry",
-    );
-    expect(result.current("status.count", { visible: 5, count: 16 })).toBe(
-      "5 of 16 entries",
-    );
+    expect(result.current("status.kind", { count: 1 })).toBe("entry");
+    expect(result.current("status.kind", { count: 16 })).toBe("entries");
   });
 
   it("leaves a placeholder with no value verbatim instead of throwing", () => {

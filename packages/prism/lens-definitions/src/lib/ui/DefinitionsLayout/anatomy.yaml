@@ -1,7 +1,9 @@
 ---
 # DefinitionsLayout — the Definitions lens's page layout: the workspace
-# archetype with the site's rail, the strip (the trail, the chips and the
-# status), the explorer in the canvas and the term inspector in its
+# archetype with the site's rail, the strip (the trail, the fold below two
+# groups and the status closing the filtering group), the facet bar under
+# it (the chips), the explorer in the canvas, the filter sheet the address
+# opens below two groups (the chips again), and the term inspector in its
 # region, all under the lens's filter provider. It renders no element of
 # its own: the workspace renders the root.
 node:
@@ -21,19 +23,33 @@ node:
                     edges:
                       - node:
                           uri: prism.component.trail
-                        relation: { cardinality: "1", slotName: context }
+                        relation: { cardinality: "1", slotName: trail }
                       - node:
-                          uri: prism.component.controls
-                        relation: { cardinality: "1", slotName: controls }
+                          uri: prism.subcomponent.fold
+                        relation: { cardinality: "1", slotName: fold }
                       - node:
                           uri: prism.component.status
-                        relation: { cardinality: "1", slotName: status }
+                        relation: { cardinality: "1", slotName: count }
+                  relation: { cardinality: "1", slotName: strip }
+                - node:
+                    uri: prism.component.filter_bar
+                    edges:
+                      - node:
+                          uri: prism.component.controls
+                        relation: { cardinality: "1", slotName: facets }
                   relation: { cardinality: "1", slotName: strip }
                 - node:
                     uri: prism.component.inspector
                   relation: { cardinality: "1", slotName: inspector }
                 - node:
                     role: routed page
+                  relation: { cardinality: "1", slotName: default }
+                - node:
+                    uri: prism.component.filter_sheet
+                    edges:
+                      - node:
+                          uri: prism.component.controls
+                        relation: { cardinality: "0..1", slotName: default }
                   relation: { cardinality: "1", slotName: default }
             relation: { cardinality: "1" }
       relation: { cardinality: "1" }

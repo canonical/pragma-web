@@ -124,7 +124,7 @@ const SEEDED_PAGES = [
   // inspector on both sides, mismatch-silent.
   {
     name: "journeys job in the graph view",
-    url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3?view=graph",
+    url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3?as=graph",
     records: journeysExplorerRecordsJob,
     serverMarker: 'class="ds journey-hop is-selected"',
     liveSelector: ".inspector #journey-inspector-title",

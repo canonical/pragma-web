@@ -18,6 +18,7 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
+import { SiteRenderers } from "../SiteRenderers/index.js";
 import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
@@ -71,23 +72,25 @@ export default function Shell<
                 LinkComponent={RouterLink}
                 maps={defaultProjectionMaps}
               >
-                <div
-                  {...props}
-                  className={[
-                    componentCssClassName,
-                    ...GRID_PRESET_CLASS_NAMES,
-                    className,
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  <Outlet
-                    fallback={
-                      <p className="loading">{MESSAGES["shell.loading"]}</p>
-                    }
-                  />
-                  <CommandPalette />
-                </div>
+                <SiteRenderers>
+                  <div
+                    {...props}
+                    className={[
+                      componentCssClassName,
+                      ...GRID_PRESET_CLASS_NAMES,
+                      className,
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <Outlet
+                      fallback={
+                        <p className="loading">{MESSAGES["shell.loading"]}</p>
+                      }
+                    />
+                    <CommandPalette />
+                  </div>
+                </SiteRenderers>
               </ProjectionsProvider>
             </HomesProvider>
           </RouterProvider>

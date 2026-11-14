@@ -1,0 +1,11 @@
+---
+# ComponentsView — the strip's view tenant: the renderers the page offers
+# (the catalog's table and cards, a component page's page and Turtle) as
+# core's renderer switch, whose own anatomy owns the markup, so it binds no
+# style.
+node:
+  uri: docs.subcomponent.components_view
+  edges:
+    - node:
+        uri: prism.component.renderer_switch
+      relation: { cardinality: "1" }

@@ -94,7 +94,7 @@ export function GlossaryLayout({ children }: { children: ReactNode }) {
           {/* the site's utility cluster */}
         </Rail>
       }
-      strip={<ModeStrip context={<GlossaryContext lensLabel="Glossary" />} />}
+      strip={<ModeStrip trail={<GlossaryContext lensLabel="Glossary" />} />}
     >
       {children}
     </DocumentLayout>
@@ -412,7 +412,27 @@ site's own catalog, and the factory holds no reader-facing string.
   `FacetBearer`, `LensEntry`, `LensTier`, `CollectedLens`,
   `ShortcutAllocation`.
 - Router: `createStaticRouter`.
+- Renderers: `RenderersProvider`, `useRenderers`, `resolveRenderers`,
+  `readRenderer`, `buildRendererSearch`, `viewSearch` (the search schema
+  every route with a strip declares), `VIEW_PARAMS` (the address's view grammar: the renderer, the search
+  text, the open sheet and the graph's kind, selection and expansion), `FILTER_SHEET`, `FILTER_PLACEMENTS`,
+  `DEFAULT_FILTER_PLACEMENT`, `RENDERER_KINDS`, `PAGE_RENDERER_NAMES`,
+  `RENDERER_LABEL_KEYS`, `usePageRenderers` (core's page renderers, Page
+  and Turtle), `warmPageRenderer` (a route's warm calls it so the server
+  page already holds what the address's page renderer reads); types `Renderer`, `RendererDeclaration`,
+  `RendererDefaults`, `RendererFacts`, `RendererKind`, `LensRenderers`,
+  `ListRendererProps`, `PageRendererProps`, `ResolvedRenderers`,
+  `RenderersProviderProps`, `RenderersValue`, `FilterPlacement`,
+  `ViewSearch`, `ViewSearchSchema`.
 - Links: `RouterLink`; types `RouterLinkProps`.
+- The strip and the filters: the strip itself (above), `RendererSwitch` (the
+  view group's links), `CountLine`, `FilterBar`, `FilterPanel`,
+  `FilterSheet`, `FilterFold`; types `RendererSwitchProps`, `Count`,
+  `CountLineProps`, `FilterBarProps`, `FilterPanelProps`,
+  `FilterSheetProps`, `FilterFoldProps`.
+- Turtle: `SourceView`, `EntitySource` (an entity's source, asked of the
+  provider on the client); types `SourceViewProps`, `EntitySourceProps`,
+  `TurtleToken`, `TurtleTokenRole`.
 - Homes: `HomesProvider`, `useHome`; types `Homes`, `HomeResolver`,
   `HomeNode`, `HomesProviderProps`.
 - Stored theme: `StoredThemeProvider`, `useStoredTheme`; types

@@ -56,8 +56,8 @@ describe("LensBreadcrumbs SSR", () => {
     );
     // The lens crumb is a real anchor to the index (SPA-routed on click).
     expect(html).toContain('href="/components"');
-    // The entity crumb is the current page.
-    expect(html).toContain("ds:global.component.button");
-    expect(html).toContain('aria-current="page"');
+    // The trail ends at the parent: the address is not drawn.
+    expect(html).not.toContain("ds:global.component.button");
+    expect(html).not.toContain('aria-current="page"');
   });
 });

@@ -4,3 +4,4 @@ export * from "./LensCard/index.js";
 export * from "./NotFoundPage/index.js";
 export * from "./Shell/index.js";
 export * from "./SiteDocument/index.js";
+export * from "./SiteRenderers/index.js";

@@ -1,0 +1,10 @@
+---
+# Fold — the strip's fold below two groups: core's filter fold, a link to
+# the filter sheet counting the filters the reader applied. It renders the
+# fold, whose own anatomy owns the markup, so it binds no style.
+node:
+  uri: prism.subcomponent.fold
+  edges:
+    - node:
+        uri: prism.component.filter_fold
+      relation: { cardinality: "1" }

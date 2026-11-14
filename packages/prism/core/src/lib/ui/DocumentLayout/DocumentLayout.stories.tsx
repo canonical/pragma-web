@@ -30,7 +30,7 @@ const meta: Meta<typeof DocumentLayout> = {
         entries={collectLenses(STORY_ROUTES)}
       />
     ),
-    strip: <ModeStrip context="Glossary" />,
+    strip: <ModeStrip trail="Glossary" />,
     // A page places itself on the canvas's page grid: this one spans it.
     children: <div style={{ gridColumn: "1 / -1" }}>{PARAGRAPHS}</div>,
     colophon: <p>The colophon.</p>,

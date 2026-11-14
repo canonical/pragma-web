@@ -4,8 +4,7 @@
 
 @layer ds.components.global {
   /* A subgrid of the page over every column, its gap the grid's gutter on
-   * both axes: the list view places itself, and the Load more line spans
-   * the main column. */
+   * both axes: the list and the Load more line span the main column. */
   .ds.entity-index {
     --entity-index-gap: var(--grid-gutter);
 
@@ -15,7 +14,39 @@
     gap: var(--entity-index-gap);
   }
 
+  /* The filter panel's two columns, as tall as the list beside it, so the
+   * panel stays in view while the list scrolls. */
+  .ds.entity-index > .panel {
+    grid-column: 1 / span 2;
+  }
+
+  .ds.entity-index > .list {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    gap: var(--entity-index-gap);
+  }
+
   .ds.entity-index > .more {
     grid-column: 1 / -1;
+  }
+
+  /* Beside the panel, the list and the Load more line take the rest. */
+  .ds.entity-index:has(> .panel) > .list,
+  .ds.entity-index:has(> .panel) > .more {
+    grid-column: 3 / -1;
+  }
+
+  /* Below two groups the sheet holds the filters: the panel is not
+   * displayed, and the list and the Load more line span every column. */
+  @container shell (width < 912px) {
+    .ds.entity-index > .panel {
+      display: none;
+    }
+
+    .ds.entity-index:has(> .panel) > .list,
+    .ds.entity-index:has(> .panel) > .more {
+      grid-column: 1 / -1;
+    }
   }
 }

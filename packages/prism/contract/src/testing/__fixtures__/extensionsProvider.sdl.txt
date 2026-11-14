@@ -1,0 +1,3 @@
+extend type Query {
+  source(uri: ID!): String
+}

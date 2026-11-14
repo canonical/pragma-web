@@ -11,8 +11,8 @@ import "./styles.css";
 const componentCssClassName = "ds station-panel";
 
 /**
- * A station's place on the network, the main column of its page: its title
- * and kind, its facts, and for every route of every line serving it the
+ * A station's place on the network, the main column of its page under the
+ * page's title: its kind, its facts, and for every route of every line serving it the
  * stop before and the stop after, each linking to its page. A subgrid of the
  * page, so every fact and every route aligns to the grid's columns.
  *
@@ -60,7 +60,6 @@ export default function StationPanel({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <header className="header">
-        <h1>{station.title}</h1>
         <p className="kind">{t(`network.station.kind.${station.kind}`)}</p>
       </header>
       {facts.length === 0 ? null : (

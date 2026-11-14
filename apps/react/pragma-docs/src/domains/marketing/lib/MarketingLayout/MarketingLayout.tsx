@@ -41,9 +41,7 @@ export default function MarketingLayout({
     <DocumentLayout
       colophon={<SiteColophon />}
       rail={<SiteRail />}
-      strip={
-        <ModeStrip context={<HomeContext lensLabel={t("lobby.lens")} />} />
-      }
+      strip={<ModeStrip trail={<HomeContext lensLabel={t("lobby.lens")} />} />}
     >
       {children}
     </DocumentLayout>

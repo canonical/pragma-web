@@ -78,6 +78,7 @@ import {
   readRequestLocale,
 } from "../prose/index.js";
 import { createSearchExtensions, indexSearch } from "../search/index.js";
+import { createSourceExtensions } from "../source/index.js";
 import {
   collectProseSidecars,
   collectTtlSources,
@@ -113,11 +114,13 @@ export const createPragmaProvider = async (
   const prefixes = harvestPrefixes(sources);
   const graphql = createSchemaPlugin({
     // `Prose` and `Query.prose(uri:)`: Markdown sidecars served beside the
-    // compiled graph; `Query.search`: text search over every node. See
+    // compiled graph; `Query.search`: text search over every node;
+    // `Query.source`: one entity's statements as Turtle. See
     // `createProseExtensions` for why each is a root field.
     extensions: composeExtensions([
       createProseExtensions(),
       createSearchExtensions(),
+      createSourceExtensions(),
     ]),
     incremental: true,
     mode: MODE,

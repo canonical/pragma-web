@@ -5,14 +5,13 @@ import { describe, expect, it } from "vitest";
 import EntityList from "./EntityList.js";
 
 describe("EntityList SSR", () => {
-  it("renders the toolbar and the rows on the server", () => {
+  it("renders the table on the server", () => {
     const html = renderToString(
-      <EntityList count={1} kind="station" onViewChange={() => {}} view="rows">
+      <EntityList>
         <li>Northgate</li>
       </EntityList>,
     );
     expect(html).toContain("ds entity-list");
-    expect(html).toContain('aria-pressed="true"');
     expect(html).toContain('<ol class="items"><li>Northgate</li></ol>');
   });
 

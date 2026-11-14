@@ -36,6 +36,7 @@ export default function EntityPage({
   className,
   label,
   uri,
+  renderers,
   ...props
 }: EntityPageProps): ReactElement {
   const t = useMessages();
@@ -53,7 +54,12 @@ export default function EntityPage({
         resetKey={uri}
       >
         <Suspense fallback={<p className="status">{t("page.loading")}</p>}>
-          <EntityDetail binding={binding} label={label} uri={uri} />
+          <EntityDetail
+            binding={binding}
+            label={label}
+            renderers={renderers}
+            uri={uri}
+          />
         </Suspense>
       </ErrorBoundary>
     </section>

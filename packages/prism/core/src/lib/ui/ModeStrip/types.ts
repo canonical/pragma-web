@@ -3,23 +3,32 @@
 import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
-  /** The lens's context region, west slot: typically the breadcrumb trail
-   * to the current page (`LensBreadcrumbs`). A ReactNode rather than a bare
-   * string, because the socket holds navigation markup that carries the page
-   * title, not a label. Empty until a layout claims it. */
-  readonly context?: ReactNode;
-  /** The lens's controls region content: its filters and toggles. */
-  readonly controls?: ReactNode;
-  /** The lens's status region content: its readouts. */
-  readonly status?: ReactNode;
+  /** The trail group: the breadcrumb trail to the current page. */
+  readonly trail?: ReactNode;
+  /** The view group: the renderers the page offers, as a switch. */
+  readonly view?: ReactNode;
+  /** The filtering group's Search, which grows into the free tracks. */
+  readonly search?: ReactNode;
+  /** The filtering group's applied filters, as chips. */
+  readonly chips?: ReactNode;
+  /** The folded filters below two groups: a link to the sheet. */
+  readonly fold?: ReactNode;
+  /** The index's count, which closes the filtering group. */
+  readonly count?: ReactNode;
+  /**
+   * Display the count only in the folded strip, below two groups: for a
+   * lens whose count stands in a panel at two groups and wider, so the
+   * folded strip still reads the trail, the menu, the fold and the count.
+   */
+  readonly countFolded?: boolean;
 };
 
 /**
- * Props accepted by `ModeStrip`: its three sockets, and the native props of
- * its `<header>` root.
+ * Props accepted by `ModeStrip`: its groups and the filtering group's
+ * slots, and the native props of its `<header>` root.
  *
- * `children` is excluded: the strip's content is its three sockets, so a
- * free child would have no socket to land in.
+ * `children` is excluded: the strip's content is its groups, so a free
+ * child would have no place to land in.
  */
 export type ModeStripProps = OwnProps &
   Omit<ComponentProps<"header">, keyof OwnProps | "children">;

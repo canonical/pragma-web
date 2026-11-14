@@ -1,0 +1,13 @@
+---
+# NetworkStrip — the network lens's mode strip on every one of its pages:
+# the network trail (the lens, then the page's address on a node's page)
+# and, on a station's or a line's page, the page's renderers (the page and
+# its Turtle) as core's renderer switch. The map offers no renderer, so its
+# view group stays empty. Core's strip owns the markup, so it binds no
+# style.
+node:
+  uri: metro.subcomponent.network_strip
+  edges:
+    - node:
+        uri: prism.component.mode_strip
+      relation: { cardinality: "1" }

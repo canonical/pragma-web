@@ -2,17 +2,19 @@
 
 import {
   DocumentLayout,
+  ErrorBoundary,
   ModeStrip,
   makeLensContext,
 } from "@canonical/prism-core";
 import { readUriParam } from "@canonical/prism-lens-entity";
 import { useRouterState } from "@canonical/router-react";
 import type React from "react";
-import type { ReactElement } from "react";
+import { type ReactElement, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
 import { FLEET_ROUTES, KIND_BY_ROUTE } from "../../constants.js";
 import { FleetFacts } from "../FleetFacts/index.js";
+import { FleetCount, FleetView } from "./common/index.js";
 import type { FleetLayoutProps } from "./types.js";
 
 const componentCssClassName = "ds fleet-layout";
@@ -39,9 +41,14 @@ function selectFacts(
 
 /**
  * The fleet lens's layout, on the document archetype: the metro rail, the
- * fleet trail in the mode strip, the routed page in the canvas and, on a
+ * fleet trail and the page's renderers (the index's table and cards, a
+ * node page's page and Turtle) in the mode strip, the routed page in the canvas and, on a
  * node's page, its facts in the aside, the canvas's last three columns.
- * The strip's rule bleeds one gutter west, so it meets the rail's border.
+ * On the index, the index's count closes the strip's filtering group; it
+ * reads the index's operation from the warm store inside its own error
+ * boundary and Suspense, both falling back to nothing, so a cold store
+ * empties the count's socket and nothing else. The strip's rule bleeds one
+ * gutter west, so it meets the rail's border.
  *
  * `import { FleetLayout } from "./FleetLayout/index.js";`
  */
@@ -52,6 +59,7 @@ const FleetLayout = ({
 }: FleetLayoutProps): React.ReactElement => {
   const t = useMessages();
   const { match } = useRouterState();
+  const onIndex = match?.kind === "route" && match.name === FLEET_ROUTES.index;
   return (
     <DocumentLayout
       {...props}
@@ -62,7 +70,25 @@ const FleetLayout = ({
       }
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       rail={<MetroRail />}
-      strip={<ModeStrip context={<FleetTrail lensLabel={t("lens.fleet")} />} />}
+      strip={
+        <ModeStrip
+          count={
+            onIndex ? (
+              <ErrorBoundary fallback={null}>
+                <Suspense fallback={null}>
+                  <FleetCount />
+                </Suspense>
+              </ErrorBoundary>
+            ) : null
+          }
+          trail={<FleetTrail lensLabel={t("lens.fleet")} />}
+          view={
+            match?.kind === "route" ? (
+              <FleetView kind={onIndex ? "list" : "page"} />
+            ) : null
+          }
+        />
+      }
     >
       {children}
     </DocumentLayout>

@@ -2,11 +2,13 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { render, screen, waitFor, within } from "@testing-library/react";
-import { RelayEnvironmentProvider } from "react-relay";
+import { screen, waitFor, within } from "@testing-library/react";
+import type { FetchFunction, GraphQLResponse } from "relay-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import createMetroFetch from "../../../../../testing/createMetroFetch.js";
 import { SERIES_90_CURIE } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
+import renderWithSite from "../../../../../testing/renderWithSite.js";
 import StockPage from "./StockPage.js";
 
 afterEach(() => {
@@ -18,14 +20,10 @@ const url = `/fleet/${encodeURIComponent(SERIES_90_CURIE)}`;
 
 /** Render the page alone, over an environment answering with `response`. */
 const renderWithAnswer = (response: Promise<unknown>) =>
-  render(
-    <RelayEnvironmentProvider
-      environment={createEnvironment({
-        fetchFn: vi.fn().mockReturnValue(response),
-      })}
-    >
-      <StockPage address={SERIES_90_CURIE} />
-    </RelayEnvironmentProvider>,
+  renderWithSite(
+    <StockPage address={SERIES_90_CURIE} />,
+    "/fleet",
+    createEnvironment({ fetchFn: vi.fn().mockReturnValue(response) }),
   );
 
 describe("StockPage", () => {
@@ -80,11 +78,51 @@ describe("StockPage", () => {
     expect(facts).not.toHaveTextContent(" to ");
   });
 
+  it("draws its Turtle source in place of its sections at as=turtle", async () => {
+    renderMetroPage(`${url}?as=turtle`);
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Series 90" }),
+    ).toBeInTheDocument();
+    const source = await screen.findByRole("figure");
+    await waitFor(() => expect(source).toHaveTextContent("@prefix"));
+    expect(source).toHaveTextContent("Series 90");
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Formations" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("says nothing of its type lives at an address that names none", async () => {
     renderMetroPage(`/fleet/${encodeURIComponent("metro:northgate")}`);
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Nothing in the fleet lives at metro:northgate.",
     );
+  });
+
+  it("says so when no formation runs the stock, and lists no car type", async () => {
+    const metroFetch = createMetroFetch();
+    // The graph's stocks all run formations, so the page's answer drops
+    // them, as a stock not yet in service would read.
+    const fetchFn: FetchFunction = async (params, variables, ...rest) => {
+      const response = (await metroFetch(
+        params,
+        variables,
+        ...rest,
+      )) as GraphQLResponse & {
+        data?: { node?: { formations?: unknown[] } };
+      };
+      if (params.name === "StockPageQuery" && response.data?.node) {
+        response.data.node.formations = [];
+      }
+      return response;
+    };
+    renderWithSite(
+      <StockPage address={SERIES_90_CURIE} />,
+      "/fleet",
+      createEnvironment({ fetchFn }),
+    );
+    const section = await screen.findByRole("region", { name: "Formations" });
+    expect(section).toHaveTextContent("No formation runs this stock.");
+    expect(screen.queryByRole("region", { name: "Car types" })).toBeNull();
   });
 
   it("says so while its data is on its way", () => {

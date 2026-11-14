@@ -1,6 +1,9 @@
-import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
+import {
+  routeLensFacet,
+  routeShortcutFacet,
+  viewSearch,
+} from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import catalogSearch from "./catalogSearch.js";
 import { ComponentEntityPage } from "./lib/ComponentEntityPage/index.js";
 import { ComponentsCatalogPage } from "./lib/ComponentsCatalogPage/index.js";
 import { ComponentsIcon } from "./lib/ComponentsIcon/index.js";
@@ -18,15 +21,16 @@ import warmComponentEntity from "./warmComponentEntity.js";
  *   against the browser environment, where it does nothing when the store
  *   already holds the data (the freshly hydrated page).
  *
- * The catalog declares the lens (`routeLensFacet`) and its digit, and its
- * view as a search parameter (`catalogSearch`), which never reaches its
- * operation, so a warm store serves every view; both routes render inside
- * `ComponentsLayout`, whose strip carries the trail.
+ * The catalog declares the lens (`routeLensFacet`) and its digit. Both
+ * routes declare core's view search, whose renderer (`as`) never reaches
+ * their operations, so a warm store serves every renderer; both render
+ * inside `ComponentsLayout`, whose strip carries the trail and the
+ * renderer switch.
  */
 const routes = {
   components: route({
     url: "/components",
-    search: catalogSearch,
+    search: viewSearch,
     content: () => <ComponentsCatalogPage />,
     warm: warmCatalog,
     meta: {
@@ -41,6 +45,7 @@ const routes = {
   }),
   componentEntity: route({
     url: "/components/:uri",
+    search: viewSearch,
     content: ({ params }) => <ComponentEntityPage params={params} />,
     warm: warmComponentEntity,
   }),

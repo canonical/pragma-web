@@ -48,21 +48,22 @@ const createLensLinkComponent =
  * is exactly the SSR-determinism the strip's tenants must honour: no
  * empty-then-populated hydration mismatch in the lens layout.
  *
- * Two shapes:
- * - INDEX (`current` absent): one crumb, the lens name, marked `current`
- *   (rendered as text, not a link) — `/definitions` shows `Definitions`.
- * - ENTITY (`current` present): the lens crumb LINKS back to the index
- *   (through the router, so the click is an SPA navigation), the entity
- *   crumb is `current` text — `/components/:uri` shows `Components / …`.
+ * Two shapes, each one crumb:
+ * - INDEX (`current` absent): the lens name, marked `current` (rendered as
+ *   text, not a link) — `/definitions` shows `Definitions`.
+ * - ENTITY (`current` present): the trail ends at the parent, the lens
+ *   crumb LINKING back to the index (through the router, so the click is
+ *   an SPA navigation) — `/components/:uri` shows `Components`. The
+ *   page's own address is not drawn as a crumb: an address is not a name,
+ *   and the page's heading names it.
  *
  * The default DS `Breadcrumbs.Item` and the default "/" separator are used
  * unchanged (the component's own contract: Canonical products must use
  * both), so this feeds plain `items` plus the router `LinkComponent`.
  *
- * The trail stays on one line within the width its socket gives it: the
- * current crumb may shrink below its text, which ends in an ellipsis, so
- * an identifier with no break opportunity, such as an absolute IRI, never
- * reaches past the strip; the lens crumb keeps its whole label.
+ * The trail folds within the width its socket gives it: it stays on one
+ * line, and its crumb may shrink below its text, which then ends in an
+ * ellipsis, so it never wraps and never reaches past the strip.
  *
  * `import { LensBreadcrumbs } from "@canonical/prism-core";`
  *
@@ -82,17 +83,21 @@ export default function LensBreadcrumbs({
     () => createLensLinkComponent(lensRouteName),
     [lensRouteName],
   );
-  const items: BreadcrumbItem[] =
+  const items: BreadcrumbItem[] = [
     current === undefined
-      ? [{ key: lensRouteName, label: lensLabel, current: true }]
-      : [
-          {
-            key: lensRouteName,
-            label: lensLabel,
-            url: router.buildPath(lensRouteName),
-          },
-          { key: current, label: current, current: true },
-        ];
+      ? {
+          key: lensRouteName,
+          label: lensLabel,
+          className: "lens",
+          current: true,
+        }
+      : {
+          key: lensRouteName,
+          label: lensLabel,
+          className: "lens",
+          url: router.buildPath(lensRouteName),
+        },
+  ];
 
   return (
     <Breadcrumbs

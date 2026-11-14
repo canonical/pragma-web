@@ -229,7 +229,7 @@ describe("client-side navigation over a hydrated app", () => {
     // The index and the job are two routes, so the move remounts the
     // journeys layout: the graph view survives it only because it rides
     // the address.
-    const url = "/journeys?view=graph";
+    const url = "/journeys?as=graph";
     const records = mergeRecordMaps(
       journeysExplorerRecords,
       journeysExplorerRecordsJob,
@@ -257,7 +257,7 @@ describe("client-side navigation over a hydrated app", () => {
         "sem://design-system-docs#job.l3",
       )}"]`,
     );
-    expect(jobLink?.getAttribute("href")).toMatch(/\?view=graph$/);
+    expect(jobLink?.getAttribute("href")).toMatch(/\?as=graph$/);
     await act(async () => {
       jobLink?.click();
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -265,7 +265,7 @@ describe("client-side navigation over a hydrated app", () => {
     expect(window.location.pathname).toBe(
       `/journeys/${encodeURIComponent("sem://design-system-docs#job.l3")}`,
     );
-    expect(window.location.search).toBe("?view=graph");
+    expect(window.location.search).toBe("?as=graph");
     // The graph, its selected job ringed, and the job in the inspector.
     expect(view()).toBe("graph");
     expect(

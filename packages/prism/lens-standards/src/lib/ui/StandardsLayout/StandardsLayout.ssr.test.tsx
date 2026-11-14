@@ -26,8 +26,9 @@ describe("StandardsLayout on the server", () => {
 
     expect(html).toContain('class="ds document-layout"');
     expect(html).toContain('aria-label="Site rail"');
-    expect(html).toContain('data-slot="context"');
-    expect(html).toContain(LINK_COMPONENT_URI);
+    expect(html).toContain('data-slot="trail"');
+    // The trail ends at the link back to the index.
+    expect(html).toContain('<a class="link" href="/standards">Standards</a>');
     expect(html).toContain("<p>Routed page</p>");
     expect(html).toContain("<footer>Colophon</footer>");
     // The trail reads the URL, never a query.

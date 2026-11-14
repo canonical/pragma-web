@@ -20,11 +20,10 @@ import {
 import type { EntityPageQuery } from "../../__generated__/EntityPageQuery.graphql.js";
 import entityPageQueryNode from "../../__generated__/EntityPageQuery.graphql.js";
 import buildEntityPageVariables from "../../lib/buildEntityPageVariables.js";
-import { EntityFilterProvider } from "../../lib/ui/EntityFilterProvider/index.js";
 import { EntityIndex } from "../../lib/ui/EntityIndexPage/common/index.js";
 import { EntityIndexPage } from "../../lib/ui/EntityIndexPage/index.js";
 import {
-  EntityControls,
+  EntitySearch,
   EntityStatus,
 } from "../../lib/ui/EntityLayout/common/index.js";
 import { EntityLayout } from "../../lib/ui/EntityLayout/index.js";
@@ -42,10 +41,14 @@ const nativeProps = (name: string) =>
   ({ className: "site", "data-probe": name, id: `${name}-root` }) as const;
 
 /** Expect the root carrying `name`'s native props to merge its class. */
-const expectRoot = (name: string, componentClass: string): void => {
+const expectRoot = (
+  name: string,
+  componentClass: string,
+  baseClass = "",
+): void => {
   const root = document.getElementById(`${name}-root`);
   expect(root, name).toHaveAttribute("data-probe", name);
-  expect(root?.className, name).toBe(`ds ${componentClass} site`);
+  expect(root?.className, name).toBe(`${baseClass}ds ${componentClass} site`);
 };
 
 /** The entity page's parts over the warm store, each given native props. */
@@ -157,17 +160,17 @@ describe("native props", () => {
     expectRoot("layout", "document-layout");
   });
 
-  it("reach the root of the strip's controls and status", {
+  it("reach the root of the strip's search and count", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     await renderWarm(
       "/stations",
-      <EntityFilterProvider>
-        <EntityControls {...nativeProps("controls")} />
+      <>
+        <EntitySearch {...nativeProps("search")} />
         <EntityStatus binding={STATIONS_BINDING} {...nativeProps("status")} />
-      </EntityFilterProvider>,
+      </>,
     );
-    expectRoot("controls", "entity-controls");
-    expectRoot("status", "entity-status");
+    expectRoot("search", "entity-search");
+    expectRoot("status", "entity-status", "ds count-line ");
   });
 });

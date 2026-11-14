@@ -23,6 +23,7 @@
     font-size: var(--explorer-status-font-size);
     color: var(--explorer-status-color);
     white-space: nowrap;
+    min-inline-size: 0;
   }
 
   /* The bar's fill is the share the caption states. */
@@ -41,7 +42,12 @@
     background: var(--explorer-status-fill-background);
   }
 
+  /* The caption may be narrower than its text, as in a phone's strip: it
+   * is then cut with an ellipsis rather than spilling past the figure. */
   .ds.explorer-status .caption {
+    min-inline-size: 0;
+    overflow-x: clip;
     font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
   }
 }

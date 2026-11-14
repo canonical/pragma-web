@@ -1,6 +1,6 @@
 ---
-# Trail — the strip's context: the lens's breadcrumbs to the selected
-# term. It renders no element of its own: the breadcrumbs render it.
+# Trail — the strip's context: the lens's breadcrumbs, which end at the
+# lens on a term's view, its address never a crumb. It renders no element of its own: the breadcrumbs render it.
 node:
   uri: prism.component.trail
   edges:

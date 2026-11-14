@@ -18,8 +18,9 @@
  * first column line and its last, painted over that whole width, that a
  * band of a document's page that bleeds across the gutter is painted to
  * the rail's border rather than clipped by the canvas's scroll, that a
- * breadcrumb wider than the strip stays on one line and ends in an
- * ellipsis inside it, its text clipped by its own crumb, and that
+ * trail whose one crumb is wider than the strip stays on one line and
+ * ends in an ellipsis inside it, its text clipped by its own crumb, its
+ * entity's address never drawn as a crumb, and that
  * nothing reaches past the viewport.
  */
 
@@ -58,6 +59,7 @@ import {
   ARCHETYPE_VIEWPORTS,
   BREADCRUMBS_STYLESHEETS,
   COMPONENT_STYLESHEETS,
+  LONG_LENS_LABEL,
   PAGE_BAND_CLASS_NAME,
   SCROLL_PX,
   SHELL_RULES,
@@ -137,7 +139,7 @@ const workspaceLayout = (
   <WorkspaceLayout
     inspector={<p>Inspector</p>}
     rail={<nav aria-label="Rail">Rail</nav>}
-    strip={<ModeStrip context="Workspace" />}
+    strip={<ModeStrip trail="Workspace" />}
   >
     <p>Canvas</p>
   </WorkspaceLayout>
@@ -174,7 +176,7 @@ const documentLayout = (
     }
     colophon={<p>Colophon</p>}
     rail={<nav aria-label="Rail">Rail</nav>}
-    strip={<ModeStrip context="Document" />}
+    strip={<ModeStrip trail="Document" />}
   >
     <div>
       {pageBand}
@@ -189,7 +191,7 @@ const documentLayout = (
 const bareDocumentLayout = (
   <DocumentLayout
     rail={<nav aria-label="Rail">Rail</nav>}
-    strip={<ModeStrip context="Document" />}
+    strip={<ModeStrip trail="Document" />}
   >
     <p>Page</p>
   </DocumentLayout>
@@ -211,8 +213,9 @@ const TRAIL_ROUTES: RouteMap = {
 };
 
 /**
- * A document whose strip carries the trail to an entity addressed by an
- * absolute IRI, under the router the trail links through.
+ * A document whose strip carries the trail of an entity addressed by an
+ * absolute IRI, which ends at its lens's crumb, a name wider than the
+ * trail, under the router the trail links through.
  */
 const trailDocumentLayout = (
   <RouterProvider
@@ -226,10 +229,10 @@ const trailDocumentLayout = (
       rail={<nav aria-label="Rail">Rail</nav>}
       strip={
         <ModeStrip
-          context={
+          trail={
             <LensBreadcrumbs
               current={ABSOLUTE_IRI}
-              lensLabel="Standards"
+              lensLabel={LONG_LENS_LABEL}
               lensRouteName="standards"
             />
           }
@@ -534,9 +537,9 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
     try {
       const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
       expect(measure.overflow).toEqual([]);
-      // One line: the lens crumb and the current crumb share a row, and the
-      // current crumb's text is painted no further than the trail's end,
-      // clipped by the crumb itself, not by the strip.
+      // One line, the trail ending at the lens's crumb, whose text is
+      // painted no further than the trail's end, clipped by the crumb
+      // itself, not by the strip.
       expect(measure.trails).toHaveLength(1);
       const [trail] = measure.trails;
       expect(trail?.rows).toBe(1);
@@ -544,7 +547,7 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       expect(trail?.textEnd).toBeLessThanOrEqual((trail?.end ?? 0) + 0.5);
       const crumb = await page.evaluate(() => {
         const text = document.querySelector(
-          '.ds.lens-breadcrumbs .link[aria-current="page"]',
+          ".ds.lens-breadcrumbs .list > :last-child > .link",
         );
         const band = document.querySelector(".ds.mode-strip");
         if (text === null || band === null) return null;
@@ -553,25 +556,20 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
           bandEnd: band.getBoundingClientRect().right,
           truncated: text.scrollWidth > text.clientWidth,
           textOverflow: getComputedStyle(text).textOverflow,
-          lensWidth:
-            document
-              .querySelector(".ds.lens-breadcrumbs .breadcrumbs-item > a.link")
-              ?.getBoundingClientRect().width ?? -1,
-          lensContentWidth:
-            document.querySelector(
-              ".ds.lens-breadcrumbs .breadcrumbs-item > a.link",
-            )?.scrollWidth ?? -1,
+          crumbs: document.querySelectorAll(".ds.lens-breadcrumbs li").length,
+          trailText:
+            document.querySelector(".ds.lens-breadcrumbs")?.textContent ?? "",
         };
       });
       expect(crumb).not.toBeNull();
       expect(crumb?.right).toBeLessThanOrEqual((crumb?.bandEnd ?? 0) + 0.5);
       expect(crumb?.textOverflow).toBe("ellipsis");
-      // At a phone's width the IRI is wider than the strip: it is cut at
-      // the crumb's end, and the lens crumb keeps its whole label.
-      expect(crumb?.truncated).toBe(viewport.width < 448);
-      expect(crumb?.lensWidth).toBeGreaterThanOrEqual(
-        (crumb?.lensContentWidth ?? 0) - 0.5,
-      );
+      // The name is wider than the trail at every width (the strip's first
+      // two columns, or its share of the one flex line below two groups):
+      // it is cut at the crumb's end, and the address is not drawn.
+      expect(crumb?.truncated).toBe(true);
+      expect(crumb?.crumbs).toBe(1);
+      expect(crumb?.trailText).not.toContain(ABSOLUTE_IRI);
     } finally {
       await page.close();
     }

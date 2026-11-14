@@ -1,4 +1,4 @@
-import type { EntityBinding } from "@canonical/prism-core";
+import type { EntityBinding, ViewSearchSchema } from "@canonical/prism-core";
 import type { DataRouteDefinition } from "@canonical/router-core";
 import type { ReactElement } from "react";
 
@@ -13,14 +13,17 @@ export type StandardsBinding = Pick<EntityBinding, "classUri">;
 /** The lens's index route: `/standards`, the bound class's instances. */
 export type StandardsIndexRoute = DataRouteDefinition<
   "/standards",
-  undefined,
+  ViewSearchSchema,
   ReactElement
 >;
 
-/** The lens's reading route: `/standards/:uri`, one standard. */
+/**
+ * The lens's reading route: `/standards/:uri`, one standard, in the
+ * renderer the address names.
+ */
 export type StandardEntityRoute = DataRouteDefinition<
   "/standards/:uri",
-  undefined,
+  ViewSearchSchema,
   ReactElement
 >;
 

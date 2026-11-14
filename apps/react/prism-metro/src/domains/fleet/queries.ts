@@ -46,6 +46,7 @@ const declareStockPageQuery = (): unknown => graphql`
     node(id: $id) {
       __typename
       ... on RollingStock {
+        uri
         _meta {
           title
         }
@@ -82,6 +83,7 @@ const declareFormationPageQuery = (): unknown => graphql`
     node(id: $id) {
       __typename
       ... on Formation {
+        uri
         length
         capacity
         _meta {
@@ -119,6 +121,7 @@ const declareUnitPageQuery = (): unknown => graphql`
     node(id: $id) {
       __typename
       ... on Unit {
+        uri
         length
         capacity
         _meta {
@@ -138,6 +141,7 @@ const declareCarTypePageQuery = (): unknown => graphql`
     node(id: $id) {
       __typename
       ... on CarType {
+        uri
         code
         hasCab
         length

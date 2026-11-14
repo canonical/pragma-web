@@ -46,7 +46,7 @@ export default function AccountLayout({
       rail={<SiteRail />}
       strip={
         <ModeStrip
-          context={
+          trail={
             login ? (
               <LoginContext lensLabel={t("login.title")} />
             ) : (

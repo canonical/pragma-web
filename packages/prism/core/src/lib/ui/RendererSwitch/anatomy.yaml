@@ -1,0 +1,143 @@
+---
+# RendererSwitch — the strip's view group: the renderers a page offers as a
+# row of links, so it works before hydration and in a new tab; exactly one
+# carries aria-current. Rendered only with two or more renderers (a lone
+# renderer is not drawn). Two forms of the same list: at two groups and
+# wider a row of tab links (each a RouterLink whose href differs from the
+# address only in `as`, with `expand` dropped), the current one underlined;
+# below two groups one menu, a native disclosure whose summary names the
+# current renderer, opening an overlay list of the same links under it.
+# Both are in the markup; the container query displays one.
+#
+# Bespoke tabs: the published Tabs sets a 40px tab on the baseline grid,
+# taller than the strip's density line, so the band would grow past its
+# fixed height. The tab links set no block inset; the current tab draws a
+# 2px highlighted underline, which stays inside the line, and a keyboard
+# focus draws the focus ring. The menu's overlay is the disclosure's own list,
+# absolutely positioned under the summary and ending where it ends, so it
+# opens toward the strip's start and never past the viewport (the resilient
+# baseline), on the page's background with a hairline, one compact inset,
+# so the strip stays one line while it is open. The summary and each
+# option are as tall as the strip's density line, so each is a full
+# target; the summary draws no native marker, and a chevron ("▾") follows
+# the current renderer's name; the current option is bold.
+#
+# Every decision is read through a component token declared on the root
+# (`--renderer-switch-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   1px: the overlay's hairline frame.
+#   2px: the tab's underline and its focus ring.
+#   space.200 (16px) between the tab links: the published tabs' inset.
+#   layout.stack 1: the overlay sits over the canvas's in-flow content; no
+#     semantic stacking symbol exists.
+#   layout.offset.top 100%: the overlay starts under the summary (an
+#     unthemable percentage).
+#   The chevron is the catalog's `rendererSwitch.chevron` glyph, hidden
+#     from assistive tech: the summary's name is the renderer's.
+#   space.100 (8px) inset and gap of the overlay list.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups: the tabs are not
+#     displayed and the menu is.
+#
+# Roster namespaces (accepted and tracked): space.100, space.200,
+# density.line.height, and the
+# semantic typography symbol typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.renderer_switch
+  styles:
+    size.min.width: 0
+  edges:
+    - node:
+        role: tabs (the navigation, named from the catalog)
+        edges:
+          - node:
+              role: list
+              styles:
+                layout.type: flex
+                layout.align: center
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+                spacing.gap: space.200
+              edges:
+                - node:
+                    role: tab (a router link)
+                    styles:
+                      layout.type: inline-flex
+                      layout.align: center
+                      typography.color: color.text
+                      typography.decoration: none
+                      typography.whiteSpace: nowrap
+                      appearance.border.width@selected: 2px
+                      appearance.border.style@selected: solid
+                      appearance.border.bottom.color@selected: color.border.highlighted
+                      appearance.outline.width@focus: 2px
+                      appearance.outline.style@focus: solid
+                      appearance.outline.color@focus: color.focusRing
+                  relation: { cardinality: "2..*", slotName: tab }
+            relation: { cardinality: "1", slotName: list }
+      relation: { cardinality: "1", slotName: tabs }
+    - node:
+        role: menu
+        styles:
+          layout.type: none
+          layout.position: relative
+        edges:
+          - node:
+              role: summary
+              styles:
+                layout.type: flex
+                layout.align: center
+                size.min.block: density.line.height
+                spacing.gap: space.100
+                layout.listStyle: none
+                interaction.cursor: pointer
+                typography.whiteSpace: nowrap
+                typography.weight: typography.text.primary.bold.fontWeight
+              edges:
+                - node:
+                    role: name (the current renderer's label)
+                  relation: { cardinality: "1", slotName: name }
+                - node:
+                    role: chevron (aria-hidden glyph)
+                  relation: { cardinality: "1", slotName: chevron }
+            relation: { cardinality: "1", slotName: summary }
+          - node:
+              role: overlay list
+              styles:
+                layout.position: absolute
+                layout.offset.top: 100%
+                layout.offset.right: 0
+                layout.stack: 1
+                layout.listStyle: none
+                layout.type: flex
+                layout.direction: column
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.block.start: space.100
+                spacing.internal.block.end: space.100
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+                spacing.gap: space.100
+                appearance.background: color.background
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border.muted
+              edges:
+                - node:
+                    uri: prism.component.router_link
+                    styles:
+                      layout.type: flex
+                      layout.align: center
+                      size.min.block: density.line.height
+                      spacing.internal.inline.start: space.100
+                      spacing.internal.inline.end: space.100
+                      typography.color: color.text
+                      typography.whiteSpace: nowrap
+                      typography.weight@selected: typography.text.primary.bold.fontWeight
+                  relation: { cardinality: "2..*", slotName: option }
+            relation: { cardinality: "1", slotName: options }
+      relation: { cardinality: "1", slotName: menu }

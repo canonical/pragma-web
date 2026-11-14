@@ -11,7 +11,6 @@ import {
   STATION_COUNT,
   STATIONS_BINDING,
 } from "../../../../../../testing/fixtures.js";
-import { EntityFilterProvider } from "../../../EntityFilterProvider/index.js";
 import EntityStatus from "./EntityStatus.js";
 
 describe("EntityStatus", () => {
@@ -23,11 +22,7 @@ describe("EntityStatus", () => {
       createEntitySite({
         url: "/stations",
         environment,
-        children: (
-          <EntityFilterProvider>
-            <EntityStatus binding={STATIONS_BINDING} className="site" />
-          </EntityFilterProvider>
-        ),
+        children: <EntityStatus binding={STATIONS_BINDING} className="site" />,
       }),
     );
     const status = screen.getByRole("status");
@@ -35,8 +30,24 @@ describe("EntityStatus", () => {
       `${STATION_COUNT} of ${STATION_COUNT} entries`,
     );
     expect(status).toHaveAttribute("aria-live", "polite");
-    expect(status.className).toBe("ds entity-status site");
+    expect(status.className).toBe("ds count-line ds entity-status site");
     expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("counts only the entries the address's search text shows", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { environment } = await createWarmEnvironment("/stations");
+    render(
+      createEntitySite({
+        url: "/stations?q=zzz-no-station",
+        environment,
+        children: <EntityStatus binding={STATIONS_BINDING} />,
+      }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      `0 of ${STATION_COUNT} entries`,
+    );
   });
 
   it("suspends over a cold store, reading the index's own operation", () => {

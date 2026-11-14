@@ -1,7 +1,8 @@
 ---
 # NetworkLinePage — the content of /network/lines/:uri, a document. It
-# renders prism-core's DocumentLayout with the metro rail and, in the
-# three-column aside, the line's LinePanel; its own root is the main
+# renders prism-core's DocumentLayout with the metro rail, the network
+# strip (its trail and the page's renderers, the page and its Turtle) and,
+# in the three-column aside, the line's LinePanel; its own root is the main
 # column: a subgrid of the canvas's page over every column, holding the
 # line's title and one RouteStrip per route the line draws, or its
 # not-found, loading or error status. It renders its own archetype because
@@ -33,3 +34,7 @@ node:
         styles:
           layout.grid.column: "1 / -1"
       relation: { cardinality: "0..1", slotName: status }
+    - node:
+        uri: prism.component.entity_source
+        # the line's Turtle source, in place of its route strips, at as=turtle
+      relation: { cardinality: "0..1", slotName: source }

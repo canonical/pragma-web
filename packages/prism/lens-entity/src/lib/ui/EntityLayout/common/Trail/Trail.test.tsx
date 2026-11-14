@@ -27,7 +27,7 @@ describe("Trail", () => {
     expect(screen.getByText("Stations")).toBeInTheDocument();
   });
 
-  it("links the label back to the index and ends in the address on an entity page", () => {
+  it("ends the trail at the label, linked back to the index, on an entity page", () => {
     const { container } = renderTrail(
       `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
     );
@@ -35,6 +35,6 @@ describe("Trail", () => {
       "href",
       "/stations",
     );
-    expect(container).toHaveTextContent(NORTHGATE_CURIE);
+    expect(container).not.toHaveTextContent(NORTHGATE_CURIE);
   });
 });

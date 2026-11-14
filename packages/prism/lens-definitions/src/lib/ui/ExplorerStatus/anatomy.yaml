@@ -35,6 +35,7 @@ node:
     typography.size: typography.text.secondary.fontSize
     typography.color: color.text.muted
     typography.whiteSpace: nowrap
+    size.min.width: 0
   edges:
     - node:
         role: bar
@@ -57,5 +58,8 @@ node:
     - node:
         role: caption
         styles:
+          size.min.width: 0
+          layout.overflow.inline: clip
           typography.variant.numeric: tabular-nums
+          typography.overflow: ellipsis
       relation: { cardinality: "1", slotName: caption }

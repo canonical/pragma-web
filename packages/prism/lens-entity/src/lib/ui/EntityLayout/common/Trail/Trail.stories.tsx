@@ -22,7 +22,7 @@ type Story = StoryObj<typeof Component>;
 /** On the index: the lens's label alone. */
 export const OnTheIndex: Story = {};
 
-/** On an entity page: the label, linked back to the index, then the address. */
+/** On an entity page: the trail ends at the label, linked back to the index. */
 export const OnAnEntityPage: Story = {
   decorators: [
     withSite({ url: `/stations/${encodeURIComponent(NORTHGATE_CURIE)}` }),

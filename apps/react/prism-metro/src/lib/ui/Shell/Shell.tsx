@@ -19,6 +19,7 @@ import { homes } from "../../../homes.js";
 import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
+import { SiteRenderers } from "../SiteRenderers/index.js";
 
 const componentCssClassName = "ds shell";
 
@@ -73,23 +74,25 @@ export default function Shell<
                 LinkComponent={RouterLink}
                 maps={metroProjectionMaps}
               >
-                <div
-                  {...props}
-                  className={[
-                    componentCssClassName,
-                    ...GRID_PRESET_CLASS_NAMES,
-                    className,
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  <Outlet
-                    fallback={
-                      <p className="loading">{MESSAGES["shell.loading"]}</p>
-                    }
-                  />
-                  <CommandPalette />
-                </div>
+                <SiteRenderers>
+                  <div
+                    {...props}
+                    className={[
+                      componentCssClassName,
+                      ...GRID_PRESET_CLASS_NAMES,
+                      className,
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <Outlet
+                      fallback={
+                        <p className="loading">{MESSAGES["shell.loading"]}</p>
+                      }
+                    />
+                    <CommandPalette />
+                  </div>
+                </SiteRenderers>
               </ProjectionsProvider>
             </HomesProvider>
           </RouterProvider>

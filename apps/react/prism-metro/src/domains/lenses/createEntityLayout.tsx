@@ -22,12 +22,18 @@ import { MetroRail } from "./MetroRail/index.js";
  */
 export default function createEntityLayout(
   binding: EntityBinding,
-  lens: Pick<EntityLensOptions, "label">,
+  lens: Pick<EntityLensOptions, "label" | "renderers" | "filters">,
 ): WrapperDefinition<ReactElement> {
   const EntityLensLayout = ({
     children,
   }: WrapperComponentProps<ReactNode>): ReactElement => (
-    <EntityLayout binding={binding} label={lens.label} rail={<MetroRail />}>
+    <EntityLayout
+      binding={binding}
+      filters={lens.filters}
+      label={lens.label}
+      rail={<MetroRail />}
+      renderers={lens.renderers}
+    >
       {children}
     </EntityLayout>
   );

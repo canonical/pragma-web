@@ -153,9 +153,7 @@ export default function StandardsIndex({
       {/* Two ways to get here: a zero-edge connection, and a binding that
           names a class this graph does not carry. Both render the list
           view's empty line rather than a blank canvas. */}
-      {groups.length === 0 ? (
-        <EntityList empty={t("index.empty")} view="rows" />
-      ) : null}
+      {groups.length === 0 ? <EntityList empty={t("index.empty")} /> : null}
       {groups.map((group) => {
         const anchorId = buildGroupAnchorId(group.classUri);
         return (
@@ -168,7 +166,7 @@ export default function StandardsIndex({
             <h2 className="group-heading" id={`${anchorId}-title`}>
               {group.title}
             </h2>
-            <EntityList view="rows">
+            <EntityList>
               {group.nodes.map((node) => (
                 <EntityRow
                   href={router.buildPath("standardEntity", {

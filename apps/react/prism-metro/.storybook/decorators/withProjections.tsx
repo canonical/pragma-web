@@ -3,10 +3,12 @@ import { ProjectionsProvider } from "@canonical/prism-projections";
 import type { ElementType, ReactElement } from "react";
 import { metroProjectionMaps } from "#domains/metro";
 import { homes } from "../../src/homes.js";
+import { SiteRenderers } from "../../src/lib/ui/SiteRenderers/index.js";
 
 /**
  * Storybook decorator that gives a story the nest `Shell` gives the app: the
- * site's homes, its projection maps and the router link adapter, so every
+ * site's homes, its projection maps, the router link adapter and the site's
+ * renderers, so every
  * mention of a graph node renders through its type's arm and links to the
  * page that owns it.
  *
@@ -28,7 +30,9 @@ const withProjections =
         LinkComponent={RouterLink}
         maps={metroProjectionMaps}
       >
-        <Story />
+        <SiteRenderers>
+          <Story />
+        </SiteRenderers>
       </ProjectionsProvider>
     </HomesProvider>
   );

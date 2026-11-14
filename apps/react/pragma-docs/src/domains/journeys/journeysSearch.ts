@@ -17,7 +17,7 @@ const journeysSearch: JourneysSearchSchema = {
     vendor: "pragma-docs",
     validate: (value) => ({
       value: {
-        view: readJourneyView(
+        as: readJourneyView(
           (value as Readonly<Record<string, unknown>> | undefined)?.[
             JOURNEY_VIEW_PARAM
           ],
