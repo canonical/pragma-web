@@ -31,7 +31,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/_work_in_progress/DataTable/common/BodyCell/BodyCell.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/HeaderMenu/HeaderMenu.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/Row/Row.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataTable/common/Row/Row.tsx test",
   "src/lib/_work_in_progress/DataTable/common/SettingsMenu/LabelsContext.ts test",
   "src/lib/_work_in_progress/DataTable/common/SettingsMenu/SettingsMenu.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/SettingsMenu/common/ItemLabel/ItemLabel.tsx test",
