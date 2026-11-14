@@ -14,7 +14,8 @@ import type { StripMeasure } from "./types.js";
  * its content. A group is painted where its descendants' boxes are, each
  * cut by every element up to the group that clips or scrolls it, so a
  * group that spills toward the start shows over its neighbour even though
- * the strip itself does not overflow. Each crumb is its list item's own
+ * the strip itself does not overflow; what is not rendered, such as a
+ * closed menu's options, paints nothing. Each crumb is its list item's own
  * text, without the separator the item hides from assistive technology.
  * A count that is not displayed has no end. The facet bar overflows when
  * it, or its controls, is narrower than its content; its controls end
@@ -49,6 +50,7 @@ export default function measureStrip(): StripMeasure {
   const barBox = bar?.getBoundingClientRect();
   const controls = bar?.querySelector<HTMLElement>(":scope > .controls");
   const controlRights = [...(controls?.querySelectorAll("*") ?? [])]
+    .filter((element) => element.checkVisibility())
     .map((element) => element.getBoundingClientRect())
     .filter((box) => box.width > 0 && box.height > 0)
     .map((box) => box.right);
@@ -59,6 +61,8 @@ export default function measureStrip(): StripMeasure {
     );
     if (group === null || group === undefined) return null;
     const extents = [...group.querySelectorAll("*")].flatMap((element) => {
+      // A closed menu's options still have a box, but are not painted.
+      if (!element.checkVisibility()) return [];
       const box = element.getBoundingClientRect();
       if (box.width === 0 || box.height === 0) return [];
       let x = box.x;
