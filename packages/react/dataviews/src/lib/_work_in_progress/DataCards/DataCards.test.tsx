@@ -528,55 +528,55 @@ describe("DataCards", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
     await expectNoAxeViolations(view.container);
   });
-});
 
-describe("DataCards hydrating what the server drew", () => {
-  it("draws the cards and checkboxes the server drew, with no mismatch", async () => {
-    const errors = vi.spyOn(console, "error");
-    onTestFinished(() => {
-      errors.mockRestore();
-    });
-    const build = () => {
-      const provider = createDataViewsProvider({
-        collection: machines,
-        source: createArraySource({ rows, collection: machines }),
-      });
-      provider.refresh();
-      return (
-        <DataCards
-          provider={provider}
-          fields={fields}
-          title="name"
-          label="Machines"
-          selectable
-        />
-      );
-    };
-    const container = document.createElement("div");
-    container.innerHTML = renderToString(build());
-    document.body.append(container);
-    onTestFinished(() => {
-      container.remove();
-    });
-    const drawn = container.innerHTML;
-    expect(drawn).toContain("alpha");
-    const recovered = vi.fn();
-    await act(async () => {
-      const root = hydrateRoot(container, build(), {
-        onRecoverableError: recovered,
-      });
+  describe("DataCards hydrating what the server drew", () => {
+    it("draws the cards and checkboxes the server drew, with no mismatch", async () => {
+      const errors = vi.spyOn(console, "error");
       onTestFinished(() => {
-        act(() => {
-          root.unmount();
+        errors.mockRestore();
+      });
+      const build = () => {
+        const provider = createDataViewsProvider({
+          collection: machines,
+          source: createArraySource({ rows, collection: machines }),
+        });
+        provider.refresh();
+        return (
+          <DataCards
+            provider={provider}
+            fields={fields}
+            title="name"
+            label="Machines"
+            selectable
+          />
+        );
+      };
+      const container = document.createElement("div");
+      container.innerHTML = renderToString(build());
+      document.body.append(container);
+      onTestFinished(() => {
+        container.remove();
+      });
+      const drawn = container.innerHTML;
+      expect(drawn).toContain("alpha");
+      const recovered = vi.fn();
+      await act(async () => {
+        const root = hydrateRoot(container, build(), {
+          onRecoverableError: recovered,
+        });
+        onTestFinished(() => {
+          act(() => {
+            root.unmount();
+          });
         });
       });
+      expect(recovered).not.toHaveBeenCalled();
+      expect(errors).not.toHaveBeenCalled();
+      expect(
+        within(container)
+          .getAllByRole("listitem")
+          .map((card) => card.querySelector(".title")?.textContent),
+      ).toEqual(["alpha", "beta"]);
     });
-    expect(recovered).not.toHaveBeenCalled();
-    expect(errors).not.toHaveBeenCalled();
-    expect(
-      within(container)
-        .getAllByRole("listitem")
-        .map((card) => card.querySelector(".title")?.textContent),
-    ).toEqual(["alpha", "beta"]);
   });
 });

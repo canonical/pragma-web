@@ -814,96 +814,99 @@ describe("ResizeHandle", () => {
       expect(handle.parentElement).not.toHaveAttribute("data-mode");
     });
   });
-});
 
-describe("ResizeHandle in a table, a press then a press", () => {
-  /** The handle's header row inside a table, laid out on screen. */
-  const mountInTable = () => {
-    const layout = createLayoutOf([
-      {
-        id: "name",
-        sizing: { kind: "flex", weight: 1, minPx: 50, maxPx: 300 },
-      },
-    ]);
-    const interaction = createGridInteraction(layout);
-    render(
-      <Table>
-        <HeaderRow>
-          <HeaderCell>
-            <ResizeHandle
-              interaction={interaction}
-              columnId="name"
-              name="Name"
-              width={100}
-              min={50}
-              max={300}
-              labelledBy="name-label"
-              announce={() => {}}
-            />
-          </HeaderCell>
-        </HeaderRow>
-      </Table>,
-    );
-    const cell = screen.getByRole("columnheader");
-    vi.spyOn(cell, "getBoundingClientRect").mockReturnValue(
-      DOMRect.fromRect({ x: 10, y: 0, width: 100, height: 32 }),
-    );
-    vi.spyOn(screen.getByRole("row"), "getBoundingClientRect").mockReturnValue(
-      DOMRect.fromRect({ x: 10, y: 0, width: 100, height: 32 }),
-    );
-    return { layout, handle: screen.getByRole("separator") };
-  };
+  describe("ResizeHandle in a table, a press then a press", () => {
+    /** The handle's header row inside a table, laid out on screen. */
+    const mountInTable = () => {
+      const layout = createLayoutOf([
+        {
+          id: "name",
+          sizing: { kind: "flex", weight: 1, minPx: 50, maxPx: 300 },
+        },
+      ]);
+      const interaction = createGridInteraction(layout);
+      render(
+        <Table>
+          <HeaderRow>
+            <HeaderCell>
+              <ResizeHandle
+                interaction={interaction}
+                columnId="name"
+                name="Name"
+                width={100}
+                min={50}
+                max={300}
+                labelledBy="name-label"
+                announce={() => {}}
+              />
+            </HeaderCell>
+          </HeaderRow>
+        </Table>,
+      );
+      const cell = screen.getByRole("columnheader");
+      vi.spyOn(cell, "getBoundingClientRect").mockReturnValue(
+        DOMRect.fromRect({ x: 10, y: 0, width: 100, height: 32 }),
+      );
+      vi.spyOn(
+        screen.getByRole("row"),
+        "getBoundingClientRect",
+      ).mockReturnValue(
+        DOMRect.fromRect({ x: 10, y: 0, width: 100, height: 32 }),
+      );
+      return { layout, handle: screen.getByRole("separator") };
+    };
 
-  it("widens the column into the space the table leaves past the row", () => {
-    const { layout, handle } = mountInTable();
-    pressHandle(handle);
-    act(() => {
-      fireEvent.pointerDown(screen.getByRole("table"), {
-        isPrimary: true,
-        clientX: 250,
-        clientY: 16,
+    it("widens the column into the space the table leaves past the row", () => {
+      const { layout, handle } = mountInTable();
+      pressHandle(handle);
+      act(() => {
+        fireEvent.pointerDown(screen.getByRole("table"), {
+          isPrimary: true,
+          clientX: 250,
+          clientY: 16,
+        });
       });
+      expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 240 });
     });
-    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 240 });
-  });
 
-  it("places nothing for a press in the table below the header row", () => {
-    const { layout, handle } = mountInTable();
-    pressHandle(handle);
-    act(() => {
-      fireEvent.pointerDown(screen.getByRole("table"), {
-        isPrimary: true,
-        clientX: 250,
-        clientY: 80,
+    it("places nothing for a press in the table below the header row", () => {
+      const { layout, handle } = mountInTable();
+      pressHandle(handle);
+      act(() => {
+        fireEvent.pointerDown(screen.getByRole("table"), {
+          isPrimary: true,
+          clientX: 250,
+          clientY: 80,
+        });
       });
+      expect(layout.state.get().overrides["name"]).toBeUndefined();
+      expect(handle.parentElement).not.toHaveAttribute("data-mode");
     });
-    expect(layout.state.get().overrides["name"]).toBeUndefined();
-    expect(handle.parentElement).not.toHaveAttribute("data-mode");
-  });
 
-  it("places nothing for a press above the header row", () => {
-    const { layout, handle } = mountInTable();
-    pressHandle(handle);
-    act(() => {
-      fireEvent.pointerDown(screen.getByRole("table"), {
-        isPrimary: true,
-        clientX: 250,
-        clientY: -8,
+    it("places nothing for a press above the header row", () => {
+      const { layout, handle } = mountInTable();
+      pressHandle(handle);
+      act(() => {
+        fireEvent.pointerDown(screen.getByRole("table"), {
+          isPrimary: true,
+          clientX: 250,
+          clientY: -8,
+        });
       });
+      expect(layout.state.get().overrides["name"]).toBeUndefined();
     });
-    expect(layout.state.get().overrides["name"]).toBeUndefined();
-  });
 
-  it("places nothing for a press outside the table", () => {
-    const { layout, handle } = mountInTable();
-    pressHandle(handle);
-    act(() => {
-      fireEvent.pointerDown(document.body, {
-        isPrimary: true,
-        clientX: 250,
-        clientY: 16,
+    it("places nothing for a press outside the table", () => {
+      const { layout, handle } = mountInTable();
+      pressHandle(handle);
+      act(() => {
+        fireEvent.pointerDown(document.body, {
+          isPrimary: true,
+          clientX: 250,
+          clientY: 16,
+        });
       });
+      expect(layout.state.get().overrides["name"]).toBeUndefined();
     });
-    expect(layout.state.get().overrides["name"]).toBeUndefined();
   });
 });
