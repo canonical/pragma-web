@@ -11,6 +11,9 @@ export type {
   DataViewsSavedViewsProps,
   DataViewsSearchProps,
   DataViewsSortPanelProps,
+  FilterButtonCondition,
+  FilterButtonPanelHandle,
+  FilterButtonProps,
   PaginationBarProps,
   QueryChipEntryProps,
   QueryChipProps,
@@ -22,6 +25,7 @@ export type {
 export {
   DataTable,
   DataViews,
+  FilterButton,
   PaginationBar,
   QueryChip,
   QueryChips,
