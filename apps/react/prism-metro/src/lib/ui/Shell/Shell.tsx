@@ -6,7 +6,10 @@ import {
   RouterLink,
   StoredThemeProvider,
 } from "@canonical/prism-core";
-import { ProjectionsProvider } from "@canonical/prism-projections";
+import {
+  AmbientNamespaceProvider,
+  ProjectionsProvider,
+} from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
@@ -16,7 +19,7 @@ import { metroProjectionMaps } from "#domains/metro";
 import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
-import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
+import { AMBIENT_NAMESPACE, GRID_PRESET_CLASS_NAMES } from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
 import { SiteRenderers } from "../SiteRenderers/index.js";
@@ -31,7 +34,8 @@ const componentCssClassName = "ds shell";
  * as on the client. Inside the
  * router sit the site's homes and its projection maps, so every mention of
  * a graph node renders through its type's arm and links to the page that
- * owns it.
+ * owns it, and the site's one ambient namespace, `metro`, so a metro
+ * identity shows no prefix and a foreign one shows its own.
  *
  * The projections render a home through prism-core's `RouterLink`, so every
  * mention navigates on the client through the router: a plain click loads
@@ -74,25 +78,27 @@ export default function Shell<
                 LinkComponent={RouterLink}
                 maps={metroProjectionMaps}
               >
-                <SiteRenderers>
-                  <div
-                    {...props}
-                    className={[
-                      componentCssClassName,
-                      ...GRID_PRESET_CLASS_NAMES,
-                      className,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <Outlet
-                      fallback={
-                        <p className="loading">{MESSAGES["shell.loading"]}</p>
-                      }
-                    />
-                    <CommandPalette />
-                  </div>
-                </SiteRenderers>
+                <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
+                  <SiteRenderers>
+                    <div
+                      {...props}
+                      className={[
+                        componentCssClassName,
+                        ...GRID_PRESET_CLASS_NAMES,
+                        className,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <Outlet
+                        fallback={
+                          <p className="loading">{MESSAGES["shell.loading"]}</p>
+                        }
+                      />
+                      <CommandPalette />
+                    </div>
+                  </SiteRenderers>
+                </AmbientNamespaceProvider>
               </ProjectionsProvider>
             </HomesProvider>
           </RouterProvider>

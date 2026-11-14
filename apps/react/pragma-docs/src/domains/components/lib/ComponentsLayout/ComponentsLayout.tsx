@@ -6,12 +6,14 @@ import {
   ModeStrip,
   makeLensContext,
 } from "@canonical/prism-core";
+import { AmbientNamespaceProvider } from "@canonical/prism-projections";
 import { useRouterState } from "@canonical/router-react";
 import { type ReactElement, Suspense } from "react";
 import { useMessages } from "#i18n";
 import { SiteColophon } from "#lib/ui/SiteColophon";
 import { SiteRail } from "#lib/ui/SiteRail";
 import { CatalogCount, ComponentsView } from "./common/index.js";
+import { AMBIENT_NAMESPACE } from "./constants.js";
 import type { ComponentsLayoutProps } from "./types.js";
 
 /**
@@ -38,6 +40,9 @@ const ComponentsContext = makeLensContext({
  * scrolls, and the colophon in the band under it. It renders no element of
  * its own: `DocumentLayout` renders the root.
  *
+ * Its pages are about the design system's components, so it declares `ds`
+ * as their ambient namespace: a `ds:` identity on them shows no prefix.
+ *
  * `import { ComponentsLayout } from "./lib/ComponentsLayout/index.js";`
  *
  * @implements docs.component.components_layout
@@ -53,30 +58,32 @@ export default function ComponentsLayout({
   const onComponent =
     match?.kind === "route" && match.name === "componentEntity";
   return (
-    <DocumentLayout
-      colophon={<SiteColophon />}
-      rail={<SiteRail />}
-      strip={
-        <ModeStrip
-          count={
-            onCatalog ? (
-              <ErrorBoundary fallback={null}>
-                <Suspense fallback={null}>
-                  <CatalogCount />
-                </Suspense>
-              </ErrorBoundary>
-            ) : null
-          }
-          trail={<ComponentsContext lensLabel={t("catalog.title")} />}
-          view={
-            onCatalog || onComponent ? (
-              <ComponentsView kind={onCatalog ? "list" : "page"} />
-            ) : null
-          }
-        />
-      }
-    >
-      {children}
-    </DocumentLayout>
+    <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
+      <DocumentLayout
+        colophon={<SiteColophon />}
+        rail={<SiteRail />}
+        strip={
+          <ModeStrip
+            count={
+              onCatalog ? (
+                <ErrorBoundary fallback={null}>
+                  <Suspense fallback={null}>
+                    <CatalogCount />
+                  </Suspense>
+                </ErrorBoundary>
+              ) : null
+            }
+            trail={<ComponentsContext lensLabel={t("catalog.title")} />}
+            view={
+              onCatalog || onComponent ? (
+                <ComponentsView kind={onCatalog ? "list" : "page"} />
+              ) : null
+            }
+          />
+        }
+      >
+        {children}
+      </DocumentLayout>
+    </AmbientNamespaceProvider>
   );
 }

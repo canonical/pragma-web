@@ -5,6 +5,8 @@
 # count closing the filtering group, the routed page in the canvas, and the site's
 # colophon. It renders no element of its own: DocumentLayout renders the
 # root.
+# Round it all, it declares `ds` as the pages' ambient namespace
+# (AmbientNamespaceProvider): a `ds:` identity on them shows no prefix.
 node:
   uri: docs.component.components_layout
   edges:

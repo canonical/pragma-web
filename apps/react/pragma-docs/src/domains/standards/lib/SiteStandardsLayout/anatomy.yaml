@@ -2,6 +2,8 @@
 # SiteStandardsLayout — the Standards lens's layout with the site's rail
 # and colophon bound to it. It renders no element of its own:
 # StandardsLayout renders the root.
+# Round it all, it declares `cs` as the pages' ambient namespace
+# (AmbientNamespaceProvider): a `cs:` identity on them shows no prefix.
 node:
   uri: docs.component.site_standards_layout
   edges:
