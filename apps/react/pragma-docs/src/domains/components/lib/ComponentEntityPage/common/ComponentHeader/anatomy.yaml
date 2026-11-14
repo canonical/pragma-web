@@ -1,7 +1,7 @@
 ---
 # ComponentHeader — the component page's header: the name as the page's
 # level-1 heading, the summary on a reading measure of six intrinsic
-# columns, then the key values on the page's grid: the compact address in
+# columns and at most 75 characters, then the key values on the page's grid: the compact address in
 # the published InlineCode, the tier, the version and the first
 # documentation stage. An absent value leaves no pair. Application UI, not
 # prose: the heading, the summary and the key values sit one gutter apart.
@@ -11,6 +11,8 @@
 #
 # Token ledger:
 #   layout.grid.column "1 / -1", "1 / span 6": structure. The 0 resets.
+#   --component-header-summary-measure: 75ch  the summary's reading
+#     measure (heuristic 75ch prose line).
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -38,6 +40,7 @@ node:
           field: summary
         styles:
           layout.grid.column: "1 / span 6"
+          size.max.width: "75ch"
           spacing.external.block.start: 0
           spacing.external.block.end: 0
       relation: { cardinality: "0..1", slotName: summary }

@@ -8,6 +8,7 @@
    * apart. */
   .ds.component-header {
     --component-header-gap: var(--grid-gutter);
+    --component-header-summary-measure: 75ch;
 
     display: grid;
     grid-template-columns: subgrid;
@@ -20,9 +21,11 @@
     margin-block: 0;
   }
 
-  /* The summary holds a reading measure of six columns. */
+  /* The summary holds a reading measure of six columns, never wider than
+   * 75 characters. */
   .ds.component-header > .summary {
     grid-column: 1 / span 6;
+    max-inline-size: var(--component-header-summary-measure);
     margin-block: 0;
   }
 }
