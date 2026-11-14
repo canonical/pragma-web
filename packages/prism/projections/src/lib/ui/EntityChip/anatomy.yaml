@@ -10,7 +10,13 @@
 #
 # The title is the link (LinkComponent, href) unless `linked` is false; an
 # unlinked chip is inert text and has no peek (nothing to focus). The peek is
-# a sibling of the link inside the root, never inside the <a>: a non-modal
+# never inside the <a>: while open it is mounted through a portal on the
+# document's body (class `ds entity-chip-peek`), outside the paragraph a
+# mention sits in, whose phrasing content cannot hold a card; it is still
+# the root's child in the React tree, so its pointer, focus and key events
+# reach the chip, and focus moving between the chip and the peek keeps it
+# open. It is shown from the link as its source, so a browser that takes a
+# source puts it next after the link in the tab order. A non-modal
 # popover (popover="manual", role="dialog", named by a hidden label from the
 # catalog "chip.peek" with the title, aria-labelledby) holding the peek the
 # arm passes. It opens after PEEK_OPEN_DELAY_MS (EntityChip/constants.ts) of
@@ -63,7 +69,6 @@
 #   --entity-chip-peek-offset: space.050 (4px)    below the chip
 #   --entity-chip-peek-max-height: calc(100dvh - space.100)   viewport less 8px
 #   --entity-chip-peek-background: color.background
-#   --entity-chip-peek-white-space: normal        literal: the pill's nowrap stops here
 #   --entity-chip-mark-size: space.200 (16px)
 #   PEEK_OPEN_DELAY_MS = 500, PEEK_CLOSE_DELAY_MS = 200 (constants.ts, not CSS)
 node:
@@ -145,7 +150,6 @@ node:
           spacing.internal.inline.end: 0
           appearance.border.width: 0
           appearance.background: color.background
-          typography.whiteSpace: normal
         edges:
           - node:
               role: label

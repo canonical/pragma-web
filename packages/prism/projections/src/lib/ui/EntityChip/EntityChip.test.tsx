@@ -265,6 +265,16 @@ describe("EntityChip", () => {
       expect(document.activeElement).toBe(link);
     });
 
+    it("closes on Escape on the link, focus staying there", () => {
+      const link = renderPeeking();
+      act(() => {
+        link.focus();
+      });
+      fireEvent.keyDown(link, { key: "Escape" });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+      expect(document.activeElement).toBe(link);
+    });
+
     it("closes a hover-opened peek on Escape, wherever focus is", () => {
       renderPeeking();
       const chip = screen.getByTestId("chip");
@@ -388,9 +398,63 @@ describe("EntityChip", () => {
           link.focus();
         });
         expect(showPopover).toHaveBeenCalledOnce();
+        expect(showPopover).toHaveBeenCalledWith({ source: link });
       } finally {
         Reflect.deleteProperty(HTMLElement.prototype, "showPopover");
       }
+    });
+
+    it("mounts the open peek outside a paragraph that holds the chip", () => {
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
+      try {
+        render(
+          <p data-testid="prose">
+            See{" "}
+            <EntityChip
+              href="#button"
+              peek={
+                <div>
+                  <h3>Button</h3>
+                  <a href="#button">Open Button</a>
+                </div>
+              }
+              title="Button"
+            />
+          </p>,
+        );
+        const link = screen.getByRole("link", { name: "Button" });
+        act(() => {
+          link.focus();
+        });
+        const dialog = screen.getByRole("dialog", { hidden: true });
+        expect(screen.getByTestId("prose").contains(dialog)).toBe(false);
+        expect(dialog.parentElement).toBe(document.body);
+        expect(error).not.toHaveBeenCalled();
+      } finally {
+        error.mockRestore();
+      }
+    });
+
+    it("stays open while focus moves into the peek and back", () => {
+      const link = renderPeeking();
+      act(() => {
+        link.focus();
+      });
+      const inner = screen.getByRole("link", {
+        hidden: true,
+        name: "Open Button",
+      });
+      act(() => {
+        inner.focus();
+      });
+      act(() => {
+        link.focus();
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+      act(() => {
+        link.blur();
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
     });
   });
 });

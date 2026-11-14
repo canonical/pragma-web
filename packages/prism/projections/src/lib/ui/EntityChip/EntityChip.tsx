@@ -2,6 +2,7 @@
 
 import { Icon } from "@canonical/react-ds-global";
 import { type ReactElement, useId } from "react";
+import { createPortal } from "react-dom";
 import { Message } from "../../i18n/index.js";
 import usePeek from "./hooks/usePeek.js";
 import type { EntityChipProps } from "./types.js";
@@ -17,10 +18,14 @@ const componentCssClassName = "ds entity-chip";
  *
  * A linked chip with a `peek` peeks at the entity: after
  * `PEEK_OPEN_DELAY_MS` of hover, or at once on focus, a non-modal dialog
- * anchored to the pill, 4px below it, shows the peek (the entity's card)
- * beside the link, never inside it. Escape closes it, a hover-opened one
- * too, and returns focus to the link when focus was in the chip; a touch
- * never opens it, so a tap follows the link.
+ * anchored to the pill, 4px below it, shows the peek (the entity's card).
+ * The open dialog is mounted on the document's body, outside the link and
+ * outside the paragraph a mention sits in, whose phrasing content cannot
+ * hold a card; it stays the chip's own for hover, focus and Escape, and
+ * comes next in the tab order after the link where the browser can show a
+ * popover from its source. Escape closes it, a hover-opened one too, and
+ * returns focus to the link when focus was in the chip; a touch never
+ * opens it, so a tap follows the link.
  *
  * It renders only the slots it is given, in the slot order every
  * representation keeps (mark, prefix, title, status); the transitional
@@ -34,7 +39,8 @@ const componentCssClassName = "ds entity-chip";
  *
  * @implements prism.component.entity_chip
  * @note Impure: reads the translator context in scope, through `Message`,
- *   and runs the peek's timers and focus moves, through `usePeek`.
+ *   runs the peek's timers and focus moves, through `usePeek`, and mounts
+ *   the open peek on the document's body.
  */
 export default function EntityChip({
   mark,
@@ -105,21 +111,24 @@ export default function EntityChip({
       ) : (
         <span className={nameClass}>{name}</span>
       )}
-      {open ? (
-        <div
-          aria-labelledby={labelId}
-          className="peek"
-          popover="manual"
-          ref={peekRef}
-          role="dialog"
-          style={{ positionAnchor: anchor }}
-        >
-          <span hidden id={labelId}>
-            <Message elements={{ title: name }} id="chip.peek" />
-          </span>
-          {peek}
-        </div>
-      ) : null}
+      {open
+        ? createPortal(
+            <div
+              aria-labelledby={labelId}
+              className="ds entity-chip-peek"
+              popover="manual"
+              ref={peekRef}
+              role="dialog"
+              style={{ positionAnchor: anchor }}
+            >
+              <span hidden id={labelId}>
+                <Message elements={{ title: name }} id="chip.peek" />
+              </span>
+              {peek}
+            </div>,
+            document.body,
+          )
+        : null}
       {badge}
       {icon}
       {chevron ? <Icon icon="chevron-down" /> : null}

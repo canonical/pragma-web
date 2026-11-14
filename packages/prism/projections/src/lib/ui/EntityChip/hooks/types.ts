@@ -37,3 +37,9 @@ export interface UsePeekResult {
   /** The handlers for the root, the consumer's composed in. */
   readonly handlers: PeekHandlers;
 }
+
+/**
+ * `showPopover` as the HTML standard has it, with the element that shows
+ * the popover: the DOM types in use declare it without its options.
+ */
+export type ShowPopover = (options?: { source?: HTMLElement }) => void;
