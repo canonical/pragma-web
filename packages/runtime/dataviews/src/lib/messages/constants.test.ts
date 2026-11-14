@@ -26,6 +26,9 @@ describe("DEFAULT_MESSAGES", () => {
     );
     expect(m.statusNoResults).toBe("No rows match this query.");
     expect(m.statusNoData).toBe("There is nothing here yet.");
+    expect(m.statusNoAccess).toBe(
+      "You do not have permission to see these rows.",
+    );
     expect(m.statusRefused('"melted" is not an option')).toBe(
       'This link could not be followed: "melted" is not an option.',
     );

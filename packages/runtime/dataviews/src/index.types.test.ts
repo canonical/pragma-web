@@ -512,6 +512,7 @@ describe("public surface types", () => {
       | "refused"
       | "refresh-failed"
       | "stale"
+      | "no-access"
       | "no-data"
       | "no-results"
     >();
@@ -561,7 +562,7 @@ describe("public surface types", () => {
 
   it("discriminates the completion and outcome unions by status", () => {
     expectTypeOf<Completion["status"]>().toEqualTypeOf<
-      "succeeded" | "failed" | "refused"
+      "succeeded" | "failed" | "forbidden" | "refused"
     >();
     expectTypeOf<ResultStatus>().toEqualTypeOf<
       | "idle"

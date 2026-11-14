@@ -596,6 +596,13 @@ export type QuerySourceConfig<TRow extends object = RowRecord> = {
   readonly fetchPage: (request: SourceRequest) => Promise<SourcePage<TRow>>;
   /** Mint one observer against the application's client. */
   readonly createObserver: QueryObserverFactory<SourcePage<TRow>>;
+  /**
+   * Whether an error the client reports means the request is forbidden — a
+   * 401 or a 403 — rather than that it failed. Answering true delivers
+   * `forbidden`, with the error as its cause and no words of the server's;
+   * a check that throws answers nothing, and the error is a failure.
+   */
+  readonly isForbidden?: ((error: unknown) => boolean) | undefined;
   /** Row operations, when the endpoint has any. */
   readonly runAction?: SourceActionRunner | undefined;
 };
@@ -700,6 +707,14 @@ export type RelaySourceConfig<
   readonly connection: (
     data: TQuery["response"],
   ) => RelayConnection<TRow> | null | undefined;
+  /**
+   * Whether an error the environment's fetch reports means the request is
+   * forbidden — a 401 or a 403 — rather than that it failed. Answering true
+   * delivers `forbidden`, with the error as its cause and no words of the
+   * server's; a check that throws answers nothing, and the error is a
+   * failure.
+   */
+  readonly isForbidden?: ((error: unknown) => boolean) | undefined;
   /** Row operations, when the schema has any. */
   readonly runAction?: SourceActionRunner | undefined;
 };

@@ -8,6 +8,7 @@ describe("DISPLAY_STATUS_PHASES", () => {
       regrouping: "transient",
       failed: "terminal",
       refused: "terminal",
+      "no-access": "terminal",
       "refresh-failed": "terminal",
       stale: "terminal",
       "no-data": "terminal",

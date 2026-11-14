@@ -270,7 +270,14 @@ export type SourceFailure = {
  */
 export type SourceDelivery<TRow extends object = RowRecord> =
   | { readonly status: "succeeded"; readonly page: SourcePage<TRow> }
-  | { readonly status: "failed"; readonly failure: SourceFailure };
+  | { readonly status: "failed"; readonly failure: SourceFailure }
+  /**
+   * The request is forbidden to whoever made it. It carries no reason: a
+   * server's words about permissions are not rendered, so nothing about the
+   * denial leaks. The cause is for the application's logging, as a
+   * failure's is.
+   */
+  | { readonly status: "forbidden"; readonly cause: unknown };
 
 /**
  * What one request completes with: a delivery, or the binding's refusal.

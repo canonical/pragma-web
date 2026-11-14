@@ -182,7 +182,9 @@ export type QueryCoordinator<TRow extends object = RowRecord> = {
    * cursors and provenance together. A refusal or a failure keeps the rows
    * with the problem recorded — `failed` when no rows have been published,
    * `refresh-failed` while the kept rows still answer the current query,
-   * `stale` when an earlier query produced them, even an empty set.
+   * `stale` when an earlier query produced them, even an empty set. A
+   * forbidden request withdraws every row, count and facet, and is
+   * `failed` with the forbidden delivery as its problem.
    */
   readonly complete: (
     requestId: string,

@@ -73,6 +73,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     `These rows could not be refreshed: ${composeClause(reason)}`,
   statusStale: (reason) =>
     `These rows do not match the current query: ${composeClause(reason)}`,
+  statusNoAccess: "You do not have permission to see these rows.",
   statusNoResults: "No rows match this query.",
   statusNoData: "There is nothing here yet.",
 

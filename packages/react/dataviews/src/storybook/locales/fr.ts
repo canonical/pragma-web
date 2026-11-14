@@ -74,6 +74,7 @@ export const FRENCH: DataViewsMessages = {
     `Ces lignes n’ont pas pu être actualisées : ${clause(reason)}`,
   statusStale: (reason) =>
     `Ces lignes ne correspondent pas à la requête actuelle : ${clause(reason)}`,
+  statusNoAccess: "Vous n’avez pas l’autorisation de voir ces lignes.",
   statusNoResults: "Aucune ligne ne correspond à cette requête.",
   statusNoData: "Il n’y a encore rien ici.",
 

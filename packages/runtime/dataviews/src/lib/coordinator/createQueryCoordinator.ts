@@ -316,6 +316,13 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
         });
         return true;
       }
+      if (completion.status === "forbidden") {
+        // No access withdraws every row, count and facet, even those kept
+        // from before: the source has just refused to show them.
+        publishedKey = null;
+        publish({ ...idleResult, status: "failed", problem: completion });
+        return true;
+      }
       // The completion is the problem: re-keying it would put one fact in
       // two shapes on the surface.
       publish({

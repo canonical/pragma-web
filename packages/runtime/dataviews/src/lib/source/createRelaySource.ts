@@ -8,6 +8,7 @@ import {
 import type { RowRecord } from "../rows/index.js";
 import copyCapabilities from "./copyCapabilities.js";
 import describeError from "./describeError.js";
+import resolveErrorDelivery from "./resolveErrorDelivery.js";
 import type {
   RelayConnection,
   RelaySnapshot,
@@ -48,7 +49,9 @@ const unreachable = (page: number): string =>
  * fetches it, and delivers every later store change to the page — a
  * mutation or a local update — so the collection follows Relay's store
  * rather than keeping a cache of its own. Releasing unsubscribes, cancels
- * the fetch and releases the retention.
+ * the fetch and releases the retention. A page whose fetch was forbidden
+ * delivers nothing from the store, in that request or a later one, until a
+ * fetch of it completes.
  *
  * A forward connection reaches a page only through the one before it: the
  * source remembers each page's end cursor per query and page size, and
@@ -70,6 +73,14 @@ export default function createRelaySource<
   const { environment } = config;
   /** Per query and page size, the cursor each reached page starts after. */
   const trails = new Map<string, Map<number, string>>();
+
+  /**
+   * The pages a fetch was forbidden for, keyed as the trails are plus the
+   * page. Their rows stay withdrawn, whatever the store still holds, until a
+   * fetch of the page completes: a refresh or a return to the query reads
+   * the store at once, and must not show the refused page while it runs.
+   */
+  const forbidden = new Set<string>();
 
   /** The trail one query keeps its cursors under: what it asks for, and how
    * many rows at a time. */
@@ -121,6 +132,8 @@ export default function createRelaySource<
     execute(request, deliver) {
       const { slice, window } = request;
       const key = trailKey(slice, window.size);
+      /** The forbidden mark this request's page is kept under. */
+      const mark = `${window.page}@${key}`;
       const after = cursorFor(request);
       if (after === undefined) {
         // The binding refuses this before it gets here; a caller executing
@@ -169,6 +182,9 @@ export default function createRelaySource<
       };
 
       const publish = (): void => {
+        if (forbidden.has(mark)) {
+          return;
+        }
         const { data, isMissingData } = latest;
         if (isMissingData) {
           // While the fetch runs, missing data is data still to come.
@@ -252,10 +268,16 @@ export default function createRelaySource<
         const fetch = environment.execute({ operation }).subscribe({
           error(error) {
             settled = true;
-            fail(error, describeError(error), error);
+            const answer = resolveErrorDelivery(error, config.isForbidden);
+            if (answer.status === "forbidden") {
+              forbidden.add(mark);
+            }
+            send(error, answer);
           },
           complete() {
             settled = true;
+            // A fetch of the page completed: the reader may see it again.
+            forbidden.delete(mark);
             publish();
           },
         });

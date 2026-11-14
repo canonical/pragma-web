@@ -1,6 +1,7 @@
 import type { Completion } from "../result/index.js";
 import {
   createRowModel,
+  EMPTY_ROW_MODEL,
   type RowModel,
   type RowRecord,
 } from "../rows/index.js";
@@ -31,7 +32,11 @@ export default function createRequestCompleter<TRow extends object = RowRecord>(
     }
     let model: RowModel<TRow> | null = null;
     let rejection: string | null = null;
-    if (completion.status === "succeeded") {
+    if (completion.status === "forbidden") {
+      // No access withdraws the rows the model holds as it withdraws the
+      // result's.
+      model = EMPTY_ROW_MODEL;
+    } else if (completion.status === "succeeded") {
       const built = createRowModel({
         rows: completion.page.rows,
         identify,

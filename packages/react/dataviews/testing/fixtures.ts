@@ -462,6 +462,7 @@ export const MESSAGE_SAMPLES: {
   statusRefused: [[MESSAGE_MARK]],
   statusRefreshFailed: [[MESSAGE_MARK]],
   statusStale: [[MESSAGE_MARK]],
+  statusNoAccess: null,
   statusNoResults: null,
   statusNoData: null,
   selectAllRows: null,

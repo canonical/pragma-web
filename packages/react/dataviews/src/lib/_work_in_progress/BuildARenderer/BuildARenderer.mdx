@@ -88,6 +88,7 @@ Before the first page arrives, the plain list is empty. It is also empty when th
 | `refused` | The query was refused: a link's clause that would have narrowed it, or a query the source cannot run. Nothing ran. Rows already shown are kept as `stale` instead. | replaced | terminal | `statusRefused(reason)` |
 | `refresh-failed` | A refresh failed. The rows shown still answer the query. | kept | terminal | `statusRefreshFailed(reason)` |
 | `stale` | The current query failed. The rows shown answer an earlier one. | kept | terminal | `statusStale(reason)` |
+| `no-access` | The source forbids the request. Every row is withdrawn, even rows kept from before. | replaced | terminal | `statusNoAccess` |
 | `no-data` | The query has no filter or search, and the collection is empty. | replaced | terminal | `statusNoData` |
 | `no-results` | A filter or a search matches nothing. | replaced | terminal | `statusNoResults` |
 | `regrouping` | Rows are withheld while a grouping changes. Nothing produces it yet. | replaced | transient | `statusRegrouping` |
