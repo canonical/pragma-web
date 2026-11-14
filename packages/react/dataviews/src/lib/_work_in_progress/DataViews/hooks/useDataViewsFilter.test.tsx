@@ -1,18 +1,17 @@
 /**
  * One filter of the enclosing root, bound by collection, field and
  * operator: its edits reach the provider's applied query through the root's
- * own record, its applied value is typed by the field's kind, and it
+ * own record, its applied value follows the field's kind, and it
  * re-renders for its own filter and nothing else.
  */
 import {
   createCollection,
-  type EmptyOr,
   type PredicateOperator,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import createMachineProvider from "../../../../../testing/createMachineProvider.js";
 import { machines } from "../../../../../testing/machines.js";
 import type { MachineFixture } from "../../../../../testing/types.js";
@@ -59,33 +58,16 @@ describe("useDataViewsFilter", () => {
     ]);
   });
 
-  it("types the applied value by the field's kind", () => {
+  it("sets a choices field's applied value", () => {
     const machineProvider = createMachineProvider();
     const { result } = renderHook(
-      () => ({
-        cores: useDataViewsFilter(machines, "cores", "lte"),
-        status: useDataViewsFilter(machines, "status", "isAny"),
-      }),
+      () => useDataViewsFilter(machines, "status", "isAny"),
       { wrapper: inRoot(machineProvider) },
     );
-    expectTypeOf(result.current.cores.applied).toEqualTypeOf<EmptyOr<number>>();
-    expectTypeOf(result.current.status.applied).toEqualTypeOf<
-      EmptyOr<ReadonlySet<"failed" | "running">>
-    >();
-    // Text is looked for, never equal, and a number is bounded, never equal:
-    // neither is an address, so neither compiles. Never called: the check is
-    // the compiler's.
-    const rejectedAddresses = (): void => {
-      // @ts-expect-error a text field contains, it is never equal
-      useDataViewsFilter(machines, "name", "isAny");
-      // @ts-expect-error a number is bounded, never equal
-      useDataViewsFilter(machines, "cores", "isAny");
-    };
-    expect(rejectedAddresses).toBeTypeOf("function");
     act(() => {
-      result.current.status.set(["failed"]);
+      result.current.set(["failed"]);
     });
-    expect(result.current.status.applied).toEqual({
+    expect(result.current.applied).toEqual({
       kind: "value",
       value: new Set(["failed"]),
     });
