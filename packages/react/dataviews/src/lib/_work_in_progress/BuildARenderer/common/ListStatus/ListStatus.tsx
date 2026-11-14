@@ -17,8 +17,6 @@ const describe = (
   switch (status.status) {
     case "pending":
       return messages.statusPending;
-    case "regrouping":
-      return messages.statusRegrouping;
     case "failed":
       return messages.statusFailed(status.reason);
     case "refused":

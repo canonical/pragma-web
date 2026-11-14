@@ -163,7 +163,7 @@ export type GroupCapabilities = {
 };
 
 /**
- * What a source declares about each of the three counts.
+ * What a source declares about each of its two counts.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -171,7 +171,6 @@ export type GroupCapabilities = {
 export type CountCapabilities = {
   readonly pageable: CountSupport;
   readonly matched: CountSupport;
-  readonly total: CountSupport;
 };
 
 /**
@@ -458,8 +457,6 @@ export type PageConfig<TRow extends object = RowRecord> = {
   readonly rows: readonly TRow[];
   /** Rows matching the query, before any collapse. */
   readonly matched?: number | undefined;
-  /** Rows in the collection, ignoring the query. */
-  readonly total?: number | undefined;
   /** Whether a further page exists when no count says so. */
   readonly more?: boolean | undefined;
   /** The adjacent pages' tokens, for a cursor source. */

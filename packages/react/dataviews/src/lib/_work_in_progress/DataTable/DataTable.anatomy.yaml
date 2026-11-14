@@ -44,7 +44,7 @@
 #                       "Row/select-all checkboxes" (1.3.1, 2.1.1, 4.1.2-4.1.3)
 #                       — CheckboxInput's own contract, plus the table's
 #                       names: "Select all displayed rows", "Select <row>"
-#   status row          "pending/regrouping/failed/refused/refresh-failed/stale/no-access/no-data/no-results"
+#   status row          "pending/failed/refused/refresh-failed/stale/no-access/no-data/no-results"
 #                       (1.3.1, 1.4.1, 4.1.3). The cell is `role=cell`, not a
 #                       live region; a settled outcome — failed, refused, stale,
 #                       refresh-failed, no-access, no-data, no-results — wraps
@@ -105,8 +105,8 @@
 #   - The status cell wraps where every other cell holds one line, and its
 #     row lays out as a block, so it spans the table even when a selectable
 #     table has no columns; the DSL has no keys for either.
-#   - The statuses (pending, regrouping, failed, refused, refresh-failed,
-#     stale, no-access, no-data, no-results) are the core's `DisplayStatus`,
+#   - The statuses (pending, failed, refused, refresh-failed, stale,
+#     no-access, no-data, no-results) are the core's `DisplayStatus`,
 #     carried as `data-status`; they are not registry states. They change
 #     text, and only the two failures take `color/text/error` in place of
 #     `color/text/muted`: `refused` and `no-access` stay muted, since nothing

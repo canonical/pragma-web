@@ -25,14 +25,6 @@ import type { Count } from "../result/index.js";
  */
 export type DisplayStatus =
   | { readonly status: "pending" }
-  /**
-   * Rows withheld while a grouping is applied, changed or cleared: the one
-   * change of shape there is. No state produces it yet.
-   *
-   * @seam grouping — read by the grouping renderer, which withholds the
-   * rows behind it and reveals them under `stale` should the request fail
-   */
-  | { readonly status: "regrouping" }
   | { readonly status: "failed"; readonly reason: string }
   /**
    * The query was refused before anything ran — a followed link's clause

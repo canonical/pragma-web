@@ -11,7 +11,6 @@ import type { SettledRow } from "./types.js";
 const countingPageable = (pageable: Count): SourceCounts => ({
   pageable,
   matched: UNKNOWN_COUNT,
-  total: UNKNOWN_COUNT,
 });
 
 /** A page of `rows` records, counted and continued as the settled fields say. */

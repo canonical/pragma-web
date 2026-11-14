@@ -13,7 +13,6 @@ export const DISPLAY_STATUS_PHASES: Readonly<
   Record<DisplayStatus["status"], DisplayStatusPhase>
 > = Object.freeze({
   pending: "transient",
-  regrouping: "transient",
   failed: "terminal",
   refused: "terminal",
   "no-access": "terminal",

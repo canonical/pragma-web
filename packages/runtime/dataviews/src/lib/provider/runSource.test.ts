@@ -39,7 +39,7 @@ const permissive: SourceCapabilities = declare({
   filter: { status: ["isAny"], cpu: ["gte", "lte"] },
   search: { fields: ["name"] },
   sort: declareSort(["cpu"], 2),
-  counts: { pageable: "exact", matched: "exact", total: "exact" },
+  counts: { pageable: "exact", matched: "exact" },
 });
 
 const exact = (value: number): Count => ({ kind: "exact", value });
@@ -482,7 +482,6 @@ describe("runSource", () => {
     host.setPredicate({ field: "cpu", operator: "gte", operands: [8] });
     expect(idsOf(host.state.get())).toEqual(["b", "c"]);
     expect(host.state.get().result.counts?.matched).toEqual(exact(2));
-    expect(host.state.get().result.counts?.total).toEqual(exact(3));
     release();
   });
 
@@ -953,7 +952,7 @@ describe("runSource completePending", () => {
       ...local(),
       capabilities: {
         ...local().capabilities,
-        counts: { pageable: "at-least", matched: "unknown", total: "unknown" },
+        counts: { pageable: "at-least", matched: "unknown" },
       },
     });
     held.host.refresh();
@@ -1090,7 +1089,6 @@ describe("runSource take-up", () => {
     const recounted = {
       pageable: exact(9),
       matched: exact(9),
-      total: exact(9),
     };
     // Each delivery differs from the one before it in one member alone.
     const moves: readonly SourcePage[] = [
@@ -1101,7 +1099,6 @@ describe("runSource take-up", () => {
         more: true,
         counts: { ...page.counts, pageable: exact(9), matched: exact(9) },
       },
-      { ...page, more: true, counts: recounted },
       {
         ...page,
         more: true,
@@ -1137,7 +1134,7 @@ describe("runSource take-up", () => {
     const summary = { path: ["ready"], count: exact(2) };
     // Each delivery differs from the one before it in one member alone.
     const moves: readonly SourcePage[] = [
-      { ...page, counts: { ...page.counts, total: { kind: "unknown" } } },
+      { ...page, counts: { ...page.counts, matched: { kind: "unknown" } } },
       page,
       {
         ...page,
@@ -1184,41 +1181,29 @@ describe("runSource counts", () => {
   const claimed = {
     pageable: exact(1),
     matched: { kind: "at-least", value: 2 } as Count,
-    total: { kind: "unknown" } as Count,
   };
 
   it("publishes unknown for a count the declaration does not carry", () => {
     expect(
-      publishing(
-        { pageable: "unknown", matched: "unknown", total: "unknown" },
-        claimed,
-      ),
+      publishing({ pageable: "unknown", matched: "unknown" }, claimed),
     ).toEqual({
       pageable: { kind: "unknown" },
       matched: { kind: "unknown" },
-      total: { kind: "unknown" },
     });
   });
 
   it("holds an exact count to the lower bound the declaration allows", () => {
     expect(
-      publishing(
-        { pageable: "at-least", matched: "at-least", total: "at-least" },
-        claimed,
-      ),
+      publishing({ pageable: "at-least", matched: "at-least" }, claimed),
     ).toEqual({
       pageable: { kind: "at-least", value: 1 },
       matched: { kind: "at-least", value: 2 },
-      total: { kind: "unknown" },
     });
   });
 
   it("publishes an exact count a source is declared to answer exactly", () => {
     expect(
-      publishing(
-        { pageable: "exact", matched: "exact", total: "exact" },
-        claimed,
-      ),
+      publishing({ pageable: "exact", matched: "exact" }, claimed),
     ).toEqual(claimed);
   });
 
@@ -1227,10 +1212,10 @@ describe("runSource counts", () => {
     // nothing, and page numbers derive from this count.
     expect(
       publishing(
-        { pageable: "exact", matched: "exact", total: "exact" },
-        { pageable: exact(0), matched: exact(0), total: exact(0) },
+        { pageable: "exact", matched: "exact" },
+        { pageable: exact(0), matched: exact(0) },
       ),
-    ).toEqual({ pageable: exact(0), matched: exact(0), total: exact(0) });
+    ).toEqual({ pageable: exact(0), matched: exact(0) });
   });
 
   it.each([
@@ -1243,17 +1228,15 @@ describe("runSource counts", () => {
     // as NaN, a fraction or a negative, and page numbers derive from it.
     expect(
       publishing(
-        { pageable: "exact", matched: "exact", total: "exact" },
+        { pageable: "exact", matched: "exact" },
         {
           pageable: { kind: "exact", value },
           matched: exact(2),
-          total: exact(3),
         },
       ),
     ).toEqual({
       pageable: { kind: "unknown" },
       matched: exact(2),
-      total: exact(3),
     });
   });
 
@@ -1261,7 +1244,7 @@ describe("runSource counts", () => {
     const source = manual(
       declare({
         ...permissive,
-        counts: { pageable: "unknown", matched: "unknown", total: "unknown" },
+        counts: { pageable: "unknown", matched: "unknown" },
       }),
     );
     const { host, release } = running(source.source);
@@ -1272,7 +1255,6 @@ describe("runSource counts", () => {
     expect(host.state.get().result.counts).toEqual({
       pageable: { kind: "unknown" },
       matched: { kind: "unknown" },
-      total: { kind: "unknown" },
     });
     release();
   });
@@ -1281,7 +1263,7 @@ describe("runSource counts", () => {
     const source = manual(
       declare({
         ...permissive,
-        counts: { pageable: "unknown", matched: "unknown", total: "unknown" },
+        counts: { pageable: "unknown", matched: "unknown" },
       }),
     );
     const { host, release } = running(source.source);

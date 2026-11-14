@@ -32,7 +32,6 @@ describe("ListStatus", () => {
 
   it.each<[DisplayStatus, string]>([
     [{ status: "pending" }, english.statusPending],
-    [{ status: "regrouping" }, english.statusRegrouping],
   ])("shows a passing %o without announcing it", (status, text) => {
     const view = render(<ListStatus status={status} messages={english} />);
     expect(screen.queryByRole("status")).toBeNull();

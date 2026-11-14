@@ -91,7 +91,6 @@ Before the first page arrives, the plain list is empty. It is also empty when th
 | `no-access` | The source forbids the request. Every row is withdrawn, even rows kept from before. | replaced | terminal | `statusNoAccess` |
 | `no-data` | The query has no filter or search, and the collection is empty. | replaced | terminal | `statusNoData` |
 | `no-results` | A filter or a search matches nothing. | replaced | terminal | `statusNoResults` |
-| `regrouping` | Rows are withheld while a grouping changes. Nothing produces it yet. | replaced | transient | `statusRegrouping` |
 
 `listDisplayEntries` applies the "Rows" column for you. It returns a `status` entry first, when there is a status, then a `record` entry for each row the status keeps. Each entry has an `id` that is unique across kinds.
 

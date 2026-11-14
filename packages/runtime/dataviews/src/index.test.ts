@@ -46,7 +46,7 @@ describe("public surface", () => {
     });
     expect(dataviews.declareCapabilities(ids, {}).sort.terms).toBe(0);
     expect(dataviews.readSlice(ids, EMPTY_SLICE).filters).toEqual({});
-    expect(dataviews.createPage({ rows: [] }).counts.total).toEqual({
+    expect(dataviews.createPage({ rows: [] }).counts.matched).toEqual({
       kind: "unknown",
     });
     const provider = dataviews.createDataViewsProvider({

@@ -39,7 +39,6 @@ describe("a number field answered with a facet of values", () => {
           page: createPage({
             rows: [buildMachine("m-1", "alpha")],
             matched: 1,
-            total: 1,
             facets: {
               cores: {
                 kind: "values",

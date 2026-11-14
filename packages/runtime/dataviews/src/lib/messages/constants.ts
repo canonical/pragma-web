@@ -59,7 +59,6 @@ const formatSortTerm = (name: string, direction: SortDirection): string =>
  */
 export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   statusPending: "Loading…",
-  statusRegrouping: "Regrouping…",
   statusFailed: (reason) =>
     `These rows could not be loaded: ${composeClause(reason)}`,
   statusRefused: (reason) => {

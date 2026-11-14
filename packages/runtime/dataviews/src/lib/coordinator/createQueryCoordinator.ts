@@ -293,7 +293,6 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
           counts: Object.freeze({
             pageable: page.counts.pageable,
             matched: page.counts.matched,
-            total: page.counts.total,
           }),
           // The same facets again keep their identity, so what reads them by
           // identity — a control showing counts — has nothing to redraw.

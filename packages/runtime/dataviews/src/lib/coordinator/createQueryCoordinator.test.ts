@@ -45,7 +45,6 @@ const UNKNOWN: Count = { kind: "unknown" };
 const counts = (matched: number): SourceCounts => ({
   pageable: { kind: "exact", value: matched },
   matched: { kind: "exact", value: matched },
-  total: UNKNOWN,
 });
 
 const succeeded = (

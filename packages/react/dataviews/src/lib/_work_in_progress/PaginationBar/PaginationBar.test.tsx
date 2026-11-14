@@ -79,7 +79,7 @@ const load = (
         rows,
         groups: null,
         facets: {},
-        counts: { pageable: counted, matched: counted, total: counted },
+        counts: { pageable: counted, matched: counted },
         more,
         cursors: null,
       },
@@ -510,7 +510,6 @@ describe("PaginationBar", () => {
           counts: {
             pageable: { kind: "exact", value: 6 },
             matched: { kind: "unknown" },
-            total: { kind: "unknown" },
           },
           more: null,
           cursors: { next: "c:m1", previous: null },

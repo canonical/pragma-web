@@ -225,8 +225,6 @@ const statusText = (status: DisplayStatus): string => {
   switch (status.status) {
     case "pending":
       return "Fetching machines…";
-    case "regrouping":
-      return "Regrouping machines…";
     case "failed":
       return `Could not read machines: ${status.reason}`;
     case "refused":

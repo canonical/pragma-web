@@ -19,11 +19,10 @@ import type {
   OperatorRecord,
 } from "./types.js";
 
-/** All three counts answered exactly, as complete local input answers them. */
+/** Both counts answered exactly, as complete local input answers them. */
 export const COUNTED_EXACTLY: CountCapabilities = Object.freeze({
   pageable: "exact",
   matched: "exact",
-  total: "exact",
 });
 
 /**
@@ -457,7 +456,6 @@ export const MESSAGE_SAMPLES: {
     : null;
 } = {
   statusPending: null,
-  statusRegrouping: null,
   statusFailed: [[MESSAGE_MARK]],
   statusRefused: [[MESSAGE_MARK]],
   statusRefreshFailed: [[MESSAGE_MARK]],

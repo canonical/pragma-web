@@ -19,7 +19,6 @@ export default function deliverFacets(
       page: createPage({
         rows: [buildMachine("m-1", "alpha")],
         matched: 1,
-        total: 1,
         facets,
       }),
     });

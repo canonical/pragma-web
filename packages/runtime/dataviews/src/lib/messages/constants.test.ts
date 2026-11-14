@@ -14,7 +14,6 @@ const unknown = { kind: "unknown" } as const;
 describe("DEFAULT_MESSAGES", () => {
   it("words the table's status row", () => {
     expect(m.statusPending).toBe("Loading…");
-    expect(m.statusRegrouping).toBe("Regrouping…");
     expect(m.statusFailed("timeout")).toBe(
       "These rows could not be loaded: timeout",
     );
