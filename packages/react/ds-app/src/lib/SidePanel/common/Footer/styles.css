@@ -12,7 +12,10 @@
       Inset by margin rather than padding, so the actions stay in line with
       the text column while the pane's edge line runs the full panel width.
     */
-    margin-inline: var(--side-panel-padding-inline);
+    margin-inline: var(
+      --side-panel-padding-inline,
+      var(--ds-spacing-inset-surface-major-inline)
+    );
 
     display: flex;
     justify-content: flex-end;

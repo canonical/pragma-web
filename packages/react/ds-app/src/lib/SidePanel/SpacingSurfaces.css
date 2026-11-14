@@ -1,0 +1,141 @@
+.surfaces06 {
+  --surfaces-preview-grid-margin: var(--grid-margin);
+  padding: 24px;
+  font-weight: 400;
+}
+/* Frozen pre-adoption defaults; the adopted peer reads production styles. */
+.surfaces-card-before {
+  border: var(--card-border-width) solid var(--card-color-border);
+  --ds-stroke-width: 0;
+  padding-block: 0;
+  row-gap: 1rem;
+  --card-header-padding-block: 1rem;
+  --card-header-padding-inline: 1rem;
+  --card-content-padding-block-start: 0.5rem;
+  --card-content-padding-block-end: 1rem;
+  --card-content-padding-inline: 1rem;
+  --card-footer-padding-block: 1rem;
+  --card-footer-padding-inline: 1rem;
+}
+.surfaces-card-before > .card-header:has(+ .card-content) {
+  padding-block-end: 0;
+}
+.surfaces-tile-before {
+  row-gap: 0;
+  padding: 0;
+  --tile-header-padding-block: 0.5rem;
+  --tile-header-padding-inline: 1rem;
+  --tile-content-padding-top: 0.5rem;
+  --tile-content-padding-bottom: 1rem;
+  --tile-content-padding-inline: 1rem;
+}
+.surfaces06 h1,
+.surfaces06 h2,
+.surfaces06 h3 {
+  margin-block: 0 16px;
+}
+.surfaces06 p {
+  font-weight: 400;
+}
+.surfaces-tier {
+  margin-block: 32px;
+  padding: 16px;
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+}
+.surfaces-measure {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--grid-gutter);
+  position: relative;
+  inline-size: max-content;
+  min-inline-size: 100%;
+}
+.surfaces-tier {
+  overflow-x: auto;
+}
+.surfaces-cards.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 16rem);
+  row-gap: var(--container-gap-default);
+  column-gap: var(--grid-gutter);
+  inline-size: max-content;
+}
+.surfaces-reference.grid {
+  display: grid;
+  grid-template-columns: 16rem;
+  inline-size: 16rem;
+  flex: none;
+}
+.surfaces-measure > .tile {
+  inline-size: 16rem;
+  flex: none;
+}
+.surfaces-nav-stage {
+  inline-size: 15rem;
+  block-size: 24rem;
+  flex: none;
+}
+/* Same public rail containment as Marks04, retaining every surface slot here. */
+.surfaces-nav-stage > .side-navigation.surfaces-nav-fixture {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  block-size: 100%;
+  flex: none;
+}
+.surfaces-caption {
+  margin-block: 16px 32px;
+  max-inline-size: 80ch;
+}
+.surfaces-scope-grid > div {
+  grid-column: 1 / -1;
+}
+.surfaces-scope-grid {
+  border: 1px solid var(--color-border);
+}
+@media (width < 620px) {
+  .surfaces-measure[data-relationship="gutter-scope"] {
+    flex-direction: column;
+    inline-size: 100%;
+  }
+}
+.surfaces-inner-scroll {
+  overflow-x: auto;
+  min-inline-size: 0;
+}
+.surfaces-inner-scroll pre {
+  margin: 0;
+  font-weight: 400;
+}
+.surfaces-tooltip-stage {
+  padding-block-start: 48px;
+  min-inline-size: 16rem;
+}
+.surfaces-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.surfaces-guides i {
+  position: absolute;
+  inset-inline: 0;
+  block-size: 1px;
+  background: rgb(190 40 40 / 45%);
+}
+.surfaces-guides i[data-guide="baseline"] {
+  background: rgb(40 90 190 / 60%);
+}
+.surfaces-guides > b {
+  position: absolute;
+  transform: translateY(-4px);
+  inline-size: 1px;
+  block-size: 8px;
+  background: rgb(190 40 40 / 65%);
+}
+.surfaces-guides > b[data-guide="baseline"] {
+  background: rgb(40 90 190 / 80%);
+}
+.surfaces-overlay-trigger {
+  flex: none;
+}

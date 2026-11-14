@@ -1,0 +1,157 @@
+.density08 {
+  padding: 24px;
+  font-weight: 400;
+}
+.density-tier {
+  padding: 16px;
+  margin-block: 32px;
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+  overflow-x: auto;
+}
+.density-fit-row,
+.density-other-row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--grid-gutter);
+  inline-size: max-content;
+  min-inline-size: 100%;
+}
+.density-fit-proof .side-navigation.density-nav-fixture {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  block-size: 12rem;
+}
+.density-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.density-guides > i {
+  position: absolute;
+  inset-inline: 0;
+  block-size: 1px;
+  background: rgb(190 40 40 / 45%);
+}
+.density-guides > b {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 8px;
+  transform: translateY(-4px);
+  background: rgb(190 40 40 / 65%);
+}
+.density-guides > [data-guide="baseline"] {
+  background: rgb(40 90 190 / 70%);
+}
+.density-caption {
+  margin-block: 16px 32px;
+  max-inline-size: 80ch;
+}
+
+.density-portal-reference {
+  display: flow-root;
+  margin-block: var(--ds-spacing-group);
+}
+
+.density-neutral-wrapper {
+  display: contents;
+}
+
+.density-fit-proof
+  .side-navigation.density-nav-fixture.density-nested-provider-fixture {
+  block-size: auto;
+  min-block-size: 0;
+}
+
+.density-policy-boundary {
+  display: block;
+}
+
+.density-nested-provider-fixture > .side-navigation-header {
+  display: none;
+}
+
+/* Frozen Before only; no fixed sizing or manual seat override in After. */
+.density-frozen-before .side-navigation-item {
+  height: var(--dimension-400);
+}
+.density-frozen-before .side-navigation-item > .row {
+  height: 100%;
+  align-items: center;
+}
+.density-frozen-before .label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.density-frozen-before .chip {
+  --ds-control-seat-padding-block: var(--ds-control-padding-block);
+  --ds-control-seat-margin-block-end: var(--ds-control-grid-compensation);
+}
+
+.density-frozen-before .row > .start {
+  align-self: center;
+  margin-block-start: 0;
+}
+
+.indicator-fit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--ds-spacing-group);
+}
+
+.indicator-fit-case {
+  min-inline-size: 17rem;
+  padding: var(--ds-spacing-action);
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+}
+
+.chip-badge-case {
+  min-inline-size: 30rem;
+  padding: var(--ds-spacing-group);
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+  overflow-x: auto;
+}
+
+.indicator-fit .chip-badge-case .side-navigation.indicator-fit-nav {
+  inline-size: 28rem;
+}
+
+.chip-badge-grid {
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+}
+
+.chip-badge-case > h2 {
+  margin-block-start: 0;
+}
+
+.chip-badge-pair {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: start;
+  gap: var(--ds-spacing-item-inline);
+  margin-block-end: var(--ds-spacing-group);
+}
+
+.chip-badge-pair > div {
+  display: flex;
+  align-items: flex-start;
+}
+
+.indicator-fit-case > h2 {
+  margin-block-start: 0;
+}
+
+.indicator-fit .side-navigation.indicator-fit-nav {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  min-block-size: 0;
+  block-size: auto;
+  inline-size: 15rem;
+}

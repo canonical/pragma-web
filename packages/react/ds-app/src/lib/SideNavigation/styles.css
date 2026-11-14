@@ -29,11 +29,10 @@
     /* 0.5rem from the left and the right (aligns with the collapse
      toggle / context-switcher chevron beyond it). */
     --sidenav-inset-inline: var(--dimension-100);
-    /* 0.5rem between a leading icon and its label. */
-    --sidenav-icon-gap: var(--dimension-100);
-    /* Leading-icon column so labels align with or without an icon. No token
-     names it; provisional, scoped here. */
-    --sidenav-icon-column-inline-size: 1.5rem;
+    /* Mark-to-label gap, independent of the row inset. */
+    --sidenav-icon-gap: var(--ds-spacing-mark);
+    /* The leading column follows the tier body icon, whether filled or empty. */
+    --sidenav-icon-column-inline-size: var(--ds-typography-body-font-size);
 
     /* ── Row background channel ────────────────────────────────────────
      Rows consume this channel, not the navigation-primary token directly,
@@ -63,6 +62,19 @@
   }
 
   .ds.side-navigation {
+    /* Resolve the existing override on its real owner, independently of control/popover insets. */
+    --sidenav-surface-inset-inline: var(
+      --ds-spacing-inset-surface-major-inline
+    );
+    font-size: var(--ds-typography-body-font-size);
+    --sidenav-icon-gap: var(--ds-spacing-mark);
+    --sidenav-icon-column-inline-size: var(--ds-typography-body-font-size);
+    /* Row labels follow the reserved mark column, independent of outer padding. */
+    --sidenav-label-continuation: calc(
+      var(--sidenav-icon-column-inline-size) +
+      var(--sidenav-icon-gap)
+    );
+    --icon-size: var(--sidenav-icon-column-inline-size);
     box-sizing: border-box;
     /* Skip-link's absolute overlay anchors to this box. */
     position: relative;
@@ -74,7 +86,8 @@
     gap: var(--dimension-100); /* 0.5rem */
 
     inline-size: var(--sidenav-rail-inline-size);
-    padding-inline: var(--sidenav-inset-inline); /* 0.5rem */
+    /* Region padding keeps the inherited gutter inside each scroll/paint window. */
+    padding-inline: 0;
     flex-shrink: 0;
 
     /* The nav spans the full viewport height. Content (flex:1, min-height:0)
@@ -97,6 +110,16 @@
 
     /* Skip navigation — visually hidden until keyboard focus, then it
      overlays the rail so keyboard users can bypass the block. */
+
+    &
+      > :is(
+        .side-navigation-header,
+        .side-navigation-context-switcher,
+        .side-navigation-content,
+        .side-navigation-footer
+      ) {
+      padding-inline: var(--sidenav-surface-inset-inline);
+    }
 
     & .skip-link {
       position: absolute;
@@ -123,6 +146,13 @@
 
         color: var(--color-text-default, #111);
         background: var(--color-background-default, #fff);
+      }
+    }
+
+    /* A compact desktop rail keeps its control inset and narrow width. */
+    @media (min-width: 38.75rem) {
+      &[data-expanded="false"] {
+        --sidenav-surface-inset-inline: var(--sidenav-inset-inline);
       }
     }
 

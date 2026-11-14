@@ -19,13 +19,24 @@
   /* Collapsed rail: the Footer stays visible, degrading to icon-only rows.
      Label hover tooltips are a documented follow-up. */
   .ds.side-navigation[data-expanded="false"] > .ds.side-navigation-footer {
-    .label,
+    .side-navigation-label {
+      /* Preserve the real text box while the collapsed rail shows its icon. */
+      clip-path: inset(50%);
+      inline-size: 0;
+      grid-area: 1 / 1;
+    }
+
+    .start {
+      grid-area: 1 / 1;
+    }
+
     .end {
       display: none;
     }
 
     .row {
       grid-template-columns: var(--sidenav-icon-column-inline-size);
+      justify-content: center;
     }
   }
 }

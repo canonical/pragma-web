@@ -137,7 +137,7 @@ const ContextSwitcher = ({
         gutter={gutter}
         maxWidth={
           maxWidth ??
-          "calc(var(--sidenav-rail-inline-size) - 2 * var(--sidenav-inset-inline))"
+          "calc(var(--sidenav-rail-inline-size) - 2 * var(--sidenav-surface-inset-inline, var(--sidenav-inset-inline)))"
         }
         autoFit={autoFit}
         items={items}

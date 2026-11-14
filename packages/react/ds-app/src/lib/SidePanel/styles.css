@@ -43,8 +43,7 @@
       TODO: replace with a token when one exists.
     */
     --side-panel-overflow-line-thickness: 2px;
-    /* One inline padding, read by the header, content and footer alike. */
-    --side-panel-padding-inline: var(--dimension-300);
+    /* Parts share the public inline override, with a responsive major fallback. */
     /* Block padding of the two pinned regions, so the rhythm is tunable. */
     --side-panel-header-padding-block: var(--dimension-200);
     --side-panel-footer-padding-block: var(--dimension-200);

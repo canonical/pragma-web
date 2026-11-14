@@ -1,14 +1,121 @@
+import { Chip } from "@canonical/react-ds-global";
 import { render, screen } from "@testing-library/react";
 import type React from "react";
 import { describe, expect, it } from "vitest";
+import type { LinkComponentProps } from "../../types.js";
+import { navigationDensityPolicy } from "../densityPolicy.js";
 import Item from "./Item.js";
 
 describe("Item", () => {
+  it("seats only the actual label and publishes the versioned slot policy", () => {
+    const { container } = render(<Item url="/machines">Machines</Item>);
+    const row = screen.getByRole("link");
+    expect(row).toHaveAttribute(
+      "data-ds-density-provider",
+      "navigation-static-chip",
+    );
+    expect(row).toHaveAttribute("data-ds-density-policy-version", "1");
+    expect(container.querySelectorAll(".spacing-control-seat")).toHaveLength(1);
+    expect(screen.getByText("Machines")).toHaveClass(
+      "side-navigation-label",
+      "spacing-control-seat",
+    );
+    expect(screen.getByText("Machines")).not.toHaveClass("label");
+    expect(row).not.toHaveClass("spacing-control-seat");
+  });
+  it("preserves enrollment through a custom link forwarding only its public contract", () => {
+    function ClassOnlyLink({
+      href,
+      className,
+      children,
+      "aria-current": current,
+    }: LinkComponentProps) {
+      return (
+        <a href={href} className={className} aria-current={current}>
+          {children}
+        </a>
+      );
+    }
+    const { container } = render(
+      <Item
+        url="/machines"
+        LinkComponent={ClassOnlyLink}
+        slot={<Chip value="Chip" />}
+      >
+        Machines
+      </Item>,
+    );
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("href", "/machines");
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
+    expect(
+      container.querySelector(
+        `${navigationDensityPolicy.providerSelector} ${navigationDensityPolicy.subscriberSelector}`,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Machines")).toHaveClass("spacing-control-seat");
+  });
+
   it("renders a link when url is set", () => {
     render(<Item url="/machines">Machines</Item>);
     expect(screen.getByRole("link", { name: "Machines" })).toHaveAttribute(
       "href",
       "/machines",
+    );
+  });
+
+  it("keeps a direct static Chip eligible when it carries the obsolete reset attribute", () => {
+    const { container } = render(
+      <Item slot={<Chip value="Legacy attribute" data-ds-density-reset="" />}>
+        Machines
+      </Item>,
+    );
+    const chip = screen.getByText("Legacy attribute").closest(".chip");
+    expect(chip).toHaveAttribute("data-ds-density-reset");
+    expect(
+      container.querySelector(
+        `${navigationDensityPolicy.providerSelector} ${navigationDensityPolicy.subscriberSelector}:not(.site,.docs,.app)`,
+      ),
+    ).toBe(chip);
+  });
+
+  it("keeps static trailing Chips eligible through one or two neutral wrappers", () => {
+    const { container } = render(
+      <>
+        <Item slot={<Chip value="Direct" />}>Direct row</Item>
+        <Item
+          slot={
+            <span>
+              <Chip value="One wrapper" />
+            </span>
+          }
+        >
+          One-wrapper row
+        </Item>
+        <Item
+          slot={
+            <span data-ds-density-reset className="comfortable">
+              <span className="dense">
+                <Chip value="Two wrappers" />
+              </span>
+            </span>
+          }
+        >
+          Two-wrapper row
+        </Item>
+      </>,
+    );
+    const subscribers = container.querySelectorAll(
+      `${navigationDensityPolicy.providerSelector} ${navigationDensityPolicy.subscriberSelector}`,
+    );
+    expect([...subscribers].map((chip) => chip.textContent)).toEqual([
+      "Direct",
+      "One wrapper",
+      "Two wrappers",
+    ]);
+    expect(screen.getByText("Direct").closest(".chip")).toHaveClass(
+      "ds",
+      "chip",
     );
   });
 
@@ -89,6 +196,8 @@ describe("Item", () => {
       </Item>,
     );
     const strong = screen.getByText("Machines");
-    expect(strong.closest(".label")).not.toHaveAttribute("title");
+    expect(strong.closest(".side-navigation-label")).not.toHaveAttribute(
+      "title",
+    );
   });
 });
