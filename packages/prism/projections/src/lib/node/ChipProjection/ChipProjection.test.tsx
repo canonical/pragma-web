@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSwitchCoverage } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
@@ -13,13 +14,14 @@ import {
   MOCK_ONTOLOGY_CLASS,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
+import nodeFragment from "../../../__generated__/ChipProjection_node.graphql.js";
 import testQuery, {
   type ChipProjectionTestQuery,
 } from "../../../__generated__/ChipProjectionTestQuery.graphql.js";
 import siteFragment, {
   type SiteChipSlot_node$key,
 } from "../../../__generated__/SiteChipSlot_node.graphql.js";
-import { ONTOLOGY_TYPES } from "../../ontology/constants.js";
+import type { ONTOLOGY_TYPES } from "../../ontology/constants.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import ChipProjection from "./ChipProjection.js";
@@ -166,31 +168,31 @@ describe("ChipProjection", () => {
     expect(container.querySelector(".ds.node-chip")).not.toBeNull();
   });
 
-  describe("covers every case of its switch", () => {
+  it("covers every case of its switch", () => {
     /** The mock node of each ontology type the switch names. */
-    const ENTITIES: Record<
+    const cases: Record<
       keyof typeof ONTOLOGY_TYPES,
       Readonly<Record<string, unknown>>
     > = {
       OntologyClass: MOCK_ONTOLOGY_CLASS,
     };
-
-    for (const typename of Object.keys(ONTOLOGY_TYPES) as Array<
-      keyof typeof ONTOLOGY_TYPES
-    >) {
-      it(`renders ${typename} through its own arm`, () => {
+    expectSwitchCoverage({
+      fragment: nodeFragment,
+      cases,
+      render: (typename, entity) => {
         const kebab = typename.replace(/(?<!^)([A-Z])/g, "-$1").toLowerCase();
-        const { container } = renderWithNode(
+        const { container, unmount } = renderWithNode(
           (node) => <ChipProjection node={node} />,
-          ENTITIES[typename],
+          entity,
         );
         expect(container.querySelector(`.ds.${kebab}-chip`)).toHaveAttribute(
           "data-type",
           typename,
         );
         expect(container.querySelector(".ds.node-chip")).toBeNull();
-      });
-    }
+        unmount();
+      },
+    });
   });
 
   it("hands linked={false} to the arm, which then neither links nor peeks", () => {
