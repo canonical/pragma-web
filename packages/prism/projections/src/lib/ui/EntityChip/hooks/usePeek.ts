@@ -81,8 +81,13 @@ export default function usePeek({
       if (!open || event.key !== "Escape") return;
       event.preventDefault();
       settle(false);
-      const link = rootRef.current?.querySelector<HTMLElement>(":scope > [href]");
-      if (link !== undefined && link !== null && link !== document.activeElement) {
+      const link =
+        rootRef.current?.querySelector<HTMLElement>(":scope > [href]");
+      if (
+        link !== undefined &&
+        link !== null &&
+        link !== document.activeElement
+      ) {
         returning.current = true;
         link.focus();
       }

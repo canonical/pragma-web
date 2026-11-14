@@ -61,9 +61,7 @@ export default function EntityRow({
             {mark}
           </span>
         )}
-        {prefix === undefined ? null : (
-          <span className="prefix">{prefix}</span>
-        )}
+        {prefix === undefined ? null : <span className="prefix">{prefix}</span>}
         {location === undefined ? null : (
           <span className="location">{location}</span>
         )}
