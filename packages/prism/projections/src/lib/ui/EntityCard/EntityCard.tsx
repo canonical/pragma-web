@@ -81,7 +81,7 @@ export default function EntityCard({
             {location === undefined ? null : (
               <p className="location">{location}</p>
             )}
-            <h3 className="title">
+            <div className="headline">
               {mark === undefined ? null : (
                 <span aria-hidden="true" className="mark">
                   {mark}
@@ -90,18 +90,20 @@ export default function EntityCard({
               {prefix === undefined ? null : (
                 <span className="prefix">{prefix}</span>
               )}
-              {parent === undefined ? (
-                name
-              ) : (
-                <Message
-                  elements={{
-                    title: name,
-                    parent: <span className="parent">{parent}</span>,
-                  }}
-                  id={PARENT_MESSAGES[parentRelation]}
-                />
-              )}
-            </h3>
+              <h3 className="title">
+                {parent === undefined ? (
+                  name
+                ) : (
+                  <Message
+                    elements={{
+                      title: name,
+                      parent: <span className="parent">{parent}</span>,
+                    }}
+                    id={PARENT_MESSAGES[parentRelation]}
+                  />
+                )}
+              </h3>
+            </div>
             {address === undefined ? null : (
               <p className="address">{address}</p>
             )}

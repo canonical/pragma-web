@@ -36,7 +36,10 @@
 # the selected background, so the keyboard's selection still shows on it.
 #
 # The identity slots (heuristic 4.1), in their order: mark, prefix, title,
-# address, kind, status. The first line, the headline, holds the foreign
+# address, kind, status. The mark is the 16px box every HTML form gives
+# it, in its own column so the second line stands under the title, and
+# spaced from the title by the chip's gap, 4px; the vital and the aside
+# stand the gutter from the identity. The first line, the headline, holds the foreign
 # prefix (muted, monospace, never shrinking) when given, then the title,
 # which takes what is left and truncates. The mark leads the first line, its 16px centred
 # in the 24px line by a 4px offset. With an address, the full CURIE in
@@ -59,6 +62,7 @@
 #                                      literal: no typography token names a
 #                                      monospace face.
 #   space.050 (4px) for the mark's offset: (24px line - 16px mark) / 2.
+#   space.200 (16px) for the mark's box; space.050 (4px) for its gap.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
 #   --entity-command-identifier-vertical-align: baseline,
@@ -78,7 +82,6 @@ node:
     layout.type: flex
     layout.align: flex-start
     layout.justify: space-between
-    spacing.gap: grid.gutter
     spacing.internal.inline.start: component.padding.inline
     spacing.internal.inline.end: component.padding.inline
     spacing.internal.block.start: space.050
@@ -95,7 +98,10 @@ node:
         styles:
           layout.type: flex
           layout.flex.shrink: 0
+          size.width: space.200
+          size.height: space.200
           spacing.external.block.start: space.050
+          spacing.external.inline.end: space.050
       relation: { cardinality: "0..1", slotName: mark }
     - node:
         role: identity
@@ -168,6 +174,7 @@ node:
     - node:
         role: vital
         styles:
+          spacing.external.inline.start: grid.gutter
           layout.alignSelf: flex-end
           typography.color: color.text.muted
           typography.align: end
@@ -183,6 +190,7 @@ node:
     - node:
         role: aside
         styles:
+          spacing.external.inline.start: grid.gutter
           layout.type: flex
           layout.direction: column
           layout.align: flex-end

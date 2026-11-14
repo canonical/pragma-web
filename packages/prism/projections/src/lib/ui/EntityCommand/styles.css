@@ -24,7 +24,12 @@
       --typography-text-primary-smallcaps-letter-spacing
     );
     --entity-command-vital-color: var(--color-text-muted);
+    /* The mark is the 16px box every form gives it, centred on the first
+     * 24px line by the offset, and spaced from the title by the chip's
+     * gap. */
+    --entity-command-mark-size: var(--space-200);
     --entity-command-mark-offset: var(--space-050);
+    --entity-command-mark-gap: var(--space-050);
     --entity-command-prefix-color: var(--color-text-muted);
     /* No typography token names a monospace face. */
     --entity-command-prefix-font-family: ui-monospace, monospace;
@@ -42,7 +47,6 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--entity-command-gap);
     padding-inline: var(--entity-command-padding-inline);
     padding-block: var(--entity-command-padding-block);
     list-style: none;
@@ -65,11 +69,21 @@
     color: var(--entity-command-disabled-color);
   }
 
-  /* The mark sits on the first line, its 16px centred in the 24px line. */
+  /* The mark sits on the first line, its 16px box centred in the 24px
+   * line, the chip's gap from the title; it never shrinks. */
   .ds.entity-command .mark {
     display: flex;
     flex-shrink: 0;
+    width: var(--entity-command-mark-size);
+    height: var(--entity-command-mark-size);
     margin-block-start: var(--entity-command-mark-offset);
+    margin-inline-end: var(--entity-command-mark-gap);
+  }
+
+  /* What ends the row stands the row's gap from the identity. */
+  .ds.entity-command .vital,
+  .ds.entity-command .aside {
+    margin-inline-start: var(--entity-command-gap);
   }
 
   /* The identity and the title clip only along their line, so a chip in

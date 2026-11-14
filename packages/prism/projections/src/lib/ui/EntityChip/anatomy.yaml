@@ -91,6 +91,7 @@ node:
         role: mark
         styles:
           layout.type: flex
+          layout.flex.shrink: 0
           size.width: space.200
           size.height: space.200
       relation: { cardinality: "0..1", slotName: mark }

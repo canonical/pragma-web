@@ -51,9 +51,11 @@
     white-space: nowrap;
   }
 
-  /* The mark is a 16px box the pill centres. */
+  /* The mark is a 16px box the pill centres on its line; it never
+   * shrinks, so a long title cannot squeeze it. */
   .ds.entity-chip .mark {
     display: flex;
+    flex-shrink: 0;
     width: var(--entity-chip-mark-size);
     height: var(--entity-chip-mark-size);
   }

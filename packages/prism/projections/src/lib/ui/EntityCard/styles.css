@@ -179,7 +179,8 @@
 
   /* A heading at the text size: the card's hierarchy is weight, not size.
    * A word longer than the card ends in an ellipsis. */
-  .ds.entity-card > .body > .description > .heading > .title {
+  .ds.entity-card > .body > .description > .heading > .headline > .title {
+    min-width: 0;
     margin-block: 0;
     padding-block: 0;
     overflow: hidden;
@@ -191,12 +192,24 @@
 
   /* The title's link reads as the title: the text's colour, underlined on
    * approach. */
-  .ds.entity-card > .body > .description > .heading > .title > .link {
+  .ds.entity-card
+    > .body
+    > .description
+    > .heading
+    > .headline
+    > .title
+    > .link {
     color: inherit;
     text-decoration: none;
   }
 
-  .ds.entity-card > .body > .description > .heading > .title > .link:hover {
+  .ds.entity-card
+    > .body
+    > .description
+    > .heading
+    > .headline
+    > .title
+    > .link:hover {
     text-decoration: underline;
   }
 
@@ -204,6 +217,7 @@
     > .body
     > .description
     > .heading
+    > .headline
     > .title
     > .link:focus-visible {
     outline-width: var(--entity-card-focus-ring-width);
@@ -212,19 +226,35 @@
     outline-offset: var(--entity-card-focus-ring-offset);
   }
 
-  .ds.entity-card > .body > .description > .heading > .title > .parent {
+  .ds.entity-card
+    > .body
+    > .description
+    > .heading
+    > .headline
+    > .title
+    > .parent {
     font-weight: var(--entity-card-parent-font-weight);
   }
 
-  /* The mark and the prefix lead the title on its line. */
-  .ds.entity-card > .body > .description > .heading > .title > .mark {
-    display: inline-flex;
+  /* The title's line: the mark and the prefix lead the heading, outside
+   * it, so the heading names the entity alone; a flex line that centres
+   * the mark's 16px box on the 24px line. */
+  .ds.entity-card > .body > .description > .heading > .headline {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .ds.entity-card > .body > .description > .heading > .headline > .mark {
+    display: flex;
+    flex-shrink: 0;
     width: var(--entity-card-mark-size);
     height: var(--entity-card-mark-size);
     margin-inline-end: var(--entity-card-identity-gap);
   }
 
-  .ds.entity-card > .body > .description > .heading > .title > .prefix {
+  .ds.entity-card > .body > .description > .heading > .headline > .prefix {
+    flex-shrink: 0;
     margin-inline-end: var(--entity-card-identity-gap);
     color: var(--entity-card-prefix-color);
     font-family: var(--entity-card-mono-font-family);

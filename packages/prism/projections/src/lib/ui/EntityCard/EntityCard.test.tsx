@@ -250,6 +250,23 @@ describe("EntityCard", () => {
       ).toBe("true");
       expect(screen.getByRole("link", { name: "Button" })).toBeDefined();
     });
+
+    it("leads its heading with the mark and prefix, outside it", () => {
+      const { container } = render(
+        <EntityCard
+          mark={<span className="swatch" />}
+          prefix="cs:"
+          title="Link component"
+        />,
+      );
+      const heading = screen.getByRole("heading", { level: 3 });
+      expect(heading.textContent).toBe("Link component");
+      expect(
+        [...(container.querySelector(".headline")?.children ?? [])].map(
+          (slot) => slot.className,
+        ),
+      ).toEqual(["mark", "prefix", "title"]);
+    });
   });
 
   describe("specimen", () => {

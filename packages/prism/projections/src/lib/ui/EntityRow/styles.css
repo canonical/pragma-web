@@ -19,6 +19,8 @@
     --entity-row-line-height: var(--space-300);
     /* The chip's gap between its slots. */
     --entity-row-mark-gap: var(--space-050);
+    /* The mark is the 16px box every form gives it. */
+    --entity-row-mark-size: var(--space-200);
     --entity-row-location-color: var(--color-text-muted);
     --entity-row-identifier-vertical-align: baseline;
     --entity-row-identifier-line-height: 0;
@@ -38,7 +40,7 @@
     --entity-row-focus-ring-color: var(--color-focus-ring);
 
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     min-width: 0;
@@ -55,6 +57,8 @@
    * only along its line, so a chip in it keeps its whole pill, and the
    * line grows to hold it. */
   .ds.entity-row .identity {
+    display: flex;
+    align-items: center;
     overflow-x: clip;
     min-width: 0;
     text-overflow: ellipsis;
@@ -78,8 +82,13 @@
     outline-offset: var(--entity-row-focus-ring-offset);
   }
 
-  /* The mark leads the identity, set apart from the text after it. */
+  /* The mark leads the identity, a 16px box centred on its line, set
+   * apart from the text after it by the chip's gap; it never shrinks. */
   .ds.entity-row .mark {
+    display: flex;
+    flex-shrink: 0;
+    width: var(--entity-row-mark-size);
+    height: var(--entity-row-mark-size);
     margin-inline-end: var(--entity-row-mark-gap);
   }
 
