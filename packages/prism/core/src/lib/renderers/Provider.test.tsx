@@ -53,7 +53,7 @@ describe("RenderersProvider", () => {
           adapter: createMemoryAdapter("/"),
         })}
       >
-        <RenderersProvider defaults={DEFAULTS} extensions={["prose"]}>
+        <RenderersProvider defaults={DEFAULTS} extensions={[]}>
           <PageRenderers />
         </RenderersProvider>
       </RouterProvider>,

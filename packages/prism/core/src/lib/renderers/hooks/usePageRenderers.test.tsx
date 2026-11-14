@@ -22,7 +22,7 @@ describe("usePageRenderers", () => {
     const { result } = renderHook(() => usePageRenderers());
     const turtle = result.current.at(1);
     expect(turtle?.offered?.({ extensions: new Set(["source"]) })).toBe(true);
-    expect(turtle?.offered?.({ extensions: new Set(["prose"]) })).toBe(false);
+    expect(turtle?.offered?.({ extensions: new Set() })).toBe(false);
   });
 
   it("renders the page as given, and Turtle as the entity's source", () => {
