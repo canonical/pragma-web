@@ -73,7 +73,6 @@ import {
 } from "@canonical/ke-graphql";
 import { createGraphQLHandler } from "@canonical/ke-graphql/http";
 import { indexSiteLens } from "@canonical/prism-contract";
-import { printSchema } from "graphql";
 import type { PragmaProvider, PragmaProviderOptions } from "../config/index.js";
 import { countClassEdges, createClassEdgesExtension } from "../edges/index.js";
 import { extendWithLens, readTBoxOutline, SITE_LENS } from "../lens/index.js";
@@ -92,6 +91,7 @@ import {
   resolveRefRoots,
 } from "../sources/index.js";
 import { composeExtensions } from "./composeExtensions.js";
+import { printServedSdl } from "./printServedSdl.js";
 
 /** Projection mode, pinned — see this module's header. */
 const MODE = "annotated";
@@ -203,18 +203,7 @@ export const createPragmaProvider = async (
     cors: true,
     incremental: true,
   });
-  // The compiler's provenance header, then the schema this provider serves.
-  const compiled = printSchema(api.schema);
-  /* v8 ignore next 5 -- unreachable with the pinned ke-graphql, whose SDL is
-     its header followed by printSchema of the schema it hands out. Kept as a
-     loud failure so a release that changes the format cannot make this
-     provider write a header-less or doubled SDL. */
-  if (!api.sdl.endsWith(compiled)) {
-    throw new Error(
-      "ke-graphql's SDL is no longer its header followed by the printed schema",
-    );
-  }
-  const sdl = `${api.sdl.slice(0, api.sdl.length - compiled.length)}${printSchema(schema)}`;
+  const sdl = printServedSdl(api.sdl, api.schema, schema);
   if (options.sdlOutput !== undefined) {
     writeFileSync(options.sdlOutput, sdl, "utf-8");
   }

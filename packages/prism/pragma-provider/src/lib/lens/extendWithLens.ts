@@ -29,9 +29,11 @@ interface ClassPropertySource {
   readonly propertyUri: string;
 }
 
-/** A resolver for one lens field. */
-// biome-ignore lint/suspicious/noExplicitAny: each resolver narrows its own source and arguments
-type LensResolver = GraphQLFieldResolver<any, unknown, any>;
+/**
+ * A resolver for one lens field. Its source and arguments are `never` so a
+ * resolver typed for its own source and arguments is one.
+ */
+type LensResolver = (source: never, args: never) => unknown;
 
 /** The resolvers of the lens fields, by type and field name. */
 const createLensResolvers = (
@@ -116,7 +118,8 @@ export const extendWithLens = (
   for (const [typeName, fields] of Object.entries(resolvers)) {
     const type = extended.getType(typeName) as GraphQLObjectType;
     for (const [name, resolve] of Object.entries(fields)) {
-      type.getFields()[name].resolve = resolve;
+      type.getFields()[name].resolve =
+        resolve as unknown as GraphQLFieldResolver<unknown, unknown>;
     }
   }
   return extended;
