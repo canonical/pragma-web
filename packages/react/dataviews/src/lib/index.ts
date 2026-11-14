@@ -48,6 +48,11 @@ export { QueryChip } from "./_work_in_progress/QueryChip/index.js";
 export type { QueryChipsProps } from "./_work_in_progress/QueryChips/index.js";
 export { QueryChips } from "./_work_in_progress/QueryChips/index.js";
 export type {
+  QueryInputOption,
+  QueryInputProps,
+} from "./_work_in_progress/QueryInput/index.js";
+export { QueryInput } from "./_work_in_progress/QueryInput/index.js";
+export type {
   DisplayField,
   DisplayFieldCellProps,
 } from "./common/index.js";
