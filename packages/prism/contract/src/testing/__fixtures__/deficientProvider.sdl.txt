@@ -64,6 +64,9 @@ type OntologyClass implements Node {
   instanceCount: Int!
   isAbstract: Boolean!
   namespace: String!
+  visibility: TermVisibility
+  glyph: String
+  pluralLabel(lang: String = "en"): String
 }
 
 type ClassProperty {
@@ -72,6 +75,10 @@ type ClassProperty {
   required: Boolean!
   singular: Boolean!
   inherited: Boolean!
+  group: PropertyGroup
+  order: Float
+  role: PropertyRole
+  visibility: TermVisibility
 }
 
 type OntologyProperty {
@@ -84,6 +91,11 @@ type OntologyProperty {
   functional: Boolean!
   inverse: OntologyProperty
   namespace: String!
+  visibility: TermVisibility
+  pluralLabel(lang: String = "en"): String
+  inverseLabel(lang: String = "en"): String
+  inversePluralLabel(lang: String = "en"): String
+  inverseVisibility: TermVisibility
 }
 
 enum PropertyKind {
@@ -92,10 +104,39 @@ enum PropertyKind {
   ANNOTATION
 }
 
+enum TermVisibility {
+  PROMINENT
+  NORMAL
+  HIDDEN
+}
+
+enum PropertyRole {
+  LABEL
+  DESCRIPTION
+  DEPICTION
+  ICON
+  CLASSIFICATION
+}
+
+type PropertyGroup {
+  uri: ID!
+  label(lang: String = "en"): String
+  order: Float
+}
+
+type ClassEdge {
+  property: ID!
+  subjectClass: ID!
+  objectClass: ID!
+  count: Int!
+  declared: Boolean!
+}
+
 type Query {
   node(id: ID!): Node
   ontologies: [Ontology!]!
   ontology: Ontology
   ontologyClass(uri: String!): OntologyClass
   ontologyProperty(uri: String!): OntologyProperty
+  classEdges: [ClassEdge!]!
 }

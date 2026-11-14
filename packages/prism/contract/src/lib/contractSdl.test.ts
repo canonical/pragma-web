@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  assertEnumType,
   assertInterfaceType,
   assertNonNullType,
   assertObjectType,
@@ -81,6 +82,10 @@ describe("the shipped contract SDL", () => {
       "OntologyProperty",
       "PropertyKind",
       "EntityMeta",
+      "TermVisibility",
+      "PropertyRole",
+      "PropertyGroup",
+      "ClassEdge",
     ]) {
       expect(
         schema.getType(name) ?? null,
@@ -179,7 +184,106 @@ describe("the shipped contract SDL", () => {
       "ontology",
       "ontologyClass",
       "ontologyProperty",
+      "classEdges",
     ]);
+  });
+
+  it("declares the type lens nullable, so a provider without a lens conforms", () => {
+    const schema = buildSchema(readContractSdl());
+    const lensFields = {
+      OntologyClass: {
+        visibility: "TermVisibility",
+        glyph: "String",
+        pluralLabel: "String",
+      },
+      ClassProperty: {
+        group: "PropertyGroup",
+        order: "Float",
+        role: "PropertyRole",
+        visibility: "TermVisibility",
+      },
+      OntologyProperty: {
+        visibility: "TermVisibility",
+        pluralLabel: "String",
+        inverseLabel: "String",
+        inversePluralLabel: "String",
+        inverseVisibility: "TermVisibility",
+      },
+      PropertyGroup: { uri: "ID!", label: "String", order: "Float" },
+    };
+    for (const [typeName, fields] of Object.entries(lensFields)) {
+      const type = assertObjectType(schema.getType(typeName));
+      for (const [name, fieldType] of Object.entries(fields)) {
+        expect(
+          String(type.getFields()[name]?.type),
+          `${typeName}.${name}`,
+        ).toBe(fieldType);
+      }
+    }
+  });
+
+  it("gives every lens label a lang argument defaulting to en", () => {
+    const schema = buildSchema(readContractSdl());
+    const labels = [
+      ["OntologyClass", "pluralLabel"],
+      ["OntologyProperty", "pluralLabel"],
+      ["OntologyProperty", "inverseLabel"],
+      ["OntologyProperty", "inversePluralLabel"],
+      ["PropertyGroup", "label"],
+    ] as const;
+    for (const [typeName, name] of labels) {
+      const field = assertObjectType(schema.getType(typeName)).getFields()[
+        name
+      ];
+      const fallback = field?.args.find((arg) => arg.name === "lang")?.astNode
+        ?.defaultValue;
+      expect(
+        fallback?.kind === Kind.STRING ? fallback.value : undefined,
+        `${typeName}.${name}(lang:)`,
+      ).toBe("en");
+    }
+  });
+
+  it("pins the lens enums' members", () => {
+    const schema = buildSchema(readContractSdl());
+    const listMembers = (name: string): string[] =>
+      assertEnumType(schema.getType(name))
+        .getValues()
+        .map((value) => value.name);
+    expect(listMembers("TermVisibility")).toEqual([
+      "PROMINENT",
+      "NORMAL",
+      "HIDDEN",
+    ]);
+    expect(listMembers("PropertyRole")).toEqual([
+      "LABEL",
+      "DESCRIPTION",
+      "DEPICTION",
+      "ICON",
+      "CLASSIFICATION",
+    ]);
+  });
+
+  it("serves the class edges as a total root list", () => {
+    const schema = buildSchema(readContractSdl());
+    const query = schema.getQueryType();
+    expect(String(query?.getFields().classEdges?.type)).toBe("[ClassEdge!]!");
+    expect(query?.getFields().classEdges?.args).toEqual([]);
+    const edge = assertObjectType(schema.getType("ClassEdge"));
+    expect(
+      Object.fromEntries(
+        Object.entries(edge.getFields()).map(([name, field]) => [
+          name,
+          String(field.type),
+        ]),
+      ),
+    ).toEqual({
+      property: "ID!",
+      subjectClass: "ID!",
+      objectClass: "ID!",
+      count: "Int!",
+      declared: "Boolean!",
+    });
   });
 
   it("takes String!, not ID!, for the TBox convenience lookups", () => {

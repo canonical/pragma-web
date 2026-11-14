@@ -3,6 +3,8 @@
 # exName, count -> exCount). The structural fields (uri, _meta) and the whole
 # TBox surface carry no prefix, and the contract names no ontology terms —
 # so this schema satisfies the contract exactly as the unprefixed one does.
+# The emission carries the type lens (a ke-graphql that reads it compiled
+# it); a provider appends classEdgesExtension before serving it.
 # ke-graphql · canonical SDL
 # graphql-schema-spec: 1
 # provider: fixture
@@ -11,37 +13,14 @@
 # revision: 0
 # prefixing: all
 
-type Query {
-  ontologies: [Ontology!]!
-  ontology(prefix: String!): Ontology
-  ontologyClass(uri: String!): OntologyClass
-  ontologyProperty(uri: String!): OntologyProperty
-  node(id: ID!): Node
-  thing(uri: String!): Thing
-  things(first: Int, after: String, last: Int, before: String): ThingConnection!
-}
-
-type Ontology {
-  prefix: String!
-  namespace: String!
-  label: String
-  classes: [OntologyClass!]!
-  properties: [OntologyProperty!]!
-}
-
-type OntologyClass implements Node {
+type Thing implements Node {
+  """The entity's absolute IRI — the primary key."""
   uri: ID!
+
+  """Self-describing TBox access for this entity."""
   _meta: EntityMeta!
-  label: String
-  definition: String
-  superclass: OntologyClass
-  superclasses: [OntologyClass!]!
-  subclasses: [OntologyClass!]!
-  properties: [ClassProperty!]!
-  instances(first: Int, after: String, last: Int, before: String): NodeConnection!
-  instanceCount: Int!
-  isAbstract: Boolean!
-  namespace: String!
+  exCount: Int
+  exName: String
 }
 
 interface Node {
@@ -49,23 +28,109 @@ interface Node {
   _meta: EntityMeta!
 }
 
+"""
+Self-describing TBox access attached to every generated type, plus the generic descriptive fields a lens renders without knowing the concrete type.
+"""
 type EntityMeta {
+  """
+  Compact display form of `uri`: `prefix:local` from the compiled namespace inventory, else the absolute IRI unchanged, else the GraphQL type name when the value has no IRI at all (an embedded blank node). TOTAL, exactly like `title`. NEVER an identity — `uri` is the only address; this string is not accepted by `node(id:)` and never appears in a cursor.
+  """
   curie: String!
+
+  """
+  TOTAL display string: label(lang), else any-tag literal, else the IRI local name, else the IRI, else the GraphQL type name when the value has no IRI at all (an embedded blank node). Never null — render this.
+  """
   title(lang: String = "en"): String!
+
+  """
+  rdfs:label, else skos:prefLabel, else the class's own name/title predicate — exact language tag, else untagged. Null when none is asserted; `title` is the total alternative.
+  """
   label(lang: String = "en"): String
+
+  """
+  Incidental prose: rdfs:comment, else the class's own summary predicate. Null when none is asserted.
+  """
   comment(lang: String = "en"): String
+
+  """
+  Defining prose: skos:definition, else the class's own description predicate. Null when none is asserted.
+  """
   definition(lang: String = "en"): String
   type: OntologyClass!
   field(name: String!): ClassProperty
   fields: [ClassProperty!]!
 }
 
+type OntologyClass implements Node {
+  uri: ID!
+
+  """Self-describing TBox access for this class."""
+  _meta: EntityMeta!
+  label: String
+  definition: String
+  superclass: OntologyClass
+  superclasses: [OntologyClass!]!
+  subclasses: [OntologyClass!]!
+  properties: [ClassProperty!]!
+
+  """
+  Named instances of this class (blank-node instances are embeddable and not standalone-resolvable).
+  """
+  instances(first: Int, after: String, last: Int, before: String): NodeConnection!
+
+  """Count of NAMED instances (matches `instances`)."""
+  instanceCount: Int!
+  isAbstract: Boolean!
+  namespace: String!
+
+  """
+  prism:visibility of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  visibility: TermVisibility
+
+  """
+  prism:glyph of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  glyph: String
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); never inherited; null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+}
+
+"""
+Class-scoped view of a property: SHACL cardinality is a fact about a (class, property) pair — and so is `name`.
+"""
 type ClassProperty {
+  """
+  The field name this property answers to ON THIS CLASS — the exact string `EntityMeta.field(name:)` accepts, so `fields { name }` and `field(name:)` round-trip. Class-scoped because per-class cardinality decides pluralization: one property is `part` on one class and `parts` on another. When the property projects no field on this class (SHACL sh:maxCount 0, an unexposed range, an unprojected class) the OWL local name is returned as a label — there is no name `field(name:)` would accept.
+  """
   name: String!
   property: OntologyProperty!
   required: Boolean!
   singular: Boolean!
   inherited: Boolean!
+
+  """
+  sh:group of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  group: PropertyGroup
+
+  """
+  sh:order of the lens shape targeting this class, else of its nearest ancestor's that declares one, ascending; null when none does.
+  """
+  order: Float
+
+  """
+  shui:propertyRole of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  role: PropertyRole
+
+  """
+  prism:visibility on this class: the lens shape's, else the property's own; null when neither declares one.
+  """
+  visibility: TermVisibility
 }
 
 type OntologyProperty {
@@ -80,12 +145,69 @@ type OntologyProperty {
   acceptanceCriteria: String
   completionGuidance: String
   namespace: String!
+
+  """prism:visibility of the property; null when undeclared."""
+  visibility: TermVisibility
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseLabel, else the declared inverse property's asserted rdfs:label; null when neither exists.
+  """
+  inverseLabel(lang: String = "en"): String
+
+  """
+  prism:inversePluralLabel, else the declared inverse property's prism:pluralLabel; null when neither exists.
+  """
+  inversePluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseVisibility, else the declared inverse property's prism:visibility; null when neither exists.
+  """
+  inverseVisibility: TermVisibility
 }
 
 enum PropertyKind {
   DATATYPE
   OBJECT
   ANNOTATION
+}
+
+"""
+How prominently a term is shown: prominent leads, normal is listed, hidden is a value and never an entity (prism:visibility).
+"""
+enum TermVisibility {
+  PROMINENT
+  NORMAL
+  HIDDEN
+}
+
+"""A sh:PropertyGroup: a named, ordered section of a class's properties."""
+type PropertyGroup {
+  """The group's IRI."""
+  uri: ID!
+
+  """rdfs:label in `lang` (exact tag, else untagged); null when undeclared."""
+  label(lang: String = "en"): String
+
+  """
+  sh:order: the group's position among a class's groups, ascending; null when undeclared.
+  """
+  order: Float
+}
+
+"""
+The role a property's values play for their subject (SHACL UI shui:propertyRole).
+"""
+enum PropertyRole {
+  LABEL
+  DESCRIPTION
+  DEPICTION
+  ICON
+  CLASSIFICATION
 }
 
 type NodeConnection {
@@ -105,11 +227,24 @@ type PageInfo {
   endCursor: String
 }
 
-type Thing implements Node {
-  uri: ID!
-  _meta: EntityMeta!
-  exName: String
-  exCount: Int
+type Query {
+  ontologies: [Ontology!]!
+  ontology(prefix: String!): Ontology
+  ontologyClass(uri: String!): OntologyClass
+  ontologyProperty(uri: String!): OntologyProperty
+
+  """Relay node resolution by absolute IRI."""
+  node(id: ID!): Node
+  thing(uri: String!): Thing
+  things(first: Int, after: String, last: Int, before: String): ThingConnection!
+}
+
+type Ontology {
+  prefix: String!
+  namespace: String!
+  label: String
+  classes: [OntologyClass!]!
+  properties: [OntologyProperty!]!
 }
 
 type ThingConnection {
