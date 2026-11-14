@@ -1,0 +1,137 @@
+---
+# SectionedView (packages/prism/core/src/lib/ui/SectionedView/): the generic
+# single-entity page (heuristics 3.1 to 3.3; PS8 V1, ps8-measured.json; M13,
+# M14). It takes the header, the facts and the sections as data and renders
+# the section index itself; nothing reads the DOM to list sections.
+# DOM order: header, aside (contents, facts), content (body, then one
+# <section> per entry with its <h2 id>).
+# The root is one subgrid of the canvas's page grid over every column.
+#
+# Reflow, bound in styles.css (thresholds are whole groups, container `shell`):
+#   three groups and wider (default): header and content on `1 / -4`, rows 1
+#     and 2; the aside on `-4 / -1`, `grid-row: 1 / span 2`, sticky at the
+#     scroller's top, `align-self: start`.
+#   `:not(:has(> .aside))`: header and content on `1 / -1` (1.1).
+#   @container shell (width < 1376px)  below three groups: every region on
+#     `1 / -1`; the aside is `display: contents`, its contents nav is not
+#     displayed and its facts take the row under the header (50a, 51a).
+# Every section heading carries `scroll-margin-block-start` of the bar's
+# block size, at every width; the DSL's roster has no key for it, so the
+# ledger below and the stylesheet carry it, and the anatomy check reads it
+# as an unkeyed property.
+#
+# Changed from the planner's anatomy, each for a reason:
+#   - The "On this page" bar, its `has-bar` state and its rows are not here
+#     yet: the slice that builds the bar adds its edge with the bar.
+#   - Keys are spelled as the DSL's roster spells them (`layout.alignSelf`,
+#     `layout.offset.block.start`); the per-width `display` values are
+#     reflow, which the stylesheet binds under its container query.
+#   - The body's slot is `body` and a section's content slot `section-body`:
+#     a slot's class is its name, and `content` names the content region.
+#   - The facts region is a subgrid, so a `KeyValueList` passed as facts
+#     keeps its terms and values on the page's column lines.
+#   - Every section takes the top margin, the first included: the check
+#     names no positional state, and the first section follows the header
+#     or the body.
+#
+# Token ledger (component tokens on `.ds.sectioned-view`):
+#   --sectioned-view-gap: --grid-gutter                      every grid here, both axes
+#   --sectioned-view-padding-block-end: container.gap.loose  the page ends one loose step above the canvas's end
+#   --sectioned-view-bar-block-size: calc(var(--density-line-height) + 2 * var(--space-050))
+#                                                            PS8 L171; 44px drawn; the bound is "at most 44px"
+#   --sectioned-view-section-margin-block-start: space.300   a section after another (external spacing, A2)
+#   --sectioned-view-aside-inset-block-start: 0              literal 0
+#   --sectioned-view-contents-label-color: color.text.muted  the "On this page" label
+# Literals: none but 0.
+node:
+  uri: prism.component.sectioned_view
+  element: article
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+    spacing.internal.block.end: container.gap.loose
+  edges:
+    - node:
+        role: header region
+        styles:
+          layout.grid.column: "1 / -4"
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: aside
+        element: aside
+        styles:
+          layout.grid.column: "-4 / -1"
+          layout.grid.row: "1 / span 2"
+          layout.alignSelf: start
+          layout.position: sticky
+          layout.offset.block.start: 0
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              role: contents
+              element: nav
+              attributes: { aria-labelledby: "{labelId}" }
+              styles: { layout.grid.column: "1 / -1" }
+              edges:
+                - node:
+                    role: label
+                    element: h2
+                    styles: { typography.color: color.text.muted }
+                  relation: { cardinality: "1", slotName: label }
+                - node:
+                    uri: prism.subcomponent.contents_list
+                  relation: { cardinality: "1", slotName: list }
+            relation: { cardinality: "0..1", slotName: contents }   # absent with no section
+          - node:
+              role: facts
+              styles:
+                layout.grid.column: "1 / -1"
+                layout.type: grid
+                layout.grid.columns: subgrid
+                spacing.gap: grid.gutter
+            relation: { cardinality: "0..1", slotName: facts }      # absent when facts renders nothing
+      relation: { cardinality: "0..1", slotName: aside }            # absent with no section and no facts
+    - node:
+        role: content region
+        styles:
+          layout.grid.column: "1 / -4"
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              role: body
+              styles: { layout.grid.column: "1 / -1", layout.type: grid, layout.grid.columns: subgrid, spacing.gap: grid.gutter }
+            relation: { cardinality: "0..1", slotName: body }       # children; absent when they render nothing
+          - node:
+              role: section
+              element: section
+              attributes: { aria-labelledby: "{id}" }
+              styles:
+                layout.grid.column: "1 / -1"
+                layout.type: grid
+                layout.grid.columns: subgrid
+                spacing.gap: grid.gutter
+                spacing.external.block.start: space.300
+              edges:
+                - node:
+                    role: heading
+                    element: h2
+                    attributes: { id: "{id}" }
+                    styles:
+                      layout.grid.column: "1 / -1"
+                  relation: { cardinality: "1", slotName: heading }
+                - node:
+                    role: section content
+                    styles: { layout.grid.column: "1 / -1", layout.type: grid, layout.grid.columns: subgrid, spacing.gap: grid.gutter }
+                  relation: { cardinality: "1", slotName: section-body }
+            relation: { cardinality: "0..*", slotName: section }
+      relation: { cardinality: "1", slotName: content }

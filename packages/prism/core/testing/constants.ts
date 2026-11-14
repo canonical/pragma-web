@@ -224,11 +224,14 @@ export const LINK_QUALIFIERS: readonly string[] = ["[href]"];
 
 /**
  * The properties no style key binds, because they set no design decision:
- * generated content, and whether forced colours may repaint an element.
+ * generated content, whether forced colours may repaint an element, and
+ * where a heading stops when a link scrolls to it, which the anatomy DSL's
+ * roster has no key for and a component reads through its own token.
  */
 export const UNKEYED_PROPERTIES: readonly string[] = [
   "content",
   "forced-color-adjust",
+  "scroll-margin-block-start",
 ];
 
 /**

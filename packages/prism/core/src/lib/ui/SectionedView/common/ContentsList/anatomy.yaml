@@ -1,0 +1,59 @@
+---
+# ContentsList (packages/prism/core/src/lib/ui/SectionedView/common/ContentsList/):
+# the ordered list of the sections passed in, one link per section to
+# `#<id>`, in order; the current section's link carries
+# aria-current="location" once a script has measured it (never on the
+# server). Used twice: in the aside's contents nav and in the bar's panel.
+# Private to SectionedView (cs:react.component.subcomponent_export_api).
+# Reference: PS8 V1 `.mockup-toc` (L148: the current entry is bold with a 2px
+# inset rule at its start).
+#
+# Token ledger (on `.ds.contents-list`):
+#   --contents-list-gap: space.050                          between entries
+#   --contents-list-link-padding-block: space.050
+#   --contents-list-link-padding-inline: space.100
+#   --contents-list-link-color: color.text
+#   --contents-list-current-font-weight: typography.text.primary.bold.fontWeight
+#   --contents-list-current-rule-color: color.border.highlighted
+#   --contents-list-current-rule-width: 2px                 literal (PS8 L148)
+#   --contents-list-focus-ring-color: color.focusRing
+#   --contents-list-focus-ring-width: 2px, --contents-list-focus-ring-offset: -2px   literals
+#
+# Changed from the planner's anatomy: keys are spelled as the DSL's roster
+# spells them (`layout.listStyle`, `typography.weight`). The roster has no
+# key for the current entry's inset rule; it stays named here as
+# `appearance.boxShadow@current`, the stylesheet's `box-shadow` through the
+# two tokens above.
+node:
+  uri: prism.subcomponent.contents_list
+  element: ol
+  styles:
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: space.050
+    spacing.internal.inline.start: 0
+    spacing.external.block: 0
+    layout.listStyle: none
+  edges:
+    - node:
+        role: entry
+        element: li
+        edges:
+          - node:
+              role: link
+              element: a
+              attributes: { href: "#{id}", aria-current: "location when current" }
+              styles:
+                layout.type: block
+                spacing.internal.block.start: space.050
+                spacing.internal.block.end: space.050
+                spacing.internal.inline.start: space.100
+                typography.color: color.text
+                typography.weight@current: typography.text.primary.bold.fontWeight
+                appearance.boxShadow@current: "inset 2px 0 0 color.border.highlighted"
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
+            relation: { cardinality: "1", slotName: link }
+      relation: { cardinality: "1..*", slotName: entry }
