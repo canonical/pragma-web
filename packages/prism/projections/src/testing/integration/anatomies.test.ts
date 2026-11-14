@@ -70,6 +70,10 @@ const UI_TOKENS = [
   "--color-foreground-ghost-hover",
   "--color-foreground-secondary",
   "--color-text-muted",
+  "--popover-border-width",
+  "--popover-color-border",
+  "--popover-padding-horizontal",
+  "--popover-padding-vertical",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-font-size",
   "--typography-text-primary-font-weight",
@@ -138,9 +142,10 @@ describe("the package's components", () => {
     });
   }
 
-  it("and the card's specimen, its one subcomponent", () => {
+  it("and the subcomponents: the card's specimen and the chip's peek", () => {
     expect(subcomponentFolders.map((folder) => basename(folder))).toEqual([
       "Specimen",
+      "Peek",
     ]);
   });
 
@@ -162,6 +167,12 @@ describe("the package's components", () => {
   }
 });
 
+/**
+ * The semantic tokens the projections read beyond the shim: the peek's
+ * address line is muted.
+ */
+const PROJECTION_TOKENS = ["--color-text-muted"];
+
 describe("the package's stylesheets", () => {
   it("keep the design's token and grid rules in the generic representations", () => {
     expect(() =>
@@ -176,7 +187,11 @@ describe("the package's stylesheets", () => {
   for (const directory of [NODE_DIRECTORY, ONTOLOGY_DIRECTORY]) {
     it(`keep the design's token and grid rules in ${basename(directory)}'s projections`, () => {
       expect(() =>
-        assertStylesheets({ directory, layer: "ds.components.global" }),
+        assertStylesheets({
+          directory,
+          layer: "ds.components.global",
+          externalTokens: PROJECTION_TOKENS,
+        }),
       ).not.toThrow();
     });
   }

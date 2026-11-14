@@ -90,29 +90,4 @@
     outline-color: var(--entity-chip-focus-ring-color);
     outline-offset: var(--entity-chip-focus-ring-offset);
   }
-
-  /* The peek, mounted on the document's body and shown in the top layer
-   * while open: tethered below the pill's start, above it when the
-   * viewport has no room below; it scrolls rather than outgrowing the
-   * viewport. It is outside the pill, so it declares its own tokens: the
-   * drawn 248px card, 4px below the pill, no taller than the viewport less
-   * 4px at each end. The card draws its own frame, so the peek adds none. */
-  .ds.entity-chip-peek {
-    --entity-chip-peek-width: 248px;
-    --entity-chip-peek-offset: var(--space-050);
-    --entity-chip-peek-max-height: calc(100dvh - var(--space-100));
-    --entity-chip-peek-background: var(--color-background);
-
-    position-area: block-end span-inline-end;
-    position-try-fallbacks: flip-block;
-    width: var(--entity-chip-peek-width);
-    max-height: var(--entity-chip-peek-max-height);
-    overflow-y: auto;
-    margin-block-start: var(--entity-chip-peek-offset);
-    margin-block-end: 0;
-    margin-inline: 0;
-    padding: 0;
-    border-width: 0;
-    background: var(--entity-chip-peek-background);
-  }
 }

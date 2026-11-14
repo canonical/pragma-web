@@ -19,7 +19,10 @@ describe("ProjectionPeek SSR", () => {
       }),
     );
     const html = renderToString(
-      createSiteTree(environment, <ProjectionPeek uri="ds:button" />),
+      createSiteTree(
+        environment,
+        <ProjectionPeek uri="https://ds.canonical.com/global.component.icon-button" />,
+      ),
     );
     expect(html).toContain("ds entity-card");
   });

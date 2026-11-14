@@ -28,7 +28,7 @@ const meta: Meta<typeof Component> = {
   tags: ["autodocs"],
   decorators: [withProjectionSite(), withRelayEnvironment],
   parameters: { relay: mockEntity() },
-  args: { uri: "ds:global.component.button" },
+  args: { uri: "https://ds.canonical.com/global.component.icon-button" },
 };
 
 export default meta;

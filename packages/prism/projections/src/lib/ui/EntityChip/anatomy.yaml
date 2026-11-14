@@ -11,7 +11,7 @@
 # The title is the link (LinkComponent, href) unless `linked` is false; an
 # unlinked chip is inert text and has no peek (nothing to focus). The peek is
 # never inside the <a>: while open it is mounted through a portal on the
-# document's body (class `ds entity-chip-peek`), outside the paragraph a
+# document's body (the chip's Peek, common/Peek/), outside the paragraph a
 # mention sits in, whose phrasing content cannot hold a card; it is still
 # the root's child in the React tree, so its pointer, focus and key events
 # reach the chip, and focus moving between the chip and the peek keeps it
@@ -44,9 +44,10 @@
 # the chip's root (the pill), not the link, so "4px below the chip" holds
 # and the published LinkComponent, which takes no ref or style, needs no
 # wrapper; the anchor-name and position-anchor are set inline from useId
-# (an instance's ident cannot live in a stylesheet). The peek draws no
-# padding or border of its own: the EntityCard it holds draws the frame,
-# and a popover frame around it would draw a frame in a frame. The
+# (an instance's ident cannot live in a stylesheet). The peek is the frame,
+# as PS1 V4's peek draws it (its anatomy is common/Peek's): the popover's
+# padding and border round the card it holds, which draws no border of its
+# own (ProjectionPeek), and the address line under the card. The
 # dialog's name is a hidden label inside it (aria-labelledby), since the
 # title is a node, not a string.
 #
@@ -65,10 +66,6 @@
 #   --entity-chip-focus-ring-color: color.focusRing
 #   --entity-chip-focus-ring-width: 2px, --entity-chip-focus-ring-offset: -2px  literals
 #   --entity-chip-max-width: 100%                 literal
-#   --entity-chip-peek-width: 248px               literal: the drawn peek (M9)
-#   --entity-chip-peek-offset: space.050 (4px)    below the chip
-#   --entity-chip-peek-max-height: calc(100dvh - space.100)   viewport less 8px
-#   --entity-chip-peek-background: color.background
 #   --entity-chip-mark-size: space.200 (16px)
 #   PEEK_OPEN_DELAY_MS = 500, PEEK_CLOSE_DELAY_MS = 200 (constants.ts, not CSS)
 node:
@@ -135,28 +132,7 @@ node:
           appearance.outline.offset@focus: -2px
       relation: { cardinality: "0..1", slotName: value }
     - node:
-        role: peek
-        styles:
-          size.width: 248px
-          size.max.height: "calc(100dvh - var(--space-100))"
-          layout.overflow.block: auto
-          spacing.external.block.start: space.050
-          spacing.external.block.end: 0
-          spacing.external.inline.start: 0
-          spacing.external.inline.end: 0
-          spacing.internal.block.start: 0
-          spacing.internal.block.end: 0
-          spacing.internal.inline.start: 0
-          spacing.internal.inline.end: 0
-          appearance.border.width: 0
-          appearance.background: color.background
-        edges:
-          - node:
-              role: label
-            relation: { cardinality: "1", slotName: label }
-          - node:
-              uri: prism.component.entity_card
-            relation: { cardinality: "1", slotName: card }
+        uri: prism.component.entity_chip.peek
       relation: { cardinality: "0..1", slotName: peek }
     - node:
         uri: global.component.badge

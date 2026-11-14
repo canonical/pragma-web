@@ -1,12 +1,17 @@
 ---
-# ProjectionPeek: the card a chip's peek shows. It renders no element of
-# its own: it runs ProjectionPeekQuery, `node(id: $id)` with the node's
-# absolute IRI (Node.uri; node(id:) accepts no CURIE), and hands the node to the card dispatcher inside a
-# Suspense boundary, so the card's own anatomy is the peek's content.
+# ProjectionPeek: what a chip's peek shows. It runs ProjectionPeekQuery,
+# `node(id: $id)` with the node's absolute IRI (Node.uri; node(id:)
+# accepts no CURIE), reading the node's compact address and handing the
+# node to the card dispatcher inside a Suspense boundary. It renders the
+# card, then the address line under it (PS1 V4's peek; heuristic 4.3: the
+# full CURIE shows in the peek, copyable there, "Copied" announced): the
+# CURIE in monospace, muted, and core's CopyButton. The chip's peek is the
+# frame (the popover's padding and border), so the card draws no border of
+# its own inside it.
 #
 # The query is lazy: the chip mounts the peek only while it is open, so a
 # chip's fragment never spreads a card's (no fragment cycle, no card read
-# on the server for a mention). The node field reads no field of its own;
+# on the server for a mention). The node field reads its compact address;
 # the card dispatcher's fragment reads the rest.
 #
 # Both the Suspense boundary and an ErrorBoundary (prism-core) have a null
@@ -15,7 +20,17 @@
 # replacing the page region the chip sits in; the chip's link is the way to
 # the node in every case.
 #
-# No styles: the chip's peek dialog sizes and places the card.
+# The chip's peek dialog sizes and places it; it renders nothing at all
+# (no element, no address line) while loading and when there is no node,
+# so the chip's frame, which is not displayed while empty, shows no box.
+#
+# Token ledger (every decision; a literal only where no symbol exists):
+#   --projection-peek-card-border-width: 0      the frame encloses the card
+#   --projection-peek-address-spacing: space.100 (8px) above the line
+#   --projection-peek-address-gap: grid.gutter between the CURIE and Copy
+#   --projection-peek-curie-color: color.text.muted
+#   --projection-peek-curie-font-family: ui-monospace, monospace   literal: no mono token
+#   --projection-peek-curie-wrap: anywhere      keyword: a long CURIE breaks
 node:
   uri: prism.component.projection_peek
   projection:
@@ -25,6 +40,34 @@ node:
         uri: prism.component.card_projection
         projection:
           on: Node
+        styles:
+          appearance.border.width: 0
       relation:
-        cardinality: "0..1"
+        cardinality: "1"
         slotName: card
+    - node:
+        role: address
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap.inline: grid.gutter
+          spacing.external.block.start: space.100
+          spacing.external.block.end: 0
+          spacing.internal.block.start: 0
+          spacing.internal.block.end: 0
+        edges:
+          - node:
+              role: curie
+              projection:
+                field: node._meta.curie
+              styles:
+                size.min.width: 0
+                typography.color: color.text.muted
+                typography.fontFamily: "ui-monospace, monospace"
+                typography.wrap: anywhere
+            relation: { cardinality: "1", slotName: curie }
+          - node:
+              uri: prism.component.copy_button
+            relation: { cardinality: "1", slotName: copy }
+      relation: { cardinality: "1", slotName: address }

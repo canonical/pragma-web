@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0979e15dc7befb39f9e3d57931b1eb22>>
+ * @generated SignedSource<<6d3538c669789c58f946db5ba25f8f1e>>
  * @lightSyntaxTransform
  */
 
@@ -14,6 +14,9 @@ export type ProjectionPeekQuery$variables = {
 };
 export type ProjectionPeekQuery$data = {
   readonly node: {
+    readonly _meta: {
+      readonly curie: string;
+    };
     readonly " $fragmentSpreads": FragmentRefs<"CardProjection_node">;
   } | null | undefined;
 };
@@ -41,24 +44,31 @@ v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "title",
+  "name": "curie",
   "storageKey": null
 },
 v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "definition",
+  "name": "title",
   "storageKey": null
 },
 v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
+  "name": "definition",
+  "storageKey": null
+},
+v5 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
   "name": "uri",
   "storageKey": null
 },
-v5 = [
+v6 = [
   {
     "alias": null,
     "args": null,
@@ -67,11 +77,11 @@ v5 = [
     "name": "_meta",
     "plural": false,
     "selections": [
-      (v2/*:: as any*/)
+      (v3/*:: as any*/)
     ],
     "storageKey": null
   },
-  (v4/*:: as any*/)
+  (v5/*:: as any*/)
 ];
 return {
   "fragment": {
@@ -88,6 +98,18 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "EntityMeta",
+            "kind": "LinkedField",
+            "name": "_meta",
+            "plural": false,
+            "selections": [
+              (v2/*:: as any*/)
+            ],
+            "storageKey": null
+          },
           {
             "args": null,
             "kind": "FragmentSpread",
@@ -122,10 +144,6 @@ return {
             "storageKey": null
           },
           {
-            "kind": "TypeDiscriminator",
-            "abstractKey": "__isNode"
-          },
-          {
             "alias": null,
             "args": null,
             "concreteType": "EntityMeta",
@@ -134,14 +152,8 @@ return {
             "plural": false,
             "selections": [
               (v2/*:: as any*/),
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "curie",
-                "storageKey": null
-              },
               (v3/*:: as any*/),
+              (v4/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -149,13 +161,17 @@ return {
                 "kind": "LinkedField",
                 "name": "type",
                 "plural": false,
-                "selections": (v5/*:: as any*/),
+                "selections": (v6/*:: as any*/),
                 "storageKey": null
               }
             ],
             "storageKey": null
           },
-          (v4/*:: as any*/),
+          {
+            "kind": "TypeDiscriminator",
+            "abstractKey": "__isNode"
+          },
+          (v5/*:: as any*/),
           {
             "kind": "InlineFragment",
             "selections": [
@@ -166,7 +182,7 @@ return {
                 "name": "isAbstract",
                 "storageKey": null
               },
-              (v3/*:: as any*/),
+              (v4/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -174,7 +190,7 @@ return {
                 "kind": "LinkedField",
                 "name": "superclass",
                 "plural": false,
-                "selections": (v5/*:: as any*/),
+                "selections": (v6/*:: as any*/),
                 "storageKey": null
               }
             ],
@@ -187,16 +203,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a98327ccf712d4c2b789e8bee37596da",
+    "cacheID": "15e46433cdf9ff02396ca932fbea0f2c",
     "id": null,
     "metadata": {},
     "name": "ProjectionPeekQuery",
     "operationKind": "query",
-    "text": "query ProjectionPeekQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...CardProjection_node\n    uri\n  }\n}\n\nfragment CardProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeCard_node\n  ...SiteCardSlot_node\n  ...OntologyClassCard_node\n}\n\nfragment NodeCard_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    definition\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassCard_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n  superclass {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment SiteCardSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n"
+    "text": "query ProjectionPeekQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    _meta {\n      curie\n    }\n    ...CardProjection_node\n    uri\n  }\n}\n\nfragment CardProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeCard_node\n  ...SiteCardSlot_node\n  ...OntologyClassCard_node\n}\n\nfragment NodeCard_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    definition\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassCard_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n  superclass {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment SiteCardSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n"
   }
 };
 })();
 
-(node as any).hash = "eac5e8b1967caca2ffa2f674a0432df5";
+(node as any).hash = "a77e618dcf7d3e2cee34f95d215d28e2";
 
 export default node;

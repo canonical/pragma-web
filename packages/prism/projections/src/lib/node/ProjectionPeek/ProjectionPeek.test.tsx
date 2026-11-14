@@ -28,6 +28,10 @@ const renderPeek = (uri: string, failure?: Error) => {
     return operation.request.variables.id === NODE_IRI
       ? MockPayloadGenerator.generate(operation, {
           Node: resolveRoot({ ...MOCK_NODE, uri: NODE_IRI }),
+          // The node's own meta, which the peek's query reads beside the
+          // card's fragment.
+          EntityMeta: (context) =>
+            context.path?.length === 2 ? MOCK_NODE._meta : undefined,
         })
       : { data: { node: null } };
   });
@@ -47,6 +51,21 @@ describe("ProjectionPeek", () => {
     const { container, variables } = renderPeek(NODE_IRI);
     expect(variables).toEqual([{ id: NODE_IRI }]);
     expect(container.querySelector(".ds.entity-card")).not.toBeNull();
+  });
+
+  it("puts the node's CURIE under its card, with a Copy button", () => {
+    const { container } = renderPeek(NODE_IRI);
+    const peek = container.querySelector(".ds.projection-peek");
+    expect([...(peek?.children ?? [])].map((child) => child.className)).toEqual(
+      [expect.stringContaining("entity-card"), "address"],
+    );
+    const address = peek?.querySelector(".address");
+    expect(address?.querySelector("code.curie")?.textContent).toBe(
+      MOCK_NODE._meta.curie,
+    );
+    expect(address?.querySelector(".ds.copy-button button")?.textContent).toBe(
+      "Copy",
+    );
   });
 
   it("renders nothing for a CURIE, an address node(id:) does not accept", () => {

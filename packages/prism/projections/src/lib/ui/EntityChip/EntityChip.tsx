@@ -4,6 +4,7 @@ import { Icon } from "@canonical/react-ds-global";
 import { type ReactElement, useId } from "react";
 import { createPortal } from "react-dom";
 import { Message } from "../../i18n/index.js";
+import { Peek } from "./common/index.js";
 import usePeek from "./hooks/usePeek.js";
 import type { EntityChipProps } from "./types.js";
 import "./styles.css";
@@ -82,7 +83,6 @@ export default function EntityChip({
   // A dashed ident from the instance's id: the anchor the peek is tethered
   // to, unique on the page.
   const anchor = `--entity-chip-${id.replace(/[^\w-]/g, "")}`;
-  const labelId = `${id}-peek-label`;
   const name = title ?? value;
   const nameClass = title === undefined ? "value" : "title";
   return (
@@ -113,19 +113,13 @@ export default function EntityChip({
       )}
       {open
         ? createPortal(
-            <div
-              aria-labelledby={labelId}
-              className="ds entity-chip-peek"
-              popover="manual"
+            <Peek
+              anchor={anchor}
+              label={<Message elements={{ title: name }} id="chip.peek" />}
               ref={peekRef}
-              role="dialog"
-              style={{ positionAnchor: anchor }}
             >
-              <span hidden id={labelId}>
-                <Message elements={{ title: name }} id="chip.peek" />
-              </span>
               {peek}
-            </div>,
+            </Peek>,
             document.body,
           )
         : null}
