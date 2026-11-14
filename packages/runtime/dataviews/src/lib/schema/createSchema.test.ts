@@ -46,15 +46,17 @@ describe("createSchema", () => {
     types.push("container");
     // The copy answers, not the caller's array: a schema whose scoping
     // could change under it would scope a field one way per read.
-    expect(scoped.fields[0].appliesTo).toEqual(["virtual-machine"]);
-    expect(scoped.fields[1].appliesTo).toEqual(["virtual-machine"]);
-    expect(Object.isFrozen(scoped.fields[0].appliesTo)).toBe(true);
-    expect(scoped.fields[0].options).toEqual(["container"]);
+    const [typeField, securebootField] = scoped.fields;
+    expect(typeField.appliesTo).toEqual(["virtual-machine"]);
+    expect(securebootField.appliesTo).toEqual(["virtual-machine"]);
+    expect(Object.isFrozen(typeField.appliesTo)).toBe(true);
+    expect(typeField.options).toEqual(["container"]);
   });
 
   it("leaves an unscoped field with no scoping at all", () => {
-    expect(schema.fields[0]).not.toHaveProperty("appliesTo");
-    expect(schema.fields[1]).not.toHaveProperty("appliesTo");
+    const [first, second] = schema.fields;
+    expect(first).not.toHaveProperty("appliesTo");
+    expect(second).not.toHaveProperty("appliesTo");
   });
 
   it("rejects a field scoped to no record type", () => {

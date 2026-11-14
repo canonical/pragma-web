@@ -12,7 +12,7 @@ import { createSchema } from "../schema/index.js";
 import decodeQuery from "./decodeQuery.js";
 import encodeQuery from "./encodeQuery.js";
 
-const machines = () =>
+const createMachines = () =>
   createSchema([
     {
       field: "status",
@@ -26,7 +26,10 @@ const machines = () =>
   ]);
 
 const decode = (search: string) =>
-  decodeQuery({ schema: machines(), params: new URLSearchParams(search) });
+  decodeQuery({
+    schema: createMachines(),
+    params: new URLSearchParams(search),
+  });
 
 const noQuery = { filter: [], search: null, sort: [], group: [] };
 
@@ -82,7 +85,7 @@ describe("decodeQuery", () => {
     // Written back, the delimited spelling is respelled bare, once per option.
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: mixed.slice,
         window: null,
       }).toString(),
@@ -235,7 +238,7 @@ describe("decodeQuery", () => {
 
   it("drops a cursor the source cannot reach, and says so once", () => {
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams("page=3&cursor=after-page-two&sort=cpu__asc"),
       capabilities: declare({ sort: declareSort(["cpu"]) }),
     });
@@ -625,7 +628,7 @@ describe("decodeQuery", () => {
 
   it("reports a clause the source cannot execute under each key that spelled it", () => {
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams("status__isAny=ready&status=failed"),
       capabilities: declare({}),
     });
@@ -644,7 +647,7 @@ describe("decodeQuery", () => {
       sort: declareSort(["cpu"], 1),
     });
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams(
         "status=ready&cpu__gte=4&cpu__lte=8&owner__isSet=1&q=yak&sort=cpu__asc&group=status",
       ),
@@ -689,7 +692,7 @@ describe("decodeQuery", () => {
 
   it("reports every refusal one clause earns", () => {
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams("sort=cpu__asc&sort=name__desc"),
       capabilities: declare({ sort: declareSort(["status"]) }),
     });
@@ -715,7 +718,7 @@ describe("decodeQuery", () => {
       sort: declareSort(["cpu", "name"], 1),
     });
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams("sort=cpu__asc&sort=name__desc"),
       capabilities,
     });
@@ -731,7 +734,7 @@ describe("decodeQuery", () => {
     // A field spelled twice is one term, so it fits the same limit.
     expect(
       decodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         params: new URLSearchParams("sort=cpu__asc&sort=cpu__desc"),
         capabilities,
       }),
@@ -744,7 +747,7 @@ describe("decodeQuery", () => {
   it("checks only the grammar and the schema without a declaration", () => {
     for (const capabilities of [undefined, null]) {
       const decoded = decodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         params: new URLSearchParams("q=yak&sort=cpu__asc&group=status"),
         capabilities,
       });
@@ -760,7 +763,7 @@ describe("decodeQuery", () => {
 
   it("refuses an ordering whole rather than truncating it", () => {
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams("sort=cpu__asc&sort=name__desc"),
       capabilities: declare({ sort: declareSort(["cpu"]) }),
     });
@@ -777,7 +780,7 @@ describe("decodeQuery", () => {
 
   it("refuses a grouping whole rather than truncating it", () => {
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams("group=status&group=region"),
       capabilities: declare({
         group: {
@@ -801,7 +804,7 @@ describe("decodeQuery", () => {
 
   it("keeps a grouping the source declares it can nest", () => {
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams("group=status&group=owner"),
       capabilities: declare({
         group: {
@@ -820,7 +823,7 @@ describe("decodeQuery", () => {
   });
 
   it("round-trips an encoded query", () => {
-    const schema = machines();
+    const schema = createMachines();
     const slice = {
       filter: [
         { field: "cpu", operator: "gte" as const, operands: [4] },
@@ -977,7 +980,7 @@ describe("decodeQuery, conjunct ordinals", () => {
 
   it("refuses each conjunct the source cannot execute under its own key", () => {
     const decoded = decodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       params: new URLSearchParams(
         "status__isNone=failed&status__isNone__1=ready&cpu__gte=4",
       ),

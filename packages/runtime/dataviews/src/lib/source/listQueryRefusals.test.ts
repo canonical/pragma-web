@@ -12,7 +12,7 @@ import type { SourceCapabilities } from "./types.js";
 
 const emptySlice: Slice = { filter: [], search: null, sort: [], group: [] };
 
-const query = (
+const buildQuery = (
   slice: Partial<Slice> = {},
   window: Partial<ResultWindow> = {},
 ): Query => ({
@@ -33,7 +33,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         permissive,
-        query(
+        buildQuery(
           {
             filter: [
               { field: "status", operator: "isAny", operands: ["failed"] },
@@ -52,7 +52,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         permissive,
-        query({
+        buildQuery({
           filter: [
             { field: "status", operator: "isNone", operands: ["failed"] },
             { field: "status", operator: "isNone", operands: ["ready"] },
@@ -68,14 +68,16 @@ describe("listQueryRefusals", () => {
   });
 
   it("freezes the refusals it collects", () => {
-    expect(Object.isFrozen(listQueryRefusals(permissive, query()))).toBe(true);
+    expect(Object.isFrozen(listQueryRefusals(permissive, buildQuery()))).toBe(
+      true,
+    );
   });
 
   it("refuses a filter on a field it does not declare", () => {
     expect(
       listQueryRefusals(
         permissive,
-        query({
+        buildQuery({
           filter: [{ field: "zone", operator: "isAny", operands: ["eu-west"] }],
         }),
       ),
@@ -94,7 +96,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         permissive,
-        query({
+        buildQuery({
           filter: [{ field: "status", operator: "isSet", operands: [] }],
         }),
       ),
@@ -112,7 +114,9 @@ describe("listQueryRefusals", () => {
   it("reads a field declared with no operator as unfilterable", () => {
     const refusals = listQueryRefusals(
       declare({ filter: { cpu: [] } }),
-      query({ filter: [{ field: "cpu", operator: "gte", operands: [1] }] }),
+      buildQuery({
+        filter: [{ field: "cpu", operator: "gte", operands: [1] }],
+      }),
     );
     expect(refusals).toMatchObject([
       { code: "undeclared-field", field: "cpu" },
@@ -120,7 +124,9 @@ describe("listQueryRefusals", () => {
   });
 
   it("refuses a search on a source that declares none", () => {
-    expect(listQueryRefusals(declare({}), query({ search: "web" }))).toEqual([
+    expect(
+      listQueryRefusals(declare({}), buildQuery({ search: "web" })),
+    ).toEqual([
       {
         part: "search",
         code: "undeclared-field",
@@ -135,7 +141,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         declare({}),
-        query({ sort: [{ field: "cpu", direction: "asc" }] }),
+        buildQuery({ sort: [{ field: "cpu", direction: "asc" }] }),
       ),
     ).toEqual([
       {
@@ -152,7 +158,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         declare({ sort: declareSort(["cpu", "name"], 1) }),
-        query({
+        buildQuery({
           sort: [
             { field: "cpu", direction: "asc" },
             { field: "name", direction: "desc" },
@@ -174,7 +180,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         declare({ sort: declareSort(["cpu"], 1) }),
-        query({
+        buildQuery({
           sort: [
             { field: "cpu", direction: "asc" },
             { field: "zone", direction: "desc" },
@@ -191,7 +197,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         declare({ sort: declareSort(["cpu"], 1) }),
-        query({
+        buildQuery({
           sort: [
             { field: "cpu", direction: "asc" },
             { field: "cpu", direction: "desc" },
@@ -207,7 +213,7 @@ describe("listQueryRefusals", () => {
         declare({
           sort: declareSort(["cpu", "name", "zone"], 2),
         }),
-        query({
+        buildQuery({
           sort: [
             { field: "cpu", direction: "asc" },
             { field: "name", direction: "desc" },
@@ -222,7 +228,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         declare({ sort: declareSort(["cpu"]) }),
-        query({ sort: [{ field: "zone", direction: "asc" }] }),
+        buildQuery({ sort: [{ field: "zone", direction: "asc" }] }),
       ),
     ).toEqual([
       {
@@ -237,7 +243,10 @@ describe("listQueryRefusals", () => {
 
   it("refuses any grouping on a source declaring no levels", () => {
     expect(
-      listQueryRefusals(declare({}), query({ group: [{ field: "status" }] })),
+      listQueryRefusals(
+        declare({}),
+        buildQuery({ group: [{ field: "status" }] }),
+      ),
     ).toEqual([
       {
         part: "group",
@@ -262,13 +271,13 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         shallow,
-        query({ group: [{ field: "status" }] }),
+        buildQuery({ group: [{ field: "status" }] }),
       ).filter((refusal) => refusal.part === "group"),
     ).toEqual([]);
     expect(
       listQueryRefusals(
         shallow,
-        query({ group: [{ field: "status" }, { field: "zone" }] }),
+        buildQuery({ group: [{ field: "status" }, { field: "zone" }] }),
       ),
     ).toEqual([
       {
@@ -293,7 +302,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         deeper,
-        query({
+        buildQuery({
           group: [
             { field: "status" },
             { field: "status" },
@@ -306,7 +315,7 @@ describe("listQueryRefusals", () => {
 
   it("refuses a grouping level on a field it cannot group", () => {
     expect(
-      listQueryRefusals(permissive, query({ group: [{ field: "zone" }] })),
+      listQueryRefusals(permissive, buildQuery({ group: [{ field: "zone" }] })),
     ).toEqual([
       {
         part: "group",
@@ -320,7 +329,10 @@ describe("listQueryRefusals", () => {
 
   it("refuses a collapsed group on a source that cannot leave rows out", () => {
     expect(
-      listQueryRefusals(declare({}), query({}, { collapsed: [["failed"]] })),
+      listQueryRefusals(
+        declare({}),
+        buildQuery({}, { collapsed: [["failed"]] }),
+      ),
     ).toEqual([
       {
         part: "window",
@@ -333,17 +345,17 @@ describe("listQueryRefusals", () => {
   });
 
   it("refuses a cursor on a source that pages by number", () => {
-    expect(listQueryRefusals(declare({}), query({}, { cursor: "c1" }))).toEqual(
-      [
-        {
-          part: "window",
-          code: "unreachable-page",
-          field: null,
-          operator: null,
-          reason: "this source pages by number and reaches no page by token",
-        },
-      ],
-    );
+    expect(
+      listQueryRefusals(declare({}), buildQuery({}, { cursor: "c1" })),
+    ).toEqual([
+      {
+        part: "window",
+        code: "unreachable-page",
+        field: null,
+        operator: null,
+        reason: "this source pages by number and reaches no page by token",
+      },
+    ]);
   });
 
   it("leaves a cursor alone on a source that pages by token", () => {
@@ -352,7 +364,7 @@ describe("listQueryRefusals", () => {
         declare({
           pagination: { kind: "cursor", backward: false, durable: true },
         }),
-        query({}, { cursor: "c1" }),
+        buildQuery({}, { cursor: "c1" }),
       ),
     ).toEqual([]);
   });
@@ -361,7 +373,7 @@ describe("listQueryRefusals", () => {
     expect(
       listQueryRefusals(
         declare({}),
-        query(
+        buildQuery(
           {
             filter: [{ field: "zone", operator: "isAny", operands: ["eu"] }],
             search: "web",
@@ -377,7 +389,7 @@ describe("listQueryRefusals", () => {
   it("canonicalizes first, so one query always refuses the same way", () => {
     const respelled = listQueryRefusals(
       permissive,
-      query({
+      buildQuery({
         filter: [
           { field: "zone", operator: "isAny", operands: ["b", "a"] },
           { field: "zone", operator: "isAny", operands: ["a", "b"] },
@@ -385,6 +397,6 @@ describe("listQueryRefusals", () => {
       }),
     );
     expect(respelled).toHaveLength(1);
-    expect(respelled[0]).toMatchObject({ field: "zone" });
+    expect(respelled.at(0)).toMatchObject({ field: "zone" });
   });
 });

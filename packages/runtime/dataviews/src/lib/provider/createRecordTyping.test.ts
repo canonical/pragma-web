@@ -7,29 +7,22 @@
  */
 import { describe, expect, it } from "vitest";
 import buildRowModel from "../../../testing/buildRowModel.js";
+import type {
+  ContainerInstance as Container,
+  Instance,
+  VirtualMachineInstance as VirtualMachine,
+} from "../../../testing/types.js";
 import { createCollection } from "../collection/index.js";
 import { createChannel } from "../observable/index.js";
 import { EMPTY_ROW_MODEL, type RowModel } from "../rows/index.js";
 import { createSelection } from "../selection/index.js";
 import createRecordTyping from "./createRecordTyping.js";
 
-type Container = {
-  readonly id: string;
-  readonly type: "container";
-  readonly processes?: number;
-};
-type VirtualMachine = {
-  readonly id: string;
-  readonly type: "virtual-machine";
-  readonly secureboot?: string;
-};
-type Instance = Container | VirtualMachine;
+const readId = (instance: Instance): string => instance.id;
 
-const byId = (instance: Instance): string => instance.id;
-
-const instances = () =>
+const createInstances = () =>
   createCollection({
-    identify: byId,
+    identify: readId,
     discriminator: "type",
     fields: [
       {
@@ -48,32 +41,32 @@ const instances = () =>
     ],
   });
 
-const container = (id: string): Container => ({ id, type: "container" });
-const machine = (id: string): VirtualMachine => ({
+const buildContainer = (id: string): Container => ({ id, type: "container" });
+const buildMachine = (id: string): VirtualMachine => ({
   id,
   type: "virtual-machine",
 });
 
 /** One typing over a model and a selection the case drives directly. */
-const typing = (model: RowModel<Instance> = EMPTY_ROW_MODEL) => {
+const createTyping = (model: RowModel<Instance> = EMPTY_ROW_MODEL) => {
   const selection = createSelection();
   const rows = createChannel<RowModel<Instance>>(model);
   const record = createRecordTyping({
-    collection: instances(),
+    collection: createInstances(),
     selection,
     rows,
   });
   return { record, rows, selection };
 };
 
-const modelOf = (rows: readonly Instance[]): RowModel<Instance> =>
-  buildRowModel({ identify: byId, rows });
+const buildModel = (rows: readonly Instance[]): RowModel<Instance> =>
+  buildRowModel({ identify: readId, rows });
 
 describe("createRecordTyping", () => {
   it("refuses to build over a monomorphic collection", () => {
     expect(() =>
       createRecordTyping({
-        collection: createCollection({ fields: [], identify: byId }),
+        collection: createCollection({ fields: [], identify: readId }),
         selection: createSelection(),
         rows: createChannel<RowModel<Instance>>(EMPTY_ROW_MODEL),
       }),
@@ -82,39 +75,44 @@ describe("createRecordTyping", () => {
 
   describe("applicability", () => {
     it("applies an unscoped field to every type", () => {
-      const { record } = typing();
-      expect(record.readApplicability("type", container("c-1"))).toBe(
+      const { record } = createTyping();
+      expect(record.readApplicability("type", buildContainer("c-1"))).toBe(
         "applies",
       );
-      expect(record.readApplicability("type", machine("v-1"))).toBe("applies");
+      expect(record.readApplicability("type", buildMachine("v-1"))).toBe(
+        "applies",
+      );
     });
 
     it("applies a field the schema does not describe at all", () => {
       // A column showing something outside the schema has no scoping, and
       // absent scoping is every type.
       expect(
-        typing().record.readApplicability("uptime", container("c-1")),
+        createTyping().record.readApplicability(
+          "uptime",
+          buildContainer("c-1"),
+        ),
       ).toBe("applies");
     });
 
     it("withholds a scoped field from a row of another type", () => {
-      const { record } = typing();
-      expect(record.readApplicability("secureboot", machine("v-1"))).toBe(
+      const { record } = createTyping();
+      expect(record.readApplicability("secureboot", buildMachine("v-1"))).toBe(
         "applies",
       );
-      expect(record.readApplicability("secureboot", container("c-1"))).toBe(
-        "not-applicable",
-      );
-      expect(record.readApplicability("processes", container("c-1"))).toBe(
+      expect(
+        record.readApplicability("secureboot", buildContainer("c-1")),
+      ).toBe("not-applicable");
+      expect(record.readApplicability("processes", buildContainer("c-1"))).toBe(
         "applies",
       );
-      expect(record.readApplicability("processes", machine("v-1"))).toBe(
+      expect(record.readApplicability("processes", buildMachine("v-1"))).toBe(
         "not-applicable",
       );
     });
 
     it("withholds a scoped field from a row carrying no declared type", () => {
-      const { record } = typing();
+      const { record } = createTyping();
       const untyped = { id: "x", type: "sandbox" } as unknown as Instance;
       expect(record.readApplicability("secureboot", untyped)).toBe(
         "not-applicable",
@@ -124,23 +122,27 @@ describe("createRecordTyping", () => {
 
   describe("rejectionOf", () => {
     it("accepts a model whose every row carries a declared type", () => {
-      const { record } = typing();
-      expect(record.readRejection(modelOf([container("c-1"), machine("v-1")]))) //
+      const { record } = createTyping();
+      expect(
+        record.readRejection(
+          buildModel([buildContainer("c-1"), buildMachine("v-1")]),
+        ),
+      ) //
         .toBeNull();
     });
 
     it("names the row and the value a model cannot be displayed for", () => {
-      const { record } = typing();
+      const { record } = createTyping();
       const rogue = { id: "x-1", type: "sandbox" } as unknown as Instance;
-      expect(record.readRejection(modelOf([container("c-1"), rogue]))).toBe(
-        'record type "sandbox" of row "x-1" is not declared',
-      );
+      expect(
+        record.readRejection(buildModel([buildContainer("c-1"), rogue])),
+      ).toBe('record type "sandbox" of row "x-1" is not declared');
     });
 
     it("names a row carrying no discriminator value at all", () => {
-      const { record } = typing();
+      const { record } = createTyping();
       const rogue = { id: "x-1" } as unknown as Instance;
-      expect(record.readRejection(modelOf([rogue]))).toBe(
+      expect(record.readRejection(buildModel([rogue]))).toBe(
         'record type undefined of row "x-1" is not declared',
       );
     });
@@ -148,21 +150,23 @@ describe("createRecordTyping", () => {
 
   describe("type memory", () => {
     it("reads a selected row's type from the rows on display", () => {
-      const { record, selection } = typing(modelOf([machine("v-1")]));
+      const { record, selection } = createTyping(
+        buildModel([buildMachine("v-1")]),
+      );
       selection.set(["v-1"]);
       expect(record.readRecordType("v-1")).toBe("virtual-machine");
     });
 
     it("knows no type for an identity that is not selected", () => {
-      const { record } = typing(modelOf([machine("v-1")]));
+      const { record } = createTyping(buildModel([buildMachine("v-1")]));
       expect(record.readRecordType("v-1")).toBeNull();
     });
 
     it("knows no type for a selected identity it never modelled", () => {
       // A selection a host restored over rows this provider has not seen:
       // "not loaded", never a type assumed from nothing.
-      const displayed = modelOf([machine("v-1")]);
-      const { record, rows, selection } = typing(displayed);
+      const displayed = buildModel([buildMachine("v-1")]);
+      const { record, rows, selection } = createTyping(displayed);
       selection.set(["gone", "v-1"]);
       record.remember(displayed);
       rows.set(EMPTY_ROW_MODEL);
@@ -171,18 +175,18 @@ describe("createRecordTyping", () => {
     });
 
     it("keeps a selected row's type once its page is replaced", () => {
-      const first = modelOf([machine("v-1"), container("c-1")]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([buildMachine("v-1"), buildContainer("c-1")]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["v-1", "c-1"]);
       record.remember(first);
-      rows.set(modelOf([machine("v-2")]));
+      rows.set(buildModel([buildMachine("v-2")]));
       expect(record.readRecordType("v-1")).toBe("virtual-machine");
       expect(record.readRecordType("c-1")).toBe("container");
     });
 
     it("takes the type of a row selected on the page being left", () => {
-      const first = modelOf([machine("v-1")]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([buildMachine("v-1")]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["v-1"]);
       // No read while it was displayed: the memory is taken on the way out.
       record.remember(first);
@@ -191,22 +195,22 @@ describe("createRecordTyping", () => {
     });
 
     it("answers from the row on display, never from an older memory", () => {
-      const first = modelOf([machine("v-1")]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([buildMachine("v-1")]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["v-1"]);
       record.remember(first);
       // The identity comes back as a record of another type. Memory is for
       // the rows that are not displayed; it never overrules one that is.
-      rows.set(modelOf([container("v-1")]));
+      rows.set(buildModel([buildContainer("v-1")]));
       expect(record.readRecordType("v-1")).toBe("container");
     });
 
     it("re-takes the memory from the row displayed now", () => {
-      const first = modelOf([machine("v-1")]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([buildMachine("v-1")]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["v-1"]);
       record.remember(first);
-      const second = modelOf([container("v-1")]);
+      const second = buildModel([buildContainer("v-1")]);
       rows.set(second);
       record.remember(second);
       rows.set(EMPTY_ROW_MODEL);
@@ -214,11 +218,11 @@ describe("createRecordTyping", () => {
     });
 
     it("carries a remembered type through the pages that follow", () => {
-      const first = modelOf([machine("v-1")]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([buildMachine("v-1")]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["v-1"]);
       record.remember(first);
-      const second = modelOf([container("c-1")]);
+      const second = buildModel([buildContainer("c-1")]);
       rows.set(second);
       // A second page the row is not on: the memory is not re-taken from a
       // model that never held it, it is carried.
@@ -228,8 +232,8 @@ describe("createRecordTyping", () => {
     });
 
     it("drops the type of an identity that left the selection", () => {
-      const first = modelOf([machine("v-1")]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([buildMachine("v-1")]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["v-1"]);
       record.remember(first);
       rows.set(EMPTY_ROW_MODEL);
@@ -243,8 +247,8 @@ describe("createRecordTyping", () => {
 
     it("remembers nothing for a row whose type is not declared", () => {
       const rogue = { id: "x-1", type: "sandbox" } as unknown as Instance;
-      const first = modelOf([rogue]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([rogue]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["x-1"]);
       record.remember(first);
       rows.set(EMPTY_ROW_MODEL);
@@ -252,8 +256,8 @@ describe("createRecordTyping", () => {
     });
 
     it("forgets everything when reset begins the next generation", () => {
-      const first = modelOf([machine("v-1")]);
-      const { record, rows, selection } = typing(first);
+      const first = buildModel([buildMachine("v-1")]);
+      const { record, rows, selection } = createTyping(first);
       selection.set(["v-1"]);
       record.remember(first);
       rows.set(EMPTY_ROW_MODEL);

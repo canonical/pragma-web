@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import createSizeIndex from "./createSizeIndex.js";
 
 /** The offsets a plain running sum gives, for comparison. */
-const runningOffsets = (sizes: readonly number[]): number[] => {
+const sumOffsets = (sizes: readonly number[]): number[] => {
   const offsets = [0];
   let total = 0;
   for (const size of sizes) {
@@ -13,7 +13,7 @@ const runningOffsets = (sizes: readonly number[]): number[] => {
 };
 
 /** A deterministic sequence of sizes between 1 and 64. */
-const pseudoRandomSizes = (count: number, seed: number): number[] => {
+const generateSizes = (count: number, seed: number): number[] => {
   let state = seed;
   return Array.from({ length: count }, () => {
     state = (state * 1103515245 + 12345) % 2147483648;
@@ -77,14 +77,14 @@ describe("createSizeIndex", () => {
   });
 
   it("agrees with a running sum through any series of replacements", () => {
-    const sizes = pseudoRandomSizes(1000, 7);
+    const sizes = generateSizes(1000, 7);
     const index = createSizeIndex(sizes);
-    for (const [step, size] of pseudoRandomSizes(200, 11).entries()) {
+    for (const [step, size] of generateSizes(200, 11).entries()) {
       const position = (step * 37) % sizes.length;
       sizes[position] = size;
       index.set(position, size);
     }
-    const offsets = runningOffsets(sizes);
+    const offsets = sumOffsets(sizes);
     for (let position = 0; position <= sizes.length; position += 1) {
       expect(index.readOffset(position)).toBe(offsets[position]);
     }

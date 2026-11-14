@@ -26,7 +26,7 @@ const machines = createCollection({
 });
 
 /** A provider whose source executes every filter, over an empty page. */
-const provider = (location?: QueryLocation) =>
+const createProvider = (location?: QueryLocation) =>
   createDataViewsProvider({
     collection: machines,
     source: createManualSource({
@@ -47,7 +47,7 @@ const provider = (location?: QueryLocation) =>
 describe("createFilterInputs", () => {
   it("builds one handle per field and legal operator", () => {
     const { handles } = createFilterInputs({
-      host: readProviderHost(provider()),
+      host: readProviderHost(createProvider()),
     });
     expect(Object.keys(handles).sort()).toEqual([
       "cpu",
@@ -65,7 +65,7 @@ describe("createFilterInputs", () => {
   });
 
   it("routes a valid edit to the provider's query as a request", () => {
-    const p = provider();
+    const p = createProvider();
     const { handles } = createFilterInputs({ host: readProviderHost(p) });
     handles.cpu.gte.edit("4");
     expect(p.state.get().slice.filter).toEqual([
@@ -100,7 +100,7 @@ describe("createFilterInputs", () => {
   });
 
   it("keeps the records apart per set: two sets share the query, not the input", () => {
-    const p = provider();
+    const p = createProvider();
     const host = readProviderHost(p);
     const one = createFilterInputs({ host });
     const two = createFilterInputs({ host });
@@ -130,7 +130,7 @@ describe("createFilterInputs", () => {
   });
 
   it("follows the query while observing, and catches up when it starts", () => {
-    const p = provider();
+    const p = createProvider();
     const host = readProviderHost(p);
     const inputs = createFilterInputs({ host });
     // Moved before anything followed it: seen on observe.
@@ -193,7 +193,7 @@ describe("createFilterInputs", () => {
   });
 
   it("hands each record the first conjunct its address holds", () => {
-    const p = provider();
+    const p = createProvider();
     const host = readProviderHost(p);
     host.adopt(
       {
@@ -222,7 +222,7 @@ describe("createFilterInputs", () => {
   describe("further conjuncts", () => {
     const observeAt = (href: string) => {
       const location = createMemoryLocation({ href });
-      const p = provider(location);
+      const p = createProvider(location);
       const release = p.observe();
       const host = readProviderHost(p);
       const inputs = createFilterInputs({ host });
@@ -329,7 +329,7 @@ describe("createFilterInputs", () => {
     const location = createMemoryLocation({
       href: "/machines?cpu__gte=4&page=1&size=50",
     });
-    const p = provider(location);
+    const p = createProvider(location);
     const release = p.observe();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
     const stop = inputs.observe();
@@ -354,7 +354,7 @@ describe("createFilterInputs", () => {
 
   it("ends every typing session at once, keeping what each input reads", () => {
     const { location, writes } = createRecordingLocation({ href: "/machines" });
-    const p = provider(location);
+    const p = createProvider(location);
     const release = p.observe();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
     const stop = inputs.observe();
@@ -375,7 +375,7 @@ describe("createFilterInputs", () => {
   });
 
   it("adopts nothing for a publication that moved no predicate", () => {
-    const p = provider();
+    const p = createProvider();
     const host = readProviderHost(p);
     const inputs = createFilterInputs({ host });
     inputs.observe();
@@ -392,7 +392,7 @@ describe("createFilterInputs", () => {
   });
 
   it("clears a predicate on the query and answers with no refusal", () => {
-    const p = provider();
+    const p = createProvider();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
     inputs.handles.owner.isSet.set([]);
     expect(p.state.get().slice.filter).toHaveLength(1);

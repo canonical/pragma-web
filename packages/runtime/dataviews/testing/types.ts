@@ -1,6 +1,11 @@
 /** Test-only shapes, named here so a test file imports one place for them. */
 
 import type { HistoryMode, QueryLocation } from "../src/lib/location/index.js";
+import type {
+  OwnedPresentation,
+  PresentationStore,
+} from "../src/lib/presentation/index.js";
+import type { HistoryPolicy } from "../src/lib/provider/index.js";
 import type { Query, Slice } from "../src/lib/query/index.js";
 import type {
   QueryIssue,
@@ -209,4 +214,50 @@ export type ExportRecord = {
   readonly wrapper?: string;
   /** The wrapper is `memo` or `forwardRef` over a `function` declaration. */
   readonly wrapsFunction?: boolean;
+};
+
+/** A presentation with the store it runs over, for one script to run twice. */
+export type ScriptedPresentation = {
+  readonly store: PresentationStore;
+  readonly presentation: OwnedPresentation;
+};
+
+/** A machine row whose fields other than its id may be absent. */
+export type SparseMachine = {
+  readonly id: string;
+  readonly name?: string;
+  readonly cpu?: number;
+};
+
+/** A machine row with a status, as a row model reads it. */
+export type StatusMachine = { readonly id: string; readonly status: string };
+
+/** A row identified by a `uuid` rather than an `id`. */
+export type UuidRow = { readonly uuid: string };
+
+/** An instance of the container record type. */
+export type ContainerInstance = {
+  readonly id: string;
+  readonly type: "container";
+  readonly processes?: number;
+};
+
+/** An instance of the virtual-machine record type. */
+export type VirtualMachineInstance = {
+  readonly id: string;
+  readonly type: "virtual-machine";
+  readonly secureboot?: string;
+};
+
+/** A row of either record type. */
+export type Instance = ContainerInstance | VirtualMachineInstance;
+
+/** What a location test sets up its provider with. */
+export type LocationSetUp = {
+  readonly href?: string | undefined;
+  readonly location?: QueryLocation | undefined;
+  readonly capabilities?: SourceCapabilities | undefined;
+  /** The query the provider starts from, as a snapshot carries it. */
+  readonly query?: string | undefined;
+  readonly history?: HistoryPolicy | undefined;
 };

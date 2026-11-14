@@ -66,7 +66,7 @@ describe("regression 0076 — a linked arrangement lost under an open view", () 
       async (_target, patch) => {
         stored = Object.fromEntries(
           Object.entries({ ...stored, ...patch }).filter(
-            (entry): entry is [string, JsonValue] => entry[1] !== undefined,
+            (entry): entry is [string, JsonValue] => entry.at(1) !== undefined,
           ),
         );
         return { status: "saved" };

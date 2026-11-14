@@ -6,7 +6,10 @@ import flushPresentation from "../../../testing/flushPresentation.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
 import openIndexedDBTab from "../../../testing/openIndexedDBTab.js";
 import settleCalls from "../../../testing/settleCalls.js";
-import type { Deferred } from "../../../testing/types.js";
+import type {
+  Deferred,
+  ScriptedPresentation as Scripted,
+} from "../../../testing/types.js";
 import { WRITE_DEADLINE, WRITE_DELAY } from "./constants.js";
 import createMemoryPresentationStore from "./createMemoryPresentationStore.js";
 import createPresentation from "./createPresentation.js";
@@ -28,12 +31,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
-
-/** A presentation with the store it runs over, for one script to run twice. */
-type Scripted = {
-  readonly store: PresentationStore;
-  readonly presentation: OwnedPresentation;
-};
 
 const readArrangement = (presentation: OwnedPresentation) =>
   presentation.state.get().presentation;
@@ -270,13 +267,13 @@ describe("createPresentation", () => {
       .mockReturnValueOnce(older.promise)
       .mockReturnValueOnce(newer.promise)
       .mockResolvedValue({ status: "saved" });
-    let changed = (): void => {};
+    let notifyChange = (): void => {};
     const presentation = createPresentation({
       store: createStandInPresentationStore({
         readPresentation: async () => ({ width: 120, seen: 1 }),
         patchPresentation,
         subscribe: (listener) => {
-          changed = listener;
+          notifyChange = listener;
           return () => {};
         },
       }),
@@ -296,7 +293,7 @@ describe("createPresentation", () => {
     older.resolve({ status: "saved" });
     presentation.arrange({ seen: undefined });
     await vi.advanceTimersByTimeAsync(WRITE_DELAY);
-    changed();
+    notifyChange();
     await vi.waitFor(() => {
       expect(readArrangement(presentation)).toEqual({ width: 130, seen: 1 });
     });
@@ -330,12 +327,12 @@ describe("createPresentation", () => {
     const readPresentation = vi.fn<PresentationStore["readPresentation"]>(
       async () => ({ width: 90 }),
     );
-    let changed = (): void => {};
+    let notifyChange = (): void => {};
     const presentation = createPresentation({
       store: createStandInPresentationStore({
         readPresentation,
         subscribe: (listener) => {
-          changed = listener;
+          notifyChange = listener;
           return () => {};
         },
       }),
@@ -345,7 +342,7 @@ describe("createPresentation", () => {
       expect(readArrangement(presentation)).toEqual({ width: 90 });
     });
     presentation.arrange({ width: 120 });
-    changed();
+    notifyChange();
     // The read the notice began has answered.
     await settleCalls(readPresentation);
     expect(readArrangement(presentation)).toEqual({ width: 120 });
@@ -368,13 +365,13 @@ describe("createPresentation", () => {
     // read both again.
     presentation.refresh();
     expect(reads).toHaveLength(4);
-    reads[2]?.resolve({ width: 90 });
-    reads[3]?.resolve({ own: 1 });
+    reads.at(2)?.resolve({ width: 90 });
+    reads.at(3)?.resolve({ own: 1 });
     await vi.waitFor(() => {
       expect(readArrangement(presentation)).toEqual({ width: 90, own: 1 });
     });
-    reads[0]?.resolve({ stale: 1 });
-    reads[1]?.resolve({ stale: 2 });
+    reads.at(0)?.resolve({ stale: 1 });
+    reads.at(1)?.resolve({ stale: 2 });
     await Promise.allSettled(reads.map(({ promise }) => promise));
     expect(readArrangement(presentation)).toEqual({ width: 90, own: 1 });
   });
@@ -522,12 +519,12 @@ describe("createPresentation", () => {
       .fn<PresentationStore["patchPresentation"]>()
       .mockRejectedValueOnce(new Error("view storage failed: quota exceeded"))
       .mockResolvedValue({ status: "saved" });
-    let changed = (): void => {};
+    let notifyChange = (): void => {};
     const presentation = createPresentation({
       store: createStandInPresentationStore({
         patchPresentation,
         subscribe: (listener) => {
-          changed = listener;
+          notifyChange = listener;
           return () => {};
         },
       }),
@@ -539,7 +536,7 @@ describe("createPresentation", () => {
       "view storage failed: quota exceeded",
     );
     // Read again, and another key written: still unsaved, still reported.
-    changed();
+    notifyChange();
     presentation.arrange({ height: 1 });
     await flushPresentation(patchPresentation);
     expect(patchPresentation).toHaveBeenCalledTimes(2);
@@ -665,7 +662,7 @@ describe("createPresentation", () => {
     // The page was held past the deadline before the write's timer ran.
     vi.setSystemTime(Date.now() + WRITE_DEADLINE + 1);
     presentation.arrange({ width: 120 });
-    expect(schedule.mock.calls.at(-1)?.[1]).toBe(0);
+    expect(schedule.mock.calls.at(-1)?.at(1)).toBe(0);
     await vi.advanceTimersByTimeAsync(0);
     expect(patchPresentation.mock.calls).toEqual([["default", { width: 120 }]]);
   });

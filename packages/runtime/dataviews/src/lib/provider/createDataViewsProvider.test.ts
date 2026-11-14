@@ -7,6 +7,13 @@ import createRecordingLocation from "../../../testing/createRecordingLocation.js
 import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
 import createStandInViewStore from "../../../testing/createStandInViewStore.js";
 import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
+import type {
+  ContainerInstance as Container,
+  Instance,
+  UuidRow as Keyed,
+  SparseMachine as Machine,
+  VirtualMachineInstance as VirtualMachine,
+} from "../../../testing/types.js";
 import type { ActionOutcome } from "../action/index.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation } from "../location/index.js";
@@ -31,14 +38,8 @@ import createDataViewsProvider from "./createDataViewsProvider.js";
 import isDataViewsProvider from "./isDataViewsProvider.js";
 import readProviderHost from "./readProviderHost.js";
 
-type Machine = {
-  readonly id: string;
-  readonly name?: string;
-  readonly cpu?: number;
-};
-
 /** The machines collection, over the identity given or the row's own `id`. */
-const machineCollection = (
+const createMachineCollection = (
   identify: RowIdentifier<Machine> = (row) => row.id,
 ) =>
   createCollection({
@@ -52,7 +53,7 @@ const machineCollection = (
     identify,
   });
 
-const machines = machineCollection();
+const machines = createMachineCollection();
 
 /** Everything the fixture queries need: a status filter, search and two sortable fields. */
 const permissive: SourceCapabilities = declareCapabilities(machines, {
@@ -62,7 +63,7 @@ const permissive: SourceCapabilities = declareCapabilities(machines, {
   counts: { pageable: "exact", matched: "exact" },
 });
 
-const delivered = <TRow extends object>(
+const buildDelivered = <TRow extends object>(
   rows: readonly TRow[],
 ): SourceDelivery<TRow> => ({ status: "succeeded", page: buildPage(rows) });
 
@@ -85,7 +86,9 @@ const REFUSED: Completion<Machine> = {
 };
 
 /** A provider over the machines and a manual source declaring `capabilities`. */
-const machineProvider = (capabilities: SourceCapabilities = permissive) => {
+const createMachineProvider = (
+  capabilities: SourceCapabilities = permissive,
+) => {
   const manual = createManualSource<Machine>({ capabilities });
   const provider = createDataViewsProvider({
     collection: machines,
@@ -105,7 +108,7 @@ const STATUS_FAILED: Predicate = {
 
 describe("createDataViewsProvider", () => {
   it("assembles the collection, the selection and no views without a store", () => {
-    const { provider } = machineProvider();
+    const { provider } = createMachineProvider();
     expect(isDataViewsProvider(provider)).toBe(true);
     expect(isDataViewsProvider({ ...provider })).toBe(false);
     expect(provider.collection).toBe(machines);
@@ -121,7 +124,7 @@ describe("createDataViewsProvider", () => {
   });
 
   it("exposes only the public surface", () => {
-    const { provider } = machineProvider();
+    const { provider } = createMachineProvider();
     expect(Object.keys(provider).sort()).toEqual([
       "capabilities",
       "clear",
@@ -161,7 +164,7 @@ describe("createDataViewsProvider", () => {
   });
 
   it("hands every channel outward read-only", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     for (const channel of [
       provider.state,
       provider.rows,
@@ -199,18 +202,18 @@ describe("createDataViewsProvider", () => {
   });
 
   it("carries the source's declaration as a frozen copy, never null", () => {
-    const { provider, source } = machineProvider();
+    const { provider, source } = createMachineProvider();
     expect(provider.capabilities).toEqual(source.capabilities);
     expect(provider.capabilities).not.toBe(source.capabilities);
     expect(Object.isFrozen(provider.capabilities)).toBe(true);
     expect(Object.isFrozen(provider.capabilities.sort.fields)).toBe(true);
-    expect(machineProvider(NOTHING_DECLARED).provider.capabilities).toEqual(
-      NOTHING_DECLARED,
-    );
+    expect(
+      createMachineProvider(NOTHING_DECLARED).provider.capabilities,
+    ).toEqual(NOTHING_DECLARED);
   });
 
   it("pairs the provider with its host, and nothing else", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     expect(readProviderHost(provider)).toBe(host);
     expect(host.collection).toBe(machines);
     expect(host.capabilities).toBe(provider.capabilities);
@@ -509,22 +512,22 @@ describe("createDataViewsProvider observe", () => {
   });
 
   it("publishes what the source delivers and refreshes over retained rows", () => {
-    const { provider, callAt, calls } = machineProvider();
+    const { provider, callAt, calls } = createMachineProvider();
     const release = provider.observe();
-    callAt(0).deliver(delivered([{ id: "m-1" }]));
+    callAt(0).deliver(buildDelivered([{ id: "m-1" }]));
     expect(provider.state.get().result.status).toBe("ready");
     expect(provider.rows.get().ids).toEqual(["m-1"]);
     expect(provider.refresh()).toBeUndefined();
     expect(calls).toHaveLength(2);
     expect(provider.state.get().result.status).toBe("refreshing");
     expect(provider.rows.get().ids).toEqual(["m-1"]);
-    callAt(1).deliver(delivered([{ id: "m-2" }]));
+    callAt(1).deliver(buildDelivered([{ id: "m-2" }]));
     expect(provider.rows.get().ids).toEqual(["m-2"]);
     release();
   });
 
   it("reports no issues without a location, on a channel that stays empty", () => {
-    const { provider } = machineProvider();
+    const { provider } = createMachineProvider();
     expect(provider.issues.get()).toEqual([]);
     expect(Object.isFrozen(provider.issues.get())).toBe(true);
     expect(Object.isFrozen(provider.issues)).toBe(true);
@@ -611,7 +614,7 @@ describe("createDataViewsProvider open view", () => {
   });
 
   it("publishes the adopted query before the open view moves", () => {
-    const { host } = machineProvider();
+    const { host } = createMachineProvider();
     const heard: (readonly Predicate[])[] = [];
     host.view.subscribe(() => {
       heard.push(host.state.get().slice.filter);
@@ -628,7 +631,7 @@ describe("createDataViewsProvider open view", () => {
   });
 
   it("announces a move of the open view alone, and nothing when neither moves", () => {
-    const { host } = machineProvider();
+    const { host } = createMachineProvider();
     const heard: string[] = [];
     host.transitions.subscribe(() => {
       const transition = host.transitions.get();
@@ -834,7 +837,7 @@ describe("createDataViewsProvider refresh", () => {
     const release = provider.observe();
     expect(calls).toHaveLength(1);
     expect(callAt(0).request.requestId).toBe(pendingRequestId);
-    callAt(0).deliver(delivered([{ id: "m-1" }]));
+    callAt(0).deliver(buildDelivered([{ id: "m-1" }]));
     expect(provider.state.get().result.status).toBe("ready");
     release();
   });
@@ -888,7 +891,7 @@ describe("createDataViewsProvider refresh", () => {
 
 describe("createDataViewsProvider commands", () => {
   it("navigates the window and replaces sort and search", () => {
-    const { provider, calls } = machineProvider();
+    const { provider, calls } = createMachineProvider();
     const release = provider.observe();
     expect(provider.navigateWindow({ page: 2 })).toEqual([]);
     expect(provider.state.get().window).toEqual({ ...DEFAULT_WINDOW, page: 2 });
@@ -912,7 +915,7 @@ describe("createDataViewsProvider commands", () => {
   });
 
   it("issues no request for a command that changes nothing", () => {
-    const { provider, calls } = machineProvider();
+    const { provider, calls } = createMachineProvider();
     const release = provider.observe();
     let notifications = 0;
     provider.state.subscribe(() => {
@@ -1027,7 +1030,7 @@ describe("createDataViewsProvider commands", () => {
   });
 
   it("throws on a command the grammar rejects", () => {
-    const { provider } = machineProvider();
+    const { provider } = createMachineProvider();
     expect(() => provider.navigateWindow({ page: 0 })).toThrow(
       "page must be a positive integer",
     );
@@ -1039,7 +1042,7 @@ describe("createDataViewsProvider commands", () => {
 
 describe("createDataViewsProvider host", () => {
   it("adopts an external query and names the request", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     const adopted: Slice = {
       ...EMPTY_SLICE,
       filter: [STATUS_FAILED],
@@ -1058,7 +1061,7 @@ describe("createDataViewsProvider host", () => {
   });
 
   it("adopts an identical query without notifying", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     let notifications = 0;
     provider.state.subscribe(() => {
       notifications += 1;
@@ -1072,7 +1075,7 @@ describe("createDataViewsProvider host", () => {
   it("announces every move as a transition carrying its cause and history", () => {
     // Grouping is not declarable yet; the raw record stands in for a source
     // that will honour it, so the group and collapse causes are heard.
-    const { provider, host } = machineProvider({
+    const { provider, host } = createMachineProvider({
       ...permissive,
       group: {
         fields: ["status"],
@@ -1128,9 +1131,11 @@ describe("createDataViewsProvider host", () => {
   });
 
   it("enters history by the policy: one mode for all, or per transition", () => {
-    const heardOf = (
-      provider: ReturnType<typeof machineProvider>["provider"],
-      moves: (provider: ReturnType<typeof machineProvider>["provider"]) => void,
+    const listHeard = (
+      provider: ReturnType<typeof createMachineProvider>["provider"],
+      moves: (
+        provider: ReturnType<typeof createMachineProvider>["provider"],
+      ) => void,
     ): (string | null)[] => {
       const host = readProviderHost(provider);
       const modes: (string | null)[] = [];
@@ -1140,8 +1145,8 @@ describe("createDataViewsProvider host", () => {
       moves(provider);
       return modes;
     };
-    const moves = (
-      provider: ReturnType<typeof machineProvider>["provider"],
+    const makeMoves = (
+      provider: ReturnType<typeof createMachineProvider>["provider"],
     ) => {
       provider.setSearch("yak");
       provider.setSort([{ field: "cpu", direction: "asc" }]);
@@ -1152,13 +1157,21 @@ describe("createDataViewsProvider host", () => {
       source: createManualSource<Machine>({ capabilities: permissive }).source,
       history: "replace",
     });
-    expect(heardOf(uniform, moves)).toEqual(["replace", "replace", "replace"]);
+    expect(listHeard(uniform, makeMoves)).toEqual([
+      "replace",
+      "replace",
+      "replace",
+    ]);
     const overridden = createDataViewsProvider({
       collection: machines,
       source: createManualSource<Machine>({ capabilities: permissive }).source,
       history: { search: "push", window: "replace" },
     });
-    expect(heardOf(overridden, moves)).toEqual(["push", "push", "replace"]);
+    expect(listHeard(overridden, makeMoves)).toEqual([
+      "push",
+      "push",
+      "replace",
+    ]);
   });
 
   it("carries a withheld query's refused clauses into every destination it spells", () => {
@@ -1296,8 +1309,8 @@ describe("createDataViewsProvider host", () => {
       slice: { ...EMPTY_SLICE, filter: [STATUS_FAILED] },
       window: { ...DEFAULT_WINDOW, page: 2 },
     };
-    expect(machineProvider().host.spellQuery(query)).toBeNull();
-    expect(machineProvider().host.location).toBeNull();
+    expect(createMachineProvider().host.spellQuery(query)).toBeNull();
+    expect(createMachineProvider().host.location).toBeNull();
     const location = createMemoryLocation({
       href: "/machines?tab=overview&q=old",
     });
@@ -1323,7 +1336,7 @@ describe("createDataViewsProvider host", () => {
   });
 
   it("edits the filter through predicate commands", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     expect(host.setPredicate(STATUS_FAILED)).toEqual([]);
     expect(provider.state.get().slice.filter).toEqual([STATUS_FAILED]);
     expect(
@@ -1335,17 +1348,20 @@ describe("createDataViewsProvider host", () => {
   });
 
   it("addresses one conjunct by its place, and edits several in one transition", () => {
-    const { provider, host } = machineProvider();
-    const atLeast = (cores: number): Predicate => ({
+    const { provider, host } = createMachineProvider();
+    const buildAtLeast = (cores: number): Predicate => ({
       field: "cpu",
       operator: "gte",
       operands: [cores],
     });
-    host.editPredicates([], [atLeast(8), atLeast(4)]);
-    expect(provider.state.get().slice.filter).toEqual([atLeast(8), atLeast(4)]);
+    host.editPredicates([], [buildAtLeast(8), buildAtLeast(4)]);
+    expect(provider.state.get().slice.filter).toEqual([
+      buildAtLeast(8),
+      buildAtLeast(4),
+    ]);
     // Conjunct 1 in canonical order is the bound at 8.
     expect(host.removePredicate("cpu", "gte", 1)).toEqual([]);
-    expect(provider.state.get().slice.filter).toEqual([atLeast(4)]);
+    expect(provider.state.get().slice.filter).toEqual([buildAtLeast(4)]);
     const heard: string[] = [];
     host.transitions.subscribe(() => {
       heard.push(String(host.transitions.get()?.cause));
@@ -1353,11 +1369,11 @@ describe("createDataViewsProvider host", () => {
     expect(
       host.editPredicates(
         [{ field: "cpu", operator: "gte", nth: 0 }],
-        [atLeast(2), STATUS_FAILED],
+        [buildAtLeast(2), STATUS_FAILED],
       ),
     ).toEqual([]);
     expect(provider.state.get().slice.filter).toEqual([
-      atLeast(2),
+      buildAtLeast(2),
       STATUS_FAILED,
     ]);
     expect(heard).toEqual(["filter"]);
@@ -1405,9 +1421,11 @@ describe("createDataViewsProvider host", () => {
   });
 
   it("completes the pending request and publishes the result", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     const requestId = host.refresh();
-    expect(host.complete(requestId, delivered([{ id: "m-1" }]))).toBe(true);
+    expect(host.complete(requestId, buildDelivered([{ id: "m-1" }]))).toBe(
+      true,
+    );
     const { result } = provider.state.get();
     expect(result.status).toBe("ready");
     expect(result.rows).toEqual([{ id: "m-1" }]);
@@ -1419,12 +1437,14 @@ describe("createDataViewsProvider host", () => {
   });
 
   it("ignores completions of requests it never issued", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     let notifications = 0;
     provider.state.subscribe(() => {
       notifications += 1;
     });
-    expect(host.complete("i999:r9", delivered([{ id: "ghost" }]))).toBe(false);
+    expect(host.complete("i999:r9", buildDelivered([{ id: "ghost" }]))).toBe(
+      false,
+    );
     expect(notifications).toBe(0);
     expect(provider.state.get().result.status).toBe("idle");
     expect(provider.rows.get().ids).toEqual([]);
@@ -1436,18 +1456,18 @@ describe("createDataViewsProvider host", () => {
       capabilities: permissive,
     });
     const provider = createDataViewsProvider({
-      collection: machineCollection(identify),
+      collection: createMachineCollection(identify),
       source,
     });
     const host = readProviderHost(provider);
     const settled = host.refresh();
-    host.complete(settled, delivered([{ id: "m-1" }]));
+    host.complete(settled, buildDelivered([{ id: "m-1" }]));
     identify.mockClear();
     let notifications = 0;
     provider.state.subscribe(() => {
       notifications += 1;
     });
-    expect(host.complete(settled, delivered([{ id: "m-2" }]))).toBe(false);
+    expect(host.complete(settled, buildDelivered([{ id: "m-2" }]))).toBe(false);
     expect(identify).not.toHaveBeenCalled();
     expect(notifications).toBe(0);
     expect(provider.rows.get().ids).toEqual(["m-1"]);
@@ -1456,25 +1476,31 @@ describe("createDataViewsProvider host", () => {
 
 describe("createDataViewsProvider rows", () => {
   it("publishes the shared row model when a request succeeds", () => {
-    const { provider, host } = machineProvider();
-    host.complete(host.refresh(), delivered([{ id: "m-1" }, { id: "m-2" }]));
+    const { provider, host } = createMachineProvider();
+    host.complete(
+      host.refresh(),
+      buildDelivered([{ id: "m-1" }, { id: "m-2" }]),
+    );
     expect(provider.rows.get().ids).toEqual(["m-1", "m-2"]);
     expect(provider.rows.get().findRecord("m-2")).toEqual({ id: "m-2" });
   });
 
   it("carries the model across a republication of the same records", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     const rows = [{ id: "m-1" }];
-    host.complete(host.refresh(), delivered(rows));
+    host.complete(host.refresh(), buildDelivered(rows));
     const first = provider.rows.get();
-    host.complete(host.refresh(), delivered([...rows]));
+    host.complete(host.refresh(), buildDelivered([...rows]));
     expect(provider.rows.get()).toBe(first);
   });
 
   it("fails the whole completion when a record has no usable identity", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     expect(
-      host.complete(host.refresh(), delivered([{ id: "" }, { id: "m-1" }])),
+      host.complete(
+        host.refresh(),
+        buildDelivered([{ id: "" }, { id: "m-1" }]),
+      ),
     ).toBe(true);
     expect(provider.rows.get().ids).toEqual([]);
     const { result } = provider.state.get();
@@ -1489,10 +1515,13 @@ describe("createDataViewsProvider rows", () => {
   });
 
   it("fails a completion whose records claim one identity", () => {
-    const { provider, host } = machineProvider();
-    host.complete(host.refresh(), delivered([{ id: "m-1" }]));
+    const { provider, host } = createMachineProvider();
+    host.complete(host.refresh(), buildDelivered([{ id: "m-1" }]));
     const retained = provider.rows.get();
-    host.complete(host.refresh(), delivered([{ id: "m-2" }, { id: "m-2" }]));
+    host.complete(
+      host.refresh(),
+      buildDelivered([{ id: "m-2" }, { id: "m-2" }]),
+    );
     // The rows still answer the query, so they are kept and the refresh is
     // reported as failed over them — never replaced by rows nothing can key.
     expect(provider.rows.get()).toBe(retained);
@@ -1503,7 +1532,6 @@ describe("createDataViewsProvider rows", () => {
   });
 
   it("identifies records through the collection's identity", () => {
-    type Keyed = { readonly uuid: string };
     const keyed = createCollection({
       fields: [{ field: "name", kind: "text" }],
       identify: (row: Keyed) => row.uuid,
@@ -1511,13 +1539,13 @@ describe("createDataViewsProvider rows", () => {
     const { source } = createManualSource<Keyed>();
     const provider = createDataViewsProvider({ collection: keyed, source });
     const host = readProviderHost(provider);
-    host.complete(host.refresh(), delivered([{ uuid: "a" }]));
+    host.complete(host.refresh(), buildDelivered([{ uuid: "a" }]));
     expect(provider.rows.get().ids).toEqual(["a"]);
   });
 
   it("retains the row model when a request fails or is refused", () => {
-    const { provider, host } = machineProvider();
-    host.complete(host.refresh(), delivered([{ id: "m-1" }]));
+    const { provider, host } = createMachineProvider();
+    host.complete(host.refresh(), buildDelivered([{ id: "m-1" }]));
     const retained = provider.rows.get();
     host.complete(host.refresh(), FAILED);
     expect(provider.rows.get()).toBe(retained);
@@ -1528,10 +1556,10 @@ describe("createDataViewsProvider rows", () => {
   });
 
   it("discards the row model of a superseded request", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     const stale = host.refresh();
     provider.setSearch("failed");
-    expect(host.complete(stale, delivered([{ id: "m-1" }]))).toBe(false);
+    expect(host.complete(stale, buildDelivered([{ id: "m-1" }]))).toBe(false);
     expect(provider.rows.get().ids).toEqual([]);
   });
 });
@@ -1548,7 +1576,7 @@ describe("createDataViewsProvider reset", () => {
     });
     const release = provider.observe();
     expect(callAt(0).request.slice.search).toBe("yak");
-    callAt(0).deliver(delivered([{ id: "m-1" }]));
+    callAt(0).deliver(buildDelivered([{ id: "m-1" }]));
     provider.selection.set(["m-1"]);
     provider.setSearch("zebra");
     provider.navigateWindow({ page: 3 });
@@ -1571,19 +1599,19 @@ describe("createDataViewsProvider reset", () => {
     expect(stale.releases).toBe(1);
 
     // The old generation's delivery publishes nothing into the new one.
-    stale.deliver(delivered([{ id: "ghost" }]));
+    stale.deliver(buildDelivered([{ id: "ghost" }]));
     expect(provider.state.get()).toBe(reset);
     expect(provider.rows.get().ids).toEqual([]);
 
-    callAt(3).deliver(delivered([{ id: "m-2" }]));
+    callAt(3).deliver(buildDelivered([{ id: "m-2" }]));
     expect(provider.rows.get().ids).toEqual(["m-2"]);
     expect(provider.state.get().result.status).toBe("ready");
     release();
   });
 
   it("waits for the first observer when reset while unobserved", () => {
-    const { provider, host, calls, callAt } = machineProvider();
-    host.complete(host.refresh(), delivered([{ id: "m-1" }]));
+    const { provider, host, calls, callAt } = createMachineProvider();
+    host.complete(host.refresh(), buildDelivered([{ id: "m-1" }]));
     provider.reset();
     expect(calls).toHaveLength(0);
     expect(provider.state.get().result.status).toBe("idle");
@@ -1604,7 +1632,7 @@ describe("createDataViewsProvider runAction", () => {
   });
 
   /** A runner failing `m-2` and succeeding every other explicit target. */
-  const runner: SourceActionRunner = async (request) =>
+  const runTargets: SourceActionRunner = async (request) =>
     request.targets.kind === "explicit"
       ? request.targets.ids.map((target) =>
           target === "m-2"
@@ -1613,7 +1641,7 @@ describe("createDataViewsProvider runAction", () => {
         )
       : [];
 
-  const actingProvider = (runAction: SourceActionRunner = runner) => {
+  const createActingProvider = (runAction: SourceActionRunner = runTargets) => {
     const spy = vi.fn(runAction);
     const { source } = createManualSource<Machine>({
       capabilities: acting,
@@ -1624,7 +1652,7 @@ describe("createDataViewsProvider runAction", () => {
   };
 
   it("runs over the selection and keeps only the failures selected", async () => {
-    const { provider, runAction } = actingProvider();
+    const { provider, runAction } = createActingProvider();
     provider.selection.set(["m-1", "m-2"]);
     const run = await provider.runAction({ action: "stop" });
     expect(runAction).toHaveBeenCalledWith({
@@ -1644,13 +1672,13 @@ describe("createDataViewsProvider runAction", () => {
 
   it("captures the targets when the run begins, whatever the selection does after", async () => {
     let settle: ((outcomes: readonly ActionOutcome[]) => void) | null = null;
-    const runner: SourceActionRunner = () =>
+    const runUntilSettled: SourceActionRunner = () =>
       new Promise((resolve) => {
         settle = resolve;
       });
     const { source } = createManualSource<Machine>({
       capabilities: acting,
-      runAction: runner,
+      runAction: runUntilSettled,
     });
     const provider = createDataViewsProvider({ collection: machines, source });
     provider.selection.set(["m-1"]);
@@ -1668,7 +1696,7 @@ describe("createDataViewsProvider runAction", () => {
   });
 
   it("takes explicit targets over the selection, with the payload", async () => {
-    const { provider, runAction } = actingProvider();
+    const { provider, runAction } = createActingProvider();
     provider.selection.set(["m-1"]);
     const run = await provider.runAction({
       action: "stop",
@@ -1686,7 +1714,7 @@ describe("createDataViewsProvider runAction", () => {
   });
 
   it("rejects an undeclared action, no targets and too many targets", async () => {
-    const { provider, runAction } = actingProvider();
+    const { provider, runAction } = createActingProvider();
     await expect(
       provider.runAction({ action: "delete", targets: ["m-1"] }),
     ).rejects.toThrow('this source declares no "delete" action');
@@ -1697,14 +1725,14 @@ describe("createDataViewsProvider runAction", () => {
       provider.runAction({ action: "stop", targets: ["a", "b", "c"] }),
     ).rejects.toThrow('"stop" addresses at most 2 records at a time');
     expect(runAction).not.toHaveBeenCalled();
-    const { provider: inert } = machineProvider();
+    const { provider: inert } = createMachineProvider();
     await expect(
       inert.runAction({ action: "stop", targets: ["m-1"] }),
     ).rejects.toThrow("this source runs no actions");
   });
 
   it("fails every target when the runner throws", async () => {
-    const { provider } = actingProvider(async () => {
+    const { provider } = createActingProvider(async () => {
       throw new Error("gateway down");
     });
     provider.selection.set(["m-1", "m-2"]);
@@ -1718,7 +1746,7 @@ describe("createDataViewsProvider runAction", () => {
   });
 
   it("fails a target the source reports no outcome for", async () => {
-    const { provider } = actingProvider(async () => [
+    const { provider } = createActingProvider(async () => [
       { target: "m-1", status: "succeeded" },
     ]);
     const run = await provider.runAction({
@@ -1740,14 +1768,6 @@ describe("createDataViewsProvider runAction", () => {
 });
 
 describe("createDataViewsProvider record types", () => {
-  type Container = { readonly id: string; readonly type: "container" };
-  type VirtualMachine = {
-    readonly id: string;
-    readonly type: "virtual-machine";
-    readonly secureboot?: string;
-  };
-  type Instance = Container | VirtualMachine;
-
   const instances = createCollection({
     fields: [
       {
@@ -1766,44 +1786,46 @@ describe("createDataViewsProvider record types", () => {
     discriminator: "type",
   });
 
-  const instanceProvider = () => {
+  const createInstanceProvider = () => {
     const { source } = createManualSource<Instance>();
     const provider = createDataViewsProvider({ collection: instances, source });
     return { provider, host: readProviderHost(provider) };
   };
 
-  const container = (id: string): Container => ({ id, type: "container" });
-  const machine = (id: string): VirtualMachine => ({
+  const buildContainer = (id: string): Container => ({ id, type: "container" });
+  const buildMachine = (id: string): VirtualMachine => ({
     id,
     type: "virtual-machine",
   });
 
   it("reads the declared types off the collection, and null without them", () => {
-    const { provider } = instanceProvider();
+    const { provider } = createInstanceProvider();
     expect(provider.collection.types).toEqual({
       field: "type",
       names: ["container", "virtual-machine"],
     });
-    expect(machineProvider().provider.collection.types).toBeNull();
+    expect(createMachineProvider().provider.collection.types).toBeNull();
   });
 
   it("answers whether a field applies to a row", () => {
-    const { host } = instanceProvider();
-    expect(host.readApplicability("secureboot", machine("v-1"))).toBe(
+    const { host } = createInstanceProvider();
+    expect(host.readApplicability("secureboot", buildMachine("v-1"))).toBe(
       "applies",
     );
-    expect(host.readApplicability("secureboot", container("c-1"))).toBe(
+    expect(host.readApplicability("secureboot", buildContainer("c-1"))).toBe(
       "not-applicable",
     );
-    expect(host.readApplicability("type", container("c-1"))).toBe("applies");
+    expect(host.readApplicability("type", buildContainer("c-1"))).toBe(
+      "applies",
+    );
   });
 
   it("fails a completion carrying a row of an undeclared type", () => {
-    const { provider, host } = instanceProvider();
-    host.complete(host.refresh(), delivered([machine("v-1")]));
+    const { provider, host } = createInstanceProvider();
+    host.complete(host.refresh(), buildDelivered([buildMachine("v-1")]));
     const retained = provider.rows.get();
     const rogue = { id: "x-1", type: "sandbox" } as unknown as Instance;
-    expect(host.complete(host.refresh(), delivered([rogue]))).toBe(true);
+    expect(host.complete(host.refresh(), buildDelivered([rogue]))).toBe(true);
     // Never displayed: the rows already on screen stay, and the refresh is
     // reported as failed over them.
     expect(provider.rows.get()).toBe(retained);
@@ -1829,40 +1851,40 @@ describe("createDataViewsProvider record types", () => {
         },
       },
     ) as Instance;
-    const { host } = instanceProvider();
-    host.complete(host.refresh(), delivered([counted]));
+    const { host } = createInstanceProvider();
+    host.complete(host.refresh(), buildDelivered([counted]));
     const checked = reads;
     expect(checked).toBeGreaterThan(0);
-    host.complete(host.refresh(), delivered([counted]));
+    host.complete(host.refresh(), buildDelivered([counted]));
     // The model came back whole, so its rows were checked once and are not
     // read again: they were already accepted and have not changed since.
     expect(reads).toBe(checked);
   });
 
   it("remembers the type of a record selected on an earlier page", () => {
-    const { provider, host } = instanceProvider();
+    const { provider, host } = createInstanceProvider();
     host.complete(
       host.refresh(),
-      delivered([machine("v-1"), container("c-1")]),
+      buildDelivered([buildMachine("v-1"), buildContainer("c-1")]),
     );
     provider.selection.set(["v-1", "c-1"]);
-    host.complete(host.refresh(), delivered([machine("v-2")]));
+    host.complete(host.refresh(), buildDelivered([buildMachine("v-2")]));
     expect(provider.rows.get().findRecord("v-1")).toBeUndefined();
     expect(host.readRecordType("v-1")).toBe("virtual-machine");
     expect(host.readRecordType("c-1")).toBe("container");
   });
 
   it("knows no type for a selection restored over rows it never saw", () => {
-    const { provider, host } = instanceProvider();
+    const { provider, host } = createInstanceProvider();
     provider.selection.set(["unseen"]);
     expect(host.readRecordType("unseen")).toBeNull();
   });
 
   it("forgets every remembered type on reset", () => {
-    const { provider, host } = instanceProvider();
-    host.complete(host.refresh(), delivered([machine("v-1")]));
+    const { provider, host } = createInstanceProvider();
+    host.complete(host.refresh(), buildDelivered([buildMachine("v-1")]));
     provider.selection.set(["v-1"]);
-    host.complete(host.refresh(), delivered([]));
+    host.complete(host.refresh(), buildDelivered([]));
     expect(host.readRecordType("v-1")).toBe("virtual-machine");
     provider.reset();
     provider.selection.set(["v-1"]);
@@ -1875,9 +1897,9 @@ describe("createDataViewsProvider monomorphic collection", () => {
   // discriminator: no row is read for a type, no memory is kept, and every
   // field applies to every row.
   it("declares no types, remembers nothing and applies every field", () => {
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     expect(provider.collection.types).toBeNull();
-    host.complete(host.refresh(), delivered([{ id: "m-1" }]));
+    host.complete(host.refresh(), buildDelivered([{ id: "m-1" }]));
     provider.selection.set(["m-1"]);
     expect(host.readRecordType("m-1")).toBeNull();
     expect(host.readApplicability("status", { id: "m-1" })).toBe("applies");
@@ -1906,7 +1928,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
     // The discriminator is the only reason a provider reads a row for
     // anything but its identity. A record that answers to no read at all
     // still completes, so nothing here touches it.
-    const { provider, host } = machineProvider();
+    const { provider, host } = createMachineProvider();
     const record = new Proxy(
       // The record carries a key that looks like a discriminator, so a
       // provider that read one would reach the trap rather than an absent
@@ -1921,7 +1943,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
         },
       },
     );
-    expect(host.complete(host.refresh(), delivered([record]))).toBe(true);
+    expect(host.complete(host.refresh(), buildDelivered([record]))).toBe(true);
     expect(provider.state.get().result.status).toBe("ready");
     provider.selection.set(["m-1"]);
     expect(host.readRecordType("m-1")).toBeNull();
