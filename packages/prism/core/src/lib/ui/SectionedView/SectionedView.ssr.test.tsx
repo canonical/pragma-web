@@ -32,6 +32,24 @@ describe("SectionedView SSR", () => {
     expect(html).not.toContain("aria-current");
   });
 
+  it("server-renders the bar first from three sections on, reading the label alone", () => {
+    const html = renderToString(
+      <SectionedView
+        header={<h1>Button</h1>}
+        sections={[
+          { id: "usage", title: "Usage", content: null },
+          { id: "anatomy", title: "Anatomy", content: null },
+          { id: "changes", title: "Changes", content: null },
+        ]}
+      />,
+    );
+    expect(html).toMatch(
+      /^<article class="ds sectioned-view"><nav aria-label="On this page" class="ds contents-bar bar" data-region="contents-bar"><details class="disclosure"><summary class="toggle"><span class="label">On this page<\/span><svg/,
+    );
+    expect(html).not.toContain('class="current"');
+    expect(html).not.toContain("aria-current");
+  });
+
   it("server-renders no aside for a page with no section and no facts", () => {
     const html = renderToString(
       <SectionedView header={<h1>Guide</h1>} sections={[]}>

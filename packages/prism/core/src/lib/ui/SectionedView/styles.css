@@ -28,6 +28,20 @@
     gap: var(--sectioned-view-gap);
   }
 
+  /* The "On this page" bar is not shown at three groups and wider, where
+   * the aside holds the index. Its grid area is the whole view, every
+   * column and every row, so it sticks at the scroller's top until the
+   * view's end: a sticky grid item is held by its grid area. */
+  .ds.sectioned-view > .bar {
+    display: none;
+    grid-column: 1 / -1;
+    grid-row: 1 / span 4;
+    align-self: start;
+    position: sticky;
+    inset-block-start: 0;
+    block-size: var(--sectioned-view-bar-block-size);
+  }
+
   /* The header and the content hold the columns before the aside's three. */
   .ds.sectioned-view > .header {
     display: grid;
@@ -135,6 +149,38 @@
 
     .ds.sectioned-view > .aside > .contents {
       display: none;
+    }
+
+    /* With the bar, the view's first row is the bar's height and the bar
+     * is shown there, its area running down every row; the header, the
+     * facts and the content take the rows under it, in that order, the
+     * content taking the facts' row when there are none. */
+    .ds.sectioned-view:has(> .bar) {
+      grid-template-rows: var(--sectioned-view-bar-block-size);
+    }
+
+    .ds.sectioned-view > .bar {
+      display: block;
+    }
+
+    .ds.sectioned-view:has(> .bar) > .header {
+      grid-row: 2;
+    }
+
+    .ds.sectioned-view:has(> .bar) > .aside > .facts {
+      grid-row: 3;
+    }
+
+    .ds.sectioned-view:has(> .bar) > .content {
+      grid-row: 4;
+    }
+
+    .ds.sectioned-view:has(> .bar):not(:has(> .aside > .facts)) > .bar {
+      grid-row: 1 / span 3;
+    }
+
+    .ds.sectioned-view:has(> .bar):not(:has(> .aside > .facts)) > .content {
+      grid-row: 3;
     }
 
     /* Under the header the facts keep the list's own layout. */

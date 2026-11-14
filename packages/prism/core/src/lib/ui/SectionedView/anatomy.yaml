@@ -3,27 +3,38 @@
 # single-entity page (heuristics 3.1 to 3.3; PS8 V1, ps8-measured.json; M13,
 # M14). It takes the header, the facts and the sections as data and renders
 # the section index itself; nothing reads the DOM to list sections.
-# DOM order: header, aside (contents, facts), content (body, then one
-# <section> per entry with its <h2 id>).
+# DOM order: bar (only with 3 sections or more), header, aside (contents,
+# facts), content (body, then one <section> per entry with its <h2 id>).
 # The root is one subgrid of the canvas's page grid over every column. It
 # adds no space at the page's end: the page wrapper that holds it owns that.
 #
 # Reflow, bound in styles.css (thresholds are whole groups, container `shell`):
 #   three groups and wider (default): header and content on `1 / -4`, rows 1
 #     and 2; the aside on `-4 / -1`, `grid-row: 1 / span 2`, sticky at the
-#     scroller's top, `align-self: start`.
+#     scroller's top, `align-self: start`; the bar is not displayed.
 #   `:not(:has(> .aside))`: header and content on `1 / -1` (1.1).
 #   @container shell (width < 1376px)  below three groups: every region on
 #     `1 / -1`; the aside is `display: contents`, its contents nav is not
 #     displayed and its facts take the row under the header (50a, 51a).
+#     With the bar (`:has(> .bar)`): `grid-template-rows` starts with one
+#     track of --sectioned-view-bar-block-size; the bar is displayed and
+#     keeps `grid-row: 1 / span 4` with `align-self: start`, so its grid
+#     area is the whole view and it sticks through the whole scroll (a
+#     sticky grid item is held by its grid area); header row 2, facts row 3,
+#     content row 4. With no facts (`:not(:has(> .aside > .facts))`) the
+#     content takes row 3 and the bar spans 3 rows, so no empty row adds a
+#     gap.
 # Every section heading carries `scroll-margin-block-start` of the bar's
 # block size, at every width; the DSL's roster has no key for it, so the
 # ledger below and the stylesheet carry it, and the anatomy check reads it
 # as an unkeyed property.
 #
 # Changed from the planner's anatomy, each for a reason:
-#   - The "On this page" bar, its `has-bar` state and its rows are not here
-#     yet: the slice that builds the bar adds its edge with the bar.
+#   - The bar's presence is read by `:has(> .bar)`, not a `has-bar` state:
+#     the check's states are interaction states, and a root that holds a
+#     bar is a reflow, as a root without an aside is. The bar's block size
+#     is set here, on its slot, from --sectioned-view-bar-block-size, the
+#     length the headings' scroll margin reads, so the two are one value.
 #   - Keys are spelled as the DSL's roster spells them (`layout.alignSelf`,
 #     `layout.offset.block.start`); the per-width `display` values are
 #     reflow, which the stylesheet binds under its container query.
@@ -59,6 +70,17 @@ node:
     layout.alignSelf: start
     spacing.gap: grid.gutter
   edges:
+    - node:
+        uri: prism.subcomponent.contents_bar
+        styles:
+          layout.type: none
+          layout.grid.column: "1 / -1"
+          layout.grid.row: "1 / span 4"
+          layout.alignSelf: start
+          layout.position: sticky
+          layout.offset.block.start: 0
+          size.block: "calc(var(--density-line-height) + 2 * var(--space-050))"
+      relation: { cardinality: "0..1", slotName: bar }             # sections.length >= BAR_MIN_SECTIONS (3)
     - node:
         role: header region
         styles:

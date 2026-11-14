@@ -3,8 +3,9 @@
 import type { ReactElement } from "react";
 import { useMessages } from "../../i18n/index.js";
 import isRenderedNode from "../isRenderedNode.js";
-import { ContentsList } from "./common/index.js";
-import { CONTENTS_LABEL_ID } from "./constants.js";
+import { ContentsBar, ContentsList } from "./common/index.js";
+import { BAR_MIN_SECTIONS, CONTENTS_LABEL_ID } from "./constants.js";
+import useCurrentSection from "./hooks/useCurrentSection.js";
 import type { SectionedViewProps } from "./types.js";
 import "./styles.css";
 
@@ -17,7 +18,8 @@ const componentCssClassName = "ds sectioned-view";
  * page. Every section renders its own level-2 heading, whose id is the
  * section's and the fragment its index link points to; a heading stops
  * the "On this page" bar's height under the scroller's top when a link
- * scrolls to it.
+ * scrolls to it. Once scripts run, the section whose heading has reached
+ * that line is the current one, marked in the index.
  *
  * It is a subgrid of the canvas's page grid over every column. At three
  * groups of columns and wider the header and the content hold the columns
@@ -25,7 +27,10 @@ const componentCssClassName = "ds sectioned-view";
  * the facts, sticky at the scroller's top, where a `KeyValueList` passed
  * as the facts stacks each key over its value; with no aside the header and
  * the content take every column. Below three groups every region takes
- * every column, the index is not shown and the facts follow the header.
+ * every column, the index is not shown and the facts follow the header;
+ * with three sections or more the "On this page" bar comes first, sticky
+ * at the scroller's top through the whole view, naming the current section
+ * and opening the index over the page.
  * A body given before the sections (`children`) is off the index; a facts
  * node or a body that renders nothing leaves no region, and a page with no
  * section and no facts has no aside. It adds no space at the page's end:
@@ -37,7 +42,8 @@ const componentCssClassName = "ds sectioned-view";
  * @throws When a section's id is empty or repeated, or is the index
  *   label's (`sectioned-view-contents`): it is the heading's id and a
  *   link's fragment, so it must name one section.
- * @note Impure: reads the translator in scope.
+ * @note Impure: reads the translator in scope, and follows the current
+ *   section once mounted.
  */
 export default function SectionedView({
   children,
@@ -58,12 +64,16 @@ export default function SectionedView({
     seen.add(id);
   }
   const hasFacts = isRenderedNode(facts);
+  const current = useCurrentSection(sections.map(({ id }) => id));
 
   return (
     <article
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
+      {sections.length >= BAR_MIN_SECTIONS ? (
+        <ContentsBar className="bar" current={current} sections={sections} />
+      ) : null}
       <div className="header">{header}</div>
       {sections.length > 0 || hasFacts ? (
         <aside className="aside">
@@ -72,7 +82,11 @@ export default function SectionedView({
               <h2 className="label" id={CONTENTS_LABEL_ID}>
                 {t("sectionedView.contents")}
               </h2>
-              <ContentsList className="list" sections={sections} />
+              <ContentsList
+                className="list"
+                current={current}
+                sections={sections}
+              />
             </nav>
           ) : null}
           {hasFacts ? <div className="facts">{facts}</div> : null}
