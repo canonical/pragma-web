@@ -18,8 +18,7 @@ import type { RowRecord } from "../rows/index.js";
 
 /**
  * A number a source claims, with how much it claims. Never a bare null:
- * "unknown" is a value, so an unfiltered total can never be read as a
- * filtered one and a missing count can never be read as zero.
+ * "unknown" is a value, so a missing count can never be read as zero.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -31,14 +30,10 @@ export type Count =
   | { readonly kind: "unknown" };
 
 /**
- * Three counts with distinct provenance. `pageable`: rows the window pages
+ * Two counts with distinct provenance. `pageable`: rows the window pages
  * over, after collapse — the only basis for "page n of m". `matched`: rows
- * satisfying filter and search, before collapse. `total`: the collection
- * ignoring the query, which nothing displays yet. Without grouping
+ * satisfying filter and search, before collapse. Without grouping
  * `pageable` equals `matched`.
- *
- * @seam summary — read by `DataViews.Summary`, which shows `total` under
- * its own label
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -46,7 +41,6 @@ export type Count =
 export type SourceCounts = {
   readonly pageable: Count;
   readonly matched: Count;
-  readonly total: Count;
 };
 
 /**
@@ -150,10 +144,7 @@ export type SourcePage<TRow extends object = RowRecord> = {
 };
 
 /**
- * Which member of a request was refused. `targets` names an action
- * addressing every row a query matches; nothing declares that scope, so
- * the binding rejects such a request outright rather than answering a
- * refusal nothing could act on.
+ * Which member of a request was refused.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -163,13 +154,10 @@ export type SourceRefusalPart =
   | "search"
   | "sort"
   | "group"
-  | "window"
-  | "targets";
+  | "window";
 
 /**
  * Machine-readable cause, so a control can react without reading text.
- * `query-targets-unsupported` is the refusal a query-wide target set
- * would carry; see `SourceRefusalPart`.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -181,7 +169,6 @@ export type SourceRefusalCode =
   | "too-many-levels"
   | "unreachable-page"
   | "unsupported-collapse"
-  | "query-targets-unsupported"
   | "unsupported-combination";
 
 /**

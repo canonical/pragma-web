@@ -63,7 +63,6 @@ const total = (counted: Exclude<Count, { readonly kind: "unknown" }>): string =>
 /** Every DataViews message, in French. */
 export const FRENCH: DataViewsMessages = {
   statusPending: "Chargement…",
-  statusRegrouping: "Regroupement…",
   statusFailed: (reason) =>
     `Ces lignes n’ont pas pu être chargées : ${clause(reason)}`,
   statusRefused: (reason) =>

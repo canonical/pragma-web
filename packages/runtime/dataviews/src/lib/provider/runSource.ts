@@ -74,7 +74,6 @@ const holdCounts = (
 ): SourceCounts => ({
   pageable: holdCount(counts.pageable, declared.pageable),
   matched: holdCount(counts.matched, declared.matched),
-  total: holdCount(counts.total, declared.total),
 });
 
 /**
@@ -140,7 +139,6 @@ const isSameResult = <TRow extends object>(
         areListsEqual(result.groups, page.groups, Object.is)) &&
     areCountsEqual(counts.pageable, page.counts.pageable) &&
     areCountsEqual(counts.matched, page.counts.matched) &&
-    areCountsEqual(counts.total, page.counts.total) &&
     areFacetsEqual(facets, page.facets) &&
     result.more === page.more &&
     (result.cursors?.next ?? null) === (page.cursors?.next ?? null) &&

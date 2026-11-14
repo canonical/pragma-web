@@ -61,7 +61,7 @@ const permissive: SourceCapabilities = declareCapabilities(machines, {
   filter: { status: ["isAny"], cpu: ["gte", "lte"] },
   search: ["name"],
   sort: { fields: ["cpu", "updated"], terms: 2 },
-  counts: { pageable: "exact", matched: "exact", total: "exact" },
+  counts: { pageable: "exact", matched: "exact" },
 });
 
 const delivered = <TRow extends object>(
@@ -1380,7 +1380,6 @@ describe("createDataViewsProvider host", () => {
     expect(result.counts).toEqual({
       pageable: { kind: "exact", value: 1 },
       matched: { kind: "exact", value: 1 },
-      total: { kind: "exact", value: 1 },
     });
     expect(result.provenance?.requestId).toBe(requestId);
   });

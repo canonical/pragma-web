@@ -10,7 +10,6 @@ export default function buildPage<TRow extends object>(
     counts: {
       pageable: { kind: "exact", value: rows.length },
       matched: { kind: "exact", value: rows.length },
-      total: { kind: "exact", value: rows.length },
     },
     facets: {},
     more: null,

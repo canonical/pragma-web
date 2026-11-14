@@ -23,7 +23,6 @@ const page: SourcePage = {
   counts: {
     pageable: { kind: "unknown" },
     matched: { kind: "unknown" },
-    total: { kind: "unknown" },
   },
   more: null,
   cursors: null,

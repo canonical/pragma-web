@@ -33,7 +33,6 @@ describe("createUncountedSource", () => {
     expect(source.capabilities.counts).toEqual({
       pageable: "unknown",
       matched: "unknown",
-      total: "unknown",
     });
     const [delivery] = deliveries(source);
     expect(delivery).toMatchObject({
@@ -42,7 +41,6 @@ describe("createUncountedSource", () => {
         counts: {
           pageable: { kind: "unknown" },
           matched: { kind: "unknown" },
-          total: { kind: "unknown" },
         },
       },
     });

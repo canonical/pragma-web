@@ -302,10 +302,10 @@ const relay = () => {
   return { environment, fetches, fetchAt };
 };
 
-/** A forward connection: a status filter, no search, no declareSort, a total. */
+/** A forward connection: a status filter, no search, no declareSort, exact counts. */
 const connectionCapabilities: SourceCapabilities = declare({
   filter: { status: ["isAny"] },
-  counts: { pageable: "exact", matched: "exact", total: "unknown" },
+  counts: { pageable: "exact", matched: "exact" },
   pagination: { kind: "cursor", backward: false, durable: false },
 });
 
@@ -313,7 +313,6 @@ const connectionCapabilities: SourceCapabilities = declare({
 const countsOf = (matched: Count): SourceCounts => ({
   pageable: matched,
   matched,
-  total: UNKNOWN_COUNT,
 });
 
 const statusOf = (slice: Slice): readonly string[] | null => {

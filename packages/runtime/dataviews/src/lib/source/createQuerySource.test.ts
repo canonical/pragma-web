@@ -43,7 +43,7 @@ const endpoint: SourceCapabilities = declare({
   filter: { status: ["isAny"] },
   search: { fields: ["name"] },
   sort: declareSort(["cpu"], 1),
-  counts: { pageable: "exact", matched: "exact", total: "exact" },
+  counts: { pageable: "exact", matched: "exact" },
 });
 
 const exact = (value: number) => ({ kind: "exact" as const, value });
@@ -55,7 +55,6 @@ const page = (rows: readonly RowRecord[], matched: number): SourcePage => ({
   counts: {
     pageable: exact(matched),
     matched: exact(matched),
-    total: exact(matched),
   },
   more: null,
   cursors: null,

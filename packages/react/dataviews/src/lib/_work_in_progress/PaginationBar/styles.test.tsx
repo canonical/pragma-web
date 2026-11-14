@@ -68,7 +68,6 @@ const selectorOf = (dom: string): string =>
 const twoOfThree = createPage({
   rows: [buildMachine("m1", "one"), buildMachine("m2", "two")],
   matched: 3,
-  total: 3,
 });
 
 /**

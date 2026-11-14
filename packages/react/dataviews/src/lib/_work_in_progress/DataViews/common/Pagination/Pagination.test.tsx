@@ -41,7 +41,6 @@ describe("DataViews.Pagination", () => {
         page: createPage({
           rows: [buildMachine("m1", "alpha"), buildMachine("m2", "beta")],
           matched: 5,
-          total: 5,
         }),
       });
     });
@@ -78,7 +77,6 @@ describe("DataViews.Pagination", () => {
         page: createPage({
           rows: [buildMachine("m1", "alpha"), buildMachine("m2", "beta")],
           matched: 5,
-          total: 5,
         }),
       });
     });

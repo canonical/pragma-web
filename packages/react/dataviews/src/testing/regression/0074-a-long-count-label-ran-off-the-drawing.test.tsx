@@ -31,7 +31,6 @@ describe("a count label with no room at its bar's tip", () => {
         page: createPage({
           rows: [buildMachine("m-1", "alpha")],
           matched: 1,
-          total: 1,
           facets: {
             status: {
               kind: "values",

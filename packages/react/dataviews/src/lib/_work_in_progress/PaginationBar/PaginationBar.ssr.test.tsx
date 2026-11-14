@@ -45,7 +45,6 @@ describe("PaginationBar SSR", () => {
       page: createPage({
         rows: [buildMachine("m3", "three"), buildMachine("m4", "four")],
         matched: 6,
-        total: 6,
       }),
     });
     const html = renderToString(<PaginationBar provider={provider} />);
@@ -74,7 +73,6 @@ describe("PaginationBar SSR", () => {
       page: createPage({
         rows: [buildMachine("m3", "three"), buildMachine("m4", "four")],
         matched: 6,
-        total: 6,
       }),
     });
     const html = renderToString(<PaginationBar provider={provider} />);
@@ -93,7 +91,6 @@ describe("PaginationBar SSR", () => {
       page: createPage({
         rows: [buildMachine("m1", "one"), buildMachine("m2", "two")],
         matched: 5,
-        total: 5,
       }),
     });
     const html = renderToString(<PaginationBar provider={provider} />);
