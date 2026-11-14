@@ -20,10 +20,11 @@
 #   --contents-list-focus-ring-width: 2px, --contents-list-focus-ring-offset: -2px   literals
 #
 # Changed from the planner's anatomy: keys are spelled as the DSL's roster
-# spells them (`layout.listStyle`, `typography.weight`). The roster has no
-# key for the current entry's inset rule; it stays named here as
-# `appearance.boxShadow@current`, the stylesheet's `box-shadow` through the
-# two tokens above.
+# spells them (`layout.listStyle`, `typography.weight`), and the current
+# entry is the roster's `selected` state, as a link to the current page is. The roster has no
+# key for a box shadow, so the current entry's inset rule is not a key: the
+# stylesheet draws it with `box-shadow: inset <width> 0 0 <color>` through
+# the `--contents-list-current-rule-*` tokens above.
 node:
   uri: prism.subcomponent.contents_list
   element: ol
@@ -32,7 +33,8 @@ node:
     layout.direction: column
     spacing.gap: space.050
     spacing.internal.inline.start: 0
-    spacing.external.block: 0
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
     layout.listStyle: none
   edges:
     - node:
@@ -49,8 +51,7 @@ node:
                 spacing.internal.block.end: space.050
                 spacing.internal.inline.start: space.100
                 typography.color: color.text
-                typography.weight@current: typography.text.primary.bold.fontWeight
-                appearance.boxShadow@current: "inset 2px 0 0 color.border.highlighted"
+                typography.weight@selected: typography.text.primary.bold.fontWeight
                 appearance.outline.width@focus: 2px
                 appearance.outline.style@focus: solid
                 appearance.outline.color@focus: color.focusRing

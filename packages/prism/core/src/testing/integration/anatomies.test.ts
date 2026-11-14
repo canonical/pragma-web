@@ -1,5 +1,6 @@
 // @vitest-environment node
 
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
@@ -55,6 +56,11 @@ const REACHES = [
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
 
+/** The private subcomponents each component keeps under its `common/`. */
+const subcomponentFolders = listAnatomyFolders(
+  folders.map((folder) => join(folder, "common")),
+);
+
 describe("the package's components", () => {
   it("are found", () => {
     expect(folders.length).toBeGreaterThan(0);
@@ -66,6 +72,13 @@ describe("the package's components", () => {
       const specification = assertAnatomy(folder);
       assertStylesMatchAnatomy(folder, specification);
       assertScaffold(folder, { packageRoot: PACKAGE_ROOT, testSuffix: "test" });
+    },
+  );
+
+  it.each(subcomponentFolders)(
+    "%s keeps its anatomy and its styles",
+    (folder) => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
     },
   );
 
