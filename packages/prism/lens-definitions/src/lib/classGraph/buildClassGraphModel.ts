@@ -1,4 +1,15 @@
 import {
+  ceilTo,
+  compareText,
+  type FontFace,
+  LABEL_SIZE,
+  LATTICE,
+  measureTextWidth,
+  orderBy,
+  requireAt,
+  requireEntry,
+} from "@canonical/prism-core";
+import {
   BOX_HEIGHT,
   BOX_INSET,
   BOX_MAX_WIDTH,
@@ -8,20 +19,15 @@ import {
   HUB_LABEL_SIZE,
   HUB_LOOP_EXTENT,
   HUB_MIN_DEGREE,
-  LABEL_SIZE,
-  LATTICE,
   LOOP_EXTENT,
   WRAPPED_HEIGHT,
 } from "./constants.js";
-import { ceilTo, compareText, measureTextWidth, orderBy } from "./geometry.js";
-import { requireAt, requireEntry } from "./require.js";
 import type {
   Bundle,
   ClassGraphInput,
   ClassGraphModel,
   ClassModel,
   DrawnRelation,
-  FontFace,
   GraphClassInput,
   GraphRelationInput,
   RegionJoin,

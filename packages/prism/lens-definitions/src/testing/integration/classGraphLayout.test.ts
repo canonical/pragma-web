@@ -8,6 +8,13 @@
  * layout shows here first.
  */
 
+import {
+  measurePathBounds,
+  parsePathData,
+  requireAt,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import {
   countCrossings,
@@ -24,16 +31,7 @@ import {
 import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import { DESIGN_CANVAS, MIN_FIT } from "../../lib/classGraph/constants.js";
-import {
-  measurePathBounds,
-  parsePathData,
-} from "../../lib/classGraph/geometry.js";
 import layOutClassGraph from "../../lib/classGraph/layOutClassGraph.js";
-import {
-  requireAt,
-  requireDefined,
-  requireEntry,
-} from "../../lib/classGraph/require.js";
 
 const layout = layOutClassGraph(ontologyGraph);
 

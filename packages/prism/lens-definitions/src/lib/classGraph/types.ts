@@ -1,3 +1,10 @@
+import type {
+  FontFace,
+  LabelledBundle,
+  Point,
+  Rect,
+} from "@canonical/prism-core";
+
 /** One class the graph draws, as the explorer's query states it. */
 export interface GraphClassInput {
   /** The class's full IRI. */
@@ -40,56 +47,6 @@ export interface ClassGraphInput {
   readonly relations: readonly GraphRelationInput[];
 }
 
-/** A face of the shipped font the canvas sets text in. */
-export type FontFace = "regular" | "bold" | "boldItalic";
-
-/** One face's advance widths, in font units, by character. */
-export interface FaceMetrics {
-  readonly advances: Readonly<Record<string, number>>;
-  readonly tabular: Readonly<Record<string, number>>;
-}
-
-/** The shipped font's metrics, in font units. */
-export interface FontMetrics {
-  readonly unitsPerEm: number;
-  readonly ascender: number;
-  readonly descender: number;
-  /** The width of a character the table does not hold, in ems. */
-  readonly fallbackEm: number;
-  readonly faces: Readonly<Record<FontFace, FaceMetrics>>;
-}
-
-/** A rectangle, in px of the graph's world space. */
-export interface Rect {
-  readonly x: number;
-  readonly y: number;
-  readonly w: number;
-  readonly h: number;
-}
-
-/** A point, in px of the graph's world space. */
-export type Point = readonly [number, number];
-
-/**
- * One command of an SVG path, with absolute integer coordinates: `M`, `L`
- * and `C` take points, `H` and `V` one coordinate.
- */
-export type PathCommand =
-  | readonly ["M" | "L", number, number]
-  | readonly ["H" | "V", number]
-  | readonly ["C", number, number, number, number, number, number];
-
-/** One level of port spacing a box's side tries, in px. */
-export interface PortLevel {
-  readonly name: string;
-  /** The least distance from a corner. */
-  readonly corner: number;
-  /** The least distance from the subclass tick. */
-  readonly tick: number;
-  /** The least distance between two ports. */
-  readonly spacing: number;
-}
-
 /** A class as the model holds it: its input, its box and its encodings. */
 export interface ClassModel extends GraphClassInput {
   /** The label's type size: 14, or 16 on a hub. */
@@ -117,19 +74,9 @@ export interface ClassModel extends GraphClassInput {
 }
 
 /** Every relation between one unordered pair of classes, drawn as one path. */
-export interface Bundle {
-  /** The pair's IRIs, sorted, joined by a space. */
-  readonly id: string;
-  readonly a: string;
-  readonly b: string;
-  /** Whether both ends are one class. */
-  readonly self: boolean;
+export interface Bundle extends LabelledBundle {
   /** The bundled relations, by label. */
   readonly relations: readonly DrawnRelation[];
-  /** The ends that are some relation's range, which carry an arrowhead. */
-  readonly heads: ReadonlySet<string>;
-  /** Whether the ends lie in two regions. */
-  readonly cross: boolean;
   /** Whether relations run both ways. */
   readonly opposite: boolean;
 }
@@ -274,67 +221,6 @@ export interface ClassGraphLayout {
   readonly phone: PhoneLayout;
 }
 
-/** An edge label placed for the focus node. */
-export interface PlacedLabel {
-  readonly edge: string;
-  readonly lines: readonly string[];
-  readonly box: Rect;
-  /** The label's centre. */
-  readonly cx: number;
-  readonly cy: number;
-}
-
-/** The labels placed for a focus node, and those that found no place. */
-export interface LabelPlacement {
-  readonly placed: readonly PlacedLabel[];
-  readonly omitted: readonly {
-    readonly edge: string;
-    readonly lines: readonly string[];
-  }[];
-}
-
-/** A line already fixed on a box's side: a subclass tick or a loop's end. */
-export interface FixedPort {
-  readonly kind: "tick" | "loop";
-  /** Its offset from the box's top, in px. */
-  readonly y: number;
-}
-
-/** The ports a side was given and the spacing level it needed. */
-export interface PortAllocation {
-  /** Each request's offset from the box's top, in the requests' order. */
-  readonly ys: readonly number[];
-  /** The index of the level in `PORT_LEVELS` the side needed. */
-  readonly level: number;
-}
-
-/** A box placed in its region's own coordinates. */
-export interface RegionNode {
-  readonly id: string;
-  readonly col: number;
-  readonly x: number;
-  readonly y: number;
-  readonly w: number;
-  readonly h: number;
-  /** Its place in its column, top first. */
-  readonly order: number;
-}
-
-/** An edge routed in its region's own coordinates. */
-export interface RegionEdge {
-  readonly id: string;
-  readonly kind: "subclass" | "relation";
-  readonly from: string;
-  readonly to: readonly string[];
-  readonly commands: readonly PathCommand[];
-  readonly heads: readonly (readonly PathCommand[])[];
-  readonly bundle?: Bundle;
-  readonly busX?: number;
-  readonly self?: boolean;
-  readonly arc?: boolean;
-  readonly apex?: Point;
-}
-
 /** What a legible window frames, beyond the graph and the canvas. */
 export interface LegibleWindowOptions {
   /** The box of the class selected on arrival, which the window holds. */
@@ -346,40 +232,6 @@ export interface LegibleWindowOptions {
    * (`MIN_FIT`) when omitted; the overview's floor for a Fit.
    */
   readonly zoom?: number;
-}
-
-/**
- * Where one end of a relation between two regions meets its box: the side
- * that faces the other end, and the port's ideal offset from the box's top,
- * towards the other end's middle.
- */
-export interface CrossPort {
-  readonly side: "left" | "right";
-  readonly ideal: number;
-}
-
-/** One region laid out in its own coordinates, its top-left at the origin. */
-export interface RegionLayout {
-  readonly nodes: ReadonlyMap<string, RegionNode>;
-  readonly edges: readonly RegionEdge[];
-  /** Each column's items, top first: class IRIs and waypoint ids. */
-  readonly columns: readonly (readonly string[])[];
-  readonly columnX: readonly number[];
-  readonly columnWidth: readonly number[];
-  /** Each relation port's height, by `<bundle> <class>`. */
-  readonly ports: ReadonlyMap<string, number>;
-  /** The box that holds every node, loop and edge. */
-  readonly content: Rect;
-  /** Every rule the region could not keep, in words. */
-  readonly findings: readonly string[];
-  /** How many same-column arcs nest past the channel into the next column. */
-  readonly crowdedArcs: number;
-  /** A class's column. */
-  readonly columnOf: (id: string) => number;
-  /** A class's superclass hops to its root. */
-  readonly depthOf: (id: string) => number;
-  /** A relation-placed class's predecessors, back edges removed. */
-  readonly predecessorsOf: (id: string) => readonly string[];
 }
 
 /** A packing of regions into shelves. */

@@ -12,6 +12,7 @@ import {
   insetRect,
   intersectsRect,
   measurePathBounds,
+  measureRegionLabelWidth,
   measureTextBox,
   measureTextWidth,
   orderBy,
@@ -20,6 +21,18 @@ import {
   samplePath,
   uniteRects,
 } from "./geometry.js";
+
+describe("measureRegionLabelWidth", () => {
+  it("measures the bold capital prefix, the gap and the regular count", () => {
+    expect(measureRegionLabelWidth("ds", 12)).toBe(
+      Math.ceil(
+        measureTextWidth("DS", "bold", 16) +
+          8 +
+          measureTextWidth("12 classes", "regular", 14),
+      ),
+    );
+  });
+});
 
 describe("measureTextWidth", () => {
   it("measures bold 14px labels from the shipped font's advances", () => {

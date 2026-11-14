@@ -5,6 +5,7 @@
  * lifting the fade.
  */
 
+import { requireEntry } from "@canonical/prism-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
@@ -12,7 +13,6 @@ import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js"
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
 import { MIN_FIT } from "../../classGraph/constants.js";
-import { requireEntry } from "../../classGraph/require.js";
 import frameOpeningView from "./frameOpeningView.js";
 import HierarchyWell from "./HierarchyWell.js";
 import type { HierarchyWellProps } from "./types.js";

@@ -1,13 +1,17 @@
 import {
-  CLEAN_EDGE_ZOOM,
+  intersectsRect,
   LATTICE,
+  measureRegionLabelWidth,
+  REGION_LABEL_ROW,
+  type Rect,
+} from "@canonical/prism-core";
+import {
+  CLEAN_EDGE_ZOOM,
   LEGIBLE_MARGIN,
   MIN_FIT,
-  REGION_LABEL_ROW,
   VIEW_MARGIN,
 } from "./constants.js";
-import { intersectsRect, measureRegionLabelWidth } from "./geometry.js";
-import type { ClassGraphLayout, LegibleWindowOptions, Rect } from "./types.js";
+import type { ClassGraphLayout, LegibleWindowOptions } from "./types.js";
 
 /** How far a rectangle may overrun another and still count as inside it. */
 const TOLERANCE = 1e-6;

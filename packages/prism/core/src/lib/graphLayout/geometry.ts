@@ -1,5 +1,5 @@
 /**
- * The class graph's pure geometry: text widths from the shipped font's
+ * The layered graph's pure geometry: text widths from the shipped font's
  * advance table, path data from commands, a path's samples and bounds, and
  * the rectangle tests the layout keeps its rules with. They share one unit,
  * px of the graph's world space, and one input form, absolute commands
@@ -106,7 +106,7 @@ export function formatPathData(
       );
       const fraction = shifted.find((value) => !Number.isInteger(value));
       if (fraction !== undefined) {
-        throw new Error(`a class graph path holds ${fraction}, not an integer`);
+        throw new Error(`a path holds ${fraction}, not an integer`);
       }
       return `${name}${shifted.join(" ")}`;
     })

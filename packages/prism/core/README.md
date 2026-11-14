@@ -404,6 +404,30 @@ site's own catalog, and the factory holds no reader-facing string.
   or its top-left corner at that zoom without one, the rest a pan away), and
   the camera pans over the graph's whole bounds however
   small a window of it the viewBox opens on.
+- Graph budgets: `GRAPH_DRAWN_NODES_MAX`, `GRAPH_BAND_MEMBERS_MAX`,
+  `GRAPH_FETCHED_NODES_MAX`, `GRAPH_SVG_BYTES_MAX`, `GRAPH_SVG_ELEMENTS_MAX`,
+  `GRAPH_LABEL_PX_MIN`, `GRAPH_BUDGET` (all six as one record),
+  `createGraphBudget` (the site's budget, built once: a bare number only
+  tightens a budget, loosening one takes a reason),
+  `GraphBudgetProvider`, `useGraphBudget`; types `GraphBudget`,
+  `GraphBudgetOverrides`, `GraphBudgetRaise`, `GraphBudgetProviderProps`.
+- Graph layout: the engine contract and the layered engine, pure functions
+  of their input: `layoutLayered` (a region of nodes as layered columns,
+  root at the left, on the contract), `layOutRegion`, the lengths it places
+  by `LATTICE`, `BUS_OFFSET`, `ARC_BASE`, `ARC_NEST`, `LABEL_SIZE`,
+  `REGION_LABEL_SIZE`, `REGION_LABEL_GAP`, `REGION_LABEL_ROW`, `COLLISION_MARGIN`,
+  `LABEL_LINE_PITCH`, `LABEL_HALO`, `DIRECTION_ARROWS`, the label placer
+  `placeEdgeLabels`, and the geometry it shares `measureTextWidth`,
+  `measureTextBox`, `measureRegionLabelWidth`, `findCentredBaseline`,
+  `ceilTo`, `roundTo`, `formatPathData`, `parsePathData`, `buildArrowhead`,
+  `flattenPath`, `samplePath`, `measurePathBounds`, `insetRect`,
+  `containsPoint`, `intersectsRect`, `uniteRects`, `compareText`, `orderBy`,
+  `requireAt`, `requireEntry`, `requireDefined`; types `GraphLayout`,
+  `GraphLayoutNode`, `GraphLayoutEdge`, `GraphLayoutOptions`,
+  `GraphLayoutResult`, `LayeredNodes`, `LayeredEdges`, `LayeredModel`,
+  `LayeredBundle`, `RegionLayout`, `CrossPort`, `LabelledLayout`,
+  `LabelledBundle`, `LabelPlacement`, `Rect`, `Point`, `PathCommand`,
+  `FontFace`.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.

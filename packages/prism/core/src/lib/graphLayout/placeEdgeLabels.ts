@@ -20,16 +20,16 @@ import {
 } from "./geometry.js";
 import { requireAt, requireDefined, requireEntry } from "./require.js";
 import type {
-  ClassGraphLayout,
+  LabelledLayout,
+  LabelledNode,
+  LabelledRegion,
   LabelPlacement,
-  LaidOutNode,
-  LaidOutRegion,
   PlacedLabel,
   Rect,
 } from "./types.js";
 
 /** A node's collision box: its box, 4px around, and its loop's extent. */
-function measureCollisionBox(node: LaidOutNode): Rect {
+function measureCollisionBox(node: LabelledNode): Rect {
   return {
     x: node.x - COLLISION_MARGIN,
     y: node.y - COLLISION_MARGIN - node.loopExtent,
@@ -54,20 +54,20 @@ function measureLabelBox(
 }
 
 /** The box a region's label row's text takes: its prefix and its count. */
-function measureRegionLabel(region: LaidOutRegion, classCount: string): Rect {
+function measureRegionLabel(region: LabelledRegion, memberCount: string): Rect {
   return {
     x: region.x,
     y: region.y,
     w:
       measureTextWidth(region.prefix.toUpperCase(), "bold", REGION_LABEL_SIZE) +
       REGION_LABEL_GAP +
-      measureTextWidth(classCount, "regular", LABEL_SIZE),
+      measureTextWidth(memberCount, "regular", LABEL_SIZE),
     h: REGION_LABEL_ROW,
   };
 }
 
 /**
- * Place the labels of a focus class's relation edges, deterministically:
+ * Place the labels of a focus node's relation edges, deterministically:
  * a loop's first, by the loop; then each edge's at t = 0.5, 0.35 and 0.65
  * along it, centred, then 12px above or below the points at 0.5, 0.35,
  * 0.65, 0.2 and 0.8, then beside a same-column arc's apex, then above or
@@ -78,27 +78,27 @@ function measureRegionLabel(region: LaidOutRegion, classCount: string): Rect {
  * that is not drawn, its source or every target faded or hidden, gets no
  * label.
  *
- * @param layout - The class graph's layout.
- * @param focus - The focus class's IRI.
- * @param faded - The classes not drawn at full strength: outside the
+ * @param layout - The layout of the graph.
+ * @param focus - The focus node's id.
+ * @param faded - The nodes not drawn at full strength: outside the
  *   focus's neighbourhood, or hidden by the filter.
  * @param formatCount - How "‹n› relations" reads, from the catalog.
- * @param formatClassCount - How a region's "‹n› classes" reads.
+ * @param formatMemberCount - How a region's "‹n› members" reads.
  * @returns The placed and the omitted labels.
  */
 export default function placeEdgeLabels(
-  layout: ClassGraphLayout,
+  layout: LabelledLayout,
   focus: string,
   faded: ReadonlySet<string>,
   formatCount: (count: number) => string,
-  formatClassCount: (count: number) => string,
+  formatMemberCount: (count: number) => string,
 ): LabelPlacement {
   const visible = [...layout.nodes.values()].filter(
     (node) => !faded.has(node.uri),
   );
   const obstacles = visible.map(measureCollisionBox);
   const texts = layout.regions.map((region) =>
-    measureRegionLabel(region, formatClassCount(region.ids.length)),
+    measureRegionLabel(region, formatMemberCount(region.ids.length)),
   );
   const { viewBox } = layout;
   const placed: PlacedLabel[] = [];

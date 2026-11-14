@@ -1,7 +1,7 @@
-import type { GraphBox } from "@canonical/prism-core";
+import type { GraphBox, Rect } from "@canonical/prism-core";
 import { DESIGN_CANVAS } from "../../classGraph/constants.js";
 import frameLegibleWindow from "../../classGraph/frameLegibleWindow.js";
-import type { ClassGraphLayout, Rect } from "../../classGraph/types.js";
+import type { ClassGraphLayout } from "../../classGraph/types.js";
 
 /**
  * Frame the box the canvas opens on, as the server paints it for the

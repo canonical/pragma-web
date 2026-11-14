@@ -1,8 +1,8 @@
+import { requireEntry } from "@canonical/prism-core";
 import { cleanup, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../../../testing/createRouterHarness.js";
-import { requireEntry } from "../../../../classGraph/require.js";
 import PhoneGraph from "./PhoneGraph.js";
 import type { PhoneGraphProps } from "./types.js";
 

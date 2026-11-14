@@ -1,30 +1,27 @@
 import {
   ARC_BASE,
   ARC_NEST,
-  BOX_HEIGHT,
-  COLLISION_MARGIN,
-  PHONE,
-  ROUTE_STEP,
-} from "./constants.js";
-import {
   buildArrowhead,
+  COLLISION_MARGIN,
   compareText,
   containsPoint,
   formatPathData,
   insetRect,
   orderBy,
+  type PathCommand,
+  type Point,
+  type Rect,
+  requireAt,
+  requireEntry,
   samplePath,
-} from "./geometry.js";
-import { requireAt, requireEntry } from "./require.js";
+} from "@canonical/prism-core";
+import { BOX_HEIGHT, PHONE, ROUTE_STEP } from "./constants.js";
 import type {
   ClassGraphModel,
   LaidOutEdge,
   LaidOutNode,
-  PathCommand,
   PhoneLayout,
   PhoneRow,
-  Point,
-  Rect,
 } from "./types.js";
 
 /**

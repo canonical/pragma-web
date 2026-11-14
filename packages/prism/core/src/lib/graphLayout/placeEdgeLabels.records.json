@@ -1,0 +1,3868 @@
+{
+  "layouts": {
+    "small": {
+      "nodes": [
+        [
+          "ex:Long",
+          {
+            "uri": "ex:Long",
+            "col": 0,
+            "region": "ex",
+            "x": 0,
+            "y": 32,
+            "w": 208,
+            "h": 64,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "ex:Note",
+          {
+            "uri": "ex:Note",
+            "col": 1,
+            "region": "ex",
+            "x": 256,
+            "y": 208,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 16
+          }
+        ],
+        [
+          "ex:Part",
+          {
+            "uri": "ex:Part",
+            "col": 1,
+            "region": "ex",
+            "x": 256,
+            "y": 96,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "ex:Remark",
+          {
+            "uri": "ex:Remark",
+            "col": 2,
+            "region": "ex",
+            "x": 416,
+            "y": 144,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "ex:Thing",
+          {
+            "uri": "ex:Thing",
+            "col": 0,
+            "region": "ex",
+            "x": 0,
+            "y": 112,
+            "w": 96,
+            "h": 48,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "ex:Whole",
+          {
+            "uri": "ex:Whole",
+            "col": 1,
+            "region": "ex",
+            "x": 256,
+            "y": 144,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "zz:Leaf",
+          {
+            "uri": "zz:Leaf",
+            "col": 1,
+            "region": "zz",
+            "x": 144,
+            "y": 336,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "zz:Root",
+          {
+            "uri": "zz:Root",
+            "col": 0,
+            "region": "zz",
+            "x": 0,
+            "y": 320,
+            "w": 96,
+            "h": 48,
+            "loopExtent": 0
+          }
+        ]
+      ],
+      "edges": [
+        {
+          "id": "sub:ex:Thing",
+          "kind": "subclass",
+          "from": "ex:Thing",
+          "to": ["ex:Part", "ex:Whole"],
+          "d": "M96 136H224M224 112V160M224 112H256M224 160H256"
+        },
+        {
+          "id": "rel:ex:Long ex:Note",
+          "kind": "relation",
+          "from": "ex:Long",
+          "to": ["ex:Note"],
+          "d": "M208 88C232 88 232 216 256 216",
+          "bundle": {
+            "id": "ex:Long ex:Note",
+            "a": "ex:Long",
+            "b": "ex:Note",
+            "self": false,
+            "cross": false,
+            "heads": ["ex:Note"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "ex:cites",
+                "label": "cites",
+                "domain": "ex:Long",
+                "range": "ex:Note"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:ex:Long ex:Remark",
+          "kind": "relation",
+          "from": "ex:Long",
+          "to": ["ex:Remark"],
+          "d": "M208 84C232 84 232 88 256 88H368C392 88 392 152 416 152",
+          "bundle": {
+            "id": "ex:Long ex:Remark",
+            "a": "ex:Long",
+            "b": "ex:Remark",
+            "self": false,
+            "cross": false,
+            "heads": ["ex:Long"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "ex:refines",
+                "label": "refines",
+                "domain": "ex:Remark",
+                "range": "ex:Long"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:ex:Note ex:Note",
+          "kind": "relation",
+          "from": "ex:Note",
+          "to": ["ex:Note"],
+          "d": "M344 208C344 176 384 216 352 216",
+          "bundle": {
+            "id": "ex:Note ex:Note",
+            "a": "ex:Note",
+            "b": "ex:Note",
+            "self": true,
+            "cross": false,
+            "heads": ["ex:Note"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "ex:seeAlso",
+                "label": "seeAlso",
+                "domain": "ex:Note",
+                "range": "ex:Note"
+              }
+            ]
+          },
+          "self": true,
+          "apex": [364, 196]
+        },
+        {
+          "id": "rel:ex:Note ex:Remark",
+          "kind": "relation",
+          "from": "ex:Note",
+          "to": ["ex:Remark"],
+          "d": "M352 220H368C392 220 392 168 416 168",
+          "bundle": {
+            "id": "ex:Note ex:Remark",
+            "a": "ex:Note",
+            "b": "ex:Remark",
+            "self": false,
+            "cross": false,
+            "heads": ["ex:Remark"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "ex:about",
+                "label": "about",
+                "domain": "ex:Note",
+                "range": "ex:Remark"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:ex:Part ex:Whole",
+          "kind": "relation",
+          "from": "ex:Part",
+          "to": ["ex:Whole"],
+          "d": "M352 120H368C384 120 384 120 384 136V136C384 152 384 152 368 152H352",
+          "bundle": {
+            "id": "ex:Part ex:Whole",
+            "a": "ex:Part",
+            "b": "ex:Whole",
+            "self": false,
+            "cross": false,
+            "heads": ["ex:Part", "ex:Whole"],
+            "opposite": true,
+            "relations": [
+              {
+                "uri": "ex:hasPart",
+                "label": "hasPart",
+                "domain": "ex:Whole",
+                "range": "ex:Part"
+              },
+              {
+                "uri": "ex:partOf",
+                "label": "partOf",
+                "domain": "ex:Part",
+                "range": "ex:Whole"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [384, 136]
+        },
+        {
+          "id": "sub:zz:Root",
+          "kind": "subclass",
+          "from": "zz:Root",
+          "to": ["zz:Leaf"],
+          "d": "M96 344H112M112 344V352M112 352H144"
+        },
+        {
+          "id": "rel:ex:Whole zz:Leaf",
+          "kind": "relation",
+          "from": "ex:Whole",
+          "to": ["zz:Leaf"],
+          "d": "M256 168H232V264H264V344H240",
+          "bundle": {
+            "id": "ex:Whole zz:Leaf",
+            "a": "ex:Whole",
+            "b": "zz:Leaf",
+            "self": false,
+            "cross": true,
+            "heads": ["ex:Whole"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "ex:links",
+                "label": "links",
+                "domain": "zz:Leaf",
+                "range": "ex:Whole"
+              }
+            ]
+          }
+        },
+        {
+          "id": "join:zz ex:Thing",
+          "kind": "subclass",
+          "from": "ex:Thing",
+          "to": ["zz:Root"],
+          "d": "M-16 344V344M-16 344H0M-16 344V264H224V136H96"
+        }
+      ],
+      "regions": [
+        {
+          "prefix": "ex",
+          "ids": [
+            "ex:Long",
+            "ex:Note",
+            "ex:Part",
+            "ex:Remark",
+            "ex:Thing",
+            "ex:Whole"
+          ],
+          "x": 0,
+          "y": 0
+        },
+        {
+          "prefix": "zz",
+          "ids": ["zz:Leaf", "zz:Root"],
+          "x": 0,
+          "y": 288
+        }
+      ],
+      "viewBox": {
+        "x": -32,
+        "y": -16,
+        "w": 560,
+        "h": 400
+      }
+    },
+    "real": {
+      "nodes": [
+        [
+          "http://pragma.canonical.com/codestandards#Category",
+          {
+            "uri": "http://pragma.canonical.com/codestandards#Category",
+            "col": 1,
+            "region": "cs",
+            "x": 224,
+            "y": 976,
+            "w": 112,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "http://pragma.canonical.com/codestandards#CodeStandard",
+          {
+            "uri": "http://pragma.canonical.com/codestandards#CodeStandard",
+            "col": 0,
+            "region": "cs",
+            "x": 0,
+            "y": 992,
+            "w": 160,
+            "h": 32,
+            "loopExtent": 16
+          }
+        ],
+        [
+          "http://pragma.canonical.com/codestandards#Example",
+          {
+            "uri": "http://pragma.canonical.com/codestandards#Example",
+            "col": 1,
+            "region": "cs",
+            "x": 224,
+            "y": 1024,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/AnonymousNode",
+          {
+            "uri": "https://anatomy.canonical.com/AnonymousNode",
+            "col": 1,
+            "region": "anatomy",
+            "x": 432,
+            "y": 672,
+            "w": 144,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Edge",
+          {
+            "uri": "https://anatomy.canonical.com/Edge",
+            "col": 0,
+            "region": "anatomy",
+            "x": 272,
+            "y": 752,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/NamedNode",
+          {
+            "uri": "https://anatomy.canonical.com/NamedNode",
+            "col": 1,
+            "region": "anatomy",
+            "x": 432,
+            "y": 720,
+            "w": 112,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Node",
+          {
+            "uri": "https://anatomy.canonical.com/Node",
+            "col": 0,
+            "region": "anatomy",
+            "x": 272,
+            "y": 688,
+            "w": 96,
+            "h": 48,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Projection",
+          {
+            "uri": "https://anatomy.canonical.com/Projection",
+            "col": 0,
+            "region": "anatomy",
+            "x": 272,
+            "y": 640,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Prop",
+          {
+            "uri": "https://anatomy.canonical.com/Prop",
+            "col": 2,
+            "region": "anatomy",
+            "x": 624,
+            "y": 752,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Relation",
+          {
+            "uri": "https://anatomy.canonical.com/Relation",
+            "col": 1,
+            "region": "anatomy",
+            "x": 432,
+            "y": 816,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Specification",
+          {
+            "uri": "https://anatomy.canonical.com/Specification",
+            "col": 0,
+            "region": "anatomy",
+            "x": 272,
+            "y": 592,
+            "w": 112,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Style",
+          {
+            "uri": "https://anatomy.canonical.com/Style",
+            "col": 1,
+            "region": "anatomy",
+            "x": 432,
+            "y": 768,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/StyleKey",
+          {
+            "uri": "https://anatomy.canonical.com/StyleKey",
+            "col": 0,
+            "region": "anatomy",
+            "x": 272,
+            "y": 800,
+            "w": 112,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/Switch",
+          {
+            "uri": "https://anatomy.canonical.com/Switch",
+            "col": 1,
+            "region": "anatomy",
+            "x": 432,
+            "y": 864,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://anatomy.canonical.com/SwitchCase",
+          {
+            "uri": "https://anatomy.canonical.com/SwitchCase",
+            "col": 2,
+            "region": "anatomy",
+            "x": 624,
+            "y": 800,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ChangeLogEntry",
+          {
+            "uri": "https://ds.canonical.com/ChangeLogEntry",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 336,
+            "w": 144,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Component",
+          {
+            "uri": "https://ds.canonical.com/Component",
+            "col": 3,
+            "region": "ds",
+            "x": 560,
+            "y": 160,
+            "w": 128,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Concept",
+          {
+            "uri": "https://ds.canonical.com/Concept",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 32,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ConceptType",
+          {
+            "uri": "https://ds.canonical.com/ConceptType",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 80,
+            "w": 128,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Entity",
+          {
+            "uri": "https://ds.canonical.com/Entity",
+            "col": 0,
+            "region": "ds",
+            "x": 0,
+            "y": 240,
+            "w": 96,
+            "h": 48,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Group",
+          {
+            "uri": "https://ds.canonical.com/Group",
+            "col": 3,
+            "region": "ds",
+            "x": 560,
+            "y": 112,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ImplementationLibrary",
+          {
+            "uri": "https://ds.canonical.com/ImplementationLibrary",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 240,
+            "w": 176,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ImplementationObject",
+          {
+            "uri": "https://ds.canonical.com/ImplementationObject",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 192,
+            "w": 176,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Layout",
+          {
+            "uri": "https://ds.canonical.com/Layout",
+            "col": 3,
+            "region": "ds",
+            "x": 560,
+            "y": 256,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Modifier",
+          {
+            "uri": "https://ds.canonical.com/Modifier",
+            "col": 2,
+            "region": "ds",
+            "x": 368,
+            "y": 64,
+            "w": 112,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ModifierFamily",
+          {
+            "uri": "https://ds.canonical.com/ModifierFamily",
+            "col": 2,
+            "region": "ds",
+            "x": 368,
+            "y": 112,
+            "w": 144,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Pattern",
+          {
+            "uri": "https://ds.canonical.com/Pattern",
+            "col": 3,
+            "region": "ds",
+            "x": 560,
+            "y": 304,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Property",
+          {
+            "uri": "https://ds.canonical.com/Property",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 384,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Subcomponent",
+          {
+            "uri": "https://ds.canonical.com/Subcomponent",
+            "col": 3,
+            "region": "ds",
+            "x": 560,
+            "y": 208,
+            "w": 144,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Tag",
+          {
+            "uri": "https://ds.canonical.com/Tag",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 432,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/TagCategory",
+          {
+            "uri": "https://ds.canonical.com/TagCategory",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 480,
+            "w": 128,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Tier",
+          {
+            "uri": "https://ds.canonical.com/Tier",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 288,
+            "w": 96,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/TokenBinding",
+          {
+            "uri": "https://ds.canonical.com/TokenBinding",
+            "col": 3,
+            "region": "ds",
+            "x": 560,
+            "y": 352,
+            "w": 112,
+            "h": 32,
+            "loopExtent": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/UIBlock",
+          {
+            "uri": "https://ds.canonical.com/UIBlock",
+            "col": 2,
+            "region": "ds",
+            "x": 368,
+            "y": 192,
+            "w": 96,
+            "h": 48,
+            "loopExtent": 32
+          }
+        ],
+        [
+          "https://ds.canonical.com/UIElement",
+          {
+            "uri": "https://ds.canonical.com/UIElement",
+            "col": 1,
+            "region": "ds",
+            "x": 144,
+            "y": 128,
+            "w": 112,
+            "h": 48,
+            "loopExtent": 0
+          }
+        ]
+      ],
+      "edges": [
+        {
+          "id": "sub:https://ds.canonical.com/Entity",
+          "kind": "subclass",
+          "from": "https://ds.canonical.com/Entity",
+          "to": [
+            "https://ds.canonical.com/ChangeLogEntry",
+            "https://ds.canonical.com/Concept",
+            "https://ds.canonical.com/ConceptType",
+            "https://ds.canonical.com/ImplementationLibrary",
+            "https://ds.canonical.com/ImplementationObject",
+            "https://ds.canonical.com/Property",
+            "https://ds.canonical.com/Tag",
+            "https://ds.canonical.com/TagCategory",
+            "https://ds.canonical.com/Tier",
+            "https://ds.canonical.com/UIElement"
+          ],
+          "d": "M96 264H112M112 48V496M112 352H144M112 48H144M112 96H144M112 256H144M112 208H144M112 400H144M112 448H144M112 496H144M112 304H144M112 152H144"
+        },
+        {
+          "id": "sub:https://ds.canonical.com/UIBlock",
+          "kind": "subclass",
+          "from": "https://ds.canonical.com/UIBlock",
+          "to": [
+            "https://ds.canonical.com/Component",
+            "https://ds.canonical.com/Group",
+            "https://ds.canonical.com/Layout",
+            "https://ds.canonical.com/Pattern",
+            "https://ds.canonical.com/Subcomponent"
+          ],
+          "d": "M464 216H528M528 128V320M528 176H560M528 128H560M528 272H560M528 320H560M528 224H560"
+        },
+        {
+          "id": "sub:https://ds.canonical.com/UIElement",
+          "kind": "subclass",
+          "from": "https://ds.canonical.com/UIElement",
+          "to": [
+            "https://ds.canonical.com/Modifier",
+            "https://ds.canonical.com/ModifierFamily",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          "d": "M256 152H336M336 80V216M336 80H368M336 128H368M336 216H368"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ChangeLogEntry",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M288 344H320C344 344 344 224 368 224",
+          "bundle": {
+            "id": "https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/ChangeLogEntry",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/ChangeLogEntry"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/changeLog",
+                "label": "changeLog",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/ChangeLogEntry"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ImplementationObject",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M320 212C344 212 344 208 368 208",
+          "bundle": {
+            "id": "https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/ImplementationObject",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/UIBlock"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/implementsBlock",
+                "label": "implementsBlock",
+                "domain": "https://ds.canonical.com/ImplementationObject",
+                "range": "https://ds.canonical.com/UIBlock"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Property",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M240 392H320C344 392 344 228 368 228",
+          "bundle": {
+            "id": "https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/Property",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/Property"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/hasProperty",
+                "label": "hasProperty",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/Property"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Tag",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M240 440H320C344 440 344 232 368 232",
+          "bundle": {
+            "id": "https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/Tag",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/Tag"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/documentationStage",
+                "label": "documentationStage",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/Tag"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Tier",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M240 296H320C344 296 344 220 368 220",
+          "bundle": {
+            "id": "https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/Tier",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/Tier"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/tier",
+                "label": "tier",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/Tier"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/TokenBinding",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M464 232H512C536 232 536 360 560 360",
+          "bundle": {
+            "id": "https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/TokenBinding",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "cross": false,
+            "heads": [
+              "https://ds.canonical.com/TokenBinding",
+              "https://ds.canonical.com/UIBlock"
+            ],
+            "opposite": true,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/hasTokenBinding",
+                "label": "hasTokenBinding",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/TokenBinding"
+              },
+              {
+                "uri": "https://ds.canonical.com/viaBlock",
+                "label": "viaBlock",
+                "domain": "https://ds.canonical.com/TokenBinding",
+                "range": "https://ds.canonical.com/UIBlock"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/UIBlock",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M456 192C456 128 528 200 464 200",
+          "bundle": {
+            "id": "https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/UIBlock",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": true,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/UIBlock"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/hasVariant",
+                "label": "hasVariant",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/UIBlock"
+              },
+              {
+                "uri": "https://ds.canonical.com/inheritsFrom",
+                "label": "inheritsFrom",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/UIBlock"
+              },
+              {
+                "uri": "https://ds.canonical.com/specializedBy",
+                "label": "specializedBy",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/UIBlock"
+              },
+              {
+                "uri": "https://ds.canonical.com/variantOf",
+                "label": "variantOf",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/UIBlock"
+              }
+            ]
+          },
+          "self": true,
+          "apex": [491, 165]
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Component",
+          "to": ["https://ds.canonical.com/Subcomponent"],
+          "d": "M688 184H704C720 184 720 184 720 200V200C720 216 720 216 704 216",
+          "bundle": {
+            "id": "https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+            "a": "https://ds.canonical.com/Component",
+            "b": "https://ds.canonical.com/Subcomponent",
+            "self": false,
+            "cross": false,
+            "heads": [
+              "https://ds.canonical.com/Subcomponent",
+              "https://ds.canonical.com/Component"
+            ],
+            "opposite": true,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/hasSubcomponent",
+                "label": "hasSubcomponent",
+                "domain": "https://ds.canonical.com/Component",
+                "range": "https://ds.canonical.com/Subcomponent"
+              },
+              {
+                "uri": "https://ds.canonical.com/parentComponent",
+                "label": "parentComponent",
+                "domain": "https://ds.canonical.com/Subcomponent",
+                "range": "https://ds.canonical.com/Component"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [720, 200]
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Concept",
+          "to": ["https://ds.canonical.com/ConceptType"],
+          "d": "M240 56H320C348 56 348 56 348 72V72C348 88 348 88 320 88H272",
+          "bundle": {
+            "id": "https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+            "a": "https://ds.canonical.com/Concept",
+            "b": "https://ds.canonical.com/ConceptType",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/ConceptType"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/conceptType",
+                "label": "conceptType",
+                "domain": "https://ds.canonical.com/Concept",
+                "range": "https://ds.canonical.com/ConceptType"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [348, 72]
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ImplementationLibrary",
+          "to": ["https://ds.canonical.com/ImplementationObject"],
+          "d": "M320 248C336 248 336 248 336 232V232C336 216 336 216 320 216",
+          "bundle": {
+            "id": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+            "a": "https://ds.canonical.com/ImplementationLibrary",
+            "b": "https://ds.canonical.com/ImplementationObject",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/ImplementationLibrary"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/library",
+                "label": "library",
+                "domain": "https://ds.canonical.com/ImplementationObject",
+                "range": "https://ds.canonical.com/ImplementationLibrary"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [336, 232]
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ImplementationLibrary",
+          "to": ["https://ds.canonical.com/Tier"],
+          "d": "M320 264C336 264 336 264 336 280V284C336 300 336 300 320 300H240",
+          "bundle": {
+            "id": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+            "a": "https://ds.canonical.com/ImplementationLibrary",
+            "b": "https://ds.canonical.com/Tier",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/Tier"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/libraryTier",
+                "label": "libraryTier",
+                "domain": "https://ds.canonical.com/ImplementationLibrary",
+                "range": "https://ds.canonical.com/Tier"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [336, 282]
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Modifier",
+          "to": ["https://ds.canonical.com/ModifierFamily"],
+          "d": "M480 88H512C528 88 528 88 528 104V104C528 120 528 120 512 120",
+          "bundle": {
+            "id": "https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+            "a": "https://ds.canonical.com/Modifier",
+            "b": "https://ds.canonical.com/ModifierFamily",
+            "self": false,
+            "cross": false,
+            "heads": [
+              "https://ds.canonical.com/Modifier",
+              "https://ds.canonical.com/ModifierFamily"
+            ],
+            "opposite": true,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/hasModifier",
+                "label": "hasModifier",
+                "domain": "https://ds.canonical.com/ModifierFamily",
+                "range": "https://ds.canonical.com/Modifier"
+              },
+              {
+                "uri": "https://ds.canonical.com/modifierFamily",
+                "label": "modifierFamily",
+                "domain": "https://ds.canonical.com/Modifier",
+                "range": "https://ds.canonical.com/ModifierFamily"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [528, 104]
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ModifierFamily",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "d": "M512 136C540 136 540 136 540 164V176C540 204 540 204 512 204H464",
+          "bundle": {
+            "id": "https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/ModifierFamily",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/ModifierFamily"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/hasModifierFamily",
+                "label": "hasModifierFamily",
+                "domain": "https://ds.canonical.com/UIBlock",
+                "range": "https://ds.canonical.com/ModifierFamily"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [540, 170]
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Tag",
+          "to": ["https://ds.canonical.com/TagCategory"],
+          "d": "M240 456H320C336 456 336 456 336 472V472C336 488 336 488 320 488H272",
+          "bundle": {
+            "id": "https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+            "a": "https://ds.canonical.com/Tag",
+            "b": "https://ds.canonical.com/TagCategory",
+            "self": false,
+            "cross": false,
+            "heads": ["https://ds.canonical.com/TagCategory"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://ds.canonical.com/category",
+                "label": "category",
+                "domain": "https://ds.canonical.com/Tag",
+                "range": "https://ds.canonical.com/TagCategory"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [336, 472]
+        },
+        {
+          "id": "sub:https://anatomy.canonical.com/Node",
+          "kind": "subclass",
+          "from": "https://anatomy.canonical.com/Node",
+          "to": [
+            "https://anatomy.canonical.com/AnonymousNode",
+            "https://anatomy.canonical.com/NamedNode"
+          ],
+          "d": "M368 712H400M400 688V736M400 688H432M400 736H432"
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Relation",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/Edge",
+          "to": ["https://anatomy.canonical.com/Relation"],
+          "d": "M368 772H384C408 772 408 824 432 824",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Relation",
+            "a": "https://anatomy.canonical.com/Edge",
+            "b": "https://anatomy.canonical.com/Relation",
+            "self": false,
+            "cross": false,
+            "heads": ["https://anatomy.canonical.com/Relation"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/hasRelation",
+                "label": "has relation",
+                "domain": "https://anatomy.canonical.com/Edge",
+                "range": "https://anatomy.canonical.com/Relation"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Switch",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/Edge",
+          "to": ["https://anatomy.canonical.com/Switch"],
+          "d": "M368 776H384C408 776 408 872 432 872",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Switch",
+            "a": "https://anatomy.canonical.com/Edge",
+            "b": "https://anatomy.canonical.com/Switch",
+            "self": false,
+            "cross": false,
+            "heads": ["https://anatomy.canonical.com/Switch"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/edgeSwitch",
+                "label": "edge switch",
+                "domain": "https://anatomy.canonical.com/Edge",
+                "range": "https://anatomy.canonical.com/Switch"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Prop",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/NamedNode",
+          "to": ["https://anatomy.canonical.com/Prop"],
+          "d": "M544 744H576C600 744 600 760 624 760",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Prop",
+            "a": "https://anatomy.canonical.com/NamedNode",
+            "b": "https://anatomy.canonical.com/Prop",
+            "self": false,
+            "cross": false,
+            "heads": ["https://anatomy.canonical.com/Prop"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/hasProp",
+                "label": "has prop",
+                "domain": "https://anatomy.canonical.com/NamedNode",
+                "range": "https://anatomy.canonical.com/Prop"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Specification",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/NamedNode",
+          "to": ["https://anatomy.canonical.com/Specification"],
+          "d": "M384 616C408 616 408 728 432 728",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Specification",
+            "a": "https://anatomy.canonical.com/NamedNode",
+            "b": "https://anatomy.canonical.com/Specification",
+            "self": false,
+            "cross": false,
+            "heads": ["https://anatomy.canonical.com/NamedNode"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/rootNode",
+                "label": "root node",
+                "domain": "https://anatomy.canonical.com/Specification",
+                "range": "https://anatomy.canonical.com/NamedNode"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/Style",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/Node",
+          "to": ["https://anatomy.canonical.com/Style"],
+          "d": "M368 724H384C408 724 408 776 432 776",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/Node https://anatomy.canonical.com/Style",
+            "a": "https://anatomy.canonical.com/Node",
+            "b": "https://anatomy.canonical.com/Style",
+            "self": false,
+            "cross": false,
+            "heads": ["https://anatomy.canonical.com/Style"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/hasStyle",
+                "label": "has style",
+                "domain": "https://anatomy.canonical.com/Node",
+                "range": "https://anatomy.canonical.com/Style"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/SwitchCase",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/Node",
+          "to": ["https://anatomy.canonical.com/SwitchCase"],
+          "d": "M368 728H384C408 728 408 808 432 808H576C600 808 600 808 624 808",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/Node https://anatomy.canonical.com/SwitchCase",
+            "a": "https://anatomy.canonical.com/Node",
+            "b": "https://anatomy.canonical.com/SwitchCase",
+            "self": false,
+            "cross": false,
+            "heads": ["https://anatomy.canonical.com/Node"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/caseNode",
+                "label": "case node",
+                "domain": "https://anatomy.canonical.com/SwitchCase",
+                "range": "https://anatomy.canonical.com/Node"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/Switch https://anatomy.canonical.com/SwitchCase",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/Switch",
+          "to": ["https://anatomy.canonical.com/SwitchCase"],
+          "d": "M528 872H576C600 872 600 824 624 824",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/Switch https://anatomy.canonical.com/SwitchCase",
+            "a": "https://anatomy.canonical.com/Switch",
+            "b": "https://anatomy.canonical.com/SwitchCase",
+            "self": false,
+            "cross": false,
+            "heads": ["https://anatomy.canonical.com/SwitchCase"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/hasCase",
+                "label": "has case",
+                "domain": "https://anatomy.canonical.com/Switch",
+                "range": "https://anatomy.canonical.com/SwitchCase"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Node",
+          "kind": "relation",
+          "from": "https://anatomy.canonical.com/Edge",
+          "to": ["https://anatomy.canonical.com/Node"],
+          "d": "M368 760H384C412 760 412 760 412 740V740C412 720 412 720 384 720H368",
+          "bundle": {
+            "id": "https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Node",
+            "a": "https://anatomy.canonical.com/Edge",
+            "b": "https://anatomy.canonical.com/Node",
+            "self": false,
+            "cross": false,
+            "heads": [
+              "https://anatomy.canonical.com/Node",
+              "https://anatomy.canonical.com/Edge"
+            ],
+            "opposite": true,
+            "relations": [
+              {
+                "uri": "https://anatomy.canonical.com/edgeTarget",
+                "label": "edge target",
+                "domain": "https://anatomy.canonical.com/Edge",
+                "range": "https://anatomy.canonical.com/Node"
+              },
+              {
+                "uri": "https://anatomy.canonical.com/hasEdge",
+                "label": "has edge",
+                "domain": "https://anatomy.canonical.com/Node",
+                "range": "https://anatomy.canonical.com/Edge"
+              }
+            ]
+          },
+          "arc": true,
+          "apex": [412, 740]
+        },
+        {
+          "id": "rel:http://pragma.canonical.com/codestandards#Category http://pragma.canonical.com/codestandards#CodeStandard",
+          "kind": "relation",
+          "from": "http://pragma.canonical.com/codestandards#Category",
+          "to": ["http://pragma.canonical.com/codestandards#CodeStandard"],
+          "d": "M160 1004H176C200 1004 200 1000 224 1000",
+          "bundle": {
+            "id": "http://pragma.canonical.com/codestandards#Category http://pragma.canonical.com/codestandards#CodeStandard",
+            "a": "http://pragma.canonical.com/codestandards#Category",
+            "b": "http://pragma.canonical.com/codestandards#CodeStandard",
+            "self": false,
+            "cross": false,
+            "heads": ["http://pragma.canonical.com/codestandards#Category"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "http://pragma.canonical.com/codestandards#hasCategory",
+                "label": "has category",
+                "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+                "range": "http://pragma.canonical.com/codestandards#Category"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rel:http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#CodeStandard",
+          "kind": "relation",
+          "from": "http://pragma.canonical.com/codestandards#CodeStandard",
+          "to": ["http://pragma.canonical.com/codestandards#CodeStandard"],
+          "d": "M152 992C152 960 192 1000 160 1000",
+          "bundle": {
+            "id": "http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#CodeStandard",
+            "a": "http://pragma.canonical.com/codestandards#CodeStandard",
+            "b": "http://pragma.canonical.com/codestandards#CodeStandard",
+            "self": true,
+            "cross": false,
+            "heads": ["http://pragma.canonical.com/codestandards#CodeStandard"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "http://pragma.canonical.com/codestandards#extends",
+                "label": "extends",
+                "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+                "range": "http://pragma.canonical.com/codestandards#CodeStandard"
+              }
+            ]
+          },
+          "self": true,
+          "apex": [172, 980]
+        },
+        {
+          "id": "rel:http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#Example",
+          "kind": "relation",
+          "from": "http://pragma.canonical.com/codestandards#CodeStandard",
+          "to": ["http://pragma.canonical.com/codestandards#Example"],
+          "d": "M160 1016H176C200 1016 200 1032 224 1032",
+          "bundle": {
+            "id": "http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#Example",
+            "a": "http://pragma.canonical.com/codestandards#CodeStandard",
+            "b": "http://pragma.canonical.com/codestandards#Example",
+            "self": false,
+            "cross": false,
+            "heads": ["http://pragma.canonical.com/codestandards#Example"],
+            "opposite": false,
+            "relations": [
+              {
+                "uri": "http://pragma.canonical.com/codestandards#do",
+                "label": "do",
+                "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+                "range": "http://pragma.canonical.com/codestandards#Example"
+              },
+              {
+                "uri": "http://pragma.canonical.com/codestandards#dont",
+                "label": "don't",
+                "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+                "range": "http://pragma.canonical.com/codestandards#Example"
+              }
+            ]
+          }
+        }
+      ],
+      "regions": [
+        {
+          "prefix": "ds",
+          "ids": [
+            "https://ds.canonical.com/ChangeLogEntry",
+            "https://ds.canonical.com/Component",
+            "https://ds.canonical.com/Concept",
+            "https://ds.canonical.com/ConceptType",
+            "https://ds.canonical.com/Entity",
+            "https://ds.canonical.com/Group",
+            "https://ds.canonical.com/ImplementationLibrary",
+            "https://ds.canonical.com/ImplementationObject",
+            "https://ds.canonical.com/Layout",
+            "https://ds.canonical.com/Modifier",
+            "https://ds.canonical.com/ModifierFamily",
+            "https://ds.canonical.com/Pattern",
+            "https://ds.canonical.com/Property",
+            "https://ds.canonical.com/Subcomponent",
+            "https://ds.canonical.com/Tag",
+            "https://ds.canonical.com/TagCategory",
+            "https://ds.canonical.com/Tier",
+            "https://ds.canonical.com/TokenBinding",
+            "https://ds.canonical.com/UIBlock",
+            "https://ds.canonical.com/UIElement"
+          ],
+          "x": 0,
+          "y": 0
+        },
+        {
+          "prefix": "anatomy",
+          "ids": [
+            "https://anatomy.canonical.com/AnonymousNode",
+            "https://anatomy.canonical.com/Edge",
+            "https://anatomy.canonical.com/NamedNode",
+            "https://anatomy.canonical.com/Node",
+            "https://anatomy.canonical.com/Projection",
+            "https://anatomy.canonical.com/Prop",
+            "https://anatomy.canonical.com/Relation",
+            "https://anatomy.canonical.com/Specification",
+            "https://anatomy.canonical.com/Style",
+            "https://anatomy.canonical.com/StyleKey",
+            "https://anatomy.canonical.com/Switch",
+            "https://anatomy.canonical.com/SwitchCase"
+          ],
+          "x": 272,
+          "y": 560
+        },
+        {
+          "prefix": "cs",
+          "ids": [
+            "http://pragma.canonical.com/codestandards#Category",
+            "http://pragma.canonical.com/codestandards#CodeStandard",
+            "http://pragma.canonical.com/codestandards#Example"
+          ],
+          "x": 0,
+          "y": 944
+        }
+      ],
+      "viewBox": {
+        "x": -16,
+        "y": -16,
+        "w": 752,
+        "h": 1088
+      }
+    }
+  },
+  "lines": [
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Long ex:Note",
+        "kind": "relation",
+        "from": "ex:Long",
+        "to": ["ex:Note"],
+        "d": "M208 88C232 88 232 216 256 216",
+        "bundle": {
+          "id": "ex:Long ex:Note",
+          "a": "ex:Long",
+          "b": "ex:Note",
+          "self": false,
+          "cross": false,
+          "heads": ["ex:Note"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "ex:cites",
+              "label": "cites",
+              "domain": "ex:Long",
+              "range": "ex:Note"
+            }
+          ]
+        }
+      },
+      "result": ["cites"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Long ex:Remark",
+        "kind": "relation",
+        "from": "ex:Long",
+        "to": ["ex:Remark"],
+        "d": "M208 84C232 84 232 88 256 88H368C392 88 392 152 416 152",
+        "bundle": {
+          "id": "ex:Long ex:Remark",
+          "a": "ex:Long",
+          "b": "ex:Remark",
+          "self": false,
+          "cross": false,
+          "heads": ["ex:Long"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "ex:refines",
+              "label": "refines",
+              "domain": "ex:Remark",
+              "range": "ex:Long"
+            }
+          ]
+        }
+      },
+      "result": ["refines"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Note ex:Note",
+        "kind": "relation",
+        "from": "ex:Note",
+        "to": ["ex:Note"],
+        "d": "M344 208C344 176 384 216 352 216",
+        "bundle": {
+          "id": "ex:Note ex:Note",
+          "a": "ex:Note",
+          "b": "ex:Note",
+          "self": true,
+          "cross": false,
+          "heads": ["ex:Note"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "ex:seeAlso",
+              "label": "seeAlso",
+              "domain": "ex:Note",
+              "range": "ex:Note"
+            }
+          ]
+        },
+        "self": true,
+        "apex": [364, 196]
+      },
+      "result": ["seeAlso"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Note ex:Remark",
+        "kind": "relation",
+        "from": "ex:Note",
+        "to": ["ex:Remark"],
+        "d": "M352 220H368C392 220 392 168 416 168",
+        "bundle": {
+          "id": "ex:Note ex:Remark",
+          "a": "ex:Note",
+          "b": "ex:Remark",
+          "self": false,
+          "cross": false,
+          "heads": ["ex:Remark"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "ex:about",
+              "label": "about",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            }
+          ]
+        }
+      },
+      "result": ["about"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Part ex:Whole",
+        "kind": "relation",
+        "from": "ex:Part",
+        "to": ["ex:Whole"],
+        "d": "M352 120H368C384 120 384 120 384 136V136C384 152 384 152 368 152H352",
+        "bundle": {
+          "id": "ex:Part ex:Whole",
+          "a": "ex:Part",
+          "b": "ex:Whole",
+          "self": false,
+          "cross": false,
+          "heads": ["ex:Part", "ex:Whole"],
+          "opposite": true,
+          "relations": [
+            {
+              "uri": "ex:hasPart",
+              "label": "hasPart",
+              "domain": "ex:Whole",
+              "range": "ex:Part"
+            },
+            {
+              "uri": "ex:partOf",
+              "label": "partOf",
+              "domain": "ex:Part",
+              "range": "ex:Whole"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [384, 136]
+      },
+      "result": ["↑ hasPart", "partOf ↓"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Whole zz:Leaf",
+        "kind": "relation",
+        "from": "ex:Whole",
+        "to": ["zz:Leaf"],
+        "d": "M256 168H232V264H264V344H240",
+        "bundle": {
+          "id": "ex:Whole zz:Leaf",
+          "a": "ex:Whole",
+          "b": "zz:Leaf",
+          "self": false,
+          "cross": true,
+          "heads": ["ex:Whole"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "ex:links",
+              "label": "links",
+              "domain": "zz:Leaf",
+              "range": "ex:Whole"
+            }
+          ]
+        }
+      },
+      "result": ["links"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/ChangeLogEntry",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M288 344H320C344 344 344 224 368 224",
+        "bundle": {
+          "id": "https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/ChangeLogEntry",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/ChangeLogEntry"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/changeLog",
+              "label": "changeLog",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/ChangeLogEntry"
+            }
+          ]
+        }
+      },
+      "result": ["changeLog"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/ImplementationObject",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M320 212C344 212 344 208 368 208",
+        "bundle": {
+          "id": "https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/ImplementationObject",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/UIBlock"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/implementsBlock",
+              "label": "implementsBlock",
+              "domain": "https://ds.canonical.com/ImplementationObject",
+              "range": "https://ds.canonical.com/UIBlock"
+            }
+          ]
+        }
+      },
+      "result": ["implementsBlock"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/Property",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M240 392H320C344 392 344 228 368 228",
+        "bundle": {
+          "id": "https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/Property",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/Property"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/hasProperty",
+              "label": "hasProperty",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/Property"
+            }
+          ]
+        }
+      },
+      "result": ["hasProperty"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/Tag",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M240 440H320C344 440 344 232 368 232",
+        "bundle": {
+          "id": "https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/Tag",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/Tag"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/documentationStage",
+              "label": "documentationStage",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/Tag"
+            }
+          ]
+        }
+      },
+      "result": ["documentationStage"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/Tier",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M240 296H320C344 296 344 220 368 220",
+        "bundle": {
+          "id": "https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/Tier",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/Tier"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/tier",
+              "label": "tier",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/Tier"
+            }
+          ]
+        }
+      },
+      "result": ["tier"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/TokenBinding",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M464 232H512C536 232 536 360 560 360",
+        "bundle": {
+          "id": "https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/TokenBinding",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": false,
+          "cross": false,
+          "heads": [
+            "https://ds.canonical.com/TokenBinding",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          "opposite": true,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/hasTokenBinding",
+              "label": "hasTokenBinding",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/TokenBinding"
+            },
+            {
+              "uri": "https://ds.canonical.com/viaBlock",
+              "label": "viaBlock",
+              "domain": "https://ds.canonical.com/TokenBinding",
+              "range": "https://ds.canonical.com/UIBlock"
+            }
+          ]
+        }
+      },
+      "result": ["← viaBlock", "hasTokenBinding →"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/UIBlock",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M456 192C456 128 528 200 464 200",
+        "bundle": {
+          "id": "https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/UIBlock",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": true,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/UIBlock"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/hasVariant",
+              "label": "hasVariant",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/UIBlock"
+            },
+            {
+              "uri": "https://ds.canonical.com/inheritsFrom",
+              "label": "inheritsFrom",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/UIBlock"
+            },
+            {
+              "uri": "https://ds.canonical.com/specializedBy",
+              "label": "specializedBy",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/UIBlock"
+            },
+            {
+              "uri": "https://ds.canonical.com/variantOf",
+              "label": "variantOf",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/UIBlock"
+            }
+          ]
+        },
+        "self": true,
+        "apex": [491, 165]
+      },
+      "result": ["hasVariant", "inheritsFrom", "specializedBy", "variantOf"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/Component",
+        "to": ["https://ds.canonical.com/Subcomponent"],
+        "d": "M688 184H704C720 184 720 184 720 200V200C720 216 720 216 704 216",
+        "bundle": {
+          "id": "https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+          "a": "https://ds.canonical.com/Component",
+          "b": "https://ds.canonical.com/Subcomponent",
+          "self": false,
+          "cross": false,
+          "heads": [
+            "https://ds.canonical.com/Subcomponent",
+            "https://ds.canonical.com/Component"
+          ],
+          "opposite": true,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/hasSubcomponent",
+              "label": "hasSubcomponent",
+              "domain": "https://ds.canonical.com/Component",
+              "range": "https://ds.canonical.com/Subcomponent"
+            },
+            {
+              "uri": "https://ds.canonical.com/parentComponent",
+              "label": "parentComponent",
+              "domain": "https://ds.canonical.com/Subcomponent",
+              "range": "https://ds.canonical.com/Component"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [720, 200]
+      },
+      "result": ["↑ parentComponent", "hasSubcomponent ↓"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/Concept",
+        "to": ["https://ds.canonical.com/ConceptType"],
+        "d": "M240 56H320C348 56 348 56 348 72V72C348 88 348 88 320 88H272",
+        "bundle": {
+          "id": "https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+          "a": "https://ds.canonical.com/Concept",
+          "b": "https://ds.canonical.com/ConceptType",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/ConceptType"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/conceptType",
+              "label": "conceptType",
+              "domain": "https://ds.canonical.com/Concept",
+              "range": "https://ds.canonical.com/ConceptType"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [348, 72]
+      },
+      "result": ["conceptType"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/ImplementationLibrary",
+        "to": ["https://ds.canonical.com/ImplementationObject"],
+        "d": "M320 248C336 248 336 248 336 232V232C336 216 336 216 320 216",
+        "bundle": {
+          "id": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+          "a": "https://ds.canonical.com/ImplementationLibrary",
+          "b": "https://ds.canonical.com/ImplementationObject",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/ImplementationLibrary"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/library",
+              "label": "library",
+              "domain": "https://ds.canonical.com/ImplementationObject",
+              "range": "https://ds.canonical.com/ImplementationLibrary"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [336, 232]
+      },
+      "result": ["library"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/ImplementationLibrary",
+        "to": ["https://ds.canonical.com/Tier"],
+        "d": "M320 264C336 264 336 264 336 280V284C336 300 336 300 320 300H240",
+        "bundle": {
+          "id": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+          "a": "https://ds.canonical.com/ImplementationLibrary",
+          "b": "https://ds.canonical.com/Tier",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/Tier"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/libraryTier",
+              "label": "libraryTier",
+              "domain": "https://ds.canonical.com/ImplementationLibrary",
+              "range": "https://ds.canonical.com/Tier"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [336, 282]
+      },
+      "result": ["libraryTier"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/Modifier",
+        "to": ["https://ds.canonical.com/ModifierFamily"],
+        "d": "M480 88H512C528 88 528 88 528 104V104C528 120 528 120 512 120",
+        "bundle": {
+          "id": "https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+          "a": "https://ds.canonical.com/Modifier",
+          "b": "https://ds.canonical.com/ModifierFamily",
+          "self": false,
+          "cross": false,
+          "heads": [
+            "https://ds.canonical.com/Modifier",
+            "https://ds.canonical.com/ModifierFamily"
+          ],
+          "opposite": true,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/hasModifier",
+              "label": "hasModifier",
+              "domain": "https://ds.canonical.com/ModifierFamily",
+              "range": "https://ds.canonical.com/Modifier"
+            },
+            {
+              "uri": "https://ds.canonical.com/modifierFamily",
+              "label": "modifierFamily",
+              "domain": "https://ds.canonical.com/Modifier",
+              "range": "https://ds.canonical.com/ModifierFamily"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [528, 104]
+      },
+      "result": ["↑ hasModifier", "modifierFamily ↓"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/ModifierFamily",
+        "to": ["https://ds.canonical.com/UIBlock"],
+        "d": "M512 136C540 136 540 136 540 164V176C540 204 540 204 512 204H464",
+        "bundle": {
+          "id": "https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+          "a": "https://ds.canonical.com/ModifierFamily",
+          "b": "https://ds.canonical.com/UIBlock",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/ModifierFamily"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/hasModifierFamily",
+              "label": "hasModifierFamily",
+              "domain": "https://ds.canonical.com/UIBlock",
+              "range": "https://ds.canonical.com/ModifierFamily"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [540, 170]
+      },
+      "result": ["hasModifierFamily"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+        "kind": "relation",
+        "from": "https://ds.canonical.com/Tag",
+        "to": ["https://ds.canonical.com/TagCategory"],
+        "d": "M240 456H320C336 456 336 456 336 472V472C336 488 336 488 320 488H272",
+        "bundle": {
+          "id": "https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+          "a": "https://ds.canonical.com/Tag",
+          "b": "https://ds.canonical.com/TagCategory",
+          "self": false,
+          "cross": false,
+          "heads": ["https://ds.canonical.com/TagCategory"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://ds.canonical.com/category",
+              "label": "category",
+              "domain": "https://ds.canonical.com/Tag",
+              "range": "https://ds.canonical.com/TagCategory"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [336, 472]
+      },
+      "result": ["category"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Relation",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/Edge",
+        "to": ["https://anatomy.canonical.com/Relation"],
+        "d": "M368 772H384C408 772 408 824 432 824",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Relation",
+          "a": "https://anatomy.canonical.com/Edge",
+          "b": "https://anatomy.canonical.com/Relation",
+          "self": false,
+          "cross": false,
+          "heads": ["https://anatomy.canonical.com/Relation"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/hasRelation",
+              "label": "has relation",
+              "domain": "https://anatomy.canonical.com/Edge",
+              "range": "https://anatomy.canonical.com/Relation"
+            }
+          ]
+        }
+      },
+      "result": ["has relation"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Switch",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/Edge",
+        "to": ["https://anatomy.canonical.com/Switch"],
+        "d": "M368 776H384C408 776 408 872 432 872",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Switch",
+          "a": "https://anatomy.canonical.com/Edge",
+          "b": "https://anatomy.canonical.com/Switch",
+          "self": false,
+          "cross": false,
+          "heads": ["https://anatomy.canonical.com/Switch"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/edgeSwitch",
+              "label": "edge switch",
+              "domain": "https://anatomy.canonical.com/Edge",
+              "range": "https://anatomy.canonical.com/Switch"
+            }
+          ]
+        }
+      },
+      "result": ["edge switch"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Prop",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/NamedNode",
+        "to": ["https://anatomy.canonical.com/Prop"],
+        "d": "M544 744H576C600 744 600 760 624 760",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Prop",
+          "a": "https://anatomy.canonical.com/NamedNode",
+          "b": "https://anatomy.canonical.com/Prop",
+          "self": false,
+          "cross": false,
+          "heads": ["https://anatomy.canonical.com/Prop"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/hasProp",
+              "label": "has prop",
+              "domain": "https://anatomy.canonical.com/NamedNode",
+              "range": "https://anatomy.canonical.com/Prop"
+            }
+          ]
+        }
+      },
+      "result": ["has prop"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Specification",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/NamedNode",
+        "to": ["https://anatomy.canonical.com/Specification"],
+        "d": "M384 616C408 616 408 728 432 728",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Specification",
+          "a": "https://anatomy.canonical.com/NamedNode",
+          "b": "https://anatomy.canonical.com/Specification",
+          "self": false,
+          "cross": false,
+          "heads": ["https://anatomy.canonical.com/NamedNode"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/rootNode",
+              "label": "root node",
+              "domain": "https://anatomy.canonical.com/Specification",
+              "range": "https://anatomy.canonical.com/NamedNode"
+            }
+          ]
+        }
+      },
+      "result": ["root node"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/Style",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/Node",
+        "to": ["https://anatomy.canonical.com/Style"],
+        "d": "M368 724H384C408 724 408 776 432 776",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/Node https://anatomy.canonical.com/Style",
+          "a": "https://anatomy.canonical.com/Node",
+          "b": "https://anatomy.canonical.com/Style",
+          "self": false,
+          "cross": false,
+          "heads": ["https://anatomy.canonical.com/Style"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/hasStyle",
+              "label": "has style",
+              "domain": "https://anatomy.canonical.com/Node",
+              "range": "https://anatomy.canonical.com/Style"
+            }
+          ]
+        }
+      },
+      "result": ["has style"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/SwitchCase",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/Node",
+        "to": ["https://anatomy.canonical.com/SwitchCase"],
+        "d": "M368 728H384C408 728 408 808 432 808H576C600 808 600 808 624 808",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/Node https://anatomy.canonical.com/SwitchCase",
+          "a": "https://anatomy.canonical.com/Node",
+          "b": "https://anatomy.canonical.com/SwitchCase",
+          "self": false,
+          "cross": false,
+          "heads": ["https://anatomy.canonical.com/Node"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/caseNode",
+              "label": "case node",
+              "domain": "https://anatomy.canonical.com/SwitchCase",
+              "range": "https://anatomy.canonical.com/Node"
+            }
+          ]
+        }
+      },
+      "result": ["case node"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/Switch https://anatomy.canonical.com/SwitchCase",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/Switch",
+        "to": ["https://anatomy.canonical.com/SwitchCase"],
+        "d": "M528 872H576C600 872 600 824 624 824",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/Switch https://anatomy.canonical.com/SwitchCase",
+          "a": "https://anatomy.canonical.com/Switch",
+          "b": "https://anatomy.canonical.com/SwitchCase",
+          "self": false,
+          "cross": false,
+          "heads": ["https://anatomy.canonical.com/SwitchCase"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/hasCase",
+              "label": "has case",
+              "domain": "https://anatomy.canonical.com/Switch",
+              "range": "https://anatomy.canonical.com/SwitchCase"
+            }
+          ]
+        }
+      },
+      "result": ["has case"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Node",
+        "kind": "relation",
+        "from": "https://anatomy.canonical.com/Edge",
+        "to": ["https://anatomy.canonical.com/Node"],
+        "d": "M368 760H384C412 760 412 760 412 740V740C412 720 412 720 384 720H368",
+        "bundle": {
+          "id": "https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Node",
+          "a": "https://anatomy.canonical.com/Edge",
+          "b": "https://anatomy.canonical.com/Node",
+          "self": false,
+          "cross": false,
+          "heads": [
+            "https://anatomy.canonical.com/Node",
+            "https://anatomy.canonical.com/Edge"
+          ],
+          "opposite": true,
+          "relations": [
+            {
+              "uri": "https://anatomy.canonical.com/edgeTarget",
+              "label": "edge target",
+              "domain": "https://anatomy.canonical.com/Edge",
+              "range": "https://anatomy.canonical.com/Node"
+            },
+            {
+              "uri": "https://anatomy.canonical.com/hasEdge",
+              "label": "has edge",
+              "domain": "https://anatomy.canonical.com/Node",
+              "range": "https://anatomy.canonical.com/Edge"
+            }
+          ]
+        },
+        "arc": true,
+        "apex": [412, 740]
+      },
+      "result": ["↑ edge target", "has edge ↓"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:http://pragma.canonical.com/codestandards#Category http://pragma.canonical.com/codestandards#CodeStandard",
+        "kind": "relation",
+        "from": "http://pragma.canonical.com/codestandards#Category",
+        "to": ["http://pragma.canonical.com/codestandards#CodeStandard"],
+        "d": "M160 1004H176C200 1004 200 1000 224 1000",
+        "bundle": {
+          "id": "http://pragma.canonical.com/codestandards#Category http://pragma.canonical.com/codestandards#CodeStandard",
+          "a": "http://pragma.canonical.com/codestandards#Category",
+          "b": "http://pragma.canonical.com/codestandards#CodeStandard",
+          "self": false,
+          "cross": false,
+          "heads": ["http://pragma.canonical.com/codestandards#Category"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "http://pragma.canonical.com/codestandards#hasCategory",
+              "label": "has category",
+              "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+              "range": "http://pragma.canonical.com/codestandards#Category"
+            }
+          ]
+        }
+      },
+      "result": ["has category"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#CodeStandard",
+        "kind": "relation",
+        "from": "http://pragma.canonical.com/codestandards#CodeStandard",
+        "to": ["http://pragma.canonical.com/codestandards#CodeStandard"],
+        "d": "M152 992C152 960 192 1000 160 1000",
+        "bundle": {
+          "id": "http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#CodeStandard",
+          "a": "http://pragma.canonical.com/codestandards#CodeStandard",
+          "b": "http://pragma.canonical.com/codestandards#CodeStandard",
+          "self": true,
+          "cross": false,
+          "heads": ["http://pragma.canonical.com/codestandards#CodeStandard"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "http://pragma.canonical.com/codestandards#extends",
+              "label": "extends",
+              "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+              "range": "http://pragma.canonical.com/codestandards#CodeStandard"
+            }
+          ]
+        },
+        "self": true,
+        "apex": [172, 980]
+      },
+      "result": ["extends"]
+    },
+    {
+      "layout": "real",
+      "edge": {
+        "id": "rel:http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#Example",
+        "kind": "relation",
+        "from": "http://pragma.canonical.com/codestandards#CodeStandard",
+        "to": ["http://pragma.canonical.com/codestandards#Example"],
+        "d": "M160 1016H176C200 1016 200 1032 224 1032",
+        "bundle": {
+          "id": "http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#Example",
+          "a": "http://pragma.canonical.com/codestandards#CodeStandard",
+          "b": "http://pragma.canonical.com/codestandards#Example",
+          "self": false,
+          "cross": false,
+          "heads": ["http://pragma.canonical.com/codestandards#Example"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "http://pragma.canonical.com/codestandards#do",
+              "label": "do",
+              "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+              "range": "http://pragma.canonical.com/codestandards#Example"
+            },
+            {
+              "uri": "http://pragma.canonical.com/codestandards#dont",
+              "label": "don't",
+              "domain": "http://pragma.canonical.com/codestandards#CodeStandard",
+              "range": "http://pragma.canonical.com/codestandards#Example"
+            }
+          ]
+        }
+      },
+      "result": ["do", "don't"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Note ex:Remark",
+        "kind": "relation",
+        "from": "ex:Note",
+        "to": ["ex:Remark"],
+        "d": "M352 220H368C392 220 392 168 416 168",
+        "bundle": {
+          "id": "ex:Note ex:Remark",
+          "a": "ex:Note",
+          "b": "ex:Remark",
+          "self": false,
+          "cross": false,
+          "heads": ["ex:Remark"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "a",
+              "label": "a",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "b",
+              "label": "b",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "c",
+              "label": "c",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "d",
+              "label": "d",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "e",
+              "label": "e",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            }
+          ]
+        }
+      },
+      "result": ["5 relations"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Note ex:Remark",
+        "kind": "relation",
+        "from": "ex:Note",
+        "to": ["ex:Remark"],
+        "d": "M352 220H368C392 220 392 168 416 168",
+        "bundle": {
+          "id": "ex:Note ex:Remark",
+          "a": "ex:Note",
+          "b": "ex:Remark",
+          "self": false,
+          "cross": false,
+          "heads": ["ex:Remark"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "a",
+              "label": "a",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "b",
+              "label": "b",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "c",
+              "label": "c",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "d",
+              "label": "d",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "e",
+              "label": "e",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            }
+          ]
+        },
+        "self": true
+      },
+      "result": ["a", "b", "c", "+2"]
+    },
+    {
+      "layout": "small",
+      "edge": {
+        "id": "rel:ex:Note ex:Remark",
+        "kind": "relation",
+        "from": "ex:Note",
+        "to": ["ex:Remark"],
+        "d": "M352 220H368C392 220 392 168 416 168",
+        "bundle": {
+          "id": "ex:Note ex:Remark",
+          "a": "ex:Note",
+          "b": "ex:Remark",
+          "self": false,
+          "cross": false,
+          "heads": ["ex:Remark"],
+          "opposite": false,
+          "relations": [
+            {
+              "uri": "a",
+              "label": "a",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            },
+            {
+              "uri": "b",
+              "label": "b",
+              "domain": "ex:Note",
+              "range": "ex:Remark"
+            }
+          ]
+        }
+      },
+      "result": ["a", "b"]
+    }
+  ],
+  "labels": [
+    {
+      "layout": "small",
+      "focus": "ex:Long",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:ex:Long ex:Note",
+            "lines": ["cites"],
+            "cx": 232,
+            "cy": 152,
+            "box": {
+              "x": 214.391,
+              "y": 141,
+              "w": 35.218,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:ex:Long ex:Remark",
+            "lines": ["refines"],
+            "cx": 330,
+            "cy": 76,
+            "box": {
+              "x": 305.216,
+              "y": 65,
+              "w": 49.568,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "focus": "ex:Note",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:ex:Note ex:Note",
+            "lines": ["seeAlso"],
+            "cx": 364,
+            "cy": 259,
+            "box": {
+              "x": 336.717,
+              "y": 248,
+              "w": 54.566,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:ex:Long ex:Note",
+            "lines": ["cites"],
+            "cx": 232,
+            "cy": 152,
+            "box": {
+              "x": 214.391,
+              "y": 141,
+              "w": 35.218,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:ex:Note ex:Remark",
+            "lines": ["about"],
+            "cx": 394,
+            "cy": 201,
+            "box": {
+              "x": 372.464,
+              "y": 190,
+              "w": 43.072,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "focus": "ex:Part",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:ex:Part ex:Whole",
+            "lines": ["↑ hasPart", "partOf ↓"],
+            "cx": 319,
+            "cy": 73,
+            "box": {
+              "x": 286.376,
+              "y": 54,
+              "w": 65.24799999999999,
+              "h": 38
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "focus": "ex:Remark",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:ex:Long ex:Remark",
+            "lines": ["refines"],
+            "cx": 330,
+            "cy": 76,
+            "box": {
+              "x": 305.216,
+              "y": 65,
+              "w": 49.568,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:ex:Note ex:Remark",
+            "lines": ["about"],
+            "cx": 394,
+            "cy": 201,
+            "box": {
+              "x": 372.464,
+              "y": 190,
+              "w": 43.072,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "focus": "ex:Thing",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "focus": "ex:Whole",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:ex:Part ex:Whole",
+            "lines": ["↑ hasPart", "partOf ↓"],
+            "cx": 319,
+            "cy": 73,
+            "box": {
+              "x": 286.376,
+              "y": 54,
+              "w": 65.24799999999999,
+              "h": 38
+            }
+          },
+          {
+            "edge": "rel:ex:Whole zz:Leaf",
+            "lines": ["links"],
+            "cx": 240,
+            "cy": 264,
+            "box": {
+              "x": 222.895,
+              "y": 253,
+              "w": 34.21,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "focus": "zz:Leaf",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:ex:Whole zz:Leaf",
+            "lines": ["links"],
+            "cx": 240,
+            "cy": 264,
+            "box": {
+              "x": 222.895,
+              "y": 253,
+              "w": 34.21,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "focus": "zz:Root",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "http://pragma.canonical.com/codestandards#Category",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:http://pragma.canonical.com/codestandards#Category http://pragma.canonical.com/codestandards#CodeStandard",
+            "lines": ["has category"],
+            "cx": 267,
+            "cy": 961,
+            "box": {
+              "x": 224.149,
+              "y": 950,
+              "w": 85.702,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "http://pragma.canonical.com/codestandards#CodeStandard",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#CodeStandard",
+            "lines": ["extends"],
+            "cx": 172,
+            "cy": 957,
+            "box": {
+              "x": 143.856,
+              "y": 946,
+              "w": 56.288,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:http://pragma.canonical.com/codestandards#Category http://pragma.canonical.com/codestandards#CodeStandard",
+            "lines": ["has category"],
+            "cx": 267,
+            "cy": 961,
+            "box": {
+              "x": 224.149,
+              "y": 950,
+              "w": 85.702,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#Example",
+            "lines": ["do", "don't"],
+            "cx": 140,
+            "cy": 1047,
+            "box": {
+              "x": 120.375,
+              "y": 1028,
+              "w": 39.25,
+              "h": 38
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "http://pragma.canonical.com/codestandards#Example",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:http://pragma.canonical.com/codestandards#CodeStandard http://pragma.canonical.com/codestandards#Example",
+            "lines": ["do", "don't"],
+            "cx": 140,
+            "cy": 953,
+            "box": {
+              "x": 120.375,
+              "y": 934,
+              "w": 39.25,
+              "h": 38
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/AnonymousNode",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Edge",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Switch",
+            "lines": ["edge switch"],
+            "cx": 473,
+            "cy": 911,
+            "box": {
+              "x": 432.375,
+              "y": 900,
+              "w": 81.25,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Node",
+            "lines": ["↑ edge target", "has edge ↓"]
+          },
+          {
+            "edge": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Relation",
+            "lines": ["has relation"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/NamedNode",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Prop",
+            "lines": ["has prop"],
+            "cx": 586,
+            "cy": 745,
+            "box": {
+              "x": 555.826,
+              "y": 734,
+              "w": 60.348,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Specification",
+            "lines": ["root node"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Node",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/SwitchCase",
+            "lines": ["case node"],
+            "cx": 659,
+            "cy": 847,
+            "box": {
+              "x": 624.591,
+              "y": 836,
+              "w": 68.818,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Node",
+            "lines": ["↑ edge target", "has edge ↓"]
+          },
+          {
+            "edge": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/Style",
+            "lines": ["has style"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Projection",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Prop",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Prop",
+            "lines": ["has prop"],
+            "cx": 586,
+            "cy": 745,
+            "box": {
+              "x": 555.826,
+              "y": 734,
+              "w": 60.348,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Relation",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Relation",
+            "lines": ["has relation"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Specification",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/NamedNode https://anatomy.canonical.com/Specification",
+            "lines": ["root node"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Style",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/Style",
+            "lines": ["has style"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/StyleKey",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/Switch",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Edge https://anatomy.canonical.com/Switch",
+            "lines": ["edge switch"],
+            "cx": 473,
+            "cy": 911,
+            "box": {
+              "x": 432.375,
+              "y": 900,
+              "w": 81.25,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://anatomy.canonical.com/Switch https://anatomy.canonical.com/SwitchCase",
+            "lines": ["has case"],
+            "cx": 587,
+            "cy": 868,
+            "box": {
+              "x": 558.009,
+              "y": 857,
+              "w": 57.982,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://anatomy.canonical.com/SwitchCase",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://anatomy.canonical.com/Node https://anatomy.canonical.com/SwitchCase",
+            "lines": ["case node"],
+            "cx": 659,
+            "cy": 847,
+            "box": {
+              "x": 624.591,
+              "y": 836,
+              "w": 68.818,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://anatomy.canonical.com/Switch https://anatomy.canonical.com/SwitchCase",
+            "lines": ["has case"],
+            "cx": 587,
+            "cy": 868,
+            "box": {
+              "x": 558.009,
+              "y": 857,
+              "w": 57.982,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/ChangeLogEntry",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+            "lines": ["changeLog"],
+            "cx": 341,
+            "cy": 300,
+            "box": {
+              "x": 303.581,
+              "y": 289,
+              "w": 74.838,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Component",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": [
+          {
+            "edge": "rel:https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+            "lines": ["↑ parentComponent", "hasSubcomponent ↓"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Concept",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+            "lines": ["conceptType"],
+            "cx": 313,
+            "cy": 56,
+            "box": {
+              "x": 269.463,
+              "y": 45,
+              "w": 87.074,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/ConceptType",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+            "lines": ["conceptType"],
+            "cx": 313,
+            "cy": 56,
+            "box": {
+              "x": 269.463,
+              "y": 45,
+              "w": 87.074,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Entity",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Group",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/ImplementationLibrary",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+            "lines": ["library"],
+            "cx": 297,
+            "cy": 287,
+            "box": {
+              "x": 274.092,
+              "y": 276,
+              "w": 45.816,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+            "lines": ["libraryTier"],
+            "cx": 311,
+            "cy": 312,
+            "box": {
+              "x": 275.98199999999997,
+              "y": 301,
+              "w": 70.036,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/ImplementationObject",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+            "lines": ["library"],
+            "cx": 297,
+            "cy": 287,
+            "box": {
+              "x": 274.092,
+              "y": 276,
+              "w": 45.816,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+            "lines": ["implementsBlock"],
+            "cx": 426,
+            "cy": 255,
+            "box": {
+              "x": 368.61,
+              "y": 244,
+              "w": 114.78,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Layout",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Modifier",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+            "lines": ["↑ hasModifier", "modifierFamily ↓"],
+            "cx": 424,
+            "cy": 41,
+            "box": {
+              "x": 368.15,
+              "y": 22,
+              "w": 111.7,
+              "h": 38
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/ModifierFamily",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+            "lines": ["↑ hasModifier", "modifierFamily ↓"],
+            "cx": 424,
+            "cy": 41,
+            "box": {
+              "x": 368.15,
+              "y": 22,
+              "w": 111.7,
+              "h": 38
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+            "lines": ["hasModifierFamily"],
+            "cx": 403,
+            "cy": 255,
+            "box": {
+              "x": 342.278,
+              "y": 244,
+              "w": 121.444,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Pattern",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Property",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+            "lines": ["hasProperty"],
+            "cx": 338,
+            "cy": 350,
+            "box": {
+              "x": 296.696,
+              "y": 339,
+              "w": 82.608,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Subcomponent",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": [
+          {
+            "edge": "rel:https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+            "lines": ["↑ parentComponent", "hasSubcomponent ↓"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Tag",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+            "lines": ["category"],
+            "cx": 333,
+            "cy": 457,
+            "box": {
+              "x": 302.385,
+              "y": 446,
+              "w": 61.23,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+            "lines": ["documentationStage"],
+            "cx": 332,
+            "cy": 420,
+            "box": {
+              "x": 262.85699999999997,
+              "y": 409,
+              "w": 138.286,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/TagCategory",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+            "lines": ["category"],
+            "cx": 333,
+            "cy": 457,
+            "box": {
+              "x": 302.385,
+              "y": 446,
+              "w": 61.23,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/Tier",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+            "lines": ["libraryTier"],
+            "cx": 311,
+            "cy": 300,
+            "box": {
+              "x": 275.98199999999997,
+              "y": 289,
+              "w": 70.036,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+            "lines": ["tier"],
+            "cx": 340,
+            "cy": 271,
+            "box": {
+              "x": 326.031,
+              "y": 260,
+              "w": 27.938,
+              "h": 22
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/TokenBinding",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+            "lines": ["← viaBlock", "hasTokenBinding →"],
+            "cx": 623,
+            "cy": 407,
+            "box": {
+              "x": 560.22,
+              "y": 388,
+              "w": 125.56,
+              "h": 38
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/UIBlock",
+      "faded": [],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+            "lines": [
+              "hasVariant",
+              "inheritsFrom",
+              "specializedBy",
+              "variantOf"
+            ],
+            "cx": 491,
+            "cy": 283,
+            "box": {
+              "x": 445.916,
+              "y": 248,
+              "w": 90.168,
+              "h": 70
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+            "lines": ["changeLog"],
+            "cx": 341,
+            "cy": 300,
+            "box": {
+              "x": 303.581,
+              "y": 289,
+              "w": 74.838,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+            "lines": ["hasProperty"],
+            "cx": 338,
+            "cy": 350,
+            "box": {
+              "x": 296.696,
+              "y": 339,
+              "w": 82.608,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+            "lines": ["documentationStage"],
+            "cx": 332,
+            "cy": 420,
+            "box": {
+              "x": 262.85699999999997,
+              "y": 409,
+              "w": 138.286,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+            "lines": ["tier"],
+            "cx": 340,
+            "cy": 271,
+            "box": {
+              "x": 326.031,
+              "y": 260,
+              "w": 27.938,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+            "lines": ["← viaBlock", "hasTokenBinding →"],
+            "cx": 623,
+            "cy": 407,
+            "box": {
+              "x": 560.22,
+              "y": 388,
+              "w": 125.56,
+              "h": 38
+            }
+          }
+        ],
+        "omitted": [
+          {
+            "edge": "rel:https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+            "lines": ["implementsBlock"]
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+            "lines": ["hasModifierFamily"]
+          }
+        ]
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/UIElement",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "real",
+      "focus": "https://ds.canonical.com/UIBlock",
+      "faded": [
+        "http://pragma.canonical.com/codestandards#Category",
+        "http://pragma.canonical.com/codestandards#CodeStandard",
+        "http://pragma.canonical.com/codestandards#Example",
+        "https://anatomy.canonical.com/AnonymousNode",
+        "https://anatomy.canonical.com/Edge",
+        "https://anatomy.canonical.com/NamedNode",
+        "https://anatomy.canonical.com/Node",
+        "https://anatomy.canonical.com/Projection",
+        "https://anatomy.canonical.com/Prop",
+        "https://anatomy.canonical.com/Relation",
+        "https://anatomy.canonical.com/Specification",
+        "https://anatomy.canonical.com/Style",
+        "https://anatomy.canonical.com/StyleKey",
+        "https://anatomy.canonical.com/Switch",
+        "https://anatomy.canonical.com/SwitchCase",
+        "https://ds.canonical.com/Concept",
+        "https://ds.canonical.com/ConceptType",
+        "https://ds.canonical.com/Entity",
+        "https://ds.canonical.com/ImplementationLibrary",
+        "https://ds.canonical.com/Modifier",
+        "https://ds.canonical.com/TagCategory"
+      ],
+      "result": {
+        "placed": [
+          {
+            "edge": "rel:https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+            "lines": [
+              "hasVariant",
+              "inheritsFrom",
+              "specializedBy",
+              "variantOf"
+            ],
+            "cx": 491,
+            "cy": 283,
+            "box": {
+              "x": 445.916,
+              "y": 248,
+              "w": 90.168,
+              "h": 70
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+            "lines": ["changeLog"],
+            "cx": 341,
+            "cy": 300,
+            "box": {
+              "x": 303.581,
+              "y": 289,
+              "w": 74.838,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+            "lines": ["implementsBlock"],
+            "cx": 262,
+            "cy": 239,
+            "box": {
+              "x": 204.61,
+              "y": 228,
+              "w": 114.78,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+            "lines": ["hasModifierFamily"],
+            "cx": 451,
+            "cy": 97,
+            "box": {
+              "x": 390.278,
+              "y": 86,
+              "w": 121.444,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+            "lines": ["hasProperty"],
+            "cx": 338,
+            "cy": 350,
+            "box": {
+              "x": 296.696,
+              "y": 339,
+              "w": 82.608,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+            "lines": ["documentationStage"],
+            "cx": 332,
+            "cy": 420,
+            "box": {
+              "x": 262.85699999999997,
+              "y": 409,
+              "w": 138.286,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+            "lines": ["tier"],
+            "cx": 340,
+            "cy": 271,
+            "box": {
+              "x": 326.031,
+              "y": 260,
+              "w": 27.938,
+              "h": 22
+            }
+          },
+          {
+            "edge": "rel:https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+            "lines": ["← viaBlock", "hasTokenBinding →"],
+            "cx": 623,
+            "cy": 407,
+            "box": {
+              "x": 560.22,
+              "y": 388,
+              "w": 125.56,
+              "h": 38
+            }
+          }
+        ],
+        "omitted": []
+      }
+    },
+    {
+      "layout": "small",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1
+      },
+      "focus": "ex:Part",
+      "faded": [],
+      "result": {
+        "placed": [],
+        "omitted": [
+          {
+            "edge": "rel:ex:Part ex:Whole",
+            "lines": ["↑ hasPart", "partOf ↓"]
+          }
+        ]
+      }
+    }
+  ]
+}

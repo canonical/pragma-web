@@ -1,6 +1,6 @@
-import type { GraphBox, GraphTransform } from "@canonical/prism-core";
+import type { GraphBox, GraphTransform, Rect } from "@canonical/prism-core";
 import frameLegibleWindow from "../../classGraph/frameLegibleWindow.js";
-import type { ClassGraphLayout, Rect } from "../../classGraph/types.js";
+import type { ClassGraphLayout } from "../../classGraph/types.js";
 
 /**
  * Compute the camera the canvas opens on once the client has measured it:
