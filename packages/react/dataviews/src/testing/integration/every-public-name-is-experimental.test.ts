@@ -26,7 +26,7 @@ describe("every public name is experimental", () => {
     expect(listMembers()).toHaveLength(8);
   });
 
-  it.fails("tags every DataViews member", () => {
+  it("tags every DataViews member", () => {
     expect(
       listMembers().filter(([, doc]) => !doc.includes("@experimental")),
     ).toEqual([]);

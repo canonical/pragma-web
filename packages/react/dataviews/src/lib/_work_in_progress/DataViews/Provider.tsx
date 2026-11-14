@@ -58,19 +58,59 @@ export default function DataViews<
   );
 }
 
-/** The connected action bar, over the current selection. */
+/**
+ * The connected action bar, over the current selection.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.Actions = Actions;
-/** The collection's rows, bound to this root. */
+/**
+ * The collection's rows, bound to this root.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.DataTable = DataTable;
-/** The connected query-editing part of the composition. */
+/**
+ * The connected query-editing part of the composition.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.Filters = Filters;
-/** The connected window-navigation part of the composition. */
+/**
+ * The connected window-navigation part of the composition.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.Pagination = Pagination;
-/** The connected saved-view control, over the store the provider was given. */
+/**
+ * The connected saved-view control, over the store the provider was given.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.SavedViews = SavedViews;
-/** The connected search part, over the applied search. */
+/**
+ * The connected search part, over the applied search.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.Search = Search;
-/** The table's column settings, given to a table as its `settings`. */
+/**
+ * The table's column settings, given to a table as its `settings`.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.Settings = Settings;
-/** The connected sort panel, over the applied ordering. */
+/**
+ * The connected sort panel, over the applied ordering.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 DataViews.SortPanel = SortPanel;
