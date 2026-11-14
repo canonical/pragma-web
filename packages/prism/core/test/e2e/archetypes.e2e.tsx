@@ -566,9 +566,11 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       expect(crumb).not.toBeNull();
       expect(crumb?.right).toBeLessThanOrEqual((crumb?.bandEnd ?? 0) + 0.5);
       expect(crumb?.textOverflow).toBe("ellipsis");
-      // At a phone's width the IRI is wider than the strip: it is cut at
-      // the crumb's end, and the lens crumb keeps its whole label.
-      expect(crumb?.truncated).toBe(viewport.width < 448);
+      // The IRI is wider than the trail at every width (the strip's first
+      // two columns, or its share of the one flex line below two groups):
+      // it is cut at the crumb's end, and the lens crumb keeps its whole
+      // label.
+      expect(crumb?.truncated).toBe(true);
       expect(crumb?.lensWidth).toBeGreaterThanOrEqual(
         (crumb?.lensContentWidth ?? 0) - 0.5,
       );
