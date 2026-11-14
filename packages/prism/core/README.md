@@ -332,7 +332,8 @@ binding can derive names from it. Check the bindings in two places:
   type is missing or does not implement `Node`;
 - at boot, `await assertBindingsLive(execute, bindings)` asks the running
   graph for every binding's class and throws when the graph does not know
-  one.
+  one, or when its type lens hides one (a hidden class's instances are
+  values, never an index).
 
 ## Strings
 
