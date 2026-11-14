@@ -32,8 +32,8 @@ describe("the committed schema", () => {
   it("is what the provider compiles from the installed ref packages", {
     timeout: BOOT_TIMEOUT_MS,
   }, async () => {
-    const { api } = await createPragmaProvider();
-    expect(printSorted(api.sdl)).toBe(
+    const { sdl } = await createPragmaProvider();
+    expect(printSorted(sdl)).toBe(
       printSorted(readFileSync(SCHEMA_PATH, "utf-8")),
     );
   });
