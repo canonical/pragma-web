@@ -5,7 +5,8 @@
 # the section index itself; nothing reads the DOM to list sections.
 # DOM order: header, aside (contents, facts), content (body, then one
 # <section> per entry with its <h2 id>).
-# The root is one subgrid of the canvas's page grid over every column.
+# The root is one subgrid of the canvas's page grid over every column. It
+# adds no space at the page's end: the page wrapper that holds it owns that.
 #
 # Reflow, bound in styles.css (thresholds are whole groups, container `shell`):
 #   three groups and wider (default): header and content on `1 / -4`, rows 1
@@ -36,7 +37,6 @@
 #
 # Token ledger (component tokens on `.ds.sectioned-view`):
 #   --sectioned-view-gap: --grid-gutter                      every grid here, both axes
-#   --sectioned-view-padding-block-end: container.gap.loose  the page ends one loose step above the canvas's end
 #   --sectioned-view-bar-block-size: calc(var(--density-line-height) + 2 * var(--space-050))
 #                                                            PS8 L171; 44px drawn; the bound is "at most 44px"
 #   --sectioned-view-section-margin-block-start: space.300   a section after another (external spacing, A2)
@@ -52,7 +52,6 @@ node:
     layout.grid.column: "1 / -1"
     layout.alignSelf: start
     spacing.gap: grid.gutter
-    spacing.internal.block.end: container.gap.loose
   edges:
     - node:
         role: header region

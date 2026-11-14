@@ -26,7 +26,8 @@ const componentCssClassName = "ds sectioned-view";
  * every column, the index is not shown and the facts follow the header.
  * A body given before the sections (`children`) is off the index; a facts
  * node or a body that renders nothing leaves no region, and a page with no
- * section and no facts has no aside.
+ * section and no facts has no aside. It adds no space at the page's end:
+ * the page that holds it owns that.
  *
  * `import { SectionedView } from "@canonical/prism-core";`
  *

@@ -4,11 +4,10 @@
 
 @layer ds.components.global {
   /* A subgrid of the canvas's page grid over every column, its gap the
-   * grid's gutter on both axes. It packs at the top of the canvas and ends
-   * one loose step above the canvas's end. */
+   * grid's gutter on both axes. It packs at the top of the canvas; the page
+   * that holds it owns the space at the page's end. */
   .ds.sectioned-view {
     --sectioned-view-gap: var(--grid-gutter);
-    --sectioned-view-padding-block-end: var(--container-gap-loose);
     /* The "On this page" bar's height: one line and a small step above and
      * under it. Every section heading stops this far under the scroller's
      * top, so the bar never covers the heading a link scrolled to. */
@@ -26,7 +25,6 @@
     grid-column: 1 / -1;
     align-self: start;
     gap: var(--sectioned-view-gap);
-    padding-block-end: var(--sectioned-view-padding-block-end);
   }
 
   /* The header and the content hold the columns before the aside's three. */
