@@ -400,6 +400,8 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `NodeGraphNode`; types `NodeChipProps`, `NodeRowProps`, `NodeCardProps`,
   `NodeCommandProps`, `NodeGraphNodeProps`.
 - List view: `NodeList`; types `NodeListProps`.
+- Peek: `ProjectionPeek` (the card a chip's peek shows, read by a lazy
+  query of its own when the peek opens); types `ProjectionPeekProps`.
 - Class projections: `OntologyClassChip`, `OntologyClassRow`,
   `OntologyClassCard`, `OntologyClassCommand`,
   `OntologyClassGraphNode`; types `OntologyClassChipProps`,

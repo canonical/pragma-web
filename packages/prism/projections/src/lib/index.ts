@@ -30,6 +30,7 @@ export type {
   NodeGraphNodeProps,
   NodeListProps,
   NodeRowProps,
+  ProjectionPeekProps,
   RowArmNative,
   RowProjectionProps,
 } from "./node/index.js";
@@ -45,6 +46,7 @@ export {
   NodeGraphNode,
   NodeList,
   NodeRow,
+  ProjectionPeek,
   RowProjection,
 } from "./node/index.js";
 export type {

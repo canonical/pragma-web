@@ -1,0 +1,24 @@
+---
+# ProjectionPeek: the card a chip's peek shows. It renders no element of
+# its own: it runs ProjectionPeekQuery, `node(id: $id)` with the chip's
+# compact address, and hands the node to the card dispatcher inside a
+# Suspense boundary, so the card's own anatomy is the peek's content.
+#
+# The query is lazy: the chip mounts the peek only while it is open, so a
+# chip's fragment never spreads a card's (no fragment cycle, no card read
+# on the server for a mention). The node field reads no field of its own;
+# the card dispatcher's fragment reads the rest.
+#
+# No styles: the chip's peek dialog sizes and places the card.
+node:
+  uri: prism.component.projection_peek
+  projection:
+    on: Query
+  edges:
+    - node:
+        uri: prism.component.card_projection
+        projection:
+          on: Node
+      relation:
+        cardinality: "0..1"
+        slotName: card

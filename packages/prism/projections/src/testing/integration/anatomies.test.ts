@@ -10,7 +10,7 @@ import {
   assertStylesMatchAnatomy,
   listAnatomyFolders,
 } from "@canonical/prism-core/testing";
-import type { ReaderFragment } from "relay-runtime";
+import type { ConcreteRequest, ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 
 /** The package's root, three levels up from this file. */
@@ -34,6 +34,22 @@ const FRAGMENTS = new Map(
   ).map(([path, fragment]) => [
     basename(path, ".graphql.ts").replace(/_node$/, ""),
     fragment,
+  ]),
+);
+
+/**
+ * The compiled operation of every peek, by its component's name: a peek
+ * runs a query of its own, read by its operation's root fragment.
+ */
+const PEEK_FRAGMENTS = new Map(
+  Object.entries(
+    import.meta.glob<ConcreteRequest>(
+      "../../__generated__/*PeekQuery.graphql.ts",
+      { eager: true, import: "default" },
+    ),
+  ).map(([path, request]) => [
+    basename(path, ".graphql.ts").replace(/Query$/, ""),
+    request.fragment,
   ]),
 );
 
@@ -100,6 +116,7 @@ describe("the package's components", () => {
       "NodeGraphNode",
       "NodeList",
       "NodeRow",
+      "ProjectionPeek",
       "RowProjection",
       "OntologyClassCard",
       "OntologyClassChip",
@@ -135,7 +152,8 @@ describe("the package's components", () => {
 
   for (const folder of projectionFolders) {
     it(`${basename(folder)} reads what its anatomy projects`, () => {
-      const fragment = FRAGMENTS.get(basename(folder));
+      const fragment =
+        FRAGMENTS.get(basename(folder)) ?? PEEK_FRAGMENTS.get(basename(folder));
       if (fragment === undefined) {
         throw new Error(`${basename(folder)} has no compiled fragment`);
       }

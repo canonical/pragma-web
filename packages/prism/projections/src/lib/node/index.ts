@@ -20,4 +20,5 @@ export * from "./NodeCommand/index.js";
 export * from "./NodeGraphNode/index.js";
 export * from "./NodeList/index.js";
 export * from "./NodeRow/index.js";
+export * from "./ProjectionPeek/index.js";
 export * from "./RowProjection/index.js";
