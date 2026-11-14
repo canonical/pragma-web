@@ -15,11 +15,11 @@
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 
 const componentEntityRecordsCard = {
-  "client:https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card:_meta":
+  "client:https://ds.canonical.com/apps_workplace.pattern.travel_provider_card:_meta":
     {
-      __id: "client:https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card:_meta",
+      __id: "client:https://ds.canonical.com/apps_workplace.pattern.travel_provider_card:_meta",
       __typename: "EntityMeta",
-      curie: "ds:apps_workplaceengineering.pattern.travel_provider_card",
+      curie: "ds:apps_workplace.pattern.travel_provider_card",
     },
   "client:https://ds.canonical.com/global.component.card:_meta": {
     __id: "client:https://ds.canonical.com/global.component.card:_meta",
@@ -95,7 +95,7 @@ const componentEntityRecordsCard = {
       __typename: "UIBlockEdge",
       node: {
         __ref:
-          "https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card",
+          "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card",
       },
     },
   "client:https://ds.canonical.com/global.component.card:specializedBies(first:24):pageInfo":
@@ -247,15 +247,15 @@ const componentEntityRecordsCard = {
     label: "Component",
     namespace: "ds",
   },
-  "https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card":
+  "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card":
     {
-      __id: "https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card",
+      __id: "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card",
       __typename: "Pattern",
-      uri: "https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card",
+      uri: "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card",
       name: "TravelProviderCard",
       _meta: {
         __ref:
-          "client:https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card:_meta",
+          "client:https://ds.canonical.com/apps_workplace.pattern.travel_provider_card:_meta",
       },
     },
   "https://ds.canonical.com/global": {
