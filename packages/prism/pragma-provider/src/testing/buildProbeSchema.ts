@@ -26,6 +26,12 @@ const META = new GraphQLObjectType({
     curie: { type: new GraphQLNonNull(GraphQLString) },
     title: { type: new GraphQLNonNull(GraphQLString) },
     definition: { type: GraphQLString },
+    type: {
+      type: new GraphQLObjectType({
+        name: "MetaType",
+        fields: { visibility: { type: GraphQLString } },
+      }),
+    },
   },
 });
 

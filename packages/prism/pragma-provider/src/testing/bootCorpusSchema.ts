@@ -13,6 +13,12 @@ import {
   createStoreQueryFn,
   type SchemaPluginApi,
 } from "@canonical/ke-graphql";
+import { indexSiteLens, type SiteLens } from "@canonical/prism-contract";
+import {
+  extendWithLens,
+  readTBoxOutline,
+  SITE_LENS,
+} from "../lib/lens/index.js";
 import type { SearchIndexSources } from "../lib/search/types.js";
 import {
   cacheRefRoots,
@@ -23,12 +29,14 @@ import { CORPUS_REFS_ROOT } from "./corpus.js";
 
 /**
  * Boot a store over the corpus's ref packages with the schema plugin,
- * compiled as the provider compiles it, and return the schema, a fresh
- * context and a query function.
+ * compiled and served with `lens` as the provider serves it, and return the
+ * schema, a fresh context and a query function.
  *
  * @note Impure: reads the corpus and boots an Oxigraph WASM store.
  */
-export const bootCorpusSchema = async (): Promise<SearchIndexSources> => {
+export const bootCorpusSchema = async (
+  lens: SiteLens = SITE_LENS,
+): Promise<SearchIndexSources> => {
   const sources = collectTtlSources(cacheRefRoots(CORPUS_REFS_ROOT));
   // biome-ignore lint/suspicious/noExplicitAny: the Plugin generic is invariant, so the plugin array needs `any` here, as in createPragmaProvider
   const plugins: Plugin<any>[] = [
@@ -47,9 +55,13 @@ export const bootCorpusSchema = async (): Promise<SearchIndexSources> => {
   if (api === undefined) {
     throw new Error("ke-graphql plugin did not register its API");
   }
+  const query = createStoreQueryFn(store);
   return {
-    schema: api.schema,
+    schema: extendWithLens(
+      api.schema,
+      indexSiteLens(lens, await readTBoxOutline(query)),
+    ),
     context: api.createContext(store),
-    query: createStoreQueryFn(store),
+    query,
   };
 };

@@ -7,13 +7,16 @@ import type { SearchEntry, SearchIndex, SearchIndexSources } from "./types.js";
 /** What `SEARCH_ENTRY_QUERY` selects of one node. */
 interface SearchEntryNode {
   readonly uri: string;
-  readonly _meta: Omit<SearchEntry, "uri">;
+  readonly _meta: Omit<SearchEntry, "uri"> & {
+    readonly type: { readonly visibility: string | null };
+  };
 }
 
 /**
  * Read one candidate through the schema's `node(id:)`.
  *
- * @returns Its entry, or undefined when `node(id:)` resolves it to null.
+ * @returns Its entry, or undefined when `node(id:)` resolves it to null or
+ * its class is hidden.
  * @throws Naming the IRI, when the query reports an error.
  * @note Impure: executes a query, which reads the store.
  */
@@ -39,14 +42,18 @@ const readSearchEntry = async (
     throw new Error(`search index: node(id: "${id}") failed: ${error.message}`);
   }
   const { node } = result.data as { node: SearchEntryNode | null };
-  return node === null ? undefined : { uri: node.uri, ...node._meta };
+  if (node === null || node._meta.type.visibility === "HIDDEN") {
+    return undefined;
+  }
+  const { curie, title, definition } = node._meta;
+  return { uri: node.uri, curie, title, definition };
 };
 
 /**
  * Build the search index: every IRI the graph types, read through the
- * compiled schema's own `node(id:)`, so an entry holds exactly what `_meta`
+ * served schema's own `node(id:)`, so an entry holds exactly what `_meta`
  * serves. IRIs `node(id:)` resolves to null, properties and ontologies
- * among them, are left out.
+ * among them, are left out, and so are instances of a hidden class.
  *
  * The reads run concurrently over the one context, so its loaders batch
  * them.

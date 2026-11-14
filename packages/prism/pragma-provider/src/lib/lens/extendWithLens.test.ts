@@ -5,7 +5,6 @@ import { buildSchema, parse } from "graphql";
 import { describe, expect, it } from "vitest";
 import { bootCorpusSchema } from "../../testing/bootCorpusSchema.js";
 import { extendWithLens } from "./extendWithLens.js";
-import { readTBoxOutline } from "./readTBoxOutline.js";
 
 const DS = "https://design.example.org/ontology#";
 
@@ -43,15 +42,14 @@ const CORPUS_LENS: SiteLens = {
   ],
 };
 
-/** Execute `source` against `lens` served on the corpus's compiled schema. */
+/**
+ * Execute `source` against `lens` served on the corpus's compiled schema,
+ * which `bootCorpusSchema` extends with `extendWithLens`.
+ */
 const runWith = async (lens: SiteLens, source: string) => {
-  const { schema, context, query } = await bootCorpusSchema();
-  const served = extendWithLens(
-    schema,
-    indexSiteLens(lens, await readTBoxOutline(query)),
-  );
+  const { schema, context } = await bootCorpusSchema(lens);
   const result = await executeLocal({
-    schema: served,
+    schema,
     source,
     document: parse(source),
     contextValue: context,

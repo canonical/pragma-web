@@ -34,7 +34,7 @@ export interface SearchMatch {
 
 /** What the search index is built from. */
 export interface SearchIndexSources {
-  /** The compiled schema, whose `node(id:)` reads each entry. */
+  /** The served schema, whose `node(id:)` reads each entry and its class's visibility. */
   readonly schema: GraphQLSchema;
   /** A context for the schema, shared by every read so its loaders batch. */
   readonly context: CompilerContext;
