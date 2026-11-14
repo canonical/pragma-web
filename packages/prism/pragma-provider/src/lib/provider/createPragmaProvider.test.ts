@@ -40,9 +40,12 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { createStore, type Plugin } from "@canonical/ke";
 import { createSchemaPlugin } from "@canonical/ke-graphql";
-import { satisfiesContract } from "@canonical/prism-contract";
+import { indexSiteLens, satisfiesContract } from "@canonical/prism-contract";
+import { buildSchema, printSchema } from "graphql";
 import { describe, expect, it, vi } from "vitest";
+import { bootCorpusQuery } from "../../testing/bootCorpusQuery.js";
 import { CORPUS_REFS_ROOT, MISSING_ROOT } from "../../testing/corpus.js";
+import { readTBoxOutline, SITE_LENS } from "../lens/index.js";
 import {
   cacheRefRoots,
   collectTtlSources,
@@ -67,8 +70,42 @@ describe("createPragmaProvider over the ref packages", () => {
     // the contract until someone regenerates it; this reads the live emission
     // of the ke-graphql this package pins, so a bump that breaks conformance
     // is red on the bump itself.
-    const { api } = await booted;
-    expect(satisfiesContract(api.sdl).violations).toEqual([]);
+    const { sdl } = await booted;
+    expect(satisfiesContract(sdl).violations).toEqual([]);
+  });
+
+  it("serves the compiler's header, then the compiled schema with the type lens", async () => {
+    const { api, sdl } = await booted;
+    const header = api.sdl.slice(
+      0,
+      api.sdl.length - printSchema(api.schema).length,
+    );
+    expect(header).toContain("@canonical/prism-pragma-provider");
+    expect(sdl.startsWith(header)).toBe(true);
+    expect(printSchema(buildSchema(sdl.slice(header.length)))).toBe(
+      sdl.slice(header.length),
+    );
+    expect(sdl).toContain('pluralLabel(lang: String = "en"): String');
+    expect(api.sdl).not.toContain("enum TermVisibility");
+  });
+
+  it("answers classEdges over the fetch handler", async () => {
+    const { handle } = await booted;
+    const response = await handle(
+      new Request("http://localhost/graphql", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          query: "{ classEdges { property count declared } }",
+        }),
+      }),
+    );
+    const body = (await response.json()) as {
+      data?: { classEdges: unknown[] };
+      errors?: unknown;
+    };
+    expect(body.errors).toBeUndefined();
+    expect(Array.isArray(body.data?.classEdges)).toBe(true);
   });
 
   it("parses the channel-dotted reference rather than choking on it", async () => {
@@ -217,6 +254,27 @@ describe("prose sidecars", () => {
       ),
     ]);
     expect(infos.join("\n")).toContain("2 prose sidecars bound");
+  });
+});
+
+describe("the site lens", () => {
+  it("warns once for each IRI the graph does not declare", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
+    const warnings = warn.mock.calls
+      .map((call) => String(call.at(0)))
+      .filter((line) => line.includes("the site lens names"));
+    warn.mockRestore();
+    info.mockRestore();
+    // The hermetic corpus mints its own namespaces, so it declares none of
+    // the site lens's terms.
+    const outline = await readTBoxOutline(await bootCorpusQuery());
+    const { unknownIris } = indexSiteLens(SITE_LENS, outline);
+    expect(unknownIris).toContain("https://ds.canonical.com/Tier");
+    expect(warnings).toEqual(
+      unknownIris.map((iri) => expect.stringContaining(` ${iri},`)),
+    );
   });
 });
 

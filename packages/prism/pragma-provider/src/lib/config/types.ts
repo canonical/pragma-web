@@ -60,4 +60,9 @@ export interface PragmaProvider {
   readonly handle: (request: Request) => Promise<Response>;
   /** The compiled schema and its diagnostics, as ke-graphql registers them. */
   readonly api: SchemaPluginApi;
+  /**
+   * The SDL of the schema the handler serves: the compiler's provenance
+   * header, then the compiled schema with the type lens.
+   */
+  readonly sdl: string;
 }

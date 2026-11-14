@@ -63,6 +63,7 @@
  * for the same reason `REF_PACKAGES` is (see config/constants.ts).
  */
 
+import { writeFileSync } from "node:fs";
 import { relative } from "node:path";
 import { createStore, type Plugin } from "@canonical/ke";
 import {
@@ -71,7 +72,11 @@ import {
   type SchemaPluginApi,
 } from "@canonical/ke-graphql";
 import { createGraphQLHandler } from "@canonical/ke-graphql/http";
+import { indexSiteLens } from "@canonical/prism-contract";
+import { printSchema } from "graphql";
 import type { PragmaProvider, PragmaProviderOptions } from "../config/index.js";
+import { countClassEdges, createClassEdgesExtension } from "../edges/index.js";
+import { extendWithLens, readTBoxOutline, SITE_LENS } from "../lens/index.js";
 import {
   bindProseSidecars,
   createProseExtensions,
@@ -102,8 +107,10 @@ const PROVIDER = "@canonical/prism-pragma-provider";
  *
  * @note Impure — reads the source cache and the prose sidecars beside it,
  * boots an Oxigraph WASM store, queries it once to bind the sidecars,
- * executes one query per typed subject to index search, and writes the
- * emitted SDL **only** when `sdlOutput` is given.
+ * reads the TBox outline and counts the class edges, executes one query
+ * per typed subject to index search, warns for each site-lens IRI the graph
+ * does not declare, and writes the served SDL **only** when `sdlOutput` is
+ * given.
  */
 export const createPragmaProvider = async (
   options: PragmaProviderOptions = {},
@@ -115,12 +122,14 @@ export const createPragmaProvider = async (
   const graphql = createSchemaPlugin({
     // `Prose` and `Query.prose(uri:)`: Markdown sidecars served beside the
     // compiled graph; `Query.search`: text search over every node;
-    // `Query.source`: one entity's statements as Turtle. See
-    // `createProseExtensions` for why each is a root field.
+    // `Query.source`: one entity's statements as Turtle; `Query.classEdges`:
+    // the contract's weighed class edges. See `createProseExtensions` for why
+    // each is a root field.
     extensions: composeExtensions([
       createProseExtensions(),
       createSearchExtensions(),
       createSourceExtensions(),
+      createClassEdgesExtension(),
     ]),
     incremental: true,
     mode: MODE,
@@ -129,7 +138,6 @@ export const createPragmaProvider = async (
     // Which release of each ref package the SDL was compiled from, so a
     // schema diff names its cause.
     revision: describeRefRoots(refRoots),
-    sdlOutput: options.sdlOutput,
   });
   // biome-ignore lint/suspicious/noExplicitAny: the Plugin generic is invariant, so the heterogeneous plugin array needs `any` here — matching ke-graphql's own demo
   const plugins: Plugin<any>[] = [graphql];
@@ -161,15 +169,26 @@ export const createPragmaProvider = async (
       `[graphql] prose sidecar ${path} names no entity in the graph and is not served. A sidecar is named after the local name of an entity the Turtle in its directory declares (<name>.md, or <name>.<lang>.md for a translation).`,
     );
   }
-  // Built once, here, from the compiled schema itself: what search matches
+  // The type lens: ke-graphql 0.43 reads none from the ontologies, so the
+  // site lens is served on the compiled schema until a release does.
+  const outline = await readTBoxOutline(query);
+  const lensIndex = indexSiteLens(SITE_LENS, outline);
+  for (const iri of lensIndex.unknownIris) {
+    console.warn(
+      `[graphql] the site lens names ${iri}, which the graph does not declare; its entry is not served.`,
+    );
+  }
+  const schema = extendWithLens(api.schema, lensIndex);
+  const classEdges = await countClassEdges(query, outline);
+  // Built once, here, from the served schema itself: what search matches
   // is exactly what `_meta` serves, and a node that fails to read fails the
   // boot rather than the first search.
   const searchIndex = await indexSearch({
-    schema: api.schema,
+    schema,
     context: api.createContext(store),
     query,
   });
-  const handle = createGraphQLHandler(api.schema, {
+  const handle = createGraphQLHandler(schema, {
     // A fresh context per request: ke-graphql's loaders, plus what the prose
     // and search resolvers read. The locale comes from the request, never
     // from state.
@@ -178,11 +197,27 @@ export const createPragmaProvider = async (
       locale: readRequestLocale(request),
       proseIndex: binding.index,
       searchIndex,
+      classEdges,
     }),
     graphiql: true,
     cors: true,
     incremental: true,
   });
+  // The compiler's provenance header, then the schema this provider serves.
+  const compiled = printSchema(api.schema);
+  /* v8 ignore next 5 -- unreachable with the pinned ke-graphql, whose SDL is
+     its header followed by printSchema of the schema it hands out. Kept as a
+     loud failure so a release that changes the format cannot make this
+     provider write a header-less or doubled SDL. */
+  if (!api.sdl.endsWith(compiled)) {
+    throw new Error(
+      "ke-graphql's SDL is no longer its header followed by the printed schema",
+    );
+  }
+  const sdl = `${api.sdl.slice(0, api.sdl.length - compiled.length)}${printSchema(schema)}`;
+  if (options.sdlOutput !== undefined) {
+    writeFileSync(options.sdlOutput, sdl, "utf-8");
+  }
   const destination =
     options.sdlOutput === undefined
       ? "SDL output disabled (no sdlOutput given)"
@@ -190,5 +225,5 @@ export const createPragmaProvider = async (
   console.info(
     `[graphql] schema compiled from ${sources.length} TTL sources (${api.diagnostics.length} diagnostics), ${sidecars.length - binding.unbound.length} prose sidecars bound, ${searchIndex.length} nodes indexed for search — ${destination}`,
   );
-  return { handle, api };
+  return { handle, api, sdl };
 };

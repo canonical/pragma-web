@@ -285,3 +285,33 @@ export const RANKING_CASES: readonly RankingCase[] = [
     expected: [`${DS}alert`, `${DS}alert-banner`],
   },
 ];
+
+/**
+ * A TBox and ABox whose class edges and outline are counted by hand. `ann`
+ * is asserted both a person and an employee, and counts once, under the more
+ * specific class; `bob` is asserted a person and a place, unrelated classes,
+ * and counts once, under the lesser IRI. `employs` declares no inverse, and
+ * reads `worksFor` backwards; `locatedIn` has no domain, so its statement is
+ * undeclared.
+ */
+export const EDGE_TURTLE = `@prefix ex: <https://example.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:Agent a owl:Class .
+ex:Person a owl:Class ; rdfs:subClassOf ex:Agent .
+ex:Employee a owl:Class ; rdfs:subClassOf ex:Person .
+ex:Org a owl:Class ; rdfs:subClassOf ex:Agent .
+ex:Place a owl:Class .
+
+ex:worksFor a owl:ObjectProperty ; rdfs:domain ex:Person ; rdfs:range ex:Org ;
+    owl:inverseOf ex:employs ;
+    rdfs:label "works for"@en, "travaille pour"@fr .
+ex:employs a owl:ObjectProperty ; rdfs:domain ex:Org ; rdfs:range ex:Person .
+ex:locatedIn a owl:ObjectProperty ; rdfs:label "located in" .
+
+ex:ann a ex:Employee, ex:Person ; ex:worksFor ex:acme .
+ex:bob a ex:Person, ex:Place ; ex:worksFor ex:acme .
+ex:acme a ex:Org ; ex:locatedIn ex:town .
+ex:town a ex:Place .
+`;
