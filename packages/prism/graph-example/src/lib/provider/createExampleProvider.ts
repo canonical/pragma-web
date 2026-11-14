@@ -18,6 +18,13 @@
  * getters, which only complicate coverage.
  */
 
+import {
+  indexSiteLens,
+  type LensGroup,
+  type SiteLens,
+  selectLiteral,
+  weighClassEdges,
+} from "@canonical/prism-contract";
 import { buildSchema, isObjectType } from "graphql";
 import {
   type ConnectionArgs,
@@ -38,12 +45,17 @@ import {
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
 import { exampleDataset } from "./dataset.js";
+import { declareClassEdges } from "./declareClassEdges.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
+import { expandCurie } from "./expandCurie.js";
 import { extractReferences } from "./extractReferences.js";
 import { isNetworkEntity } from "./isNetworkEntity.js";
+import { observeClassEdges } from "./observeClassEdges.js";
+import { outlineDataset } from "./outlineDataset.js";
 import { readProviderSdl } from "./providerSdl.js";
 import { rankSearchEntries } from "./rankSearchEntries.js";
 import { selectProseLanguage } from "./selectProseLanguage.js";
+import { siteLens } from "./siteLens.js";
 import { sumMeasures } from "./sumMeasures.js";
 import type {
   ExampleCarPlacement,
@@ -81,6 +93,11 @@ type View = Record<string, unknown>;
 /** Arguments of the language-tagged `EntityMeta` fields. */
 interface LangArgs {
   readonly lang: string;
+}
+
+/** Arguments of the lens's language-tagged fields; null asks for the untagged literal. */
+interface LiteralArgs {
+  readonly lang?: string | null;
 }
 
 /** Everything `_meta` needs. `uri` is null for an embeddable. */
@@ -139,14 +156,24 @@ const namespaceOf = (uri: string): string =>
  * a hard-wired import, so the defensive paths below (a dangling property
  * reference, a class cycle, an entity of an unknown class) are reachable from
  * tests with a purpose-built dataset rather than being untestable dead code.
+ * The lens is a parameter for the same reason: a purpose-built lens reaches
+ * the resolution rules the metro's own does not exercise.
  *
  * @note Impure: reads the provider SDL from the filesystem on every call.
  */
 export const createExampleProvider = (
   dataset: ExampleDataset = exampleDataset,
+  lens: SiteLens = siteLens,
 ): ExampleProvider => {
   const sdl = readProviderSdl();
   const schema = buildSchema(sdl);
+  const outline = outlineDataset(dataset);
+  const lensIndex = indexSiteLens(lens, outline);
+  const classEdges = weighClassEdges(
+    declareClassEdges(dataset),
+    observeClassEdges(dataset),
+    outline,
+  );
 
   /**
    * The field names each object type in this provider's schema declares.
@@ -248,7 +275,7 @@ export const createExampleProvider = (
         : [
             {
               uri: property.uri,
-              view: classPropertyView(cp, property, inherited),
+              view: classPropertyView(cls, cp, property, inherited),
             },
           ];
     });
@@ -279,10 +306,34 @@ export const createExampleProvider = (
         return inverse === undefined ? null : propertyView(inverse);
       },
       namespace: namespaceOf(property.uri),
+      ...propertyLensView(property.uri),
     };
   }
 
+  /** The lens fields of a property, resolved by the site lens. */
+  const propertyLensView = (uri: string): View => {
+    const resolved = lensIndex.propertyLens(uri);
+    return {
+      visibility: resolved.visibility,
+      pluralLabel: (args: LiteralArgs) =>
+        selectLiteral(resolved.pluralLabels, args.lang),
+      inverseLabel: (args: LiteralArgs) =>
+        selectLiteral(resolved.inverseLabels, args.lang),
+      inversePluralLabel: (args: LiteralArgs) =>
+        selectLiteral(resolved.inversePluralLabels, args.lang),
+      inverseVisibility: resolved.inverseVisibility,
+    };
+  };
+
+  /** A section of a class's fields, as `PropertyGroup` serves it. */
+  const groupView = (group: LensGroup): View => ({
+    uri: group.uri,
+    label: (args: LiteralArgs) => selectLiteral(group.labels ?? {}, args.lang),
+    order: group.order ?? null,
+  });
+
   function classPropertyView(
+    cls: ExampleClass,
     cp: ExampleClassProperty,
     property: ExampleProperty,
     inherited: boolean,
@@ -306,6 +357,18 @@ export const createExampleProvider = (
       required: cp.required,
       singular: cp.singular,
       inherited,
+      ...fieldLensView(cls.uri, property.uri),
+    };
+  }
+
+  /** The lens fields of a class's field, resolved by the site lens. */
+  function fieldLensView(classUri: string, propertyUri: string): View {
+    const resolved = lensIndex.fieldLens(classUri, propertyUri);
+    return {
+      group: resolved.group === null ? null : groupView(resolved.group),
+      order: resolved.order,
+      role: resolved.role,
+      visibility: resolved.visibility,
     };
   }
 
@@ -376,6 +439,18 @@ export const createExampleProvider = (
       instanceCount: () => instancesOf(cls).length,
       isAbstract: cls.isAbstract,
       namespace: namespaceOf(cls.uri),
+      ...classLensView(cls.uri),
+    };
+  }
+
+  /** The lens fields of a class, resolved by the site lens. */
+  function classLensView(uri: string): View {
+    const resolved = lensIndex.classLens(uri);
+    return {
+      visibility: resolved.visibility,
+      glyph: resolved.glyph,
+      pluralLabel: (args: LiteralArgs) =>
+        selectLiteral(resolved.pluralLabels, args.lang),
     };
   }
 
@@ -944,23 +1019,12 @@ export const createExampleProvider = (
     return buildNodeConnectionView(buildNodeEdges(page.items), page);
   };
 
-  /**
-   * Expand the prefixed convenience form (`"metro:Station"`) to an absolute
-   * IRI. An absolute IRI passes through untouched: its scheme is never a
-   * declared prefix.
-   */
-  const expandUri = (value: string): string => {
-    const colon = value.indexOf(":");
-    const ontology = dataset.ontologies.find(
-      (candidate) => candidate.prefix === value.slice(0, colon),
-    );
-    return ontology === undefined
-      ? value
-      : `${ontology.namespace}${value.slice(colon + 1)}`;
-  };
+  /** Expand the prefixed convenience form (`"metro:Station"`) to an absolute IRI. */
+  const expandUri = (value: string): string =>
+    expandCurie(value, dataset.ontologies);
 
   // -------------------------------------------------------------------
-  // The contract's five root fields, plus `prose`, `search` and `source`:
+  // The contract's six root fields, plus `prose`, `search` and `source`:
   // the three root fields this provider adds (see schema/extension.graphql for why each is
   // a root field). Every type the provider declares is reachable from here.
   // -------------------------------------------------------------------
@@ -984,6 +1048,7 @@ export const createExampleProvider = (
       const prose = proseByUri.get(args.uri);
       return prose === undefined ? null : buildProseView(prose);
     },
+    classEdges: () => classEdges,
     search: (args: SearchArgs) =>
       buildSearchView(rankSearchEntries(searchEntries, args.text), args),
     source: (args: { uri: string }) => {

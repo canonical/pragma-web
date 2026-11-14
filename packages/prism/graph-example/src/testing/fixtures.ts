@@ -13,7 +13,7 @@
  * rather than searching the network for something shaped right.
  */
 
-import { METRO_NAMESPACE } from "../lib/provider/constants.js";
+import { GEO_NAMESPACE, METRO_NAMESPACE } from "../lib/provider/constants.js";
 import { BARE_ENTITY_URI, exampleDataset } from "../lib/provider/dataset.js";
 import type { ExampleDataset, SearchEntry } from "../lib/provider/types.js";
 import type { ExtractionCase, RankingCase } from "./types.js";
@@ -454,3 +454,86 @@ export const OVERLONG_LINE_URI = `${METRO_NAMESPACE}north-line`;
 
 /** The station whose platform {@link OVERLONG_FORMATION_URI} overhangs. */
 export const SHORT_PLATFORM_STATION_URI = `${METRO_NAMESPACE}marsh-end`;
+
+/**
+ * The example TBox over a small ABox whose class edges are counted by hand:
+ * a line of two routes, one the other's reverse; a station and an
+ * interchange it calls at; a fare zone; one rolling stock, formation, unit
+ * and car type; and references to a record the ABox lacks, which link no two
+ * classes.
+ */
+export const EDGE_DATASET: ExampleDataset = {
+  ...exampleDataset,
+  entities: [
+    {
+      uri: "urn:line",
+      type: `${METRO_NAMESPACE}Line`,
+      typename: "Line",
+      code: "1",
+      colour: "#000000",
+      formations: ["urn:formation"],
+      routes: [
+        {
+          key: "out",
+          labels: { "": "Out" },
+          isLoop: false,
+          calls: ["urn:station", "urn:interchange"],
+          reverse: "back",
+        },
+        {
+          key: "back",
+          labels: { "": "Back" },
+          isLoop: false,
+          calls: ["urn:interchange", "urn:station", "urn:gone"],
+        },
+      ],
+    },
+    {
+      uri: "urn:station",
+      type: `${METRO_NAMESPACE}Station`,
+      typename: "Station",
+      servesLine: ["urn:line"],
+      inZone: "urn:zone",
+      location: { latitude: 0, longitude: 0 },
+      diagramPosition: { x: 0, y: 0 },
+    },
+    {
+      uri: "urn:interchange",
+      type: `${METRO_NAMESPACE}Interchange`,
+      typename: "Interchange",
+      servesLine: ["urn:line", "urn:gone"],
+      inZone: "urn:gone",
+    },
+    { uri: "urn:zone", type: `${GEO_NAMESPACE}Zone`, typename: "Zone" },
+    {
+      uri: "urn:stock",
+      type: `${METRO_NAMESPACE}RollingStock`,
+      typename: "RollingStock",
+      formations: ["urn:formation"],
+    },
+    {
+      uri: "urn:formation",
+      type: `${METRO_NAMESPACE}Formation`,
+      typename: "Formation",
+      units: [{ unit: "urn:unit", reversed: false }],
+    },
+    {
+      uri: "urn:unit",
+      type: `${METRO_NAMESPACE}Unit`,
+      typename: "Unit",
+      cars: [
+        { carType: "urn:car", reversed: false },
+        { carType: "urn:car", reversed: true },
+      ],
+    },
+    {
+      uri: "urn:car",
+      type: `${METRO_NAMESPACE}CarType`,
+      typename: "CarType",
+      code: "DM",
+      hasCab: true,
+      length: 1,
+      capacity: 1,
+    },
+  ],
+};

@@ -10,6 +10,7 @@ import {
   ASYMMETRIC_UNIT_URI,
   COUPLED_FORMATION_URI,
   COUPLED_STOCK_URI,
+  EDGE_DATASET,
   EMPTY_LOCAL_NAME_DATASET,
   EMPTY_LOCAL_NAME_URI,
   MIXED_STOCK_LINE_URI,
@@ -78,9 +79,10 @@ describe("the schema", () => {
     expect(provider.sdl).toContain("type Station implements Node");
   });
 
-  it("adds three root fields, prose, search and source, to the contract's five", () => {
+  it("adds three root fields, prose, search and source, to the contract's six", () => {
     const query = provider.schema.getQueryType();
     expect(Object.keys(query?.getFields() ?? {}).sort()).toEqual([
+      "classEdges",
       "node",
       "ontologies",
       "ontology",
@@ -2434,5 +2436,206 @@ describe("determinism", () => {
       rootValue: other.rootValue,
     });
     expect(result.data).toEqual(first);
+  });
+});
+
+describe("the type lens", () => {
+  const M = "https://metro.example/onto#";
+  const GEO = "https://geo.example/onto#";
+  const OVERVIEW = {
+    uri: `${M}section.overview`,
+    label: "Overview",
+    order: 1,
+  };
+
+  /** A class's fields from `ONTOLOGY_FIELDS`, keyed by property IRI. */
+  const readFields = (data: Record<string, unknown>) =>
+    new Map(
+      (
+        data.ontologyClass as {
+          properties: { property: { uri: string } }[];
+        }
+      ).properties.map((field) => [field.property.uri, field]),
+    );
+
+  it("serves a class's visibility, glyph and plural label, inherited where undeclared", async () => {
+    const data = await run(`{
+      station: ontologyClass(uri: "metro:Station") {
+        visibility glyph pluralLabel
+        fr: pluralLabel(lang: "fr") untagged: pluralLabel(lang: null)
+      }
+      interchange: ontologyClass(uri: "metro:Interchange") { visibility glyph pluralLabel }
+      zone: ontologyClass(uri: "geo:Zone") { visibility }
+    }`);
+    expect(data).toEqual({
+      station: {
+        visibility: "PROMINENT",
+        glyph: "location",
+        pluralLabel: "Stations",
+        fr: "Gares",
+        untagged: null,
+      },
+      interchange: {
+        visibility: "PROMINENT",
+        glyph: "swap",
+        pluralLabel: "Interchanges",
+      },
+      zone: { visibility: "HIDDEN" },
+    });
+  });
+
+  it("serves each field's group, order, role and visibility, a subclass reordering one", async () => {
+    const fields = readFields(
+      await run(`{ ontologyClass(uri: "metro:Interchange") {
+        properties {
+          property { uri }
+          group { uri label fr: label(lang: "fr") order }
+          order role visibility
+        }
+      } }`),
+    );
+    const overview = { ...OVERVIEW, fr: null };
+    expect(fields.get(`${M}name`)).toEqual({
+      property: { uri: `${M}name` },
+      group: overview,
+      order: 1,
+      role: "LABEL",
+      visibility: null,
+    });
+    expect(fields.get(`${M}platformCount`)).toMatchObject({
+      group: overview,
+      order: 3,
+      role: null,
+    });
+    expect(fields.get(`${M}transferMinutes`)).toMatchObject({
+      order: 2,
+      visibility: "PROMINENT",
+    });
+    expect(fields.get(`${M}note`)).toMatchObject({
+      group: null,
+      order: null,
+      visibility: "HIDDEN",
+    });
+  });
+
+  it("serves a property's plural and inverse labels, from its declared partner when it has none", async () => {
+    const data = await run(`{
+      servesLine: ontologyProperty(uri: "metro:servesLine") {
+        visibility pluralLabel inverseLabel inversePluralLabel inverseVisibility
+      }
+      stop: ontologyProperty(uri: "metro:stop") {
+        visibility pluralLabel inverseLabel inversePluralLabel inverseVisibility
+      }
+    }`);
+    expect(data).toEqual({
+      servesLine: {
+        visibility: "PROMINENT",
+        pluralLabel: "serves lines",
+        inverseLabel: "served by",
+        inversePluralLabel: "served by",
+        inverseVisibility: null,
+      },
+      stop: {
+        visibility: null,
+        pluralLabel: null,
+        inverseLabel: "Called at by",
+        inversePluralLabel: "Called at by",
+        inverseVisibility: null,
+      },
+    });
+  });
+
+  it("reads a purpose-built lens through the second parameter", async () => {
+    const custom = createExampleProvider(exampleDataset, {
+      groups: [
+        { uri: "urn:named", labels: { fr: "Nommé" } },
+        { uri: "urn:unnamed", order: 2 },
+      ],
+      classes: [
+        {
+          uri: `${M}Line`,
+          visibility: "HIDDEN",
+          fields: [
+            { property: `${M}code`, group: "urn:named" },
+            { property: `${M}colour`, group: "urn:unnamed" },
+          ],
+        },
+      ],
+      properties: [],
+    });
+    const result = await graphql({
+      schema: custom.schema,
+      rootValue: custom.rootValue,
+      source: `{ ontologyClass(uri: "metro:Line") {
+        visibility glyph pluralLabel
+        properties { property { uri } group { label fr: label(lang: "fr") order } }
+      } }`,
+    });
+    expect(result.errors).toBeUndefined();
+    const data = result.data as Record<string, unknown>;
+    const fields = readFields(data);
+    expect(data.ontologyClass).toMatchObject({
+      visibility: "HIDDEN",
+      glyph: null,
+      pluralLabel: null,
+    });
+    expect(fields.get(`${M}code`)?.group).toEqual({
+      label: null,
+      fr: "Nommé",
+      order: null,
+    });
+    expect(fields.get(`${M}colour`)?.group).toEqual({
+      label: null,
+      fr: null,
+      order: 2,
+    });
+    expect(fields.get(`${GEO}inZone`)).toBeUndefined();
+  });
+});
+
+describe("Query.classEdges", () => {
+  const M = "https://metro.example/onto#";
+  const GEO = "https://geo.example/onto#";
+
+  it("weighs each declared edge with the statements it covers, and serves the undeclared", async () => {
+    const data = await runWith(
+      EDGE_DATASET,
+      "{ classEdges { property subjectClass objectClass count declared } }",
+    );
+    const edges = (
+      data.classEdges as {
+        property: string;
+        subjectClass: string;
+        objectClass: string;
+        count: number;
+        declared: boolean;
+      }[]
+    ).map((edge) => [
+      edge.property,
+      edge.subjectClass,
+      edge.objectClass,
+      edge.count,
+      edge.declared,
+    ]);
+    expect(edges).toEqual([
+      [`${GEO}inZone`, `${M}Station`, `${GEO}Zone`, 1, true],
+      [`${GEO}location`, `${M}Station`, `${GEO}GeoPoint`, 1, true],
+      [`${GEO}stops`, `${GEO}Zone`, `${M}Stop`, 0, true],
+      [`${M}calls`, `${M}Route`, `${M}Call`, 5, true],
+      [`${M}carType`, `${M}CarPosition`, `${M}CarType`, 2, true],
+      [`${M}cars`, `${M}Unit`, `${M}CarPosition`, 2, true],
+      [`${M}diagramPosition`, `${M}Station`, `${M}DiagramPoint`, 1, true],
+      [`${M}formations`, `${M}Line`, `${M}Formation`, 1, false],
+      [`${M}formations`, `${M}RollingStock`, `${M}Formation`, 1, false],
+      [`${M}lines`, `${M}Formation`, `${M}Line`, 0, true],
+      [`${M}reverse`, `${M}Route`, `${M}Route`, 1, true],
+      [`${M}routes`, `${M}Line`, `${M}Route`, 2, true],
+      [`${M}servedBy`, `${M}Line`, `${M}Station`, 0, true],
+      [`${M}servesLine`, `${M}Station`, `${M}Line`, 2, true],
+      [`${M}stock`, `${M}Formation`, `${M}RollingStock`, 0, true],
+      [`${M}stop`, `${M}Call`, `${M}Stop`, 4, true],
+      [`${M}unit`, `${M}UnitPosition`, `${M}Unit`, 1, true],
+      [`${M}units`, `${M}Formation`, `${M}UnitPosition`, 1, true],
+    ]);
   });
 });

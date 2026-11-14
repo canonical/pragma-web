@@ -143,3 +143,24 @@ export const TURTLE_RECORD_KEYS: readonly string[] = [
   "units",
   "cars",
 ];
+
+/**
+ * The object properties the ABox stores a value of, keyed by local name.
+ * Their inverses (`servedBy`, `stops`, `stock`, `lines`) are read backwards
+ * by the provider and never stored, so a class edge counts none of them.
+ */
+export const STORED_OBJECT_PROPERTY_URIS = {
+  servesLine: `${METRO_NAMESPACE}servesLine`,
+  location: `${GEO_NAMESPACE}location`,
+  inZone: `${GEO_NAMESPACE}inZone`,
+  diagramPosition: `${METRO_NAMESPACE}diagramPosition`,
+  formations: `${METRO_NAMESPACE}formations`,
+  routes: `${METRO_NAMESPACE}routes`,
+  calls: `${METRO_NAMESPACE}calls`,
+  reverse: `${METRO_NAMESPACE}reverse`,
+  stop: `${METRO_NAMESPACE}stop`,
+  units: `${METRO_NAMESPACE}units`,
+  unit: `${METRO_NAMESPACE}unit`,
+  cars: `${METRO_NAMESPACE}cars`,
+  carType: `${METRO_NAMESPACE}carType`,
+} as const;
