@@ -105,6 +105,10 @@ describe("SectionedView", () => {
         { id: "usage", title: "Usage again", content: null },
       ],
     ],
+    [
+      "the index label's id",
+      [{ id: "sectioned-view-contents", title: "Contents", content: null }],
+    ],
   ])("throws on %s", (_name, sections) => {
     expect(() =>
       render(<SectionedView header={HEADER} sections={sections} />),

@@ -83,12 +83,13 @@ node:
           - node:
               role: contents
               element: nav
-              attributes: { aria-labelledby: "{labelId}" }
+              attributes: { aria-labelledby: sectioned-view-contents }
               styles: { layout.grid.column: "1 / -1" }
               edges:
                 - node:
                     role: label
                     element: h2
+                    attributes: { id: sectioned-view-contents }   # fixed: SSR and hydration agree
                     styles: { typography.color: color.text.muted }
                   relation: { cardinality: "1", slotName: label }
                 - node:
