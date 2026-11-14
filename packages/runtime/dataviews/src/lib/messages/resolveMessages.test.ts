@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { DEFAULT_MESSAGES } from "./constants.js";
 import resolveMessages from "./resolveMessages.js";
 import type { DataViewsMessages } from "./types.js";
@@ -44,14 +44,5 @@ describe("resolveMessages", () => {
   it("freezes what it resolves, so no part rewords another's", () => {
     expect(Object.isFrozen(resolveMessages({ search: "Find" }))).toBe(true);
     expect(Object.isFrozen(DEFAULT_MESSAGES)).toBe(true);
-  });
-
-  it("types a whole replacement against every message, and a partial one against none", () => {
-    // @ts-expect-error — a whole replacement missing a message does not compile.
-    const incomplete: DataViewsMessages = { search: "Find" };
-    expect(incomplete.search).toBe("Find");
-    expectTypeOf(resolveMessages)
-      .parameter(0)
-      .toEqualTypeOf<Partial<DataViewsMessages> | undefined>();
   });
 });

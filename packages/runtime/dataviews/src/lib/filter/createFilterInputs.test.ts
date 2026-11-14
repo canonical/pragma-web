@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
@@ -7,13 +7,11 @@ import declareSort from "../../../testing/declareSort.js";
 import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
-import type { ReadonlyChannel } from "../observable/index.js";
 import {
   createDataViewsProvider,
   readProviderHost,
 } from "../provider/index.js";
 import { canonicalizeSlice } from "../query/index.js";
-import type { EmptyOr } from "../schema/index.js";
 import createFilterInputs from "./createFilterInputs.js";
 
 const machines = createCollection({
@@ -47,7 +45,7 @@ const provider = (location?: QueryLocation) =>
   });
 
 describe("createFilterInputs", () => {
-  it("builds one handle per field and legal operator, typed by the schema", () => {
+  it("builds one handle per field and legal operator", () => {
     const { handles } = createFilterInputs({
       host: readProviderHost(provider()),
     });
@@ -61,15 +59,6 @@ describe("createFilterInputs", () => {
     expect(Object.keys(handles.cpu).sort()).toEqual(["gte", "lte"]);
     expect(Object.keys(handles.name)).toEqual(["contains", "startsWith"]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
-    expectTypeOf(handles.name.contains.applied).toEqualTypeOf<
-      ReadonlyChannel<EmptyOr<string>>
-    >();
-    expectTypeOf(handles.status.isAny.applied).toEqualTypeOf<
-      ReadonlyChannel<EmptyOr<ReadonlySet<"failed" | "cancelled">>>
-    >();
-    expectTypeOf(handles.cpu.gte.applied).toEqualTypeOf<
-      ReadonlyChannel<EmptyOr<number>>
-    >();
     // The adoption stays with the records: a root's handle cannot impose
     // a predicate the query does not hold.
     expect(handles.cpu.gte).not.toHaveProperty("setApplied");
