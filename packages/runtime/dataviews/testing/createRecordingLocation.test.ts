@@ -28,10 +28,10 @@ describe("createRecordingLocation", () => {
 
   it("counts its reads and subscriptions", () => {
     const recording = createRecordingLocation();
-    expect(recording.spies.read).not.toHaveBeenCalled();
+    expect(recording.countReads()).toBe(0);
     recording.location.read();
     recording.location.subscribe(() => {});
-    expect(recording.spies.read).toHaveBeenCalledTimes(1);
-    expect(recording.spies.subscribe).toHaveBeenCalledTimes(1);
+    expect(recording.countReads()).toBe(1);
+    expect(recording.countSubscriptions()).toBe(1);
   });
 });

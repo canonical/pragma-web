@@ -228,7 +228,9 @@ describe("createDataViewsProvider", () => {
     const { source, calls } = createManualSource<Machine>({
       capabilities: permissive,
     });
-    const { location, spies } = createRecordingLocation({ href: "/" });
+    const { location, countSubscriptions } = createRecordingLocation({
+      href: "/",
+    });
     const views = createCountingViewStore();
     const provider = createDataViewsProvider({
       collection: machines,
@@ -237,7 +239,7 @@ describe("createDataViewsProvider", () => {
       views: views.store,
     });
     expect(calls).toHaveLength(0);
-    expect(spies.subscribe).not.toHaveBeenCalled();
+    expect(countSubscriptions()).toBe(0);
     expect(views.subscribers).toBe(0);
     expect(provider.state.get().result.status).toBe("idle");
     expect(provider.state.get().pendingRequestId).toBeNull();
@@ -268,8 +270,8 @@ describe("createDataViewsProvider construction", () => {
     });
     expect(readPresentation).not.toHaveBeenCalled();
     expect(hearPresentation).not.toHaveBeenCalled();
-    expect(recorded.spies.read).toHaveBeenCalledTimes(1);
-    expect(recorded.spies.subscribe).not.toHaveBeenCalled();
+    expect(recorded.countReads()).toBe(1);
+    expect(recorded.countSubscriptions()).toBe(0);
     expect(recorded.writes).toEqual([]);
     expect(views.subscribers).toBe(0);
     expect(calls).toHaveLength(0);
@@ -789,7 +791,7 @@ describe("createDataViewsProvider snapshot", () => {
 
 describe("createDataViewsProvider refresh", () => {
   it("publishes a page the source answers within the call, and holds nothing after", () => {
-    const { location, spies } = createRecordingLocation({
+    const { location, countSubscriptions } = createRecordingLocation({
       href: "/machines?cpu__gte=4",
     });
     const views = createCountingViewStore();
@@ -813,7 +815,7 @@ describe("createDataViewsProvider refresh", () => {
     expect(state.resultMatchesQuery).toBe(true);
     expect(state.pendingRequestId).toBeNull();
     expect(provider.rows.get().ids).toEqual(["m-2"]);
-    expect(spies.subscribe).not.toHaveBeenCalled();
+    expect(countSubscriptions()).toBe(0);
     expect(views.subscribers).toBe(0);
     // The execution was released: rows changing in the source reach no one.
     source.setRows([{ id: "m-3", cpu: 16 }]);
