@@ -153,21 +153,22 @@
       rotate: 90deg;
     }
 
-    /* A control only the enhancement can drive waits for it; the baseline's
-       submit controls leave once it is there. */
+    /* A control only the enhancement can drive waits for scripting; the
+       baseline's submit controls leave only once the page has hydrated, so
+       a page whose script never runs keeps a way to page. */
     & > .trailing > .navigation > .scripted {
       display: none;
     }
 
     @media (scripting: enabled) {
-      & > .leading > .page-size > .submit,
-      & > .trailing > .page > .submit {
-        display: none;
-      }
-
       & > .trailing > .navigation > .scripted {
         display: inline-flex;
       }
+    }
+
+    &[data-hydrated] > .leading > .page-size > .submit,
+    &[data-hydrated] > .trailing > .page > .submit {
+      display: none;
     }
   }
 }

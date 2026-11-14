@@ -22,7 +22,11 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { useDataViewsValue, useMessages } from "../../hooks/index.js";
+import {
+  useDataViewsValue,
+  useIsHydrated,
+  useMessages,
+} from "../../hooks/index.js";
 import { interceptSubmit, listHiddenFields } from "../../utils/index.js";
 import { PageControl } from "./common/index.js";
 import { useRedrawOnDestinationInputs } from "./hooks/index.js";
@@ -127,6 +131,7 @@ export default function PaginationBar<
   );
   const { page, pages } = facts;
   const baseId = useId();
+  const hydrated = useIsHydrated();
   const sizeId = `${baseId}-size`;
   const totalId = `${baseId}-total`;
   const { spellQuery } = readProviderHost(provider);
@@ -203,6 +208,7 @@ export default function PaginationBar<
       {...rest}
       aria-label={label ?? messages.pagination}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      data-hydrated={hydrated ? "" : undefined}
     >
       <div className="leading">
         <form method="get" className="page-size" onSubmit={interceptSubmit}>

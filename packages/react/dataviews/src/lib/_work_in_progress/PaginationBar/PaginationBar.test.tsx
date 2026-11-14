@@ -120,7 +120,7 @@ describe("PaginationBar", () => {
     );
   });
 
-  it.fails("marks its root once the page has hydrated", () => {
+  it("marks its root once the page has hydrated", () => {
     const { provider } = makeProvider();
     mount(provider);
     expect(
