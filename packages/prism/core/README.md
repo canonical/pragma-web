@@ -374,12 +374,15 @@ site's own catalog, and the factory holds no reader-facing string.
 - Layouts: `WorkspaceLayout`, `DocumentLayout`; types
   `WorkspaceLayoutProps`, `DocumentLayoutProps`.
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
-  `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+  `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `CopyButton` (a Copy
+  button for a cited text, "Copied" announced in a live region),
+  `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`, `KeyValueList` (key values on the
   page's grid, each key on the main column's first two columns and its
   value from the third); types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
-  `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
+  `CanvasSkipLinkProps`, `ClientOnlyProps`, `CopyButtonProps`,
+  `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
   `ThemeSelectorProps`, `KeyValueListProps`, `KeyValuePair`.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot

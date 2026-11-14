@@ -48,10 +48,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .ds.source-view > .caption > .announcement {
-    color: var(--source-view-muted-color);
-  }
-
   /* The document wraps on the inline axis, so nothing scrolls sideways;
    * a run of spaces wraps too rather than hanging past the line's end. */
   .ds.source-view > .code {

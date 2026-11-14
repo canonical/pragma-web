@@ -1,0 +1,43 @@
+---
+# CopyButton: a Copy button for a text the reader cites (a CURIE, a
+# document's source), and the live region that announces "Copied" once the
+# clipboard holds it (heuristic 4.3: the full CURIE is copyable where it is
+# shown, "Copied" announced). The label and the announcement are the
+# catalog's (`copyButton.copy`, `copyButton.copied`).
+#
+# The button needs scripts, so it renders inside ClientOnly: the server
+# sends no button that cannot work. The announcement is rendered from the
+# server on, empty, so assistive technology hears it when it fills.
+#
+# The root lays nothing out (`display: contents`): the button and the
+# announcement are items of the line that holds them and take its gap, so
+# SourceView's caption and the peek's address line space them as they
+# space their other items.
+#
+# Why not a published component: the published Button is the button; no
+# published component pairs it with a live announcement.
+#
+# Token ledger (every decision; a literal only where no symbol exists):
+#   --copy-button-display: contents          keyword: the root lays nothing out
+#   --copy-button-announcement-color: color.text.muted
+node:
+  uri: prism.component.copy_button
+  styles:
+    layout.type: contents
+  edges:
+    - node:
+        uri: prism.component.client_only
+        edges:
+          - node:
+              uri: global.component.button
+              props:
+                importance: tertiary
+                type: button
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: copy }
+    - node:
+        role: announcement
+        attributes: { aria-live: polite }
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: announcement }

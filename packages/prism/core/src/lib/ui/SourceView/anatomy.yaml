@@ -1,8 +1,8 @@
 ---
 # SourceView — an entity's statements as Turtle, read as code: a figure
 # whose caption holds the entity's title, the text's size in bytes and,
-# once scripts run, a Copy button (the published Button, tertiary; "Copied"
-# announced in the caption's live region); then the text in a preformatted
+# the CopyButton (once scripts run, a Copy button; "Copied" announced in
+# its live region, both items of the caption's line); then the text in a preformatted
 # block, wrapped on the inline axis so nothing scrolls sideways at 390,
 # in the code face at the secondary size, on the second background layer
 # inside a hairline, with the component's insets. A hand-written lossless
@@ -58,17 +58,8 @@ node:
                 typography.variant.numeric: tabular-nums
             relation: { cardinality: "1", slotName: size }
           - node:
-              uri: prism.component.client_only
-              edges:
-                - node:
-                    uri: global.component.button
-                  relation: { cardinality: "1", slotName: default }
+              uri: prism.component.copy_button
             relation: { cardinality: "1", slotName: copy }
-          - node:
-              role: announcement
-              styles:
-                typography.color: color.text.muted
-            relation: { cardinality: "1", slotName: announcement }
       relation: { cardinality: "1", slotName: caption }
     - node:
         role: code block
