@@ -9,6 +9,9 @@
 # `DataViews.Actions`, which keeps the composition's name; the graph's block
 # is the design of that part's default UI.
 #
+# The component is `ActionBar`, after the graph's block; the composition's
+# member keeps its name, `DataViews.Actions`.
+#
 # Names — one per part, the same in the design, the DOM and here:
 #   action bar           design "Action bar"   graph "DataTable.ActionBar"
 #                                              DOM `ds data-table-action-bar contrasted`

@@ -22,7 +22,7 @@ import type { DataTableColumn } from "../../../DataTable/index.js";
 import { useDataViews } from "../../hooks/index.js";
 import DataViews from "../../Provider.js";
 import Pagination from "../Pagination/Pagination.js";
-import Component from "./Actions.js";
+import Component from "./ActionBar.js";
 
 const meta = {
   title: "_work_in_progress/DataViews/Actions",

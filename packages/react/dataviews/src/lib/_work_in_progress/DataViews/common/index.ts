@@ -1,4 +1,4 @@
-export * from "./Actions/index.js";
+export * from "./ActionBar/index.js";
 export * from "./DataCards/index.js";
 export * from "./DataChart/index.js";
 export * from "./DataChartWithTable/index.js";

@@ -1,7 +1,7 @@
 import Provider from "./Provider.js";
 import type { DataViewsComponent } from "./types.js";
 
-export type { DataViewsActionsProps } from "./common/Actions/index.js";
+export type { DataViewsActionsProps } from "./common/ActionBar/index.js";
 export type { DataViewsDataTableProps } from "./common/DataTable/index.js";
 export type { DataViewsFiltersProps } from "./common/Filters/index.js";
 export type { DataViewsPaginationProps } from "./common/Pagination/index.js";

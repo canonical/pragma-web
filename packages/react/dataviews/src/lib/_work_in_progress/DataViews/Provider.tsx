@@ -6,7 +6,7 @@ import type { ReactElement } from "react";
 import { Announcer } from "../../common/index.js";
 import Context from "./Context.js";
 import {
-  Actions,
+  ActionBar,
   DataTable,
   Filters,
   Pagination,
@@ -61,7 +61,7 @@ const Provider = Object.assign(
     );
   },
   {
-    Actions,
+    Actions: ActionBar,
     DataTable,
     Filters,
     Pagination,

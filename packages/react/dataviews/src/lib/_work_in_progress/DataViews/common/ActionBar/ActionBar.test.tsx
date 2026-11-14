@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { MachineProvider } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
-import Actions from "./Actions.js";
+import ActionBar from "./ActionBar.js";
 import type { DataViewsActionsProps } from "./types.js";
 
 /** A provider whose source answers every request at once with no rows. */
@@ -18,7 +18,7 @@ const makeProvider = (): MachineProvider =>
 const mount = (provider: MachineProvider, props: DataViewsActionsProps = {}) =>
   render(
     <DataViews provider={provider}>
-      <Actions {...props} />
+      <ActionBar {...props} />
     </DataViews>,
   );
 
@@ -32,11 +32,11 @@ const bar = () => screen.getByRole("group", { name: "Selection actions" });
 
 describe("DataViews.Actions", () => {
   it("is reachable as the composition's Actions part", () => {
-    expect(DataViews.Actions).toBe(Actions);
+    expect(DataViews.Actions).toBe(ActionBar);
   });
 
   it("fails clearly outside a DataViews root", () => {
-    expect(() => render(<Actions />)).toThrow(
+    expect(() => render(<ActionBar />)).toThrow(
       "DataViews.Actions must be used inside a DataViews root",
     );
   });
@@ -106,7 +106,7 @@ describe("DataViews.Actions", () => {
     expect(bar()).not.toHaveTextContent("1 selected");
     rerender(
       <DataViews provider={provider}>
-        <Actions indicator={null} />
+        <ActionBar indicator={null} />
       </DataViews>,
     );
     expect(within(bar()).queryByRole("status")).toBeNull();
@@ -142,9 +142,9 @@ describe("DataViews.Actions", () => {
     render(
       <DataViews provider={provider}>
         <button type="button">Before</button>
-        <Actions>
+        <ActionBar>
           <button type="button">Archive</button>
-        </Actions>
+        </ActionBar>
       </DataViews>,
     );
     select(provider, ["m1"]);
@@ -176,7 +176,7 @@ describe("DataViews.Actions", () => {
       <DataViews provider={provider}>
         <button type="button">Before</button>
         <button type="button">Elsewhere</button>
-        <Actions />
+        <ActionBar />
       </DataViews>,
     );
     select(provider, ["m1"]);
@@ -197,9 +197,9 @@ describe("DataViews.Actions", () => {
     render(
       <DataViews provider={provider}>
         <button type="button">Before</button>
-        <Actions onFocus={onFocus} onBlur={onBlur}>
+        <ActionBar onFocus={onFocus} onBlur={onBlur}>
           <button type="button">Export</button>
-        </Actions>
+        </ActionBar>
       </DataViews>,
     );
     select(provider, ["m1"]);
@@ -222,7 +222,7 @@ describe("DataViews.Actions", () => {
     render(
       <DataViews provider={provider}>
         <button type="button">Before</button>
-        <Actions />
+        <ActionBar />
       </DataViews>,
     );
     select(provider, ["m1"]);
@@ -242,7 +242,7 @@ describe("DataViews.Actions", () => {
     render(
       <DataViews provider={provider}>
         <button type="button">Before</button>
-        <Actions />
+        <ActionBar />
       </DataViews>,
     );
     select(provider, ["m1"]);
@@ -299,7 +299,7 @@ describe("DataViews.Actions", () => {
     render(
       <StrictMode>
         <DataViews provider={provider}>
-          <Actions />
+          <ActionBar />
         </DataViews>
       </StrictMode>,
     );

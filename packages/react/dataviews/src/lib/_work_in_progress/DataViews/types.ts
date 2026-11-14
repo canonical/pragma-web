@@ -8,7 +8,7 @@ import type {
 import type { ReactElement, ReactNode, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../../common/index.js";
 import type {
-  Actions,
+  ActionBar,
   DataTable,
   Filters,
   Pagination,
@@ -106,7 +106,7 @@ export type DataViewsComponent = (<
    * @experimental Pre-release: the whole surface is still settling, and this
    * name may change or move before the first release.
    */
-  readonly Actions: typeof Actions;
+  readonly Actions: typeof ActionBar;
   /**
    * The collection's rows, bound to this root.
    *

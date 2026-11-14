@@ -2,9 +2,9 @@
 
 @layer ds.components.global {
   /**
-   * Actions styles
+   * ActionBar styles
    *
-   * The specification is the anatomy beside the code, `Actions.anatomy.yaml`.
+   * The specification is the anatomy beside the code, `ActionBar.anatomy.yaml`.
    * Every value below is one it binds; what it could not bind is recorded
    * there, never hardcoded here.
    *

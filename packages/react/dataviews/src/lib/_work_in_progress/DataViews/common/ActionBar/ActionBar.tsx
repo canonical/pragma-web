@@ -1,5 +1,5 @@
 import { Button } from "@canonical/react-ds-global";
-import { type ReactElement, useCallback, useRef } from "react";
+import { type FocusEvent, type ReactElement, useCallback, useRef } from "react";
 import { useDataViewsValue, useMergedRef } from "../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import type { DataViewsActionsProps } from "./types.js";
@@ -23,13 +23,16 @@ const componentCssClassName = "ds data-table-action-bar contrasted";
  *
  * That is the design system's description of the block. What this
  * implementation covers: how much is selected, the actions a caller
- * places, and a button that clears the selection. The bar reads the enclosing root's selection and takes no copy of it. It
- * is absent while nothing is selected. The count is the whole selection,
- * across pages, not the rows on screen.
+ * places, and a button that clears the selection, grouped under the name
+ * its label gives. The bar reads the enclosing root's selection and takes
+ * no copy of it. It is absent while nothing is selected. The count is the
+ * whole selection, across pages, not the rows on screen.
  *
  * When the bar leaves with the focus inside it — the selection cleared, or
  * every target of an action succeeded — the focus returns to the control it
  * entered the bar from, rather than to the document.
+ *
+ * @note Impure: hands the focus back as the bar's ref is released.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
@@ -38,7 +41,7 @@ const componentCssClassName = "ds data-table-action-bar contrasted";
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export default function Actions({
+export default function ActionBar({
   label,
   indicator,
   children,
@@ -47,6 +50,7 @@ export default function Actions({
   ref,
   ...rest
 }: DataViewsActionsProps): ReactElement | null {
+  // The public member keeps the composition's name, Actions.
   const { provider, messages } = useDataViewsRoot("Actions");
   const { selection } = provider;
   const count = useDataViewsValue(selection.state).ids.size;
@@ -71,6 +75,14 @@ export default function Actions({
   // released.
   const attach = useMergedRef(ref, returnFocus);
 
+  const handleFocus = (event: FocusEvent<HTMLDivElement>): void => {
+    const from = event.relatedTarget;
+    if (!event.currentTarget.contains(from)) {
+      origin.current = from instanceof HTMLElement ? from : null;
+    }
+    onFocus?.(event);
+  };
+
   if (count === 0) {
     return null;
   }
@@ -82,13 +94,7 @@ export default function Actions({
       role="group"
       aria-label={label ?? messages.selectionActions}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      onFocus={(event) => {
-        const from = event.relatedTarget;
-        if (!event.currentTarget.contains(from)) {
-          origin.current = from instanceof HTMLElement ? from : null;
-        }
-        onFocus?.(event);
-      }}
+      onFocus={handleFocus}
     >
       {indicator === undefined ? (
         <span role="status" className="indicator">

@@ -33,7 +33,7 @@ import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCar
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
-import * as actionsStories from "../../lib/_work_in_progress/DataViews/common/Actions/Actions.stories.js";
+import * as actionsStories from "../../lib/_work_in_progress/DataViews/common/ActionBar/ActionBar.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as paginationStories from "../../lib/_work_in_progress/DataViews/common/Pagination/Pagination.stories.js";
 import * as savedViewsStories from "../../lib/_work_in_progress/DataViews/common/SavedViews/SavedViews.stories.js";

@@ -83,7 +83,7 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 - **Your own words** — `<DataViews provider={provider} messages={{ search: "Rechercher", shownRows: ({ first, shown, total }) => … }}>`: the parts left out keep English, and a record typed `DataViewsMessages` replaces them all. Keep the record at module scope, or its functions stable: the root holds its words while their members stay the same.
 - **Keeping the query in the URL** — hand the provider a location and the URL is the query's other home, adopted before the first page is asked for; a refused link reports its reasons on `provider.issues`.
 
-The parts have recipe pages of their own: [`Filters.mdx`](src/lib/_work_in_progress/DataViews/common/Filters/Filters.mdx), [`Actions.mdx`](src/lib/_work_in_progress/DataViews/common/Actions/Actions.mdx), [`Pagination.mdx`](src/lib/_work_in_progress/DataViews/common/Pagination/Pagination.mdx) and [`PaginationBar.mdx`](src/lib/_work_in_progress/PaginationBar/PaginationBar.mdx).
+The parts have recipe pages of their own: [`Filters.mdx`](src/lib/_work_in_progress/DataViews/common/Filters/Filters.mdx), [`ActionBar.mdx`](src/lib/_work_in_progress/DataViews/common/ActionBar/ActionBar.mdx), [`Pagination.mdx`](src/lib/_work_in_progress/DataViews/common/Pagination/Pagination.mdx) and [`PaginationBar.mdx`](src/lib/_work_in_progress/PaginationBar/PaginationBar.mdx).
 
 ## Messages and internationalization
 
