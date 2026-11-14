@@ -15,6 +15,7 @@ export const DISPLAY_STATUS_PHASES: Readonly<
   pending: "transient",
   regrouping: "transient",
   failed: "terminal",
+  refused: "terminal",
   "refresh-failed": "terminal",
   stale: "terminal",
   "no-data": "terminal",

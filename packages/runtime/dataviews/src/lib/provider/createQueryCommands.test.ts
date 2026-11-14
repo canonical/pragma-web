@@ -4,7 +4,7 @@ import declare from "../../../testing/declare.js";
 import { createQueryCoordinator } from "../coordinator/index.js";
 import { createChannel } from "../observable/index.js";
 import { DEFAULT_WINDOW, type Query, type Slice } from "../query/index.js";
-import type { SourceRefusal } from "../result/index.js";
+import type { QueryIssue, SourceRefusal } from "../result/index.js";
 import type { SourceCapabilities } from "../source/index.js";
 import createQueryCommands from "./createQueryCommands.js";
 import resolveHistoryPolicy from "./resolveHistoryPolicy.js";
@@ -26,14 +26,25 @@ const failedOnly = {
   operands: ["failed"],
 } as const;
 
+const refusedStatus: QueryIssue = {
+  parameter: "status__isAny",
+  field: "status",
+  code: "invalid",
+  reason: '"melted" is not an option',
+};
+
 const setup = (
   options: {
     readonly capabilities?: SourceCapabilities;
     readonly refusals?: (query: Query) => readonly SourceRefusal[];
     readonly initial?: Query;
+    readonly withheld?: readonly QueryIssue[];
   } = {},
 ) => {
-  const coordinator = createQueryCoordinator({ initial: options.initial });
+  const coordinator = createQueryCoordinator({
+    initial: options.initial,
+    withheld: options.withheld,
+  });
   const source = createManualSource({
     capabilities: options.capabilities ?? statusOnly,
     refusals: options.refusals,
@@ -143,6 +154,24 @@ describe("createQueryCommands", () => {
       expect(publish).not.toHaveBeenCalled();
     });
 
+    it("moves on a command replacing a withheld clause even when the slice stays", () => {
+      const { coordinator, commands, publish, transitions } = setup({
+        initial: query(),
+        withheld: [refusedStatus],
+      });
+      expect(coordinator.state.result.problem).toMatchObject({
+        status: "refused",
+      });
+      commands.command({
+        kind: "removePredicate",
+        field: "status",
+        operator: "isAny",
+      });
+      expect(coordinator.state.result.problem).toBeNull();
+      expect(publish).toHaveBeenCalledTimes(1);
+      expect(transitions.get()?.cause).toBe("filter");
+    });
+
     it("throws on a command the grammar rejects", () => {
       const { commands } = setup();
       expect(() =>
@@ -183,6 +212,20 @@ describe("createQueryCommands", () => {
       expect(publish).toHaveBeenCalledTimes(1);
       expect(view.get()).toBe("failing");
       expect(seen).toEqual(["failing"]);
+    });
+
+    it("withholds a refused link's query: no request, and the state still moves", () => {
+      const { coordinator, commands, publish } = setup();
+      expect(
+        commands.adopt(query({ filter: [failedOnly] }), "adopt", null, [
+          refusedStatus,
+        ]),
+      ).toBeNull();
+      expect(coordinator.state.result.problem).toEqual({
+        status: "refused",
+        issues: [refusedStatus],
+      });
+      expect(publish).toHaveBeenCalledTimes(1);
     });
   });
 

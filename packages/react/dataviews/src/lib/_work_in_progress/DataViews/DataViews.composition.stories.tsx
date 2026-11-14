@@ -8,13 +8,10 @@ import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import type { MachineProvider } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import useStoryViewStore from "../../../storybook/machines/useStoryViewStore.js";
-import { useDataViewsValue } from "../../hooks/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
-import { useDataViews } from "./hooks/index.js";
 import Component from "./Provider.js";
 
 const meta = {
@@ -43,39 +40,6 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];`;
 
-/**
- * The parameters the location carried that the provider refused — a clause
- * the grammar, the schema or the source cannot run. Reads the root, like
- * any child of one; empty without a location.
- */
-function QueryIssues(): ReactElement | null {
-  const { issues } = useDataViews(machineCollection);
-  const refused = useDataViewsValue(issues);
-  return refused.length === 0 ? null : (
-    <ul className="query-issues">
-      {refused.map((issue) => (
-        // One parameter can be refused for several reasons.
-        <li key={`${issue.parameter}:${issue.reason}`}>{issue.reason}</li>
-      ))}
-    </ul>
-  );
-}
-
-const queryIssuesCode = `// Refused parameters of the URL: a clause the grammar, the collection or the
-// source cannot run stays in the URL, and its reasons are the provider's.
-function QueryIssues() {
-  const { issues } = useDataViews(machineCollection);
-  const refused = useDataViewsValue(issues);
-  return refused.length === 0 ? null : (
-    <ul className="query-issues">
-      {refused.map((issue) => (
-        // One parameter can be refused for several reasons.
-        <li key={\`\${issue.parameter}:\${issue.reason}\`}>{issue.reason}</li>
-      ))}
-    </ul>
-  );
-}`;
-
 /** The pagination bar's summary: the filters hold status regions of their own. */
 const getSummary = (canvas: ReturnType<typeof within>): HTMLElement =>
   within(canvas.getByRole("navigation", { name: "Pagination" })).getByRole(
@@ -103,7 +67,6 @@ function Collection({
           owner: "Owner",
         }}
       />
-      <QueryIssues />
       {children}
       <Component.DataTable
         columns={columns}
@@ -141,18 +104,11 @@ const failedMachines: ViewDraft = {
  */
 export const ConnectedParts: Story = {
   parameters: consumerCode({
-    parts: [
-      "DataViews",
-      "type DataTableColumn",
-      "useDataViews",
-      "useDataViewsValue",
-    ],
+    parts: ["DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
-    declarations: `${columnsCode}
-
-${queryIssuesCode}`,
+    declarations: `${columnsCode}`,
     location: "createPlatformLocation(platform)",
     store: true,
     query: "page=1&size=5",
@@ -160,7 +116,6 @@ ${queryIssuesCode}`,
   <DataViews.SavedViews />
   <DataViews.Search label="Search machines" />
   <DataViews.Filters labels={{ status: "Status", cores: "Cores", name: "Host", region: "Region", owner: "Owner" }} />
-  <QueryIssues />
   <DataViews.DataTable
     columns={columns}
     label="Machines"
@@ -217,36 +172,20 @@ function QueryInTheLocation({
   );
 }
 
-/**
- * The query in the URL: the location arrived carrying `status=failed`, so
- * the provider adopted it, and running machines were then added in the
- * filters, which wrote the query back to the location as a history entry —
- * a filter is a step Back returns from, while typing in the search replaces
- * the entry. A link carrying a clause the source refuses stays in the URL
- * with its reasons on the provider's `issues`.
- */
-export const QueryInTheUrl: Story = {
-  parameters: consumerCode({
-    parts: [
-      "DataViews",
-      "type DataTableColumn",
-      "useDataViews",
-      "useDataViewsValue",
-    ],
-    core: ["createPlatformLocation"],
-    imports: `import { machineCollection, machines } from "./machines.js";
+/** The code the stories of a query in the URL show. */
+const queryInTheUrlCode = consumerCode({
+  parts: ["DataViews", "type DataTableColumn"],
+  core: ["createPlatformLocation"],
+  imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
-    declarations: `${columnsCode}
-
-${queryIssuesCode}`,
-    // The router's platform surface: anything with getLocation, navigate
-    // and subscribe. The provider adopts the query it carries and writes
-    // every edit back.
-    location: "createPlatformLocation(platform)",
-    render: `<DataViews provider={provider}>
+  declarations: `${columnsCode}`,
+  // The router's platform surface: anything with getLocation, navigate
+  // and subscribe. The provider adopts the query it carries and writes
+  // every edit back.
+  location: "createPlatformLocation(platform)",
+  render: `<DataViews provider={provider}>
   <DataViews.Search label="Search machines" />
   <DataViews.Filters labels={{ status: "Status", cores: "Cores", name: "Host", region: "Region", owner: "Owner" }} />
-  <QueryIssues />
   <DataViews.DataTable
     columns={columns}
     label="Machines"
@@ -256,7 +195,18 @@ ${queryIssuesCode}`,
   <DataViews.Actions />
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
-  }),
+});
+
+/**
+ * The query in the URL: the location arrived carrying `status=failed`, so
+ * the provider adopted it, and running machines were then added in the
+ * filters, which wrote the query back to the location as a history entry —
+ * a filter is a step Back returns from, while typing in the search replaces
+ * the entry. A link carrying a clause the source refuses stays in the URL,
+ * and the filters list it with its reasons.
+ */
+export const QueryInTheUrl: Story = {
+  parameters: queryInTheUrlCode,
   render: function Render() {
     // A memory location stands in for the browser's here, so the story
     // never rewrites the page's own address.
@@ -292,5 +242,79 @@ ${queryIssuesCode}`,
       // nine.
       expect(getSummary(canvas)).toHaveTextContent("Showing 1–9 out of 9 rows"),
     );
+  },
+};
+
+/**
+ * A link with a refused filter: the link carried `status=melted`, which is no
+ * status a machine has. Leaving it out would show every machine, wider than
+ * the link asked for, so nothing runs: the table says the link could not be
+ * followed and why, and the filters list the clause with a Clear control.
+ * Clearing it removes the clause from the URL, and the query runs over all
+ * twelve machines.
+ */
+export const LinkWithARefusedFilter: Story = {
+  parameters: queryInTheUrlCode,
+  render: function Render() {
+    const [location] = useState(() =>
+      createMemoryLocation({ href: "/machines?status=melted" }),
+    );
+    const provider = useMachineProvider({ query: "page=1&size=5", location });
+    return (
+      <Collection provider={provider}>
+        <QueryInTheLocation location={location} />
+      </Collection>
+    );
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText(
+        'This link could not be followed: "melted" is not an option of "status".',
+      ),
+    ).toBeInTheDocument();
+    const refusals = canvas.getByRole("list", {
+      name: "Not applied from the link",
+    });
+    await expect(
+      within(refusals).getByRole("button", { name: "Clear Status" }),
+    ).toBeInTheDocument();
+    // Nothing ran, and the link stands in the URL until it is cleared.
+    await expect(canvas.getByLabelText("Location")).toHaveTextContent(
+      "status=melted",
+    );
+  },
+};
+
+/**
+ * A link with a refused sort: the link asked to order by a field the machines
+ * do not have. An ordering narrows nothing, so the rows come in the source's
+ * own order and the filters list the refused sort, with nothing to clear.
+ */
+export const LinkWithARefusedSort: Story = {
+  parameters: queryInTheUrlCode,
+  render: function Render() {
+    const [location] = useState(() =>
+      createMemoryLocation({ href: "/machines?sort=colour__asc" }),
+    );
+    const provider = useMachineProvider({ query: "page=1&size=5", location });
+    return (
+      <Collection provider={provider}>
+        <QueryInTheLocation location={location} />
+      </Collection>
+    );
+  },
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(getSummary(canvas)).toHaveTextContent(
+        "Showing 1–12 out of 12 rows",
+      ),
+    );
+    const refusals = canvas.getByRole("list", {
+      name: "Not applied from the link",
+    });
+    await expect(refusals).toHaveTextContent(
+      'Sort: "colour" is not a field of this collection.',
+    );
+    await expect(within(refusals).queryByRole("button")).toBeNull();
   },
 };

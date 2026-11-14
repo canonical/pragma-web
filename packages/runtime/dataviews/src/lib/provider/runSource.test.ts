@@ -243,7 +243,11 @@ describe("runSource refusals", () => {
     );
     expect(source.calls).toHaveLength(0);
     const problem = problemOf(host.state.get());
-    expect(problem?.status === "refused" && problem.refusals).toMatchObject([
+    expect(
+      problem?.status === "refused" &&
+        "refusals" in problem &&
+        problem.refusals,
+    ).toMatchObject([
       { part: "search", code: "undeclared-field" },
       { part: "sort", code: "too-many-terms" },
     ]);

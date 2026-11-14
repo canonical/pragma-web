@@ -82,15 +82,29 @@ describe("resolveDisplayStatus", () => {
     });
   });
 
-  it("reads a refusal's reasons as one sentence", () => {
+  it("reads a refusal's reasons as one sentence, refused rather than failed", () => {
+    // Nothing ran, so nothing failed: the source refused the query.
     const coordinator = createQueryCoordinator<Machine>();
     coordinator.complete(
       coordinator.refresh(),
       buildRefusedResult("name cannot be ordered", "two orderings at once"),
     );
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
-      status: "failed",
+      status: "refused",
       reason: "name cannot be ordered; two orderings at once",
+    });
+  });
+
+  it("reads a followed link's refused clauses as one sentence", () => {
+    const coordinator = createQueryCoordinator<Machine>({
+      withheld: [
+        { parameter: "status", field: "status", code: "invalid", reason: "a" },
+        { parameter: "q", field: null, code: "malformed", reason: "b" },
+      ],
+    });
+    expect(resolveDisplayStatus(coordinator.state)).toEqual({
+      status: "refused",
+      reason: "a; b",
     });
   });
 
@@ -237,6 +251,17 @@ describe("resolveDisplayStatus", () => {
         failure: { reason: "x", cause: null, transient: null },
       },
       buildRefusedResult("x"),
+      {
+        status: "refused",
+        issues: [
+          {
+            parameter: "status",
+            field: "status",
+            code: "invalid",
+            reason: "x",
+          },
+        ],
+      },
     ];
     const rowSets: readonly (readonly Machine[] | null)[] = [
       null,

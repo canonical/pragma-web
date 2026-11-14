@@ -42,6 +42,7 @@ describe("regression 0015 — a written adoption is read back", () => {
     expect(provider.issues.get()).toEqual([
       {
         parameter: "q",
+        field: null,
         code: "undeclared-field",
         reason: "this source cannot search",
       },

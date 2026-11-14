@@ -25,7 +25,7 @@ import type {
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
-import type { Completion, SourceRefusal } from "../result/index.js";
+import type { Completion, QueryIssue, SourceRefusal } from "../result/index.js";
 import type {
   Applicability,
   RowIdentifier,
@@ -45,7 +45,6 @@ import type {
   ViewAdoptionCause,
   ViewStore,
 } from "../views/index.js";
-import type { QueryIssue } from "../wire/index.js";
 
 /**
  * The provider: the one owner of a collection's state and of the ports
@@ -149,7 +148,8 @@ export type DataViewsProvider<
    * leaves the request pending for the first observer. Nothing is started
    * or subscribed either way, and the first observer takes the source up
    * over the rows drawn without asking for them again. This is the call a
-   * server render makes before rendering.
+   * server render makes before rendering. A query withheld for a link's
+   * refused clauses is not asked for: nothing happens.
    */
   readonly refresh: () => void;
   /**
@@ -331,7 +331,8 @@ export type Transition = {
 
 /** The history mode of every cause, resolved from the provider's policy. */
 export type TransitionHistory = Readonly<
-  Record<TransitionCause, HistoryMode | null>
+  Record<QueryTransition, HistoryMode> &
+    Record<Exclude<TransitionCause, QueryTransition>, HistoryMode | null>
 >;
 
 /**
@@ -364,21 +365,28 @@ export type ProviderHost<
     field: string,
     operator: PredicateOperator,
   ) => readonly SourceRefusal[];
-  /** Request the current query again and name the request. */
+  /**
+   * Request the current query again and name the request. A withheld query
+   * is never asked for, so refreshing one throws.
+   */
   readonly refresh: () => string;
   /**
    * Adopt an externally authoritative query with the saved view open beside
    * it — null for none — and name the request it issued, or null when the
-   * query did not move. Query and view move as one transition, so one write
-   * enters history once. The cause says whose authority: the location's
-   * (`adopt`), which is never written back; a view opened (`view`), which
-   * enters history as the policy says; or a view reverted to or left
-   * (`revert`), which replaces.
+   * query did not move or is withheld. Query and view move as one
+   * transition, so one write enters history once. The cause says whose
+   * authority: the location's (`adopt`), which is never written back; a view
+   * opened (`view`), which enters history as the policy says; or a view
+   * reverted to or left (`revert`), which replaces. Given the narrowing
+   * clauses its link was refused for, the query is withheld rather than run;
+   * given none, nothing is withheld; left out, what is withheld stands while
+   * the slice stays where it is.
    */
   readonly adopt: (
     query: Query,
     cause: AdoptionCause,
     view: string | null,
+    withheld?: readonly QueryIssue[],
   ) => string | null;
   /**
    * The saved view open beside the query — the location's `view`, or the
@@ -396,9 +404,18 @@ export type ProviderHost<
   /**
    * A query spelled as the location would carry it, the location's other
    * parameters preserved — the destination a link or a form leads to. Null
-   * without a location: there is nowhere for a destination to lead.
+   * without a location: there is nowhere for a destination to lead. The
+   * refused clauses the query is withheld for are carried as the location
+   * spells them, so a link drawn over a refused link widens nothing.
    */
   readonly spellQuery: (query: Query) => URLSearchParams | null;
+  /**
+   * Remove one refused parameter of the location — a filter or the search
+   * a followed link carried — as the link to the URL without it does: the
+   * location moves, entering history as a filter or the search does, and
+   * the query it then carries is read. Nothing happens without a location.
+   */
+  readonly clearRefused: (parameter: string) => void;
   /**
    * The read side of the location port the provider was given, or null:
    * what a control spelling destinations watches, since the location's
@@ -513,6 +530,11 @@ export type StartingPoint = {
    * when it carries one, the snapshot's otherwise, none without either.
    */
   readonly issues: readonly QueryIssue[];
+  /**
+   * The location's refused clauses that would have narrowed its query, which
+   * withhold it; none when the provider does not stand on the location.
+   */
+  readonly withheld: readonly QueryIssue[];
   /** The saved view open beside the query the provider stands on. */
   readonly view: string | null;
   /** The snapshot's arrangement, with the view it was drawn under, if any. */
@@ -593,6 +615,12 @@ export type QueryCommands = Pick<
 export type LocationSync = PortRun & {
   /** The owned parameters the location carries that were refused. */
   readonly issues: ReadonlyChannel<readonly QueryIssue[]>;
+  /**
+   * Remove one refused parameter from the location, entering history as
+   * `history` says, and read the location that leaves: the move a link to
+   * the URL without that parameter makes.
+   */
+  readonly clearRefused: (parameter: string, history: HistoryMode) => void;
 };
 
 /** Configuration of the provider's action runner. */

@@ -1,6 +1,6 @@
-import type { Query } from "../query/index.js";
+import type { Query, Slice } from "../query/index.js";
 import type { Schema, SchemaFieldDefinition } from "../schema/index.js";
-import { encodeQuery, VIEW_KEY } from "../wire/index.js";
+import { encodeCarryingQuery, VIEW_KEY } from "../wire/index.js";
 import placeView from "./placeView.js";
 
 /** Configuration of one location spelling: a query and the view open beside it. */
@@ -12,7 +12,18 @@ type LocationSpellingConfig = {
   readonly view: string | null;
   /** The location's parameters, whose other members are kept. */
   readonly preserve: URLSearchParams;
+  /**
+   * The refused clauses' keys to carry from `preserve` as they are spelled,
+   * and the slice the location's readable clauses were applied as; none by
+   * default.
+   */
+  readonly carry?:
+    | { readonly keys: readonly string[]; readonly applied: Slice }
+    | undefined;
 };
+
+/** A spelling that carries nothing through. */
+const NOTHING_CARRIED: readonly string[] = Object.freeze([]);
 
 /**
  * A query as a location spells it, with the saved view open beside it: the
@@ -29,12 +40,14 @@ type LocationSpellingConfig = {
 export default function spellLocation(
   config: LocationSpellingConfig,
 ): URLSearchParams {
-  const { schema, query, view, preserve } = config;
-  const encoded = encodeQuery({
+  const { schema, query, view, preserve, carry } = config;
+  const encoded = encodeCarryingQuery({
     schema,
     slice: query.slice,
     window: query.window,
     preserve,
+    carry: carry?.keys ?? NOTHING_CARRIED,
+    applied: carry?.applied ?? query.slice,
   });
   if (view === null && !encoded.has(VIEW_KEY)) {
     return encoded;

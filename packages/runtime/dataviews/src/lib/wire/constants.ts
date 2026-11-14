@@ -10,17 +10,30 @@ import type { PredicateOperator } from "../query/index.js";
 export const OPERATOR_DELIMITER = "__";
 
 /**
+ * The parameter each written member of a query is spelled under: the
+ * search, the ordering, the grouping, and the window's page, size and
+ * cursor. Named once, so every reader and writer of the grammar spells
+ * them alike.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export const QUERY_KEYS = Object.freeze({
+  search: "q",
+  sort: "sort",
+  group: "group",
+  page: "page",
+  size: "size",
+  cursor: "cursor",
+} as const);
+
+/**
  * The parameters the grammar writes for every collection. Collapse is
  * window-class but has no spelling: a reload expands every group.
  */
-export const WRITTEN_QUERY_KEYS: readonly string[] = Object.freeze([
-  "q",
-  "sort",
-  "group",
-  "page",
-  "size",
-  "cursor",
-]);
+export const WRITTEN_QUERY_KEYS: readonly string[] = Object.freeze(
+  Object.values(QUERY_KEYS),
+);
 
 /**
  * The annotation naming the saved view a location has open. It asks the source

@@ -62,6 +62,13 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   statusRegrouping: "Regrouping…",
   statusFailed: (reason) =>
     `These rows could not be loaded: ${composeClause(reason)}`,
+  statusRefused: (reason) => {
+    // A blank reason says nothing: the plain statement, not a bare colon.
+    const clause = composeClause(reason);
+    return clause === ""
+      ? "This link could not be followed."
+      : `This link could not be followed: ${clause}.`;
+  },
   statusRefreshFailed: (reason) =>
     `These rows could not be refreshed: ${composeClause(reason)}`,
   statusStale: (reason) =>
@@ -137,6 +144,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   filterLowest: (value) => `Lowest: ${value}`,
   filterHighest: (value) => `Highest: ${value}`,
   clearFilter: (name) => `Clear ${name}`,
+  linkRefusals: "Not applied from the link",
+  clauseRefused: (name, reason) => `${name}: ${composeClause(reason)}.`,
+  grouping: "Grouping",
   filterIsAnyOf: (label) => `${label} is any of`,
   filterIsNoneOf: (label) => `${label} is none of`,
   matchAnyInstead: "Match any of these instead",

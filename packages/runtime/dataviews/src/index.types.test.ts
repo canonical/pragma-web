@@ -509,15 +509,16 @@ describe("public surface types", () => {
       | "pending"
       | "regrouping"
       | "failed"
+      | "refused"
       | "refresh-failed"
       | "stale"
       | "no-data"
       | "no-results"
     >();
-    // The failures carry their reason; the rest say what they are.
+    // The failures and refusals carry their reason; the rest say what they are.
     expectTypeOf<
       Extract<DisplayStatus, { readonly reason: string }>["status"]
-    >().toEqualTypeOf<"failed" | "refresh-failed" | "stale">();
+    >().toEqualTypeOf<"failed" | "refused" | "refresh-failed" | "stale">();
     expectTypeOf(bindings.DISPLAY_STATUS_PHASES).toEqualTypeOf<
       Readonly<Record<DisplayStatus["status"], "terminal" | "transient">>
     >();
@@ -649,7 +650,12 @@ describe("public surface types", () => {
       .toHaveProperty("complete")
       .parameters.toEqualTypeOf<[string, Completion<Machine>]>();
     expectTypeOf<ProviderHost["adopt"]>().parameters.toEqualTypeOf<
-      [Query, "adopt" | "view" | "revert", string | null]
+      [
+        Query,
+        "adopt" | "view" | "revert",
+        string | null,
+        (readonly QueryIssue[] | undefined)?,
+      ]
     >();
     expectTypeOf<ProviderHost["refresh"]>().returns.toEqualTypeOf<string>();
     expectTypeOf<DataViewsProvider["refresh"]>().returns.toEqualTypeOf<void>();

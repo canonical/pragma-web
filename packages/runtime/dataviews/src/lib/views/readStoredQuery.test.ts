@@ -40,11 +40,13 @@ describe("readStoredQuery", () => {
     expect(issues).toEqual([
       {
         parameter: "q",
+        field: null,
         code: "undeclared-field",
         reason: "this source cannot search",
       },
       {
         parameter: "region",
+        field: "region",
         code: "unknown-field",
         reason: '"region" names no field of this collection',
       },

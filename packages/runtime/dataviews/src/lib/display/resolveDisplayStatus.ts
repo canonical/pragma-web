@@ -3,10 +3,16 @@ import type { ResultProblem } from "../result/index.js";
 import type { DisplayStatus } from "./types.js";
 
 /** One problem as the reason shown above or in place of the rows. */
-const describeProblem = (problem: ResultProblem): string =>
-  problem.status === "refused"
-    ? problem.refusals.map((refusal) => refusal.reason).join("; ")
-    : problem.failure.reason;
+const describeProblem = (problem: ResultProblem): string => {
+  switch (problem.status) {
+    case "refused":
+      return "issues" in problem
+        ? problem.issues.map((issue) => issue.reason).join("; ")
+        : problem.refusals.map((refusal) => refusal.reason).join("; ");
+    case "failed":
+      return problem.failure.reason;
+  }
+};
 
 /**
  * What the table says instead of its rows or above them, or null when the
@@ -20,6 +26,10 @@ const describeProblem = (problem: ResultProblem): string =>
  * rows that still answer the query, whose refresh failed, are shown under
  * that reason too — saying nothing there would hide the failure entirely.
  * The coordinator has already told the two apart; this reads its answer.
+ * A refused query — a followed link's clause that would have narrowed it,
+ * or a query the source cannot execute — is `refused` with no rows, for
+ * nothing ran; `failed` means execution failed. A link's refusal keeps any
+ * rows shown as `stale`, so nothing wider than the link asked for runs.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -39,7 +49,9 @@ export default function resolveDisplayStatus(
       : { status: "refresh-failed", reason };
   }
   if (reason !== null) {
-    return { status: "failed", reason };
+    return result.problem?.status === "refused"
+      ? { status: "refused", reason }
+      : { status: "failed", reason };
   }
   // No rows yet, or an earlier query's empty page: neither says anything
   // about the query now asked, so nothing is claimed until the source

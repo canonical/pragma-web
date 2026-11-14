@@ -65,6 +65,7 @@ describe("readStartingPoint", () => {
       start: undefined,
       initial: undefined,
       issues: [],
+      withheld: [],
       view: null,
       restored: undefined,
     });

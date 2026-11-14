@@ -74,11 +74,13 @@ describe("describeViewStatus", () => {
         issues: [
           {
             parameter: "cores__gte",
+            field: "cores",
             code: "invalid",
             reason: '"zero" is not a number',
           },
           {
             parameter: "sort",
+            field: null,
             code: "too-many-terms",
             reason: "sorting is not supported",
           },
