@@ -33,4 +33,19 @@ describe("ListStatus", () => {
     expect(screen.queryByRole("status")).toBeNull();
     expect(view.container).toHaveTextContent(text);
   });
+
+  it("takes the native props of its root, keeping its own status", () => {
+    render(
+      <ListStatus
+        status={{ status: "no-data" }}
+        messages={english}
+        className="extra"
+        title="From the list"
+      />,
+    );
+    const root = screen.getByRole("status");
+    expect(root).toHaveClass("extra");
+    expect(root).toHaveAttribute("title", "From the list");
+    expect(root).toHaveAttribute("data-status", "no-data");
+  });
 });
