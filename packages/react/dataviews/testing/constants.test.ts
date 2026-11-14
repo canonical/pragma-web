@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { CHART_FACETS, DELIVERY_WAIT, MOCK_API_ORIGIN } from "./constants.js";
+import {
+  CHART_FACETS,
+  DELIVERY_WAIT,
+  FILE_RULE_ALLOWLIST,
+  MOCK_API_ORIGIN,
+} from "./constants.js";
 
 describe("constants", () => {
   it("polls often, within a test's own timeout", () => {
@@ -13,5 +18,10 @@ describe("constants", () => {
 
   it("addresses the mock API on the local host", () => {
     expect(MOCK_API_ORIGIN).toBe("http://localhost");
+  });
+
+  it("lists each owed file-rule finding once, frozen", () => {
+    expect(new Set(FILE_RULE_ALLOWLIST).size).toBe(FILE_RULE_ALLOWLIST.length);
+    expect(Object.isFrozen(FILE_RULE_ALLOWLIST)).toBe(true);
   });
 });
