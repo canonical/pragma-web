@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import DeleteConfirm from "./DeleteConfirm.js";
 
@@ -19,6 +19,18 @@ const mountConfirm = ({
     />,
   );
   return { onSubmit, onCancel };
+};
+
+/** Open the one dialog rendered, as its command does. */
+const openDialog = (): HTMLDialogElement => {
+  const dialog = document.querySelector("dialog");
+  if (dialog === null) {
+    throw new Error("expected a dialog");
+  }
+  act(() => {
+    dialog.showModal();
+  });
+  return dialog;
 };
 
 describe("DeleteConfirm", () => {
@@ -66,5 +78,46 @@ describe("DeleteConfirm", () => {
     mountConfirm({ pending: true });
     expect(screen.getByRole("button", { name: "Delete view" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Cancel" })).toBeEnabled();
+  });
+  it.fails("is a dialog named by its question, with the focus on Cancel as it opens", () => {
+    mountConfirm();
+    openDialog();
+    expect(
+      screen.getByRole("dialog", {
+        name: "Delete “Failed”? This cannot be undone.",
+      }),
+    ).toHaveClass("ds", "data-views-saved-views-confirm");
+    expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus();
+  });
+
+  it.fails("closes on Cancel and on Escape", () => {
+    mountConfirm();
+    const dialog = openDialog();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(dialog.open).toBe(false);
+    openDialog();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), {
+      key: "Escape",
+    });
+    expect(dialog.open).toBe(false);
+  });
+
+  it.fails("takes its dialog's native props", () => {
+    render(
+      <DeleteConfirm
+        question="Delete “Failed”? This cannot be undone."
+        submit="Delete view"
+        cancel="Cancel"
+        pending={false}
+        onSubmit={() => {}}
+        // Typed for both shapes: the props before and after the dialog.
+        {...({ id: "deleting", className: "extra", onCancel: () => {} } as {
+          readonly onCancel: () => void;
+        })}
+      />,
+    );
+    const dialog = document.querySelector("dialog");
+    expect(dialog).toHaveAttribute("id", "deleting");
+    expect(dialog).toHaveClass("ds", "data-views-saved-views-confirm", "extra");
   });
 });

@@ -404,6 +404,49 @@ describe("DataViews.SavedViews", () => {
     });
   });
 
+  it.fails("opens each dialog natively from its command", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    await choose(failed);
+    for (const name of ["Save as…", "Rename…", "Delete…"]) {
+      const command = getButton(name);
+      expect(command).toHaveAttribute("command", "show-modal");
+      const dialog = document.getElementById(
+        command.getAttribute("commandfor") ?? "",
+      );
+      expect(dialog).toBeInstanceOf(HTMLDialogElement);
+      fireEvent.click(command);
+      expect(dialog).toHaveAttribute("open");
+      fireEvent.keyDown(document.activeElement ?? document.body, {
+        key: "Escape",
+      });
+      expect(dialog).not.toHaveAttribute("open");
+    }
+  });
+
+  it.fails("refuses a blank name natively, never asking the collection", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    fireEvent.click(getButton("Save as…"));
+    const form = screen.getByRole("form", { name: "Save as a new view" });
+    const name = within(form).getByRole("textbox", { name: "Name" });
+    fireEvent.change(name, { target: { value: "   " } });
+    expect(name).toBeInvalid();
+    fireEvent.click(within(form).getByRole("button", { name: "Save view" }));
+    expect(queryStatus()).toHaveTextContent("");
+    expect(getSelect().options).toHaveLength(2);
+  });
+
+  it.fails("asks before deleting in a dialog named by its question", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    await choose(failed);
+    fireEvent.click(getButton("Delete…"));
+    const confirm = screen.getByRole("dialog", {
+      name: 'Delete "Failed"? This cannot be undone.',
+    });
+    expect(
+      within(confirm).getByRole("button", { name: "Cancel" }),
+    ).toHaveFocus();
+  });
+
   it("renames the open view", async () => {
     await mountListed(createMemoryViewStore([failed, running]).store);
     await choose(failed);
@@ -704,5 +747,24 @@ describe("DataViews.SavedViews", () => {
     unmount();
     // StrictMode's rehearsal released once already; the kept mount now too.
     expect(unsubscribe).toHaveBeenCalledTimes(2);
+  });
+
+  it.fails("pre-fills Rename with the name a save conflict brings back", async () => {
+    const memory = createMemoryViewStore([failed]);
+    const { provider } = await mountListed(memory.store);
+    await choose(failed);
+    memory.elsewhere(failed.id, { name: "Theirs", query: "status=running" });
+    setStatus(provider, ["failed", "running"]);
+    fireEvent.click(getButton("Save"));
+    await waitFor(() => {
+      expect(queryStatus()).toHaveTextContent(
+        'Not saved: "Theirs" was changed elsewhere.',
+      );
+    });
+    fireEvent.click(getButton("Rename…"));
+    const dialog = screen.getByRole("dialog", { name: 'Rename "Theirs"' });
+    expect(within(dialog).getByRole("textbox", { name: "Name" })).toHaveValue(
+      "Theirs",
+    );
   });
 });

@@ -24,6 +24,18 @@ const mountForm = ({
   return { onSubmit, onCancel };
 };
 
+/** Open the one dialog rendered, as its command does. */
+const openDialog = (): HTMLDialogElement => {
+  const dialog = document.querySelector("dialog");
+  if (dialog === null) {
+    throw new Error("expected a dialog");
+  }
+  act(() => {
+    dialog.showModal();
+  });
+  return dialog;
+};
+
 /** Submit the form through its submit button, letting the answer settle. */
 const submitForm = async (): Promise<void> => {
   await act(async () => {
@@ -100,5 +112,89 @@ describe("NameForm", () => {
   it("disables the submit while pending", () => {
     mountForm({ pending: true });
     expect(screen.getByRole("button", { name: "Save view" })).toBeDisabled();
+  });
+  it.fails("is a dialog named for what the name is for, focusing its input as it opens", () => {
+    mountForm({ initial: "Failed" });
+    openDialog();
+    expect(
+      screen.getByRole("dialog", { name: "Save as a new view" }),
+    ).toHaveClass("ds", "data-views-saved-views-name-form");
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
+  });
+
+  it.fails("refuses a name of only spaces natively", () => {
+    mountForm();
+    openDialog();
+    const input = screen.getByRole<HTMLInputElement>("textbox", {
+      name: "Name",
+    });
+    fireEvent.change(input, { target: { value: "   " } });
+    expect(input).toBeInvalid();
+    expect(input.validity.patternMismatch).toBe(true);
+  });
+
+  it.fails("closes on Cancel and on Escape, back to the name it started with", () => {
+    mountForm({ initial: "Failed" });
+    const dialog = openDialog();
+    fireEvent.change(screen.getByRole("textbox", { name: "Name" }), {
+      target: { value: "Busy" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(dialog.open).toBe(false);
+    openDialog();
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Failed");
+    fireEvent.keyDown(screen.getByRole("textbox", { name: "Name" }), {
+      key: "Escape",
+    });
+    expect(dialog.open).toBe(false);
+  });
+
+  it.fails("takes its dialog's native props", () => {
+    render(
+      <NameForm
+        label="Save as a new view"
+        submit="Save view"
+        nameLabel="Name"
+        cancel="Cancel"
+        initial=""
+        pending={false}
+        onSubmit={async () => null}
+        // Typed for both shapes: the props before and after the dialog.
+        {...({ id: "names", className: "extra", onCancel: () => {} } as {
+          readonly onCancel: () => void;
+        })}
+      />,
+    );
+    const dialog = document.querySelector("dialog");
+    expect(dialog).toHaveAttribute("id", "names");
+    expect(dialog).toHaveClass(
+      "ds",
+      "data-views-saved-views-name-form",
+      "extra",
+    );
+  });
+
+  it.fails("ignores a refusal that arrives after the dialog closed", async () => {
+    let answer = (_refused: string | null): void => {};
+    const onSubmit = vi.fn(
+      (_name: string) =>
+        new Promise<string | null>((resolve) => {
+          answer = resolve;
+        }),
+    );
+    mountForm({ initial: "Failed", onSubmit });
+    const dialog = openDialog();
+    await submitForm();
+    fireEvent.keyDown(screen.getByRole("textbox", { name: "Name" }), {
+      key: "Escape",
+    });
+    expect(dialog.open).toBe(false);
+    await act(async () => {
+      answer("Taken");
+    });
+    openDialog();
+    const input = screen.getByRole("textbox", { name: "Name" });
+    expect(input).not.toHaveAttribute("aria-describedby");
+    expect(input).toBeValid();
   });
 });
