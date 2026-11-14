@@ -4,8 +4,6 @@
  * on a listed one no longer found, so a row leaves with the fix.
  */
 export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
-  "src/lib/collection/readRecordTypes.ts test",
-  "src/lib/filter/isSamePredicate.ts test",
   "src/lib/indexeddb/constants.ts test",
   "src/lib/indexeddb/isStoredPreference.ts test",
   "src/lib/indexeddb/readSavedView.ts test",
@@ -18,13 +16,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/provider/observePorts.ts test",
   "src/lib/provider/readProviderHost.ts test",
   "src/lib/provider/registerProviderHost.ts test",
-  "src/lib/query/addressPredicate.ts test",
-  "src/lib/query/arePredicatesEqual.ts test",
-  "src/lib/query/collapseSortTerms.ts test",
-  "src/lib/query/constants.ts test",
-  "src/lib/query/rankOperand.ts test",
-  "src/lib/query/rejectOperandArity.ts test",
-  "src/lib/query/stringifyStable.ts test",
   "src/lib/result/areFieldFacetsEqual.ts test",
   "src/lib/result/constants.ts test",
   "src/lib/rows/readField.ts test",
