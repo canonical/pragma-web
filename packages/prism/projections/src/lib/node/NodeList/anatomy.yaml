@@ -10,8 +10,9 @@
 # in the `cards` renderer, so each node reads through the arm its site maps
 # to its type; each item is keyed by the node's address, so a re-render
 # keeps it. A node whose type's visibility is HIDDEN is a value, never an
-# entity, so the list drops it before the items. The renderer's name and the empty line are the lens's: it reads
-# the renderer from the page's address and passes its name.
+# entity, so the list leaves it out of its items. The renderer's name and
+# the empty line are the lens's: it reads the renderer from the page's
+# address and passes its name.
 node:
   uri: prism.component.node_list
   projection:
