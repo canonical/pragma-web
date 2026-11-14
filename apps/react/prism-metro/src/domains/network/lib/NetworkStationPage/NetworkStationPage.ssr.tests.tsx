@@ -9,6 +9,7 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { describe, expect, it } from "vitest";
 import createMetroFetch from "../../../../../testing/createMetroFetch.js";
 import formatDocumentTitle from "../../../../formatDocumentTitle.js";
+import { SiteRenderers } from "../../../../lib/ui/SiteRenderers/index.js";
 import { appRoutes } from "../../../../routes.js";
 import NetworkStationPage from "./NetworkStationPage.js";
 
@@ -24,7 +25,9 @@ describe("NetworkStationPage SSR", () => {
               adapter: createMemoryAdapter("/network"),
             })}
           >
-            <NetworkStationPage address="metro:tannery-lane" />
+            <SiteRenderers>
+              <NetworkStationPage address="metro:tannery-lane" />
+            </SiteRenderers>
           </RouterProvider>
         </RelayEnvironmentProvider>
       </HeadProvider>,

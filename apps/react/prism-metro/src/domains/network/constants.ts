@@ -1,3 +1,4 @@
+import type { LensRenderers } from "@canonical/prism-core";
 import { MESSAGES } from "#i18n";
 
 /**
@@ -17,3 +18,18 @@ export const INTERCHANGE_CLASS_URI = "metro:Interchange";
  * site draws, so the map reads every line at once and never pages.
  */
 export const LINE_PAGE_SIZE = 100;
+
+/** The network routes of a node's page, whose strip offers its renderers. */
+export const NETWORK_NODE_ROUTES: ReadonlySet<string> = new Set([
+  "networkStation",
+  "networkLine",
+]);
+
+/**
+ * The renderers a station's or a line's page offers over the site's
+ * defaults: the page, the default, or its Turtle source while the site's
+ * provider serves `source`. The map offers none.
+ */
+export const NETWORK_RENDERERS: LensRenderers = {
+  page: ["page", "turtle"],
+};

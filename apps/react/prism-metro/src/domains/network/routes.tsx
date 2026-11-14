@@ -1,4 +1,4 @@
-import { routeLensFacet } from "@canonical/prism-core";
+import { routeLensFacet, viewSearch } from "@canonical/prism-core";
 import { readUriParam } from "@canonical/prism-lens-entity";
 import { route } from "@canonical/router-core";
 import type { ReactElement } from "react";
@@ -45,6 +45,7 @@ const NetworkLineContent = ({ params }: RouteContentProps): ReactElement => (
 export const networkRoutes = {
   network: route({
     url: "/network",
+    search: viewSearch,
     content: NetworkMapContent,
     warm: () => warmNetwork(),
     meta: routeLensFacet.of({
@@ -56,11 +57,13 @@ export const networkRoutes = {
   }),
   networkStation: route({
     url: "/network/stations/:uri",
+    search: viewSearch,
     content: NetworkStationContent,
     warm: (params) => warmNetworkNode("stop", params),
   }),
   networkLine: route({
     url: "/network/lines/:uri",
+    search: viewSearch,
     content: NetworkLineContent,
     warm: (params) => warmNetworkNode("line", params),
   }),

@@ -7,6 +7,7 @@ import { renderToString } from "react-dom/server";
 import { RelayEnvironmentProvider } from "react-relay";
 import { describe, expect, it } from "vitest";
 import createMetroFetch from "../../../../../testing/createMetroFetch.js";
+import { SiteRenderers } from "../../../../lib/ui/SiteRenderers/index.js";
 import { appRoutes } from "../../../../routes.js";
 import NetworkLayout from "./NetworkLayout.js";
 
@@ -21,7 +22,9 @@ describe("NetworkLayout SSR", () => {
             adapter: createMemoryAdapter("/network"),
           })}
         >
-          <NetworkLayout>The map</NetworkLayout>
+          <SiteRenderers>
+            <NetworkLayout>The map</NetworkLayout>
+          </SiteRenderers>
         </RouterProvider>
       </RelayEnvironmentProvider>,
     );
