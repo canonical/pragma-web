@@ -1,4 +1,4 @@
-import directionOf from "./directionOf.js";
+import getDirection from "./getDirection.js";
 import type { Direction, I18nConfig, Locale } from "./types.js";
 
 /**
@@ -9,9 +9,9 @@ import type { Direction, I18nConfig, Locale } from "./types.js";
  * @param config - Active locale configuration.
  * @param locale - The resolved locale.
  */
-export default function documentAttrs(
+export default function getDocumentAttributes(
   config: I18nConfig,
   locale: Locale,
 ): { lang: Locale; dir: Direction } {
-  return { lang: locale, dir: directionOf(config, locale) };
+  return { lang: locale, dir: getDirection(config, locale) };
 }
