@@ -21,6 +21,7 @@ const SOURCES = "tests/elements.test.ts";
 /** Operating-system preferences a test can set through the `emulateMedia` command. */
 export interface MediaEmulation {
   colorScheme?: "light" | "dark" | null;
+  forcedColors?: "active" | "none" | null;
   reducedMotion?: "reduce" | "no-preference" | null;
 }
 

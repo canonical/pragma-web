@@ -31,6 +31,7 @@ const MIXED_ORDER = [
   "ds.typography",
   "ds.modifiers",
   "ds.surfaces",
+  "ds.density",
   "ds.states",
   "ds.adapter",
   "ds.components",
@@ -72,14 +73,16 @@ const VANILLA_REACH_EXPECTED = [
 ];
 
 /**
- * The counters themselves, one per property, as adapter.css writes them. Four
- * of them answer the five reaching rules above, because one covers both
- * table-layout utilities.
+ * The counters themselves, one per selector branch, as adapter.css writes
+ * them. Five answer the reaching rules above: one covers both table-layout
+ * utilities, while the content-card rule splits migrated text owners from the
+ * remaining first children so each branch keeps its Pragma margin.
  */
 const SECOND_BOUNDARY = [
   ":where(.u-text-max-width) :where(:scope, :scope *):is(ul, ol) max-width",
   ":where(.u-table-layout--fixed) :where(:scope, :scope *):is(table) table-layout",
   ":where(.p-content-card__author-and-date) > :where(:scope:first-child):not(h1, h2, h3, h4, h5, h6, p, .p, .code) margin-bottom",
+  ":where(.p-content-card__author-and-date) > :where(:scope:first-child):is(h1, h2, h3, h4, h5, h6, p, .p) margin-bottom",
   ":where(.u-vertically-center) > :where(:scope):is(img) align-self",
 ];
 
@@ -102,7 +105,7 @@ const withoutImports = (css: string): string =>
   css.replace(/^\s*@import[^;]*;/gm, "");
 
 describe("the order contract", () => {
-  it("layers.css is a single statement naming the nineteen layers in order", () => {
+  it("layers.css is a single statement naming the twenty layers in order", () => {
     const sheet = parse(layersCss);
     expect(sheet.cssRules.length).toBe(1);
     expect(sheet.cssRules[0]).toBeInstanceOf(CSSLayerStatementRule);
@@ -208,7 +211,7 @@ describe("the order contract", () => {
     },
   );
 
-  it("pragma's CSS carries no !important except the second boundary's four (the README's installation, step 7)", () => {
+  it("pragma's CSS carries no !important except the second boundary's five (the README's installation, step 7)", () => {
     // A page running pragma alone has none at all. On a mixed page the only
     // important declarations are the second boundary's, and they are important
     // because nothing else can be: for important rules the layer order
@@ -243,7 +246,7 @@ describe("the order contract", () => {
     );
   });
 
-  it("sorts all 171 pairs of the nineteen names as written, by computed style", async () => {
+  it("sorts all 190 pairs of the twenty names as written, by computed style", async () => {
     // The name list alone cannot show this: a top-level layer written between
     // two sublayers of `ds` sorts above all of `ds`, which is how a top-level
     // `adapter` sat above the component tiers until it became `ds.adapter`.
@@ -262,7 +265,7 @@ describe("the order contract", () => {
         css += `@layer ${MIXED_ORDER[j]} { #${id} { color: rgb(2, 2, 2) } } @layer ${MIXED_ORDER[i]} { #${id} { color: rgb(1, 1, 1) } }\n`;
         body += `<i id="${id}"></i>`;
       }
-    expect(pairs.length).toBe(171);
+    expect(pairs.length).toBe(190);
     const doc = await render({ root: "", styles: [layersCss, css], body });
     const parentWins = (i: number, j: number): boolean =>
       MIXED_ORDER[j]?.startsWith(`${MIXED_ORDER[i]}.`) ?? false;

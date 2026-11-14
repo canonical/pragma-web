@@ -60,7 +60,7 @@ const ROOT_ELEMENTS = `
 <optgroup class="ds" id="root-optgroup" label="x"></optgroup>
 <input class="ds" type="search" id="root-search">`;
 
-/** The four Vanilla utilities whose important declarations reach inside an island. */
+/** The Vanilla utilities whose important declarations reach inside an island. */
 const ESCAPES = `
 <div class="u-text-max-width">
   <div class="ds card"><ul id="esc-ul"><li>x</li></ul><ol id="esc-ol"><li>x</li></ol></div>
@@ -335,9 +335,10 @@ describe.each(VANILLA_VERSIONS)(
       // Five rules in Vanilla's build carry an important declaration that can
       // reach an element inside an island, because their subject compound has no
       // class and the Vanilla class sits on an ancestor OUTSIDE the island — the
-      // arrangement rule 2 recommends. Four counters answer them, one covering
-      // both table-layout utilities. `all: revert` cannot touch an important
-      // declaration: for important rules the layer order reverses.
+      // arrangement rule 2 recommends. Five counters answer them: one covers
+      // both table-layout utilities, and the content-card rule splits migrated
+      // text owners from its other first children. `all: revert` cannot touch
+      // an important declaration: for important rules the layer order reverses.
       await sameAsPragmaOnly(
         vanilla,
         ["esc-ul", "esc-ol", "esc-root-ul"],
@@ -348,12 +349,10 @@ describe.each(VANILLA_VERSIONS)(
         ["esc-table", "esc-root-table"],
         ["table-layout"],
       );
-      // A list root is the case the margin counter exists for: pragma leaves it
-      // at the browser's 16px and Vanilla forces it to 0. A paragraph or a
-      // heading in the same position is the case the counter must NOT touch,
-      // because pragma zeroes those itself and Vanilla's rule already agrees;
-      // reverting there would hand them the browser's `1em` instead. Measured
-      // before the exclusion: 14px on the paragraph, 19.92px on the heading.
+      // A list root keeps the original counter: pragma leaves it at the
+      // browser's 16px and Vanilla forces it to 0. Paragraphs and headings now
+      // carry their cap compensation in the sole bottom margin, so their narrow
+      // counter restores that computed value rather than reverting to `1em`.
       await sameAsPragmaOnly(
         vanilla,
         ["esc-first-child", "esc-first-p", "esc-first-h2", "esc-later-child"],
@@ -535,15 +534,15 @@ describe.each(VANILLA_VERSIONS)(
       const first = await render(
         mixedPage(vanilla, { root: ROOT, body: COLLAPSE_BODY }),
       );
-      // Statement first: pragma's typography reaches the island.
+      // Statement first: pragma's typography and Card grid reach the island.
       expect(computed(first, "text").fontSize).toBe("14px");
       expect(computed(first, "text").marginTop).toBe("0px");
-      expect(computed(first, "card").borderTopWidth).toBe("1px");
+      expect(computed(first, "card").display).toBe("grid");
       // Statement late: `ds` was placed below `boundary`, so `all: revert` runs
       // over pragma's own rules and the island renders as bare markup.
       expect(computed(late, "text").fontSize).toBe("16px");
       expect(computed(late, "text").marginTop).toBe("16px");
-      expect(computed(late, "card").borderTopWidth).toBe("0px");
+      expect(computed(late, "card").display).toBe("block");
     });
 
     it("carries its own order statement, so importing adapter.css alone is enough", async () => {
@@ -562,7 +561,7 @@ describe.each(VANILLA_VERSIONS)(
         }),
       );
       expect(computed(carried, "text").fontSize).toBe("14px");
-      expect(computed(carried, "card").borderTopWidth).toBe("1px");
+      expect(computed(carried, "card").display).toBe("grid");
 
       // The same page with that statement taken out: the component sheet then
       // places `ds`, and the island collapses.
@@ -575,7 +574,7 @@ describe.each(VANILLA_VERSIONS)(
         }),
       );
       expect(computed(missing, "text").fontSize).toBe("16px");
-      expect(computed(missing, "card").borderTopWidth).toBe("0px");
+      expect(computed(missing, "card").display).toBe("block");
     });
   },
 );
