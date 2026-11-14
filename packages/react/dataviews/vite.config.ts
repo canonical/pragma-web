@@ -12,17 +12,12 @@ const plugins: any[] = [react()];
 const testConfig = reactTestConfig({
   glob: "test",
   ssr: true,
-  // Unmeasured: stories, decorators, the hidden-button reader, the French
-  // record, the import speller, the consumer-code and summary helpers, the
-  // GraphQL query, the mock API's untested readers and matchers, and the
-  // untested testing/ helpers.
+  // Unmeasured: stories, and the story and testing/ helpers without a test.
   coverage: {
     include: ["src/**/*.{ts,tsx}", "testing/**/*.{ts,tsx}"],
     exclude: [
       "**/*.stories.{ts,tsx}",
-      "src/storybook/decorators.tsx",
       "src/storybook/getHiddenButton.ts",
-      "src/storybook/locales/fr.ts",
       "src/storybook/machines/api/answerBehind.ts",
       "src/storybook/machines/api/compareRecords.ts",
       "src/storybook/machines/api/constants.ts",
@@ -32,9 +27,7 @@ const testConfig = reactTestConfig({
       "src/storybook/machines/api/readGraphQLQuery.ts",
       "src/storybook/machines/api/readRestQuery.ts",
       "src/storybook/machines/api/selectRecords.ts",
-      "src/storybook/machines/consumerCode.ts",
       "src/storybook/machines/readPaginationSummary.ts",
-      "src/storybook/machines/sources/MachinesQuery.ts",
       "src/storybook/spellPublicImports.ts",
       "testing/**/*.d.ts",
       "testing/**/*.test.{ts,tsx}",
