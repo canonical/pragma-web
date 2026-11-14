@@ -1,8 +1,4 @@
-/**
- * Test doubles for the core and its framework bindings: a manual source, a
- * recording location, stand-in stores, builders of pages, counts, stored
- * views and display statuses, and the reader of the file rules.
- */
+/** Test doubles and file-rule readers for the core and its bindings. */
 
 export { default as buildPage } from "./buildPage.js";
 export { default as buildStoredView } from "./buildStoredView.js";
@@ -12,6 +8,7 @@ export { default as createRecordingLocation } from "./createRecordingLocation.js
 export { default as createStandInPresentationStore } from "./createStandInPresentationStore.js";
 export { default as createStandInViewStore } from "./createStandInViewStore.js";
 export { default as listFileRuleFindings } from "./listFileRuleFindings.js";
+export { default as listUnmarkedNames } from "./listUnmarkedNames.js";
 export { default as readDisplayStatus } from "./readDisplayStatus.js";
 export type {
   ManualCall,
