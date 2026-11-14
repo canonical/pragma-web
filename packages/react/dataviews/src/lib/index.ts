@@ -16,6 +16,7 @@ export type {
   QueryChipEntryProps,
   QueryChipProps,
   QueryChipSegmentProps,
+  QueryChipsProps,
   UseDataViewsFilterResult,
   UseDataViewsResult,
 } from "./_work_in_progress/index.js";
@@ -24,6 +25,7 @@ export {
   DataViews,
   PaginationBar,
   QueryChip,
+  QueryChips,
   useDataViews,
   useDataViewsFilter,
 } from "./_work_in_progress/index.js";

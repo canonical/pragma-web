@@ -31,3 +31,5 @@ export type {
   QueryChipSegmentProps,
 } from "./QueryChip/index.js";
 export { QueryChip } from "./QueryChip/index.js";
+export type { QueryChipsProps } from "./QueryChips/index.js";
+export { QueryChips } from "./QueryChips/index.js";
