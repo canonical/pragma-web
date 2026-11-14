@@ -98,12 +98,10 @@
     /* --component-padding-inline-end:   … ; */ /* right (LTR) padding     */
 
     /* ── Layout grid ────────────────────────────────────────────────── */
-    --grid-gutter: var(
-      --space-200
-    ); /* 16px / 1rem — column gutters (inline-direction) */
-    --grid-margin: var(
-      --space-400
-    ); /* 32px / 2rem   — outer page margin (inline-direction) */
+    /* Viewport inputs are independent of product tier and grid column queries. */
+    --grid-viewport-margin: 1rem;
+    --grid-viewport-gutter: 1rem;
+    --grid-viewport-gutter-app: 1rem;
 
     /* Grid gap axis overrides (consumed by grid.css): */
     /* --grid-gap:        … ; */ /* shorthand: sets both row-gap and column-gap */
@@ -113,5 +111,33 @@
     /* ── Heading alignment ──────────────────────────────────────────── */
     /* Inline padding for headings to align with padded blocks.           */
     /* --heading-padding-inline: … ; */ /* set by layout context, default 0 */
+  }
+  @media (min-width: 38.75rem) {
+    :root {
+      --grid-viewport-margin: 1.5rem;
+      --grid-viewport-gutter: 1.5rem;
+      --grid-viewport-gutter-app: 1.5rem;
+    }
+  }
+  @media (min-width: 64.75rem) {
+    :root {
+      --grid-viewport-margin: 2rem;
+      --grid-viewport-gutter: 2rem;
+      --grid-viewport-gutter-app: 1.5rem;
+    }
+  }
+  :root,
+  .site,
+  .docs,
+  .app {
+    --grid-margin: var(--grid-viewport-margin);
+  }
+  :root,
+  .site,
+  .docs {
+    --grid-gutter: var(--grid-viewport-gutter);
+  }
+  .app {
+    --grid-gutter: var(--grid-viewport-gutter-app);
   }
 }

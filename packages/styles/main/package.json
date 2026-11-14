@@ -15,6 +15,9 @@
     "./modifiers.criticality.shim.css": "./src/modifiers.criticality.shim.css",
     "./modifiers.density.css": "./src/modifiers.density.css",
     "./spacing.css": "./src/spacing.css",
+    "./spacing-roles.css": "./src/spacing-roles.css",
+    "./spacing-seat.css": "./src/spacing-seat.css",
+    "./stroke-paint.css": "./src/stroke-paint.css",
     "./package.json": "./package.json"
   },
   "files": [

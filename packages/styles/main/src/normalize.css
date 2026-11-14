@@ -145,6 +145,11 @@
     margin: 0;
   }
 
+  /* Keep native option-group labels at the UI text weight. */
+  optgroup {
+    font-weight: normal;
+  }
+
   /* Correct the odd font size a browser gives the generic monospace family.
      Blink scales the keyword size when the computed family is the bare
      `monospace` keyword, and a list of two defeats that; `font-size: 1em` then

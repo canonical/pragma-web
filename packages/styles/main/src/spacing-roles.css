@@ -1,0 +1,88 @@
+/* @canonical/styles — Semantic spacing compatibility aliases
+ *
+ * Components keep their established channels while the generated spacing
+ * provider owns product values. Every product root redeclares the bridge so a
+ * nested context resolves its own provider values rather than inheriting an
+ * alias that was resolved by an ancestor.
+ */
+
+@layer ds.tokens {
+  :root {
+    /* Internal body font input: Site 16px; Docs 14px; App 14px. */
+    --ds-typography-body-font-size-site: 1rem;
+    --ds-typography-body-font-size-docs: 0.875rem;
+    --ds-typography-body-font-size-app: 0.875rem;
+
+    /* Internal body line input: Site 24px; Docs 20px; App 20px. */
+    --ds-typography-body-line-height-site: 1.5rem;
+    --ds-typography-body-line-height-docs: 1.25rem;
+    --ds-typography-body-line-height-app: 1.25rem;
+  }
+
+  :root,
+  .site {
+    --ds-typography-body-font-size: var(--ds-typography-body-font-size-site);
+    --ds-typography-body-line-height: var(
+      --ds-typography-body-line-height-site
+    );
+  }
+
+  .docs {
+    --ds-typography-body-font-size: var(--ds-typography-body-font-size-docs);
+    --ds-typography-body-line-height: var(
+      --ds-typography-body-line-height-docs
+    );
+  }
+
+  .app {
+    --ds-typography-body-font-size: var(--ds-typography-body-font-size-app);
+    --ds-typography-body-line-height: var(--ds-typography-body-line-height-app);
+  }
+
+  /* Private SP-7 indicator type. `.global` is the existing Site-equivalent
+   * provider alias; it does not change the inherited body type. */
+  :root,
+  .global,
+  .site,
+  .docs,
+  .app {
+    --_typography-indicator-font-size: 0.75rem;
+    --_typography-indicator-line-height: 1rem;
+  }
+
+  .os {
+    --_typography-indicator-font-size: 0.625rem;
+    --_typography-indicator-line-height: 1rem;
+  }
+
+  :root,
+  .global,
+  .site,
+  .docs,
+  .app,
+  .os {
+    --ds-spacing-baseline: var(--spacing-baseline);
+    --ds-spacing-control-inset: var(--spacing-inset-control-block);
+    --ds-spacing-control-inset-dense: var(--_spacing-inset-control-block-dense);
+    --ds-spacing-action: var(--spacing-inset-action-inline);
+    --ds-spacing-field: var(--spacing-inset-input-inline);
+    --ds-spacing-mark: var(--spacing-gap-mark-inline);
+    --ds-spacing-item-block: var(--spacing-gap-item-block);
+    --ds-spacing-item-inline: var(--spacing-gap-item-inline);
+    --ds-spacing-group: var(--spacing-gap-group-block);
+    --ds-spacing-section: var(--spacing-gap-section-block);
+    --ds-spacing-inset-surface-compact-inline: var(
+      --spacing-inset-surface-compact-inline
+    );
+    --ds-spacing-inset-surface-compact-block: var(
+      --spacing-inset-surface-compact-block
+    );
+    --ds-spacing-inset-surface-standard-inline: var(
+      --spacing-inset-surface-standard-inline
+    );
+    --ds-spacing-inset-surface-standard-block: var(
+      --spacing-inset-surface-standard-block
+    );
+    --ds-spacing-inset-surface-major-inline: var(--grid-margin);
+  }
+}

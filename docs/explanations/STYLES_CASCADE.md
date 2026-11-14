@@ -80,7 +80,7 @@ layer, and one statement fixing their order. Where the rules that select bare el
 question with its own answer, further down: not in pragma's stylesheet, but in the package written for
 the pages that need it.
 
-## One statement, fifteen names
+## One statement, sixteen names
 
 Layer order is settled by first appearance. A layer that first appears in whichever file a bundler
 happened to emit first takes a position nobody chose, and once a layer exists a later statement can add
@@ -93,7 +93,7 @@ the order is the thing least able to survive drifting. The order itself reads:
 
 ```css
 @layer normalize, ds.tokens, ds.reset, ds.typography, ds.modifiers, ds.surfaces,
-  ds.states, ds.components, ds.components.global, ds.components.sites,
+  ds.density, ds.states, ds.components, ds.components.global, ds.components.sites,
   ds.components.documentation, ds.components.stores, ds.components.apps,
   lib, app;
 ```
@@ -118,8 +118,8 @@ able to overrule this?"
 - **Typography above that**, because it is a more specific statement about text than the baseline is.
 - **Modifiers above typography**, because a modifier's whole job is to shift what the layers below
   produced. **Surfaces above modifiers**, because a surface re-points colour channels a modifier set.
-  **States above surfaces**, because a state is derived from whatever the surface resolved to. Each of
-  those three is the input to the next, and the order is that pipeline written down.
+  **Density above surfaces** lets provider-owned density channels refine product spacing, and **states
+  above density** derive from the resolved channels. The order is that pipeline written down.
 - **Components highest of the design system's layers**, so that a component is the final word on
   its own box. Everything below it is material it composes, and a component that has to escalate its
   selector to beat one of pragma's own rules is reporting a layer that is in the wrong place.
@@ -184,7 +184,7 @@ guarantees.
 The order statement is not the package's to load: it comes from the application loading
 `@canonical/styles` first, as above. The sub-tier name is not in pragma's statement, and does not need
 to be: a name the statement does not carry is placed where it first appears, so a name that first
-appears *after* the fifteen lands above the tiers, which is where a sub-tier belongs. Nothing has to be
+appears *after* the sixteen lands above the tiers, which is where a sub-tier belongs. Nothing has to be
 reserved in advance, and pragma does not have to know which sub-tiers exist.
 
 **The names are flat, and the hyphen is load-bearing.** `ds.components.apps-lxd` is a sublayer of
@@ -235,7 +235,7 @@ statement, and the adapter carries a copy of one of them:
 | Entry | What is in it | A pragma page | A mixed page |
 | --- | --- | --- | --- |
 | `@canonical/styles` | Everything: the values, what bare elements get, and the layout presets. The file is `index.css`. | imports this | — |
-| `@canonical/styles/tokens.css` | Four layers of values — `ds.tokens`, `ds.modifiers`, `ds.surfaces`, `ds.states` — and the classes that set them. No rule that selects an element, with the one exception below. | (in the whole) | imports this |
+| `@canonical/styles/tokens.css` | The value layers — `ds.tokens`, `ds.modifiers`, `ds.surfaces`, `ds.density`, `ds.states` — and the classes that set them. No component selector or element rule, with the one exception below. | (in the whole) | imports this |
 | `@canonical/styles/elements.css` | `normalize`, `ds.reset`, `ds.typography` — what bare elements get. | (in the whole) | takes the adapter's copy instead |
 | `@canonical/styles/layout.css` | The layout presets, `content-flow` among them, which claim five class names in a page's namespace. | (in the whole) | imports this |
 | `@canonical/styles/layers.css` | The order statement and nothing else: no rule, no import, no declaration, and no layer opened — a statement places names in an order, it does not put a rule in one. Every other entry imports it as its first rule. | — | — |

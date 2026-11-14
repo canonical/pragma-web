@@ -16,7 +16,7 @@
  *   .content-flow    Container whose children carry their own bottom margin
  *
  * Customization:
- *   --grid-gap        Shorthand: sets both row-gap and column-gap (default: var(--grid-gutter))
+ *   --grid-gap        Shorthand: sets both row-gap and column-gap (default: inline grid gutter; block container gap)
  *   --grid-row-gap    Block-direction (vertical) gap between rows
  *   --grid-column-gap Inline-direction (horizontal) gap between columns
  *   --grid-col-min    Minimum column width for intrinsic mode (default: 100px)
@@ -101,7 +101,11 @@
       --grid-column-gap,
       var(--grid-gap, var(--grid-gutter, 1.5rem))
     );
-    row-gap: var(--grid-row-gap, var(--grid-gap, var(--grid-gutter, 1.5rem)));
+    /* Responsive horizontal gutters do not change the existing block gap. */
+    row-gap: var(
+      --grid-row-gap,
+      var(--grid-gap, var(--container-gap-default, 1rem))
+    );
   }
 
   .responsive {

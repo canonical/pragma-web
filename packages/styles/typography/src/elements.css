@@ -16,7 +16,7 @@
  *   --font-size       → <length>
  *   --line-height     → <length> snapped to the baseline grid
  *   --font-weight     → <number>
- *   --space-after     → <number> in baseline-height units
+ *   --space-after     → legacy editorial metadata; containers own rendered gaps
  *   --baseline-height → set at :root, in any length unit; optional, because
  *                       this file declares the 0.25rem default itself
  *
@@ -206,17 +206,23 @@
 
   p,
   .p {
-    --font-size: var(--typography-text-primary-font-size);
+    --font-size: var(
+      --ds-typography-body-font-size,
+      var(--typography-text-primary-font-size)
+    );
     --font-weight: var(--typography-text-primary-font-weight);
     --line-height: var(
-      --typography-text-primary-line-height-dimension,
-      round(
-        up,
-        calc(
-          var(--typography-text-primary-font-size) *
-          var(--typography-text-primary-line-height)
-        ),
-        var(--baseline-height)
+      --ds-typography-body-line-height,
+      var(
+        --typography-text-primary-line-height-dimension,
+        round(
+          up,
+          calc(
+            var(--typography-text-primary-font-size) *
+            var(--typography-text-primary-line-height)
+          ),
+          var(--baseline-height)
+        )
       )
     );
     --space-after: 0;
@@ -239,17 +245,23 @@
      snap to the grid, combine both classes: `class="p code"` gives `.p`'s block
      nudges plus `.code`'s monospace mapping. */
   .code {
-    --font-size: var(--typography-text-primary-code-font-size);
+    --font-size: var(
+      --ds-typography-body-font-size,
+      var(--typography-text-primary-code-font-size)
+    );
     --font-weight: var(--typography-text-primary-code-font-weight);
     --line-height: var(
-      --typography-text-primary-code-line-height-dimension,
-      round(
-        up,
-        calc(
-          var(--typography-text-primary-code-font-size) *
-          var(--typography-text-primary-code-line-height)
-        ),
-        var(--baseline-height)
+      --ds-typography-body-line-height,
+      var(
+        --typography-text-primary-code-line-height-dimension,
+        round(
+          up,
+          calc(
+            var(--typography-text-primary-code-font-size) *
+            var(--typography-text-primary-code-line-height)
+          ),
+          var(--baseline-height)
+        )
       )
     );
     --space-after: 0;

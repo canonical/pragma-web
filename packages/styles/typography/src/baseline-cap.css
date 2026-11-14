@@ -1,6 +1,6 @@
 /* @canonical/styles-typography — Cap-unit engine (default)
  *
- * No JS font extraction required. Uses the CSS `cap` unit and `mod()` for
+ * No JS font extraction required. Uses the CSS `cap` unit and `round()` for
  * baseline alignment.
  *
  * Consumer contract:
@@ -12,10 +12,10 @@
  * Browser floor: Chrome 125, Safari 17.2, Firefox 118 — a different feature
  * binds each column, and this engine uses two:
  *
- *   mod()            Chrome 125, Safari 15.4, Firefox 118
+ *   round()          Chrome 125, Safari 15.4, Firefox 118
  *   cap unit         Chrome 118, Safari 17.2, Firefox 97
  *
- * Chrome and Firefox are held by `mod()`, Safari by the `cap` unit.
+ * Chrome and Firefox are held by `round()`, Safari by the `cap` unit.
  *
  * The grid unit:
  *   --baseline-height may be a length in any unit — 0.5rem and 8px are both
@@ -60,16 +60,15 @@
 
   /* Baseline alignment — cap-unit engine
    *
-   * Each text element's total height snaps to a multiple of --baseline-height.
-   * The engine achieves this by adding padding nudges inside the element box:
+   * Each text element closes on its tier baseline. The engine puts the cap
+   * baseline on the next grid line, quantizes that start nudge to 1/64px, then
+   * uses the element's sole block-end margin to compensate its occupied size:
    *
-   *   padding-block-start = start nudge (pushes the first baseline onto the grid)
-   *   padding-block-end   = end nudge   (fills the remainder so total block size
-   *                                      is a whole number of baseline units)
+   *   padding-block-start = cap nudge
+   *   padding-block-end   = 0
+   *   margin-block-end    = grid compensation
    *
-   * Both nudges are padding (not margin) so the element's border-box block size
-   * participates correctly in flex and grid layouts. margin-block-end is reserved
-   * solely for --space-after (editorial element-owned spacing, default 0).
+   * Larger gaps belong to the surrounding container rather than this element.
    */
   h1,
   h2,
@@ -87,17 +86,37 @@
     line-height: var(--computed-line-height);
     font-size: var(--font-size);
 
+    --text-baseline-unit: var(--ds-spacing-baseline, var(--baseline-height));
     --baseline-position: calc((var(--computed-line-height) + 1cap) / 2);
-    --start-nudge: calc(
-      var(--baseline-height) -
-      mod(var(--baseline-position), var(--baseline-height))
+    --start-nudge: round(
+      nearest,
+      calc(
+        round(up, var(--baseline-position), var(--text-baseline-unit)) -
+        var(--baseline-position)
+      ),
+      0.015625px
     );
-    --end-nudge: calc(var(--baseline-height) - var(--start-nudge));
+    /* Every mapped line-height is a whole tier baseline: Site uses
+       24/32/40/48px on 8px; Docs and App use 20/24/32/40/48px on 4px.
+       Extra wrapped lines therefore add whole baselines and leave this
+       one-line compensation unchanged. */
+    --precompensation-size: calc(
+      var(--computed-line-height) +
+      var(--start-nudge)
+    );
+    --grid-compensation: calc(
+      round(
+        up,
+        calc(var(--precompensation-size) + var(--start-nudge)),
+        var(--text-baseline-unit)
+      ) -
+      var(--precompensation-size)
+    );
   }
 
   /* Block-level baseline nudges.
    *
-   * The padding-block nudges snap a BLOCK element's box onto the baseline grid.
+   * The start padding and compensation margin seat a BLOCK element on the grid.
    * They must not apply to inline `.code` (e.g. InlineCode's <code> or
    * KeyboardKey's <kbd>) nested in a paragraph — there the parent line already
    * owns the baseline, and adding the nudge double-pads the top, breaking
@@ -112,11 +131,9 @@
   h6,
   p,
   .p {
-    /* Nudges as padding — inside the box for flex/grid compatibility */
+    /* The cap nudge is inside the box; the remainder belongs to its sole margin. */
     padding-block-start: var(--start-nudge);
-    padding-block-end: var(--end-nudge);
-
-    /* Element-owned spacing — only active in .editorial contexts */
-    margin-block-end: calc(var(--space-after, 0) * var(--baseline-height));
+    padding-block-end: 0;
+    margin-block-end: var(--grid-compensation);
   }
 }

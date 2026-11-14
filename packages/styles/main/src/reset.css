@@ -85,7 +85,7 @@
     color: var(--color-text);
   }
 
-  :where(html:not(b, strong, optgroup, th)) {
+  :where(html:not(b, strong, th)) {
     font-weight: normal;
   }
 
@@ -115,7 +115,7 @@
      of pragma's own, rather than left to the host. Measured: a `<b class="ds">`
      inside a Vanilla `.p-heading--4` computed weight 400 against pragma's 700,
      and inside `.p-muted-heading` 900. */
-  :where(html):is(b, strong, optgroup) {
+  :where(html):is(b, strong) {
     font-weight: bold;
   }
 
