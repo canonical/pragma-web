@@ -7,7 +7,7 @@ import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeChip_node.graphql.js";
 import { useProjectionLink } from "../../projections/index.js";
 import { EntityChip } from "../../ui/index.js";
-import { ProjectionPeek } from "../ProjectionPeek/index.js";
+import { useProjectionPeek } from "../ProjectionPeek/index.js";
 import { NODE_MARK_ICON } from "./constants.js";
 import type { NodeChipProps } from "./types.js";
 import "./styles.css";
@@ -37,9 +37,9 @@ const componentCssClassName = "ds node-chip";
  * Any graph node as an inline mention, from what every node carries: the
  * generic node glyph as its mark and its title in the chip's pill, linked
  * to its home when the site has one and inert text when it has none or
- * `linked` is false. A linked chip peeks at the node's card
- * (`ProjectionPeek`, queried at the node's absolute IRI when the peek
- * opens). A passage's own link
+ * `linked` is false. A linked chip peeks at the node at its absolute IRI
+ * through the site's peek, `useProjectionPeek` (the package's
+ * `ProjectionPeek` when the site gives none), mounted when the peek opens. A passage's own link
  * text, given as `children`, stands in for the title.
  *
  * It is the chip's `Node` arm: `ChipProjection` renders it for every type
@@ -53,7 +53,7 @@ const componentCssClassName = "ds node-chip";
  *
  * @implements prism.component.node_chip
  * @note Impure: reads its node from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes and its link and peek from the projection provider.
  */
 export default function NodeChip({
   node,
@@ -65,6 +65,7 @@ export default function NodeChip({
   const { curie, title } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const peek = useProjectionPeek(data.uri);
   return (
     <EntityChip
       {...props}
@@ -73,7 +74,7 @@ export default function NodeChip({
       href={href}
       LinkComponent={LinkComponent}
       mark={<Icon icon={NODE_MARK_ICON} />}
-      peek={<ProjectionPeek uri={data.uri} />}
+      peek={peek}
       title={children ?? title}
     />
   );

@@ -54,8 +54,9 @@ function PeekCard({ uri }: ProjectionPeekProps): ReactElement | null {
  * node at `uri`. The chip stays a link, which is the way to the node in
  * every case.
  *
- * Arms pass it to their chip with the node's absolute IRI, never its
- * CURIE: `peek={<ProjectionPeek uri={data.uri} />}`.
+ * It is the peek `useProjectionPeek` returns where the site's provider
+ * gives none; an arm never mounts it itself, and passes the node's absolute
+ * IRI, never its CURIE: `peek={useProjectionPeek(data.uri)}`.
  *
  * `import { ProjectionPeek } from "@canonical/prism-projections";`
  *

@@ -48,6 +48,7 @@ export {
   NodeRow,
   ProjectionPeek,
   RowProjection,
+  useProjectionPeek,
 } from "./node/index.js";
 export type {
   OntologyClassCardProps,

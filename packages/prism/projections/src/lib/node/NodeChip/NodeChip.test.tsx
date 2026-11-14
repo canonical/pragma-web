@@ -11,6 +11,8 @@ import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
 import testQuery, {
   type NodeChipTestQuery,
 } from "../../../__generated__/NodeChipTestQuery.graphql.js";
+import { ProjectionsProvider } from "../../projections/index.js";
+import { defaultProjectionMaps } from "../constants.js";
 import NodeChip from "./NodeChip.js";
 import type { NodeChipProps } from "./types.js";
 
@@ -117,6 +119,34 @@ describe("NodeChip", () => {
         { id: "https://ds.canonical.com/global.component.icon-button" },
       ],
     ]);
+  });
+
+  it("shows the site's peek for the node's IRI when the site gives one", () => {
+    const seen: string[] = [];
+    const sitePeek = (uri: string): ReactElement => {
+      seen.push(uri);
+      return <span className="site-peek" />;
+    };
+    renderWithNode(
+      (node) => (
+        <ProjectionsProvider maps={defaultProjectionMaps} peek={sitePeek}>
+          <NodeChip node={node} />
+        </ProjectionsProvider>
+      ),
+      {
+        __typename: "OntologyClass",
+        uri: "https://ds.canonical.com/global.component.icon-button",
+      },
+    );
+    act(() => {
+      screen.getByRole("link", { name: "IconButton" }).focus();
+    });
+    expect(
+      screen.getByRole("dialog", { hidden: true }).querySelector(".site-peek"),
+    ).not.toBeNull();
+    expect(seen.at(-1)).toBe(
+      "https://ds.canonical.com/global.component.icon-button",
+    );
   });
 
   it("neither links nor peeks when it is not linked", () => {

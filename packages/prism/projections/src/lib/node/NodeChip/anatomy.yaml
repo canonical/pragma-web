@@ -3,9 +3,9 @@
 # Reference: the W3 chip anatomy: the slot order mark, prefix, title,
 # status; any node fills the mark and the title. The mark is the generic
 # node glyph; the title its own, or a passage's link text when given. A
-# linked chip peeks at the node's card: ProjectionPeek, which queries the
-# card by the node's absolute IRI (uri, the only address node(id:) accepts)
-# only when the peek opens.
+# linked chip peeks at the node: the peek useProjectionPeek returns for its
+# absolute IRI (uri, the only address node(id:) accepts), the site's own or
+# the package's ProjectionPeek, mounted only when the peek opens.
 # Projected onto EntityChip, which carries every style: this anatomy binds
 # none and says only which field fills which slot. The home is the link the
 # title renders through: the site's homes resolve it from the compact

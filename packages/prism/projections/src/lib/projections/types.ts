@@ -117,6 +117,13 @@ export interface ProjectionsProviderProps {
    * Defaults to the intrinsic `"a"`, a full document load.
    */
   readonly LinkComponent?: LinkComponent;
+  /**
+   * The site's peek: the element a chip shows for the node at an absolute
+   * IRI, such as the site's own card switch read by a query of the site's.
+   * Every chip arm takes it through `useProjectionPeek`, so no arm imports
+   * it. Without one, chips show the package's `ProjectionPeek`.
+   */
+  readonly peek?: (uri: string) => ReactNode;
   /** The content whose projections read the maps. */
   readonly children: ReactNode;
 }
@@ -127,4 +134,6 @@ export interface ProjectionsContextValue {
   readonly maps: ProjectionMaps;
   /** The link a node's home renders through. */
   readonly LinkComponent: LinkComponent;
+  /** The site's peek for the node at an absolute IRI, when it gives one. */
+  readonly peek?: (uri: string) => ReactNode;
 }

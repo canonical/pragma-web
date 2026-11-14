@@ -262,6 +262,13 @@ the client and the page keeps its state. A site's own projections read the
 same link with `useProjectionLink`, so their homes navigate as the
 package's arms do.
 
+A chip peeks at its node through the site's peek: `peek`, a function from
+a node's absolute IRI (`Node.uri`, the only address `node(id:)` accepts)
+to the element the chip shows, typically the site's card switch read by a
+query of the site's. Every chip arm takes it with
+`peek={useProjectionPeek(data.uri)}`, so no arm imports its site's peek;
+without one, chips show the package's `ProjectionPeek`.
+
 A node's or a class's home is resolved with its compact address
 (`_meta.curie`) as the `uri` a site's home resolver receives, so one
 entity has one address; a property's with its IRI, its only address.
@@ -400,8 +407,11 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `NodeGraphNode`; types `NodeChipProps`, `NodeRowProps`, `NodeCardProps`,
   `NodeCommandProps`, `NodeGraphNodeProps`.
 - List view: `NodeList`; types `NodeListProps`.
-- Peek: `ProjectionPeek` (the card a chip's peek shows, read by a lazy
-  query of its own when the peek opens); types `ProjectionPeekProps`.
+- Peek: `ProjectionPeek` (the card a chip's peek shows, read at the
+  node's absolute IRI by a lazy query of its own when the peek opens),
+  `useProjectionPeek` (the peek every chip arm passes its chip: the site's
+  own, given to the provider, or the package's); types
+  `ProjectionPeekProps`.
 - Class projections: `OntologyClassChip`, `OntologyClassRow`,
   `OntologyClassCard`, `OntologyClassCommand`,
   `OntologyClassGraphNode`; types `OntologyClassChipProps`,
