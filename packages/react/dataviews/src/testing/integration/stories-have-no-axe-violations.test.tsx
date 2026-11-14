@@ -25,6 +25,7 @@ import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.st
 import * as filterButtonStories from "../../lib/_work_in_progress/FilterButton/FilterButton.stories.js";
 import * as queryChipStories from "../../lib/_work_in_progress/QueryChip/QueryChip.stories.js";
 import * as queryChipsStories from "../../lib/_work_in_progress/QueryChips/QueryChips.stories.js";
+import * as queryInputStories from "../../lib/_work_in_progress/QueryInput/QueryInput.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -122,6 +123,15 @@ describe("the query controls' played stories have no axe violations", () => {
   });
 
   // Every story runs, so a new play cannot be left out.
+  for (const [name, Story] of Object.entries(
+    composeStories(queryInputStories),
+  )) {
+    it(`QueryInput ${name}`, async () => {
+      await Story.run();
+      await expectNoAxeViolations(document.body);
+    });
+  }
+
   for (const [name, Story] of Object.entries(
     composeStories(filterButtonStories),
   )) {
