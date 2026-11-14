@@ -7,18 +7,25 @@ import { DEFAULT_ENTITY_LIST_RENDERER } from "../../ui/EntityList/constants.js";
 import { EntityList } from "../../ui/index.js";
 import { CardProjection } from "../CardProjection/index.js";
 import { RowProjection } from "../RowProjection/index.js";
+import { HIDDEN_VISIBILITY } from "./constants.js";
 import type { NodeListProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields NodeList reads from each Node it lists: its address, which
- * keys its item, and the card's and the row's composites, which dispatch
- * it to its type's arm in either view.
+ * keys its item, its type's visibility, which drops values from the list,
+ * and the card's and the row's composites, which dispatch it to its type's
+ * arm in either view.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment NodeList_node on Node @relay(plural: true) {
     uri
+    _meta {
+      type {
+        visibility
+      }
+    }
     ...CardProjection_node
     ...RowProjection_node
   }
@@ -33,6 +40,10 @@ const componentCssClassName = "ds node-list";
  * node as an item, a row through `RowProjection` in the `table` renderer
  * and a card through `CardProjection` in the `cards` renderer, so each node
  * reads through the arm its site maps to its type.
+ *
+ * A node whose type the graph's type lens hides is a value, never an
+ * entity, so the list skips it; the empty line shows when every node is
+ * hidden.
  *
  * It keeps no renderer of its own: the lens reads it from the page's
  * address and passes its name as `renderer`. The empty line is the lens's
@@ -53,7 +64,9 @@ export default function NodeList({
   className,
   ...props
 }: NodeListProps): ReactElement {
-  const data = useFragment(nodeFragment, nodes);
+  const data = useFragment(nodeFragment, nodes).filter(
+    ({ _meta }) => _meta.type.visibility !== HIDDEN_VISIBILITY,
+  );
   return (
     <EntityList
       {...props}

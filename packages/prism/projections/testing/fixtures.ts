@@ -45,6 +45,20 @@ export const MOCK_NODE = {
 } as const;
 
 /**
+ * A node of a type the graph's type lens hides, as a Relay mock environment
+ * answers it: a value, never an entity, so no list shows it.
+ */
+export const MOCK_HIDDEN_NODE = {
+  __typename: "Component",
+  uri: "https://ds.canonical.com/Tier",
+  _meta: {
+    title: "Tier",
+    curie: "ds:Tier",
+    type: { visibility: "HIDDEN", _meta: { title: "Tier" } },
+  },
+} as const;
+
+/**
  * The abstract class Layout as a Relay mock environment answers an
  * `OntologyClass`, read off the projection matrix's classes row.
  */
