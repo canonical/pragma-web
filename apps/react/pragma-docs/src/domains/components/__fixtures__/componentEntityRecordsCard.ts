@@ -247,17 +247,16 @@ const componentEntityRecordsCard = {
     label: "Component",
     namespace: "ds",
   },
-  "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card":
-    {
-      __id: "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card",
-      __typename: "Pattern",
-      uri: "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card",
-      name: "TravelProviderCard",
-      _meta: {
-        __ref:
-          "client:https://ds.canonical.com/apps_workplace.pattern.travel_provider_card:_meta",
-      },
+  "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card": {
+    __id: "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card",
+    __typename: "Pattern",
+    uri: "https://ds.canonical.com/apps_workplace.pattern.travel_provider_card",
+    name: "TravelProviderCard",
+    _meta: {
+      __ref:
+        "client:https://ds.canonical.com/apps_workplace.pattern.travel_provider_card:_meta",
     },
+  },
   "https://ds.canonical.com/global": {
     __id: "https://ds.canonical.com/global",
     __typename: "Tier",
