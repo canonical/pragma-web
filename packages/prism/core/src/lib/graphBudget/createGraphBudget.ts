@@ -12,19 +12,26 @@ import type { GraphBudget, GraphBudgetOverrides } from "./types.js";
  *
  * @param overrides - The site's changes, by budget.
  * @returns The site's budget.
- * @throws When a budget is loosened without a reason, or a value is not a
- *   positive finite number.
+ * @throws When a key names no budget, a budget is loosened without a
+ *   reason, a value is not a positive finite number, or a maximum is not a
+ *   whole number.
  */
 export default function createGraphBudget(
   overrides: GraphBudgetOverrides = {},
 ): GraphBudget {
   const budget: Record<keyof GraphBudget, number> = { ...GRAPH_BUDGET };
   for (const key of Object.keys(overrides) as (keyof GraphBudget)[]) {
+    if (!Object.hasOwn(GRAPH_BUDGET, key)) {
+      throw new Error(`createGraphBudget: ${key} is not a graph budget`);
+    }
     const override = overrides[key];
     if (override === undefined) continue;
     const value = typeof override === "number" ? override : override.value;
     if (!Number.isFinite(value) || value <= 0) {
       throw new Error(`createGraphBudget: ${key} must be a positive number`);
+    }
+    if (key !== "labelPxMin" && !Number.isInteger(value)) {
+      throw new Error(`createGraphBudget: ${key} must be a whole number`);
     }
     const loosens =
       key === "labelPxMin"

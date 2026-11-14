@@ -67,6 +67,20 @@ describe("createGraphBudget", () => {
     ).toThrow("svgElementsMax must be a positive number");
   });
 
+  it("refuses a fractional maximum", () => {
+    expect(() => createGraphBudget({ drawnNodesMax: 0.5 })).toThrow(
+      "drawnNodesMax must be a whole number",
+    );
+    expect(createGraphBudget({ labelPxMin: 12.5 }).labelPxMin).toBe(12.5);
+  });
+
+  it("refuses a key that names no budget", () => {
+    const overrides = JSON.parse('{"nodesMax": 10}');
+    expect(() => createGraphBudget(overrides)).toThrow(
+      "nodesMax is not a graph budget",
+    );
+  });
+
   it("skips an override left undefined", () => {
     expect(createGraphBudget({ drawnNodesMax: undefined })).toEqual(
       GRAPH_BUDGET,
