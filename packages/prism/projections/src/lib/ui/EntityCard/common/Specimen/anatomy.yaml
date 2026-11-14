@@ -10,7 +10,7 @@
 # Exported as EntityCard.Specimen only (cs:react.component.subcomponent_export_api);
 # its story nests under EntityCard (cs:storybook.story.subcomponent_nesting).
 #
-# Changes from the plan's sketch, with their reasons: the well centres its
+# Choices, with their reasons: the well centres its
 # depiction in a flex box (align-items and justify-content), since the
 # anatomy DSL has no place-items key and a grid would need a gap; the swatch's flush well (padding 0) comes with
 # the first swatch specimen, the palette preview's, where it is measured.

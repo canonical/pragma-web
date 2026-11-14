@@ -164,9 +164,9 @@
 # the media track (row 1) and pushes the body to the two tracks after it
 # (a reflow under :has(> .specimen)); with no specimen there is no track
 # and no box. The transitional location, parent, key values, vitals and
-# sidecar keep their places until the closure slice; the facts share the
+# sidecar keep their places while callers still pass them; the facts share the
 # key values' rules. The card keeps its published Card structure rather
-# than the plan's sketch of a fresh grid: the Cards group lines up the
+# than a fresh grid: the Cards group lines up the
 # sections it already has.
 #
 # Token ledger (the identity slots):

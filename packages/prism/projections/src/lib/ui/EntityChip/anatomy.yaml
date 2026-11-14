@@ -2,7 +2,7 @@
 # EntityChip: the inline mention of an entity, a 28px pill in running text,
 # a link to its home by default, which peeks at the entity's card.
 # Reference: PS1 V4 (mockups/ps1-v4-sheet.html, ps1-v4-sheet-peek.html,
-# tools/ps1v4-measured.json "peek"); Figma 449:22408 via forge/plans/S3.md
+# tools/ps1v4-measured.json "peek"); Figma 449:22408
 # (24px line, 2px block insets, 8px/4px inline insets, 4px gap, full radius,
 # 1px border). Slot order (heuristic 4.1, a subsequence of mark, prefix,
 # title, address, kind, summary, facts, status): mark, prefix, title, then
@@ -25,13 +25,13 @@
 # Why not the published Popover: it is a click disclosure on a button; the
 # peek opens on hover-intent and focus of a link (EXPLANATIONS S5).
 #
-# Until the closure slice the transitional slots keep their places: lead
+# While callers still pass them, the transitional slots keep their places: lead
 # (the key, then the catalog's separator) before the title, value in the
 # title's place when no title is given, and badge, icon and chevron between
 # the peek and the status. The status slot is the 4.1 slot that replaces
 # them.
 #
-# Changes from the plan's sketch, with their reasons: the peek's anchor is
+# Choices, with their reasons: the peek's anchor is
 # the chip's root (the pill), not the link, so "4px below the chip" holds
 # and the published LinkComponent, which takes no ref or style, needs no
 # wrapper; the anchor-name and position-anchor are set inline from useId

@@ -79,9 +79,8 @@
 # (lines="two", 56px): it is rendered only then, ordered after every slot
 # of the first line and spanning the row. Each fact cell names its
 # property in data-property (Annex D). The transitional location and meta
-# keep their places until the closure slice. The row stays a flex line
-# rather than the plan's subgrid sketch: its lists do not yet lay their
-# rows on a subgrid (W4 builds them).
+# keep their places while callers still pass them. The row stays a flex line
+# rather than a subgrid: its lists do not lay their rows on a subgrid.
 #
 # Token ledger (the identity slots):
 #   --entity-row-prefix-font-family: ui-monospace, monospace   literal: no mono token
