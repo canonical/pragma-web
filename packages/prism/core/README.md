@@ -163,7 +163,11 @@ Every component folder carries an `anatomy.yaml` in the anatomy DSL, and
 its stylesheet transcribes it. The experimental `@canonical/prism-core/testing`
 subpath holds the checks the prism packages and apps run over their own
 components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
-`assertStylesheets` and `listAnatomyFolders`. Its `testing/browser` subpath
+`assertStylesheets` and `listAnatomyFolders`; and over their projections:
+`expectSlotOrder` (an identity's slots in the shared order, its required
+slots present) and `expectSwitchCoverage` (a switch over a node's typename
+names one case per type condition of its compiled fragment, and renders
+one node per condition). Its `testing/browser` subpath
 holds the browser side the apps' layout suites share: `launchBrowser`,
 `measurePage` and `measureLayout`, which read a page's grid, scroll model,
 overflow and spacing. Both subpaths ship as TypeScript source and import
