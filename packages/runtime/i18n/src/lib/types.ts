@@ -60,7 +60,12 @@ export interface Formatters {
     value: Date | number,
     options?: Intl.DateTimeFormatOptions,
   ): string;
-  /** Format the time portion of a date/timestamp for the locale. */
+  /**
+   * Format the time portion of a date/timestamp for the locale. Options that
+   * name no time field still get the time: the short time style is added, or
+   * the hour and minute when the options name a date field or `timeZoneName`,
+   * which `Intl` refuses beside a time style.
+   */
   formatTime(
     value: Date | number,
     options?: Intl.DateTimeFormatOptions,

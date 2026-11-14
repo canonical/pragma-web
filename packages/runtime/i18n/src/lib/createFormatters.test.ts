@@ -13,12 +13,66 @@ describe("createFormatters", () => {
     expect(en.formatCurrency(1234.5, "USD")).toBe("$1,234.50");
   });
 
-  it("formats dates and times", () => {
+  describe("formatDate", () => {
+    it("formats a date with the given options", () => {
+      const date = new Date(Date.UTC(2026, 0, 15, 9, 5));
+      expect(
+        en.formatDate(date, { dateStyle: "medium", timeZone: "UTC" }),
+      ).toBe("Jan 15, 2026");
+      expect(en.formatDate(0, { timeZone: "UTC" })).toBe("1/1/1970");
+    });
+
+    it("uses the locale's default date when no options are given", () => {
+      expect(en.formatDate(0)).toMatch(/^\d{1,2}\/\d{1,2}\/19(69|70)$/);
+    });
+  });
+
+  describe("formatTime", () => {
     const date = new Date(Date.UTC(2026, 0, 15, 9, 5));
-    expect(en.formatDate(date, { dateStyle: "medium", timeZone: "UTC" })).toBe(
-      "Jan 15, 2026",
-    );
-    expect(typeof en.formatTime(date, { timeZone: "UTC" })).toBe("string");
+
+    it("formats the short time when options name no field", () => {
+      expect(en.formatTime(date, { timeZone: "UTC" })).toBe("9:05 AM");
+      expect(en.formatTime(date, { timeZone: "UTC", hour12: false })).toBe(
+        "09:05",
+      );
+    });
+
+    it.each<[Intl.DateTimeFormatOptions, string]>([
+      [{ year: "numeric", hour: "numeric" }, "2026, 9 AM"],
+      [{ hour: "numeric" }, "9 AM"],
+      [{ minute: "2-digit" }, "5"],
+      [{ second: "2-digit" }, "0"],
+      [{ dayPeriod: "short" }, "in the morning"],
+      [{ fractionalSecondDigits: 2 }, "00"],
+      [{ timeStyle: "short" }, "9:05 AM"],
+    ])("keeps the time field in %o", (options, expected) => {
+      expect(en.formatTime(date, { ...options, timeZone: "UTC" })).toBe(
+        expected,
+      );
+    });
+
+    it.each<[Intl.DateTimeFormatOptions, string]>([
+      [{ weekday: "short" }, "Thu 9:05 AM"],
+      [{ era: "short" }, "AD, 9:05 AM"],
+      [{ year: "numeric" }, "2026, 9:05 AM"],
+      [{ month: "short" }, "Jan, 9:05 AM"],
+      [{ day: "numeric" }, "15, 9:05 AM"],
+      [{ timeZoneName: "short" }, "9:05 AM UTC"],
+    ])("adds the hour and minute to %o", (options, expected) => {
+      expect(en.formatTime(date, { ...options, timeZone: "UTC" })).toBe(
+        expected,
+      );
+    });
+
+    it("adds the short time to a date style", () => {
+      expect(
+        en.formatTime(date, { dateStyle: "medium", timeZone: "UTC" }),
+      ).toBe("Jan 15, 2026, 9:05 AM");
+    });
+
+    it("formats the short time when no options are given", () => {
+      expect(en.formatTime(date)).toMatch(/^\d{1,2}:\d{2}\s[AP]M$/);
+    });
   });
 
   it("formats relative time and lists", () => {
@@ -28,14 +82,9 @@ describe("createFormatters", () => {
     expect(en.formatList(["A", "B", "C"])).toBe("A, B, and C");
   });
 
-  it("uses default options when none are given", () => {
-    expect(typeof en.formatTime(0)).toBe("string");
-    expect(typeof en.formatDate(0)).toBe("string");
-  });
-
   it("produces locale-specific output", () => {
     const fr = createFormatters("fr-FR");
-    expect(fr.formatNumber(1234.5)).not.toBe(en.formatNumber(1234.5));
+    expect(fr.formatNumber(1234.5)).toBe("1\u202f234,5");
   });
 
   it("constructs one Intl instance per distinct options (memoized)", () => {
