@@ -86,7 +86,12 @@ export default function RendererSwitch({
         </ul>
       </nav>
       <details className="menu" onToggle={followToggle} open={open}>
-        <summary className="summary">{current?.text}</summary>
+        <summary className="summary">
+          <span className="name">{current?.text}</span>
+          <span aria-hidden="true" className="chevron">
+            {t("rendererSwitch.chevron")}
+          </span>
+        </summary>
         <ul aria-label={label ?? t("rendererSwitch.label")} className="options">
           {links.map(({ name, text, href }) => (
             <li key={name}>
