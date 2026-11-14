@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators/index.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
@@ -244,9 +247,8 @@ function SortedAndPagedMachines({
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({ query: "page=1&size=5" });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.SortPanel />
       <ConnectedCards
         fields={fields}
@@ -256,7 +258,7 @@ function SortedAndPagedMachines({
         rowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -266,6 +268,7 @@ function SortedAndPagedMachines({
  * both placed beside the cards in one root, as they are beside a table.
  */
 export const SortedAndPaged: Story = {
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: ({ label }) => <SortedAndPagedMachines label={label} />,
   parameters: showConsumerCode({
     parts: ["DataViews", "type DisplayField"],
@@ -296,9 +299,8 @@ function TableOrCardsMachines({
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({ query: "page=1&size=5" });
   return (
-    <DataViews provider={provider}>
+    <>
       <RendererSwitch
         label="Show machines as"
         renderers={[
@@ -330,7 +332,7 @@ function TableOrCardsMachines({
         ]}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -341,6 +343,7 @@ function TableOrCardsMachines({
  * drawn alone.
  */
 export const TableOrCards: Story = {
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: ({ label }) => <TableOrCardsMachines label={label} />,
   parameters: showConsumerCode({
     parts: ["DataViews", "type DisplayField"],
@@ -395,12 +398,8 @@ function RestBackedMachines({
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({
-    source: () => createRestMachineSource("live"),
-    query: "page=1&size=5",
-  });
   return (
-    <DataViews provider={provider}>
+    <>
       <ConnectedCards
         fields={fields}
         title="name"
@@ -408,7 +407,7 @@ function RestBackedMachines({
         rowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -418,6 +417,12 @@ function RestBackedMachines({
  * and say they are loading until it does.
  */
 export const RestBacked: Story = {
+  decorators: [
+    withMachineRoot({
+      source: () => createRestMachineSource("live"),
+      query: "page=1&size=5",
+    }),
+  ],
   render: ({ label }) => <RestBackedMachines label={label} />,
   play: async ({ canvas }) => {
     await waitFor(() =>

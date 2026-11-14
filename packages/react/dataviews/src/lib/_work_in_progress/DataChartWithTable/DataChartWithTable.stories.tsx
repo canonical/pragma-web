@@ -2,7 +2,10 @@ import type { SchemaFieldDefinition } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators/index.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
@@ -156,12 +159,8 @@ export const RangeOrTable: Story = {
 
 /** The connected chart with its table, beside the filters and the pagination. */
 function BesideFiltersMachines(): ReactElement {
-  const provider = useMachineProvider({
-    query: "page=1&size=5",
-    facets: ["status", "cores"],
-  });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Filters />
       <ConnectedChartWithTable
         chartProps={statusCounts}
@@ -172,7 +171,7 @@ function BesideFiltersMachines(): ReactElement {
         }}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -182,6 +181,12 @@ function BesideFiltersMachines(): ReactElement {
  * lifts its own field's filter.
  */
 export const BesideFilters: Story = {
+  decorators: [
+    withMachineRoot({
+      query: "page=1&size=5",
+      facets: ["status", "cores"],
+    }),
+  ],
   render: () => <BesideFiltersMachines />,
   parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],

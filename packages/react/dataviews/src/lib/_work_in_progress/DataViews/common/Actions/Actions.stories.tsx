@@ -4,20 +4,21 @@ import {
   type Source,
 } from "@canonical/dataviews-core";
 import { Button, type ButtonProps } from "@canonical/react-ds-global";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators/index.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../../../storybook/decorators/index.js";
 import {
   machineCollection,
   storyMachines,
 } from "../../../../../storybook/machines/fixtures.js";
-import readHostName from "../../../../../storybook/machines/readHostName.js";
 import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { Machine } from "../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import { useDataViewsValue } from "../../../../hooks/index.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import type { DataTableColumn } from "../../../DataTable/index.js";
 import { useDataViews } from "../../hooks/index.js";
 import DataViews from "../../Provider.js";
 import Pagination from "../Pagination/Pagination.js";
@@ -88,31 +89,31 @@ function SelectionAction({
 }
 
 /**
- * The machines over a source that can archive and delete them, five to a
- * page, with the table, the action bar and the pagination bar.
+ * Render the story inside a root over a source that can archive and delete
+ * the machines, five to a page, with the given machines selected.
  */
-function ManagedMachines({
-  select = [],
-  indicator,
-}: {
-  readonly select?: readonly string[] | undefined;
-  readonly indicator?: ReactNode;
-}): ReactElement {
-  const provider = useMachineProvider({
+const withManagedMachines = (select: readonly string[] = []): Decorator =>
+  withMachineRoot({
     source: createManagedSource,
     query: "page=1&size=5",
     prepare: (built) => {
       built.selection.add(select);
     },
   });
+
+/** The table, the action bar and the pagination bar, inside the story's root. */
+function ManagedMachines({
+  indicator,
+}: {
+  readonly indicator?: ReactNode;
+}): ReactElement {
   return (
-    <DataViews provider={provider}>
-      <DataTable
-        provider={provider}
+    <>
+      <DataViews.DataTable
         columns={columns}
         label="Machines"
         selectable
-        rowLabel={readHostName}
+        rowLabel={(row) => String(row["name"])}
       />
       <Component indicator={indicator}>
         <SelectionAction action="archive">Archive</SelectionAction>
@@ -125,7 +126,7 @@ function ManagedMachines({
         </SelectionAction>
       </Component>
       <Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -216,6 +217,7 @@ const selectTwo = `provider.selection.add(["m-02", "m-06"]);`;
  */
 export const NothingSelected: Story = {
   parameters: spellActionsCode(),
+  decorators: [withManagedMachines()],
   render: () => <ManagedMachines />,
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -234,7 +236,8 @@ export const NothingSelected: Story = {
  */
 export const TwoSelected: Story = {
   parameters: spellActionsCode({ prepare: selectTwo }),
-  render: () => <ManagedMachines select={["m-02", "m-06"]} />,
+  decorators: [withManagedMachines(["m-02", "m-06"])],
+  render: () => <ManagedMachines />,
   play: async ({ canvas }) => {
     const bar = await canvas.findByRole("group", { name: "Selection actions" });
     await expect(bar).toHaveTextContent("2 selected");
@@ -253,7 +256,8 @@ export const SelectedAcrossPages: Story = {
   parameters: spellActionsCode({
     prepare: `provider.selection.add(["m-02", "m-09"]);`,
   }),
-  render: () => <ManagedMachines select={["m-02", "m-09"]} />,
+  decorators: [withManagedMachines(["m-02", "m-09"])],
+  render: () => <ManagedMachines />,
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByRole("checkbox", { name: "Select birch.example.com" }),
@@ -299,12 +303,8 @@ export const CustomIndicator: Story = {
     indicator: " indicator={<MachinesSelected />}",
     declarations: machinesSelectedCode,
   }),
-  render: () => (
-    <ManagedMachines
-      select={["m-02", "m-06"]}
-      indicator={<MachinesSelected />}
-    />
-  ),
+  decorators: [withManagedMachines(["m-02", "m-06"])],
+  render: () => <ManagedMachines indicator={<MachinesSelected />} />,
   play: async ({ canvas }) => {
     const bar = await canvas.findByRole("group", {
       name: "Selection actions",
@@ -322,7 +322,8 @@ export const CustomIndicator: Story = {
  */
 export const Archived: Story = {
   parameters: spellActionsCode({ prepare: selectTwo }),
-  render: () => <ManagedMachines select={["m-02", "m-06"]} />,
+  decorators: [withManagedMachines(["m-02", "m-06"])],
+  render: () => <ManagedMachines />,
   play: async ({ canvas }) => {
     const archive = await canvas.findByRole("button", { name: "Archive" });
     await userEvent.click(archive);

@@ -1,7 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators/index.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
 import { SERVER_BACKED_FACETS } from "../../../storybook/machines/constants.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
@@ -127,18 +130,14 @@ export const CoresRange: Story = {
   },
 };
 
-/** The counts beside the filters, a table and its pagination, over one root. */
+/** The counts beside the filters, a table and its pagination, inside the story's root. */
 function CountsBesideFiltersMachines({
   label,
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({
-    query: "page=1&size=5",
-    facets: ["status", "cores"],
-  });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Filters />
       <ConnectedChart type="bar" field="status" label={label} />
       <DataViews.DataTable
@@ -147,7 +146,7 @@ function CountsBesideFiltersMachines({
         rowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -158,6 +157,9 @@ function CountsBesideFiltersMachines({
  * screen.
  */
 export const CountsBesideFilters: Story = {
+  decorators: [
+    withMachineRoot({ query: "page=1&size=5", facets: ["status", "cores"] }),
+  ],
   render: ({ label }) => <CountsBesideFiltersMachines label={label} />,
   parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
@@ -198,18 +200,17 @@ export const CountsBesideFilters: Story = {
   },
 };
 
-/** The range beside the filters, over one root. */
+/** The range beside the filters, inside the story's root. */
 function RangeBesideFiltersMachines({
   label,
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({ facets: ["status", "cores"] });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Filters />
       <ConnectedChart type="range" field="cores" label={label} />
-    </DataViews>
+    </>
   );
 }
 
@@ -220,6 +221,7 @@ function RangeBesideFiltersMachines({
  */
 export const RangeBesideFilters: Story = {
   args: { type: "range", field: "cores", label: "Cores" },
+  decorators: [withMachineRoot({ facets: ["status", "cores"] })],
   render: ({ label }) => <RangeBesideFiltersMachines label={label} />,
   parameters: showConsumerCode({
     parts: ["DataViews"],
@@ -258,29 +260,16 @@ export const Loading: Story = {
   },
 };
 
-/** The chart over the REST endpoint, which computes its facets. */
-function RestBackedMachines({
-  type,
-  field,
-  label,
-  query,
-}: {
-  readonly type: DataChartType;
-  readonly field: string;
-  readonly label: string;
-  readonly query?: string;
-}): ReactElement {
-  const provider = useMachineProvider({
+/**
+ * Render the story inside a root over the REST endpoint, which computes its
+ * facets, starting on `query` when one is given.
+ */
+const withRestBackedRoot = (query?: string): Decorator =>
+  withMachineRoot({
     source: () => createRestMachineSource("live"),
     ...(query === undefined ? {} : { query }),
     facets: SERVER_BACKED_FACETS,
   });
-  return (
-    <DataViews provider={provider}>
-      <ConnectedChart type={type} field={field} label={label} />
-    </DataViews>
-  );
-}
 
 /**
  * Counts over REST: the same chart over a REST endpoint reached through
@@ -288,13 +277,9 @@ function RestBackedMachines({
  * matches, and the chart draws what it answers.
  */
 export const CountsRestBacked: Story = {
+  decorators: [withRestBackedRoot("page=1&size=5")],
   render: ({ label }) => (
-    <RestBackedMachines
-      type="bar"
-      field="status"
-      label={label}
-      query="page=1&size=5"
-    />
+    <ConnectedChart type="bar" field="status" label={label} />
   ),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole(
@@ -316,8 +301,9 @@ export const CountsRestBacked: Story = {
  */
 export const RangeRestBacked: Story = {
   args: { type: "range", field: "cores", label: "Cores" },
+  decorators: [withRestBackedRoot()],
   render: ({ label }) => (
-    <RestBackedMachines type="range" field="cores" label={label} />
+    <ConnectedChart type="range" field="cores" label={label} />
   ),
   play: async ({ canvas }) => {
     await expect(

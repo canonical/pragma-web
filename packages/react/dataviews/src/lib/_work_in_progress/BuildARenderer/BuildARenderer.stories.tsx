@@ -2,7 +2,10 @@ import type { Source, SourceRefusal } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators/index.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
 import createMachineSource from "../../../storybook/machines/createMachineSource.js";
@@ -147,9 +150,8 @@ const columns: readonly DataTableColumn[] = [
 ];
 
 function ConnectedMachines(): ReactElement {
-  const provider = useMachineProvider({ query: "page=1&size=5" });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Search label="Search machines" />
       <ConnectedRecordList
         collection={machineCollection}
@@ -164,7 +166,7 @@ function ConnectedMachines(): ReactElement {
         rowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -174,6 +176,7 @@ function ConnectedMachines(): ReactElement {
  * selected in the other.
  */
 export const ConnectedTwin: Story = {
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: () => <ConnectedMachines />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
