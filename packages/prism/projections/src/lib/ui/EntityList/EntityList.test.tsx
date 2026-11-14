@@ -30,6 +30,19 @@ describe("EntityList", () => {
       expect(cards?.getAttribute("style")).toContain("--card-span: 2");
     });
 
+    it("lists its children in the order given when the table is named", () => {
+      render(
+        <EntityList renderer="table">
+          <li>Layout</li>
+          <li>Danger</li>
+        </EntityList>,
+      );
+      expect(screen.getByRole("list").tagName).toBe("OL");
+      expect(
+        screen.getAllByRole("listitem").map((item) => item.textContent),
+      ).toEqual(["Layout", "Danger"]);
+    });
+
     it("draws no toolbar: the strip holds the switch and the count", () => {
       render(
         <EntityList data-testid="list">
@@ -50,6 +63,20 @@ describe("EntityList", () => {
         "Nothing to list.",
       );
       expect(list.querySelector(".ds.cards, .items")).toBeNull();
+    });
+
+    it("stands the line in for children that render nothing", () => {
+      render(
+        <EntityList data-testid="list">
+          {null}
+          {false}
+        </EntityList>,
+      );
+      const list = screen.getByTestId("list");
+      expect(list.querySelector(".empty")?.textContent).toBe(
+        "Nothing to list.",
+      );
+      expect(screen.queryByRole("list")).toBeNull();
     });
 
     it("stands the line it is given in for no children", () => {
