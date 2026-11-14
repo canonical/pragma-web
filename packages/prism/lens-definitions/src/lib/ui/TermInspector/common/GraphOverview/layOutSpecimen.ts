@@ -1,10 +1,11 @@
-import { COLLISION_MARGIN } from "../../../../classGraph/constants.js";
 import {
   measurePathBounds,
+  type Rect,
   uniteRects,
-} from "../../../../classGraph/geometry.js";
+} from "@canonical/prism-core";
+import { COLLISION_MARGIN } from "../../../../classGraph/constants.js";
 import layOutClassGraph from "../../../../classGraph/layOutClassGraph.js";
-import type { ClassGraphLayout, Rect } from "../../../../classGraph/types.js";
+import type { ClassGraphLayout } from "../../../../classGraph/types.js";
 import type { Translate } from "../../../../i18n/index.js";
 import { SPECIMEN_MARGIN, SPECIMEN_PREFIX } from "./constants.js";
 import type { Specimen } from "./types.js";

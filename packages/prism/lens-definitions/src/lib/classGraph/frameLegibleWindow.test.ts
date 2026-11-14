@@ -1,12 +1,16 @@
+import {
+  LATTICE,
+  measureRegionLabelWidth,
+  type Rect,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../testing/createClassGraphSetup.js";
 import { CROSS_REGION_GRAPH } from "../../../testing/fixtures.js";
-import { LATTICE, MIN_FIT, REGION_LABEL_ROW } from "./constants.js";
+import { MIN_FIT, REGION_LABEL_ROW } from "./constants.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
-import { measureRegionLabelWidth } from "./geometry.js";
 import layOutClassGraph from "./layOutClassGraph.js";
-import { requireDefined, requireEntry } from "./require.js";
-import type { Rect } from "./types.js";
 
 const { layout, uris } = createClassGraphSetup();
 

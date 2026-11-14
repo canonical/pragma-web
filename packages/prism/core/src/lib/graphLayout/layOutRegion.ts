@@ -22,10 +22,10 @@ import {
 } from "./geometry.js";
 import { requireAt, requireEntry } from "./require.js";
 import type {
-  Bundle,
-  ClassGraphModel,
   CrossPort,
   FixedPort,
+  LayeredBundle,
+  LayeredModel,
   PathCommand,
   RegionEdge,
   RegionLayout,
@@ -68,7 +68,7 @@ interface StackItem {
  * corner. Each route steps outward until no sample falls inside another
  * box's collision box.
  *
- * @param model - The class graph's model.
+ * @param model - The nodes and edges to lay out.
  * @param ids - The region's classes, by IRI.
  * @param channel - The gap between columns, in px.
  * @param sweeps - How many barycentre sweeps run.
@@ -77,13 +77,13 @@ interface StackItem {
  *   domain's right side or enters its range's left side, at the middle.
  * @returns The region's layout.
  */
-export default function layOutRegion(
-  model: ClassGraphModel,
+export default function layOutRegion<TBundle extends LayeredBundle>(
+  model: LayeredModel<TBundle>,
   ids: readonly string[],
   channel: number,
   sweeps: number,
   crossPorts: ReadonlyMap<string, CrossPort> = new Map(),
-): RegionLayout {
+): RegionLayout<TBundle> {
   const { byId } = model;
   const findings: string[] = [];
   let crowdedArcs = 0;
@@ -580,7 +580,7 @@ export default function layOutRegion(
   }
 
   // Subclass buses.
-  const edges: RegionEdge[] = [];
+  const edges: RegionEdge<TBundle>[] = [];
   for (const id of ids) {
     const subclasses = childrenOf(id);
     if (subclasses.length === 0) continue;
@@ -613,7 +613,7 @@ export default function layOutRegion(
   }
 
   // Relations: loops, S-curves between columns, arcs within one.
-  const arcs: Bundle[] = [];
+  const arcs: TBundle[] = [];
   for (const bundle of regionBundles) {
     if (bundle.self) {
       const node = nodeOf(bundle.a);

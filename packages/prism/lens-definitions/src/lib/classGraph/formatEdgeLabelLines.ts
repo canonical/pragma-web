@@ -1,6 +1,10 @@
+import {
+  compareText,
+  orderBy,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import { DIRECTION_ARROWS, LOOP_LABEL_LINES } from "./constants.js";
-import { compareText, orderBy } from "./geometry.js";
-import { requireDefined, requireEntry } from "./require.js";
 import type { ClassGraphLayout, LaidOutEdge } from "./types.js";
 
 /**

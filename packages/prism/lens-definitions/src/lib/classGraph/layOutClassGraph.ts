@@ -1,12 +1,29 @@
+import {
+  BUS_OFFSET,
+  buildArrowhead,
+  type CrossPort,
+  ceilTo,
+  compareText,
+  formatPathData,
+  LATTICE,
+  layOutRegion,
+  measurePathBounds,
+  measureRegionLabelWidth,
+  type PathCommand,
+  type RegionLayout,
+  requireAt,
+  requireDefined,
+  requireEntry,
+  roundTo,
+  uniteRects,
+} from "@canonical/prism-core";
 import buildClassGraphModel from "./buildClassGraphModel.js";
 import {
   ALIGNMENT_SEARCH_LIMIT,
-  BUS_OFFSET,
   CHANNEL,
   CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
   FALLBACK_CHANNEL,
-  LATTICE,
   MIN_FIT,
   REGION_ALIGNMENTS,
   REGION_LABEL_ROW,
@@ -16,32 +33,18 @@ import {
   VIEW_MARGIN,
 } from "./constants.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
-import {
-  buildArrowhead,
-  ceilTo,
-  compareText,
-  formatPathData,
-  measurePathBounds,
-  measureRegionLabelWidth,
-  roundTo,
-  uniteRects,
-} from "./geometry.js";
 import layOutPhoneView from "./layOutPhoneView.js";
-import layOutRegion from "./layOutRegion.js";
 import orderRail from "./orderRail.js";
 import packShelves from "./packShelves.js";
-import { requireAt, requireDefined, requireEntry } from "./require.js";
 import type {
+  Bundle,
   ClassGraphInput,
   ClassGraphLayout,
   ClassGraphModel,
-  CrossPort,
   LaidOutEdge,
   LaidOutNode,
   LaidOutRegion,
   NodeNavigation,
-  PathCommand,
-  RegionLayout,
   ShelfPacking,
 } from "./types.js";
 
@@ -49,7 +52,7 @@ import type {
 interface SizedRegion {
   readonly prefix: string;
   readonly ids: readonly string[];
-  readonly layout: RegionLayout;
+  readonly layout: RegionLayout<Bundle>;
   readonly w: number;
   readonly h: number;
 }
@@ -58,7 +61,7 @@ interface SizedRegion {
 function sizeRegion(
   prefix: string,
   ids: readonly string[],
-  layout: RegionLayout,
+  layout: RegionLayout<Bundle>,
 ): SizedRegion {
   return {
     prefix,

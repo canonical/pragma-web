@@ -1,5 +1,8 @@
-import { formatPathData } from "./geometry.js";
-import { requireDefined, requireEntry } from "./require.js";
+import {
+  formatPathData,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import type { ClassGraphLayout } from "./types.js";
 
 /**

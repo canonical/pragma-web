@@ -1,9 +1,9 @@
-import type { GraphBox } from "@canonical/prism-core";
-import { REGION_LABEL_ROW, VIEW_MARGIN } from "../../classGraph/constants.js";
 import {
+  type GraphBox,
   measureRegionLabelWidth,
   uniteRects,
-} from "../../classGraph/geometry.js";
+} from "@canonical/prism-core";
+import { REGION_LABEL_ROW, VIEW_MARGIN } from "../../classGraph/constants.js";
 import type { ClassGraphLayout } from "../../classGraph/types.js";
 
 /**

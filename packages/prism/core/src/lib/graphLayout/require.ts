@@ -12,7 +12,7 @@
 export function requireAt<Value>(list: readonly Value[], index: number): Value {
   const value = list.at(index);
   if (value === undefined) {
-    throw new Error(`the class graph has no element at ${index}`);
+    throw new Error(`the layout has no element at ${index}`);
   }
   return value;
 }
@@ -28,7 +28,7 @@ export function requireEntry<Key, Value>(
 ): Value {
   const value = map.get(key);
   if (value === undefined) {
-    throw new Error(`the class graph has no entry for ${String(key)}`);
+    throw new Error(`the layout has no entry for ${String(key)}`);
   }
   return value;
 }
@@ -42,6 +42,6 @@ export function requireDefined<Value>(
   value: Value | undefined,
   what: string,
 ): Value {
-  if (value === undefined) throw new Error(`the class graph has no ${what}`);
+  if (value === undefined) throw new Error(`the layout has no ${what}`);
   return value;
 }

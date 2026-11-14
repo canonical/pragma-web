@@ -1,4 +1,4 @@
-import { requireEntry } from "../../classGraph/require.js";
+import { requireEntry } from "@canonical/prism-core";
 import type { ClassGraphLayout } from "../../classGraph/types.js";
 import { matchesChips, matchesDimming } from "../../lensFilter.js";
 import type { LensFilter } from "../../types.js";

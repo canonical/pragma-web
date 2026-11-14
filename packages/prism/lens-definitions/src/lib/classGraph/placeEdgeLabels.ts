@@ -1,31 +1,33 @@
 import {
+  compareText,
+  findPointOnPath,
+  intersectsRect,
+  LABEL_SIZE,
+  measureTextWidth,
+  orderBy,
+  REGION_LABEL_GAP,
+  REGION_LABEL_SIZE,
+  type Rect,
+  requireAt,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
+import {
   COLLISION_MARGIN,
   LABEL_BESIDE_AT,
   LABEL_CENTRED_AT,
   LABEL_HALO,
   LABEL_LINE_PITCH,
   LABEL_OFFSET,
-  LABEL_SIZE,
-  REGION_LABEL_GAP,
   REGION_LABEL_ROW,
-  REGION_LABEL_SIZE,
 } from "./constants.js";
 import formatEdgeLabelLines from "./formatEdgeLabelLines.js";
-import {
-  compareText,
-  findPointOnPath,
-  intersectsRect,
-  measureTextWidth,
-  orderBy,
-} from "./geometry.js";
-import { requireAt, requireDefined, requireEntry } from "./require.js";
 import type {
   ClassGraphLayout,
   LabelPlacement,
   LaidOutNode,
   LaidOutRegion,
   PlacedLabel,
-  Rect,
 } from "./types.js";
 
 /** A node's collision box: its box, 4px around, and its loop's extent. */

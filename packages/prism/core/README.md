@@ -411,6 +411,21 @@ site's own catalog, and the factory holds no reader-facing string.
   tightens a budget, loosening one takes a reason),
   `GraphBudgetProvider`, `useGraphBudget`; types `GraphBudget`,
   `GraphBudgetOverrides`, `GraphBudgetRaise`, `GraphBudgetProviderProps`.
+- Graph layout: the engine contract and the layered engine, pure functions
+  of their input: `layoutLayered` (a region of nodes as layered columns,
+  root at the left, on the contract), `layOutRegion`, the lengths it places
+  by `LATTICE`, `BUS_OFFSET`, `ARC_BASE`, `ARC_NEST`, `LABEL_SIZE`,
+  `REGION_LABEL_SIZE`, `REGION_LABEL_GAP`, and the geometry it shares
+  `measureTextWidth`, `measureTextBox`, `measureRegionLabelWidth`,
+  `findCentredBaseline`, `ceilTo`, `roundTo`, `formatPathData`,
+  `parsePathData`, `buildArrowhead`, `flattenPath`, `samplePath`,
+  `findPointOnPath`, `measurePathBounds`, `insetRect`, `containsPoint`,
+  `intersectsRect`, `uniteRects`, `compareText`, `orderBy`, `requireAt`,
+  `requireEntry`, `requireDefined`; types `GraphLayout`, `GraphDraw`,
+  `LayeredNode`, `LayeredNodes`, `LayeredRelation`, `LayeredBundle`,
+  `LayeredEdges`, `LayeredModel`, `LayeredOptions`, `RegionNode`,
+  `RegionEdge`, `RegionLayout`, `CrossPort`, `Rect`, `Point`,
+  `PathCommand`, `FontFace`.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.

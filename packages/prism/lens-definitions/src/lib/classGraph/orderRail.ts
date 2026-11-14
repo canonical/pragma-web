@@ -1,6 +1,11 @@
-import { compareText, orderBy } from "./geometry.js";
-import { requireAt, requireEntry } from "./require.js";
-import type { ClassGraphModel, RegionLayout } from "./types.js";
+import {
+  compareText,
+  orderBy,
+  type RegionLayout,
+  requireAt,
+  requireEntry,
+} from "@canonical/prism-core";
+import type { ClassGraphModel } from "./types.js";
 
 /**
  * Order a region's classes for the rail: the subclass forest in pre-order,
