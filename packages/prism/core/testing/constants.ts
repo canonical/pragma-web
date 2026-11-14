@@ -390,3 +390,10 @@ export const SLOT_ORDER: readonly string[] = [
   "facts",
   "status",
 ];
+
+/**
+ * The slots a typed arm's identity always renders, which `expectSlotOrder`
+ * requires unless a representation passes its own list: every anatomy
+ * starts with its mark and its title.
+ */
+export const REQUIRED_SLOTS: readonly string[] = ["mark", "title"];

@@ -25,6 +25,7 @@ export { default as listAnatomyFolders } from "./listAnatomyFolders.js";
 export type {
   AssertScaffoldOptions,
   AssertStylesheetsOptions,
+  ExpectSlotOrderOptions,
   SwitchCoverageOptions,
   SwitchFragment,
   SwitchSelection,

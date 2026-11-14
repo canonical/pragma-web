@@ -138,7 +138,8 @@ describe("EntityCommand", () => {
       const row = renderCommand(
         <EntityCommand kind="Component" status="New" title="Button" />,
       );
-      expectSlotOrder(row);
+      // The form given no mark: only its title is required.
+      expectSlotOrder(row, { requires: ["title"] });
       expect(row.querySelector(".context")?.textContent).toBe("Component");
       expect(row.querySelector(".aside")?.innerHTML).toBe(
         '<span class="status">New</span>',

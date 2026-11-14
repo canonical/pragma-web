@@ -19,6 +19,16 @@ export interface GraphStub {
   readonly close: () => Promise<void>;
 }
 
+/** Options of `expectSlotOrder`. */
+export interface ExpectSlotOrderOptions {
+  /**
+   * The slots the representation must render, by class. Defaults to
+   * `mark` and `title`, what every typed arm renders; a form, or an arm
+   * whose anatomy leaves one out, passes its own list (`[]` for none).
+   */
+  readonly requires?: readonly string[];
+}
+
 /**
  * One selection of a compiled fragment, as `expectSwitchCoverage` reads it:
  * an inline fragment carries its type condition as `type`, an aliased

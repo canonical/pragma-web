@@ -29,6 +29,7 @@ describe("expectSlotOrder", () => {
   it("rejects two slots out of order", () => {
     const { container } = render(
       <p>
+        <span className="mark" />
         <span className="title">Button</span>
         <span className="prefix">ds</span>
       </p>,
@@ -52,8 +53,67 @@ describe("expectSlotOrder", () => {
     );
   });
 
-  it("accepts a representation with no slots", () => {
-    const { container } = render(<p>Button</p>);
+  it("requires a mark and a title by default", () => {
+    const { container } = render(
+      <p>
+        <span className="title">Button</span>
+      </p>,
+    );
+    expect(() => expectSlotOrder(container)).toThrow(
+      'the required slot "mark" is absent',
+    );
+    expect(() =>
+      expectSlotOrder(render(<p className="mark" />).container),
+    ).toThrow('the required slot "title" is absent');
+  });
+
+  it("requires the slots a representation passes, and none for []", () => {
+    const { container } = render(
+      <p>
+        <span className="title">Button</span>
+      </p>,
+    );
+    expect(() =>
+      expectSlotOrder(container, { requires: ["title"] }),
+    ).not.toThrow();
+    expect(() =>
+      expectSlotOrder(container, { requires: ["title", "status"] }),
+    ).toThrow('the required slot "status" is absent');
+    expect(() =>
+      expectSlotOrder(render(<p>Button</p>).container, { requires: [] }),
+    ).not.toThrow();
+  });
+
+  it("leaves out the slots of a dialog below the root, as an open peek's card", () => {
+    const { container } = render(
+      <span>
+        <span className="mark" />
+        <span className="title">Button</span>
+        <span role="dialog">
+          <span className="mark" />
+          <span className="title">Button</span>
+          <span className="summary">A button.</span>
+        </span>
+        <span className="status">Stable</span>
+      </span>,
+    );
     expect(() => expectSlotOrder(container)).not.toThrow();
+    const dialog = container.querySelector('[role="dialog"]');
+    if (dialog === null) throw new Error("no dialog rendered");
+    expect(() => expectSlotOrder(dialog)).not.toThrow();
+  });
+
+  it("does not count a required slot that only a dialog below holds", () => {
+    const { container } = render(
+      <span>
+        <span className="title">Button</span>
+        <span role="dialog">
+          <span className="mark" />
+        </span>
+      </span>,
+    );
+    expect(() => expectSlotOrder(container)).toThrow(
+      'the required slot "mark" is absent',
+    );
   });
 });

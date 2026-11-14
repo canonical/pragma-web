@@ -1,24 +1,42 @@
-import { SLOT_ORDER } from "./constants.js";
+import { REQUIRED_SLOTS, SLOT_ORDER } from "./constants.js";
+import type { ExpectSlotOrderOptions } from "./types.js";
 
 /**
  * Assert that an entity's rendered identity follows the slot order every
  * representation shares (mark, prefix, title, address, kind, summary,
  * facts, status): the slots it renders are a subsequence of that order,
- * never a reordering, and its mark, when it has one, leads its title.
+ * never a reordering, its mark, when it has one, leads its title, and the
+ * slots it requires are there. A typed arm requires its mark and its
+ * title, the default; a form, or an arm whose anatomy leaves one out,
+ * passes its own list.
  *
  * A slot is an element whose class names one of the eight slots. A slot
  * rendered inside another (a card's mark at the start of its title
  * heading) is read where it begins: an element that holds another slot is
  * left out of the order and the slots it holds stand for it, so the mark
- * inside a title still precedes the title's text.
+ * inside a title still precedes the title's text. Slots inside a dialog
+ * below the root (a chip's open peek, which holds another
+ * representation, the node's card) are not the root's and are left out.
  *
  * @param root - The rendered representation: its root element or any
  *   ancestor of the slots.
- * @throws When two slots are out of order, or the mark follows the title.
+ * @param options - The slots the representation must render.
+ * @throws When two slots are out of order, the mark follows the title, or
+ *   a required slot is absent.
  */
-export default function expectSlotOrder(root: Element): void {
+export default function expectSlotOrder(
+  root: Element,
+  { requires = REQUIRED_SLOTS }: ExpectSlotOrderOptions = {},
+): void {
   const selector = SLOT_ORDER.map((slot) => `.${slot}`).join(", ");
-  const slots = [...root.querySelectorAll(selector)];
+  const slots = [...root.querySelectorAll(selector)].filter(
+    (slot) => !isInsideDialog(slot, root),
+  );
+  for (const required of requires) {
+    if (!slots.some((slot) => slot.classList.contains(required))) {
+      throw new Error(`the required slot "${required}" is absent`);
+    }
+  }
   const leaves = slots.filter(
     (slot) => !slots.some((other) => other !== slot && slot.contains(other)),
   );
@@ -31,9 +49,9 @@ export default function expectSlotOrder(root: Element): void {
       );
     }
   });
-  const mark = root.querySelector(".mark");
-  const title = root.querySelector(".title");
-  if (mark !== null && title !== null && !title.contains(mark)) {
+  const mark = slots.find((slot) => slot.classList.contains("mark"));
+  const title = slots.find((slot) => slot.classList.contains("title"));
+  if (mark !== undefined && title !== undefined && !title.contains(mark)) {
     const following = mark.compareDocumentPosition(title);
     if ((following & Node.DOCUMENT_POSITION_FOLLOWING) === 0) {
       throw new Error("the mark does not lead the title");
@@ -48,4 +66,10 @@ function rankSlot(element: Element): number {
     throw new Error(`${element.className} names no slot`);
   }
   return rank;
+}
+
+/** Whether `slot` sits in a dialog below `root`, another representation. */
+function isInsideDialog(slot: Element, root: Element): boolean {
+  const dialog = slot.closest('[role="dialog"]');
+  return dialog !== null && dialog !== root && root.contains(dialog);
 }
