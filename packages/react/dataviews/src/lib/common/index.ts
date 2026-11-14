@@ -15,6 +15,7 @@ export * from "./Announcer/index.js";
 export * from "./CellContext/index.js";
 export * from "./DisplayField/index.js";
 export * from "./MessagesContext/index.js";
+export * from "./Roving/index.js";
 export * from "./SettingsMenuContext/index.js";
 export * from "./StatusItem/index.js";
 export * from "./virtualization/index.js";
