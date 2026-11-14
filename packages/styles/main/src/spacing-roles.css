@@ -6,6 +6,8 @@
  * alias that was resolved by an ancestor.
  */
 
+@import url("./layers.css");
+
 @layer ds.tokens {
   :root {
     /* Internal body font input: Site 16px; Docs 14px; App 14px. */
@@ -88,6 +90,7 @@
 }
 
 @layer ds.density {
+  /* Cells select dense insets; nested product roots reset inherited selection. */
   :where(
     td,
     th,

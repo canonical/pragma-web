@@ -1,3 +1,4 @@
+import standaloneSpacingRolesCss from "@canonical/styles/spacing-roles.css?inline";
 import { describe, expect, it } from "vitest";
 import modifierCss from "../../main/src/private.spacing.modifiers.css?raw";
 import primitiveCss from "../../main/src/private.spacing.primitive.css?raw";
@@ -99,6 +100,22 @@ describe("automatic cell density selection", () => {
       }
     },
   );
+
+  it("keeps cell selection when the standalone roles entry loads first", async () => {
+    const doc = await render({
+      root: "",
+      styles: [standaloneSpacingRolesCss, layersCss, primitiveCss, modifierCss],
+      body: roots
+        .filter(Boolean)
+        .map(
+          (root, index) =>
+            `<div role="table"><div role="row"><section class="${root}" role="cell" style="--_spacing-inset-control-block-dense:11px">${probe(`standalone${index}`)}</section></div></div>`,
+        )
+        .join(""),
+    });
+    for (let index = 0; index < roots.length - 1; index += 1)
+      expect(computed(doc, `standalone${index}`).inlineSize).toBe("11px");
+  });
 
   it("selects each product's ordinary dense value", async () => {
     const doc = await render({
