@@ -63,12 +63,15 @@ const renderWithNode = (
       Node: resolveRoot({ ...MOCK_NODE, ...entity }),
     }),
   );
-  return render(
-    createSiteTree(
-      environment,
-      <NodeChipTestNode>{children}</NodeChipTestNode>,
+  return {
+    ...render(
+      createSiteTree(
+        environment,
+        <NodeChipTestNode>{children}</NodeChipTestNode>,
+      ),
     ),
-  );
+    environment,
+  };
 };
 
 describe("NodeChip", () => {
@@ -87,9 +90,13 @@ describe("NodeChip", () => {
   });
 
   it("leads with the node glyph and peeks at the node's card, in the slot order", () => {
-    const { container } = renderWithNode((node) => <NodeChip node={node} />, {
-      __typename: "OntologyClass",
-    });
+    const { container, environment } = renderWithNode(
+      (node) => <NodeChip node={node} />,
+      {
+        __typename: "OntologyClass",
+        uri: "https://ds.canonical.com/global.component.icon-button",
+      },
+    );
     const chip = container.querySelector(".ds.node-chip");
     if (chip === null) throw new Error("no chip rendered");
     expectSlotOrder(chip);
@@ -100,6 +107,16 @@ describe("NodeChip", () => {
       screen.getByRole("link", { name: "IconButton" }).focus();
     });
     expect(screen.getByRole("dialog", { hidden: true })).not.toBeNull();
+    expect(
+      environment.mock
+        .getAllOperations()
+        .map(({ request }) => [request.node.params.name, request.variables]),
+    ).toEqual([
+      [
+        "ProjectionPeekQuery",
+        { id: "https://ds.canonical.com/global.component.icon-button" },
+      ],
+    ]);
   });
 
   it("neither links nor peeks when it is not linked", () => {

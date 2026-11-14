@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<72f8a1271d0a6083d61a6f0401458f9c>>
+ * @generated SignedSource<<2bc1ef3930e17b00da78f64326b46235>>
  * @lightSyntaxTransform
  */
 
@@ -15,6 +15,7 @@ export type NodeChip_node$data = {
     readonly curie: string;
     readonly title: string;
   };
+  readonly uri: string;
   readonly " $fragmentType": "NodeChip_node";
 };
 export type NodeChip_node$key = {
@@ -33,6 +34,13 @@ const node: ReaderFragment = {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "uri",
       "storageKey": null
     },
     {
@@ -65,6 +73,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "29b7e8f85f98b4f0feed2fc9ec216da4";
+(node as any).hash = "9700aa2c70dd6d93386730ac234c6248";
 
 export default node;

@@ -2,6 +2,9 @@
 
 /** Props accepted by `ProjectionPeek`, which renders no element of its own. */
 export type ProjectionPeekProps = {
-  /** The compact address of the node to peek at, read as its `node(id:)`. */
+  /**
+   * The absolute IRI of the node to peek at (`Node.uri`), the only address
+   * `node(id:)` accepts: a compact address (CURIE) finds no node.
+   */
   readonly uri: string;
 };

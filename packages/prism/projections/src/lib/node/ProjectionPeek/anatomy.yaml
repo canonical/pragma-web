@@ -1,7 +1,7 @@
 ---
 # ProjectionPeek: the card a chip's peek shows. It renders no element of
-# its own: it runs ProjectionPeekQuery, `node(id: $id)` with the chip's
-# compact address, and hands the node to the card dispatcher inside a
+# its own: it runs ProjectionPeekQuery, `node(id: $id)` with the node's
+# absolute IRI (Node.uri; node(id:) accepts no CURIE), and hands the node to the card dispatcher inside a
 # Suspense boundary, so the card's own anatomy is the peek's content.
 #
 # The query is lazy: the chip mounts the peek only while it is open, so a

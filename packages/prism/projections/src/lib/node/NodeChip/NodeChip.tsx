@@ -15,11 +15,13 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields NodeChip reads from the Node it renders, which every node
- * carries: its title and its compact address, the peek's address.
+ * carries: its absolute IRI, the address its peek reads the node at, its
+ * title and its compact address, the address its home is built from.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment NodeChip_node on Node {
     __typename
+    uri
     _meta {
       title
       curie
@@ -36,7 +38,8 @@ const componentCssClassName = "ds node-chip";
  * generic node glyph as its mark and its title in the chip's pill, linked
  * to its home when the site has one and inert text when it has none or
  * `linked` is false. A linked chip peeks at the node's card
- * (`ProjectionPeek`, queried when the peek opens). A passage's own link
+ * (`ProjectionPeek`, queried at the node's absolute IRI when the peek
+ * opens). A passage's own link
  * text, given as `children`, stands in for the title.
  *
  * It is the chip's `Node` arm: `ChipProjection` renders it for every type
@@ -70,7 +73,7 @@ export default function NodeChip({
       href={href}
       LinkComponent={LinkComponent}
       mark={<Icon icon={NODE_MARK_ICON} />}
-      peek={<ProjectionPeek uri={curie} />}
+      peek={<ProjectionPeek uri={data.uri} />}
       title={children ?? title}
     />
   );

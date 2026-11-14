@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a413a16f6bf4f625018c90caa0421b04>>
+ * @generated SignedSource<<c29cb52044eae817949a62d7648b1880>>
  * @lightSyntaxTransform
  */
 
@@ -92,6 +92,13 @@ return {
           {
             "alias": null,
             "args": null,
+            "kind": "ScalarField",
+            "name": "uri",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
             "concreteType": "EntityMeta",
             "kind": "LinkedField",
             "name": "_meta",
@@ -113,13 +120,6 @@ return {
               }
             ],
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "uri",
-            "storageKey": null
           }
         ],
         "storageKey": null
@@ -127,12 +127,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a40c636ea4d4bad5f3ce1b20df274699",
+    "cacheID": "02bd4843ed34ff255aacfe3074bcf495",
     "id": null,
     "metadata": {},
     "name": "ShellTestsQuery",
     "operationKind": "query",
-    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipSlot_node\n  ...OntologyClassChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n"
+    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipSlot_node\n  ...OntologyClassChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n"
   }
 };
 })();

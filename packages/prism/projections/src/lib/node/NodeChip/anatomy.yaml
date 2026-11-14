@@ -4,7 +4,8 @@
 # status; any node fills the mark and the title. The mark is the generic
 # node glyph; the title its own, or a passage's link text when given. A
 # linked chip peeks at the node's card: ProjectionPeek, which queries the
-# card by the compact address only when the peek opens.
+# card by the node's absolute IRI (uri, the only address node(id:) accepts)
+# only when the peek opens.
 # Projected onto EntityChip, which carries every style: this anatomy binds
 # none and says only which field fills which slot. The home is the link the
 # title renders through: the site's homes resolve it from the compact
@@ -43,7 +44,7 @@ node:
                 - node:
                     uri: prism.component.projection_peek
                     projection:
-                      field: _meta.curie
+                      field: uri
                   relation:
                     cardinality: "0..1"
             relation:

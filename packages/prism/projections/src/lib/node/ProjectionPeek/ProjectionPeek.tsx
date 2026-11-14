@@ -10,7 +10,7 @@ import type { ProjectionPeekProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The operation a peek runs when it opens: the node at the address, read
+ * The operation a peek runs when it opens: the node at the IRI, read
  * through the card dispatcher, so the peek shows the card the site maps to
  * the node's type.
  */
@@ -25,8 +25,8 @@ void declarePeekQuery;
 /* v8 ignore stop */
 
 /**
- * Read the node at `uri` and render its card, or nothing when the graph
- * holds no node there.
+ * Read the node at the IRI `uri` and render its card, or nothing when the
+ * graph holds no node there.
  *
  * @note Impure: suspends on the peek's query, through the Relay environment
  *   in scope.
@@ -48,7 +48,8 @@ function PeekCard({ uri }: ProjectionPeekProps): ReactElement | null {
  * itself. Until the card arrives the peek shows nothing; a node the store
  * already holds shows at once.
  *
- * Arms pass it to their chip: `peek={<ProjectionPeek uri={curie} />}`.
+ * Arms pass it to their chip with the node's absolute IRI, never its
+ * CURIE: `peek={<ProjectionPeek uri={data.uri} />}`.
  *
  * `import { ProjectionPeek } from "@canonical/prism-projections";`
  *

@@ -7,15 +7,16 @@ import createSiteTree from "../../../../testing/createSiteTree.js";
 import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
 import ProjectionPeek from "./ProjectionPeek.js";
 
+/** The absolute IRI the mock graph holds a node at. */
+const NODE_IRI = "https://ds.canonical.com/global.component.icon-button";
+
 /**
- * Render a peek at `uri` over a Relay mock environment that answers its
- * query with `node`, and return the container and the variables the query
- * ran with.
+ * Render a peek at `uri` over a Relay mock environment that answers
+ * `node(id:)` as a graph does: the node at `NODE_IRI`, and null at any other
+ * address, a CURIE included. Return the container and the variables the
+ * query ran with.
  */
-const renderPeek = (
-  uri: string,
-  node: Readonly<Record<string, unknown>> | null,
-) => {
+const renderPeek = (uri: string) => {
   // relay-test-utils wraps the mock environment's methods in `jest.fn` when
   // NODE_ENV is "test"; vitest's `vi` offers the same surface.
   vi.stubGlobal("jest", vi);
@@ -23,11 +24,11 @@ const renderPeek = (
   const variables: Record<string, unknown>[] = [];
   environment.mock.queueOperationResolver((operation) => {
     variables.push(operation.request.variables);
-    return node === null
-      ? { data: { node: null } }
-      : MockPayloadGenerator.generate(operation, {
-          Node: resolveRoot(node),
-        });
+    return operation.request.variables.id === NODE_IRI
+      ? MockPayloadGenerator.generate(operation, {
+          Node: resolveRoot({ ...MOCK_NODE, uri: NODE_IRI }),
+        })
+      : { data: { node: null } };
   });
   const { container } = render(
     createSiteTree(environment, <ProjectionPeek uri={uri} />),
@@ -36,14 +37,14 @@ const renderPeek = (
 };
 
 describe("ProjectionPeek", () => {
-  it("queries the node at its address and renders its card", () => {
-    const { container, variables } = renderPeek("ds:button", MOCK_NODE);
-    expect(variables).toEqual([{ id: "ds:button" }]);
+  it("queries the node at its absolute IRI and renders its card", () => {
+    const { container, variables } = renderPeek(NODE_IRI);
+    expect(variables).toEqual([{ id: NODE_IRI }]);
     expect(container.querySelector(".ds.entity-card")).not.toBeNull();
   });
 
-  it("renders nothing when the graph holds no node at the address", () => {
-    const { container } = renderPeek("ds:missing", null);
+  it("renders nothing for a CURIE, an address node(id:) does not accept", () => {
+    const { container } = renderPeek(MOCK_NODE._meta.curie);
     expect(container.innerHTML).toBe("");
   });
 });
