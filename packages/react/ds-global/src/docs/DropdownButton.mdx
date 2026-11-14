@@ -1,4 +1,5 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as MenuStories from "../lib/component/DropdownButton/common/Menu/Menu.stories";
 import * as Stories from "../lib/component/DropdownButton/withDropdownButton.stories";
 
 <Meta title="Documentation/DropdownButton" />
@@ -88,6 +89,25 @@ in the panel. FilterButton, the component for filters, builds on this panel
 and adds the active look and count.
 
 <Canvas of={Stories.CheckboxList} />
+
+## Menus
+
+Put a `<DropdownPanel.Menu>` in the panel for a flat menu of actions and
+links, with separators and no submenus. Its items take ContextualMenu's entry
+shape: `key` or `url`, `label`, `disabled`, `icon`, `slot`, `className`, and a
+custom `Component`. The trigger then advertises a menu, and the menu follows
+the menu button pattern: ArrowDown or ArrowUp on the trigger opens it on the
+first or last item, the arrows, Home and End move between items, typing jumps
+to an item whose label starts with what was typed, Enter or Space chooses one,
+and Escape or Tab closes it with focus back on the trigger.
+
+Choosing an item calls `onSelect(item, event)`, then closes the panel. An item
+with a `url` is a real link, so it works with no script; a client router takes
+it by calling `event.preventDefault()` in `onSelect` and navigating itself. An
+item with no `url` needs a script, so it is hidden while scripting is off, and
+a menu of actions alone hides its trigger too.
+
+<Canvas of={MenuStories.Default} />
 
 ## Known limits
 

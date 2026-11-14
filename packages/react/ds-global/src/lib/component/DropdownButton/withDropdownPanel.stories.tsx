@@ -19,12 +19,25 @@ export default meta;
 
 const renderSettings: WithDropdownRender = ({ ref, id, triggerId }) => (
   <DropdownPanel ref={ref} id={id} aria-labelledby={triggerId}>
-    <label style={{ display: "block" }}>
-      <input type="checkbox" defaultChecked /> Show row numbers
-    </label>
-    <label style={{ display: "block" }}>
-      <input type="checkbox" /> Wrap long values
-    </label>
+    <DropdownPanel.Menu
+      items={[
+        { url: "?density=comfortable", label: "Comfortable rows" },
+        { url: "?density=dense", label: "Dense rows" },
+      ]}
+    />
+  </DropdownPanel>
+);
+
+const renderColumnOptions: WithDropdownRender = ({ ref, id, triggerId }) => (
+  <DropdownPanel ref={ref} id={id} aria-labelledby={triggerId}>
+    <DropdownPanel.Menu
+      items={[
+        { url: "?sort=name", label: "Sort ascending" },
+        { url: "?sort=-name", label: "Sort descending" },
+        { type: "separator", key: "visibility" },
+        { key: "hide", label: "Hide column" },
+      ]}
+    />
   </DropdownPanel>
 );
 
@@ -36,14 +49,14 @@ const SettingsTrigger = Component(
 );
 const OptionsTrigger = Component(
   withTooltip(IconButton, "Options for Name"),
-  renderSettings,
+  renderColumnOptions,
 );
 
 /**
  * The same wiring as withDropdownButton, with no chevron: for triggers the
  * design draws without one. The settings trigger is a gear, and a column's
- * options trigger is three vertical dots. Each icon button is named by its
- * `aria-label` and paired with a Tooltip.
+ * options trigger is three vertical dots; each opens a menu. Each icon
+ * button is named by its `aria-label` and paired with a Tooltip.
  */
 export const IconTriggers: StoryFn = () => (
   <div style={{ display: "flex", gap: "var(--dimension-200)" }}>
@@ -65,7 +78,9 @@ IconTriggers.parameters = {
       code: `const SettingsTrigger = withDropdownPanel(
   withTooltip(IconButton, "Table settings"),
   ({ ref, id, triggerId }) => (
-    <DropdownPanel ref={ref} id={id} aria-labelledby={triggerId}>…</DropdownPanel>
+    <DropdownPanel ref={ref} id={id} aria-labelledby={triggerId}>
+      <DropdownPanel.Menu items={settings} />
+    </DropdownPanel>
   ),
 );
 
