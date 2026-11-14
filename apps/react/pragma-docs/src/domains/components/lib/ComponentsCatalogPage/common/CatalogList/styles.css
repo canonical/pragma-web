@@ -43,6 +43,11 @@
     padding-inline-start: 0;
   }
 
+  /* A tier's count spans its section's row, under the tier's name. */
+  .ds.catalog-list > .page-section > .count {
+    grid-column: 1 / -1;
+  }
+
   .ds.catalog-list > .more {
     grid-column: 1 / -1;
     margin-block: 0;

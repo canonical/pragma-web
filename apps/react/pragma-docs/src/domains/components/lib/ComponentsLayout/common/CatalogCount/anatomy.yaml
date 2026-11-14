@@ -1,0 +1,17 @@
+---
+# CatalogCount — the strip's count on the catalog, closing its filtering
+# group: how many components the catalog lists, read from the catalog's own
+# operation and paginated fragment, so the components a "Load more" adds
+# count too. The connection carries no total, so while pages remain the
+# noun says the count holds only the components loaded so far. It renders
+# core's count line and binds no style of its own.
+#
+# Token ledger: none.
+node:
+  uri: docs.subcomponent.catalog_count
+  projection:
+    on: Query
+  edges:
+    - node:
+        uri: prism.component.count_line
+      relation: { cardinality: "1", slotName: default }

@@ -1,7 +1,8 @@
 ---
 # ComponentsLayout — the Components lens's layout: the document archetype
 # with the site's rail, a strip whose context is the trail to the catalog
-# or to a component, the routed page in the canvas, and the site's
+# or to a component, its renderers and, on the catalog, the catalog's
+# count closing the filtering group, the routed page in the canvas, and the site's
 # colophon. It renders no element of its own: DocumentLayout renders the
 # root.
 node:
@@ -22,6 +23,9 @@ node:
                 - node:
                     uri: docs.subcomponent.components_view
                   relation: { cardinality: "0..1", slotName: view }
+                - node:
+                    uri: docs.subcomponent.catalog_count
+                  relation: { cardinality: "0..1", slotName: count }
             relation: { cardinality: "1", slotName: strip }
           - node:
               role: routed page
