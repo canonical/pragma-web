@@ -232,7 +232,11 @@ export default function measureLayout({
     const isTextBlock = element.matches(
       "p, .p, .code, h1, h2, h3, h4, h5, h6, .ds.button",
     );
-    const hasAutoMargin = element.matches(".kbd, .inspector-trigger");
+    // The strip's filtering group and its count are pushed to the band's
+    // end by an auto margin, which takes the free space before them.
+    const hasAutoMargin = element.matches(
+      ".kbd, .inspector-trigger, .ds.mode-strip > .filtering, .ds.mode-strip > .filtering > .count",
+    );
     for (const property of properties) {
       if (isTextBlock && /^padding-(top|bottom)$/.test(property)) continue;
       if (hasAutoMargin && /^margin-(left|right)$/.test(property)) continue;
