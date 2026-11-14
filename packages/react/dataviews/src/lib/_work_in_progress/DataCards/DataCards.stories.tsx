@@ -20,11 +20,11 @@ import type {
   MachineProviderConfig,
 } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
-import {
-  type DisplayField,
-  type DisplayFieldCellProps,
-  RendererSwitch,
+import type {
+  DisplayField,
+  DisplayFieldCellProps,
 } from "../../common/index.js";
+import { RendererSwitch } from "../../common/RendererSwitch/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataCards as ConnectedCards } from "../DataViews/common/DataCards/index.js";
 import { DataViews } from "../DataViews/index.js";

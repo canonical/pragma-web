@@ -11,18 +11,14 @@
     "skipLibCheck": false,
     "types": ["node", "react", "react-dom"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": [
-    "src/**/*.stories.ts",
-    "src/**/*.stories.tsx",
-    "src/**/*.fixtures.ts",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/**/*.ssr.test.ts",
-    "src/**/*.ssr.test.tsx",
-    "src/storybook",
-    ".storybook",
-    "vite.config.ts",
-    "vitest.setup.ts"
+  // Built from the entry points, so only what an export reaches is emitted:
+  // the unexported prototypes stay out. The Vite types declare the
+  // stylesheets the parts import; the invoker types, the dialogs' commands.
+  "include": [],
+  "files": [
+    "src/vite-env.d.ts",
+    "src/react-invoker-commands.d.ts",
+    "src/index.ts",
+    "src/lib/virtualization/index.ts"
   ]
 }
