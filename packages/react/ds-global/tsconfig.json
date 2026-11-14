@@ -14,6 +14,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
+    "testing/**/*.ts",
     ".storybook/*.ts",
     ".storybook/*.tsx",
     "vite.config.ts",
