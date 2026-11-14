@@ -7,7 +7,7 @@ import { RadioInput } from "../../../../subcomponent/RadioInput/index.js";
 import useOptionAriaProperties from "../../../../utils/hooks/useOptionAriaProperties.js";
 import type { OptionProps } from "./types.js";
 
-const componentCssClassName = "ds option";
+const componentCssClassName = "ds option spacing-text-seat";
 
 /**
  * A single plain-label option within a `Choices` group: a styled native
@@ -52,7 +52,12 @@ const Option = ({
       {/* Option labels are plain choice text: the Label subcomponent's
           required/optional markers belong to field chrome, not to individual
           options, so `isOptional` suppresses the required marker. */}
-      <Label name={name} isOptional className="p" {...ariaProps.label}>
+      <Label
+        name={name}
+        isOptional
+        className="p field-choice-label"
+        {...ariaProps.label}
+      >
         {option.label}
       </Label>
     </div>

@@ -2,7 +2,8 @@ import { forwardRef, type ReactElement } from "react";
 import type { DateTimeInputProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds input datetime chrome";
+const componentCssClassName =
+  "ds input datetime chrome spacing-control-seat stroke-paint stroke";
 
 /**
  * Presentational datetime-local input — pure markup, no react-hook-form.

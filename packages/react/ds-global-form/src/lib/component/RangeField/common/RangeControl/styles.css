@@ -12,7 +12,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--form-group-gap);
+    row-gap: var(--form-group-gap);
+    column-gap: var(--ds-spacing-item-inline);
 
     /* `.range-number` is the NumberInput WRAPPER (a <div>). Size/order the whole
      * control here: fixed, non-flexing width so the slider takes the slack, and

@@ -12,7 +12,8 @@ import mergeRefs from "../../utils/mergeRefs.js";
 import type { PhoneInputProps, PhoneValue } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds input phone chrome";
+const componentCssClassName =
+  "ds input phone chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within";
 
 // Every country lookup falls back to the first entry, so an empty dataset has no
 // country to render at all. Asserted rather than silently read out of bounds, so
@@ -203,7 +204,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
         <select
-          className="country-select p"
+          className="country-select"
           value={selectedCountry}
           onChange={handleCountryChange}
           disabled={disabled}
@@ -218,7 +219,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         </select>
         <input
           type="tel"
-          className="number-input p"
+          className="number-input"
           name={name}
           inputMode="tel"
           autoComplete="tel-national"

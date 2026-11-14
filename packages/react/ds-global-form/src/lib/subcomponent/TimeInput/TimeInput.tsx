@@ -2,7 +2,8 @@ import { forwardRef, type ReactElement } from "react";
 import type { TimeInputProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds input time chrome";
+const componentCssClassName =
+  "ds input time chrome spacing-control-seat stroke-paint stroke";
 
 /**
  * Presentational time input — pure markup, no react-hook-form.

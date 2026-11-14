@@ -1,3 +1,5 @@
+@import url("@canonical/styles/spacing-seat.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -10,7 +12,8 @@
     flex-wrap: wrap;
     /* Row gap gives stacked/wrapped options vertical breathing room (was 0, so
      * stacked items touched); column gap is the inline separation (per review). */
-    gap: var(--form-group-gap) var(--container-gap-loose);
+    row-gap: var(--ds-spacing-item-block);
+    column-gap: var(--ds-spacing-item-inline);
 
     /* Stacked: one option per line */
     &.stacked {
@@ -24,7 +27,8 @@
     &.columns {
       display: grid;
       grid-template-columns: repeat(var(--choices-columns, 2), 1fr);
-      gap: var(--form-group-gap) var(--container-gap-loose);
+      row-gap: var(--ds-spacing-item-block);
+      column-gap: var(--ds-spacing-item-inline);
     }
 
     /* Each option (common/Option, `.ds.option`) is styled here, scoped to this
@@ -32,18 +36,34 @@
     & > .ds.option {
       direction: inherit;
       display: flex;
-      align-items: center;
-      gap: var(--space-100);
+      align-items: flex-start;
+      gap: var(--ds-spacing-mark);
       cursor: pointer;
 
       label {
-        padding: 0;
+        /* The option owns the complete body seat, including paragraph closure. */
+        padding-block: 0;
+        margin-block: 0;
+        line-height: inherit;
       }
 
       /* RadioInput/CheckboxInput carry their own padding margins
        * (--form-input-padding-inline); options align to the group edge. */
       & > input {
+        /* Natural label wrapping must not shrink the native mark. */
+        flex-shrink: 0;
+        /* Wrapped labels retain a first-line mark seat, derived from the line
+         * and mark sizes; closing compensation belongs to the option. */
+        align-self: flex-start;
         margin-inline: 0;
+        margin-block: calc(
+            (
+              var(--ds-typography-body-line-height) -
+              var(--ds-typography-body-font-size)
+            ) /
+            2
+          )
+          0;
       }
 
       &.disabled {
@@ -66,8 +86,8 @@
       & > input[type="radio"] {
         appearance: none;
         box-sizing: border-box;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        width: var(--ds-typography-body-font-size);
+        height: var(--ds-typography-body-font-size);
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: 50%;
@@ -133,8 +153,8 @@
         appearance: none;
         box-sizing: border-box;
         position: relative;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        width: var(--ds-typography-body-font-size);
+        height: var(--ds-typography-body-font-size);
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: var(--dimension-radius-small);

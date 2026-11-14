@@ -150,9 +150,8 @@ const MultipleCombobox = ({
       </div>
 
       {/* Input field with reset button in chrome wrapper */}
-      <div className="ds input combobox-input chrome">
+      <div className="ds input combobox-input chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within">
         <input
-          className="p"
           {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
           placeholder={placeholder}
           disabled={disabled}

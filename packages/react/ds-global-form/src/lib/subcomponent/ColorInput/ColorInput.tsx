@@ -128,7 +128,11 @@ export const ColorInput = ({
 
   const hexInputRow = showHexInput && (
     <div
-      className={["hex-input-row", !hasSwatches && "no-separator"]
+      className={[
+        "hex-input-row",
+        !hasSwatches &&
+          "ds input chrome color-inline-seat spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within no-separator",
+      ]
         .filter(Boolean)
         .join(" ")}
     >
@@ -180,7 +184,7 @@ export const ColorInput = ({
     >
       <button
         type="button"
-        className="color-trigger chrome"
+        className="ds input color-trigger chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within"
         onClick={() => !disabled && setIsOpen((prev) => !prev)}
         disabled={disabled}
         {...otherProps}

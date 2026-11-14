@@ -4,7 +4,8 @@ import { forwardRef, type ReactElement, useId, useState } from "react";
 import type { PasswordInputProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds input password chrome";
+const componentCssClassName =
+  "ds input password chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within";
 
 /**
  * Presentational password input — pure markup, no react-hook-form. The entered
@@ -46,7 +47,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
       >
         <input
           id={resolvedId}
-          className="p"
           type={revealed ? "text" : "password"}
           ref={ref}
           disabled={disabled}

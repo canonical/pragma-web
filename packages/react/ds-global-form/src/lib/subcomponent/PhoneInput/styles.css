@@ -1,3 +1,6 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -8,7 +11,7 @@
   .ds.input.phone {
     display: flex;
     align-items: stretch;
-    padding: 0;
+    padding-inline: 0;
 
     & > .country-select {
       appearance: none;
@@ -16,7 +19,9 @@
       background: transparent;
       color: inherit;
       font-family: inherit;
-      /* .p class provides font-size, line-height, baseline nudges */
+      font-size: inherit;
+      line-height: inherit;
+      padding-block: 0;
       padding-inline: var(--form-input-padding-inline);
       padding-inline-end: var(--form-field-inline-gap);
       border-inline-end: var(--form-input-border-width) solid
@@ -49,8 +54,10 @@
       background: transparent;
       color: inherit;
       font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
       outline: none;
-      /* .p class provides font-size, line-height, baseline nudges */
+      padding-block: 0;
       padding-inline: var(--form-input-padding-inline);
 
       &:disabled {

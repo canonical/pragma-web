@@ -4,7 +4,8 @@ import { forwardRef, type ReactElement } from "react";
 import type { NumberInputProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds input number chrome";
+const componentCssClassName =
+  "ds input number chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within";
 
 /**
  * Presentational number input — pure markup, no react-hook-form. A native
@@ -33,7 +34,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {/* `id` goes on the <input> (not the wrapper) so the Field label's
             `htmlFor` targets a labelable element; `type` is last so it can't be
             overridden via spread. */}
-        <input id={id} className="p" ref={ref} {...nativeProps} type="number" />
+        <input id={id} ref={ref} {...nativeProps} type="number" />
         {suffix && <span className="suffix">{suffix}</span>}
       </div>
     );

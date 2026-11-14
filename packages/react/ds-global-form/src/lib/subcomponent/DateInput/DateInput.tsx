@@ -2,7 +2,8 @@ import { forwardRef, type ReactElement } from "react";
 import type { DateInputProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds input date chrome";
+const componentCssClassName =
+  "ds input date chrome spacing-control-seat stroke-paint stroke";
 
 /**
  * Presentational date input — pure markup, no react-hook-form.
