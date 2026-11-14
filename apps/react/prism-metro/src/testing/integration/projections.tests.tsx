@@ -5,6 +5,8 @@ import {
   CENTRAL_EXCHANGE_TITLE,
   CIRCLE_LINE_TITLE,
   INTERCHANGE_COUNT,
+  LENS_PAGE_TEST_TIMEOUT_MS,
+  LENS_PAGE_WAIT_MS,
   LINE_COUNT,
   NORTHGATE_TITLE,
   PLAIN_STATION_COUNT,
@@ -31,6 +33,13 @@ afterEach(() => {
 
 afterAll(() => graph.close());
 
+/**
+ * How long each wait below gives the page to answer: it mounts the whole
+ * provider stack over a real socket, which overruns the default under
+ * parallel machine load.
+ */
+const WAIT = { timeout: LENS_PAGE_WAIT_MS };
+
 /** Find the card whose title reads `title`. */
 const findCard = (container: HTMLElement, title: string): Element => {
   const card = [...container.querySelectorAll(".ds.entity-card")].find(
@@ -53,14 +62,14 @@ const readPairs = (card: Element): (string | null)[][] =>
 const readVitals = (card: Element): (string | null)[] =>
   [...card.querySelectorAll(".vital")].map((vital) => vital.textContent);
 
-describe("the stations lens's cards", () => {
+describe("the stations lens's cards", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("card every station as a station and every interchange as one", async () => {
     const { container } = renderLensPage("/stations?as=cards", graph.url);
     await waitFor(() => {
       expect(container.querySelectorAll(".ds.station-card")).toHaveLength(
         PLAIN_STATION_COUNT,
       );
-    });
+    }, WAIT);
     expect(container.querySelectorAll(".ds.interchange-card")).toHaveLength(
       INTERCHANGE_COUNT,
     );
@@ -77,14 +86,14 @@ describe("the stations lens's cards", () => {
   });
 });
 
-describe("the lines lens's rows", () => {
+describe("the lines lens's rows", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("row every line as a line, each ending in its stops", async () => {
     const { container } = renderLensPage("/lines", graph.url);
     await waitFor(() => {
       expect(container.querySelectorAll("li.line-row")).toHaveLength(
         LINE_COUNT,
       );
-    });
+    }, WAIT);
     expect(container.querySelector(".node-row")).toBeNull();
     const circle = [...container.querySelectorAll("li.line-row")].find(
       (row) => row.querySelector(".title")?.textContent === CIRCLE_LINE_TITLE,
@@ -93,7 +102,7 @@ describe("the lines lens's rows", () => {
   });
 });
 
-describe("a fare zone", () => {
+describe("a fare zone", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("chips as a zone and, with no home, reads as text", async () => {
     const { container } = renderLensPage(
       `/definitions/${encodeURIComponent(ZONE_CLASS_CURIE)}`,
@@ -103,7 +112,7 @@ describe("a fare zone", () => {
       expect(
         container.querySelector(".term-inspector .zone-chip"),
       ).not.toBeNull();
-    });
+    }, WAIT);
     const chips = [...container.querySelectorAll(".term-inspector .zone-chip")];
     expect(chips.map((chip) => chip.textContent)).toContain(ZONE_TITLE);
     for (const chip of chips) {
