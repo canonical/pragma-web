@@ -1,0 +1,23 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.query-chips {
+    /* 8 px, so a focused chip's ring, which reaches 5 px past it, never draws
+       over its neighbour. */
+    --query-chips-gap: var(--dimension-100);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--query-chips-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    & > li {
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
