@@ -21,7 +21,7 @@ type Story = StoryObj<typeof LensBreadcrumbs>;
 /** On a lens's index: the lens crumb is the current page. */
 export const Default: Story = {};
 
-/** Under a lens: the lens crumb links home, the current page follows. */
+/** Under a lens: the trail ends at the lens crumb, which links home. */
 export const WithCurrent: Story = {
   args: { current: "Term" },
 };

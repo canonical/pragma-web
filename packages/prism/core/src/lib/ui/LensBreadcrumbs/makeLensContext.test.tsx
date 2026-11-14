@@ -85,16 +85,14 @@ describe("makeLensContext", () => {
     );
   });
 
-  it("adds the route param as the current crumb when present", async () => {
+  it("ends the trail at the lens's link when the route param is present", async () => {
     const nav = await renderAt("/glossary/ds%3AUIBlock", GlossaryContext);
+    expect(within(nav).getAllByRole("listitem")).toHaveLength(1);
     expect(within(nav).getByRole("link", { name: "Glossary" })).toHaveAttribute(
       "href",
       "/glossary",
     );
-    expect(within(nav).getByText("ds:UIBlock")).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    expect(within(nav).queryByText("ds:UIBlock")).toBeNull();
   });
 
   it("reads the lens crumb's text from its prop on every render", async () => {
