@@ -92,10 +92,10 @@ describe("NodeGraphNode", () => {
     ));
     expectSlotOrder(container);
     expect(container.querySelector(".title")?.textContent).toBe(
-      "ds IconButton",
+      "ds: IconButton",
     );
     expect(container.querySelector(".title > .prefix")?.textContent).toBe(
-      "ds ",
+      "ds: ",
     );
     expect(container.querySelector(".context")?.textContent).toBe("Component");
     expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(

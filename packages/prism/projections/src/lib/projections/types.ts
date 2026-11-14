@@ -141,3 +141,14 @@ export interface ProjectionsContextValue {
   /** The site's peek for the node at an absolute IRI, when it gives one. */
   readonly peek?: (uri: string) => ReactNode;
 }
+
+/** Props accepted by `AmbientNamespaceProvider`. */
+export interface AmbientNamespaceProviderProps {
+  /**
+   * The prefix of the page's namespace as its CURIEs write it, without its
+   * colon: `ds` for a page of `ds:` entities.
+   */
+  readonly namespace: string;
+  /** The content whose identities read it. */
+  readonly children: ReactNode;
+}

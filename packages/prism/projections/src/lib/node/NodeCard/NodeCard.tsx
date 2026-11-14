@@ -5,9 +5,11 @@ import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeCard_node.graphql.js";
-import { useProjectionLink } from "../../projections/index.js";
+import {
+  useForeignPrefix,
+  useProjectionLink,
+} from "../../projections/index.js";
 import { EntityCard } from "../../ui/index.js";
-import { findCuriePrefix } from "../../utils/index.js";
 import { NODE_MARK_ICON } from "../NodeChip/constants.js";
 import type { NodeCardProps } from "./types.js";
 import "./styles.css";
@@ -58,7 +60,8 @@ const componentCssClassName = "ds node-card";
  *
  * @implements prism.component.node_card
  * @note Impure: reads its node from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes, its link from the projection provider and the page's
+ *   ambient namespace.
  */
 export default function NodeCard({
   node,
@@ -69,6 +72,7 @@ export default function NodeCard({
   const { curie, title, definition, type } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   return (
     <EntityCard
       {...props}
@@ -79,7 +83,7 @@ export default function NodeCard({
       kind={type._meta.title}
       LinkComponent={LinkComponent}
       mark={<Icon icon={NODE_MARK_ICON} />}
-      prefix={findCuriePrefix(curie)}
+      prefix={prefix}
       summary={definition ?? undefined}
       title={title}
     />

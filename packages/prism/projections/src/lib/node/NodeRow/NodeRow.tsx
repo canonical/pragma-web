@@ -5,9 +5,11 @@ import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeRow_node.graphql.js";
-import { useProjectionLink } from "../../projections/index.js";
+import {
+  useForeignPrefix,
+  useProjectionLink,
+} from "../../projections/index.js";
 import { EntityRow } from "../../ui/index.js";
-import { findCuriePrefix } from "../../utils/index.js";
 import { NODE_MARK_ICON } from "../NodeChip/constants.js";
 import type { NodeRowProps } from "./types.js";
 import "./styles.css";
@@ -38,7 +40,7 @@ const componentCssClassName = "ds node-row";
 
 /**
  * Any graph node as a 32px list entry, from what every node carries, in
- * the slot order: the generic node glyph as its mark, its namespace prefix
+ * the slot order: the generic node glyph as its mark, its namespace prefix when it differs from the page's ambient one
  * before its title, the title linked to its home when the site has one and
  * inert text when it has none, then its class's title as its kind. A node
  * whose address did not compact has no prefix.
@@ -54,7 +56,8 @@ const componentCssClassName = "ds node-row";
  *
  * @implements prism.component.node_row
  * @note Impure: reads its node from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes, its link from the projection provider and the page's
+ *   ambient namespace.
  */
 export default function NodeRow({
   node,
@@ -65,6 +68,7 @@ export default function NodeRow({
   const { curie, title, type } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   return (
     <EntityRow
       {...props}
@@ -74,7 +78,7 @@ export default function NodeRow({
       kind={type._meta.title}
       LinkComponent={LinkComponent}
       mark={<Icon icon={NODE_MARK_ICON} />}
-      prefix={findCuriePrefix(curie)}
+      prefix={prefix}
       title={title}
     />
   );

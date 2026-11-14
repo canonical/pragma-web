@@ -92,7 +92,7 @@ describe("NodeRow", () => {
       [...container.querySelectorAll(".prefix, .title, .kind")].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["ds", "IconButton", "Component"]);
+    ).toEqual(["ds:", "IconButton", "Component"]);
     expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
       "/icons/file-blank.svg#file-blank",
     );

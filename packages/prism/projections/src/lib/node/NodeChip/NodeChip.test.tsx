@@ -11,7 +11,10 @@ import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
 import testQuery, {
   type NodeChipTestQuery,
 } from "../../../__generated__/NodeChipTestQuery.graphql.js";
-import { ProjectionsProvider } from "../../projections/index.js";
+import {
+  AmbientNamespaceProvider,
+  ProjectionsProvider,
+} from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import NodeChip from "./NodeChip.js";
 import type { NodeChipProps } from "./types.js";
@@ -83,6 +86,18 @@ describe("NodeChip", () => {
       "data-type",
       "Component",
     );
+  });
+
+  it("shows its prefix only when its namespace is not the page's", () => {
+    const foreign = renderWithNode((node) => <NodeChip node={node} />);
+    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
+    foreign.unmount();
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <NodeChip node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
   });
 
   it("shows its title as inert text when the site does not home its type", () => {

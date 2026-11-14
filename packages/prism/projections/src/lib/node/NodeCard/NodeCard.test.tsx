@@ -88,7 +88,7 @@ describe("NodeCard", () => {
         (slot) => slot.textContent,
       ),
     ).toEqual([
-      "ds",
+      "ds:",
       "ds:global.component.icon-button",
       "Component",
       "A button is an interactive element that triggers a command.",

@@ -5,9 +5,11 @@ import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeGraphNode_node.graphql.js";
-import { useProjectionLink } from "../../projections/index.js";
+import {
+  useForeignPrefix,
+  useProjectionLink,
+} from "../../projections/index.js";
 import { EntityGraphNode } from "../../ui/index.js";
-import { findCuriePrefix } from "../../utils/index.js";
 import { NODE_MARK_ICON } from "../NodeChip/constants.js";
 import type { NodeGraphNodeProps } from "./types.js";
 import "./styles.css";
@@ -39,7 +41,7 @@ const componentCssClassName = "ds node-graph-node";
 /**
  * Any graph node as a node of a graph, native SVG, from what every node
  * carries, in the slot order: the generic node glyph as its mark, drawn
- * at every zoom, then its namespace prefix and its title on the first
+ * at every zoom, then its namespace prefix when it differs from the page's ambient one and its title on the first
  * line, the title linked to its home when the site has one and inert text
  * when it has none, and its class's title as its kind, muted on the
  * second. A node whose address did not compact has no prefix.
@@ -52,7 +54,8 @@ const componentCssClassName = "ds node-graph-node";
  *
  * @implements prism.component.node_graph_node
  * @note Impure: reads its node from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes, its link from the projection provider and the page's
+ *   ambient namespace.
  */
 export default function NodeGraphNode({
   node,
@@ -63,6 +66,7 @@ export default function NodeGraphNode({
   const { curie, title, type } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   return (
     <EntityGraphNode
       {...props}
@@ -72,7 +76,7 @@ export default function NodeGraphNode({
       kind={type._meta.title}
       LinkComponent={LinkComponent}
       mark={<Icon icon={NODE_MARK_ICON} />}
-      prefix={findCuriePrefix(curie)}
+      prefix={prefix}
       title={title}
     />
   );

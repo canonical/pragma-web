@@ -75,6 +75,7 @@ export {
   OntologyPropertyRow,
 } from "./ontology/index.js";
 export type {
+  AmbientNamespaceProviderProps,
   ArmProps,
   ProjectionArm,
   ProjectionMap,
@@ -83,8 +84,10 @@ export type {
   SiteArmProps,
 } from "./projections/index.js";
 export {
+  AmbientNamespaceProvider,
   ProjectionsProvider,
   renderArm,
+  useForeignPrefix,
   useProjectionLink,
   useProjectionMaps,
 } from "./projections/index.js";
