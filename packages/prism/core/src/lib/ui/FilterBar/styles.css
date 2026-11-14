@@ -45,6 +45,15 @@
     gap: var(--filter-bar-spacing);
   }
 
+  /* Below three groups the columns from the fifth line are narrower than
+   * a lens's facet buttons (about 330px at 1366), so the controls start on
+   * the first column line and the bar stays one line. */
+  @container shell (width < 1376px) {
+    .ds.filter-bar > .controls {
+      grid-column: 1 / -1;
+    }
+  }
+
   /* Below two groups the sheet holds the facets. */
   @container shell (width < 912px) {
     .ds.filter-bar {

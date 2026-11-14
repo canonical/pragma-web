@@ -8,7 +8,9 @@
 # last column line. It bleeds upward across the layout's row gap (a
 # negative block margin of one gutter), so the two bands touch and the
 # layout keeps one gap variable on both axes. It is one line at every
-# width: its controls never wrap. Below two groups the bar is not
+# width: its controls never wrap. Below three groups the columns from 5
+# (about 330px at 1366, 216px at 912) are narrower than a lens's facet
+# buttons, so the controls start on the first column line instead. Below two groups the bar is not
 # displayed: its content is the sheet's.
 #
 # Every decision is read through a component token declared on the root
@@ -21,6 +23,8 @@
 #   space.100 (8px) between the controls.
 #
 # Reflow, bound in styles.css:
+#   @container shell (width < 1376px)  below three groups: the controls
+#     run from the first column line to the last.
 #   @container shell (width < 912px)  below two groups: not displayed.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
