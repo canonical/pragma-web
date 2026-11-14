@@ -111,6 +111,7 @@ describe("public surface", () => {
       ".",
       "./bindings",
       "./indexeddb",
+      "./testing",
       "./virtualization",
     ]);
     for (const entry of ["bindings", "indexeddb", "virtualization"]) {
@@ -119,6 +120,10 @@ describe("public surface", () => {
         import: `./dist/esm/lib/${entry}/index.js`,
       });
     }
+    expect(manifest().exports["./testing"]).toEqual({
+      types: "./dist/types/testing/index.d.ts",
+      import: "./dist/esm/testing/index.js",
+    });
   });
 
   it("hands framework bindings their shared machinery from ./bindings", () => {

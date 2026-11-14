@@ -18,7 +18,12 @@ import type {
 import type { ViewStore } from "../src/lib/views/index.js";
 import type { DecodedQuery } from "../src/lib/wire/index.js";
 
-/** One execution the manual source was asked for, and how to answer it. */
+/**
+ * One execution the manual source was asked for, and how to answer it.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export type ManualCall<TRow extends object = RowRecord> = {
   readonly request: SourceRequest;
   readonly deliver: (delivery: SourceDelivery<TRow>) => void;
@@ -26,7 +31,12 @@ export type ManualCall<TRow extends object = RowRecord> = {
   releases: number;
 };
 
-/** Configuration of one manual source. */
+/**
+ * Configuration of one manual source.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export type ManualSourceConfig<TRow extends object = RowRecord> = {
   /** What the source declares; nothing executable by default. */
   readonly capabilities?: SourceCapabilities | undefined;
@@ -41,7 +51,12 @@ export type ManualSourceConfig<TRow extends object = RowRecord> = {
   readonly answer?: ((request: SourceRequest) => SourcePage<TRow>) | undefined;
 };
 
-/** A source whose deliveries the test drives by hand. */
+/**
+ * A source whose deliveries the test drives by hand.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export type ManualSource<TRow extends object = RowRecord> = {
   readonly source: Source<TRow>;
   /** Every execution asked for, in order. */
@@ -71,10 +86,18 @@ export type CountingViewStoreConfig = {
 /**
  * One write a recording location received: the parameters, and the history
  * mode the writer asked for — null when it asked for none.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export type RecordedWrite = readonly [string, HistoryMode | null];
 
-/** A location port and the record of what passed through it. */
+/**
+ * A location port and the record of what passed through it.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export type RecordingLocation = {
   readonly location: QueryLocation;
   /** Every write, in order. */

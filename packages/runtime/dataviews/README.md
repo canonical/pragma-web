@@ -208,3 +208,11 @@ import { createVirtualRange } from "@canonical/dataviews-core/virtualization";
 ```
 
 The range works over `listDisplayEntries`, from `./bindings`: the entries a table body displays, in order — its status row, then a row per record — each with an id unique across kinds and its logical row position, the header row being 1. It is arithmetic over estimated and measured entry sizes, keyed by entry id: a binding reports the viewport and the measurements, and scrolls by the corrections the range returns. React applications use `virtualizeRows` from `@canonical/dataviews-react/virtualization` rather than the range itself.
+
+## Test doubles
+
+Framework bindings test against the same doubles as the core. They are experimental, from their own entry point:
+
+```ts
+import { createManualSource } from "@canonical/dataviews-core/testing";
+```

@@ -13,6 +13,9 @@ import type { ManualCall, ManualSource, ManualSourceConfig } from "./types.js";
  *
  * @note Impure by design: it records every execution and counts every
  * release, into the lists it hands back for a test to read.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function createManualSource<TRow extends object = RowRecord>(
   config: ManualSourceConfig<TRow> = {},

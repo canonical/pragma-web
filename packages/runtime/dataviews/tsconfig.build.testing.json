@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist/testing-build/esm",
+    "declaration": true,
+    "declarationDir": "dist/testing-build/types"
+  },
+  "include": ["testing/index.ts"]
+}

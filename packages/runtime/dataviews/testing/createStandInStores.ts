@@ -14,6 +14,9 @@ const refuse = (): Promise<never> =>
 /**
  * Create a presentation store that answers as a test says: every call not
  * overridden reads nothing, saves and hears nobody.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export const createStandInPresentationStore = (
   overrides: Partial<PresentationStore> = {},
@@ -27,6 +30,9 @@ export const createStandInPresentationStore = (
 /**
  * Create a view store that answers as a test says: every call not
  * overridden lists nothing, finds nothing, refuses to write and hears nobody.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export const createStandInViewStore = (
   overrides: Partial<ViewStore> = {},

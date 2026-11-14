@@ -18,6 +18,9 @@ import type { RecordingLocation } from "./types.js";
  *
  * @note Impure by design: it records every write, and the core's every
  * notification, into the lists it hands back for a test to read.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function createRecordingLocation(
   config: MemoryLocationConfig = {},
