@@ -38,13 +38,14 @@ const renderList = (
   return { provider, view, stop };
 };
 
-const region = () => within(screen.getByRole("region", { name: "Machines" }));
+const getRegion = () =>
+  within(screen.getByRole("region", { name: "Machines" }));
 
 describe("ScopedRecordList", () => {
   it("lists the scope's rows, and says nothing while they speak for themselves", () => {
     renderList();
     expect(
-      region()
+      getRegion()
         .getAllByRole("listitem")
         .map((item) => item.textContent),
     ).toEqual(["alpha", "beta"]);
@@ -60,7 +61,7 @@ describe("ScopedRecordList", () => {
       "aria-busy",
       "true",
     );
-    expect(region().queryAllByRole("listitem")).toHaveLength(0);
+    expect(getRegion().queryAllByRole("listitem")).toHaveLength(0);
     expect(screen.getByRole("region", { name: "Machines" })).toHaveTextContent(
       "Chargement…",
     );
@@ -68,7 +69,9 @@ describe("ScopedRecordList", () => {
 
   it("draws a checkbox per record when selectable", () => {
     const { provider } = renderList({ selectable: true });
-    fireEvent.click(region().getByRole("checkbox", { name: "Select alpha" }));
+    fireEvent.click(
+      getRegion().getByRole("checkbox", { name: "Select alpha" }),
+    );
     expect([...provider.selection.state.get().ids]).toEqual(["m-1"]);
   });
 
@@ -134,6 +137,6 @@ describe("ScopedRecordList", () => {
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows could not be refreshed: offline",
     );
-    expect(region().getAllByRole("listitem")).toHaveLength(2);
+    expect(getRegion().getAllByRole("listitem")).toHaveLength(2);
   });
 });

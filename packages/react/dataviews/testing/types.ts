@@ -236,3 +236,27 @@ export type ResolvedRule = {
   readonly selectors: readonly string[];
   readonly declarations: string;
 };
+
+/** A host measured by its memory. */
+export type MemoryRecord = { readonly id: string; readonly memory: number };
+
+/** A record of the values a cell renders by its own rules. */
+export type OddRecord = {
+  readonly id: string;
+  readonly ready: boolean;
+  readonly big: bigint;
+  readonly shape: object;
+};
+
+/** A machine carrying the fields its facets are computed from. */
+export type FacetedRecord = IdentifiedRecord & {
+  readonly status: string;
+  readonly cpu: number;
+  readonly name: string;
+};
+
+/** A record that may be placed in a region. */
+export type PlacedRecord = { readonly id: string; readonly region?: string };
+
+/** A record placed in a region. */
+export type RegionRecord = { readonly id: string; readonly region: string };

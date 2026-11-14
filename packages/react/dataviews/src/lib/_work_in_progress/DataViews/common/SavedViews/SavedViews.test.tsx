@@ -367,7 +367,7 @@ describe("DataViews.SavedViews", () => {
       expect(getButton("Save as…")).toHaveFocus();
     });
     expect(screen.queryByRole("form")).toBeNull();
-    expect(getSelect().selectedOptions[0]).toHaveTextContent(
+    expect(getSelect().selectedOptions.item(0)).toHaveTextContent(
       "Running machines",
     );
   });
@@ -464,7 +464,7 @@ describe("DataViews.SavedViews", () => {
     await waitFor(() => {
       expect(queryStatus()).toHaveTextContent('Renamed to "Failures".');
     });
-    expect(getSelect().selectedOptions[0]).toHaveTextContent("Failures");
+    expect(getSelect().selectedOptions.item(0)).toHaveTextContent("Failures");
     await waitFor(() => {
       expect(getButton("Rename…")).toHaveFocus();
     });
@@ -544,7 +544,9 @@ describe("DataViews.SavedViews", () => {
       expect(getButton("Discard changes")).toBeEnabled();
     });
     fireEvent.click(getButton("Discard changes"));
-    expect(provider.state.get().slice.filter[0]?.operands).toEqual(["running"]);
+    expect(provider.state.get().slice.filter.at(0)?.operands).toEqual([
+      "running",
+    ]);
     expect(screen.queryByText("Modified")).toBeNull();
     expect(queryStatus()).toHaveTextContent("");
     expect(getButton("Save")).toBeDisabled();

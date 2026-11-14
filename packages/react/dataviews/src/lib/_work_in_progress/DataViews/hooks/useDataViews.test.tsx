@@ -25,7 +25,7 @@ import DataViews from "../Provider.js";
 import useDataViews from "./useDataViews.js";
 
 /** A wrapper for renderHook, over one root. */
-const inRoot =
+const withRoot =
   (provider: MachineProvider) =>
   ({ children }: { children: ReactNode }) => (
     <DataViews provider={provider}>{children}</DataViews>
@@ -41,7 +41,7 @@ describe("useDataViews", () => {
   it("returns the stable typed scope for the enclosing provider", () => {
     const { provider } = createMachineProvider();
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     expect(result.current.collection).toBe(machines);
     expect(result.current.capabilities).toBe(provider.capabilities);
@@ -75,7 +75,7 @@ describe("useDataViews", () => {
   it("hands out channels that cannot be published on", () => {
     const { provider } = createMachineProvider();
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     for (const channel of [
       result.current.state,
@@ -93,7 +93,7 @@ describe("useDataViews", () => {
   it("serves the same scope across re-renders", () => {
     const { provider } = createMachineProvider();
     const { result, rerender } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     const first = result.current;
     rerender();
@@ -110,7 +110,7 @@ describe("useDataViews", () => {
     const { provider } = createMachineProvider();
     expect(() =>
       renderHook(() => useDataViews(racks), {
-        wrapper: inRoot(provider),
+        wrapper: withRoot(provider),
       }),
     ).toThrow(
       "useDataViews was passed a collection that is not the one the enclosing DataViews root's provider was built over",
@@ -134,7 +134,7 @@ describe("useDataViews", () => {
   it("commands the shared query through the scope", () => {
     const { provider, source } = createMachineProvider();
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     let refusals: readonly unknown[] = [];
     act(() => {
@@ -177,7 +177,7 @@ describe("useDataViews", () => {
       runAction,
     });
     const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: inRoot(provider),
+      wrapper: withRoot(provider),
     });
     act(() => {
       provider.selection.add(["m1", "m2"]);
@@ -190,7 +190,7 @@ describe("useDataViews", () => {
       throw new Error("expected the run to settle");
     }
     expect(runAction).toHaveBeenCalledTimes(1);
-    expect(runAction.mock.calls[0]?.[0]).toEqual({
+    expect(runAction.mock.calls.at(0)?.at(0)).toEqual({
       action: "stop",
       targets: { kind: "explicit", ids: ["m1", "m2"] },
       payload: undefined,

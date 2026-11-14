@@ -120,10 +120,10 @@ const watchRequests = () => {
         unanswered += 1;
       } else {
         waiting += 1;
-        const answered = () => {
+        const markAnswered = () => {
           waiting -= 1;
         };
-        request.then(answered, answered);
+        request.then(markAnswered, markAnswered);
       }
       return request;
     });

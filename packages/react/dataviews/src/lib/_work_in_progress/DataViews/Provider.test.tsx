@@ -25,7 +25,7 @@ const Root = ({
 }) => <DataViews provider={provider}>{children}</DataViews>;
 
 /** The executions the source still holds. */
-const live = (source: ReturnType<typeof createMachineProvider>["source"]) =>
+const listLive = (source: ReturnType<typeof createMachineProvider>["source"]) =>
   source.calls.filter((call) => call.releases === 0);
 
 /** A control over the `cores` lower bound, as a child of one root. */
@@ -107,7 +107,7 @@ describe("DataViews root", () => {
       </StrictMode>,
     );
     // The rehearsal observed and released; the kept mount observes again.
-    expect(live(source)).toHaveLength(1);
+    expect(listLive(source)).toHaveLength(1);
     act(() => {
       source.readLatest().deliver({
         status: "succeeded",
@@ -115,7 +115,7 @@ describe("DataViews root", () => {
       });
     });
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
-    expect(live(source)).toHaveLength(1);
+    expect(listLive(source)).toHaveLength(1);
   });
 
   it("releases the first provider and observes the next when the prop changes", () => {
@@ -126,14 +126,14 @@ describe("DataViews root", () => {
         <DataViews.DataTable columns={columns} label="Machines" />
       </Root>,
     );
-    expect(live(first.source)).toHaveLength(1);
+    expect(listLive(first.source)).toHaveLength(1);
     rerender(
       <Root provider={second.provider}>
         <DataViews.DataTable columns={columns} label="Machines" />
       </Root>,
     );
-    expect(live(first.source)).toHaveLength(0);
-    expect(live(second.source)).toHaveLength(1);
+    expect(listLive(first.source)).toHaveLength(0);
+    expect(listLive(second.source)).toHaveLength(1);
     // The parts now read the new provider.
     act(() => {
       second.source.readLatest().deliver({
@@ -143,7 +143,7 @@ describe("DataViews root", () => {
     });
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
     unmount();
-    expect(live(second.source)).toHaveLength(0);
+    expect(listLive(second.source)).toHaveLength(0);
   });
 
   it("keeps the source live after a StrictMode mount over a source that answered at once", () => {
@@ -161,7 +161,7 @@ describe("DataViews root", () => {
       </StrictMode>,
     );
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
-    expect(live(source)).toHaveLength(1);
+    expect(listLive(source)).toHaveLength(1);
     act(() => {
       source.readLatest().deliver({
         status: "succeeded",

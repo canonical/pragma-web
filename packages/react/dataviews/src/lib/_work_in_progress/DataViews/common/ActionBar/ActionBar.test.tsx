@@ -31,7 +31,7 @@ const select = (provider: MachineProvider, ids: string[]): void => {
   });
 };
 
-const bar = () => screen.getByRole("group", { name: "Selection actions" });
+const getBar = () => screen.getByRole("group", { name: "Selection actions" });
 
 describe("DataViews.ActionBar", () => {
   it("is reachable as the composition's ActionBar part", () => {
@@ -50,7 +50,7 @@ describe("DataViews.ActionBar", () => {
     // Nothing of the bar: the root's announcer region, empty, is the root's.
     expect(container.querySelector(".ds.data-table-action-bar")).toBeNull();
     select(provider, ["m1"]);
-    expect(bar()).toBeInTheDocument();
+    expect(getBar()).toBeInTheDocument();
   });
 
   it("counts the whole selection and names the deselect by it", () => {
@@ -58,14 +58,14 @@ describe("DataViews.ActionBar", () => {
     mount(provider);
     // Selected rows need not be on screen: the count is the selection's.
     select(provider, ["m1", "m9"]);
-    expect(bar()).toHaveTextContent("2 selected");
+    expect(getBar()).toHaveTextContent("2 selected");
     expect(
       screen.getByRole("button", { name: "Deselect 2 rows" }),
     ).toBeInTheDocument();
     act(() => {
       provider.selection.remove(["m9"]);
     });
-    expect(bar()).toHaveTextContent("1 selected");
+    expect(getBar()).toHaveTextContent("1 selected");
     expect(
       screen.getByRole("button", { name: "Deselect 1 row" }),
     ).toBeInTheDocument();
@@ -90,8 +90,8 @@ describe("DataViews.ActionBar", () => {
       ),
     });
     select(provider, ["m1"]);
-    expect([...bar().children]).toEqual([
-      within(bar()).getByRole("status"),
+    expect([...getBar().children]).toEqual([
+      within(getBar()).getByRole("status"),
       screen.getByRole("button", { name: "Export" }),
       screen.getByRole("button", { name: "Deselect 1 row" }),
     ]);
@@ -106,13 +106,13 @@ describe("DataViews.ActionBar", () => {
     expect(
       screen.getByRole("button", { name: "Review selection" }),
     ).toBeInTheDocument();
-    expect(bar()).not.toHaveTextContent("1 selected");
+    expect(getBar()).not.toHaveTextContent("1 selected");
     rerender(
       <DataViews provider={provider}>
         <ActionBar indicator={null} />
       </DataViews>,
     );
-    expect(within(bar()).queryByRole("status")).toBeNull();
+    expect(within(getBar()).queryByRole("status")).toBeNull();
   });
 
   it("sits on the contrasted surface, and passes native props through", () => {
@@ -137,7 +137,9 @@ describe("DataViews.ActionBar", () => {
     const provider = makeProvider();
     mount(provider);
     select(provider, ["m1", "m2"]);
-    expect(within(bar()).getByRole("status")).toHaveTextContent("2 selected");
+    expect(within(getBar()).getByRole("status")).toHaveTextContent(
+      "2 selected",
+    );
   });
 
   it("returns focus to where it entered the bar from when the bar leaves", () => {
@@ -269,7 +271,7 @@ describe("DataViews.ActionBar", () => {
     const held = createRef<HTMLFieldSetElement>();
     const view = mount(provider, { ref: held });
     select(provider, ["m1"]);
-    expect(held.current).toBe(bar());
+    expect(held.current).toBe(getBar());
     view.unmount();
     // A ref object is cleared on detach, and the bar still has its own root
     // to hand the focus back from.
@@ -283,9 +285,9 @@ describe("DataViews.ActionBar", () => {
       },
     });
     select(second, ["m1"]);
-    expect(seen).toEqual([bar()]);
+    expect(seen).toEqual([getBar()]);
     callback.unmount();
-    expect(seen[1]).toBe(null);
+    expect(seen.at(1)).toBe(null);
 
     // A callback returning its own cleanup gets that called instead.
     const cleanup = vi.fn();
@@ -307,6 +309,6 @@ describe("DataViews.ActionBar", () => {
       </StrictMode>,
     );
     select(provider, ["m1", "m2", "m3"]);
-    expect(bar()).toHaveTextContent("3 selected");
+    expect(getBar()).toHaveTextContent("3 selected");
   });
 });

@@ -51,8 +51,8 @@ describe("describeViewStatus", () => {
   it("confirms an open or a save only while the query is still the view's, a rename always", () => {
     const opened = { status: "opened", view } as const;
     const saved = { status: "saved", view } as const;
-    expect(describeSettledAs(opened)[0]).toBe('Opened "Failed".');
-    expect(describeSettledAs(opened, true)[0]).toBe("");
+    expect(describeSettledAs(opened).at(0)).toBe('Opened "Failed".');
+    expect(describeSettledAs(opened, true).at(0)).toBe("");
     expect(describeSettledAs(saved).slice(1, 4)).toEqual([
       'Saved "Failed".',
       'Saved "Failed".',
@@ -63,7 +63,9 @@ describe("describeViewStatus", () => {
       "",
       'Renamed to "Failed".',
     ]);
-    expect(describeSettledAs({ status: "removed" })[4]).toBe("View deleted.");
+    expect(describeSettledAs({ status: "removed" }).at(4)).toBe(
+      "View deleted.",
+    );
   });
 
   it("names every reason a view was refused, and says the query stands", () => {
@@ -85,7 +87,7 @@ describe("describeViewStatus", () => {
             reason: "sorting is not supported",
           },
         ],
-      })[0],
+      }).at(0),
     ).toBe(
       'Not opened: "Failed" asks for what this collection cannot show — "zero" is not a number; sorting is not supported. The query is unchanged.',
     );
@@ -109,14 +111,14 @@ describe("describeViewStatus", () => {
   });
 
   it("says a view is gone, unreadable or not written, for the command tried", () => {
-    expect(describeSettledAs({ status: "missing" })[0]).toBe(
+    expect(describeSettledAs({ status: "missing" }).at(0)).toBe(
       "Not opened: the view no longer exists.",
     );
     expect(
-      describeSettledAs({ status: "unreadable", reason: "corrupt" })[1],
+      describeSettledAs({ status: "unreadable", reason: "corrupt" }).at(1),
     ).toBe("Not saved: the stored view cannot be read (corrupt).");
     expect(
-      describeSettledAs({ status: "failed", reason: "quota exceeded" })[4],
+      describeSettledAs({ status: "failed", reason: "quota exceeded" }).at(4),
     ).toBe("Not deleted: quota exceeded.");
   });
 

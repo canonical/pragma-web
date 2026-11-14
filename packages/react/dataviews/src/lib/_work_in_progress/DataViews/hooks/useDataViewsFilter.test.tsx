@@ -19,7 +19,7 @@ import DataViews from "../Provider.js";
 import useDataViewsFilter from "./useDataViewsFilter.js";
 
 /** A wrapper for renderHook, over one root. */
-const inRoot =
+const withRoot =
   ({ provider }: MachineFixture) =>
   ({ children }: { children: ReactNode }) => (
     <DataViews provider={provider}>{children}</DataViews>
@@ -37,7 +37,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     expect(result.current.input).toBe("");
     expect(result.current.applied).toEqual({ kind: "empty" });
@@ -62,7 +62,7 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "status", "isAny"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       result.current.set(["failed"]);
@@ -78,7 +78,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       result.current.edit("4");
@@ -103,7 +103,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       result.current.edit("4");
@@ -124,7 +124,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "status", "isAny"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       result.current.set(["failed", "running"]);
@@ -145,7 +145,7 @@ describe("useDataViewsFilter", () => {
         useDataViewsFilter(machines, "cores", bound),
       {
         initialProps: { bound: "gte" },
-        wrapper: inRoot(machineProvider),
+        wrapper: withRoot(machineProvider),
       },
     );
     act(() => {
@@ -164,7 +164,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       readProviderHost(provider).setPredicate({
@@ -188,7 +188,7 @@ describe("useDataViewsFilter", () => {
         renders += 1;
         return useDataViewsFilter(machines, "cores", "gte");
       },
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     const mounted = renders;
     // Another filter, the search and the selection move; this one does not.
@@ -218,7 +218,7 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     expect(() =>
       renderHook(() => useDataViewsFilter(racks, "cores", "gte"), {
-        wrapper: inRoot(machineProvider),
+        wrapper: withRoot(machineProvider),
       }),
     ).toThrow(
       "useDataViewsFilter was passed a collection that is not the one the enclosing DataViews root's provider was built over",
@@ -232,13 +232,13 @@ describe("useDataViewsFilter", () => {
     const operator: PredicateOperator = "isAny";
     expect(() =>
       renderHook(() => useDataViewsFilter(machines, field as "cores", "gte"), {
-        wrapper: inRoot(machineProvider),
+        wrapper: withRoot(machineProvider),
       }),
     ).toThrow("the root holds no filter for zone gte");
     expect(() =>
       renderHook(
         () => useDataViewsFilter(machines, "cores", operator as "gte"),
-        { wrapper: inRoot(machineProvider) },
+        { wrapper: withRoot(machineProvider) },
       ),
     ).toThrow("the root holds no filter for cores isAny");
   });

@@ -24,12 +24,12 @@ const columns: readonly DataTableColumn[] = [
 ];
 
 /** Two reasons one ordering is refused for, which no declaration states. */
-const REASONS = [
+const [FIRST_REASON, SECOND_REASON] = [
   "this endpoint orders only what it has indexed",
   "an ordering cannot be applied to a filtered set here",
 ] as const;
 
-const SAID = `Sort unchanged: ${REASONS[0]}; ${REASONS[1]}.`;
+const SAID = `Sort unchanged: ${FIRST_REASON}; ${SECOND_REASON}.`;
 
 beforeEach(() => {
   fakeAnnouncerClock();
@@ -50,14 +50,14 @@ describe("regression 0064 — only the first reason was read", () => {
                 code: "too-many-terms",
                 field: null,
                 operator: null,
-                reason: REASONS[0],
+                reason: FIRST_REASON,
               },
               {
                 part: "sort",
                 code: "too-many-terms",
                 field: null,
                 operator: null,
-                reason: REASONS[1],
+                reason: SECOND_REASON,
               },
             ],
     });

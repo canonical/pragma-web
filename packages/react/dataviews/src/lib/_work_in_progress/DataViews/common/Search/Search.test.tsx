@@ -36,7 +36,7 @@ const mount = (provider: MachineProvider, props: DataViewsSearchProps = {}) =>
     </DataViews>,
   );
 
-const searchbox = (): HTMLInputElement =>
+const getSearchbox = (): HTMLInputElement =>
   screen.getByRole("searchbox", { name: "Search" });
 
 describe("DataViews.Search", () => {
@@ -62,7 +62,7 @@ describe("DataViews.Search", () => {
   it("renders one labelled native search input, spelled as the wire spells search", () => {
     const { provider } = createMachineProvider({ rows: [] });
     mount(provider);
-    const input = searchbox();
+    const input = getSearchbox();
     expect(input).toHaveAttribute("type", "search");
     expect(input).toHaveAttribute("name", "q");
     expect(input).toHaveValue("");
@@ -91,7 +91,7 @@ describe("DataViews.Search", () => {
     mount(provider);
     writes.length = 0;
     for (const typed of ["y", "ya", "yak"]) {
-      fireEvent.change(searchbox(), { target: { value: typed } });
+      fireEvent.change(getSearchbox(), { target: { value: typed } });
       expect(provider.state.get().slice.search).toBe(typed);
     }
     expect(writes).toEqual([
@@ -100,7 +100,7 @@ describe("DataViews.Search", () => {
       ["q=yak&page=1&size=50", "replace"],
     ]);
     // Emptying the input clears the search rather than searching for nothing.
-    fireEvent.change(searchbox(), { target: { value: "" } });
+    fireEvent.change(getSearchbox(), { target: { value: "" } });
     expect(provider.state.get().slice.search).toBeNull();
     expect(writes.at(-1)).toEqual(["page=1&size=50", "replace"]);
   });
@@ -109,14 +109,14 @@ describe("DataViews.Search", () => {
     const location = createMemoryLocation({ href: "/machines?q=alder" });
     const { provider } = createMachineProvider({ rows: [], location });
     mount(provider);
-    expect(searchbox()).toHaveValue("alder");
-    fireEvent.change(searchbox(), { target: { value: "birch" } });
-    expect(searchbox()).toHaveValue("birch");
+    expect(getSearchbox()).toHaveValue("alder");
+    fireEvent.change(getSearchbox(), { target: { value: "birch" } });
+    expect(getSearchbox()).toHaveValue("birch");
     // Back: the location moves, the provider adopts, the input follows.
     act(() => {
       location.write(new URLSearchParams("q=alder&page=1&size=50"));
     });
-    expect(searchbox()).toHaveValue("alder");
+    expect(getSearchbox()).toHaveValue("alder");
     expect(provider.state.get().slice.search).toBe("alder");
   });
 
@@ -160,7 +160,7 @@ describe("DataViews.Search", () => {
       );
     });
     expect(rendered).toHaveBeenCalledTimes(mounted + 1);
-    expect(searchbox()).toHaveValue("cedar");
+    expect(getSearchbox()).toHaveValue("cedar");
   });
 
   it("is a GET form carrying the rest of the query hidden, from the first page", () => {
@@ -199,16 +199,16 @@ describe("DataViews.Search", () => {
     });
     const { provider } = createMachineProvider({ rows: [], location });
     const { container } = mount(provider);
-    const hiddenTab = () =>
+    const readHiddenTab = () =>
       container.querySelector<HTMLInputElement>('input[name="tab"]')?.value;
-    expect(hiddenTab()).toBe("overview");
+    expect(readHiddenTab()).toBe("overview");
     act(() => {
       location.write(
         new URLSearchParams("tab=details&status=failed&page=1&size=50"),
       );
     });
     expect(provider.state.get().slice.filter).toHaveLength(1);
-    expect(hiddenTab()).toBe("details");
+    expect(readHiddenTab()).toBe("details");
   });
 
   it("intercepts a submission, which has nothing left to apply", () => {
@@ -235,7 +235,7 @@ describe("DataViews.Search", () => {
       placeholder: "host or owner",
       autoComplete: "off",
     });
-    const input = searchbox();
+    const input = getSearchbox();
     expect(input).toHaveAttribute("id", "machine-search");
     expect(input).toHaveAttribute("placeholder", "host or owner");
     expect(input).toHaveAttribute("autocomplete", "off");
@@ -263,12 +263,12 @@ describe("DataViews.Search", () => {
       </StrictMode>,
     );
     writes.length = 0;
-    fireEvent.change(searchbox(), { target: { value: "yak" } });
-    expect(searchbox()).toHaveValue("yak");
+    fireEvent.change(getSearchbox(), { target: { value: "yak" } });
+    expect(getSearchbox()).toHaveValue("yak");
     expect(writes).toEqual([["q=yak&page=1&size=50", "replace"]]);
     act(() => {
       move("page=1&size=50");
     });
-    expect(searchbox()).toHaveValue("");
+    expect(getSearchbox()).toHaveValue("");
   });
 });

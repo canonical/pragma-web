@@ -14,7 +14,10 @@ import createMachineProvider from "../../../../testing/createMachineProvider.js"
 import deliverFacets from "../../../../testing/deliverFacets.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
-import type { MachineProvider as Provider } from "../../../../testing/types.js";
+import type {
+  MemoryRecord,
+  MachineProvider as Provider,
+} from "../../../../testing/types.js";
 import DataChart from "./DataChart.js";
 
 /** The accessible name the status chart is given. */
@@ -468,9 +471,8 @@ describe('DataChart of type "range"', () => {
   });
 
   it("reaches the field's declared upper bound past the range, and starts from the range where no lower bound is declared", () => {
-    type Host = { readonly id: string; readonly memory: number };
     const hosts = createCollection({
-      identify: (host: Host) => host.id,
+      identify: (host: MemoryRecord) => host.id,
       // An upper bound only: the axis starts from the range itself.
       fields: [{ field: "memory", kind: "number", max: 64 }],
     });

@@ -35,7 +35,7 @@ const columns = [
 ] as const;
 
 /** A source that orders by `name` alone, answered by hand. */
-const sortableByName = () =>
+const createSortableByName = () =>
   createMachineProvider({
     capabilities: declareCapabilities(machines, {
       sort: { fields: ["name"], terms: 1 },
@@ -46,7 +46,7 @@ afterEach(cleanup);
 
 describe("regression 0002 — stale rows reported ready", () => {
   it("keeps the rows in view and says they are stale, and why", () => {
-    const { provider, source } = sortableByName();
+    const { provider, source } = createSortableByName();
     render(
       <DataTable provider={provider} columns={columns} label="Machines" />,
     );
@@ -79,7 +79,7 @@ describe("regression 0002 — stale rows reported ready", () => {
   });
 
   it("offers sorting only on the fields the source declares", () => {
-    const { provider } = sortableByName();
+    const { provider } = createSortableByName();
     render(
       <DataTable provider={provider} columns={columns} label="Machines" />,
     );

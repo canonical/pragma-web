@@ -421,7 +421,7 @@ describe("ResizeHandle", () => {
       { id: "name", sizing: { kind: "flex", weight: 1, minPx: 50 } },
     ]);
     const interaction = createGridInteraction(layout);
-    const view = (width: number) => (
+    const renderHandle = (width: number) => (
       <ResizeHandle
         interaction={interaction}
         columnId="name"
@@ -433,16 +433,16 @@ describe("ResizeHandle", () => {
         announce={() => {}}
       />
     );
-    const { rerender } = render(view(100));
+    const { rerender } = render(renderHandle(100));
     const handle = screen.getByRole("separator");
     expect(handle).not.toHaveAttribute("aria-valuemax");
     fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
     movePointer(120);
     flushFrames();
-    rerender(view(120));
+    rerender(renderHandle(120));
     releasePointer("pointerUp");
-    rerender(view(140));
-    rerender(view(160));
+    rerender(renderHandle(140));
+    rerender(renderHandle(160));
     expect(interaction.state.get().status).toBe("idle");
   });
   describe("a press, then a press where the column should end", () => {
