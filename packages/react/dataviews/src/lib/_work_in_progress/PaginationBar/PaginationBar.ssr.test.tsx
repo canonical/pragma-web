@@ -24,6 +24,13 @@ describe("PaginationBar SSR", () => {
     expect(error).not.toHaveBeenCalled();
   });
 
+  it("leaves its root unmarked until the page hydrates", () => {
+    const { provider } = createMachineProvider();
+    expect(renderToString(<PaginationBar provider={provider} />)).not.toContain(
+      "data-hydrated",
+    );
+  });
+
   it("renders the same markup twice and asks the source for nothing", () => {
     // No effect runs on the server, so the bar never observes the provider:
     // the source is not executed, and two renders of one provider agree.

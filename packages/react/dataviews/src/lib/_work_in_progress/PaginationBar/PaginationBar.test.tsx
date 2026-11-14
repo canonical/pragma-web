@@ -120,6 +120,14 @@ describe("PaginationBar", () => {
     );
   });
 
+  it.fails("marks its root once the page has hydrated", () => {
+    const { provider } = makeProvider();
+    mount(provider);
+    expect(
+      screen.getByRole("navigation", { name: "Pagination" }),
+    ).toHaveAttribute("data-hydrated");
+  });
+
   it("observes its provider for as long as it is mounted", () => {
     const { provider, source } = makeProvider();
     // Construction subscribes to nothing and requests nothing: the first
