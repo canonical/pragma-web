@@ -151,3 +151,60 @@ export type RespelledLink = {
   readonly written: URLSearchParams;
   readonly reread: DecodedQuery;
 };
+
+/**
+ * What a file is to the file rules, read from its name: only a source file
+ * is judged.
+ */
+export type FileRole =
+  | "test"
+  | "d.ts"
+  | "stories"
+  | "spec"
+  | "config"
+  | "barrel"
+  | "css"
+  | "source"
+  | "other";
+
+/** What one export carries: a type, a function, a value, a class or a re-export. */
+export type ExportKind =
+  | "type"
+  | "function"
+  | "value"
+  | "class"
+  | "reexport"
+  | "unknown";
+
+/** How a local binding is declared, as the declaration rule tells them apart. */
+export type BindingForm =
+  /** A `function` declaration. */
+  | "function"
+  /** A `class` declaration. */
+  | "class"
+  /** A variable holding a function or a plain value. */
+  | "variable"
+  /** A variable holding a call or a cast, such as a context or a memo. */
+  | "wrapped"
+  /** A type, an enum, an import, or nothing found. */
+  | "other";
+
+/** A local binding: what it exports as, and how it is declared. */
+export type LocalBinding = {
+  readonly kind: ExportKind;
+  readonly form: BindingForm;
+};
+
+/** One export of a source text, as the export rule reads it. */
+export type ExportRecord = {
+  /** The exported name; null for an anonymous default. */
+  readonly name: string | null;
+  readonly kind: ExportKind;
+  readonly isDefault: boolean;
+  /** Exported on a separate line from a declaration that could carry it. */
+  readonly isAtEnd: boolean;
+  /** The callee of `export default callee(…)`. */
+  readonly wrapper?: string;
+  /** The wrapper is `memo` or `forwardRef` over a `function` declaration. */
+  readonly wrapsFunction?: boolean;
+};
