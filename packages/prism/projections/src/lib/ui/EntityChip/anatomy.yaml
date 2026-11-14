@@ -11,16 +11,19 @@
 # The title is the link (LinkComponent, href) unless `linked` is false; an
 # unlinked chip is inert text and has no peek (nothing to focus). The peek is
 # a sibling of the link inside the root, never inside the <a>: a non-modal
-# popover (popover="manual", role="dialog", aria-label from the catalog
-# "chip.peek" with the title) holding the EntityCard the arm passes. It opens
-# after PEEK_OPEN_DELAY_MS (EntityChip/constants.ts) of hover on the link,
-# at once on focus; stays open while the pointer is over the link or the
-# peek; closes PEEK_CLOSE_DELAY_MS after the pointer leaves both, on focus
-# leaving both, and on Escape (focus returns to the link). A touch pointer
-# never opens it: a tap follows the link. Tethered with CSS anchor
-# positioning (anchor-name on the link, position-anchor on the peek, a
-# dashed ident from useId), 4px below the chip, flipping above when the
-# viewport has no room below (position-try-fallbacks: flip-block).
+# popover (popover="manual", role="dialog", named by a hidden label from the
+# catalog "chip.peek" with the title, aria-labelledby) holding the peek the
+# arm passes. It opens after PEEK_OPEN_DELAY_MS (EntityChip/constants.ts) of
+# hover on the chip, at once on focus of the link; stays open while the
+# pointer is over the chip or the peek; closes PEEK_CLOSE_DELAY_MS after the
+# pointer leaves both, on focus leaving both, and on Escape: focus returns
+# to the link when it was in the chip, and a hover-opened peek, which holds
+# no focus, hears Escape on the document while open. A touch pointer never
+# opens it: a tap follows the link. Tethered with CSS anchor positioning
+# (anchor-name on the chip's root, the pill, while the peek is open;
+# position-anchor on the peek; a dashed ident from useId), 4px below the
+# pill's start, flipping above when the viewport has no room below
+# (position-try-fallbacks: flip-block).
 #
 # Why not the published Popover: it is a click disclosure on a button; the
 # peek opens on hover-intent and focus of a link (EXPLANATIONS S5).

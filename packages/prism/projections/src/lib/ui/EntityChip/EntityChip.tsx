@@ -17,9 +17,10 @@ const componentCssClassName = "ds entity-chip";
  *
  * A linked chip with a `peek` peeks at the entity: after
  * `PEEK_OPEN_DELAY_MS` of hover, or at once on focus, a non-modal dialog
- * tethered 4px below the pill shows the peek (the entity's card) beside
- * the link, never inside it. Escape closes it and returns focus to the
- * link; a touch never opens it, so a tap follows the link.
+ * anchored to the pill, 4px below it, shows the peek (the entity's card)
+ * beside the link, never inside it. Escape closes it, a hover-opened one
+ * too, and returns focus to the link when focus was in the chip; a touch
+ * never opens it, so a tap follows the link.
  *
  * It renders only the slots it is given, in the slot order every
  * representation keeps (mark, prefix, title, status); the transitional
