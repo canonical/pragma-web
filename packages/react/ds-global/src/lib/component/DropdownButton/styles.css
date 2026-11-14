@@ -1,0 +1,31 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * DropdownButton styles
+   * @implements ds:global.component.dropdown_button
+   *
+   * The trigger is the wrapped Button; this sheet only seats the persistent
+   * chevron that trails its label.
+   */
+  /* The trigger's own class carries the tokens and the chevron, whatever
+     button component renders it. */
+  .ds.dropdown-button {
+    /* The chevron sits closer to the edge, as a leading icon does. */
+    --dropdown-button-padding-inline-end: var(--dimension-100);
+    --dropdown-button-chevron-gap: var(--dimension-100);
+
+    & .chevron {
+      display: inline-flex;
+      vertical-align: middle;
+      margin-inline-start: var(--dropdown-button-chevron-gap);
+    }
+  }
+
+  /* Through Button's own padding variable, so the link variant, which sets
+     the padding itself, keeps none. (0,3,0), so it wins over Button's (0,2,0)
+     declaration of the variable in either load order. */
+  .ds.button.dropdown-button {
+    --button-padding-inline-end: var(--dropdown-button-padding-inline-end);
+  }
+}
