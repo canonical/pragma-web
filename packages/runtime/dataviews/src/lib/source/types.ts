@@ -667,11 +667,14 @@ export type RelayConnection<TRow extends object = RowRecord> = {
     | readonly ({ readonly node: TRow | null | undefined } | null | undefined)[]
     | null
     | undefined;
-  readonly pageInfo: {
-    readonly endCursor?: string | null | undefined;
-    /** Whether a further page exists, as the connection spec defines it. */
-    readonly hasNextPage?: boolean | null | undefined;
-  };
+  readonly pageInfo:
+    | {
+        readonly endCursor?: string | null | undefined;
+        /** Whether a further page exists, as the connection spec defines it. */
+        readonly hasNextPage?: boolean | null | undefined;
+      }
+    | null
+    | undefined;
   /** The rows matching the query, when the schema counts them. */
   readonly totalCount?: number | null | undefined;
   /** The facets the operation selected, keyed by field, when it asked for any. */

@@ -1090,7 +1090,7 @@ describe("createRelaySource over relay-runtime", () => {
     });
   });
 
-  it.fails("fails a connection that carries no page info", () => {
+  it("fails a connection that carries no page info", () => {
     const { environment, fetchAt } = relay();
     const deliver = delivery();
     source(environment).execute(request(), deliver);

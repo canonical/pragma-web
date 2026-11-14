@@ -223,7 +223,12 @@ export default function createRelaySource<
           }
           rows.push(node);
         }
-        const { endCursor, hasNextPage } = connection.pageInfo;
+        const { pageInfo } = connection;
+        if (pageInfo === null || pageInfo === undefined) {
+          fail(data, "the connection carries no page info");
+          return;
+        }
+        const { endCursor, hasNextPage } = pageInfo;
         // A page with no end cursor has no next page to reach any more.
         if (typeof endCursor === "string") {
           trail.set(window.page + 1, endCursor);
