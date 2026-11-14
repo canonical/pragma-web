@@ -321,16 +321,21 @@ describe("Query.search", () => {
   });
 
   it("orders titles of one length by code point", async () => {
-    expect(await rank("coastal")).toEqual([
-      { __typename: "Line", uri: `${M}coastal-line` },
-      { __typename: "Zone", uri: `${GEO}coastal-zone` },
+    expect((await rank("series")).slice(0, 3)).toEqual([
+      { __typename: "RollingStock", uri: `${M}series-50` },
+      { __typename: "RollingStock", uri: `${M}series-70` },
+      { __typename: "RollingStock", uri: `${M}series-90` },
     ]);
   });
 
-  it("ranks a title match, a class's included, before a definition match", async () => {
+  it("finds a hidden class by its title, and none of its instances", async () => {
+    // Fare zones are hidden: their instances are values, never results,
+    // whether their title or their definition matches.
     expect(await rank("fare")).toEqual([
       { __typename: "OntologyClass", uri: `${GEO}Zone` },
-      { __typename: "Zone", uri: `${GEO}central-zone` },
+    ]);
+    expect(await rank("coastal")).toEqual([
+      { __typename: "Line", uri: `${M}coastal-line` },
     ]);
   });
 

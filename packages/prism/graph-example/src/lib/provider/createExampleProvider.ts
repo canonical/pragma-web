@@ -993,15 +993,22 @@ export const createExampleProvider = (
     definition: resolveLabel(definitions, DEFAULT_LANG),
   });
 
+  // An instance of a hidden class is a value, never a search result; the
+  // class itself stays searchable.
   const searchEntries: readonly SearchEntry[] = [
-    ...records.map(({ entity }) =>
-      buildSearchEntry(
-        entity.uri,
-        entity.labels,
-        entity.definitions,
-        entity.typename,
+    ...records
+      .filter(
+        ({ entity }) =>
+          lensIndex.classLens(entity.type).visibility !== "HIDDEN",
+      )
+      .map(({ entity }) =>
+        buildSearchEntry(
+          entity.uri,
+          entity.labels,
+          entity.definitions,
+          entity.typename,
+        ),
       ),
-    ),
     ...dataset.classes.map((cls) =>
       buildSearchEntry(cls.uri, cls.labels, cls.definitions, "OntologyClass"),
     ),
