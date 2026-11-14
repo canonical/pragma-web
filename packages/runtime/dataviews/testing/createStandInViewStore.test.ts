@@ -1,31 +1,8 @@
 import { describe, expect, it } from "vitest";
 import buildStoredView from "./buildStoredView.js";
-import {
-  createStandInPresentationStore,
-  createStandInViewStore,
-} from "./createStandInStores.js";
+import createStandInViewStore from "./createStandInViewStore.js";
 
 const REVISION = { id: "v", revision: 1 };
-
-describe("createStandInPresentationStore", () => {
-  it("reads nothing, saves, and hears nobody by default", async () => {
-    const store = createStandInPresentationStore();
-    await expect(store.readPresentation("default")).resolves.toEqual({});
-    await expect(store.patchPresentation("default", {})).resolves.toEqual({
-      status: "saved",
-    });
-    expect(store.subscribe(() => {})()).toBeUndefined();
-  });
-
-  it("answers as an override says", async () => {
-    const store = createStandInPresentationStore({
-      patchPresentation: async () => ({ status: "missing" }),
-    });
-    await expect(store.patchPresentation("default", {})).resolves.toEqual({
-      status: "missing",
-    });
-  });
-});
 
 describe("createStandInViewStore", () => {
   it("lists and finds nothing, and refuses to create, by default", async () => {

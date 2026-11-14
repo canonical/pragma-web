@@ -11,7 +11,7 @@
  */
 
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import { createStandInPresentationStore } from "../../../testing/createStandInStores.js";
+import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
 import {
   createPresentation,
   type JsonValue,

@@ -4,10 +4,8 @@ import buildPage from "../../../testing/buildPage.js";
 import createCountingViewStore from "../../../testing/createCountingViewStore.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import {
-  createStandInPresentationStore,
-  createStandInViewStore,
-} from "../../../testing/createStandInStores.js";
+import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
+import createStandInViewStore from "../../../testing/createStandInViewStore.js";
 import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
 import type { ActionOutcome } from "../action/index.js";
 import { createCollection } from "../collection/index.js";

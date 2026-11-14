@@ -11,7 +11,7 @@
 import { describe, expect, it } from "vitest";
 import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { createStandInViewStore } from "../../../testing/createStandInStores.js";
+import createStandInViewStore from "../../../testing/createStandInViewStore.js";
 import declare from "../../../testing/declare.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
 import readId from "../../../testing/readId.js";

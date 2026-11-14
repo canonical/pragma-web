@@ -9,10 +9,8 @@ export { default as buildStoredView } from "./buildStoredView.js";
 export { default as countExactly } from "./countExactly.js";
 export { default as createManualSource } from "./createManualSource.js";
 export { default as createRecordingLocation } from "./createRecordingLocation.js";
-export {
-  createStandInPresentationStore,
-  createStandInViewStore,
-} from "./createStandInStores.js";
+export { default as createStandInPresentationStore } from "./createStandInPresentationStore.js";
+export { default as createStandInViewStore } from "./createStandInViewStore.js";
 export { default as readDisplayStatus } from "./readDisplayStatus.js";
 export type {
   ManualCall,

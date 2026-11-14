@@ -5,7 +5,7 @@ import buildStoredView from "../../../testing/buildStoredView.js";
 import createDeferred from "../../../testing/createDeferred.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import { createStandInViewStore } from "../../../testing/createStandInStores.js";
+import createStandInViewStore from "../../../testing/createStandInViewStore.js";
 import declare from "../../../testing/declare.js";
 import flushPresentation from "../../../testing/flushPresentation.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";

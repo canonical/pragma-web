@@ -1,7 +1,7 @@
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import createDeferred from "../../../testing/createDeferred.js";
-import { createStandInPresentationStore } from "../../../testing/createStandInStores.js";
+import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
 import flushPresentation from "../../../testing/flushPresentation.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
 import openIndexedDBTab from "../../../testing/openIndexedDBTab.js";
