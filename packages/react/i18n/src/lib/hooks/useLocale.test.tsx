@@ -34,4 +34,29 @@ describe("useLocale", () => {
     expect(result.current.locale).toBe("ar");
     expect(result.current.direction).toBe("rtl");
   });
+
+  it("refuses a tag that matches no configured locale, keeping the locale", () => {
+    const { result } = renderHook(() => useLocale(), {
+      wrapper: WithProvider,
+    });
+    expect(() => result.current.setLocale("de")).toThrow(RangeError);
+    expect(result.current.locale).toBe("en");
+  });
+
+  it("does not re-render for a tag of the current locale", () => {
+    let renders = 0;
+    const { result } = renderHook(
+      () => {
+        renders += 1;
+        return useLocale();
+      },
+      { wrapper: WithProvider },
+    );
+    act(() => result.current.setLocale("fr"));
+    const settled = renders;
+    act(() => result.current.setLocale("FR"));
+    act(() => result.current.setLocale("fr-CA"));
+    expect(renders).toBe(settled);
+    expect(result.current.locale).toBe("fr");
+  });
 });

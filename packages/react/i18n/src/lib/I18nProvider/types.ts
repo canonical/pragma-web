@@ -26,7 +26,9 @@ export interface I18nProviderProps {
   catalogs: Record<Locale, Messages>;
   /**
    * Initial locale (e.g. SSR-negotiated). Defaults to `config.defaultLocale`.
-   * Ignored when `source` is given: the external source keeps its own locale.
+   * Stored as given, unlike a tag passed to `setLocale`, so pass a configured
+   * locale, such as the result of `negotiateLocale`. Ignored when `source` is
+   * given: the external source keeps its own locale.
    */
   locale?: Locale;
   /**
