@@ -1,3 +1,4 @@
+import { assertInvariant } from "../assertion/index.js";
 import {
   collapseSortTerms,
   DEFAULT_WINDOW,
@@ -40,8 +41,10 @@ const singletonOf = (
       reason: `"${key}" takes one value; the extra values were ignored`,
     });
   }
-  // A key read off the parameters has at least the value it was read from.
-  return values[0] as string;
+  return assertInvariant(
+    values.at(0),
+    "a key read off the parameters has the value it was read from",
+  );
 };
 
 /** Read one window value, falling back rather than paging somewhere absurd. */

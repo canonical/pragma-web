@@ -55,7 +55,7 @@ export default function createRowModel<TRow extends object>(
       carried !== undefined && carried.record === record
         ? carried
         : Object.freeze({ id, record });
-    if (unmoved !== undefined && unmoved.entries[position] !== entry) {
+    if (unmoved !== undefined && unmoved.entries.at(position) !== entry) {
       unmoved = undefined;
     }
     entries.push(entry);

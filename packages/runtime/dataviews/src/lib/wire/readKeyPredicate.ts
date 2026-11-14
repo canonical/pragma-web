@@ -32,7 +32,9 @@ export default function readKeyPredicate(
   definition: SchemaFieldDefinition,
 ): KeyReading {
   const { field } = definition;
-  const filled = [...values.keys()].filter((at) => values[at] !== "");
+  const filled = [...values.entries()]
+    .filter(([, value]) => value !== "")
+    .map(([at]) => at);
   if (filled.length === 0) {
     return { issues: [], conjunct: null };
   }

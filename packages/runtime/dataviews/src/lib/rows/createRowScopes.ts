@@ -4,6 +4,7 @@ import {
   protectChannel,
   type ReadonlyChannel,
 } from "../observable/index.js";
+import { areListsEqual } from "../query/index.js";
 import readField from "./readField.js";
 import type { RowChannels, RowScopes, RowScopesConfig } from "./types.js";
 
@@ -17,9 +18,6 @@ type ScopeRecord<TRow extends object> = {
   readonly selected: Channel<boolean>;
   readonly slots: readonly FieldSlot[];
 };
-
-const sameOrder = (a: readonly string[], b: readonly string[]): boolean =>
-  a.length === b.length && a.every((id, position) => id === b[position]);
 
 /**
  * Create the row-scope registry of one mounted table.
@@ -43,7 +41,7 @@ export default function createRowScopes<TRow extends object>(
   const observed = [...new Set(config.fields)];
   const records = new Map<string, ScopeRecord<TRow>>();
   const ids = createChannel<readonly string[]>(Object.freeze([]), {
-    equals: sameOrder,
+    equals: (a, b) => areListsEqual(a, b, Object.is),
   });
 
   const mint = (

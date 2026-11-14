@@ -1,3 +1,4 @@
+import { assertInvariant } from "../assertion/index.js";
 import type { DisplayEntry } from "../display/index.js";
 import { areListsEqual } from "../query/index.js";
 import createSizeIndex from "./createSizeIndex.js";
@@ -67,7 +68,7 @@ export default function createVirtualRange(
   // past, as the browser's own scroll anchoring leaves them.
   const anchorAt = (offset: number): void => {
     const position = sizes.at(offset);
-    const entry = entries[position];
+    const entry = entries.at(position);
     anchor =
       entry === undefined || offset <= 0
         ? null
@@ -91,23 +92,20 @@ export default function createVirtualRange(
     if (count === 0) {
       return emptyRange;
     }
-    const main: [number, number] = [
-      Math.max(0, sizes.at(start) - overscan),
-      Math.min(count, sizes.at(start + size) + 1 + overscan),
-    ];
+    const mainStart = Math.max(0, sizes.at(start) - overscan);
+    const mainEnd = Math.min(count, sizes.at(start + size) + 1 + overscan);
+    const main: [number, number] = [mainStart, mainEnd];
     const spans: [number, number][] = [main];
     const kept = retained === null ? undefined : positions.get(retained);
     if (kept !== undefined) {
-      const span: [number, number] = [
-        Math.max(0, kept - 1),
-        Math.min(count, kept + 2),
-      ];
-      if (span[1] < main[0]) {
-        spans.unshift(span);
-      } else if (span[0] > main[1]) {
-        spans.push(span);
+      const keptStart = Math.max(0, kept - 1);
+      const keptEnd = Math.min(count, kept + 2);
+      if (keptEnd < mainStart) {
+        spans.unshift([keptStart, keptEnd]);
+      } else if (keptStart > mainEnd) {
+        spans.push([keptStart, keptEnd]);
       } else {
-        spans[0] = [Math.min(span[0], main[0]), Math.max(span[1], main[1])];
+        spans[0] = [Math.min(keptStart, mainStart), Math.max(keptEnd, mainEnd)];
       }
     }
     let reached = 0;
@@ -212,8 +210,10 @@ export default function createVirtualRange(
           continue;
         }
         measured.delete(id);
-        // In range: the positions were built from these entries.
-        const entry = entries[position] as DisplayEntry;
+        const entry = assertInvariant(
+          entries.at(position),
+          "positions are built from the entries they index",
+        );
         const estimate = config.estimates[entry.kind];
         if (sizes.size(position) !== estimate) {
           sizes.set(position, estimate);

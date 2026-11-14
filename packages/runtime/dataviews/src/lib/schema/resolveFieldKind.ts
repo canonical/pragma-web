@@ -24,7 +24,7 @@ const describeOperand = (value: PredicateOperand): string =>
   typeof value === "string" ? `"${value}"` : String(value);
 
 /** The single bound a range predicate carries. */
-const readBound = (predicate: Predicate): unknown => predicate.operands[0];
+const readBound = (predicate: Predicate): unknown => predicate.operands.at(0);
 
 /** Two values of one kind compared by identity, as every scalar kind is. */
 const isSameValue = (a: unknown, b: unknown): boolean => a === b;
