@@ -258,6 +258,8 @@ describe("EntityChip", () => {
         inner.focus();
       });
       expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+      fireEvent.keyDown(inner, { key: "Tab" });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
       fireEvent.keyDown(inner, { key: "Escape" });
       expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
       expect(document.activeElement).toBe(link);
@@ -279,6 +281,7 @@ describe("EntityChip", () => {
       const chip = screen.getByTestId("chip");
       fireEvent.pointerEnter(chip, { pointerType: "touch" });
       fireEvent.pointerDown(link, { pointerType: "touch" });
+      fireEvent.pointerLeave(chip, { pointerType: "touch" });
       act(() => {
         link.focus();
         vi.advanceTimersByTime(PEEK_OPEN_DELAY_MS);
@@ -301,6 +304,23 @@ describe("EntityChip", () => {
       });
       expect(onFocus).toHaveBeenCalledOnce();
       expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+    });
+
+    it("shows the peek in the top layer where the browser can", () => {
+      const showPopover = vi.fn();
+      Object.defineProperty(HTMLElement.prototype, "showPopover", {
+        configurable: true,
+        value: showPopover,
+      });
+      try {
+        const link = renderPeeking();
+        act(() => {
+          link.focus();
+        });
+        expect(showPopover).toHaveBeenCalledOnce();
+      } finally {
+        Reflect.deleteProperty(HTMLElement.prototype, "showPopover");
+      }
     });
   });
 });
