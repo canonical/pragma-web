@@ -39,3 +39,38 @@ export interface RankingCase {
   readonly text: string;
   readonly expected: readonly string[];
 }
+
+/** A field's section, as `ontologyClass` serves it. */
+export interface LensReadingGroup {
+  readonly uri: string;
+  readonly label: string | null;
+  readonly order: number | null;
+}
+
+/** A property's own lens, as `ontologyClass` serves it on a class's field. */
+export interface LensReadingProperty {
+  readonly uri: string;
+  readonly visibility: string | null;
+  readonly pluralLabel: string | null;
+  readonly inverseLabel: string | null;
+  readonly inversePluralLabel: string | null;
+  readonly inverseVisibility: string | null;
+}
+
+/** One field of a class with its lens, as `ontologyClass` serves it. */
+export interface LensReadingField {
+  readonly property: LensReadingProperty;
+  readonly group: LensReadingGroup | null;
+  readonly order: number | null;
+  readonly role: string | null;
+  readonly visibility: string | null;
+}
+
+/** A class with its lens and its fields' lenses, as `ontologyClass` serves it. */
+export interface LensReadingClass {
+  readonly uri: string;
+  readonly visibility: string | null;
+  readonly glyph: string | null;
+  readonly pluralLabel: string | null;
+  readonly properties: readonly LensReadingField[];
+}

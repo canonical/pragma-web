@@ -1,0 +1,290 @@
+# The design-system type lens, the parity input: the ontology's lens.ttl as a
+# ke-graphql that reads the type lens compiles it, beside the installed
+# design-system ontology. Compiled together, they report no lens diagnostic.
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix shui:  <http://www.w3.org/ns/shacl-ui/> .
+@prefix prism: <https://pragma.canonical.com/prism#> .
+@prefix ds:    <https://ds.canonical.com/> .
+
+###############################################################################
+# THE TYPE LENS OF THE DESIGN SYSTEM
+#
+# How each documented class is shown: its plural name, its glyph and how
+# prominent it is; the sections its properties are grouped into, their order
+# and the role their values play; and how the reader's side of a relation is
+# labelled. SHACL 1.2 UI terms (shui:propertyRole, sh:group, sh:order) carry
+# what that vocabulary defines; prism: carries the rest (visibility, glyph,
+# plural and inverse labels).
+#
+# Presentation only. The lens shapes below carry no sh:minCount, sh:maxCount
+# or sh:in, so they constrain nothing and change no projected field; the
+# constraint shapes stay where they are. Keep it that way: adding a lens term
+# to a count-free constraint shape removes that shape's constraint.
+###############################################################################
+
+###############################################################################
+# CLASSES
+###############################################################################
+
+ds:Entity prism:pluralLabel "Entities"@en .
+ds:UIElement prism:pluralLabel "UI Elements"@en .
+ds:UIBlock prism:pluralLabel "UI Blocks"@en .
+
+ds:Component
+    prism:pluralLabel "Components"@en ;
+    prism:visibility prism:prominent ;
+    prism:glyph "bundle" .
+
+ds:Pattern
+    prism:pluralLabel "Patterns"@en ;
+    prism:visibility prism:prominent ;
+    prism:glyph "blueprint" .
+
+ds:Layout
+    prism:pluralLabel "Layouts"@en ;
+    prism:visibility prism:prominent ;
+    prism:glyph "layout-grid" .
+
+ds:Subcomponent
+    prism:pluralLabel "Subcomponents"@en ;
+    prism:glyph "units" .
+
+ds:Group
+    prism:pluralLabel "Groups"@en ;
+    prism:glyph "containers" .
+
+ds:Modifier
+    prism:pluralLabel "Modifiers"@en ;
+    prism:glyph "tag" .
+
+ds:ModifierFamily
+    prism:pluralLabel "Modifier Families"@en ;
+    prism:glyph "switcher" .
+
+ds:Property prism:pluralLabel "Properties"@en .
+
+ds:Tier
+    prism:pluralLabel "Tiers"@en ;
+    prism:visibility prism:hidden .
+
+ds:ImplementationObject
+    prism:pluralLabel "Implementation Objects"@en ;
+    prism:glyph "file" .
+
+ds:ImplementationLibrary
+    prism:pluralLabel "Implementation Libraries"@en ;
+    prism:glyph "repository" .
+
+ds:Tag
+    prism:pluralLabel "Tags"@en ;
+    prism:visibility prism:hidden .
+
+ds:TagCategory
+    prism:pluralLabel "Tag Categories"@en ;
+    prism:visibility prism:hidden .
+
+ds:ChangeLogEntry prism:pluralLabel "Change Log Entries"@en .
+
+ds:Concept
+    prism:pluralLabel "Concepts"@en ;
+    prism:glyph "book" .
+
+ds:ConceptType
+    prism:pluralLabel "Concept Types"@en ;
+    prism:visibility prism:hidden .
+
+ds:TokenBinding prism:pluralLabel "Token Bindings"@en .
+
+###############################################################################
+# PROPERTIES: prominence and the reader's side of each relation
+#
+# A relation declared with owl:inverseOf is labelled from its partner and
+# needs nothing here.
+###############################################################################
+
+ds:tier
+    prism:visibility prism:prominent ;
+    prism:inverseLabel "Block"@en ;
+    prism:inversePluralLabel "Blocks"@en .
+
+ds:documentationStage
+    prism:visibility prism:prominent ;
+    prism:inverseLabel "Block at this stage"@en ;
+    prism:inversePluralLabel "Blocks at this stage"@en .
+
+ds:libraryTier
+    prism:inverseLabel "Library"@en ;
+    prism:inversePluralLabel "Libraries"@en .
+
+ds:category
+    prism:inverseLabel "Tag"@en ;
+    prism:inversePluralLabel "Tags"@en .
+
+ds:conceptType
+    prism:inverseLabel "Concept"@en ;
+    prism:inversePluralLabel "Concepts"@en .
+
+ds:hasModifierFamily
+    prism:inverseLabel "Used by"@en ;
+    prism:inversePluralLabel "Used by"@en .
+
+ds:viaBlock
+    prism:inverseLabel "Bound through it"@en ;
+    prism:inversePluralLabel "Bound through it"@en .
+
+ds:implementsBlock
+    prism:inverseLabel "Implementation"@en ;
+    prism:inversePluralLabel "Implementations"@en .
+
+ds:library
+    prism:inverseLabel "Implementation"@en ;
+    prism:inversePluralLabel "Implementations"@en .
+
+###############################################################################
+# PROPERTY GROUPS: the sections of a page, in order
+###############################################################################
+
+ds:section.overview a sh:PropertyGroup ;
+    rdfs:label "Overview"@en ;
+    sh:order 1 .
+
+ds:section.content a sh:PropertyGroup ;
+    rdfs:label "Content"@en ;
+    sh:order 2 .
+
+ds:section.usage a sh:PropertyGroup ;
+    rdfs:label "Usage"@en ;
+    sh:order 3 .
+
+ds:section.anatomy a sh:PropertyGroup ;
+    rdfs:label "Anatomy"@en ;
+    sh:order 4 .
+
+ds:section.api a sh:PropertyGroup ;
+    rdfs:label "API"@en ;
+    sh:order 5 .
+
+ds:section.relations a sh:PropertyGroup ;
+    rdfs:label "Relations"@en ;
+    sh:order 6 .
+
+ds:section.history a sh:PropertyGroup ;
+    rdfs:label "History"@en ;
+    sh:order 7 .
+
+###############################################################################
+# LENS SHAPES: where each property is shown, in what order, in what role
+#
+# A subclass's shape adds or overrides fields; everything it leaves out is
+# read from the nearest ancestor's shape.
+###############################################################################
+
+ds:UIBlockLens
+    a sh:NodeShape ;
+    sh:targetClass ds:UIBlock ;
+    sh:property
+        [ sh:path ds:name ; sh:group ds:section.overview ; sh:order 1 ;
+          shui:propertyRole shui:LabelRole ] ,
+        [ sh:path ds:summary ; sh:group ds:section.overview ; sh:order 2 ;
+          shui:propertyRole shui:DescriptionRole ] ,
+        [ sh:path ds:tier ; sh:group ds:section.overview ; sh:order 3 ;
+          shui:propertyRole shui:ClassificationRole ] ,
+        [ sh:path ds:documentationStage ; sh:group ds:section.overview ;
+          sh:order 4 ] ,
+        [ sh:path ds:version ; sh:group ds:section.overview ; sh:order 5 ] ,
+        [ sh:path ds:figmaLink ; sh:group ds:section.overview ; sh:order 6 ] ,
+        [ sh:path ds:usage ; sh:group ds:section.usage ; sh:order 1 ] ,
+        [ sh:path ds:guidelines ; sh:group ds:section.usage ; sh:order 2 ] ,
+        [ sh:path ds:anatomyDsl ; sh:group ds:section.anatomy ; sh:order 1 ] ,
+        [ sh:path ds:anatomyClassic ; sh:group ds:section.anatomy ;
+          sh:order 2 ] ,
+        [ sh:path ds:hasTokenBinding ; sh:group ds:section.anatomy ;
+          sh:order 3 ] ,
+        [ sh:path ds:hasProperty ; sh:group ds:section.api ; sh:order 1 ] ,
+        [ sh:path ds:hasModifierFamily ; sh:group ds:section.api ;
+          sh:order 2 ] ,
+        [ sh:path ds:inheritsFrom ; sh:group ds:section.relations ;
+          sh:order 1 ] ,
+        [ sh:path ds:specializedBy ; sh:group ds:section.relations ;
+          sh:order 2 ] ,
+        [ sh:path ds:variantOf ; sh:group ds:section.relations ; sh:order 3 ] ,
+        [ sh:path ds:hasVariant ; sh:group ds:section.relations ;
+          sh:order 4 ] ,
+        [ sh:path ds:changeLog ; sh:group ds:section.history ; sh:order 1 ] ,
+        [ sh:path ds:decisionLog ; sh:group ds:section.history ;
+          sh:order 2 ] .
+
+ds:ComponentLens
+    a sh:NodeShape ;
+    sh:targetClass ds:Component ;
+    sh:property
+        [ sh:path ds:hasSubcomponent ; sh:group ds:section.relations ;
+          sh:order 5 ] .
+
+ds:SubcomponentLens
+    a sh:NodeShape ;
+    sh:targetClass ds:Subcomponent ;
+    sh:property
+        [ sh:path ds:parentComponent ; sh:group ds:section.relations ;
+          sh:order 0 ; prism:visibility prism:prominent ] ,
+        [ sh:path ds:standalone ; sh:group ds:section.overview ; sh:order 7 ] .
+
+ds:LayoutLens
+    a sh:NodeShape ;
+    sh:targetClass ds:Layout ;
+    sh:property
+        [ sh:path ds:grid ; sh:group ds:section.anatomy ; sh:order 4 ] ,
+        [ sh:path ds:gridAreas ; sh:group ds:section.anatomy ; sh:order 5 ] ,
+        [ sh:path ds:domain ; sh:group ds:section.overview ; sh:order 7 ] ,
+        [ sh:path ds:targetDevices ; sh:group ds:section.overview ;
+          sh:order 8 ] .
+
+ds:ModifierLens
+    a sh:NodeShape ;
+    sh:targetClass ds:Modifier ;
+    sh:property
+        [ sh:path ds:name ; sh:group ds:section.overview ; sh:order 1 ;
+          shui:propertyRole shui:LabelRole ] ,
+        [ sh:path ds:summary ; sh:group ds:section.overview ; sh:order 2 ;
+          shui:propertyRole shui:DescriptionRole ] ,
+        [ sh:path ds:modifierFamily ; sh:group ds:section.overview ;
+          sh:order 3 ; shui:propertyRole shui:ClassificationRole ] .
+
+ds:ModifierFamilyLens
+    a sh:NodeShape ;
+    sh:targetClass ds:ModifierFamily ;
+    sh:property
+        [ sh:path ds:name ; sh:group ds:section.overview ; sh:order 1 ;
+          shui:propertyRole shui:LabelRole ] ,
+        [ sh:path ds:summary ; sh:group ds:section.overview ; sh:order 2 ;
+          shui:propertyRole shui:DescriptionRole ] ,
+        [ sh:path ds:hasModifier ; sh:group ds:section.overview ; sh:order 3 ;
+          prism:visibility prism:prominent ] .
+
+ds:ConceptLens
+    a sh:NodeShape ;
+    sh:targetClass ds:Concept ;
+    sh:property
+        [ sh:path ds:name ; sh:group ds:section.overview ; sh:order 1 ;
+          shui:propertyRole shui:LabelRole ] ,
+        [ sh:path ds:summary ; sh:group ds:section.overview ; sh:order 2 ;
+          shui:propertyRole shui:DescriptionRole ] ,
+        [ sh:path ds:conceptType ; sh:group ds:section.overview ; sh:order 3 ;
+          shui:propertyRole shui:ClassificationRole ] ,
+        [ sh:path ds:content ; sh:group ds:section.content ; sh:order 1 ] ,
+        [ sh:path ds:knownEdgeCases ; sh:group ds:section.content ;
+          sh:order 2 ] .
+
+ds:TagLens
+    a sh:NodeShape ;
+    sh:targetClass ds:Tag ;
+    sh:property
+        [ sh:path ds:name ; sh:group ds:section.overview ; sh:order 1 ;
+          shui:propertyRole shui:LabelRole ] ,
+        [ sh:path ds:summary ; sh:group ds:section.overview ; sh:order 2 ;
+          shui:propertyRole shui:DescriptionRole ] ,
+        [ sh:path ds:category ; sh:group ds:section.overview ; sh:order 3 ;
+          shui:propertyRole shui:ClassificationRole ] ,
+        [ sh:path ds:whenToApply ; sh:group ds:section.usage ; sh:order 1 ] ,
+        [ sh:path ds:whenToRemove ; sh:group ds:section.usage ; sh:order 2 ] .
