@@ -7,7 +7,7 @@
 #   If "stable" is provided, the script will publish current pre-release versions as stable versions.
 #   If a pre-release identifier is provided, updates will be applied s as pre-release versions (e.g., 0.0.1-alpha.0 -> 0.0.1-alpha.1), and will include the pre-release identifier in the tag.
 # $2: tag_prefix (optional, default "v") - Prefix of the release git tag, used to check for tag collisions.
-# $3: force_publish (optional, default "false") - "true" bumps every package, changed or not (`lerna version --force-publish`).
+# $3: force_publish (optional, default "false") - "true" bumps every package, changed or not.
 #   For re-releasing after a failed publish, when nothing has changed since the stranded tag.
 # OUTPUTS:
 # $GITHUB_OUTPUT: The highest version number among all packages after the update is completed is written to "VERSION" in the $GITHUB_OUTPUT environment.
@@ -140,8 +140,15 @@ main() {
     VERSION_ARGS="--preid $release_type --conventional-prerelease"
   fi
 
+  # Under --conventional-graduate lerna ignores --force-publish (the forced set
+  # comes from the graduate option), so a stable release forces through
+  # --force-conventional-graduate instead.
   if [ "$force_publish" == "true" ]; then
-    VERSION_ARGS="$VERSION_ARGS --force-publish"
+    if [ "$release_type" == "stable" ]; then
+      VERSION_ARGS="$VERSION_ARGS --force-conventional-graduate"
+    else
+      VERSION_ARGS="$VERSION_ARGS --force-publish"
+    fi
   fi
 
   # Run lerna version with the specified arguments
