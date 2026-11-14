@@ -39,7 +39,7 @@
    * without its native border, padding and margin. */
   .ds.filter-bar > .controls {
     grid-column: 5 / -1;
-    border: 0;
+    border-width: 0;
     padding: 0;
     margin: 0;
     display: flex;
