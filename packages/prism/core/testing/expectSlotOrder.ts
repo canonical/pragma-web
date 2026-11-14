@@ -43,9 +43,7 @@ export default function expectSlotOrder(root: Element): void {
 
 /** The slot an element's class names, as its index in the slot order. */
 function rankSlot(element: Element): number {
-  const rank = SLOT_ORDER.findIndex((slot) =>
-    element.classList.contains(slot),
-  );
+  const rank = SLOT_ORDER.findIndex((slot) => element.classList.contains(slot));
   if (rank < 0) {
     throw new Error(`${element.className} names no slot`);
   }
