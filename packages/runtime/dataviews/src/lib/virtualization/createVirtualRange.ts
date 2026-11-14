@@ -18,7 +18,7 @@ const emptyRange: MountedRange = Object.freeze({
   after: 0,
 });
 
-const sameRange = (a: MountedRange, b: MountedRange): boolean =>
+const isSameRange = (a: MountedRange, b: MountedRange): boolean =>
   a.after === b.after &&
   areListsEqual(
     a.runs,
@@ -128,7 +128,7 @@ export default function createVirtualRange(
 
   const publish = (notify: boolean): void => {
     const next = compute();
-    if (sameRange(current, next)) {
+    if (isSameRange(current, next)) {
       return;
     }
     current = next;
@@ -146,7 +146,7 @@ export default function createVirtualRange(
     return moved;
   };
 
-  const mounted = (position: number): boolean =>
+  const isMounted = (position: number): boolean =>
     current.runs.some((run) => run.start <= position && position < run.end);
 
   return {
@@ -206,7 +206,11 @@ export default function createVirtualRange(
       let changed = false;
       for (const id of ids === "all" ? [...measured.keys()] : ids) {
         const position = positions.get(id);
-        if (position === undefined || mounted(position) || !measured.has(id)) {
+        if (
+          position === undefined ||
+          isMounted(position) ||
+          !measured.has(id)
+        ) {
           continue;
         }
         measured.delete(id);

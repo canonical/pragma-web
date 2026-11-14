@@ -7,7 +7,7 @@ import {
   type ResultWindow,
   type Slice,
 } from "../query/index.js";
-import refusalsOf from "./refusalsOf.js";
+import listQueryRefusals from "./listQueryRefusals.js";
 import type { SourceCapabilities } from "./types.js";
 
 const emptySlice: Slice = { filter: [], search: null, sort: [], group: [] };
@@ -28,10 +28,10 @@ const permissive: SourceCapabilities = declare({
   group: { fields: ["status"], levels: 2, summaries: "counts", collapse: true },
 });
 
-describe("refusalsOf", () => {
+describe("listQueryRefusals", () => {
   it("refuses nothing when every term is declared", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         permissive,
         query(
           {
@@ -50,7 +50,7 @@ describe("refusalsOf", () => {
 
   it("refuses an address once, however many conjuncts it holds", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         permissive,
         query({
           filter: [
@@ -68,12 +68,12 @@ describe("refusalsOf", () => {
   });
 
   it("freezes the refusals it collects", () => {
-    expect(Object.isFrozen(refusalsOf(permissive, query()))).toBe(true);
+    expect(Object.isFrozen(listQueryRefusals(permissive, query()))).toBe(true);
   });
 
   it("refuses a filter on a field it does not declare", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         permissive,
         query({
           filter: [{ field: "zone", operator: "isAny", operands: ["eu-west"] }],
@@ -92,7 +92,7 @@ describe("refusalsOf", () => {
 
   it("refuses an operator it does not declare for a field it does", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         permissive,
         query({
           filter: [{ field: "status", operator: "isSet", operands: [] }],
@@ -110,7 +110,7 @@ describe("refusalsOf", () => {
   });
 
   it("reads a field declared with no operator as unfilterable", () => {
-    const refusals = refusalsOf(
+    const refusals = listQueryRefusals(
       declare({ filter: { cpu: [] } }),
       query({ filter: [{ field: "cpu", operator: "gte", operands: [1] }] }),
     );
@@ -120,7 +120,7 @@ describe("refusalsOf", () => {
   });
 
   it("refuses a search on a source that declares none", () => {
-    expect(refusalsOf(declare({}), query({ search: "web" }))).toEqual([
+    expect(listQueryRefusals(declare({}), query({ search: "web" }))).toEqual([
       {
         part: "search",
         code: "undeclared-field",
@@ -133,7 +133,7 @@ describe("refusalsOf", () => {
 
   it("refuses any ordering on a source declaring no sort terms", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({}),
         query({ sort: [{ field: "cpu", direction: "asc" }] }),
       ),
@@ -150,7 +150,7 @@ describe("refusalsOf", () => {
 
   it("refuses an over-long ordering whole rather than truncating it", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({ sort: declareSort(["cpu", "name"], 1) }),
         query({
           sort: [
@@ -172,7 +172,7 @@ describe("refusalsOf", () => {
 
   it("reports an unsortable field beside the term limit, not instead of it", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({ sort: declareSort(["cpu"], 1) }),
         query({
           sort: [
@@ -189,7 +189,7 @@ describe("refusalsOf", () => {
 
   it("counts a field spelled twice once against the term limit", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({ sort: declareSort(["cpu"], 1) }),
         query({
           sort: [
@@ -203,7 +203,7 @@ describe("refusalsOf", () => {
 
   it("counts the term limit in the plural above one", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({
           sort: declareSort(["cpu", "name", "zone"], 2),
         }),
@@ -220,7 +220,7 @@ describe("refusalsOf", () => {
 
   it("refuses an ordering term on a field it cannot sort", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({ sort: declareSort(["cpu"]) }),
         query({ sort: [{ field: "zone", direction: "asc" }] }),
       ),
@@ -237,7 +237,7 @@ describe("refusalsOf", () => {
 
   it("refuses any grouping on a source declaring no levels", () => {
     expect(
-      refusalsOf(declare({}), query({ group: [{ field: "status" }] })),
+      listQueryRefusals(declare({}), query({ group: [{ field: "status" }] })),
     ).toEqual([
       {
         part: "group",
@@ -260,12 +260,13 @@ describe("refusalsOf", () => {
     });
     // Exactly as deep as declared is within the declaration.
     expect(
-      refusalsOf(shallow, query({ group: [{ field: "status" }] })).filter(
-        (refusal) => refusal.part === "group",
-      ),
+      listQueryRefusals(
+        shallow,
+        query({ group: [{ field: "status" }] }),
+      ).filter((refusal) => refusal.part === "group"),
     ).toEqual([]);
     expect(
-      refusalsOf(
+      listQueryRefusals(
         shallow,
         query({ group: [{ field: "status" }, { field: "zone" }] }),
       ),
@@ -290,7 +291,7 @@ describe("refusalsOf", () => {
       },
     });
     expect(
-      refusalsOf(
+      listQueryRefusals(
         deeper,
         query({
           group: [
@@ -305,7 +306,7 @@ describe("refusalsOf", () => {
 
   it("refuses a grouping level on a field it cannot group", () => {
     expect(
-      refusalsOf(permissive, query({ group: [{ field: "zone" }] })),
+      listQueryRefusals(permissive, query({ group: [{ field: "zone" }] })),
     ).toEqual([
       {
         part: "group",
@@ -319,7 +320,7 @@ describe("refusalsOf", () => {
 
   it("refuses a collapsed group on a source that cannot leave rows out", () => {
     expect(
-      refusalsOf(declare({}), query({}, { collapsed: [["failed"]] })),
+      listQueryRefusals(declare({}), query({}, { collapsed: [["failed"]] })),
     ).toEqual([
       {
         part: "window",
@@ -332,20 +333,22 @@ describe("refusalsOf", () => {
   });
 
   it("refuses a cursor on a source that pages by number", () => {
-    expect(refusalsOf(declare({}), query({}, { cursor: "c1" }))).toEqual([
-      {
-        part: "window",
-        code: "unreachable-page",
-        field: null,
-        operator: null,
-        reason: "this source pages by number and reaches no page by token",
-      },
-    ]);
+    expect(listQueryRefusals(declare({}), query({}, { cursor: "c1" }))).toEqual(
+      [
+        {
+          part: "window",
+          code: "unreachable-page",
+          field: null,
+          operator: null,
+          reason: "this source pages by number and reaches no page by token",
+        },
+      ],
+    );
   });
 
   it("leaves a cursor alone on a source that pages by token", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({
           pagination: { kind: "cursor", backward: false, durable: true },
         }),
@@ -356,7 +359,7 @@ describe("refusalsOf", () => {
 
   it("collects every refusal at once rather than the first", () => {
     expect(
-      refusalsOf(
+      listQueryRefusals(
         declare({}),
         query(
           {
@@ -372,7 +375,7 @@ describe("refusalsOf", () => {
   });
 
   it("canonicalizes first, so one query always refuses the same way", () => {
-    const respelled = refusalsOf(
+    const respelled = listQueryRefusals(
       permissive,
       query({
         filter: [

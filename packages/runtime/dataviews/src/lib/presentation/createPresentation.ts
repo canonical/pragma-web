@@ -230,7 +230,7 @@ export default function createPresentation(
   };
 
   /** A view's own preferences, made when the view is first shown. */
-  const findLayer = (view: string): KeptLayer => {
+  const findOrCreateLayer = (view: string): KeptLayer => {
     const key = spellTargetKey({ view });
     const kept = layers.get(key);
     if (kept !== undefined) {
@@ -259,7 +259,7 @@ export default function createPresentation(
           // read, which then cannot undo it.
           adopted = true;
           writer.persist(
-            linkedView === null ? defaults : findLayer(linkedView),
+            linkedView === null ? defaults : findOrCreateLayer(linkedView),
             linked,
           );
           if (linkedView === shown) {
@@ -311,7 +311,7 @@ export default function createPresentation(
       const id = view?.id ?? null;
       if (id !== shown) {
         shown = id;
-        own = id === null ? defaults : findLayer(id);
+        own = id === null ? defaults : findOrCreateLayer(id);
         // Only the view's own preferences are new; the defaults stand, and
         // what the last view's read said is the last view's.
         forgetViewRead();

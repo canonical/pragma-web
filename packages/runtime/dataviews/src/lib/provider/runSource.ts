@@ -262,7 +262,7 @@ export default function runSource<
     }
     // Requests issued by another listener during the republish were
     // invisible above; converge on whatever the host now wants.
-    onHostChange();
+    handleHostChange();
   };
 
   /**
@@ -312,7 +312,7 @@ export default function runSource<
     }
   };
 
-  function onHostChange(): void {
+  function handleHostChange(): void {
     if (driving || unsubscribe === null) {
       return;
     }
@@ -356,8 +356,8 @@ export default function runSource<
       if (unsubscribe !== null) {
         throw new Error("this source is already running against its host");
       }
-      unsubscribe = host.state.subscribe(onHostChange);
-      onHostChange();
+      unsubscribe = host.state.subscribe(handleHostChange);
+      handleHostChange();
       return detach;
     },
     completePending(): void {

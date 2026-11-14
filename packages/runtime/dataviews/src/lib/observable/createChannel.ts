@@ -7,7 +7,7 @@ import type { Channel, ChannelConfig } from "./types.js";
  * consumers of that category.
  */
 
-const strictEquals = <T>(a: T, b: T): boolean => a === b;
+const isStrictlyEqual = <T>(a: T, b: T): boolean => a === b;
 
 /**
  * Create an observation channel.
@@ -19,7 +19,7 @@ export default function createChannel<T>(
   initial: T,
   config: ChannelConfig<T> = {},
 ): Channel<T> {
-  const equals = config.equals ?? strictEquals;
+  const equals = config.equals ?? isStrictlyEqual;
   const listeners = new Set<() => void>();
   let current = initial;
 

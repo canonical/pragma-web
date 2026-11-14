@@ -7,7 +7,7 @@ import {
 import type { SchemaFieldDefinition } from "../schema/index.js";
 import type { RecordTyping, RecordTypingConfig } from "./types.js";
 
-const valueLabel = (value: unknown): string =>
+const spellValue = (value: unknown): string =>
   typeof value === "string" ? `"${value}"` : String(value);
 
 /**
@@ -44,7 +44,7 @@ export default function createRecordTyping<
   }
 
   /** A row's declared type name, or null when it carries no such name. */
-  const nameOf = (row: TRow): string | null => {
+  const readTypeName = (row: TRow): string | null => {
     const value = readField(row, discriminator);
     return typeof value === "string" && declared.has(value) ? value : null;
   };
@@ -58,7 +58,7 @@ export default function createRecordTyping<
       for (const entry of model.entries) {
         const value = readField(entry.record, discriminator);
         if (typeof value !== "string" || !declared.has(value)) {
-          return `record type ${valueLabel(value)} of row "${entry.id}" is not declared`;
+          return `record type ${spellValue(value)} of row "${entry.id}" is not declared`;
         }
       }
       return null;
@@ -68,7 +68,7 @@ export default function createRecordTyping<
       if (scope === undefined) {
         return "applies";
       }
-      const type = nameOf(row);
+      const type = readTypeName(row);
       return type !== null && scope.has(type) ? "applies" : "not-applicable";
     },
     recordType(id: string): string | null {
@@ -84,7 +84,7 @@ export default function createRecordTyping<
       const record = rows.get().byId(id);
       return record === undefined
         ? (remembered.get(id) ?? null)
-        : nameOf(record);
+        : readTypeName(record);
     },
     remember(model: RowModel<TRow>): void {
       // Rebuilt rather than added to: the pass that takes the types about
@@ -93,7 +93,9 @@ export default function createRecordTyping<
       for (const id of selection.state.get().ids) {
         const record = model.byId(id);
         const name =
-          record === undefined ? (remembered.get(id) ?? null) : nameOf(record);
+          record === undefined
+            ? (remembered.get(id) ?? null)
+            : readTypeName(record);
         if (name !== null) {
           next.set(id, name);
         }

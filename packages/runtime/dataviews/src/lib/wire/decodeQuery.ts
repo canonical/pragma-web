@@ -9,7 +9,7 @@ import {
   type SortTerm,
 } from "../query/index.js";
 import type { QueryIssue } from "../result/index.js";
-import { refusalsOf, type SourceCapabilities } from "../source/index.js";
+import { listQueryRefusals, type SourceCapabilities } from "../source/index.js";
 import {
   OPERATOR_DELIMITER,
   QUERY_KEYS,
@@ -34,7 +34,7 @@ type Reading<T> = {
 };
 
 /** Read a parameter the grammar spells once, reporting any extra values. */
-const singletonOf = (
+const readSingleton = (
   key: string,
   values: readonly string[],
 ): Reading<string> => ({
@@ -56,12 +56,12 @@ const singletonOf = (
 });
 
 /** Read one window value, falling back rather than paging somewhere absurd. */
-const windowValueOf = (
+const readWindowValue = (
   key: string,
   values: readonly string[],
   fallback: number,
 ): Reading<number> => {
-  const { value, issues } = singletonOf(key, values);
+  const { value, issues } = readSingleton(key, values);
   const parsed = Number(value);
   // Digits alone are not enough: past the safe range a page or size reads
   // as Infinity or as a neighbouring number.
@@ -83,7 +83,7 @@ const windowValueOf = (
 };
 
 /** Read one ordered sort term, or null when the value is not one. */
-const sortTermOf = (value: string): SortTerm | null => {
+const readSortTerm = (value: string): SortTerm | null => {
   const at = value.indexOf(OPERATOR_DELIMITER);
   if (at < 1) {
     return null;
@@ -102,7 +102,7 @@ const sortTermOf = (value: string): SortTerm | null => {
  * window's own refusal, not every clause's. An ordering is kept or refused
  * whole, never truncated.
  */
-const executableOf = (
+const keepExecutableSlice = (
   slice: Slice,
   filter: readonly ReadPredicate[],
   capabilities: SourceCapabilities,
@@ -113,7 +113,7 @@ const executableOf = (
     field: string | null,
     clause: Slice,
   ): boolean => {
-    const refusals = refusalsOf(capabilities, {
+    const refusals = listQueryRefusals(capabilities, {
       slice: clause,
       window: DEFAULT_WINDOW,
     });
@@ -162,11 +162,11 @@ const executableOf = (
  * out of a cursor source's reach is that source's own refusal at execution,
  * which needs the trail this layer does not have.
  */
-const addressableWindow = (
+const keepAddressableWindow = (
   window: ResultWindow,
   capabilities: SourceCapabilities,
 ): Reading<ResultWindow> => {
-  const refusals = refusalsOf(capabilities, {
+  const refusals = listQueryRefusals(capabilities, {
     slice: EMPTY_SLICE,
     window,
   });
@@ -219,7 +219,7 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       continue;
     }
     if (key === QUERY_KEYS.search) {
-      const reading = singletonOf(key, values);
+      const reading = readSingleton(key, values);
       search = reading.value;
       issues.push(...reading.issues);
       continue;
@@ -227,7 +227,7 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
     if (key === QUERY_KEYS.sort) {
       const terms: SortTerm[] = [];
       for (const value of values) {
-        const term = sortTermOf(value);
+        const term = readSortTerm(value);
         if (term === null) {
           issues.push({
             parameter: key,
@@ -260,19 +260,19 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       continue;
     }
     if (key === QUERY_KEYS.cursor) {
-      const reading = singletonOf(key, values);
+      const reading = readSingleton(key, values);
       cursor = reading.value;
       issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.page) {
-      const reading = windowValueOf(key, values, page);
+      const reading = readWindowValue(key, values, page);
       page = reading.value;
       issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.size) {
-      const reading = windowValueOf(key, values, size);
+      const reading = readWindowValue(key, values, size);
       size = reading.value;
       issues.push(...reading.issues);
       continue;
@@ -325,8 +325,8 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
   if (capabilities === undefined || capabilities === null) {
     return { slice: read, window: readWindow, issues };
   }
-  const executable = executableOf(read, filter, capabilities);
-  const addressable = addressableWindow(readWindow, capabilities);
+  const executable = keepExecutableSlice(read, filter, capabilities);
+  const addressable = keepAddressableWindow(readWindow, capabilities);
   return {
     slice: executable.value,
     window: addressable.value,

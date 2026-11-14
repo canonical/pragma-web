@@ -1,7 +1,10 @@
 import { createChannel, protectChannel } from "../observable/index.js";
 import type { Selection, SelectionState } from "./types.js";
 
-const setsEqual = (a: ReadonlySet<string>, b: ReadonlySet<string>): boolean => {
+const areSetsEqual = (
+  a: ReadonlySet<string>,
+  b: ReadonlySet<string>,
+): boolean => {
   if (a.size !== b.size) {
     return false;
   }
@@ -27,7 +30,7 @@ export default function createSelection(
 
   const publish = (ids: Set<string>): void => {
     const current = channel.get();
-    if (setsEqual(current.ids, ids)) {
+    if (areSetsEqual(current.ids, ids)) {
       return;
     }
     channel.set(Object.freeze({ ids, revision: current.revision + 1 }));

@@ -36,7 +36,7 @@ const mergesPages = (selections: readonly unknown[]): boolean =>
 const REMEMBERED_QUERIES = 32;
 
 /** Why a page beyond the trail cannot be reached. */
-const unreachable = (page: number): string =>
+const describeUnreachable = (page: number): string =>
   `a forward connection reaches page ${page} only from page ${page - 1}`;
 
 /**
@@ -80,11 +80,11 @@ export default function createRelaySource<
 
   /** The trail one query keeps its cursors under: what it asks for, and how
    * many rows at a time. */
-  const trailKey = (slice: Slice, size: number): string =>
+  const spellTrailKey = (slice: Slice, size: number): string =>
     `${size}:${spellSliceKey(slice)}`;
 
   /** The trail of one query, now the most recently used. */
-  const trailOf = (key: string): Map<number, string> => {
+  const touchTrail = (key: string): Map<number, string> => {
     const trail = trails.get(key) ?? new Map<number, string>();
     trails.delete(key);
     trails.set(key, trail);
@@ -98,7 +98,7 @@ export default function createRelaySource<
   };
 
   /** The cursor one page starts after, or undefined when none reaches it. */
-  const cursorFor = (query: Query): string | null | undefined => {
+  const findCursor = (query: Query): string | null | undefined => {
     const { slice, window } = query;
     if (window.cursor !== null) {
       return window.cursor;
@@ -106,13 +106,13 @@ export default function createRelaySource<
     if (window.page === 1) {
       return null;
     }
-    return trails.get(trailKey(slice, window.size))?.get(window.page);
+    return trails.get(spellTrailKey(slice, window.size))?.get(window.page);
   };
 
   return {
     capabilities,
     refusals(query: Query): readonly SourceRefusal[] {
-      if (cursorFor(query) !== undefined) {
+      if (findCursor(query) !== undefined) {
         return [];
       }
       return [
@@ -121,20 +121,20 @@ export default function createRelaySource<
           code: "unreachable-page",
           field: null,
           operator: null,
-          reason: unreachable(query.window.page),
+          reason: describeUnreachable(query.window.page),
         },
       ];
     },
     execute(request, deliver) {
       const { slice, window } = request;
-      const key = trailKey(slice, window.size);
+      const key = spellTrailKey(slice, window.size);
       /** The forbidden mark this request's page is kept under. */
       const mark = `${window.page}@${key}`;
-      const after = cursorFor(request);
+      const after = findCursor(request);
       if (after === undefined) {
         // The binding refuses this before it gets here; a caller executing
         // the source itself still gets a reason rather than a wrong page.
-        throw new Error(unreachable(window.page));
+        throw new Error(describeUnreachable(window.page));
       }
       const operation = config.operation({
         slice,
@@ -148,7 +148,7 @@ export default function createRelaySource<
         );
       }
       // Only a request that proceeds counts as using its query's cursors.
-      const trail = trailOf(key);
+      const trail = touchTrail(key);
       /** How to release what this request has acquired, newest first. */
       const acquired: (() => void)[] = [];
       const release = (): void => {

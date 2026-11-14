@@ -94,7 +94,7 @@ export default function createArraySource<TRow extends object = RowRecord>(
       search: slice.search,
     });
 
-  const deliveryFor = (request: SourceRequest): SourceDelivery<TRow> => {
+  const buildDelivery = (request: SourceRequest): SourceDelivery<TRow> => {
     if (executed === null || executed.slice !== request.slice) {
       executed = {
         slice: request.slice,
@@ -153,13 +153,13 @@ export default function createArraySource<TRow extends object = RowRecord>(
   return {
     capabilities,
     // Complete local input always holds the answer.
-    readDelivery: deliveryFor,
+    readDelivery: buildDelivery,
     execute(
       request: SourceRequest,
       deliver: (delivery: SourceDelivery<TRow>) => void,
     ): () => void {
       const run = (): void => {
-        deliver(deliveryFor(request));
+        deliver(buildDelivery(request));
       };
       live.add(run);
       run();

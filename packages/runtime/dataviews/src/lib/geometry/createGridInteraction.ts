@@ -45,7 +45,7 @@ export default function createGridInteraction(
   // A conflicting same-column update invalidates the live preview; an
   // unrelated column's update does not. Our own commit ends the interaction
   // before writing, so any change observed while resizing is external.
-  const onLayoutChange = (): void => {
+  const handleLayoutChange = (): void => {
     const state = channel.get();
     if (state.status === "resizing" && resizingBaseline !== null) {
       const current = layout.effective(state.columnId);
@@ -105,7 +105,7 @@ export default function createGridInteraction(
       publish({ status: "idle" });
     },
     observe(): () => void {
-      return layout.state.subscribe(onLayoutChange);
+      return layout.state.subscribe(handleLayoutChange);
     },
   };
 }

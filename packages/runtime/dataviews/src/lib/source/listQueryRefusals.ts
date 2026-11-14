@@ -19,7 +19,7 @@ import type { SourceCapabilities } from "./types.js";
  * combinations one endpoint rejects — is the source's own `refusals`, and
  * the binding runs both.
  */
-export default function refusalsOf(
+export default function listQueryRefusals(
   capabilities: SourceCapabilities,
   query: Query,
 ): readonly SourceRefusal[] {

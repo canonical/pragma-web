@@ -1,7 +1,7 @@
 import type { ColumnToSize, ResolvedColumn } from "./types.js";
 
 /** The declarative track of one column, used before any width is measured. */
-const declaredTrack = (column: ColumnToSize): string => {
+const readDeclaredTrack = (column: ColumnToSize): string => {
   const { sizing } = column;
   if (sizing.kind === "fixed") {
     return `${sizing.px}px`;
@@ -37,6 +37,6 @@ export default function buildColumnTemplate(
     return "none";
   }
   return resolved === null
-    ? columns.map(declaredTrack).join(" ")
+    ? columns.map(readDeclaredTrack).join(" ")
     : resolved.map((column) => `${column.width}px`).join(" ");
 }
