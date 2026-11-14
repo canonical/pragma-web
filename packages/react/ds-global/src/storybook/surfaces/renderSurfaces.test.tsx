@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import surfaces from "./surfaces.js";
+import renderSurfaces from "./renderSurfaces.js";
 
-describe("surfaces", () => {
+describe("renderSurfaces", () => {
   it("stacks three nested surface bands across every column", () => {
     const { container } = render(
-      surfaces((level: number) => <span>Level {level}</span>),
+      renderSurfaces((level: number) => <span>Level {level}</span>),
     );
     expect(container.querySelectorAll(".surface")).toHaveLength(3);
     expect(

@@ -1,17 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import type { ElementType } from "react";
 import { describe, expect, it } from "vitest";
-import rtl from "./rtl.js";
+import withGrid from "./withGrid.js";
 
 /** A story stand-in. */
 const Story: ElementType = () => <span data-testid="story">Story</span>;
 
-describe("rtl", () => {
-  it("wraps the story in dir=rtl", () => {
-    render(rtl()(Story));
-    expect(screen.getByTestId("story").closest("[dir]")).toHaveAttribute(
-      "dir",
-      "rtl",
-    );
+describe("withGrid", () => {
+  it("wraps the story in the bare grid preset", () => {
+    render(withGrid()(Story));
+    expect(screen.getByTestId("story").closest(".grid")).toBeInTheDocument();
   });
 });

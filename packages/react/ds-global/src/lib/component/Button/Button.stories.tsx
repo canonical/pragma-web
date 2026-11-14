@@ -4,14 +4,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { Fragment } from "react";
 import { fn } from "storybook/test";
-import surface from "../../../storybook/decorators/surface.js";
+import { withSurface } from "../../../storybook/decorators/index.js";
 
 import Component from "./Button.js";
 
 const meta = {
   title: "components/Button",
   component: Component,
-  decorators: [surface()],
+  decorators: [withSurface()],
   argTypes: {
     // Importance is never blank — primary is the default hierarchy.
     importance: {

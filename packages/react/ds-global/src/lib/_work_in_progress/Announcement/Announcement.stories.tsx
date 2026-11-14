@@ -1,6 +1,6 @@
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import rtl from "storybook/decorators/rtl.js";
+import { withRtl } from "../../../storybook/decorators/index.js";
 import Component from "./Announcement.js";
 
 const meta = {
@@ -72,7 +72,7 @@ export const LongMessage: Story = {
  * trailing (right) edge and the icon leads on the right.
  */
 export const RightToLeft: Story = {
-  decorators: [rtl()],
+  decorators: [withRtl()],
   args: {
     criticality: "information",
     heading: "صيانة النظام",

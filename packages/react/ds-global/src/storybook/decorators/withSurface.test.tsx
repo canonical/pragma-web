@@ -1,14 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import type { ElementType } from "react";
 import { describe, expect, it } from "vitest";
-import surface from "./surface.js";
+import withSurface from "./withSurface.js";
 
 /** A story stand-in. */
 const Story: ElementType = () => <span data-testid="story">Story</span>;
 
-describe("surface", () => {
+describe("withSurface", () => {
   it("paints the story on one padded surface", () => {
-    const { container } = render(surface()(Story));
+    const { container } = render(withSurface()(Story));
     const wrapper = container.firstElementChild;
     expect(wrapper).toBeInstanceOf(HTMLElement);
     if (!(wrapper instanceof HTMLElement)) return;

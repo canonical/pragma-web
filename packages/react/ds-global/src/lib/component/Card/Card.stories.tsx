@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import surfaces from "../../../storybook/decorators/surfaces.js";
+import { renderSurfaces } from "../../../storybook/surfaces/index.js";
 import { Chip } from "../Chip/index.js";
 import Component from "./Card.js";
 import type { CardProps } from "./types.js";
@@ -104,7 +104,7 @@ export const HeaderContentFooter: StoryFn<CardProps> = (props) => (
 export const OnSurfaces: StoryFn<CardProps> = () =>
   // The card sets no background of its own, so it takes the same background as
   // the surface band it sits on and blends in (rather than stepping).
-  surfaces((level) => (
+  renderSurfaces((level) => (
     <Component>
       <Component.Content>
         <h4>On surface level {level + 1}</h4>
