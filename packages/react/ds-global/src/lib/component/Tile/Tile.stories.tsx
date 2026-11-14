@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import surfaces from "../../../storybook/decorators/surfaces.js";
+import { renderSurfaces } from "../../../storybook/surfaces/index.js";
 import Component from "./Tile.js";
 
 const meta = {
@@ -54,7 +54,7 @@ export const OnSurfaces: Story = {
   render: () =>
     // The tile provides its own surface, so its background steps a level above
     // whatever band it sits on — it stands out rather than blending in.
-    surfaces((level) => (
+    renderSurfaces((level) => (
       <Component>
         <Component.Header>
           <h4>On surface level {level + 1}</h4>

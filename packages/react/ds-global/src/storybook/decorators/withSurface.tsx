@@ -1,7 +1,7 @@
 import type { ElementType, ReactElement } from "react";
 
 /** Paints the story on one surface, as it would sit in an app. */
-export default function surface() {
+export default function withSurface() {
   return (Story: ElementType): ReactElement => (
     <div
       className="surface"

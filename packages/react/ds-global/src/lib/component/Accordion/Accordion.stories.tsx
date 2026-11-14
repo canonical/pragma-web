@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import surfaces from "../../../storybook/decorators/surfaces.js";
+import { renderSurfaces } from "../../../storybook/surfaces/index.js";
 import Component from "./Accordion.js";
 
 const meta: Meta<typeof Component> = {
@@ -82,7 +82,7 @@ export const OnSurfaces: Story = {
     // The accordion's header background uses the ghost surface channel, which
     // steps with each nested surface band. The bands are subgrids, so the
     // accordion (grid-column: 1 / -1) aligns to the page grid.
-    surfaces((level) => (
+    renderSurfaces((level) => (
       <Component>
         <Component.Item heading={`On surface level ${level + 1}`} expanded>
           <p className="p">

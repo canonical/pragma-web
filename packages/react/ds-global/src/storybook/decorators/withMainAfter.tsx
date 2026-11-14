@@ -7,7 +7,7 @@ import type { ElementType, ReactElement, ReactNode } from "react";
  * @param id - the main element's id.
  * @param children - the main element's content.
  */
-export default function beforeMain({
+export default function withMainAfter({
   id = "main",
   children,
 }: {

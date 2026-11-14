@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
-import surface from "../../../storybook/decorators/surface.js";
+import { withSurface } from "../../../storybook/decorators/index.js";
 import { Button } from "../../component/Button/index.js";
 import { TooltipEngine, withTooltip } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
@@ -17,7 +17,7 @@ const tooltipParameters = {
 const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
-  decorators: [surface()],
+  decorators: [withSurface()],
   render: (args) => (
     <TooltipEngine Message={args["aria-label"]}>
       <Component {...args} />

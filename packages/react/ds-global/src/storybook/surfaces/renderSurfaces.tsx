@@ -43,7 +43,7 @@ function SurfaceBand({
  *
  * @param renderAtLevel - returns the node for a level (0-based).
  */
-export default function surfaces(
+export default function renderSurfaces(
   renderAtLevel: (level: number) => ReactNode,
 ): ReactElement {
   return (
