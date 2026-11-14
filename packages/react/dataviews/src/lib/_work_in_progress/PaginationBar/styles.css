@@ -2,16 +2,21 @@
 
 @layer ds.components.global {
   /**
-   * PaginationBar component tokens — each a binding to a design token, never
-   * a value of its own. The rules below read these and nothing else, so a
-   * theme or a host retunes the bar by setting them, and the anatomy beside
-   * the code names what each binds. The bindings that read a channel of
-   * @canonical/styles — density and surface — are declared on the bar
-   * itself, below: a custom property set here resolves its `var()` at the
-   * root, where no context class sets a channel, so it would freeze there
-   * rather than follow the nearest `.dense` or surface.
+   * PaginationBar styles
+   *
+   * The specification is the anatomy beside the code,
+   * `PaginationBar.anatomy.yaml`. Every value below is one it binds; what it
+   * could not bind is recorded there, never hardcoded here.
+   *
+   * The selects and buttons are the design system's own. The bar themes them
+   * through their channels — the form layer's input tokens and the Button's
+   * padding — and overrides only what a row of them needs: a select's width,
+   * and each icon-only button's square.
    */
-  :root {
+  .ds.data-table-pagination-bar {
+    /* The component tokens, each a binding to a design token, set on the
+       bar so no token leaks onto the page: a theme or a host retunes the
+       bar by setting them, and the anatomy names what each binds. */
     --data-table-pagination-bar-gap: var(--dimension-100);
     --data-table-pagination-bar-gap-control: var(--dimension-050);
     /* The inset a control keeps from the divider beside it. */
@@ -37,21 +42,7 @@
     --data-table-pagination-bar-control-padding-inline-end: var(
       --dimension-100
     );
-  }
 
-  /**
-   * PaginationBar styles
-   *
-   * The specification is the anatomy beside the code,
-   * `PaginationBar.anatomy.yaml`. Every value below is one it binds; what it
-   * could not bind is recorded there, never hardcoded here.
-   *
-   * The selects and buttons are the design system's own. The bar themes them
-   * through their channels — the form layer's input tokens and the Button's
-   * padding — and overrides only what a row of them needs: a select's width,
-   * and each icon-only button's square.
-   */
-  .ds.data-table-pagination-bar {
     /* The channel-bound tokens, resolved where the channels are set: the
        leading inset reads the density channel, as the table's cells do; the
        control size is one density line; the colours are the surface the bar

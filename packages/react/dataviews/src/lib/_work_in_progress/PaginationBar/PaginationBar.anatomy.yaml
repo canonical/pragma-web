@@ -35,21 +35,8 @@
 # (`density/padding-inline`, `--density-padding-inline`), as the table's cells
 # do; the DSL cannot name a channel, so the path does and this note records it.
 #
-# The stylesheet binds each of these through the bar's own component tokens,
-# `--data-table-pagination-bar-*`, read by every rule. The static bindings
-# are declared once on the root scope: gap (`dimension/100`), gap-control
-# (`dimension/050`), inset-inline (`dimension/100`), border-width (`dimension/stroke/thickness/medium`),
-# border-color and divider-color (`color/border/muted`), font-family, -size
-# and -weight (`typography/text/primary`), divider-inline-size
-# (`dimension/stroke/thickness/medium`), divider-block-size (`dimension/300`)
-# and control-padding-inline-end (`dimension/100`). The four that read a
-# channel are declared on the bar itself, where the channel is set —
-# padding-inline-start (the density channel), control-size
-# (`density/line-height-effective`), color-text and color-background (the
-# surface channel, falling back to `color/text` and `color/background`) — so
-# they follow the nearest density and surface rather than freezing at the
-# root. The DSL binds design tokens, not a component's own tier, so the
-# styles below name the design tokens and this note records the tier between.
+# The stylesheet binds each path through the bar's own
+# `--data-table-pagination-bar-*` tokens, all declared on the bar.
 #
 # The two selects are the design system's SelectInput, themed through the form
 # layer's own channels on the bar, never restyled:
