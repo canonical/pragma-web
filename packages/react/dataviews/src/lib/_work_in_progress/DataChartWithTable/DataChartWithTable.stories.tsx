@@ -2,7 +2,7 @@ import type { SchemaFieldDefinition } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
+import { withAppScope } from "../../../storybook/decorators/index.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";

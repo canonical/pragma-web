@@ -5,7 +5,7 @@ import { expect, userEvent, waitFor } from "storybook/test";
 import {
   withAppScope,
   withScrollingFrame,
-} from "../../../storybook/decorators.js";
+} from "../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../storybook/getHiddenButton.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
@@ -95,7 +95,7 @@ const expectAvailable = async (
   const names = ["First page", "Previous page", "Next page", "Last page"];
   for (const [at, name] of names.entries()) {
     const button = canvas.getByRole("button", { name });
-    await (available[at]
+    await (available.at(at)
       ? expect(button).toBeEnabled()
       : expect(button).toBeDisabled());
   }

@@ -2,7 +2,7 @@ import type { DataViewsMessages } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
+import { withAppScope } from "../../../storybook/decorators/index.js";
 import { FRENCH } from "../../../storybook/locales/fr.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "../DataTable/index.js";

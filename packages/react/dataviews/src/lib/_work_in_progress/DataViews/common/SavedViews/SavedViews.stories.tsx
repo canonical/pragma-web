@@ -14,7 +14,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
+import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
@@ -317,7 +317,7 @@ export const AViewsArrangement: Story = {
     const headers = canvas.getAllByRole("columnheader");
     await expect(headers).toHaveLength(3);
     for (const [index, header] of ["Owner", "Host", "Status"].entries()) {
-      await expect(headers[index]).toHaveAccessibleName(header);
+      await expect(headers.at(index)).toHaveAccessibleName(header);
     }
   },
 };

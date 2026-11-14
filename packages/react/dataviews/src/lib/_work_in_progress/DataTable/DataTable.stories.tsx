@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope, withFrame } from "../../../storybook/decorators.js";
+import {
+  withAppScope,
+  withFrame,
+} from "../../../storybook/decorators/index.js";
 import buildMachines from "../../../storybook/machines/buildMachines.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
@@ -82,7 +85,7 @@ const renderMachines =
   (args) => <MachinesTable {...args} columns={columns} options={options} />;
 
 /** A heading that states its column's sizing rule under its name. */
-const ruled = (name: string, rule: string): ReactNode => (
+const renderRuledHeader = (name: string, rule: string): ReactNode => (
   <>
     {name}
     <br />
@@ -104,49 +107,49 @@ const plainColumns: readonly DataTableColumn[] = [
 // order by, and every sortable column below is built through this helper,
 // whose type holds it to that: a column offering a sort its source cannot
 // execute is a dead control, and no story demonstrates one.
-const sortableColumn = (
+const declareSortableColumn = (
   id: SortableField,
   header: string,
 ): DataTableColumn => ({ id, header, sortable: true });
 
 const sortableColumns: readonly DataTableColumn[] = [
-  sortableColumn("name", "Host"),
-  sortableColumn("status", "Status"),
+  declareSortableColumn("name", "Host"),
+  declareSortableColumn("status", "Status"),
   { id: "region", header: "Region" },
-  sortableColumn("cores", "Cores"),
+  declareSortableColumn("cores", "Cores"),
   { id: "owner", header: "Owner" },
 ];
 
 const sizedColumns: readonly DataTableColumn[] = [
   {
     id: "name",
-    header: ruled("Host", "flex ×2 · min 160"),
+    header: renderRuledHeader("Host", "flex ×2 · min 160"),
     sizing: { kind: "flex", weight: 2, minPx: 160 },
   },
   {
     id: "status",
-    header: ruled("Status", "fixed 112"),
+    header: renderRuledHeader("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
     id: "region",
-    header: ruled("Region", "flex ×1 · 96–144"),
+    header: renderRuledHeader("Region", "flex ×1 · 96–144"),
     sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 },
   },
   {
     id: "cores",
-    header: ruled("Cores", "fixed 80"),
+    header: renderRuledHeader("Cores", "fixed 80"),
     sizing: { kind: "fixed", px: 80 },
   },
   {
     id: "owner",
-    header: ruled("Owner", "flex ×1 · min 96"),
+    header: renderRuledHeader("Owner", "flex ×1 · min 96"),
     sizing: { kind: "flex", weight: 1, minPx: 96 },
   },
 ];
 
 /** Mark the named columns resizable, leaving the rest as they are. */
-const resizing = (
+const markResizable = (
   columns: readonly DataTableColumn[],
   ids: readonly string[],
 ): readonly DataTableColumn[] =>
@@ -188,7 +191,7 @@ const selectableTableCode = `<DataTable
 />`;
 
 /** The table inside a frame of the given width. */
-const framedTableCode = (
+const spellFramedTableCode = (
   width: string,
 ): string => `<div style={{ maxWidth: "${width}" }}>
   ${tableCode}
@@ -229,7 +232,7 @@ const press = async (
 };
 
 /** An element's rendered width, in whole pixels. */
-const widthOf = (element: HTMLElement): number =>
+const measureWidth = (element: HTMLElement): number =>
   Math.round(element.getBoundingClientRect().width);
 
 /**
@@ -301,7 +304,7 @@ export const SortedAscending: Story = {
         canvas
           .getAllByRole("row")
           .slice(1)
-          .map((row) => within(row).getAllByRole("cell")[0]?.textContent),
+          .map((row) => within(row).getAllByRole("cell").at(0)?.textContent),
       ).toEqual(
         [
           "alder",
@@ -345,7 +348,7 @@ export const SortedDescending: Story = {
       canvas.getByRole("columnheader", { name: "Cores" }).querySelector("use"),
     ).toHaveAttribute("href", expect.stringMatching(/#chevron-down$/));
     await waitFor(() =>
-      expect(canvas.getAllByRole("cell")[0]).toHaveTextContent(
+      expect(canvas.getAllByRole("cell").at(0)).toHaveTextContent(
         "ironwood.example.com",
       ),
     );
@@ -471,7 +474,9 @@ export const Selectable: Story = {
     // The select-all header leads the row: the stylesheet's track, from the
     // design's 32px dimension token.
     const [selection, ...columns] = canvas.getAllByRole("columnheader");
-    await expect(selection === undefined ? null : widthOf(selection)).toBe(32);
+    await expect(selection === undefined ? null : measureWidth(selection)).toBe(
+      32,
+    );
     // The data columns share exactly what that track leaves.
     const shared = columns.reduce(
       (total, column) => total + column.getBoundingClientRect().width,
@@ -531,7 +536,7 @@ export const FixedAndFlexibleColumns: Story = {
   parameters: consumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
-    render: framedTableCode("48rem"),
+    render: spellFramedTableCode("48rem"),
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(sizedColumns),
@@ -548,7 +553,7 @@ export const HorizontalScroll: Story = {
   parameters: consumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
-    render: framedTableCode("24rem"),
+    render: spellFramedTableCode("24rem"),
   }),
   decorators: [withFrame("24rem")],
   render: renderMachines(sizedColumns),
@@ -585,7 +590,9 @@ const resizableCode = consumerCode({
 export const Resizable: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  render: renderMachines(
+    markResizable(sizedColumns, ["name", "region", "owner"]),
+  ),
   play: async ({ canvas }) => {
     const controls = await canvas.findAllByRole("separator");
     await expect(controls).toHaveLength(2);
@@ -613,7 +620,7 @@ export const MixedResizableColumns: Story = {
     render: tableCode,
   }),
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(plainColumns, ["name", "region"])),
+  render: renderMachines(markResizable(plainColumns, ["name", "region"])),
 };
 
 /**
@@ -627,7 +634,9 @@ export const MixedResizableColumns: Story = {
 export const ResizeWithoutDragging: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  render: renderMachines(
+    markResizable(sizedColumns, ["name", "region", "owner"]),
+  ),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const before = Number(host.getAttribute("aria-valuenow"));
@@ -664,7 +673,9 @@ export const PlacingAColumnsEdge: Story = {
   name: "Placing a column's edge",
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  render: renderMachines(
+    markResizable(sizedColumns, ["name", "region", "owner"]),
+  ),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const edge = host.getBoundingClientRect();
@@ -691,24 +702,24 @@ export const PlacingAColumnsEdge: Story = {
 const boundedColumns: readonly DataTableColumn[] = [
   {
     id: "name",
-    header: ruled("Host", "resizable · 120–320"),
+    header: renderRuledHeader("Host", "resizable · 120–320"),
     sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 },
     resizable: true,
   },
   {
     id: "region",
-    header: ruled("Region", "resizable · 96–160"),
+    header: renderRuledHeader("Region", "resizable · 96–160"),
     sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 160 },
     resizable: true,
   },
   {
     id: "status",
-    header: ruled("Status", "fixed 112"),
+    header: renderRuledHeader("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
     id: "owner",
-    header: ruled("Owner", "takes the rest"),
+    header: renderRuledHeader("Owner", "takes the rest"),
     sizing: { kind: "flex", weight: 1, minPx: 96 },
   },
 ];
@@ -767,10 +778,10 @@ export const ResizePastTheContainer: Story = {
   { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
   { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
 ];`,
-    render: framedTableCode("36rem"),
+    render: spellFramedTableCode("36rem"),
   }),
   decorators: [withFrame("36rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region"])),
+  render: renderMachines(markResizable(sizedColumns, ["name", "region"])),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole("table");
     const host = await canvas.findByRole("separator", { name: /^Host/ });
@@ -786,7 +797,7 @@ export const ResizePastTheContainer: Story = {
       start + table.clientWidth + 0.5,
     );
     await expect(
-      widthOf(canvas.getByRole("columnheader", { name: /^Owner/ })),
+      measureWidth(canvas.getByRole("columnheader", { name: /^Owner/ })),
     ).toBe(96);
   },
 };
@@ -794,18 +805,18 @@ export const ResizePastTheContainer: Story = {
 const fixedColumns: readonly DataTableColumn[] = [
   {
     id: "name",
-    header: ruled("Host", "resizable · fixed 200"),
+    header: renderRuledHeader("Host", "resizable · fixed 200"),
     sizing: { kind: "fixed", px: 200 },
     resizable: true,
   },
   {
     id: "status",
-    header: ruled("Status", "fixed 112"),
+    header: renderRuledHeader("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
     id: "owner",
-    header: ruled("Owner", "fixed 120"),
+    header: renderRuledHeader("Owner", "fixed 120"),
     sizing: { kind: "fixed", px: 120 },
   },
 ];
@@ -825,14 +836,16 @@ export const SpaceAfterFixedColumns: Story = {
   { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
   { id: "owner", header: "Owner", sizing: { kind: "fixed", px: 120 } },
 ];`,
-    render: framedTableCode("48rem"),
+    render: spellFramedTableCode("48rem"),
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(fixedColumns),
   play: async ({ canvas }) => {
     await expect(
       Math.round(
-        widthOf(await canvas.findByRole("columnheader", { name: /^Owner/ })),
+        measureWidth(
+          await canvas.findByRole("columnheader", { name: /^Owner/ }),
+        ),
       ),
     ).toBe(120);
   },
@@ -1119,7 +1132,7 @@ export const LongValues: Story = {
   { id: "status", header: "Status", sizing: { kind: "fixed", px: 96 } },
   { id: "note", header: "Note", sizing: { kind: "flex", weight: 1, minPx: 160 } },
 ];`,
-    render: framedTableCode("40rem"),
+    render: spellFramedTableCode("40rem"),
   }),
   decorators: [withFrame("40rem")],
   render: renderMachines([
@@ -1158,7 +1171,7 @@ const renderVirtualized =
  * A virtualized story's consumer code: the table, virtualized, in a capped
  * frame, over a provider whose window holds every one of ten thousand machines.
  */
-const virtualizedConsumer = (
+const showVirtualizedCode = (
   columns: string,
   parts: readonly string[] = tableParts,
 ): NonNullable<Story["parameters"]> =>
@@ -1184,7 +1197,7 @@ ${columns}`,
   });
 
 /** The logical positions of the rows mounted right now. */
-const mountedPositions = (table: HTMLElement): number[] =>
+const listMountedPositions = (table: HTMLElement): number[] =>
   [...table.querySelectorAll('[role="row"]')].map((row) =>
     Number(row.getAttribute("aria-rowindex")),
   );
@@ -1202,7 +1215,7 @@ const mountedPositions = (table: HTMLElement): number[] =>
  * window, mounted or not.
  */
 export const Virtualized: Story = {
-  parameters: virtualizedConsumer(`const columns: readonly DataTableColumn[] = [
+  parameters: showVirtualizedCode(`const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sortable: true },
   { id: "status", header: "Status", sortable: true },
   { id: "region", header: "Region" },
@@ -1216,14 +1229,14 @@ export const Virtualized: Story = {
     await waitFor(() =>
       expect(table).toHaveAttribute("aria-rowcount", "10001"),
     );
-    await expect(mountedPositions(table).length).toBeLessThan(40);
+    await expect(listMountedPositions(table).length).toBeLessThan(40);
     table.scrollTop = table.scrollHeight;
     const last = await canvas.findByText("node-09999.example.com");
     await expect(last.closest('[role="row"]')).toHaveAttribute(
       "aria-rowindex",
       "10001",
     );
-    await expect(mountedPositions(table).length).toBeLessThan(40);
+    await expect(listMountedPositions(table).length).toBeLessThan(40);
   },
 };
 
@@ -1240,7 +1253,7 @@ function WrappingNote({ value }: DisplayFieldCellProps): ReactElement {
  * its estimate, the view stays on the rows being read rather than jumping.
  */
 export const VirtualizedVariableHeights: Story = {
-  parameters: virtualizedConsumer(
+  parameters: showVirtualizedCode(
     `function WrappingNote({ value }: DisplayFieldCellProps) {
   return <span style={{ whiteSpace: "normal" }}>{String(value)}</span>;
 }
@@ -1274,34 +1287,34 @@ const columns: readonly DataTableColumn[] = [
     await canvas.findByText("node-00000.example.com");
     table.scrollTop = table.scrollHeight / 2;
     await waitFor(() =>
-      expect(Math.min(...mountedPositions(table).slice(1))).toBeGreaterThan(
+      expect(Math.min(...listMountedPositions(table).slice(1))).toBeGreaterThan(
         1000,
       ),
     );
     const header = table.querySelector(".ds.data-table-row-group.header");
-    const rows = () => [
+    const listRows = () => [
       ...table.querySelectorAll(".ds.data-table-row-group.body > [role=row]"),
     ];
-    const frames = async (): Promise<void> => {
+    const waitFrames = async (): Promise<void> => {
       for (let frame = 0; frame < 2; frame += 1) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
       }
     };
-    await frames();
+    await waitFrames();
     const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
-    const first = rows().find(
+    const first = listRows().find(
       (row) => row.getBoundingClientRect().bottom > headerBottom,
     );
     const top = first?.getBoundingClientRect().top;
     await expect(top).toBeDefined();
     // Settled, and measured: the row being read holds still.
-    await frames();
+    await waitFrames();
     await expect(first?.getBoundingClientRect().top).toBe(top);
     // The mounted rows cover the viewport, with no blank band at either end.
-    const mounted = rows();
-    await expect(mounted[0]?.getBoundingClientRect().top).toBeLessThanOrEqual(
-      headerBottom,
-    );
+    const mounted = listRows();
+    await expect(
+      mounted.at(0)?.getBoundingClientRect().top,
+    ).toBeLessThanOrEqual(headerBottom);
     await expect(
       mounted.at(-1)?.getBoundingClientRect().bottom,
     ).toBeGreaterThanOrEqual(table.getBoundingClientRect().bottom - 1);
@@ -1321,7 +1334,7 @@ const columns: readonly DataTableColumn[] = [
  * the row is let go.
  */
 export const VirtualizedKeepsFocus: Story = {
-  parameters: virtualizedConsumer(`const columns: readonly DataTableColumn[] = [
+  parameters: showVirtualizedCode(`const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
   { id: "status", header: "Status" },
   { id: "region", header: "Region" },
@@ -1338,7 +1351,7 @@ export const VirtualizedKeepsFocus: Story = {
     const table = canvas.getByRole("table");
     table.scrollTop = table.scrollHeight / 2;
     await waitFor(() =>
-      expect(Math.max(...mountedPositions(table))).toBeGreaterThan(4000),
+      expect(Math.max(...listMountedPositions(table))).toBeGreaterThan(4000),
     );
     await expect(checkbox).toBeInTheDocument();
     await expect(checkbox).toHaveFocus();

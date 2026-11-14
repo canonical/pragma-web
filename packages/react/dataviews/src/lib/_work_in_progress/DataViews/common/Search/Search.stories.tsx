@@ -5,7 +5,7 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
+import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";

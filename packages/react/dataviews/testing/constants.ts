@@ -70,7 +70,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/utils/interceptSubmit.ts test",
   "src/lib/utils/readFieldName.ts test",
   "src/lib/virtualization/common/VirtualBody/VirtualBody.tsx export:memo-over-function",
-  "src/storybook/decorators.tsx export:several-functions",
   "src/storybook/getHiddenButton.ts test",
   "src/storybook/locales/fr.ts export:one-value",
   "src/storybook/machines/api/answerBehind.ts test",

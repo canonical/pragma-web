@@ -7,7 +7,7 @@ import { Button, type ButtonProps } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
+import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import {
   machineCollection,
@@ -156,7 +156,7 @@ function SelectionAction({
 }`;
 
 /** A story's consumer code: the collection, its action bar and its actions. */
-const actionsCode = ({
+const spellActionsCode = ({
   prepare,
   indicator = "",
   declarations = "",
@@ -215,7 +215,7 @@ const selectTwo = `provider.selection.add(["m-02", "m-06"]);`;
  * appears with the first selection.
  */
 export const NothingSelected: Story = {
-  parameters: actionsCode(),
+  parameters: spellActionsCode(),
   render: () => <ManagedMachines />,
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -233,7 +233,7 @@ export const NothingSelected: Story = {
  * with what it clears. It renders on the design system's contrasted surface.
  */
 export const TwoSelected: Story = {
-  parameters: actionsCode({ prepare: selectTwo }),
+  parameters: spellActionsCode({ prepare: selectTwo }),
   render: () => <ManagedMachines select={["m-02", "m-06"]} />,
   play: async ({ canvas }) => {
     const bar = await canvas.findByRole("group", { name: "Selection actions" });
@@ -250,7 +250,7 @@ export const TwoSelected: Story = {
  * The count is the whole selection, not the rows on screen.
  */
 export const SelectedAcrossPages: Story = {
-  parameters: actionsCode({
+  parameters: spellActionsCode({
     prepare: `provider.selection.add(["m-02", "m-09"]);`,
   }),
   render: () => <ManagedMachines select={["m-02", "m-09"]} />,
@@ -294,7 +294,7 @@ function MachinesSelected() {
  * persistent selection panel ships, its trigger takes this place.
  */
 export const CustomIndicator: Story = {
-  parameters: actionsCode({
+  parameters: spellActionsCode({
     prepare: selectTwo,
     indicator: " indicator={<MachinesSelected />}",
     declarations: machinesSelectedCode,
@@ -321,7 +321,7 @@ export const CustomIndicator: Story = {
  * left selected the bar went with them. Ten machines remain.
  */
 export const Archived: Story = {
-  parameters: actionsCode({ prepare: selectTwo }),
+  parameters: spellActionsCode({ prepare: selectTwo }),
   render: () => <ManagedMachines select={["m-02", "m-06"]} />,
   play: async ({ canvas }) => {
     const archive = await canvas.findByRole("button", { name: "Archive" });

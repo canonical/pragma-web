@@ -2,7 +2,7 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
+import { withAppScope } from "../../../storybook/decorators/index.js";
 import {
   answerBehind,
   createGraphQLHandlers,
