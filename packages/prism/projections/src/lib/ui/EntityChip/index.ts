@@ -2,3 +2,4 @@
 
 export { default as EntityChip } from "./EntityChip.js";
 export type * from "./types.js";
+export { PEEK_CLOSE_DELAY_MS, PEEK_OPEN_DELAY_MS } from "./constants.js";

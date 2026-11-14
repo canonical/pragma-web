@@ -1,63 +1,68 @@
 ---
-# EntityChip — the inline mention of an entity: a 28px pill in running text.
-# Reference: the projection matrix's chip (a 24px line, 2px block insets, 8px
-# before the value and 4px after the last slot, 4px between slots, a full
-# radius and a 1px border), with the segmented chip's icon and chevron. Slot
-# order, left to right: mark, lead (the key, then the catalog's separator),
-# value, badge, icon, chevron.
+# EntityChip: the inline mention of an entity, a 28px pill in running text,
+# a link to its home by default, which peeks at the entity's card.
+# Reference: PS1 V4 (mockups/ps1-v4-sheet.html, ps1-v4-sheet-peek.html,
+# tools/ps1v4-measured.json "peek"); Figma 449:22408 via forge/plans/S3.md
+# (24px line, 2px block insets, 8px/4px inline insets, 4px gap, full radius,
+# 1px border). Slot order (heuristic 4.1, a subsequence of mark, prefix,
+# title, address, kind, summary, facts, status): mark, prefix, title, then
+# the peek, which is not an identity slot and sits after the title.
 #
-# The mark is a small sign that leads the pill, such as a swatch of the
-# entity's colour, drawn and styled by the projection that fills it. The
-# chip hides it from assistive technology, so the chip's name is its value
-# alone, sizes it to its content (a flex box, so no line box makes it 24px
-# tall) and spaces it from the next slot with its gap.
+# The title is the link (LinkComponent, href) unless `linked` is false; an
+# unlinked chip is inert text and has no peek (nothing to focus). The peek is
+# a sibling of the link inside the root, never inside the <a>: a non-modal
+# popover (popover="manual", role="dialog", aria-label from the catalog
+# "chip.peek" with the title) holding the EntityCard the arm passes. It opens
+# after PEEK_OPEN_DELAY_MS (EntityChip/constants.ts) of hover on the link,
+# at once on focus; stays open while the pointer is over the link or the
+# peek; closes PEEK_CLOSE_DELAY_MS after the pointer leaves both, on focus
+# leaving both, and on Escape (focus returns to the link). A touch pointer
+# never opens it: a tap follows the link. Tethered with CSS anchor
+# positioning (anchor-name on the link, position-anchor on the peek, a
+# dashed ident from useId), 4px below the chip, flipping above when the
+# viewport has no room below (position-try-fallbacks: flip-block).
 #
-# Why not a published component: the published Chip renders a span or a
-# button, never a link, has no badge, icon or chevron slot, and carries outer
-# margins a mention in a sentence cannot have. The badge and the icons are
-# the published Badge and Icon.
+# Why not the published Popover: it is a click disclosure on a button; the
+# peek opens on hover-intent and focus of a link (EXPLANATIONS S5).
 #
-# A linked value reads as the pill's text: the text's colour, underlined
-# on hover, with a focus ring; the states apply to the link alone.
+# Until the closure slice the transitional slots keep their places: lead
+# (the key, then the catalog's separator) before the title, value in the
+# title's place when no title is given, and badge, icon and chevron between
+# the peek and the status. The status slot is the 4.1 slot that replaces
+# them.
 #
-# The 28px: the matrix draws the border inside the pill, CSS draws it outside
-# the padding, so each block inset is the matrix's 2px less the border.
+# Changes from the plan's sketch, with their reasons: the peek's anchor is
+# the chip's root (the pill), not the link, so "4px below the chip" holds
+# and the published LinkComponent, which takes no ref or style, needs no
+# wrapper; the anchor-name and position-anchor are set inline from useId
+# (an instance's ident cannot live in a stylesheet). The peek draws no
+# padding or border of its own: the EntityCard it holds draws the frame,
+# and a popover frame around it would draw a frame in a frame. The
+# dialog's name is a hidden label inside it (aria-labelledby), since the
+# title is a node, not a string.
 #
-# Every decision is read through a component token declared on the root
-# (`--entity-chip-*`), bound to the symbol or the literal named here.
-#
-# The pill sets its text on the matrix's 24px line, the line every
-# representation shares, so it is 28px in every context.
-#
-# The line that holds it holds the whole pill: it sets no block margins,
-# so the line box grows to the pill's 28px where a mention sits (8px over
-# the docs' 20px line, 4px over the matrix's 24px line, a key value's
-# included) and nothing of the pill paints over the lines above and below
-# it. A pill that overhung its line instead painted over the descenders of
-# the line above and the ascenders of the line below in the docs' text;
-# clipping it inside the slots that hold it would cut its border. A
-# paragraph with a mention has one taller line, its other lines keep their
-# pitch.
-#
-# Token ledger (no symbol to bind):
-#   --entity-chip-border-width: 1px    stroke thickness has only the
-#                                      primitive dimension.stroke.thickness.*.
-#   --entity-chip-radius: 9999px       a full radius has only the primitive
-#                                      dimension.radius.full.
-#   --entity-chip-focus-ring-width: 2px, --entity-chip-focus-ring-offset: -2px
-#                                      the link's ring, drawn inside it and so inside the pill.
-#   --entity-chip-max-width: 100%      no wider than its line, so a long
-#                                      value truncates inside the pill.
-#   --entity-chip-padding-block: calc(var(--space-025) - var(--entity-chip-border-width))
-#                                      the matrix's 2px inset less the border.
-#   space.100 (8px) and space.050 (4px) for the inline insets and space.050
-#   for the gap: the shim's inline component padding (16px) is a surface's,
-#   not a pill's, and no gap may read a container gap.
-#   space.300 (24px) for the line height: the matrix's line; no typography
-#   token is 24px in every context (the docs' primary line is 20px).
-#
-# Roster namespaces (accepted and tracked): space.100, space.050, space.300
-# (a line height), space.025 in the block insets.
+# Token ledger (every decision; a literal only where no symbol exists):
+#   --entity-chip-gap: space.050 (4px)            between slots
+#   --entity-chip-padding-inline-start: space.100 (8px)
+#   --entity-chip-padding-inline-end: space.050 (4px)
+#   --entity-chip-padding-block: calc(space.025 - border width)  2px less the border
+#   --entity-chip-line-height: space.300 (24px)  the matrix line
+#   --entity-chip-background: color.foreground.secondary
+#   --entity-chip-border-color: color.border
+#   --entity-chip-border-width: 1px               literal: only primitive stroke tokens
+#   --entity-chip-radius: 9999px                  literal: only primitive radius.full
+#   --entity-chip-prefix-color: color.text.muted
+#   --entity-chip-prefix-font-family: ui-monospace, monospace   literal: no mono token
+#   --entity-chip-focus-ring-color: color.focusRing
+#   --entity-chip-focus-ring-width: 2px, --entity-chip-focus-ring-offset: -2px  literals
+#   --entity-chip-max-width: 100%                 literal
+#   --entity-chip-peek-width: 248px               literal: the drawn peek (M9)
+#   --entity-chip-peek-offset: space.050 (4px)    below the chip
+#   --entity-chip-peek-max-height: calc(100dvh - space.100)   viewport less 8px
+#   --entity-chip-peek-background: color.background
+#   --entity-chip-peek-white-space: normal        literal: the pill's nowrap stops here
+#   --entity-chip-mark-size: space.200 (16px)
+#   PEEK_OPEN_DELAY_MS = 500, PEEK_CLOSE_DELAY_MS = 200 (constants.ts, not CSS)
 node:
   uri: prism.component.entity_chip
   styles:
@@ -81,12 +86,33 @@ node:
         role: mark
         styles:
           layout.type: flex
+          size.width: space.200
+          size.height: space.200
       relation: { cardinality: "0..1", slotName: mark }
+    - node:
+        role: prefix
+        styles:
+          typography.color: color.text.muted
+          typography.fontFamily: "ui-monospace, monospace"
+      relation: { cardinality: "0..1", slotName: prefix }
     - node:
         role: lead
         styles:
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: lead }
+    - node:
+        role: title
+        styles:
+          layout.overflow: hidden
+          typography.overflow: ellipsis
+          typography.color: inherit
+          typography.decoration: none
+          typography.decoration@hover: underline
+          appearance.outline.width@focus: 2px
+          appearance.outline.style@focus: solid
+          appearance.outline.color@focus: color.focusRing
+          appearance.outline.offset@focus: -2px
+      relation: { cardinality: "0..1", slotName: title }
     - node:
         role: value
         styles:
@@ -99,7 +125,32 @@ node:
           appearance.outline.style@focus: solid
           appearance.outline.color@focus: color.focusRing
           appearance.outline.offset@focus: -2px
-      relation: { cardinality: "1", slotName: value }
+      relation: { cardinality: "0..1", slotName: value }
+    - node:
+        role: peek
+        styles:
+          size.width: 248px
+          size.max.height: "calc(100dvh - var(--space-100))"
+          layout.overflow.block: auto
+          spacing.external.block.start: space.050
+          spacing.external.block.end: 0
+          spacing.external.inline.start: 0
+          spacing.external.inline.end: 0
+          spacing.internal.block.start: 0
+          spacing.internal.block.end: 0
+          spacing.internal.inline.start: 0
+          spacing.internal.inline.end: 0
+          appearance.border.width: 0
+          appearance.background: color.background
+          typography.whiteSpace: normal
+        edges:
+          - node:
+              role: label
+            relation: { cardinality: "1", slotName: label }
+          - node:
+              uri: prism.component.entity_card
+            relation: { cardinality: "1", slotName: card }
+      relation: { cardinality: "0..1", slotName: peek }
     - node:
         uri: global.component.badge
       relation: { cardinality: "0..1", slotName: badge }
@@ -111,3 +162,6 @@ node:
         props:
           icon: chevron-down
       relation: { cardinality: "0..1", slotName: chevron }
+    - node:
+        role: status
+      relation: { cardinality: "0..1", slotName: status }

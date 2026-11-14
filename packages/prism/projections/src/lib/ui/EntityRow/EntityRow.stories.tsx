@@ -75,3 +75,21 @@ export const List: Story = {
     </>
   ),
 };
+
+/**
+ * The identity in the slot order every representation keeps, on the two
+ * lines an index opts into: the summary under the title, each fact naming
+ * its property.
+ */
+export const TwoLines: Story = {
+  args: {
+    href: "#button",
+    mark: <Icon icon="information" />,
+    prefix: "ds",
+    title: "Button",
+    kind: "Component",
+    summary: "Starts the action its label names.",
+    facts: [{ property: "ds:tier", label: "Tier", value: "Global" }],
+    lines: "two",
+  },
+};

@@ -91,10 +91,12 @@ export type {
   EntityCardProps,
   EntityChipProps,
   EntityCommandProps,
+  EntityFact,
   EntityGraphNodeProps,
   EntityListProps,
   EntityListRenderer,
   EntityRowProps,
+  SpecimenKind,
 } from "./ui/index.js";
 export {
   DEFAULT_ENTITY_LIST_RENDERER,
@@ -105,5 +107,7 @@ export {
   EntityGraphNode,
   EntityList,
   EntityRow,
+  PEEK_CLOSE_DELAY_MS,
+  PEEK_OPEN_DELAY_MS,
 } from "./ui/index.js";
 export { findCuriePrefix } from "./utils/index.js";

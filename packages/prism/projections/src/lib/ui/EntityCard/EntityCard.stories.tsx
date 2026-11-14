@@ -205,3 +205,24 @@ export const Matrix: Story = {
     </>
   ),
 };
+
+/**
+ * The identity in the slot order every representation keeps, over its
+ * specimen: the entity drawn in the media track, inert.
+ */
+export const WithSpecimen: Story = {
+  args: {
+    href: "#button",
+    prefix: "ds",
+    title: "Button",
+    address: "ds:global.component.button",
+    kind: "Component",
+    summary: "Starts the action its label names.",
+    facts: [{ property: "ds:tier", label: "Tier", value: "Global" }],
+    children: (
+      <Component.Specimen kind="block" label="A primary button, drawn">
+        <Button importance="primary">Save</Button>
+      </Component.Specimen>
+    ),
+  },
+};

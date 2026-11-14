@@ -23,6 +23,19 @@
     /* No wider than the line that holds it. */
     --entity-chip-max-width: 100%;
     --entity-chip-lead-color: var(--color-text-muted);
+    --entity-chip-prefix-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-chip-prefix-font-family: ui-monospace, monospace;
+    /* The mark is a 16px sign on the pill's line. */
+    --entity-chip-mark-size: var(--space-200);
+    /* The peek: the drawn 248px card, 4px below the pill, no taller than
+     * the viewport less 4px at each end. The card draws its own frame, so
+     * the peek adds none. */
+    --entity-chip-peek-width: 248px;
+    --entity-chip-peek-offset: var(--space-050);
+    --entity-chip-peek-max-height: calc(100dvh - var(--space-100));
+    --entity-chip-peek-background: var(--color-background);
+    --entity-chip-peek-white-space: normal;
     /* The ring sits inside the value, on the pill's fill. */
     --entity-chip-focus-ring-width: 2px;
     --entity-chip-focus-ring-offset: -2px;
@@ -46,17 +59,25 @@
     white-space: nowrap;
   }
 
-  /* The mark is as tall as what it holds, so the pill centres it. */
+  /* The mark is a 16px box the pill centres. */
   .ds.entity-chip .mark {
     display: flex;
+    width: var(--entity-chip-mark-size);
+    height: var(--entity-chip-mark-size);
+  }
+
+  .ds.entity-chip .prefix {
+    color: var(--entity-chip-prefix-color);
+    font-family: var(--entity-chip-prefix-font-family);
   }
 
   .ds.entity-chip .lead {
     color: var(--entity-chip-lead-color);
   }
 
-  /* A long value truncates inside the pill, which is no wider than its
+  /* A long title truncates inside the pill, which is no wider than its
    * line, rather than widening it. */
+  .ds.entity-chip .title,
   .ds.entity-chip .value {
     overflow: hidden;
     color: inherit;
@@ -64,15 +85,35 @@
     text-overflow: ellipsis;
   }
 
-  /* A linked value reads as the pill's text, underlined on approach. */
+  /* A linked title reads as the pill's text, underlined on approach. */
+  .ds.entity-chip .title[href]:hover,
   .ds.entity-chip .value[href]:hover {
     text-decoration: underline;
   }
 
+  .ds.entity-chip .title[href]:focus-visible,
   .ds.entity-chip .value[href]:focus-visible {
     outline-width: var(--entity-chip-focus-ring-width);
     outline-style: solid;
     outline-color: var(--entity-chip-focus-ring-color);
     outline-offset: var(--entity-chip-focus-ring-offset);
+  }
+
+  /* The peek, in the top layer while open: tethered below the pill's
+   * start, above it when the viewport has no room below; it scrolls
+   * rather than outgrowing the viewport. */
+  .ds.entity-chip .peek {
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block;
+    width: var(--entity-chip-peek-width);
+    max-height: var(--entity-chip-peek-max-height);
+    overflow-y: auto;
+    margin-block-start: var(--entity-chip-peek-offset);
+    margin-block-end: 0;
+    margin-inline: 0;
+    padding: 0;
+    border-width: 0;
+    background: var(--entity-chip-peek-background);
+    white-space: var(--entity-chip-peek-white-space);
   }
 }

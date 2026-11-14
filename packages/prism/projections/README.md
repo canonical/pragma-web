@@ -410,10 +410,13 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `OntologyPropertyGraphNode`; types `OntologyPropertyChipProps`,
   `OntologyPropertyRowProps`, `OntologyPropertyCardProps`,
   `OntologyPropertyCommandProps`, `OntologyPropertyGraphNodeProps`.
-- Representations: `EntityChip`, `EntityRow`, `EntityCard`,
-  `EntityCommand`, `EntityGraphNode`, `EntityList`; types
-  `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
-  `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
+- Representations: `EntityChip`, `EntityRow`, `EntityCard` (its
+  depiction is its static Specimen), `EntityCommand`,
+  `EntityGraphNode`, `EntityList`, `PEEK_OPEN_DELAY_MS` and
+  `PEEK_CLOSE_DELAY_MS` (how long a chip's peek waits to open and to
+  close); types `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
+  `EntityCardKeyValue`, `EntityFact` (one fact a card or a row states),
+  `SpecimenKind`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListRenderer`.
 - List renderers: `useListRenderers` (the table and the cards, the list
   renderers a site gives its indexes), `ENTITY_LIST_RENDERERS`,

@@ -23,6 +23,15 @@
     --entity-row-identifier-vertical-align: baseline;
     --entity-row-identifier-line-height: 0;
     --entity-row-meta-color: var(--color-text-muted);
+    --entity-row-prefix-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-row-prefix-font-family: ui-monospace, monospace;
+    --entity-row-kind-color: var(--color-text-muted);
+    --entity-row-summary-color: var(--color-text-muted);
+    --entity-row-fact-label-color: var(--color-text-muted);
+    /* The second line spans the row, after every slot of the first. */
+    --entity-row-summary-basis: 100%;
+    --entity-row-summary-order: 1;
     /* The ring sits inside the title, since the identity clips. */
     --entity-row-focus-ring-width: 2px;
     --entity-row-focus-ring-offset: -2px;
@@ -95,5 +104,43 @@
     overflow-x: clip;
     min-width: 0;
     text-overflow: ellipsis;
+  }
+
+  .ds.entity-row .prefix {
+    margin-inline-end: var(--entity-row-mark-gap);
+    color: var(--entity-row-prefix-color);
+    font-family: var(--entity-row-prefix-font-family);
+  }
+
+  .ds.entity-row .kind {
+    margin-inline-start: var(--entity-row-mark-gap);
+    color: var(--entity-row-kind-color);
+  }
+
+  /* The second line of a two-line row: the summary under the title, on
+   * one line, cut by an ellipsis. */
+  .ds.entity-row .summary {
+    order: var(--entity-row-summary-order);
+    flex-basis: var(--entity-row-summary-basis);
+    min-width: 0;
+    overflow: hidden;
+    color: var(--entity-row-summary-color);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .ds.entity-row .facts {
+    display: flex;
+    column-gap: var(--entity-row-gap);
+    white-space: nowrap;
+  }
+
+  .ds.entity-row .term {
+    margin-inline-end: var(--entity-row-mark-gap);
+    color: var(--entity-row-fact-label-color);
+  }
+
+  .ds.entity-row .status {
+    display: flex;
   }
 }

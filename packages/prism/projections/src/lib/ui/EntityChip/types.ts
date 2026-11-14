@@ -11,10 +11,17 @@ type OwnProps = {
    * its value.
    */
   readonly mark?: ReactNode;
+  /**
+   * The entity's foreign prefix, such as `ds`, set in monospace before the
+   * title: where a mention names an entity of another vocabulary.
+   */
+  readonly prefix?: ReactNode;
+  /** The entity's name: the mention's text, and its link when linked. */
+  readonly title?: ReactNode;
   /** The key the value is filed under, shown before the catalog's separator. */
   readonly lead?: ReactNode;
-  /** The mention's text. */
-  readonly value: ReactNode;
+  /** The mention's text, when no `title` is given. */
+  readonly value?: ReactNode;
   /**
    * The entity's home: with one the value links to it, without one the value
    * is inert text.
@@ -22,12 +29,24 @@ type OwnProps = {
   readonly href?: string;
   /** The link the home renders through; the intrinsic anchor by default. */
   readonly LinkComponent?: LinkComponent;
+  /**
+   * Whether the title links to the entity's home: `false` sets it as inert
+   * text with no peek, for a mention that names the page it sits on.
+   */
+  readonly linked?: boolean;
+  /**
+   * What the chip peeks at: the entity's card, mounted only while the peek
+   * is open, so a lazy query in it runs only when a reader asks.
+   */
+  readonly peek?: ReactNode;
   /** A count beside the value: a published `Badge`. */
   readonly badge?: ReactNode;
   /** A status glyph after the badge: a published `Icon`. */
   readonly icon?: ReactNode;
   /** Whether the chip ends in the disclosure chevron. */
   readonly chevron?: boolean;
+  /** The entity's status after the title, such as a published `Badge`. */
+  readonly status?: ReactNode;
 };
 
 /**

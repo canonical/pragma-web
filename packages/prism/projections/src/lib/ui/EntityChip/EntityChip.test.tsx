@@ -2,9 +2,11 @@
 
 import type { LinkComponentProps } from "@canonical/react-ds-global";
 import { Badge, Icon } from "@canonical/react-ds-global";
-import { render, screen } from "@testing-library/react";
+import { expectSlotOrder } from "@canonical/prism-core/testing";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { PEEK_CLOSE_DELAY_MS, PEEK_OPEN_DELAY_MS } from "./constants.js";
 import EntityChip from "./EntityChip.js";
 
 /** A router link stand-in: an anchor that says it came through the router. */
@@ -127,14 +129,178 @@ describe("EntityChip", () => {
         <EntityChip
           className="mention"
           data-testid="chip"
-          title="ds:Layout"
+          lang="en"
           value="Layout"
         />,
       );
       const chip = screen.getByTestId("chip");
       expect(chip.tagName).toBe("SPAN");
       expect(chip.className).toBe("ds entity-chip mention");
-      expect(chip.getAttribute("title")).toBe("ds:Layout");
+      expect(chip.getAttribute("lang")).toBe("en");
+    });
+  });
+
+  describe("identity slots", () => {
+    it("renders mark, prefix, title and status in the slot order", () => {
+      render(
+        <EntityChip
+          data-testid="chip"
+          href="#button"
+          mark={<span className="swatch" />}
+          prefix="ds"
+          status={<span>Stable</span>}
+          title="Button"
+        />,
+      );
+      const chip = screen.getByTestId("chip");
+      expect(listSlots(chip)).toEqual(["mark", "prefix", "title", "status"]);
+      expectSlotOrder(chip);
+      expect(screen.getByRole("link", { name: "Button" }).className).toBe(
+        "title",
+      );
+    });
+
+    it("sets the title as inert text with no peek when unlinked", () => {
+      render(
+        <EntityChip
+          data-testid="chip"
+          href="#button"
+          linked={false}
+          peek={<p>Card</p>}
+          title="Button"
+        />,
+      );
+      expect(screen.queryByRole("link")).toBeNull();
+      fireEvent.focus(screen.getByText("Button"));
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+    });
+  });
+
+  describe("peek", () => {
+    // A document without the popover API (jsdom's) hides a popover that
+    // is never shown, so the peek is queried among hidden elements.
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    /** A linked chip with a peek, and its link. */
+    function renderPeeking(): HTMLElement {
+      render(
+        <EntityChip
+          data-testid="chip"
+          href="#button"
+          peek={<a href="#button">Open Button</a>}
+          title="Button"
+        />,
+      );
+      return screen.getByRole("link", { name: "Button" });
+    }
+
+    it("opens after the named delay of hover, and not before", () => {
+      renderPeeking();
+      const chip = screen.getByTestId("chip");
+      fireEvent.pointerEnter(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_OPEN_DELAY_MS - 1);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      const dialog = screen.getByRole("dialog", { hidden: true });
+      const label = dialog.getAttribute("aria-labelledby") ?? "";
+      expect(document.getElementById(label)?.textContent).toBe(
+        "Preview of Button",
+      );
+      expect(dialog.getAttribute("popover")).toBe("manual");
+      expect(dialog.closest("a")).toBeNull();
+      expect(dialog.querySelector("a[href]")).not.toBeNull();
+    });
+
+    it("closes after the pointer has left the chip and the peek", () => {
+      renderPeeking();
+      const chip = screen.getByTestId("chip");
+      fireEvent.pointerEnter(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_OPEN_DELAY_MS);
+      });
+      fireEvent.pointerLeave(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_CLOSE_DELAY_MS - 1);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+      fireEvent.pointerEnter(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_CLOSE_DELAY_MS);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+      fireEvent.pointerLeave(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_CLOSE_DELAY_MS);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+    });
+
+    it("opens at once on focus and closes on Escape, focus on the link", () => {
+      const link = renderPeeking();
+      act(() => {
+        link.focus();
+      });
+      const inner = screen.getByRole("link", {
+        hidden: true,
+        name: "Open Button",
+      });
+      act(() => {
+        inner.focus();
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+      fireEvent.keyDown(inner, { key: "Escape" });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+      expect(document.activeElement).toBe(link);
+    });
+
+    it("closes when focus leaves the chip and the peek", () => {
+      const link = renderPeeking();
+      act(() => {
+        link.focus();
+      });
+      act(() => {
+        link.blur();
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+    });
+
+    it("never opens on touch, so a tap follows the link", () => {
+      const link = renderPeeking();
+      const chip = screen.getByTestId("chip");
+      fireEvent.pointerEnter(chip, { pointerType: "touch" });
+      fireEvent.pointerDown(link, { pointerType: "touch" });
+      act(() => {
+        link.focus();
+        vi.advanceTimersByTime(PEEK_OPEN_DELAY_MS);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+    });
+
+    it("runs the consumer's handlers before its own", () => {
+      const onFocus = vi.fn();
+      render(
+        <EntityChip
+          href="#button"
+          onFocus={onFocus}
+          peek={<p>Card</p>}
+          title="Button"
+        />,
+      );
+      act(() => {
+        screen.getByRole("link").focus();
+      });
+      expect(onFocus).toHaveBeenCalledOnce();
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
     });
   });
 });

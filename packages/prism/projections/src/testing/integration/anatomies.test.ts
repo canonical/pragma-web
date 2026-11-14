@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { basename } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertAnatomy,
@@ -62,6 +62,15 @@ const UI_TOKENS = [
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
 
+/**
+ * The subcomponents, each in its parent's `common/` folder. The scaffold
+ * check places a component only under `src/lib/ui` or a subject folder, so
+ * these keep their anatomy and their styles, not that check.
+ */
+const subcomponentFolders = listAnatomyFolders(
+  folders.map((folder) => join(folder, "common")),
+);
+
 const projectionFolders = listAnatomyFolders([
   NODE_DIRECTORY,
   ONTOLOGY_DIRECTORY,
@@ -109,6 +118,18 @@ describe("the package's components", () => {
     it(`${basename(folder)} keeps its anatomy, its styles and its scaffold`, () => {
       assertStylesMatchAnatomy(folder, assertAnatomy(folder));
       assertScaffold(folder, { packageRoot: PACKAGE_ROOT, testSuffix: "test" });
+    });
+  }
+
+  it("and the card's specimen, its one subcomponent", () => {
+    expect(subcomponentFolders.map((folder) => basename(folder))).toEqual([
+      "Specimen",
+    ]);
+  });
+
+  for (const folder of subcomponentFolders) {
+    it(`${basename(folder)} keeps its anatomy and its styles`, () => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
     });
   }
 

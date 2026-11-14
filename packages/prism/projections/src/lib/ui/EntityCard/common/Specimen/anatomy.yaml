@@ -1,0 +1,37 @@
+---
+# EntityCard.Specimen (EntityCard/common/Specimen/): the depiction of an
+# entity in its card's media track, the only specimen there is (4.4).
+# Reference: PS1 V4 cards (Button: the block on the real stylesheet; Circle
+# Line: its strip with its stop ringed; color.text: the two-mode swatch).
+# Required props: label (the accessible name, non-empty: an invariant throws
+# on an empty one) and kind (block | swatch | strip | drawing | image),
+# written to data-specimen. role="img" with aria-label=label; the depiction
+# (children) is inert (a rendered component cannot take focus or clicks).
+# Exported as EntityCard.Specimen only (cs:react.component.subcomponent_export_api);
+# its story nests under EntityCard (cs:storybook.story.subcomponent_nesting).
+#
+# Changes from the plan's sketch, with their reasons: the well centres its
+# depiction in a flex box (align-items and justify-content), since the
+# anatomy DSL has no place-items key and a grid would need a gap; the swatch's flush well (padding 0) comes with
+# the first swatch specimen, the palette preview's, where it is measured.
+#
+# Token ledger:
+#   --specimen-background: color.background.container   the well
+#   --specimen-padding: space.200 (16px)
+#   --specimen-min-height: space.800                    the drawn track height
+node:
+  uri: prism.component.entity_card.specimen
+  styles:
+    layout.type: flex
+    layout.align: center
+    layout.justify: center
+    size.min.height: space.800
+    spacing.internal.block.start: space.200
+    spacing.internal.block.end: space.200
+    spacing.internal.inline.start: space.200
+    spacing.internal.inline.end: space.200
+    appearance.background: color.background.container
+  edges:
+    - node:
+        role: depiction
+      relation: { cardinality: "1", slotName: children }

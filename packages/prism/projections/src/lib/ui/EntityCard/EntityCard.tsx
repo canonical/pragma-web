@@ -3,6 +3,7 @@
 import { Card } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { Message } from "../../i18n/index.js";
+import { Specimen } from "./common/Specimen/index.js";
 import { PARENT_MESSAGES } from "./constants.js";
 import type { EntityCardProps } from "./types.js";
 import "./styles.css";
@@ -22,6 +23,13 @@ const componentCssClassName = "ds entity-card";
  * it spans the whole row instead, the sidecar under the body. Without a
  * sidecar, below one group of the shell, it spans the whole row too. It
  * renders only the slots it is given, so it renders anywhere inside a grid.
+ *
+ * Its identity keeps the slot order every representation shares: the mark
+ * and the foreign prefix lead the title heading, then the address, the
+ * kind, the summary, the facts (each cell naming its property in
+ * `data-property`) and the status. Its one child, an `EntityCard.Specimen`,
+ * takes the media track above the body; a card without one draws no box
+ * for it.
  *
  * Native props reach the Card's `<div>` root; a consumer `className` merges
  * after the card's own.
@@ -44,6 +52,12 @@ export default function EntityCard({
   keyValues = [],
   vitals = [],
   sidecar,
+  mark,
+  prefix,
+  address,
+  facts = [],
+  status,
+  children,
   className,
   ...props
 }: EntityCardProps): ReactElement {
@@ -60,6 +74,7 @@ export default function EntityCard({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
+      {children}
       <Card.Content className="body">
         <div className="description">
           <div className="heading">
@@ -67,6 +82,14 @@ export default function EntityCard({
               <p className="location">{location}</p>
             )}
             <h3 className="title">
+              {mark === undefined ? null : (
+                <span aria-hidden="true" className="mark">
+                  {mark}
+                </span>
+              )}
+              {prefix === undefined ? null : (
+                <span className="prefix">{prefix}</span>
+              )}
               {parent === undefined ? (
                 name
               ) : (
@@ -79,6 +102,9 @@ export default function EntityCard({
                 />
               )}
             </h3>
+            {address === undefined ? null : (
+              <p className="address">{address}</p>
+            )}
             {kind === undefined ? null : <p className="kind">{kind}</p>}
           </div>
           {summary === undefined ? null : <p className="summary">{summary}</p>}
@@ -93,6 +119,17 @@ export default function EntityCard({
             ))}
           </dl>
         )}
+        {facts.length === 0 ? null : (
+          <dl className="facts">
+            {facts.map(({ property, label, value }) => (
+              <div className="fact" data-property={property} key={property}>
+                <dt className="term">{label}</dt>
+                <dd className="detail">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {status === undefined ? null : <div className="status">{status}</div>}
       </Card.Content>
       {vitals.length === 0 ? null : (
         <Card.Footer className="footer">
@@ -107,3 +144,5 @@ export default function EntityCard({
     </Card>
   );
 }
+
+EntityCard.Specimen = Specimen;

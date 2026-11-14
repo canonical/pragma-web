@@ -2,6 +2,7 @@
 
 import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode } from "react";
+import type { EntityFact } from "../EntityCard/types.js";
 
 type OwnProps = {
   /**
@@ -28,6 +29,21 @@ type OwnProps = {
   readonly LinkComponent?: LinkComponent;
   /** One word about the entity at the end of the row: its abstraction, its stage. */
   readonly meta?: ReactNode;
+  /** The entity's foreign prefix, such as `ds`, in monospace before the title. */
+  readonly prefix?: ReactNode;
+  /** The entity's kind, muted after the title. */
+  readonly kind?: ReactNode;
+  /** The entity's summary: the row's second line, shown only on two lines. */
+  readonly summary?: ReactNode;
+  /** The facts the row states at the end of its first line. */
+  readonly facts?: readonly EntityFact[];
+  /** The entity's status, closing the first line. */
+  readonly status?: ReactNode;
+  /**
+   * How many lines the row takes: one (32px), or two (56px), the summary
+   * under the title, where an index opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

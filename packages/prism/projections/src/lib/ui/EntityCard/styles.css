@@ -55,6 +55,12 @@
     --entity-card-identifier-line-height: 0;
     --entity-card-vital-max-width: 100%;
     --entity-card-vital-color: var(--color-text-muted);
+    --entity-card-mark-size: var(--space-200);
+    --entity-card-identity-gap: var(--space-050);
+    --entity-card-prefix-color: var(--color-text-muted);
+    --entity-card-address-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-card-mono-font-family: ui-monospace, monospace;
 
     font-size: var(--entity-card-font-size);
     line-height: var(--entity-card-line-height);
@@ -64,6 +70,15 @@
    * its own, so it starts at the card's edge. */
   .ds.entity-card > .body {
     grid-row: 1 / 4;
+  }
+
+  /* A specimen takes the media track, the first; the body the two after. */
+  .ds.entity-card > .specimen {
+    grid-row: 1;
+  }
+
+  .ds.entity-card:has(> .specimen) > .body {
+    grid-row: 2 / 4;
   }
 
   /* The footer meets the body at the body's divider. */
@@ -201,6 +216,30 @@
     font-weight: var(--entity-card-parent-font-weight);
   }
 
+  /* The mark and the prefix lead the title on its line. */
+  .ds.entity-card > .body > .description > .heading > .title > .mark {
+    display: inline-flex;
+    width: var(--entity-card-mark-size);
+    height: var(--entity-card-mark-size);
+    margin-inline-end: var(--entity-card-identity-gap);
+  }
+
+  .ds.entity-card > .body > .description > .heading > .title > .prefix {
+    margin-inline-end: var(--entity-card-identity-gap);
+    color: var(--entity-card-prefix-color);
+    font-family: var(--entity-card-mono-font-family);
+    font-weight: var(--entity-card-parent-font-weight);
+  }
+
+  .ds.entity-card > .body > .description > .heading > .address {
+    margin-block: 0;
+    overflow: hidden;
+    color: var(--entity-card-address-color);
+    font-family: var(--entity-card-mono-font-family);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .ds.entity-card > .body > .description > .heading > .kind {
     margin-block: 0;
     padding-block: 0;
@@ -214,21 +253,24 @@
     line-height: var(--entity-card-line-height);
   }
 
-  .ds.entity-card > .body > .key-values {
+  .ds.entity-card > .body > .key-values,
+  .ds.entity-card > .body > .facts {
     margin-block-start: var(--entity-card-section-spacing);
     margin-block-end: 0;
   }
 
   /* Two equal halves under a rule. Each clips only along its line, so a
    * chip in a value keeps its whole pill, and the line grows to hold it. */
-  .ds.entity-card > .body > .key-values > .pair {
+  .ds.entity-card > .body > .key-values > .pair,
+  .ds.entity-card > .body > .facts > .fact {
     display: flex;
     border-top-width: var(--entity-card-rule-width);
     border-style: solid none none;
     border-block-start-color: var(--entity-card-rule-color);
   }
 
-  .ds.entity-card > .body > .key-values > .pair > .key {
+  .ds.entity-card > .body > .key-values > .pair > .key,
+  .ds.entity-card > .body > .facts > .fact > .term {
     flex-grow: 1;
     flex-basis: 0;
     overflow-x: clip;
@@ -237,7 +279,8 @@
     color: var(--entity-card-key-color);
   }
 
-  .ds.entity-card > .body > .key-values > .pair > .value {
+  .ds.entity-card > .body > .key-values > .pair > .value,
+  .ds.entity-card > .body > .facts > .fact > .detail {
     flex-grow: 1;
     flex-basis: 0;
     overflow-x: clip;
@@ -255,6 +298,10 @@
   }
 
   /* A vital no wider than the footer, a long word ending in an ellipsis. */
+  .ds.entity-card > .body > .status {
+    margin-block-start: var(--entity-card-section-spacing);
+  }
+
   .ds.entity-card > .footer > .vital {
     max-width: var(--entity-card-vital-max-width);
     overflow: hidden;

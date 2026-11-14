@@ -73,6 +73,23 @@
 # Roster namespaces (accepted and tracked): grid.gutter, space.0,
 # space.050, space.300 (a line height), and the semantic typography symbol
 # typography.text.primary.fontSize.
+# The identity slots (heuristic 4.1), in their order: mark, prefix, title,
+# kind, summary, facts, status (address is not shown in a row). The
+# summary is the second line of a row an index opts into two lines
+# (lines="two", 56px): it is rendered only then, ordered after every slot
+# of the first line and spanning the row. Each fact cell names its
+# property in data-property (Annex D). The transitional location and meta
+# keep their places until the closure slice. The row stays a flex line
+# rather than the plan's subgrid sketch: its lists do not yet lay their
+# rows on a subgrid (W4 builds them).
+#
+# Token ledger (the identity slots):
+#   --entity-row-prefix-font-family: ui-monospace, monospace   literal: no mono token
+#   --entity-row-summary-basis: 100%    literal: the second line spans the row
+#   --entity-row-summary-order: 1       literal: after every first-line slot
+#   prefix, kind, summary and fact labels: color.text.muted
+#   space.050 between the prefix, the title and the kind, and a fact's
+#   label and value; grid.gutter between facts.
 node:
   uri: prism.component.entity_row
   styles:
@@ -103,6 +120,13 @@ node:
                 spacing.external.inline.end: space.050
             relation: { cardinality: "0..1", slotName: mark }
           - node:
+              role: prefix
+              styles:
+                spacing.external.inline.end: space.050
+                typography.color: color.text.muted
+                typography.fontFamily: "ui-monospace, monospace"
+            relation: { cardinality: "0..1", slotName: prefix }
+          - node:
               role: location
               styles:
                 typography.color: color.text.muted
@@ -125,7 +149,46 @@ node:
                 appearance.outline.color@focus: color.focusRing
                 appearance.outline.offset@focus: -2px
             relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              styles:
+                spacing.external.inline.start: space.050
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: kind }
       relation: { cardinality: "1", slotName: identity }
+    - node:
+        role: summary
+        styles:
+          layout.order: 1
+          layout.flex.basis: 100%
+          size.min.width: 0
+          layout.overflow: hidden
+          typography.color: color.text.muted
+          typography.whiteSpace: nowrap
+          typography.overflow: ellipsis
+      relation: { cardinality: "0..1", slotName: summary }
+    - node:
+        role: facts
+        styles:
+          layout.type: flex
+          spacing.gap.inline: grid.gutter
+          typography.whiteSpace: nowrap
+        edges:
+          - node:
+              role: fact
+              attributes: { data-property: "{property}" }
+              edges:
+                - node:
+                    role: term
+                    styles:
+                      spacing.external.inline.end: space.050
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: term }
+                - node:
+                    role: detail
+                  relation: { cardinality: "1", slotName: detail }
+            relation: { cardinality: "1..*", slotName: fact }
+      relation: { cardinality: "0..1", slotName: facts }
     - node:
         role: meta
         styles:
@@ -136,3 +199,8 @@ node:
           size.min.width: 0
           typography.overflow: ellipsis
       relation: { cardinality: "0..1", slotName: meta }
+    - node:
+        role: status
+        styles:
+          layout.type: flex
+      relation: { cardinality: "0..1", slotName: status }

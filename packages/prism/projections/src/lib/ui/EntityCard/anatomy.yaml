@@ -157,12 +157,34 @@
 # typography.text.primary.fontSize,
 # typography.text.primary.bold.fontWeight and
 # typography.text.primary.fontWeight.
+# The identity slots (heuristic 4.1), in their order: the mark and the
+# foreign prefix lead the title heading, then the address, the kind, the
+# summary, the facts (each cell naming its property in data-property,
+# Annex D) and the status. EntityCard.Specimen, the card's one child, takes
+# the media track (row 1) and pushes the body to the two tracks after it
+# (a reflow under :has(> .specimen)); with no specimen there is no track
+# and no box. The transitional location, parent, key values, vitals and
+# sidecar keep their places until the closure slice; the facts share the
+# key values' rules. The card keeps its published Card structure rather
+# than the plan's sketch of a fresh grid: the Cards group lines up the
+# sections it already has.
+#
+# Token ledger (the identity slots):
+#   --entity-card-mark-size: space.200 (16px)
+#   --entity-card-identity-gap: space.050 (4px)   mark and prefix to the title
+#   --entity-card-mono-font-family: ui-monospace, monospace   literal: no mono token
+#   prefix and address: color.text.muted; status above: container.gap.default
 node:
   uri: prism.component.entity_card
   styles:
     typography.size: typography.text.primary.fontSize
     typography.lineHeight: space.300
   edges:
+    - node:
+        uri: prism.component.entity_card.specimen
+        styles:
+          layout.grid.row: 1
+      relation: { cardinality: "0..1", slotName: specimen }
     - node:
         role: sidecar
         styles:
@@ -217,6 +239,22 @@ node:
                             typography.weight: typography.text.primary.bold.fontWeight
                           edges:
                             - node:
+                                role: mark
+                                styles:
+                                  layout.type: inline-flex
+                                  size.width: space.200
+                                  size.height: space.200
+                                  spacing.external.inline.end: space.050
+                              relation: { cardinality: "0..1", slotName: mark }
+                            - node:
+                                role: prefix
+                                styles:
+                                  spacing.external.inline.end: space.050
+                                  typography.color: color.text.muted
+                                  typography.fontFamily: "ui-monospace, monospace"
+                                  typography.weight: typography.text.primary.fontWeight
+                              relation: { cardinality: "0..1", slotName: prefix }
+                            - node:
                                 role: link
                                 styles:
                                   typography.color: inherit
@@ -233,6 +271,17 @@ node:
                                   typography.weight: typography.text.primary.fontWeight
                               relation: { cardinality: "0..1", slotName: parent }
                         relation: { cardinality: "1", slotName: title }
+                      - node:
+                          role: address
+                          styles:
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            layout.overflow: hidden
+                            typography.color: color.text.muted
+                            typography.fontFamily: "ui-monospace, monospace"
+                            typography.whiteSpace: nowrap
+                            typography.overflow: ellipsis
+                        relation: { cardinality: "0..1", slotName: address }
                       - node:
                           role: kind
                           styles:
@@ -298,6 +347,50 @@ node:
                         relation: { cardinality: "1", slotName: value }
                   relation: { cardinality: "1..*", slotName: pair }
             relation: { cardinality: "0..1", slotName: key-values }
+          - node:
+              role: facts
+              styles:
+                spacing.external.block.start: container.gap.default
+                spacing.external.block.end: 0
+              edges:
+                - node:
+                    role: fact
+                    attributes: { data-property: "{property}" }
+                    styles:
+                      # One rule above the pair: the top side alone has
+                      # a width and a style, every other side none.
+                      layout.type: flex
+                      appearance.border.top.width: 1px
+                      appearance.border.style: "solid none none"
+                      appearance.border.block.start.color: color.border.muted
+                    edges:
+                      - node:
+                          role: term
+                          styles:
+                            layout.flex.grow: 1
+                            layout.flex.basis: 0
+                            layout.overflow.inline: clip
+                            size.min.width: 0
+                            typography.overflow: ellipsis
+                            typography.color: color.text.muted
+                        relation: { cardinality: "1", slotName: term }
+                      - node:
+                          role: detail
+                          styles:
+                            layout.flex.grow: 1
+                            layout.flex.basis: 0
+                            layout.overflow.inline: clip
+                            size.min.width: 0
+                            typography.overflow: ellipsis
+                            spacing.external.inline.start: 0
+                        relation: { cardinality: "1", slotName: detail }
+                  relation: { cardinality: "1..*", slotName: fact }
+            relation: { cardinality: "0..1", slotName: facts }
+          - node:
+              role: status
+              styles:
+                spacing.external.block.start: container.gap.default
+            relation: { cardinality: "0..1", slotName: status }
       relation: { cardinality: "1", slotName: body }
     - node:
         uri: global.subcomponent.card-footer

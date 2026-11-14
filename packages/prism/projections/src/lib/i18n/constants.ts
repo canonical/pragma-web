@@ -9,6 +9,7 @@
  */
 export const MESSAGES = {
   "chip.lead": "{lead}:",
+  "chip.peek": "Preview of {title}",
   "entity.parent": "{title} ∈ {parent}",
   "entity.subclass": "{title} ⊂ {parent}",
   "entity.context": "{kind} in {location}",

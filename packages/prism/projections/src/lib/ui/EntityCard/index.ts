@@ -2,3 +2,4 @@
 
 export { default as EntityCard } from "./EntityCard.js";
 export type * from "./types.js";
+export type { SpecimenKind, SpecimenProps } from "./common/Specimen/index.js";
