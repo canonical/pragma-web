@@ -4,6 +4,18 @@ import type {
   ReactElement,
   ReactNode,
 } from "react";
+import { renderToString } from "react-dom/server";
+
+/**
+ * Renders a story's server markup and no more: React never attaches to it,
+ * so it behaves as a page does before any script runs.
+ */
+export const serverMarkup = () => (Story: ElementType) => (
+  <div
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: the story's own server markup, rendered from its own element
+    dangerouslySetInnerHTML={{ __html: renderToString(<Story />) }}
+  />
+);
 
 export const rtl = () => (Story: ElementType) => (
   <div dir="rtl">

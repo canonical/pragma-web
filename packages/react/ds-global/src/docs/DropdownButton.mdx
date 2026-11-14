@@ -1,0 +1,97 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "../lib/component/DropdownButton/withDropdownButton.stories";
+
+<Meta title="Documentation/DropdownButton" />
+
+# DropdownButton
+
+A DropdownButton is a button with a persistent chevron that reveals a panel of
+options or controls. It draws no button of its own: a higher-order component
+wires the trigger you already use, usually `Button`, to a `DropdownPanel`.
+
+```tsx
+import { Button, DropdownPanel, withDropdownButton } from "@canonical/react-ds-global";
+
+// Module scope, once.
+const ViewTrigger = withDropdownButton(Button, ({ ref, id, triggerId }) => (
+  <DropdownPanel ref={ref} id={id} aria-labelledby={triggerId}>
+    <ViewOptions />
+  </DropdownPanel>
+));
+
+<ViewTrigger importance="secondary">View</ViewTrigger>;
+```
+
+<Canvas of={Stories.Default} />
+
+## Two routes
+
+- **The HOCs.** `withDropdownButton(Trigger, render)` adds the chevron.
+  `withDropdownPanel(Trigger, render)` is the same wiring with no chevron, for
+  triggers the design draws without one, such as an icon button that opens a
+  settings menu. Both are the recommended route: they add the anchor, the
+  ARIA that waits for scripts, and the focus return.
+- **Direct composition.** Render your own `<Button popoverTarget={id}>` and a
+  `<DropdownPanel ref={ref} id={id}>` beside it, and drive the panel through
+  its handle: `show()`, `hide()` and `toggle()`. Such a panel opens where the
+  browser places popovers, because no anchor ties it to its trigger.
+
+## The render contract
+
+The render function receives `{ close, ref, id, triggerId }` and returns the
+complete `<DropdownPanel>`. It must set `ref` and `id` on it. `DropdownPanel`
+requires both, so forgetting either fails to compile. Name the panel with
+`aria-labelledby={triggerId}` or an `aria-label`; one of them is required.
+
+Call the HOC once, at module scope. The render function sees only module
+values, so data from the parent, such as a selection or a count, reaches the
+panel through a context you provide above the trigger. The panel renders in
+the top layer, but it stays where it is in the React tree, so the context
+reaches it.
+
+## The trigger's props
+
+Every prop you pass reaches the trigger unchanged: `importance`, `icon`,
+`loading`, `disabled`, `className`, `data-*`, `id`, `style` and the children.
+The HOC owns five keys and refuses them: `popoverTarget`,
+`popoverTargetAction`, `aria-haspopup`, `aria-expanded` and `aria-controls`.
+Your `onClick` runs as your own, and `event.preventDefault()` there cancels
+the toggle. The trigger renders `type="button"` unless you pass a `type`.
+
+## How the panel closes
+
+Only four things close a panel: Escape, a click outside, its trigger, and a
+control inside it with `popovertargetaction="hide"` or a call to `close()`.
+Nothing its content does closes it: a checkbox that toggles, a field that
+changes, an Apply button that does not navigate, or focus that moves away all
+leave it open. Opening another panel closes this one. Closing it while focus
+is inside returns focus to the trigger; a click outside leaves focus where the
+click put it.
+
+There is no `open` prop. The open state lives in the element, and the native
+`onToggle` reports every change with `event.newState`.
+
+## Before scripts run
+
+The trigger is a real `<button popovertarget>` and the panel a native
+`popover="auto"`, so the panel opens, closes on Escape and a click outside,
+and submits a GET form inside it with no script. The server HTML carries no
+`aria-haspopup`, `aria-expanded`, `aria-controls` or `role`; they appear once
+the page is hydrated.
+
+<Canvas of={Stories.WithoutScripts} />
+
+## Filters
+
+For the query bar's filters, put a `<form method="get">` of native checkboxes
+in the panel. FilterButton, the component for filters, builds on this panel
+and adds the active look and count.
+
+<Canvas of={Stories.CheckboxList} />
+
+## Known limits
+
+- A browser without CSS anchor positioning opens the panel centred in the
+  viewport rather than under its trigger.
+- A Tooltip on a control inside an open panel renders under the top layer, so
+  it is hidden. Pair Tooltips with the trigger, outside the panel.
