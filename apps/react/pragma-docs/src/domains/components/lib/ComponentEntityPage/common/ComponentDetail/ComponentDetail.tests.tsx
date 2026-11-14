@@ -78,9 +78,14 @@ describe("ComponentDetail", () => {
         render: () => null,
       };
       render(
-        entityPageAt(BUTTON_URI, componentEntityRecordsButton, createFetchSpy(), {
-          renderers: { list: [], page: [page, turtle] },
-        }),
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+          {
+            renderers: { list: [], page: [page, turtle] },
+          },
+        ),
       );
       const drawn = screen.getByRole("region", { name: "Button" });
       expect(

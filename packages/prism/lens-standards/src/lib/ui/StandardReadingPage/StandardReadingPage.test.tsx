@@ -403,7 +403,10 @@ describe("StandardReadingPage", () => {
           <RenderersProvider
             defaults={{
               list: [],
-              page: [page, { name: "turtle", label: "Turtle", render: () => null }],
+              page: [
+                page,
+                { name: "turtle", label: "Turtle", render: () => null },
+              ],
             }}
             extensions={["source"]}
           >

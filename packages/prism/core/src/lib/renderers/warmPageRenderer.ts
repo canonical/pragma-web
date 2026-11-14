@@ -32,10 +32,7 @@ export default function warmPageRenderer(
   search: ViewSearch,
   environment: Environment | undefined = getPrefetchEnvironment(),
 ): Promise<void> {
-  if (
-    environment === undefined ||
-    search.as !== PAGE_RENDERER_NAMES.turtle
-  ) {
+  if (environment === undefined || search.as !== PAGE_RENDERER_NAMES.turtle) {
     return Promise.resolve();
   }
   return fetchQuery(

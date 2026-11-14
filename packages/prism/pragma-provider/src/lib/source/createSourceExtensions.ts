@@ -1,10 +1,10 @@
+import type { Quad } from "@canonical/ke";
 import {
   type CompilerContext,
   createStoreQueryFn,
   isAbsoluteIri,
   isSafeIri,
 } from "@canonical/ke-graphql";
-import type { Quad } from "@canonical/ke";
 import {
   type GraphQLFieldConfig,
   GraphQLID,
@@ -75,9 +75,7 @@ const resolveSource = async (
     if (result.type !== "construct" || result.quads.length === 0) break;
     quads.push(...result.quads);
   }
-  return quads.length > 0
-    ? writeTurtle(quads, collectPrefixes(context))
-    : null;
+  return quads.length > 0 ? writeTurtle(quads, collectPrefixes(context)) : null;
 };
 
 /**

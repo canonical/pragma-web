@@ -90,9 +90,9 @@ describe("EntityDetail", () => {
     );
     const drawn = screen.getByRole("region", { name: "Northgate" });
     expect(drawn.dataset.probe).toBe("page-renderer");
-    expect(
-      [...drawn.children].map((child) => child.classList.item(1)),
-    ).toEqual(["entity-summary", "field-list", "relations"]);
+    expect([...drawn.children].map((child) => child.classList.item(1))).toEqual(
+      ["entity-summary", "field-list", "relations"],
+    );
   });
 
   it("renders the entity's Turtle under its heading from the warm store", {

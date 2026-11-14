@@ -1,10 +1,10 @@
+import { createStore } from "@canonical/ke";
+import { createStoreQueryFn } from "@canonical/ke-graphql";
 import {
   type ExecutionResult,
   experimentalExecuteIncrementally,
   parse,
 } from "graphql";
-import { createStore } from "@canonical/ke";
-import { createStoreQueryFn } from "@canonical/ke-graphql";
 import oxigraph from "oxigraph";
 import { describe, expect, it } from "vitest";
 import { bootCorpusQuery } from "../../testing/bootCorpusQuery.js";
@@ -141,8 +141,7 @@ describe("createSourceExtensions", () => {
         graph.quads
           .filter(
             ({ subject, predicate }) =>
-              subject.termType === "NamedNode" &&
-              predicate.value === RDF_TYPE,
+              subject.termType === "NamedNode" && predicate.value === RDF_TYPE,
           )
           .map(({ subject }) => subject.value),
       ),
