@@ -119,17 +119,61 @@ ds:button
     expect(text).toContain("ds:uses onto:Thing .");
   });
 
-  it("writes blank nodes by a label Turtle accepts", () => {
+  it("writes a blank node one statement names in place, nested", () => {
+    const part: Term = { termType: "BlankNode", value: "part" };
+    const size: Term = { termType: "BlankNode", value: "size" };
     const text = writeTurtle(
       [
-        statement(button, `${DS}part`, {
-          termType: "BlankNode",
-          value: "b0:x",
-        }),
+        statement(button, `${DS}part`, part),
+        statement(
+          part,
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          named(`${DS}Part`),
+        ),
+        statement(part, `${DS}size`, size),
+        statement(size, `${DS}value`, { termType: "Literal", value: "4" }),
       ],
       PREFIXES,
     );
-    expect(text).toContain("ds:part _:b0_x .");
+    expect(text).toBe(`@prefix ds: <${DS}> .
+
+ds:button
+  ds:part [
+    a ds:Part ;
+    ds:size [
+      ds:value "4"
+    ]
+  ] .
+`);
+  });
+
+  it("writes a blank node the graph does not describe as []", () => {
+    const text = writeTurtle(
+      [statement(button, `${DS}part`, { termType: "BlankNode", value: "x" })],
+      PREFIXES,
+    );
+    expect(text).toContain("ds:part [] .");
+  });
+
+  it("keeps a label Turtle accepts for a blank node two statements name", () => {
+    const shared: Term = { termType: "BlankNode", value: "b0:x" };
+    const text = writeTurtle(
+      [
+        statement(button, `${DS}part`, shared),
+        statement(button, `${DS}also`, shared),
+        statement(shared, `${DS}value`, { termType: "Literal", value: "4" }),
+      ],
+      PREFIXES,
+    );
+    expect(text).toBe(`@prefix ds: <${DS}> .
+
+_:b0_x
+  ds:value "4" .
+
+ds:button
+  ds:also _:b0_x ;
+  ds:part _:b0_x .
+`);
   });
 
   it("lists several objects in order and several subjects in order", () => {
