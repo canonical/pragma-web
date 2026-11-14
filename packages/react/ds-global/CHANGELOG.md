@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.47.0](https://github.com/canonical/pragma-web/compare/v0.46.0...v0.47.0) (2026-11-14)
+
+### Bug Fixes
+
+* **react-ds-global:** accept conditional children in Tile, Accordion and Timeline.Content ([#1593](https://github.com/canonical/pragma-web/issues/1593)) ([aee3649](https://github.com/canonical/pragma-web/commit/aee3649742f07bc6d62e0fb69c2b8e7edf33b046))
+* **react-ds-global:** recompute useWindowFitment placement on open and ref mount ([#1596](https://github.com/canonical/pragma-web/issues/1596)) ([960ab65](https://github.com/canonical/pragma-web/commit/960ab652169bf359ff77eb818ac93fd69df434b8))
+
+
 # [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
 
 ### Bug Fixes

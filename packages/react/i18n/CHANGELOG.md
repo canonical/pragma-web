@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.47.0](https://github.com/canonical/pragma-web/compare/v0.46.0...v0.47.0) (2026-11-14)
+
+* feat(i18n-core,i18n-react,react-boilerplate-vite)!: renames functions (#1613) ([6cf9760](https://github.com/canonical/pragma-web/commit/6cf97609c34b93ec9f7ad1d9865089f580f618b7)), closes [#1613](https://github.com/canonical/pragma-web/issues/1613)
+
+### Bug Fixes
+
+* **i18n-react:** creates no own source beside an external one ([#1566](https://github.com/canonical/pragma-web/issues/1566)) ([c628ff9](https://github.com/canonical/pragma-web/commit/c628ff9d8d22cf2f0200cbf35802d92a841c95e0))
+
+### BREAKING CHANGES
+
+* @canonical/i18n-core renames its public functions so
+  each starts with a verb. The Formatters members number, currency,
+  date, time, relativeTime and list become formatNumber,
+  formatCurrency, formatDate, formatTime, formatRelativeTime and
+  formatList, and the document helpers directionOf and documentAttrs
+  become getDirection and getDocumentAttributes. Callers of
+  createFormatters, useFormatters and the helpers must use the new
+  names; the old ones are removed.
+
+
 # [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
 
 ### Bug Fixes

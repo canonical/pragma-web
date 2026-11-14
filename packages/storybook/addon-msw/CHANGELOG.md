@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.47.0](https://github.com/canonical/pragma-web/compare/v0.46.0...v0.47.0) (2026-11-14)
+
+### Bug Fixes
+
+* **storybook-addon-msw:** keeps every shown story's handlers ([#1568](https://github.com/canonical/pragma-web/issues/1568)) ([d1dd164](https://github.com/canonical/pragma-web/commit/d1dd164b6d0b67bf9608ce3aa9140bf064cee048))
+
+
 # [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
 
 ### Bug Fixes

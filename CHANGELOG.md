@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.47.0](https://github.com/canonical/pragma-web/compare/v0.46.0...v0.47.0) (2026-11-14)
+
+* feat(i18n-core,i18n-react,react-boilerplate-vite)!: renames functions (#1613) ([6cf9760](https://github.com/canonical/pragma-web/commit/6cf97609c34b93ec9f7ad1d9865089f580f618b7)), closes [#1613](https://github.com/canonical/pragma-web/issues/1613)
+
+### Bug Fixes
+
+* **ci:** forces stable releases through --force-conventional-graduate ([#1611](https://github.com/canonical/pragma-web/issues/1611)) ([3c11671](https://github.com/canonical/pragma-web/commit/3c116717e9deff9355033df59d3ebcd19cd15275))
+* **ci:** restores npm publishing on ubuntu-26.04 runners ([#1598](https://github.com/canonical/pragma-web/issues/1598)) ([c732996](https://github.com/canonical/pragma-web/commit/c73299615dd8a9743b270f2a8828da98a6ae464b))
+* **i18n-react:** creates no own source beside an external one ([#1566](https://github.com/canonical/pragma-web/issues/1566)) ([c628ff9](https://github.com/canonical/pragma-web/commit/c628ff9d8d22cf2f0200cbf35802d92a841c95e0))
+* **react-ds-global:** accept conditional children in Tile, Accordion and Timeline.Content ([#1593](https://github.com/canonical/pragma-web/issues/1593)) ([aee3649](https://github.com/canonical/pragma-web/commit/aee3649742f07bc6d62e0fb69c2b8e7edf33b046))
+* **react-ds-global:** recompute useWindowFitment placement on open and ref mount ([#1596](https://github.com/canonical/pragma-web/issues/1596)) ([960ab65](https://github.com/canonical/pragma-web/commit/960ab652169bf359ff77eb818ac93fd69df434b8))
+* **storybook-addon-msw:** keeps every shown story's handlers ([#1568](https://github.com/canonical/pragma-web/issues/1568)) ([d1dd164](https://github.com/canonical/pragma-web/commit/d1dd164b6d0b67bf9608ce3aa9140bf064cee048))
+
+### Features
+
+* **ci:** adds a force_publish input to the release workflow ([#1600](https://github.com/canonical/pragma-web/issues/1600)) ([c6542f0](https://github.com/canonical/pragma-web/commit/c6542f0dde643fb5ddf428a1dff6028ac1b9dccf))
+
+### BREAKING CHANGES
+
+* @canonical/i18n-core renames its public functions so
+  each starts with a verb. The Formatters members number, currency,
+  date, time, relativeTime and list become formatNumber,
+  formatCurrency, formatDate, formatTime, formatRelativeTime and
+  formatList, and the document helpers directionOf and documentAttrs
+  become getDirection and getDocumentAttributes. Callers of
+  createFormatters, useFormatters and the helpers must use the new
+  names; the old ones are removed.
+
+
 # [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
 
 ### Bug Fixes
