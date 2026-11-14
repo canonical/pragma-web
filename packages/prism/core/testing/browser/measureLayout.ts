@@ -19,7 +19,7 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  * sign: what the strip holds must shrink inside it.
  *
  * A lens's breadcrumb trail is read for the rows its crumbs take and for
- * where its current crumb's text is painted: the text's own extent, cut by
+ * where its last crumb's text is painted: the text's own extent, cut by
  * every element of the trail that clips it, so a text that runs past its
  * crumb unclipped shows even where the strip would hide it.
  *
@@ -186,7 +186,7 @@ export default function measureLayout({
           Math.round(item.getBoundingClientRect().top),
         ),
       );
-      const current = trail.querySelector('.link[aria-current="page"]');
+      const current = trail.querySelector(".list > :last-child > .link");
       let textEnd = -1;
       if (current !== null) {
         const range = document.createRange();
@@ -232,7 +232,11 @@ export default function measureLayout({
     const isTextBlock = element.matches(
       "p, .p, .code, h1, h2, h3, h4, h5, h6, .ds.button",
     );
-    const hasAutoMargin = element.matches(".kbd, .inspector-trigger");
+    // The strip's filtering group and its count are pushed to the band's
+    // end by an auto margin, which takes the free space before them.
+    const hasAutoMargin = element.matches(
+      ".kbd, .inspector-trigger, .ds.mode-strip > .filtering, .ds.mode-strip > .filtering > .count",
+    );
     for (const property of properties) {
       if (isTextBlock && /^padding-(top|bottom)$/.test(property)) continue;
       if (hasAutoMargin && /^margin-(left|right)$/.test(property)) continue;

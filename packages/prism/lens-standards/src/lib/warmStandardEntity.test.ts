@@ -36,6 +36,24 @@ describe("warmStandardEntity", () => {
     );
   });
 
+  it("warms the standard's Turtle beside it when the address asks", () => {
+    const fetchFn = createFetchSpy();
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+
+    void warmStandardEntity(
+      STANDARDS_BINDING_FIXTURE,
+      { uri: LINK_COMPONENT_URI },
+      { as: "turtle" },
+    );
+
+    expect(
+      fetchFn.mock.calls.map(([request, variables]) => [
+        request.name,
+        variables,
+      ]),
+    ).toContainEqual(["EntitySourceQuery", { uri: LINK_COMPONENT_URI }]);
+  });
+
   it("refuses params with no address before fetching", () => {
     const fetchFn = createFetchSpy();
     setPrefetchEnvironment(createEnvironment({ fetchFn }));

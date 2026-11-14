@@ -17,7 +17,10 @@
 # absolutely positioned under the summary and ending where it ends, so it
 # opens toward the strip's start and never past the viewport (the resilient
 # baseline), on the page's background with a hairline, one compact inset,
-# so the strip stays one line while it is open.
+# so the strip stays one line while it is open. The summary and each
+# option are as tall as the strip's density line, so each is a full
+# target; the summary draws no native marker, and a chevron ("▾") follows
+# the current renderer's name; the current option is bold.
 #
 # Every decision is read through a component token declared on the root
 # (`--renderer-switch-*`), bound to the symbol named here.
@@ -30,13 +33,16 @@
 #     semantic stacking symbol exists.
 #   layout.offset.top 100%: the overlay starts under the summary (an
 #     unthemable percentage).
+#   The chevron is the catalog's `rendererSwitch.chevron` glyph, hidden
+#     from assistive tech: the summary's name is the renderer's.
 #   space.100 (8px) inset and gap of the overlay list.
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)  below two groups: the tabs are not
 #     displayed and the menu is.
 #
-# Roster namespaces (accepted and tracked): space.100, space.200, and the
+# Roster namespaces (accepted and tracked): space.100, space.200,
+# density.line.height, and the
 # semantic typography symbol typography.text.primary.bold.fontWeight.
 node:
   uri: prism.component.renderer_switch
@@ -83,9 +89,21 @@ node:
           - node:
               role: summary
               styles:
+                layout.type: flex
+                layout.align: center
+                size.min.block: density.line.height
+                spacing.gap: space.100
+                layout.listStyle: none
                 interaction.cursor: pointer
                 typography.whiteSpace: nowrap
                 typography.weight: typography.text.primary.bold.fontWeight
+              edges:
+                - node:
+                    role: name (the current renderer's label)
+                  relation: { cardinality: "1", slotName: name }
+                - node:
+                    role: chevron (aria-hidden glyph)
+                  relation: { cardinality: "1", slotName: chevron }
             relation: { cardinality: "1", slotName: summary }
           - node:
               role: overlay list
@@ -111,6 +129,15 @@ node:
               edges:
                 - node:
                     uri: prism.component.router_link
+                    styles:
+                      layout.type: flex
+                      layout.align: center
+                      size.min.block: density.line.height
+                      spacing.internal.inline.start: space.100
+                      spacing.internal.inline.end: space.100
+                      typography.color: color.text
+                      typography.whiteSpace: nowrap
+                      typography.weight@selected: typography.text.primary.bold.fontWeight
                   relation: { cardinality: "2..*", slotName: option }
             relation: { cardinality: "1", slotName: options }
       relation: { cardinality: "1", slotName: menu }

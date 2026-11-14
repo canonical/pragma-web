@@ -29,7 +29,15 @@ export default function SourceView({
 }: SourceViewProps): ReactElement {
   const t = useMessages();
   const [copied, setCopied] = useState(false);
-  const tokens = useMemo(() => tokenizeTurtle(source), [source]);
+  // Each token keyed by its offset in the document, which no other token shares.
+  const tokens = useMemo(() => {
+    let offset = 0;
+    return tokenizeTurtle(source).map((token) => {
+      const start = offset;
+      offset += token.text.length;
+      return { ...token, start };
+    });
+  }, [source]);
   const bytes = new TextEncoder().encode(source).length;
 
   /**
@@ -62,15 +70,11 @@ export default function SourceView({
       </figcaption>
       <pre className="code">
         <code>
-          {tokens.map((token, index) =>
+          {tokens.map((token) =>
             token.role === "text" ? (
               token.text
             ) : (
-              <span
-                className={token.role}
-                // biome-ignore lint/suspicious/noArrayIndexKey: the tokens are a fixed sequence; their positions are their identity
-                key={index}
-              >
+              <span className={token.role} key={token.start}>
                 {token.text}
               </span>
             ),

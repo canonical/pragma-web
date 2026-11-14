@@ -47,7 +47,7 @@ describe("LensBreadcrumbs", () => {
     expect(current).toHaveAttribute("aria-current", "page");
   });
 
-  it("renders a linked lens crumb plus a current entity crumb", () => {
+  it("ends an entity's trail at the linked lens crumb", () => {
     render(
       wrapInRouterAt(
         "/components/ds%3Aglobal.component.button",
@@ -59,17 +59,16 @@ describe("LensBreadcrumbs", () => {
       ),
     );
     const nav = screen.getByRole("navigation", { name: "Breadcrumb" });
-    expect(within(nav).getAllByRole("listitem")).toHaveLength(2);
+    expect(within(nav).getAllByRole("listitem")).toHaveLength(1);
 
     // The lens crumb is a REAL router anchor pointing at the index, so a
     // click is an SPA navigation rather than a full page load.
     const back = within(nav).getByRole("link", { name: "Components" });
     expect(back).toHaveAttribute("href", "/components");
 
-    // The entity crumb is the current page — text with aria-current, no link.
-    const current = within(nav).getByText("ds:global.component.button");
-    expect(current).toHaveAttribute("aria-current", "page");
-    expect(current.tagName).not.toBe("A");
+    // An address is not a name: the entity's crumb is not drawn.
+    expect(within(nav).queryByText("ds:global.component.button")).toBeNull();
+    expect(nav.querySelector('[aria-current="page"]')).toBeNull();
   });
 
   it("derives the back-link's href from the route table", () => {
@@ -120,7 +119,6 @@ describe("LensBreadcrumbs", () => {
         />
       </RouterProvider>,
     );
-    expect(screen.getByText("b")).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Components" })).toBe(before);
   });
 

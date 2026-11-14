@@ -1,6 +1,7 @@
 import {
   createEnvironment,
   setPrefetchEnvironment,
+  type ViewSearch,
 } from "@canonical/prism-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import formationPageQueryNode from "#relay/__generated__/FormationPageQuery.graphql.js";
@@ -21,10 +22,11 @@ afterEach(() => {
 const warmLikeTheServer = (
   environment: ReturnType<typeof createEnvironment>,
   params: Readonly<Record<string, unknown>>,
+  search: ViewSearch = {},
 ): Promise<void> => {
   setPrefetchEnvironment(environment);
   try {
-    return warmFleetNode(formationPageQueryNode, params);
+    return warmFleetNode(formationPageQueryNode, params, search);
   } finally {
     setPrefetchEnvironment(undefined);
   }
@@ -55,6 +57,25 @@ describe("warmFleetNode", () => {
       "FormationPageQuery",
     ]);
     expect(fetchFn.mock.lastCall?.at(1)).toEqual({ id: SERIES_90_SIX_CAR_IRI });
+  });
+
+  it("warms the node's Turtle source beside its page at as=turtle", async () => {
+    const fetchFn = createMetroFetch();
+
+    await warmLikeTheServer(
+      createEnvironment({ fetchFn }),
+      { uri: SERIES_90_SIX_CAR_CURIE },
+      { as: "turtle" },
+    );
+
+    expect(fetchFn.mock.calls.map(([request]) => request.name)).toEqual([
+      "FleetNamespacesQuery",
+      "FormationPageQuery",
+      "EntitySourceQuery",
+    ]);
+    expect(fetchFn.mock.lastCall?.at(1)).toEqual({
+      uri: SERIES_90_SIX_CAR_IRI,
+    });
   });
 
   it("makes no request when the store already holds both operations", async () => {

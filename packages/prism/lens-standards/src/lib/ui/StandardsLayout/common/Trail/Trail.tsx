@@ -11,9 +11,9 @@ const LensContext = makeLensContext({
 
 /**
  * The strip's `context` tenant: the breadcrumb trail. `Standards` on the
- * index, `Standards / <uri>` on a reading page. The reading crumb is the
- * `:uri` route param (the standard's absolute IRI), read off the URL, so the
- * trail reads no query.
+ * index; on a reading page the trail ends at the parent, `Standards`
+ * linked back to the index, since the standard's address is not a name.
+ * It reads the URL alone, so the trail reads no query.
  *
  * `import { Trail } from "./common/Trail/index.js";`
  *

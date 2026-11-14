@@ -60,7 +60,7 @@ describe("StandardsLayout", () => {
     expect(within(context).getByText("Standards")).toBeInTheDocument();
   });
 
-  it("adds the standard's address as the trail's last crumb on a reading page", () => {
+  it("ends a reading page's trail at the link back to the index", () => {
     const { container } = render(
       createStandardsPage(
         READING_URL,
@@ -76,7 +76,7 @@ describe("StandardsLayout", () => {
     expect(
       within(context).getByRole("link", { name: "Standards" }),
     ).toHaveAttribute("href", "/standards");
-    expect(context).toHaveTextContent(LINK_COMPONENT_URI);
+    expect(context).not.toHaveTextContent(LINK_COMPONENT_URI);
   });
 
   it("offers the page and its Turtle in the strip on a reading page only", () => {

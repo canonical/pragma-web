@@ -17,6 +17,7 @@ export const MESSAGES = {
   "graphCanvas.zoomOut.glyph": "−",
   "graphCanvas.zoomLevel": "{percent}%",
   "rendererSwitch.label": "Show as",
+  "rendererSwitch.chevron": "▾",
   "renderer.page": "Page",
   "renderer.turtle": "Turtle",
   "filterFold.label": "Filter · {count}",

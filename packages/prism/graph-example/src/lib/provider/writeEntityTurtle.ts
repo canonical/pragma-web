@@ -103,9 +103,12 @@ const joinLines = (lines: readonly PredicateLine[], indent: string): string =>
 const writeBlankNode = (lines: readonly PredicateLine[]): string =>
   `[\n${joinLines(lines, "    ")}\n  ]`;
 
-/** The label a route's blank node is written with in one document. */
-const labelRoute = (route: ExampleRoute): string =>
-  `_:route-${route.key.replaceAll(/[^A-Za-z0-9_-]/g, "_")}`;
+/**
+ * The label a line's route is written with: `_:b0`, `_:b1`, ... in the
+ * order the routes first appear in the document, which is the line's own
+ * order of them, so the text never depends on the routes' keys.
+ */
+const labelRoute = (index: number): string => `_:b${index}`;
 
 /**
  * The objects one record key is written with: its value as literals,
@@ -145,7 +148,9 @@ const writeValue = (
     ];
   }
   if (key === "routes") {
-    return (value as readonly ExampleRoute[]).map(labelRoute);
+    return (value as readonly ExampleRoute[]).map((_, index) =>
+      labelRoute(index),
+    );
   }
   if (key === "units" || key === "cars") {
     const target = key === "units" ? "unit" : "carType";
@@ -173,22 +178,20 @@ const writeValue = (
 /** The statements of a route's labelled node. */
 const writeRoute = (
   route: ExampleRoute,
+  index: number,
   routes: readonly ExampleRoute[],
   dataset: ExampleDataset,
   writer: TermWriter,
 ): string => {
-  const reverse = routes.find(({ key }) => key === route.reverse);
+  const reverse = routes.findIndex(({ key }) => key === route.reverse);
   const predicate = (name: string): string =>
     writer.iri(findPropertyIri(name, dataset));
-  return `${labelRoute(route)}\n${joinLines(
+  return `${labelRoute(index)}\n${joinLines(
     [
       [writer.iri(`${RDFS_NAMESPACE}label`), writeLangMap(route.labels)],
       [predicate("isLoop"), [String(route.isLoop)]],
       [predicate("calls"), [`( ${route.calls.map(writer.iri).join(" ")} )`]],
-      [
-        predicate("reverse"),
-        reverse === undefined ? [] : [labelRoute(reverse)],
-      ],
+      [predicate("reverse"), reverse === -1 ? [] : [labelRoute(reverse)]],
     ],
     "  ",
   )} .\n`;
@@ -201,7 +204,8 @@ const writeRoute = (
  * typed literals, references IRIs, a location and a diagram position
  * blank nodes, a formation's units and a unit's cars blank nodes with
  * their positions counted from 1, and a line's routes labelled nodes whose
- * calls are an RDF collection in order. The prefixes are the dataset's
+ * calls are an RDF collection in order, labelled `_:b0`, `_:b1`, ... in
+ * order of first appearance, so one record always reads the same. The prefixes are the dataset's
  * ontologies' and the standard vocabularies' the document uses, in
  * code-point order. Pure.
  *
@@ -254,7 +258,9 @@ export default function writeEntityTurtle(
   const routes = (fields.routes ?? []) as readonly ExampleRoute[];
   const body = [
     `${writer.iri(record.uri)}\n${joinLines(lines, "  ")} .\n`,
-    ...routes.map((route) => writeRoute(route, routes, dataset, writer)),
+    ...routes.map((route, index) =>
+      writeRoute(route, index, routes, dataset, writer),
+    ),
   ];
   const header = [...writer.used]
     .sort()

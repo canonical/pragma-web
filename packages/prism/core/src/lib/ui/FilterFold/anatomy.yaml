@@ -5,10 +5,17 @@
 # slot displays it only below two groups. Its root is the router's link
 # (the published Button renders a native button only, which cannot carry
 # an href), named for assistive technology as "Filter, n applied"; the
-# label never wraps.
+# label never wraps. It is drawn as the trail's links are: the link
+# colour, underlined only under the pointer.
+#
+# Every decision is read through a component token declared on the root
+# (`--filter-fold-*`), bound to the symbol named here.
 #
 # Token ledger: none.
 node:
   uri: prism.component.filter_fold
   styles:
+    typography.color: color.text.link
+    typography.decoration: none
+    typography.decoration@hover: underline
     typography.whiteSpace: nowrap

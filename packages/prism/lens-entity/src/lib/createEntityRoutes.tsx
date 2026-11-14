@@ -89,7 +89,7 @@ export default function createEntityRoutes<const TId extends string>(
     url: `/${id}/:uri`,
     search: viewSearch,
     content: EntityPageContent,
-    warm: (params) => warmEntity(binding, params),
+    warm: (params, search) => warmEntity(binding, params, search),
   });
 
   // The one cast: the table's keys are computed from the binding's id, and

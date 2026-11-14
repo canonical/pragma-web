@@ -36,3 +36,4 @@ export type {
   ViewSearchSchema,
 } from "./types.js";
 export { default as viewSearch } from "./viewSearch.js";
+export { default as warmPageRenderer } from "./warmPageRenderer.js";

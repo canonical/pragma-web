@@ -87,6 +87,26 @@ describe("createStandardsRoutes", () => {
     });
   });
 
+  it("passes the address's renderer to the reading page's warm", () => {
+    const fetchFn = createFetchSpy();
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+
+    void routes.standardEntity.warm?.(
+      { uri: LINK_COMPONENT_URI },
+      { as: "turtle" },
+      {
+        signal: new AbortController().signal,
+      },
+    );
+
+    expect(
+      fetchFn.mock.calls.map(([request, variables]) => [
+        request.name,
+        variables,
+      ]),
+    ).toContainEqual(["EntitySourceQuery", { uri: LINK_COMPONENT_URI }]);
+  });
+
   it("mounts the index page over the binding's class", {
     timeout: STANDARDS_TEST_TIMEOUT_MS,
   }, () => {

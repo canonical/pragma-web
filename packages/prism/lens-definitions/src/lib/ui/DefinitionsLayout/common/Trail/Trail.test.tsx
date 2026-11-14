@@ -5,7 +5,7 @@ import createStripHarness from "../../../../../../testing/createStripHarness.js"
 import { Trail } from "./index.js";
 
 describe("Trail", () => {
-  it("leads from the lens to the selected term", () => {
+  it("ends the trail at the lens, linked back to it, on a term", () => {
     render(
       createStripHarness(
         "/definitions/ds%3AUIBlock",
@@ -18,7 +18,7 @@ describe("Trail", () => {
       "href",
       "/definitions",
     );
-    expect(screen.getByText("ds:UIBlock")).toBeInTheDocument();
+    expect(screen.queryByText("ds:UIBlock")).not.toBeInTheDocument();
   });
 
   it("names only the lens on the explorer", () => {

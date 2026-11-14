@@ -13,7 +13,10 @@ describe("FilterBar", () => {
       />,
     );
     const bar = screen.getByRole("group", { name: "Facets" });
-    expect(bar.dataset.region).toBe("filter-bar");
+    expect(bar.tagName).toBe("FIELDSET");
+    expect(bar.closest<HTMLElement>("[data-region]")?.dataset.region).toBe(
+      "filter-bar",
+    );
     const slots = [...bar.querySelectorAll("[data-slot]")].map(
       (slot) => (slot as HTMLElement).dataset.slot,
     );

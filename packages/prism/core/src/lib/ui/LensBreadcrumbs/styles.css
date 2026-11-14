@@ -15,15 +15,16 @@
     min-inline-size: 0;
   }
 
-  /* The current crumb, the trail's last, may shrink below its text. */
-  .ds.lens-breadcrumbs .current {
+  /* The lens's crumb, the trail's one, may shrink below its text. */
+  .ds.lens-breadcrumbs .lens {
     min-inline-size: 0;
   }
 
   /* Its text keeps to one line and ends in an ellipsis where the crumb
-   * ends, so an identifier with no break opportunity, such as an absolute
-   * IRI, never reaches past the strip. */
-  .ds.lens-breadcrumbs .link[aria-current="page"] {
+   * ends, so the trail folds instead of wrapping or reaching past the
+   * strip, whether the crumb is the current page or the link back to the
+   * index. */
+  .ds.lens-breadcrumbs .link {
     min-inline-size: 0;
     overflow: hidden;
     white-space: nowrap;

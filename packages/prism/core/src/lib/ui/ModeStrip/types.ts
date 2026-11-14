@@ -15,6 +15,12 @@ type OwnProps = {
   readonly fold?: ReactNode;
   /** The index's count, which closes the filtering group. */
   readonly count?: ReactNode;
+  /**
+   * Display the count only in the folded strip, below two groups: for a
+   * lens whose count stands in a panel at two groups and wider, so the
+   * folded strip still reads the trail, the menu, the fold and the count.
+   */
+  readonly countFolded?: boolean;
 };
 
 /**

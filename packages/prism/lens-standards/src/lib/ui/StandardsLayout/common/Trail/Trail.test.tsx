@@ -15,7 +15,7 @@ describe("Trail", () => {
     expect(screen.getByText("Standards")).toBeInTheDocument();
   });
 
-  it("links the label back to the index and ends in the address on a reading page", () => {
+  it("ends the trail at the label, linked back to the index, on a reading page", () => {
     const { container } = render(
       createStandardsPage(
         `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
@@ -28,6 +28,6 @@ describe("Trail", () => {
       "href",
       "/standards",
     );
-    expect(container).toHaveTextContent(LINK_COMPONENT_URI);
+    expect(container).not.toHaveTextContent(LINK_COMPONENT_URI);
   });
 });

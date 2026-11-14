@@ -35,14 +35,27 @@
     border-bottom-color: var(--filter-bar-divider-color);
   }
 
-  /* The facets under Search, then the chips, on one line. */
+  /* The facets under Search, then the chips, on one line: a fieldset
+   * without its native border, padding and margin. */
   .ds.filter-bar > .controls {
     grid-column: 5 / -1;
+    border-width: 0;
+    padding: 0;
+    margin: 0;
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
     min-inline-size: 0;
     gap: var(--filter-bar-spacing);
+  }
+
+  /* Below three groups the columns from the fifth line are narrower than
+   * a lens's facet buttons (about 330px at 1366), so the controls start on
+   * the first column line and the bar stays one line. */
+  @container shell (width < 1376px) {
+    .ds.filter-bar > .controls {
+      grid-column: 1 / -1;
+    }
   }
 
   /* Below two groups the sheet holds the facets. */

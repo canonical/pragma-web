@@ -61,6 +61,18 @@ describe("ModeStrip", () => {
     ).toBeNull();
   });
 
+  it("marks the count folded only when asked", () => {
+    const { rerender } = render(
+      <ModeStrip count="3 lines" countFolded data-testid="strip" />,
+    );
+    const readCount = () =>
+      screen.getByTestId("strip").querySelector('[data-slot="count"]');
+    expect(readCount()).toHaveClass("count", "is-folded");
+    expect(readCount()?.textContent).toBe("3 lines");
+    rerender(<ModeStrip count="3 lines" data-testid="strip" />);
+    expect(readCount()).not.toHaveClass("is-folded");
+  });
+
   it("applies custom className alongside the component class", () => {
     render(<ModeStrip className="custom-class" data-testid="strip" />);
     const strip = screen.getByTestId("strip");

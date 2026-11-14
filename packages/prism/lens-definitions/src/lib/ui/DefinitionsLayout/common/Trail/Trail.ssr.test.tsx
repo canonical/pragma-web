@@ -15,7 +15,8 @@ describe("Trail SSR", () => {
         <Trail />,
       ),
     );
-    expect(html).toContain("ds:UIBlock");
+    expect(html).toContain('href="/definitions"');
+    expect(html).not.toContain("ds:UIBlock");
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });

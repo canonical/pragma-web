@@ -46,10 +46,9 @@ describe("FilterSheet", () => {
       "/catalog?q=cen&sheet=filter",
       <FilterSheet open>Facets</FilterSheet>,
     );
-    expect(screen.getByRole("link", { name: "Close" })).toHaveAttribute(
-      "href",
-      "/catalog?q=cen",
-    );
+    const close = screen.getByRole("link", { name: "Close" });
+    expect(close).toHaveAttribute("href", "/catalog?q=cen");
+    expect(close).toHaveClass("close");
   });
 
   it("closes on Escape by writing the address", () => {

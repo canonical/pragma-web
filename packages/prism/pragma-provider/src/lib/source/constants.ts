@@ -15,6 +15,12 @@ export const STANDARD_PREFIXES: ReadonlyMap<string, string> = new Map([
   ["xsd", "http://www.w3.org/2001/XMLSchema#"],
 ]);
 
+/**
+ * How many blank nodes in a row a document follows below its entity: deep
+ * enough for every nesting the corpus has, and a bound on a blank cycle.
+ */
+export const MAX_BLANK_DEPTH = 8;
+
 /** `rdf:type`, which Turtle writes as `a` and lists first. */
 export const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 

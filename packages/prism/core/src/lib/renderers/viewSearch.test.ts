@@ -87,7 +87,7 @@ describe("viewSearch", () => {
 
     it("matches an address with none of them to an empty search", () => {
       const router = createViewRouter("/x");
-      const match = router.match("/x?view=cards");
+      const match = router.match("/x?sort=name");
       expect(match?.kind === "route" && match.search).toEqual({});
     });
   });

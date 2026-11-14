@@ -15,6 +15,7 @@ import orientCars from "../../../orientCars.js";
 import { PlatformFit } from "../../../PlatformFit/index.js";
 import readFormationLines from "../../../readFormationLines.js";
 import readFormationTrain from "../../../readFormationTrain.js";
+import readFitLine from "./readFitLine.js";
 import type { FormationDetailProps } from "./types.js";
 
 /**
@@ -107,14 +108,9 @@ export default function FormationDetail({
               <h2 id={fitId}>{t("fleet.platformFit")}</h2>
               <PlatformFit
                 fits={fits}
-                renderName={({ code, title }) => {
-                  const line = lines.get(code);
-                  return line === undefined ? (
-                    title
-                  ) : (
-                    <ChipProjection node={line} />
-                  );
-                }}
+                renderName={({ code }) => (
+                  <ChipProjection node={readFitLine(lines, code)} />
+                )}
               />
             </section>
           </>

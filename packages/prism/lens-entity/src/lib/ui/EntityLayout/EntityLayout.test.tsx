@@ -97,17 +97,15 @@ describe("EntityLayout", () => {
         layout: STATIONS_LAYOUT,
       }),
     );
-    // The lens crumb links back to the index; the address is the current
-    // page, as the URL carries it.
+    // The trail ends at the parent: the lens crumb links back to the index,
+    // and the address is not drawn as a crumb.
     expect(within(readSocket("trail")).getAllByRole("listitem")).toHaveLength(
-      2,
+      1,
     );
     expect(
       within(readSocket("trail")).getByRole("link", { name: "Stations" }),
     ).toHaveAttribute("href", "/stations");
-    expect(
-      within(readSocket("trail")).getByText("metro:northgate"),
-    ).toHaveAttribute("aria-current", "page");
+    expect(readSocket("trail")).not.toHaveTextContent("metro:northgate");
   });
 
   it("claims the search, the fold and the count on the index only", {
@@ -204,7 +202,7 @@ describe("EntityLayout", () => {
     expect(readSocket("fold")).toBeNull();
   });
 
-  it("leaves the search and the count to the panel when the lens places it", {
+  it("leaves the search to the panel and folds the count when the lens places it", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
@@ -216,7 +214,7 @@ describe("EntityLayout", () => {
       }),
     );
     expect(readSocket("search")).toBeNull();
-    expect(readSocket("count")).toBeNull();
+    expect(readSocket("count")).toHaveClass("is-folded");
     expect(readSocket("fold")).not.toBeNull();
   });
 

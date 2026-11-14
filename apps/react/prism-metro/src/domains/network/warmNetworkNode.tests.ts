@@ -3,6 +3,7 @@
 import {
   createEnvironment,
   setPrefetchEnvironment,
+  type ViewSearch,
 } from "@canonical/prism-core";
 import { afterEach, describe, expect, it } from "vitest";
 import createMetroFetch from "../../../testing/createMetroFetch.js";
@@ -20,10 +21,11 @@ const warmLikeTheServer = (
   environment: ReturnType<typeof createEnvironment>,
   kind: "line" | "stop",
   params: Readonly<Record<string, unknown>>,
+  search: ViewSearch = {},
 ): Promise<void> => {
   setPrefetchEnvironment(environment);
   try {
-    return warmNetworkNode(kind, params);
+    return warmNetworkNode(kind, params, search);
   } finally {
     setPrefetchEnvironment(undefined);
   }
@@ -51,6 +53,23 @@ describe("warmNetworkNode", () => {
     ]);
     const [, variables] = fetchFn.mock.lastCall ?? [];
     expect(variables).toEqual({ id: `${METRO_NAMESPACE}tannery-lane` });
+  });
+
+  it("warms the station's Turtle source beside its page at as=turtle", async () => {
+    const fetchFn = createMetroFetch();
+    await warmLikeTheServer(
+      createEnvironment({ fetchFn }),
+      "stop",
+      { uri: "metro:tannery-lane" },
+      { as: "turtle" },
+    );
+    expect(fetchFn.mock.calls.map(([request]) => request.name)).toEqual([
+      "NetworkNamespacesQuery",
+      "NetworkStationQuery",
+      "EntitySourceQuery",
+    ]);
+    const [, variables] = fetchFn.mock.lastCall ?? [];
+    expect(variables).toEqual({ uri: `${METRO_NAMESPACE}tannery-lane` });
   });
 
   it("reads the line an absolute address names", async () => {

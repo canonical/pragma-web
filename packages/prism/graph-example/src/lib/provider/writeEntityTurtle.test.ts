@@ -97,6 +97,23 @@ describe("writeEntityTurtle", () => {
     ).toEqual(["Circle Line", "Ligne Circulaire"]);
   });
 
+  it("labels routes by first appearance, whatever their keys", () => {
+    const circle = findRecord(CIRCLE);
+    if (!("routes" in circle) || circle.routes === undefined) {
+      throw new Error("the Circle Line has no routes");
+    }
+    const routes = circle.routes.map((route) => ({
+      ...route,
+      key: `renamed-${route.key}`,
+      reverse:
+        route.reverse === undefined ? undefined : `renamed-${route.reverse}`,
+    }));
+    const text = writeEntityTurtle(circle, exampleDataset);
+    expect(text).toContain("_:b0");
+    expect(text).toContain("_:b1");
+    expect(writeEntityTurtle({ ...circle, routes }, exampleDataset)).toBe(text);
+  });
+
   it("writes a route that runs one way without a reverse", () => {
     const ringway = exampleDataset.entities.find(
       (entity) =>

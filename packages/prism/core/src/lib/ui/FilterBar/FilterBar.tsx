@@ -12,7 +12,9 @@ const componentCssClassName = "ds filter-bar";
  * The facet bar: the second band under the strip, for a lens that places
  * its facets in a bar. Its controls start under the strip's Search and
  * run on one line to the last column, the applied chips after the facets;
- * it touches the strip above it. Below two groups it is not displayed, and
+ * below three groups they start on the first column line, so they stay on
+ * one line. The controls are one labelled fieldset; the band around them
+ * stays a plain subgrid. It touches the strip above it. Below two groups it is not displayed, and
  * the sheet holds its content.
  *
  * `import { FilterBar } from "@canonical/prism-core";`
@@ -27,15 +29,12 @@ export default function FilterBar({
 }: FilterBarProps): ReactElement {
   const t = useMessages();
   return (
-    // biome-ignore lint/a11y/useSemanticElements: the band is a subgrid of the canvas's columns, which a fieldset's min-content sizing and legend box would break
     <div
-      aria-label={t("filterBar.label")}
-      role="group"
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-region="filter-bar"
     >
-      <div className="controls">
+      <fieldset aria-label={t("filterBar.label")} className="controls">
         <div className="facets" data-slot="facets">
           {facets}
         </div>
@@ -44,7 +43,7 @@ export default function FilterBar({
             {chips}
           </div>
         ) : null}
-      </div>
+      </fieldset>
     </div>
   );
 }

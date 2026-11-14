@@ -15,6 +15,8 @@ import {
   createEnvironment,
   createStaticRouter,
   HomesProvider,
+  type RendererDefaults,
+  RenderersProvider,
   RouterLink,
 } from "@canonical/prism-core";
 import {
@@ -45,15 +47,25 @@ export const ACCORDION_URI = "ds:global.component.accordion";
  */
 export const ENTITY_TEST_TIMEOUT_MS = 15_000;
 
+/** What else the entity page's address and site carry. */
+interface EntityPageOptions {
+  /** The address's search, such as `?as=turtle`. */
+  readonly search?: string;
+  /** Renderers in place of the site's own. */
+  readonly renderers?: RendererDefaults;
+}
+
 /**
  * The entity page at `uri` over an environment seeded with `records`
- * (`undefined` = cold store). The page owns its Suspense/ErrorBoundary, so
- * the harness adds none.
+ * (`undefined` = cold store), at the address's `search`, under the site's
+ * renderers or the given ones. The page owns its Suspense/ErrorBoundary,
+ * so the harness adds none.
  */
 export const entityPageAt = (
   uri: string,
   records: RecordMap | undefined,
   fetchFn: FetchFunction,
+  { search = "", renderers }: EntityPageOptions = {},
 ): ReactElement => (
   <HeadProvider titleTemplate={formatDocumentTitle}>
     <RelayEnvironmentProvider
@@ -62,7 +74,7 @@ export const entityPageAt = (
       <RouterProvider
         router={createStaticRouter(
           appRoutes,
-          `/components/${encodeURIComponent(uri)}`,
+          `/components/${encodeURIComponent(uri)}${search}`,
           { middleware: [...middleware], notFound: notFoundRoute },
         )}
       >
@@ -71,9 +83,15 @@ export const entityPageAt = (
             LinkComponent={RouterLink}
             maps={defaultProjectionMaps}
           >
-            <SiteRenderers>
-              <ComponentEntityPage params={{ uri }} />
-            </SiteRenderers>
+            {renderers === undefined ? (
+              <SiteRenderers>
+                <ComponentEntityPage params={{ uri }} />
+              </SiteRenderers>
+            ) : (
+              <RenderersProvider defaults={renderers} extensions={["source"]}>
+                <ComponentEntityPage params={{ uri }} />
+              </RenderersProvider>
+            )}
           </ProjectionsProvider>
         </HomesProvider>
       </RouterProvider>

@@ -8,9 +8,9 @@
  * what the layout promises: one intrinsic grid, the shell, which is the one
  * query container; no page scroll, and nothing reaching past the viewport
  * or past its region, a strip's crumb included, a strip's trail on one
- * line with its current crumb's text clipped by the crumb, and nothing in
+ * line with its last crumb's text clipped by the crumb, and nothing in
  * the strip scrolling sideways, at 390px too, on a term's page and a standard's page
- * whose crumbs are absolute IRIs; twelve columns at 1440px and four at
+ * addressed by absolute IRIs; twelve columns at 1440px and four at
  * 390px; a workspace canvas
  * that never scrolls; a document whose only scrolling regions are its
  * canvas and its rail, and whose page's first element spans the whole main
@@ -256,7 +256,7 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
           1,
         );
       }
-      // A lens's trail keeps to one line, its current crumb's text painted
+      // A lens's trail keeps to one line, its last crumb's text painted
       // no further than the trail's end, clipped by the crumb itself.
       for (const trail of layout.trails) {
         expect(trail.rows, `${theme} ${trail.element}`).toBe(1);

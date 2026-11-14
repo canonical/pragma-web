@@ -26,9 +26,10 @@ import type { EntityLayoutProps } from "./types.js";
  * routed page, with the strip carrying the breadcrumb trail, the page's
  * renderers and, on the index, the filtering group: the search box and the
  * count of entries shown when the lens places its filters in the bar (in
- * the panel they are the index's), and the fold below two groups. The
- * index's sheet holds the search and the count below two groups, opened
- * through the address (`sheet=filter`).
+ * the panel they are the index's, and the strip shows the same count only
+ * below two groups, where the panel is not displayed), and the fold below
+ * two groups. The index's sheet holds the search and the count below two
+ * groups, opened through the address (`sheet=filter`).
  *
  * The search text and the renderer live in the address, so the strip and
  * the index in the canvas, siblings, read the same state without sharing
@@ -74,7 +75,8 @@ export default function EntityLayout({
       {...props}
       strip={
         <ModeStrip
-          count={onIndex && inBar ? count : null}
+          count={onIndex ? count : null}
+          countFolded={!inBar}
           fold={onIndex ? <FilterFold count={text === "" ? 0 : 1} /> : null}
           search={onIndex && inBar ? <EntitySearch /> : null}
           trail={<Trail binding={binding} label={label} />}

@@ -19,7 +19,8 @@ const componentCssClassName = "ds mode-strip";
  * component padding on each side, so the canvas below never jumps. Below
  * two groups of columns it folds to one line: the trail, the view group's
  * menu, the fold (a link to the sheet that holds the filters) and the
- * count.
+ * count. A count marked `countFolded` is displayed only there, for a lens
+ * whose count stands in a panel at two groups and wider.
  *
  * `import { ModeStrip } from "@canonical/prism-core";`
  *
@@ -33,6 +34,7 @@ export default function ModeStrip({
   chips,
   fold,
   count,
+  countFolded = false,
   ...props
 }: ModeStripProps): ReactElement {
   return (
@@ -64,7 +66,10 @@ export default function ModeStrip({
           </div>
         ) : null}
         {isRenderedNode(count) ? (
-          <div className="count" data-slot="count">
+          <div
+            className={countFolded ? "count is-folded" : "count"}
+            data-slot="count"
+          >
             {count}
           </div>
         ) : null}

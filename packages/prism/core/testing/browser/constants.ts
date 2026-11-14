@@ -21,7 +21,8 @@ export const VIEWPORTS = [
 
 /**
  * The viewports the strip is measured at: each side of the two-group
- * threshold, the widest desktop, a common laptop and a phone, with the
+ * threshold, the widest desktop, a common laptop, the narrow rail's
+ * threshold and a phone, with the
  * columns the shell's intrinsic grid lays at each.
  */
 export const STRIP_VIEWPORTS = [
@@ -29,6 +30,7 @@ export const STRIP_VIEWPORTS = [
   { name: "1366", width: 1366, height: 768, columns: 10 },
   { name: "912", width: 912, height: 1368, columns: 8 },
   { name: "820", width: 820, height: 1180, columns: 6 },
+  { name: "448", width: 448, height: 896, columns: 4 },
   { name: "390", width: 390, height: 844, columns: 4 },
 ] as const;
 

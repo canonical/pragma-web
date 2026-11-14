@@ -72,6 +72,23 @@ describe("FleetIndex", () => {
     expect(container.querySelector(".rolling-stock-card")).toBeNull();
   });
 
+  it("closes the strip with a count of the rolling stocks it lists", async () => {
+    const { container } = renderMetroPage("/fleet");
+    const rows = await waitFor(() => {
+      const found = container.querySelectorAll(
+        ".ds.node-list .rolling-stock-row",
+      );
+      expect(found).toHaveLength(ROLLING_STOCK_COUNT);
+      return found;
+    });
+    const slot = container.querySelector(
+      '[data-region="mode-strip"] .filtering > [data-slot="count"]',
+    ) as HTMLElement;
+    expect(within(slot).getByRole("status")).toHaveTextContent(
+      `${rows.length} rolling stocks`,
+    );
+  });
+
   it("says so while the fleet is on its way", () => {
     renderWithAnswer(new Promise(() => {}));
     expect(screen.getByText("Loading the fleet…")).toBeInTheDocument();

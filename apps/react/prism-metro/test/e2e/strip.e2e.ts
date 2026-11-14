@@ -3,10 +3,16 @@
 /**
  * The strip in the browser, at each side of the two-group threshold: one
  * band of the same height on every page, its view and filtering groups on
- * the same column lines across pages at two groups and wider, its count
- * ending on the band's last line, the facet bar only where a lens has
- * facets, the lines index's panel below the strip, the folded sheet at a
- * phone's width, and no link to the retired `view=` anywhere.
+ * the same column lines across pages at two groups and wider, no group
+ * painted over another, its count shortened only once the trail has given
+ * way, no crumb reading as an address, the count ending on the band's last
+ * line, the facet bar
+ * one band of the strip's height only where a lens has facets, its
+ * controls inside the band, a panel's count in the strip only below two
+ * groups, the folded
+ * renderer menu's options as links that change only `as`, each a full
+ * target, the folded sheet covering a phone's viewport, and no link to the
+ * retired `view=` anywhere.
  */
 
 import {
@@ -17,7 +23,11 @@ import {
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { NORTHGATE_CURIE } from "../../testing/fixtures.js";
+import {
+  CIRCLE_LINE_CURIE,
+  NORTHGATE_CURIE,
+  SERIES_90_CURIE,
+} from "../../testing/fixtures.js";
 import {
   DEV_READY_MS,
   GRAPH_READY_MS,
@@ -35,6 +45,15 @@ const STRIP_HEIGHT_PX = 53;
 /** How far a measured edge may round, in pixels. */
 const EDGE_TOLERANCE_PX = 1;
 
+/** How far a band's height may round, in pixels: the bands are strict. */
+const BAND_TOLERANCE_PX = 0.5;
+
+/** The smallest target a menu option may be, in pixels. */
+const MIN_TARGET_PX = 24;
+
+/** A crumb that reads as an address, a prefixed name or an absolute IRI. */
+const ADDRESS_PATTERN = /^[a-z][\w-]*:/;
+
 /** A station's page. */
 const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
 
@@ -46,13 +65,19 @@ const STRIP_PATHS = [
   STATION_PATH,
   "/lines",
   "/fleet",
+  `/fleet/${encodeURIComponent(SERIES_90_CURIE)}`,
   "/network",
+  `/network/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
+  `/network/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`,
   WORKSPACE_PATH,
   "/not-found",
 ] as const;
 
 /** The indexes whose count closes the strip's filtering group. */
 const COUNTED_PATHS = ["/stations", "/stations?q=cen"] as const;
+
+/** An index that offers more than one renderer. */
+const SWITCHED_PATH = "/stations?q=cen";
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -120,26 +145,75 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
     }
   };
 
-  it("keeps the strip one 53px band on every page, nothing overflowing", async () => {
+  it("keeps the strip one 53px band on every page, no group over another", async () => {
     for (const path of STRIP_PATHS) {
       const strip = await measure(path);
-      expect(strip.height, path).toBeCloseTo(STRIP_HEIGHT_PX, 0);
+      const trail = strip.groups.trail;
+      const trailWidth = trail === null ? 0 : trail.right - trail.x;
+      expect(
+        Math.abs((strip.height ?? 0) - STRIP_HEIGHT_PX),
+        path,
+      ).toBeLessThanOrEqual(BAND_TOLERANCE_PX);
       expect(strip.overflow, path).toBe(false);
+      expect(strip.overlaps, path).toEqual([]);
+      // The count shortens only once the trail has given way entirely.
+      expect(strip.countClipped && trailWidth > EDGE_TOLERANCE_PX, path).toBe(
+        false,
+      );
+      expect(
+        strip.crumbs.filter((crumb) => ADDRESS_PATTERN.test(crumb)),
+        path,
+      ).toEqual([]);
       expect(strip.viewHrefs, path).toEqual([]);
     }
   });
 
-  it("draws the facet bar only where the lens has facets", async () => {
+  it("draws the facet bar as one 53px band only where the lens has facets", async () => {
     expect((await measure("/stations")).bar).toBeNull();
     const bar = (await measure(WORKSPACE_PATH)).bar;
     if (viewport.width >= 912) {
-      // The explorer's chips are wider than the bar's columns and wrap in
-      // it, so the bar is at least the strip's height.
-      expect(bar).toBeGreaterThanOrEqual(STRIP_HEIGHT_PX - EDGE_TOLERANCE_PX);
+      expect(Math.abs((bar ?? 0) - STRIP_HEIGHT_PX)).toBeLessThanOrEqual(
+        BAND_TOLERANCE_PX,
+      );
     } else {
       expect(bar).toBeNull();
     }
   });
+
+  it.runIf(viewport.width === 1366 || viewport.width === 912)(
+    "keeps the facet bar's controls inside the band, a chip applied",
+    async () => {
+      const page = await open(WORKSPACE_PATH);
+      try {
+        const states = [await page.evaluate(measureStrip)];
+        const chip = await page
+          .locator('[data-region="filter-bar"] button[aria-pressed="false"]')
+          .first()
+          .elementHandle();
+        if (chip !== null) {
+          await expect
+            .poll(
+              async () => {
+                await chip.click();
+                return chip.getAttribute("aria-pressed");
+              },
+              { timeout: PAGE_SETTLE_MS },
+            )
+            .not.toBe("false");
+          states.push(await page.evaluate(measureStrip));
+        }
+        for (const strip of states) {
+          expect(strip.barOverflow).toBe(false);
+          expect(strip.controlsRight).not.toBeNull();
+          expect(strip.controlsRight ?? 0).toBeLessThanOrEqual(
+            (strip.contentEnd ?? 0) + EDGE_TOLERANCE_PX,
+          );
+        }
+      } finally {
+        await page.close();
+      }
+    },
+  );
 
   it.runIf(viewport.width >= 1366)(
     "starts the view and filtering groups on the same lines on every page",
@@ -173,8 +247,85 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
     },
   );
 
+  it("shows the lines' count in the strip only where its panel is folded", async () => {
+    const page = await open("/lines");
+    try {
+      const strip = await page.evaluate(measureStrip);
+      const folded = await page.evaluate(() => {
+        const read = (selector: string) => {
+          const element = document.querySelector(
+            `[data-region="mode-strip"] ${selector}`,
+          );
+          const box = element?.getBoundingClientRect();
+          return {
+            text: (element?.textContent ?? "").trim(),
+            x: box?.x ?? 0,
+            right: box?.right ?? 0,
+          };
+        };
+        return {
+          fold: read('[data-slot="fold"]'),
+          count: read('[data-slot="count"]'),
+        };
+      });
+      if (viewport.width < 912) {
+        // The folded strip reads the trail, the menu, the fold, the count.
+        expect(strip.countRight).not.toBeNull();
+        expect(folded.count.text).toMatch(/\d/);
+        expect(folded.fold.right).toBeLessThanOrEqual(
+          folded.count.x + EDGE_TOLERANCE_PX,
+        );
+        expect(strip.overlaps).toEqual([]);
+      } else {
+        // The panel beside the list holds the count.
+        expect(strip.countRight).toBeNull();
+      }
+    } finally {
+      await page.close();
+    }
+  });
+
   it.runIf(viewport.width < 912)(
-    "folds the filters into a link to the sheet, which opens full width",
+    "lists the offered renderers in the menu, each a link changing only as",
+    async () => {
+      const page = await open(SWITCHED_PATH);
+      try {
+        await page.click('[data-slot="view"] summary');
+        const menu = await page.evaluate(() => {
+          const options = [
+            ...document.querySelectorAll<HTMLAnchorElement>(
+              '[data-slot="view"] details[open] a[href]',
+            ),
+          ];
+          return options.map((option) => ({
+            href: option.href,
+            current: option.getAttribute("aria-current"),
+            height: option.getBoundingClientRect().height,
+          }));
+        });
+        const here = new URL(SWITCHED_PATH, server.base);
+        here.searchParams.delete("as");
+        expect(menu.length).toBeGreaterThanOrEqual(2);
+        expect(menu.filter(({ current }) => current === "page")).toHaveLength(
+          1,
+        );
+        for (const { href, height } of menu) {
+          const target = new URL(href);
+          target.searchParams.delete("as");
+          expect(target.pathname).toBe(here.pathname);
+          expect(target.searchParams.toString()).toBe(
+            here.searchParams.toString(),
+          );
+          expect(height).toBeGreaterThanOrEqual(MIN_TARGET_PX);
+        }
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
+  it.runIf(viewport.width < 912)(
+    "folds the filters into a link to the sheet, which covers the viewport",
     async () => {
       const page = await open("/lines?sheet=filter");
       try {
@@ -186,6 +337,7 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
           return {
             open: dialog !== null,
             width: box?.width ?? 0,
+            height: box?.height ?? 0,
             scrolls:
               document.documentElement.scrollWidth >
               document.documentElement.clientWidth,
@@ -193,6 +345,7 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
         });
         expect(sheet.open).toBe(true);
         expect(sheet.width).toBeCloseTo(viewport.width, 0);
+        expect(sheet.height).toBeCloseTo(viewport.height, 0);
         expect(sheet.scrolls).toBe(false);
       } finally {
         await page.close();

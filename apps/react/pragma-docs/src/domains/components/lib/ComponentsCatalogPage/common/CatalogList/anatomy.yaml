@@ -25,7 +25,8 @@
 # design-system types' arms.
 #
 # The root is a subgrid of the page over every column, its gap the grid's
-# gutter on both axes; the navigation's line and the jump links sit on one
+# gutter on both axes; a tier's count spans its section's row, under the
+# tier's name; the navigation's line and the jump links sit on one
 # wrapping line, a gutter apart and on a shared baseline, the links with no
 # markers or insets.
 #
@@ -93,6 +94,11 @@ node:
               projection:
                 field: tier.name
             relation: { cardinality: "1" }
+          - node:
+              uri: prism.component.count_line
+              styles:
+                layout.grid.column: "1 / -1"
+            relation: { cardinality: "1", slotName: count }
           - node:
               uri: prism.component.entity_list
               edges:
