@@ -418,7 +418,8 @@ site's own catalog, and the factory holds no reader-facing string.
   text, the open sheet and the graph's kind, selection and expansion), `FILTER_SHEET`, `FILTER_PLACEMENTS`,
   `DEFAULT_FILTER_PLACEMENT`, `RENDERER_KINDS`, `PAGE_RENDERER_NAMES`,
   `RENDERER_LABEL_KEYS`, `usePageRenderers` (core's page renderers, Page
-  and Turtle); types `Renderer`, `RendererDeclaration`,
+  and Turtle), `warmPageRenderer` (a route's warm calls it so the server
+  page already holds what the address's page renderer reads); types `Renderer`, `RendererDeclaration`,
   `RendererDefaults`, `RendererFacts`, `RendererKind`, `LensRenderers`,
   `ListRendererProps`, `PageRendererProps`, `ResolvedRenderers`,
   `RenderersProviderProps`, `RenderersValue`, `FilterPlacement`,
