@@ -10,9 +10,13 @@ import type { StripMeasure } from "./types.js";
  * content is wider than its box. Every href on the page is read for the
  * retired `view=` parameter, which the renderers' `as=` replaced.
  *
+ * The count is clipped when it, or anything inside it, is narrower than
+ * its content; the trail's crumbs are its list items' texts.
+ *
  * @returns The strip's height, the bar's, its groups' extents, where its
  *   content ends, the count's end, the search's width, whether it
- *   overflows, and the hrefs that still carry `view=`.
+ *   overflows, whether the count is clipped, the trail's crumbs, and the
+ *   hrefs that still carry `view=`.
  * @note Impure: reads the page's document and its computed styles.
  */
 export default function measureStrip(): StripMeasure {
@@ -55,6 +59,15 @@ export default function measureStrip(): StripMeasure {
       strip === null || strip === undefined
         ? false
         : strip.scrollWidth > strip.clientWidth,
+    countClipped:
+      count === null || count === undefined
+        ? false
+        : [count, ...count.querySelectorAll("*")].some(
+            (element) => element.scrollWidth > element.clientWidth,
+          ),
+    crumbs: [...(strip?.querySelectorAll('[data-slot="trail"] li') ?? [])].map(
+      (crumb) => crumb.textContent?.trim() ?? "",
+    ),
     viewHrefs: [...document.querySelectorAll("a[href]")]
       .map((anchor) => anchor.getAttribute("href") ?? "")
       .filter((href) => /[?&]view=/.test(href)),
