@@ -7,7 +7,9 @@
  * painted over another, its count shortened only once the trail has given
  * way, no crumb reading as an address, the count ending on the band's last
  * line, the facet bar
- * one band of the strip's height only where a lens has facets, the folded
+ * one band of the strip's height only where a lens has facets, its
+ * controls inside the band, a panel's count in the strip only below two
+ * groups, the folded
  * renderer menu's options as links that change only `as`, each a full
  * target, the folded sheet covering a phone's viewport, and no link to the
  * retired `view=` anywhere.
@@ -178,6 +180,41 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
+  it.runIf(viewport.width === 1366 || viewport.width === 912)(
+    "keeps the facet bar's controls inside the band, a chip applied",
+    async () => {
+      const page = await open(WORKSPACE_PATH);
+      try {
+        const states = [await page.evaluate(measureStrip)];
+        const chip = await page
+          .locator('[data-region="filter-bar"] button[aria-pressed="false"]')
+          .first()
+          .elementHandle();
+        if (chip !== null) {
+          await expect
+            .poll(
+              async () => {
+                await chip.click();
+                return chip.getAttribute("aria-pressed");
+              },
+              { timeout: PAGE_SETTLE_MS },
+            )
+            .not.toBe("false");
+          states.push(await page.evaluate(measureStrip));
+        }
+        for (const strip of states) {
+          expect(strip.barOverflow).toBe(false);
+          expect(strip.controlsRight).not.toBeNull();
+          expect(strip.controlsRight ?? 0).toBeLessThanOrEqual(
+            (strip.contentEnd ?? 0) + EDGE_TOLERANCE_PX,
+          );
+        }
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
   it.runIf(viewport.width >= 1366)(
     "starts the view and filtering groups on the same lines on every page",
     async () => {
@@ -209,6 +246,41 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
       }
     },
   );
+
+  it("shows the lines' count in the strip only where its panel is folded", async () => {
+    const page = await open("/lines");
+    try {
+      const strip = await page.evaluate(measureStrip);
+      const folded = await page.evaluate(() => {
+        const read = (selector: string) => {
+          const element = document.querySelector(
+            `[data-region="mode-strip"] ${selector}`,
+          );
+          const box = element?.getBoundingClientRect();
+          return {
+            text: (element?.textContent ?? "").trim(),
+            x: box?.x ?? 0,
+            right: box?.right ?? 0,
+          };
+        };
+        return { fold: read('[data-slot="fold"]'), count: read('[data-slot="count"]') };
+      });
+      if (viewport.width < 912) {
+        // The folded strip reads the trail, the menu, the fold, the count.
+        expect(strip.countRight).not.toBeNull();
+        expect(folded.count.text).toMatch(/\d/);
+        expect(folded.fold.right).toBeLessThanOrEqual(
+          folded.count.x + EDGE_TOLERANCE_PX,
+        );
+        expect(strip.overlaps).toEqual([]);
+      } else {
+        // The panel beside the list holds the count.
+        expect(strip.countRight).toBeNull();
+      }
+    } finally {
+      await page.close();
+    }
+  });
 
   it.runIf(viewport.width < 912)(
     "lists the offered renderers in the menu, each a link changing only as",
