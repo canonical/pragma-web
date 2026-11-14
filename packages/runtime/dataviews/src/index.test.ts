@@ -135,6 +135,7 @@ describe("public surface", () => {
       "areFieldFacetsEqual",
       "areListsEqual",
       "areSizingsEqual",
+      "assertInvariant",
       "buildColumnTemplate",
       "createColumnLayout",
       "createFilterInputs",
