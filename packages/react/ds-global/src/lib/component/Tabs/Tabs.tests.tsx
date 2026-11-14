@@ -1,9 +1,20 @@
+import type { Item as NavigationItem } from "@canonical/ds-types";
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import type { LinkComponentProps } from "../../types/link.js";
 import Tabs from "./Tabs.js";
 import type { TabItem } from "./types.js";
+
+const ordinaryItemTree: NavigationItem = {
+  key: "root",
+  items: [
+    { url: "/overview", label: "Overview" },
+    { key: "soon", label: "Coming soon" },
+  ],
+};
+const asTabItem = (item: NavigationItem): TabItem => item;
+const recursiveTabTree: TabItem = asTabItem(ordinaryItemTree);
 
 const root: TabItem = {
   key: "root",
@@ -15,6 +26,13 @@ const root: TabItem = {
 };
 
 describe("Tabs", () => {
+  it("accepts an ordinary recursive Item tree without weakening item identity", () => {
+    expectTypeOf<NavigationItem>().toMatchTypeOf<TabItem>();
+    expectTypeOf(recursiveTabTree).toMatchTypeOf<TabItem>();
+    expect(recursiveTabTree.items?.[0]).toHaveProperty("url", "/overview");
+    expect(recursiveTabTree.items?.[1]).toHaveProperty("key", "soon");
+  });
+
   it("renders a navigation landmark with its accessible name", () => {
     render(<Tabs aria-label="Sections" navigationRoot={root} />);
     expect(
@@ -29,6 +47,29 @@ describe("Tabs", () => {
       "href",
       "/overview",
     );
+  });
+
+  it("renders a public child slot without changing the root or adding another action", () => {
+    render(
+      <Tabs
+        aria-label="Sections"
+        navigationRoot={{
+          key: "root",
+          items: [
+            {
+              url: "/machines",
+              label: "Machines",
+              slot: <span>42</span>,
+            },
+          ],
+        }}
+      />,
+    );
+    const link = screen.getByRole("link", { name: "Machines 42" });
+
+    expect(link).toContainElement(screen.getByText("42"));
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("does not render the root node itself, only its children", () => {
@@ -87,6 +128,46 @@ describe("Tabs", () => {
       "data-custom",
     );
     expect(CustomLink).toHaveBeenCalled();
+  });
+
+  it("keeps the four-prop LinkComponent boundary when a tab has a slot", () => {
+    const CustomLink = vi.fn(
+      ({
+        href,
+        className,
+        children,
+        "aria-current": ariaCurrent,
+      }: LinkComponentProps): ReactNode => (
+        <a href={href} className={className} aria-current={ariaCurrent}>
+          {children}
+        </a>
+      ),
+    );
+    render(
+      <Tabs
+        aria-label="Sections"
+        navigationRoot={{
+          key: "root",
+          items: [
+            { url: "/machines", label: "Machines", slot: <span>42</span> },
+          ],
+        }}
+        LinkComponent={CustomLink}
+      />,
+    );
+    const received = CustomLink.mock.calls[0]?.[0];
+
+    expect(Object.keys(received ?? {}).sort()).toEqual([
+      "aria-current",
+      "children",
+      "className",
+      "href",
+    ]);
+    expect(received).not.toHaveProperty("data-ds-density-provider");
+    expect(received).not.toHaveProperty("data-ds-density-policy-version");
+    const link = screen.getByRole("link", { name: "Machines 42" });
+    expect(link).not.toHaveClass("tabs-static-chip-provider-v1");
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
   });
 
   it("applies custom classNames to the nav and list", () => {

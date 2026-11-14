@@ -5,17 +5,9 @@
    * Tile.Content styles
    * @implements ds:global.subcomponent.tile-content
    *
-   * DSL anatomy mapping:
-   * - layout.type: stack, layout.direction: vertical -> flex column
-   * - spacing.padding.top: dimension/100, spacing.padding.bottom: dimension/200,
-   *   spacing.internal.horizontal: dimension/200 -> top 100, bottom 200,
-   *   sides 200. With a header above (padding-bottom 100), the two sections read
-   *   as top 100 / sides 200 / bottom 200 with the sections meeting in between.
+   * The Tile frame owns standard insets; sections add no default padding.
    */
   :root {
-    --tile-content-padding-top: var(--dimension-100);
-    --tile-content-padding-bottom: var(--dimension-200);
-    --tile-content-padding-inline: var(--dimension-200);
     --tile-content-gap: var(--dimension-100);
   }
 
@@ -24,8 +16,8 @@
     flex-direction: column;
     gap: var(--tile-content-gap);
 
-    padding-block-start: var(--tile-content-padding-top);
-    padding-block-end: var(--tile-content-padding-bottom);
-    padding-inline: var(--tile-content-padding-inline);
+    padding-block-start: var(--tile-content-padding-top, 0);
+    padding-block-end: var(--tile-content-padding-bottom, 0);
+    padding-inline: var(--tile-content-padding-inline, 0);
   }
 }

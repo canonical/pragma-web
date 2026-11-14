@@ -8,12 +8,21 @@ import {
   useContextualMenu,
   useIsMounted,
 } from "../../hooks/index.js";
+import { Button } from "../Button/index.js";
 import MenuContext from "./common/MenuContext.js";
 import SubMenu from "./common/SubMenu/index.js";
 import type { ContextualMenuProps, MenuItem } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds contextual-menu";
+
+/** Product tier inherited by a trigger before its menu is portalled to body. */
+const spacingTierOf = (element: Element | null): "site" | "docs" | "app" => {
+  const owner = element?.closest(".app, .docs, .site");
+  if (owner?.classList.contains("app")) return "app";
+  if (owner?.classList.contains("docs")) return "docs";
+  return "site";
+};
 
 /**
  * A contextual menu presents a flat list of actions — optionally partitioned
@@ -85,6 +94,7 @@ const ContextualMenu = ({
 
   const triggerProps = getTriggerProps();
   const annotatedEntries = annotatedRoot.items ?? [];
+  const spacingTier = spacingTierOf(targetRef.current);
 
   // The shared menu API threaded to every (nested) level. One state, one
   // highlight path, one keyboard handler — submenus are render-only. Memoised so
@@ -141,7 +151,9 @@ const ContextualMenu = ({
         // its own pragma territory, and that must not depend on another
         // constant keeping its "ds " prefix. SubMenu.tsx does the same.
         "ds",
+        spacingTier,
         "contextual-menu__surface",
+        "spacing-control-group",
         bestPosition?.positionName,
       ]
         .filter(Boolean)
@@ -172,7 +184,7 @@ const ContextualMenu = ({
             a no-op — focus would silently fall to <body> (WCAG 2.4.3). The
             fitment hook types its anchor as a div; the button anchors the same
             rect, so cast (Popover precedent). */}
-        <button
+        <Button
           type="button"
           id={triggerId}
           className="trigger"
@@ -180,7 +192,7 @@ const ContextualMenu = ({
           {...triggerProps}
         >
           {children}
-        </button>
+        </Button>
         {mounted ? createPortal(menuElement, document.body) : menuElement}
       </div>
     </MenuContext.Provider>

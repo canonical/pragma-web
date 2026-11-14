@@ -24,6 +24,9 @@
   .ds.tile {
     display: flex;
     flex-direction: column;
+    padding-inline: var(--ds-spacing-inset-surface-standard-inline);
+    padding-block: var(--ds-spacing-inset-surface-standard-block);
+    row-gap: var(--ds-spacing-group);
 
     /* Tile is a surface: it paints its own background (stands out on the page). */
     background: var(--surface-color-background, var(--color-background));

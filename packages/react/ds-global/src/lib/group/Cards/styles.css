@@ -53,7 +53,11 @@
     align-self: start;
     align-content: start;
 
-    gap: var(--grid-row-gap, var(--grid-gutter))
-      var(--grid-column-gap, var(--grid-gutter));
+    /* Card section gaps belong to Card; wrapped bands retain the block gap. */
+    row-gap: var(
+      --grid-row-gap,
+      var(--grid-gap, var(--container-gap-default, 1rem))
+    );
+    column-gap: var(--grid-column-gap, var(--grid-gap, var(--grid-gutter)));
   }
 }

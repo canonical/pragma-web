@@ -3,7 +3,7 @@ import { Icon } from "../../../Icon/index.js";
 import type { ItemProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds contextual-menu-item";
+const componentCssClassName = "ds contextual-menu-item spacing-control-seat";
 
 /**
  * A single contextual-menu entry. By default it renders an optional leading

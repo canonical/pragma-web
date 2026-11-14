@@ -62,6 +62,7 @@ const Button = ({
         importance,
         anticipation,
         variant,
+        variant !== "link" && "spacing-control-seat stroke-paint stroke",
         loading && "loading",
         className,
       ]

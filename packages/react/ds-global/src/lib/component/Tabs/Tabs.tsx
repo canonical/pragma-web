@@ -3,7 +3,7 @@ import { Item } from "./common/index.js";
 import type { TabsProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds tabs";
+const componentCssClassName = "ds tabs spacing-control-group";
 
 /**
  * A tabs component organises related content into separate sections, letting

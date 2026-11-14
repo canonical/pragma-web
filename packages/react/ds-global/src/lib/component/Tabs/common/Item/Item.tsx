@@ -18,9 +18,23 @@ const Item = ({
   active,
   LinkComponent,
 }: ItemProps): React.ReactElement => {
-  const { url, label, disabled, className } = item;
+  const { url, label, disabled, className, slot } = item;
   const Link = LinkComponent;
   const inert = !url;
+  const hasSlot =
+    slot !== null &&
+    slot !== undefined &&
+    slot !== "" &&
+    typeof slot !== "boolean";
+  const linkClassName =
+    "ds tabs-link spacing-control-seat stroke-paint stroke-block-end";
+  const content = (
+    <>
+      {hasSlot ? <span className="tabs-label">{label}</span> : label}
+      {hasSlot ? " " : null}
+      {hasSlot ? <span className="tabs-indicator">{slot}</span> : null}
+    </>
+  );
   return (
     <li
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
@@ -30,15 +44,18 @@ const Item = ({
     >
       {url ? (
         <Link
-          className="tabs-link"
+          className={linkClassName}
           href={disabled ? undefined : url}
           aria-current={active ? "page" : undefined}
         >
-          {label}
+          {content}
         </Link>
       ) : (
-        <span className="tabs-link" aria-current={active ? "page" : undefined}>
-          {label}
+        <span
+          className={linkClassName}
+          aria-current={active ? "page" : undefined}
+        >
+          {content}
         </span>
       )}
     </li>

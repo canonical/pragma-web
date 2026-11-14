@@ -1,3 +1,6 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -9,22 +12,30 @@
     --chip-color-border: var(--color-border-high-contrast);
     --chip-color-text: var(--color-text);
 
-    --chip-border-radius: 1rem;
-    --chip-font-size: var(--font-size-small);
+    --chip-border-radius: 999rem;
+    --chip-font-size: var(--ds-typography-body-font-size);
     --chip-font-weight: var(--font-weight-default);
-    --chip-line-height: var(--line-height-small);
-    --chip-border-width: var(--spacing-border-width);
-    --chip-padding-vertical: var(--spacing-vertical-xsmall);
-    --chip-padding-horizontal: var(--spacing-horizontal-small);
-    --chip-margin-bottom: var(--spacing-vertical-small);
+    --chip-line-height: var(--ds-typography-body-line-height);
+    --chip-border-width: var(--dimension-stroke-thickness-medium, 1px);
+    --chip-padding-horizontal: var(--ds-spacing-action);
     --chip-margin-left: var(--spacing-horizontal-medium);
   }
 
   .ds.chip {
+    /* Resolve these inherited aliases on the actual tier owner. */
+    --chip-font-size: var(--ds-typography-body-font-size);
+    --chip-line-height: var(--ds-typography-body-line-height);
+    --chip-padding-horizontal: var(--ds-spacing-action);
+    --ds-control-seat-font-size: var(--chip-font-size);
+    --ds-control-seat-line-height: var(--chip-line-height);
+    --ds-stroke-width: var(--chip-border-width);
+    --ds-stroke-color: var(--modifier-color-border, var(--chip-color-border));
+    --ds-focus-width: var(--dimension-stroke-thickness-large, 2px);
+    --ds-focus-color: var(--color-focus-ring, currentColor);
+    --ds-focus-offset: 2px;
     border-color: var(--modifier-color-border, var(--chip-color-border));
     border-style: solid;
     border-radius: var(--chip-border-radius);
-    border-width: var(--chip-border-width);
 
     color: var(--modifier-color-text, var(--chip-color-text));
     background-color: var(
@@ -38,13 +49,9 @@
     user-select: none;
     white-space: nowrap;
 
-    font-size: var(--chip-font-size);
     font-weight: var(--chip-font-weight);
-    line-height: var(--chip-line-height);
 
-    margin-block-end: var(--chip-margin-bottom);
     margin-inline-end: var(--chip-margin-left);
-    padding-block: var(--chip-padding-vertical);
     padding-inline: var(--chip-padding-horizontal);
 
     & > .lead {
@@ -64,20 +71,30 @@
     }
 
     & > .dismiss {
-      background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' fill-rule='nonzero' d='M13.041 1.898l1.06 1.06L9.062 8l5.04 5.042-1.06 1.06L8 9.062 2.96 14.1l-1.06-1.06L6.938 8 1.9 2.96l1.06-1.06 5.04 5.04z'/%3E%3C/svg%3E");
-      background-color: var(--chip-color-background);
       align-self: center;
-      background-size: 0.75rem;
-      background-repeat: no-repeat;
-      background-position: center;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      margin-left: var(--spacing-horizontal-xsmall);
+      margin-inline-start: var(--dimension-050);
       flex: 0 0 auto;
       border-radius: 50%;
-      border-color: transparent;
-      height: var(--font-size-default);
-      width: var(--font-size-default);
+      border: 0;
+      padding: 0;
+      inline-size: 1rem;
+      block-size: 1rem;
+      color: inherit;
+      background-color: transparent;
+
+      &::before {
+        inline-size: 0.75rem;
+        block-size: 0.75rem;
+        background-color: currentColor;
+        content: "";
+        mask:
+          url("data:image/svg+xml,%3Csvg width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' fill-rule='nonzero' d='M13.041 1.898l1.06 1.06L9.062 8l5.04 5.042-1.06 1.06L8 9.062 2.96 14.1l-1.06-1.06L6.938 8 1.9 2.96l1.06-1.06 5.04 5.04z'/%3E%3C/svg%3E")
+          center / contain no-repeat;
+      }
     }
 
     &:is(button) {
@@ -100,14 +117,33 @@
       );
     }
 
-    /* Context-specific styling for badges within chips */
-    & .ds.badge {
-      /** Pull the badge closer to the edge of a chip */
+    /* Isolate the slotted content from this Chip's primary criticality channel.
+     * initial makes a neutral Badge fall back to the neutral primary surface;
+     * a critical Badge supplies its own generic channel on the Badge itself. */
+    & > .badge-slot {
+      --modifier-color-foreground-primary: initial;
+
+      display: contents;
+    }
+
+    /* Context-specific styling for the public Badge slot. */
+    & .badge-slot .ds.badge {
+      /* Own the local paint so the Chip's inherited secondary criticality
+       * channel cannot replace it. Consumer aliases remain overridable. */
+      --badge-color-background: var(
+        --modifier-color-foreground-primary,
+        var(--color-foreground-primary)
+      );
+      --badge-color-text: var(--color-text-onForegroundPrimary);
+
+      /* Pull the badge closer to the edge of a chip. */
       --badge-chip-margin-tweak: var(--dimension-025);
 
-      align-self: center;
-      margin-left: var(--spacing-horizontal-small);
-      margin-right: var(--badge-chip-margin-tweak);
+      align-self: baseline;
+      background-color: var(--badge-color-background);
+      color: var(--badge-color-text);
+      margin-inline-start: var(--ds-spacing-mark);
+      margin-inline-end: var(--badge-chip-margin-tweak);
     }
   }
 }

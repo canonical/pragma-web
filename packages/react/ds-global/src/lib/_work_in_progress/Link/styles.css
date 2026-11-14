@@ -3,7 +3,7 @@
 @layer ds.components.global {
   /* Component tokens — sourced from @canonical/design-tokens */
   :root {
-    --link-soft-selected-font-weight: var(--font-weight-bold);
+    --link-soft-selected-font-weight: var(--font-weight-default, 400);
     --link-activation-contents-padding-vertical: var(--spacing-vertical-small);
     --link-activation-contents-padding-horizontal: var(
       --spacing-horizontal-small

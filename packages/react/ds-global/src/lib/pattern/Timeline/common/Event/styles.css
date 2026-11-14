@@ -91,7 +91,7 @@
   .ds.timeline-event > .content > .actor {
     font-weight: var(
       --timeline-actor-font-weight,
-      var(--font-weight-semibold, 600)
+      var(--font-weight-default, 400)
     );
     color: var(--timeline-actor-color, var(--color-text-primary, inherit));
   }

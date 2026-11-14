@@ -16,8 +16,11 @@ const componentCssClassName = "ds chip";
  * @implements ds:global.component.chip
  */
 const Chip = (props: ChipProps): React.ReactElement => {
+  const hasBadge =
+    props.badge !== undefined && props.badge !== null && props.badge !== false;
   const className = [
     componentCssClassName,
+    "spacing-control-seat stroke-paint stroke",
     props.criticality,
     props.release,
     props.className,
@@ -29,6 +32,8 @@ const Chip = (props: ChipProps): React.ReactElement => {
     <>
       {props.lead && <span className="lead">{props.lead}</span>}
       {props.value && <span className="value">{props.value}</span>}
+      {hasBadge && (props.lead || props.value) ? " " : null}
+      {hasBadge ? <span className="badge-slot">{props.badge}</span> : null}
       {props.onDismiss && (
         <button
           type="button"
@@ -48,6 +53,7 @@ const Chip = (props: ChipProps): React.ReactElement => {
       release: _release,
       lead: _lead,
       value: _value,
+      badge: _badge,
       onDismiss: _onDismiss,
       className: _className,
       ...rest
@@ -68,13 +74,18 @@ const Chip = (props: ChipProps): React.ReactElement => {
     release: _release,
     lead: _lead,
     value: _value,
+    badge: _badge,
     onDismiss: _onDismiss,
     onClick: _onClick,
     className: _className,
     ...rest
   } = props;
   return (
-    <span className={className} {...rest}>
+    <span
+      className={className}
+      {...rest}
+      data-ds-density-subscriber={!_onDismiss ? "static-chip" : undefined}
+    >
       {content}
     </span>
   );

@@ -5,9 +5,10 @@ import "./styles.css";
 
 // The Card is NOT a surface: it establishes no `.surface` context of its own,
 // so on a surface it takes the same background (no step) and reads as flush
-// with its container. It stays delimited by its border, radius, and the
+// with its container. It stays delimited by its painted frame, radius, and the
 // dividers between its sections.
-const componentCssClassName = "ds card";
+const componentCssClassName =
+  "ds card stroke-paint stroke-paint-overlay stroke";
 
 /**
  * The card is a container that is designed to represent data objects that share

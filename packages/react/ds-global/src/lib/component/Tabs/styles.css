@@ -1,3 +1,5 @@
+@import url("@canonical/styles/spacing-seat.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -18,7 +20,19 @@
   }
 
   .ds.tabs {
+    font-size: var(--ds-typography-body-font-size);
+    line-height: var(--ds-typography-body-line-height);
     display: block;
+  }
+
+  /* `calc-size()` closes the complete strip when available. Its fail-soft path
+     adds the same one-row remainder outside the painted list, so the underline
+     remains at the natural strip edge. */
+  @supports not (block-size: calc-size(auto, round(up, size, 1px))) {
+    .ds.tabs.spacing-control-group {
+      display: flow-root;
+      margin-block-end: var(--ds-control-group-single-row-compensation);
+    }
   }
 
   .ds.tabs .tabs-list {
@@ -32,7 +46,9 @@
 
     /* Full-width muted baseline; the active tab paints a highlighted segment
        over it (see Tabs.Tab). */
-    border-bottom: var(--tabs-border-width) solid var(--color-border-muted);
+    border: 0;
+    box-shadow: inset 0 calc(-1 * var(--tabs-border-width)) 0
+      var(--color-border-muted);
 
     /* Overflow: the strip scrolls horizontally when the tabs exceed the
        container width (Figma "Overflow"). */

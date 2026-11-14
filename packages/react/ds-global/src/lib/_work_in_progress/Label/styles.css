@@ -8,7 +8,7 @@
    * DSL anatomy mapping:
    * - layout.display: inline -> display: inline
    * - typography.size: font/size/label -> font-size: var(--font-size-label)
-   * - typography.weight: font/weight/medium -> font-weight: var(--font-weight-medium)
+   * - typography.weight: font/weight/default -> font-weight: var(--font-weight-default)
    */
   .ds.label {
     /* layout.display: inline */
@@ -17,8 +17,8 @@
     /* typography.size: font/size/label */
     font-size: var(--label-font-size, var(--font-size-label, 0.75rem));
 
-    /* typography.weight: font/weight/medium */
-    font-weight: var(--label-font-weight, var(--font-weight-medium, 500));
+    /* typography.weight: font/weight/default */
+    font-weight: var(--label-font-weight, var(--font-weight-default, 400));
 
     /* Additional styling */
     line-height: var(--label-line-height, 1.2);
