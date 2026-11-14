@@ -191,10 +191,7 @@ const writeRoute = (
       [writer.iri(`${RDFS_NAMESPACE}label`), writeLangMap(route.labels)],
       [predicate("isLoop"), [String(route.isLoop)]],
       [predicate("calls"), [`( ${route.calls.map(writer.iri).join(" ")} )`]],
-      [
-        predicate("reverse"),
-        reverse === -1 ? [] : [labelRoute(reverse)],
-      ],
+      [predicate("reverse"), reverse === -1 ? [] : [labelRoute(reverse)]],
     ],
     "  ",
   )} .\n`;
