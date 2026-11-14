@@ -12,6 +12,24 @@ export {
   HIDDEN_VISIBILITY,
 } from "./bindings/index.js";
 export type {
+  GraphBudget,
+  GraphBudgetOverrides,
+  GraphBudgetProviderProps,
+  GraphBudgetRaise,
+} from "./graphBudget/index.js";
+export {
+  createGraphBudget,
+  GRAPH_BAND_MEMBERS_MAX,
+  GRAPH_BUDGET,
+  GRAPH_DRAWN_NODES_MAX,
+  GRAPH_FETCHED_NODES_MAX,
+  GRAPH_LABEL_PX_MIN,
+  GRAPH_SVG_BYTES_MAX,
+  GRAPH_SVG_ELEMENTS_MAX,
+  GraphBudgetProvider,
+  useGraphBudget,
+} from "./graphBudget/index.js";
+export type {
   HomeNode,
   HomeResolver,
   Homes,
