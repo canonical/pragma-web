@@ -3,8 +3,9 @@
 # Reference: the W3 card anatomy: the slot order mark, prefix, title,
 # address, kind, summary, facts, status; any node fills the mark (the
 # generic node glyph), the prefix (the compact address's; a node whose
-# address did not compact has none), the title, the address (in full), the
-# kind (its class) and the summary (its asserted definition). Any node
+# address did not compact has none), the title, the kind (its class: any
+# node's lists mix types) and the summary (its asserted definition); it
+# passes no address, which the peek's own line shows in full. Any node
 # carries no facts, status or depiction, so it draws no specimen.
 # Projected onto EntityCard, which carries every style: this anatomy binds
 # none. The home is the link the title renders through, resolved from the
@@ -49,13 +50,6 @@ node:
             relation:
               cardinality: "1"
               slotName: title
-          - node:
-              role: address
-              projection:
-                field: _meta.curie
-            relation:
-              cardinality: "1"
-              slotName: address
           - node:
               role: kind
               projection:

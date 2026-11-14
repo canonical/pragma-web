@@ -44,8 +44,9 @@ const componentCssClassName = "ds node-card";
  * Any graph node as a card in a grid of entities, from what every node
  * carries, in the slot order: the generic node glyph as its mark and its
  * namespace prefix leading its title, the title linked to its home when
- * the site has one and inert text when it has none, its full address, its
- * class's title as its kind and its definition as its summary. A node
+ * the site has one and inert text when it has none, its class's title as
+ * its kind (any node's lists mix types) and its definition as its summary.
+ * It passes no address: the peek's own line shows the full CURIE. A node
  * whose address did not compact has no prefix; any node has no facts, no
  * status and no specimen.
  *
@@ -76,7 +77,6 @@ export default function NodeCard({
   return (
     <EntityCard
       {...props}
-      address={curie}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}

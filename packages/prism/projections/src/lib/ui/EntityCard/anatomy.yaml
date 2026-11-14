@@ -1,6 +1,13 @@
 ---
 # EntityCard — an entity as a card in a grid of entities: 209x345 at two
 # intrinsic columns.
+#
+# What an arm passes (say it once, heuristics 2.5 and 4.3): a card arm
+# passes no address, since the full CURIE shows on the peek's own line
+# under the card and the foreign prefix already says where the entity is
+# from; a typed card arm passes no kind, since its index states the type
+# once for every card. Only the generic Node arm, whose lists mix types,
+# passes a kind. The address slot stays for a card shown alone.
 # Reference: the projection matrix's cards (location, title with its parent,
 # kind, summary, the key values with a rule above each pair, the footer's
 # muted vitals) and its side panel, the sidecar. Slot order: location,
