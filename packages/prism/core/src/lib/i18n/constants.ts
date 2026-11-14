@@ -22,6 +22,7 @@ export const MESSAGES = {
   "filterFold.label": "Filter · {count}",
   "filterFold.name": "Filter, {count} applied",
   "filterBar.label": "Facets",
+  "filterBar.more": "More filters",
   "filterPanel.label": "Filters",
   "filterSheet.title": "Filters",
   "filterSheet.close": "Close",

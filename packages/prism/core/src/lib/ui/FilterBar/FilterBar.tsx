@@ -12,8 +12,10 @@ const componentCssClassName = "ds filter-bar";
  * The facet bar: the second band under the strip, for a lens that places
  * its facets in a bar. Its controls start under the strip's Search and
  * run on one line to the last column, the applied chips after the facets;
- * it touches the strip above it. Below two groups it is not displayed, and
- * the sheet holds its content.
+ * it touches the strip above it. Below three groups the facets fold under
+ * "More filters", a native disclosure whose panel overlays the canvas, so
+ * the bar stays one line and the chips stay in it. Below two groups it is
+ * not displayed, and the sheet holds its content.
  *
  * `import { FilterBar } from "@canonical/prism-core";`
  *
@@ -36,9 +38,12 @@ export default function FilterBar({
       data-region="filter-bar"
     >
       <div className="controls">
-        <div className="facets" data-slot="facets">
-          {facets}
-        </div>
+        <details className="more">
+          <summary className="summary">{t("filterBar.more")}</summary>
+          <div className="facets" data-slot="facets">
+            {facets}
+          </div>
+        </details>
         {isRenderedNode(chips) ? (
           <div className="chips" data-slot="chips">
             {chips}

@@ -20,10 +20,21 @@ describe("FilterBar", () => {
     expect(slots).toEqual(["facets", "chips"]);
   });
 
+  it("folds the facets under a disclosure named More filters", () => {
+    render(<FilterBar facets={<button type="button">Zone</button>} />);
+    const more = screen.getByText("More filters").closest("details");
+    expect(more?.querySelector('[data-slot="facets"]')?.textContent).toBe(
+      "Zone",
+    );
+    expect(more?.open).toBe(false);
+  });
+
   it("renders the chips only when given", () => {
     render(<FilterBar facets="Zone" />);
     expect(
-      screen.getByRole("group").querySelector('[data-slot="chips"]'),
+      screen
+        .getByRole("group", { name: "Facets" })
+        .querySelector('[data-slot="chips"]'),
     ).toBeNull();
   });
 

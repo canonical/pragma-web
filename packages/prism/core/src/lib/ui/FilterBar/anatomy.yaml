@@ -8,7 +8,14 @@
 # last column line. It bleeds upward across the layout's row gap (a
 # negative block margin of one gutter), so the two bands touch and the
 # layout keeps one gap variable on both axes. It is one line at every
-# width: its controls never wrap. Below two groups the bar is not
+# width: its controls never wrap. The facets sit in a native disclosure,
+# "More filters": at three groups and wider its summary is not displayed
+# and its content is drawn in the row (the facet buttons fit the
+# columns from 5); below three groups (six columns at 1366, about 330px
+# from column 5) the buttons do not fit, so the summary is displayed and
+# the open disclosure's panel overlays the canvas under the bar, as wide
+# as the controls, its buttons wrapping inside it; the chips stay in the
+# bar. It works without scripts. Below two groups the bar is not
 # displayed: its content is the sheet's.
 #
 # Every decision is read through a component token declared on the root
@@ -18,13 +25,20 @@
 #   --filter-bar-divider-width: 1px  the hairline below the band.
 #   --filter-bar-bleed: calc(-1 * var(--grid-gutter))  the negation of
 #     grid.gutter (inline start and block start alike).
-#   space.100 (8px) between the controls.
+#   space.100 (8px) between the controls, and the panel's inset.
+#   layout.stack 1: the panel sits over the canvas's in-flow content; no
+#     semantic stacking symbol exists.
+#   layout.offset.blockStart 100%: the panel starts under the controls
+#     (an unthemable percentage).
 #
 # Reflow, bound in styles.css:
+#   @container shell (width >= 1376px)  three groups and wider: the
+#     disclosure's summary is not displayed and its content is drawn.
 #   @container shell (width < 912px)  below two groups: not displayed.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
-# density.line.height, component.padding.block, space.100.
+# density.line.height, component.padding.block, space.100, and the
+# semantic typography symbol typography.text.primary.bold.fontWeight.
 node:
   uri: prism.component.filter_bar
   styles:
@@ -55,10 +69,38 @@ node:
           layout.wrap: nowrap
           size.min.width: 0
           spacing.gap: space.100
+          layout.position: relative
         edges:
           - node:
-              role: facets slot
-            relation: { cardinality: "1", slotName: facets }
+              role: more (a native disclosure)
+              styles:
+                size.min.width: 0
+              edges:
+                - node:
+                    role: summary
+                    styles:
+                      interaction.cursor: pointer
+                      typography.whiteSpace: nowrap
+                      typography.weight: typography.text.primary.bold.fontWeight
+                  relation: { cardinality: "1", slotName: summary }
+                - node:
+                    role: facets slot (the panel below three groups)
+                    styles:
+                      layout.position: absolute
+                      layout.offset.blockStart: 100%
+                      layout.offset.inlineStart: 0
+                      layout.offset.inlineEnd: 0
+                      layout.stack: 1
+                      spacing.internal.block.start: space.100
+                      spacing.internal.block.end: space.100
+                      spacing.internal.inline.start: space.100
+                      spacing.internal.inline.end: space.100
+                      appearance.background: color.background
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.color: color.border.muted
+                  relation: { cardinality: "1", slotName: facets }
+            relation: { cardinality: "1", slotName: more }
           - node:
               role: chips slot
             relation: { cardinality: "0..1", slotName: chips }

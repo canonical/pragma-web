@@ -14,8 +14,15 @@
     --filter-bar-padding-inline-start: var(--grid-gutter);
     --filter-bar-divider-width: 1px;
     --filter-bar-divider-color: var(--color-border-muted);
-    /* One baseline pair, between the controls. */
+    /* One baseline pair, between the controls and inside the panel. */
     --filter-bar-spacing: var(--space-100);
+    --filter-bar-summary-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+    --filter-bar-overlay-stack: 1;
+    --filter-bar-overlay-background: var(--color-background);
+    --filter-bar-overlay-border-width: 1px;
+    --filter-bar-overlay-border-color: var(--color-border-muted);
 
     grid-column: 1 / -1;
     display: grid;
@@ -43,6 +50,52 @@
     flex-wrap: nowrap;
     min-inline-size: 0;
     gap: var(--filter-bar-spacing);
+    position: relative;
+  }
+
+  /* The facets' disclosure: below three groups its summary names it and
+   * its open panel overlays the canvas under the bar, as wide as the
+   * controls, so the bar stays one line. */
+  .ds.filter-bar > .controls > .more {
+    min-inline-size: 0;
+  }
+
+  .ds.filter-bar > .controls > .more > .summary {
+    cursor: pointer;
+    white-space: nowrap;
+    font-weight: var(--filter-bar-summary-font-weight);
+  }
+
+  .ds.filter-bar > .controls > .more > .facets {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline: 0;
+    z-index: var(--filter-bar-overlay-stack);
+    padding: var(--filter-bar-spacing);
+    background: var(--filter-bar-overlay-background);
+    border-width: var(--filter-bar-overlay-border-width);
+    border-style: solid;
+    border-color: var(--filter-bar-overlay-border-color);
+  }
+
+  /* At three groups and wider the facet buttons fit the columns from the
+   * fifth line: the summary is not displayed and the disclosure's content
+   * is drawn in the row. */
+  @container shell (width >= 1376px) {
+    .ds.filter-bar > .controls > .more > .summary {
+      display: none;
+    }
+
+    .ds.filter-bar > .controls > .more::details-content {
+      content-visibility: visible;
+    }
+
+    .ds.filter-bar > .controls > .more > .facets {
+      position: static;
+      padding: 0;
+      border-width: 0;
+      background: transparent;
+    }
   }
 
   /* Below two groups the sheet holds the facets. */
