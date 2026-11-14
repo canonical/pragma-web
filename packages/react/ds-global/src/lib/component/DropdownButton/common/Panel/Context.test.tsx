@@ -16,7 +16,16 @@ describe("Context", () => {
   it("carries the value provided", () => {
     render(
       <Context.Provider
-        value={{ panelId: "panel", isOpen: false, setOpen: () => {} }}
+        value={{
+          panelId: "panel",
+          isOpen: false,
+          setOpen: () => {},
+          kind: "dialog",
+          registerMenu: () => () => {},
+          focusIntent: "first",
+          setFocusIntent: () => {},
+          hide: () => {},
+        }}
       >
         <ReadPanelId />
       </Context.Provider>,

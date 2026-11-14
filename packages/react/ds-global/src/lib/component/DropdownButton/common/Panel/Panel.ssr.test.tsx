@@ -36,6 +36,11 @@ describe("DropdownPanel SSR", () => {
           anchorName: "--_R_1_",
           isOpen: false,
           setOpen: () => {},
+          kind: "dialog",
+          registerMenu: () => () => {},
+          focusIntent: "first",
+          setFocusIntent: () => {},
+          hide: () => {},
         }}
       >
         <Component

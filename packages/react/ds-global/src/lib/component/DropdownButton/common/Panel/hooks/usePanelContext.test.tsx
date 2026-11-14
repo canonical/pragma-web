@@ -16,6 +16,11 @@ describe("usePanelContext", () => {
       panelId: "p",
       isOpen: true,
       setOpen: () => {},
+      kind: "dialog",
+      registerMenu: () => () => {},
+      focusIntent: "first",
+      setFocusIntent: () => {},
+      hide: () => {},
     };
     const wrapper = ({ children }: { children: ReactNode }) => (
       <Context.Provider value={value}>{children}</Context.Provider>

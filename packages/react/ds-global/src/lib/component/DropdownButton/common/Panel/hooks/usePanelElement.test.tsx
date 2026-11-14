@@ -13,6 +13,11 @@ const createPanel = (
   triggerId: "trigger",
   isOpen: false,
   setOpen: vi.fn(),
+  kind: "dialog",
+  registerMenu: () => () => {},
+  focusIntent: "first",
+  setFocusIntent: vi.fn(),
+  hide: vi.fn(),
   ...overrides,
 });
 
@@ -79,6 +84,7 @@ describe("usePanelElement", () => {
       result.current.handleToggle(createToggle("closed", element));
     });
     expect(onBeforeToggle).toHaveBeenCalledTimes(1);
+    expect(panel.setFocusIntent).toHaveBeenCalledWith("first");
     expect(document.activeElement).toBe(trigger);
   });
 
@@ -103,5 +109,26 @@ describe("usePanelElement", () => {
     expect(onToggle).toHaveBeenCalledTimes(1);
     expect(onBeforeToggle).toHaveBeenCalledTimes(1);
     expect(panel.setOpen).not.toHaveBeenCalled();
+  });
+
+  it("keeps focus where it was for a menu open before hydration", () => {
+    document.body.innerHTML =
+      '<div id="panel"><a class="ds dropdown-button-menu-item" href="#a">A</a><a class="ds dropdown-button-menu-item" href="#b">B</a></div><button id="out">Out</button>';
+    const element = document.getElementById("panel") as HTMLDivElement;
+    Object.assign(element, {
+      matches: (selector: string) => selector === ":popover-open",
+    });
+    const panel = createPanel();
+    const { result } = renderHook(() =>
+      usePanelElement({ elementRef: createRef(), panel }),
+    );
+    (document.querySelector('[href="#b"]') as HTMLElement).focus();
+    act(() => result.current.attachElement(element));
+    expect(panel.setFocusIntent).toHaveBeenLastCalledWith(1);
+    act(() => result.current.attachElement(null));
+    (document.getElementById("out") as HTMLElement).focus();
+    act(() => result.current.attachElement(element));
+    expect(panel.setFocusIntent).toHaveBeenLastCalledWith("none");
+    expect(panel.setOpen).toHaveBeenLastCalledWith(true);
   });
 });

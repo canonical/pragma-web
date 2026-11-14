@@ -4,10 +4,11 @@ import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import installPopoverStandIn from "../../../../../../testing/installPopoverStandIn.js";
+import Menu from "../Menu/Menu.js";
 import Context from "./Context.js";
 import { usePanelContext } from "./hooks/index.js";
-import Component from "./Provider.js";
 import type { PanelContextValue } from "./hooks/types.js";
+import Component from "./Provider.js";
 import type { DropdownPanelHandle } from "./types.js";
 
 let uninstall: () => void;
@@ -54,6 +55,11 @@ const createContextValue = (
   anchorName: "--panel",
   isOpen: false,
   setOpen: vi.fn(),
+  kind: "dialog",
+  registerMenu: () => () => {},
+  focusIntent: "first",
+  setFocusIntent: vi.fn(),
+  hide: vi.fn(),
   ...overrides,
 });
 
@@ -436,6 +442,57 @@ describe("DropdownPanel", () => {
         </Context.Provider>,
       );
       expect(screen.getByTestId("open")).toHaveTextContent("true");
+    });
+  });
+
+  describe("menu mode", () => {
+    const renderMenuPanel = () =>
+      renderPanel(
+        <>
+          <Menu items={[{ key: "copy", label: "Copy" }]} data-testid="menu" />
+          <OpenState />
+        </>,
+        { "aria-label": "Actions" },
+      );
+
+    it("takes no role and no name: the menu carries them", () => {
+      const { panel } = renderMenuPanel();
+      expect(panel).not.toHaveAttribute("role");
+      expect(panel).not.toHaveAttribute("aria-label");
+    });
+
+    it("hands its name to the menu inside", () => {
+      const NameProbe = () => {
+        const panel = usePanelContext();
+        return <output data-testid="name">{panel?.label}</output>;
+      };
+      renderPanel(<NameProbe />, { "aria-label": "Actions" });
+      expect(screen.getByTestId("name")).toHaveTextContent("Actions");
+    });
+
+    it("leaves focus to the menu when it opens", async () => {
+      const { panel, trigger } = renderMenuPanel();
+      act(() => trigger.focus());
+      fireEvent.click(trigger);
+      await flushToggles();
+      expect(document.activeElement).not.toBe(panel);
+    });
+
+    it("resets the menu's focus intent when it closes", async () => {
+      const value = createContextValue();
+      const ref = createRef<DropdownPanelHandle>();
+      render(
+        <Context.Provider value={value}>
+          <Component ref={ref} id="panel" aria-label="Options">
+            Content
+          </Component>
+        </Context.Provider>,
+      );
+      act(() => ref.current?.show());
+      await flushToggles();
+      act(() => ref.current?.hide());
+      await flushToggles();
+      expect(value.setFocusIntent).toHaveBeenCalledWith("first");
     });
   });
 
