@@ -16,6 +16,7 @@
     --filter-sheet-title-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
+    --filter-sheet-close-color: var(--color-text-link);
 
     position: fixed;
     top: 0;
@@ -51,6 +52,17 @@
     margin-block: 0;
     font-size: inherit;
     font-weight: var(--filter-sheet-title-font-weight);
+  }
+
+  /* The close link, drawn as the trail's links are: the link colour,
+   * underlined only under the pointer. */
+  .ds.filter-sheet > .header > .close {
+    color: var(--filter-sheet-close-color);
+    text-decoration: none;
+  }
+
+  .ds.filter-sheet > .header > .close:hover {
+    text-decoration: underline;
   }
 
   .ds.filter-sheet > .content {

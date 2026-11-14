@@ -75,7 +75,9 @@ export default function FilterSheet({
         <h2 className="title" ref={title} tabIndex={-1}>
           {t("filterSheet.title")}
         </h2>
-        <RouterLink href={closeHref}>{t("filterSheet.close")}</RouterLink>
+        <RouterLink className="close" href={closeHref}>
+          {t("filterSheet.close")}
+        </RouterLink>
       </div>
       <div className="content">{children}</div>
     </dialog>

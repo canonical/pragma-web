@@ -7,7 +7,8 @@
 # (nothing can call showModal before scripts run), so it is positioned
 # over the shell: fixed, every inset 0, the full viewport, on the page's
 # background, above the canvas's in-flow content. It holds a header (the
-# title, then the close link at the end) and a scrolling content column:
+# title, then the close link at the end, drawn as the trail's links
+# are) and a scrolling content column:
 # the count, the applied chips, Search, then the facets, one gutter apart,
 # the same parts the panel or the bar hold at wider widths. It is not
 # displayed unless it is open below two groups, whatever the address says:
@@ -82,6 +83,10 @@ node:
             relation: { cardinality: "1", slotName: title }
           - node:
               uri: prism.component.router_link
+              styles:
+                typography.color: color.text.link
+                typography.decoration: none
+                typography.decoration@hover: underline
             relation: { cardinality: "1", slotName: close }
       relation: { cardinality: "1", slotName: header }
     - node:
