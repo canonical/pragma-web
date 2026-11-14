@@ -1,11 +1,15 @@
 /**
- * Static fixtures for the site lens tests.
+ * Static fixtures for the site lens and class-edge tests.
  *
  * The outline is a small hierarchy with a diamond: `Hub` is both an `Agent`
  * and a `Place`, which declare disagreeing lens facts at the same distance.
  * `Spectre` descends from `Ghost`, a class the outline does not know.
  */
 
+import type {
+  ClassEdgeDeclaration,
+  ClassEdgeObservation,
+} from "../lib/edges/types.js";
 import type { SiteLens, TBoxOutline } from "../lib/lens/types.js";
 
 /** The fixtures' namespace. */
@@ -97,3 +101,44 @@ export const SITE_LENS_FIXTURE: SiteLens = {
     { uri: `${EX}ghostProperty`, visibility: "HIDDEN" },
   ],
 };
+
+/** Declared class edges over {@link LENS_OUTLINE}. */
+export const EDGE_DECLARATIONS: readonly ClassEdgeDeclaration[] = [
+  { property: `${EX}worksFor`, domain: `${EX}Person`, range: `${EX}Agent` },
+  { property: `${EX}locatedIn`, domain: `${EX}Thing`, range: `${EX}Place` },
+  { property: `${EX}employs`, domain: `${EX}Agent`, range: `${EX}Person` },
+];
+
+/** Instance statements between classes, counted by class pair. */
+export const EDGE_OBSERVATIONS: readonly ClassEdgeObservation[] = [
+  {
+    property: `${EX}worksFor`,
+    subjectClass: `${EX}Employee`,
+    objectClass: `${EX}Hub`,
+    count: 3,
+  },
+  {
+    property: `${EX}worksFor`,
+    subjectClass: `${EX}Person`,
+    objectClass: `${EX}Agent`,
+    count: 2,
+  },
+  {
+    property: `${EX}locatedIn`,
+    subjectClass: `${EX}Hub`,
+    objectClass: `${EX}Hub`,
+    count: 4,
+  },
+  {
+    property: `${EX}worksFor`,
+    subjectClass: `${EX}Place`,
+    objectClass: `${EX}Agent`,
+    count: 1,
+  },
+  {
+    property: `${EX}name`,
+    subjectClass: `${EX}Agent`,
+    objectClass: `${EX}Thing`,
+    count: 5,
+  },
+];
