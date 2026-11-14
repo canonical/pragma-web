@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { HIDDEN_VISIBILITY } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeList_node.graphql.js";
@@ -7,7 +8,6 @@ import { DEFAULT_ENTITY_LIST_RENDERER } from "../../ui/EntityList/constants.js";
 import { EntityList } from "../../ui/index.js";
 import { CardProjection } from "../CardProjection/index.js";
 import { RowProjection } from "../RowProjection/index.js";
-import { HIDDEN_VISIBILITY } from "./constants.js";
 import type { NodeListProps } from "./types.js";
 import "./styles.css";
 

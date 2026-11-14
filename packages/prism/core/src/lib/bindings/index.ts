@@ -7,5 +7,6 @@
 
 export { default as assertBindings } from "./assertBindings.js";
 export { default as assertBindingsLive } from "./assertBindingsLive.js";
+export { HIDDEN_VISIBILITY } from "./constants.js";
 export { default as defineBinding } from "./defineBinding.js";
 export type { EntityBinding, GraphQLExecute } from "./types.js";

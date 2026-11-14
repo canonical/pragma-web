@@ -437,8 +437,8 @@ site's own catalog, and the factory holds no reader-facing string.
   `HomeNode`, `HomesProviderProps`.
 - Stored theme: `StoredThemeProvider`, `useStoredTheme`; types
   `StoredThemeProviderProps`.
-- Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`; types
-  `EntityBinding`, `GraphQLExecute`.
+- Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`,
+  `HIDDEN_VISIBILITY`; types `EntityBinding`, `GraphQLExecute`.
 - Relay: `createEnvironment`, `getPrefetchEnvironment`,
   `setPrefetchEnvironment`, `prefetchQuery`, `prepareRelayData`; types
   `CreateEnvironmentOptions`, `PrepareRelayDataOptions`, `PreparedRelayData`.

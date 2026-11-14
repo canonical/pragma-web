@@ -9,6 +9,7 @@ export {
   assertBindings,
   assertBindingsLive,
   defineBinding,
+  HIDDEN_VISIBILITY,
 } from "./bindings/index.js";
 export type {
   HomeNode,

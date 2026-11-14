@@ -12,6 +12,7 @@ export const BINDING_PROBE_QUERY =
 /**
  * The visibility a type lens gives a class whose instances are values, never
  * entities: no index may list them.
+ * Not the contract's value: its entry reads the file system on import.
  */
 export const HIDDEN_VISIBILITY: TermVisibility = "HIDDEN";
 
