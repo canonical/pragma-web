@@ -14,7 +14,8 @@ const componentCssClassName = "ds entity-command";
  * `LinkComponent`; without one it is inert text.
  *
  * It renders only the slots it is given, in the slot order every
- * representation keeps: mark, title, address, kind, status. With an
+ * representation keeps: mark, prefix, title, address, kind, status. The
+ * first line holds the prefix, when given, then the title. With an
  * `address` the second line is that address in monospace and the kind
  * closes the first line, the status the second. Without one the second
  * line is the transitional "kind in location": with both, the catalog's
@@ -34,6 +35,7 @@ const componentCssClassName = "ds entity-command";
  */
 export default function EntityCommand({
   mark,
+  prefix,
   title,
   href,
   LinkComponent = "a",
@@ -64,13 +66,18 @@ export default function EntityCommand({
         </span>
       )}
       <span className="identity">
-        {href === undefined ? (
-          <span className="title">{title}</span>
-        ) : (
-          <LinkComponent className="title" href={href}>
-            {title}
-          </LinkComponent>
-        )}
+        <span className="headline">
+          {prefix === undefined ? null : (
+            <span className="prefix">{prefix}</span>
+          )}
+          {href === undefined ? (
+            <span className="title">{title}</span>
+          ) : (
+            <LinkComponent className="title" href={href}>
+              {title}
+            </LinkComponent>
+          )}
+        </span>
         {address === undefined ? null : (
           <span className="address">{address}</span>
         )}

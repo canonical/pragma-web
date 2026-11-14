@@ -11,6 +11,13 @@ type OwnProps = {
    * title.
    */
   readonly mark?: ReactNode;
+  /**
+   * The entity's foreign prefix with its colon, such as `cs:`, in monospace
+   * before the title on the first line; an arm passes
+   * `useForeignPrefix(curie)`, so it is given only off the page's
+   * namespace.
+   */
+  readonly prefix?: ReactNode;
   /** The entity's name, on the first line. */
   readonly title: ReactNode;
   /**

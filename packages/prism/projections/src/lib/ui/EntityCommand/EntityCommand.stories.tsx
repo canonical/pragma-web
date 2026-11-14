@@ -102,3 +102,18 @@ export const Identity: Story = {
     status: "Stable",
   },
 };
+
+/**
+ * A result off the page's namespace: its foreign prefix, muted in
+ * monospace, leads the title on the first line.
+ */
+export const ForeignPrefix: Story = {
+  args: {
+    href: "#link-component",
+    mark: <Icon icon="information" />,
+    prefix: "cs:",
+    title: "Link component",
+    address: "cs:react.component.link_component",
+    kind: "Standard",
+  },
+};

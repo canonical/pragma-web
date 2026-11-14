@@ -35,8 +35,10 @@
 # with the rest, so it reads apart from a row that opens a page; it keeps
 # the selected background, so the keyboard's selection still shows on it.
 #
-# The identity slots (heuristic 4.1), in their order: mark, title,
-# address, kind, status. The mark leads the first line, its 16px centred
+# The identity slots (heuristic 4.1), in their order: mark, prefix, title,
+# address, kind, status. The first line, the headline, holds the foreign
+# prefix (muted, monospace, never shrinking) when given, then the title,
+# which takes what is left and truncates. The mark leads the first line, its 16px centred
 # in the 24px line by a 4px offset. With an address, the full CURIE in
 # monospace takes the second line, and the aside at the row's end holds
 # the kind on the first line and the status on the second (pushed down by
@@ -52,6 +54,7 @@
 #   shim's block component padding (8px) would make it 64px.
 #   --entity-command-focus-ring-width: 2px, --entity-command-focus-ring-offset: -2px
 #                                      the link's ring, drawn inside it since the title clips.
+#   --entity-command-prefix-font-family: ui-monospace, monospace
 #   --entity-command-address-font-family: ui-monospace, monospace
 #                                      literal: no typography token names a
 #                                      monospace face.
@@ -104,20 +107,36 @@ node:
           size.min.width: 0
         edges:
           - node:
-              role: title
+              role: headline
               styles:
+                layout.type: flex
                 layout.overflow.inline: clip
-                typography.whiteSpace: nowrap
-                typography.overflow: ellipsis
-                typography.weight: typography.text.primary.bold.fontWeight
-                typography.color: inherit
-                typography.decoration: none
-                typography.decoration@hover: underline
-                appearance.outline.width@focus: 2px
-                appearance.outline.style@focus: solid
-                appearance.outline.color@focus: color.focusRing
-                appearance.outline.offset@focus: -2px
-            relation: { cardinality: "1", slotName: title }
+                size.min.width: 0
+              edges:
+                - node:
+                    role: prefix
+                    styles:
+                      layout.flex.shrink: 0
+                      typography.color: color.text.muted
+                      typography.fontFamily: "ui-monospace, monospace"
+                  relation: { cardinality: "0..1", slotName: prefix }
+                - node:
+                    role: title
+                    styles:
+                      layout.overflow.inline: clip
+                      size.min.width: 0
+                      typography.whiteSpace: nowrap
+                      typography.overflow: ellipsis
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      typography.color: inherit
+                      typography.decoration: none
+                      typography.decoration@hover: underline
+                      appearance.outline.width@focus: 2px
+                      appearance.outline.style@focus: solid
+                      appearance.outline.color@focus: color.focusRing
+                      appearance.outline.offset@focus: -2px
+                  relation: { cardinality: "1", slotName: title }
+            relation: { cardinality: "1", slotName: headline }
           - node:
               role: address
               styles:

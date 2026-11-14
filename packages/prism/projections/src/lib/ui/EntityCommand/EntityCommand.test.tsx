@@ -119,11 +119,13 @@ describe("EntityCommand", () => {
           href="#button"
           kind="Component"
           mark={<span className="glyph" />}
+          prefix="ds:"
           status={<span>New</span>}
           title="Button"
         />,
       );
       expectSlotOrder(row);
+      expect(row.querySelector(".headline")?.textContent).toBe("ds:Button");
       expect(row.querySelector(".mark")?.getAttribute("aria-hidden")).toBe(
         "true",
       );

@@ -25,6 +25,9 @@
     );
     --entity-command-vital-color: var(--color-text-muted);
     --entity-command-mark-offset: var(--space-050);
+    --entity-command-prefix-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-command-prefix-font-family: ui-monospace, monospace;
     --entity-command-address-color: var(--color-text-muted);
     /* No typography token names a monospace face. */
     --entity-command-address-font-family: ui-monospace, monospace;
@@ -80,10 +83,26 @@
     min-width: 0;
   }
 
+  /* The first line: the prefix, then the title, which takes what is left
+   * and truncates, so the line never wraps. */
+  .ds.entity-command .headline {
+    display: flex;
+    overflow-x: clip;
+    min-width: 0;
+  }
+
+  /* The foreign prefix, muted in monospace, keeps its whole width. */
+  .ds.entity-command .prefix {
+    flex-shrink: 0;
+    color: var(--entity-command-prefix-color);
+    font-family: var(--entity-command-prefix-font-family);
+  }
+
   /* The title truncates on its line, as the second line does; linked, it
    * reads as the row's text, underlined on approach. */
   .ds.entity-command .title {
     overflow-x: clip;
+    min-width: 0;
     color: inherit;
     white-space: nowrap;
     text-decoration: none;

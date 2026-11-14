@@ -11,6 +11,7 @@ import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
 import testQuery, {
   type NodeCommandTestQuery,
 } from "../../../__generated__/NodeCommandTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import NodeCommand from "./NodeCommand.js";
 import type { NodeCommandProps } from "./types.js";
 
@@ -100,6 +101,24 @@ describe("NodeCommand", () => {
       "/icons/file-blank.svg#file-blank",
     );
     expect(container.querySelector(".context, .vital, .status")).toBeNull();
+  });
+
+  it("shows its prefix only when its namespace is not the page's", () => {
+    const foreign = renderWithNode((node) => (
+      <ul>
+        <NodeCommand node={node} />
+      </ul>
+    ));
+    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
+    foreign.unmount();
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <ul>
+          <NodeCommand node={node} />
+        </ul>
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
   });
 
   it("links its title to the home of a type the site homes", () => {
