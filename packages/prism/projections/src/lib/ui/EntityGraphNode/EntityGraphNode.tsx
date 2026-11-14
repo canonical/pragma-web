@@ -6,6 +6,8 @@ import {
   GRAPH_NODE_HEIGHT,
   GRAPH_NODE_INSET,
   GRAPH_NODE_LINE,
+  GRAPH_NODE_MARK,
+  GRAPH_NODE_MARK_GAP,
   GRAPH_NODE_RADIUS,
   GRAPH_NODE_STROKE,
   GRAPH_NODE_WIDTH,
@@ -40,7 +42,13 @@ const CONTEXT_Y = TITLE_Y + GRAPH_NODE_LINE;
  * by a nested SVG viewport over the inner box rather than a clip path: a
  * clip path is addressed by a document-wide id, and an id React derives
  * from the tree's position can differ between the server and the client.
- * It renders only the slots it is given, so it renders anywhere in an SVG.
+ * It renders only the slots it is given, in the slot order every
+ * representation keeps: mark, prefix, title, kind. The mark, a 16px SVG
+ * viewport on the title's line, moves both lines' text past it; it names
+ * nothing, so it is hidden from assistive technology, and it stays drawn
+ * below the size the text can be read at, so no node at the graph's
+ * fitted zoom lacks one. The prefix leads the title's text, muted in
+ * monospace. It renders anywhere in an SVG.
  *
  * Native props reach the `<g>` root; a consumer `className` merges after
  * the node's own.
@@ -52,6 +60,8 @@ const CONTEXT_Y = TITLE_Y + GRAPH_NODE_LINE;
  *   for the "kind in location" line.
  */
 export default function EntityGraphNode({
+  mark,
+  prefix,
   title,
   href,
   LinkComponent = "a",
@@ -69,6 +79,10 @@ export default function EntityGraphNode({
   const innerWidth = Math.max(0, width - 2 * TEXT_X);
   const hasContext = kind !== undefined || location !== undefined;
   const titleY = hasContext ? TITLE_Y : height / 2;
+  const textX =
+    mark === undefined
+      ? TEXT_X
+      : TEXT_X + GRAPH_NODE_MARK + GRAPH_NODE_MARK_GAP;
   const kindSlot =
     kind === undefined ? undefined : <tspan className="kind">{kind}</tspan>;
   const locationSlot =
@@ -100,6 +114,18 @@ export default function EntityGraphNode({
         x={GRAPH_NODE_STROKE / 2}
         y={GRAPH_NODE_STROKE / 2}
       />
+      {mark === undefined ? null : (
+        <svg
+          aria-hidden="true"
+          className="mark"
+          height={GRAPH_NODE_MARK}
+          width={GRAPH_NODE_MARK}
+          x={TEXT_X}
+          y={titleY - GRAPH_NODE_MARK / 2}
+        >
+          {mark}
+        </svg>
+      )}
       {showText ? (
         // The inner box's own viewport, in the node's coordinates, clips
         // every line at the inset.
@@ -120,9 +146,12 @@ export default function EntityGraphNode({
             dominantBaseline="central"
             fill="currentColor"
             fontStyle={hollow ? "italic" : undefined}
-            x={TEXT_X}
+            x={textX}
             y={titleY}
           >
+            {prefix === undefined ? null : (
+              <tspan className="prefix">{prefix} </tspan>
+            )}
             {href === undefined ? (
               title
             ) : (
@@ -148,7 +177,7 @@ export default function EntityGraphNode({
               className="context"
               dominantBaseline="central"
               fill="currentColor"
-              x={TEXT_X}
+              x={textX}
               y={CONTEXT_Y}
             >
               {kindSlot === undefined || locationSlot === undefined ? (

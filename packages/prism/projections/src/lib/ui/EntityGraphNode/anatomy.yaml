@@ -39,13 +39,22 @@
 # alone. The italic is the title's `font-style` attribute: the roster has
 # no font-style key.
 #
+# The identity slots (heuristic 4.1), in their order: mark, prefix, title,
+# kind. The mark is a 16px nested SVG viewport on the title's line, 8px
+# in from the border, holding the projection's SVG sign (GRAPH_NODE_MARK
+# 16 and GRAPH_NODE_MARK_GAP 4 move both lines' text past it); it is drawn
+# whether or not the text is, so a graph zoomed below the text's legible
+# size still shows every node's mark. The prefix is a tspan leading the
+# title's text, muted in monospace at the text's regular weight.
+#
 # Every decision is read through a component token declared on the root
 # (`--entity-graph-node-*`), bound to the symbol named here.
 #
 # Token ledger (no symbol to bind, held in constants.ts):
 #   GRAPH_NODE_HEIGHT 50, GRAPH_NODE_LINE 24, GRAPH_NODE_INSET 8,
 #   GRAPH_NODE_STROKE 1, GRAPH_NODE_RADIUS 4 and the default
-#   GRAPH_NODE_WIDTH 192, in SVG user units: SVG geometry is attributes,
+#   GRAPH_NODE_WIDTH 192, GRAPH_NODE_MARK 16 and GRAPH_NODE_MARK_GAP 4, in
+#   SVG user units: SVG geometry is attributes,
 #   not CSS.
 #   --entity-graph-node-hollow-surface-color:
 #     light-dark(oklch(94% 0 0), var(--color-background-container))
@@ -66,7 +75,8 @@
 #                                      for `code`.
 #
 # Roster namespaces (accepted and tracked): the semantic typography symbols
-# typography.text.primary.fontSize and
+# typography.text.primary.fontSize,
+# typography.text.primary.fontWeight and
 # typography.text.primary.bold.fontWeight.
 node:
   uri: prism.component.entity_graph_node
@@ -90,6 +100,9 @@ node:
         styles:
           typography.color: color.border
       relation: { cardinality: "1", slotName: frame }
+    - node:
+        role: mark
+      relation: { cardinality: "0..1", slotName: mark }
     - switch:
         on: internal
         cases:
@@ -98,6 +111,13 @@ node:
               styles:
                 typography.weight: typography.text.primary.bold.fontWeight
               edges:
+                - node:
+                    role: prefix
+                    styles:
+                      typography.color: color.text.muted
+                      typography.fontFamily: "ui-monospace, monospace"
+                      typography.weight: typography.text.primary.fontWeight
+                  relation: { cardinality: "0..1", slotName: prefix }
                 - node:
                     role: link
                     styles:
