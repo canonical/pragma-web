@@ -5,10 +5,7 @@ import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeChip_node.graphql.js";
-import {
-  useForeignPrefix,
-  useProjectionLink,
-} from "../../projections/index.js";
+import { useProjectionLink } from "../../projections/index.js";
 import { EntityChip } from "../../ui/index.js";
 import { useProjectionPeek } from "../ProjectionPeek/index.js";
 import { NODE_MARK_ICON } from "./constants.js";
@@ -38,8 +35,7 @@ const componentCssClassName = "ds node-chip";
 
 /**
  * Any graph node as an inline mention, from what every node carries: the
- * generic node glyph as its mark, its namespace prefix when it differs
- * from the page's ambient one, and its title in the chip's pill, linked
+ * generic node glyph as its mark and its title in the chip's pill, linked
  * to its home when the site has one and inert text when it has none or
  * `linked` is false. A linked chip peeks at the node at its absolute IRI
  * through the site's peek, `useProjectionPeek` (the package's
@@ -57,8 +53,7 @@ const componentCssClassName = "ds node-chip";
  *
  * @implements prism.component.node_chip
  * @note Impure: reads its node from the Relay store, its home from the
- *   site's homes, its link and peek from the projection provider and the
- *   page's ambient namespace.
+ *   site's homes and its link and peek from the projection provider.
  */
 export default function NodeChip({
   node,
@@ -71,7 +66,6 @@ export default function NodeChip({
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
   const peek = useProjectionPeek(data.uri);
-  const prefix = useForeignPrefix(curie);
   return (
     <EntityChip
       {...props}
@@ -81,7 +75,6 @@ export default function NodeChip({
       LinkComponent={LinkComponent}
       mark={<Icon icon={NODE_MARK_ICON} />}
       peek={peek}
-      prefix={prefix}
       title={children ?? title}
     />
   );
