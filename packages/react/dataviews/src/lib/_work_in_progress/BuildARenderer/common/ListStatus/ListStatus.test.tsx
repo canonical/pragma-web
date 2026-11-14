@@ -18,6 +18,7 @@ describe("ListStatus", () => {
       english.statusRefreshFailed("offline"),
     ],
     [{ status: "stale", reason: "offline" }, english.statusStale("offline")],
+    [{ status: "no-access" }, english.statusNoAccess],
     [{ status: "no-results" }, english.statusNoResults],
     [{ status: "no-data" }, english.statusNoData],
   ])("says a settled %o as a status message", (status, text) => {

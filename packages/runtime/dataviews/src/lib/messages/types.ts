@@ -102,6 +102,8 @@ export type DataViewsMessages = {
   readonly statusRefreshFailed: (reason: string) => string;
   /** The rows shown answer an earlier query, and why. */
   readonly statusStale: (reason: string) => string;
+  /** The source refused to show the rows to whoever asked. */
+  readonly statusNoAccess: string;
   /** The query matches no row. */
   readonly statusNoResults: string;
   /** The collection holds no row at all. */

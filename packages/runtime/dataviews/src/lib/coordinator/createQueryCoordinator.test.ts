@@ -1144,4 +1144,33 @@ describe("createQueryCoordinator", () => {
       );
     });
   });
+
+  it("withdraws every row, count and facet a forbidden request was shown", () => {
+    const coordinator = createQueryCoordinator();
+    coordinator.complete(
+      refreshRequest(coordinator),
+      succeeded([{ id: "a" }], {
+        facets: { status: { kind: "values", values: [] } },
+      }),
+    );
+    const cause = new Error("403");
+    expect(
+      coordinator.complete(refreshRequest(coordinator), {
+        status: "forbidden",
+        cause,
+      }),
+    ).toBe(true);
+    const { result, resultMatchesQuery } = coordinator.state;
+    expect(result).toMatchObject({
+      status: "failed",
+      rows: null,
+      counts: null,
+      facets: null,
+      provenance: null,
+      problem: { status: "forbidden", cause },
+    });
+    expect(resultMatchesQuery).toBe(false);
+    // A late success for an earlier request does not bring the rows back.
+    expect(coordinator.complete("i0:r0", succeeded([{ id: "a" }]))).toBe(false);
+  });
 });

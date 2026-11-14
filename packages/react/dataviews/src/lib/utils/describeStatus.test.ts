@@ -27,6 +27,15 @@ describe("describeStatus", () => {
     expect(describeStatus({ status: "no-data" }, english)).toBe(
       "There is nothing here yet.",
     );
+    expect(
+      describeStatus(
+        { status: "refused", reason: '"x" is not an option' },
+        english,
+      ),
+    ).toBe('This link could not be followed: "x" is not an option.');
+    expect(describeStatus({ status: "no-access" }, english)).toBe(
+      "You do not have permission to see these rows.",
+    );
   });
 
   it("words each status in the messages it is given", () => {
