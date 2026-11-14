@@ -6,7 +6,8 @@
  * over another, the count shortened only once the trail has given way and
  * no crumb reading as an address, the count ending on the band's last
  * line at 1440 and 1366, the facet bar one band of the strip's height on the
- * Definitions lens and absent below two groups, the folded renderer menu's
+ * Definitions lens, its controls inside the band, and absent below two
+ * groups, the folded renderer menu's
  * options as links that change only `as`, each a full target, the folded
  * sheet covering a phone's viewport, and no link to the retired `view=`
  * anywhere.
@@ -152,6 +153,41 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
       expect(bar).toBeNull();
     }
   });
+
+  it.runIf(viewport.width === 1366 || viewport.width === 912)(
+    "keeps the facet bar's controls inside the band, a chip applied",
+    async () => {
+      const page = await open(WORKSPACE_PATH);
+      try {
+        const states = [await page.evaluate(measureStrip)];
+        const chip = await page
+          .locator('[data-region="filter-bar"] button[aria-pressed="false"]')
+          .first()
+          .elementHandle();
+        if (chip !== null) {
+          await expect
+            .poll(
+              async () => {
+                await chip.click();
+                return chip.getAttribute("aria-pressed");
+              },
+              { timeout: PAGE_SETTLE_MS },
+            )
+            .not.toBe("false");
+          states.push(await page.evaluate(measureStrip));
+        }
+        for (const strip of states) {
+          expect(strip.barOverflow).toBe(false);
+          expect(strip.controlsRight).not.toBeNull();
+          expect(strip.controlsRight ?? 0).toBeLessThanOrEqual(
+            (strip.contentEnd ?? 0) + EDGE_TOLERANCE_PX,
+          );
+        }
+      } finally {
+        await page.close();
+      }
+    },
+  );
 
   it.runIf(viewport.width >= 1366)(
     "ends the count on the band's last line",
