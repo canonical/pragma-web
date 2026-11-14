@@ -6,9 +6,11 @@ import {
 } from "@canonical/prism-core";
 import { afterEach, describe, expect, expectTypeOf, it } from "vitest";
 import createFetchSpy from "../../testing/createFetchSpy.js";
+import createRecordedFetch from "../../testing/createRecordedFetch.js";
 import {
   LINES_BINDING,
   NORTHGATE_CURIE,
+  NORTHGATE_IRI,
   SITE_ROUTES,
   STATIONS_BINDING,
   STATIONS_LENS,
@@ -96,6 +98,28 @@ describe("createEntityRoutes", () => {
     );
     const [request] = fetchFn.mock.lastCall ?? [];
     expect(request?.name).toBe("EntityNamespacesQuery");
+  });
+
+  it("passes the address's renderer to the entity page's warm", async () => {
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation((request, variables, ...rest) =>
+      request.name === "EntitySourceQuery"
+        ? Promise.resolve({ data: { source: "<s> a <o> ." } })
+        : recorded(request, variables, ...rest),
+    );
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+    await SITE_ROUTES.stationsEntity.warm?.(
+      { uri: NORTHGATE_CURIE },
+      { as: "turtle" },
+      {
+        signal: new AbortController().signal,
+      },
+    );
+    const source = fetchFn.mock.calls.find(
+      ([request]) => request.name === "EntitySourceQuery",
+    );
+    expect(source?.at(1)).toEqual({ uri: NORTHGATE_IRI });
   });
 
   it("throws on a binding whose id cannot name a route", () => {
