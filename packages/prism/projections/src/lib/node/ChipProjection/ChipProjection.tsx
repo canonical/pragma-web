@@ -6,7 +6,7 @@ import nodeFragment from "../../../__generated__/ChipProjection_node.graphql.js"
 import { OntologyClassChip } from "../../ontology/index.js";
 import { useProjectionMaps } from "../../projections/index.js";
 import renderArm from "../../projections/renderArm.js";
-import requireArmKey from "./requireArmKey.js";
+import { requireArmKey } from "../../utils/index.js";
 import type { ChipProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */

@@ -113,4 +113,4 @@ export {
   PEEK_CLOSE_DELAY_MS,
   PEEK_OPEN_DELAY_MS,
 } from "./ui/index.js";
-export { findCuriePrefix } from "./utils/index.js";
+export { findCuriePrefix, requireArmKey } from "./utils/index.js";

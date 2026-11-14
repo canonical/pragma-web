@@ -440,3 +440,5 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Prose: `markdownComponents`, `ProseReferencesProvider`; types
   `ProseLinkProps`, `ProseReferencesProviderProps`.
 - Addresses: `findCuriePrefix`.
+- Switches: `requireArmKey` (the fragment key a switch's case reads,
+  throwing when the switch's fragment spreads no arm for the node's type).

@@ -9,7 +9,7 @@ describe("requireArmKey", () => {
 
   it("throws, naming the type, when the node carries no spread for it", () => {
     expect(() => requireArmKey(null, "OntologyClass")).toThrow(
-      "the node is a OntologyClass but its composite fragment spreads no OntologyClass arm",
+      "requireArmKey: the node is a OntologyClass, but the switch's fragment spreads no OntologyClass arm",
     );
     expect(() => requireArmKey(undefined, "OntologyClass")).toThrow();
   });
