@@ -94,4 +94,26 @@ describe("CardItem", () => {
       ),
     ).toThrow('no channel observes the field "name"');
   });
+
+  it.fails("passes native props to its card", () => {
+    const { provider, channels } = observeRow(["name"]);
+    render(
+      <ul>
+        <CardItem
+          provider={provider}
+          channels={channels}
+          title={{ id: "name", header: "Name" }}
+          details={[]}
+          selectable={false}
+          nameRecord={() => null}
+          // @ts-expect-error not yet a native prop
+          id="probe"
+        />
+      </ul>,
+    );
+    expect(screen.getByRole("listitem", { name: "alpha" })).toHaveAttribute(
+      "id",
+      "probe",
+    );
+  });
 });

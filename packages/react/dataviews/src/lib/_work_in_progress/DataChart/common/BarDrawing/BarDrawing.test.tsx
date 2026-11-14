@@ -81,4 +81,20 @@ describe("BarDrawing", () => {
     ).toEqual(["at least 3", "Not counted"]);
     expect(container.querySelectorAll(".bar")).toHaveLength(1);
   });
+
+  it.fails("holds its drawing and its table in one root, taking native props", () => {
+    const { container } = render(
+      <BarDrawing
+        label="Machines by status"
+        values={counted}
+        // @ts-expect-error not yet a native prop
+        id="probe"
+      />,
+    );
+    const root = container.firstElementChild;
+    expect(container.childElementCount).toBe(1);
+    expect(root).toHaveAttribute("id", "probe");
+    expect(root?.querySelector(":scope > svg.chart")).not.toBeNull();
+    expect(root?.querySelector(":scope > table.data")).not.toBeNull();
+  });
 });

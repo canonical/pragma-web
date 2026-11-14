@@ -91,4 +91,23 @@ describe("RangeDrawing", () => {
     expect(labels.at(0)).toHaveAttribute("text-anchor", "start");
     expect(labels.at(1)).toHaveAttribute("text-anchor", "end");
   });
+
+  it.fails("holds its drawing and its table in one root, taking native props", () => {
+    const { container } = render(
+      <RangeDrawing
+        label="Cores"
+        min={1}
+        max={12}
+        lowerBound={0}
+        upperBound={undefined}
+        // @ts-expect-error not yet a native prop
+        id="probe"
+      />,
+    );
+    const root = container.firstElementChild;
+    expect(container.childElementCount).toBe(1);
+    expect(root).toHaveAttribute("id", "probe");
+    expect(root?.querySelector(":scope > svg.chart")).not.toBeNull();
+    expect(root?.querySelector(":scope > table.data")).not.toBeNull();
+  });
 });

@@ -75,4 +75,22 @@ describe("RecordItem", () => {
     expect(checkbox).not.toBeChecked();
     detach();
   });
+
+  it.fails("passes native props to its list item", () => {
+    const { provider, channels } = readChannels();
+    render(
+      <ul>
+        <RecordItem
+          channels={channels}
+          selection={provider.selection}
+          nameRecord={(record) => record.name}
+          selectable={false}
+          messages={english}
+          // @ts-expect-error not yet a native prop
+          id="probe"
+        />
+      </ul>,
+    );
+    expect(screen.getByRole("listitem")).toHaveAttribute("id", "probe");
+  });
 });

@@ -76,4 +76,17 @@ describe("SelectAllOnPage", () => {
     expect(readCheckbox().checked).toBe(false);
     expect(readCheckbox().indeterminate).toBe(true);
   });
+
+  it.fails("passes native props to its root", () => {
+    const { provider } = createMachineProvider();
+    const { container } = render(
+      <SelectAllOnPage
+        selection={provider.selection}
+        ids={createFakeChannel<readonly string[]>([])}
+        // @ts-expect-error not yet a native prop
+        id="probe"
+      />,
+    );
+    expect(container.firstElementChild).toHaveAttribute("id", "probe");
+  });
 });
