@@ -24,7 +24,6 @@ export const MOCK_API_ORIGIN = "http://localhost";
 export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/_work_in_progress/DataTable/common/BodyCell/BodyCell.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/HeaderMenu/HeaderMenu.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataTable/common/Row/Row.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/SettingsMenu/LabelsContext.ts test",
   "src/lib/_work_in_progress/DataTable/common/SettingsMenu/SettingsMenu.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/SettingsMenu/common/ItemLabel/ItemLabel.tsx test",
@@ -35,7 +34,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/_work_in_progress/DataTable/constants.ts test",
   "src/lib/_work_in_progress/PaginationBar/common/PageControl/PageControl.tsx test",
   "src/lib/common/SettingsMenuContext/SettingsMenuContext.tsx test",
-  "src/lib/virtualization/common/VirtualBody/VirtualBody.tsx export:memo-over-function",
   "testing/keyboard/DataTable.keyboard.ts export:none",
   "testing/keyboard/DataTable.keyboard.ts test",
 ]);

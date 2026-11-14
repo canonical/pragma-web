@@ -5,6 +5,7 @@ import type {
 } from "@canonical/dataviews-core";
 import {
   areDisplayStatusesEqual,
+  assertInvariant,
   type ColumnToSize,
   createColumnLayout,
   createGridInteraction,
@@ -71,7 +72,7 @@ const componentCssClassName = "ds data-table dense";
 const NO_SORTABLE_FIELDS: readonly string[] = Object.freeze([]);
 
 /** A record answers to its own identity until the caller names it better. */
-const defaultRowLabel = (_row: object, rowId: string): string => rowId;
+const labelRowById = (_row: object, rowId: string): string => rowId;
 
 /**
  * The body a virtualization descriptor carries, given what a virtualized body
@@ -95,6 +96,9 @@ const renderVirtualizedBody = (
  * from the context it installs over them.
  *
  * @implements ds:apps.pattern.data_table
+ *
+ * @note Impure: observes the provider and the grid interaction while
+ * mounted.
  */
 export default function ScopedDataTable<
   TFields extends readonly SchemaFieldDefinition[],
@@ -104,7 +108,7 @@ export default function ScopedDataTable<
   columns,
   label,
   selectable = false,
-  getRowLabel = defaultRowLabel,
+  getRowLabel = labelRowById,
   renderStatus,
   virtualization,
   settings,
@@ -364,7 +368,10 @@ export default function ScopedDataTable<
                   }
                   bounds={readSizingBounds(layout.readDeclared(column.id))}
                   // Solved for every rendered column, in the same order.
-                  width={geometry.widths[position] as number}
+                  width={assertInvariant(
+                    geometry.widths.at(position),
+                    "a solved width for every rendered column",
+                  )}
                   labelId={`${baseId}-${column.id}`}
                   announce={announce}
                 />

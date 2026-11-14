@@ -35,7 +35,7 @@ const wasReplaced = (
  * table's status row leaves while the next request is pending, and its
  * measurement leaves with it.
  */
-const replaced = (before: Snapshot, after: Snapshot): string[] => {
+const listReplaced = (before: Snapshot, after: Snapshot): string[] => {
   const ids: string[] = [];
   for (const entry of after.entries) {
     if (
@@ -78,6 +78,9 @@ const readViewport = (body: HTMLDivElement | null): HTMLElement =>
  * On the server, and while hydrating, every entry is mounted: the full
  * current window is the markup a reader without JavaScript gets, and the
  * range narrows it once the viewport is measured.
+ *
+ * @note Impure: observes the viewport's scroll and sizes while mounted, and
+ * sets its scroll to hold the rows in view.
  */
 export default function useVirtualRows({
   entries,
@@ -173,7 +176,7 @@ export default function useVirtualRows({
     };
   }, [range, measured]);
 
-  const onFocus = useCallback(
+  const handleFocus = useCallback(
     (event: FocusEvent<HTMLDivElement>): void => {
       // A focus event bubbling through the body targets an element of it.
       const row = (event.target as Element).closest('[role="row"]');
@@ -187,7 +190,7 @@ export default function useVirtualRows({
 
   // Focus that leaves the body lets its row go. Focus that leaves the
   // window has not left the body, and the row waits for its return.
-  const onBlur = useCallback(
+  const handleBlur = useCallback(
     (event: FocusEvent<HTMLDivElement>): void => {
       const group = event.currentTarget;
       if (
@@ -213,7 +216,7 @@ export default function useVirtualRows({
             for (const record of records) {
               const id = measured.get(record.target);
               // A record without a box reports nothing to measure.
-              const box = record.borderBoxSize[0];
+              const box = record.borderBoxSize.at(0);
               if (id !== undefined && box !== undefined) {
                 sizes.push([id, box.blockSize]);
                 rowWidth = box.inlineSize;
@@ -268,7 +271,7 @@ export default function useVirtualRows({
         ? range.invalidate("all")
         : before.model === model
           ? 0
-          : range.invalidate(replaced(before, after));
+          : range.invalidate(listReplaced(before, after));
     correct(shift.current + outdated);
     shift.current = 0;
     if (outdated !== 0) {
@@ -287,5 +290,11 @@ export default function useVirtualRows({
     }
   });
 
-  return { mounted, body, readRowRef, onFocus, onBlur };
+  return {
+    mounted,
+    body,
+    readRowRef,
+    onFocus: handleFocus,
+    onBlur: handleBlur,
+  };
 }

@@ -7,7 +7,18 @@ import type { RowProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-row";
 
-function Row<TRow extends object>({
+/**
+ * One data row. It observes its own selection membership — a selection
+ * change reaches only the rows whose membership moved — and consumes the
+ * table's shared track list rather than a width per cell.
+ *
+ * Memoised: every prop it takes is held at a stable reference by the
+ * table, so a row re-renders for its own selection channel and for a
+ * column model that actually changed, and for nothing else.
+ *
+ * @implements ds:apps.subcomponent.data_table-row
+ */
+const Row = <TRow extends object>({
   provider,
   channels,
   columns,
@@ -15,7 +26,7 @@ function Row<TRow extends object>({
   getRowLabel,
   position,
   ref,
-}: RowProps<TRow>): ReactElement {
+}: RowProps<TRow>): ReactElement => {
   const selected = useDataViewsValue(channels.selected);
   return (
     // aria-selected is only meaningful where selection is offered, and it
@@ -50,15 +61,6 @@ function Row<TRow extends object>({
       ))}
     </div>
   );
-}
+};
 
-/**
- * One data row. It observes its own selection membership — a selection
- * change reaches only the rows whose membership moved — and consumes the
- * table's shared track list rather than a width per cell.
- *
- * Memoised: every prop it takes is held at a stable reference by the
- * table, so a row re-renders for its own selection channel and for a
- * column model that actually changed, and for nothing else.
- */
 export default memo(Row) as typeof Row;
