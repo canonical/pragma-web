@@ -4,6 +4,7 @@ export * from "./CategoriesSection/index.js";
 export * from "./ChatSection/index.js";
 export * from "./DescriptionSection/index.js";
 export * from "./grid/index.js";
+export * from "./IconButton/index.js";
 export * from "./IconSection/index.js";
 export * from "./Label/index.js";
 export * from "./Link/index.js";
