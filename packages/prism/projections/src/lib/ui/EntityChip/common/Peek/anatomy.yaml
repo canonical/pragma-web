@@ -16,6 +16,11 @@
 # (position-try-fallbacks: flip-block); it scrolls rather than outgrowing
 # the viewport, no taller than it less 4px at each end.
 #
+# A peek that shows nothing (its card loading, no node at the IRI, a site
+# peek that renders null) holds only its hidden label, and is then not
+# displayed (`:not(:has(> :not([hidden])))`, display none): no empty frame
+# shows and no empty dialog is announced.
+#
 # The popover's tokens are declared on :root only where the published
 # Popover is loaded, so each falls back to the value that component gives
 # it.

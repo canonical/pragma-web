@@ -11,6 +11,9 @@ import type { UseProjectionPeekResult } from "./types.js";
  * renders.
  *
  * Every chip arm passes `peek={useProjectionPeek(data.uri)}`.
+ * A peek that renders nothing for that IRI shows nothing: the chip's peek
+ * is not displayed while it holds no content, so no empty frame or dialog
+ * appears.
  *
  * @param uri - The node's absolute IRI (`Node.uri`), the only address
  *   `node(id:)` accepts.

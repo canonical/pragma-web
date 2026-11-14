@@ -121,7 +121,11 @@ export interface ProjectionsProviderProps {
    * The site's peek: the element a chip shows for the node at an absolute
    * IRI, such as the site's own card switch read by a query of the site's.
    * Every chip arm takes it through `useProjectionPeek`, so no arm imports
-   * it. Without one, chips show the package's `ProjectionPeek`.
+   * it. Without one, chips show the package's `ProjectionPeek`. A peek
+   * that renders nothing for an IRI (`null`, or a component that renders
+   * `null`, as one does while loading or for a node it cannot find) shows
+   * nothing: the chip's peek is not displayed, frame and dialog alike, and
+   * the chip stays a link.
    */
   readonly peek?: (uri: string) => ReactNode;
   /** The content whose projections read the maps. */

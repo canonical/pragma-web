@@ -4,6 +4,12 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Peek from "./Peek.js";
 
+/**
+ * The selector the stylesheet hides a peek that shows nothing by (the SSR
+ * test reads the rule in the stylesheet).
+ */
+const EMPTY_PEEK = ".ds.peek:not(:has(> :not([hidden])))";
+
 describe("Peek", () => {
   it("is a manual popover dialog named by its hidden label", () => {
     render(
@@ -38,5 +44,21 @@ describe("Peek", () => {
     const peek = screen.getByTestId("peek");
     expect(peek.className).toBe("ds peek custom-class");
     expect(peek.style.zIndex).toBe("1");
+  });
+
+  it("is not displayed while it shows nothing, and is once it does", () => {
+    const { rerender } = render(
+      <Peek anchor="--entity-chip-c" data-testid="peek" label="Preview">
+        {null}
+      </Peek>,
+    );
+    const peek = screen.getByTestId("peek");
+    expect(peek.matches(EMPTY_PEEK)).toBe(true);
+    rerender(
+      <Peek anchor="--entity-chip-c" data-testid="peek" label="Preview">
+        <p>Card</p>
+      </Peek>,
+    );
+    expect(peek.matches(EMPTY_PEEK)).toBe(false);
   });
 });

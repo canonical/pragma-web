@@ -36,4 +36,12 @@
     border-color: var(--peek-border-color);
     background: var(--peek-background);
   }
+
+  /* A peek that shows nothing, while its card loads, for a node the graph
+   * does not hold, or where the site's peek renders nothing, holds only its
+   * hidden label: it is not displayed, so no empty frame shows and no
+   * empty dialog is announced. */
+  .ds.peek:not(:has(> :not([hidden]))) {
+    display: none;
+  }
 }
