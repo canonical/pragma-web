@@ -1090,6 +1090,19 @@ describe("createRelaySource over relay-runtime", () => {
     });
   });
 
+  it.fails("fails a connection that carries no page info", () => {
+    const { environment, fetchAt } = relay();
+    const deliver = delivery();
+    source(environment).execute(request(), deliver);
+    fetchAt(0).respond({
+      data: { machines: { totalCount: 5, pageInfo: null, edges: [] } },
+    });
+    expect(lastOf(deliver)).toMatchObject({
+      status: "failed",
+      failure: { reason: "the connection carries no page info" },
+    });
+  });
+
   it("cancels a fetch still in flight on release", () => {
     const { environment, fetchAt } = relay();
     const deliver = delivery();
