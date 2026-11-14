@@ -21,7 +21,10 @@ type OwnProps = {
   /**
    * What the page records about the entity, such as a `KeyValueList`:
    * rendered once, in the aside at three groups and wider and under the
-   * header below. No facts region when omitted or when it renders nothing.
+   * header below. In the aside a `KeyValueList`'s pairs stack, each key,
+   * muted, over its value across the aside, the value wrapping anywhere;
+   * under the header the list keeps its own layout. No facts region when
+   * omitted or when it renders nothing.
    */
   readonly facts?: ReactNode;
   /**

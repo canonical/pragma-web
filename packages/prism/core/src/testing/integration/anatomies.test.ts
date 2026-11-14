@@ -44,7 +44,9 @@ const EXTERNAL_TOKENS = [
  * The rules that style markup a component does not write itself: the
  * site's utility cluster at the rail's foot, styled from the class
  * contract `Rail` documents, and the published Breadcrumbs' list and its
- * crumb's text, which `LensBreadcrumbs` keeps on one line.
+ * crumb's text, which `LensBreadcrumbs` keeps on one line, and the pairs
+ * of the `KeyValueList` a page passes as `SectionedView`'s facts, which
+ * stack in the view's aside.
  */
 const REACHES = [
   ".ds.rail .utilities-label",
@@ -52,6 +54,9 @@ const REACHES = [
   ".ds.rail .theme",
   ".ds.lens-breadcrumbs .list",
   ".ds.lens-breadcrumbs .link",
+  ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair",
+  ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .key",
+  ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .value",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);

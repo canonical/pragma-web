@@ -19,6 +19,7 @@
     --sectioned-view-section-margin-block-start: var(--space-300);
     --sectioned-view-aside-inset-block-start: 0;
     --sectioned-view-contents-label-color: var(--color-text-muted);
+    --sectioned-view-facts-key-color: var(--color-text-muted);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -63,6 +64,22 @@
     gap: var(--sectioned-view-gap);
   }
 
+  /* The facts a page passes as a KeyValueList: in the aside's three
+   * columns each pair stacks, the key, muted, over the value across the
+   * aside, and a value too long for the line wraps anywhere rather than
+   * run past the aside's edge. */
+  .ds.sectioned-view > .aside > .facts > .key-value-list > .pair {
+    display: block;
+  }
+
+  .ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .key {
+    color: var(--sectioned-view-facts-key-color);
+  }
+
+  .ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .value {
+    overflow-wrap: anywhere;
+  }
+
   .ds.sectioned-view > .content {
     display: grid;
     grid-template-columns: subgrid;
@@ -105,7 +122,7 @@
 
   /* Below three groups every region takes every column: the aside gives
    * its place up, its contents are not shown and its facts take the row
-   * under the header. */
+   * under the header, where a pair is the list's grid again. */
   @container shell (width < 1376px) {
     .ds.sectioned-view > .header,
     .ds.sectioned-view > .content {
@@ -118,6 +135,12 @@
 
     .ds.sectioned-view > .aside > .contents {
       display: none;
+    }
+
+    /* Under the header the facts keep the list's own layout. */
+    .ds.sectioned-view > .aside > .facts > .key-value-list > .pair {
+      display: grid;
+      gap: var(--sectioned-view-gap);
     }
   }
 }

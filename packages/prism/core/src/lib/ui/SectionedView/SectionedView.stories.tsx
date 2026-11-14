@@ -30,6 +30,11 @@ export const Default: Story = {
             value: "ds:global.component.button",
           },
           { id: "tier", term: "Tier", value: "global" },
+          {
+            id: "uri",
+            term: "URI",
+            value: "https://ds.canonical.com/ontology/global.component.button",
+          },
         ]}
       />
     ),

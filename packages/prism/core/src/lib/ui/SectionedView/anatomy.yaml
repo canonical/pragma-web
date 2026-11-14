@@ -31,6 +31,11 @@
 #     a slot's class is its name, and `content` names the content region.
 #   - The facts region is a subgrid, so a `KeyValueList` passed as facts
 #     keeps its terms and values on the page's column lines.
+#   - The facts stack in the aside (ruling on the facts' layout): a pair of
+#     the KeyValueList a page passes is a block there, its key muted over its
+#     value, the value wrapping anywhere (PS8 V1 `.mockup-facts`), since the
+#     aside's three columns leave a value one column; below three groups,
+#     under the header, the pair is the list's own grid again.
 #   - Every section takes the top margin, the first included: the check
 #     names no positional state, and the first section follows the header
 #     or the body.
@@ -42,6 +47,7 @@
 #   --sectioned-view-section-margin-block-start: space.300   a section after another (external spacing, A2)
 #   --sectioned-view-aside-inset-block-start: 0              literal 0
 #   --sectioned-view-contents-label-color: color.text.muted  the "On this page" label
+#   --sectioned-view-facts-key-color: color.text.muted       a fact's key (PS8 `.mockup-facts dt`)
 # Literals: none but 0.
 node:
   uri: prism.component.sectioned_view
@@ -96,6 +102,28 @@ node:
                 layout.type: grid
                 layout.grid.columns: subgrid
                 spacing.gap: grid.gutter
+              edges:
+                # The page's KeyValueList, reached through its own classes:
+                # in the aside each pair stacks, its key (muted) over its
+                # value across the aside, the value wrapping anywhere; below
+                # three groups the pair is the list's own grid again.
+                - node:
+                    uri: prism.component.key_value_list
+                    edges:
+                      - node:
+                          role: pair
+                          styles: { layout.type: block }
+                          edges:
+                            - node:
+                                role: key
+                                styles: { typography.color: color.text.muted }
+                              relation: { cardinality: "1", slotName: key }
+                            - node:
+                                role: value
+                                styles: { typography.wrap: anywhere }
+                              relation: { cardinality: "1", slotName: value }
+                        relation: { cardinality: "1..*", slotName: pair }
+                  relation: { cardinality: "0..1", slotName: key-value-list }
             relation: { cardinality: "0..1", slotName: facts }      # absent when facts renders nothing
       relation: { cardinality: "0..1", slotName: aside }            # absent with no section and no facts
     - node:

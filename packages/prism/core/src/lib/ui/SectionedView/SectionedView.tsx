@@ -21,7 +21,8 @@ const componentCssClassName = "ds sectioned-view";
  * It is a subgrid of the canvas's page grid over every column. At three
  * groups of columns and wider the header and the content hold the columns
  * before the last three, and the aside holds those three, the index over
- * the facts, sticky at the scroller's top; with no aside the header and
+ * the facts, sticky at the scroller's top, where a `KeyValueList` passed
+ * as the facts stacks each key over its value; with no aside the header and
  * the content take every column. Below three groups every region takes
  * every column, the index is not shown and the facts follow the header.
  * A body given before the sections (`children`) is off the index; a facts
