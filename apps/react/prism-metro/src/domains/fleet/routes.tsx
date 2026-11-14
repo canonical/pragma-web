@@ -53,7 +53,7 @@ export const fleetRoutes = {
     content: ({ params }: NodeRouteProps): ReactElement => (
       <StockPage address={readUriParam(params)} />
     ),
-    warm: (params) => warmFleetNode(stockPageQueryNode, params),
+    warm: (params, search) => warmFleetNode(stockPageQueryNode, params, search),
   }),
   fleetFormation: route({
     url: "/fleet/formations/:uri",
@@ -61,7 +61,7 @@ export const fleetRoutes = {
     content: ({ params }: NodeRouteProps): ReactElement => (
       <FormationPage address={readUriParam(params)} />
     ),
-    warm: (params) => warmFleetNode(formationPageQueryNode, params),
+    warm: (params, search) => warmFleetNode(formationPageQueryNode, params, search),
   }),
   fleetUnit: route({
     url: "/fleet/units/:uri",
@@ -69,7 +69,7 @@ export const fleetRoutes = {
     content: ({ params }: NodeRouteProps): ReactElement => (
       <UnitPage address={readUriParam(params)} />
     ),
-    warm: (params) => warmFleetNode(unitPageQueryNode, params),
+    warm: (params, search) => warmFleetNode(unitPageQueryNode, params, search),
   }),
   fleetCarType: route({
     url: "/fleet/car-types/:uri",
@@ -77,6 +77,6 @@ export const fleetRoutes = {
     content: ({ params }: NodeRouteProps): ReactElement => (
       <CarTypePage address={readUriParam(params)} />
     ),
-    warm: (params) => warmFleetNode(carTypePageQueryNode, params),
+    warm: (params, search) => warmFleetNode(carTypePageQueryNode, params, search),
   }),
 } as const;

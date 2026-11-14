@@ -59,12 +59,12 @@ export const networkRoutes = {
     url: "/network/stations/:uri",
     search: viewSearch,
     content: NetworkStationContent,
-    warm: (params) => warmNetworkNode("stop", params),
+    warm: (params, search) => warmNetworkNode("stop", params, search),
   }),
   networkLine: route({
     url: "/network/lines/:uri",
     search: viewSearch,
     content: NetworkLineContent,
-    warm: (params) => warmNetworkNode("line", params),
+    warm: (params, search) => warmNetworkNode("line", params, search),
   }),
 } as const;
