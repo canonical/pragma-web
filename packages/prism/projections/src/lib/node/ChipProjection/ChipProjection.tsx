@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/ChipProjection_node.graphql.js";
+import { OntologyClassChip } from "../../ontology/index.js";
 import { useProjectionMaps } from "../../projections/index.js";
 import renderArm from "../../projections/renderArm.js";
 import type { ChipProjectionProps } from "./types.js";
@@ -26,11 +27,14 @@ void declareNodeFragment;
 /* v8 ignore stop */
 
 /**
- * Any graph node as the inline mention, dispatched on its type: it renders the
- * arm the site's chip map holds for the node's typename, or the `Node` arm,
- * `NodeChip`, for every type no other arm takes. A site's arm for a type of its
- * own renders over the site slot's key, the site's own compile of
- * `SiteChipSlot_node`.
+ * Any graph node as the inline mention, dispatched on its type by an
+ * explicit switch: an ontology class renders through its own arm,
+ * `OntologyClassChip`, the cases being `ONTOLOGY_TYPES`; any other type through
+ * the arm the site's chip map holds for its typename, or the `Node` arm,
+ * `NodeChip`, for every type no other arm takes. A site's arm for a type of
+ * its own renders over the site slot's key, the site's own compile of
+ * `SiteChipSlot_node`. `linked={false}` reaches every arm, which then
+ * neither links nor peeks.
  *
  * It renders no element of its own: the arm renders the root, a `<span>`, and
  * every native prop reaches it.
@@ -46,5 +50,15 @@ export default function ChipProjection({
   ...props
 }: ChipProjectionProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  return renderArm(useProjectionMaps().chip, data, props);
+  const { chip } = useProjectionMaps();
+  switch (data.__typename) {
+    case "OntologyClass":
+      if (data.OntologyClass) {
+        return <OntologyClassChip {...props} node={data.OntologyClass} />;
+      }
+      break;
+    default:
+      break;
+  }
+  return renderArm(chip, data, props);
 }

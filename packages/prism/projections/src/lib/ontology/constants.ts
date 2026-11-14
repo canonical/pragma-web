@@ -25,3 +25,14 @@ export const PROPERTY_KIND_WORDS: Readonly<
   DATATYPE: "property.meta.datatype",
   ANNOTATION: "property.meta.annotation",
 };
+
+/**
+ * The contract's ontology types that the package's switches render through
+ * an arm of their own: the cases every switch names, which its coverage
+ * test walks. A switch dispatches a `Node`, so it names only the ontology
+ * types that implement `Node`: an `OntologyProperty` does not, so its arms
+ * are rendered by the screens that read properties, never by a switch.
+ */
+export const ONTOLOGY_TYPES = {
+  OntologyClass: true,
+} as const;
