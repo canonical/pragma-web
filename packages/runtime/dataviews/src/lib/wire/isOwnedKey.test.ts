@@ -22,6 +22,11 @@ describe("isOwnedKey", () => {
     expect(isOwnedKey("cores__between", schema)).toBe(true);
   });
 
+  it("owns a filter spelled on a field the collection does not declare", () => {
+    expect(isOwnedKey("memory__gte", schema)).toBe(true);
+    expect(isOwnedKey("owner__isSet", schema)).toBe(true);
+  });
+
   it("leaves the host's own parameters to the host", () => {
     expect(isOwnedKey("tab", schema)).toBe(false);
     expect(isOwnedKey("view", schema)).toBe(false);

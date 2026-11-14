@@ -124,6 +124,7 @@ describe("public surface", () => {
   it("hands framework bindings their shared machinery from ./bindings", () => {
     expect(Object.keys(bindings).sort()).toEqual([
       "DISPLAY_STATUS_PHASES",
+      "QUERY_KEYS",
       "applyQueryCommand",
       "areDisplayStatusesEqual",
       "areFieldFacetsEqual",
@@ -137,6 +138,7 @@ describe("public surface", () => {
       "cycleSortTerm",
       "hideColumn",
       "isDataViewsProvider",
+      "isNarrowingIssue",
       "listDisplayEntries",
       "moveColumn",
       "placeSortTerm",

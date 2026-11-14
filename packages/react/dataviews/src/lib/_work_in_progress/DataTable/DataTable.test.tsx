@@ -2832,6 +2832,32 @@ describe("DataTable", () => {
       await expectNoAxeViolations(view.container);
     });
 
+    it("has no axe violation over a link it refused, and the filters listing it", async () => {
+      const { provider } = createMachineProvider({
+        location: createMemoryLocation({ href: "/machines?status=melted" }),
+      });
+      const markup = (
+        <DataViews provider={provider}>
+          <DataViews.Filters />
+          <DataTable provider={provider} columns={columns} label="Machines" />
+        </DataViews>
+      );
+      // The server's markup, with the Clear links, then the page once
+      // scripts run, with its buttons and the refused status.
+      const container = document.createElement("div");
+      container.innerHTML = renderToString(markup);
+      document.body.append(container);
+      onTestFinished(() => {
+        container.remove();
+      });
+      await expectNoAxeViolations(container);
+      const view = render(markup);
+      expect(
+        view.container.querySelector('[data-status="refused"]'),
+      ).toHaveTextContent("This link could not be followed");
+      await expectNoAxeViolations(view.container);
+    });
+
     it("has no axe violation in the markup a server sends", async () => {
       const { provider } = createMachineProvider({
         location: createMemoryLocation({ href: "/machines" }),

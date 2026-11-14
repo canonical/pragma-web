@@ -66,6 +66,10 @@ export const FRENCH: DataViewsMessages = {
   statusRegrouping: "Regroupement…",
   statusFailed: (reason) =>
     `Ces lignes n’ont pas pu être chargées : ${clause(reason)}`,
+  statusRefused: (reason) =>
+    clause(reason) === ""
+      ? "Ce lien n’a pas pu être suivi."
+      : `Ce lien n’a pas pu être suivi : ${clause(reason)}.`,
   statusRefreshFailed: (reason) =>
     `Ces lignes n’ont pas pu être actualisées : ${clause(reason)}`,
   statusStale: (reason) =>
@@ -135,6 +139,9 @@ export const FRENCH: DataViewsMessages = {
   filterLowest: (value) => `Minimum : ${value}`,
   filterHighest: (value) => `Maximum : ${value}`,
   clearFilter: (name) => `Effacer ${name}`,
+  linkRefusals: "Non appliqué depuis le lien",
+  clauseRefused: (name, reason) => `${name} : ${clause(reason)}.`,
+  grouping: "Regroupement",
   filterIsAnyOf: (label) => `${label} est l’une des valeurs`,
   filterIsNoneOf: (label) => `${label} n’est aucune des valeurs`,
   matchAnyInstead: "Correspondre plutôt à l’une d’elles",

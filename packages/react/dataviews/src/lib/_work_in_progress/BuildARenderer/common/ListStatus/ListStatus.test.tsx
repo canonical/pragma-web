@@ -10,6 +10,10 @@ describe("ListStatus", () => {
   it.each<[DisplayStatus, string]>([
     [{ status: "failed", reason: "offline" }, english.statusFailed("offline")],
     [
+      { status: "refused", reason: "melted is not a status" },
+      english.statusRefused("melted is not a status"),
+    ],
+    [
       { status: "refresh-failed", reason: "offline" },
       english.statusRefreshFailed("offline"),
     ],

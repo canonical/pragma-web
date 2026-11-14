@@ -99,6 +99,10 @@ A bound outside the schema's bounds is refused, not applied — by the schema, a
 
 <Canvas of={Stories.InvalidEditKeepsTheRestriction} sourceState="none" />
 
+## What a link asked for and did not get
+
+A followed link can carry a clause the grammar, the collection or the source refuses — `?status=melted`, a filter on a field since removed, a sort by a field the source cannot order. The filters list each one after the controls, under "Not applied from the link", with its reason: "Status: "melted" is not an option of "status".". A refused filter or the search would have narrowed the result, so the provider withholds the query rather than run a wider one, the table says "This link could not be followed", and the clause has a Clear control that removes it from the URL, after which the query runs. Focus moves to the next Clear, or to the filters' group once none is left. A refused sort, page or grouping narrows nothing: it falls back to its default and is listed without a Clear. The clauses stay in the URL through other edits until they are cleared, so changing the sort does not quietly drop one.
+
 ## Before any script runs
 
 The filters are a GET form. Each control is named as the URL spells its clause — `status` repeated once per chosen option, `owner__isSet`, `cores__gte`, `name__contains` — and the rest of the applied query rides hidden beside them, so a submission lands on the destination the provider would have written, from the first page. Once scripting is enabled every edit applies as it is made, a submission is intercepted, the submit control is hidden and the clear buttons appear.

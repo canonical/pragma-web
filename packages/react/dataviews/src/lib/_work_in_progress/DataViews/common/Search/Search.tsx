@@ -1,4 +1,5 @@
 import type { DataViewsState, Query } from "@canonical/dataviews-core";
+import { QUERY_KEYS } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useId } from "react";
 import { interceptSubmit } from "../../../../utils/index.js";
@@ -9,11 +10,8 @@ import "./styles.css";
 
 const componentCssClassName = "ds data-views-search";
 
-/** The wire name of the search, which the input submits itself. */
-const SEARCH_KEY = "q";
-
-/** The names the form's own control submits. */
-const OWN_KEYS: readonly string[] = [SEARCH_KEY];
+/** The names the form's own control submits: the search, which the input submits itself. */
+const OWN_KEYS: readonly string[] = [QUERY_KEYS.search];
 
 /**
  * The destination a submission reaches: the applied query less the search
@@ -84,7 +82,7 @@ export default function Search({
         // landmark keeps the component's own.
         className={["input", className].filter(Boolean).join(" ")}
         type="search"
-        name={SEARCH_KEY}
+        name={QUERY_KEYS.search}
         value={applied}
         onChange={(event) => {
           provider.setSearch(event.target.value);

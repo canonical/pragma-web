@@ -185,6 +185,47 @@ export type SourceRefusalCode =
   | "unsupported-combination";
 
 /**
+ * Which stage refused a parameter, for a control to switch on: the
+ * source's own code where the source refused it, `malformed` where the
+ * grammar could not read it, `invalid` where the schema refused its value or
+ * its operator, and `unknown-field` where a sort term names a field the
+ * collection does not have. A filter's key spelled with an operator over a
+ * name the collection does not declare — a field since removed — is
+ * `undeclared-field`, the code a source gives a field it does not filter.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type QueryIssueCode =
+  | SourceRefusalCode
+  | "malformed"
+  | "invalid"
+  | "unknown-field";
+
+/**
+ * One refusal of an owned parameter — by the grammar, the schema or the
+ * source — named for a visible query error. One parameter may carry
+ * several. The code names the stage that refused it, and the reason is what
+ * a control says.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type QueryIssue = {
+  /** The parameter as it was spelled in the URL. */
+  readonly parameter: string;
+  /**
+   * The field the parameter addresses: a filter's field, declared or not, or
+   * null for every other parameter, the search `q` included.
+   */
+  readonly field: string | null;
+  /** Which stage refused it, for a control to switch on. */
+  readonly code: QueryIssueCode;
+  /** Why it was refused: a lowercase fragment, as schema reasons are. */
+  readonly reason: string;
+};
+
+/**
  * One structured refusal. A source reports what it cannot execute; it never
  * rewrites the query, truncates an ordering or answers with broader rows.
  * `field` and `operator` are null when the refusal addresses neither.
@@ -260,13 +301,20 @@ export type ResultProvenance = {
 
 /**
  * Why the last request produced nothing, structurally: the completion it
- * ended with, less the success. One shape, so a renderer switches on the
- * same `status` the source answered with.
+ * ended with, less the success — or a followed link refused before anything
+ * ran. One shape, so a renderer switches on the same `status` the source
+ * answered with: a link's refusal is `refused` too, carrying the link's
+ * clauses, with the code each was refused for, in place of the source's
+ * refusals. Those clauses would have narrowed the result, so the query
+ * stands withheld while they do.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type ResultProblem = Exclude<
-  Completion,
-  { readonly status: "succeeded" }
->;
+export type ResultProblem =
+  | Exclude<Completion, { readonly status: "succeeded" }>
+  | {
+      readonly status: "refused";
+      /** The link's refused clauses that would have narrowed the result. */
+      readonly issues: readonly QueryIssue[];
+    };

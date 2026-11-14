@@ -76,10 +76,11 @@ export type FacetCountWords = Exclude<Count, { readonly kind: "unknown" }>;
  * and ordinals are the message's own to word, as the English record words
  * them through the platform's English rules.
  *
- * Message keys are noun phrases rather than verbs, against the standard for
- * function names: a message is named for what it says, and the name must
- * not change when a message stops being text and becomes a function of one
- * fact. Recorded as a deviation.
+ * Message keys are noun phrases rather than verbs: a message is named for
+ * what it says, and the name must not change when a message stops being
+ * text and becomes a function of one fact. The code standards' verb rule for
+ * function names exempts every member of a word record, whatever its value;
+ * that exemption is canonical/pragma-core#127.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -92,6 +93,11 @@ export type DataViewsMessages = {
   readonly statusRegrouping: string;
   /** No rows could be loaded, and why. */
   readonly statusFailed: (reason: string) => string;
+  /**
+   * A followed link's clause was refused, and nothing ran for it, and why:
+   * every reason its clauses were refused for.
+   */
+  readonly statusRefused: (reason: string) => string;
   /** The rows shown could not be refreshed, and why. */
   readonly statusRefreshFailed: (reason: string) => string;
   /** The rows shown answer an earlier query, and why. */
@@ -200,6 +206,12 @@ export type DataViewsMessages = {
   readonly filterHighest: (value: string) => string;
   /** The control clearing one restriction, by the restriction's name. */
   readonly clearFilter: (name: string) => string;
+  /** The list of a followed link's clauses that were refused, as a place. */
+  readonly linkRefusals: string;
+  /** One refused clause of a followed link, by its name, and why. */
+  readonly clauseRefused: (name: string, reason: string) => string;
+  /** A refused grouping's name, where the link names no field to group by. */
+  readonly grouping: string;
   /** A closed set's any-of group, by the field's label. */
   readonly filterIsAnyOf: (label: string) => string;
   /** A closed set's none-of group, by the field's label. */
