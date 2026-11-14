@@ -3,7 +3,9 @@ import {
   QueryObserver as TanStackObserver,
 } from "@tanstack/query-core";
 import { describe, expect, it, vi } from "vitest";
-import { byId, declare, declareSort } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createDataViewsProvider } from "../provider/index.js";
 import { DEFAULT_WINDOW, type Slice } from "../query/index.js";
@@ -41,7 +43,7 @@ const endpoint: SourceCapabilities = declare({
   filter: { status: ["isAny"] },
   search: { fields: ["name"] },
   sort: declareSort(["cpu"], 1),
-  counts: { pageable: "exact", matched: "exact", total: "exact" },
+  counts: { pageable: "exact", matched: "exact" },
 });
 
 const exact = (value: number) => ({ kind: "exact" as const, value });
@@ -53,7 +55,6 @@ const page = (rows: readonly RowRecord[], matched: number): SourcePage => ({
   counts: {
     pageable: exact(matched),
     matched: exact(matched),
-    total: exact(matched),
   },
   more: null,
   cursors: null,
@@ -83,12 +84,14 @@ const source = (
   queryClient: QueryClient,
   fetchPage: (request: SourceRequest) => Promise<SourcePage>,
   queryKey: readonly unknown[] = ["machines"],
+  isForbidden?: (error: unknown) => boolean,
 ) =>
   createQuerySource({
     capabilities: endpoint,
     queryKey,
     fetchPage,
     createObserver: (query) => new TanStackObserver(queryClient, query),
+    ...(isForbidden === undefined ? {} : { isForbidden }),
   });
 
 /** The single cached query key, or a failure rather than an empty key. */
@@ -242,6 +245,55 @@ describe("createQuerySource over @tanstack/query-core", () => {
     });
   });
 
+  it("delivers nothing the application writes into a forbidden query's cache", async () => {
+    const queryClient = client();
+    const denied = new Error("403");
+    const built = source(
+      queryClient,
+      () => Promise.reject(denied),
+      ["machines"],
+      (error) => error === denied,
+    );
+    const deliver = delivery();
+    built.execute(request(), deliver);
+    await vi.waitFor(() => expect(deliver).toHaveBeenCalledTimes(1));
+    expect(deliveredAt(deliver, 0)).toEqual({
+      status: "forbidden",
+      cause: denied,
+    });
+
+    // An optimistic update to the list is no grant of access.
+    queryClient.setQueryData(soleQueryKey(queryClient), page([{ id: "z" }], 2));
+    expect(deliver).toHaveBeenCalledTimes(1);
+    // Nor is it to a later request of the same query.
+    const later = delivery();
+    built.execute(request({ requestId: "i1:r2" }), later);
+    expect(later).not.toHaveBeenCalled();
+  });
+
+  it("delivers a forbidden query again once a fetch of it completes", async () => {
+    const queryClient = client();
+    const denied = new Error("403");
+    const fetchPage = vi
+      .fn<(request: SourceRequest) => Promise<SourcePage>>()
+      .mockRejectedValueOnce(denied)
+      .mockResolvedValue(page([{ id: "a" }], 1));
+    const built = source(
+      queryClient,
+      fetchPage,
+      ["machines"],
+      (error) => error === denied,
+    );
+    const deliver = delivery();
+    built.execute(request(), deliver);
+    await vi.waitFor(() => expect(deliver).toHaveBeenCalledTimes(1));
+    await queryClient.refetchQueries();
+    expect(deliveredAt(deliver, 1)).toEqual({
+      status: "succeeded",
+      page: page([{ id: "a" }], 1),
+    });
+  });
+
   it("releasing detaches this request's observer and leaves the cache", async () => {
     const queryClient = client();
     const built = source(queryClient, () =>
@@ -266,7 +318,7 @@ describe("createQuerySource over @tanstack/query-core", () => {
         fields: [
           { field: "status", kind: "choices", options: ["ready", "failed"] },
         ],
-        identify: byId,
+        identify: readId,
       }),
       source: source(queryClient, () => Promise.resolve(served)),
     });
@@ -363,19 +415,23 @@ const fakeObserver = () => {
   };
 };
 
-const fakeSource = (observer: ReturnType<typeof fakeObserver>) =>
+const createFakeSource = (
+  observer: ReturnType<typeof fakeObserver>,
+  isForbidden?: (error: unknown) => boolean,
+) =>
   createQuerySource({
     capabilities: endpoint,
     queryKey: ["machines"],
     fetchPage: () => Promise.resolve(page([], 0)),
     createObserver: () => observer.handle,
+    ...(isForbidden === undefined ? {} : { isForbidden }),
   });
 
 describe("createQuerySource observation handling", () => {
   const attach = () => {
     const observer = fakeObserver();
     const deliver = delivery();
-    const release = fakeSource(observer).execute(request(), deliver);
+    const release = createFakeSource(observer).execute(request(), deliver);
     return { observer, deliver, release };
   };
 
@@ -451,7 +507,7 @@ describe("createQuerySource observation handling", () => {
       error: null,
     });
     const deliver = delivery();
-    fakeSource(observer).execute(request(), deliver);
+    createFakeSource(observer).execute(request(), deliver);
     expect(deliver).toHaveBeenCalledTimes(1);
   });
 
@@ -465,5 +521,38 @@ describe("createQuerySource observation handling", () => {
       error: null,
     });
     expect(deliver).not.toHaveBeenCalled();
+  });
+
+  describe("an error the application reads as forbidden", () => {
+    const forbidden = new Error("403");
+    const deliverError = (isForbidden: (error: unknown) => boolean) => {
+      const observer = fakeObserver();
+      const deliver = delivery();
+      createFakeSource(observer, isForbidden).execute(request(), deliver);
+      observer.emit({ status: "error", data: undefined, error: forbidden });
+      return deliveredAt(deliver, 0);
+    };
+
+    it("delivers forbidden, with the error as its cause and no reason", () => {
+      expect(deliverError((error) => error === forbidden)).toEqual({
+        status: "forbidden",
+        cause: forbidden,
+      });
+    });
+
+    it("delivers a failure where the check answers no", () => {
+      expect(deliverError(() => false)).toMatchObject({
+        status: "failed",
+        failure: { reason: "403", cause: forbidden },
+      });
+    });
+
+    it("delivers a failure where the check throws", () => {
+      expect(
+        deliverError(() => {
+          throw new Error("the check broke");
+        }),
+      ).toMatchObject({ status: "failed", failure: { reason: "403" } });
+    });
   });
 });

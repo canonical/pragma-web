@@ -2,11 +2,9 @@ import { createMemoryLocation, createPage } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import buildMachine from "../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import { createStandInViewStore } from "../../../../testing/createStandInStores.js";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../testing/machines.js";
 import PaginationBar from "./PaginationBar.js";
 
 afterEach(() => {
@@ -45,9 +43,8 @@ describe("PaginationBar SSR", () => {
     host.complete(host.refresh(), {
       status: "succeeded",
       page: createPage({
-        rows: [machine("m3", "three"), machine("m4", "four")],
+        rows: [buildMachine("m3", "three"), buildMachine("m4", "four")],
         matched: 6,
-        total: 6,
       }),
     });
     const html = renderToString(<PaginationBar provider={provider} />);
@@ -74,9 +71,8 @@ describe("PaginationBar SSR", () => {
     host.complete(host.refresh(), {
       status: "succeeded",
       page: createPage({
-        rows: [machine("m3", "three"), machine("m4", "four")],
+        rows: [buildMachine("m3", "three"), buildMachine("m4", "four")],
         matched: 6,
-        total: 6,
       }),
     });
     const html = renderToString(<PaginationBar provider={provider} />);
@@ -93,9 +89,8 @@ describe("PaginationBar SSR", () => {
     host.complete(host.refresh(), {
       status: "succeeded",
       page: createPage({
-        rows: [machine("m1", "one"), machine("m2", "two")],
+        rows: [buildMachine("m1", "one"), buildMachine("m2", "two")],
         matched: 5,
-        total: 5,
       }),
     });
     const html = renderToString(<PaginationBar provider={provider} />);

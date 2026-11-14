@@ -4,7 +4,8 @@ import {
 } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { machine, machines } from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import { machines } from "../../../../../../testing/machines.js";
 import PlainList from "./PlainList.js";
 
 describe("PlainList on the server", () => {
@@ -12,7 +13,7 @@ describe("PlainList on the server", () => {
     const provider = createDataViewsProvider({
       collection: machines,
       source: createArraySource({
-        rows: [machine("m-1", "alpha")],
+        rows: [buildMachine("m-1", "alpha")],
         collection: machines,
       }),
     });

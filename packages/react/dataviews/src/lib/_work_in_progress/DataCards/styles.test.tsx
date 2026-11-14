@@ -15,10 +15,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../testing/machines.js";
+import buildMachine from "../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import type { DisplayField } from "../../common/index.js";
 import DataCards from "./DataCards.js";
 
@@ -69,7 +67,7 @@ const everyRenderedClass = (): ReadonlySet<string> =>
 /** Selectable cards over two machines. */
 const mounted = (): HTMLElement => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha"), machine("m-2", "beta")],
+    rows: [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
   });
   const { container } = render(
     <DataCards

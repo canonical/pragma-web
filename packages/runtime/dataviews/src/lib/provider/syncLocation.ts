@@ -1,12 +1,15 @@
+import { readWithheld } from "../coordinator/index.js";
 import type { HistoryMode } from "../location/index.js";
 import { createChannel, protectChannel } from "../observable/index.js";
-import { areListsEqual, areSlicesEqual, type Query } from "../query/index.js";
+import { areSlicesEqual, type Query } from "../query/index.js";
+import type { QueryIssue } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
 import {
+  areQueryIssuesEqual,
   type DecodedQuery,
   decodeQuery,
-  type QueryIssue,
+  isNarrowingIssue,
   readOpenView,
 } from "../wire/index.js";
 import isCarryingQuery from "./isCarryingQuery.js";
@@ -25,18 +28,9 @@ const isSameQuery = (a: Query, b: Query): boolean =>
   a.window.size === b.window.size &&
   a.window.cursor === b.window.cursor;
 
-const areIssuesEqual = (
-  a: readonly QueryIssue[],
-  b: readonly QueryIssue[],
-): boolean =>
-  areListsEqual(
-    a,
-    b,
-    (issue, other) =>
-      issue.parameter === other.parameter &&
-      issue.code === other.code &&
-      issue.reason === other.reason,
-  );
+/** The clauses of a decoding that narrow the result, which withhold it. */
+const listNarrowing = (decoded: DecodedQuery): readonly QueryIssue[] =>
+  decoded.issues.filter(isNarrowingIssue);
 
 /**
  * Keep a location and the host's query in step.
@@ -73,7 +67,7 @@ export default function syncLocation<
   const { host, location, keepsViews } = config;
   const { schema } = host.collection;
   const issues = createChannel<readonly QueryIssue[]>(config.issues, {
-    equals: areIssuesEqual,
+    equals: areQueryIssuesEqual,
   });
   /**
    * The spellings of the loop's own writes whose echo it has not heard, oldest
@@ -118,13 +112,26 @@ export default function syncLocation<
 
   /**
    * A query as the location spells it, with the saved view open beside it,
-   * the location's other parameters kept.
+   * the location's other parameters kept, and the refused clauses the host's
+   * query is withheld for carried as the location spells them: they stand
+   * until the reader removes them.
    */
   const spell = (
     query: Query,
     view: string | null,
     preserve: URLSearchParams,
-  ): URLSearchParams => spellLocation({ schema, query, view, preserve });
+    withheld: readonly QueryIssue[] = readWithheld(host.state.get()),
+  ): URLSearchParams =>
+    spellLocation({
+      schema,
+      query,
+      view,
+      preserve,
+      carry: {
+        keys: withheld.map((issue) => issue.parameter),
+        applied: query.slice,
+      },
+    });
 
   /** The query a location's parameters decode to, with what they refuse. */
   const decodeAt = (params: URLSearchParams): DecodedQuery =>
@@ -194,12 +201,20 @@ export default function syncLocation<
       }
     }
     // The open view is the location's as the query is: a move of either is
-    // adopted, together.
-    if (!isSameQuery(host.state.get(), decoded) || view !== host.view.get()) {
+    // adopted, together. So are the refused clauses that narrow it, which
+    // withhold the query while they stand.
+    const narrowing = listNarrowing(decoded);
+    const state = host.state.get();
+    if (
+      !isSameQuery(state, decoded) ||
+      view !== host.view.get() ||
+      !areQueryIssuesEqual(readWithheld(state), narrowing)
+    ) {
       host.adopt(
         { slice: decoded.slice, window: decoded.window },
         "adopt",
         view,
+        narrowing,
       );
     }
   };
@@ -233,12 +248,17 @@ export default function syncLocation<
   } => {
     const view = host.view.get();
     const here = decodeAt(params);
+    const withheld = readWithheld(host.state.get());
+    // A refused clause removed is a move of the query, though the slice
+    // reads the same.
     const keepsQuery =
-      transition.cause !== "reset" && isSameQuery(here, transition.query);
+      transition.cause !== "reset" &&
+      isSameQuery(here, transition.query) &&
+      areQueryIssuesEqual(listNarrowing(here), withheld);
     return {
       spelled: keepsQuery
         ? placeView(params, view)
-        : spell(transition.query, view, params),
+        : spell(transition.query, view, params, withheld),
       keepsQuery,
       here,
     };
@@ -494,6 +514,16 @@ export default function syncLocation<
 
   return {
     issues: protectChannel(issues),
+    clearRefused(parameter: string, history: HistoryMode): void {
+      const params = readSpellingBase();
+      const next = new URLSearchParams(params);
+      next.delete(parameter);
+      if (next.toString() === params.toString()) {
+        return;
+      }
+      writeLocation(next, history);
+      readLocation(next, decodeAt(next));
+    },
     observe(): () => void {
       let live = true;
       settleAwaited();

@@ -19,8 +19,8 @@ const createExactCount = (value: number) => ({ kind: "exact" as const, value });
 
 /**
  * Create a source over a complete local record set. Each request is
- * filtered, searched and ordered over every record and then windowed, so all
- * three counts are exact rather than one loaded page's, and so is every
+ * filtered, searched and ordered over every record and then windowed, so
+ * both counts are exact rather than one loaded page's, and so is every
  * facet, which it declares for each field that is not text. Grouping is not
  * executed here, so a grouped query is refused rather than answered with
  * ungrouped rows.
@@ -50,7 +50,7 @@ export default function createArraySource<TRow extends object = RowRecord>(
       ...(collation === null ? {} : { collation }),
       ...(config.empties === undefined ? {} : { empties: config.empties }),
     },
-    counts: { pageable: "exact", matched: "exact", total: "exact" },
+    counts: { pageable: "exact", matched: "exact" },
     actions: config.actions ?? {},
     facets: schema.fields
       .filter((definition) => definition.kind !== "text")
@@ -102,6 +102,7 @@ export default function createArraySource<TRow extends object = RowRecord>(
           schema,
           sort: capabilities.sort,
           searchFields,
+          types: collection.types,
         }),
       };
     }
@@ -141,7 +142,6 @@ export default function createArraySource<TRow extends object = RowRecord>(
         counts: {
           pageable: matched,
           matched,
-          total: createExactCount(rows.length),
         },
         facets: faceted.facets,
         more: null,

@@ -63,13 +63,17 @@ const total = (counted: Exclude<Count, { readonly kind: "unknown" }>): string =>
 /** Every DataViews message, in French. */
 export const FRENCH: DataViewsMessages = {
   statusPending: "Chargement…",
-  statusRegrouping: "Regroupement…",
   statusFailed: (reason) =>
     `Ces lignes n’ont pas pu être chargées : ${clause(reason)}`,
+  statusRefused: (reason) =>
+    clause(reason) === ""
+      ? "Ce lien n’a pas pu être suivi."
+      : `Ce lien n’a pas pu être suivi : ${clause(reason)}.`,
   statusRefreshFailed: (reason) =>
     `Ces lignes n’ont pas pu être actualisées : ${clause(reason)}`,
   statusStale: (reason) =>
     `Ces lignes ne correspondent pas à la requête actuelle : ${clause(reason)}`,
+  statusNoAccess: "Vous n’avez pas l’autorisation de voir ces lignes.",
   statusNoResults: "Aucune ligne ne correspond à cette requête.",
   statusNoData: "Il n’y a encore rien ici.",
 
@@ -77,6 +81,8 @@ export const FRENCH: DataViewsMessages = {
   selectRow: (name) => `Sélectionner ${name}`,
   columnWidth: (pixels) =>
     `${count(pixels)} ${plural(pixels, "pixel", "pixels")}`,
+  columnEndPlacement: (name) =>
+    `Cliquez ou touchez dans la ligne d’en-tête là où la colonne ${name} doit se terminer. Appuyez de nouveau sur le bord ou sur Échap pour annuler.`,
 
   sortPrecedence: (direction, position, terms) =>
     terms === 1
@@ -133,6 +139,9 @@ export const FRENCH: DataViewsMessages = {
   filterLowest: (value) => `Minimum : ${value}`,
   filterHighest: (value) => `Maximum : ${value}`,
   clearFilter: (name) => `Effacer ${name}`,
+  linkRefusals: "Non appliqué depuis le lien",
+  clauseRefused: (name, reason) => `${name} : ${clause(reason)}.`,
+  grouping: "Regroupement",
   filterIsAnyOf: (label) => `${label} est l’une des valeurs`,
   filterIsNoneOf: (label) => `${label} n’est aucune des valeurs`,
   matchAnyInstead: "Correspondre plutôt à l’une d’elles",

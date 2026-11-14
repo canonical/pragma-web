@@ -66,4 +66,11 @@ export type ContextOptions = {
    * applied query and never each other's half-typed input.
    */
   readonly filters: FilterHandles<readonly SchemaFieldDefinition[]>;
+  /**
+   * End every input session of the root's filter records, as leaving an
+   * input or submitting the filters does: the next edit of a typed value —
+   * text, a number or a date — is a history step of its own, where a
+   * session's later edits replace its first.
+   */
+  readonly endSessions: () => void;
 };

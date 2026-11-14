@@ -1,6 +1,7 @@
 /**
- * Every DataTable, sort panel, renderer switch, cards, chart prototype and
- * server-backed story, and the filters' faceted stories, have no axe violation:
+ * Every root, table, sort panel, settings, cards, chart, chart-with-table and
+ * server-backed story, the filters' faceted stories and the composition's
+ * links with a refused clause, have no axe violation:
  * the automated half of the evidence the Storybook accessibility addon shows
  * in its panel, run with the package's tests so a story that gains a
  * violation fails `test` rather than waiting for someone to open the panel.
@@ -28,6 +29,7 @@ import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.s
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
+import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
@@ -44,6 +46,12 @@ setProjectAnnotations([preview]);
 // worker, which jsdom lacks: msw/node answers the same handlers here instead.
 serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
+/** The composition's stories over a link the provider refused a clause of. */
+const REFUSED_LINK_STORIES: ReadonlySet<string> = new Set([
+  "LinkWithARefusedFilter",
+  "LinkWithARefusedSort",
+]);
+
 /** The stories checked as first rendered, by the part they show. */
 const rendered = {
   DataViews: composeStories(rootStories),
@@ -59,6 +67,12 @@ const played = {
   DataCards: composeStories(dataCardsStories),
   DataChart: composeStories(dataChartStories),
   DataChartWithTable: composeStories(dataChartWithTableStories),
+  // The links with a refused clause, on a memory location and no mock API.
+  Composition: Object.fromEntries(
+    Object.entries(composeStories(compositionStories)).filter(([name]) =>
+      REFUSED_LINK_STORIES.has(name),
+    ),
+  ),
   Filters: Object.fromEntries(
     Object.entries(composeStories(filtersStories)).filter(([name]) =>
       FACETED_FILTER_STORIES.has(name),

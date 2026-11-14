@@ -8,17 +8,15 @@ import {
 } from "../../../storybook/decorators.js";
 import getHiddenButton from "../../../storybook/getHiddenButton.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import {
-  createPendingSource,
-  createUncountedSource,
-  type Machine,
-  type MachineFields,
-} from "../../../storybook/machines/fixtures.js";
-import {
-  type MachineProvider,
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
+import createUncountedSource from "../../../storybook/machines/createUncountedSource.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProvider,
+  MachineProviderConfig,
+} from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "../DataTable/index.js";
 import Component from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";

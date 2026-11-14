@@ -8,7 +8,7 @@ import type { RowRecord } from "../rows/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
 import type { DataViewsSnapshot } from "../snapshot/index.js";
 import type { SourceCapabilities } from "../source/index.js";
-import { decodeQuery, readOpenView } from "../wire/index.js";
+import { decodeQuery, isNarrowingIssue, readOpenView } from "../wire/index.js";
 import isCarryingQuery from "./isCarryingQuery.js";
 import readLocatedArrangement from "./readLocatedArrangement.js";
 import type { StartingPoint } from "./types.js";
@@ -120,6 +120,7 @@ export default function readStartingPoint<
             window: fromLocation.decoded.window,
           },
     issues: standing?.decoded.issues ?? [],
+    withheld: fromLocation?.decoded.issues.filter(isNarrowingIssue) ?? [],
     // A provider keeping no views can show none, so it stands on none.
     view: keepsViews ? view : null,
     restored:

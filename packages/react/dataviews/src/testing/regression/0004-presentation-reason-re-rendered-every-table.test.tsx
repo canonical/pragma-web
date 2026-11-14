@@ -11,11 +11,12 @@
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Profiler } from "react";
 import { afterEach, describe, expect, it } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "../../../testing/createStandInStores.js";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
@@ -25,7 +26,7 @@ describe("regression 0004 — a presentation reason re-rendered every table", ()
   it("commits the table again for a width, not for a reason", async () => {
     let commits = 0;
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       presentation: createStandInPresentationStore({
         patchPresentation: async () => {
           throw new Error("view storage failed");
@@ -64,7 +65,7 @@ describe("regression 0004 — a presentation reason re-rendered every table", ()
   it("commits the saved-views control for a reason, not for a width", async () => {
     let commits = 0;
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       views: createStandInViewStore(),
       presentation: createStandInPresentationStore({
         patchPresentation: async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { DEFAULT_WINDOW, type Slice, type SortTerm } from "../query/index.js";
 import type { SourceDelivery } from "../result/index.js";
@@ -27,7 +27,7 @@ const rows = [
 ];
 
 const collection = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "id", kind: "text" },
     { field: "name", kind: "text" },
@@ -56,10 +56,14 @@ const deliveredAt = (
   return call[0];
 };
 
-const idsOf = (delivered: SourceDelivery) =>
-  delivered.status === "succeeded"
+const readIds = (delivered: SourceDelivery) => {
+  if (delivered.status === "forbidden") {
+    throw new Error("the local source forbids nothing");
+  }
+  return delivered.status === "succeeded"
     ? delivered.page.rows.map((row) => (row as { id: string }).id)
     : [delivered.failure.reason];
+};
 
 describe("createArraySource", () => {
   it("declares complete input, and each field's own operators", () => {
@@ -80,7 +84,7 @@ describe("createArraySource", () => {
         collation: ROOT_NUMERIC_COLLATION,
       },
       group: { fields: [], levels: 0, summaries: "none", collapse: false },
-      counts: { pageable: "exact", matched: "exact", total: "exact" },
+      counts: { pageable: "exact", matched: "exact" },
       pagination: { kind: "offset" },
       selection: { scope: "explicit" },
       actions: {},
@@ -120,7 +124,7 @@ describe("createArraySource", () => {
     });
     const deliver = delivery();
     live.execute(request({ window: { ...DEFAULT_WINDOW, size: 3 } }), deliver);
-    expect(idsOf(deliveredAt(deliver, 0))).toEqual(["b", "c", "a"]);
+    expect(readIds(deliveredAt(deliver, 0))).toEqual(["b", "c", "a"]);
   });
 
   it("collates text at the root locale, numerically, unless told otherwise", () => {
@@ -136,7 +140,7 @@ describe("createArraySource", () => {
       }),
       deliver,
     );
-    expect(idsOf(deliveredAt(deliver, 0))).toEqual(["n2", "n10"]);
+    expect(readIds(deliveredAt(deliver, 0))).toEqual(["n2", "n10"]);
 
     const byCodePoint = createArraySource({
       rows: numbered,
@@ -150,7 +154,7 @@ describe("createArraySource", () => {
       }),
       other,
     );
-    expect(idsOf(deliveredAt(other, 0))).toEqual(["n10", "n2"]);
+    expect(readIds(deliveredAt(other, 0))).toEqual(["n10", "n2"]);
   });
 
   it("places a field's empties first in both directions when told to", () => {
@@ -169,7 +173,7 @@ describe("createArraySource", () => {
         }),
         deliver,
       );
-      expect(idsOf(deliveredAt(deliver, 0)).at(0)).toBe("d");
+      expect(readIds(deliveredAt(deliver, 0)).at(0)).toBe("d");
     }
   });
 
@@ -204,7 +208,7 @@ describe("createArraySource", () => {
     expect(Object.isFrozen(capabilities.sort.fields)).toBe(true);
   });
 
-  it("delivers the requested window synchronously with all three counts", () => {
+  it("delivers the requested window synchronously with both counts", () => {
     const deliver = delivery();
     source().execute(request(), deliver);
     expect(deliver).toHaveBeenCalledTimes(1);
@@ -213,7 +217,7 @@ describe("createArraySource", () => {
       page: {
         rows: [rows[0], rows[1]],
         groups: null,
-        counts: { pageable: exact(3), matched: exact(3), total: exact(3) },
+        counts: { pageable: exact(3), matched: exact(3) },
         facets: {},
         more: null,
         cursors: null,
@@ -254,12 +258,12 @@ describe("createArraySource", () => {
     expect(deliveredAt(deliver, 0)).toMatchObject({
       page: {
         rows: [rows[0]],
-        counts: { pageable: exact(3), matched: exact(3), total: exact(3) },
+        counts: { pageable: exact(3), matched: exact(3) },
       },
     });
   });
 
-  it("reports the filtered set apart from the collection total", () => {
+  it("counts the filtered set exactly", () => {
     const deliver = delivery();
     source().execute(
       request({
@@ -272,7 +276,7 @@ describe("createArraySource", () => {
     );
     expect(deliveredAt(deliver, 0)).toMatchObject({
       page: {
-        counts: { pageable: exact(2), matched: exact(2), total: exact(3) },
+        counts: { pageable: exact(2), matched: exact(2) },
       },
     });
   });
@@ -317,7 +321,7 @@ describe("createArraySource", () => {
       second,
     );
     expect(reads).toBe(afterFirst);
-    expect(idsOf(deliveredAt(second, 0))).toEqual(["b"]);
+    expect(readIds(deliveredAt(second, 0))).toEqual(["b"]);
   });
 
   it("re-executes a query the records changed under", () => {
@@ -328,9 +332,9 @@ describe("createArraySource", () => {
       sort: [{ field: "cpu", direction: "asc" }],
     };
     live.execute(request({ slice: query }), deliver);
-    expect(idsOf(deliveredAt(deliver, 0))).toEqual(["a", "c"]);
+    expect(readIds(deliveredAt(deliver, 0))).toEqual(["a", "c"]);
     live.setRows([...rows, { id: "d", name: "delta", cpu: 1 }]);
-    expect(idsOf(deliveredAt(deliver, 1))).toEqual(["d", "a"]);
+    expect(readIds(deliveredAt(deliver, 1))).toEqual(["d", "a"]);
   });
 
   it("re-executes every live request when the records change", () => {
@@ -347,8 +351,8 @@ describe("createArraySource", () => {
     );
     live.setRows([...rows, { id: "d", name: "delta", cpu: 1 }]);
     expect(first).toHaveBeenCalledTimes(2);
-    expect(idsOf(deliveredAt(first, 1))).toEqual(["a", "b"]);
-    expect(idsOf(deliveredAt(second, 1))).toEqual(["b", "c"]);
+    expect(readIds(deliveredAt(first, 1))).toEqual(["a", "b"]);
+    expect(readIds(deliveredAt(second, 1))).toEqual(["b", "c"]);
   });
 
   it("computes the facets again over the records that replace its own", () => {
@@ -395,7 +399,7 @@ describe("createArraySource", () => {
     mutable.push({ id: "b" });
     const deliver = delivery();
     live.execute(request(), deliver);
-    expect(idsOf(deliveredAt(deliver, 0))).toEqual(["a"]);
+    expect(readIds(deliveredAt(deliver, 0))).toEqual(["a"]);
   });
 
   it("copies the replacement records too", () => {
@@ -406,7 +410,7 @@ describe("createArraySource", () => {
     replacement.push({ id: "y" });
     const later = delivery();
     live.execute(request({ requestId: "i1:r9" }), later);
-    expect(idsOf(deliveredAt(later, 0))).toEqual(["z"]);
+    expect(readIds(deliveredAt(later, 0))).toEqual(["z"]);
   });
 
   it("carries the application's row operations", async () => {

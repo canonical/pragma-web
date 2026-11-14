@@ -2,7 +2,7 @@ import type { DisplayStatus } from "@canonical/dataviews-core";
 import { DISPLAY_STATUS_PHASES } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { displayStatusOf } from "../../../../testing/fixtures.js";
+import readDisplayStatus from "../../../../testing/readDisplayStatus.js";
 import StatusItem from "./StatusItem.js";
 
 /** The status's own name, as a test's renderer shows it. */
@@ -39,7 +39,7 @@ describe("StatusItem", () => {
     // Read from the core's own table, so a status added there is checked here
     // rather than quietly left out.
     for (const [name, phase] of Object.entries(DISPLAY_STATUS_PHASES)) {
-      const status = displayStatusOf(name as DisplayStatus["status"]);
+      const status = readDisplayStatus(name as DisplayStatus["status"]);
       const { unmount } = render(
         <StatusItem status={status} renderStatus={spellStatus} />,
       );

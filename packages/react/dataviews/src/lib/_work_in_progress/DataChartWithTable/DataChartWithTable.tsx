@@ -22,14 +22,13 @@ const componentCssClassName = "ds data-chart-with-table";
  * a group named by `label` or the words' own `renderer`. Each is a region
  * named for it, and the chart keeps its caption and its own numbers table as
  * its text alternative. The choice is held while it is mounted, and written
- * to neither the URL nor a saved view. Without scripting both the chart and
- * the table are drawn, each in its named region, with no choice to make.
+ * to neither the URL nor a saved view. Without scripting the chart, the
+ * default, is drawn alone in its named region, with no choice to make.
  *
- * Not exported from the package root: a work-in-progress prototype, imported
- * from its own module.
+ * @experimental Pre-release: a work-in-progress prototype, internal to the
+ * package and not exported; its shape may change or it may be withdrawn.
  *
- * @experimental Pre-release: a work-in-progress prototype, not admitted to
- * the package root; its shape may change or it may be withdrawn.
+ * @implements ds:apps.pattern.data_chart_with_table
  */
 export default function DataChartWithTable<
   TFields extends readonly SchemaFieldDefinition[],

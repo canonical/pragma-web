@@ -16,11 +16,9 @@ import type * as DsGlobal from "@canonical/react-ds-global";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 const renders = vi.hoisted(() => ({ count: 0 }));
@@ -41,7 +39,7 @@ vi.mock("@canonical/react-ds-global", async (importOriginal) => {
 describe("regression 0014 — a resize preview re-rendered every header menu", () => {
   it("renders no opened menu again for a resize step", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
     });
     render(

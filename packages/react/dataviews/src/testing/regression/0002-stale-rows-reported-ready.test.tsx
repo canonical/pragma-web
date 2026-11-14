@@ -23,12 +23,10 @@ import {
   within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { pageOf } from "../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  machine,
-  machines,
-} from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import buildPage from "../../../testing/buildPage.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { machines } from "../../../testing/machines.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 const columns = [
@@ -55,7 +53,7 @@ describe("regression 0002 — stale rows reported ready", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m-1", "alpha")]),
+        page: buildPage([buildMachine("m-1", "alpha")]),
       });
     });
     fireEvent.click(screen.getByRole("button", { name: "Name" }));

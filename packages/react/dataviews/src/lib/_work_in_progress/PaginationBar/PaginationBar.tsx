@@ -7,6 +7,7 @@ import type {
 import {
   type DisplayPagination,
   isDataViewsProvider,
+  QUERY_KEYS,
   readProviderHost,
   resolvePagination,
 } from "@canonical/dataviews-core/bindings";
@@ -208,7 +209,7 @@ export default function PaginationBar<
           <label htmlFor={sizeId}>{messages.rowsPerPage}</label>
           <SelectInput
             id={sizeId}
-            name="size"
+            name={QUERY_KEYS.size}
             value={String(facts.size)}
             options={listSizeOptions(facts.sizes)}
             onChange={(event) => {
@@ -223,7 +224,11 @@ export default function PaginationBar<
           />
           {/* The size is the select's, and the page is left to default: a
               new size is a new window, so the old page cannot survive it. */}
-          {renderHiddenFields(destinations.query, ["page", "size", "cursor"])}
+          {renderHiddenFields(destinations.query, [
+            QUERY_KEYS.page,
+            QUERY_KEYS.size,
+            QUERY_KEYS.cursor,
+          ])}
           <Button type="submit" importance="secondary" className="submit">
             {messages.submitPageSize}
           </Button>
@@ -237,7 +242,7 @@ export default function PaginationBar<
         <form method="get" className="page" onSubmit={interceptSubmit}>
           <SelectInput
             ref={pageSelect}
-            name="page"
+            name={QUERY_KEYS.page}
             aria-label={messages.page}
             aria-describedby={pages === null ? undefined : totalId}
             value={String(page)}
@@ -254,7 +259,7 @@ export default function PaginationBar<
               {messages.pageCount(pages)}
             </span>
           )}
-          {renderHiddenFields(destinations.current, ["page"])}
+          {renderHiddenFields(destinations.current, [QUERY_KEYS.page])}
           <Button type="submit" importance="secondary" className="submit">
             {messages.submitPage}
           </Button>

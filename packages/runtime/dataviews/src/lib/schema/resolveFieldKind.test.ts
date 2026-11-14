@@ -6,7 +6,7 @@ import type { FieldKind, SchemaFieldDefinition } from "./types.js";
 const definitions: { readonly [TKind in FieldKind]: SchemaFieldDefinition } = {
   choices: { field: "status", kind: "choices", options: ["failed", 2] },
   number: { field: "cpu", kind: "number", min: 0, max: 64 },
-  flag: { field: "owner", kind: "flag" },
+  presence: { field: "owner", kind: "presence" },
   date: { field: "updated", kind: "date" },
   text: { field: "name", kind: "text" },
 };
@@ -21,7 +21,7 @@ describe("resolveFieldKind", () => {
   it("declares the operators each kind accepts", () => {
     expect(resolveFieldKind("choices").operators).toEqual(["isAny", "isNone"]);
     expect(resolveFieldKind("number").operators).toEqual(["gte", "lte"]);
-    expect(resolveFieldKind("flag").operators).toEqual(["isSet"]);
+    expect(resolveFieldKind("presence").operators).toEqual(["isSet"]);
     expect(resolveFieldKind("date").operators).toEqual(["gte", "lte"]);
     expect(resolveFieldKind("text").operators).toEqual([
       "contains",
@@ -42,9 +42,9 @@ describe("resolveFieldKind", () => {
       status: "invalid",
       reason: '"ready" is not an option of "status"',
     });
-    expect(resolveFieldKind("flag").input).toEqual({
+    expect(resolveFieldKind("presence").input).toEqual({
       kind: "none",
-      reason: "flag fields edit through direct commands",
+      reason: "presence fields edit through direct commands",
     });
     const text = rulesOf("text");
     if (text.rules.input.kind !== "text") {
@@ -66,8 +66,10 @@ describe("resolveFieldKind", () => {
     expect(date.rules.rejectOperands(date.definition, ["yesterday"])).toBe(
       '"yesterday" is not an ISO-8601 calendar date (YYYY-MM-DD)',
     );
-    const flag = rulesOf("flag");
-    expect(flag.rules.rejectOperands(flag.definition, [true])).toBeNull();
+    const presence = rulesOf("presence");
+    expect(
+      presence.rules.rejectOperands(presence.definition, [true]),
+    ).toBeNull();
     const text = rulesOf("text");
     expect(text.rules.rejectOperands(text.definition, ["web"])).toBeNull();
     expect(text.rules.rejectOperands(text.definition, [""])).toBe(
@@ -100,7 +102,7 @@ describe("resolveFieldKind", () => {
     ).toBe("b");
     expect(text.areAppliedEqual("b", "b")).toBe(true);
     expect(
-      resolveFieldKind("flag").readApplied({
+      resolveFieldKind("presence").readApplied({
         field: "owner",
         operator: "isSet",
         operands: [],
@@ -113,8 +115,10 @@ describe("resolveFieldKind", () => {
     expect(resolveFieldKind("number").compareToBound(Number.NaN, 4)).toBeNull();
     expect(resolveFieldKind("text").compareToBound("b", "a")).toBe(1);
     expect(resolveFieldKind("text").compareToBound(1, "a")).toBeNull();
-    expect(resolveFieldKind("flag").compareToBound(false, true)).toBe(-1);
-    expect(resolveFieldKind("flag").compareToBound("yes", true)).toBeNull();
+    // Presence has no range, so no pair of its values compares.
+    expect(resolveFieldKind("presence").compareToBound(false, true)).toBeNull();
+    expect(resolveFieldKind("presence").compareToBound(true, true)).toBeNull();
+    expect(resolveFieldKind("presence").compareToBound("yes", true)).toBeNull();
   });
 
   it("orders each kind's values, with a text order through the collator given", () => {

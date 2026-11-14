@@ -9,6 +9,7 @@ import type {
   GridInteraction,
   SizingBounds,
 } from "@canonical/dataviews-core/bindings";
+import type { ComponentProps, ReactNode } from "react";
 import type { DataTableColumn } from "../../types.js";
 import type { HeaderColumnChange, HeaderColumnOffers } from "../types.js";
 
@@ -21,14 +22,8 @@ export type SortPrecedence = {
   readonly count: number;
 };
 
-/**
- * Props of one header cell.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the column model and the ordering in force, not
- * forwarding a caller's native props.
- */
-export type HeaderCellProps = {
+type OwnProps = {
+  /** The column this header names, sorts and resizes. */
   readonly column: DataTableColumn;
   /**
    * Whether this header offers sorting: the column asks for it and the
@@ -95,6 +90,7 @@ export type HeaderCellProps = {
   ) => void;
   /** Let a refusal's reason go, once focus leaves the header and its menu. */
   readonly onClearRefusal: () => void;
+  /** The table's grid interaction, which every resize path commands. */
   readonly interaction: GridInteraction;
   /**
    * Offer a resize handle at this header cell's trailing edge. False for the
@@ -111,4 +107,27 @@ export type HeaderCellProps = {
   readonly width: number;
   /** The id this header's label carries, for the resize handle's name. */
   readonly labelId: string;
+  /**
+   * Say something through the table's announcer: the resize handle's hint
+   * as a press starts placing the column's edge.
+   */
+  readonly announce: (message: ReactNode) => void;
 };
+
+/**
+ * Props of one header cell: its own, and the native props of the `div` it
+ * renders as its root. The cell owns its role, its name, its sort state,
+ * its description and its blur, all derived from the column and the
+ * ordering in force, so those are not taken.
+ */
+export type HeaderCellProps = OwnProps &
+  Omit<
+    ComponentProps<"div">,
+    | keyof OwnProps
+    | "children"
+    | "role"
+    | "aria-labelledby"
+    | "aria-sort"
+    | "aria-describedby"
+    | "onBlur"
+  >;

@@ -54,7 +54,7 @@ const collection = createCollection({
     },
     { field: "cpu", kind: "number", min: 0, max: 64 },
     { field: "updated", kind: "date" },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
     { field: "name", kind: "text" },
   ],
 });
@@ -123,7 +123,7 @@ describe("DataViews.Filters", () => {
 
   it("offers one control per field and legal operator, and no others", () => {
     mount(makeProvider());
-    // Three options and the flag; two bounds on each of two fields.
+    // Three options and the presence field; two bounds on each of two fields.
     expect(screen.getAllByRole("checkbox")).toHaveLength(4);
     expect(screen.getAllByRole("spinbutton")).toHaveLength(2);
     expect(screen.queryByLabelText("owner from")).toBeNull();
@@ -1655,5 +1655,69 @@ describe("DataViews.Filters", () => {
       adopt(provider, [{ field: "cpu", operator: "gte", operands: [4] }]);
       await expectNoAxeViolations(container);
     });
+  });
+
+  it("types a bound as one history step, until the input is left or the form submitted", () => {
+    const recorded = createRecordingLocation({ href: "/machines" });
+    mount(
+      createDataViewsProvider({
+        collection,
+        source: createManualSource<Row>({ capabilities: everything }).source,
+        location: recorded.location,
+      }),
+    );
+    const [from] = screen.getAllByRole("spinbutton");
+    if (from === undefined) {
+      throw new Error("expected the cpu's lower bound");
+    }
+    const before = recorded.writes.length;
+    fireEvent.change(from, { target: { value: "4" } });
+    fireEvent.change(from, { target: { value: "48" } });
+    fireEvent.blur(from);
+    fireEvent.change(from, { target: { value: "8" } });
+    fireEvent.submit(screen.getByRole("button", { name: "Apply filters" }));
+    fireEvent.change(from, { target: { value: "16" } });
+    expect(
+      recorded.writes
+        .slice(before)
+        .map(([spelling, mode]) => [
+          new URLSearchParams(spelling).get("cpu__gte"),
+          mode,
+        ]),
+    ).toEqual([
+      ["4", "push"],
+      ["48", "replace"],
+      ["8", "push"],
+      ["16", "push"],
+    ]);
+  });
+
+  it("types text as one history step, until the input is left", () => {
+    const recorded = createRecordingLocation({ href: "/machines" });
+    mount(
+      createDataViewsProvider({
+        collection,
+        source: createManualSource<Row>({ capabilities: withText }).source,
+        location: recorded.location,
+      }),
+    );
+    const contains = screen.getByRole("textbox", { name: "name contains" });
+    const before = recorded.writes.length;
+    fireEvent.change(contains, { target: { value: "w" } });
+    fireEvent.change(contains, { target: { value: "web" } });
+    fireEvent.blur(contains);
+    fireEvent.change(contains, { target: { value: "web-1" } });
+    expect(
+      recorded.writes
+        .slice(before)
+        .map(([spelling, mode]) => [
+          new URLSearchParams(spelling).get("name__contains"),
+          mode,
+        ]),
+    ).toEqual([
+      ["w", "push"],
+      ["web", "replace"],
+      ["web-1", "push"],
+    ]);
   });
 });

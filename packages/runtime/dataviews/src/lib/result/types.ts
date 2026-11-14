@@ -18,8 +18,7 @@ import type { RowRecord } from "../rows/index.js";
 
 /**
  * A number a source claims, with how much it claims. Never a bare null:
- * "unknown" is a value, so an unfiltered total can never be read as a
- * filtered one and a missing count can never be read as zero.
+ * "unknown" is a value, so a missing count can never be read as zero.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -31,14 +30,10 @@ export type Count =
   | { readonly kind: "unknown" };
 
 /**
- * Three counts with distinct provenance. `pageable`: rows the window pages
+ * Two counts with distinct provenance. `pageable`: rows the window pages
  * over, after collapse — the only basis for "page n of m". `matched`: rows
- * satisfying filter and search, before collapse. `total`: the collection
- * ignoring the query, which nothing displays yet. Without grouping
+ * satisfying filter and search, before collapse. Without grouping
  * `pageable` equals `matched`.
- *
- * @seam summary — read by `DataViews.Summary`, which shows `total` under
- * its own label
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -46,13 +41,12 @@ export type Count =
 export type SourceCounts = {
   readonly pageable: Count;
   readonly matched: Count;
-  readonly total: Count;
 };
 
 /**
  * One value a discrete field holds across the records matching the query,
  * with how many of them hold it: an option of a `choices` field, or `true`
- * for a `flag` field's records that are set.
+ * for a `presence` field's records that are set.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -68,11 +62,11 @@ export type FacetValue = {
  * out keep their counts and a bound can widen past itself. Computed by the
  * source over the whole matching set, never over a loaded page.
  *
- * - `values`, for a `choices` or `flag` field: every distinct value held
+ * - `values`, for a `choices` or `presence` field: every distinct value held
  *   by at least one matching record, each with its count, in the field's
  *   order — a `choices` field's declared options in their order, then any
  *   other value by code unit, and where the options are the server's each
- *   value as its text; a `flag` field's one value, `true`, while any
+ *   value as its text; a `presence` field's one value, `true`, while any
  *   record is set.
  * - `range`, for a `number` or `date` field: the least and greatest value a
  *   matching record holds, null while none holds one — a number among the
@@ -150,10 +144,7 @@ export type SourcePage<TRow extends object = RowRecord> = {
 };
 
 /**
- * Which member of a request was refused. `targets` names an action
- * addressing every row a query matches; nothing declares that scope, so
- * the binding rejects such a request outright rather than answering a
- * refusal nothing could act on.
+ * Which member of a request was refused.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -163,13 +154,10 @@ export type SourceRefusalPart =
   | "search"
   | "sort"
   | "group"
-  | "window"
-  | "targets";
+  | "window";
 
 /**
  * Machine-readable cause, so a control can react without reading text.
- * `query-targets-unsupported` is the refusal a query-wide target set
- * would carry; see `SourceRefusalPart`.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -181,8 +169,48 @@ export type SourceRefusalCode =
   | "too-many-levels"
   | "unreachable-page"
   | "unsupported-collapse"
-  | "query-targets-unsupported"
   | "unsupported-combination";
+
+/**
+ * Which stage refused a parameter, for a control to switch on: the
+ * source's own code where the source refused it, `malformed` where the
+ * grammar could not read it, `invalid` where the schema refused its value or
+ * its operator, and `unknown-field` where a sort term names a field the
+ * collection does not have. A filter's key spelled with an operator over a
+ * name the collection does not declare — a field since removed — is
+ * `undeclared-field`, the code a source gives a field it does not filter.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type QueryIssueCode =
+  | SourceRefusalCode
+  | "malformed"
+  | "invalid"
+  | "unknown-field";
+
+/**
+ * One refusal of an owned parameter — by the grammar, the schema or the
+ * source — named for a visible query error. One parameter may carry
+ * several. The code names the stage that refused it, and the reason is what
+ * a control says.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type QueryIssue = {
+  /** The parameter as it was spelled in the URL. */
+  readonly parameter: string;
+  /**
+   * The field the parameter addresses: a filter's field, declared or not, or
+   * null for every other parameter, the search `q` included.
+   */
+  readonly field: string | null;
+  /** Which stage refused it, for a control to switch on. */
+  readonly code: QueryIssueCode;
+  /** Why it was refused: a lowercase fragment, as schema reasons are. */
+  readonly reason: string;
+};
 
 /**
  * One structured refusal. A source reports what it cannot execute; it never
@@ -229,7 +257,14 @@ export type SourceFailure = {
  */
 export type SourceDelivery<TRow extends object = RowRecord> =
   | { readonly status: "succeeded"; readonly page: SourcePage<TRow> }
-  | { readonly status: "failed"; readonly failure: SourceFailure };
+  | { readonly status: "failed"; readonly failure: SourceFailure }
+  /**
+   * The request is forbidden to whoever made it. It carries no reason: a
+   * server's words about permissions are not rendered, so nothing about the
+   * denial leaks. The cause is for the application's logging, as a
+   * failure's is.
+   */
+  | { readonly status: "forbidden"; readonly cause: unknown };
 
 /**
  * What one request completes with: a delivery, or the binding's refusal.
@@ -260,13 +295,20 @@ export type ResultProvenance = {
 
 /**
  * Why the last request produced nothing, structurally: the completion it
- * ended with, less the success. One shape, so a renderer switches on the
- * same `status` the source answered with.
+ * ended with, less the success — or a followed link refused before anything
+ * ran. One shape, so a renderer switches on the same `status` the source
+ * answered with: a link's refusal is `refused` too, carrying the link's
+ * clauses, with the code each was refused for, in place of the source's
+ * refusals. Those clauses would have narrowed the result, so the query
+ * stands withheld while they do.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type ResultProblem = Exclude<
-  Completion,
-  { readonly status: "succeeded" }
->;
+export type ResultProblem =
+  | Exclude<Completion, { readonly status: "succeeded" }>
+  | {
+      readonly status: "refused";
+      /** The link's refused clauses that would have narrowed the result. */
+      readonly issues: readonly QueryIssue[];
+    };

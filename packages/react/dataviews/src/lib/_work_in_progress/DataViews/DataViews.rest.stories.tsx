@@ -65,7 +65,7 @@ const capabilities = declareCapabilities(machineCollection, {
     terms: 1,
     tiebreak: "opaque",
   },
-  counts: { pageable: "exact", matched: "exact", total: "exact" },
+  counts: { pageable: "exact", matched: "exact" },
   facets: ["status", "cores"],
 });
 
@@ -145,7 +145,6 @@ const source = createQuerySource({
     return createPage({
       rows: body.items,
       matched: typeof body.matched === "number" ? body.matched : undefined,
-      total: typeof body.total === "number" ? body.total : undefined,
       facets: readAnsweredFacets(body.facets),
     });
   },

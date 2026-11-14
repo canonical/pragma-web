@@ -11,7 +11,8 @@
 
 import { describe, expect, it } from "vitest";
 import createManualSource from "../../../testing/createManualSource.js";
-import { byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   createDataViewsProvider,
@@ -20,7 +21,7 @@ import {
 import { DEFAULT_WINDOW, EMPTY_SLICE } from "../../lib/query/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "ready"] },
     { field: "cpu", kind: "number" },

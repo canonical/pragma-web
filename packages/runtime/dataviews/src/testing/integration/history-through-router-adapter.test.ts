@@ -11,13 +11,15 @@
 import { createMemoryAdapter } from "@canonical/router-core";
 import { describe, expect, it } from "vitest";
 import createManualSource from "../../../testing/createManualSource.js";
-import { byId, declare, declareSort } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createPlatformLocation } from "../../lib/location/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "cpu", kind: "number" }],
 });
 

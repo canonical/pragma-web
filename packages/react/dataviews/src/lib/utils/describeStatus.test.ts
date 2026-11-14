@@ -7,9 +7,6 @@ const english = resolveMessages();
 describe("describeStatus", () => {
   it("gives each status its own words", () => {
     expect(describeStatus({ status: "pending" }, english)).toBe("Loading…");
-    expect(describeStatus({ status: "regrouping" }, english)).toBe(
-      "Regrouping…",
-    );
     expect(
       describeStatus({ status: "failed", reason: "offline" }, english),
     ).toBe("These rows could not be loaded: offline");
@@ -26,6 +23,15 @@ describe("describeStatus", () => {
     );
     expect(describeStatus({ status: "no-data" }, english)).toBe(
       "There is nothing here yet.",
+    );
+    expect(
+      describeStatus(
+        { status: "refused", reason: '"x" is not an option' },
+        english,
+      ),
+    ).toBe('This link could not be followed: "x" is not an option.');
+    expect(describeStatus({ status: "no-access" }, english)).toBe(
+      "You do not have permission to see these rows.",
     );
   });
 

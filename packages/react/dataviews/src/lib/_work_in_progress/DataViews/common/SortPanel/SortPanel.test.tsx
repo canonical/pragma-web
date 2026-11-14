@@ -11,15 +11,13 @@ import { Profiler } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../../../../testing/declareMachineOrdering.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import fakeAnnouncerClock from "../../../../../../testing/fakeAnnouncerClock.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type MachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
 import readAnnouncements from "../../../../../../testing/readAnnouncements.js";
+import type { MachineProvider } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import SortPanel from "./SortPanel.js";
 
@@ -29,7 +27,7 @@ const mount = (
   defaultSort: Parameters<MachineProvider["setSort"]>[0] = [],
 ) => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
     capabilities: declareMachineOrdering(null, defaultSort),
   });
   provider.setSort(sort);
@@ -72,7 +70,7 @@ describe("DataViews.SortPanel", () => {
   const hydratePanel = async (focusControl: string | null) => {
     const build = () => {
       const { provider } = createMachineProvider({
-        rows: [machine("m-1", "alpha")],
+        rows: [buildMachine("m-1", "alpha")],
         capabilities: declareMachineOrdering(null),
         location: createMemoryLocation({ href: "/machines" }),
       });
@@ -159,7 +157,7 @@ describe("DataViews.SortPanel", () => {
 
   it("names the panel by its label and each term by its field", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
     });
     provider.setSort([{ field: "cores", direction: "asc" }]);
@@ -287,7 +285,7 @@ describe("DataViews.SortPanel", () => {
 
   it("spreads native props onto its section and merges its class", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
     });
     render(
@@ -317,7 +315,7 @@ describe("DataViews.SortPanel", () => {
 
   it("renders nothing again for a publication that leaves the terms alone", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
     });
     provider.setSort([{ field: "status", direction: "asc" }]);
@@ -407,7 +405,7 @@ describe("DataViews.SortPanel", () => {
 
   it("speaks its root's words", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
     });
     provider.setSort([{ field: "cores", direction: "asc" }]);

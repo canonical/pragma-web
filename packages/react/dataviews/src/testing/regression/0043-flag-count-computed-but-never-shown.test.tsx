@@ -1,8 +1,8 @@
 /**
- * Regression: a flag filter shows how many matching records set its
+ * Regression: a presence filter shows how many matching records set its
  * field.
  *
- * Before the fix, a source computed the facet of a flag field when asked
+ * Before the fix, a source computed the facet of a presence field when asked
  * — the records setting it, counted — and Filters never read it: the
  * checkbox stood without the count a choice's options show beside them. The
  * count now describes the checkbox while the result answers the applied
@@ -26,7 +26,7 @@ type Owned = { readonly id: string };
 
 const owned = createCollection({
   identify: (row: Owned) => row.id,
-  fields: [{ field: "owner", kind: "flag" }],
+  fields: [{ field: "owner", kind: "presence" }],
 });
 
 describe("regression 0043 — flag count computed but never shown", () => {

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import isCarryingQuery from "./isCarryingQuery.js";
 
 const { schema } = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "status", kind: "choices", options: ["failed"] }],
 });
 
@@ -21,7 +21,13 @@ describe("isCarryingQuery", () => {
 
   it("reads the host's own parameters, and none, as no query", () => {
     expect(carries("")).toBe(false);
-    expect(carries("tab=inventory&owner__isSet=1&as=table")).toBe(false);
+    expect(carries("tab=inventory&utm__source=mail&as=table")).toBe(false);
+  });
+
+  it("reads a filter on a field the collection does not declare as a query", () => {
+    // Spelled with one of the grammar's operators, it is a filter, refused
+    // rather than left to the host.
+    expect(carries("tab=inventory&gone__isSet=1")).toBe(true);
   });
 
   it("reads an open view as no query where the provider keeps no views", () => {

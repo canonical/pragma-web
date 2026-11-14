@@ -1,3 +1,4 @@
+import type { HistoryMode } from "../location/index.js";
 import { createChannel, protectChannel } from "../observable/index.js";
 import type { Predicate, PredicateOperand } from "../query/index.js";
 import type { SourceRefusal } from "../result/index.js";
@@ -48,6 +49,17 @@ export default function createFilterInput(
    * the copy is recognised here and left alone.
    */
   let applying: Predicate | null = null;
+  /**
+   * Whether a typed edit has applied since the input session began. The
+   * session's first applied edit enters history as the policy says; every
+   * later one replaces that entry, so typing a bound is one step Back
+   * returns from, not one per keystroke.
+   */
+  let sessionApplied = false;
+  /** End the input session: the next typed edit is a new step. */
+  const endSession = (): void => {
+    sessionApplied = false;
+  };
   const state = createChannel<FilterInputState>(
     Object.freeze({ input, feedback }),
   );
@@ -65,12 +77,18 @@ export default function createFilterInput(
     );
   };
 
-  /** Apply one predicate through the host; the feedback says how it went. */
-  const apply = (predicate: Predicate): readonly SourceRefusal[] => {
+  /**
+   * Apply one predicate through the host, entering history as `history`
+   * says or, left out, as the policy does; the feedback says how it went.
+   */
+  const apply = (
+    predicate: Predicate,
+    history?: HistoryMode,
+  ): readonly SourceRefusal[] => {
     applying = predicate;
     let refusals: readonly SourceRefusal[];
     try {
-      refusals = host.setPredicate(predicate);
+      refusals = host.setPredicate(predicate, undefined, history);
     } finally {
       applying = null;
     }
@@ -98,7 +116,19 @@ export default function createFilterInput(
       input = next;
       const validation = schema.validateInput(field, next);
       if (validation.status === "valid") {
-        apply({ field, operator, operands: [...validation.operands] });
+        const predicate = {
+          field,
+          operator,
+          operands: [...validation.operands],
+        };
+        // An edit that reads as what is applied moves nothing, so it starts
+        // no session: the next change is still the session's first step.
+        const moves = !isSamePredicate(predicate, applied);
+        const refusals = apply(
+          predicate,
+          sessionApplied ? "replace" : undefined,
+        );
+        sessionApplied ||= moves && refusals.length === 0;
         return;
       }
       feedback =
@@ -123,9 +153,12 @@ export default function createFilterInput(
         return [];
       }
       input = "";
+      // A discrete choice is a step of its own, and ends any session.
+      endSession();
       return apply(built.predicate);
     },
     clear(): readonly SourceRefusal[] {
+      endSession();
       const refusals = host.removePredicate(field, operator);
       input = "";
       feedback = { status: "none" };
@@ -150,7 +183,10 @@ export default function createFilterInput(
       applied = next;
       input = next === null ? "" : String(next.operands.at(0) ?? "");
       feedback = { status: "none" };
+      // The query moved under the record: what was being typed has gone.
+      endSession();
       publish();
     },
+    endSession,
   };
 }

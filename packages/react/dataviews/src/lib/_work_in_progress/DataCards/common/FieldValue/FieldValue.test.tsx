@@ -1,11 +1,9 @@
 import { createRowScopes } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-  machines,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import { machines } from "../../../../../../testing/machines.js";
 import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
 import type { DisplayFieldCellProps } from "../../../../common/index.js";
 import {
@@ -22,7 +20,7 @@ import FieldValue from "./FieldValue.js";
  */
 const observeRow = (fields: readonly string[]) => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha", "failed", 8)],
+    rows: [buildMachine("m-1", "alpha", "failed", 8)],
   });
   const releaseProvider = provider.observe();
   const scopes = createRowScopes({

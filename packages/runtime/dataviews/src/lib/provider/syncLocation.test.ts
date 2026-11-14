@@ -10,23 +10,17 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import buildPage from "../../../testing/buildPage.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import {
-  byId,
-  declare,
-  declareSort,
-  NOTHING_DECLARED,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createFilterInputs } from "../filter/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
-import {
-  DEFAULT_WINDOW,
-  type ResultWindow,
-  type Slice,
-} from "../query/index.js";
+import { DEFAULT_WINDOW, type ResultWindow } from "../query/index.js";
 import type { Completion, SourceRefusal } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
@@ -49,15 +43,15 @@ const machines = createCollection({
       options: ["failed", "cancelled", "ready"],
     },
     { field: "cpu", kind: "number", min: 0, max: 64 },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
   ],
-  identify: byId,
+  identify: readId,
 });
 
 /** The machines without their cpu: a source over it cannot order by one. */
 const machinesWithoutCpu = createCollection({
   fields: machines.schema.fields.filter((field) => field.field !== "cpu"),
-  identify: byId,
+  identify: readId,
 });
 
 /** Everything the scenarios command: every filter, search, a two-field ordering. */
@@ -84,6 +78,7 @@ const CPU_UNSORTABLE: SourceRefusal = {
 /** The issue a location's `q` earns from a source declaring no search. */
 const SEARCH_REFUSED = {
   parameter: "q",
+  field: null,
   code: "undeclared-field",
   reason: "this source cannot search",
 };
@@ -91,6 +86,7 @@ const SEARCH_REFUSED = {
 /** The issue a `status` value outside the options earns. */
 const MELTED = {
   parameter: "status",
+  field: "status",
   code: "invalid",
   reason: '"melted" is not an option of "status"',
 };
@@ -107,7 +103,7 @@ const fleet: readonly RowRecord[] = [
 /** One exactly counted page of rows, as a source delivers it. */
 const delivered = (rows: readonly RowRecord[]): Completion => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 /**
@@ -339,7 +335,8 @@ describe("syncLocation", () => {
   it("reads a written spelling back once, and not again as its echo", () => {
     // The read-back is the transition's; the location's notification of the
     // very spelling written is the loop's own echo and stops before reading
-    // anything — one comparison of the host's state per transition, not two.
+    // anything — one read of the host's state for the spelling, whose
+    // withheld clauses it carries, and one for the read-back, never a third.
     const provider = createMachinesProvider();
     const host = readProviderHost(provider);
     const read = vi.fn(host.state.get);
@@ -357,7 +354,7 @@ describe("syncLocation", () => {
     read.mockClear();
     provider.navigateWindow({ page: 2 });
     expect(location.read().get("page")).toBe("2");
-    expect(read).toHaveBeenCalledTimes(1);
+    expect(read).toHaveBeenCalledTimes(2);
     release();
   });
 
@@ -599,6 +596,7 @@ describe("syncLocation", () => {
       MELTED,
       {
         parameter: "cpu__near",
+        field: "cpu",
         code: "malformed",
         reason: 'unknown operator "near"',
       },
@@ -609,25 +607,125 @@ describe("syncLocation", () => {
     release();
   });
 
-  it("leaves a refused parameter standing until the query moves", () => {
-    const { host, location, sync } = setUp({ href: "/machines?status=melted" });
+  it("withholds the query a refused filter would widen, until the filter moves", () => {
+    const { provider, host, location, sync } = setUp({
+      href: "/machines?status=melted",
+    });
     const release = sync.observe();
     // Not rewritten: a reload must show the same error, not a broader query.
     expect(location.read().toString()).toBe("status=melted");
+    // Nothing ran: the unfiltered query is wider than the link asked for.
+    expect(provider.state.get().pendingRequestId).toBeNull();
+    expect(provider.state.get().result.problem).toEqual({
+      status: "refused",
+      issues: [MELTED],
+    });
+    // A refresh asks for nothing while the clause stands.
+    provider.refresh();
+    expect(provider.state.get().pendingRequestId).toBeNull();
 
-    // A row completion is not a query change, so it does not rewrite either.
-    const requestId = host.refresh();
-    expect(host.complete(requestId, delivered([{ id: "a" }]))).toBe(true);
-    expect(location.read().toString()).toBe("status=melted");
+    // Moving another member carries the refused clause as it was spelled.
+    provider.setSort([{ field: "cpu", direction: "desc" }]);
+    expect(location.read().toString()).toBe(
+      "status=melted&sort=cpu__desc&page=1&size=50",
+    );
+    expect(provider.state.get().pendingRequestId).toBeNull();
+    expect(sync.issues.get()).toEqual([MELTED]);
 
-    // Moving the query does: the user has replaced what was refused.
+    // A write to the field replaces what was refused, and the query runs.
     host.setPredicate({
       field: "status",
       operator: "isAny",
       operands: ["ready"],
     });
-    expect(location.read().toString()).toBe("status=ready&page=1&size=50");
+    expect(location.read().toString()).toBe(
+      "status=ready&sort=cpu__desc&page=1&size=50",
+    );
     expect(sync.issues.get()).toEqual([]);
+    expect(provider.state.get().pendingRequestId).not.toBeNull();
+    expect(provider.state.get().result.problem).toBeNull();
+    release();
+  });
+
+  it("keeps a clause refused for some of its values withheld across a sort", () => {
+    const { provider, location, sync } = setUp({
+      href: "/machines?status=failed&status=melted",
+    });
+    const release = sync.observe();
+    provider.setSort([{ field: "cpu", direction: "desc" }]);
+    // `failed` is applied, and `melted` stands beside it, refused.
+    expect(location.read().getAll("status")).toEqual(["failed", "melted"]);
+    expect(provider.state.get().pendingRequestId).toBeNull();
+    expect(sync.issues.get()).toEqual([MELTED]);
+    release();
+  });
+
+  it("keeps a clause the source refuses withheld across a sort, as the link spelled it", () => {
+    const { provider, location, sync } = setUp({
+      href: "/machines?status__isAny=failed",
+      capabilities: declare({ sort: declareSort(["cpu"]) }),
+    });
+    const release = sync.observe();
+    provider.setSort([{ field: "cpu", direction: "desc" }]);
+    expect(location.read().get("status__isAny")).toBe("failed");
+    expect(provider.state.get().pendingRequestId).toBeNull();
+    expect(sync.issues.get().map(({ parameter }) => parameter)).toEqual([
+      "status__isAny",
+    ]);
+    release();
+  });
+
+  it("removes a refused filter on clearing its field, and runs the query", () => {
+    const { provider, host, location, sync } = setUp({
+      href: "/machines?status=melted&q=al",
+    });
+    const release = sync.observe();
+    host.removePredicate("status", "isAny");
+    expect(location.read().toString()).toBe("q=al&page=1&size=50");
+    expect(sync.issues.get()).toEqual([]);
+    expect(provider.state.get().pendingRequestId).not.toBeNull();
+    release();
+  });
+
+  it("keeps the query withheld while another refused clause stands", () => {
+    const { provider, host, location, sync } = setUp({
+      href: "/machines?status=melted&cpu__gte=lots",
+    });
+    const release = sync.observe();
+    expect(sync.issues.get()).toHaveLength(2);
+    host.removePredicate("status", "isAny");
+    expect(location.read().toString()).toBe("cpu__gte=lots&page=1&size=50");
+    expect(sync.issues.get()).toEqual([
+      {
+        parameter: "cpu__gte",
+        field: "cpu",
+        code: "invalid",
+        reason: "not a number",
+      },
+    ]);
+    expect(provider.state.get().pendingRequestId).toBeNull();
+    release();
+  });
+
+  it("runs a query whose refused clauses narrow nothing, on their defaults", () => {
+    const { provider, sync } = setUp({
+      href: "/machines?sort=bogus&page=0&cpu__gte=4",
+    });
+    const release = sync.observe();
+    expect(sync.issues.get()).toHaveLength(2);
+    expect(provider.state.get().result.problem).toBeNull();
+    expect(provider.state.get().pendingRequestId).not.toBeNull();
+    release();
+  });
+
+  it("withholds again on Back to a link with a refused clause, and runs on Forward", () => {
+    const { provider, location, sync } = setUp({ href: "/machines" });
+    const release = sync.observe();
+    location.write(new URLSearchParams("status=melted&page=1&size=50"));
+    expect(provider.state.get().pendingRequestId).toBeNull();
+    expect(provider.state.get().result.problem?.status).toBe("refused");
+    location.write(new URLSearchParams("page=1&size=50"));
+    expect(provider.state.get().result.problem?.status).not.toBe("refused");
     release();
   });
 
@@ -911,11 +1009,13 @@ describe("syncLocation", () => {
     expect(sync.issues.get()).toEqual([
       {
         parameter: "cpu__gte",
+        field: "cpu",
         code: "undeclared-operator",
         reason: 'field "cpu" cannot be filtered with gte',
       },
       {
         parameter: "sort",
+        field: null,
         code: "too-many-terms",
         reason: "this source cannot sort",
       },
@@ -943,6 +1043,7 @@ describe("syncLocation", () => {
     expect(sync.issues.get()).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "undeclared-field",
         reason: 'field "cpu" cannot be sorted',
       },
@@ -1120,6 +1221,7 @@ describe("syncLocation", () => {
     expect(sync.issues.get()).toEqual([
       {
         parameter: "size",
+        field: null,
         code: "malformed",
         reason: '"0" is not a positive integer',
       },
@@ -1343,7 +1445,8 @@ describe("syncLocation", () => {
     });
     adoptSearch(host, "abc");
     expect(provider.state.get().window.page).toBe(2);
-    expect(location.read().toString()).toBe("page=2&size=50");
+    // The refused search is carried: it stands until the reader removes it.
+    expect(location.read().toString()).toBe("q=abc&page=2&size=50");
     stop();
     release();
   });
@@ -1412,7 +1515,7 @@ describe("syncLocation", () => {
     });
     writes.length = 0;
     adoptSearch(host, "abc");
-    expect(writes).toEqual([["page=2&size=50", "push"]]);
+    expect(writes).toEqual([["q=abc&page=2&size=50", "push"]]);
     pager();
     release();
   });
@@ -1556,6 +1659,7 @@ describe("syncLocation", () => {
     expect(provider.issues.get()).toEqual([
       {
         parameter: "status",
+        field: "status",
         code: "undeclared-field",
         reason: 'field "status" cannot be filtered',
       },

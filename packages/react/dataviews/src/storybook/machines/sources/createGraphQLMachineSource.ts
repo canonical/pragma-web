@@ -15,7 +15,8 @@ import {
   Store,
 } from "relay-runtime";
 import type { ApiScenario } from "../api/index.js";
-import { type Machine, machineCollection } from "../fixtures.js";
+import { machineCollection } from "../fixtures.js";
+import type { Machine } from "../types.js";
 import MachinesQuery from "./MachinesQuery.js";
 
 /**

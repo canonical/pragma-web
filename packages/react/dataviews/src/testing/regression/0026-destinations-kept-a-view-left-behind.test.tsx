@@ -13,8 +13,9 @@
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { createStandInViewStore } from "../../../testing/createStandInStores.js";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0026 — destinations kept a view left behind", () => {
@@ -24,7 +25,7 @@ describe("regression 0026 — destinations kept a view left behind", () => {
     });
     const { provider } = createMachineProvider({
       location,
-      rows: [machine("m1", "one"), machine("m2", "two")],
+      rows: [buildMachine("m1", "one"), buildMachine("m2", "two")],
       // The listing still loading: nothing yet says whether the view exists.
       views: createStandInViewStore({ list: () => new Promise(() => {}) }),
     });

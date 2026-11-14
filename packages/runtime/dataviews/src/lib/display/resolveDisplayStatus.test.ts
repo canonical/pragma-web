@@ -7,12 +7,10 @@
  * completed by hand with what a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import {
-  failedWith,
-  pageOf,
-  readIssuedRequest,
-  refusedWith,
-} from "../../../testing/fixtures.js";
+import buildFailedResult from "../../../testing/buildFailedResult.js";
+import buildPage from "../../../testing/buildPage.js";
+import buildRefusedResult from "../../../testing/buildRefusedResult.js";
+import readIssuedRequest from "../../../testing/readIssuedRequest.js";
 import {
   createQueryCoordinator,
   type DataViewsState,
@@ -37,7 +35,7 @@ const machine = (id: string, name: string): Machine => ({ id, name });
 /** The rows a source delivers. */
 const delivery = (rows: readonly Machine[]): Completion<Machine> => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 /** A coordinator whose first request was settled with `rows`. */
@@ -76,7 +74,7 @@ describe("resolveDisplayStatus", () => {
     const coordinator = createQueryCoordinator<Machine>();
     coordinator.complete(
       coordinator.refresh(),
-      failedWith("the collection is unreachable"),
+      buildFailedResult("the collection is unreachable"),
     );
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "failed",
@@ -84,15 +82,29 @@ describe("resolveDisplayStatus", () => {
     });
   });
 
-  it("reads a refusal's reasons as one sentence", () => {
+  it("reads a refusal's reasons as one sentence, refused rather than failed", () => {
+    // Nothing ran, so nothing failed: the source refused the query.
     const coordinator = createQueryCoordinator<Machine>();
     coordinator.complete(
       coordinator.refresh(),
-      refusedWith("name cannot be ordered", "two orderings at once"),
+      buildRefusedResult("name cannot be ordered", "two orderings at once"),
     );
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
-      status: "failed",
+      status: "refused",
       reason: "name cannot be ordered; two orderings at once",
+    });
+  });
+
+  it("reads a followed link's refused clauses as one sentence", () => {
+    const coordinator = createQueryCoordinator<Machine>({
+      withheld: [
+        { parameter: "status", field: "status", code: "invalid", reason: "a" },
+        { parameter: "q", field: null, code: "malformed", reason: "b" },
+      ],
+    });
+    expect(resolveDisplayStatus(coordinator.state)).toEqual({
+      status: "refused",
+      reason: "a; b",
     });
   });
 
@@ -157,7 +169,7 @@ describe("resolveDisplayStatus", () => {
 
   it("prefers the failure over emptiness when an empty result then failed", () => {
     const coordinator = loaded([]);
-    coordinator.complete(coordinator.refresh(), failedWith("offline"));
+    coordinator.complete(coordinator.refresh(), buildFailedResult("offline"));
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "failed",
       reason: "offline",
@@ -167,7 +179,7 @@ describe("resolveDisplayStatus", () => {
   it("reports rows an earlier query produced as stale, with the reason", () => {
     const coordinator = searched(
       loaded([machine("m-1", "alpha")]),
-      failedWith("search is unavailable"),
+      buildFailedResult("search is unavailable"),
     );
     expect(coordinator.state.result.status).toBe("stale");
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
@@ -179,7 +191,7 @@ describe("resolveDisplayStatus", () => {
   it("reports a failed query with no earlier rows to keep as a failure", () => {
     const coordinator = searched(
       loaded([]),
-      failedWith("search is unavailable"),
+      buildFailedResult("search is unavailable"),
     );
     expect(coordinator.state.result.status).toBe("stale");
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
@@ -190,7 +202,7 @@ describe("resolveDisplayStatus", () => {
 
   it("reports rows kept through a failed refresh, with the reason", () => {
     const coordinator = loaded([machine("m-1", "alpha")]);
-    coordinator.complete(coordinator.refresh(), failedWith("offline"));
+    coordinator.complete(coordinator.refresh(), buildFailedResult("offline"));
     expect(coordinator.state.result.status).toBe("refresh-failed");
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "refresh-failed",
@@ -218,11 +230,11 @@ describe("resolveDisplayStatus", () => {
     expect(resolveDisplayStatus(state)).toEqual({ status: "pending" });
   });
 
-  it("produces no regrouping status from any published state", () => {
-    // Every combination a state can hold, hand-built because the absence
-    // must cover the whole input space and not only the paths a source
-    // takes: no result status, rows, problem or query yields the kind the
-    // grouping work reserves.
+  it("reaches every status kind, and no other, from the published states", () => {
+    // Every combination a state can hold, hand-built because the claim must
+    // cover the whole input space and not only the paths a source takes:
+    // each kind the union names is reached, so none is a kind nothing
+    // emits.
     const statuses = Object.keys({
       idle: true,
       pending: true,
@@ -238,7 +250,19 @@ describe("resolveDisplayStatus", () => {
         status: "failed",
         failure: { reason: "x", cause: null, transient: null },
       },
-      refusedWith("x"),
+      buildRefusedResult("x"),
+      { status: "forbidden", cause: null },
+      {
+        status: "refused",
+        issues: [
+          {
+            parameter: "status",
+            field: "status",
+            code: "invalid",
+            reason: "x",
+          },
+        ],
+      },
     ];
     const rowSets: readonly (readonly Machine[] | null)[] = [
       null,
@@ -287,16 +311,23 @@ describe("resolveDisplayStatus", () => {
         }
       }
     }
-    expect(seen.has("regrouping")).toBe(false);
-    // Every other kind is reached, so the absence is not an artefact of
-    // the matrix missing a path.
     expect([...seen].sort()).toEqual(
-      [
-        null,
-        ...Object.keys(DISPLAY_STATUS_PHASES).filter(
-          (kind) => kind !== "regrouping",
-        ),
-      ].sort(),
+      [null, ...Object.keys(DISPLAY_STATUS_PHASES)].sort(),
     );
+  });
+
+  it("says no access over rows kept from before, and gives no reason", () => {
+    const coordinator = createQueryCoordinator<Machine>();
+    coordinator.complete(
+      coordinator.refresh(),
+      delivery([machine("m-1", "alpha")]),
+    );
+    coordinator.complete(coordinator.refresh(), {
+      status: "forbidden",
+      cause: new Error("403"),
+    });
+    expect(resolveDisplayStatus(coordinator.state)).toEqual({
+      status: "no-access",
+    });
   });
 });

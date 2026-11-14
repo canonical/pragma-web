@@ -1,10 +1,8 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-  machines,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import { machines } from "../../../../../../testing/machines.js";
 import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
 import { DataViews } from "../../../DataViews/index.js";
 import ConnectedRecordList from "./ConnectedRecordList.js";
@@ -12,7 +10,7 @@ import ConnectedRecordList from "./ConnectedRecordList.js";
 describe("ConnectedRecordList", () => {
   it("lists the enclosing root's rows, sharing its selection", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha"), machine("m-2", "beta")],
+      rows: [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
     });
     render(
       <DataViews provider={provider}>

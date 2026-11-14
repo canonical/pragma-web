@@ -10,11 +10,9 @@ import type { ViewPresentation } from "@canonical/dataviews-core";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { act } from "react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
@@ -31,7 +29,7 @@ const columns: readonly DataTableColumn[] = [
  */
 const choose = (name: string): void => {
   const cell = document.querySelector<HTMLElement>(
-    ".data-table-header-cell.settings",
+    ".ds.data-table-settings-cell",
   );
   if (cell === null) {
     throw new Error("expected the table's settings cell");
@@ -68,7 +66,7 @@ const listTerms = (): readonly (string | null)[] =>
  */
 const renderOrdered = (arrangement?: ViewPresentation) => {
   const { provider, source } = createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
     capabilities: declareMachineOrdering(null),
   });
   render(

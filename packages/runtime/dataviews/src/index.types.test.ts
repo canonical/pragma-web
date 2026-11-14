@@ -48,7 +48,6 @@ import type {
   FilterHandle,
   FilterHandles,
   FilterInputState,
-  FlagField,
   GroupCapabilities,
   GroupPath,
   GroupSummary,
@@ -66,6 +65,7 @@ import type {
   PredicateOperand,
   PredicateOperator,
   PreferenceResult,
+  PresenceField,
   Presentation,
   PresentationPatch,
   PresentationState,
@@ -190,7 +190,7 @@ type EveryPublicType = [
   ActionRequest,
   ActionRun,
   ActionTargets,
-  AppliedOf<FlagField>,
+  AppliedOf<PresenceField>,
   ArraySource,
   ArraySourceConfig,
   CapabilityDeclaration<readonly SchemaFieldDefinition[]>,
@@ -222,7 +222,7 @@ type EveryPublicType = [
   FilterHandle<unknown>,
   FilterHandles<readonly SchemaFieldDefinition[]>,
   FilterInputState,
-  FlagField,
+  PresenceField,
   GroupCapabilities,
   GroupPath,
   GroupSummary,
@@ -507,17 +507,18 @@ describe("public surface types", () => {
   it("spells one status vocabulary, in one casing, with its phases", () => {
     expectTypeOf<DisplayStatus["status"]>().toEqualTypeOf<
       | "pending"
-      | "regrouping"
       | "failed"
+      | "refused"
       | "refresh-failed"
       | "stale"
+      | "no-access"
       | "no-data"
       | "no-results"
     >();
-    // The failures carry their reason; the rest say what they are.
+    // The failures and refusals carry their reason; the rest say what they are.
     expectTypeOf<
       Extract<DisplayStatus, { readonly reason: string }>["status"]
-    >().toEqualTypeOf<"failed" | "refresh-failed" | "stale">();
+    >().toEqualTypeOf<"failed" | "refused" | "refresh-failed" | "stale">();
     expectTypeOf(bindings.DISPLAY_STATUS_PHASES).toEqualTypeOf<
       Readonly<Record<DisplayStatus["status"], "terminal" | "transient">>
     >();
@@ -560,7 +561,7 @@ describe("public surface types", () => {
 
   it("discriminates the completion and outcome unions by status", () => {
     expectTypeOf<Completion["status"]>().toEqualTypeOf<
-      "succeeded" | "failed" | "refused"
+      "succeeded" | "failed" | "forbidden" | "refused"
     >();
     expectTypeOf<ResultStatus>().toEqualTypeOf<
       | "idle"
@@ -586,7 +587,7 @@ describe("public surface types", () => {
     const machines = dataviews.createSchema([
       { field: "status", kind: "choices", options: ["failed", "cancelled"] },
       { field: "cpu", kind: "number" },
-      { field: "owner", kind: "flag" },
+      { field: "owner", kind: "presence" },
     ]);
     type Machines = FilterHandles<typeof machines.fields>;
     expectTypeOf<Machines["status"]["isAny"]["applied"]>().toEqualTypeOf<
@@ -649,7 +650,12 @@ describe("public surface types", () => {
       .toHaveProperty("complete")
       .parameters.toEqualTypeOf<[string, Completion<Machine>]>();
     expectTypeOf<ProviderHost["adopt"]>().parameters.toEqualTypeOf<
-      [Query, "adopt" | "view" | "revert", string | null]
+      [
+        Query,
+        "adopt" | "view" | "revert",
+        string | null,
+        (readonly QueryIssue[] | undefined)?,
+      ]
     >();
     expectTypeOf<ProviderHost["refresh"]>().returns.toEqualTypeOf<string>();
     expectTypeOf<DataViewsProvider["refresh"]>().returns.toEqualTypeOf<void>();
@@ -714,7 +720,7 @@ describe("public surface types", () => {
 
   it("reports refusals structurally, by part and code", () => {
     expectTypeOf<SourceRefusalPart>().toEqualTypeOf<
-      "filter" | "search" | "sort" | "group" | "window" | "targets"
+      "filter" | "search" | "sort" | "group" | "window"
     >();
     expectTypeOf<DataViewsProvider["refusals"]>().returns.toEqualTypeOf<
       readonly SourceRefusal[]

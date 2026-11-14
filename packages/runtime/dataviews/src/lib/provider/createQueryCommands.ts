@@ -1,9 +1,11 @@
+import { isClauseReplaced, readWithheld } from "../coordinator/index.js";
+import type { HistoryMode } from "../location/index.js";
 import {
   applyQueryCommand,
   type Query,
   type QueryCommand,
 } from "../query/index.js";
-import type { SourceRefusal } from "../result/index.js";
+import type { QueryIssue, SourceRefusal } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import { refusalsOf } from "../source/index.js";
 import { CAUSE_OF_COMMAND } from "./constants.js";
@@ -49,24 +51,30 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
     source,
     publish,
     transitions,
-    history,
+    history: policy,
     view: openView,
   } = config;
 
-  /** Announce the move the published state made. */
-  const announceTransition = (cause: TransitionCause): void => {
+  /**
+   * Announce the move the published state made, entering history as
+   * `history` says or, left out, as the policy does.
+   */
+  const announceTransition = (
+    cause: TransitionCause,
+    history: HistoryMode | null = policy[cause],
+  ): void => {
     const { slice, window } = coordinator.state;
     transitions.set({
       query: { slice, window },
       cause,
-      history: history[cause],
+      history,
     });
   };
 
   /** Publish the state the coordinator reached, then announce the move. */
-  const announce = (cause: TransitionCause): void => {
+  const announce = (cause: TransitionCause, history?: HistoryMode): void => {
     publish();
-    announceTransition(cause);
+    announceTransition(cause, history);
   };
 
   const refusals = (query: Query): readonly SourceRefusal[] => {
@@ -85,13 +93,21 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
 
   return {
     refusals,
-    command(next: QueryCommand): readonly SourceRefusal[] {
+    command(
+      next: QueryCommand,
+      history?: HistoryMode,
+    ): readonly SourceRefusal[] {
       const { slice, window } = coordinator.state;
       const applied = applyQueryCommand(slice, window, next);
       if (applied.status === "rejected") {
         throw new Error(applied.reason);
       }
-      if (!applied.sliceChanged && !applied.windowChanged) {
+      // A command replacing a refused clause of the link moves the query
+      // even when the slice stays: the clause no longer stands.
+      const replaces = readWithheld(coordinator.state).some((issue) =>
+        isClauseReplaced(next, issue),
+      );
+      if (!applied.sliceChanged && !applied.windowChanged && !replaces) {
         return NO_REFUSALS;
       }
       // The query the command starts from is checked only when the one it
@@ -107,17 +123,20 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
       // Applied above to a copy, and here for real: the same command over
       // the same state, so what moved there moves here and issues a request.
       coordinator.dispatch(next);
-      announce(CAUSE_OF_COMMAND[next.kind]);
+      announce(CAUSE_OF_COMMAND[next.kind], history);
       return NO_REFUSALS;
     },
     adopt(
       query: Query,
       cause: AdoptionCause,
       view: string | null,
+      withheld?: readonly QueryIssue[],
     ): string | null {
-      const requestId = coordinator.adopt(query);
+      const before = coordinator.state;
+      const requestId = coordinator.adopt(query, withheld);
       const viewMoved = view !== openView.get();
-      if (requestId === null && !viewMoved) {
+      // Withheld, an adoption issues no request and still moves the state.
+      if (coordinator.state === before && !viewMoved) {
         return null;
       }
       // The adopted state is published before the view moves, so anything

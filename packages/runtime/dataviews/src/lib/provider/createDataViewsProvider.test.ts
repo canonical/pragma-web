@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
+import buildPage from "../../../testing/buildPage.js";
 import createCountingViewStore from "../../../testing/createCountingViewStore.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
@@ -6,14 +8,10 @@ import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "../../../testing/createStandInStores.js";
-import {
-  answering,
-  NOTHING_DECLARED,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
 import type { ActionOutcome } from "../action/index.js";
 import { createCollection } from "../collection/index.js";
-import { createMemoryLocation, type QueryLocation } from "../location/index.js";
+import { createMemoryLocation } from "../location/index.js";
 import type { PresentationStore } from "../presentation/index.js";
 import {
   DEFAULT_WINDOW,
@@ -49,7 +47,7 @@ const machineCollection = (
     fields: [
       { field: "status", kind: "choices", options: ["failed", "cancelled"] },
       { field: "cpu", kind: "number", min: 0, max: 64 },
-      { field: "owner", kind: "flag" },
+      { field: "owner", kind: "presence" },
       { field: "updated", kind: "date" },
       { field: "name", kind: "text" },
     ],
@@ -63,12 +61,12 @@ const permissive: SourceCapabilities = declareCapabilities(machines, {
   filter: { status: ["isAny"], cpu: ["gte", "lte"] },
   search: ["name"],
   sort: { fields: ["cpu", "updated"], terms: 2 },
-  counts: { pageable: "exact", matched: "exact", total: "exact" },
+  counts: { pageable: "exact", matched: "exact" },
 });
 
 const delivered = <TRow extends object>(
   rows: readonly TRow[],
-): SourceDelivery<TRow> => ({ status: "succeeded", page: pageOf(rows) });
+): SourceDelivery<TRow> => ({ status: "succeeded", page: buildPage(rows) });
 
 const FAILED: Completion<Machine> = {
   status: "failed",
@@ -280,12 +278,14 @@ describe("createDataViewsProvider construction", () => {
     ]);
     expect(state.slice.sort).toEqual([{ field: "cpu", direction: "desc" }]);
     expect(state.window).toMatchObject({ page: 2, size: 10 });
-    expect(state.result.status).toBe("idle");
     expect(state.pendingRequestId).toBeNull();
-    // The clause the source cannot filter by is left out and reported.
+    // The clause the source cannot filter by is left out and reported, and
+    // the query it would have narrowed is withheld rather than run wider.
     expect(provider.issues.get().map((issue) => issue.parameter)).toEqual([
       "owner__isSet",
     ]);
+    expect(state.result.status).toBe("failed");
+    expect(state.result.problem?.status).toBe("refused");
   });
 
   it("reads no store when built from a snapshot naming an open view", () => {
@@ -359,7 +359,7 @@ describe("createDataViewsProvider construction", () => {
   it("adopts a location moved before the first observer before taking up rows drawn for the old query", () => {
     const { source, calls } = createManualSource<Machine>({
       capabilities: permissive,
-      answer: answering([{ id: "m-1" }]),
+      answer: answerWith([{ id: "m-1" }]),
     });
     const recorded = createRecordingLocation({
       href: "/machines?status=failed&page=1&size=50",
@@ -535,7 +535,7 @@ describe("createDataViewsProvider observe", () => {
   });
 
   it("reports a location clause the source refuses as an issue", () => {
-    const { source, callAt } = createManualSource<Machine>({
+    const { source, calls } = createManualSource<Machine>({
       capabilities: NOTHING_DECLARED,
     });
     const location = createMemoryLocation({ href: "/?status=failed" });
@@ -547,6 +547,7 @@ describe("createDataViewsProvider observe", () => {
     const refused = [
       {
         parameter: "status",
+        field: "status",
         code: "undeclared-field",
         reason: 'field "status" cannot be filtered',
       },
@@ -555,8 +556,9 @@ describe("createDataViewsProvider observe", () => {
     expect(provider.issues.get()).toEqual(refused);
     const release = provider.observe();
     expect(provider.issues.get()).toEqual(refused);
-    // The refused clause never reaches the source; the rest of the query does.
-    expect(callAt(0).request.slice.filter).toEqual([]);
+    // The refused clause never reaches the source, and nor does the wider
+    // query leaving it out would make: nothing runs while it stands.
+    expect(calls).toHaveLength(0);
     release();
   });
 });
@@ -648,7 +650,7 @@ describe("createDataViewsProvider snapshot", () => {
   it("reads the query, its window and the arrangement in force, never the selection", () => {
     const { source } = createManualSource<Machine>({
       capabilities: permissive,
-      answer: answering([{ id: "m-1" }, { id: "m-2" }]),
+      answer: answerWith([{ id: "m-1" }, { id: "m-2" }]),
     });
     const provider = createDataViewsProvider({
       collection: machines,
@@ -839,7 +841,7 @@ describe("createDataViewsProvider refresh", () => {
   it("is taken up by the first observer over the rows it drew, asking for nothing new", () => {
     const { source, calls } = createManualSource<Machine>({
       capabilities: permissive,
-      answer: answering([{ id: "m-1" }]),
+      answer: answerWith([{ id: "m-1" }]),
     });
     const provider = createDataViewsProvider({ collection: machines, source });
     provider.refresh();
@@ -1158,6 +1160,136 @@ describe("createDataViewsProvider host", () => {
     expect(heardOf(overridden, moves)).toEqual(["push", "push", "replace"]);
   });
 
+  it("carries a withheld query's refused clauses into every destination it spells", () => {
+    const location = createMemoryLocation({
+      href: "/machines?status=melted&cpu__gte=4",
+    });
+    const host = readProviderHost(
+      createDataViewsProvider({
+        collection: machines,
+        source: createManualSource<Machine>({ capabilities: permissive })
+          .source,
+        location,
+      }),
+    );
+    const { slice, window } = host.state.get();
+    // A new sort over the withheld query keeps what the link was refused.
+    expect(
+      host
+        .spellQuery({
+          slice: { ...slice, sort: [{ field: "cpu", direction: "desc" }] },
+          window,
+        })
+        ?.toString(),
+    ).toBe("status=melted&cpu__gte=4&sort=cpu__desc&page=1&size=50");
+  });
+
+  it("carries no refused clause into a destination that replaces it", () => {
+    const location = createMemoryLocation({
+      href: "/machines?status=failed&status=melted",
+    });
+    const host = readProviderHost(
+      createDataViewsProvider({
+        collection: machines,
+        source: createManualSource<Machine>({ capabilities: permissive })
+          .source,
+        location,
+      }),
+    );
+    const { slice, window } = host.state.get();
+    // The status the link applied, `failed`, and the one it was refused,
+    // `melted`, both stand while the destination leaves the status alone.
+    expect(host.spellQuery({ slice, window })?.toString()).toBe(
+      "status=failed&status=melted&page=1&size=50",
+    );
+    // A destination moving the status replaces the refused clause, and
+    // brings back neither value.
+    expect(
+      host
+        .spellQuery({
+          slice: {
+            ...slice,
+            filter: [
+              { field: "status", operator: "isNone", operands: ["failed"] },
+            ],
+          },
+          window,
+        })
+        ?.toString(),
+    ).toBe("status__isNone=failed&page=1&size=50");
+  });
+
+  it("clears one refused clause as the link without it does, and nothing else", () => {
+    const location = createMemoryLocation({
+      href: "/machines?status=failed&status__isNone=melted&page=2",
+    });
+    const provider = createDataViewsProvider({
+      collection: machines,
+      source: createManualSource<Machine>({
+        capabilities: declareCapabilities(machines, {
+          filter: { status: ["isAny", "isNone"] },
+        }),
+      }).source,
+      location,
+    });
+    const release = provider.observe();
+    const host = readProviderHost(provider);
+    expect(provider.state.get().pendingRequestId).toBeNull();
+    // Not a refused parameter, or not one the location carries: nothing moves.
+    host.clearRefused("status");
+    host.clearRefused("cpu__gte");
+    expect(location.read().toString()).toBe(
+      "status=failed&status__isNone=melted&page=2",
+    );
+    host.clearRefused("status__isNone");
+    // The applied set and the page stay, as the no-JS link keeps them.
+    expect(location.read().toString()).toBe("status=failed&page=2");
+    expect(provider.issues.get()).toEqual([]);
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "status", operator: "isAny", operands: ["failed"] },
+    ]);
+    expect(provider.state.get().pendingRequestId).not.toBeNull();
+    release();
+  });
+
+  it("clears a refused search, and nothing the location does not carry", () => {
+    const location = createMemoryLocation({ href: "/machines?q=a&q=b" });
+    const provider = createDataViewsProvider({
+      collection: machines,
+      source: createManualSource<Machine>({ capabilities: permissive }).source,
+      location,
+    });
+    const release = provider.observe();
+    readProviderHost(provider).clearRefused("q");
+    expect(location.read().has("q")).toBe(false);
+    expect(provider.issues.get()).toEqual([]);
+    release();
+    // A refusal kept from the snapshot names nothing the location carries.
+    const unlinked = createMemoryLocation({ href: "/machines" });
+    const snapshotted = createDataViewsProvider({
+      collection: machines,
+      source: createManualSource<Machine>({ capabilities: permissive }).source,
+      location: unlinked,
+      snapshot: { query: "status=melted", presentation: {} },
+    });
+    const stop = snapshotted.observe();
+    expect(snapshotted.issues.get()).toHaveLength(1);
+    const before = unlinked.read().toString();
+    readProviderHost(snapshotted).clearRefused("status");
+    expect(unlinked.read().toString()).toBe(before);
+    stop();
+  });
+
+  it("clears nothing without a location", () => {
+    const provider = createDataViewsProvider({
+      collection: machines,
+      source: createManualSource<Machine>({ capabilities: permissive }).source,
+      snapshot: { query: "status=melted", presentation: {} },
+    });
+    readProviderHost(provider).clearRefused("status");
+    expect(provider.issues.get()).toHaveLength(1);
+  });
+
   it("spells a query as the location carries it, and nothing without one", () => {
     const query = {
       slice: { ...EMPTY_SLICE, filter: [STATUS_FAILED] },
@@ -1248,7 +1380,6 @@ describe("createDataViewsProvider host", () => {
     expect(result.counts).toEqual({
       pageable: { kind: "exact", value: 1 },
       matched: { kind: "exact", value: 1 },
-      total: { kind: "exact", value: 1 },
     });
     expect(result.provenance?.requestId).toBe(requestId);
   });
@@ -1721,7 +1852,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
     const scoped = createCollection({
       fields: [
         { field: "type", kind: "choices", options: ["container"] },
-        { field: "secureboot", kind: "flag", appliesTo: ["container"] },
+        { field: "secureboot", kind: "presence", appliesTo: ["container"] },
       ],
       identify: (row: Machine) => row.id,
     });

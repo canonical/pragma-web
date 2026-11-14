@@ -27,7 +27,6 @@ export default function createPage<TRow extends object = RowRecord>(
     counts: Object.freeze({
       pageable: matched,
       matched,
-      total: readCount(config.total),
     }),
     facets: Object.freeze({ ...config.facets }),
     more: config.more ?? null,

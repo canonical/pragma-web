@@ -2,25 +2,24 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope, withFrame } from "../../../storybook/decorators.js";
+import buildMachines from "../../../storybook/machines/buildMachines.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import {
-  createEmptySource,
-  createFailingSource,
-  createMachineSource,
-  createOneTermSource,
-  createPendingSource,
-  type Machine,
-  type MachineFields,
-  machineCollection,
-  manyMachines,
-  type SortableField,
-} from "../../../storybook/machines/fixtures.js";
-import {
-  hostName,
-  type MachineProvider,
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import createEmptySource from "../../../storybook/machines/createEmptySource.js";
+import createFailingSource from "../../../storybook/machines/createFailingSource.js";
+import createForbiddingSource from "../../../storybook/machines/createForbiddingSource.js";
+import createMachineSource from "../../../storybook/machines/createMachineSource.js";
+import createOneTermSource from "../../../storybook/machines/createOneTermSource.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
+import { machineCollection } from "../../../storybook/machines/fixtures.js";
+import readHostName from "../../../storybook/machines/readHostName.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProvider,
+  MachineProviderConfig,
+  SortableField,
+} from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { virtualizeRows } from "../../virtualization/index.js";
@@ -69,7 +68,7 @@ function MachinesTable({
       {...args}
       provider={provider}
       columns={columns}
-      rowLabel={hostName}
+      rowLabel={readHostName}
     />
   );
 }
@@ -555,6 +554,19 @@ export const HorizontalScroll: Story = {
   render: renderMachines(sizedColumns),
 };
 
+/** The code a resizable table's stories show. */
+const resizableCode = consumerCode({
+  parts: tableParts,
+  declarations: `const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
+  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
+  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
+  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 }, resizable: true },
+];`,
+  render: tableCode,
+});
+
 /**
  * Resizable: Host and Region carry a resize control at their trailing edge.
  * Drag it to set the column's width; the preview is live and nothing is
@@ -571,17 +583,7 @@ export const HorizontalScroll: Story = {
  * so it has no control and takes whatever width the others leave.
  */
 export const Resizable: Story = {
-  parameters: consumerCode({
-    parts: tableParts,
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
-  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 }, resizable: true },
-];`,
-    render: tableCode,
-  }),
+  parameters: resizableCode,
   decorators: [withFrame("48rem")],
   render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
   play: async ({ canvas }) => {
@@ -612,6 +614,78 @@ export const MixedResizableColumns: Story = {
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(resizing(plainColumns, ["name", "region"])),
+};
+
+/**
+ * Resize without dragging: a press on a column's edge that does not travel
+ * starts placing it, and the next press in the header row says where the
+ * column should end. The edge takes the focus colour and a hint shows under
+ * the heading until then; a press on the edge again, a press outside the
+ * header row, Escape or leaving the column cancels with nothing changed.
+ * Host has been pressed once, then pressed again where it should end.
+ */
+export const ResizeWithoutDragging: Story = {
+  parameters: resizableCode,
+  decorators: [withFrame("48rem")],
+  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByRole("separator", { name: /^Host/ });
+    const before = Number(host.getAttribute("aria-valuenow"));
+    const edge = host.getBoundingClientRect();
+    const centre = edge.top + edge.height / 2;
+    await userEvent.pointer({
+      keys: "[MouseLeft]",
+      target: host,
+      coords: { clientX: edge.left + edge.width / 2, clientY: centre },
+    });
+    await expect(host.parentElement).toHaveAttribute("data-mode", "placing");
+    await expect(host).toHaveAccessibleDescription(
+      "Click or tap in the header row where the Host column should end. Press the edge again or Escape to cancel.",
+    );
+    const status = canvas.getByRole("columnheader", { name: "Status" });
+    await userEvent.pointer({
+      keys: "[MouseLeft]",
+      target: status,
+      coords: { clientX: edge.right + 40, clientY: centre },
+    });
+    await expect(host.parentElement).not.toHaveAttribute("data-mode");
+    await expect(Number(host.getAttribute("aria-valuenow"))).toBeGreaterThan(
+      before,
+    );
+  },
+};
+
+/**
+ * The state between the two presses: the Host column's edge is being
+ * placed, so its hairline is a focused one and the hint below the heading
+ * says where to press and how to cancel. The story ends there.
+ */
+export const PlacingAColumnsEdge: Story = {
+  name: "Placing a column's edge",
+  parameters: resizableCode,
+  decorators: [withFrame("48rem")],
+  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByRole("separator", { name: /^Host/ });
+    const edge = host.getBoundingClientRect();
+    await userEvent.pointer({
+      keys: "[MouseLeft]",
+      target: host,
+      coords: {
+        clientX: edge.left + edge.width / 2,
+        clientY: edge.top + edge.height / 2,
+      },
+    });
+    await expect(host.parentElement).toHaveAttribute("data-mode", "placing");
+    await expect(host).toHaveAccessibleDescription(
+      "Click or tap in the header row where the Host column should end. Press the edge again or Escape to cancel.",
+    );
+    // The hint the handle is described by is drawn, not only read.
+    const hint = host.ownerDocument.getElementById(
+      host.getAttribute("aria-describedby") ?? "",
+    );
+    await expect(hint).toBeVisible();
+  },
 };
 
 const boundedColumns: readonly DataTableColumn[] = [
@@ -731,20 +805,19 @@ const fixedColumns: readonly DataTableColumn[] = [
   },
   {
     id: "owner",
-    header: ruled("Owner", "fixed 120 · takes the rest"),
+    header: ruled("Owner", "fixed 120"),
     sizing: { kind: "fixed", px: 120 },
   },
 ];
 
 /**
- * Last column takes the rest: every column here is fixed, and together they
- * are narrower than the frame. Rather than leave a gap at the table's edge,
- * the last column takes whatever width the others leave — Owner declares
- * 120 and shows more. Narrow Host and Owner grows by the same amount; widen
- * Host and Owner gives it back, down to its own 120, after which the table
- * scrolls.
+ * Space after fixed columns: every column here is fixed, and together they
+ * are narrower than the frame. Each keeps its declared width, Owner its 120,
+ * and the space past the last is the table's, left empty rather than
+ * stretching a column past its declaration. A flexible last column would
+ * take it, up to its own maximum.
  */
-export const LastColumnTakesTheRest: Story = {
+export const SpaceAfterFixedColumns: Story = {
   parameters: consumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -758,8 +831,10 @@ export const LastColumnTakesTheRest: Story = {
   render: renderMachines(fixedColumns),
   play: async ({ canvas }) => {
     await expect(
-      widthOf(await canvas.findByRole("columnheader", { name: /^Owner/ })),
-    ).toBeGreaterThan(120);
+      Math.round(
+        widthOf(await canvas.findByRole("columnheader", { name: /^Owner/ })),
+      ),
+    ).toBe(120);
   },
 };
 
@@ -963,6 +1038,32 @@ export const Failed: Story = {
 };
 
 /**
+ * No access: the source answered that the reader may not see these rows.
+ * Every row, count and facet is withdrawn, the status says so without the
+ * server's words, and nothing is in the error colour, since nothing
+ * malfunctioned. A change of filter or search asks again.
+ */
+export const NoAccess: Story = {
+  parameters: consumerCode({
+    parts: tableParts,
+    declarations: `${plainColumnsCode}
+
+// Shown once the source answers that the request is forbidden.`,
+    render: tableCode,
+  }),
+  render: renderMachines(plainColumns, { source: createForbiddingSource }),
+  play: async ({ canvas }) => {
+    const status = await canvas.findByText(
+      "You do not have permission to see these rows.",
+    );
+    await expect(status.closest("[data-status]")).toHaveAttribute(
+      "data-status",
+      "no-access",
+    );
+  },
+};
+
+/**
  * Empty collection: the source answered, with no filter or search applied,
  * and has nothing in it. This is a different message from a query that
  * matched nothing — there is nothing here to find.
@@ -1037,7 +1138,7 @@ const virtualization = virtualizeRows({ estimatedRowHeight: 24 });
 
 /** Ten thousand machines, all in one window. */
 const tenThousand = {
-  source: () => createMachineSource({ rows: manyMachines(10_000) }),
+  source: () => createMachineSource({ rows: buildMachines(10_000) }),
   query: "page=1&size=10000",
 } as const;
 

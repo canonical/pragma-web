@@ -1,15 +1,15 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import declareCapabilities from "./declareCapabilities.js";
 import type { CapabilityDeclaration } from "./types.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "ready"] },
     { field: "cpu", kind: "number" },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
     { field: "name", kind: "text" },
   ],
 });
@@ -30,7 +30,7 @@ describe("declareCapabilities", () => {
         collation: null,
       },
       group: { fields: [], levels: 0, summaries: "none", collapse: false },
-      counts: { pageable: "unknown", matched: "unknown", total: "unknown" },
+      counts: { pageable: "unknown", matched: "unknown" },
       pagination: { kind: "offset" },
       selection: { scope: "explicit" },
       actions: {},
@@ -50,7 +50,7 @@ describe("declareCapabilities", () => {
         empties: { cpu: "first", name: "last" },
         collation: "en-u-kn-true",
       },
-      counts: { pageable: "exact", matched: "at-least", total: "unknown" },
+      counts: { pageable: "exact", matched: "at-least" },
       pagination: { kind: "cursor", backward: false, durable: true },
       actions: { stop: { targets: "explicit", limit: 10 } },
     });
@@ -66,7 +66,7 @@ describe("declareCapabilities", () => {
         collation: "en-u-kn-true",
       },
       group: { fields: [], levels: 0, summaries: "none", collapse: false },
-      counts: { pageable: "exact", matched: "at-least", total: "unknown" },
+      counts: { pageable: "exact", matched: "at-least" },
       pagination: { kind: "cursor", backward: false, durable: true },
       selection: { scope: "explicit" },
       actions: { stop: { targets: "explicit", limit: 10 } },

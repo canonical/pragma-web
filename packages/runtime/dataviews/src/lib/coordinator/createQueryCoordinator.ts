@@ -10,8 +10,11 @@ import {
   spellQueryKey,
   spellSliceKey,
 } from "../query/index.js";
+import type { QueryIssue } from "../result/index.js";
 import { areFacetsEqual, type Completion } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
+import { areQueryIssuesEqual } from "../wire/index.js";
+import isClauseReplaced from "./isClauseReplaced.js";
 import type {
   DataViewsState,
   DispatchResult,
@@ -119,6 +122,11 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
    * against it, and dropped whenever the slice moves. */
   let sliceKey: string | null = null;
   let result: ResultState<TRow> = idleResult;
+  /**
+   * The narrowing clauses the query in force was refused for, or null while
+   * nothing is withheld. Set, no request runs for the query.
+   */
+  let withholding: readonly QueryIssue[] | null = null;
 
   function buildSnapshot(): DataViewsState<TRow> {
     return Object.freeze({
@@ -138,6 +146,27 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
     result = next;
     snapshot = buildSnapshot();
   };
+
+  /**
+   * Withhold the query in force: no request is pending, so one in flight is
+   * obsolete and a late completion cannot publish, and the rows shown, if
+   * any, stay as `stale` — they answer no query the reader asked for, even
+   * one that reads the same once the refused clauses are left out.
+   */
+  const withhold = (issues: readonly QueryIssue[]): void => {
+    withholding = Object.freeze([...issues]);
+    lastRequestId = null;
+    publishedKey = null;
+    publish({
+      ...result,
+      status: result.rows === null ? "failed" : "stale",
+      problem: Object.freeze({ status: "refused", issues: withholding }),
+    });
+  };
+
+  if (config.withheld !== undefined && config.withheld.length > 0) {
+    withhold(config.withheld);
+  }
 
   const beginRequest = (refreshing: boolean): string => {
     counter += 1;
@@ -167,7 +196,16 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
       if (applied.status === "rejected") {
         return { ...applied, requestId: null };
       }
-      if (!applied.sliceChanged && !applied.windowChanged) {
+      // The refused clauses this command does not replace stand.
+      let standing: readonly QueryIssue[] | null = null;
+      let replaced = false;
+      if (withholding !== null) {
+        standing = withholding.filter(
+          (issue) => !isClauseReplaced(command, issue),
+        );
+        replaced = standing.length !== withholding.length;
+      }
+      if (!applied.sliceChanged && !applied.windowChanged && !replaced) {
         return { ...applied, requestId: null };
       }
       // The command layer threads the caller's own predicate, sort-term and
@@ -184,35 +222,56 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
       // command layer's object and always copied.
       window = copyWindow(applied.window);
       currentKey = spellQueryKey({ slice, window });
+      if (standing !== null && standing.length > 0) {
+        withhold(standing);
+        return { ...applied, requestId: null };
+      }
+      withholding = null;
       const requestId = beginRequest(false);
       return { ...applied, requestId };
     },
     refresh(): string {
+      if (withholding !== null) {
+        throw new Error("a withheld query is not asked for again");
+      }
       // Refreshing is the state of rows kept on display while the same
       // query is asked again; with no rows there is nothing to keep, and
       // the first page from idle is simply pending.
       return beginRequest(result.rows !== null);
     },
-    adopt(query: Query): string | null {
+    adopt(query: Query, withheld?: readonly QueryIssue[]): string | null {
       const copiedSlice = copySlice(query.slice);
       const copiedWindow = copyWindow(query.window);
       const nextKey = spellQueryKey({
         slice: copiedSlice,
         window: copiedWindow,
       });
-      if (nextKey === currentKey) {
+      const copiedSliceKey = spellSliceKey(copiedSlice);
+      sliceKey ??= spellSliceKey(slice);
+      // Unsaid, what is withheld stands while the slice stays: a move of the
+      // window alone does not replace a refused clause.
+      const standing =
+        withheld ?? (copiedSliceKey === sliceKey ? (withholding ?? []) : []);
+      const sameWithholding =
+        withholding === null
+          ? standing.length === 0
+          : areQueryIssuesEqual(withholding, standing);
+      if (nextKey === currentKey && sameWithholding) {
         return null;
       }
       // A move of the window alone keeps the slice it stood on, so what reads
       // the slice by identity — the facets it answered — sees no new query.
-      const copiedSliceKey = spellSliceKey(copiedSlice);
-      sliceKey ??= spellSliceKey(slice);
       if (copiedSliceKey !== sliceKey) {
         slice = copiedSlice;
         sliceKey = copiedSliceKey;
       }
       window = copiedWindow;
       currentKey = nextKey;
+      if (standing.length > 0) {
+        withhold(standing);
+        return null;
+      }
+      withholding = null;
       return beginRequest(false);
     },
     complete(requestId: string, completion: Completion<TRow>): boolean {
@@ -234,7 +293,6 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
           counts: Object.freeze({
             pageable: page.counts.pageable,
             matched: page.counts.matched,
-            total: page.counts.total,
           }),
           // The same facets again keep their identity, so what reads them by
           // identity — a control showing counts — has nothing to redraw.
@@ -257,6 +315,13 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
         });
         return true;
       }
+      if (completion.status === "forbidden") {
+        // No access withdraws every row, count and facet, even those kept
+        // from before: the source has just refused to show them.
+        publishedKey = null;
+        publish({ ...idleResult, status: "failed", problem: completion });
+        return true;
+      }
       // The completion is the problem: re-keying it would put one fact in
       // two shapes on the surface.
       publish({
@@ -269,6 +334,7 @@ export default function createQueryCoordinator<TRow extends object = RowRecord>(
     reset(): void {
       generation += 1;
       lastRequestId = null;
+      withholding = null;
       slice = startSlice;
       sliceKey = null;
       window = startWindow;

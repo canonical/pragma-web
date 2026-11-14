@@ -11,12 +11,10 @@ import {
   type Variables,
 } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import {
-  byId,
-  declare,
-  declareSort,
-  exactly,
-} from "../../../testing/fixtures.js";
+import countExactly from "../../../testing/countExactly.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import {
   createDataViewsProvider,
@@ -304,10 +302,10 @@ const relay = () => {
   return { environment, fetches, fetchAt };
 };
 
-/** A forward connection: a status filter, no search, no declareSort, a total. */
+/** A forward connection: a status filter, no search, no declareSort, exact counts. */
 const connectionCapabilities: SourceCapabilities = declare({
   filter: { status: ["isAny"] },
-  counts: { pageable: "exact", matched: "exact", total: "unknown" },
+  counts: { pageable: "exact", matched: "exact" },
   pagination: { kind: "cursor", backward: false, durable: false },
 });
 
@@ -315,7 +313,6 @@ const connectionCapabilities: SourceCapabilities = declare({
 const countsOf = (matched: Count): SourceCounts => ({
   pageable: matched,
   matched,
-  total: UNKNOWN_COUNT,
 });
 
 const statusOf = (slice: Slice): readonly string[] | null => {
@@ -332,13 +329,19 @@ const operation = (page: RelayPageRequest) =>
 
 const source = (
   environment: RelayEnvironment,
-  overrides: { readonly capabilities?: SourceCapabilities } = {},
+  overrides: {
+    readonly capabilities?: SourceCapabilities;
+    readonly isForbidden?: (error: unknown) => boolean;
+  } = {},
 ) =>
   createRelaySource<MachinesOperation>({
     capabilities: overrides.capabilities ?? connectionCapabilities,
     environment,
     operation,
     connection: (data: MachinesData) => data.machines,
+    ...(overrides.isForbidden === undefined
+      ? {}
+      : { isForbidden: overrides.isForbidden }),
   });
 
 const emptySlice: Slice = { filter: [], search: null, sort: [], group: [] };
@@ -396,7 +399,7 @@ const lastOf = (deliver: ReturnType<typeof delivery>): SourceDelivery => {
 
 const machinesCollection = createCollection({
   fields: [{ field: "status", kind: "choices", options: ["ready", "failed"] }],
-  identify: byId,
+  identify: readId,
 });
 
 /** A window as the snapshot a provider starts from spells it. */
@@ -497,7 +500,7 @@ describe("createRelaySource over relay-runtime", () => {
       page: {
         rows: [machines[0], machines[1]],
         groups: null,
-        counts: countsOf(exactly(5)),
+        counts: countsOf(countExactly(5)),
         facets: {},
         more: true,
         cursors: { next: "c:m2", previous: null },
@@ -723,7 +726,7 @@ describe("createRelaySource over relay-runtime", () => {
       page: {
         rows: [],
         groups: null,
-        counts: countsOf(exactly(0)),
+        counts: countsOf(countExactly(0)),
         facets: {},
         more: false,
         cursors: { next: null, previous: null },
@@ -818,6 +821,122 @@ describe("createRelaySource over relay-runtime", () => {
         },
       ],
     ]);
+  });
+
+  it("delivers a fetch the application reads as forbidden as forbidden", () => {
+    const { environment, fetchAt } = relay();
+    const deliver = delivery();
+    const denied = new Error("403 from the graph");
+    source(environment, {
+      isForbidden: (error) => error === denied,
+    }).execute(request(), deliver);
+    fetchAt(0).fail(denied);
+    expect(deliver.mock.calls).toEqual([
+      [{ status: "forbidden", cause: denied }],
+    ]);
+  });
+
+  it("delivers nothing from the store once the fetch is forbidden", () => {
+    const { environment, fetchAt } = relay();
+    const denied = new Error("403 from the graph");
+    const adapter = source(environment, {
+      isForbidden: (error) => error === denied,
+    });
+    const release = adapter.execute(request(), delivery());
+    fetchAt(0).respond();
+    release();
+
+    // The page is in the store, so it is delivered at once; the fetch then
+    // says the reader may not see it.
+    const deliver = delivery();
+    adapter.execute(request(), deliver);
+    fetchAt(1).fail(denied);
+    expect(lastOf(deliver)).toEqual({ status: "forbidden", cause: denied });
+    const delivered = deliver.mock.calls.length;
+    commitLocalUpdate(environment, (store) => {
+      store.get("m1")?.setValue("alpha-renamed", "name");
+    });
+    expect(deliver).toHaveBeenCalledTimes(delivered);
+  });
+
+  it("delivers nothing from the store to a later execution of a forbidden page until its fetch completes", () => {
+    const { environment, fetchAt } = relay();
+    const denied = new Error("403 from the graph");
+    const adapter = source(environment, {
+      isForbidden: (error) => error === denied,
+    });
+    const first = adapter.execute(request(), delivery());
+    fetchAt(0).respond();
+    first();
+    const second = adapter.execute(request(), delivery());
+    fetchAt(1).fail(denied);
+    second();
+
+    // A refresh, or a return to the query: the refused page is still in the
+    // store, and is not delivered while the fetch runs.
+    const deliver = delivery();
+    adapter.execute(request(), deliver);
+    expect(deliver).not.toHaveBeenCalled();
+    commitLocalUpdate(environment, (store) => {
+      store.get("m1")?.setValue("alpha-renamed", "name");
+    });
+    expect(deliver).not.toHaveBeenCalled();
+    // Answered again as forbidden, the page stays withdrawn.
+    fetchAt(2).fail(denied);
+    expect(deliver.mock.calls).toEqual([
+      [{ status: "forbidden", cause: denied }],
+    ]);
+  });
+
+  it("delivers a forbidden page again once a fetch of it completes", () => {
+    const { environment, fetchAt } = relay();
+    const denied = new Error("403 from the graph");
+    const adapter = source(environment, {
+      isForbidden: (error) => error === denied,
+    });
+    adapter.execute(request(), delivery());
+    fetchAt(0).fail(denied);
+    const deliver = delivery();
+    adapter.execute(request(), deliver);
+    fetchAt(1).respond();
+    expect(lastOf(deliver)).toMatchObject({ status: "succeeded" });
+    // Access granted, the next execution reads the store at once again.
+    const next = delivery();
+    adapter.execute(request(), next);
+    expect(lastOf(next)).toMatchObject({ status: "succeeded" });
+  });
+
+  it("keeps a forbidden mark to its own page", () => {
+    const { environment, fetchAt } = relay();
+    const denied = new Error("403 from the graph");
+    const adapter = source(environment, {
+      isForbidden: (error) => error === denied,
+    });
+    adapter.execute(request(), delivery());
+    fetchAt(0).respond();
+    adapter.execute(request({ window: paged({ page: 2 }) }), delivery());
+    fetchAt(1).fail(denied);
+    const deliver = delivery();
+    adapter.execute(request(), deliver);
+    expect(lastOf(deliver)).toMatchObject({ status: "succeeded" });
+  });
+
+  it("delivers a failure where the forbidden check answers no or throws", () => {
+    for (const isForbidden of [
+      () => false,
+      () => {
+        throw new Error("the check broke");
+      },
+    ]) {
+      const { environment, fetchAt } = relay();
+      const deliver = delivery();
+      source(environment, { isForbidden }).execute(request(), deliver);
+      fetchAt(0).fail(new Error("403"));
+      expect(lastOf(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "403" },
+      });
+    }
   });
 
   it("fails a page whose response left selected data missing", () => {
@@ -1258,7 +1377,7 @@ describe("createRelaySource bound to a collection", () => {
     expect(shown()).toMatchObject({
       ids: ["m1", "m2"],
       status: "ready",
-      counts: countsOf(exactly(5)),
+      counts: countsOf(countExactly(5)),
       matches: true,
     });
 
@@ -1293,7 +1412,7 @@ describe("createRelaySource bound to a collection", () => {
     expect(shown()).toMatchObject({
       ids: ["m1", "m3"],
       status: "ready",
-      counts: countsOf(exactly(3)),
+      counts: countsOf(countExactly(3)),
       matches: true,
     });
     release();

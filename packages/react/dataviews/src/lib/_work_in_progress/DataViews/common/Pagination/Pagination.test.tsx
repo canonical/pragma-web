@@ -6,10 +6,8 @@
 import { createPage, DEFAULT_WINDOW } from "@canonical/dataviews-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import DataViews from "../../Provider.js";
 import Pagination from "./Pagination.js";
 
@@ -41,9 +39,8 @@ describe("DataViews.Pagination", () => {
       source.latest().deliver({
         status: "succeeded",
         page: createPage({
-          rows: [machine("m1", "alpha"), machine("m2", "beta")],
+          rows: [buildMachine("m1", "alpha"), buildMachine("m2", "beta")],
           matched: 5,
-          total: 5,
         }),
       });
     });
@@ -78,9 +75,8 @@ describe("DataViews.Pagination", () => {
       source.latest().deliver({
         status: "succeeded",
         page: createPage({
-          rows: [machine("m1", "alpha"), machine("m2", "beta")],
+          rows: [buildMachine("m1", "alpha"), buildMachine("m2", "beta")],
           matched: 5,
-          total: 5,
         }),
       });
     });
