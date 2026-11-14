@@ -31,6 +31,12 @@ export {
   useDataViews,
   useDataViewsFilter,
 } from "./_work_in_progress/DataViews/index.js";
+export type {
+  FilterButtonCondition,
+  FilterButtonPanelHandle,
+  FilterButtonProps,
+} from "./_work_in_progress/FilterButton/index.js";
+export { FilterButton } from "./_work_in_progress/FilterButton/index.js";
 export type { PaginationBarProps } from "./_work_in_progress/PaginationBar/index.js";
 export { PaginationBar } from "./_work_in_progress/PaginationBar/index.js";
 export type {
