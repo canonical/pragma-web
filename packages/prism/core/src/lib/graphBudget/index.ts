@@ -2,6 +2,15 @@
  * The graph budgets: what one graph view may draw, fetch and ship, as named
  * constants a site changes once, at build, and never a reader.
  *
+ * The constants are the defaults; `createGraphBudget` builds the site's
+ * budget from them, a bare number only tightening one and loosening one
+ * taking a reason; `GraphBudgetProvider` hands that budget down and
+ * `useGraphBudget` reads it in a graph view, so every view counts against
+ * one record and no view keeps a number of its own.
+ *
+ * @note `GraphBudgetProvider` and `useGraphBudget` read React context;
+ *   the constants and `createGraphBudget` are pure.
+ *
  * @module
  */
 

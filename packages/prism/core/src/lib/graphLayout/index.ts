@@ -4,6 +4,17 @@
  * `draw(result)` to SVG) and the layered engine, pure functions of their
  * input, with the geometry they share.
  *
+ * `layoutLayered` is the layered kind on the contract, over `layOutRegion`;
+ * `placeEdgeLabels` places the relation labels of a laid-out graph; the
+ * lengths, the font metrics and the geometry are shared by both, so a
+ * caller's drawing lands on the same lattice the layout placed by. The
+ * same input always gives the same output, byte for byte, so a server
+ * render and the hydrated client agree.
+ *
+ * @note Every export is pure. `requireAt`, `requireEntry` and
+ *   `requireDefined` throw only when a caller breaks an invariant, never on
+ *   a well-formed graph.
+ *
  * @module
  */
 
