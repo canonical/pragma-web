@@ -1,18 +1,21 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeChip_node.graphql.js";
 import { useProjectionLink } from "../../projections/index.js";
 import { EntityChip } from "../../ui/index.js";
+import { ProjectionPeek } from "../ProjectionPeek/index.js";
+import { NODE_MARK_ICON } from "./constants.js";
 import type { NodeChipProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields NodeChip reads from the Node it renders, which every node
- * carries: its title and its compact address.
+ * carries: its title and its compact address, the peek's address.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment NodeChip_node on Node {
@@ -29,10 +32,12 @@ void declareNodeFragment;
 const componentCssClassName = "ds node-chip";
 
 /**
- * Any graph node as an inline mention, from what every node carries: its
- * title alone in the chip's pill, linked to its home when the site has one
- * and inert text when it has none. A passage's own link text, given as
- * `children`, stands in for the title.
+ * Any graph node as an inline mention, from what every node carries: the
+ * generic node glyph as its mark and its title in the chip's pill, linked
+ * to its home when the site has one and inert text when it has none or
+ * `linked` is false. A linked chip peeks at the node's card
+ * (`ProjectionPeek`, queried when the peek opens). A passage's own link
+ * text, given as `children`, stands in for the title.
  *
  * It is the chip's `Node` arm: `ChipProjection` renders it for every type
  * no other arm takes.
@@ -54,7 +59,8 @@ export default function NodeChip({
   ...props
 }: NodeChipProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  const href = useHome({ __typename: data.__typename, uri: data._meta.curie });
+  const { curie, title } = data._meta;
+  const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
   return (
     <EntityChip
@@ -63,7 +69,9 @@ export default function NodeChip({
       data-type={data.__typename}
       href={href}
       LinkComponent={LinkComponent}
-      value={children ?? data._meta.title}
+      mark={<Icon icon={NODE_MARK_ICON} />}
+      peek={<ProjectionPeek uri={curie} />}
+      title={children ?? title}
     />
   );
 }

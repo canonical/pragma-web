@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -89,14 +90,16 @@ describe("NodeGraphNode", () => {
         <NodeGraphNode node={node} />
       </svg>
     ));
+    expectSlotOrder(container);
     expect(container.querySelector(".title")?.textContent).toBe(
-      "ds:global.component.icon-button",
+      "ds IconButton",
     );
-    expect(
-      container.querySelector(".title tspan.identifier")?.textContent,
-    ).toBe("ds:global.component.icon-button");
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Component in ds",
+    expect(container.querySelector(".title > .prefix")?.textContent).toBe(
+      "ds ",
+    );
+    expect(container.querySelector(".context")?.textContent).toBe("Component");
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/file-blank.svg#file-blank",
     );
     expect(container.querySelector(".link")).toBeNull();
   });
@@ -115,7 +118,7 @@ describe("NodeGraphNode", () => {
     );
   });
 
-  it("names its class alone when the node's address did not compact", () => {
+  it("has no prefix when the node's address did not compact", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
@@ -129,7 +132,7 @@ describe("NodeGraphNode", () => {
         },
       },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Component");
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("applies custom className", () => {

@@ -1,12 +1,14 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeRow_node.graphql.js";
 import { useProjectionLink } from "../../projections/index.js";
 import { EntityRow } from "../../ui/index.js";
 import { findCuriePrefix } from "../../utils/index.js";
+import { NODE_MARK_ICON } from "../NodeChip/constants.js";
 import type { NodeRowProps } from "./types.js";
 import "./styles.css";
 
@@ -35,11 +37,11 @@ void declareNodeFragment;
 const componentCssClassName = "ds node-row";
 
 /**
- * Any graph node as a 32px list entry, from what every node carries: its
- * namespace prefix, muted with its colon, before its title, linked to its
- * home when the site has one and inert text when it has none; and its
- * class's title at the end. A node whose address did not compact has no
- * prefix.
+ * Any graph node as a 32px list entry, from what every node carries, in
+ * the slot order: the generic node glyph as its mark, its namespace prefix
+ * before its title, the title linked to its home when the site has one and
+ * inert text when it has none, then its class's title as its kind. A node
+ * whose address did not compact has no prefix.
  *
  * It is the row's `Node` arm: `RowProjection` renders it for every type no
  * other arm takes.
@@ -63,22 +65,16 @@ export default function NodeRow({
   const { curie, title, type } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
-  const prefix = findCuriePrefix(curie);
   return (
     <EntityRow
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
+      kind={type._meta.title}
       LinkComponent={LinkComponent}
-      location={
-        prefix === undefined ? undefined : (
-          <code className="identifier">
-            {curie.slice(0, prefix.length + 1)}
-          </code>
-        )
-      }
-      meta={type._meta.title}
+      mark={<Icon icon={NODE_MARK_ICON} />}
+      prefix={findCuriePrefix(curie)}
       title={title}
     />
   );

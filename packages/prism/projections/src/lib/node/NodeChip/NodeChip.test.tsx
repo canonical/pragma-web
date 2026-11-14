@@ -1,6 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
+import { expectSlotOrder } from "@canonical/prism-core/testing";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
@@ -81,8 +82,34 @@ describe("NodeChip", () => {
 
   it("shows its title as inert text when the site does not home its type", () => {
     const { container } = renderWithNode((node) => <NodeChip node={node} />);
-    expect(container.querySelector(".value")?.tagName).toBe("SPAN");
-    expect(container.querySelector(".value")?.textContent).toBe("IconButton");
+    expect(container.querySelector(".title")?.tagName).toBe("SPAN");
+    expect(container.querySelector(".title")?.textContent).toBe("IconButton");
+  });
+
+  it("leads with the node glyph and peeks at the node's card, in the slot order", () => {
+    const { container } = renderWithNode((node) => <NodeChip node={node} />, {
+      __typename: "OntologyClass",
+    });
+    const chip = container.querySelector(".ds.node-chip");
+    if (chip === null) throw new Error("no chip rendered");
+    expectSlotOrder(chip);
+    expect(chip.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/file-blank.svg#file-blank",
+    );
+    act(() => {
+      screen.getByRole("link", { name: "IconButton" }).focus();
+    });
+    expect(screen.getByRole("dialog", { hidden: true })).not.toBeNull();
+  });
+
+  it("neither links nor peeks when it is not linked", () => {
+    const { container } = renderWithNode(
+      (node) => <NodeChip linked={false} node={node} />,
+      { __typename: "OntologyClass" },
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+    fireEvent.focus(container.querySelector(".title") ?? document.body);
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
 
   it("links its title to the home of a type the site homes", () => {
@@ -98,7 +125,7 @@ describe("NodeChip", () => {
     const { container } = renderWithNode((node) => (
       <NodeChip node={node}>the icon button</NodeChip>
     ));
-    expect(container.querySelector(".value")?.textContent).toBe(
+    expect(container.querySelector(".title")?.textContent).toBe(
       "the icon button",
     );
   });

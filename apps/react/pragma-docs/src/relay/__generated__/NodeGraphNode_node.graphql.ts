@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<51c5c456b03cc84e8a4f80948a71938d>>
+ * @generated SignedSource<<3259c4609f92690a2d39007a38bd07b0>>
  * @lightSyntaxTransform
  */
 
@@ -13,6 +13,7 @@ export type NodeGraphNode_node$data = {
   readonly __typename: string;
   readonly _meta: {
     readonly curie: string;
+    readonly title: string;
     readonly type: {
       readonly _meta: {
         readonly title: string;
@@ -26,7 +27,15 @@ export type NodeGraphNode_node$key = {
   readonly " $fragmentSpreads": FragmentRefs<"NodeGraphNode_node">;
 };
 
-const node: ReaderFragment = {
+const node: ReaderFragment = (function(){
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "title",
+  "storageKey": null
+};
+return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -47,6 +56,7 @@ const node: ReaderFragment = {
       "name": "_meta",
       "plural": false,
       "selections": [
+        (v0/*:: as any*/),
         {
           "alias": null,
           "args": null,
@@ -70,13 +80,7 @@ const node: ReaderFragment = {
               "name": "_meta",
               "plural": false,
               "selections": [
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "title",
-                  "storageKey": null
-                }
+                (v0/*:: as any*/)
               ],
               "storageKey": null
             }
@@ -90,7 +94,8 @@ const node: ReaderFragment = {
   "type": "Node",
   "abstractKey": "__isNode"
 };
+})();
 
-(node as any).hash = "d48e92d85c7749659562a0d6800cd5ee";
+(node as any).hash = "de65234c2c5be3f6ea06c0bba4fe73ea";
 
 export default node;

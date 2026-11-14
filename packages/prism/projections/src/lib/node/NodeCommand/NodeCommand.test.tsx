@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -89,12 +90,16 @@ describe("NodeCommand", () => {
         <NodeCommand node={node} />
       </ul>
     ));
+    expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".title, .kind, .location")].map(
+      [...container.querySelectorAll(".title, .address, .kind")].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["IconButton", "Component", "ds"]);
-    expect(container.querySelector(".vital")).toBeNull();
+    ).toEqual(["IconButton", "ds:global.component.icon-button", "Component"]);
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/file-blank.svg#file-blank",
+    );
+    expect(container.querySelector(".context, .vital, .status")).toBeNull();
   });
 
   it("links its title to the home of a type the site homes", () => {
@@ -111,7 +116,7 @@ describe("NodeCommand", () => {
     );
   });
 
-  it("names its class alone when the node's address did not compact", () => {
+  it("shows an address that did not compact in full", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -125,7 +130,9 @@ describe("NodeCommand", () => {
         },
       },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Component");
+    expect(container.querySelector(".address")?.textContent).toBe(
+      "https://ds.canonical.com/global/component/icon-button",
+    );
   });
 
   it("applies custom className", () => {

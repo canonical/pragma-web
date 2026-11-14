@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -86,15 +87,17 @@ describe("NodeRow", () => {
         <NodeRow node={node} />
       </ul>
     ));
+    expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".location, .title, .meta")].map(
+      [...container.querySelectorAll(".prefix, .title, .kind")].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["ds:", "IconButton", "Component"]);
-    expect(
-      container.querySelector(".location code.identifier")?.textContent,
-    ).toBe("ds:");
+    ).toEqual(["ds", "IconButton", "Component"]);
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/file-blank.svg#file-blank",
+    );
     expect(container.querySelector(".title")?.tagName).toBe("SPAN");
+    expect(container.querySelector(".location, .meta")).toBeNull();
   });
 
   it("links its title to the home of a type the site homes", () => {
@@ -125,7 +128,7 @@ describe("NodeRow", () => {
         },
       },
     );
-    expect(container.querySelector(".location")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("applies custom className", () => {

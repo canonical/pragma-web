@@ -169,7 +169,7 @@ describe("ChipProjection", () => {
     const { container } = renderWithNode((node) => (
       <ChipProjection node={node}>the icon button</ChipProjection>
     ));
-    expect(container.querySelector(".value")?.textContent).toBe(
+    expect(container.querySelector(".title")?.textContent).toBe(
       "the icon button",
     );
   });
