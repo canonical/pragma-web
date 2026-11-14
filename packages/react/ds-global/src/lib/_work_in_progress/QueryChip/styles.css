@@ -149,4 +149,30 @@
       outline-offset: var(--query-chip-ring-offset);
     }
   }
+
+  /* Joined: the body's fill is the line between the parts, 1 px wide, and
+     the chip is one target for hover, selection and fault. */
+  .ds.query-chip.joined {
+    /* No symbol declares the reference design's line colour. */
+    --query-chip-background: #c5c5c5;
+    --query-chip-border-color: #c5c5c5;
+    --query-chip-border-width: var(--dimension-stroke-thickness-medium);
+    --query-chip-separation: var(--dimension-stroke-thickness-medium);
+    /* 26 px, which no symbol declares. */
+    --query-chip-min-height: 1.625rem;
+
+    & > .body:has(> button:enabled:hover) {
+      --query-chip-segment-state-background: var(
+        --query-chip-segment-background-hover
+      );
+    }
+
+    & > .body:has(> [data-invalid]) {
+      --query-chip-border-color: var(--color-border-error);
+      --query-chip-background: var(--color-border-error);
+      --query-chip-segment-state-background: var(
+        --query-chip-segment-background-invalid
+      );
+    }
+  }
 }
