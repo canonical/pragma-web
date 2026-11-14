@@ -17,7 +17,7 @@ import { createRestMachineSource } from "../../../storybook/machines/sources/ind
 import Component from "./Provider.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/REST API",
+  title: "_work_in_progress/REST API",
   component: Component,
   decorators: [withAppScope],
   argTypes: {

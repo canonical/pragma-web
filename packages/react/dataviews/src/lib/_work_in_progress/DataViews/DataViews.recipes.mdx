@@ -1,0 +1,244 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DataViews.composition.stories";
+
+<Meta title="_work_in_progress/Recipes" />
+
+# DataViews composition recipes
+
+A `DataViews` root mounts one provider for the parts inside it. The parts read the root: they take presentation choices — a name, visible field labels, the page sizes to offer — and never a second copy of the query, the window or the selection the provider already owns. Ordinary wrappers and your own components sit between them; moving pagination means moving an element, not asking for a slot.
+
+## A whole screen
+
+Three declarations at module scope, one provider in state, and the parts. The **collection** is the schema and the record identity, declared once and named by every hook as its witness. The **provider** is built once over the collection, a source, and the ports it drives — a location for the URL, a store for saved views, a store for the viewer's arrangement — and it starts nothing until something reads it: the first part to mount observes it, and that adopts the location, runs the source and asks for the first page. Your own children read the root through `useDataViews(collection)`, at module scope, and take no provider prop.
+
+Each part comes in one of two forms. A **connected** part — every `DataViews.*` — reads the enclosing root and throws outside one. A **standalone** part — `DataTable`, `PaginationBar` — takes its provider explicitly and never reads context, so it behaves the same alone as it does here. Each standalone part has a connected twin taking its props less the provider: `DataViews.DataTable` and `DataViews.Pagination` below are exactly that. Use the connected form inside a root, and the standalone form when there is no root to read.
+
+```tsx
+import {
+  createArraySource,
+  createDataViewsProvider,
+  createPlatformLocation,
+} from "@canonical/dataviews-core";
+import { createIndexedDBViewStore } from "@canonical/dataviews-core/indexeddb";
+import {
+  DataViews,
+  type DataTableColumn,
+  useDataViews,
+  useDataViewsValue,
+} from "@canonical/dataviews-react";
+import { useState } from "react";
+import { machineCollection, machines } from "./machines.js";
+import { platform } from "./router.js";
+
+// One store per collection, for as long as the application runs, serving
+// the saved views and the viewer's arrangement alike. On a server
+// `globalThis.indexedDB` is undefined and nothing reads it: the store is
+// first read when the provider is first observed, in the browser.
+const store = createIndexedDBViewStore({
+  indexedDB: globalThis.indexedDB,
+  database: "operations-console-views",
+  collection: "machines",
+  partition: null,
+});
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "status", header: "Status" },
+  { id: "cores", header: "Cores" },
+  { id: "owner", header: "Owner" },
+];
+
+// Refused parameters of the URL: a clause the grammar, the collection or the
+// source cannot run stays in the URL, and its reasons are the provider's.
+function QueryIssues() {
+  const { issues } = useDataViews(machineCollection);
+  const refused = useDataViewsValue(issues);
+  return refused.length === 0 ? null : (
+    <ul className="query-issues">
+      {refused.map((issue) => (
+        // One parameter can be refused for several reasons.
+        <li key={`${issue.parameter}:${issue.reason}`}>{issue.reason}</li>
+      ))}
+    </ul>
+  );
+}
+
+export function Machines() {
+  // Built once: the parts observe it, which starts its source and ports.
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: machineCollection,
+      source: createArraySource({
+        rows: machines,
+        collection: machineCollection,
+        searchFields: ["name", "owner"],
+      }),
+      location: createPlatformLocation(platform),
+      views: store,
+      presentation: store,
+      snapshot: { query: "page=1&size=5", presentation: {} },
+    }),
+  );
+  return (
+    <DataViews provider={provider}>
+      <DataViews.SavedViews />
+      <DataViews.Search label="Search machines" />
+      <DataViews.Filters labels={{ status: "Status", cores: "Cores" }} />
+      <QueryIssues />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        selectable
+        rowLabel={(row) => String(row["name"])}
+      />
+      <DataViews.Actions />
+      <DataViews.Pagination sizes={[5, 10, 25]} />
+    </DataViews>
+  );
+}
+```
+
+The collection is declared beside the records, once, in a module the screen imports:
+
+```ts
+import { createCollection } from "@canonical/dataviews-core";
+
+export type Machine = {
+  readonly id: string;
+  readonly name: string;
+  readonly status: "running" | "failed" | "pending";
+  readonly cores: number;
+  readonly owner: string;
+};
+
+// Every field and its kind: the kind decides which filter a field offers —
+// text is filtered by what it contains — and how the rows order by it. The
+// identity is what the selection and every row key hold; the record type is
+// inferred from it.
+export const machineCollection = createCollection({
+  identify: (machine: Machine) => machine.id,
+  fields: [
+    { field: "status", kind: "choices", options: ["running", "failed", "pending"] },
+    { field: "cores", kind: "number", min: 1 },
+    { field: "name", kind: "text" },
+    { field: "owner", kind: "text" },
+  ],
+});
+```
+
+The filters and the table's sortable columns offer nothing the source did not declare it can execute — the provider reads the source's capabilities once, and a command outside them is refused at the boundary and moves nothing. Leave `location` out and the query lives in the provider alone; leave `views` out and the collection has no saved views; leave `presentation` out and the arrangement — column widths, order and visibility — lives in memory for the session.
+
+<Canvas of={Stories.ConnectedParts} sourceState="none" />
+
+## Keeping the query in the URL
+
+With a location, the URL is the query's other home. The provider owns the loop: every edit the search and the filters make writes the canonical query to the location, and back, forward or a pasted URL is adopted — one authority, no mirroring effect and nothing to wire. A clause the grammar, the collection or the source refuses is left out of the adopted query and kept in the URL, with its reasons and codes published on the provider's `issues`, for a child of the root to show beside the controls, as `QueryIssues` above does.
+
+History follows the transition. A search replaces the entry, so typing never floods history; a filter, a sort, a page move and a saved view opened each push one, so Back returns from them one step at a time; adopting the URL writes nothing back, and a respelling of a URL that is already the query replaces. `history` on the provider config changes that — one mode for every transition, or overrides per transition:
+
+```ts
+createDataViewsProvider({
+  collection: machineCollection,
+  source,
+  location: createPlatformLocation(platform),
+  // Every filter keystroke is a step of its own here; make edits replace.
+  history: { filter: "replace" },
+});
+```
+
+## Before any script runs
+
+The search, the filters and the pagination bar are real HTML first. The search and the filters are GET forms whose controls are named as the URL spells their clauses — `q`, `status`, `cores__gte` — with a number bound a native number input carrying the schema's `min` and `max`; every page the bar can reach is a link the same encoder spelled; and the page size and the page select each sit in a GET form. Each form also carries the rest of the applied query hidden, so a submission lands on the destination the provider would have written. Once scripting is enabled the parts intercept a click or a submission and apply the same command in place, the baseline's submit controls are hidden with `@media (scripting: enabled)`, and controls only the enhancement can drive — the clear buttons, page controls with no location to lead to — appear.
+
+A server renders the page from the request's URL. It gives the provider a memory location over that URL, which the provider reads when it is built, and calls `refresh()` before rendering: a source that answers within the call — the array source, or a server-side source already holding its rows — has published the page by then, so the markup carries the rows, the ordering and the page the URL asks for, and the forms and links are the ones the browser would have built. Nothing is subscribed. A source that cannot answer within the call renders pending, and the client asks for the page once it runs.
+
+The server hands the client `readSnapshot()` — the query as canonical text and the arrangement in force, never the selection. The screen takes the provider it is handed, so one component renders on both sides:
+
+```tsx
+import type { DataViewsProvider } from "@canonical/dataviews-core";
+import { DataViews, type DataTableColumn } from "@canonical/dataviews-react";
+import type { Machine, machineCollection } from "./machines.js";
+
+type MachineProvider = DataViewsProvider<
+  typeof machineCollection.schema.fields,
+  Machine
+>;
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "status", header: "Status" },
+  { id: "cores", header: "Cores", sortable: true },
+];
+
+export function MachinesPage({
+  provider,
+}: {
+  readonly provider: MachineProvider;
+}) {
+  return (
+    <DataViews provider={provider}>
+      <DataViews.Search label="Search machines" />
+      <DataViews.Filters labels={{ status: "Status", cores: "Cores" }} />
+      <DataViews.DataTable columns={columns} label="Machines" />
+      <DataViews.Pagination sizes={[5, 10, 25]} />
+    </DataViews>
+  );
+}
+```
+
+On the server, for each request, the provider reads the request's URL and `refresh()` asks for the page before rendering. The snapshot goes into the page as JSON beside the markup, with `<` escaped, since the query comes from the URL. `renderToString` is enough, because the page is published before the render starts; a streaming render carries the same markup.
+
+```tsx
+const provider = createDataViewsProvider({
+  collection: machineCollection,
+  source,
+  location: createMemoryLocation({ href: request.url }),
+});
+provider.refresh();
+const markup = renderToString(<MachinesPage provider={provider} />);
+const snapshot = JSON.stringify(provider.readSnapshot()).replaceAll(
+  "<",
+  "\\u003c",
+);
+const html = `<div id="machines">${markup}</div>
+<script type="application/json" id="machines-snapshot">${snapshot}</script>`;
+```
+
+In the browser, once, the client's provider starts from that snapshot and asks for its page before hydrating, so that its first render draws what the server drew:
+
+```tsx
+const embedded =
+  document.getElementById("machines-snapshot")?.textContent ?? null;
+const container = document.getElementById("machines");
+if (embedded !== null && container !== null) {
+  const provider = createDataViewsProvider({
+    collection: machineCollection,
+    source,
+    location: createPlatformLocation(platform),
+    snapshot: JSON.parse(embedded),
+  });
+  provider.refresh();
+  hydrateRoot(container, <MachinesPage provider={provider} />);
+}
+```
+
+Rows never travel in the snapshot. The client's first render matches the server's only when its source answers `refresh()` within the call as well — the array source over rows the page already holds, or a source whose `readDelivery` answers from a cache the server's rows were handed to. A source that has to fetch in the browser renders pending on that first render, and React reports the difference as a hydration mismatch: hand that source's cache the page's rows beside the snapshot, or render the collection on the client alone.
+
+The same snapshot puts a collection back as an application left it: pass one kept earlier as `snapshot`, and the provider starts from its query and arrangement, and returns to that query on `reset()`.
+
+`createPlatformLocation` comes from `@canonical/dataviews-core`. The platform is your router's platform surface — anything with `getLocation`, `navigate` and `subscribe`. `createMemoryLocation` is the same port in memory, for a secondary collection on the page or a test.
+
+```tsx
+const [provider] = useState(() =>
+  createDataViewsProvider({
+    collection: machineCollection,
+    source,
+    // The URL: adopted when it carries a query, written on every edit.
+    location: createPlatformLocation(platform),
+  }),
+);
+```
+
+The story below arrives on a location carrying `status=failed`. The location wins when it carries a query, so the provider adopts it, and the filters and the table show only failed machines. It uses a memory location, so the story never rewrites this page's own address.
+
+<Canvas of={Stories.QueryInTheUrl} sourceState="none" />

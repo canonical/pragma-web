@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
+
+### Bug Fixes
+
+* **deps:** bumps pragma-core to v0.44.0 ([#1531](https://github.com/canonical/pragma-web/issues/1531)) ([e9552b2](https://github.com/canonical/pragma-web/commit/e9552b221e5e0f8cbac3aaca468685aca73fc75d))
+
+### Features
+
+* **react-hooks:** add useScrollOverflow hook for scroll container edge flags ([#1482](https://github.com/canonical/pragma-web/issues/1482)) ([6c12794](https://github.com/canonical/pragma-web/commit/6c127942677d7a1d132537391b7d65d790474342))
+
+
 # [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
 
 **Note:** Version bump only for package @canonical/react-hooks

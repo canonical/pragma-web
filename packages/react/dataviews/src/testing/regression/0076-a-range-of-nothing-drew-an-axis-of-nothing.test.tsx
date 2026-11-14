@@ -10,7 +10,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createFacetedManual } from "../../../testing/createFacetedProviders.js";
 import deliverFacets from "../../../testing/deliverFacets.js";
-import { FacetRangeChart } from "../../lib/_work_in_progress/FacetRangeChart/index.js";
+import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** The ends a source should never answer with, and once did. */
 const unusable: readonly (readonly [number, number])[] = [
@@ -24,7 +24,12 @@ describe("a range whose ends are not finite", () => {
     for (const [min, max] of unusable) {
       const { provider, source } = createFacetedManual();
       const { unmount } = render(
-        <FacetRangeChart provider={provider} field="cores" label="Cores" />,
+        <DataChart
+          type="range"
+          provider={provider}
+          field="cores"
+          label="Cores"
+        />,
       );
       deliverFacets(source, {
         status: { kind: "values", values: [] },
@@ -41,7 +46,14 @@ describe("a range whose ends are not finite", () => {
 
   it("still draws a range whose ends are finite", () => {
     const { provider, source } = createFacetedManual();
-    render(<FacetRangeChart provider={provider} field="cores" label="Cores" />);
+    render(
+      <DataChart
+        type="range"
+        provider={provider}
+        field="cores"
+        label="Cores"
+      />,
+    );
     deliverFacets(source, {
       status: { kind: "values", values: [] },
       cores: { kind: "range", min: 2, max: 8 },

@@ -1,0 +1,190 @@
+import { Canvas, Meta, Source } from "@storybook/addon-docs/blocks";
+import spellPublicImports from "../../../storybook/spellPublicImports";
+import * as Stories from "./BuildARenderer.stories";
+import connectedSource from "./common/ConnectedRecordList/ConnectedRecordList.tsx?raw";
+import connectedTypes from "./common/ConnectedRecordList/types.ts?raw";
+import listStatusSource from "./common/ListStatus/ListStatus.tsx?raw";
+import plainListSource from "./common/PlainList/PlainList.tsx?raw";
+import plainListTypes from "./common/PlainList/types.ts?raw";
+import recordItemSource from "./common/RecordItem/RecordItem.tsx?raw";
+import recordListSource from "./common/RecordList/RecordList.tsx?raw";
+import scopedSource from "./common/ScopedRecordList/ScopedRecordList.tsx?raw";
+import scopedTypes from "./common/ScopedRecordList/types.ts?raw";
+import statusListSource from "./common/StatusList/StatusList.tsx?raw";
+import useIsScriptedSource from "./hooks/useIsScripted.ts?raw";
+
+<Meta title="_work_in_progress/DataViews/Renderers/Build your own renderer" />
+
+# Build your own renderer
+
+A renderer draws the rows of a DataViews provider. `DataTable`, `DataCards` and `DataChart` are renderers. They do not fetch, sort or page. The provider does that, and the renderer draws what the provider publishes and sends it the reader's commands.
+
+This page builds a renderer of your own, a list, in four steps:
+
+1. a plain list of the rows on the page;
+2. the same list with the core's status: loading, failed, empty, no match;
+3. a checkbox per record, a sort, and the source's refusals;
+4. a standalone list that takes a provider, and a connected twin that reads a `DataViews` root.
+
+The code shown here is the code in `src/lib/_work_in_progress/BuildARenderer`. It compiles and is tested with the package. The files are shown with their imports as an application writes them, from `@canonical/dataviews-react` and `@canonical/dataviews-core`.
+
+## What a renderer reads
+
+A provider, made by `createDataViewsProvider`, carries channels and commands. A channel holds one immutable value and tells its subscribers when it changes. A renderer reads these:
+
+- `provider.state`: the query, the result, and whether a request is in flight (`pendingRequestId`).
+- `provider.rows`: the row model of the current page. It has `entries` (each an `id` and a `record`), `ids`, and `byId(id)`.
+- `provider.selection`: the selected identities, with `toggle`, `set`, `add`, `remove` and `clear`.
+- `provider.capabilities`: what the source declares it can do, such as `capabilities.sort.fields`.
+- Commands such as `setSort`, `setSearch` and `navigateWindow`. Each returns the source's refusals, and an empty list means the command applied.
+
+Three hooks from `@canonical/dataviews-react` read them in React:
+
+- `useDataViewsValue(channel)` returns the channel's value and re-renders the component when it changes. Pass a selector as the second argument to re-render only when one part of the value changes.
+- `useDataViews(collection)` returns the enclosing root's scope: the provider's channels and commands, less `observe` and `reset`. It throws outside a root, and throws when the collection is not the one the root's provider was built over.
+- `useDataViewsCell(collection)` reads the scope of one cell. `DataTable` and `DataCards` install that scope around a field's `cell`. A renderer of your own cannot install it, so it hands each row's channels to its own components instead, as step 3 does.
+
+The entry `@canonical/dataviews-core/bindings` holds what the package's renderers share, so that every renderer gives the same answer for the same state. This tutorial uses six of its names:
+
+| Name | What it does |
+| --- | --- |
+| `resolveDisplayStatus(state)` | The status a renderer shows, or `null` when the rows speak for themselves. |
+| `listDisplayEntries({ rowIds, status })` | The entries a renderer draws, in order: the status first, if any, then one entry per row the status keeps. |
+| `DISPLAY_STATUS_PHASES` | Whether each status is `terminal` (a settled outcome) or `transient` (a passing state). |
+| `createRowScopes({ rows, selection, fields })` | One set of channels per row, so a change to one row re-renders that row alone. |
+| `resolveMessages(messages)` | The words a renderer says: English, with the application's messages over it. |
+| `isDataViewsProvider(value)` | Whether a value is a provider made by `createDataViewsProvider`. |
+
+The bindings entry is for code that binds DataViews to a UI, as a renderer does. An application screen that only places parts does not need it.
+
+## Standalone and connected
+
+Each renderer comes in two forms. The **standalone** form takes `provider` as a prop and never reads context, so it behaves the same alone as inside a root. The **connected** twin takes the same props less `provider`, reads the enclosing `DataViews` root, and throws outside one. `DataTable` and `DataViews.DataTable` are such a pair. Step 4 builds one.
+
+## Step 1: a plain list
+
+The smallest renderer observes the provider and lists its rows.
+
+<Source code={spellPublicImports(plainListTypes)} language="ts" />
+
+<Source code={spellPublicImports(plainListSource)} language="tsx" />
+
+`provider.observe()` starts the provider: the first observer runs the source and the ports, such as the location. It returns the function that stops observing, so the effect returns it as its cleanup. Observing is counted: two renderers on one provider share one source, and the source stops when the last one unmounts. Call it from an effect, never during render. React can discard a render, and a subscription made there would never be released. A server render runs no effects, so it starts nothing.
+
+`useDataViewsValue(provider.rows)` re-renders the list each time the rows change. Each item is keyed by the row's identity, never by its position: sorting and paging move records between positions.
+
+<Canvas of={Stories.APlainList} sourceState="none" />
+
+On a server, build the provider over the request's URL and call `provider.refresh()` before rendering. A source that answers within the call, such as `createArraySource`, has published its rows by then, so the server's markup lists them. The recipe is on the **_work_in_progress / Recipes** page, under "Before any script runs".
+
+## Step 2: the status
+
+Before the first page arrives, the plain list is empty. It is also empty when the source fails, when the collection holds nothing, and when the query matches nothing. A reader cannot tell these apart. The core can: `resolveDisplayStatus(state)` returns one of these statuses, or `null` when the rows speak for themselves.
+
+| Status | When | Rows | Phase | English message |
+| --- | --- | --- | --- | --- |
+| `pending` | Nothing that answers the query has arrived yet. | replaced | transient | `statusPending` |
+| `failed` | The source failed, and there are no rows to keep. | replaced | terminal | `statusFailed(reason)` |
+| `refresh-failed` | A refresh failed. The rows shown still answer the query. | kept | terminal | `statusRefreshFailed(reason)` |
+| `stale` | The current query failed. The rows shown answer an earlier one. | kept | terminal | `statusStale(reason)` |
+| `no-data` | The query has no filter or search, and the collection is empty. | replaced | terminal | `statusNoData` |
+| `no-results` | A filter or a search matches nothing. | replaced | terminal | `statusNoResults` |
+| `regrouping` | Rows are withheld while a grouping changes. Nothing produces it yet. | replaced | transient | `statusRegrouping` |
+
+`listDisplayEntries` applies the "Rows" column for you. It returns a `status` entry first, when there is a status, then a `record` entry for each row the status keeps. Each entry has an `id` that is unique across kinds.
+
+The phase says what to announce. A terminal status is a settled outcome, so the list renders it in an element with `role="status"`, which a screen reader reads politely. A transient status is shown and not announced: what arrives after it speaks for itself. While a request is in flight, the list sets `aria-busy`.
+
+<Source code={spellPublicImports(listStatusSource)} language="tsx" />
+
+<Source code={spellPublicImports(statusListSource)} language="tsx" />
+
+Every word comes from `messages`: `resolveMessages` puts the application's messages over English, so a list given none speaks English. `resolveMessages` returns a new object on each call, so the list holds its result in a memo. The **_work_in_progress / Messages and internationalization** page covers the messages.
+
+<Canvas of={Stories.StatusLoading} sourceState="none" />
+
+<Canvas of={Stories.StatusFailed} sourceState="none" />
+
+<Canvas of={Stories.StatusNoData} sourceState="none" />
+
+<Canvas of={Stories.StatusNoMatch} sourceState="none" />
+
+## Step 3: selection, sort and refusals
+
+### One scope per row
+
+The step 2 list re-renders every item when anything changes. With a checkbox on each item, selecting one record would re-render them all. `createRowScopes` gives each row its own channels instead:
+
+- `ids`: the identities of the rows on the page, in order;
+- `readRow(id)`: one row's channels, `record`, `fields` and `selected`. It throws for an identity that is not on the page.
+
+Build the scopes in a memo, keyed by `provider.rows` and `provider.selection`, and call `scopes.observe()` from an effect, as you observe the provider. Building subscribes to nothing; only `observe()` does. `fields` names the fields whose channels each row carries. Pass an array held at one reference, such as a module constant: a new array builds new scopes.
+
+Each item reads its own `record` and `selected` channels, so a change to one record, or to whether it is selected, re-renders that item alone. The item is memoised, so the list re-rendering leaves the others alone.
+
+<Source code={spellPublicImports(recordItemSource)} language="tsx" />
+
+### Selection
+
+The checkbox calls `provider.selection.toggle(id)`. The selection belongs to the provider, so every renderer on the provider shows the same selection: a record selected here is selected in a `DataTable` over the same provider. The checkbox is named with the `selectRow` message and the record's name.
+
+### Sort and refusals
+
+Offer only what the source declares. `provider.capabilities.sort.fields` lists the fields the source can order by, and `capabilities.sort.terms` how many terms it takes at once. The list offers its sort only when the field is in `fields`.
+
+A command can still be refused. `provider.setSort(terms)` returns a list of refusals. An empty list means the ordering applied. A refused command changes nothing: the query, the rows and the URL stay as they were. Each refusal has a `part`, a machine-readable `code`, and a `reason` to show the reader. The list shows every reason with the `sortRefused` message, in an element with `role="status"`, so the reader hears why nothing moved.
+
+The ordering in force is `state.slice.sort`. The list reads it to mark the pressed button.
+
+### Before scripts run
+
+The server's markup and a browser without scripts see the list and its status. A checkbox or a button does nothing without scripts, so the list draws them only once scripts run. `useIsScripted` answers `false` on the server and while hydrating, and `true` after:
+
+<Source code={spellPublicImports(useIsScriptedSource)} language="ts" />
+
+The package's own parts work before scripts run: the search and the filters are GET forms, and, where the provider has a location, the pagination bar's pages are links. Place `DataViews.Search` and `DataViews.Pagination` beside your renderer, give the provider a location, and the page can be searched and paged without scripts.
+
+The list body, with all of step 3:
+
+<Source code={spellPublicImports(scopedTypes)} language="ts" />
+
+<Source code={spellPublicImports(scopedSource)} language="tsx" />
+
+The body takes a `scope`, not a provider, and does not observe it. `RecordListScope` names the members it reads: `state`, `rows`, `selection`, `capabilities` and `setSort`. A provider has them, and so does the scope `useDataViews` returns. Step 4 uses that.
+
+<Canvas of={Stories.SelectionAndSort} sourceState="none" />
+
+This source refuses every ordering:
+
+<Canvas of={Stories.SortRefused} sourceState="none" />
+
+## Step 4: the standalone list and its connected twin
+
+The standalone list takes a provider, checks it, observes it for as long as it is mounted, and hands it to the body:
+
+<Source code={spellPublicImports(recordListSource)} language="tsx" />
+
+The connected twin takes the collection instead, as the witness `useDataViews` checks, and hands the root's scope to the same body. It does not observe: the root observes its provider for as long as it is mounted.
+
+<Source code={spellPublicImports(connectedTypes)} language="ts" />
+
+<Source code={spellPublicImports(connectedSource)} language="tsx" />
+
+Two things the package's own connected parts read from the root are not public: the root's words and its announcer. So:
+
+- Pass the same `messages` to your connected renderer as to the root. Hold the record at module scope, so its identity stays the same.
+- Say an outcome where it happens, as the list says a refused sort in its own `role="status"` element. The root's live region carries only what its own parts say.
+
+Here the twin sits in a root beside `DataViews.DataTable`. The search and the pagination move both. A record selected in one is selected in the other.
+
+<Canvas of={Stories.ConnectedTwin} sourceState="none" />
+
+## Checklist
+
+- The standalone form takes `provider` and observes it from an effect. The connected twin reads the root and does not observe.
+- The status comes from `resolveDisplayStatus`, and what to draw from `listDisplayEntries`. A terminal status has `role="status"`; a transient one is not announced.
+- Items are keyed by identity, never by position.
+- Row channels come from `createRowScopes`, observed from an effect, with a stable `fields` array.
+- Every word comes from the messages, through `resolveMessages`.
+- A control is offered only where the source's capabilities allow it, and every refusal's reason is shown.
+- Nothing that needs scripts is drawn before scripts run.

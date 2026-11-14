@@ -10,7 +10,7 @@ import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createFacetedManual } from "../../../testing/createFacetedProviders.js";
 import { machine } from "../../../testing/machines.js";
-import { FacetBarChart } from "../../lib/_work_in_progress/FacetBarChart/index.js";
+import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** Answer the source's latest request with one machine and this status facet. */
 const answer = (
@@ -37,7 +37,8 @@ describe("a bar chart of a facet with nothing in it", () => {
   it("says no matching record holds a value", () => {
     const { provider, source } = createFacetedManual();
     render(
-      <FacetBarChart
+      <DataChart
+        type="bar"
         provider={provider}
         field="status"
         label="Machines by status"
@@ -53,7 +54,8 @@ describe("a bar chart of a facet with nothing in it", () => {
   it("steps its axis in whole records where every count is zero", () => {
     const { provider, source } = createFacetedManual();
     const { container } = render(
-      <FacetBarChart
+      <DataChart
+        type="bar"
         provider={provider}
         field="status"
         label="Machines by status"

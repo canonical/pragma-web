@@ -18,7 +18,7 @@ export interface UseWindowFitmentProps {
    * Defaults to centred ['block-start', 'block-end', 'inline-start',
    * 'inline-end'] (= [top, bottom, left, right] in LTR).
    */
-  preferredDirections?: (WindowFitmentSide | WindowFitmentPlacement)[];
+  preferredDirections?: readonly (WindowFitmentSide | WindowFitmentPlacement)[];
   /**
    * The distance, in pixels between the target and the popup.
    * @TODO support non-px units. E.G., someone should be able to request '1em`.

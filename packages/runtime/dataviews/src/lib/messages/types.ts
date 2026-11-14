@@ -353,4 +353,10 @@ export type DataViewsMessages = {
    * themselves are named by the application, as fields and options are.
    */
   readonly renderer: string;
+
+  // The chart with its table.
+  /** The name of the chart a switch offers beside its table. */
+  readonly chartRenderer: string;
+  /** The name of the table a switch offers beside its chart. */
+  readonly tableRenderer: string;
 };

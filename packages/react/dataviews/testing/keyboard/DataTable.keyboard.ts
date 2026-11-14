@@ -1,16 +1,15 @@
 /**
  * The keyboard-only pass over the DataTable's stories, its sort panel's, the
- * renderer switch's and the server-backed ones, in the built Storybook, where the service worker
- * answers the server-backed stories: Tab, Shift+Tab, Enter and Space, and no
- * other key.
+ * other renderers' and the server-backed ones, in the built Storybook, where
+ * the service worker answers the server-backed stories: Tab, Shift+Tab, Enter
+ * and Space, and no other key.
  *
  * Every story is walked both ways, asserting that each interactive control
  * is reached and that focus is visible on it when it is. Then the controls
  * a key operates are operated: a sort heading cycles and keeps focus, a row
- * checkbox checks. Arrow keys belong to one journey alone, the renderer
- * switch's select, whose own keys they are: the table offers no arrow
- * navigation, and a resize handle's arrow keys are its own enhancement, so
- * the handle is only reached.
+ * checkbox checks. No journey presses an arrow key: the table offers no
+ * arrow navigation, and a resize handle's arrow keys are its own
+ * enhancement, so the handle is only reached.
  *
  * Necessary evidence, not a conformance claim: it proves what a keyboard
  * reaches, not what a screen reader announces.
@@ -28,7 +27,7 @@ type IndexedStory = {
 };
 
 /** The table's stories. */
-const TABLE = "_work_in_progress/DataTable";
+const TABLE = "_work_in_progress/DataViews/Renderers/DataTable";
 
 /** The sort panel's stories, the path to an ordering without Shift. */
 const SORT_PANEL = "_work_in_progress/DataViews/SortPanel";
@@ -40,22 +39,20 @@ const FILTERS = "_work_in_progress/DataViews/Filters";
 const SETTINGS = "_work_in_progress/DataViews/Settings";
 
 /** The cards' stories, a collection's records as the design system's cards. */
-const CARDS = "_work_in_progress/Cards";
+const DATA_CARDS = "_work_in_progress/DataViews/Renderers/DataCards";
 
-/** The bar chart prototype's stories, a field's counts beside the filters. */
-const FACET_BAR_CHART = "_work_in_progress/FacetBarChart";
+/** The chart prototype's stories, a field's counts or range beside the filters. */
+const DATA_CHART = "_work_in_progress/DataViews/Renderers/DataChart";
 
-/** The range chart prototype's stories, a number field's range beside the filters. */
-const FACET_RANGE_CHART = "_work_in_progress/FacetRangeChart";
-
-/** The renderer switch's stories, one collection shown through a chosen renderer. */
-const RENDERER_SWITCH = "_work_in_progress/RendererSwitch";
+/** The chart-with-table stories, a chart and its table behind one switch. */
+const DATA_CHART_WITH_TABLE =
+  "_work_in_progress/DataViews/Renderers/DataChartWithTable";
 
 /** The stories over a REST endpoint, through TanStack Query. */
-const REST_API = "_work_in_progress/DataViews/REST API";
+const REST_API = "_work_in_progress/REST API";
 
 /** The stories over a GraphQL endpoint, through Relay. */
-const GRAPHQL_API = "_work_in_progress/DataViews/GraphQL API";
+const GRAPHQL_API = "_work_in_progress/GraphQL API";
 
 /**
  * The stories this pass walks: the table's own, the sort panel's, the
@@ -67,10 +64,9 @@ const TITLES: readonly string[] = [
   SORT_PANEL,
   FILTERS,
   SETTINGS,
-  CARDS,
-  FACET_BAR_CHART,
-  FACET_RANGE_CHART,
-  RENDERER_SWITCH,
+  DATA_CARDS,
+  DATA_CHART,
+  DATA_CHART_WITH_TABLE,
   REST_API,
   GRAPHQL_API,
 ];
@@ -738,10 +734,10 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(checkbox).toBeFocused();
   });
 
-  test("Cards Selectable: Space checks a card's checkbox, and the page's, focus stays", async ({
+  test("DataCards Selectable: Space checks a card's checkbox, and the page's, focus stays", async ({
     page,
   }) => {
-    await openStory(page, findStory(CARDS, "Selectable").id);
+    await openStory(page, findStory(DATA_CARDS, "Selectable").id);
     const birch = page.getByRole("checkbox", {
       name: "Select birch.example.com",
     });
@@ -761,10 +757,41 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     ).toBeChecked();
   });
 
-  test("FacetBarChart BesideFilters: Space on a status filter narrows the table, and the chart keeps every status's count", async ({
+  test("DataCards TableOrCards: Enter on Table shows the table, Space on Cards brings the cards back, focus stays on the choice", async ({
     page,
   }) => {
-    await openStory(page, findStory(FACET_BAR_CHART, "Beside Filters").id);
+    await openStory(page, findStory(DATA_CARDS, "Table Or Cards").id);
+    const choice = page.getByRole("group", {
+      name: "Show machines as",
+      exact: true,
+    });
+    const table = choice.getByRole("button", { name: "Table", exact: true });
+    const cards = choice.getByRole("button", { name: "Cards", exact: true });
+    // The story's own play function chooses the cards first; start from there.
+    await expect(cards).toHaveAttribute("aria-pressed", "true");
+    await tabTo(page, table);
+    await page.keyboard.press("Enter");
+    await expect(table).toHaveAttribute("aria-pressed", "true");
+    await expect(table).toBeFocused();
+    await expect(
+      page.getByRole("region", { name: "Table", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Cards", exact: true }),
+    ).toHaveCount(0);
+    await tabTo(page, cards);
+    await page.keyboard.press("Space");
+    await expect(cards).toHaveAttribute("aria-pressed", "true");
+    await expect(cards).toBeFocused();
+    await expect(
+      page.getByRole("region", { name: "Cards", exact: true }),
+    ).toBeVisible();
+  });
+
+  test("DataChart CountsBesideFilters: Space on a status filter narrows the table, and the chart keeps every status's count", async ({
+    page,
+  }) => {
+    await openStory(page, findStory(DATA_CHART, "Counts Beside Filters").id);
     const summary = page
       .getByRole("navigation", { name: "Pagination" })
       .getByRole("status");
@@ -790,26 +817,32 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(running).toContainText("6");
   });
 
-  test("RendererSwitch TableOrSummary: the select's own arrow keys choose a renderer, focus stays on the choice", async ({
+  test("DataChartWithTable Default: Enter on Table shows the table, Space on Chart brings the chart back, focus stays on the choice", async ({
     page,
   }) => {
-    await openStory(page, findStory(RENDERER_SWITCH, "Table Or Summary").id);
-    const choice = page.getByRole("combobox", {
-      name: "Show machines as",
-      exact: true,
-    });
-    await expect(choice).toHaveValue("table");
-    await tabTo(page, choice);
-    // A closed select's own key: the one exception to Tab, Enter and Space.
-    await page.keyboard.press("ArrowDown");
-    await expect(choice).toHaveValue("summary");
-    await expect(choice).toBeFocused();
-    await expect(
-      page.getByRole("region", { name: "Summary", exact: true }),
-    ).toBeVisible();
+    await openStory(page, findStory(DATA_CHART_WITH_TABLE, "Default").id);
+    const choice = page.getByRole("group", { name: "Show as", exact: true });
+    const chart = choice.getByRole("button", { name: "Chart", exact: true });
+    const table = choice.getByRole("button", { name: "Table", exact: true });
+    // The story's own play function ends back on the chart; start from there.
+    await expect(chart).toHaveAttribute("aria-pressed", "true");
+    await tabTo(page, table);
+    await page.keyboard.press("Enter");
+    await expect(table).toHaveAttribute("aria-pressed", "true");
+    await expect(table).toBeFocused();
     await expect(
       page.getByRole("region", { name: "Table", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Chart", exact: true }),
     ).toHaveCount(0);
+    await tabTo(page, chart);
+    await page.keyboard.press("Space");
+    await expect(chart).toHaveAttribute("aria-pressed", "true");
+    await expect(chart).toBeFocused();
+    await expect(
+      page.getByRole("figure", { name: "Machines by status" }),
+    ).toBeVisible();
   });
 
   test("SortPanel Default: Enter and Space move a term up, focus kept or handed to its Remove", async ({

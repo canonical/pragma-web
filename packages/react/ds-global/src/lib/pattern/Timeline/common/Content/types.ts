@@ -1,12 +1,11 @@
-import type { ComponentProps, ReactElement } from "react";
-import type { EventProps } from "../Event/types.js";
+import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
   /**
-   * Timeline.Event elements
-   * Maps to DSL cardinality: 0..* (zero or more)
+   * Zero or more Timeline.Event elements. Typed as `ReactNode` so conditional
+   * events (`{cond && <Timeline.Event />}`) and fragments are accepted.
    */
-  children?: ReactElement<EventProps> | ReactElement<EventProps>[] | null;
+  children?: ReactNode;
 };
 
 /**

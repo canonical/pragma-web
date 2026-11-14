@@ -7,8 +7,8 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { RendererChoice } from "../../lib/_work_in_progress/RendererSwitch/index.js";
-import { RendererSwitch } from "../../lib/_work_in_progress/RendererSwitch/index.js";
+import type { RendererChoice } from "../../lib/common/RendererSwitch/index.js";
+import { RendererSwitch } from "../../lib/common/RendererSwitch/index.js";
 
 const table: RendererChoice = {
   id: "table",
@@ -26,10 +26,7 @@ describe("a renderer withdrawn while it was chosen", () => {
     const { rerender } = render(
       <RendererSwitch label="Show machines as" renderers={[table, cards]} />,
     );
-    fireEvent.change(
-      screen.getByRole("combobox", { name: "Show machines as" }),
-      { target: { value: "cards" } },
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     expect(screen.getByText("the cards")).toBeInTheDocument();
 
     rerender(<RendererSwitch label="Show machines as" renderers={[table]} />);
@@ -41,9 +38,10 @@ describe("a renderer withdrawn while it was chosen", () => {
     expect(screen.getByText("the table")).toBeInTheDocument();
     expect(screen.queryByText("the cards")).toBeNull();
     expect(
-      screen.getByRole<HTMLSelectElement>("combobox", {
-        name: "Show machines as",
-      }).value,
-    ).toBe("table");
+      screen.getByRole("button", { name: "Table", pressed: true }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Cards", pressed: false }),
+    ).toBeInTheDocument();
   });
 });

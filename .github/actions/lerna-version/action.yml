@@ -8,6 +8,10 @@ inputs:
     description: "Prefix for the git tag. Default is 'v'."
     required: false
     default: "v"
+  force_publish:
+    description: "'true' bumps every package, changed or not (lerna --force-publish). Default 'false'."
+    required: false
+    default: "false"
 outputs:
   VERSION:
     description: "The new latest version number across all packages"
@@ -18,7 +22,7 @@ runs:
     - name: Version packages & generate changelogs
       shell: bash
       id: lerna_version
-      run: ${{ github.action_path }}/version.sh ${{ inputs.release_type }} ${{ inputs.tag_prefix }}
+      run: ${{ github.action_path }}/version.sh ${{ inputs.release_type }} ${{ inputs.tag_prefix }} ${{ inputs.force_publish }}
 
       # `lerna version` rewrites sibling ranges in dependencies, devDependencies
       # and optionalDependencies — but NOT peerDependencies. For a 0.x line every

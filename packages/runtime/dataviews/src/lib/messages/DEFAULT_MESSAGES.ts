@@ -231,4 +231,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   chartHighest: "Highest",
 
   renderer: "Show as",
+
+  chartRenderer: "Chart",
+  tableRenderer: "Table",
 });

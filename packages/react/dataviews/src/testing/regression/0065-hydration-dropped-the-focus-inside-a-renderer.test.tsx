@@ -9,8 +9,8 @@ import { act, screen } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import type { RendererChoice } from "../../lib/_work_in_progress/RendererSwitch/index.js";
-import { RendererSwitch } from "../../lib/_work_in_progress/RendererSwitch/index.js";
+import type { RendererChoice } from "../../lib/common/RendererSwitch/index.js";
+import { RendererSwitch } from "../../lib/common/RendererSwitch/index.js";
 
 const renderers: readonly RendererChoice[] = [
   {
@@ -55,10 +55,8 @@ describe("hydrating a renderer switch a reader is inside", () => {
     });
     expect(errors).not.toHaveBeenCalled();
     expect(
-      screen.getByRole<HTMLSelectElement>("combobox", {
-        name: "Show machines as",
-      }).value,
-    ).toBe("cards");
+      screen.getByRole("button", { name: "Cards", pressed: true }),
+    ).toBeInTheDocument();
     expect(screen.getByText("in the cards")).toBe(document.activeElement);
     expect(screen.queryByText("in the table")).toBeNull();
   });

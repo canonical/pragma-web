@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
+
+### Bug Fixes
+
+* **deps:** bumps dependency @canonical/svelte-icons to ^0.1.0 ([#1530](https://github.com/canonical/pragma-web/issues/1530)) ([85f5077](https://github.com/canonical/pragma-web/commit/85f5077169cf956b57bd4f1aefd85b4ba7dee5cd))
+* **deps:** bumps pragma-core to v0.44.0 ([#1531](https://github.com/canonical/pragma-web/issues/1531)) ([e9552b2](https://github.com/canonical/pragma-web/commit/e9552b221e5e0f8cbac3aaca468685aca73fc75d))
+* keep tooltip chaining active while any tooltip is visible ([#1517](https://github.com/canonical/pragma-web/issues/1517)) ([9a7f0a8](https://github.com/canonical/pragma-web/commit/9a7f0a816269678c635aef151fc3d4ebc97a5ac1))
+
+
 # [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
 
 **Note:** Version bump only for package @canonical/svelte-ds-app-launchpad
