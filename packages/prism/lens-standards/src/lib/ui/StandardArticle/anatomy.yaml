@@ -1,23 +1,28 @@
 ---
-# StandardArticle — a standard as a document: its header, the title as the
-# page's level-1 heading over one meta line (the compact address in the
-# published InlineCode, then the class it is an instance of, muted), over
-# its body: the prose rendered from Markdown (StandardProse), or the
-# description split into paragraphs on blank lines, or a line saying there
-# is none. A reader may draw the body another way (`renderBody`): the
-# reading page hands the prose to the address's page renderer, which shows
-# it or, for Turtle, the standard's statements under the same header.
+# StandardArticle — a standard as a document, laid on core's sectioned view
+# (prism.component.sectioned_view: the article's root is the view's, with
+# the article's class beside the view's). It hands the view its header, its
+# facts and its one section:
+#   - the header: the title as the page's level-1 heading over one meta
+#     line (the compact address in the published InlineCode, then the
+#     class it is an instance of, muted);
+#   - the facts: a KeyValueList of the address and the class;
+#   - the section `rule`: the prose rendered from Markdown (StandardProse),
+#     or the description split into paragraphs on blank lines, or a line
+#     saying there is none.
+# A reader that draws the standard another way passes it as `source`: it
+# stands in place of the sections (Turtle shows the standard's statements),
+# and the page has no section and no index.
 #
-# The article uses the whole main column: the root is a subgrid over every
-# column, its gap the grid's gutter on both axes, and the header spans it.
-# Only the body, the prose, holds a reading measure of six intrinsic
-# columns from the column's first line (a narrower subgrid clamps the
-# span), flush left. The header is application UI: the title and the meta
-# line stack one small step apart, the meta line's parts one gutter apart
-# on a shared baseline. The body is prose, and its space is element-owned:
-# `.editorial` gives its headings and paragraphs their space after, and
-# `.content-flow` clears the last block's. A description keeps its
-# hand-written line breaks.
+# The view places the regions on the page's columns; the article styles
+# what it puts in them. The header is application UI: the title and the
+# meta line stack one small step apart, the meta line's parts one gutter
+# apart on a shared baseline. Only the rule's prose holds a reading measure
+# of six intrinsic columns from the column's first line (a narrower subgrid
+# clamps the span), flush left. Its space is element-owned: `.editorial`
+# gives its headings and paragraphs their space after, and `.content-flow`
+# clears the last block's. A description keeps its hand-written line
+# breaks.
 #
 # Every decision is read through a component token declared on the root
 # (`--standard-article-*`), bound to the symbol named here.
@@ -25,6 +30,7 @@
 # Token ledger:
 #   space.100 (8px) between the title and the meta line: they read as one
 #     heading; no gap may read a container gap.
+#   grid.gutter between the meta line's parts.
 #   layout.grid.column "1 / -1" (header) and "1 / span 6" (prose):
 #     structure, a span in columns.
 #   typography.whiteSpace pre-line, layout.wrap wrap, layout.align
@@ -33,14 +39,10 @@
 # Roster namespaces (accepted and tracked): grid.gutter, space.100.
 node:
   uri: prism.component.standard_article
-  styles:
-    layout.type: grid
-    layout.grid.columns: subgrid
-    layout.grid.column: "1 / -1"
-    spacing.gap: grid.gutter
   edges:
     - node:
-        role: header
+        role: masthead (the page's header, in the view's header region)
+        element: header
         styles:
           layout.grid.column: "1 / -1"
           layout.type: flex
@@ -68,7 +70,10 @@ node:
                     role: class (the catalog's sentence naming the class)
                   relation: { cardinality: "1" }
             relation: { cardinality: "1", slotName: meta }
-      relation: { cardinality: "1", slotName: header }
+      relation: { cardinality: "1", slotName: masthead }
+    - node:
+        uri: prism.component.key_value_list
+      relation: { cardinality: "1", slotName: facts }
     - switch:
         on: internal
         cases:
@@ -90,6 +95,7 @@ node:
               role: prose (the catalog's line for a standard with no text)
               styles:
                 layout.grid.column: "1 / span 6"
-          - node:
-              uri: prism.component.entity_source
-      relation: { cardinality: "1", slotName: prose }
+      relation: { cardinality: "0..1", slotName: prose }   # the rule section's content
+    - node:
+        uri: prism.component.entity_source
+      relation: { cardinality: "0..1", slotName: source }  # in place of the sections

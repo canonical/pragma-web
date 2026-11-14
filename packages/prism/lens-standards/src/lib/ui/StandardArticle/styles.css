@@ -3,21 +3,16 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* A subgrid over every column, its gap the grid's gutter on both axes:
-   * the header spans the main column, the prose holds the measure. */
+  /* The article is core's sectioned view, which places its regions; the
+   * article styles what it puts in them. */
   .ds.standard-article {
-    --standard-article-gap: var(--grid-gutter);
     /* The title and the meta line read as one heading. */
     --standard-article-header-gap: var(--space-100);
+    --standard-article-meta-gap: var(--grid-gutter);
     --standard-article-meta-color: var(--color-text-muted);
-
-    display: grid;
-    grid-template-columns: subgrid;
-    grid-column: 1 / -1;
-    gap: var(--standard-article-gap);
   }
 
-  .ds.standard-article > .header {
+  .ds.standard-article .masthead {
     grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
@@ -28,14 +23,14 @@
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: var(--standard-article-gap);
+    gap: var(--standard-article-meta-gap);
     margin-block: 0;
     color: var(--standard-article-meta-color);
   }
 
   /* The reading measure: six columns from the first line, clamped by a
    * narrower subgrid. */
-  .ds.standard-article > .prose {
+  .ds.standard-article .prose {
     grid-column: 1 / span 6;
   }
 

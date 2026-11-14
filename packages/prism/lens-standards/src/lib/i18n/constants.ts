@@ -24,4 +24,7 @@ export const MESSAGES = {
     "No standard found at {uri}. The standards index lists every standard the graph carries.",
   "article.class": "class: {class}",
   "article.definition.none": "No description recorded.",
+  "article.section.rule": "Rule",
+  "article.fact.address": "Address",
+  "article.fact.class": "Class",
 } as const;

@@ -20,6 +20,7 @@ import {
   type Renderer,
   RenderersProvider,
 } from "@canonical/prism-core";
+import { expectSectionIndex } from "@canonical/prism-core/testing";
 import { render, screen, within } from "@testing-library/react";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
@@ -163,8 +164,12 @@ describe("StandardReadingPage", () => {
         name: "react.component.link_component",
       });
       expect(heading.id).toBe("standard-reading-title");
-      // The compact identity still reaches the reader…
-      expect(screen.getByText(LINK_COMPONENT_CURIE)).toBeInTheDocument();
+      // The compact identity still reaches the reader, in the header's
+      // meta line and in the facts…
+      expect(screen.getAllByText(LINK_COMPONENT_CURIE)).toHaveLength(2);
+      expect(
+        document.querySelector(".facts .ds.key-value-list")?.textContent,
+      ).toBe(`Address${LINK_COMPONENT_CURIE}ClassCodeStandard`);
       // …and so does its class.
       expect(screen.getByText(/class: CodeStandard/)).toBeInTheDocument();
       // The breadcrumb routes back to the index.
@@ -375,10 +380,11 @@ describe("StandardReadingPage", () => {
       ).toBeInTheDocument();
       expect(document.title).toBe("react.component.link_component — Docs");
       expect(screen.getByRole("figure")).toHaveTextContent(TURTLE);
-      // The prose gave way to the document…
+      // The sections and their index gave way to the document…
       expect(
         screen.queryByRole("heading", { level: 2, name: "Why one prop" }),
       ).not.toBeInTheDocument();
+      expectSectionIndex(document.body, []);
       // …and neither the standard nor its source was asked for.
       expect(fetchFn).not.toHaveBeenCalled();
     },
@@ -386,14 +392,12 @@ describe("StandardReadingPage", () => {
   );
 
   it(
-    "draws the body through the page renderer's render",
+    "draws its rule section itself under the page renderer",
     () => {
       const page: Renderer<PageRendererProps> = {
         name: "page",
         label: "Page",
-        render: ({ children, title }) => (
-          <section aria-label={title}>{children}</section>
-        ),
+        render: vi.fn(() => null),
       };
       render(
         createStandardsPage(
@@ -417,11 +421,13 @@ describe("StandardReadingPage", () => {
           </RenderersProvider>,
         ),
       );
-      const drawn = screen.getByRole("region", {
-        name: "react.component.link_component",
-      });
+      // The page passes its sections to the view, so a page renderer is
+      // not asked to draw them.
+      expect(page.render).not.toHaveBeenCalled();
+      expectSectionIndex(document.body, [{ id: "rule", title: "Rule" }]);
+      const rule = screen.getByRole("region", { name: "Rule" });
       expect(
-        within(drawn).getByRole("heading", { level: 2, name: "Why one prop" }),
+        within(rule).getByRole("heading", { level: 2, name: "Why one prop" }),
       ).toBeInTheDocument();
     },
     STANDARDS_TEST_TIMEOUT_MS,
