@@ -6,7 +6,8 @@
 // of an npm ref package, which this repository cannot edit, may lack one if
 // `UNDESCRIBED_REF_TERMS` lists it, and that list is the report for
 // upstream. Terms of this repository's own packages and every term the site
-// lens names are described without exception.
+// lens names are described without exception. Every class with instances
+// carries a plural label.
 // =============================================================================
 
 import { executeLocal } from "@canonical/ke-graphql";
@@ -25,7 +26,20 @@ import type { ServedOntology } from "../types.js";
 /** The boot compiles every installed ref package. */
 const BOOT_TIMEOUT_MS = 60_000;
 
+/** The query that reads every served class's instance count and plural. */
+const PLURAL_COVERAGE_QUERY = `{
+  ontologies { classes { uri instanceCount pluralLabel(lang: "en") } }
+}`;
+
+/** A class as {@link PLURAL_COVERAGE_QUERY} reads it. */
+interface CountedClass {
+  readonly uri: string;
+  readonly instanceCount: number;
+  readonly pluralLabel: string | null;
+}
+
 let coverage: ReturnType<typeof listUndescribedTerms>;
+let unpluralized: readonly string[];
 
 beforeAll(async () => {
   const { schema, context } = await bootCorpusSchema(
@@ -45,6 +59,29 @@ beforeAll(async () => {
     throw new Error(`the schema answered ${JSON.stringify(result.errors)}`);
   }
   coverage = listUndescribedTerms(result.data.ontologies);
+  const plurals = (await executeLocal({
+    schema,
+    source: PLURAL_COVERAGE_QUERY,
+    document: parse(PLURAL_COVERAGE_QUERY),
+    contextValue: context,
+  })) as {
+    data?: { ontologies: readonly { classes: readonly CountedClass[] }[] };
+    errors?: unknown;
+  };
+  if (plurals.errors !== undefined || plurals.data === undefined) {
+    throw new Error(`the schema answered ${JSON.stringify(plurals.errors)}`);
+  }
+  unpluralized = [
+    ...new Set(
+      plurals.data.ontologies
+        .flatMap((ontology) => ontology.classes)
+        .filter(
+          (cls) =>
+            cls.instanceCount > 0 && (cls.pluralLabel ?? "").trim() === "",
+        )
+        .map((cls) => cls.uri),
+    ),
+  ].sort();
 }, BOOT_TIMEOUT_MS);
 
 /** Whether `uri` is a term of an npm ref package. */
@@ -77,6 +114,10 @@ describe("description coverage", () => {
     expect(coverage.undescribed.filter((uri) => !isNpmRefTerm(uri))).toEqual(
       [],
     );
+  });
+
+  it("gives every class with instances a plural label", () => {
+    expect(unpluralized).toEqual([]);
   });
 
   it("serves and describes every term the site lens names", () => {
