@@ -1,0 +1,75 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * DropdownPanel styles
+   * @implements ds:global.subcomponent.dropdown_button-panel
+   *
+   * The panel is a native popover: the browser draws it in the top layer, so
+   * it needs no z-index and no ancestor clips it. The Surface modifier class
+   * on the element raises it one layer above where it sits in the page.
+   */
+  .ds.dropdown-button-panel {
+    /* ContextualMenu's surface widths, so a menu and a panel line up. */
+    --dropdown-button-panel-min-width: 12rem;
+    --dropdown-button-panel-max-width: 20rem;
+    /* A panel taller than the viewport scrolls inside itself. */
+    --dropdown-button-panel-max-block-size: calc(
+      100dvh -
+      2 *
+      var(--dimension-200)
+    );
+    --dropdown-button-panel-padding: var(--dimension-200);
+    /* The gap between the trigger and the anchored panel. */
+    --dropdown-button-panel-offset: var(--dimension-050);
+    /* ContextualMenu's three-layer shadow: the system has no elevation token. */
+    --dropdown-button-panel-shadow:
+      0 1px 1px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.15),
+      0 0 3px 0 rgba(0, 0, 0, 0.2);
+    --dropdown-button-panel-motion-duration: 0.12s;
+
+    min-inline-size: var(--dropdown-button-panel-min-width);
+    max-inline-size: var(--dropdown-button-panel-max-width);
+    max-block-size: var(--dropdown-button-panel-max-block-size);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--dropdown-button-panel-padding);
+    border: none;
+    /* The surface channels are read here, where the surface class sets them. */
+    background-color: var(--surface-color-background, var(--color-background));
+    color: var(--surface-color-text, var(--color-text));
+    box-shadow: var(--dropdown-button-panel-shadow);
+
+    /* The fade in and out. display and overlay are discrete, so the panel
+       stays in the top layer until the fade out ends. */
+    opacity: 0;
+    transition:
+      opacity var(--dropdown-button-panel-motion-duration) ease-in-out,
+      display var(--dropdown-button-panel-motion-duration) allow-discrete,
+      overlay var(--dropdown-button-panel-motion-duration) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+
+      @starting-style {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  /* Tethered under the trigger where the browser has anchor positioning. A
+     panel composed directly, with no anchor, keeps the browser's centred
+     placement. The logical position-area mirrors in right-to-left text. */
+  @supports (anchor-name: --a) {
+    .ds.dropdown-button-panel.anchored {
+      inset: auto;
+      margin: var(--dropdown-button-panel-offset) 0;
+      position-area: block-end span-inline-end;
+      position-try-fallbacks: flip-block, flip-inline;
+    }
+  }
+}
