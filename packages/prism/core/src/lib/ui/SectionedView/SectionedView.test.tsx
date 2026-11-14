@@ -61,7 +61,9 @@ describe("SectionedView", () => {
         (child) => child.className,
       ),
     ).toEqual(["contents", "facts"]);
+    expect(root?.querySelectorAll(".facts")).toHaveLength(1);
     expect(root?.querySelector(".facts")?.textContent).toBe("Facts");
+    expect(root?.textContent?.split("Facts")).toHaveLength(2);
     const content = root?.querySelector(":scope > .content");
     expect(content?.firstElementChild?.className).toBe("body");
     expect(content?.firstElementChild?.textContent).toBe("Example");
