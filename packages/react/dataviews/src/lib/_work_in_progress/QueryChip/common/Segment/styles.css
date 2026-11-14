@@ -105,4 +105,101 @@
       cursor: default;
     }
   }
+
+  /* Condition: one block per value, each giving the operator segment its
+     fill, text and icon channels and its mark, so a theme can re-point any
+     value alone. The mark of the values aliased to Information is pinned to
+     the plain icon colour, as no channel routes it per value yet, so no
+     Criticality colour around the chip reaches it. The value is
+     a data attribute, not a class, because a
+     bare value class such as `range` would match another component's root.
+     A stand-in until @canonical/design-tokens has Condition
+     positions: Inclusion, Match, Range and Presence take the Information
+     shades, and Exclusion its own negation tone below. The marks with no
+     glyph in @canonical/ds-assets are drawn here. */
+  .ds.query-chip-segment[data-condition="inclusion"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    /* = */
+    --modifier-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 4.75h10v1.5H3zm0 5h10v1.5H3z'/%3E%3C/svg%3E");
+  }
+
+  /* Exclusion's negation tone, a named stand-in built from the teal
+     primitives, the hue furthest from Information and from every Criticality
+     value, until @canonical/design-tokens declares the Exclusion position.
+     teal.70 arrives with the next design-tokens release; until it is pinned,
+     the fill falls back to teal.100. */
+  .ds.query-chip-segment[data-condition="exclusion"] {
+    --modifier-color-foreground-secondary: light-dark(
+      var(--color-palette-teal-70, var(--color-palette-teal-100)),
+      var(--color-palette-teal-820)
+    );
+    --modifier-color-text-onForegroundSecondary: light-dark(
+      var(--color-palette-teal-700),
+      var(--color-palette-teal-180)
+    );
+    --modifier-color-icon: light-dark(
+      var(--color-palette-teal-700),
+      var(--color-palette-teal-180)
+    );
+    /* ≠ */
+    --modifier-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 4.75h10v1.5H3zm0 5h10v1.5H3z'/%3E%3Cpath d='m10.35 1.6 1.3.75-6 11.05-1.3-.75z'/%3E%3C/svg%3E");
+  }
+
+  .ds.query-chip-segment[data-condition="match"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    --modifier-icon: url("/icons/search.svg#search");
+  }
+
+  .ds.query-chip-segment[data-condition="range"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    /* ↔ */
+    --modifier-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.56 7.25h6.88l-1.72-1.72 1.06-1.06L14.31 8l-3.53 3.53-1.06-1.06 1.72-1.72H4.56l1.72 1.72-1.06 1.06L1.69 8l3.53-3.53 1.06 1.06z'/%3E%3C/svg%3E");
+  }
+
+  .ds.query-chip-segment[data-condition="presence"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    --modifier-icon: url("/icons/status-small.svg#status-small");
+  }
+
+  /* Under forced colours the fills and masks are replaced, so the glyph is
+     painted in the text colour and each part keeps an edge. */
+  @media (forced-colors: active) {
+    .ds.query-chip-segment {
+      border: var(--dimension-stroke-thickness-medium) solid ButtonBorder;
+
+      & > .glyph {
+        forced-color-adjust: none;
+        background-color: CanvasText;
+      }
+
+      &[data-invalid] {
+        border-color: Mark;
+        border-width: var(--dimension-stroke-thickness-large);
+      }
+    }
+  }
 }
