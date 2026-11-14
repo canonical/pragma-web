@@ -1,6 +1,6 @@
 {
   "name": "@canonical/i18n-react",
-  "description": "React bindings for @canonical/i18n-core: I18nProvider and the useTranslation, useLocale, and useFormatters hooks.",
+  "description": "React bindings for @canonical/i18n-core: I18nProvider and the useLocalized, useLocale, useFormatters and useTranslation hooks.",
   "version": "0.46.0",
   "type": "module",
   "module": "dist/esm/index.js",

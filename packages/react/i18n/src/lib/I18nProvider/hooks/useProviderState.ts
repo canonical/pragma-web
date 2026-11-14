@@ -3,9 +3,16 @@ import {
   type I18nConfig,
   type Locale,
   type LocaleSource,
+  type Messages,
 } from "@canonical/i18n-core";
 import { type RefObject, useMemo, useRef } from "react";
 import type { UseProviderStateProps, UseProviderStateResult } from "./types.js";
+
+/**
+ * The catalogs of a provider given none. One shared object, so the context
+ * value keeps its identity across re-renders and consumers do not re-render.
+ */
+const NO_CATALOGS: Record<Locale, Messages> = {};
 
 /**
  * Get the provider's own locale source, creating it on first use.
@@ -38,7 +45,7 @@ function getOwnSource(
  */
 export default function useProviderState({
   config,
-  catalogs,
+  catalogs = NO_CATALOGS,
   locale,
   source,
 }: UseProviderStateProps): UseProviderStateResult {
