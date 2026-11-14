@@ -7,9 +7,10 @@ import type { TrailProps } from "./types.js";
 
 /**
  * The strip's `context` tenant: the breadcrumb trail. The lens's label on
- * the index, then `label / <address>` on an entity page, the address being
- * the route's `:uri` param as the URL carries it, so the trail reads no
- * query and needs no `SocketGuard`.
+ * the index; on an entity page the trail ends at the parent, the label
+ * linked back to the index, since the address the route's `:uri` param
+ * carries is not a name. It reads the URL alone, so it reads no query and
+ * needs no `SocketGuard`.
  *
  * The trail component is built once per binding: its back-link points at
  * the binding's index route, which the binding's id names.

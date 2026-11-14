@@ -22,7 +22,7 @@ describe("Trail on the server", () => {
       }),
     );
     expect(html).toContain('href="/stations"');
-    expect(html).toContain(NORTHGATE_CURIE);
+    expect(html).not.toContain(NORTHGATE_CURIE);
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });
