@@ -6,6 +6,7 @@ import nodeFragment from "../../../__generated__/ChipProjection_node.graphql.js"
 import { OntologyClassChip } from "../../ontology/index.js";
 import { useProjectionMaps } from "../../projections/index.js";
 import renderArm from "../../projections/renderArm.js";
+import requireArmKey from "./requireArmKey.js";
 import type { ChipProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -53,12 +54,13 @@ export default function ChipProjection({
   const { chip } = useProjectionMaps();
   switch (data.__typename) {
     case "OntologyClass":
-      if (data.OntologyClass) {
-        return <OntologyClassChip {...props} node={data.OntologyClass} />;
-      }
-      break;
+      return (
+        <OntologyClassChip
+          {...props}
+          node={requireArmKey(data.OntologyClass, data.__typename)}
+        />
+      );
     default:
-      break;
+      return renderArm(chip, data, props);
   }
-  return renderArm(chip, data, props);
 }
