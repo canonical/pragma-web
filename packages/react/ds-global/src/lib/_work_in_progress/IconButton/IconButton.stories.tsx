@@ -344,6 +344,7 @@ export const OutsideADensityScope: Story = {
       "[data-outside-scope] button.icon-button",
     );
     if (!control || !paired) throw new Error("Expected two icon buttons.");
+    await expect(control.closest(".tooltip-area")).toBeNull();
     await expect(paired.closest(".tooltip-area")).not.toBeNull();
     for (const iconButton of [control, paired]) {
       await expect(iconButton.closest(SCOPES)).toBeNull();
