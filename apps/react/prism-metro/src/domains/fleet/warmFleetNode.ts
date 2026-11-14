@@ -7,6 +7,7 @@ import { expandAddress, readUriParam } from "@canonical/prism-lens-entity";
 import {
   type CacheConfig,
   type ConcreteRequest,
+  type Environment,
   fetchQuery,
 } from "relay-runtime";
 import type { FleetNamespacesQuery } from "#relay/__generated__/FleetNamespacesQuery.graphql.js";
@@ -56,16 +57,44 @@ export default function warmFleetNode(
     STORE_OR_NETWORK,
   )
     .toPromise()
-    .then((namespaces) => {
-      const id = expandAddress(
-        address,
-        /* v8 ignore next -- the observable yields the response before it completes */
-        namespaces?.ontologies ?? [],
-      );
-      return Promise.all([
-        fetchQuery(environment, query, { id }, STORE_OR_NETWORK).toPromise(),
-        warmPageRenderer(id, search, environment),
-      ]);
-    })
-    .then(() => undefined);
+    .then((namespaces) =>
+      warmFleetPage(
+        environment,
+        query,
+        {
+          id: expandAddress(
+            address,
+            /* v8 ignore next -- the observable yields the response before it completes */
+            namespaces?.ontologies ?? [],
+          ),
+        },
+        search,
+      ),
+    );
+}
+
+/**
+ * Warm the page's own operation and, beside it, what the address's page
+ * renderer reads of the expanded IRI.
+ *
+ * @param environment - The environment both requests go through.
+ * @param query - The page's operation.
+ * @param variables - The operation's variables, carrying the expanded IRI
+ *   as `id`.
+ * @param search - The matched view search, selecting the page renderer.
+ * @returns A promise that settles when both are warm, or rejects with the
+ *   page operation's error.
+ * @note Impure: performs up to two network requests through the
+ *   environment.
+ */
+function warmFleetPage(
+  environment: Environment,
+  query: ConcreteRequest,
+  variables: { readonly id: string },
+  search: ViewSearch,
+): Promise<void> {
+  return Promise.all([
+    fetchQuery(environment, query, variables, STORE_OR_NETWORK).toPromise(),
+    warmPageRenderer(variables.id, search, environment),
+  ]).then(() => undefined);
 }
