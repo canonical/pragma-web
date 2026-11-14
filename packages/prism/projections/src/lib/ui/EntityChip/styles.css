@@ -56,6 +56,9 @@
   .ds.entity-chip .mark {
     display: flex;
     flex-shrink: 0;
+    /* A sign smaller than the box sits on its middle. */
+    align-items: center;
+    justify-content: center;
     width: var(--entity-chip-mark-size);
     height: var(--entity-chip-mark-size);
   }

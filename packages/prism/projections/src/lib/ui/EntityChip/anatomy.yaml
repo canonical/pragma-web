@@ -87,11 +87,15 @@ node:
     typography.lineHeight: space.300
     typography.whiteSpace: nowrap
   edges:
+    # The mark centres its sign on both axes in its 16px box, so a sign
+    # smaller than the box, such as a line's swatch, sits on its middle.
     - node:
         role: mark
         styles:
           layout.type: flex
           layout.flex.shrink: 0
+          layout.align: center
+          layout.justify: center
           size.width: space.200
           size.height: space.200
       relation: { cardinality: "0..1", slotName: mark }

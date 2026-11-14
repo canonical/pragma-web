@@ -100,6 +100,9 @@
   .ds.entity-row .mark {
     display: flex;
     flex-shrink: 0;
+    /* A sign smaller than the box sits on its middle. */
+    align-items: center;
+    justify-content: center;
     width: var(--entity-row-mark-size);
     height: var(--entity-row-mark-size);
     margin-inline-end: var(--entity-row-mark-gap);

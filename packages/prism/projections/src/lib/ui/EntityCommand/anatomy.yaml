@@ -93,11 +93,15 @@ node:
     appearance.background@selected: color.foreground.ghost.hover
     typography.color@disabled: color.text.muted
   edges:
+    # The mark centres its sign on both axes in its 16px box, so a sign
+    # smaller than the box, such as a line's swatch, sits on its middle.
     - node:
         role: mark
         styles:
           layout.type: flex
           layout.flex.shrink: 0
+          layout.align: center
+          layout.justify: center
           size.width: space.200
           size.height: space.200
           spacing.external.block.start: space.050

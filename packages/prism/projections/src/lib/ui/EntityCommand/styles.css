@@ -74,6 +74,9 @@
   .ds.entity-command .mark {
     display: flex;
     flex-shrink: 0;
+    /* A sign smaller than the box sits on its middle. */
+    align-items: center;
+    justify-content: center;
     width: var(--entity-command-mark-size);
     height: var(--entity-command-mark-size);
     margin-block-start: var(--entity-command-mark-offset);

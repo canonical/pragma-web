@@ -54,6 +54,12 @@ describe("EntityRow stylesheet", () => {
     }
   });
 
+  it("centres the mark's sign on both axes in its 16px box", () => {
+    const mark = readRule(".ds.entity-row .mark");
+    expect(mark).toContain("align-items: center;");
+    expect(mark).toContain("justify-content: center;");
+  });
+
   it("keeps the status's width", () => {
     expect(readRule(".ds.entity-row .status")).toContain("flex-shrink: 0;");
   });
