@@ -24,6 +24,11 @@
       --typography-text-primary-smallcaps-letter-spacing
     );
     --entity-command-vital-color: var(--color-text-muted);
+    --entity-command-mark-offset: var(--space-050);
+    --entity-command-address-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-command-address-font-family: ui-monospace, monospace;
+    --entity-command-aside-color: var(--color-text-muted);
     --entity-command-identifier-vertical-align: baseline;
     --entity-command-identifier-line-height: 0;
     /* The ring sits inside the title, which clips. */
@@ -57,11 +62,20 @@
     color: var(--entity-command-disabled-color);
   }
 
+  /* The mark sits on the first line, its 16px centred in the 24px line. */
+  .ds.entity-command .mark {
+    display: flex;
+    flex-shrink: 0;
+    margin-block-start: var(--entity-command-mark-offset);
+  }
+
   /* The identity and the title clip only along their line, so a chip in
-   * the title keeps its whole pill, and the line grows to hold it. */
+   * the title keeps its whole pill, and the line grows to hold it. The
+   * identity takes the free width, so what follows it ends the row. */
   .ds.entity-command .identity {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
     overflow-x: clip;
     min-width: 0;
   }
@@ -94,6 +108,31 @@
     color: var(--entity-command-context-color);
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  /* The full address on the second line, truncating rather than wrapping. */
+  .ds.entity-command .address {
+    overflow: hidden;
+    color: var(--entity-command-address-color);
+    font-family: var(--entity-command-address-font-family);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* The end of the row beside an address, muted: the kind closes the first
+   * line, the status the second. */
+  .ds.entity-command .aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    align-self: stretch;
+    color: var(--entity-command-aside-color);
+    white-space: nowrap;
+  }
+
+  .ds.entity-command .status {
+    display: flex;
+    margin-block-start: auto;
   }
 
   .ds.entity-command .location {

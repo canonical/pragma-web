@@ -4,6 +4,13 @@ import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
+  /**
+   * A small sign that leads the first line, such as the entity's type
+   * glyph: an element its projection draws and styles. It names nothing:
+   * the result hides it from assistive technology, so its name stays its
+   * title.
+   */
+  readonly mark?: ReactNode;
   /** The entity's name, on the first line. */
   readonly title: ReactNode;
   /**
@@ -22,6 +29,14 @@ type OwnProps = {
    * in it is a `<code className="identifier">`, which keeps the row's line.
    */
   readonly vital?: ReactNode;
+  /**
+   * The entity's full address, its CURIE, in monospace on the second line.
+   * With one the kind closes the first line; without one the second line is
+   * the transitional "kind in location".
+   */
+  readonly address?: ReactNode;
+  /** The entity's status, closing the second line. */
+  readonly status?: ReactNode;
 };
 
 /**

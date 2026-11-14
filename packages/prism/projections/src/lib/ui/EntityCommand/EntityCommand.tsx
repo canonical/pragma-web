@@ -13,11 +13,15 @@ const componentCssClassName = "ds entity-command";
  * end. With an `href` the title links to the entity's home through
  * `LinkComponent`; without one it is inert text.
  *
- * It renders only the slots it is given: with both a kind and a location
- * the second line is the catalog's one sentence, with one of them it is
- * that one alone, and with neither there is no second line. It is a list
- * item; the palette that lists it sets its role and its selection, so it
- * renders anywhere.
+ * It renders only the slots it is given, in the slot order every
+ * representation keeps: mark, title, address, kind, status. With an
+ * `address` the second line is that address in monospace and the kind
+ * closes the first line, the status the second. Without one the second
+ * line is the transitional "kind in location": with both, the catalog's
+ * one sentence, with one of them that one alone. The mark names nothing,
+ * so it is hidden from assistive technology. It is a list item; the
+ * palette that lists it sets its role and its selection, so it renders
+ * anywhere.
  *
  * Native props reach the `<li>` root; a consumer `className` merges after
  * the row's own.
@@ -29,17 +33,22 @@ const componentCssClassName = "ds entity-command";
  *   for the "kind in location" line.
  */
 export default function EntityCommand({
+  mark,
   title,
   href,
   LinkComponent = "a",
   kind,
   location,
   vital,
+  address,
+  status,
   className,
   ...props
 }: EntityCommandProps): ReactElement {
   const kindSlot =
     kind === undefined ? undefined : <span className="kind">{kind}</span>;
+  const asideKind = address === undefined ? undefined : kindSlot;
+  const contextKind = address === undefined ? kindSlot : undefined;
   const locationSlot =
     location === undefined ? undefined : (
       <span className="location">{location}</span>
@@ -49,6 +58,11 @@ export default function EntityCommand({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
+      {mark === undefined ? null : (
+        <span aria-hidden="true" className="mark">
+          {mark}
+        </span>
+      )}
       <span className="identity">
         {href === undefined ? (
           <span className="title">{title}</span>
@@ -57,13 +71,16 @@ export default function EntityCommand({
             {title}
           </LinkComponent>
         )}
-        {kindSlot === undefined && locationSlot === undefined ? null : (
+        {address === undefined ? null : (
+          <span className="address">{address}</span>
+        )}
+        {contextKind === undefined && locationSlot === undefined ? null : (
           <span className="context">
-            {kindSlot === undefined || locationSlot === undefined ? (
-              (kindSlot ?? locationSlot)
+            {contextKind === undefined || locationSlot === undefined ? (
+              (contextKind ?? locationSlot)
             ) : (
               <Message
-                elements={{ kind: kindSlot, location: locationSlot }}
+                elements={{ kind: contextKind, location: locationSlot }}
                 id="entity.context"
               />
             )}
@@ -71,6 +88,14 @@ export default function EntityCommand({
         )}
       </span>
       {vital === undefined ? null : <span className="vital">{vital}</span>}
+      {asideKind === undefined && status === undefined ? null : (
+        <span className="aside">
+          {asideKind}
+          {status === undefined ? null : (
+            <span className="status">{status}</span>
+          )}
+        </span>
+      )}
     </li>
   );
 }
