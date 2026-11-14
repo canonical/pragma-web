@@ -1,4 +1,5 @@
 import { executeLocal, isIncrementalResults } from "@canonical/ke-graphql";
+import { HIDDEN_VISIBILITY } from "@canonical/prism-contract";
 import { type DocumentNode, parse } from "graphql";
 import { SEARCH_ENTRY_QUERY } from "./constants.js";
 import { selectTypedSubjects } from "./selectTypedSubjects.js";
@@ -42,7 +43,7 @@ const readSearchEntry = async (
     throw new Error(`search index: node(id: "${id}") failed: ${error.message}`);
   }
   const { node } = result.data as { node: SearchEntryNode | null };
-  if (node === null || node._meta.type.visibility === "HIDDEN") {
+  if (node === null || node._meta.type.visibility === HIDDEN_VISIBILITY) {
     return undefined;
   }
   const { curie, title, definition } = node._meta;

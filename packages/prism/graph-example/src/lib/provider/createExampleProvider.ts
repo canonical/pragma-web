@@ -19,6 +19,7 @@
  */
 
 import {
+  HIDDEN_VISIBILITY,
   indexSiteLens,
   type LensGroup,
   type SiteLens,
@@ -999,7 +1000,7 @@ export const createExampleProvider = (
     ...records
       .filter(
         ({ entity }) =>
-          lensIndex.classLens(entity.type).visibility !== "HIDDEN",
+          lensIndex.classLens(entity.type).visibility !== HIDDEN_VISIBILITY,
       )
       .map(({ entity }) =>
         buildSearchEntry(

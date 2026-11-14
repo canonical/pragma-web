@@ -1,4 +1,4 @@
-import { indexSiteLens } from "@canonical/prism-contract";
+import { HIDDEN_VISIBILITY, indexSiteLens } from "@canonical/prism-contract";
 import { graphql } from "graphql";
 import { describe, expect, it } from "vitest";
 import { createExampleProvider } from "../../lib/provider/createExampleProvider.js";
@@ -9,7 +9,7 @@ import { siteLens } from "../../lib/provider/siteLens.js";
 const provider = createExampleProvider();
 const index = indexSiteLens(siteLens, outlineDataset(exampleDataset));
 const hiddenClasses = exampleDataset.classes.filter(
-  (cls) => index.classLens(cls.uri).visibility === "HIDDEN",
+  (cls) => index.classLens(cls.uri).visibility === HIDDEN_VISIBILITY,
 );
 
 describe("hidden classes", () => {

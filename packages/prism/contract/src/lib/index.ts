@@ -29,7 +29,11 @@ export type {
   TBoxOutline,
   TermVisibility,
 } from "./lens/index.js";
-export { indexSiteLens, selectLiteral } from "./lens/index.js";
+export {
+  HIDDEN_VISIBILITY,
+  indexSiteLens,
+  selectLiteral,
+} from "./lens/index.js";
 export { listServedExtensions } from "./listServedExtensions.js";
 export {
   assertSatisfiesContract,

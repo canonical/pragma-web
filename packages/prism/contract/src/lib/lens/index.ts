@@ -5,6 +5,7 @@
  * @module lens
  */
 
+export { HIDDEN_VISIBILITY } from "./constants.js";
 export { indexSiteLens } from "./indexSiteLens.js";
 export { selectLiteral } from "./selectLiteral.js";
 export type {
