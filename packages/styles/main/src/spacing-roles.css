@@ -86,3 +86,16 @@
     --ds-spacing-inset-surface-major-inline: var(--grid-margin);
   }
 }
+
+@layer ds.density {
+  :where(
+    td,
+    th,
+    [role="cell"],
+    [role="gridcell"],
+    [role="rowheader"],
+    [role="columnheader"]
+  ) {
+    --_density-inset-control-block: var(--_spacing-inset-control-block-dense);
+  }
+}
