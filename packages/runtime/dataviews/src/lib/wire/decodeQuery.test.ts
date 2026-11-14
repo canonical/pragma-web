@@ -856,144 +856,144 @@ describe("decodeQuery", () => {
     expect(decoded.window).toEqual(window);
     expect(decoded.issues).toEqual([]);
   });
-});
 
-describe("decodeQuery, conjunct ordinals", () => {
-  it("reads a further conjunct's key, which no link spelled before", () => {
-    // Each of these was malformed — `unknown operator "isAny__1"` — and
-    // left out; each now reads as a second conjunct on its address.
-    expect(decode("status=failed&status__isAny__1=ready").slice.filter).toEqual(
-      [
+  describe("decodeQuery, conjunct ordinals", () => {
+    it("reads a further conjunct's key, which no link spelled before", () => {
+      // Each of these was malformed — `unknown operator "isAny__1"` — and
+      // left out; each now reads as a second conjunct on its address.
+      expect(
+        decode("status=failed&status__isAny__1=ready").slice.filter,
+      ).toEqual([
         { field: "status", operator: "isAny", operands: ["failed"] },
         { field: "status", operator: "isAny", operands: ["ready"] },
-      ],
-    );
-    expect(decode("name__contains=ex&name__contains__2=web")).toMatchObject({
-      slice: {
-        filter: [
-          { field: "name", operator: "contains", operands: ["ex"] },
-          { field: "name", operator: "contains", operands: ["web"] },
-        ],
-      },
-      issues: [],
+      ]);
+      expect(decode("name__contains=ex&name__contains__2=web")).toMatchObject({
+        slice: {
+          filter: [
+            { field: "name", operator: "contains", operands: ["ex"] },
+            { field: "name", operator: "contains", operands: ["web"] },
+          ],
+        },
+        issues: [],
+      });
+      expect(decode("cpu__gte__1=8")).toMatchObject({
+        slice: { filter: [{ field: "cpu", operator: "gte", operands: [8] }] },
+        issues: [],
+      });
     });
-    expect(decode("cpu__gte__1=8")).toMatchObject({
-      slice: { filter: [{ field: "cpu", operator: "gte", operands: [8] }] },
-      issues: [],
+
+    it("reads ordinal 0 as the first conjunct, under each of its spellings", () => {
+      expect(
+        decode("status=failed&status__isAny__0=ready&status__isAny=cancelled")
+          .slice.filter,
+      ).toEqual([
+        {
+          field: "status",
+          operator: "isAny",
+          operands: ["failed", "ready", "cancelled"],
+        },
+      ]);
+      // Leading zeros read as the number they spell.
+      expect(
+        decode("status__isAny__1=failed&status__isAny__01=ready").slice.filter,
+      ).toEqual([
+        { field: "status", operator: "isAny", operands: ["failed", "ready"] },
+      ]);
     });
-  });
 
-  it("reads ordinal 0 as the first conjunct, under each of its spellings", () => {
-    expect(
-      decode("status=failed&status__isAny__0=ready&status__isAny=cancelled")
-        .slice.filter,
-    ).toEqual([
-      {
-        field: "status",
-        operator: "isAny",
-        operands: ["failed", "ready", "cancelled"],
-      },
-    ]);
-    // Leading zeros read as the number they spell.
-    expect(
-      decode("status__isAny__1=failed&status__isAny__01=ready").slice.filter,
-    ).toEqual([
-      { field: "status", operator: "isAny", operands: ["failed", "ready"] },
-    ]);
-  });
-
-  it("reads a gap in the numbering as no error", () => {
-    expect(decode("cpu__lte__3=32&cpu__lte__7=16")).toMatchObject({
-      slice: {
-        filter: [
-          { field: "cpu", operator: "lte", operands: [32] },
-          { field: "cpu", operator: "lte", operands: [16] },
-        ],
-      },
-      issues: [],
+    it("reads a gap in the numbering as no error", () => {
+      expect(decode("cpu__lte__3=32&cpu__lte__7=16")).toMatchObject({
+        slice: {
+          filter: [
+            { field: "cpu", operator: "lte", operands: [32] },
+            { field: "cpu", operator: "lte", operands: [16] },
+          ],
+        },
+        issues: [],
+      });
     });
-  });
 
-  it("refuses an ordinal that is not a whole number as malformed", () => {
-    for (const key of [
-      "cpu__gte__-1",
-      "cpu__gte__1.5",
-      "cpu__gte__x",
-      "cpu__gte__",
-      "cpu__gte__1__2",
-      "cpu__gte__99999999999999999999",
-    ]) {
-      expect(decode(`${key}=4`)).toEqual({
-        slice: noQuery,
+    it("refuses an ordinal that is not a whole number as malformed", () => {
+      for (const key of [
+        "cpu__gte__-1",
+        "cpu__gte__1.5",
+        "cpu__gte__x",
+        "cpu__gte__",
+        "cpu__gte__1__2",
+        "cpu__gte__99999999999999999999",
+      ]) {
+        expect(decode(`${key}=4`)).toEqual({
+          slice: noQuery,
+          window: firstPage,
+          issues: [
+            {
+              parameter: key,
+              field: "cpu",
+              code: "malformed",
+              reason: `"${key}" does not end in a conjunct's ordinal`,
+            },
+          ],
+        });
+      }
+    });
+
+    it("refuses an unknown operator before its ordinal", () => {
+      expect(decode("cpu__between__1=4").issues).toEqual([
+        {
+          parameter: "cpu__between__1",
+          field: "cpu",
+          code: "malformed",
+          reason: 'unknown operator "between"',
+        },
+      ]);
+    });
+
+    it("refuses a further conjunct on a field the collection does not declare", () => {
+      expect(decode("gone__isAny__1=a").issues).toEqual([
+        {
+          parameter: "gone__isAny__1",
+          field: "gone",
+          code: "undeclared-field",
+          reason: '"gone" is not a field of this collection',
+        },
+      ]);
+    });
+
+    it("reports a second spelling of a one-value conjunct, keeping the first", () => {
+      expect(decode("cpu__gte=4&cpu__gte__0=8")).toEqual({
+        slice: {
+          ...noQuery,
+          filter: [{ field: "cpu", operator: "gte", operands: [4] }],
+        },
         window: firstPage,
         issues: [
           {
-            parameter: key,
+            parameter: "cpu__gte__0",
             field: "cpu",
             code: "malformed",
-            reason: `"${key}" does not end in a conjunct's ordinal`,
+            reason: `"cpu__gte__0" repeats a conjunct that takes one value; it was ignored`,
           },
         ],
       });
-    }
-  });
-
-  it("refuses an unknown operator before its ordinal", () => {
-    expect(decode("cpu__between__1=4").issues).toEqual([
-      {
-        parameter: "cpu__between__1",
-        field: "cpu",
-        code: "malformed",
-        reason: 'unknown operator "between"',
-      },
-    ]);
-  });
-
-  it("refuses a further conjunct on a field the collection does not declare", () => {
-    expect(decode("gone__isAny__1=a").issues).toEqual([
-      {
-        parameter: "gone__isAny__1",
-        field: "gone",
-        code: "undeclared-field",
-        reason: '"gone" is not a field of this collection',
-      },
-    ]);
-  });
-
-  it("reports a second spelling of a one-value conjunct, keeping the first", () => {
-    expect(decode("cpu__gte=4&cpu__gte__0=8")).toEqual({
-      slice: {
-        ...noQuery,
-        filter: [{ field: "cpu", operator: "gte", operands: [4] }],
-      },
-      window: firstPage,
-      issues: [
-        {
-          parameter: "cpu__gte__0",
-          field: "cpu",
-          code: "malformed",
-          reason: `"cpu__gte__0" repeats a conjunct that takes one value; it was ignored`,
-        },
-      ],
     });
-  });
 
-  it("refuses each conjunct the source cannot execute under its own key", () => {
-    const decoded = decodeQuery({
-      schema: createMachines(),
-      params: new URLSearchParams(
-        "status__isNone=failed&status__isNone__1=ready&cpu__gte=4",
-      ),
-      capabilities: declare({ filter: { cpu: ["gte"], status: ["isAny"] } }),
+    it("refuses each conjunct the source cannot execute under its own key", () => {
+      const decoded = decodeQuery({
+        schema: createMachines(),
+        params: new URLSearchParams(
+          "status__isNone=failed&status__isNone__1=ready&cpu__gte=4",
+        ),
+        capabilities: declare({ filter: { cpu: ["gte"], status: ["isAny"] } }),
+      });
+      expect(decoded.slice.filter).toEqual([
+        { field: "cpu", operator: "gte", operands: [4] },
+      ]);
+      expect(
+        decoded.issues.map(({ parameter, code }) => [parameter, code]),
+      ).toEqual([
+        ["status__isNone", "undeclared-operator"],
+        ["status__isNone__1", "undeclared-operator"],
+      ]);
     });
-    expect(decoded.slice.filter).toEqual([
-      { field: "cpu", operator: "gte", operands: [4] },
-    ]);
-    expect(
-      decoded.issues.map(({ parameter, code }) => [parameter, code]),
-    ).toEqual([
-      ["status__isNone", "undeclared-operator"],
-      ["status__isNone__1", "undeclared-operator"],
-    ]);
   });
 });
