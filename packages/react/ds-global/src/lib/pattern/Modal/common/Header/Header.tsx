@@ -1,5 +1,5 @@
 import type React from "react";
-import { Button } from "../../../../component/Button/index.js";
+import { IconButtonStandIn as IconButton } from "../../../../common/IconButtonStandIn/index.js";
 import { useModalContext } from "../../hooks/useModalContext.js";
 import type { HeaderProps } from "./types.js";
 import "./styles.css";
@@ -21,7 +21,7 @@ const componentCssClassName = "ds modal-header";
  *
  * @implements ds:global.subcomponent.modal-header
  */
-const Header = ({
+export default function Header({
   children,
   titleId,
   undismissible = false,
@@ -29,7 +29,7 @@ const Header = ({
   onDismiss,
   className,
   ...props
-}: HeaderProps): React.ReactElement => {
+}: HeaderProps): React.ReactElement {
   const modal = useModalContext();
 
   return (
@@ -41,7 +41,10 @@ const Header = ({
         {children}
       </span>
       {!undismissible && (
-        <Button
+        // An icon-only control, named by dismissLabel. It carries no
+        // Tooltip: inside the modal's top layer, the Tooltip's message would
+        // render underneath it.
+        <IconButton
           type="button"
           className="close"
           importance="tertiary"
@@ -52,8 +55,6 @@ const Header = ({
       )}
     </div>
   );
-};
+}
 
 Header.displayName = "Modal.Header";
-
-export default Header;
