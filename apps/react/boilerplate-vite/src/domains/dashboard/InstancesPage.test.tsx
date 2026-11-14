@@ -116,8 +116,9 @@ describe("InstancesPage", () => {
       );
 
       await waitFor(() => expect(dialog).not.toHaveAttribute("open"));
+      // The panel closes before React commits the new row, so wait for the row.
       expect(
-        screen.getByRole("button", { name: "Show details of web-03" }),
+        await screen.findByRole("button", { name: "Show details of web-03" }),
       ).toHaveAttribute("aria-pressed", "true");
       expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("7");
     });
