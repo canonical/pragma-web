@@ -17,7 +17,10 @@
 # absolutely positioned under the summary and ending where it ends, so it
 # opens toward the strip's start and never past the viewport (the resilient
 # baseline), on the page's background with a hairline, one compact inset,
-# so the strip stays one line while it is open.
+# so the strip stays one line while it is open. The summary and each
+# option are as tall as the strip's density line, so each is a full
+# target; the summary draws no native marker, and a chevron ("▾") follows
+# the current renderer's name; the current option is bold.
 #
 # Every decision is read through a component token declared on the root
 # (`--renderer-switch-*`), bound to the symbol named here.
@@ -28,15 +31,18 @@
 #   space.200 (16px) between the tab links: the published tabs' inset.
 #   layout.stack 1: the overlay sits over the canvas's in-flow content; no
 #     semantic stacking symbol exists.
-#   layout.offset.top 100%: the overlay starts under the summary (an
-#     unthemable percentage).
+#   layout.offset.blockStart 100%: the overlay starts under the summary
+#     (an unthemable percentage); layout.offset.inlineEnd 0 ends it where
+#     the summary ends.
+#   "\25BE" (▾): the summary's chevron, a glyph, not a message.
 #   space.100 (8px) inset and gap of the overlay list.
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)  below two groups: the tabs are not
 #     displayed and the menu is.
 #
-# Roster namespaces (accepted and tracked): space.100, space.200, and the
+# Roster namespaces (accepted and tracked): space.100, space.200,
+# density.line.height, and the
 # semantic typography symbol typography.text.primary.bold.fontWeight.
 node:
   uri: prism.component.renderer_switch
@@ -83,6 +89,11 @@ node:
           - node:
               role: summary
               styles:
+                layout.type: flex
+                layout.align: center
+                size.min.block: density.line.height
+                spacing.gap: space.100
+                layout.listStyle: none
                 interaction.cursor: pointer
                 typography.whiteSpace: nowrap
                 typography.weight: typography.text.primary.bold.fontWeight
@@ -91,8 +102,8 @@ node:
               role: overlay list
               styles:
                 layout.position: absolute
-                layout.offset.top: 100%
-                layout.offset.right: 0
+                layout.offset.blockStart: 100%
+                layout.offset.inlineEnd: 0
                 layout.stack: 1
                 layout.listStyle: none
                 layout.type: flex
@@ -111,6 +122,15 @@ node:
               edges:
                 - node:
                     uri: prism.component.router_link
+                    styles:
+                      layout.type: flex
+                      layout.align: center
+                      size.min.block: density.line.height
+                      spacing.internal.inline.start: space.100
+                      spacing.internal.inline.end: space.100
+                      typography.color: color.text
+                      typography.whiteSpace: nowrap
+                      typography.weight@selected: typography.text.primary.bold.fontWeight
                   relation: { cardinality: "2..*", slotName: option }
             relation: { cardinality: "1", slotName: options }
       relation: { cardinality: "1", slotName: menu }

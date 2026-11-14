@@ -20,6 +20,8 @@
     --renderer-switch-tab-current-color: var(--color-border-highlighted);
     --renderer-switch-focus-ring-width: 2px;
     --renderer-switch-focus-ring-color: var(--color-focus-ring);
+    /* A menu entry is as tall as the strip's line: a full target. */
+    --renderer-switch-option-min-block-size: var(--density-line-height);
 
     min-inline-size: 0;
   }
@@ -63,10 +65,26 @@
     position: relative;
   }
 
+  /* The summary names the current renderer, then a chevron after it; the
+   * native disclosure marker is not drawn. It is as tall as the strip's
+   * line, a full target. */
   .ds.renderer-switch > .menu > .summary {
+    display: flex;
+    align-items: center;
+    min-block-size: var(--renderer-switch-option-min-block-size);
+    gap: var(--renderer-switch-overlay-spacing);
+    list-style: none;
     cursor: pointer;
     white-space: nowrap;
     font-weight: var(--renderer-switch-summary-font-weight);
+  }
+
+  .ds.renderer-switch > .menu > .summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .ds.renderer-switch > .menu > .summary::after {
+    content: "\25BE";
   }
 
   /* The open menu's list overlays the canvas under the summary, so the
@@ -74,8 +92,8 @@
    * toward the strip's start and never past the viewport. */
   .ds.renderer-switch > .menu > .options {
     position: absolute;
-    top: 100%;
-    right: 0;
+    inset-block-start: 100%;
+    inset-inline-end: 0;
     z-index: var(--renderer-switch-overlay-stack);
     list-style: none;
     display: flex;
@@ -88,6 +106,21 @@
     border-width: var(--renderer-switch-overlay-border-width);
     border-style: solid;
     border-color: var(--renderer-switch-overlay-border-color);
+  }
+
+  /* Each option is a full target: as tall as the strip's line, its text
+   * centred in it. */
+  .ds.renderer-switch .option {
+    display: flex;
+    align-items: center;
+    min-block-size: var(--renderer-switch-option-min-block-size);
+    padding-inline: var(--renderer-switch-overlay-spacing);
+    color: var(--renderer-switch-tab-color);
+    white-space: nowrap;
+  }
+
+  .ds.renderer-switch .option[aria-current="page"] {
+    font-weight: var(--renderer-switch-summary-font-weight);
   }
 
   /* Below two groups the menu replaces the tabs. */
