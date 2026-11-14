@@ -9,8 +9,6 @@
 # Token ledger: none.
 node:
   uri: docs.subcomponent.catalog_count
-  projection:
-    on: Query
   edges:
     - node:
         uri: prism.component.count_line

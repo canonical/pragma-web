@@ -7,4 +7,7 @@ import type { CountLineProps } from "@canonical/prism-core";
  * `<output>` root. The count is the catalog's, so none of the line's own
  * props is taken.
  */
-export type CatalogCountProps = Omit<CountLineProps, "shown" | "total" | "kind">;
+export type CatalogCountProps = Omit<
+  CountLineProps,
+  "shown" | "total" | "kind"
+>;
