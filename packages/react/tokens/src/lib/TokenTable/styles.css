@@ -2,7 +2,7 @@
   :root {
     --token-ui-canvas: #ffffff;
     --token-ui-ink: #171717;
-    --token-table-cell-padding: 0.625rem 0.75rem;
+    --token-table-cell-padding: 0.625rem var(--ds-spacing-field);
     --token-table-font-size: 0.8125rem;
   }
 
@@ -18,7 +18,7 @@
   }
 
   .ds.token-table.dense {
-    --token-table-cell-padding: 0.5rem 0.625rem;
+    --token-table-cell-padding: 0.5rem var(--ds-spacing-field);
     --token-table-font-size: 0.78125rem;
   }
 
@@ -73,7 +73,7 @@
       );
       color: color-mix(in srgb, var(--token-ui-ink, #171717) 72%, transparent);
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 400;
       letter-spacing: 0.02em;
       white-space: nowrap;
     }
@@ -126,7 +126,10 @@
 
     & .grid th,
     & .grid td {
-      padding: var(--token-table-cell-padding, 0.625rem 0.75rem);
+      padding: var(
+        --token-table-cell-padding,
+        0.625rem var(--ds-spacing-field)
+      );
       border-bottom: 1px solid
         color-mix(in srgb, var(--token-ui-ink, #171717) 8%, transparent);
       vertical-align: top;
@@ -143,7 +146,7 @@
         var(--token-ui-ink, #171717) 3%
       );
       font-size: 0.6875rem;
-      font-weight: 700;
+      font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: color-mix(in srgb, var(--token-ui-ink, #171717) 62%, transparent);
@@ -157,7 +160,7 @@
       );
       color: color-mix(in srgb, var(--token-ui-ink, #171717) 75%, transparent);
       font-size: 0.6875rem;
-      font-weight: 700;
+      font-weight: 400;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
@@ -180,7 +183,7 @@
     & .var-name {
       font-family: ui-monospace, monospace;
       font-size: 0.8125rem;
-      font-weight: 600;
+      font-weight: 400;
       color: inherit;
     }
 
@@ -199,7 +202,7 @@
       padding: 0.0625rem 0.375rem;
       border-radius: 0.375rem;
       font-size: 0.6875rem;
-      font-weight: 600;
+      font-weight: 400;
       line-height: 1.2;
       white-space: nowrap;
     }

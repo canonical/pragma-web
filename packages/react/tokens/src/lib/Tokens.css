@@ -72,7 +72,7 @@
   & .eyebrow {
     color: color-mix(in srgb, var(--token-story-ink, #171717) 65%, transparent);
     font-size: 0.6875rem;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
@@ -344,7 +344,7 @@
     border-radius: 0.625rem;
     font: inherit;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--color-text-on-foreground, var(--token-story-canvas, #ffffff));
     background: var(
       --modifier-color-foreground-primary,
