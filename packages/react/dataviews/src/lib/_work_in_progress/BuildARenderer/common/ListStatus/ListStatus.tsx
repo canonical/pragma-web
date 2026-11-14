@@ -39,17 +39,22 @@ const describe = (
  *
  * @experimental Pre-release: a tutorial example, not exported from the
  * package.
+ *
+ * @implements ds:apps.subcomponent.list_status
  */
 export default function ListStatus({
   status,
   messages,
+  ...rest
 }: ListStatusProps): ReactElement {
   const text = describe(status, messages);
   return DISPLAY_STATUS_PHASES[status.status] === "terminal" ? (
-    <p data-status={status.status} role="status">
+    <p {...rest} data-status={status.status} role="status">
       {text}
     </p>
   ) : (
-    <p data-status={status.status}>{text}</p>
+    <p {...rest} data-status={status.status}>
+      {text}
+    </p>
   );
 }
