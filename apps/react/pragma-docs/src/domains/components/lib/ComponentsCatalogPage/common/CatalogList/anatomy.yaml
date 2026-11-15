@@ -19,8 +19,8 @@
 # fragment spreads the core card and row projections, which select only the
 # contract's types, and a fragment's selection is fixed when the compiler
 # reads it, so no site arm can be handed to it at run time. Through it a UI
-# block would read as a plain node card: no tier, no vitals and no rendered
-# example in its sidecar. The catalog therefore fills the same EntityList
+# block would read as a plain node card: no tier, no facts and no rendered
+# example in its specimen. The catalog therefore fills the same EntityList
 # with the site's card and row projections, whose fragments spread the
 # design-system types' arms.
 #

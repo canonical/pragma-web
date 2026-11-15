@@ -77,12 +77,12 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * The matrix's Danger: the prefix above its title, its class, its
- * summary, its class and family as key values, and its version.
+ * The matrix's Danger: its prefix and title, its summary, and its family
+ * and its version as facts.
  */
 export const Default: Story = {};
 
-/** A modifier with no family: its class alone as a key value. */
+/** A modifier with no family: its version alone as a fact. */
 export const Familyless: Story = {
   parameters: { relay: mockEntity({ modifierFamily: null }) },
 };

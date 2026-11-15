@@ -92,8 +92,8 @@ const nameTierAnchor = (tier: string): string =>
  * It fills the shared list view itself rather than rendering `NodeList`: NodeList's
  * fragment spreads the core card and row projections, which select only
  * the contract's types, and a fragment's selection is fixed at compile
- * time, so a UI block would lose its tier, its vitals and the rendered
- * example in its card's sidecar. The site's projections, whose fragments
+ * time, so a UI block would lose its tier, its facts and the rendered
+ * example in its card's specimen. The site's projections, whose fragments
  * spread the design-system types' arms, keep them.
  *
  * It reads the catalog's operation, with the variables the route warms the

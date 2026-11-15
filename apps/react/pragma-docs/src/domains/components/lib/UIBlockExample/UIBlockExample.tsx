@@ -16,7 +16,7 @@ import type { UIBlockExampleProps } from "./types.js";
  * A UI block's rendered example: the published React component of the
  * block with its default props, given only what it cannot render without (a
  * label, a count, a key). It renders on the server as on the client, so a
- * card's sidecar shows the actual component before any script runs. A
+ * card's specimen shows the actual component before any script runs. A
  * button example is a plain button, which submits nothing.
  *
  * It renders no element of its own: the published component is the root,

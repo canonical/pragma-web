@@ -111,14 +111,14 @@ the colour on its root per line as a custom property, so no stylesheet
 names a colour. The mark is hidden from assistive technology: the name
 is the line's whatever its colour.
 
-| Type        | Card                                                                                   | Row           | Command result                                   | Chip, graph node                    |
-| ----------- | -------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------ | ----------------------------------- |
-| Station     | its zone above its name; Platforms, Zone and Lines as key values; its platform count  | "4 platforms" | "Northgate / Station in Central Zone · 4 platforms" | its name; "Station in Central Zone" |
-| Interchange | a station's card, with its transfer time, and the count of its lines as a second vital | "interchange" | "… / Interchange in Central Zone · 3 lines"      | as a station's                      |
-| Line        | Stops, and Ends for a line run end to end; "loop" as the vital of a loop               | its colour's swatch; "5 stops" | "North Line / Line · 5 stops"                    | its colour's swatch and its name; its class |
-| Fare zone   | the count of its stations as its vital                                                 | "2 stations"  | "Central Zone / Fare zone · 2 stations"          | its name; its class                 |
+| Type        | Card                                                                                         | Row                                         | Command result                                              | Chip, graph node                      |
+| ----------- | -------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------- | ------------------------------------- |
+| Station     | its name and definition; Platforms, Zone and Lines as facts                                  | its platform count as a fact                | "Northgate / metro:northgate / Station", "4 platforms"      | its mark and its name                 |
+| Interchange | a station's card, with its transfer time as a further fact                                   | its platform count as a fact                | "Central Exchange / metro:central-exchange / Interchange", "3 lines" | as a station's                        |
+| Line        | Stops, and Ends for a line run end to end, as facts; "loop" as the status of a loop          | its stop count as a fact; "loop" as status  | "North Line / metro:north-line / Line", "5 stops"           | its colour's disc and its name        |
+| Fare zone   | the count of its stations as a fact                                                          | its station count as a fact                 | "Central Zone / geo:central-zone / Fare zone", "2 stations" | its name                              |
 
-A value the graph does not assert leaves its slot, its pair or its vital
+A value the graph does not assert leaves its slot or its fact
 out. A station, an interchange and a line link to their page; a fare zone
 has no home on the site, so its name reads as inert text.
 

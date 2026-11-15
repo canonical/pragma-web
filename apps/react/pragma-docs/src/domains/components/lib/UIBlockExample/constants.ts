@@ -6,7 +6,7 @@ import type { BlockExampleName } from "./types.js";
  * published component implements, and the example each renders. A block the
  * published package does not implement has no example; nor has one whose
  * component needs a trigger and its state (a popover, a tooltip, a menu, a
- * modal) or does not fit the sidecar's two columns (tabs, breadcrumbs, an
+ * modal) or does not fit the specimen's well (tabs, breadcrumbs, an
  * accordion).
  */
 export const BLOCK_EXAMPLES: ReadonlyMap<string, BlockExampleName> = new Map([

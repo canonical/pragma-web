@@ -3,7 +3,7 @@
 # colour, its service (a loop, or end to end with its two ends), how many
 # stops it calls at, and the interchanges on it with their transfer times,
 # each stop linking to its page. Bespoke as the aside's arrangement; a
-# line's EntityCard may later carry its strip in its sidecar.
+# line's EntityCard may later carry its strip in its specimen.
 #
 # Every decision is read through a component token declared on the root
 # (`--line-panel-*`), bound to the symbol named here. The line's colour
