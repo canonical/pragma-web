@@ -452,7 +452,8 @@ export interface BridgeLabel {
   readonly box: Rect;
   /**
    * The label's centre: on or beside a stretch of route only its bridge
-   * runs on, as near its arrowhead as it fits.
+   * runs on, as near its arrowhead as it fits, or, for a route too short
+   * to carry it, under the pair of regions the bridge joins.
    */
   readonly cx: number;
   readonly cy: number;

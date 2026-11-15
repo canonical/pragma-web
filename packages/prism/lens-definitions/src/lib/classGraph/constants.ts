@@ -5,7 +5,6 @@
  * measured with, are the engine's, in `@canonical/prism-core`.
  */
 
-import { createTranslator } from "@canonical/i18n-core";
 import {
   BUS_OFFSET,
   COLLISION_MARGIN,
@@ -16,7 +15,6 @@ import {
   LATTICE,
   REGION_LABEL_SIZE,
 } from "@canonical/prism-core";
-import { MESSAGES } from "../i18n/constants.js";
 import type { StrokeWidth } from "./types.js";
 
 /** A class box's height, in px. */
@@ -273,8 +271,8 @@ export const STUB_PREFIXES: ReadonlyMap<string, string> = new Map([
 export const FIT_TOLERANCE = 1e-6;
 
 /**
- * The catalog's English, in which the layout measures a box's text: the
- * layout is the same in every locale, so the server and the client lay
- * out the same graph.
+ * The locale of the catalog in which the layout measures a box's text:
+ * the layout is the same in every locale, so the server and the client
+ * lay out the same graph.
  */
-export const MEASURED_MESSAGES = createTranslator("en", MESSAGES);
+export const MEASURED_LOCALE = "en";

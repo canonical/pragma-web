@@ -1,3 +1,4 @@
+import { createTranslator } from "@canonical/i18n-core";
 import {
   ceilTo,
   compareText,
@@ -9,6 +10,8 @@ import {
   requireAt,
   requireEntry,
 } from "@canonical/prism-core";
+import { MESSAGES } from "../i18n/constants.js";
+import type { Translate } from "../i18n/index.js";
 import {
   BOX_HEIGHT,
   BOX_INSET,
@@ -20,7 +23,7 @@ import {
   HUB_LOOP_EXTENT,
   HUB_MIN_DEGREE,
   LOOP_EXTENT,
-  MEASURED_MESSAGES,
+  MEASURED_LOCALE,
   REGION_BOX_MIN_WIDTH,
   WRAPPED_HEIGHT,
 } from "./constants.js";
@@ -51,17 +54,21 @@ type BoxGeometry = Pick<
  * height, for its prefix at a hub's size over the classes and relations
  * it holds, and at least 128px wide.
  */
-function sizeBox(klass: GraphClassInput, hub: boolean): BoxGeometry {
+function sizeBox(
+  klass: GraphClassInput,
+  hub: boolean,
+  measured: Translate,
+): BoxGeometry {
   if (klass.kind === "region") {
     // Its prefix at a hub's 16px over what it holds at 14px, both within
     // the insets: the line measured as the catalog's English sets it.
-    const box = sizeBox({ ...klass, kind: "class" }, true);
+    const box = sizeBox({ ...klass, kind: "class" }, true, measured);
     const holds = measureTextWidth(
-      MEASURED_MESSAGES("well.region.holds", {
-        classes: MEASURED_MESSAGES("well.region.count", {
+      measured("well.region.holds", {
+        classes: measured("well.region.count", {
           count: klass.members ?? 1,
         }),
-        relations: MEASURED_MESSAGES("well.relations.count", {
+        relations: measured("well.relations.count", {
           count: klass.held ?? 0,
         }),
       }),
@@ -242,6 +249,8 @@ export default function buildClassGraphModel(
   whole?: ClassGraphModel,
 ): ClassGraphModel {
   const relations: readonly AnyRelationInput[] = input.relations;
+  // The catalog a box's text is measured in, the same in every locale.
+  const measured = createTranslator(MEASURED_LOCALE, MESSAGES);
   const classes = breakSuperclassCycles(
     [...input.classes].sort((a, b) => compareText(a.uri, b.uri)),
   );
@@ -348,7 +357,7 @@ export default function buildClassGraphModel(
           kind: klass.kind ?? "class",
           members: klass.members ?? 1,
           held: klass.held ?? 0,
-          ...sizeBox(klass, hub),
+          ...sizeBox(klass, hub, measured),
           hub,
           degree: wholeOf(klass.uri)?.degree ?? requireEntry(degree, klass.uri),
           loop,
