@@ -31,6 +31,20 @@ describe("listExports", () => {
     ]);
   });
 
+  it.fails("reads a function's overload signatures as one export", () => {
+    const source = [
+      "export default function a(b: string): string;",
+      "export default function a(b: number): number;",
+      "export default function a(b: unknown) { return b; }",
+      "export function c(d: string): void;",
+      "export function c(d: unknown) {}",
+    ].join("\n");
+    expect(listExports(source)).toEqual([
+      { name: "a", kind: "function", isDefault: true, isAtEnd: false },
+      { name: "c", kind: "function", isDefault: false, isAtEnd: false },
+    ]);
+  });
+
   it("reads nothing from a file with no export", () => {
     expect(listExports("const a = [1];")).toEqual([]);
   });
