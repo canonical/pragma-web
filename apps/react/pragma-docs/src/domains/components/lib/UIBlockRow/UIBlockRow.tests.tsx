@@ -125,7 +125,7 @@ describe("UIBlockRow", () => {
         },
       },
     );
-    expect(container.querySelector(".location")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("ends in its title when the block has no stage", () => {
@@ -137,7 +137,7 @@ describe("UIBlockRow", () => {
       ),
       { documentationStages: { edges: [] } },
     );
-    expect(container.querySelector(".meta")).toBeNull();
+    expect(container.querySelector(".status")).toBeNull();
   });
 
   it("shows a pattern's title as inert text", () => {
