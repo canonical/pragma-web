@@ -29,7 +29,13 @@ import {
 import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import { MESSAGES } from "../i18n/index.js";
-import { DESIGN_CANVAS, MIN_FIT, PHONE, SHELF_GAP } from "./constants.js";
+import {
+  DESIGN_CANVAS,
+  LEGIBLE_MARGIN,
+  MIN_FIT,
+  PHONE,
+  SHELF_GAP,
+} from "./constants.js";
 import layOutClassGraph from "./layOutClassGraph.js";
 import opensWhole from "./opensWhole.js";
 import placeBridgeLabels from "./placeBridgeLabels.js";
@@ -136,27 +142,24 @@ describe("layOutClassGraph", () => {
     ).toHaveLength(8);
   });
 
-  it("retries a graph too wide for the canvas, keeps the narrower channels that lift its fit, and opens on a legible window", () => {
+  it("retries a graph too wide for the canvas, keeps the narrower channels that lift its fit, and opens at the legible floor", () => {
     const wide = layOutClassGraph(WIDE_GRAPH);
     expect(wide.channel).toBe(32);
     expect(wide.findings).toEqual([
       "G3: fit 0.281 at 48px channels; 0.307 at 32px",
       "G3: opens on a legible window, the rest a pan away",
     ]);
-    // The window ends half a lattice step past the last box that ends
-    // before the legible width, at a zoom above the legible one.
-    expect(wide.view).toMatchObject({ x: -16, y: -16, w: 632 });
-    expect(wide.view.h).toBeCloseTo(
-      (632 * DESIGN_CANVAS.h) / DESIGN_CANVAS.w,
+    // The window runs from the graph's top-left corner at the legible
+    // floor, the widest a reader can still read.
+    expect(wide.view).toMatchObject({ x: -16, y: -16 });
+    expect(DESIGN_CANVAS.w / wide.view.w).toBeCloseTo(
+      MIN_FIT * LEGIBLE_MARGIN,
       10,
     );
-    expect(DESIGN_CANVAS.w / wide.view.w).toBeGreaterThanOrEqual(MIN_FIT);
-    const right = wide.view.x + wide.view.w;
-    expect(
-      [...wide.nodes.values()].filter(
-        (node) => node.x < right && node.x + node.w > right,
-      ),
-    ).toEqual([]);
+    expect(wide.view.h / wide.view.w).toBeCloseTo(
+      DESIGN_CANVAS.h / DESIGN_CANVAS.w,
+      10,
+    );
   });
 
   it("settles on the narrower channels when they make the graph fit", () => {

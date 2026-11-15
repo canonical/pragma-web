@@ -2,7 +2,7 @@ import { requireEntry } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import { MIN_FIT } from "../../classGraph/constants.js";
-import frameLegibleWindow from "../../classGraph/frameLegibleWindow.js";
+import frameOpeningWindow from "../../classGraph/frameOpeningWindow.js";
 import frameOpeningCamera from "./frameOpeningCamera.js";
 import frameOpeningView from "./frameOpeningView.js";
 
@@ -31,12 +31,12 @@ describe("frameOpeningCamera", () => {
     { w: 632, h: 546 },
     { w: 504, h: 570 },
   ])(
-    "opens a $w by $h canvas on its own legible window, flush top-left",
+    "opens a $w by $h canvas on its own opening window, flush top-left",
     (canvas) => {
       const viewBox = frameOpeningView(layout, undefined);
       const { scale, visible } = measureIdentity(viewBox, canvas);
       const camera = frameOpeningCamera(layout, undefined, visible, scale);
-      const window = frameLegibleWindow(layout, canvas);
+      const window = frameOpeningWindow(layout, canvas);
       expect(scale * camera.k).toBeGreaterThanOrEqual(MIN_FIT);
       expect(scale * camera.k).toBeCloseTo(canvas.w / window.w, 10);
       expect(camera.x + camera.k * window.x).toBeCloseTo(visible.x, 10);

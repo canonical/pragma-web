@@ -17,7 +17,9 @@
  * selection drills into it stops at the overview's floor, on a window that
  * cuts no class; a pick in the rail keeps the chips, the search and the
  * zoom; and the inspector's field rows put their ranges on one column
- * line.
+ * line. Where the map does not fit the canvas at the legible floor, it
+ * opens at the map's top-left corner at that floor: the first shelf's
+ * boxes whole where they fit, a box the window's edge crosses cut there.
  */
 import {
   launchBrowser,
@@ -497,7 +499,7 @@ describe("at 1440 px", () => {
 describe("at 912 px, on a canvas narrower than the drawing", () => {
   const tablet = STRIP_VIEWPORTS.find((viewport) => viewport.name === "912");
 
-  it("opens on the first shelf's boxes from the left, whole and legible, and no part of the next", async () => {
+  it("opens at the map's top-left corner at the legible floor, both boxes and every class whole", async () => {
     if (tablet === undefined) throw new Error("no 912 viewport");
     const view: { shelf?: ShelfBox[] } = {};
     const { errors, measure } = await openExplorer(
@@ -508,15 +510,18 @@ describe("at 912 px, on a canvas narrower than the drawing", () => {
       },
     );
     expect(errors).toEqual([]);
-    // The boxes lead: surface and ds, each drawn as one box, fit whole at
-    // a legible zoom on this canvas; the dt stub after them does not, and
-    // no part of it shows.
-    expect(view.shelf?.map(({ id, whole }) => [id, whole])).toEqual([
+    // The widest window a reader can still read: surface and ds, each
+    // drawn as one box, are whole in it; the dt stub after them may be cut
+    // by its right edge, the sign that the map goes on, and no class is.
+    expect(
+      view.shelf
+        ?.filter(({ id }) => id === "surface" || id === "ds")
+        .map(({ id, whole }) => [id, whole]),
+    ).toEqual([
       ["surface", true],
       ["ds", true],
-      ["dt:TokenSymbol", false],
     ]);
-    expect(view.shelf?.every(({ whole, met }) => whole || !met)).toBe(true);
+    expect(measure.cut.filter((id) => id !== "dt:TokenSymbol")).toEqual([]);
     expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
     expect(measure.unlabelled).toBe(0);
   });

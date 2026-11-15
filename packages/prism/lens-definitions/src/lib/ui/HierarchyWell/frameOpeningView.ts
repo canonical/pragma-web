@@ -8,7 +8,8 @@ import type { ClassGraphLayout } from "../../classGraph/types.js";
  * design canvas: the whole graph when it fits there at a legible zoom,
  * else a legible window of it, centred on the class selected on arrival
  * when there is one, so a term page opens on its term, and otherwise
- * showing the first shelf's boxes from the left, none of them cut.
+ * from the map's top-left corner at the legible floor, the widest window
+ * a reader can still read.
  *
  * @param layout - The class graph's layout.
  * @param selected - The box of the class selected on arrival, if any.

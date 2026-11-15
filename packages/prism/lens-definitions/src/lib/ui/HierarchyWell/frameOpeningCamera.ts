@@ -6,9 +6,8 @@ import type { ClassGraphLayout } from "../../classGraph/types.js";
  * Compute the camera the canvas opens on once the client has measured it:
  * the window the canvas's real size calls for (the whole graph when it
  * fits there at a legible zoom, else a legible window around the class
- * selected on arrival, or showing the first shelf's boxes from the left,
- * none of them cut), flush with the
- * viewport's top-left corner. A canvas the size of the design canvas finds
+ * selected on arrival, or the window from the map's top-left corner at the
+ * legible floor), flush with the viewport's top-left corner. A canvas the size of the design canvas finds
  * the server's own window, at or next to the identity.
  *
  * @param layout - The class graph's layout.

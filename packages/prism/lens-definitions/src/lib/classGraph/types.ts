@@ -341,8 +341,8 @@ export interface ClassGraphLayout {
   readonly viewBox: Rect;
   /**
    * The box the canvas opens on at the design canvas: the viewBox when it
-   * fits there at the legible zoom, else the legible window from its
-   * top-left corner that shows the first shelf's boxes, none of them cut.
+   * fits there at the legible zoom, else the window from its top-left
+   * corner at the legible floor, cutting the boxes its edge crosses.
    */
   readonly view: Rect;
   /** The zoom at which the viewBox fits the design canvas. */
