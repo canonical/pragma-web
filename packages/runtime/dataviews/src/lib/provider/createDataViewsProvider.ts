@@ -209,6 +209,8 @@ export default function createDataViewsProvider<
     listRefusals,
     setPredicate: (predicate: Predicate, nth?: number, history?: HistoryMode) =>
       applyCommand({ kind: "setPredicate", predicate, nth }, history),
+    addPredicate: (predicate: Predicate, history?: HistoryMode) =>
+      applyCommand({ kind: "addPredicate", predicate }, history),
     removePredicate: (
       field: string,
       operator: PredicateOperator,
