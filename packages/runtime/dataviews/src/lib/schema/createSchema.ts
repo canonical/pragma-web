@@ -33,14 +33,29 @@ export default function createSchema<
         definition.appliesTo === undefined
           ? {}
           : { appliesTo: Object.freeze([...definition.appliesTo]) };
-      return definition.kind === "choices" && definition.options !== undefined
-        ? Object.freeze({
-            field: definition.field,
-            kind: definition.kind,
-            options: Object.freeze([...definition.options]),
-            ...scoping,
-          })
-        : Object.freeze({ ...definition, ...scoping });
+      if (definition.kind === "choices" && definition.options !== undefined) {
+        return Object.freeze({
+          ...definition,
+          options: Object.freeze([...definition.options]),
+          ...scoping,
+        });
+      }
+      if (definition.kind === "number" && definition.units !== undefined) {
+        const { base, display } = definition.units;
+        return Object.freeze({
+          ...definition,
+          units: Object.freeze({
+            base,
+            display: Object.freeze(
+              display.map(({ symbol, factor }) =>
+                Object.freeze({ symbol, factor }),
+              ),
+            ),
+          }),
+          ...scoping,
+        });
+      }
+      return Object.freeze({ ...definition, ...scoping });
     }),
   ) as TFields;
   const fieldNames = Object.freeze(
@@ -105,7 +120,7 @@ export default function createSchema<
         return { status: "incomplete" };
       }
       const parsed = kind.input.parse(definition, input);
-      if (parsed.status === "invalid") {
+      if (parsed.status !== "valid") {
         return parsed;
       }
       const operands: PredicateOperand[] = [parsed.operand];

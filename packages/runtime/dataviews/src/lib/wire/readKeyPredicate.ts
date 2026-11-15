@@ -75,21 +75,33 @@ const readInputs = (
   const operands: PredicateOperand[] = [];
   const read: number[] = [];
   for (const [at, value] of values.entries()) {
-    const parsed = schema.validateInput(field, value);
+    // A blank is a control left empty: no value, and nothing to report.
+    if (value === "") {
+      continue;
+    }
+    const typed = schema.validateInput(field, value);
+    // A value read as still being typed is whole once its trailing spaces
+    // are dropped, `16 `: nothing more is coming on the wire.
+    const parsed =
+      typed.status === "incomplete"
+        ? schema.validateInput(field, value.trimEnd())
+        : typed;
     if (parsed.status === "valid") {
       operands.push(...parsed.operands);
       read.push(at);
       continue;
     }
-    // A blank is a control left empty: no value, and nothing to report.
-    if (parsed.status === "incomplete") {
-      continue;
-    }
+    // What reads as incomplete here is text a reader was still typing,
+    // `16 G`: on the wire it restricts nothing it could be read as, and is
+    // refused rather than dropped.
     issues.push({
       parameter: key,
       field,
       code: "invalid",
-      reason: parsed.reason,
+      reason:
+        parsed.status === "incomplete"
+          ? `"${value}" is not a whole value`
+          : parsed.reason,
     });
   }
   return { operands, read };

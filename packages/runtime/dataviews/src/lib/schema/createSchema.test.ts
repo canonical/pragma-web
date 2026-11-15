@@ -130,6 +130,120 @@ describe("createSchema", () => {
     ).toEqual(["cpu"]);
   });
 
+  it("rejects number units that cannot be read back", () => {
+    const memory =
+      (display: readonly { symbol: string; factor: number }[]) => () =>
+        createSchema([
+          { field: "memory", kind: "number", units: { base: "MiB", display } },
+        ]);
+    expect(memory([{ symbol: "GiB", factor: 1024 }])).toThrow(
+      'does not display its base unit "MiB" with a factor of 1',
+    );
+    expect(memory([{ symbol: "MiB", factor: 2 }])).toThrow(
+      'does not display its base unit "MiB" with a factor of 1',
+    );
+    expect(
+      memory([
+        { symbol: "MiB", factor: 1 },
+        { symbol: "G iB", factor: 1024 },
+      ]),
+    ).toThrow(
+      "a unit symbol that is empty, holds a space or starts as a number does",
+    );
+    expect(
+      memory([
+        { symbol: "MiB", factor: 1 },
+        { symbol: "", factor: 1024 },
+      ]),
+    ).toThrow(
+      "a unit symbol that is empty, holds a space or starts as a number does",
+    );
+    expect(
+      memory([
+        { symbol: "MiB", factor: 1 },
+        { symbol: ".5k", factor: 512 },
+      ]),
+    ).toThrow(
+      "a unit symbol that is empty, holds a space or starts as a number does",
+    );
+    expect(
+      memory([
+        { symbol: "MiB", factor: 1 },
+        { symbol: "mib", factor: 1024 },
+      ]),
+    ).toThrow("two unit symbols that are the same, case aside");
+    expect(
+      memory([
+        { symbol: "MiB", factor: 1 },
+        { symbol: "MiB", factor: 1024 },
+      ]),
+    ).toThrow("two unit symbols that are the same, case aside");
+    expect(
+      memory([
+        { symbol: "GiB", factor: 1024 },
+        { symbol: "MiB", factor: 1 },
+      ]),
+    ).toThrow("unit factors that are not positive and ascending");
+    expect(
+      memory([
+        { symbol: "KiB", factor: -1 },
+        { symbol: "MiB", factor: 1 },
+      ]),
+    ).toThrow("unit factors that are not positive and ascending");
+    expect(
+      memory([
+        { symbol: "MiB", factor: 1 },
+        { symbol: "GiB", factor: Number.POSITIVE_INFINITY },
+      ]),
+    ).toThrow("unit factors that are not positive and ascending");
+  });
+
+  it("reads a number typed in a display unit in base units", () => {
+    const display = [
+      { symbol: "MiB", factor: 1 },
+      { symbol: "GiB", factor: 1024 },
+    ];
+    const units = { base: "MiB", display };
+    const schema = createSchema([
+      { field: "memory", kind: "number", max: 65_536, units },
+    ]);
+    // The schema keeps its own frozen copy of the units.
+    display.push({ symbol: "TiB", factor: 1_048_576 });
+    expect(schema.findField("memory")).toEqual({
+      field: "memory",
+      kind: "number",
+      max: 65_536,
+      units: {
+        base: "MiB",
+        display: [
+          { symbol: "MiB", factor: 1 },
+          { symbol: "GiB", factor: 1024 },
+        ],
+      },
+    });
+    expect(Object.isFrozen(schema.findField("memory"))).toBe(true);
+    expect(schema.validateInput("memory", "16 GiB")).toEqual({
+      status: "valid",
+      operands: [16_384],
+    });
+    expect(schema.validateInput("memory", "512")).toEqual({
+      status: "valid",
+      operands: [512],
+    });
+    expect(schema.validateInput("memory", "1 TiB")).toEqual({
+      status: "invalid",
+      reason: '"TiB" is not a unit; use MiB or GiB',
+    });
+    // On its way to 16 GiB, the text is incomplete, never wrong.
+    expect(schema.validateInput("memory", "16 G")).toEqual({
+      status: "incomplete",
+    });
+    expect(schema.validateInput("memory", "128 GiB")).toEqual({
+      status: "invalid",
+      reason: "131072 is above the maximum of 65536",
+    });
+  });
+
   it("answers lookups from frozen copies, immune to input mutation", () => {
     const options = ["failed"];
     const input = [{ field: "status", kind: "choices" as const, options }];
