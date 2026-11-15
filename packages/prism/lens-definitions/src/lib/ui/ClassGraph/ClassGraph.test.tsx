@@ -202,36 +202,37 @@ describe("ClassGraph", () => {
     expect(container.querySelector("text")).toBeNull();
   });
 
-  it.each([
-    "full",
-    "hubs",
-    "overview",
-  ] as const)("keeps the way back at the %s zoom, named with its count, its text by the bucket", (bucket) => {
-    zoom.bucket = bucket;
-    const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
-      budget: GRAPH_BUDGET,
-      drill: "surface",
-    });
-    const members = drilled.regions.find(
-      (region) => region.prefix === "surface",
-    )?.members;
-    const container = draw({
-      layout: drilled,
-      terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
-      buildDrillHref: (prefix) =>
-        prefix === undefined ? "/definitions" : `/definitions?expand=${prefix}`,
-    });
-    const back = container.querySelectorAll("a.way-back");
-    expect(back).toHaveLength(1);
-    expect(back[0]?.getAttribute("href")).toBe("/definitions");
-    expect(back[0]?.getAttribute("aria-label")).toBe(
-      `Namespace surface, opened, ${members} classes: back to the overview of every namespace`,
-    );
-    expect(back[0]?.querySelector("rect")).not.toBeNull();
-    expect(back[0]?.querySelector("text") === null).toBe(
-      bucket === "overview",
-    );
-  });
+  it.each(["full", "hubs", "overview"] as const)(
+    "keeps the way back at the %s zoom, named with its count, its text by the bucket",
+    (bucket) => {
+      zoom.bucket = bucket;
+      const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        budget: GRAPH_BUDGET,
+        drill: "surface",
+      });
+      const members = drilled.regions.find(
+        (region) => region.prefix === "surface",
+      )?.members;
+      const container = draw({
+        layout: drilled,
+        terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
+        buildDrillHref: (prefix) =>
+          prefix === undefined
+            ? "/definitions"
+            : `/definitions?expand=${prefix}`,
+      });
+      const back = container.querySelectorAll("a.way-back");
+      expect(back).toHaveLength(1);
+      expect(back[0]?.getAttribute("href")).toBe("/definitions");
+      expect(back[0]?.getAttribute("aria-label")).toBe(
+        `Namespace surface, opened, ${members} classes: back to the overview of every namespace`,
+      );
+      expect(back[0]?.querySelector("rect")).not.toBeNull();
+      expect(back[0]?.querySelector("text") === null).toBe(
+        bucket === "overview",
+      );
+    },
+  );
 
   it("makes each class a link with one tab stop, named for assistive technology", () => {
     const container = draw({ tabStop: uri("ds:Component") });

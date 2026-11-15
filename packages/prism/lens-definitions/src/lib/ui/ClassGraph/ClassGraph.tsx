@@ -446,20 +446,20 @@ export default function ClassGraph({
               region,
               bucket === "overview" ? null : (
                 <text
-                    className="region-label"
-                    fill="currentColor"
-                    x={region.x}
-                    y={region.y + regionBaseline}
-                  >
-                    <tspan className="prefix">
-                      {region.prefix.toUpperCase()}
+                  className="region-label"
+                  fill="currentColor"
+                  x={region.x}
+                  y={region.y + regionBaseline}
+                >
+                  <tspan className="prefix">
+                    {region.prefix.toUpperCase()}
+                  </tspan>
+                  {bucket === "full" ? (
+                    <tspan className="count" dx={REGION_LABEL_GAP}>
+                      {t("well.region.count", { count: region.members })}
                     </tspan>
-                    {bucket === "full" ? (
-                      <tspan className="count" dx={REGION_LABEL_GAP}>
-                        {t("well.region.count", { count: region.members })}
-                      </tspan>
-                    ) : null}
-                  </text>
+                  ) : null}
+                </text>
               ),
             )}
           </g>

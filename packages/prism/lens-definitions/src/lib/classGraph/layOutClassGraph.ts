@@ -51,10 +51,10 @@ import routeNeighbourBridges from "./routeNeighbourBridges.js";
 import type {
   Bundle,
   ClassGraphInput,
-  CrossPort,
   ClassGraphLayout,
   ClassGraphLayoutOptions,
   ClassGraphModel,
+  CrossPort,
   DrawnScope,
   LaidOutEdge,
   LaidOutNode,

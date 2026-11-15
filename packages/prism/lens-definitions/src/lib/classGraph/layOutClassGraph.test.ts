@@ -579,10 +579,9 @@ describe("layOutClassGraph", () => {
               )?.collapsed,
           );
         expect(boxes.length, drill).toBeGreaterThan(0);
-        expect(
-          layout.phone.headers.slice(1, boxes.length + 1),
-          drill,
-        ).toEqual(boxes);
+        expect(layout.phone.headers.slice(1, boxes.length + 1), drill).toEqual(
+          boxes,
+        );
         const region = requireDefined(
           layout.regions.find((candidate) => candidate.prefix === drill),
           "the drilled region",

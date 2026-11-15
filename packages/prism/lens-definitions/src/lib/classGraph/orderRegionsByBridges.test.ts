@@ -125,14 +125,7 @@ describe("orderRegionsByBridges", () => {
       { a: "ds", b: "dt", relations: 1 },
       { a: "surface", b: "rdf", relations: 1 },
     ];
-    const opened = [
-      "surface",
-      "ds",
-      "anatomy",
-      "cs",
-      "dt",
-      "rdf",
-    ] as const;
+    const opened = ["surface", "ds", "anatomy", "cs", "dt", "rdf"] as const;
     expect(orderRegionsByBridges(regions, bridges, "surface")).toEqual(opened);
     expect(
       orderRegionsByBridges(
