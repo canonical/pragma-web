@@ -19,7 +19,9 @@ const componentCssClassName = "ds sectioned-view";
  * section's and the fragment its index link points to; a heading stops
  * the "On this page" bar's height under the scroller's top when a link
  * scrolls to it. Once scripts run, the section whose heading has reached
- * that line is the current one, marked in the index.
+ * that line is the current one, marked in the index; a section the reader
+ * chose with a link is, until the next scroll, and the last section is
+ * with the scroller at its end.
  *
  * It is a subgrid of the canvas's page grid over every column. At three
  * groups of columns and wider the header and the content hold the columns

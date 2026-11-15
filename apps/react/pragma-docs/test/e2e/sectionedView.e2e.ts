@@ -8,7 +8,8 @@
  * aside stays where it is while the canvas scrolls to its end. Below three
  * groups, at 1366 and 390, Button's page opens on the "On this page" bar,
  * which sticks, names the current section, opens over the page without
- * moving it, and works with scripts off.
+ * moving it, and works with scripts off. At every width the section a
+ * reader chooses is current, and the last one at the canvas's end.
  */
 
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
@@ -360,6 +361,61 @@ describe("the sectioned view's contents bar below three groups", () => {
       await page.close();
     }
   });
+
+  it.each([DESKTOP, ...BAR_VIEWPORTS])(
+    "makes the section chosen at $width current, and the last one at the canvas's end (W6a-A3)",
+    async (viewport) => {
+      const page = await open(BUTTON_PATH, { viewport });
+      try {
+        const readMarked = () =>
+          page.evaluate(() =>
+            [
+              ...document.querySelectorAll(
+                '.ds.sectioned-view a[aria-current="location"]',
+              ),
+            ].map((link) => link.getAttribute("href")),
+          );
+        const readBar = () =>
+          page.evaluate(
+            () =>
+              document.querySelector(
+                "[data-region=contents-bar] summary .current",
+              )?.textContent ?? null,
+          );
+        const title = await page.locator("#relations").textContent();
+        if (viewport.width === DESKTOP.width) {
+          await page
+            .locator(
+              '.ds.sectioned-view > .aside .contents a[href="#relations"]',
+            )
+            .click();
+        } else {
+          await page.locator(`${BAR} summary`).click();
+          await page.locator(`${BAR} .panel a[href="#relations"]`).click();
+        }
+        await expect.poll(readMarked).toEqual(["#relations", "#relations"]);
+        await expect.poll(readBar).toBe(title);
+
+        const last = await page.evaluate(() => {
+          const canvas = document.querySelector("main.ds.canvas");
+          if (!canvas) throw new Error("the page has no canvas");
+          canvas.scrollTop = 0;
+          return (
+            [
+              ...document.querySelectorAll(
+                ".ds.sectioned-view > .content > .section > h2",
+              ),
+            ].at(-1)?.id ?? null
+          );
+        });
+        await expect.poll(readMarked).not.toContain("#relations");
+        expect(await page.evaluate(scrollToEnd)).toBeGreaterThan(0);
+        await expect.poll(readMarked).toEqual([`#${last}`, `#${last}`]);
+      } finally {
+        await page.close();
+      }
+    },
+  );
 
   it("opens with scripts off and its links move a heading to the bar's edge (W6a-A8)", async () => {
     const page = await open(BUTTON_PATH, {

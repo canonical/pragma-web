@@ -44,6 +44,42 @@ const placeAt = (element: Element | null, top: number): void => {
   element.getBoundingClientRect = () => ({ top }) as DOMRect;
 };
 
+/**
+ * Give an element the scroll metrics of a scroller `scrollHeight` tall with
+ * a `clientHeight` window scrolled to `scrollTop`.
+ */
+const scrollTo = (
+  element: Element | null,
+  { clientHeight = 500, scrollHeight = 2000, scrollTop = 0 },
+): void => {
+  if (element === null) throw new Error("no element to scroll");
+  for (const [name, value] of Object.entries({
+    clientHeight,
+    scrollHeight,
+    scrollTop,
+  })) {
+    Object.defineProperty(element, name, { configurable: true, value });
+  }
+};
+
+/** Click a link to `#<id>` the page holds, as a reader would. */
+const followLink = (
+  container: Element,
+  id: string,
+  init: MouseEventInit = {},
+): void => {
+  const link = container.querySelector(`a[href="#${id}"]`);
+  if (link === null) throw new Error(`no link to #${id}`);
+  link.addEventListener("click", (event) => event.preventDefault(), {
+    once: true,
+  });
+  act(() => {
+    link.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true, ...init }),
+    );
+  });
+};
+
 /** A page of headings that prints the current section's id. */
 function Page({
   ids,
@@ -56,6 +92,15 @@ function Page({
   return (
     <div className="scroller" style={{ overflowY: "auto" }}>
       <output>{current ?? "none"}</output>
+      <nav>
+        {headings.map((id) => (
+          <a href={`#${id}`} key={id}>
+            {id}
+          </a>
+        ))}
+        <a href="#elsewhere">Elsewhere</a>
+        <a href="/away">Away</a>
+      </nav>
       {headings.map((id) => (
         <h2 id={id} key={id}>
           {id}
@@ -117,6 +162,120 @@ describe("useCurrentSection", () => {
     expect(container.querySelector("output")?.textContent).toBe("b");
   });
 
+  it("is the last section when the scroller is at its end, though its heading is below the line", () => {
+    const observed = stubObserver();
+    const { container } = render(<Page ids={["a", "b", "c"]} />);
+    const scroller = container.querySelector(".scroller");
+    placeAt(scroller, 0);
+    placeAt(container.querySelector("#a"), -900);
+    placeAt(container.querySelector("#b"), -100);
+    placeAt(container.querySelector("#c"), 300);
+    scrollTo(scroller, { scrollTop: 1499 });
+    act(() => observed.at(-1)?.measure());
+    expect(container.querySelector("output")?.textContent).toBe("c");
+  });
+
+  it("follows the scroller to and from its end, though no heading crosses the line", () => {
+    const observed = stubObserver();
+    const { container } = render(<Page ids={["a", "b", "c"]} />);
+    const scroller = container.querySelector(".scroller");
+    placeAt(scroller, 0);
+    placeAt(container.querySelector("#a"), -900);
+    placeAt(container.querySelector("#b"), -100);
+    placeAt(container.querySelector("#c"), 300);
+    scrollTo(scroller, { scrollTop: 1200 });
+    act(() => observed.at(-1)?.measure());
+    expect(container.querySelector("output")?.textContent).toBe("b");
+    scrollTo(scroller, { scrollTop: 1300 });
+    act(() => scroller?.dispatchEvent(new Event("scroll")));
+    expect(container.querySelector("output")?.textContent).toBe("b");
+    scrollTo(scroller, { scrollTop: 1500 });
+    act(() => scroller?.dispatchEvent(new Event("scroll")));
+    expect(container.querySelector("output")?.textContent).toBe("c");
+    scrollTo(scroller, { scrollTop: 1400 });
+    act(() => scroller?.dispatchEvent(new Event("scroll")));
+    expect(container.querySelector("output")?.textContent).toBe("b");
+  });
+
+  it("is the first section, not the last, on a page too short to scroll", () => {
+    const observed = stubObserver();
+    const { container } = render(<Page ids={["a", "b"]} />);
+    const scroller = container.querySelector(".scroller");
+    placeAt(scroller, 0);
+    placeAt(container.querySelector("#a"), 100);
+    placeAt(container.querySelector("#b"), 300);
+    scrollTo(scroller, { clientHeight: 800, scrollHeight: 800 });
+    act(() => observed.at(-1)?.measure());
+    expect(container.querySelector("output")?.textContent).toBe("a");
+  });
+
+  it("is the section the reader chose until the scroller moves from where the link left it", () => {
+    const observed = stubObserver();
+    const { container } = render(<Page ids={["a", "b", "c"]} />);
+    const scroller = container.querySelector(".scroller");
+    placeAt(scroller, 0);
+    placeAt(container.querySelector("#a"), -900);
+    placeAt(container.querySelector("#b"), 200);
+    placeAt(container.querySelector("#c"), 300);
+    scrollTo(scroller, { scrollTop: 900 });
+    act(() => observed.at(-1)?.measure());
+    expect(container.querySelector("output")?.textContent).toBe("a");
+    followLink(container, "b");
+    expect(container.querySelector("output")?.textContent).toBe("b");
+    scrollTo(scroller, { scrollTop: 1500 });
+    act(() => scroller?.dispatchEvent(new Event("scroll")));
+    act(() => observed.at(-1)?.measure());
+    expect(container.querySelector("output")?.textContent).toBe("b");
+    scrollTo(scroller, { scrollTop: 1300 });
+    act(() => scroller?.dispatchEvent(new Event("scroll")));
+    expect(container.querySelector("output")?.textContent).toBe("a");
+  });
+
+  it("takes a chosen section the scroller cannot move to as chosen until the next scroll", () => {
+    const observed = stubObserver();
+    const { container } = render(<Page ids={["a", "b", "c"]} />);
+    const scroller = container.querySelector(".scroller");
+    placeAt(scroller, 0);
+    placeAt(container.querySelector("#a"), -900);
+    placeAt(container.querySelector("#b"), 200);
+    placeAt(container.querySelector("#c"), 300);
+    scrollTo(scroller, { scrollTop: 1500 });
+    act(() => observed.at(-1)?.measure());
+    expect(container.querySelector("output")?.textContent).toBe("c");
+    followLink(container, "b");
+    act(() => observed.at(-1)?.measure());
+    expect(container.querySelector("output")?.textContent).toBe("b");
+    scrollTo(scroller, { scrollTop: 1400 });
+    act(() => scroller?.dispatchEvent(new Event("scroll")));
+    expect(container.querySelector("output")?.textContent).toBe("a");
+  });
+
+  it("takes no choice from a modified click, a link elsewhere or a click off a link", () => {
+    const observed = stubObserver();
+    const { container } = render(<Page ids={["a", "b"]} />);
+    placeAt(container.querySelector(".scroller"), 0);
+    placeAt(container.querySelector("#a"), 100);
+    placeAt(container.querySelector("#b"), 300);
+    act(() => observed.at(-1)?.measure());
+    for (const init of [
+      { button: 1 },
+      { altKey: true },
+      { ctrlKey: true },
+      { metaKey: true },
+      { shiftKey: true },
+    ]) {
+      followLink(container, "b", init);
+    }
+    followLink(container, "elsewhere");
+    act(() => {
+      container
+        .querySelector('a[href="/away"]')
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      document.dispatchEvent(new MouseEvent("click"));
+    });
+    expect(container.querySelector("output")?.textContent).toBe("a");
+  });
+
   it("measures against the viewport when the document scrolls", () => {
     const observed = stubObserver();
     const { container } = render(
@@ -129,6 +288,12 @@ describe("useCurrentSection", () => {
     placeAt(container.querySelector("#only"), -10);
     act(() => observed.at(-1)?.measure());
     expect(container.querySelector("output")?.textContent).toBe("only");
+    scrollTo(document.documentElement, { scrollTop: 1500 });
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+    expect(container.querySelector("output")?.textContent).toBe("only");
+    scrollTo(document.documentElement, { clientHeight: 0, scrollHeight: 0 });
   });
 
   it("observes the new headings when the ids change, and none once unmounted", () => {
@@ -141,8 +306,10 @@ describe("useCurrentSection", () => {
     rerender(<Page headings={["a", "b", "c"]} ids={["b", "c"]} />);
     expect(observed.at(0)?.disconnected).toBe(true);
     expect(observed.at(1)?.targets.map(({ id }) => id)).toEqual(["b", "c"]);
+    const removed = vi.spyOn(document, "removeEventListener");
     unmount();
     expect(observed.at(1)?.disconnected).toBe(true);
+    expect(removed).toHaveBeenCalledWith("click", expect.any(Function));
   });
 
   it("is undefined when no heading is on the page", () => {
