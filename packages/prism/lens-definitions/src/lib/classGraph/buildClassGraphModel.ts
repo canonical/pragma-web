@@ -152,28 +152,6 @@ function weighBundle(relations: readonly DrawnRelation[]): number | undefined {
 }
 
 /**
- * Check that a graph's relations are all of the data, each counted, or
- * all a legend's specimens, so a relation that lost its count is never
- * drawn as a specimen.
- *
- * @param relations - The graph's relations.
- * @throws When a relation of the data carries no integer count, or the
- *   data's relations and specimens are mixed.
- */
-function requireCounted(relations: readonly AnyRelationInput[]): void {
-  const specimens = relations.filter((relation) => "specimen" in relation);
-  if (specimens.length === relations.length) return;
-  const uncounted = relations.find(
-    (relation) =>
-      "specimen" in relation ||
-      !("count" in relation) ||
-      !Number.isInteger(relation.count),
-  );
-  if (uncounted !== undefined)
-    throw new Error(`the relation ${uncounted.uri} carries no count`);
-}
-
-/**
  * Break every cycle in the superclass chains: the ontology is data from
  * outside, and a class that is its own superclass, or two classes that
  * subclass each other, would leave chains that never reach a root. Each
@@ -224,13 +202,11 @@ function breakSuperclassCycles(
  * @param input - The data's classes and counted relations, or a legend
  *   specimen's.
  * @returns The model the layout places.
- * @throws When a relation of the data carries no count.
  */
 export default function buildClassGraphModel(
   input: ClassGraphInput | SpecimenGraphInput,
 ): ClassGraphModel {
   const relations: readonly AnyRelationInput[] = input.relations;
-  requireCounted(relations);
   const classes = breakSuperclassCycles(
     [...input.classes].sort((a, b) => compareText(a.uri, b.uri)),
   );
