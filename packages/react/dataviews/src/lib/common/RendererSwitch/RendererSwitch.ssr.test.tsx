@@ -28,7 +28,7 @@ const renderers: readonly RendererChoice[] = [
 const tree = <RendererSwitch label="Show machines as" renderers={renderers} />;
 
 describe("RendererSwitch SSR", () => {
-  describe("RendererSwitch on the server", () => {
+  describe("alone", () => {
     it("draws the first renderer alone, named, and offers no choice", () => {
       const markup = renderToString(tree);
       expect(markup).toContain('aria-label="Table"');

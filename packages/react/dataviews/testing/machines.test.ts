@@ -6,7 +6,7 @@ import {
 } from "./machines.js";
 
 describe("machines", () => {
-  describe("machines", () => {
+  describe("the fleet", () => {
     it("is a collection of name, status and cores", () => {
       expect(machines.schema.fieldNames).toEqual(["name", "status", "cores"]);
     });
