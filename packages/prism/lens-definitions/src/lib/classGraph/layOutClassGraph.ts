@@ -924,14 +924,13 @@ export default function layOutClassGraph(
       engine,
       lead,
     );
-  // A drilled view is not held to the fit: the reader chose a part, and it
-  // opens on that part's region, packed first.
+  // A drilled view is not held to the fit: the reader chose a part, packed
+  // first, and it opens by the overview's rule from that part's corner.
   if (drill !== undefined) {
-    const drilled = {
+    return {
       ...layOutScope(chooseDrawnScope(whole, budget, drill), drill),
       drilled: drill,
     };
-    return { ...drilled, view: frameOpeningWindow(drilled, DESIGN_CANVAS) };
   }
   // Within the budget's drawn nodes first, then within the canvas: the
   // largest expanded namespace collapses while the overview would open

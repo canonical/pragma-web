@@ -550,7 +550,7 @@ describe("layOutClassGraph", () => {
       }
     });
 
-    it("opens a drilled view on its namespace, not on the whole graph's fit, and records the drill", () => {
+    it("opens a drilled view by the overview's rule from its namespace's corner, and records the drill", () => {
       const rest = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
         budget: GRAPH_BUDGET,
       });
@@ -590,28 +590,27 @@ describe("layOutClassGraph", () => {
           DESIGN_CANVAS.w / layout.view.w,
           DESIGN_CANVAS.h / layout.view.h,
         );
-        // At the legible zoom at least, in the canvas's aspect.
-        expect(zoom, drill).toBeGreaterThanOrEqual(MIN_FIT - 1e-9);
-        // The region's top-left corner is in view; the region is whole
-        // where it fits at the legible zoom.
+        const fits =
+          Math.min(
+            DESIGN_CANVAS.w / layout.viewBox.w,
+            DESIGN_CANVAS.h / layout.viewBox.h,
+          ) >= MIN_FIT;
+        // The whole map where it fits at the legible floor; else the
+        // map's top-left corner, the opened namespace's, at the floor,
+        // never a zoom to the namespace's own height.
+        if (fits) {
+          expect(layout.view, drill).toEqual(layout.viewBox);
+        } else {
+          expect(layout.view, drill).toMatchObject({
+            x: layout.viewBox.x,
+            y: layout.viewBox.y,
+          });
+          expect(zoom, drill).toBeCloseTo(MIN_FIT * LEGIBLE_MARGIN, 10);
+        }
         expect(layout.view.x, drill).toBeLessThanOrEqual(region.x);
         expect(layout.view.y, drill).toBeLessThanOrEqual(region.y);
         expect(layout.view.x + layout.view.w, drill).toBeGreaterThan(region.x);
         expect(layout.view.y + layout.view.h, drill).toBeGreaterThan(region.y);
-        if (
-          Math.min(
-            DESIGN_CANVAS.w / (region.w + 32),
-            DESIGN_CANVAS.h / (region.h + 32),
-          ) >=
-          MIN_FIT * LEGIBLE_MARGIN
-        ) {
-          expect(layout.view.x + layout.view.w, drill).toBeGreaterThanOrEqual(
-            region.x + region.w,
-          );
-          expect(layout.view.y + layout.view.h, drill).toBeGreaterThanOrEqual(
-            region.y + region.h,
-          );
-        }
       }
     });
 

@@ -83,29 +83,55 @@ describe("frameOpeningWindow", () => {
     );
   });
 
-  it("opens a drilled layout on its namespace, unless a class is selected on arrival", () => {
-    const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
-      budget: GRAPH_BUDGET,
-      drill: "cs",
-    });
-    const cs = requireDefined(
-      drilled.regions.find((region) => region.prefix === "cs"),
-      "the cs region",
-    );
-    const canvas = { w: 1000, h: 700 };
-    const window = frameOpeningWindow(drilled, canvas);
-    expect(containsRect(window, cs)).toBe(true);
-    // In the canvas's aspect, at the legible zoom or above, never the
-    // whole graph's frame.
-    expect(window.h / window.w).toBeCloseTo(canvas.h / canvas.w, 6);
-    expect(canvas.w / window.w).toBeGreaterThanOrEqual(MIN_FIT);
-    expect(window).not.toEqual(drilled.viewBox);
-    const arrival = requireDefined(
-      [...drilled.nodes.values()].find((node) => node.kind === "region"),
-      "a box",
-    );
-    expect(frameOpeningWindow(drilled, canvas, arrival)).toEqual(
-      frameLegibleWindow(drilled, canvas, { arrival }),
-    );
+  it("opens a drilled layout by the overview's rule, from its namespace's top-left corner, unless a class is selected on arrival", () => {
+    for (const drill of ["surface", "ds", "anatomy", "cs"]) {
+      const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        budget: GRAPH_BUDGET,
+        drill,
+      });
+      const region = requireDefined(
+        drilled.regions.find((candidate) => candidate.prefix === drill),
+        "the drilled region",
+      );
+      // Packed first: the map's top-left corner is the namespace's own.
+      expect(
+        drilled.regions.every(
+          (other) => other.x >= region.x && other.y >= region.y,
+        ),
+        drill,
+      ).toBe(true);
+      for (const canvas of [
+        { w: 1000, h: 700 },
+        { w: 340, h: 900 },
+        { w: 1440, h: 400 },
+      ]) {
+        const window = frameOpeningWindow(drilled, canvas);
+        const frame = drilled.viewBox;
+        if (Math.min(canvas.w / frame.w, canvas.h / frame.h) >= MIN_FIT) {
+          expect(window, drill).toEqual(
+            frameLegibleWindow(drilled, canvas, {}),
+          );
+          continue;
+        }
+        // Never zoomed to the namespace: the legible floor, from the
+        // map's corner, the namespace's corner in view.
+        expect(window, drill).toMatchObject({ x: frame.x, y: frame.y });
+        expect(canvas.w / window.w, drill).toBeCloseTo(
+          MIN_FIT * LEGIBLE_MARGIN,
+          10,
+        );
+        expect(window.h / window.w).toBeCloseTo(canvas.h / canvas.w, 10);
+        expect(window.x + window.w).toBeGreaterThan(region.x);
+        expect(window.y + window.h).toBeGreaterThan(region.y);
+      }
+      const canvas = { w: 1000, h: 700 };
+      const arrival = requireDefined(
+        [...drilled.nodes.values()].find((node) => node.kind === "region"),
+        "a box",
+      );
+      expect(frameOpeningWindow(drilled, canvas, arrival)).toEqual(
+        frameLegibleWindow(drilled, canvas, { arrival }),
+      );
+    }
   });
 });
