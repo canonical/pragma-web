@@ -114,6 +114,9 @@ describe("EntityRow stylesheet", () => {
       "margin-inline-start: var(--entity-row-gap);",
     );
     expect(styles).not.toContain(".ds.entity-row .fact.is-later {\n    margin");
+    // A fact is a flex line, so the spaces its markup sets for a reader
+    // take no width beside the margins.
+    expect(readRule(".ds.entity-row .fact")).toContain("display: flex;");
     expect(readRule(".ds.entity-row .status")).toContain(
       "margin-inline-start: var(--entity-row-gap);",
     );

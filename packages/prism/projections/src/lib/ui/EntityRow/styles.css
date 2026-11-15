@@ -171,8 +171,12 @@
 
   /* Each fact stands the row's gap from what comes before it, inside the
    * facts' box, so the gap leaves with the fact: a box whose facts have
-   * all left is empty and takes nothing from the title. */
+   * all left is empty and takes nothing from the title. Its label and its
+   * value are items of a line, so they are read apart, and the spaces the
+   * markup sets between them and before a later fact, for a reader and a
+   * copy, take no width: margins alone space them. */
   .ds.entity-row .fact {
+    display: flex;
     margin-inline-start: var(--entity-row-gap);
   }
 

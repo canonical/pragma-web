@@ -23,7 +23,9 @@ const componentCssClassName = "ds entity-row";
  *
  * It renders only the slots it is given, in the slot order every
  * representation keeps: mark, prefix, title, kind, summary, facts and
- * status, each fact cell naming its property in `data-property`. The mark
+ * status, each fact cell naming its property in `data-property`. A space
+ * stands between a fact's label and value and before each later fact, so
+ * a reader and a copy keep them apart; the row draws none. The mark
  * names nothing, so it is hidden from
  * assistive technology. It is a list item, so its list is the consumer's
  * `<ol>` or `<ul>`. It reads no context, so it renders anywhere.
@@ -80,7 +82,8 @@ export default function EntityRow({
               data-property={property}
               key={property}
             >
-              <span className="term">{label}</span>
+              {index === 0 ? null : " "}
+              <span className="term">{label}</span>{" "}
               <span className="detail">{value}</span>
             </span>
           ))}

@@ -177,5 +177,29 @@ describe("EntityRow", () => {
         ),
       ).toEqual(["fact", "fact is-later", "fact is-later"]);
     });
+
+    it("keeps each fact's label, value and the next fact apart in its text", () => {
+      render(
+        <ol>
+          <EntityRow
+            data-testid="row"
+            facts={[
+              { property: "ds:tier", label: "Tier", value: "Global" },
+              { property: "ds:owner", label: "Owner", value: "Ada" },
+            ]}
+            title="Button"
+          />
+        </ol>,
+      );
+      const row = screen.getByTestId("row");
+      expect(row.querySelector(".facts")?.textContent).toBe(
+        "Tier Global Owner Ada",
+      );
+      expect(
+        [...row.querySelectorAll(".fact > .term, .fact > .detail")].map(
+          (cell) => cell.textContent,
+        ),
+      ).toEqual(["Tier", "Global", "Owner", "Ada"]);
+    });
   });
 });

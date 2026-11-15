@@ -112,7 +112,10 @@
 # summary is the second line of a row an index opts into two lines
 # (lines="two", 56px): it is rendered only then, ordered after every slot
 # of the first line and spanning the row. Each fact cell names its
-# property in data-property (Annex D). The row stays a flex line
+# property in data-property (Annex D). A space stands between a fact's
+# label and value and before each later fact, so a reader and a copy keep
+# them apart; the fact is a flex line, so the spaces take no width and its
+# margins alone space it. The row stays a flex line
 # rather than a subgrid: its lists do not lay their rows on a subgrid.
 #
 # Token ledger (the identity slots):
@@ -240,6 +243,7 @@ node:
                     role: fact
                     attributes: { data-property: "{property}" }
                     styles:
+                      layout.type: flex
                       spacing.external.inline.start: grid.gutter
                     edges:
                       - node:
