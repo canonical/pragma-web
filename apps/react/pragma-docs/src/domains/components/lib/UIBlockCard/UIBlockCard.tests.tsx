@@ -131,13 +131,12 @@ describe("UIBlockCard", () => {
       "Button, as the published package renders it",
     );
     expect(specimen?.querySelector(".ds.button")?.textContent).toBe("Button");
-    expect(container.querySelector(".sidecar")).toBeNull();
     expect(container.querySelector(".status")?.textContent).toBe(
       "experimental",
     );
   });
 
-  it("has no sidecar for a block the published package does not render alone", () => {
+  it("draws no specimen for a block the published package does not render alone", () => {
     const { container } = renderWithNode(
       (node) => <UIBlockCard node={node} />,
       {
@@ -148,7 +147,8 @@ describe("UIBlockCard", () => {
         },
       },
     );
-    expect(container.querySelector(".sidecar")).toBeNull();
+    expect(container.querySelector(".specimen")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Tooltip");
   });
 
   it("renders the first paragraph of its Markdown summary, its emphasis kept", () => {
@@ -178,7 +178,7 @@ describe("UIBlockCard", () => {
         documentationStages: { edges: [] },
       },
     );
-    for (const slot of [".location", ".parent", ".summary", ".footer"]) {
+    for (const slot of [".summary", ".facts", ".fact", ".status"]) {
       expect(container.querySelector(slot), slot).toBeNull();
     }
     expect(container.querySelector(".title")?.textContent).toBe("IconButton");
