@@ -182,4 +182,18 @@ describe("UIBlockRow", () => {
       MOCK_UI_BLOCK.summary,
     );
   });
+
+  it("keeps a summary written over several lines to the row's one second line", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <UIBlockRow lines="two" node={node} />
+        </ul>
+      ),
+      { summary: "A button triggers\na command." },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.querySelector("br")).toBeNull();
+    expect(summary?.textContent).toBe("A button triggers a command.");
+  });
 });

@@ -73,7 +73,9 @@ export default function UIBlockRow({
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
   const prefix = useForeignPrefix(curie);
-  const summary = findFirstParagraph(data.summary ?? "");
+  // The summary is the row's one second line: a paragraph's line breaks,
+  // which the site's Markdown renders as breaks, join into spaces.
+  const summary = findFirstParagraph(data.summary ?? "").replaceAll("\n", " ");
   return (
     <EntityRow
       {...props}
