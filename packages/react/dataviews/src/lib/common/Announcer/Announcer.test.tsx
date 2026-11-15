@@ -221,13 +221,9 @@ describe("Announcer", () => {
     expect(listSaid()).toEqual(["Status hidden"]);
   });
 
-  it.fails("passes native props to its region", () => {
+  it("passes native props to its region", () => {
     const { container } = render(
-      <Announcer
-        ref={createRef<AnnouncerHandle>()}
-        // @ts-expect-error not yet a native prop
-        id="probe"
-      />,
+      <Announcer ref={createRef<AnnouncerHandle>()} id="probe" />,
     );
     expect(container.firstElementChild).toHaveAttribute("id", "probe");
   });

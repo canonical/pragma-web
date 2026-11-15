@@ -45,6 +45,8 @@ const RangeDrawing = ({
   max,
   lowerBound,
   upperBound,
+  className,
+  ...rest
 }: RangeDrawingProps): ReactElement => {
   const messages = useContext(MessagesContext);
   const { ticks, low, high } = listNiceTicks(
@@ -55,7 +57,10 @@ const RangeDrawing = ({
   const scale = (value: number): number =>
     place(INSET + ((value - low) / (high - low)) * (WIDTH - INSET * 2));
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <svg
         className="chart"
         role="img"

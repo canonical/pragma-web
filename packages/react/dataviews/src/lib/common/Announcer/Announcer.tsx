@@ -49,7 +49,11 @@ type Waiting = {
  *
  * @note Impure: schedules timers to speak and to clear, released on unmount.
  */
-const Announcer = ({ ref }: AnnouncerProps): ReactElement => {
+const Announcer = ({
+  ref,
+  className,
+  ...rest
+}: AnnouncerProps): ReactElement => {
   const [said, setSaid] = useState<readonly Announcement[]>([]);
   // What has been said since the wait began, not yet spoken.
   const waiting = useRef<Waiting[]>([]);
@@ -118,7 +122,8 @@ const Announcer = ({ ref }: AnnouncerProps): ReactElement => {
 
   return (
     <div
-      className={componentCssClassName}
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-live="polite"
       aria-relevant="additions"
     >

@@ -119,7 +119,7 @@ describe("CardList", () => {
     ).toBeInTheDocument();
   });
 
-  it.fails("passes native props to its root", () => {
+  it("passes native props to its root", () => {
     const { provider, scopes } = observeFleet();
     const { container } = render(
       <CardList
@@ -130,7 +130,6 @@ describe("CardList", () => {
         details={details}
         selectable={false}
         nameRecord={() => null}
-        // @ts-expect-error not yet a native prop
         id="probe"
       />,
     );

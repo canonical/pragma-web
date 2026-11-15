@@ -6,18 +6,13 @@ import type {
   DisplayEntry,
   RowChannels,
 } from "@canonical/dataviews-core/bindings";
+import type { ComponentProps } from "react";
 import type { DisplayField } from "../../../../common/index.js";
 
 /** One record's entry, as the core lists the ones it displays. */
 type RecordEntry = Extract<DisplayEntry, { readonly kind: "record" }>;
 
-/**
- * Props of the list of cards.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * laying out the cards, not forwarding a caller's native props.
- */
-export type CardListProps<TRow extends object> = {
+type OwnProps<TRow extends object> = {
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
   /** The record entries the core displays, in its order. */
   readonly records: readonly RecordEntry[];
@@ -35,3 +30,11 @@ export type CardListProps<TRow extends object> = {
    */
   readonly nameRecord: (row: TRow, rowId: string) => string | null;
 };
+
+/**
+ * Props of the list of cards. Its root is the `div` carrying the grid the
+ * Cards group takes its columns from, so it extends native div props, less
+ * `children`, the cards it renders.
+ */
+export type CardListProps<TRow extends object> = OwnProps<TRow> &
+  Omit<ComponentProps<"div">, keyof OwnProps<TRow> | "children">;

@@ -3,16 +3,10 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { RowChannels } from "@canonical/dataviews-core/bindings";
+import type { ComponentProps } from "react";
 import type { DisplayField } from "../../../../common/index.js";
 
-/**
- * Props of one record's card.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the record's channels and the declared fields, not
- * forwarding a caller's native props.
- */
-export type CardItemProps<TRow extends object> = {
+type OwnProps<TRow extends object> = {
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
   /** The record's row channels, from the cards' row scopes. */
   readonly channels: RowChannels<TRow>;
@@ -28,3 +22,18 @@ export type CardItemProps<TRow extends object> = {
    */
   readonly nameRecord: (row: TRow, rowId: string) => string | null;
 };
+
+/**
+ * Props of one record's card. Its root is the design system's Card, a `div`,
+ * so it extends native div props, less those the card owns: `children`, its
+ * record's fields; `role`, a list item; and its name.
+ */
+export type CardItemProps<TRow extends object> = OwnProps<TRow> &
+  Omit<
+    ComponentProps<"div">,
+    | keyof OwnProps<TRow>
+    | "children"
+    | "role"
+    | "aria-label"
+    | "aria-labelledby"
+  >;

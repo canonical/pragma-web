@@ -54,12 +54,11 @@ describe("StatusItem", () => {
     }
   });
 
-  it.fails("passes native props to its root", () => {
+  it("passes native props to its root", () => {
     const { container } = render(
       <StatusItem
         status={{ status: "pending" }}
         renderStatus={spellStatus}
-        // @ts-expect-error not yet a native prop
         id="probe"
       />,
     );

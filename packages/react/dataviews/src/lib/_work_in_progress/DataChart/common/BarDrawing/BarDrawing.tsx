@@ -62,7 +62,12 @@ const readDrawnCount = (entry: FacetValue): number | null =>
  * the same, so a result that moved another field's facet redraws nothing
  * here.
  */
-const BarDrawing = ({ label, values }: BarDrawingProps): ReactElement => {
+const BarDrawing = ({
+  label,
+  values,
+  className,
+  ...rest
+}: BarDrawingProps): ReactElement => {
   const messages = useContext(MessagesContext);
   const largest = Math.max(
     0,
@@ -79,7 +84,10 @@ const BarDrawing = ({ label, values }: BarDrawingProps): ReactElement => {
     place(LABEL_WIDTH + (count / domain) * plot);
   const height = values.length * BAND + AXIS;
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <svg
         className="chart"
         role="img"

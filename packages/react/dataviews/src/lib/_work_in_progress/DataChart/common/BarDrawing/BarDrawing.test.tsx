@@ -82,14 +82,9 @@ describe("BarDrawing", () => {
     expect(container.querySelectorAll(".bar")).toHaveLength(1);
   });
 
-  it.fails("holds its drawing and its table in one root, taking native props", () => {
+  it("holds its drawing and its table in one root, taking native props", () => {
     const { container } = render(
-      <BarDrawing
-        label="Machines by status"
-        values={counted}
-        // @ts-expect-error not yet a native prop
-        id="probe"
-      />,
+      <BarDrawing label="Machines by status" values={counted} id="probe" />,
     );
     const root = container.firstElementChild;
     expect(container.childElementCount).toBe(1);

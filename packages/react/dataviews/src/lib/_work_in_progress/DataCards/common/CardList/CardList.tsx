@@ -32,9 +32,14 @@ const CardList = <TRow extends object>({
   details,
   selectable,
   nameRecord,
+  className,
+  ...rest
 }: CardListProps<TRow>): ReactElement => {
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <CardGroup role="list" cardSpan={CARD_SPAN}>
         {records.map((entry) => (
           <CardItem

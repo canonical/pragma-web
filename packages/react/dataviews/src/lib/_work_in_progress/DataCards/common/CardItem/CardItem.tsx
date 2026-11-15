@@ -25,6 +25,8 @@ const CardItem = <TRow extends object>({
   details,
   selectable,
   nameRecord,
+  className,
+  ...rest
 }: CardItemProps<TRow>): ReactElement => {
   const messages = useContext(MessagesContext);
   const selected = useDataViewsValue(channels.selected);
@@ -51,6 +53,7 @@ const CardItem = <TRow extends object>({
   const name = named ?? (shown ? spelled : channels.id);
   return (
     <Card
+      {...rest}
       role="listitem"
       // Named by the title it shows wherever that title is text, so a reader
       // hears the words on screen; by the caller's label where it gave one,
@@ -58,7 +61,7 @@ const CardItem = <TRow extends object>({
       {...(named === null && shown
         ? { "aria-labelledby": titleId }
         : { "aria-label": name })}
-      className={componentCssClassName}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <Card.Header className="header">
         {selectable ? (

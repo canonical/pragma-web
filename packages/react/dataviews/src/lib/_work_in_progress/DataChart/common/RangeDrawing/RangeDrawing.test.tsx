@@ -92,7 +92,7 @@ describe("RangeDrawing", () => {
     expect(labels.at(1)).toHaveAttribute("text-anchor", "end");
   });
 
-  it.fails("holds its drawing and its table in one root, taking native props", () => {
+  it("holds its drawing and its table in one root, taking native props", () => {
     const { container } = render(
       <RangeDrawing
         label="Cores"
@@ -100,7 +100,6 @@ describe("RangeDrawing", () => {
         max={12}
         lowerBound={0}
         upperBound={undefined}
-        // @ts-expect-error not yet a native prop
         id="probe"
       />,
     );

@@ -15,9 +15,15 @@ const componentCssClassName = "status";
 export default function StatusItem({
   status,
   renderStatus,
+  className,
+  ...rest
 }: StatusItemProps): ReactElement {
   return (
-    <div className={componentCssClassName} data-status={status.status}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      data-status={status.status}
+    >
       {DISPLAY_STATUS_PHASES[status.status] === "terminal" ? (
         <span role="status">{renderStatus(status)}</span>
       ) : (

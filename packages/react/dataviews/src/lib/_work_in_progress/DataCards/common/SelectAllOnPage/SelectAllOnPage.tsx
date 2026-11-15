@@ -20,6 +20,8 @@ const componentCssClassName = "select-all";
 export default function SelectAllOnPage({
   selection,
   ids: displayed,
+  className,
+  ...rest
 }: SelectAllOnPageProps): ReactElement {
   const messages = useContext(MessagesContext);
   const ids = useDataViewsValue(displayed);
@@ -36,7 +38,10 @@ export default function SelectAllOnPage({
     }
   };
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <CheckboxInput
         id={inputId}
         ref={mark}

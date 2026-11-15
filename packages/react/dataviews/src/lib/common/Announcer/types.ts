@@ -4,7 +4,7 @@
  * one and renders the other.
  */
 
-import type { ReactNode, Ref } from "react";
+import type { ComponentProps, ReactNode, Ref } from "react";
 import type { ORDERING_TOPIC, SORT_REFUSAL_TOPIC } from "./constants.js";
 
 /**
@@ -31,13 +31,18 @@ export type AnnouncerHandle = {
   readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
 };
 
-/**
- * Props of the announcer.
- *
- * Exempt from the native-prop extension convention: an internal live region
- * whose every attribute is its own.
- */
-export type AnnouncerProps = {
-  /** Receives the handle the root announces through. */
+type OwnProps = {
+  /** Receives the handle the root announces through, in place of the node. */
   readonly ref: Ref<AnnouncerHandle>;
 };
+
+/**
+ * Props of the announcer. Its root is the live region's `div`, so it extends
+ * native div props, less those the region owns: `children`, what it says,
+ * and `aria-live` and `aria-relevant`, how it is read.
+ */
+export type AnnouncerProps = OwnProps &
+  Omit<
+    ComponentProps<"div">,
+    keyof OwnProps | "children" | "aria-live" | "aria-relevant"
+  >;

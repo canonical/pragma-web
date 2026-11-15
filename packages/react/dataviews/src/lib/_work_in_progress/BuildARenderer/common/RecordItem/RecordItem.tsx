@@ -15,6 +15,7 @@ const RecordItem = <TRow extends object>({
   nameRecord,
   selectable,
   messages,
+  ...rest
 }: RecordItemProps<TRow>): ReactElement => {
   // Each item reads its own row: a change to one record, or to whether it is
   // selected, re-renders that item alone.
@@ -22,7 +23,7 @@ const RecordItem = <TRow extends object>({
   const selected = useDataViewsValue(channels.selected);
   const name = nameRecord(record);
   return (
-    <li>
+    <li {...rest}>
       {selectable ? (
         <input
           type="checkbox"

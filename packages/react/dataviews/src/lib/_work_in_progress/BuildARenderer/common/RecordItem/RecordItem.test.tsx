@@ -76,7 +76,7 @@ describe("RecordItem", () => {
     detach();
   });
 
-  it.fails("passes native props to its list item", () => {
+  it("passes native props to its list item", () => {
     const { provider, channels } = readChannels();
     render(
       <ul>
@@ -86,7 +86,6 @@ describe("RecordItem", () => {
           nameRecord={(record) => record.name}
           selectable={false}
           messages={english}
-          // @ts-expect-error not yet a native prop
           id="probe"
         />
       </ul>,

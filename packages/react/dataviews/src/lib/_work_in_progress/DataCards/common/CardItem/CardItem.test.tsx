@@ -95,7 +95,7 @@ describe("CardItem", () => {
     ).toThrow('no channel observes the field "name"');
   });
 
-  it.fails("passes native props to its card", () => {
+  it("passes native props to its card", () => {
     const { provider, channels } = observeRow(["name"]);
     render(
       <ul>
@@ -106,7 +106,6 @@ describe("CardItem", () => {
           details={[]}
           selectable={false}
           nameRecord={() => null}
-          // @ts-expect-error not yet a native prop
           id="probe"
         />
       </ul>,
