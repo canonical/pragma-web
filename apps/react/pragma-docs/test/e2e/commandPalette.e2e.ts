@@ -11,7 +11,9 @@
  * the focus back;
  * Enter opens the highlighted result's home without loading a new document
  * and closes the palette, as following the preview's link does; Cmd+K
- * reopens it empty and Escape closes it. On a phone the open palette fits
+ * reopens it empty and Escape closes it. Under the site's home namespace,
+ * `ds`, the preview writes `cs:` before a standard and no prefix before a
+ * component, and no result row writes a prefix. On a phone the open palette fits
  * the viewport less a gutter at each side, scrolls nothing sideways, and
  * shows no preview.
  */
@@ -96,6 +98,49 @@ const search = async (page: Page, text: string, chord = "Control+k") => {
   await findPalette(page)
     .getByRole("option", { selected: true })
     .waitFor({ timeout: PAGE_SETTLE_MS });
+};
+
+/** A search whose results hold a code standard, of the `cs` namespace. */
+const STANDARD_SEARCH = "anchor positioning";
+
+/**
+ * Highlight the first result whose address is in `namespace`, and read
+ * the prefix its row and the preview's card write.
+ *
+ * @note Impure: moves the highlight with the arrow keys.
+ */
+const previewNamespace = async (
+  page: Page,
+  namespace: string,
+): Promise<{
+  readonly address: string;
+  readonly resultPrefixes: number;
+  readonly previewPrefix: string | null;
+}> => {
+  const addresses = await findPalette(page)
+    .getByRole("option")
+    .locator(".address")
+    .allTextContents();
+  const index = addresses.findIndex((address) =>
+    address.startsWith(`${namespace}:`),
+  );
+  if (index < 0) throw new Error(`no result is in ${namespace}`);
+  for (let step = 0; step < index; step += 1) {
+    await page.keyboard.press("ArrowDown");
+  }
+  const result = findPalette(page).getByRole("option", { selected: true });
+  const preview = findPalette(page).getByRole("region", { name: "Preview" });
+  await preview
+    .getByRole("link", { name: (await readSelectedTitle(page)) ?? "" })
+    .first()
+    .waitFor({ timeout: PAGE_SETTLE_MS });
+  const prefix = preview.locator(".prefix");
+  return {
+    address: (await result.locator(".address").textContent()) ?? "",
+    resultPrefixes: await result.locator(".prefix").count(),
+    previewPrefix:
+      (await prefix.count()) === 0 ? null : await prefix.first().textContent(),
+  };
 };
 
 /** The title of the highlighted result. */
@@ -194,6 +239,23 @@ describe("the command palette", () => {
     expect(await findPreviewLink(page).textContent()).toBe(
       await readSelectedTitle(page),
     );
+  });
+
+  // The palette sits under the Shell, whose home namespace is `ds`, and
+  // outside every lens: a standard is foreign there, a component is not.
+  // A result row writes its whole address and no prefix; the preview's
+  // card writes the prefix of a foreign node alone.
+  it("previews a standard with cs: and a component with no prefix", async () => {
+    const page = await openLobby();
+    await search(page, STANDARD_SEARCH);
+    const standard = await previewNamespace(page, "cs");
+    expect(standard.resultPrefixes).toBe(0);
+    expect(standard.previewPrefix).toBe("cs:");
+    await page.keyboard.press("Escape");
+    await search(page, COMPONENT_TITLE);
+    const component = await previewNamespace(page, "ds");
+    expect(component.resultPrefixes).toBe(0);
+    expect(component.previewPrefix).toBeNull();
   });
 
   it("moves the highlight and the preview with the arrow keys", async () => {

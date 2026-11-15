@@ -147,6 +147,12 @@ export const DEFINITIONS_PATHS = [
 ] as const;
 
 /**
+ * A class of the design system with instances, whose term page lists them
+ * in its inspector.
+ */
+export const INSTANCES_TERM = "ds:Component";
+
+/**
  * Desktops shorter than the 1440 by 900 the layout is designed for, once
  * the browser's chrome is taken: a laptop's 1440 by 780 and a 1280 by 720,
  * where the inspector moves into its drawer.

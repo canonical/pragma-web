@@ -34,7 +34,8 @@
  * more facts in the page and narrowed step by step loses them whole, the
  * last first, before its title is cut. Every row of the catalog, which
  * opts into two lines, is 56px, and every row of the standards index 32px,
- * at 1440 and 390px.
+ * at 1440 and 390px. The home page's chips of the site's own namespace
+ * write no `ds:`.
  */
 import {
   launchBrowser,
@@ -285,6 +286,21 @@ function narrowRowWithFacts(input: {
     });
   }
   return readings;
+}
+
+/**
+ * Read the home page's chips that mention a design-system node, those that
+ * link into the components lens, each by its whole text. It runs in the
+ * page.
+ *
+ * @returns Each such chip's text.
+ */
+function readComponentChips(): readonly string[] {
+  return [...document.querySelectorAll("main.ds.canvas .ds.entity-chip")]
+    .filter(
+      (chip) => chip.querySelector('a[href^="/components/ds%3A"]') !== null,
+    )
+    .map((chip) => chip.textContent ?? "");
 }
 
 /**
@@ -761,6 +777,21 @@ describe.each(STANDARDS_FACT_WIDTHS)(
     });
   },
 );
+
+// The site's home namespace is `ds`, declared once by its Shell: the home
+// page's chips of design-system nodes write no `ds:`.
+describe("the home page", () => {
+  it("writes no ds: on a chip of the site's own namespace", async () => {
+    const page = await openPage("/", VIEWPORTS[0]);
+    try {
+      const chips = await page.evaluate(readComponentChips);
+      expect(chips.length).toBeGreaterThan(0);
+      expect(chips.filter((text) => text.includes("ds:"))).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
+});
 
 // The standards index's rows carry one fact, so one of them is given more
 // in the browser, from its own address, and narrowed: the real stylesheet
