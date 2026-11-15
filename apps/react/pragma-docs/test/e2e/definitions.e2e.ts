@@ -646,6 +646,106 @@ describe("the drill through the address, at 1440 px", () => {
   });
 });
 
+describe("a drill's link against its address", () => {
+  const [desktop, phone] = VIEWPORTS;
+
+  /**
+   * Where the canvas shows a region's rule and a node, on screen: the
+   * camera's window and zoom, read where a reader sees them.
+   */
+  const readCamera = (
+    page: Page,
+    prefix: string,
+  ): Promise<readonly number[]> =>
+    page.evaluate((ns) => {
+      const viewport = ".ds.graph-canvas svg.viewport";
+      const rule = document.querySelector(
+        `${viewport} g.region[data-ns="${ns}"] rect.rule`,
+      );
+      const node = document.querySelector(`${viewport} g.node`);
+      if (rule === null || node === null) return [];
+      const a = rule.getBoundingClientRect();
+      const b = node.getBoundingClientRect();
+      return [a.x, a.y, a.width, b.x, b.y, b.width, b.height];
+    }, prefix);
+
+  /** Load a path, act, then read the camera on a region. */
+  const cameraAfter = async (
+    path: string,
+    prefix: string,
+    act?: (page: Page) => Promise<void>,
+  ): Promise<{ errors: readonly string[]; camera: readonly number[] }> => {
+    const seen: { camera: readonly number[] } = { camera: [] };
+    const { errors } = await openExplorer(path, desktop, async (page) => {
+      await act?.(page);
+      await page.waitForTimeout(CAMERA_SETTLE_MS);
+      seen.camera = await readCamera(page, prefix);
+    });
+    return { errors, camera: seen.camera };
+  };
+
+  /** Each figure within a pixel of the loaded address's. */
+  const expectSameCamera = (
+    seen: readonly number[],
+    loaded: readonly number[],
+  ): void => {
+    expect(seen).toHaveLength(loaded.length);
+    expect(loaded.length).toBeGreaterThan(0);
+    loaded.forEach((value, at) => {
+      expect(Math.abs((seen.at(at) ?? Number.NaN) - value)).toBeLessThanOrEqual(
+        1,
+      );
+    });
+  };
+
+  it("lands a box's click on the window and zoom that loading its address opens", async () => {
+    const loaded = await cameraAfter("/definitions?expand=surface", "surface");
+    const clicked = await cameraAfter("/definitions", "surface", async (page) => {
+      await page
+        .locator(
+          '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
+        )
+        .click();
+      await page.waitForURL(/[?&]expand=surface/);
+    });
+    expect(loaded.errors).toEqual([]);
+    expect(clicked.errors).toEqual([]);
+    expectSameCamera(clicked.camera, loaded.camera);
+  });
+
+  it("lands the way back on the overview at rest that loading it opens", async () => {
+    const loaded = await cameraAfter("/definitions", "anatomy");
+    const back = await cameraAfter(
+      "/definitions?expand=surface",
+      "anatomy",
+      async (page) => {
+        await page.locator(".ds.graph-canvas svg.viewport a.way-back").click();
+        await page.waitForURL((url) => !url.search.includes("expand"));
+      },
+    );
+    expect(back.errors).toEqual([]);
+    expectSameCamera(back.camera, loaded.camera);
+  });
+
+  it("lists the opened namespace first at 390, its heading the way back", async () => {
+    const seen: { first?: string; back?: string | null } = {};
+    const { errors } = await openExplorer(
+      "/definitions?expand=surface",
+      phone,
+      async (page) => {
+        const first = page.locator("svg.ds.phone-graph g[data-ns]").first();
+        seen.first = (await first.getAttribute("data-ns")) ?? undefined;
+        seen.back = await first
+          .locator("a.way-back")
+          .getAttribute("aria-label");
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.first).toBe("surface");
+    expect(seen.back).toMatch(/surface.*31 classes/);
+  });
+});
+
 describe("at 912 px, on a canvas narrower than the drawing", () => {
   const tablet = STRIP_VIEWPORTS.find((viewport) => viewport.name === "912");
 
