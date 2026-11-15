@@ -9,10 +9,8 @@ import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { createRef, type ReactNode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../testing/machines.js";
+import buildMachine from "../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../testing/createMachineProvider.js";
 import type { DataTableColumn } from "../types.js";
 import useColumnManagement from "./useColumnManagement.js";
 
@@ -29,7 +27,9 @@ const mountHook = (
   row: HTMLDivElement | null = null,
   declared: readonly DataTableColumn[] = columns,
 ) => {
-  const { provider } = createMachineProvider({ rows: [machine("m-1", "a")] });
+  const { provider } = createMachineProvider({
+    rows: [buildMachine("m-1", "a")],
+  });
   const headerRow = createRef<HTMLDivElement>();
   Object.assign(headerRow, { current: row });
   const announce = vi.fn<(message: ReactNode) => void>();
@@ -162,7 +162,7 @@ describe("useColumnManagement", () => {
     const row = buildHeaderRow([null, "Before", null, null]);
     const settings = document.createElement("div");
     settings.setAttribute("role", "columnheader");
-    settings.className = "settings";
+    settings.className = "ds data-table-settings-cell";
     settings.append(document.createElement("button"));
     row.append(settings);
     const { hook } = mountHook(row);

@@ -1,26 +1,16 @@
 /**
- * Delivery fixtures for tests: one exact count, one page and one delivered
- * page, the shapes a test hands a manual source when it answers a request
- * by hand. A source's declaration is built the way an application builds
- * one, with `declareCapabilities` against the test's own collection;
- * `COUNTED_EXACTLY` is the counts block complete local input declares; one
- * display status of each kind, for the parts that render one; and a stored
- * view as a store lists it, spelled as the core fixtures spell theirs; the
+ * Fixture data for tests: `COUNTED_EXACTLY`, the counts block complete
+ * local input declares; the location a server render is drawn at; the
  * Filters stories the story harnesses play and check; the operator and
  * facet case tables every executor runs; and the mark and the samples every
  * worded message is called with, which the English sweep reads a message's
- * own words from.
+ * own words from. Each helper that builds a fixture — a count, a page, a
+ * delivery, a display status, a stored view — is a file of its own beside
+ * this one.
  */
-
-import type { DataViewsMessages } from "@canonical/dataviews-core";
-import {
-  type Completion,
-  type Count,
-  type CountCapabilities,
-  createPage,
-  type DisplayStatus,
-  type SavedView,
-  type SourcePage,
+import type {
+  CountCapabilities,
+  DataViewsMessages,
 } from "@canonical/dataviews-core";
 import type {
   FacetCase,
@@ -29,58 +19,10 @@ import type {
   OperatorRecord,
 } from "./types.js";
 
-/** All three counts answered exactly, as complete local input answers them. */
+/** Both counts answered exactly, as complete local input answers them. */
 export const COUNTED_EXACTLY: CountCapabilities = Object.freeze({
   pageable: "exact",
   matched: "exact",
-  total: "exact",
-});
-
-/** One count a source claims exactly. */
-export const countExactly = (value: number): Count => ({
-  kind: "exact",
-  value,
-});
-
-/** A page of rows, counted exactly and grouped by nothing. */
-export const pageOf = <TRow extends object>(
-  rows: readonly TRow[],
-): SourcePage<TRow> =>
-  createPage({ rows, matched: rows.length, total: rows.length });
-
-/** A delivered page of rows, counted exactly and grouped by nothing. */
-export const deliverRows = <TRow extends object>(
-  rows: readonly TRow[],
-): Completion<TRow> => ({
-  status: "succeeded",
-  page: pageOf(rows),
-});
-
-/** One display status of each kind, with a reason where the kind carries one. */
-export const displayStatusOf = (
-  status: DisplayStatus["status"],
-): DisplayStatus =>
-  status === "failed" || status === "refresh-failed" || status === "stale"
-    ? { status, reason: "offline" }
-    : { status };
-
-/**
- * One stored view as a store lists it — first revision, unpinned, stamped
- * at a fixed instant — with any field overridden. The same builder, by the
- * same name, as the core package's testing fixtures.
- */
-export const buildStoredView = (
-  overrides: Partial<SavedView> = {},
-): SavedView => ({
-  id: "v1",
-  name: "Failed",
-  query: "status=failed",
-  presentation: {},
-  revision: 1,
-  pinned: false,
-  createdAt: "2026-09-11T00:00:00.000Z",
-  updatedAt: "2026-09-11T00:00:00.000Z",
-  ...overrides,
 });
 
 /**
@@ -514,15 +456,17 @@ export const MESSAGE_SAMPLES: {
     : null;
 } = {
   statusPending: null,
-  statusRegrouping: null,
   statusFailed: [[MESSAGE_MARK]],
+  statusRefused: [[MESSAGE_MARK]],
   statusRefreshFailed: [[MESSAGE_MARK]],
   statusStale: [[MESSAGE_MARK]],
+  statusNoAccess: null,
   statusNoResults: null,
   statusNoData: null,
   selectAllRows: null,
   selectRow: [[MESSAGE_MARK]],
   columnWidth: [[1], [7]],
+  columnEndPlacement: [[MESSAGE_MARK]],
   sortPrecedence: [
     ["asc", 1, 1],
     ["desc", 2, 3],
@@ -579,6 +523,9 @@ export const MESSAGE_SAMPLES: {
   filterLowest: [[MESSAGE_MARK]],
   filterHighest: [[MESSAGE_MARK]],
   clearFilter: [[MESSAGE_MARK]],
+  linkRefusals: null,
+  clauseRefused: [[MESSAGE_MARK, MESSAGE_MARK]],
+  grouping: null,
   filterIsAnyOf: [[MESSAGE_MARK]],
   filterIsNoneOf: [[MESSAGE_MARK]],
   matchAnyInstead: null,

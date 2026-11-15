@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import { expect, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
 import { FRENCH } from "../../../storybook/locales/fr.js";
-import { useMachineProvider } from "../../../storybook/machines/story-utils.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "../DataTable/index.js";
 import { PaginationBar } from "../PaginationBar/index.js";
 import Component from "./Provider.js";

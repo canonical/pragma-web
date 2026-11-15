@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { displayStatusOf } from "../../../testing/fixtures.js";
+import readDisplayStatus from "../../../testing/readDisplayStatus.js";
 import { DISPLAY_STATUS_PHASES } from "./constants.js";
 import listDisplayEntries from "./listDisplayEntries.js";
 import type { DisplayStatus } from "./types.js";
@@ -50,7 +50,7 @@ describe("listDisplayEntries", () => {
     ) as DisplayStatus["status"][]) {
       const ids = listDisplayEntries({
         rowIds: ["m-1"],
-        status: displayStatusOf(status),
+        status: readDisplayStatus(status),
       }).map((entry) => [entry.id, entry.index]);
       expect(ids, status).toEqual(
         status === "stale" || status === "refresh-failed"

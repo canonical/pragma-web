@@ -16,15 +16,15 @@ import type { LinkComponentProps } from "@canonical/react-ds-global";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
-import {
-  machines as collection,
-  createMachineProvider,
-  type Machine,
-  type MachineFields,
-  type MachineFixture,
-  machine,
-} from "../../../../testing/machines.js";
-import type { ManualSource } from "../../../../testing/types.js";
+import buildMachine from "../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import { machines as collection } from "../../../../testing/machines.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineFixture,
+  ManualSource,
+} from "../../../../testing/types.js";
 import { DataViews } from "../DataViews/index.js";
 import PaginationBar from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
@@ -52,7 +52,7 @@ const makeProvider = (window = at(1, 2)): MachineFixture =>
 
 const machines = (count: number): readonly Machine[] =>
   Array.from({ length: count }, (_unused, index) =>
-    machine(`m${index}`, `m${index}`),
+    buildMachine(`m${index}`, `m${index}`),
   );
 
 /**
@@ -79,7 +79,7 @@ const load = (
         rows,
         groups: null,
         facets: {},
-        counts: { pageable: counted, matched: counted, total: counted },
+        counts: { pageable: counted, matched: counted },
         more,
         cursors: null,
       },
@@ -510,7 +510,6 @@ describe("PaginationBar", () => {
           counts: {
             pageable: { kind: "exact", value: 6 },
             matched: { kind: "unknown" },
-            total: { kind: "unknown" },
           },
           more: null,
           cursors: { next: "c:m1", previous: null },

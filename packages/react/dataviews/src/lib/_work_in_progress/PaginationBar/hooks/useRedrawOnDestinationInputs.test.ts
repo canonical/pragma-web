@@ -2,7 +2,7 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider } from "../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../testing/createMachineProvider.js";
 import useRedrawOnDestinationInputs from "./useRedrawOnDestinationInputs.js";
 
 describe("useRedrawOnDestinationInputs", () => {

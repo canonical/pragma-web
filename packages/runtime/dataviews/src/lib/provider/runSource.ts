@@ -1,4 +1,8 @@
-import type { DataViewsState, ResultState } from "../coordinator/index.js";
+import {
+  type DataViewsState,
+  type ResultState,
+  readWithheld,
+} from "../coordinator/index.js";
 import { areListsEqual, type Query } from "../query/index.js";
 import {
   areCountsEqual,
@@ -70,7 +74,6 @@ const holdCounts = (
 ): SourceCounts => ({
   pageable: holdCount(counts.pageable, declared.pageable),
   matched: holdCount(counts.matched, declared.matched),
-  total: holdCount(counts.total, declared.total),
 });
 
 /**
@@ -136,7 +139,6 @@ const isSameResult = <TRow extends object>(
         areListsEqual(result.groups, page.groups, Object.is)) &&
     areCountsEqual(counts.pageable, page.counts.pageable) &&
     areCountsEqual(counts.matched, page.counts.matched) &&
-    areCountsEqual(counts.total, page.counts.total) &&
     areFacetsEqual(facets, page.facets) &&
     result.more === page.more &&
     (result.cursors?.next ?? null) === (page.cursors?.next ?? null) &&
@@ -322,6 +324,12 @@ export default function runSource<
     const pending = state.pendingRequestId;
     if (pending === null) {
       const { status, provenance } = state.result;
+      if (readWithheld(state).length > 0) {
+        // Withheld for a link's refused clauses: nothing runs, and a live
+        // execution of an earlier query delivers nothing more.
+        stop();
+        return;
+      }
       if (execution === null && status === "ready" && provenance !== null) {
         // Rows published while nothing ran them — answered within a call,
         // or by an observation since released: the source is taken up

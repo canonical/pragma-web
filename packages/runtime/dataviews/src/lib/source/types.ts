@@ -7,7 +7,7 @@
  */
 
 import type { ActionOutcome } from "../action/index.js";
-import type { Collection } from "../collection/index.js";
+import type { Collection, RecordTypes } from "../collection/index.js";
 import type {
   PredicateOperator,
   Query,
@@ -163,7 +163,7 @@ export type GroupCapabilities = {
 };
 
 /**
- * What a source declares about each of the three counts.
+ * What a source declares about each of its two counts.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -171,7 +171,6 @@ export type GroupCapabilities = {
 export type CountCapabilities = {
   readonly pageable: CountSupport;
   readonly matched: CountSupport;
-  readonly total: CountSupport;
 };
 
 /**
@@ -333,7 +332,7 @@ type FieldNameOf<TFields extends readonly SchemaFieldDefinition[]> =
 export type FacetFieldNameOf<TFields extends readonly SchemaFieldDefinition[]> =
   Extract<
     TFields[number],
-    { readonly kind: "choices" | "flag" | "number" | "date" }
+    { readonly kind: "choices" | "presence" | "number" | "date" }
   >["field"];
 
 /** The operators one field of a schema accepts, from its kind. */
@@ -420,10 +419,10 @@ export type CapabilityDeclaration<
  * One slice read by field, typed from the schema: a field whose kind accepts
  * several operators as a record keyed by operator — a number or date filter
  * as its bounds, a `choices` filter as the sets it is any and none of, a text
- * filter as the text it contains and starts with — and a flag as `true` when
- * set, each present only when the slice carries it; plus the search text and
- * the ordered sort terms. An adapter finds the status filter by name instead
- * of scanning predicates and stringifying operands.
+ * filter as the text it contains and starts with — and a presence field as
+ * `true` when set, each present only when the slice carries it; plus the
+ * search text and the ordered sort terms. An adapter finds the status filter
+ * by name instead of scanning predicates and stringifying operands.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -431,7 +430,7 @@ export type CapabilityDeclaration<
 export type SliceReading<TFields extends readonly SchemaFieldDefinition[]> = {
   readonly filters: {
     readonly [TDefinition in TFields[number] as TDefinition["field"]]?: TDefinition extends {
-      readonly kind: "flag";
+      readonly kind: "presence";
     }
       ? AppliedOf<TDefinition>
       : TDefinition extends {
@@ -458,8 +457,6 @@ export type PageConfig<TRow extends object = RowRecord> = {
   readonly rows: readonly TRow[];
   /** Rows matching the query, before any collapse. */
   readonly matched?: number | undefined;
-  /** Rows in the collection, ignoring the query. */
-  readonly total?: number | undefined;
   /** Whether a further page exists when no count says so. */
   readonly more?: boolean | undefined;
   /** The adjacent pages' tokens, for a cursor source. */
@@ -596,6 +593,13 @@ export type QuerySourceConfig<TRow extends object = RowRecord> = {
   readonly fetchPage: (request: SourceRequest) => Promise<SourcePage<TRow>>;
   /** Mint one observer against the application's client. */
   readonly createObserver: QueryObserverFactory<SourcePage<TRow>>;
+  /**
+   * Whether an error the client reports means the request is forbidden — a
+   * 401 or a 403 — rather than that it failed. Answering true delivers
+   * `forbidden`, with the error as its cause and no words of the server's;
+   * a check that throws answers nothing, and the error is a failure.
+   */
+  readonly isForbidden?: ((error: unknown) => boolean) | undefined;
   /** Row operations, when the endpoint has any. */
   readonly runAction?: SourceActionRunner | undefined;
 };
@@ -700,6 +704,14 @@ export type RelaySourceConfig<
   readonly connection: (
     data: TQuery["response"],
   ) => RelayConnection<TRow> | null | undefined;
+  /**
+   * Whether an error the environment's fetch reports means the request is
+   * forbidden — a 401 or a 403 — rather than that it failed. Answering true
+   * delivers `forbidden`, with the error as its cause and no words of the
+   * server's; a check that throws answers nothing, and the error is a
+   * failure.
+   */
+  readonly isForbidden?: ((error: unknown) => boolean) | undefined;
   /** Row operations, when the schema has any. */
   readonly runAction?: SourceActionRunner | undefined;
 };
@@ -716,4 +728,10 @@ export type ExecuteSliceConfig = {
   readonly sort: SortCapabilities;
   /** Fields free-text search reads; none by default. */
   readonly searchFields?: readonly string[];
+  /**
+   * The collection's record types, or null when it has one. A presence
+   * field scoped to other types than a row's is not applicable to that
+   * row, and orders with the empties.
+   */
+  readonly types: RecordTypes | null;
 };

@@ -11,10 +11,8 @@ import { fileURLToPath } from "node:url";
 import { declareCapabilities } from "@canonical/dataviews-core";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machines,
-} from "../../../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../../../testing/createMachineProvider.js";
+import { machines } from "../../../../../../../../testing/machines.js";
 import DataViews from "../../../../Provider.js";
 import Filters from "../../Filters.js";
 

@@ -9,7 +9,8 @@ import {
 } from "@canonical/dataviews-core";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
 import type { ApiScenario, FacetValue } from "../api/index.js";
-import { type Machine, machineCollection } from "../fixtures.js";
+import { machineCollection } from "../fixtures.js";
+import type { Machine } from "../types.js";
 
 /** Whether a value is a count, of a kind the envelope names. */
 const isCount = (value: unknown): value is Count =>
@@ -93,7 +94,7 @@ const REST_CAPABILITIES = declareCapabilities(machineCollection, {
     terms: 1,
     tiebreak: "opaque",
   },
-  counts: { pageable: "exact", matched: "exact", total: "exact" },
+  counts: { pageable: "exact", matched: "exact" },
   facets: ["status", "cores"],
 });
 
@@ -158,10 +159,6 @@ export default function createRestMachineSource(
         matched:
           "matched" in body && typeof body.matched === "number"
             ? body.matched
-            : undefined,
-        total:
-          "total" in body && typeof body.total === "number"
-            ? body.total
             : undefined,
         // Each facet read, never trusted: one of another shape is left out.
         facets: "facets" in body ? readAnsweredFacets(body.facets) : undefined,

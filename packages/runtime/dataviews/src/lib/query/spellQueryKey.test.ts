@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterStatusBy } from "../../../testing/fixtures.js";
+import filterStatusBy from "../../../testing/filterStatusBy.js";
 import { DEFAULT_WINDOW, EMPTY_SLICE } from "./constants.js";
 import spellQueryKey from "./spellQueryKey.js";
 

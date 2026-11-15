@@ -5,10 +5,8 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  type MachineProvider,
-} from "../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import type { MachineProvider } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import Actions from "./Actions.js";
 import type { DataViewsActionsProps } from "./types.js";

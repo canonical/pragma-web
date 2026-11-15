@@ -8,7 +8,7 @@ import { MESSAGE_MARK, MESSAGE_SAMPLES } from "./fixtures.js";
 const DATA_ZONES = [
   // A body cell's own value, but not the selection checkbox beside it nor
   // the status row's text, both of which the record words.
-  '[role="cell"]:not(.selection):not(.status)',
+  '[role="cell"]:not(.ds.data-table-selection-cell):not(.status)',
   '[role="columnheader"] > .label',
   '[role="columnheader"] > .sort > .label',
   "option",
@@ -60,10 +60,11 @@ const listEnglishPieces = (
   const phrases = new Set<string>();
   for (const [key, samples] of Object.entries(MESSAGE_SAMPLES)) {
     const message = english[key as keyof DataViewsMessages];
+    // A message with no samples is a string; one with samples, a function.
     const texts =
-      typeof message === "string"
-        ? [message]
-        : (samples ?? []).map((args) =>
+      samples === null
+        ? [message as string]
+        : samples.map((args) =>
             (message as (...args: readonly unknown[]) => string)(...args),
           );
     for (const text of texts) {
@@ -135,8 +136,8 @@ export default function findEnglish(
     }
     inspect(
       Array.from(element.childNodes)
-        .filter((node) => node.nodeType === node.TEXT_NODE)
-        .map((node) => node.textContent ?? "")
+        .filter((node): node is Text => node.nodeType === node.TEXT_NODE)
+        .map((node) => node.data)
         .join(""),
     );
     for (const attribute of SPOKEN_ATTRIBUTES) {

@@ -5,29 +5,29 @@ const schema = createSchema([
   { field: "status", kind: "choices", options: ["failed", "cancelled"] },
   { field: "cpu", kind: "number", min: 0, max: 64 },
   { field: "memory", kind: "number" },
-  { field: "owner", kind: "flag" },
+  { field: "owner", kind: "presence" },
   { field: "updated", kind: "date" },
   { field: "name", kind: "text" },
 ]);
 
 describe("createSchema", () => {
   it("rejects empty, NUL and duplicate field names at construction", () => {
-    expect(() => createSchema([{ field: "", kind: "flag" }])).toThrow(
+    expect(() => createSchema([{ field: "", kind: "presence" }])).toThrow(
       "non-empty",
     );
-    expect(() => createSchema([{ field: "a\u0000b", kind: "flag" }])).toThrow(
-      "NUL",
-    );
+    expect(() =>
+      createSchema([{ field: "a\u0000b", kind: "presence" }]),
+    ).toThrow("NUL");
     expect(() =>
       createSchema([
-        { field: "zone", kind: "flag" },
-        { field: "zone", kind: "flag" },
+        { field: "zone", kind: "presence" },
+        { field: "zone", kind: "presence" },
       ]),
     ).toThrow("duplicate");
     expect(() =>
       createSchema([
         { field: "zone", kind: "choices", options: ["north"] },
-        { field: "zone", kind: "flag" },
+        { field: "zone", kind: "presence" },
       ]),
     ).toThrow("duplicate");
   });
@@ -41,7 +41,7 @@ describe("createSchema", () => {
         options: ["container"],
         appliesTo: types,
       },
-      { field: "secureboot", kind: "flag", appliesTo: types },
+      { field: "secureboot", kind: "presence", appliesTo: types },
     ]);
     types.push("container");
     // The copy answers, not the caller's array: a schema whose scoping
@@ -61,7 +61,7 @@ describe("createSchema", () => {
     // The names themselves are the provider's to check against the
     // discriminator; an empty list is the one mistake only the schema sees.
     expect(() =>
-      createSchema([{ field: "secureboot", kind: "flag", appliesTo: [] }]),
+      createSchema([{ field: "secureboot", kind: "presence", appliesTo: [] }]),
     ).toThrow('field "secureboot" is scoped to no record type');
   });
 
@@ -70,12 +70,12 @@ describe("createSchema", () => {
     // the operator delimiter or colliding with a reserved parameter is
     // rejected here rather than at the first URL that cannot be read back.
     expect(() =>
-      createSchema([{ field: "updated__at", kind: "flag" }]),
+      createSchema([{ field: "updated__at", kind: "presence" }]),
     ).toThrow('schema field name "updated__at" must not contain "__"');
-    expect(() => createSchema([{ field: "sort", kind: "flag" }])).toThrow(
+    expect(() => createSchema([{ field: "sort", kind: "presence" }])).toThrow(
       'field name "sort" is a reserved query parameter',
     );
-    expect(() => createSchema([{ field: "page", kind: "flag" }])).toThrow(
+    expect(() => createSchema([{ field: "page", kind: "presence" }])).toThrow(
       "reserved query parameter",
     );
   });
@@ -311,14 +311,14 @@ describe("createSchema", () => {
     });
   });
 
-  it("refuses text-input editing for flag fields before other checks", () => {
+  it("refuses text-input editing for presence fields before other checks", () => {
     expect(schema.validateInput("owner", "1")).toEqual({
       status: "invalid",
-      reason: "flag fields edit through direct commands",
+      reason: "presence fields edit through direct commands",
     });
     expect(schema.validateInput("owner", "")).toEqual({
       status: "invalid",
-      reason: "flag fields edit through direct commands",
+      reason: "presence fields edit through direct commands",
     });
   });
 
@@ -416,19 +416,19 @@ describe("createSchema", () => {
         "owner",
         "isAny",
         ["x"],
-        'flag field "owner" does not accept the isAny operator',
+        'presence field "owner" does not accept the isAny operator',
       ],
       [
         "owner",
         "gte",
         [4],
-        'flag field "owner" does not accept the gte operator',
+        'presence field "owner" does not accept the gte operator',
       ],
       [
         "owner",
         "lte",
         [4],
-        'flag field "owner" does not accept the lte operator',
+        'presence field "owner" does not accept the lte operator',
       ],
     ];
     for (const [field, operator, operands, reason] of cases) {

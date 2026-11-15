@@ -8,7 +8,7 @@ import type { DisplayStatus } from "@canonical/dataviews-core";
 import { DISPLAY_STATUS_PHASES } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { displayStatusOf } from "../../../../../../testing/fixtures.js";
+import readDisplayStatus from "../../../../../../testing/readDisplayStatus.js";
 import StatusRow from "./StatusRow.js";
 
 /** The words the table would give a status: here, the status named. */
@@ -42,7 +42,7 @@ describe("StatusRow", () => {
     ) as DisplayStatus["status"][]) {
       const { unmount } = render(
         <StatusRow
-          status={displayStatusOf(status)}
+          status={readDisplayStatus(status)}
           renderStatus={describeStatus}
         />,
       );
@@ -51,7 +51,7 @@ describe("StatusRow", () => {
         DISPLAY_STATUS_PHASES[status] === "terminal" ? 1 : 0,
       );
       expect(screen.getByRole("cell"), status).toHaveTextContent(
-        describeStatus(displayStatusOf(status)),
+        describeStatus(readDisplayStatus(status)),
       );
       unmount();
     }

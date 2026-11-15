@@ -59,11 +59,13 @@ describe("createCollection", () => {
           row.id,
         fields: [
           { field: "type", kind: "choices", options: ["container"] },
-          { field: "name", kind: "flag" },
+          { field: "name", kind: "presence" },
         ],
         discriminator: "name" as never,
       }),
-    ).toThrow('discriminator field "name" must be a choices field, not a flag');
+    ).toThrow(
+      'discriminator field "name" must be a choices field, not a presence',
+    );
   });
 
   it("refuses a discriminator whose options are the server's", () => {
@@ -96,7 +98,11 @@ describe("createCollection", () => {
         discriminator: "type",
         fields: [
           { field: "type", kind: "choices", options: ["container"] },
-          { field: "secureboot", kind: "flag", appliesTo: ["virtual-machine"] },
+          {
+            field: "secureboot",
+            kind: "presence",
+            appliesTo: ["virtual-machine"],
+          },
         ],
       }),
     ).toThrow(

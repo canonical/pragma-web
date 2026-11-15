@@ -28,7 +28,7 @@ const collection = createCollection({
   fields: [
     { field: "status", kind: "choices", options: ["failed", "ready"] },
     { field: "cpu", kind: "number" },
-    { field: "spare", kind: "flag" },
+    { field: "spare", kind: "presence" },
   ],
 });
 

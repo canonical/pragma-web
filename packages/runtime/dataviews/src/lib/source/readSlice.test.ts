@@ -1,16 +1,16 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { EMPTY_SLICE } from "../query/index.js";
 import readSlice from "./readSlice.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "ready"] },
     { field: "cpu", kind: "number" },
     { field: "updated", kind: "date" },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
     { field: "name", kind: "text" },
   ],
 });

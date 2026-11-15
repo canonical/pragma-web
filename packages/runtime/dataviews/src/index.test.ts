@@ -34,7 +34,7 @@ describe("public surface", () => {
 
   it("wires the barrel to working functions", () => {
     expect(
-      dataviews.createSchema([{ field: "owner", kind: "flag" }]).fieldNames,
+      dataviews.createSchema([{ field: "owner", kind: "presence" }]).fieldNames,
     ).toEqual(["owner"]);
     const ids = dataviews.createCollection({
       identify: (row: { readonly id: string }) => row.id,
@@ -46,7 +46,7 @@ describe("public surface", () => {
     });
     expect(dataviews.declareCapabilities(ids, {}).sort.terms).toBe(0);
     expect(dataviews.readSlice(ids, EMPTY_SLICE).filters).toEqual({});
-    expect(dataviews.createPage({ rows: [] }).counts.total).toEqual({
+    expect(dataviews.createPage({ rows: [] }).counts.matched).toEqual({
       kind: "unknown",
     });
     const provider = dataviews.createDataViewsProvider({
@@ -124,6 +124,7 @@ describe("public surface", () => {
   it("hands framework bindings their shared machinery from ./bindings", () => {
     expect(Object.keys(bindings).sort()).toEqual([
       "DISPLAY_STATUS_PHASES",
+      "QUERY_KEYS",
       "applyQueryCommand",
       "areDisplayStatusesEqual",
       "areFieldFacetsEqual",
@@ -137,6 +138,7 @@ describe("public surface", () => {
       "cycleSortTerm",
       "hideColumn",
       "isDataViewsProvider",
+      "isNarrowingIssue",
       "listDisplayEntries",
       "moveColumn",
       "placeSortTerm",

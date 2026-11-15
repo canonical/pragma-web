@@ -13,14 +13,12 @@ import {
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import buildMachine from "../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import { createStandInPresentationStore } from "../../../../testing/createStandInStores.js";
-import { deliverRows } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-  machines,
-} from "../../../../testing/machines.js";
+import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
+import deliverRows from "../../../../testing/deliverRows.js";
+import { machines } from "../../../../testing/machines.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./types.js";
 
@@ -54,7 +52,7 @@ describe("DataTable SSR", () => {
       }),
     });
     const host = readProviderHost(provider);
-    host.complete(host.refresh(), deliverRows([machine("m-1", "alpha")]));
+    host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
     const html = renderToString(
       <DataTable
         provider={provider}
@@ -81,7 +79,7 @@ describe("DataTable SSR", () => {
     // A source that would answer at once, were it asked. The table observes
     // its provider from an effect, which a server render never runs.
     const { provider, source } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     const html = renderToString(
       <DataTable provider={provider} label="Machines" columns={columns} />,
@@ -189,7 +187,7 @@ describe("DataTable SSR", () => {
 
   it("renders a sortable header as its label when there is no location to link to", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(3),
     });
     const markup = renderToString(

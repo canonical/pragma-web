@@ -10,15 +10,12 @@ import { createPage, DEFAULT_WINDOW } from "@canonical/dataviews-core";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
-import {
-  createMachineProvider,
-  type Machine,
-  type MachineProvider,
-  machine,
-} from "../../../testing/machines.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
+import type { Machine, MachineProvider } from "../../../testing/types.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
@@ -59,11 +56,11 @@ const renderFirstPage = () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: createPage({ rows, matched: 2, total: 2 }),
+        page: createPage({ rows, matched: 2 }),
       });
     });
   };
-  deliver([machine("m-1", "alpha")]);
+  deliver([buildMachine("m-1", "alpha")]);
   return { provider, source, deliver };
 };
 
@@ -96,7 +93,7 @@ describe("the announcer never repeats a status", () => {
       page: 2,
       size: 1,
     });
-    deliver([machine("m-2", "beta", "failed", 8)]);
+    deliver([buildMachine("m-2", "beta", "failed", 8)]);
     expect(findSummary()).toHaveTextContent("Showing row 2 out of 2");
     expect(await readAnnouncements()).toEqual([]);
   });

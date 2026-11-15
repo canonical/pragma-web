@@ -11,13 +11,14 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { byId, declareSort } from "../../../testing/fixtures.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { EMPTY_SLICE } from "../../lib/query/index.js";
 import { executeSlice, readFacets } from "../../lib/source/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "updated", kind: "date" }],
 });
 
@@ -47,7 +48,7 @@ describe("regression 0066 — date facet offered bounds no filter reaches", () =
         ...EMPTY_SLICE,
         filter: [{ field: "updated", operator: "lte", operands: [facet.max] }],
       },
-      { schema, sort: declareSort(schema.fieldNames) },
+      { schema, sort: declareSort(schema.fieldNames), types: null },
     ).map((row) => row.id);
     expect(facet).toEqual({
       kind: "range",

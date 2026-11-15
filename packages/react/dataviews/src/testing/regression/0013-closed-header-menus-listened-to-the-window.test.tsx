@@ -9,11 +9,9 @@
 
 import { render } from "@testing-library/react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 describe("regression 0013 — closed header menus listened to the window", () => {
@@ -23,7 +21,7 @@ describe("regression 0013 — closed header menus listened to the window", () =>
       listened.mockRestore();
     });
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
     });
     render(
@@ -61,7 +59,7 @@ describe("regression 0013 — closed header menus listened to the window", () =>
       vi.unstubAllGlobals();
     });
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
     });
     const renderTable = (sortable: boolean) =>

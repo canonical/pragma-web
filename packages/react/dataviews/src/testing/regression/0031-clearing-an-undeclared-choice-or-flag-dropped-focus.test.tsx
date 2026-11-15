@@ -1,10 +1,11 @@
 /**
- * Regression: clearing an undeclared choice or flag keeps focus on a control.
+ * Regression: clearing an undeclared choice or presence filter keeps focus
+ * on a control.
  *
- * Before the fix, a set of choices or a flag the source does not declare was
- * shown only while it stood, for removal, so unchecking its last checkbox
- * unmounted the whole control while that checkbox had focus, and focus fell
- * to the document. Focus now moves to the filters' group, as it does when
+ * Before the fix, a set of choices or a presence filter the source does not
+ * declare was shown only while it stood, for removal, so unchecking its last
+ * checkbox unmounted the whole control while that checkbox had focus, and
+ * focus fell to the document. Focus now moves to the filters' group, as it does when
  * undeclared text or an undeclared bound is cleared.
  */
 
@@ -33,7 +34,7 @@ const collection = createCollection({
   identify: (row: Row) => row.id,
   fields: [
     { field: "status", kind: "choices", options: ["ready", "failed"] },
-    { field: "spare", kind: "flag" },
+    { field: "spare", kind: "presence" },
   ],
 });
 
@@ -85,7 +86,7 @@ describe("regression 0031 — clearing an undeclared choice or flag dropped focu
     expect(screen.getByRole("group", { name: "Filters" })).toHaveFocus();
   });
 
-  it("moves focus to the filters' group when the flag is unchecked", () => {
+  it("moves focus to the filters' group when the presence filter is unchecked", () => {
     renderStanding({ field: "spare", operator: "isSet", operands: [] });
     const spare = screen.getByRole("checkbox", { name: "spare" });
     spare.focus();
@@ -106,7 +107,7 @@ describe("regression 0031 — clearing an undeclared choice or flag dropped focu
     expect(failed).toHaveFocus();
   });
 
-  it("keeps focus on a declared flag, which stays to be checked again", () => {
+  it("keeps focus on a declared presence filter, which stays to be checked again", () => {
     renderStanding(
       { field: "spare", operator: "isSet", operands: [] },
       DECLARED,

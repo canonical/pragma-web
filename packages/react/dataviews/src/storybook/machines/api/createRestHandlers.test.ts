@@ -17,7 +17,7 @@ describe("createRestHandlers", () => {
     const { status, body } = await requestRest("live", "size=5");
     expect(status).toBe(200);
     expect(readIds(body)).toEqual(["m-01", "m-02", "m-03", "m-04", "m-05"]);
-    expect(body).toMatchObject({ matched: 12, total: 12 });
+    expect(body).toMatchObject({ matched: 12 });
   });
 
   it("filters, searches, orders and pages as the parameters say", async () => {
@@ -27,7 +27,7 @@ describe("createRestHandlers", () => {
     );
     // Failed or pending with at least four cores, most cores first:
     // hazel 16, birch 8, larch 8, fir 4.
-    expect(body).toMatchObject({ matched: 4, total: 12 });
+    expect(body).toMatchObject({ matched: 4 });
     expect(readIds(body)).toEqual(["m-12", "m-06"]);
     const searched = await requestRest("live", "q=EX:IVY");
     expect(readIds(searched.body)).toEqual(["m-09"]);

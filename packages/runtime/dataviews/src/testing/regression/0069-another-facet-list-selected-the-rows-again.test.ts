@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from "vitest";
 import createCountedRows from "../../../testing/createCountedRows.js";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   DEFAULT_WINDOW,
@@ -20,7 +20,7 @@ import {
 import { createArraySource } from "../../lib/source/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "name", kind: "text" },
     { field: "status", kind: "choices", options: ["failed", "ready"] },

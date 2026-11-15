@@ -5,15 +5,12 @@
  * completed by hand with the page a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import {
-  atLeast,
-  BY_NUMBER,
-  buildSettledPage,
-  exactly,
-  FORWARD_CURSORS,
-  readIssuedRequest,
-  type SettledRow,
-} from "../../../testing/fixtures.js";
+import buildSettledPage from "../../../testing/buildSettledPage.js";
+import countAtLeast from "../../../testing/countAtLeast.js";
+import countExactly from "../../../testing/countExactly.js";
+import { BY_NUMBER, FORWARD_CURSORS } from "../../../testing/fixtures.js";
+import readIssuedRequest from "../../../testing/readIssuedRequest.js";
+import type { SettledRow } from "../../../testing/types.js";
 import {
   createQueryCoordinator,
   type QueryCoordinator,
@@ -65,18 +62,22 @@ describe("resolvePagination", () => {
 
   it("counts the pages an exact pageable count makes", () => {
     const facts = resolvePagination(
-      settled(on(2, 5), { rows: 5, pageable: exactly(12) }).state,
+      settled(on(2, 5), { rows: 5, pageable: countExactly(12) }).state,
       BY_NUMBER,
       [5],
     );
-    expect(facts).toMatchObject({ shown: 5, total: exactly(12), pages: 3 });
+    expect(facts).toMatchObject({
+      shown: 5,
+      total: countExactly(12),
+      pages: 3,
+    });
     expect(facts.hasNext).toBe(true);
     expect(facts.back).toBe(1);
   });
 
   it("offers no Next from the last page a count declares", () => {
     const facts = resolvePagination(
-      settled(on(3, 5), { rows: 2, pageable: exactly(12) }).state,
+      settled(on(3, 5), { rows: 2, pageable: countExactly(12) }).state,
       BY_NUMBER,
       [5],
     );
@@ -89,11 +90,11 @@ describe("resolvePagination", () => {
     // shown for what it is, and no last page is invented from it.
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 5, pageable: atLeast(40) }).state,
+        settled(on(1, 5), { rows: 5, pageable: countAtLeast(40) }).state,
         BY_NUMBER,
         [5],
       ),
-    ).toMatchObject({ shown: 5, total: atLeast(40), pages: null });
+    ).toMatchObject({ shown: 5, total: countAtLeast(40), pages: null });
   });
 
   it("proves a later page from a lower bound past this one", () => {
@@ -102,7 +103,7 @@ describe("resolvePagination", () => {
     // it proves nothing there and the weaker authorities answer.
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 5, pageable: atLeast(40), more: false })
+        settled(on(1, 5), { rows: 5, pageable: countAtLeast(40), more: false })
           .state,
         BY_NUMBER,
         [5],
@@ -110,7 +111,7 @@ describe("resolvePagination", () => {
     ).toBe(true);
     expect(
       resolvePagination(
-        settled(on(8, 5), { rows: 5, pageable: atLeast(40), more: false })
+        settled(on(8, 5), { rows: 5, pageable: countAtLeast(40), more: false })
           .state,
         BY_NUMBER,
         [5],
@@ -124,14 +125,14 @@ describe("resolvePagination", () => {
     const facts = resolvePagination(
       settled(on(1, 5), {
         rows: 5,
-        pageable: atLeast(40),
+        pageable: countAtLeast(40),
         more: true,
         cursors: { next: null, previous: null },
       }).state,
       FORWARD_CURSORS,
       [5],
     );
-    expect(facts.total).toEqual(atLeast(40));
+    expect(facts.total).toEqual(countAtLeast(40));
     expect(facts.hasNext).toBe(false);
     expect(facts.nextCursor).toBe(null);
   });
@@ -149,7 +150,7 @@ describe("resolvePagination", () => {
   it("keeps one page for an empty collection", () => {
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 0, pageable: exactly(0) }).state,
+        settled(on(1, 5), { rows: 0, pageable: countExactly(0) }).state,
         BY_NUMBER,
         [5],
       ).pages,
@@ -193,7 +194,7 @@ describe("resolvePagination", () => {
   it("steps back from past the last page to the last one there is", () => {
     expect(
       resolvePagination(
-        settled(on(9, 5), { rows: 0, pageable: exactly(12) }).state,
+        settled(on(9, 5), { rows: 0, pageable: countExactly(12) }).state,
         BY_NUMBER,
         [5],
       ).back,
@@ -206,7 +207,7 @@ describe("resolvePagination", () => {
     // page's rows still are: the page select keeps its list.
     const coordinator = settled(on(1, 5), {
       rows: 5,
-      pageable: exactly(12),
+      pageable: countExactly(12),
       more: true,
     });
     coordinator.dispatch({ kind: "navigateWindow", page: 2 });
@@ -214,7 +215,7 @@ describe("resolvePagination", () => {
     expect(facts).toMatchObject({
       page: 2,
       shown: null,
-      total: exactly(12),
+      total: countExactly(12),
       pages: 3,
     });
     // The count says a page follows; the source's word on the page that
@@ -225,12 +226,15 @@ describe("resolvePagination", () => {
   it("keeps the count across a history step that respells the same query", () => {
     // Back or forward adopts the query as another object: the same query
     // by content keeps its count, and the pages it makes.
-    const coordinator = settled(on(1, 5), { rows: 5, pageable: exactly(12) });
+    const coordinator = settled(on(1, 5), {
+      rows: 5,
+      pageable: countExactly(12),
+    });
     coordinator.adopt({ slice: { ...EMPTY_SLICE }, window: on(2, 5) });
     expect(resolvePagination(coordinator.state, BY_NUMBER, [5])).toMatchObject({
       page: 2,
       shown: null,
-      total: exactly(12),
+      total: countExactly(12),
       pages: 3,
     });
   });
@@ -257,7 +261,10 @@ describe("resolvePagination", () => {
   });
 
   it("drops the count when the query moves", () => {
-    const coordinator = settled(on(1, 5), { rows: 5, pageable: exactly(12) });
+    const coordinator = settled(on(1, 5), {
+      rows: 5,
+      pageable: countExactly(12),
+    });
     coordinator.dispatch({ kind: "setSearch", search: "alpha" });
     expect(resolvePagination(coordinator.state, BY_NUMBER, [5])).toMatchObject({
       shown: null,
@@ -270,7 +277,10 @@ describe("resolvePagination", () => {
     // Twelve rows make three pages of five and two of ten: the old count
     // still holds, the pages it made do not, so nothing is claimed until
     // the source answers for the new size.
-    const coordinator = settled(on(1, 5), { rows: 5, pageable: exactly(12) });
+    const coordinator = settled(on(1, 5), {
+      rows: 5,
+      pageable: countExactly(12),
+    });
     coordinator.dispatch({ kind: "navigateWindow", page: 1, size: 10 });
     expect(
       resolvePagination(coordinator.state, BY_NUMBER, [5, 10]),
@@ -280,7 +290,10 @@ describe("resolvePagination", () => {
   it("keeps the count over rows a failed page move left in view", () => {
     // The rows are an earlier page's and are not summarised as this one's;
     // the count still describes the query they belong to.
-    const coordinator = settled(on(1, 5), { rows: 5, pageable: exactly(12) });
+    const coordinator = settled(on(1, 5), {
+      rows: 5,
+      pageable: countExactly(12),
+    });
     const { requestId } = coordinator.dispatch({
       kind: "navigateWindow",
       page: 2,
@@ -292,7 +305,7 @@ describe("resolvePagination", () => {
     expect(resolvePagination(coordinator.state, BY_NUMBER, [5])).toMatchObject({
       page: 2,
       shown: null,
-      total: exactly(12),
+      total: countExactly(12),
       pages: 3,
     });
   });
@@ -302,11 +315,11 @@ describe("resolvePagination", () => {
     // still reach no page but the next one, so the count is shown and the
     // page total, which would name destinations, is not.
     const facts = resolvePagination(
-      settled(on(1, 5), { rows: 5, pageable: exactly(12) }).state,
+      settled(on(1, 5), { rows: 5, pageable: countExactly(12) }).state,
       FORWARD_CURSORS,
       [5],
     );
-    expect(facts.total).toEqual(exactly(12));
+    expect(facts.total).toEqual(countExactly(12));
     expect(facts.pages).toBe(null);
     expect(facts.back).toBe(0);
   });
@@ -347,7 +360,7 @@ describe("resolvePagination", () => {
     const facts = resolvePagination(
       settled(on(1, 5), {
         rows: 5,
-        pageable: exactly(12),
+        pageable: countExactly(12),
         cursors: { next: "c:m4", previous: "c:m0" },
       }).state,
       BY_NUMBER,

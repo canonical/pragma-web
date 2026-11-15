@@ -15,14 +15,16 @@ export default function describeStatus(
   switch (status.status) {
     case "pending":
       return messages.statusPending;
-    case "regrouping":
-      return messages.statusRegrouping;
     case "failed":
       return messages.statusFailed(status.reason);
+    case "refused":
+      return messages.statusRefused(status.reason);
     case "refresh-failed":
       return messages.statusRefreshFailed(status.reason);
     case "stale":
       return messages.statusStale(status.reason);
+    case "no-access":
+      return messages.statusNoAccess;
     case "no-results":
       return messages.statusNoResults;
     case "no-data":

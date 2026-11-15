@@ -12,11 +12,9 @@ import {
 } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import {
-  buildFleet,
-  createMachineProvider,
-  machines,
-} from "../../../../testing/machines.js";
+import buildFleet from "../../../../testing/buildFleet.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import { machines } from "../../../../testing/machines.js";
 import type { DisplayField } from "../../common/index.js";
 import DataCards from "./DataCards.js";
 

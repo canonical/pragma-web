@@ -10,12 +10,10 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -40,7 +38,7 @@ beforeEach(() => {
 describe("regression 0064 — only the first reason was read", () => {
   it("says every reason one ordering was refused for, in one announcement", async () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       // The declaration refuses nothing: the source answers for itself.
       capabilities: declareMachineOrdering(2),
       refusals: (query) =>

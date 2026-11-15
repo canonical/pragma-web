@@ -8,12 +8,14 @@ import { createCollection } from "@canonical/dataviews-core";
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, expectTypeOf, it } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
 import createFakeChannel from "../../../testing/createFakeChannel.js";
-import { type Machine, machine, machines } from "../../../testing/machines.js";
+import { machines } from "../../../testing/machines.js";
+import type { Machine } from "../../../testing/types.js";
 import { CellContext, type CellContextValue } from "../common/index.js";
 import useDataViewsCell from "./useDataViewsCell.js";
 
-const alpha = machine("machine-1", "alpha", "failed", 8);
+const alpha = buildMachine("machine-1", "alpha", "failed", 8);
 
 /** The value a table installs for one cell of the machine collection. */
 const installCell = (

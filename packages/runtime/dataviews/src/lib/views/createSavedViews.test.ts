@@ -1,18 +1,16 @@
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
+import buildStoredView from "../../../testing/buildStoredView.js";
 import createDeferred from "../../../testing/createDeferred.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
 import { createStandInViewStore } from "../../../testing/createStandInStores.js";
-import {
-  answering,
-  buildStoredView,
-  byId,
-  declare,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
 import flushPresentation from "../../../testing/flushPresentation.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
 import openIndexedDBTab from "../../../testing/openIndexedDBTab.js";
+import readId from "../../../testing/readId.js";
 import settleCalls from "../../../testing/settleCalls.js";
 import { createCollection } from "../collection/index.js";
 import {
@@ -50,7 +48,7 @@ const collection = createCollection({
     { field: "status", kind: "choices", options: ["failed", "running"] },
     { field: "cores", kind: "number", min: 1, max: 64 },
   ],
-  identify: byId,
+  identify: readId,
 });
 
 /** Every filter these scenarios apply, and nothing else: no search. */
@@ -74,7 +72,7 @@ const createProviderOver = (
 ) =>
   createDataViewsProvider({
     collection,
-    source: createManualSource({ capabilities, answer: answering([]) }).source,
+    source: createManualSource({ capabilities, answer: answerWith([]) }).source,
     views: store,
     ...(presentation === undefined ? {} : { presentation }),
     snapshot: { query: "page=3&size=5", presentation: {} },
@@ -638,7 +636,7 @@ describe("createSavedViews", () => {
       const recorded = createRecordingLocation({ href });
       const source = createManualSource({
         capabilities,
-        answer: answering([]),
+        answer: answerWith([]),
       });
       const provider = createDataViewsProvider({
         collection,
@@ -742,7 +740,7 @@ describe("createSavedViews", () => {
       const hidden = { "table.hidden": ["cores"] };
       const provider = createDataViewsProvider({
         collection,
-        source: createManualSource({ capabilities, answer: answering([]) })
+        source: createManualSource({ capabilities, answer: answerWith([]) })
           .source,
         views: openIndexedDBTab(new IDBFactory()),
         location: createRecordingLocation({
@@ -800,7 +798,7 @@ describe("createSavedViews", () => {
       });
       const provider = createDataViewsProvider({
         collection,
-        source: createManualSource({ capabilities, answer: answering([]) })
+        source: createManualSource({ capabilities, answer: answerWith([]) })
           .source,
         views: createStandInViewStore({ list }),
         location,
@@ -868,7 +866,7 @@ describe("createSavedViews", () => {
       await store.create(failed);
       const provider = createDataViewsProvider({
         collection,
-        source: createManualSource({ capabilities, answer: answering([]) })
+        source: createManualSource({ capabilities, answer: answerWith([]) })
           .source,
         views: store,
       });
@@ -1236,11 +1234,13 @@ describe("createSavedViews", () => {
         issues: [
           {
             parameter: "q",
+            field: null,
             code: "undeclared-field",
             reason: "this source cannot search",
           },
           {
             parameter: "region",
+            field: "region",
             code: "unknown-field",
             reason: '"region" names no field of this collection',
           },
@@ -1264,6 +1264,7 @@ describe("createSavedViews", () => {
         issues: [
           {
             parameter: "as",
+            field: "as",
             code: "unknown-field",
             reason: '"as" names no field of this collection',
           },

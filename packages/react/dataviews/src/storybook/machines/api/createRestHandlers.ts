@@ -21,8 +21,6 @@ type RestPage = {
   readonly items: readonly ApiRecord[];
   /** Records matching the query. */
   readonly matched: number;
-  /** Records the endpoint serves, whatever the query. */
-  readonly total: number;
   /** The facets the query asked for, keyed by field. */
   readonly facets: Readonly<Record<string, Facet>>;
 };
@@ -82,7 +80,6 @@ export default function createRestHandlers({
     return HttpResponse.json<RestPage>({
       items: matched.slice(start, start + read.size),
       matched: matched.length,
-      total: records.length,
       facets: readApiFacets(records, read.query, matched, matchText),
     });
   };

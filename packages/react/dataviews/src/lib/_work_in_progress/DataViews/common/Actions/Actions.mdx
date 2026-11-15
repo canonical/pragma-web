@@ -120,7 +120,7 @@ When an action succeeds for every target, the targets leave the selection, and w
 ```tsx
 function MachinesSelected() {
   const { selection } = useDataViews(machineCollection);
-  const count = useDataViewsValue(selection.state).ids.size;
+  const count = useDataViewsValue(selection.state, (state) => state.ids.size);
   return (
     <span role="status" className="indicator">
       {`${count} ${count === 1 ? "machine" : "machines"} selected`}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { declare, declareSort } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
 import type { PredicateOperator, SortTerm } from "../query/index.js";
 import copyCapabilities from "./copyCapabilities.js";
 import type { EmptyPlacement, SourceCapabilities } from "./types.js";
@@ -103,16 +104,15 @@ describe("copyCapabilities", () => {
     });
   });
 
-  it("copies the three counts", () => {
+  it("copies the two counts", () => {
     const copy = copyCapabilities(
       declared({
-        counts: { pageable: "exact", matched: "at-least", total: "unknown" },
+        counts: { pageable: "exact", matched: "at-least" },
       }),
     );
     expect(copy.counts).toEqual({
       pageable: "exact",
       matched: "at-least",
-      total: "unknown",
     });
   });
 

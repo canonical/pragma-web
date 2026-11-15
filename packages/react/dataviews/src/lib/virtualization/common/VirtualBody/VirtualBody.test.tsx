@@ -14,15 +14,16 @@ import { type ReactElement, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import buildMachine from "../../../../../testing/buildMachine.js";
+import buildPage from "../../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../../testing/createMachineProvider.js";
+import deliverRows from "../../../../../testing/deliverRows.js";
 import elementAt from "../../../../../testing/elementAt.js";
-import { deliverRows, pageOf } from "../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type Machine,
-  type MachineFields,
-  machine,
-} from "../../../../../testing/machines.js";
-import type { ManualSource } from "../../../../../testing/types.js";
+import type {
+  Machine,
+  MachineFields,
+  ManualSource,
+} from "../../../../../testing/types.js";
 import {
   DataTable,
   type DataTableColumn,
@@ -36,7 +37,7 @@ type Provider = DataViewsProvider<MachineFields, Machine>;
 /** `count` machines from `m-<from>`, each named `host-<n>`. */
 const machines = (count: number, from = 0): Machine[] =>
   Array.from({ length: count }, (_, position) =>
-    machine(`m-${from + position}`, `host-${from + position}`),
+    buildMachine(`m-${from + position}`, `host-${from + position}`),
   );
 
 const columns: readonly DataTableColumn[] = [
@@ -132,7 +133,7 @@ const load = (
   rows: readonly Machine[],
 ): void => {
   act(() => {
-    source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+    source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
   });
 };
 
@@ -235,9 +236,7 @@ const mountedHosts = (scope: HTMLElement = document.body): string[] =>
     .getAllByRole("row")
     .slice(1)
     .map(
-      (row) =>
-        row.querySelector(".ds.data-table-body-cell:not(.selection)")
-          ?.textContent ?? "",
+      (row) => row.querySelector(".ds.data-table-body-cell")?.textContent ?? "",
     );
 
 /** The heights of the gaps, in order. */

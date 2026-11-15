@@ -8,12 +8,17 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import {
+  isNarrowingIssue,
   type ProviderHost,
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
-import { Fragment, type ReactElement, useRef } from "react";
-import { type UseFacetsResult, useFacets } from "../../../../hooks/index.js";
+import { Fragment, type ReactElement, useMemo, useRef } from "react";
+import {
+  type UseFacetsResult,
+  useDataViewsValue,
+  useFacets,
+} from "../../../../hooks/index.js";
 import { interceptSubmit } from "../../../../utils/index.js";
 import {
   useDataViewsRoot,
@@ -26,7 +31,8 @@ import { NO_RECORDS } from "./common/constants.js";
 import {
   BoundFilter,
   ChoicesFilter,
-  FlagFilter,
+  LinkRefusals,
+  PresenceFilter,
   TextFilter,
 } from "./common/index.js";
 import { listFacetOptions } from "./common/utils/index.js";
@@ -34,9 +40,6 @@ import type { DataViewsFiltersProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-filters";
-
-/** The controls submit every filter themselves; nothing else is theirs. */
-const NO_OWN_KEYS: readonly string[] = [];
 
 /**
  * The destination a submission reaches: the applied query less every
@@ -201,10 +204,10 @@ const controls: {
       </Fragment>
     );
   },
-  flag: (context, definition, name) => {
+  presence: (context, definition, name) => {
     const facet = context.answered?.[definition.field];
     return (
-      <FlagFilter
+      <PresenceFilter
         key={definition.field}
         handle={findFilterHandle<boolean>(
           context.filters,
@@ -285,11 +288,17 @@ const renderControl = (
  * restriction that is already in force and says so beside the control, and
  * two roots over one provider never share a half-typed input.
  *
+ * A followed link's refused clauses are listed after the controls, each with
+ * its reason, under "Not applied from the link". A refused filter or search
+ * withheld the query, so it has a Clear control that removes it: a link to
+ * the URL without it before scripts run, a button after. The GET form
+ * leaves refused parameters out, so submitting it removes them too.
+ *
  * Where the provider asks its source for facets, the controls read them:
- * counts beside a choice's options and beside a flag, the least and greatest
- * value beside a number or date bound, and the server's options where the
- * schema lists none — each computed by the source over the whole matching
- * set. Counts and ranges are shown only while the result answers the applied
+ * counts beside a choice's options and beside a presence field, the least
+ * and greatest value beside a number or date bound, and the server's
+ * options where the schema lists none — each computed by the source over
+ * the whole matching set. Counts and ranges are shown only while the result answers the applied
  * query; the server's options stay from the latest result until a newer one
  * lists others.
  *
@@ -300,7 +309,10 @@ const renderControl = (
  * a real link, hidden controls carry the rest of the query, and the submit
  * control leads to the destination the provider would have written. Once
  * scripting is enabled every edit applies as it is made, the clear controls
- * appear, and a submission is intercepted.
+ * appear, and a submission is intercepted. A typed value — text, a number
+ * or a date — edits in one input session: its first change enters history
+ * and the rest replace it, until the reader leaves the input or submits the
+ * form.
  *
  * With `primary` fields marked, the controls shown by default are theirs, in
  * the order marked, then any other field's that carries a restriction; the
@@ -313,6 +325,8 @@ const renderControl = (
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
+ * @implements ds:apps.subcomponent.data_table-filters
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
@@ -323,9 +337,18 @@ export default function Filters({
   className,
   ...rest
 }: DataViewsFiltersProps): ReactElement {
-  const { provider, filters, messages } = useDataViewsRoot("Filters");
+  const { provider, filters, messages, endSessions } =
+    useDataViewsRoot("Filters");
   const facets = useFacets({ provider });
   const restricted = useRestrictedFields({ provider });
+  const issues = useDataViewsValue(provider.issues);
+  // The controls submit every filter themselves, and the refused clauses
+  // the query is withheld for are left out: submitting the form removes
+  // them, as their Clear does.
+  const refused = useMemo(
+    () => issues.filter(isNarrowingIssue).map((issue) => issue.parameter),
+    [issues],
+  );
   const groupRef = useRef<HTMLFieldSetElement>(null);
   const { schema } = provider.collection;
   const marked = primary ?? [];
@@ -380,12 +403,9 @@ export default function Filters({
       groupRef.current?.focus();
     },
   };
+  const nameField = (field: string): string => labels?.[field] ?? field;
   const renderField = (definition: SchemaFieldDefinition) =>
-    renderControl(
-      context,
-      definition,
-      labels?.[definition.field] ?? definition.field,
-    );
+    renderControl(context, definition, nameField(definition.field));
   const outside = [
     ...primaryFields,
     ...schema.fields.filter(
@@ -424,7 +444,11 @@ export default function Filters({
       {...rest}
       method="get"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      onSubmit={interceptSubmit}
+      onSubmit={(event) => {
+        interceptSubmit(event);
+        // Submitting ends every input session, as leaving an input does.
+        endSessions();
+      }}
     >
       {/* Focusable from code, never by Tab: where focus goes when a control
           that had it leaves with the restriction it removed, or is
@@ -452,10 +476,19 @@ export default function Filters({
           </details>
         ) : null}
       </fieldset>
+      <LinkRefusals
+        issues={issues}
+        nameField={nameField}
+        params={context.host.location?.read() ?? null}
+        onClear={(issue) => {
+          context.host.clearRefused(issue.parameter);
+        }}
+        focusGroup={context.focusGroup}
+      />
       <HiddenQueryFields
         provider={provider}
         destinationOf={destinationOf}
-        omit={NO_OWN_KEYS}
+        omit={refused}
       />
       <Button type="submit" importance="secondary" className="submit">
         {messages.submitFilters}

@@ -27,13 +27,11 @@ import {
 } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type Machine,
-  machine,
-} from "../../../../testing/machines.js";
+import buildMachine from "../../../../testing/buildMachine.js";
+import buildPage from "../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
+import type { Machine } from "../../../../testing/types.js";
 import { virtualizeRows } from "../../virtualization/index.js";
 import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";
@@ -74,7 +72,7 @@ const columns: readonly DataTableColumn[] = [
 /** A page of rows, as the manual source delivers one. */
 const page = (rows: readonly Machine[]): SourceDelivery<Machine> => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 /** A request the source accepted and could not complete. */
@@ -124,13 +122,27 @@ const settled = (
 const loaded = (): HTMLElement =>
   settled(
     page([
-      machine("m-1", "alpha", "running"),
-      machine("m-2", "beta", "failed"),
+      buildMachine("m-1", "alpha", "running"),
+      buildMachine("m-2", "beta", "failed"),
     ]),
     { field: "name", direction: "asc" },
   );
 
 const failed = (): HTMLElement => settled(unreachable);
+
+/** Loaded rows, with a press on the first resize handle placing its edge. */
+const placing = (): HTMLElement => {
+  const container = loaded();
+  const [handle] = screen.getAllByRole("separator");
+  if (handle === undefined) {
+    throw new Error("expected a resize handle");
+  }
+  fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
+  act(() => {
+    fireEvent.pointerUp(window, { clientX: 100 });
+  });
+  return container;
+};
 
 /** Rows that still answer the query, under a refresh that failed. */
 const refreshFailedTable = (): HTMLElement => {
@@ -139,7 +151,7 @@ const refreshFailedTable = (): HTMLElement => {
     <DataTable provider={provider} columns={columns} label="Machines" />,
   );
   act(() => {
-    source.latest().deliver(page([machine("m-1", "alpha")]));
+    source.latest().deliver(page([buildMachine("m-1", "alpha")]));
   });
   act(() => {
     provider.refresh();
@@ -153,7 +165,7 @@ const refreshFailedTable = (): HTMLElement => {
 /** A virtualized table over more rows than it mounts, so it holds a gap. */
 const virtualizedTable = (): HTMLElement => {
   const rows = Array.from({ length: 20 }, (_, position) =>
-    machine(`m-${position}`, `host-${position}`),
+    buildMachine(`m-${position}`, `host-${position}`),
   );
   const { provider } = createMachineProvider({ rows });
   const { container } = render(
@@ -170,7 +182,7 @@ const virtualizedTable = (): HTMLElement => {
 /** A table ordered by two terms: each sorted header shows its precedence. */
 const renderSortedByTwo = (): HTMLElement => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
     capabilities: declareMachineOrdering(null),
   });
   const { container } = render(
@@ -213,7 +225,7 @@ const renderServerMarkup = (): HTMLElement => {
 /** A table holding its settings, one column hidden and announced. */
 const renderSettingsTable = (): HTMLElement => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
   });
   const { container } = render(
     <DataTable
@@ -276,6 +288,10 @@ describe("DataTable stylesheet", () => {
       rendered.add(name);
     }
     cleanup();
+    for (const name of classesOf(placing())) {
+      rendered.add(name);
+    }
+    cleanup();
     expect(styled.size).toBeGreaterThan(0);
     expect([...styled].filter((name) => !rendered.has(name))).toEqual([]);
   });
@@ -288,15 +304,15 @@ describe("DataTable stylesheet", () => {
       ".ds.data-table-header-cell > .sort > .label",
       ".ds.data-table-header-cell > .sort > .ds.icon",
       ".ds.data-table-header-cell > .label",
-      ".ds.data-table-header-cell > .ds.data-table-resize-handle",
-      ".ds.data-table-header-cell.selection",
-      ".ds.data-table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-header-cell.selection",
+      ".ds.data-table-header-cell > .ds.data-table-resize-handle > .strip",
+      ".ds.data-table-select-all-cell",
+      ".ds.data-table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-select-all-cell",
       ".ds.data-table-row-group.header > .ds.data-table-row",
       ".ds.data-table-row-group.body > .ds.data-table-row.selected",
-      ".ds.data-table-row > .ds.data-table-body-cell.selection",
-      // A data cell, not only the selection and status cells sharing its
-      // class: its ellipsis and padding live on this class.
-      ".ds.data-table-row-group.body > .ds.data-table-row > .ds.data-table-body-cell:not(.selection)",
+      ".ds.data-table-row > .ds.data-table-selection-cell",
+      // A data cell, not only the status cell sharing its class: its
+      // ellipsis and padding live on this class.
+      ".ds.data-table-row-group.body > .ds.data-table-row > .ds.data-table-body-cell:not(.status)",
     ]) {
       expect(container.querySelector(selector), selector).not.toBeNull();
     }
@@ -371,14 +387,38 @@ describe("DataTable stylesheet", () => {
     // Each set on a table whose header holds its cell, and empty otherwise.
     expect(
       rule(
-        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.selection\s*\)/,
+        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-select-all-cell\s*\)/,
       ),
     ).toMatch(/--data-table-selection-track:\s*var\(--dimension-400\);/);
     expect(
       rule(
-        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.settings\s*\)/,
+        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-settings-cell\s*\)/,
       ),
     ).toMatch(/--data-table-settings-track:\s*var\(--dimension-400\);/);
+  });
+
+  it("draws the selection and settings cells by their own classes", () => {
+    // One control centred in its track, never clipped, never widening it.
+    const controls = rule(
+      /\.ds\.data-table-select-all-cell,\s*\.ds\.data-table-selection-cell,\s*\.ds\.data-table-settings-cell/,
+    );
+    expect(controls).toMatch(/display:\s*flex;/);
+    expect(controls).toMatch(/justify-content:\s*center;/);
+    expect(controls).toMatch(/min-inline-size:\s*0;/);
+    expect(controls).toMatch(/padding-inline:\s*0;/);
+    expect(controls).toMatch(/overflow:\s*visible;/);
+    // The header's two take its full height and its type.
+    const header = rule(
+      /\.ds\.data-table-select-all-cell,\s*\.ds\.data-table-settings-cell/,
+    );
+    expect(header).toMatch(/align-self:\s*stretch;/);
+    expect(header).toMatch(
+      /font-weight:\s*var\(--typography-text-primary-bold-font-weight\);/,
+    );
+    // The settings menu's disclosure is placed below the cell.
+    expect(rule(/\.ds\.data-table-settings-cell/)).toMatch(
+      /position:\s*relative;/,
+    );
   });
 
   it("spans the status row across the table, however many tracks it has", () => {
@@ -414,14 +454,34 @@ describe("DataTable stylesheet", () => {
   it("keeps a resize drag from starting a text selection", () => {
     // A selection left by one drag turns the next press on the control into
     // a native drag of the selected text, and the column stops resizing.
-    const resize = rule(/\.ds\.data-table-resize-handle/);
+    const resize = rule(/& > \.strip/);
     expect(resize).toMatch(/user-select:\s*none;/);
     expect(resize).toMatch(/touch-action:\s*none;/);
   });
 
+  it("draws the hairline of an edge being placed as a focused one", () => {
+    expect(rule(/&\[data-mode="placing"\] > \.strip::after/)).toMatch(
+      /background-color:\s*var\(--color-focus-ring, currentColor\);/,
+    );
+  });
+
+  it("hides a refused sort's reason while an edge is placed, so the hint stands alone", () => {
+    // The hint and the reason are both drawn below the heading.
+    expect(
+      rule(
+        /\.ds\.data-table-header-cell:has\(\s*>\s*\.ds\.data-table-resize-handle\[data-mode="placing"\]\s*\)\s*>\s*\.sort-reason/,
+      ),
+    ).toMatch(/display:\s*none;/);
+    // The structure that rule selects is the one a placing table renders.
+    const cell = placing().querySelector(
+      '.ds.data-table-header-cell > .ds.data-table-resize-handle[data-mode="placing"]',
+    )?.parentElement;
+    expect(cell?.querySelector(":scope > .sort-reason")).not.toBeNull();
+  });
+
   it("marks the resize target with the design's hairline, centred", () => {
     const mark = sheet.match(
-      /\.ds\.data-table-resize-handle\s*\{[^}]*?&::after\s*\{([^{}]*)/,
+      /\.ds\.data-table-resize-handle\s*\{[^}]*?& > \.strip\s*\{[^}]*?&::after\s*\{([^{}]*)/,
     )?.[1];
     expect(mark).toMatch(
       /inline-size:\s*var\(--dimension-stroke-thickness-large\);/,
@@ -429,8 +489,8 @@ describe("DataTable stylesheet", () => {
     expect(mark).toMatch(/block-size:\s*var\(--dimension-250\);/);
     expect(mark).toMatch(/inset:\s*0;/);
     expect(mark).toMatch(/margin:\s*auto;/);
-    expect(rule(/\.ds\.data-table-resize-handle/)).toMatch(
-      /inline-size:\s*var\(--dimension-200\);/,
+    expect(rule(/& > \.strip/)).toMatch(
+      /inline-size:\s*var\(--dimension-300\);/,
     );
   });
 });

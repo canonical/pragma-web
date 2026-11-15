@@ -19,15 +19,13 @@ import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
 import createTokenMessages from "../../../testing/createTokenMessages.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import findEnglish from "../../../testing/findEnglish.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type MachineProvider,
-  machine,
-} from "../../../testing/machines.js";
+import type { MachineProvider } from "../../../testing/types.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
@@ -49,7 +47,10 @@ const columns: readonly DataTableColumn[] = [
 /** A provider over two machines, standing on a location, keeping views. */
 const createProvider = (): MachineProvider =>
   createMachineProvider({
-    rows: [machine("m-1", "alpha"), machine("m-2", "beta", "failed", 8)],
+    rows: [
+      buildMachine("m-1", "alpha"),
+      buildMachine("m-2", "beta", "failed", 8),
+    ],
     capabilities: declareMachineOrdering(2),
     location: createMemoryLocation({ href: "/machines?sort=name" }),
     views: createMemoryViewStore().store,

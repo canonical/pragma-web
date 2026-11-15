@@ -1,4 +1,4 @@
-import { DEFAULT_MESSAGES } from "./DEFAULT_MESSAGES.js";
+import { DEFAULT_MESSAGES } from "./constants.js";
 import type { DataViewsMessages } from "./types.js";
 
 /**
