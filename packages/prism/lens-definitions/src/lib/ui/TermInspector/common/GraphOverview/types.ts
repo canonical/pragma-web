@@ -24,6 +24,8 @@ export interface SpecimenClass {
   readonly abstract?: boolean;
   readonly superclass?: string;
   readonly instanceCount?: number;
+  /** The namespace it is drawn in, when not the legend's own. */
+  readonly prefix?: string;
 }
 
 /** One specimen relation: its predicate's message, domain and range keys. */

@@ -8,7 +8,8 @@ import type { SpecimenStroke, Specimen, StrokeSpecimen } from "./types.js";
 /**
  * The legend's rows, in order: a concrete class with its count, an
  * abstract class, a hub, a subclass bus, a relation, a bundle of an
- * opposite pair, and a self-loop. Each is laid out and drawn by the same
+ * opposite pair, a self-loop, and a bridge between two namespaces with
+ * its label at rest. Each is laid out and drawn by the same
  * code as the graph, so the legend cannot drift from it. The specimens
  * are named for their role and carry small counts, never a class of any
  * one site's ontology, so the legend reads the same over every graph.
@@ -99,6 +100,21 @@ export const SPECIMENS: readonly Specimen[] = [
         domain: "standard",
         range: "standard",
       },
+    ],
+  },
+  {
+    meaning: "legend.bridge",
+    classes: [
+      { key: "here", label: "legend.specimen.domain", instanceCount: 6 },
+      {
+        key: "there",
+        label: "legend.specimen.range",
+        instanceCount: 3,
+        prefix: "elsewhere",
+      },
+    ],
+    relations: [
+      { label: "legend.specimen.predicate", domain: "here", range: "there" },
     ],
   },
 ];

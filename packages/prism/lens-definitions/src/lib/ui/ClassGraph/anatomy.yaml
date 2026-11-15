@@ -25,7 +25,12 @@
 # where it is 0, never hidden. A zero edge keeps the edge colour, its head
 # with it, and says what it is by its dash alone: the muted rule colour
 # sits about 1.2 to 1 on the floor, and a line that carries meaning needs
-# 3 to 1; a focus draws it in the accent like any other. A relation's count
+# 3 to 1; a focus draws it in the accent like any other. A bridge (a
+# relation whose ends lie in two regions) draws in the strong line
+# (`color.border.highlighted`), its head with it, and its label at rest in
+# 16px ink on the floor's halo, on the longest clear horizontal run of its
+# route (a shelf gap or a channel); a focus's own label for it replaces
+# it, and a focus that fades it fades its label. A relation's count
 # is the one the store serves for its declared edge between the two
 # classes it is drawn between; an edge bundling several relations weighs
 # its heaviest, never their sum (an inverse pair held both ways would
@@ -54,7 +59,8 @@
 #   light-dark(var(--color-border), oklch(54.86% 0 0)): the relation edge
 #     colour, about 4:1 on the floor in both themes; no dark semantic token
 #     sits between 0.45 and 0.64.
-#   1rem: the region prefix; the docs context has no 16px text size.
+#   1rem: the region prefix and a bridge's label; the docs context has no
+#     16px text size.
 #   0.16, 0.06, 0.4: the faded class, the faded edge, the dimmed class.
 #   In constants.ts and the layout's constants (attributes, not CSS): the
 #   weight strokes 1, 2, 4 and 8px with their decades 10, 100 and 1,000,
@@ -144,6 +150,10 @@ node:
                 motion.property: opacity
                 motion.duration: motion.duration.fast
           - node:
+              role: bridge relation (.is-bridge)
+              styles:
+                typography.color: color.border.highlighted
+          - node:
               role: focus relation (.is-focus)
               styles:
                 typography.color: color.text.branded
@@ -163,6 +173,10 @@ node:
               role: filled head
               styles:
                 typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+          - node:
+              role: bridge filled head (.is-bridge)
+              styles:
+                typography.color: color.border.highlighted
           - node:
               role: focus filled head (.is-focus)
               styles:
@@ -224,12 +238,19 @@ node:
               styles:
                 typography.color: color.text.branded
       relation: { cardinality: "0..*", slotName: ring }
-    - node:
-        role: label halo
-        styles:
-          typography.size: typography.text.secondary.fontSize
-          typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
-          interaction.pointerEvents: none
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: label halo
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                interaction.pointerEvents: none
+          - node:
+              role: bridge label halo (.is-bridge)
+              styles:
+                typography.size: 1rem
       relation: { cardinality: "0..*", slotName: label-halo }
     - switch:
         on: internal
@@ -240,6 +261,11 @@ node:
                 typography.size: typography.text.secondary.fontSize
                 typography.color: color.text.muted
                 interaction.pointerEvents: none
+          - node:
+              role: bridge edge label (.is-bridge)
+              styles:
+                typography.size: 1rem
+                typography.color: color.text
           - node:
               role: focus edge label (.is-focus)
               styles:

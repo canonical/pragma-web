@@ -81,6 +81,21 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(overview.querySelector("[data-weight]")).toBeNull();
   });
 
+  it("draws a bridge between two namespaces in the strong line, named at rest", () => {
+    const overview = renderOverview();
+    const bridge = [...overview.querySelectorAll(".entry")].find((entry) =>
+      entry.textContent?.includes("A bridge:"),
+    );
+    expect(bridge?.querySelector("path.relation")?.getAttribute("class")).toBe(
+      "relation is-bridge",
+    );
+    expect(bridge?.querySelector("text.edge-label.is-bridge")?.textContent).toBe(
+      "predicate",
+    );
+    // A specimen states a stroke, never a count.
+    expect(bridge?.querySelector("[data-weight]")).toBeNull();
+  });
+
   it("shows a relation's weight in the canvas's four steps, each over the statements it stands for", () => {
     const overview = renderOverview();
     const [weight, zero] = [...overview.querySelectorAll(".entry")].slice(

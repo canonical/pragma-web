@@ -72,6 +72,8 @@ export const MESSAGES = {
   "legend.bundle":
     "Every relation between two classes as one path, a head at each range",
   "legend.loop": "Relations from a class to itself, as one loop",
+  "legend.bridge":
+    "A bridge: relations between two namespaces, in the strong line and named at rest",
   "legend.weight":
     "A relation's line is heavier the more statements the graph holds for it",
   "legend.weight.range": "{from} to {to} statements",

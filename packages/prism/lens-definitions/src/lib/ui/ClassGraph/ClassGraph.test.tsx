@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import classEdges from "../../../../testing/records/classEdges.js";
+import metroGraph from "../../../../testing/records/metroGraph.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import weighStroke from "../../classGraph/weighStroke.js";
 import ClassGraph from "./ClassGraph.js";
@@ -23,6 +24,8 @@ vi.mock("@canonical/prism-core", async (importOriginal) => ({
 }));
 
 const { layout, terms, uris } = createClassGraphSetup();
+/** The metro graph, whose geography relations cross into the metro's. */
+const metro = createClassGraphSetup(metroGraph);
 const uri = (term: string): string => requireEntry(uris, term);
 
 /** Draw the graph in an SVG under the lens's router. */
@@ -265,6 +268,49 @@ describe("ClassGraph", () => {
       'path.relation[stroke-width="1"] ~ .filled-head',
     );
     expect(measurePathBounds(light?.getAttribute("d") ?? "").w).toBe(8);
+  });
+
+  it("draws a bridge in the strong line, its label at rest at a prefix's size", () => {
+    const bridges = metro.layout.edges.filter((edge) => edge.bridge === true);
+    expect(bridges).toHaveLength(2);
+    const container = draw({ layout: metro.layout, terms: metro.terms });
+    for (const edge of bridges) {
+      const group = container.querySelector(`[data-edge="${edge.id}"]`);
+      expect(group?.querySelector("path")?.getAttribute("class")).toBe(
+        "relation is-bridge",
+      );
+    }
+    const labels = [...container.querySelectorAll("text.edge-label.is-bridge")];
+    expect(labels).toHaveLength(bridges.length);
+    expect(
+      container.querySelectorAll("text.label-halo.is-bridge"),
+    ).toHaveLength(bridges.length);
+    // Every relation that crosses regions is a bridge, and only those.
+    for (const edge of metro.layout.edges.filter(
+      (candidate) => candidate.kind === "relation",
+    )) {
+      const [from, to] = [edge.from, ...edge.to].map(
+        (id) => requireEntry(metro.layout.nodes, id).region,
+      );
+      expect(edge.bridge === true).toBe(from !== to);
+    }
+  });
+
+  it("draws no bridge label in the overview bucket, and none a focus fades", () => {
+    const own = { layout: metro.layout, terms: metro.terms };
+    zoom.bucket = "overview";
+    expect(draw(own).querySelector("text.edge-label.is-bridge")).toBeNull();
+    zoom.bucket = "full";
+    const bridge = metro.layout.edges.find((edge) => edge.bridge === true);
+    const outside = [...metro.layout.nodes.keys()].find(
+      (id) =>
+        !findNeighbourhood(metro.layout, id).edges.has(bridge?.id ?? ""),
+    );
+    expect(outside).toBeDefined();
+    const labelled = draw({ ...own, focus: outside }).querySelector(
+      `.label-layer [data-edge="${bridge?.id}"]`,
+    );
+    expect(labelled).toBeNull();
   });
 
   it("keeps a focused relation with no statements dashed, at the focus's 2px", () => {

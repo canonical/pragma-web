@@ -14,12 +14,14 @@ import {
 } from "@canonical/prism-core";
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
-import type { ReactElement, ReactNode } from "react";
+import { type ReactElement, type ReactNode, useMemo } from "react";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
+import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
 import weighStroke from "../../classGraph/weighStroke.js";
+import { BRIDGE_LABEL_SIZE } from "../../classGraph/constants.js";
 import { useMessages } from "../../i18n/index.js";
 import {
   EDGE_HIT_WIDTH,
@@ -48,8 +50,10 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * 8px by the decade of the statements it covers, a heavy line ending
  * inside a head grown to its width; 1px dashed, in the same colour, where
  * none does; a legend's specimen, which no store counts, at the lightest solid
- * stroke with no weight attribute), the classes as `EntityGraphNode`s, and
- * the focus's edge labels on a halo. Every coordinate comes from the
+ * stroke with no weight attribute), a bridge (a relation between two
+ * regions) in the strong line with its label at a region prefix's size at
+ * rest, the classes as `EntityGraphNode`s, and the focus's edge labels on
+ * a halo. Every coordinate comes from the
  * layout, and every geometric fact and encoding is readable from its data
  * attributes, so a script measures the drawing with no browser.
  *
@@ -115,6 +119,7 @@ export default function ClassGraph({
         : undefined;
     const relation = bundle !== undefined;
     const role = relation ? "relation" : "subclass";
+    const bridge = edge.bridge === true && "is-bridge";
     const state = isHidden(edge)
       ? "is-hidden"
       : isFocus(edge)
@@ -130,7 +135,7 @@ export default function ClassGraph({
     return (
       <g data-edge={edge.id} key={edge.id}>
         <path
-          className={joinClasses(role, state)}
+          className={joinClasses(role, bridge, state)}
           d={d}
           data-count={bundle?.relations.length ?? edge.to.length}
           data-from={termOf(edge.from)}
@@ -147,7 +152,7 @@ export default function ClassGraph({
         {heads.map((head) =>
           relation ? (
             <path
-              className={joinClasses("filled-head", state)}
+              className={joinClasses("filled-head", bridge, state)}
               d={head}
               fill="currentColor"
               key={head}
@@ -260,6 +265,27 @@ export default function ClassGraph({
     );
   };
 
+  // A bridge's label is drawn at rest, unless the focus's own labels
+  // name it or the focus fades it.
+  const bridgeLabels = useMemo(
+    () =>
+      placeBridgeLabels(layout, (count) =>
+        t("well.relations.count", { count }),
+      ),
+    [layout, t],
+  );
+  const focusLabelled = new Set(labels.placed.map((label) => label.edge));
+  const restingLabels = bridgeLabels.filter((label) => {
+    const edge = requireDefined(
+      layout.edges.find((candidate) => candidate.id === label.edge),
+      "a bridge's edge",
+    );
+    return !focusLabelled.has(label.edge) && !isHidden(edge) && !isFaded(edge);
+  });
+  const bridgeBaseline = findCentredBaseline(
+    BRIDGE_LABEL_SIZE + 2 * LABEL_HALO,
+    BRIDGE_LABEL_SIZE,
+  );
   const regionBaseline = findCentredBaseline(
     REGION_LABEL_ROW,
     REGION_LABEL_SIZE,
@@ -331,6 +357,35 @@ export default function ClassGraph({
         {layout.rail.map((uri) => drawNode(requireEntry(layout.nodes, uri)))}
       </g>
       <g className="label-layer" data-layer="labels">
+        {bucket === "overview"
+          ? null
+          : restingLabels.map((label) => (
+              <g data-edge={label.edge} key={label.edge}>
+                {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
+                <text
+                  aria-hidden="true"
+                  className="label-halo is-bridge"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  strokeWidth={LABEL_HALO_STROKE}
+                  textAnchor="middle"
+                  x={label.cx}
+                  y={label.box.y + bridgeBaseline}
+                >
+                  {label.text}
+                </text>
+                <text
+                  className="edge-label is-bridge"
+                  fill="currentColor"
+                  textAnchor="middle"
+                  x={label.cx}
+                  y={label.box.y + bridgeBaseline}
+                >
+                  {label.text}
+                </text>
+              </g>
+            ))}
         {bucket === "full"
           ? labels.placed.map((label) => {
               const lines = label.lines.map((line, index) => (

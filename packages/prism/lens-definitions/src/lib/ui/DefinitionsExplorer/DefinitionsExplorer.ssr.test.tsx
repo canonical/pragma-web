@@ -41,6 +41,24 @@ describe("DefinitionsExplorer SSR", () => {
     expect(html.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
   });
 
+  it("server-renders the overview byte for byte the same twice in one process", () => {
+    const render = (): string =>
+      renderToString(
+        createDefinitionsPage(
+          undefined,
+          definitionsExplorerRecords,
+          createFetchSpy(),
+        ),
+      );
+    const first = render();
+    expect(render()).toBe(first);
+    // Each bridge drawn is named at rest. The captured namespaces draw
+    // none: their relations to other namespaces end at classes not loaded.
+    expect(first.match(/class="edge-label is-bridge"/g)?.length ?? 0).toBe(
+      first.match(/class="relation is-bridge"/g)?.length ?? 0,
+    );
+  });
+
   it("lays the graph out the same on every render", () => {
     const render = (): string =>
       renderToString(

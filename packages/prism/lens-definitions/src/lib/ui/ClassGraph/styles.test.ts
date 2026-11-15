@@ -28,10 +28,21 @@ describe("ClassGraph styles", () => {
       .map(({ selector }) => selector);
     expect(colouring).toEqual([
       ".ds.class-graph .relation",
+      ".ds.class-graph .relation.is-bridge",
       ".ds.class-graph .relation.is-focus",
       ".ds.class-graph .filled-head",
+      ".ds.class-graph .filled-head.is-bridge",
       ".ds.class-graph .filled-head.is-focus",
     ]);
     expect(css).not.toMatch(/is-zero|zero-color/);
+  });
+
+  it("lets a focus's accent win over a bridge's strong line", () => {
+    const order = rules.map(({ selector }) => selector);
+    for (const part of ["relation", "filled-head"]) {
+      expect(order.indexOf(`.ds.class-graph .${part}.is-bridge`)).toBeLessThan(
+        order.indexOf(`.ds.class-graph .${part}.is-focus`),
+      );
+    }
   });
 });
