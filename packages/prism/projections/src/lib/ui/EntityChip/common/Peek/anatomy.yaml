@@ -11,9 +11,11 @@
 # "peek"): the drawn 248px peek is the popover's frame, its padding and
 # border, round a borderless card, and the address line under the card
 # (ProjectionPeek renders both). Tethered with CSS anchor positioning
-# (position-anchor set inline from the chip's ident), 4px below the chip's
-# start, flipping above when the viewport has no room below
-# (position-try-fallbacks: flip-block); it scrolls rather than outgrowing
+# (position-anchor set inline from the chip's ident), 4px below the chip,
+# from its start; from its end when the start would run past the
+# viewport's inline end, and above when the viewport has no room below
+# (position-try-fallbacks: flip-inline, flip-block, flip-block
+# flip-inline), so the whole frame stays in the viewport; it scrolls rather than outgrowing
 # the viewport, no taller than it less 4px at each end.
 #
 # A peek that shows nothing (its card loading, no node at the IRI, a site

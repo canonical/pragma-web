@@ -4,9 +4,10 @@
 
 @layer ds.components.global {
   /* The peek, mounted on the document's body and shown in the top layer
-   * while open: tethered below the chip's start, above it when the
-   * viewport has no room below; it scrolls rather than outgrowing the
-   * viewport. The drawn 248px peek, 4px below the chip, no taller than the
+   * while open: tethered below the chip, from its start; from its end
+   * when the start would run past the viewport's inline end, and above it
+   * when the viewport has no room below, so the whole frame stays in the
+   * viewport; it scrolls rather than outgrowing the viewport. The drawn 248px peek, 4px below the chip, no taller than the
    * viewport less 4px at each end. It is the frame, the popover's padding
    * and border round the borderless card it holds; the popover's tokens
    * are declared where the published Popover is loaded, so each falls back
@@ -22,7 +23,10 @@
     --peek-border-color: var(--popover-color-border, var(--color-border));
 
     position-area: block-end span-inline-end;
-    position-try-fallbacks: flip-block;
+    position-try-fallbacks:
+      flip-inline,
+      flip-block,
+      flip-block flip-inline;
     width: var(--peek-width);
     max-height: var(--peek-max-height);
     overflow-y: auto;

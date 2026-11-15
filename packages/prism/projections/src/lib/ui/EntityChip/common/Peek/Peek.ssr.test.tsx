@@ -26,4 +26,17 @@ describe("Peek SSR", () => {
       /\.ds\.peek:not\(:has\(> :not\(\[hidden\]\)\)\) \{\s*display: none;\s*\}/,
     );
   });
+
+  it("places the peek below the chip's start, falling back to its end and above, 4px off", () => {
+    const styles = readFileSync(
+      new URL("./styles.css", import.meta.url),
+      "utf8",
+    );
+    expect(styles).toMatch(/position-area: block-end span-inline-end;/);
+    expect(styles).toMatch(
+      /position-try-fallbacks:\s*flip-inline,\s*flip-block,\s*flip-block flip-inline;/,
+    );
+    expect(styles).toMatch(/--peek-offset: var\(--space-050\);/);
+    expect(styles).toMatch(/margin-block-start: var\(--peek-offset\);/);
+  });
 });

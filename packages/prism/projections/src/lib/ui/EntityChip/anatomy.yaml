@@ -28,8 +28,10 @@
 # opens it: a tap follows the link. Tethered with CSS anchor positioning
 # (anchor-name on the chip's root, the pill, while the peek is open;
 # position-anchor on the peek; a dashed ident from useId), 4px below the
-# pill's start, flipping above when the viewport has no room below
-# (position-try-fallbacks: flip-block).
+# pill, from its start; from its end when the start would run past the
+# viewport's inline end, and above when the viewport has no room below
+# (position-try-fallbacks: flip-inline, flip-block, flip-block
+# flip-inline).
 #
 # Why not the published Popover: it is a click disclosure on a button; the
 # peek opens on hover-intent and focus of a link (EXPLANATIONS S5).
