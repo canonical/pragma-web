@@ -6,8 +6,6 @@
     --popover-color-border: var(--color-border);
     --popover-border-radius: 0;
     --popover-border-width: 1px;
-    --popover-padding-vertical: var(--dimension-100);
-    --popover-padding-horizontal: var(--dimension-200);
     --popover-motion-duration: 0.12s;
   }
 
@@ -38,8 +36,14 @@
       color: var(--surface-color-text, var(--color-text));
       border: var(--popover-border-width, 1px) solid var(--popover-color-border);
       border-radius: var(--popover-border-radius);
-      padding-block: var(--popover-padding-vertical);
-      padding-inline: var(--popover-padding-horizontal);
+      padding-block: var(
+        --popover-padding-vertical,
+        var(--ds-spacing-inset-surface-compact-block)
+      );
+      padding-inline: var(
+        --popover-padding-horizontal,
+        var(--ds-spacing-inset-surface-compact-inline)
+      );
 
       /*
         CSS-only enter/exit animation. `allow-discrete` transitions `visibility`
