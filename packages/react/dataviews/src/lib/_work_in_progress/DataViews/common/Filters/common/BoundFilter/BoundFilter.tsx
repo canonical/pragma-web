@@ -3,19 +3,12 @@ import { spellWireKey } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useId, useRef } from "react";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
+import { PHRASE_MESSAGES } from "../constants.js";
 import { describeFilterFeedback } from "../utils/index.js";
 import type { BoundFilterProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-filters-bound";
-
-/** The message naming each bound, by the field's label. */
-const BOUND_MESSAGES = {
-  gte: "filterFrom",
-  lte: "filterTo",
-} as const satisfies Readonly<
-  Record<BoundFilterProps["bound"], keyof DataViewsMessages>
->;
 
 /** The message offering the value a facet holds for each bound, beside it. */
 const RANGE_MESSAGES = {
@@ -75,7 +68,7 @@ export default function BoundFilter({
     [hint === null ? null : hintId, message === null ? null : feedbackId]
       .filter((id) => id !== null)
       .join(" ") || undefined;
-  const name = messages[BOUND_MESSAGES[bound]](label);
+  const name = messages[PHRASE_MESSAGES[bound]](label);
   // The schema's bounds, natively: an out-of-range value is refused by the
   // browser at baseline and by the schema once scripted.
   const native =

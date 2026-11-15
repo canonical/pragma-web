@@ -31,7 +31,7 @@ const mountTextFilter = (): HTMLElement => {
   const { provider } = createMachineProvider({
     rows: [],
     capabilities: declareCapabilities(machines, {
-      filter: { name: ["contains"] },
+      filter: { name: ["contains", "endsWith"] },
     }),
   });
   const { container } = render(

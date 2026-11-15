@@ -1,34 +1,11 @@
-import type {
-  DataViewsMessages,
-  PredicateOperator,
-} from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { useDataViewsValue } from "../../../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
+import { PHRASE_MESSAGES } from "../constants.js";
 import { FurtherConjunct } from "./common/index.js";
 import type { FurtherConjunctsProps } from "./types.js";
 
 const componentCssClassName = "ds data-views-filters-further-conjuncts";
-
-/**
- * The message each operator's control reads by, by the field's label, or
- * null for presence, whose control reads as the label alone.
- */
-const PHRASE_MESSAGES = {
-  isAny: "filterIsAnyOf",
-  isNone: "filterIsNoneOf",
-  gte: "filterFrom",
-  lte: "filterTo",
-  contains: "filterContains",
-  startsWith: "filterStartsWith",
-  endsWith: "filterEndsWith",
-  notContains: "filterNotContains",
-  isNot: "filterIsNot",
-  is: "filterIs",
-  isSet: null,
-} as const satisfies Readonly<
-  Record<PredicateOperator, keyof DataViewsMessages | null>
->;
 
 /**
  * The conjuncts at a filter's address beyond the one its control edits, a

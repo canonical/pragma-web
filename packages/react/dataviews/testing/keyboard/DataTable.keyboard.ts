@@ -959,7 +959,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(page.getByRole("group", { name: "Filters" })).toBeFocused();
   });
 
-  test("REST API Answered: text typed into a starts-with filter narrows the table, and Enter on its clear restores it", async ({
+  test("REST API Answered: arrow keys choose starts with, text typed narrows the table, and Enter on its clear restores it", async ({
     page,
   }) => {
     await openStory(page, findStory(REST_API, "Answered").id);
@@ -967,8 +967,16 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
       .getByRole("navigation", { name: "Pagination" })
       .getByRole("status");
     await expect(summary).toHaveText("Showing 1–3 out of 3 rows");
+    // The select beside the input chooses how it matches: from contains,
+    // two steps down is starts with.
+    const how = page.getByRole("combobox", { name: "How Host matches" });
+    await tabTo(page, how);
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+    await expect(how).toHaveValue("startsWith");
     const host = page.getByRole("textbox", { name: "Host starts with" });
-    await tabTo(page, host);
+    await page.keyboard.press("Tab");
+    await expect(host).toBeFocused();
     await page.keyboard.type("b");
     await expect(summary).toHaveText("Showing row 1 out of 1");
     await expect(host).toBeFocused();

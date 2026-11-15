@@ -1425,15 +1425,77 @@ describe("DataViews.Filters", () => {
       ).toBeNull();
     });
 
-    it("offers a text input for the text a field starts with", () => {
+    it("offers one text input, matching by the operator chosen beside it", () => {
       const provider = makeProvider(withText);
       mount(provider);
+      const select = screen.getByRole("combobox", {
+        name: "How name matches",
+      });
+      // The operators the source declares, in the kind's order.
+      expect(
+        [...(select as HTMLSelectElement).options].map(({ value }) => value),
+      ).toEqual([
+        "is",
+        "isNot",
+        "contains",
+        "notContains",
+        "startsWith",
+        "endsWith",
+      ]);
+      fireEvent.change(select, { target: { value: "startsWith" } });
       const input = screen.getByRole("textbox", { name: "name starts with" });
       expect(input).toHaveAttribute("name", "name__startsWith");
       fireEvent.change(input, { target: { value: "we" } });
       expect(provider.state.get().slice.filter).toEqual([
         { field: "name", operator: "startsWith", operands: ["we"] },
       ]);
+    });
+
+    it("keeps focus on the choice that moved text, wherever its control lands", () => {
+      const provider = makeProvider(withText);
+      mount(provider);
+      adopt(provider, [
+        { field: "name", operator: "contains", operands: ["web"] },
+        { field: "name", operator: "endsWith", operands: ["01"] },
+      ]);
+      const [, ending] = screen.getAllByRole("combobox", {
+        name: "How name matches",
+      });
+      if (ending === undefined) {
+        throw new Error("expected a select beside each standing text");
+      }
+      expect(ending).toHaveValue("endsWith");
+      ending.focus();
+      // Moved to is, the text's control now comes first.
+      fireEvent.change(ending, { target: { value: "is" } });
+      const focused = document.activeElement;
+      expect(focused).toHaveAccessibleName("How name matches");
+      expect(focused).toHaveValue("is");
+      expect(
+        screen.getAllByRole("combobox", { name: "How name matches" }).at(0),
+      ).toBe(focused);
+    });
+
+    it("draws one text control per operator standing, the field's own only", () => {
+      const provider = makeProvider(withText);
+      const { container } = mount(provider);
+      adopt(provider, [
+        { field: "name", operator: "endsWith", operands: ["01"] },
+        { field: "name", operator: "contains", operands: ["web"] },
+      ]);
+      expect(
+        [...container.querySelectorAll(".data-views-filters-text input")].map(
+          (input) => input.getAttribute("name"),
+        ),
+      ).toEqual(["name__contains", "name__endsWith"]);
+      // Clearing one of two hands focus to the group: the other takes its place.
+      fireEvent.click(
+        screen.getByRole("button", { name: "Clear name contains" }),
+      );
+      expect(container.querySelector("fieldset")).toHaveFocus();
+      expect(
+        screen.getByRole("textbox", { name: "name ends with" }),
+      ).toHaveValue("01");
     });
   });
 
