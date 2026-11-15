@@ -223,6 +223,12 @@ describe("the class graph of the metro ontology", () => {
       edgesThroughBoxes: [],
       textOverlaps: 0,
     });
+    // The third bridge the provider serves, "stops" from Zone to Stop,
+    // makes four of the ten: on its way into the metro it crosses the
+    // relations from Formation to Line, Rolling stock and Unit position,
+    // and the "location" bridge once; without it the count is 6, as
+    // before the bridges ran in lanes. The label-sorted order: 12, 7
+    // without it.
     expect(countCrossings(metro).total).toBe(10);
     expect(
       countCrossings(layOutClassGraph(metroGraph, { sweeps: 0 })).total,

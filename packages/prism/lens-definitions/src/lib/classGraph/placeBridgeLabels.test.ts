@@ -1,8 +1,10 @@
 import { createTranslator } from "@canonical/i18n-core";
 import {
+  containsPoint,
   intersectsRect,
   parsePathData,
   type Rect,
+  samplePath,
 } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import {
@@ -105,12 +107,34 @@ describe("placeBridgeLabels", () => {
     ).toEqual({ placed: [], omitted: ["rel:aa:A0 bb:B0"] });
   });
 
+  it("keeps every bridge's label clear of every other relation's stroke", () => {
+    for (const graph of [ontologyGraph, metroGraph, BRIDGE_TRIO_GRAPH]) {
+      const layout = layOutClassGraph(graph);
+      const { labels } = placeOn(layout);
+      const relations = layout.edges.filter(
+        (edge) => edge.kind === "relation" && edge.bridge !== true,
+      );
+      for (const label of labels) {
+        for (const relation of relations) {
+          // Sampled every px along the stroke, curves included.
+          expect(
+            samplePath(relation.d, 1).some((point) =>
+              containsPoint(point, label.box),
+            ),
+          ).toBe(false);
+        }
+      }
+    }
+  });
+
   it("names the metro's bridges near their arrowheads", () => {
     const { labels } = placeOn(layOutClassGraph(metroGraph));
+    // "stops" sits below the Formation to Unit position curve, which its
+    // first place, at y 197, met.
     expect(labels.map(({ text, box }) => [text, box.x, box.y])).toEqual([
       ["location", 304, 365],
       ["in zone", 384, 265],
-      ["stops", 91, 197],
+      ["stops", 91, 217],
     ]);
   });
 });

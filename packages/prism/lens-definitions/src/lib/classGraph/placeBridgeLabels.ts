@@ -1,6 +1,7 @@
 import {
   COLLISION_MARGIN,
   compareText,
+  flattenPath,
   intersectsRect,
   LABEL_HALO,
   measureTextWidth,
@@ -42,6 +43,19 @@ function listRuns(d: string): Run[] {
     }));
 }
 
+/**
+ * List the straight stretches of a relation's path data: its curves
+ * flattened, so a box that meets the stroke meets one of them.
+ */
+function listStrokeRuns(d: string): Run[] {
+  return flattenPath(d).flatMap((points) =>
+    points.slice(1).map((to, index) => ({
+      from: requireDefined(points.at(index), "a stretch's start"),
+      to,
+    })),
+  );
+}
+
 /** Whether a stretch passes through a box or along its edge. */
 function touchesRun(box: Rect, { from, to }: Run): boolean {
   return (
@@ -60,11 +74,11 @@ function touchesRun(box: Rect, { from, to }: Run): boolean {
  * the label centred on the route, then beside it (above and below a
  * horizontal stretch, left and right of a vertical one), and keeps the
  * first box clear of every box, every region's label row, the viewBox's
- * edge, every label placed before it and every other bridge's route, so a
- * reader can tell which line a label names. A bridge with no such place is
- * omitted, for the focus's labels to name. Bridges are placed by edge id
- * and every centre is a whole pixel, so the same layout always gives the
- * same labels.
+ * edge, every label placed before it, every other bridge's route and
+ * every other relation's stroke, so a reader can tell which line a label
+ * names. A bridge with no such place is omitted, for the focus's labels
+ * to name. Bridges are placed by edge id and every centre is a whole
+ * pixel, so the same layout always gives the same labels.
  *
  * @param layout - The class graph laid out.
  * @param t - The translator, for how "‹n› relations" reads.
@@ -93,6 +107,10 @@ export default function placeBridgeLabels(
     .filter((edge) => edge.bridge === true)
     .sort((a, b) => compareText(a.id, b.id));
   const routes = new Map(bridges.map((edge) => [edge.id, listRuns(edge.d)]));
+  // Every relation that is not a bridge: its stroke, curves flattened.
+  const strokes = layout.edges
+    .filter((edge) => edge.kind === "relation" && edge.bridge !== true)
+    .flatMap((edge) => listStrokeRuns(edge.d));
   const placed: BridgeLabel[] = [];
   const omitted: string[] = [];
   for (const edge of bridges) {
@@ -142,22 +160,26 @@ export default function placeBridgeLabels(
         },
       ).flat();
     });
-    const chosen = candidates
-      .map(({ cx, cy }) => ({
-        cx,
-        cy,
-        box: { x: cx - Math.ceil(w / 2), y: cy - Math.ceil(h / 2), w, h },
-      }))
-      .find(
-        ({ box }) =>
-          box.x >= viewBox.x &&
-          box.y >= viewBox.y &&
-          box.x + box.w <= viewBox.x + viewBox.w &&
-          box.y + box.h <= viewBox.y + viewBox.h &&
-          !obstacles.some((obstacle) => intersectsRect(obstacle, box)) &&
-          !placed.some((label) => intersectsRect(label.box, box)) &&
-          !others.some((run) => touchesRun(box, run)),
-      );
+    const boxes = candidates.map(({ cx, cy }) => ({
+      cx,
+      cy,
+      box: { x: cx - Math.ceil(w / 2), y: cy - Math.ceil(h / 2), w, h },
+    }));
+    const isInside = (box: Rect): boolean =>
+      box.x >= viewBox.x &&
+      box.y >= viewBox.y &&
+      box.x + box.w <= viewBox.x + viewBox.w &&
+      box.y + box.h <= viewBox.y + viewBox.h;
+    const isClear = (box: Rect): boolean =>
+      !obstacles.some((obstacle) => intersectsRect(obstacle, box));
+    const chosen = boxes.find(
+      ({ box }) =>
+        isInside(box) &&
+        isClear(box) &&
+        !placed.some((label) => intersectsRect(label.box, box)) &&
+        !others.some((run) => touchesRun(box, run)) &&
+        !strokes.some((run) => touchesRun(box, run)),
+    );
     if (chosen === undefined) omitted.push(edge.id);
     else placed.push({ edge: edge.id, text, ...chosen });
   }
