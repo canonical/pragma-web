@@ -32,7 +32,7 @@ const answer = (
   });
 };
 
-describe("a bar chart of a facet with nothing in it", () => {
+describe("regression 0073 — an empty facet drew a figure of nothing", () => {
   it("says no matching record holds a value", () => {
     const { provider, source } = createFacetedManual();
     render(

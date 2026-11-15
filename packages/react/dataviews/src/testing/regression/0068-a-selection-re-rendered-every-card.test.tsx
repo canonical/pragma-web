@@ -15,7 +15,7 @@ import type {
   DisplayFieldCellProps,
 } from "../../lib/common/index.js";
 
-describe("a selection made on a card", () => {
+describe("regression 0068 — a selection re-rendered every card", () => {
   it("re-renders no card's values", () => {
     const renders: string[] = [];
     const Probe = ({ rowId }: DisplayFieldCellProps) => {

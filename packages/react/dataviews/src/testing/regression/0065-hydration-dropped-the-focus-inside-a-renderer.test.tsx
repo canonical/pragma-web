@@ -29,7 +29,7 @@ const renderers: readonly RendererChoice[] = [
 
 const tree = <RendererSwitch label="Show machines as" renderers={renderers} />;
 
-describe("hydrating a renderer switch a reader is inside", () => {
+describe("regression 0065 — hydration dropped the focus inside a renderer", () => {
   it("keeps the renderer holding the focus, and the focus with it", async () => {
     const errors = vi.spyOn(console, "error");
     onTestFinished(() => {

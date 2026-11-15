@@ -17,7 +17,7 @@ import type {
   DisplayFieldCellProps,
 } from "../../lib/common/index.js";
 
-describe("a page of records replaced by equal ones", () => {
+describe("regression 0069 — a replaced record re-rendered a card that showed nothing of it", () => {
   it("re-renders no card that shows nothing of what changed", () => {
     const renders: string[] = [];
     const Probe = ({ rowId }: DisplayFieldCellProps) => {

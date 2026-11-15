@@ -29,7 +29,7 @@ const answerWithoutFacets = (
   });
 };
 
-describe("a chart answered without its facet", () => {
+describe("regression 0071 — an answer without a facet took the page down", () => {
   it("says the source counted nothing, and does not throw", () => {
     const { provider, source } = createFacetedManual();
     render(
