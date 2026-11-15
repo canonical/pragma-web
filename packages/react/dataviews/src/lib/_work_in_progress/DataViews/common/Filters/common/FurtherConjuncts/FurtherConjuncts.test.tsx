@@ -150,8 +150,9 @@ describe("FurtherConjuncts", () => {
     expect(readRowText("endsWith", ["ex"])).toBe("Cores ends with ex");
     expect(readRowText("is", ["ex"])).toBe("Cores is ex");
     expect(readRowText("isNot", ["ex"])).toBe("Cores is not ex");
-    // Presence reads as the field and the value a link spells it with.
-    expect(readRowText("isSet", [true])).toBe("Cores true");
+    // Presence reads as the field and its choice.
+    expect(readRowText("isSet", [true])).toBe("Cores has a value");
+    expect(readRowText("isSet", [false])).toBe("Cores has no value");
   });
   it("passes native props to its list, keeping its own class first", () => {
     const provider = follow("/machines");
