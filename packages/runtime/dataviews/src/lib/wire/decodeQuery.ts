@@ -27,56 +27,59 @@ import type {
 
 const DIGITS = /^\d+$/;
 
+/** A value read off the parameters, with what reading it reported. */
+type Reading<T> = {
+  readonly value: T;
+  readonly issues: readonly QueryIssue[];
+};
+
 /** Read a parameter the grammar spells once, reporting any extra values. */
 const singletonOf = (
   key: string,
   values: readonly string[],
-  issues: QueryIssue[],
-): string => {
-  if (values.length > 1) {
-    issues.push({
-      parameter: key,
-      field: null,
-      code: "malformed",
-      reason: `"${key}" takes one value; the extra values were ignored`,
-    });
-  }
-  return assertInvariant(
+): Reading<string> => ({
+  value: assertInvariant(
     values.at(0),
     "a key read off the parameters has the value it was read from",
-  );
-};
+  ),
+  issues:
+    values.length > 1
+      ? [
+          {
+            parameter: key,
+            field: null,
+            code: "malformed",
+            reason: `"${key}" takes one value; the extra values were ignored`,
+          },
+        ]
+      : [],
+});
 
 /** Read one window value, falling back rather than paging somewhere absurd. */
 const windowValueOf = (
   key: string,
   values: readonly string[],
-  issues: QueryIssue[],
   fallback: number,
-): number => {
-  const value = singletonOf(key, values, issues);
+): Reading<number> => {
+  const { value, issues } = singletonOf(key, values);
   const parsed = Number(value);
-  if (!DIGITS.test(value) || parsed < 1) {
-    issues.push({
-      parameter: key,
-      field: null,
-      code: "malformed",
-      reason: `"${value}" is not a positive integer`,
-    });
-    return fallback;
-  }
   // Digits alone are not enough: past the safe range a page or size reads
   // as Infinity or as a neighbouring number.
-  if (!Number.isSafeInteger(parsed)) {
-    issues.push({
-      parameter: key,
-      field: null,
-      code: "malformed",
-      reason: `"${value}" is too large`,
-    });
-    return fallback;
-  }
-  return parsed;
+  const reason =
+    !DIGITS.test(value) || parsed < 1
+      ? `"${value}" is not a positive integer`
+      : Number.isSafeInteger(parsed)
+        ? null
+        : `"${value}" is too large`;
+  return reason === null
+    ? { value: parsed, issues }
+    : {
+        value: fallback,
+        issues: [
+          ...issues,
+          { parameter: key, field: null, code: "malformed", reason },
+        ],
+      };
 };
 
 /** Read one ordered sort term, or null when the value is not one. */
@@ -103,8 +106,8 @@ const executableOf = (
   slice: Slice,
   filter: readonly ReadPredicate[],
   capabilities: SourceCapabilities,
-  issues: QueryIssue[],
-): Slice => {
+): Reading<Slice> => {
+  const issues: QueryIssue[] = [];
   const keeps = (
     parameters: readonly string[],
     field: string | null,
@@ -114,24 +117,21 @@ const executableOf = (
       slice: clause,
       window: DEFAULT_WINDOW,
     });
-    if (refusals.length === 0) {
-      return true;
-    }
     // Reported under every key the clause was read from, as the link spells
     // it, so carrying or clearing it finds what the URL holds.
-    for (const parameter of parameters) {
-      for (const refusal of refusals) {
-        issues.push({
+    issues.push(
+      ...parameters.flatMap((parameter) =>
+        refusals.map(({ code, reason }) => ({
           parameter,
           field,
-          code: refusal.code,
-          reason: refusal.reason,
-        });
-      }
-    }
-    return false;
+          code,
+          reason,
+        })),
+      ),
+    );
+    return refusals.length === 0;
   };
-  return {
+  const value: Slice = {
     filter: filter
       .filter(({ predicate, keys }) =>
         keeps(keys, predicate.field, { ...EMPTY_SLICE, filter: [predicate] }),
@@ -153,6 +153,7 @@ const executableOf = (
       ? slice.group
       : [],
   };
+  return { value, issues };
 };
 
 /**
@@ -164,24 +165,20 @@ const executableOf = (
 const addressableWindow = (
   window: ResultWindow,
   capabilities: SourceCapabilities,
-  issues: QueryIssue[],
-): ResultWindow => {
+): Reading<ResultWindow> => {
   const refusals = refusalsOf(capabilities, {
     slice: EMPTY_SLICE,
     window,
   });
-  if (refusals.length === 0) {
-    return window;
-  }
-  for (const refusal of refusals) {
-    issues.push({
+  return {
+    value: refusals.length === 0 ? window : { ...window, cursor: null },
+    issues: refusals.map(({ code, reason }) => ({
       parameter: QUERY_KEYS.cursor,
       field: null,
-      code: refusal.code,
-      reason: refusal.reason,
-    });
-  }
-  return { ...window, cursor: null };
+      code,
+      reason,
+    })),
+  };
 };
 
 /**
@@ -222,7 +219,9 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       continue;
     }
     if (key === QUERY_KEYS.search) {
-      search = singletonOf(key, values, issues);
+      const reading = singletonOf(key, values);
+      search = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.sort) {
@@ -261,15 +260,21 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       continue;
     }
     if (key === QUERY_KEYS.cursor) {
-      cursor = singletonOf(key, values, issues);
+      const reading = singletonOf(key, values);
+      cursor = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.page) {
-      page = windowValueOf(key, values, issues, page);
+      const reading = windowValueOf(key, values, page);
+      page = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (key === QUERY_KEYS.size) {
-      size = windowValueOf(key, values, issues, size);
+      const reading = windowValueOf(key, values, size);
+      size = reading.value;
+      issues.push(...reading.issues);
       continue;
     }
     if (RESERVED_QUERY_KEYS.includes(key)) {
@@ -320,9 +325,11 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
   if (capabilities === undefined || capabilities === null) {
     return { slice: read, window: readWindow, issues };
   }
+  const executable = executableOf(read, filter, capabilities);
+  const addressable = addressableWindow(readWindow, capabilities);
   return {
-    slice: executableOf(read, filter, capabilities, issues),
-    window: addressableWindow(readWindow, capabilities, issues),
-    issues,
+    slice: executable.value,
+    window: addressable.value,
+    issues: [...issues, ...executable.issues, ...addressable.issues],
   };
 }

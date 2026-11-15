@@ -53,6 +53,15 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([]);
   });
 
+  it("merges a second spelling in place, leaving the other filters", () => {
+    expect(
+      decode("cpu__gte=2&status=failed&status__isAny=ready").slice.filter,
+    ).toEqual([
+      { field: "cpu", operator: "gte", operands: [2] },
+      { field: "status", operator: "isAny", operands: ["failed", "ready"] },
+    ]);
+  });
+
   it("reads isAny under its bare and its delimited spelling as one set", () => {
     // The bare field is any-of, as any-of was always spelled.
     expect(decode("status__isAny=failed&status__isAny=ready").slice).toEqual(
