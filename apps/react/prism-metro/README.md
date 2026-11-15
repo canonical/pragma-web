@@ -132,7 +132,13 @@ itself, `SiteChipSlot` to `SiteGraphNodeSlot` in `src/lib/ui/`, each
 spreading its form's metro switch and handing it the node;
 `relay.config.json` leaves the package's default slots out of the app's
 compile, and the `Shell` gives the five slots to `ProjectionLinkProvider`
-as the site's switches (`SITE_SWITCHES`).
+as the site's switches (`SITE_SWITCHES`), with the site's peek,
+`MetroPeek`.
+
+The `Shell` declares the site's home namespace, `metro`, once
+(`AMBIENT_NAMESPACE` in `src/lib/ui/Shell/constants.ts`), so a metro
+node's prefix is hidden and a `geo:` one shows; `MetroDefinitionsLayout`
+declares none (`namespace={null}`), so every prefix shows in Definitions.
 
 The packages run on the app's own Relay compile: a Vite plugin,
 `src/relay/redirectPackageArtifacts.ts`, resolves each artifact a lens or

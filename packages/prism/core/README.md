@@ -172,7 +172,11 @@ arm and the absence of the default's). Its
 `testing/browser` subpath
 holds the browser side the apps' layout suites share: `launchBrowser`,
 `measurePage` and `measureLayout`, which read a page's grid, scroll model,
-overflow and spacing. Both subpaths ship as TypeScript source and import
+overflow and spacing; `measureRowHeights`, each drawn row's height
+against `ROW_PX` and `TWO_LINE_ROW_PX`; and, for the apps' peek suites,
+`watchPeek` and `measurePeek`, which time and measure a chip's open peek
+in the page, with `placePeek` and `listPeekViolations`, which hold it to
+the peek's size and its first place that fits. Both subpaths ship as TypeScript source and import
 what only a test run needs, so a consumer installs those optional peer
 dependencies itself: `@canonical/anatomy-dsl`, `@canonical/summon-core`,
 `vitest` and `yaml` for `testing`, and `playwright` for `testing/browser`.

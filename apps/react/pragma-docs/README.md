@@ -228,7 +228,7 @@ own Relay fragment and checked against its `anatomy.yaml`:
   `UIBlockCommand` and `UIBlockGraphNode`, on the `UIBlock` interface, so one
   projection serves a component, a pattern and a layout; and
   `UIBlockExample`, the published React component a block's card renders in
-  its sidecar, server-rendered, for a block the package implements.
+  its specimen, server-rendered, for a block the package implements.
 - `src/domains/modifiers/lib/`: the `Modifier*` and `ModifierFamily*`
   projections.
 - `src/domains/standards/lib/`: the `CodeStandard*` projections.
@@ -246,6 +246,15 @@ each alias holds a key for its own type alone. Each switch cases the types
 its `DOCS_<FORM>_TYPES` constant lists, and renders every other node
 through the package's switch, which renders ontology classes through their
 arm and any other node through its `Node` arm.
+
+The `Shell` gives the provider the site's peek, `DocsPeek`, and no
+switches, so the package's screens (the palette, the entity lens,
+`NodeList`) render the site's types through the package's arms. It
+declares the site's home namespace, `ds`, once (`AMBIENT_NAMESPACE` in
+`src/lib/ui/Shell/constants.ts`), so a design-system node's prefix is
+hidden; `SiteStandardsLayout` declares `cs` for the standards lens, and
+`SiteDefinitionsLayout` declares none (`namespace={null}`), since
+Definitions lists terms of several namespaces and shows every prefix.
 
 ```tsx
 import { DocsCardProjection } from "#lib/ui";

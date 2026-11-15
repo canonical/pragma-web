@@ -51,7 +51,7 @@ lays the five representations of each type out as one matrix, under
   index opts into two lines, the summary under the title): an optional
   mark, hidden as the chip's is, the foreign prefix, the title and the
   kind, then the facts and the status at the end. The title yields last:
-  the facts give way first, ending in an ellipsis.
+  a fact with no room leaves whole, the last first.
 - **`EntityCard`**: the card, built on the published `Card`: the mark, the
   foreign prefix and the title, the address, the kind, the summary, the
   facts and the status, over its static Specimen, which depicts the
@@ -66,6 +66,17 @@ lays the five representations of each type out as one matrix, under
   title's line, and the graph's encodings: `hollow` (an abstract class),
   `prominent` (a hub) and `showText` (off when zoomed out), for a graph to
   place with a transform inside its `<svg>`.
+
+Every form renders a subsequence of one slot order, mark, prefix, title,
+address, kind, summary, facts, status: the chip mark, prefix, title,
+status; the row mark, prefix, title, kind, summary, facts, status; the
+card all eight, over its Specimen; the command mark, prefix, title,
+address, kind, status; the graph node mark, prefix, title, kind, count.
+A chip that peeks opens a 248px dialog 4px from it, after
+`PEEK_OPEN_DELAY_MS` of hover or at once on focus, inside the viewport;
+Escape closes it and gives the link the focus back, and a tap follows
+the link.
+
 - **`SwatchMark`**, **`TokenMark`** and **`TokenSwatch`**: the marks and
   the swatch a colour is drawn by. `SwatchMark` is a 16px disc of an
   entity's own colour (a metro line's), ringed so a pale colour shows;
@@ -281,7 +292,9 @@ type it is on (narrowing an interface's arm to each type with an aliased
 inline fragment, `... on Component @alias(as: "Component") { ...UIBlockCard_node }`),
 and a component that switches on the typename, with
 `requireArmKey` for each case, and renders every other node through its
-default. The site's own pages render its switches.
+default. The site's own pages render its switches. Each switch's test is one call
+to `expectSwitchCoverage`, and each arm's slot order is held by
+`expectSlotOrder`, both from `@canonical/prism-core/testing`.
 
 ## The site's switches
 
@@ -413,12 +426,14 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   renderers a site gives its indexes), `ENTITY_LIST_RENDERERS`,
   `DEFAULT_ENTITY_LIST_RENDERER`.
 - Site: `ProjectionLinkProvider` (the link, the peek and the site's
-  switches), `useProjectionLink`; types `ProjectionLinkProviderProps`,
+  switches; a nested provider keeps what it is not given),
+  `useProjectionLink`; types `ProjectionLinkProviderProps`,
   `SiteSwitches`.
 - Prose: `markdownComponents`, `ProseReferencesProvider`; types
   `ProseLinkProps`, `ProseReferencesProviderProps`.
 - Addresses: `findCuriePrefix`; `AmbientNamespaceProvider`, which
-  declares the page's ambient namespace once, and `useForeignPrefix`, the
+  declares the page's ambient namespace once (a null namespace declares
+  none, over a farther one, so every prefix shows), and `useForeignPrefix`, the
   prefix with its colon an identity shows only when its namespace differs
   from it, read from a compact address or, for a property, from
   its namespace (every arm's prefix but the command's, whose address
