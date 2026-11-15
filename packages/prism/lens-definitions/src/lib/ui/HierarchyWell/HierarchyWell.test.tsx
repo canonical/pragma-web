@@ -620,6 +620,42 @@ describe("over a layout whose rail opens on a box", () => {
     expect(memory.current).toBeUndefined();
   });
 
+  it("links every box when every namespace is a box and the rail holds no class", () => {
+    const allBoxed = layOutClassGraph(input, {
+      budget: createGraphBudget({ drawnNodesMax: 1 }),
+    });
+    expect(
+      allBoxed.rail.every(
+        (uri) => allBoxed.nodes.get(uri)?.kind !== "class",
+      ),
+    ).toBe(true);
+    const { container } = render(
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={allBoxed}
+          onHoverTerm={vi.fn()}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+      ),
+    );
+    for (const view of [".desktop", ".phone"]) {
+      const boxes = [
+        ...container.querySelectorAll(`${view} [data-kind="region"]`),
+      ];
+      expect(boxes, view).toHaveLength(2);
+      expect(
+        boxes.map((box) => box.querySelector("a")?.getAttribute("href")),
+        view,
+      ).toEqual(["/definitions?expand=aa", "/definitions?expand=zz"]);
+    }
+    expect(
+      container.querySelector('.desktop [data-kind="region"][role="img"]'),
+    ).toBeNull();
+  });
+
   it("draws a box on a term page as an image, with no link", () => {
     const { container } = render(drawBoxed("zz:Z1"));
     const box = container.querySelector('.desktop .node[data-kind="region"]');

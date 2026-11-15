@@ -241,10 +241,10 @@ export default function ClassGraph({
       />
     );
     const ring = ringed.has(node.uri) || node.uri === selected;
-    // A box opens its namespace wherever the graph links its classes and
-    // the page drills; a stub, and a box elsewhere, hold no link.
-    const opens =
-      region && buildDrillHref !== undefined && tabStop !== undefined;
+    // A box opens its namespace wherever the page drills, whatever else
+    // the graph links, every namespace boxed included; a stub, and a box
+    // elsewhere, hold no link.
+    const opens = region && buildDrillHref !== undefined;
     const regionName = region ? nameRegionBox(layout, node, t) : undefined;
     return (
       <g
@@ -393,9 +393,7 @@ export default function ClassGraph({
     region: LaidOutRegion,
     label: ReactElement,
   ): ReactElement =>
-    buildDrillHref !== undefined &&
-    tabStop !== undefined &&
-    layout.drilled === region.prefix ? (
+    buildDrillHref !== undefined && layout.drilled === region.prefix ? (
       <RouterLink
         aria-label={t("well.region.back", { prefix: region.prefix })}
         className="way-back"
