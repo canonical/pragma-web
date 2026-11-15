@@ -10,11 +10,15 @@ import ProjectionPeek from "./ProjectionPeek.js";
 /** The absolute IRI the mock graph holds a node at. */
 const NODE_IRI = "https://ds.canonical.com/global.component.icon-button";
 
+/** An absolute IRI whose query the mock graph fails. */
+const FAILING_IRI = "https://ds.canonical.com/global.component.broken";
+
 /**
  * Render a peek at `uri` over a Relay mock environment that answers
  * `node(id:)` as a graph does: the node at `NODE_IRI`, and null at any other
- * address, a CURIE included. Return the container and the variables the
- * query ran with.
+ * address, a CURIE included, and fails at `FAILING_IRI`. Return the
+ * container, the variables each query ran with, and a way to give the same
+ * peek another IRI.
  */
 const renderPeek = (uri: string, failure?: Error) => {
   // relay-test-utils wraps the mock environment's methods in `jest.fn` when
@@ -22,28 +26,38 @@ const renderPeek = (uri: string, failure?: Error) => {
   vi.stubGlobal("jest", vi);
   const environment = createMockEnvironment();
   const variables: Record<string, unknown>[] = [];
-  environment.mock.queueOperationResolver((operation) => {
-    variables.push(operation.request.variables);
-    if (failure !== undefined) return failure;
-    return operation.request.variables.id === NODE_IRI
-      ? MockPayloadGenerator.generate(operation, {
-          Node: resolveRoot({ ...MOCK_NODE, uri: NODE_IRI }),
-          // The node's own meta, which the peek's query reads beside the
-          // card's fragment.
-          EntityMeta: (context) =>
-            context.path?.length === 2 ? MOCK_NODE._meta : undefined,
-        })
-      : { data: { node: null } };
-  });
-  const { container } = render(
-    createSiteTree(
+  // The mock environment drops a resolver once it has answered, so each
+  // render queues it again.
+  const answer: Parameters<typeof environment.mock.queueOperationResolver>[0] =
+    (operation) => {
+      variables.push(operation.request.variables);
+      if (failure !== undefined) return failure;
+      if (operation.request.variables.id === FAILING_IRI) {
+        return new Error("the graph is down");
+      }
+      return operation.request.variables.id === NODE_IRI
+        ? MockPayloadGenerator.generate(operation, {
+            Node: resolveRoot({ ...MOCK_NODE, uri: NODE_IRI }),
+            // The node's own meta, which the peek's query reads beside the
+            // card's fragment.
+            EntityMeta: (context) =>
+              context.path?.length === 2 ? MOCK_NODE._meta : undefined,
+          })
+        : { data: { node: null } };
+    };
+  const renderAt = (at: string) => {
+    environment.mock.queueOperationResolver(answer);
+    return createSiteTree(
       environment,
       <div className="passage">
-        Read <ProjectionPeek uri={uri} />.
+        Read <ProjectionPeek uri={at} />.
       </div>,
-    ),
-  );
-  return { container, variables };
+    );
+  };
+  const { container, rerender } = render(renderAt(uri));
+  /** Give the same peek another IRI, as a peek kept mounted is given one. */
+  const moveTo = (at: string): void => rerender(renderAt(at));
+  return { container, variables, moveTo };
 };
 
 describe("ProjectionPeek", () => {
@@ -78,6 +92,25 @@ describe("ProjectionPeek", () => {
     const { container } = renderPeek(NODE_IRI, new Error("the graph is down"));
     expect(container.querySelector(".passage")?.textContent).toBe("Read .");
     expect(report).toHaveBeenCalled();
+    report.mockRestore();
+  });
+
+  it("shows the card of the next IRI after a query that failed", () => {
+    const report = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { container, variables, moveTo } = renderPeek(FAILING_IRI);
+    expect(container.querySelector(".ds.entity-card")).toBeNull();
+    moveTo(NODE_IRI);
+    expect(variables).toEqual([{ id: FAILING_IRI }, { id: NODE_IRI }]);
+    expect(container.querySelector(".ds.entity-card")).not.toBeNull();
+    report.mockRestore();
+  });
+
+  it("keeps showing nothing when given the same IRI that failed", () => {
+    const report = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { container, variables, moveTo } = renderPeek(FAILING_IRI);
+    moveTo(FAILING_IRI);
+    expect(variables).toEqual([{ id: FAILING_IRI }]);
+    expect(container.querySelector(".passage")?.textContent).toBe("Read .");
     report.mockRestore();
   });
 });
