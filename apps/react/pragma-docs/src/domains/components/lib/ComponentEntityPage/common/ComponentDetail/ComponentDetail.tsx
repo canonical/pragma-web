@@ -3,6 +3,7 @@
 import {
   KeyValueList,
   type KeyValuePair,
+  orderSections,
   PAGE_RENDERER_NAMES,
   SectionedView,
   useRenderers,
@@ -24,7 +25,6 @@ import { ComponentHeader } from "../ComponentHeader/index.js";
 import { ComponentProperties } from "../ComponentProperties/index.js";
 import { ComponentRelations } from "../ComponentRelations/index.js";
 import { SECTION_ANCHORS } from "./constants.js";
-import orderSections from "./orderSections.js";
 import type { ComponentDetailProps } from "./types.js";
 import "./styles.css";
 

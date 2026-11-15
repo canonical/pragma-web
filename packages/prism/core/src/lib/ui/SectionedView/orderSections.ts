@@ -1,4 +1,4 @@
-import type { LensField } from "./types.js";
+import type { LensFieldOrder } from "./types.js";
 
 /** Where a field the lens does not order sorts among the placed ones. */
 const UNORDERED = Number.POSITIVE_INFINITY;
@@ -8,7 +8,11 @@ const UNORDERED = Number.POSITIVE_INFINITY;
  * field's group order, then by the field's own order, keeping the input
  * order between equals. A section whose field the lens does not place (no
  * such field, or one with neither an order nor a group order) keeps its
- * input position after the placed ones.
+ * input position after the placed ones. Every page laid on the
+ * `SectionedView` that follows a class's lens orders its sections here,
+ * so two pages of one class read in the same order.
+ *
+ * `import { orderSections } from "@canonical/prism-core";`
  *
  * @param sections - The sections, each naming the field it anchors on.
  * @param fields - The class's fields as the lens describes them.
@@ -16,7 +20,7 @@ const UNORDERED = Number.POSITIVE_INFINITY;
  */
 export default function orderSections<T extends { readonly field: string }>(
   sections: readonly T[],
-  fields: readonly LensField[],
+  fields: readonly LensFieldOrder[],
 ): readonly T[] {
   const ranks = new Map(
     fields
@@ -27,14 +31,16 @@ export default function orderSections<T extends { readonly field: string }>(
       ]),
   );
   const placed = sections
-    .filter(({ field }) => ranks.has(field))
-    .toSorted((a, b) => {
-      const [groupA, orderA] = ranks.get(a.field) ?? [UNORDERED, UNORDERED];
-      const [groupB, orderB] = ranks.get(b.field) ?? [UNORDERED, UNORDERED];
-      return groupA === groupB
+    .flatMap((section) => {
+      const rank = ranks.get(section.field);
+      return rank === undefined ? [] : [{ section, rank }];
+    })
+    .toSorted(({ rank: [groupA, orderA] }, { rank: [groupB, orderB] }) =>
+      groupA === groupB
         ? compareRanks(orderA, orderB)
-        : compareRanks(groupA, groupB);
-    });
+        : compareRanks(groupA, groupB),
+    )
+    .map(({ section }) => section);
   return [...placed, ...sections.filter(({ field }) => !ranks.has(field))];
 }
 

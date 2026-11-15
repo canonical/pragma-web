@@ -46,3 +46,15 @@ type OwnProps = {
  */
 export type SectionedViewProps = OwnProps &
   Omit<ComponentProps<"article">, keyof OwnProps>;
+
+/**
+ * A class's field as the served lens describes it (`_meta.fields`): its
+ * name, its order and its group's order, each null (or, as Relay reads a
+ * nullable field, absent) when the lens does not declare one. What
+ * `orderSections` reads to order a page's sections.
+ */
+export type LensFieldOrder = {
+  readonly name: string;
+  readonly order?: number | null;
+  readonly group?: { readonly order?: number | null } | null;
+};

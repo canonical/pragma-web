@@ -14,14 +14,3 @@ type OwnProps = {
  */
 export type ComponentDetailProps = OwnProps &
   Omit<ComponentProps<"div">, keyof OwnProps | "children">;
-
-/**
- * A class's field as the lens describes it: its name, its order and its
- * group's order, each null (or, as Relay reads a nullable field, absent)
- * when the lens does not declare one.
- */
-export type LensField = {
-  readonly name: string;
-  readonly order?: number | null;
-  readonly group?: { readonly order?: number | null } | null;
-};
