@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -10,13 +11,14 @@ import testQuery, {
 } from "#relay/__generated__/CarTypeRowTestQuery.graphql.js";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import { MOCK_CAR_TYPE, resolveRoot } from "../../../../../testing/fixtures.js";
-import Component from "./CarTypeRow.js";
+import CarTypeRow from "./CarTypeRow.js";
 import type { CarTypeRowProps } from "./types.js";
 
 /**
- * The operation the tests render CarTypeRow under: one CarType, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render CarTypeRow under: one CarType, read through
+ * the `node` field. The spread is aliased because that field is typed by an
+ * interface, so a node of another type reads as null instead of as a key that
+ * does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query CarTypeRowTestQuery @relay_test_operation {
@@ -27,7 +29,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const CarTypeRowTestNode = ({
   children,
 }: {
@@ -43,8 +48,8 @@ const CarTypeRowTestNode = ({
 
 /**
  * Render `children` with the key of the CarType a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 driving motor car, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 driving motor car, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: CarTypeRowProps["node"]) => ReactElement,
@@ -71,7 +76,7 @@ describe("CarTypeRow", () => {
   it("reads the CarType through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <CarTypeRow node={node} />
       </ul>
     ));
     expect(container.querySelector(".ds.car-type-row")).toHaveAttribute(
@@ -80,34 +85,72 @@ describe("CarTypeRow", () => {
     );
   });
 
-  it("fills its slots from the car type", () => {
+  it("fills the row's slots from the car type, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <CarTypeRow node={node} />
       </ul>
     ));
-    for (const text of ["Series 90 driving motor car", "20 m"]) {
-      expect(container.textContent).toContain(text);
+    const root = container.querySelector(".ds.car-type-row");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/models.svg#models",
+    );
+    expect(
+      [...(root?.querySelectorAll(".prefix, .title") ?? [])].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual(["metro:", "Series 90 driving motor car"]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["length", "20 m"]]);
+    for (const slot of [".meta", ".kind", ".location", ".summary", ".status"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
     }
+    if (root) expectSlotOrder(root);
+    expect(
+      screen.getByRole("link", { name: "Series 90 driving motor car" }),
+    ).toHaveAttribute("href", "/fleet/car-types/metro%3Acar-90-driving");
   });
 
-  it("links its title to the car type's page", () => {
-    renderWithNode((node) => (
+  it("puts its definition under its name in a two-line row", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <CarTypeRow lines="two" node={node} />
+        </ul>
+      ),
+      {
+        _meta: {
+          ...MOCK_CAR_TYPE._meta,
+          definition: "The car of the Series 90 with a cab.",
+        },
+      },
+    );
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "The car of the Series 90 with a cab.",
+    );
+  });
+
+  it("has no summary where the graph asserts no definition", () => {
+    const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <CarTypeRow lines="two" node={node} />
       </ul>
     ));
-    expect(
-      screen
-        .getByRole("link", { name: "Series 90 driving motor car" })
-        .getAttribute("href"),
-    ).toBe("/fleet/car-types/metro%3Acar-90-driving");
+    expect(container.querySelector(".summary")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "Series 90 driving motor car",
+    );
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component className="custom-class" node={node} />
+        <CarTypeRow className="custom-class" node={node} />
       </ul>
     ));
     expect(
@@ -118,7 +161,7 @@ describe("CarTypeRow", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <ul>
-        <Component data-testid="test-component" node={node} />
+        <CarTypeRow data-testid="test-component" node={node} />
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");

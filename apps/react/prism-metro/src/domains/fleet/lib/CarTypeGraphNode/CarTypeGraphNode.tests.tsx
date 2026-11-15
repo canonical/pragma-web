@@ -10,13 +10,14 @@ import testQuery, {
 } from "#relay/__generated__/CarTypeGraphNodeTestQuery.graphql.js";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import { MOCK_CAR_TYPE, resolveRoot } from "../../../../../testing/fixtures.js";
-import Component from "./CarTypeGraphNode.js";
+import CarTypeGraphNode from "./CarTypeGraphNode.js";
 import type { CarTypeGraphNodeProps } from "./types.js";
 
 /**
- * The operation the tests render CarTypeGraphNode under: one CarType, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render CarTypeGraphNode under: one CarType, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query CarTypeGraphNodeTestQuery @relay_test_operation {
@@ -27,7 +28,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const CarTypeGraphNodeTestNode = ({
   children,
 }: {
@@ -43,8 +47,8 @@ const CarTypeGraphNodeTestNode = ({
 
 /**
  * Render `children` with the key of the CarType a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 driving motor car, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 driving motor car, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: CarTypeGraphNodeProps["node"]) => ReactElement,
@@ -71,7 +75,7 @@ describe("CarTypeGraphNode", () => {
   it("reads the CarType through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component node={node} />
+        <CarTypeGraphNode node={node} />
       </svg>
     ));
     expect(container.querySelector(".ds.car-type-graph-node")).toHaveAttribute(
@@ -80,34 +84,32 @@ describe("CarTypeGraphNode", () => {
     );
   });
 
-  it("fills its slots from the car type", () => {
+  it("fills the node's lines from the car type, and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component node={node} />
+        <CarTypeGraphNode node={node} />
       </svg>
     ));
-    for (const text of ["Series 90 driving motor car", "Car type"]) {
-      expect(container.textContent).toContain(text);
-    }
-  });
-
-  it("links its title to the car type's page", () => {
-    renderWithNode((node) => (
-      <svg aria-label="Graph" role="img">
-        <Component node={node} />
-      </svg>
-    ));
-    expect(
-      screen
-        .getByRole("link", { name: "Series 90 driving motor car" })
-        .getAttribute("href"),
-    ).toBe("/fleet/car-types/metro%3Acar-90-driving");
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "metro: Series 90 driving motor car",
+    );
+    expect(container.querySelector(".title .prefix")?.textContent).toBe(
+      "metro: ",
+    );
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/models.svg#models",
+    );
+    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".link")?.getAttribute("href")).toBe(
+      "/fleet/car-types/metro%3Acar-90-driving",
+    );
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component className="custom-class" node={node} />
+        <CarTypeGraphNode className="custom-class" node={node} />
       </svg>
     ));
     expect(
@@ -118,7 +120,7 @@ describe("CarTypeGraphNode", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component data-testid="test-component" node={node} />
+        <CarTypeGraphNode data-testid="test-component" node={node} />
       </svg>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("g");
