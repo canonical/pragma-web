@@ -7,24 +7,13 @@ import {
 } from "@canonical/prism-core";
 import {
   CLEAN_EDGE_ZOOM,
+  FIT_TOLERANCE,
   LEGIBLE_MARGIN,
   MIN_FIT,
   VIEW_MARGIN,
 } from "./constants.js";
+import containsRect from "./containsRect.js";
 import type { ClassGraphLayout, LegibleWindowOptions } from "./types.js";
-
-/** How far a rectangle may overrun another and still count as inside it. */
-const TOLERANCE = 1e-6;
-
-/** Whether `inner` lies inside `outer`, edges included. */
-function containsRect(outer: Rect, inner: Rect): boolean {
-  return (
-    inner.x >= outer.x - TOLERANCE &&
-    inner.y >= outer.y - TOLERANCE &&
-    inner.x + inner.w <= outer.x + outer.w + TOLERANCE &&
-    inner.y + inner.h <= outer.y + outer.h + TOLERANCE
-  );
-}
 
 /**
  * Frame the window of the class graph a canvas of a given size opens on,
@@ -92,9 +81,9 @@ export default function frameLegibleWindow(
       (box) =>
         !intersectsRect(window, box) ||
         containsRect(window, box) ||
-        (box.x >= window.x - TOLERANCE &&
-          box.x + box.w <= window.x + window.w + TOLERANCE &&
-          box.y >= window.y - TOLERANCE &&
+        (box.x >= window.x - FIT_TOLERANCE &&
+          box.x + box.w <= window.x + window.w + FIT_TOLERANCE &&
+          box.y >= window.y - FIT_TOLERANCE &&
           box.y + box.h > window.y + window.h),
     );
   const isClean = (window: Rect): boolean =>
@@ -183,8 +172,9 @@ export default function frameLegibleWindow(
       if (
         found !== undefined &&
         (best === undefined ||
-          found.w > best.w + TOLERANCE ||
-          (found.w > best.w - TOLERANCE && offCentre(found) < offCentre(best)))
+          found.w > best.w + FIT_TOLERANCE ||
+          (found.w > best.w - FIT_TOLERANCE &&
+            offCentre(found) < offCentre(best)))
       ) {
         best = found;
       }

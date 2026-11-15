@@ -6,11 +6,14 @@ import {
   REGION_LABEL_ROW,
   type Rect,
 } from "@canonical/prism-core";
-import { FRAME_ZOOM_MAX, LEGIBLE_MARGIN, MIN_FIT } from "./constants.js";
+import {
+  FIT_TOLERANCE,
+  FRAME_ZOOM_MAX,
+  LEGIBLE_MARGIN,
+  MIN_FIT,
+} from "./constants.js";
+import containsRect from "./containsRect.js";
 import type { ClassGraphLayout } from "./types.js";
-
-/** How far a rectangle may overrun another and still count as inside it. */
-const TOLERANCE = 1e-6;
 
 /**
  * Frame the window a canvas shows when it fits one region: in the canvas's
@@ -63,12 +66,7 @@ export default function frameRegionWindow(
   ];
   const isClean = (window: Rect): boolean =>
     obstacles.every(
-      (box) =>
-        !intersectsRect(window, box) ||
-        (box.x >= window.x - TOLERANCE &&
-          box.y >= window.y - TOLERANCE &&
-          box.x + box.w <= window.x + window.w + TOLERANCE &&
-          box.y + box.h <= window.y + window.h + TOLERANCE),
+      (box) => !intersectsRect(window, box) || containsRect(window, box),
     );
   // Where an edge may fall: the frame's own sides, centred on the frame,
   // or half a lattice step clear of a box, in the gap beside it; only
@@ -91,7 +89,8 @@ export default function frameRegionWindow(
       ]),
     ].filter(
       (start) =>
-        start <= from + TOLERANCE && start + span >= from + size - TOLERANCE,
+        start <= from + FIT_TOLERANCE &&
+        start + span >= from + size - FIT_TOLERANCE,
     );
   const countHeld = (window: Rect): number =>
     obstacles.filter((box) => intersectsRect(window, box)).length;

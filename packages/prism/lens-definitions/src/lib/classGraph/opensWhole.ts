@@ -1,4 +1,4 @@
-import { FIT_TOLERANCE } from "./constants.js";
+import containsRect from "./containsRect.js";
 import type { ClassGraphLayout } from "./types.js";
 
 /**
@@ -11,12 +11,5 @@ import type { ClassGraphLayout } from "./types.js";
  * @returns Whether its opening view holds every region.
  */
 export default function opensWhole(layout: ClassGraphLayout): boolean {
-  const { view } = layout;
-  return layout.regions.every(
-    (region) =>
-      region.x >= view.x - FIT_TOLERANCE &&
-      region.y >= view.y - FIT_TOLERANCE &&
-      region.x + region.w <= view.x + view.w + FIT_TOLERANCE &&
-      region.y + region.h <= view.y + view.h + FIT_TOLERANCE,
-  );
+  return layout.regions.every((region) => containsRect(layout.view, region));
 }

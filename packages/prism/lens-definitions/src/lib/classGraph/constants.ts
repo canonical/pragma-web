@@ -252,9 +252,9 @@ export const STUB_PREFIXES: ReadonlyMap<string, string> = new Map([
 ]);
 
 /**
- * How far a region may overrun the opening view, in px, and still count
- * as inside it: the view's edges are fractional where it is a legible
- * window.
+ * How far a rectangle may overrun another, in px, and still count as
+ * inside it: a window's edges are fractional where it is framed at the
+ * legible zoom.
  */
 export const FIT_TOLERANCE = 1e-6;
 

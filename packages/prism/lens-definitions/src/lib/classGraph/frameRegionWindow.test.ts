@@ -8,16 +8,16 @@ import {
 import { describe, expect, it } from "vitest";
 import { FOUR_NAMESPACE_GRAPH } from "../../../testing/fixtures.js";
 import metroGraph from "../../../testing/records/metroGraph.js";
-import { FRAME_ZOOM_MAX, MIN_FIT, VIEW_MARGIN } from "./constants.js";
+import {
+  FIT_TOLERANCE,
+  FRAME_ZOOM_MAX,
+  LEGIBLE_MARGIN,
+  MIN_FIT,
+  VIEW_MARGIN,
+} from "./constants.js";
+import containsRect from "./containsRect.js";
 import frameRegionWindow from "./frameRegionWindow.js";
 import layOutClassGraph from "./layOutClassGraph.js";
-
-/** Whether `inner` lies inside `outer`, with a hair's tolerance. */
-const holds = (outer: Rect, inner: Rect): boolean =>
-  inner.x >= outer.x - 1e-6 &&
-  inner.y >= outer.y - 1e-6 &&
-  inner.x + inner.w <= outer.x + outer.w + 1e-6 &&
-  inner.y + inner.h <= outer.y + outer.h + 1e-6;
 
 /** The canvases of the desktops the browser tests open, on screen. */
 const CANVASES = [
@@ -59,7 +59,7 @@ describe("frameRegionWindow", () => {
           // legible window's to show.
           if (
             Math.min(canvas.w / frame.w, canvas.h / frame.h) <
-            MIN_FIT * (1 + 1e-6)
+            MIN_FIT * LEGIBLE_MARGIN
           ) {
             expect(window).toBeUndefined();
             continue;
@@ -67,13 +67,14 @@ describe("frameRegionWindow", () => {
           if (window === undefined)
             throw new Error(`no window: ${region.prefix}`);
           expect(window.h / window.w).toBeCloseTo(canvas.h / canvas.w, 9);
-          expect(holds(window, frame)).toBe(true);
+          expect(containsRect(window, frame)).toBe(true);
           const zoom = canvas.w / window.w;
           expect(zoom).toBeGreaterThanOrEqual(MIN_FIT);
-          expect(zoom).toBeLessThanOrEqual(FRAME_ZOOM_MAX + 1e-9);
+          expect(zoom).toBeLessThanOrEqual(FRAME_ZOOM_MAX + FIT_TOLERANCE);
           expect(
             boxes.filter(
-              (box) => intersectsRect(window, box) && !holds(window, box),
+              (box) =>
+                intersectsRect(window, box) && !containsRect(window, box),
             ),
           ).toEqual([]);
         }
@@ -104,7 +105,8 @@ describe("frameRegionWindow", () => {
     // The widest legible window, holding more than ds's lone box.
     expect(ds?.w).toBeCloseTo(canvas.w / MIN_FIT, 2);
     expect(
-      [...layout.nodes.values()].filter((node) => ds && holds(ds, node)).length,
+      [...layout.nodes.values()].filter((node) => ds && containsRect(ds, node))
+        .length,
     ).toBeGreaterThan(1);
     const anatomy = frameOf("anatomy");
     const open = frameRegionWindow(layout, canvas, anatomy);

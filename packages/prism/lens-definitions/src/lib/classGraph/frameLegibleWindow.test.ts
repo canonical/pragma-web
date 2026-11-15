@@ -9,7 +9,8 @@ import {
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../testing/createClassGraphSetup.js";
 import { CROSS_REGION_GRAPH } from "../../../testing/fixtures.js";
-import { MIN_FIT } from "./constants.js";
+import { FIT_TOLERANCE, MIN_FIT } from "./constants.js";
+import containsRect from "./containsRect.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
 import layOutClassGraph from "./layOutClassGraph.js";
 
@@ -52,14 +53,10 @@ const findSideCuts = (window: Rect): Rect[] =>
       window.x < box.x + box.w &&
       box.y < bottom &&
       window.y < box.y + box.h;
-    const inside =
-      box.x >= window.x - 1e-6 &&
-      box.x + box.w <= right + 1e-6 &&
-      box.y >= window.y - 1e-6 &&
-      box.y + box.h <= bottom + 1e-6;
+    const inside = containsRect(window, box);
     const openBelow =
       box.y >= window.y &&
-      box.x + box.w <= right + 1e-6 &&
+      box.x + box.w <= right + FIT_TOLERANCE &&
       box.y + box.h > bottom;
     return inView && !inside && !openBelow;
   });
