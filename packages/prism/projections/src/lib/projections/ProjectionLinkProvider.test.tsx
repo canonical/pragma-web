@@ -69,4 +69,38 @@ describe("ProjectionLinkProvider", () => {
       site: NO_SITE_SWITCHES,
     });
   });
+
+  it("inherits the link component in a provider given only a peek", () => {
+    const wrapper = ({ children }: { readonly children: ReactNode }) => (
+      <ProjectionLinkProvider LinkComponent={RouterLink}>
+        <ProjectionLinkProvider peek={sitePeek}>
+          {children}
+        </ProjectionLinkProvider>
+      </ProjectionLinkProvider>
+    );
+    const provided = renderHook(readProvided, { wrapper }).result.current;
+    expect(provided?.LinkComponent).toBe(RouterLink);
+    expect(provided?.peek).toBe(sitePeek);
+    expect(provided?.site).toBeUndefined();
+  });
+
+  it("replaces the outer peek and switches with the inner ones", () => {
+    const innerPeek = (): ReactNode => null;
+    const innerSite = { ...NO_SITE_SWITCHES };
+    const wrapper = ({ children }: { readonly children: ReactNode }) => (
+      <ProjectionLinkProvider
+        LinkComponent={RouterLink}
+        peek={sitePeek}
+        site={NO_SITE_SWITCHES}
+      >
+        <ProjectionLinkProvider peek={innerPeek} site={innerSite}>
+          {children}
+        </ProjectionLinkProvider>
+      </ProjectionLinkProvider>
+    );
+    const provided = renderHook(readProvided, { wrapper }).result.current;
+    expect(provided?.LinkComponent).toBe(RouterLink);
+    expect(provided?.peek).toBe(innerPeek);
+    expect(provided?.site).toBe(innerSite);
+  });
 });

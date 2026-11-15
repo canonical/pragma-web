@@ -72,7 +72,9 @@ describe("EntityGraphNode", () => {
       const context = node.querySelector(".context");
       expect(context?.textContent).toBe("Class");
       expect(
-        [...(context?.children ?? [])].map((child) => child.getAttribute("class")),
+        [...(context?.children ?? [])].map((child) =>
+          child.getAttribute("class"),
+        ),
       ).toEqual(["kind"]);
     });
   });

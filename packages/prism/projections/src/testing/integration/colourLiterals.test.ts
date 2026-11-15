@@ -70,12 +70,13 @@ function listStylesheets(folder: string): string[] {
 
 /**
  * List the colour literals a stylesheet's declarations hold, each as
- * `property: value`; comments and selectors are not read.
+ * `property: value`, the last of a rule too, which needs no semicolon;
+ * comments and selectors are not read.
  */
 function listColourLiterals(source: string): string[] {
   const declarations = source
     .replace(/\/\*[\s\S]*?\*\//g, "")
-    .matchAll(/([-a-z]+)\s*:\s*([^;{}]+);/gi);
+    .matchAll(/([-a-z]+)\s*:\s*([^;{}]+)(?:;|(?=\}))/gi);
   return [...declarations].flatMap(([, property, value]) => {
     const words = (value ?? "").toLowerCase().match(/[a-z-]+/g) ?? [];
     const literal =
@@ -113,5 +114,12 @@ describe("the Entity forms' stylesheets", () => {
         "a { color: #fff; background: rgb(0 0 0); border-color: red; fill: var(--x); }",
       ),
     ).toEqual(["color: #fff", "background: rgb(0 0 0)", "border-color: red"]);
+  });
+
+  it("finds a literal in a rule's last declaration, which has no semicolon", () => {
+    expect(listColourLiterals("a { color: red }")).toEqual(["color: red"]);
+    expect(
+      listColourLiterals("a:hover { fill: var(--x); stroke: #000 }"),
+    ).toEqual(["stroke: #000"]);
   });
 });
