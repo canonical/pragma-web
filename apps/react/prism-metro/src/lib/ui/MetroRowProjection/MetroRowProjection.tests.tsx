@@ -113,6 +113,19 @@ describe("MetroRowProjection", () => {
     expect(arms.item(0)).toHaveAttribute("data-type", typename);
   });
 
+  it.each([
+    ["Station", MOCK_STATION],
+    ["Line", MOCK_LINE],
+  ] as const)("hands a %s's arm its two-line opt-in", (_typename, entity) => {
+    const { container } = renderWithNode(
+      (node) => <MetroRowProjection lines="two" node={node} />,
+      entity,
+    );
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      entity._meta.definition,
+    );
+  });
+
   it("hands its native props to the arm's root", () => {
     renderWithNode(
       (node) => (

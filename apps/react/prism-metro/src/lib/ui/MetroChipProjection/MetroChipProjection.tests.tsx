@@ -113,6 +113,20 @@ describe("MetroChipProjection", () => {
     expect(arms.item(0)).toHaveAttribute("data-type", typename);
   });
 
+  it.each([
+    ["Station", MOCK_STATION],
+    ["Line", MOCK_LINE],
+  ] as const)("hands a %s's arm its unlinked opt-out", (_typename, entity) => {
+    const { container } = renderWithNode(
+      (node) => <MetroChipProjection linked={false} node={node} />,
+      entity,
+    );
+    expect(container.querySelector(".title")?.textContent).toBe(
+      entity._meta.title,
+    );
+    expect(container.querySelector("a")).toBeNull();
+  });
+
   it("hands its native props to the arm's root", () => {
     renderWithNode(
       (node) => (
