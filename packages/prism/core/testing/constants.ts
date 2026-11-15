@@ -116,6 +116,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "overflow-x": ["layout.overflow.inline"],
   "overflow-wrap": ["typography.wrap"],
   "overflow-y": ["layout.overflow.block"],
+  "overscroll-behavior": ["layout.overscroll"],
   padding: [
     "spacing.internal.block.start",
     "spacing.internal.block.end",

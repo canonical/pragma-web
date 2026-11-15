@@ -36,7 +36,9 @@
 #     or below the canvas, and 256px holds the strip, the bar and a footer,
 #     so every entry of a long index stays within reach on the screen. It
 #     is `max-height`: the roster's `size.max.block` takes a token only,
-#     and the bound is a calculation.
+#     and the bound is a calculation. A scroll that reaches either end of
+#     the panel stays in it (`overscroll-behavior: contain`), never moving
+#     the page under it.
 #   - The panel's background is color.background.layer2, the layer token
 #     the package's components read; `color.background.layer` is not one.
 #   - The separator is a dot drawn by the stylesheet (a muted circle one
@@ -124,6 +126,7 @@ node:
                 size.inline: "100%"
                 size.max.height: "calc(100dvh - 4 * var(--space-800))"
                 layout.overflow.block: auto
+                layout.overscroll: contain
                 layout.boxSizing: border-box
                 spacing.internal.block.start: space.100
                 spacing.internal.block.end: space.100

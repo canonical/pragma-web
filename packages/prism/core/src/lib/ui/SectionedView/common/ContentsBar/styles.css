@@ -84,7 +84,7 @@
 
   /* The list overlays the sections under the bar, across its width, so
    * opening it moves nothing; past its maximum height it scrolls on its
-   * own. */
+   * own, and a scroll that reaches either end stays in it. */
   .ds.contents-bar > .disclosure > .panel {
     position: absolute;
     inset-block-start: 100%;
@@ -92,6 +92,7 @@
     inline-size: 100%;
     max-height: var(--contents-bar-panel-max-height);
     overflow-y: auto;
+    overscroll-behavior: contain;
     box-sizing: border-box;
     padding-block-start: var(--contents-bar-panel-padding-block);
     padding-block-end: var(--contents-bar-panel-padding-block);
