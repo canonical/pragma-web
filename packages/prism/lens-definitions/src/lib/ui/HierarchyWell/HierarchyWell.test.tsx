@@ -596,10 +596,10 @@ describe("over a layout whose rail opens on a box", () => {
     });
     const kept = { camera: { k: 2, x: 30, y: 40 }, moved: true };
     const memory = { current: kept as typeof kept | undefined };
-    const draw = (shown: typeof boxed) =>
+    const draw = (shown: typeof boxed, remembers = true) =>
       createRouterHarness(
         <HierarchyWell
-          cameraMemory={memory}
+          cameraMemory={remembers ? memory : undefined}
           filter={createAllNamespacesFilter(["aa", "zz"])}
           hoverCentre={undefined}
           layout={shown}
@@ -618,6 +618,10 @@ describe("over a layout whose rail opens on a box", () => {
     rerender(draw(drilled));
     expect(container.querySelector(".desktop")).not.toBe(canvas);
     expect(memory.current).toBeUndefined();
+    // With no memory to forget, the canvas still opens anew.
+    const opened = container.querySelector(".desktop");
+    rerender(draw(boxed, false));
+    expect(container.querySelector(".desktop")).not.toBe(opened);
   });
 
   it("links every box when every namespace is a box and the rail holds no class", () => {
@@ -625,9 +629,7 @@ describe("over a layout whose rail opens on a box", () => {
       budget: createGraphBudget({ drawnNodesMax: 1 }),
     });
     expect(
-      allBoxed.rail.every(
-        (uri) => allBoxed.nodes.get(uri)?.kind !== "class",
-      ),
+      allBoxed.rail.every((uri) => allBoxed.nodes.get(uri)?.kind !== "class"),
     ).toBe(true);
     const { container } = render(
       createRouterHarness(
