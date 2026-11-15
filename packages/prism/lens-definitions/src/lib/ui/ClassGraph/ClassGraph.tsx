@@ -265,10 +265,13 @@ export default function ClassGraph({
     );
   };
 
-  // A bridge's label is drawn at rest, unless the focus's own labels
-  // name it or the focus fades it.
+  // A bridge's label is drawn at rest, unless the focus fades it or the
+  // focus's own labels, drawn only at full zoom, name it. A bridge whose
+  // label finds no place at rest is named by the focus's labels.
   const bridgeLabels = useMemo(() => placeBridgeLabels(layout, t), [layout, t]);
-  const focusLabelled = new Set(labels.placed.map((label) => label.edge));
+  const focusLabelled = new Set(
+    bucket === "full" ? labels.placed.map((label) => label.edge) : [],
+  );
   const restingLabels = bridgeLabels.placed.filter((label) => {
     const edge = requireDefined(
       layout.edges.find((candidate) => candidate.id === label.edge),

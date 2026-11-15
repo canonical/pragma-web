@@ -1,10 +1,12 @@
 import {
   measurePathBounds,
   placeEdgeLabels,
+  requireAt,
+  requireDefined,
   requireEntry,
 } from "@canonical/prism-core";
 import { render } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import classEdges from "../../../../testing/records/classEdges.js";
@@ -323,6 +325,59 @@ describe("ClassGraph", () => {
       `.label-layer [data-edge="${bridge?.id}"]`,
     );
     expect(labelled).toBeNull();
+  });
+
+  describe("a bridge in the focus's neighbourhood", () => {
+    const own = { layout: metro.layout, terms: metro.terms };
+    const bridge = requireDefined(
+      metro.layout.edges.find((edge) => edge.bridge === true),
+      "a bridge",
+    );
+    const labels = {
+      placed: [
+        {
+          edge: bridge.id,
+          lines: ["focus"],
+          box: { x: 0, y: 0, w: 32, h: 16 },
+          cx: 16,
+          cy: 8,
+        },
+      ],
+      omitted: [],
+    };
+    const groupsOf = (container: HTMLElement) =>
+      container.querySelectorAll(`.label-layer [data-edge="${bridge.id}"]`);
+    afterEach(() => {
+      zoom.bucket = "full";
+    });
+
+    it("is named once, by the focus's label, at full zoom", () => {
+      const container = draw({ ...own, focus: bridge.from, labels });
+      expect(groupsOf(container)).toHaveLength(1);
+      expect(
+        container.querySelector(
+          `.label-layer [data-edge="${bridge.id}"] text.is-bridge`,
+        ),
+      ).toBeNull();
+    });
+
+    it("keeps its label at rest in the hubs bucket, where the focus's are not drawn", () => {
+      zoom.bucket = "hubs";
+      const container = draw({ ...own, focus: bridge.from, labels });
+      expect(groupsOf(container)).toHaveLength(1);
+      expect(
+        container.querySelector(
+          `.label-layer [data-edge="${bridge.id}"] text.edge-label.is-bridge`,
+        )?.textContent,
+      ).toBe(
+        requireAt(requireDefined(bridge.bundle, "bundle").relations, 0).label,
+      );
+    });
+
+    it("loses its label when a class it ends is hidden", () => {
+      const container = draw({ ...own, hidden: new Set([bridge.from]) });
+      expect(groupsOf(container)).toHaveLength(0);
+    });
   });
 
   it("keeps a focused relation with no statements dashed, at the focus's 2px", () => {
