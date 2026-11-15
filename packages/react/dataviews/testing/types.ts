@@ -2,6 +2,7 @@ import type {
   Collection,
   DataViewsProvider,
   DataViewsProviderConfig,
+  FieldKindOperators,
   PresentationStore,
   QueryLocation,
   ReadonlyChannel,
@@ -53,7 +54,7 @@ export type OperatorRecord = {
  * A text operator looks at `name`, a choice operator at `status`.
  */
 export type OperatorCase = {
-  readonly operator: "contains" | "startsWith" | "isAny" | "isNone";
+  readonly operator: FieldKindOperators["text" | "choices"];
   readonly operands: readonly string[];
   readonly matches: readonly string[];
   /** What the case pins, for a failure to say. */
