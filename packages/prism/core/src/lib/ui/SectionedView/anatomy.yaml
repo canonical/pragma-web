@@ -55,7 +55,9 @@
 #     section's every column and holds the 75ch reading measure (M13, v3
 #     1.1). Its text is set to the paragraphs' size (text primary), so the
 #     `ch` it counts is a paragraph's own: the measure is one rule for every
-#     page kind, never a column span. A table the published Markdown
+#     page kind, never a column span. A string with no break in it (an
+#     address written as a link's text) wraps anywhere, so it never widens
+#     the section past the page. A table the published Markdown
 #     writes in the prose (`.markdown-table`) keeps to that measure: one
 #     wider scrolls sideways inside its own box, never the page and never
 #     cut (`display: block` makes the table its own scroller, since the
@@ -212,6 +214,7 @@ node:
                             layout.grid.column: "1 / -1"
                             size.max.width: "75ch"
                             typography.size: typography.text.primary.fontSize
+                            typography.wrap: anywhere
                           edges:
                             # A table the published Markdown writes in the
                             # prose: within the measure, scrolling sideways

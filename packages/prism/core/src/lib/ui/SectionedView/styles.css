@@ -150,11 +150,14 @@
    * takes the section's every column and holds the reading measure, 75
    * characters, whatever the columns add up to. Its text is its
    * paragraphs' size, so the characters it counts are theirs and a
-   * paragraph reads at most 75 of its own. */
+   * paragraph reads at most 75 of its own. A string with no break in it
+   * (an address written as a link's text) wraps anywhere rather than
+   * widen the section past the page. */
   .ds.sectioned-view > .content > .section > .section-body > .editorial {
     grid-column: 1 / -1;
     max-inline-size: var(--sectioned-view-prose-measure);
     font-size: var(--sectioned-view-prose-font-size);
+    overflow-wrap: anywhere;
   }
 
   /* A table in a section's prose (the published Markdown's) keeps to the

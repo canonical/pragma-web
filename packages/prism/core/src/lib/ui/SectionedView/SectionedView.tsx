@@ -35,7 +35,8 @@ const componentCssClassName = "ds sectioned-view";
  * and opening the index over the page.
  * A prose given as a section's content takes the section's every column
  * and holds the 75ch reading measure when its `.editorial` block is the
- * direct child of the section's body; one nested deeper keeps neither.
+ * direct child of the section's body, a string with no break in it
+ * wrapping anywhere; one nested deeper keeps neither.
  * A body given before the sections (`children`) is off the index; facts
  * or a body given as `null`, `undefined`, a boolean or the empty string
  * leave no region (an element always does, whatever it renders). The
