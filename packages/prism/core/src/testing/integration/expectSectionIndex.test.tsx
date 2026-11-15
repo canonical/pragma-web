@@ -48,6 +48,18 @@ describe("expectSectionIndex", () => {
     );
   });
 
+  it("fails on a level-2 heading a section's content writes itself", () => {
+    const root = renderView();
+    const body = root.querySelector("#usage + .section-body");
+    if (body === null) throw new Error("no body for usage");
+    const stray = document.createElement("h2");
+    stray.textContent = "Do";
+    body.append(stray);
+    expect(() => expectSectionIndex(root, SECTIONS)).toThrow(
+      /neither a section's nor the index's label/,
+    );
+  });
+
   it("fails on a page that is not a sectioned view, even with no section", () => {
     const { container } = render(<article>Nothing here</article>);
     expect(() => expectSectionIndex(container, [])).toThrow(

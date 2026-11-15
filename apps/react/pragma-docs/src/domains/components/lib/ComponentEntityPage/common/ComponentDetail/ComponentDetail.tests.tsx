@@ -69,9 +69,6 @@ describe("ComponentDetail", () => {
         ),
       );
       expectSectionIndex(readView(), BUTTON_SECTIONS);
-      expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(
-        BUTTON_SECTIONS.length + 1,
-      );
     },
     ENTITY_TEST_TIMEOUT_MS,
   );
