@@ -1,6 +1,7 @@
 /**
  * The package's helpers: over colours from a graph, the gate every mark
- * and swatch passes its colour through, which the package keeps internal;
+ * and swatch passes its colour through, which the package exports for a
+ * site that paints a colour from its graph outside a mark;
  * over graph addresses, a compact address's prefix,
  * which the package exports for a site's own projections, and an IRI's
  * local name, which it keeps internal; over switches, the case's fragment

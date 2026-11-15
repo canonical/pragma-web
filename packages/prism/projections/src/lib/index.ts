@@ -122,4 +122,8 @@ export {
   TokenMark,
   TokenSwatch,
 } from "./ui/index.js";
-export { findCuriePrefix, requireArmKey } from "./utils/index.js";
+export {
+  acceptColour,
+  findCuriePrefix,
+  requireArmKey,
+} from "./utils/index.js";
