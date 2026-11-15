@@ -23,7 +23,7 @@ const INITIAL_DATA_PATTERN = /window\.__INITIAL_DATA__ = (.*?)<\/script>/s;
 
 /** An instance chip of the term inspector, linking to the network lens. */
 const INSTANCE_CHIP_PATTERN =
-  /<a class="ds router-link value" href="(\/network\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
+  /<a class="ds router-link title" href="(\/network\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
 
 const CELLS = [
   { script: "dev:bun", timeoutMs: DEV_READY_MS },
