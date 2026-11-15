@@ -329,6 +329,13 @@ describe("virtualized DataTable", () => {
     );
   });
 
+  it("draws its body by its own class, its trailing gap as padding", () => {
+    const { table } = renderVirtualizedTable();
+    const body = table.querySelector<HTMLElement>(":scope > tbody");
+    expect(body?.className).toBe("ds data-table-row-group body virtual");
+    expect(body?.style.paddingBlockEnd).not.toBe("");
+  });
+
   it("ends on the last row, with no gap after it", () => {
     const { table } = renderVirtualizedTable();
     scrollTo(table, 9900);
