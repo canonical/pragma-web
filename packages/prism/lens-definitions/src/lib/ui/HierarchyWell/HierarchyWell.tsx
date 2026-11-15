@@ -219,9 +219,18 @@ export default function HierarchyWell({
   // on the window its own canvas calls for. Fit fits the whole, or shows a
   // window of it at the overview's floor whose edges cut no class, never
   // below.
-  const [arrival] = useState(selected);
+  //
+  // A drill the address changes, by a box, the way back, a term page
+  // reached from another or the history, opens as a load of that address
+  // does: the canvas mounts anew on the new layout, framing the class then
+  // selected as its arrival, the camera kept for the other view forgotten
+  // before the new canvas reads it.
+  const drillKey = layout.drilled ?? "";
+  const [arrival, setArrival] = useState({ drill: drillKey, uri: selected });
+  if (arrival.drill !== drillKey)
+    setArrival({ drill: drillKey, uri: selected });
   const arrivalNode =
-    arrival === undefined ? undefined : layout.nodes.get(arrival);
+    arrival.uri === undefined ? undefined : layout.nodes.get(arrival.uri);
   const viewBox = useMemo(
     () => frameOpeningView(layout, arrivalNode),
     [arrivalNode, layout],
@@ -231,11 +240,9 @@ export default function HierarchyWell({
       frameOpeningCamera(layout, arrivalNode, visible, scale),
     [arrivalNode, layout],
   );
-  // A drill the address changes, by a box, the way back or the history,
-  // opens as a load of that address does: the canvas mounts anew on the
-  // new layout, the camera kept for the other view forgotten before the
-  // new canvas reads it.
-  const drillKey = layout.drilled ?? "";
+  // The order is load-bearing: the new canvas reads the memory in a
+  // passive effect, and a child's passive effects run before its parent's,
+  // so only a layout effect clears it first.
   const openedDrill = useRef(drillKey);
   useLayoutEffect(() => {
     if (openedDrill.current === drillKey) return;

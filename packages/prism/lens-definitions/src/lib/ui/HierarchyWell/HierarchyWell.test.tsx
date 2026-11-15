@@ -16,7 +16,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
-import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
+import {
+  CROSS_REGION_GRAPH,
+  FOUR_NAMESPACE_GRAPH,
+} from "../../../../testing/fixtures.js";
 import ontologyGraph from "../../../../testing/records/ontologyGraph.js";
 import { MIN_FIT } from "../../classGraph/constants.js";
 import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
@@ -622,6 +625,48 @@ describe("over a layout whose rail opens on a box", () => {
     const opened = container.querySelector(".desktop");
     rerender(draw(boxed, false));
     expect(container.querySelector(".desktop")).not.toBe(opened);
+  });
+
+  it("frames the class selected when a term page's drill moves, as loading its address does", () => {
+    const four = createClassGraphSetup(FOUR_NAMESPACE_GRAPH);
+    const firstOf = (prefix: string): string =>
+      requireDefined(
+        FOUR_NAMESPACE_GRAPH.classes.find((entry) => entry.prefix === prefix),
+        prefix,
+      ).uri;
+    const from = firstOf("ds");
+    const to = firstOf("surface");
+    const drillInto = (prefix: string) =>
+      layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        budget: GRAPH_BUDGET,
+        drill: prefix,
+      });
+    const [ds, surface] = [drillInto("ds"), drillInto("surface")];
+    // The class first selected is in a box once the drill moves.
+    expect(surface.nodes.get(from)).toBeUndefined();
+    const draw = (shown: typeof ds, uri: string) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["surface", "ds", "anatomy", "cs"])}
+          hoverCentre={undefined}
+          layout={shown}
+          onHoverTerm={vi.fn()}
+          term={requireEntry(four.terms, uri)}
+          terms={four.terms}
+        />,
+      );
+    const viewBoxOf = (container: HTMLElement) =>
+      container.querySelector(".desktop svg.viewport")?.getAttribute("viewBox");
+    const loaded = render(draw(surface, to));
+    const expected = viewBoxOf(loaded.container);
+    loaded.unmount();
+    const opened = frameOpeningView(surface, surface.nodes.get(to));
+    expect(expected).toBe(
+      `${opened.x} ${opened.y} ${opened.width} ${opened.height}`,
+    );
+    const { container, rerender } = render(draw(ds, from));
+    rerender(draw(surface, to));
+    expect(viewBoxOf(container)).toBe(expected);
   });
 
   it("links every box when every namespace is a box and the rail holds no class", () => {
