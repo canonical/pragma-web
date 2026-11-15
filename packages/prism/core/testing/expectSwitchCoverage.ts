@@ -1,6 +1,4 @@
-import { closeCoverageGuard, openCoverageGuard } from "./coverageGuard.js";
 import type {
-  CoverageGuardResult,
   SwitchCoverageOptions,
   SwitchFragment,
   SwitchSelection,
@@ -20,22 +18,16 @@ import type {
  * fail here, as it would otherwise fall through to the default arm
  * silently.
  *
- * A switch's default branch renders through the tree's projection maps,
- * so a typed arm in them would render the node of a case the switch
- * lacks and hide the missing case. Each case therefore renders under a
- * tree whose maps hold no typed arm: the tree passes its maps through
- * `guardTypedArms`, which, while a case renders, replaces every typed
- * and site arm in them with one that throws, so a node reaches its typed
- * arm only through the switch's own case. A case whose tree did not
- * guard its maps fails, and so does a case whose switch read its form
- * from maps other than the object `guardTypedArms` returned: the tree
- * hands the provider that object, as it is.
+ * A switch's default branch renders the node through an arm that takes
+ * every type (the package's `Node` arm), so a switch that lacks a case
+ * still renders the node, through the wrong arm. The caller's `render`
+ * therefore asserts the case's own arm by its root's class and that the
+ * default's arm is absent: a case the switch lacks then fails there.
  *
  * @param options - The switch's compiled fragment, one mock node per case
  *   by type condition, and how to render and check one.
  * @throws When a type condition has no case, a case names no condition,
- *   a case rendered under maps its tree did not pass through
- *   `guardTypedArms`, or its switch read no form from the maps it returned.
+ *   or `render` throws for a case.
  * @note Impure: calls `render`, which mounts the switch, once per condition.
  */
 export default function expectSwitchCoverage<TNode>({
@@ -63,23 +55,7 @@ export default function expectSwitchCoverage<TNode>({
     if (node === undefined) {
       throw new Error(`the case ${condition} holds no node`);
     }
-    openCoverageGuard();
-    let guard: CoverageGuardResult = { guarded: false, read: false };
-    try {
-      render(condition, node);
-    } finally {
-      guard = closeCoverageGuard();
-    }
-    if (!guard.guarded) {
-      throw new Error(
-        `${fragment.name}: the case ${condition} rendered under maps its tree did not pass through guardTypedArms, so a typed arm in them could hide a missing case`,
-      );
-    }
-    if (!guard.read) {
-      throw new Error(
-        `${fragment.name}: the case ${condition} read no form from the maps guardTypedArms returned, so its provider holds other maps whose typed arms could hide a missing case`,
-      );
-    }
+    render(condition, node);
   }
 }
 

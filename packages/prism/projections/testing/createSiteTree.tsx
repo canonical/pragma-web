@@ -1,22 +1,32 @@
 import { createEnvironment, HomesProvider } from "@canonical/prism-core";
-import { guardTypedArms } from "@canonical/prism-core/testing";
 import type { LinkComponent } from "@canonical/react-ds-global";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { Environment, IEnvironment } from "relay-runtime";
-import { defaultProjectionMaps } from "../src/lib/node/index.js";
 import {
-  type ProjectionMaps,
-  ProjectionsProvider,
+  ProjectionLinkProvider,
+  type SiteSwitches,
 } from "../src/lib/projections/index.js";
 import { HOMES, THING_ROUTES } from "./fixtures.js";
 
+/**
+ * A site's five switches that render nothing, for a test to replace the
+ * one form it probes.
+ */
+export const NO_SITE_SWITCHES: SiteSwitches = {
+  chip: () => null,
+  row: () => null,
+  card: () => null,
+  command: () => null,
+  graphNode: () => null,
+};
+
 /** Options for `createSiteTree`. */
 export interface SiteTreeOptions {
-  /** The maps to provide, in place of `defaultProjectionMaps`. */
-  readonly maps?: ProjectionMaps;
+  /** The site's switches to provide; none by default. */
+  readonly site?: SiteSwitches;
   /**
    * The link a node's home renders through, in place of the provider's default.
    */
@@ -34,14 +44,13 @@ export const createStoreOnlyEnvironment = (): Environment =>
 
 /**
  * Wrap `children` in the providers a site mounts: the Relay environment, a
- * router over one entity page, the site's homes and the projection maps.
- * The maps pass through `guardTypedArms`, so under a switch's coverage a
- * node reaches its typed arm only through the switch's own case.
+ * router over one entity page, the site's homes and the projection link
+ * provider, with no site switches unless the test gives them.
  */
 export default function createSiteTree(
   environment: IEnvironment,
   children: ReactNode,
-  { maps = defaultProjectionMaps, LinkComponent }: SiteTreeOptions = {},
+  { site, LinkComponent }: SiteTreeOptions = {},
 ): ReactElement {
   return (
     <RelayEnvironmentProvider environment={environment}>
@@ -51,12 +60,9 @@ export default function createSiteTree(
         })}
       >
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider
-            LinkComponent={LinkComponent}
-            maps={guardTypedArms(maps)}
-          >
+          <ProjectionLinkProvider LinkComponent={LinkComponent} site={site}>
             {children}
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

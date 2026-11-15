@@ -5,8 +5,7 @@ import {
   usePageRenderers,
 } from "@canonical/prism-core";
 import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
+  ProjectionLinkProvider,
   useListRenderers,
 } from "@canonical/prism-projections";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
@@ -38,7 +37,7 @@ const SiteRenderers = ({
  * environment, a router over the site's two lenses at `url` (a static one,
  * as the server renders with, or one over a memory history that a reader's
  * clicks can navigate, the test's own when it reads the address back), and,
- * inside the router, the site's homes, the default projection maps, which
+ * inside the router, the site's homes, the projection link provider, which
  * the index's rows and cards and the page's title and chip read their arms
  * and their links from, and the site's renderers over the provider
  * extensions it serves. The content sits in the lens layout when one is
@@ -67,7 +66,7 @@ export default function createEntitySite({
     <RelayEnvironmentProvider environment={environment}>
       <RouterProvider router={router}>
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider maps={defaultProjectionMaps}>
+          <ProjectionLinkProvider>
             <SiteRenderers extensions={extensions}>
               {layout === undefined ? (
                 children
@@ -85,7 +84,7 @@ export default function createEntitySite({
                 </EntityLayout>
               )}
             </SiteRenderers>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

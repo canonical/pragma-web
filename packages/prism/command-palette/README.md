@@ -37,12 +37,12 @@ import { CommandPalette } from "@canonical/prism-command-palette";
 <RelayEnvironmentProvider environment={environment}>
   <RouterProvider router={router}>
     <HomesProvider homes={homes}>
-      <ProjectionsProvider LinkComponent={RouterLink} maps={maps}>
+      <ProjectionLinkProvider LinkComponent={RouterLink} site={switches}>
         <div className="ds shell grid intrinsic">
           <Outlet />
           <CommandPalette />
         </div>
-      </ProjectionsProvider>
+      </ProjectionLinkProvider>
     </HomesProvider>
   </RouterProvider>
 </RelayEnvironmentProvider>
@@ -54,7 +54,7 @@ import { CommandPalette } from "@canonical/prism-command-palette";
 - `HomesProvider`: a result's home is the one the site gives its type; a
   result whose type has no home is listed, muted, and previewed as a
   disabled option, and choosing it does nothing.
-- `ProjectionsProvider`: each row is the site's command projection for its
+- `ProjectionLinkProvider`: each row is the site's command projection for its
   result's type, and the preview its card projection, so a site's own arms
   render there as everywhere else.
 

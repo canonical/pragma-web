@@ -8,18 +8,21 @@ import {
 } from "@canonical/prism-core";
 import {
   AmbientNamespaceProvider,
-  ProjectionsProvider,
+  ProjectionLinkProvider,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import { metroProjectionMaps } from "#domains/metro";
 import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
-import { AMBIENT_NAMESPACE, GRID_PRESET_CLASS_NAMES } from "./constants.js";
+import {
+  AMBIENT_NAMESPACE,
+  GRID_PRESET_CLASS_NAMES,
+  SITE_SWITCHES,
+} from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
 import { MetroPeek } from "../MetroPeek/index.js";
@@ -40,8 +43,9 @@ const renderPeek = (uri: string): ReactElement => <MetroPeek uri={uri} />;
  * the router's `Outlet`, with the document-title template and the theme
  * the reader's cookie stores, which the theme control shows on the server
  * as on the client. Inside the
- * router sit the site's homes and its projection maps, so every mention of
- * a graph node renders through its type's arm and links to the page that
+ * router sit the site's homes and the projection link provider, with the
+ * site's five switches, so every mention of a graph node, a lens's
+ * included, renders through its type's arm and links to the page that
  * owns it, with the site's peek, `MetroPeek`, which every chip opens, and
  * the site's one ambient namespace, `metro`, so a metro
  * identity shows no prefix and a foreign one shows its own.
@@ -83,10 +87,10 @@ export default function Shell<
         <RelayEnvironmentProvider environment={environment}>
           <RouterProvider router={router}>
             <HomesProvider homes={homes}>
-              <ProjectionsProvider
+              <ProjectionLinkProvider
                 LinkComponent={RouterLink}
-                maps={metroProjectionMaps}
                 peek={renderPeek}
+                site={SITE_SWITCHES}
               >
                 <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
                   <SiteRenderers>
@@ -109,7 +113,7 @@ export default function Shell<
                     </div>
                   </SiteRenderers>
                 </AmbientNamespaceProvider>
-              </ProjectionsProvider>
+              </ProjectionLinkProvider>
             </HomesProvider>
           </RouterProvider>
         </RelayEnvironmentProvider>

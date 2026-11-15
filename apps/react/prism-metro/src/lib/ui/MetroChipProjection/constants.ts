@@ -1,6 +1,6 @@
 /**
- * The site's own types that `MetroChipProjection` cases, each through its
- * own arm: the cases its coverage test walks, one node per type.
+ * The types that `MetroChipProjection` cases, the site's own and the
+ * ontology class, each through its own arm: the cases its coverage test walks, one node per type.
  */
 export const METRO_CHIP_TYPES = {
   Station: true,
@@ -11,4 +11,5 @@ export const METRO_CHIP_TYPES = {
   Formation: true,
   Unit: true,
   CarType: true,
+  OntologyClass: true,
 } as const;

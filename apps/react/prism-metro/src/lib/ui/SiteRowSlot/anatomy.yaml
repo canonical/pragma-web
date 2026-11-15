@@ -1,0 +1,11 @@
+---
+# SiteRowSlot: the site's row switch as the package's row switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to MetroRowProjection,
+# whose case renders the root.
+node:
+  uri: metro.component.site_row_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: metro.component.metro_row_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

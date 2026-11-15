@@ -15,8 +15,8 @@ const componentCssClassName = "ds projection-peek";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The operation a peek runs when it opens: the node at the IRI, read
- * through the card dispatcher, so the peek shows the card the site maps to
- * the node's type, and its compact address, which the peek's address line
+ * through the card switch, so the peek shows the card of the node's type,
+ * and its compact address, which the peek's address line
  * shows and copies.
  */
 const declarePeekQuery = (): unknown => graphql`

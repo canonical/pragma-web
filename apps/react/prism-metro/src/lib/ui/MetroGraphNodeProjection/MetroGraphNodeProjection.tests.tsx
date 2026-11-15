@@ -23,7 +23,6 @@ import {
   MOCK_ZONE,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
-import ProvidedMapReader from "../../../../testing/ProvidedMapReader.js";
 import { METRO_GRAPH_NODE_TYPES } from "./constants.js";
 import MetroGraphNodeProjection from "./MetroGraphNodeProjection.js";
 import type { MetroGraphNodeProjectionProps } from "./types.js";
@@ -154,6 +153,7 @@ describe("MetroGraphNodeProjection", () => {
       Formation: MOCK_FORMATION,
       Unit: MOCK_UNIT,
       CarType: MOCK_CAR_TYPE,
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
     };
     // The switch's cases are the site's types, one mock node each.
     expect(Object.keys(cases)).toEqual(Object.keys(METRO_GRAPH_NODE_TYPES));
@@ -164,12 +164,9 @@ describe("MetroGraphNodeProjection", () => {
       fragment: nodeFragment,
       cases,
       render: (typename, entity) => {
-        // The reader proves the provider holds the guarded maps: the
-        // switch reaches them only in its default, the package's switch.
         const { container, unmount } = renderWithNode(
           (node) => (
             <svg aria-label="Graph" role="img">
-              <ProvidedMapReader form="graphNode" />
               <MetroGraphNodeProjection node={node} />
             </svg>
           ),

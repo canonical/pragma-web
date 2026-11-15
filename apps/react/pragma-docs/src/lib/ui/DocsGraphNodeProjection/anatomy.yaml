@@ -6,9 +6,9 @@
 # It renders no element of its own: the case its node's type selects
 # renders the root. A design-system type reads through the site's own
 # projection; every other type through the package's dispatcher, which
-# takes ontology classes and any node from the site's provided maps. The
-# cases are the site composite's aliased arms and the site map's arms, by
-# the same names; the three UI-block types share one projection.
+# takes ontology classes through their arm and any other node through its
+# Node arm. The cases are the site composite's aliased arms (the
+# DOCS_<FORM>_TYPES constant), by the same names; the three UI-block types share one projection.
 node:
   uri: docs.component.docs_graph_node_projection
   projection:

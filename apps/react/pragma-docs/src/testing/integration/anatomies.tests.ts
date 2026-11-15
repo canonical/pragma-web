@@ -87,7 +87,7 @@ const subcomponentFolders = listAnatomyFolders(
 describe("the app's components", () => {
   it("are found, the shell, a dispatcher and a domain library's among them", () => {
     expect(folders).toContain(join(UI_DIRECTORY, "Shell"));
-    expect(folders).toContain(join(UI_DIRECTORY, "SiteCardProjection"));
+    expect(folders).toContain(join(UI_DIRECTORY, "DocsCardProjection"));
     expect(folders).toContain(
       join(APP_ROOT, "src", "domains", "components", "lib", "UIBlockCard"),
     );

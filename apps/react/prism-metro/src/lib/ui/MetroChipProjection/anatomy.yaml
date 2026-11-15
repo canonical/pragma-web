@@ -4,9 +4,9 @@
 # Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
 # matrix: one EntityChip per type, each type filling the slots it has).
 # It renders no element of its own: the case its node's type selects
-# renders the root. A metro type reads through the site's own arm; every
-# other type through the package's switch, which takes ontology classes
-# and any node through its own arms. The cases are the site composite's
+# renders the root. A metro type reads through the site's own arm; an
+# ontology class through the package's class arm; any other node through
+# the package's Node arm. The cases are the site composite's
 # aliased arms, by the same names (METRO_CHIP_TYPES).
 node:
   uri: metro.component.metro_chip_projection
@@ -49,7 +49,11 @@ node:
               projection:
                 on: CarType
           - node:
-              uri: prism.component.chip_projection
+              uri: prism.component.ontology_class_chip
+              projection:
+                on: OntologyClass
+          - node:
+              uri: prism.component.node_chip
               projection:
                 on: Node
       relation:

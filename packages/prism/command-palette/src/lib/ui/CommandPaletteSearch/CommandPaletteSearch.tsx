@@ -2,8 +2,7 @@
 
 import {
   CardProjection,
-  ProjectionsProvider,
-  useProjectionMaps,
+  ProjectionLinkProvider,
 } from "@canonical/prism-projections";
 import {
   type ChangeEvent,
@@ -93,7 +92,7 @@ const componentCssClassName = "ds command-palette-search";
  * matches shows one line naming it. Groups follow the ranking: a type's
  * group sits where its best result ranks, under the type's title.
  *
- * The rows render under the site's projection maps with the palette's inert
+ * The rows render under the site's switches with the palette's inert
  * title as their link, since an option is chosen as a whole; the preview
  * renders under the site's own link, so its title links to the home, and
  * following a link in the preview chooses the result as its row does,
@@ -105,7 +104,7 @@ const componentCssClassName = "ds command-palette-search";
  * `import { CommandPaletteSearch } from "../CommandPaletteSearch/index.js";`
  *
  * @implements prism.component.command_palette_search
- * @note Impure: fetches the search through Relay, reads the projection maps
+ * @note Impure: fetches the search through Relay, reads the projection link
  *   and the translator in scope, clicks and scrolls the highlighted
  *   option's element, prevents a pointer's press from moving the focus,
  *   focuses the field after a click in the preview, and tells the palette
@@ -119,7 +118,6 @@ export default function CommandPaletteSearch({
   ...props
 }: CommandPaletteSearchProps): ReactElement {
   const t = useMessages();
-  const maps = useProjectionMaps();
   const listboxId = useId();
   const [text, setText] = useState("");
   const [highlighted, setHighlighted] = useState(0);
@@ -258,7 +256,7 @@ export default function CommandPaletteSearch({
       {/* biome-ignore lint/a11y/noStaticElementInteractions: the body only keeps a pointer's press from taking the focus out of the field; the field is the control and takes the keys. */}
       <div className="body" onMouseDown={handleBodyMouseDown}>
         {listed ? (
-          <ProjectionsProvider LinkComponent={CommandPaletteTitle} maps={maps}>
+          <ProjectionLinkProvider LinkComponent={CommandPaletteTitle}>
             <div
               aria-busy={searched !== text.trim()}
               aria-label={t("search.results")}
@@ -300,7 +298,7 @@ export default function CommandPaletteSearch({
                 );
               })}
             </div>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         ) : (
           <output className="status">
             {searched === ""

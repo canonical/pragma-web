@@ -22,8 +22,8 @@ instances, the results of a search, the entities a passage of prose links
 to) renders them through a **dispatcher**, one per form: `ChipProjection`,
 `RowProjection`, `CardProjection`, `CommandProjection` and
 `GraphNodeProjection` switch on the node's `__typename`: an ontology
-class renders through its own arm, any other type through the arm its
-site maps to the typename. A property is no node, so no dispatcher takes
+class renders through its own arm, any other type through the `Node` arm
+or, when the site gives its switches, the site's switch. A property is no node, so no dispatcher takes
 it. `NodeList` lists any nodes through the card and row
 dispatchers, as the shared list view. Prose links to graph nodes render as
 chips too, through the element overrides a Markdown renderer takes.
@@ -205,7 +205,7 @@ projects `on` its type, and each slot names the field it reads. The
 anatomies suite holds each anatomy's field paths to the compiled
 fragment's.
 
-## Dispatchers and maps
+## Switches and the site's switches
 
 ```tsx
 import { ChipProjection, RowProjection } from "@canonical/prism-projections";
@@ -220,48 +220,39 @@ import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 </ul>
 ```
 
-A dispatcher renders no element of its own: its arm renders the root, and
-every arm of one form renders the same representation, so the
-dispatcher's native props are that root's. The chip takes `children`, the
-mention's text in place of the name.
+A switch renders no element of its own: its arm renders the root, and
+every arm of one form renders the same representation, so the switch's
+native props are that root's. The chip takes `children`, the mention's
+text in place of the name.
 
-A dispatcher reads a composite fragment: the node's typename, each arm's
+A switch reads a composite fragment: the node's typename, each arm's
 fragment spread aliased by the type it projects,
 `...NodeCard_node @alias(as: "Node")` and
 `...OntologyClassCard_node @alias(as: "OntologyClass")`, and the site slot,
-`...SiteCardSlot_node @alias(as: "Site")`. Each form's map holds the
-arms:
+`...SiteCardSlot_node @alias(as: "Site")`. It switches on the typename:
+an ontology class renders through its own arm, any other node through the
+`Node` arm. When the site gives its switches (below), every node renders
+through the site's switch of the form instead, over the site slot's key.
+The package's tests hold each composite's aliases and its switch's
+anatomy cases to one set.
 
-- `Node`: the arm of every type no other arm takes.
-- `types`: one arm per aliased spread besides `Node`, each typed against
-  that alias's key, so a wrong or missing arm does not compile.
-- `siteTypes`: a site's arms for its own types, by typename. Each reads
-  the site slot's key and receives the node's typename beside it
-  (`SiteArmProps`); see "Site arms" below.
-
-A typed arm wins, then a site arm, then the `Node` arm. The package's
-tests hold each composite's aliases, its map's `types` and its
-dispatcher's anatomy cases to one set.
-
-Mount the maps once, inside the router and beside the site's homes, with
-the site's router link adapter:
+Mount `ProjectionLinkProvider` once, inside the router and beside the
+site's homes, with the site's router link adapter and its peek:
 
 ```tsx
 import { HomesProvider } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 
 <HomesProvider homes={homes}>
-  <ProjectionsProvider LinkComponent={RouterLink} maps={defaultProjectionMaps}>
+  <ProjectionLinkProvider LinkComponent={RouterLink} peek={renderPeek}>
     <Outlet />
-  </ProjectionsProvider>
+  </ProjectionLinkProvider>
 </HomesProvider>;
 ```
 
-A site with types of its own extends the defaults, as "Site arms" below
-describes.
+A provider nested in another takes what it is not given from the one
+above, so a surface that renders its homes through another link keeps the
+site's peek and switches.
 
 Every link to a home renders through `LinkComponent`, typed against the
 shared `LinkComponentProps` of `@canonical/react-ds-global` and defaulting
@@ -283,75 +274,49 @@ A node's or a class's home is resolved with its compact address
 (`_meta.curie`) as the `uri` a site's home resolver receives, so one
 entity has one address; a property's with its IRI, its only address.
 
-### A site's own composites
+### A site's own switches
 
-A site arm reads the `Node` key alone, so it can show only what every node
-carries. A site whose types need their own fields writes a composite of its
-own on `Node` and a dispatcher over it: the composite spreads the package's
-dispatcher of that form aliased as `Node`, and each of the site's
-projections aliased by the type it is on, narrowing an interface's
-projection to each type with an aliased inline fragment
-(`... on Component @alias(as: "Component") { ...UIBlockCard_node }`). Its
-map's `Node` arm is the package's dispatcher, so every other node, ontology
-classes included, still dispatches through the maps the site provides, and
-`renderArm` keeps one precedence and one compile-time check for both:
+A site whose types need their own arms writes a switch of its own per
+form: a composite on `Node` that spreads each of its arms aliased by the
+type it is on (narrowing an interface's arm to each type with an aliased
+inline fragment, `... on Component @alias(as: "Component") { ...UIBlockCard_node }`),
+and a component that switches on the typename, with
+`requireArmKey` for each case, and renders every other node through its
+default. The site's own pages render its switches.
 
-```tsx
-import { renderArm } from "@canonical/prism-projections";
+## The site's switches
 
-export default function SiteCardProjection({ node, ...props }) {
-  const data = useFragment(nodeFragment, node);
-  return renderArm(siteProjectionMaps.card, data, props);
-}
-```
-
-A site's own projections read their link through `useProjectionLink` and
-their namespace prefix through `findCuriePrefix`, as the package's do.
-
-## Site arms
-
-A site projects its own types, a metro site's stations or a docsite's
-components, through the site slot every composite spreads:
-`...Site<Form>Slot_node @alias(as: "Site")`, a fragment on `Node`.
-The package ships a default of each, in `src/lib/site/`, that reads the
-typename alone, for a site with no types of its own; the package, the lens
+The lens packages' queries spread the package's switches, so a site whose
+pages render those lenses gives the package its five switches, and a node
+of the site's types reaches the site's arm through the package's switch.
+The seam is the site slot every composite spreads,
+`...Site<Form>Slot_node @alias(as: "Site")`, a fragment on `Node`. The
+package ships a default of each, in `src/lib/site/`, that reads the
+typename alone, for a site that gives no switches; the package, the lens
 packages and any site that compiles the package's documents compile it.
-The slot's names are the package's: a site's own composite, for a
-dispatcher the site renders itself, takes a name of its own, need not
-spread the slot, and then arms no type under `siteTypes`; a map that does
-over a composite with no slot throws on the first such node.
 
-A site with types of its own takes three steps: it compiles the
-package's documents against its own schema, excluding `src/lib/site/`
-from its compile; it defines the five fragments itself; and it makes its
-bundler run the package's dispatchers on its own compile, as the last
-paragraph of this section describes. Each fragment spreads its arms'
-fragments aliased by the type they are on:
+A site that gives its switches compiles the package's documents against
+its own schema, excluding `src/lib/site/` from its compile, and defines
+the five slots itself, each spreading its switch's fragment, with a
+component that hands the slot's data to the switch:
 
-```graphql
+```tsx
 fragment SiteCardSlot_node on Node {
-  __typename
-  ...StationCard_node @alias(as: "Station")
-  ...LineCard_node @alias(as: "Line")
+  ...MetroCardProjection_node
+}
+
+export default function SiteCardSlot({ node, ...props }) {
+  return <MetroCardProjection {...props} node={useFragment(nodeFragment, node)} />;
 }
 ```
 
-The component that defines that fragment is the site's dispatcher for the
-form: it reads the slot's key, switches on the typename it receives, and
-renders the arm over that type's aliased key. The site lists it in its
-maps under `siteTypes`, once per typename it arms:
+It gives the five slot components to the provider as `site`
+(`{ chip, row, card, command, graphNode }`, typed `SiteSwitches`). Its
+switches' defaults take the package's arms directly (the `Node` arm and
+the ontology class's): a site switch whose fragment spread the package's
+switch would make a fragment cycle through the slot.
 
-```tsx
-const maps: ProjectionMaps = {
-  ...defaultProjectionMaps,
-  card: {
-    ...defaultProjectionMaps.card,
-    siteTypes: { Station: SiteCardSlot, Line: SiteCardSlot },
-  },
-};
-```
-
-The package's dispatchers import the composites' artifacts their own
+The package's switches import the composites' artifacts their own
 compile writes, which spread the default slots. A site that defines the
 slots must therefore configure its bundler to resolve the package's
 artifact imports, `…/__generated__/<Name>.graphql.js` from any package
@@ -448,10 +413,9 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - List renderers: `useListRenderers` (the table and the cards, the list
   renderers a site gives its indexes), `ENTITY_LIST_RENDERERS`,
   `DEFAULT_ENTITY_LIST_RENDERER`.
-- Maps: `ProjectionsProvider`, `useProjectionMaps`, `useProjectionLink`,
-  `renderArm`, `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
-  `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,
-  `SiteArmProps`.
+- Site: `ProjectionLinkProvider` (the link, the peek and the site's
+  switches), `useProjectionLink`; types `ProjectionLinkProviderProps`,
+  `SiteSwitches`.
 - Prose: `markdownComponents`, `ProseReferencesProvider`; types
   `ProseLinkProps`, `ProseReferencesProviderProps`.
 - Addresses: `findCuriePrefix`; `AmbientNamespaceProvider`, which

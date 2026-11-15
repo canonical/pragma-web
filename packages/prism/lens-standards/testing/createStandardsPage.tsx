@@ -6,8 +6,7 @@ import {
   usePageRenderers,
 } from "@canonical/prism-core";
 import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
+  ProjectionLinkProvider,
   useListRenderers,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
@@ -45,7 +44,7 @@ const formatDocumentTitle = (title: string): string => `${title} — Docs`;
  * cold store), and a static router over the lens's own two routes at `url`,
  * because the index's links, the breadcrumb and the trail render router
  * `Link`s whose hrefs come from the `standards` and `standardEntity` codecs.
- * The homes and the default projection maps sit inside the router, because
+ * The homes and the projection link provider sit inside the router, because
  * a mention in a standard's prose renders as a chip that links to its home
  * through it, and the site's renderers over a provider that serves source.
  *
@@ -68,9 +67,9 @@ export default function createStandardsPage(
       >
         <RouterProvider router={createStaticRouter(routes, url)}>
           <HomesProvider homes={HOMES}>
-            <ProjectionsProvider maps={defaultProjectionMaps}>
+            <ProjectionLinkProvider>
               <SiteRenderers>{page}</SiteRenderers>
-            </ProjectionsProvider>
+            </ProjectionLinkProvider>
           </HomesProvider>
         </RouterProvider>
       </RelayEnvironmentProvider>

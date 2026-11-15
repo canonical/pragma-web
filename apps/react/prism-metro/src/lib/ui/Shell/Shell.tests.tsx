@@ -2,8 +2,8 @@
 
 import { createEnvironment, useHome } from "@canonical/prism-core";
 import {
+  type ProjectionLinkProviderProps,
   useForeignPrefix,
-  useProjectionMaps,
   useProjectionPeek,
 } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
@@ -15,15 +15,32 @@ import {
 import { render, screen } from "@testing-library/react";
 import { isValidElement, type ReactElement } from "react";
 import { useRelayEnvironment } from "react-relay";
-import { describe, expect, it } from "vitest";
-import { metroProjectionMaps } from "#domains/metro";
+import { describe, expect, it, vi } from "vitest";
 import {
   CIRCLE_LINE_CURIE,
   NORTHGATE_CURIE,
   STATION_CLASS_CURIE,
 } from "../../../../testing/fixtures.js";
 import { MetroPeek } from "../MetroPeek/index.js";
+import { SITE_SWITCHES } from "./constants.js";
 import Shell from "./Shell.js";
+
+/** The site switches the Shell last gave its projection link provider. */
+const provided = vi.hoisted(() => ({ site: undefined as unknown }));
+
+// Record the switches the Shell hands the provider, which keeps them in a
+// context only the package reads.
+vi.mock("@canonical/prism-projections", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@canonical/prism-projections")>();
+  return {
+    ...actual,
+    ProjectionLinkProvider: (props: ProjectionLinkProviderProps) => {
+      provided.site = props.site;
+      return actual.ProjectionLinkProvider(props);
+    },
+  };
+});
 
 // The nest only provides the environment; nothing here queries, so a fetch
 // that never settles stands in for the network.
@@ -40,7 +57,6 @@ function Probe(): ReactElement {
     __typename: "OntologyClass",
     uri: STATION_CLASS_CURIE,
   });
-  const maps = useProjectionMaps();
   const peek = useProjectionPeek("https://metro.example/onto#northgate");
   const ownPrefix = useForeignPrefix(NORTHGATE_CURIE);
   const foreignPrefix = useForeignPrefix("geo:Place");
@@ -52,7 +68,6 @@ function Probe(): ReactElement {
       <p>Station home: {stationHome}</p>
       <p>Line home: {lineHome}</p>
       <p>Class home: {classHome}</p>
-      <p>{maps === metroProjectionMaps ? "Metro maps" : "Other maps"}</p>
       <p>
         Peek:{" "}
         {isValidElement(peek) && peek.type === MetroPeek
@@ -131,9 +146,10 @@ describe("Shell", () => {
     ).toBeInTheDocument();
   });
 
-  it("provides the site's projection maps", async () => {
+  it("gives the package's switches the site's five switches", async () => {
     renderShell();
-    expect(await screen.findByText("Metro maps")).toBeInTheDocument();
+    await screen.findByText("Probe content");
+    expect(provided.site).toBe(SITE_SWITCHES);
   });
 
   it("gives every chip the site's peek, MetroPeek", async () => {

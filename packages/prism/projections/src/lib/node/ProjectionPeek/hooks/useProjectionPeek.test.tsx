@@ -1,8 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import ProjectionsProvider from "../../../projections/Provider.js";
-import { defaultProjectionMaps } from "../../constants.js";
+import ProjectionLinkProvider from "../../../projections/ProjectionLinkProvider.js";
 import ProjectionPeek from "../ProjectionPeek.js";
 import useProjectionPeek from "./useProjectionPeek.js";
 
@@ -17,9 +16,9 @@ const sitePeek = (uri: string): ReactElement => (
 describe("useProjectionPeek", () => {
   it("returns the site's peek for the IRI when the provider carries one", () => {
     const wrapper = ({ children }: { readonly children: ReactNode }) => (
-      <ProjectionsProvider maps={defaultProjectionMaps} peek={sitePeek}>
+      <ProjectionLinkProvider peek={sitePeek}>
         {children}
-      </ProjectionsProvider>
+      </ProjectionLinkProvider>
     );
     const peek = renderHook(() => useProjectionPeek(NODE_IRI), { wrapper })
       .result.current;
@@ -31,9 +30,7 @@ describe("useProjectionPeek", () => {
 
   it("returns the package's ProjectionPeek at the IRI when the site gives none", () => {
     const wrapper = ({ children }: { readonly children: ReactNode }) => (
-      <ProjectionsProvider maps={defaultProjectionMaps}>
-        {children}
-      </ProjectionsProvider>
+      <ProjectionLinkProvider>{children}</ProjectionLinkProvider>
     );
     const peek = renderHook(() => useProjectionPeek(NODE_IRI), { wrapper })
       .result.current;
@@ -41,14 +38,14 @@ describe("useProjectionPeek", () => {
     expect(isValidElement(peek) && peek.props).toEqual({ uri: NODE_IRI });
   });
 
-  it("throws when no ProjectionsProvider is mounted above", () => {
+  it("throws when no ProjectionLinkProvider is mounted above", () => {
     // React reports the render error before rethrowing; keep the output clean.
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
     try {
       expect(() => renderHook(() => useProjectionPeek(NODE_IRI))).toThrow(
-        "useProjectionPeek: no ProjectionsProvider above",
+        "useProjectionPeek: no ProjectionLinkProvider above",
       );
     } finally {
       consoleError.mockRestore();

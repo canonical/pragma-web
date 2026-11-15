@@ -21,14 +21,11 @@ export { default as assertStylesheets } from "./assertStylesheets.js";
 export { default as assertStylesMatchAnatomy } from "./assertStylesMatchAnatomy.js";
 export { default as expectSlotOrder } from "./expectSlotOrder.js";
 export { default as expectSwitchCoverage } from "./expectSwitchCoverage.js";
-export { default as guardTypedArms } from "./guardTypedArms.js";
 export { default as listAnatomyFolders } from "./listAnatomyFolders.js";
 export type {
   AssertScaffoldOptions,
   AssertStylesheetsOptions,
   ExpectSlotOrderOptions,
-  GuardableMap,
-  GuardableMaps,
   SwitchCoverageOptions,
   SwitchFragment,
   SwitchSelection,

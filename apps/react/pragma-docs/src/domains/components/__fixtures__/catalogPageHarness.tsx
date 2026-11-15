@@ -2,7 +2,7 @@
  * Shared harness for the catalog's warm-store tests: the REAL
  * `ComponentsCatalogPage` under the real provider stack — Relay
  * environment (seeded or cold), `HeadProvider`, a static router over the
- * REAL app routes, and the site's homes and projection maps, because the
+ * REAL app routes, and the site's homes and projection link provider, because the
  * catalog's cards and rows link through hrefs that must come from the
  * actual `componentEntity` codec.
  *
@@ -16,10 +16,7 @@ import {
   HomesProvider,
   RouterLink,
 } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
@@ -66,14 +63,11 @@ export const catalogPage = (
     >
       <RouterProvider router={router}>
         <HomesProvider homes={homes}>
-          <ProjectionsProvider
-            LinkComponent={RouterLink}
-            maps={defaultProjectionMaps}
-          >
+          <ProjectionLinkProvider LinkComponent={RouterLink}>
             <SiteRenderers>
               <ComponentsCatalogPage />
             </SiteRenderers>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

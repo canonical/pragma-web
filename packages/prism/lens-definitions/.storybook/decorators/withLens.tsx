@@ -1,8 +1,5 @@
 import { createEnvironment, HomesProvider } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ElementType } from "react";
@@ -25,7 +22,7 @@ interface LensSetup {
  * mounts the lens in: a Relay environment over a captured store, whose
  * network never answers, so the story shows what the store holds and
  * nothing else; a router over the lens's two routes, in memory at `url`;
- * the homes and projection maps the inspector's instance chips read; and
+ * the homes and projection link provider the inspector's instance chips read; and
  * the lens's shared state.
  *
  * @example
@@ -48,11 +45,11 @@ const withLens =
         })}
       >
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider maps={defaultProjectionMaps}>
+          <ProjectionLinkProvider>
             <LensFilterProvider>
               <Story />
             </LensFilterProvider>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

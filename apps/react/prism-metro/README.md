@@ -122,15 +122,17 @@ A value the graph does not assert leaves its slot, its pair or its vital
 out. A station, an interchange and a line link to their page; a fare zone
 has no home on the site, so its name reads as inert text.
 
-The package's dispatchers render them through the site slot every
-composite spreads, `...Site<Form>Slot_node @alias(as: "Site")`. The
-app defines the five slots itself, `SiteChipSlot` to
-`SiteGraphNodeSlot` in `src/domains/metro/lib/`, each spreading its
-form's four arms aliased by their type and rendering the one the node's
-typename selects; `relay.config.json` leaves the package's default slots
-out of the app's compile. `metroProjectionMaps`, exported from
-`#domains/metro`, lists each slot under its form's `siteTypes` for the four
-metro types and keeps the package's arms for every other type.
+The site's own switches, `MetroChipProjection` to
+`MetroGraphNodeProjection` in `src/lib/ui/`, case each metro type and the
+ontology class through its arm and render every other node through the
+package's `Node` arm. The package's switches, which the lenses' queries
+spread, reach them through the site slot every composite spreads,
+`...Site<Form>Slot_node @alias(as: "Site")`. The app defines the five slots
+itself, `SiteChipSlot` to `SiteGraphNodeSlot` in `src/lib/ui/`, each
+spreading its form's metro switch and handing it the node;
+`relay.config.json` leaves the package's default slots out of the app's
+compile, and the `Shell` gives the five slots to `ProjectionLinkProvider`
+as the site's switches (`SITE_SWITCHES`).
 
 The packages run on the app's own Relay compile: a Vite plugin,
 `src/relay/redirectPackageArtifacts.ts`, resolves each artifact a lens or

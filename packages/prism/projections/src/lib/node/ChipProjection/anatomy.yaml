@@ -6,13 +6,11 @@
 # It renders no element of its own: the case its node's type selects
 # renders the root. The switch is explicit: each ontology type that
 # implements Node (ONTOLOGY_TYPES: OntologyClass) is a case of its own,
-# read through its aliased spread; every other type falls to the default,
-# the map's arms, and then the Node projection, from what every node
-# carries. OntologyProperty implements no Node, so no case names it.
+# read through its aliased spread; every other type falls to the default, the
+# Node projection, from what every node carries. OntologyProperty implements no Node, so no case names it.
 # `linked` reaches the case's arm with every other native prop.
-# A site's own types read through the site slot, the site's own compile
-# of `SiteChipSlot_node`, for the typenames its map lists under
-# `siteTypes`.
+# A site that gives its switches takes every node: its switch reads the
+# site slot, the site's own compile of `SiteChipSlot_node`.
 node:
   uri: prism.component.chip_projection
   projection:

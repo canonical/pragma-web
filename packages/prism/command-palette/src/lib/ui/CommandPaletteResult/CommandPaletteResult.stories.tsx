@@ -1,9 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import {
   type RelayParameters,
   withRelayEnvironment,
@@ -57,14 +54,11 @@ const CommandPaletteResultOverNode = (
  * title as the rows' link, so a result reads as it does in the palette.
  */
 const withListbox = (Story: ElementType): ReactElement => (
-  <ProjectionsProvider
-    LinkComponent={CommandPaletteTitle}
-    maps={defaultProjectionMaps}
-  >
+  <ProjectionLinkProvider LinkComponent={CommandPaletteTitle}>
     <div aria-label="Results" role="listbox">
       <Story />
     </div>
-  </ProjectionsProvider>
+  </ProjectionLinkProvider>
 );
 
 /** The story's mock environment, answering `entity` as the Node. */

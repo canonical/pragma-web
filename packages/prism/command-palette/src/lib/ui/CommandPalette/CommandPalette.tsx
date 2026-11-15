@@ -51,7 +51,7 @@ const componentCssClassName = "ds command-palette";
  *
  * Mount it once, inside the site's providers: the Relay environment, whose
  * provider serves the search extension; the router; the homes; and the
- * projection maps.
+ * projection link provider.
  *
  * Native props reach the `<dialog>` root; a consumer `className` merges
  * after the palette's own.

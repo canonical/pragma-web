@@ -6,10 +6,7 @@ import {
   RouterLink,
   StoredThemeProvider,
 } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
@@ -39,7 +36,7 @@ const renderPeek = (uri: string): ReactElement => <DocsPeek uri={uri} />;
  * the router's `Outlet`, with the document-title template and the theme
  * the reader's cookie stores, which the theme control shows on the server
  * as on the client. Inside the
- * router sit the site's homes and the projection maps, so every mention of
+ * router sit the site's homes and the projection link provider, so every mention of
  * a graph node renders through its type's arm and links to the page that
  * owns it, through the router so the link navigates on the client.
  *
@@ -76,9 +73,8 @@ export default function Shell<
         <RelayEnvironmentProvider environment={environment}>
           <RouterProvider router={router}>
             <HomesProvider homes={homes}>
-              <ProjectionsProvider
+              <ProjectionLinkProvider
                 LinkComponent={RouterLink}
-                maps={defaultProjectionMaps}
                 peek={renderPeek}
               >
                 <SiteRenderers>
@@ -100,7 +96,7 @@ export default function Shell<
                     <CommandPalette />
                   </div>
                 </SiteRenderers>
-              </ProjectionsProvider>
+              </ProjectionLinkProvider>
             </HomesProvider>
           </RouterProvider>
         </RelayEnvironmentProvider>

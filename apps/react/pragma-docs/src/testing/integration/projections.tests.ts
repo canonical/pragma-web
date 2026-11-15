@@ -10,8 +10,11 @@ import {
 } from "@canonical/prism-core/testing";
 import type { ReaderFragment, ReaderSelection } from "relay-runtime";
 import { describe, expect, it } from "vitest";
-import { siteProjectionMaps } from "../../lib/ui/constants.js";
-import type { SiteProjectionMaps } from "../../lib/ui/types.js";
+import { DOCS_CARD_TYPES } from "../../lib/ui/DocsCardProjection/constants.js";
+import { DOCS_CHIP_TYPES } from "../../lib/ui/DocsChipProjection/constants.js";
+import { DOCS_COMMAND_TYPES } from "../../lib/ui/DocsCommandProjection/constants.js";
+import { DOCS_GRAPH_NODE_TYPES } from "../../lib/ui/DocsGraphNodeProjection/constants.js";
+import { DOCS_ROW_TYPES } from "../../lib/ui/DocsRowProjection/constants.js";
 
 /** The app's root, three levels up from this file. */
 const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
@@ -158,16 +161,16 @@ function readCompositeArms(
   );
 }
 
-/** The site's dispatcher of each form, by the form's key in its maps. */
-const SITE_DISPATCHERS: readonly (readonly [
-  keyof SiteProjectionMaps,
+/** The site's switch of each form, by the form's word, with its cases. */
+const SITE_SWITCHES: readonly (readonly [
   string,
+  Readonly<Record<string, true>>,
 ])[] = [
-  ["chip", "Chip"],
-  ["row", "Row"],
-  ["card", "Card"],
-  ["command", "Command"],
-  ["graphNode", "GraphNode"],
+  ["Chip", DOCS_CHIP_TYPES],
+  ["Row", DOCS_ROW_TYPES],
+  ["Card", DOCS_CARD_TYPES],
+  ["Command", DOCS_COMMAND_TYPES],
+  ["GraphNode", DOCS_GRAPH_NODE_TYPES],
 ];
 
 /** The app's component folders, with their private subcomponents. */
@@ -216,11 +219,6 @@ describe("the app's projections", () => {
       "ModifierFamilyRow",
       "ModifierGraphNode",
       "ModifierRow",
-      "SiteCardProjection",
-      "SiteChipProjection",
-      "SiteCommandProjection",
-      "SiteGraphNodeProjection",
-      "SiteRowProjection",
       "UIBlockCard",
       "UIBlockChip",
       "UIBlockCommand",
@@ -243,23 +241,20 @@ describe("the app's projections", () => {
 });
 
 describe("the site's composites", () => {
-  it.each(
-    ["Site", "Docs"].flatMap((site) =>
-      SITE_DISPATCHERS.map(([form, word]) => [site, form, word] as const),
-    ),
-  )(
-    "the %s %s composite arms exactly what its map and its anatomy arm",
-    (site, form, word) => {
-      const name = `${site}${word}Projection`;
+  it.each(SITE_SWITCHES)(
+    "the Docs %s composite arms exactly what its cases and its anatomy arm",
+    (word, types) => {
+      const name = `Docs${word}Projection`;
       const arms = readCompositeArms(
         readNodeFragment(join(APP_ROOT, "src", "lib", "ui", name)),
       );
       expect(arms.get("Node")).toEqual([`${word}Projection_node`]);
-      const types = siteProjectionMaps[form].types;
       const typed = [...arms.keys()].filter((alias) => alias !== "Node");
       expect(typed.sort()).toEqual(Object.keys(types).sort());
-      for (const [alias, Arm] of Object.entries(types)) {
-        expect(arms.get(alias), alias).toEqual([`${Arm.name}_node`]);
+      for (const alias of typed) {
+        expect(arms.get(alias), alias).toEqual([
+          expect.stringMatching(new RegExp(`${word}_node$`)),
+        ]);
       }
       const { root } = assertAnatomy(join(APP_ROOT, "src", "lib", "ui", name));
       const cases = (root.edges ?? []).flatMap(({ target }) =>

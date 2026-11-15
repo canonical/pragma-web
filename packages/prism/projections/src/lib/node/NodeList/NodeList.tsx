@@ -32,7 +32,7 @@ const componentCssClassName = "ds node-list";
  * An index of graph nodes as the shared list view: `EntityList` with each
  * node as an item, a row through `RowProjection` in the `table` renderer
  * and a card through `CardProjection` in the `cards` renderer, so each node
- * reads through the arm its site maps to its type.
+ * reads through the arm of its type.
  *
  * It keeps no renderer of its own: the lens reads it from the page's
  * address and passes its name as `renderer`. The empty line is the lens's

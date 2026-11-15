@@ -2,7 +2,7 @@
  * Shared harness for the Home lobby's warm-store tests: the REAL page
  * under the real provider stack — Relay environment (seeded or cold),
  * `HeadProvider`, a static router over the REAL app routes at `/`, and the
- * site's homes and projection maps, because the exemplar chips and every
+ * site's homes and projection link provider, because the exemplar chips and every
  * door link through hrefs that must come from the actual route codecs (an
  * exemplar's chip round-trips the `componentEntity` codec through its
  * home).
@@ -17,10 +17,7 @@ import {
   HomesProvider,
   RouterLink,
 } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
@@ -71,12 +68,9 @@ export const lobbyPage = (
         })}
       >
         <HomesProvider homes={homes}>
-          <ProjectionsProvider
-            LinkComponent={RouterLink}
-            maps={defaultProjectionMaps}
-          >
+          <ProjectionLinkProvider LinkComponent={RouterLink}>
             <HomePage />
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

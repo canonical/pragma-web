@@ -1,11 +1,10 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { RouterLink } from "@canonical/prism-core";
-import { expectSlotOrder, guardTypedArms } from "@canonical/prism-core/testing";
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import {
   AmbientNamespaceProvider,
-  defaultProjectionMaps,
-  ProjectionsProvider,
+  ProjectionLinkProvider,
 } from "@canonical/prism-projections";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
@@ -86,13 +85,9 @@ const withRecordingPeek = (
   peek: (uri: string) => ReactNode,
   children: ReactElement,
 ): ReactElement => (
-  <ProjectionsProvider
-    LinkComponent={RouterLink}
-    maps={guardTypedArms(defaultProjectionMaps)}
-    peek={peek}
-  >
+  <ProjectionLinkProvider LinkComponent={RouterLink} peek={peek}>
     {children}
-  </ProjectionsProvider>
+  </ProjectionLinkProvider>
 );
 
 describe("LineChip", () => {

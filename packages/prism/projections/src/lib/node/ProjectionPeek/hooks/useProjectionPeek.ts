@@ -5,7 +5,7 @@ import type { UseProjectionPeekResult } from "./types.js";
 
 /**
  * Return the peek a chip arm hands its chip for the node at `uri`: the
- * site's own peek when the nearest `ProjectionsProvider` carries one, the
+ * site's own peek when the nearest `ProjectionLinkProvider` carries one, the
  * package's `ProjectionPeek` when it does not. An arm therefore imports no
  * peek of its site, so no arm depends on the switch its site's peek
  * renders.
@@ -18,7 +18,7 @@ import type { UseProjectionPeekResult } from "./types.js";
  * @param uri - The node's absolute IRI (`Node.uri`), the only address
  *   `node(id:)` accepts.
  * @returns The peek element, mounted by the chip only while it is open.
- * @throws When no `ProjectionsProvider` is mounted above: that is a wiring
+ * @throws When no `ProjectionLinkProvider` is mounted above: that is a wiring
  *   bug, not a site without peeks.
  * @note Impure: reads the projection provider in scope.
  */
@@ -27,7 +27,7 @@ export default function useProjectionPeek(
 ): UseProjectionPeekResult {
   const projections = useContext(ProjectionsContext);
   if (projections === undefined) {
-    throw new Error("useProjectionPeek: no ProjectionsProvider above");
+    throw new Error("useProjectionPeek: no ProjectionLinkProvider above");
   }
   return projections.peek === undefined
     ? createElement(ProjectionPeek, { uri })

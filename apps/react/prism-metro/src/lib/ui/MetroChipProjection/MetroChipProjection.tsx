@@ -1,6 +1,10 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { ChipProjection, requireArmKey } from "@canonical/prism-projections";
+import {
+  NodeChip,
+  OntologyClassChip,
+  requireArmKey,
+} from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import {
@@ -21,14 +25,17 @@ import type { MetroChipProjectionProps } from "./types.js";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields MetroChipProjection reads from the Node it dispatches: its
- * typename; the package's chip switch, spread aliased as `Node`, for
- * every type the site does not project itself; and the arm of each metro
- * type, aliased by the type it is on.
+ * typename; the package's `Node` arm, spread aliased as `Node`, for every
+ * type no other arm takes; and the arm of each metro type and of the
+ * ontology class, aliased by the type it is on. It spreads the package's
+ * arms, not its switch: the package's switch reaches this one through
+ * the site slot, so spreading it here would make a fragment cycle.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment MetroChipProjection_node on Node {
     __typename
-    ...ChipProjection_node @alias(as: "Node")
+    ...NodeChip_node @alias(as: "Node")
+    ...OntologyClassChip_node @alias(as: "OntologyClass")
     ...StationChip_node @alias(as: "Station")
     ...InterchangeChip_node @alias(as: "Interchange")
     ...LineChip_node @alias(as: "Line")
@@ -46,9 +53,9 @@ void declareNodeFragment;
  * Any graph node as the inline mention on this site, dispatched on its type by an
  * explicit switch, the cases being `METRO_CHIP_TYPES`: a station, an
  * interchange, a line, a fare zone, a rolling stock, a formation, a unit or
- * a car type renders through its own arm; every other node through the
- * package's `ChipProjection`, which renders an ontology class through its
- * own arm and any other node through its `Node` arm.
+ * a car type renders through its own arm; an ontology
+ * class through the package's class arm; every other node through the
+ * package's `Node` arm, `NodeChip`.
  *
  * It renders no element of its own: the arm renders the root, a `<span>`,
  * and every native prop reaches it.
@@ -111,7 +118,14 @@ export default function MetroChipProjection({
           node={requireArmKey(data.CarType, data.__typename)}
         />
       );
+    case "OntologyClass":
+      return (
+        <OntologyClassChip
+          {...props}
+          node={requireArmKey(data.OntologyClass, data.__typename)}
+        />
+      );
     default:
-      return <ChipProjection {...props} node={data.Node} />;
+      return <NodeChip {...props} node={data.Node} />;
   }
 }

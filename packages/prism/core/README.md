@@ -167,11 +167,8 @@ components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
 `expectSlotOrder` (an identity's slots in the shared order, its required
 slots present) and `expectSwitchCoverage` (a switch over a node's typename
 names one case per type condition of its compiled fragment, and renders
-one node per condition under a tree whose maps passed through
-`guardTypedArms`, which makes every typed arm in them throw, so a node
-reaches its typed arm only through the switch's own case; the tree passes
-all five forms and hands its provider the object `guardTypedArms`
-returns, and a case whose switch read its form from other maps fails). Its
+one node per condition through the caller, which asserts the case's own
+arm and the absence of the default's). Its
 `testing/browser` subpath
 holds the browser side the apps' layout suites share: `launchBrowser`,
 `measurePage` and `measureLayout`, which read a page's grid, scroll model,
@@ -291,7 +288,7 @@ provider is a wiring bug, not a node without a home.
 A home is an ordinary href, so a component that renders it through a plain
 `<a>` loads the destination as a document. Hand such a component
 `RouterLink` as its `LinkComponent` (for the projections,
-`<ProjectionsProvider LinkComponent={RouterLink}>`) and a plain click on a
+`<ProjectionLinkProvider LinkComponent={RouterLink}>`) and a plain click on a
 path of the site (an href that starts with `/` and that the browser resolves
 to the page's own origin) that a route matches navigates on the client,
 while hovering it warms the destination. Any other href (an absolute or

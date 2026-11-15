@@ -7,7 +7,6 @@ import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree from "../../../../testing/createSiteTree.js";
-import ProvidedMapReader from "../../../../testing/ProvidedMapReader.js";
 import {
   MOCK_CODE_STANDARD,
   MOCK_MODIFIER,
@@ -145,15 +144,8 @@ describe("DocsCardProjection", () => {
       fragment: nodeFragment,
       cases,
       render: (typename, entity) => {
-        // The reader proves the provider holds the guarded maps: the
-        // switch reaches them only in its default, the package's switch.
         const { container, unmount } = renderWithNode(
-          (node) => (
-            <>
-              <ProvidedMapReader form="card" />
-              <DocsCardProjection node={node} />
-            </>
-          ),
+          (node) => <DocsCardProjection node={node} />,
           entity,
         );
         const arms = container.querySelectorAll("[data-type]");

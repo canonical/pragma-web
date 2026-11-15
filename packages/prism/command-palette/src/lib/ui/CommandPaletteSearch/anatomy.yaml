@@ -25,7 +25,7 @@
 # order. The highlighted result is one index over the rows in that order.
 #
 # The rows are the site's command projections, each through the arm its
-# type selects, rendered under the site's projection maps with the
+# type selects, rendered under the site's switches with the
 # palette's inert title (CommandPaletteTitle) as their link: an option is
 # chosen as a whole, so it holds no link of its own
 # (cs:react.component.link_component). The preview renders under the

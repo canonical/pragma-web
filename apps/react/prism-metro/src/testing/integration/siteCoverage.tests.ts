@@ -1,125 +1,85 @@
 // @vitest-environment node
 
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { assertAnatomy } from "@canonical/prism-core/testing";
-import {
-  defaultProjectionMaps,
-  type ProjectionMaps,
-} from "@canonical/prism-projections";
 import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
-import { metroProjectionMaps } from "#domains/metro";
+import cardProjectionNode from "#relay/__generated__/CardProjection_node.graphql.js";
+import chipProjectionNode from "#relay/__generated__/ChipProjection_node.graphql.js";
+import commandProjectionNode from "#relay/__generated__/CommandProjection_node.graphql.js";
+import graphNodeProjectionNode from "#relay/__generated__/GraphNodeProjection_node.graphql.js";
+import rowProjectionNode from "#relay/__generated__/RowProjection_node.graphql.js";
 import siteCardSlotNode from "#relay/__generated__/SiteCardSlot_node.graphql.js";
 import siteChipSlotNode from "#relay/__generated__/SiteChipSlot_node.graphql.js";
 import siteCommandSlotNode from "#relay/__generated__/SiteCommandSlot_node.graphql.js";
 import siteGraphNodeSlotNode from "#relay/__generated__/SiteGraphNodeSlot_node.graphql.js";
 import siteRowSlotNode from "#relay/__generated__/SiteRowSlot_node.graphql.js";
 
-/** Where the metro domain's components live. */
-const METRO_LIBRARY = fileURLToPath(
-  new URL("../../domains/metro/lib", import.meta.url),
-);
-
 /**
- * Each form's map, beside the site slot the app compiles for it, whose
- * name is its site dispatcher's.
+ * Each form's package switch, as the app compiles it, beside the site slot
+ * it spreads and the metro switch that slot hands its node to.
  */
-const SITE_SLOTS: readonly {
-  readonly form: keyof ProjectionMaps;
-  readonly fragment: ReaderFragment;
+const SEAMS: readonly {
+  readonly composite: ReaderFragment;
+  readonly slot: ReaderFragment;
+  readonly metro: string;
 }[] = [
-  { form: "chip", fragment: siteChipSlotNode },
-  { form: "row", fragment: siteRowSlotNode },
-  { form: "card", fragment: siteCardSlotNode },
-  { form: "command", fragment: siteCommandSlotNode },
-  { form: "graphNode", fragment: siteGraphNodeSlotNode },
+  {
+    composite: chipProjectionNode,
+    slot: siteChipSlotNode,
+    metro: "MetroChipProjection_node",
+  },
+  {
+    composite: rowProjectionNode,
+    slot: siteRowSlotNode,
+    metro: "MetroRowProjection_node",
+  },
+  {
+    composite: cardProjectionNode,
+    slot: siteCardSlotNode,
+    metro: "MetroCardProjection_node",
+  },
+  {
+    composite: commandProjectionNode,
+    slot: siteCommandSlotNode,
+    metro: "MetroCommandProjection_node",
+  },
+  {
+    composite: graphNodeProjectionNode,
+    slot: siteGraphNodeSlotNode,
+    metro: "MetroGraphNodeProjection_node",
+  },
 ];
 
 /**
- * List the aliases and types of the arms a site slot spreads at its top
- * level. relay-runtime's reader types predate the aliased spread, so it is
- * read by its shape.
+ * List the fragments a selection set spreads, through the inline fragments
+ * an aliased spread compiles to. relay-runtime's reader types predate the
+ * aliased spread, so each selection is read by its shape.
  */
-function listArms(
-  fragment: ReaderFragment,
-): { readonly alias: string; readonly type: string }[] {
-  return fragment.selections.flatMap((selection) => {
-    const aliased = selection as {
+function listSpreads(selections: readonly unknown[]): string[] {
+  return selections.flatMap((selection) => {
+    const read = selection as {
       readonly kind: string;
       readonly name?: string;
-      readonly fragment?: { readonly type: string };
+      readonly selections?: readonly unknown[];
+      readonly fragment?: { readonly selections: readonly unknown[] };
     };
-    return aliased.kind === "AliasedInlineFragmentSpread" &&
-      aliased.name !== undefined &&
-      aliased.fragment !== undefined
-      ? [{ alias: aliased.name, type: aliased.fragment.type }]
-      : [];
+    if (read.kind === "FragmentSpread" && read.name !== undefined) {
+      return [read.name];
+    }
+    return listSpreads(read.fragment?.selections ?? read.selections ?? []);
   });
 }
 
-/** List the types a site dispatcher's anatomy narrows its cases to. */
-function listCaseTypes(dispatcher: string): string[] {
-  return (
-    assertAnatomy(join(METRO_LIBRARY, dispatcher)).root.edges ?? []
-  ).flatMap(({ target }) =>
-    "cases" in target
-      ? target.cases.flatMap(({ node }) =>
-          node.projection?.on === undefined ? [] : [node.projection.on],
-        )
-      : [],
-  );
-}
-
-describe("each form's site slot", () => {
-  for (const { form, fragment } of SITE_SLOTS) {
-    describe(fragment.name, () => {
-      const arms = listArms(fragment);
-      const siteTypes = metroProjectionMaps[form].siteTypes ?? {};
-      const dispatcher = fragment.name.replace(/_node$/, "");
-
-      it("spreads every arm aliased by the type it is on, on Node", () => {
-        expect(fragment.type).toBe("Node");
-        expect(arms).not.toHaveLength(0);
-        for (const { alias, type } of arms) {
-          expect(alias).toBe(type);
-        }
+describe("the seam from the package's switches to the site's", () => {
+  for (const { composite, slot, metro } of SEAMS) {
+    describe(slot.name, () => {
+      it(`is spread by the app's compile of ${composite.name}`, () => {
+        expect(listSpreads(composite.selections)).toContain(slot.name);
       });
 
-      it(`arms exactly the types the ${form} map lists under siteTypes`, () => {
-        expect(arms.map(({ alias }) => alias).sort()).toEqual(
-          Object.keys(siteTypes).sort(),
-        );
-      });
-
-      it("arms exactly the cases its dispatcher's anatomy switches on", () => {
-        expect(arms.map(({ type }) => type).sort()).toEqual(
-          listCaseTypes(dispatcher).sort(),
-        );
-      });
-
-      it(`renders every site type through ${dispatcher}`, () => {
-        for (const arm of Object.values(siteTypes)) {
-          expect(arm.name).toBe(dispatcher);
-        }
-      });
-
-      it("keeps the package's Node arm and typed arms", () => {
-        expect(metroProjectionMaps[form].Node).toBe(
-          defaultProjectionMaps[form].Node,
-        );
-        expect(metroProjectionMaps[form].types).toBe(
-          defaultProjectionMaps[form].types,
-        );
+      it(`spreads ${metro} alone, the site's switch of its form`, () => {
+        expect(slot.type).toBe("Node");
+        expect(listSpreads(slot.selections)).toEqual([metro]);
       });
     });
   }
-});
-
-describe("the list view's two site slots", () => {
-  it("arm the same types, so a list's cards and rows project each node alike", () => {
-    expect(Object.keys(metroProjectionMaps.row.siteTypes ?? {}).sort()).toEqual(
-      Object.keys(metroProjectionMaps.card.siteTypes ?? {}).sort(),
-    );
-  });
 });

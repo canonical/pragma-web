@@ -72,7 +72,7 @@ function resolveRouteIntent(
 
 /**
  * The router's link renderer for components that hand it an `href`, such
- * as the entity projections through `ProjectionsProvider`. It renders the
+ * as the entity projections through `ProjectionLinkProvider`. It renders the
  * anchor its caller asked for, the same markup on the server and the
  * client, and resolves the href against the route table only when the
  * reader acts on it: a plain click on a path of this site (an href that

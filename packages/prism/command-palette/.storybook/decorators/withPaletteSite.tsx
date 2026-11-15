@@ -1,8 +1,5 @@
 import { HomesProvider, RouterLink } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { RouterProvider } from "@canonical/router-react";
 import type { ElementType, ReactElement } from "react";
 import createSiteRouter from "../../testing/createSiteRouter.js";
@@ -37,14 +34,11 @@ const withPaletteSite =
   (Story: ElementType): ReactElement => (
     <RouterProvider router={createSiteRouter()}>
       <HomesProvider homes={HOMES}>
-        <ProjectionsProvider
-          LinkComponent={RouterLink}
-          maps={defaultProjectionMaps}
-        >
+        <ProjectionLinkProvider LinkComponent={RouterLink}>
           <div style={{ container: "shell / inline-size", inlineSize }}>
             <Story />
           </div>
-        </ProjectionsProvider>
+        </ProjectionLinkProvider>
       </HomesProvider>
     </RouterProvider>
   );

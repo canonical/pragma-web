@@ -13,9 +13,8 @@ import testQuery, {
 } from "../../../__generated__/NodeChipTestQuery.graphql.js";
 import {
   AmbientNamespaceProvider,
-  ProjectionsProvider,
+  ProjectionLinkProvider,
 } from "../../projections/index.js";
-import { defaultProjectionMaps } from "../constants.js";
 import NodeChip from "./NodeChip.js";
 import type { NodeChipProps } from "./types.js";
 
@@ -144,9 +143,9 @@ describe("NodeChip", () => {
     };
     renderWithNode(
       (node) => (
-        <ProjectionsProvider maps={defaultProjectionMaps} peek={sitePeek}>
+        <ProjectionLinkProvider peek={sitePeek}>
           <NodeChip node={node} />
-        </ProjectionsProvider>
+        </ProjectionLinkProvider>
       ),
       {
         __typename: "OntologyClass",

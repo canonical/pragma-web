@@ -3,10 +3,7 @@ import {
   createStaticRouter,
   HomesProvider,
 } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
@@ -20,7 +17,7 @@ import { HOMES } from "./fixtures.js";
  * Mount strip tenants under the providers `DefinitionsLayout` renders them
  * in: a Relay environment over `records` (`undefined`: a cold store), a
  * static router over the lens's two routes at `url`, the homes and
- * projection maps the inspector's instance chips read, and the shared
+ * projection link provider the inspector's instance chips read, and the shared
  * filter.
  *
  * @param url - The URL the static router matches.
@@ -41,9 +38,9 @@ export default function createStripHarness(
     >
       <RouterProvider router={createStaticRouter(definitionsRoutes, url)}>
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider maps={defaultProjectionMaps}>
+          <ProjectionLinkProvider>
             <LensFilterProvider>{children}</LensFilterProvider>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

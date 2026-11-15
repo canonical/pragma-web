@@ -86,7 +86,7 @@ document layout's root.
 
 The lens renders inside the site's provider nest: `HeadProvider`,
 `RelayEnvironmentProvider`, `RouterProvider`, and inside the router
-`HomesProvider`, `ProjectionsProvider`, which the prose's chips read their
+`HomesProvider`, `ProjectionLinkProvider`, which the prose's chips read their
 homes and arms from, and core's `RenderersProvider`, which the reading page's
 renderers resolve against; Turtle is offered only when the site's provider
 serves the source extension. The prose takes its space from the typography layer of

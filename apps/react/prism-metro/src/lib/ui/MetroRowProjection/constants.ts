@@ -1,6 +1,6 @@
 /**
- * The site's own types that `MetroRowProjection` cases, each through its
- * own arm: the cases its coverage test walks, one node per type.
+ * The types that `MetroRowProjection` cases, the site's own and the
+ * ontology class, each through its own arm: the cases its coverage test walks, one node per type.
  */
 export const METRO_ROW_TYPES = {
   Station: true,
@@ -11,4 +11,5 @@ export const METRO_ROW_TYPES = {
   Formation: true,
   Unit: true,
   CarType: true,
+  OntologyClass: true,
 } as const;

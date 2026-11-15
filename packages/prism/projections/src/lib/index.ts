@@ -1,8 +1,8 @@
 /**
  * The Entity projections of a Prism documentation site: generic slotted
  * components for the five forms an entity takes, the projections that fill
- * them from a type's Relay fragment, and the dispatchers that render any
- * graph node through the arm its site maps to the node's type.
+ * them from a type's Relay fragment, and the switches that render any
+ * graph node through the arm of its type.
  *
  * @module
  */
@@ -38,7 +38,6 @@ export {
   CardProjection,
   ChipProjection,
   CommandProjection,
-  defaultProjectionMaps,
   GraphNodeProjection,
   NodeCard,
   NodeChip,
@@ -76,20 +75,14 @@ export {
 } from "./ontology/index.js";
 export type {
   AmbientNamespaceProviderProps,
-  ArmProps,
-  ProjectionArm,
-  ProjectionMap,
-  ProjectionMaps,
-  ProjectionsProviderProps,
-  SiteArmProps,
+  ProjectionLinkProviderProps,
+  SiteSwitches,
 } from "./projections/index.js";
 export {
   AmbientNamespaceProvider,
-  ProjectionsProvider,
-  renderArm,
+  ProjectionLinkProvider,
   useForeignPrefix,
   useProjectionLink,
-  useProjectionMaps,
 } from "./projections/index.js";
 export { useListRenderers } from "./renderers/index.js";
 export type {
