@@ -1,7 +1,14 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { RouterLink } from "@canonical/prism-core";
+import { expectSlotOrder, guardTypedArms } from "@canonical/prism-core/testing";
+import {
+  AmbientNamespaceProvider,
+  defaultProjectionMaps,
+  ProjectionsProvider,
+} from "@canonical/prism-projections";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -71,6 +78,23 @@ const renderWithNode = (
   );
 };
 
+/**
+ * Wrap `children` in a projection provider whose peek records the address
+ * each chip asks it for, and renders that address as a link to look for.
+ */
+const withRecordingPeek = (
+  peek: (uri: string) => ReactNode,
+  children: ReactElement,
+): ReactElement => (
+  <ProjectionsProvider
+    LinkComponent={RouterLink}
+    maps={guardTypedArms(defaultProjectionMaps)}
+    peek={peek}
+  >
+    {children}
+  </ProjectionsProvider>
+);
+
 describe("LineChip", () => {
   it("reads the Line through its fragment", () => {
     const { container } = renderWithNode((node) => <LineChip node={node} />);
@@ -82,61 +106,83 @@ describe("LineChip", () => {
 
   it("links its title to the line's page", () => {
     renderWithNode((node) => <LineChip node={node} />);
-    expect(
-      screen.getByRole("link", { name: "North Line" }).getAttribute("href"),
-    ).toBe("/network/lines/metro%3Anorth-line");
+    const link = screen.getByRole("link", { name: "North Line" });
+    expect(link).toHaveAttribute("href", "/network/lines/metro%3Anorth-line");
+    expect(link).toHaveClass("title");
   });
 
-  it("leads with a swatch of the line's colour, set on its root", () => {
+  it("leads with its mark, then its prefix off the page's namespace", () => {
     const { container } = renderWithNode((node) => <LineChip node={node} />);
-    const chip = container.querySelector(".ds.line-chip");
-    expect(chip?.querySelector(".mark > .swatch")).not.toBeNull();
+    const root = container.querySelector(".ds.line-chip");
     expect(
-      (chip as HTMLElement | null)?.style.getPropertyValue(
-        "--line-chip-swatch-color",
-      ),
+      root
+        ?.querySelector<HTMLElement>(".mark .swatch-mark")
+        ?.style.getPropertyValue("--swatch-mark-colour"),
     ).toBe("#c8102e");
+    expect(root?.querySelector(".mark")).toHaveAttribute("aria-hidden", "true");
+    expect(root?.querySelector(".prefix")?.textContent).toBe("metro:");
+    if (root) expectSlotOrder(root);
   });
 
-  it("paints each line in its own colour", () => {
-    const { container } = renderWithNode((node) => <LineChip node={node} />, {
-      colour: "#f2b705",
+  it("shows no prefix on a page of the metro's own namespace", () => {
+    const { container } = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="metro">
+        <LineChip node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("North Line");
+  });
+
+  it("peeks at the line's absolute IRI, never its CURIE", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    renderWithNode(
+      (node) => withRecordingPeek(peek, <LineChip node={node} />),
+      { uri: "https://metro.example/onto#north-line" },
+    );
+    expect(peek).toHaveBeenCalledWith("https://metro.example/onto#north-line");
+    expect(peek).not.toHaveBeenCalledWith("metro:north-line");
+    act(() => {
+      screen.getByRole("link", { name: "North Line" }).focus();
     });
     expect(
-      container
-        .querySelector<HTMLElement>(".ds.line-chip")
-        ?.style.getPropertyValue("--line-chip-swatch-color"),
-    ).toBe("#f2b705");
+      screen
+        .getByRole("dialog", { hidden: true })
+        .querySelector('a[href="https://metro.example/onto#north-line"]'),
+    ).not.toBeNull();
   });
 
-  it("keeps its name the line's, whatever the colour", () => {
-    const { container } = renderWithNode((node) => <LineChip node={node} />);
-    expect(container.querySelector(".mark")).toHaveAttribute(
-      "aria-hidden",
-      "true",
+  it("sets its title as inert text with no peek when unlinked", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    const { container } = renderWithNode((node) =>
+      withRecordingPeek(peek, <LineChip linked={false} node={node} />),
     );
-    expect(screen.getByRole("link").textContent).toBe("North Line");
+    expect(screen.queryByRole("link")).toBeNull();
+    const title = container.querySelector(".title");
+    expect(title?.tagName).toBe("SPAN");
+    expect(title?.textContent).toBe("North Line");
+    if (title) fireEvent.focus(title);
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
 
-  it("keeps a consumer's style beside the line's colour", () => {
-    const { container } = renderWithNode((node) => (
-      <LineChip node={node} style={{ marginInline: "0" }} />
-    ));
-    const chip = container.querySelector<HTMLElement>(".ds.line-chip");
-    expect(chip?.style.marginInline).toBe("0px");
-    expect(chip?.style.getPropertyValue("--line-chip-swatch-color")).toBe(
-      "#c8102e",
+  it("shows a passage's own link text in place of its name", () => {
+    renderWithNode((node) => <LineChip node={node}>the line</LineChip>);
+    expect(screen.getByRole("link", { name: "the line" })).toHaveAttribute(
+      "href",
+      "/network/lines/metro%3Anorth-line",
     );
   });
 
-  it("takes a passage's link text in place of the name", () => {
-    const { container } = renderWithNode((node) => (
-      <LineChip node={node}>the north line</LineChip>
-    ));
-    expect(container.querySelector(".value")?.textContent).toBe(
-      "the north line",
-    );
+  it("leaves its mark uncoloured for a colour the gate refuses", () => {
+    const { container } = renderWithNode((node) => <LineChip node={node} />, {
+      colour: "red; background: url(https://example.com/x)",
+    });
+    const mark = container.querySelector<HTMLElement>(".mark .swatch-mark");
+    expect(mark).not.toBeNull();
+    expect(mark?.style.getPropertyValue("--swatch-mark-colour")).toBe("");
+    expect(container.innerHTML).not.toContain("url(");
   });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <LineChip className="custom-class" node={node} />

@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -90,24 +91,26 @@ describe("LineCommand", () => {
         <LineCommand node={node} />
       </ul>
     ));
+    const root = container.querySelector(".ds.line-command");
     expect(
-      [...container.querySelectorAll(".title, .context, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["North Line", "Line", "5 stops"]);
-    expect(container.querySelector(".location")).toBeNull();
+      root
+        ?.querySelector<HTMLElement>(".mark .swatch-mark")
+        ?.style.getPropertyValue("--swatch-mark-colour"),
+    ).toBe("#c8102e");
+    expect(
+      [
+        ...(root?.querySelectorAll(".title, .address, .kind, .status") ?? []),
+      ].map((slot) => slot.textContent),
+    ).toEqual(["North Line", "metro:north-line", "Line", "5 stops"]);
+    expect(root?.querySelector(".prefix")).toBeNull();
+    expect(root?.querySelector(".location")).toBeNull();
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "North Line" })).toHaveAttribute(
+      "href",
+      "/network/lines/metro%3Anorth-line",
+    );
   });
 
-  it("links its title to the line's page", () => {
-    renderWithNode((node) => (
-      <ul>
-        <LineCommand node={node} />
-      </ul>
-    ));
-    expect(
-      screen.getByRole("link", { name: "North Line" }).getAttribute("href"),
-    ).toBe("/network/lines/metro%3Anorth-line");
-  });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>

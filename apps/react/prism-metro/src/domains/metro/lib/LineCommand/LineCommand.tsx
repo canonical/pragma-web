@@ -1,7 +1,11 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
-import { EntityCommand, useProjectionLink } from "@canonical/prism-projections";
+import {
+  EntityCommand,
+  SwatchMark,
+  useProjectionLink,
+} from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
@@ -11,12 +15,13 @@ import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The fields LineCommand reads from the Line it renders: the stops it
- * serves, its name, its compact address and its class's title.
+ * The fields LineCommand reads from the Line it renders: what its slots
+ * show, and its compact address, which its home is resolved from.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment LineCommand_node on Line {
     __typename
+    colour
     servedBy {
       uri
     }
@@ -37,21 +42,23 @@ void declareNodeFragment;
 const componentCssClassName = "ds line-command";
 
 /**
- * A line as a 56px command-palette result: its name on the first line,
- * linked to the line's page, then its class alone, since a line has no
- * place of its own, and the count of the stops it serves at the end:
- * "North Line / Line · 5 stops".
+ * A line as a command-palette entry: its mark and its name, linked
+ * to its home, then its compact address, its kind and its stop count, its
+ * one figure, in the status. The address states its namespace, so it
+ * shows no prefix.
+ * Its mark is a disc of the line's colour (`SwatchMark`), which the
+ * package paints only with a plain colour value.
  *
- * Native props reach the result's `<li>` root; a consumer `className`
- * merges after the projection's own, and the root carries the typename as
- * `data-type`.
+ * Native props reach the entry's `<li>` root; a consumer `className`
+ * merges after the projection's own, and the root carries the typename
+ * as `data-type`.
  *
- * `import { LineCommand } from "./lib/index.js";`
+ * `import { LineCommand } from "#domains/metro";`
  *
  * @implements metro.component.line_command
  * @note Impure: reads its line from the Relay store, its home from the
- *   site's homes, its link from the projection provider and its words from
- *   the translator in scope.
+ *   site's homes, and its link from the
+ *   projection providers, and its words from the translator in scope.
  */
 export default function LineCommand({
   node,
@@ -59,20 +66,22 @@ export default function LineCommand({
   ...props
 }: LineCommandProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  const { curie, title, type } = data._meta;
+  const { curie, title } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
   const t = useMessages();
   return (
     <EntityCommand
       {...props}
+      address={curie}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
-      kind={type._meta.title}
+      kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
+      mark={<SwatchMark colour={data.colour} />}
+      status={t("line.stops.count", { count: data.servedBy.length })}
       title={title}
-      vital={t("line.stops.count", { count: data.servedBy.length })}
     />
   );
 }

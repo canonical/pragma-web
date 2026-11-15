@@ -59,13 +59,13 @@ export default function MetroRowProjection({
 }: MetroRowProjectionProps): ReactElement {
   const data = useFragment(nodeFragment, node);
   // The arms not yet on the identity's slots take no `lines`: it reaches
-  // the arms that are alone.
+  // the station's and the line's arms alone.
   const { lines, ...native } = props;
   switch (data.__typename) {
     case "Station":
       return (
         <StationRow
-          {...native}
+          {...props}
           node={requireArmKey(data.Station, data.__typename)}
         />
       );

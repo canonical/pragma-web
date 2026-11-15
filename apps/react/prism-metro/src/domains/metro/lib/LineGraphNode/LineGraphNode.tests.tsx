@@ -84,27 +84,29 @@ describe("LineGraphNode", () => {
     );
   });
 
-  it("fills the node's lines from the line", () => {
+  it("fills the node's lines from the line, and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
         <LineGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("North Line");
-    expect(container.querySelector(".context")?.textContent).toBe("Line");
-    expect(container.querySelector(".location")).toBeNull();
-  });
-
-  it("links its title to the line's page", () => {
-    const { container } = renderWithNode((node) => (
-      <svg aria-label="Graph" role="img">
-        <LineGraphNode node={node} />
-      </svg>
-    ));
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "metro: North Line",
+    );
+    expect(container.querySelector(".title .prefix")?.textContent).toBe(
+      "metro: ",
+    );
+    expect(
+      container
+        .querySelector<HTMLElement>("svg.mark .swatch-mark")
+        ?.style.getPropertyValue("--swatch-mark-colour"),
+    ).toBe("#c8102e");
+    expect(container.querySelector(".kind, .context, .location")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/network/lines/metro%3Anorth-line",
     );
   });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
