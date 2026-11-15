@@ -10,6 +10,7 @@ import {
   GRAPH_LABEL_PX_MIN,
   LABEL_SIZE,
   LATTICE,
+  REGION_LABEL_SIZE,
 } from "@canonical/prism-core";
 import type { StrokeWidth } from "./types.js";
 
@@ -170,3 +171,15 @@ export const HEAVY_HEAD_SIZES: Readonly<Partial<Record<StrokeWidth, number>>> =
 
 /** The dash pattern of a relation no statement instantiates, in px. */
 export const ZERO_STROKE_DASH = "4 4";
+
+/**
+ * The type size of a bridge's label, in px: a region prefix's, so it
+ * stays legible from the zoom at which the prefixes are drawn.
+ */
+export const BRIDGE_LABEL_SIZE = REGION_LABEL_SIZE;
+
+/** How many relations a bridge's label names before it counts them. */
+export const BRIDGE_LABEL_NAMES = 2;
+
+/** What a bridge's label joins the names of its relations with. */
+export const BRIDGE_LABEL_SEPARATOR = " · ";

@@ -170,7 +170,10 @@ export interface NodeNavigation {
 
 /** A class laid out: its model and its place. */
 export interface LaidOutNode extends ClassModel {
-  /** The column in its region. */
+  /**
+   * Its column in the graph: its region's first column, over the regions
+   * in packing order, plus its column in the region.
+   */
   readonly col: number;
   /** The box's top-left corner in the graph. */
   readonly x: number;
@@ -201,6 +204,8 @@ export interface LaidOutEdge {
   readonly region: string;
   /** The relations bundled, for a relation. */
   readonly bundle?: Bundle;
+  /** Whether the relation is a bridge: its ends lie in two regions. */
+  readonly bridge?: boolean;
   /** The bus's x, for a subclass bus. */
   readonly busX?: number;
   /** Whether the relation is a self-loop or a same-column arc. */
@@ -284,6 +289,33 @@ export interface LegibleWindowOptions {
   readonly zoom?: number;
 }
 
+/** A namespace region as the packing orders it: its prefix and its size. */
+export interface RegionSize {
+  readonly prefix: string;
+  /** How many classes it holds. */
+  readonly size: number;
+}
+
+/**
+ * The relations that cross between two regions, whichever way they run:
+ * a bridge, by the regions' prefixes.
+ */
+export interface Bridge {
+  readonly a: string;
+  readonly b: string;
+  /** How many relations cross between the two. */
+  readonly relations: number;
+}
+
+/** How the class graph is laid out, beyond its input. */
+export interface ClassGraphLayoutOptions {
+  /**
+   * How many barycentre sweeps order the columns; 0 keeps the
+   * label-sorted order, the baseline the crossings are measured against.
+   */
+  readonly sweeps?: number;
+}
+
 /** A packing of regions into shelves. */
 export interface ShelfPacking {
   /** Each shelf's regions, by index into the sizes. */
@@ -312,4 +344,16 @@ export interface RelationStroke {
   readonly width: number;
   /** The dash pattern, where no statement instantiates the relation. */
   readonly dash: string | undefined;
+}
+
+/** A bridge's label placed on its route, drawn at rest. */
+export interface BridgeLabel {
+  /** The bridge's edge id. */
+  readonly edge: string;
+  readonly text: string;
+  /** The label's box with its halo. */
+  readonly box: Rect;
+  /** The label's centre: on the route's longest clear horizontal run. */
+  readonly cx: number;
+  readonly cy: number;
 }

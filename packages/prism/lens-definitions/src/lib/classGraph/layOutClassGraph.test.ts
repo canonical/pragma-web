@@ -100,7 +100,7 @@ describe("layOutClassGraph", () => {
   });
 
   it("keeps the label-sorted order without sweeps", () => {
-    expect(layOutClassGraph(CROSS_REGION_GRAPH, 0).rail).toHaveLength(8);
+    expect(layOutClassGraph(CROSS_REGION_GRAPH, { sweeps: 0 }).rail).toHaveLength(8);
   });
 
   it("retries a graph too wide for the canvas, keeps the narrower channels that lift its fit, and opens on a legible window", () => {
@@ -295,7 +295,35 @@ describe("layOutClassGraph", () => {
     expect(bounds.y + bounds.h).toBeLessThanOrEqual(lower.y + lower.h);
   });
 
-  it("routes between shelves with a shelf between them round the packing's left margin", () => {
+  it("numbers columns graph-wide: each region's after the regions packed before it", () => {
+    const layout = layOutClassGraph(ontologyGraph);
+    let first = 0;
+    for (const region of layout.regions) {
+      const columns = new Set(
+        [...layout.nodes.values()]
+          .filter((node) => node.region === region.prefix)
+          .map((node) => node.col),
+      );
+      expect(Math.min(...columns)).toBe(first);
+      expect(Math.max(...columns)).toBeLessThan(first + region.columns);
+      first += region.columns;
+    }
+  });
+
+  it("lays the same graph out whatever order its classes and relations come in", () => {
+    const reordered = layOutClassGraph({
+      classes: ontologyGraph.classes.toReversed(),
+      relations: ontologyGraph.relations.toReversed(),
+    });
+    const layout = layOutClassGraph(ontologyGraph);
+    expect(reordered).toEqual(layout);
+    expect(JSON.stringify([...reordered.nodes])).toBe(
+      JSON.stringify([...layout.nodes]),
+    );
+    expect(JSON.stringify(reordered.edges)).toBe(JSON.stringify(layout.edges));
+  });
+
+  it("packs a bridged region next to its partner, and routes round the margin only past a shelf", () => {
     // Three chains each too wide to share a shelf, so each takes its own.
     const chain = (prefix: string) =>
       ["One", "Two", "Three", "Four", "Five"].map((label, index) =>
@@ -334,6 +362,10 @@ describe("layOutClassGraph", () => {
         "the region",
       ).y;
     expect(new Set(["aa", "bb", "cc"].map(shelfOf)).size).toBe(3);
+    // The relation pulls cc onto the shelf after aa's, ahead of the larger
+    // bb by prefix, so it crosses one gap instead of going round.
+    expect(shelfOf("aa")).toBeLessThan(shelfOf("cc"));
+    expect(shelfOf("cc")).toBeLessThan(shelfOf("bb"));
     const far = requireDefined(
       stacked.edges.find((edge) => edge.id === "rel:aa:Two cc:Two"),
       "the far relation",
@@ -342,9 +374,10 @@ describe("layOutClassGraph", () => {
       stacked.edges.find((edge) => edge.id === "join:dd aa:One"),
       "the far join",
     );
-    for (const edge of [far, join]) {
-      expect(measurePathBounds(edge.d).x).toBe(-SHELF_GAP / 2);
-    }
+    expect(far.bridge).toBe(true);
+    expect(measurePathBounds(far.d).x).toBeGreaterThan(-SHELF_GAP / 2);
+    // No relation pulls dd, so its join to aa runs past two shelves.
+    expect(measurePathBounds(join.d).x).toBe(-SHELF_GAP / 2);
   });
 
   it("routes between two shelves through the gap that joins them, never round the margin", () => {

@@ -6,7 +6,7 @@ import {
   compareText,
   formatPathData,
   LATTICE,
-  layOutRegion,
+  layoutLayered,
   measurePathBounds,
   measureRegionLabelWidth,
   type PathCommand,
@@ -34,12 +34,15 @@ import {
 } from "./constants.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
 import layOutPhoneView from "./layOutPhoneView.js";
+import listRegionBridges from "./listRegionBridges.js";
 import orderRail from "./orderRail.js";
+import orderRegionsByBridges from "./orderRegionsByBridges.js";
 import packShelves from "./packShelves.js";
 import type {
   Bundle,
   ClassGraphInput,
   ClassGraphLayout,
+  ClassGraphLayoutOptions,
   ClassGraphModel,
   LaidOutEdge,
   LaidOutNode,
@@ -80,11 +83,31 @@ function sizeRegion(
 }
 
 /**
- * Lay every region out at a channel and pack them into shelves, saying
- * whether any arc nests past the channel.
+ * Lay one region out with the layered engine at a channel, its relations
+ * to other regions meeting their boxes at the ports given.
+ */
+function layOutLayers(
+  model: ClassGraphModel,
+  ids: readonly string[],
+  channel: number,
+  sweeps: number,
+  crossPorts?: ReadonlyMap<string, CrossPort>,
+): RegionLayout<Bundle> {
+  return layoutLayered(model, model, {
+    ids,
+    channel,
+    sweeps,
+    ...(crossPorts === undefined ? {} : { crossPorts }),
+  });
+}
+
+/**
+ * Lay every region out at a channel, in the order given, and pack them
+ * into shelves, saying whether any arc nests past the channel.
  */
 function packRegions(
   model: ClassGraphModel,
+  order: readonly { readonly prefix: string; readonly ids: readonly string[] }[],
   channel: number,
   sweeps: number,
 ): {
@@ -92,8 +115,8 @@ function packRegions(
   readonly packing: ShelfPacking;
   readonly crowded: boolean;
 } {
-  const regions = model.regionOrder.map(({ prefix, ids }) =>
-    sizeRegion(prefix, ids, layOutRegion(model, ids, channel, sweeps)),
+  const regions = order.map(({ prefix, ids }) =>
+    sizeRegion(prefix, ids, layOutLayers(model, ids, channel, sweeps)),
   );
   return {
     regions,
@@ -282,7 +305,9 @@ function alignShelves(
 
 /**
  * Lay the class graph out: each namespace region in its own layered
- * columns, the regions packed into shelves for the largest fit on the
+ * columns by the layered engine, the regions ordered by their bridges
+ * (the largest first, then the one with most relations to those placed)
+ * and packed in that order into shelves for the largest fit on the
  * design canvas (retried with narrower channels when the fit would put
  * 14px labels below 12px, which are kept whenever they lift the fit and
  * no arc nests past them), placed on the lattice, then the cross-region
@@ -301,14 +326,18 @@ function alignShelves(
  *
  * @param input - The classes and relations: the data's, each counted, or a
  *   legend specimen's.
- * @param sweeps - How many barycentre sweeps order the columns; 0 keeps
- *   the label-sorted order, the baseline the crossings are measured against.
- * @returns The layout.
+ * @param options - How many barycentre sweeps order the columns (`SWEEPS`
+ *   unless given; 0 keeps the label-sorted order, the baseline the
+ *   crossings are measured against).
+ * @returns The layout. Each class's column is graph-wide: its region's
+ *   first column, counted over the regions in packing order, plus its
+ *   column in the region.
  */
 export default function layOutClassGraph(
   input: ClassGraphInput | SpecimenGraphInput,
-  sweeps: number = SWEEPS,
+  options: ClassGraphLayoutOptions = {},
 ): ClassGraphLayout {
+  const { sweeps = SWEEPS } = options;
   const model = buildClassGraphModel(input);
   // An ontology with no class is data a provider may serve: it lays out
   // as an empty floor the size of the design canvas.
@@ -328,10 +357,17 @@ export default function layOutClassGraph(
     };
   }
   const findings: string[] = [];
+  const idsOf = new Map(
+    model.regionOrder.map(({ prefix, ids }) => [prefix, ids]),
+  );
+  const order = orderRegionsByBridges(
+    model.regionOrder.map(({ prefix, ids }) => ({ prefix, size: ids.length })),
+    listRegionBridges(model),
+  ).map((prefix) => ({ prefix, ids: requireEntry(idsOf, prefix) }));
   let channel = CHANNEL;
-  let packed = packRegions(model, channel, sweeps);
+  let packed = packRegions(model, order, channel, sweeps);
   if (packed.packing.fit < MIN_FIT) {
-    const retry = packRegions(model, FALLBACK_CHANNEL, sweeps);
+    const retry = packRegions(model, order, FALLBACK_CHANNEL, sweeps);
     findings.push(
       `G3: fit ${packed.packing.fit.toFixed(3)} at ${CHANNEL}px channels; ${retry.packing.fit.toFixed(3)} at ${FALLBACK_CHANNEL}px`,
     );
@@ -360,7 +396,7 @@ export default function layOutClassGraph(
       ? sizeRegion(
           region.prefix,
           region.ids,
-          layOutRegion(model, region.ids, channel, sweeps, crossPorts),
+          layOutLayers(model, region.ids, channel, sweeps, crossPorts),
         )
       : region,
   );
@@ -370,6 +406,9 @@ export default function layOutClassGraph(
   // shelf aligned to its top, middle or bottom, whichever leaves the
   // fewest empty cells on the canvas.
   const placed = alignShelves(sized, packing);
+  const sizedByPrefix = new Map(sized.map((region) => [region.prefix, region]));
+  const regionOf = (prefix: string): SizedRegion =>
+    requireEntry(sizedByPrefix, prefix);
   const originOf = (prefix: string) => {
     const place = requireEntry(placed, prefix);
     return { ...place, ox: place.x, oy: place.y + REGION_LABEL_ROW };
@@ -378,21 +417,33 @@ export default function layOutClassGraph(
   const nodeList: Omit<LaidOutNode, "nav">[] = [];
   const edges: LaidOutEdge[] = [];
   const rail: string[] = [];
+  // Each region's first column in the graph: the columns of the regions
+  // packed before it.
+  const firstColumns = new Map<string, number>();
+  for (const region of sized) {
+    firstColumns.set(
+      region.prefix,
+      [...firstColumns.keys()].reduce(
+        (sum, prefix) => sum + regionOf(prefix).layout.columns.length,
+        0,
+      ),
+    );
+  }
   for (const region of sized) {
     const { ox, oy } = originOf(region.prefix);
-    const order = orderRail(model, region.layout);
+    const railOrder = orderRail(model, region.layout);
     for (const node of region.layout.nodes.values()) {
       nodeList.push({
         ...requireEntry(model.byId, node.id),
-        col: node.col,
+        col: requireEntry(firstColumns, region.prefix) + node.col,
         x: node.x + ox,
         y: node.y + oy,
         region: region.prefix,
-        railIndex: rail.length + order.indexOf(node.id),
+        railIndex: rail.length + railOrder.indexOf(node.id),
         depth: region.layout.depthOf(node.id),
       });
     }
-    rail.push(...order);
+    rail.push(...railOrder);
     for (const edge of region.layout.edges) {
       edges.push({
         id: edge.id,
@@ -415,11 +466,6 @@ export default function layOutClassGraph(
   }
   const placedNodes = new Map(nodeList.map((node) => [node.uri, node]));
   const nodeOf = (id: string) => requireEntry(placedNodes, id);
-  const regionOf = (prefix: string): SizedRegion =>
-    requireEntry(
-      new Map(sized.map((region) => [region.prefix, region])),
-      prefix,
-    );
 
   // Cross-region routes: orthogonal, through the gaps between regions.
   const shelfTops = [
@@ -450,19 +496,20 @@ export default function layOutClassGraph(
       side: "left" | "right",
     ): number => {
       const { ox, x } = originOf(node.region);
+      const col = region.layout.columnOf(node.uri);
       if (side === "right") {
         return (
           ox +
-          requireAt(region.layout.columnX, node.col) +
-          requireAt(region.layout.columnWidth, node.col) +
+          requireAt(region.layout.columnX, col) +
+          requireAt(region.layout.columnWidth, col) +
           CROSS_CHANNEL_OFFSET
         );
       }
-      return node.col === 0
+      return col === 0
         ? x - SHELF_GAP / 2
         : ox +
-            requireAt(region.layout.columnX, node.col - 1) +
-            requireAt(region.layout.columnWidth, node.col - 1) +
+            requireAt(region.layout.columnX, col - 1) +
+            requireAt(region.layout.columnWidth, col - 1) +
             CROSS_CHANNEL_OFFSET;
     };
     const startX = sideA === "right" ? a.x + a.w : a.x;
@@ -499,6 +546,7 @@ export default function layOutClassGraph(
     crossEdges.push({
       id: `rel:${bundle.id}`,
       kind: "relation",
+      bridge: true,
       bundle,
       from: bundle.a,
       to: [bundle.b],
@@ -518,8 +566,14 @@ export default function layOutClassGraph(
     const targetY = target.y + target.h / 2;
     const targetBusX =
       originOf(target.region).ox +
-      requireAt(targetRegion.layout.columnX, target.col) +
-      requireAt(targetRegion.layout.columnWidth, target.col) +
+      requireAt(
+        targetRegion.layout.columnX,
+        targetRegion.layout.columnOf(target.uri),
+      ) +
+      requireAt(
+        targetRegion.layout.columnWidth,
+        targetRegion.layout.columnOf(target.uri),
+      ) +
       BUS_OFFSET;
     const joinGap = joined.shelfY - SHELF_GAP / 2;
     const targetGap = originOf(target.region).shelfY - SHELF_GAP / 2;
