@@ -165,7 +165,10 @@ export default function ComponentDetail({
                               id: "usage",
                               title: t("component.section.usage"),
                               content: (
-                                <ComponentProse source={component.usage} />
+                                <ComponentProse
+                                  scope="usage"
+                                  source={component.usage}
+                                />
                               ),
                             },
                           ]
@@ -177,7 +180,10 @@ export default function ComponentDetail({
                               id: "guidelines",
                               title: t("component.section.guidelines"),
                               content: (
-                                <ComponentProse source={component.guidelines} />
+                                <ComponentProse
+                                  scope="guidelines"
+                                  source={component.guidelines}
+                                />
                               ),
                             },
                           ]

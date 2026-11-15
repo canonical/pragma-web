@@ -152,6 +152,29 @@ describe("ComponentDetail", () => {
   );
 
   it(
+    "gives two texts that share a heading two ids, each under its section",
+    () => {
+      const guidelines = (
+        componentEntityRecordsButton as unknown as Record<
+          string,
+          { readonly guidelines?: string }
+        >
+      )[BUTTON_IRI]?.guidelines;
+      const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
+        usage: guidelines,
+      });
+      render(entityPageAt(BUTTON_URI, records, createFetchSpy()));
+      const ids = [...readView().querySelectorAll(".editorial [id]")].map(
+        ({ id }) => id,
+      );
+      expect(ids).toContain("usage-user-content-accessibility");
+      expect(ids).toContain("guidelines-user-content-accessibility");
+      expect(new Set(ids).size).toBe(ids.length);
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
     "shows the example before the sections, off the index",
     () => {
       render(

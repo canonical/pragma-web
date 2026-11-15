@@ -5,7 +5,7 @@ import ComponentProse from "./ComponentProse.js";
 describe("ComponentProse SSR", () => {
   it("server-renders the text under its root", () => {
     const html = renderToString(
-      <ComponentProse source={"## Heading\n\nText"} />,
+      <ComponentProse scope="usage" source={"## Heading\n\nText"} />,
     );
     expect(html).toContain(
       '<div class="ds component-prose editorial content-flow">',

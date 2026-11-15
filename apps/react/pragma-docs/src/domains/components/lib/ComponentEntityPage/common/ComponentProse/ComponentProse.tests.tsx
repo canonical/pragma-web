@@ -15,6 +15,7 @@ describe("ComponentProse", () => {
   it("renders the Markdown with its headings two levels down", () => {
     render(
       <ComponentProse
+        scope="usage"
         source={"# One\n\n## Two\n\n### Three\n\nA paragraph."}
       />,
     );
@@ -26,14 +27,19 @@ describe("ComponentProse", () => {
 
   it("starts a text authored from level 3, as Button's usage is, at level 3", () => {
     if (BUTTON_USAGE === undefined) throw new Error("the fixture lost usage");
-    render(<ComponentProse source={BUTTON_USAGE} />);
+    render(<ComponentProse scope="usage" source={BUTTON_USAGE} />);
     expect(
       screen.getAllByRole("heading").map(({ tagName }) => tagName),
     ).toEqual(["H3", "H3", "H3"]);
   });
 
   it("stops the levels at six", () => {
-    render(<ComponentProse source={"# One\n\n##### Five\n\n###### Six"} />);
+    render(
+      <ComponentProse
+        scope="usage"
+        source={"# One\n\n##### Five\n\n###### Six"}
+      />,
+    );
     expect(
       screen.getAllByRole("heading").map(({ tagName }) => tagName),
     ).toEqual(["H3", "H6", "H6"]);
@@ -41,7 +47,7 @@ describe("ComponentProse", () => {
 
   it("carries the editorial and content-flow classes beside its own", () => {
     const { container } = render(
-      <ComponentProse className="extra" source="Text" />,
+      <ComponentProse scope="usage" className="extra" source="Text" />,
     );
     expect(container.firstElementChild?.className).toBe(
       "ds component-prose editorial content-flow extra",
@@ -49,7 +55,7 @@ describe("ComponentProse", () => {
   });
 
   it("passes the native props to its root", () => {
-    render(<ComponentProse data-testid="root" source="Text" />);
+    render(<ComponentProse scope="usage" data-testid="root" source="Text" />);
     expect(screen.getByTestId("root").tagName).toBe("DIV");
   });
 });

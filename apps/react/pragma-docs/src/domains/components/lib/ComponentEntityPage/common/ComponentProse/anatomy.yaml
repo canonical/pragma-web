@@ -5,7 +5,9 @@
 # headings and paragraphs, and the last block none. Headings move by one
 # offset, under the section that holds the text, so the shallowest starts
 # at level 3 whatever level it was written at (Button's usage from ###,
-# its guidelines from #) and the others keep their steps, down to 6. It renders no heading of its own: the sectioned view renders the
+# its guidelines from #) and the others keep their steps, down to 6. Each
+# heading's id is prefixed by `scope`, the id of the section that holds
+# the text, so two texts on one page never repeat an id. It renders no heading of its own: the sectioned view renders the
 # section's. It binds no style of its own: as the direct child of the
 # section's body, the view gives it every column and the 75-character
 # reading measure (1.1, M13), in one place for every prose.
