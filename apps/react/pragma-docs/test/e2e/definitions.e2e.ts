@@ -35,6 +35,17 @@ import {
   STRIP_VIEWPORTS,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
+import {
+  type BridgeLabelMeasure,
+  type CanvasMeasure,
+  fetchServedGraph,
+  MIN_FIT,
+  measureBridgeLabels,
+  measureCanvasSvg,
+  type ServedWeights,
+  sliceCanvasSvg,
+  weighServedRelations,
+} from "@canonical/prism-lens-definitions/testing/browser";
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DEFAULT_GRAPHQL_URL } from "../../src/relay/graphqlEndpoint.js";
@@ -904,5 +915,108 @@ describe("at 912 px, on a canvas narrower than the drawing", () => {
     expect(measure.cut.filter((id) => id !== "dt:TokenSymbol")).toEqual([]);
     expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
     expect(measure.unlabelled).toBe(0);
+  });
+});
+
+describe("the overview's record, on the docs site", () => {
+  const [desktop] = VIEWPORTS;
+  const served: { weights?: ServedWeights; prefixes?: readonly string[] } = {};
+  const canvases = new Map<string, string>();
+
+  /** The canvas's SVG the server renders for `path`, fetched afresh. */
+  const serveCanvas = async (path: string): Promise<string> =>
+    sliceCanvasSvg(await (await fetch(new URL(path, server.base))).text());
+
+  /** The overview at rest, then with each namespace opened. */
+  const listViews = (): readonly string[] => [
+    "/definitions",
+    ...(served.prefixes ?? []).map((prefix) => `/definitions?expand=${prefix}`),
+  ];
+
+  /** Each view's canvas, as first served, measured. */
+  const measureViews = (): [string, CanvasMeasure][] =>
+    listViews().map((path) => [
+      path,
+      measureCanvasSvg(canvases.get(path) ?? ""),
+    ]);
+
+  beforeAll(async () => {
+    const graph = await fetchServedGraph(
+      new URL(new URL(DEFAULT_GRAPHQL_URL).pathname, server.graphBase).href,
+    );
+    served.weights = weighServedRelations(graph);
+    served.prefixes = graph.ontologies.map((ontology) => ontology.prefix);
+    for (const path of listViews()) canvases.set(path, await serveCanvas(path));
+  }, PAGE_SETTLE_MS);
+
+  it("packs the overview deterministically: two server renders give the same SVG bytes, at rest and opened", async () => {
+    expect(canvases.size).toBe(1 + (served.prefixes?.length ?? 0));
+    for (const path of listViews()) {
+      expect(await serveCanvas(path), path).toBe(canvases.get(path));
+    }
+  });
+
+  it("labels every drawn bridge at rest, as many as the site's data serves, legibly at the opening zoom", async () => {
+    const rest = measureCanvasSvg(canvases.get("/definitions") ?? "");
+    // Two bridges, each to a stub: anatomy to rdf:List, ds to dt:TokenSymbol.
+    expect(rest.bridges).toBe(served.weights?.bridges);
+    expect(rest.bridgeLabels).toBe(rest.bridges);
+    const seen: { labels?: readonly BridgeLabelMeasure[] } = {};
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        seen.labels = await page.evaluate(measureBridgeLabels);
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.labels).toHaveLength(rest.bridges);
+    for (const label of seen.labels ?? []) {
+      expect(label.px, label.text).toBeGreaterThanOrEqual(
+        GRAPH_BUDGET.labelPxMin,
+      );
+    }
+  });
+
+  it("states each relation's weight by its stroke, 1, 2, 4 or 8 px and dashed exactly at 0, the served count of its heaviest relation", () => {
+    const prefixes = served.prefixes ?? [];
+    const isClass = (term: string): boolean =>
+      prefixes.includes(term.split(":").at(0) ?? "") && term.includes(":");
+    let weighed = 0;
+    for (const [path, measure] of measureViews()) {
+      for (const relation of measure.relations) {
+        const name = `${path}: ${relation.from} to ${relation.to}`;
+        expect(relation.focus, name).toBe(false);
+        expect([1, 2, 4, 8], name).toContain(relation.width);
+        expect(relation.dashed, name).toBe(relation.weight === 0);
+        if (!isClass(relation.from) || !isClass(relation.to)) continue;
+        const pair = [relation.from, relation.to].sort().join(" ");
+        expect(relation.weight, name).toBe(served.weights?.weights.get(pair));
+        weighed += 1;
+      }
+    }
+    expect(weighed).toBeGreaterThan(0);
+  });
+
+  it("measures section C at the design canvas: the fit at the legible floor or above, every node and region on the 16px lattice", () => {
+    for (const [path, measure] of measureViews()) {
+      expect(measure.openingZoom, path).toBeGreaterThanOrEqual(MIN_FIT);
+      expect(measure.offLattice, path).toEqual([]);
+    }
+  });
+
+  it("draws within the budget at rest and with each namespace opened: nodes, the largest column, bytes and elements", () => {
+    for (const [path, measure] of measureViews()) {
+      expect(measure.nodes, path).toBeLessThanOrEqual(
+        GRAPH_BUDGET.drawnNodesMax,
+      );
+      expect(measure.largestColumn, path).toBeLessThanOrEqual(
+        GRAPH_BUDGET.bandMembersMax,
+      );
+      expect(measure.bytes, path).toBeLessThanOrEqual(GRAPH_BUDGET.svgBytesMax);
+      expect(measure.elements, path).toBeLessThanOrEqual(
+        GRAPH_BUDGET.svgElementsMax,
+      );
+    }
   });
 });
