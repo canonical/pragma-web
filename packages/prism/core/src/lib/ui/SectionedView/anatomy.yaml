@@ -55,7 +55,11 @@
 #     section's every column and holds the 75ch reading measure (M13, v3
 #     1.1). Its text is set to the paragraphs' size (text primary), so the
 #     `ch` it counts is a paragraph's own: the measure is one rule for every
-#     page kind, never a column span.
+#     page kind, never a column span. A table the published Markdown
+#     writes in the prose (`.markdown-table`) keeps to that measure: one
+#     wider scrolls sideways inside its own box, never the page and never
+#     cut (`display: block` makes the table its own scroller, since the
+#     published table has no wrapper).
 #
 # Token ledger (component tokens on `.ds.sectioned-view`):
 #   --sectioned-view-gap: --grid-gutter                      every grid here, both axes
@@ -208,6 +212,17 @@ node:
                             layout.grid.column: "1 / -1"
                             size.max.width: "75ch"
                             typography.size: typography.text.primary.fontSize
+                          edges:
+                            # A table the published Markdown writes in the
+                            # prose: within the measure, scrolling sideways
+                            # inside its own box when wider.
+                            - node:
+                                role: table (a Markdown table in the prose)
+                                styles:
+                                  layout.type: block
+                                  size.max.width: 100%
+                                  layout.overflow.inline: auto
+                              relation: { cardinality: "0..*", slotName: markdown-table }
                         relation: { cardinality: "0..1", slotName: editorial }
                   relation: { cardinality: "1", slotName: section-body }
             relation: { cardinality: "0..*", slotName: section }

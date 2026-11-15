@@ -47,7 +47,8 @@ const EXTERNAL_TOKENS = [
  * contract `Rail` documents, and the published Breadcrumbs' list and its
  * crumb's text, which `LensBreadcrumbs` keeps on one line, and the pairs
  * of the `KeyValueList` a page passes as `SectionedView`'s facts, which
- * stack in the view's aside.
+ * stack in the view's aside, and the table the published Markdown writes in
+ * a section's prose, which scrolls inside the prose's measure.
  */
 const REACHES = [
   ".ds.rail .utilities-label",
@@ -59,6 +60,7 @@ const REACHES = [
   ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .key",
   ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .value",
   ".ds.sectioned-view > .content > .section > .section-body > .editorial",
+  ".ds.sectioned-view > .content > .section > .section-body > .editorial > .markdown-table",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);

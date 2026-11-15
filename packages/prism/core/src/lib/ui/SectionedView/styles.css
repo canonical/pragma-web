@@ -157,6 +157,20 @@
     font-size: var(--sectioned-view-prose-font-size);
   }
 
+  /* A table in a section's prose (the published Markdown's) keeps to the
+   * prose's measure: one wider than the measure scrolls sideways inside
+   * its own box, never the page and never cut. */
+  .ds.sectioned-view
+    > .content
+    > .section
+    > .section-body
+    > .editorial
+    > .markdown-table {
+    display: block;
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+
   /* With no aside, the header and the content take every column. */
   .ds.sectioned-view:not(:has(> .aside)) > .header,
   .ds.sectioned-view:not(:has(> .aside)) > .content {
