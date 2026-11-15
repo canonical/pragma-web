@@ -153,6 +153,10 @@ ds:section.content a sh:PropertyGroup ;
     rdfs:label "Content"@en ;
     sh:order 2 .
 
+ds:section.variants a sh:PropertyGroup ;
+    rdfs:label "Variants"@en ;
+    sh:order 2.5 .
+
 ds:section.usage a sh:PropertyGroup ;
     rdfs:label "Usage"@en ;
     sh:order 3 .
@@ -219,6 +223,9 @@ ds:ComponentLens
     a sh:NodeShape ;
     sh:targetClass ds:Component ;
     sh:property
+        [ sh:path ds:hasModifierFamily ; sh:group ds:section.variants ;
+          sh:order 1 ] ,
+        [ sh:path ds:hasTokenBinding ; sh:group ds:section.api ; sh:order 2 ] ,
         [ sh:path ds:hasSubcomponent ; sh:group ds:section.relations ;
           sh:order 5 ] .
 

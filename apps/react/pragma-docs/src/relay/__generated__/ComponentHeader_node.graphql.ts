@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7e2949df4b5c2a0dcd8ad857f4ad2640>>
+ * @generated SignedSource<<c2ba87207b83a171ad0269c635cec6d2>>
  * @lightSyntaxTransform
  */
 
@@ -27,7 +27,6 @@ export type ComponentHeader_node$data = {
   readonly tier: {
     readonly name: string | null | undefined;
   } | null | undefined;
-  readonly version: string | null | undefined;
   readonly " $fragmentType": "ComponentHeader_node";
 };
 export type ComponentHeader_node$key = {
@@ -55,13 +54,6 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "summary",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "version",
       "storageKey": null
     },
     {
@@ -157,6 +149,6 @@ return {
 };
 })();
 
-(node as any).hash = "30071df5b702f1bef9cd0c178e4e7092";
+(node as any).hash = "1849b7da21b5f6fac95901f3661e2e3c";
 
 export default node;

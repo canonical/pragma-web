@@ -17,9 +17,9 @@ const componentCssClassName = "ds standard-reading-page";
  * `data-view` marker live outside the suspending interior, so route content
  * never suspends at the outlet; the boundaries are keyed by the address, so
  * a new standard starts afresh after an error. Whatever the renderer, the
- * standard's title heads the page and names the document; in the Turtle
- * renderer (`?as=turtle`) its statements, which the route warmed, stand in
- * place of the prose.
+ * standard's title and its facts head the page and the title names the
+ * document; in the Turtle renderer (`?as=turtle`) its statements, which the
+ * route warmed, stand in place of its sections.
  *
  * The page uses the whole main column, a subgrid of the canvas's page grid;
  * only the article's prose holds the reading measure.

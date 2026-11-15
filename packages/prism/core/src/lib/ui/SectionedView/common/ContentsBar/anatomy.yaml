@@ -1,0 +1,139 @@
+---
+# ContentsBar (packages/prism/core/src/lib/ui/SectionedView/common/ContentsBar/):
+# the "On this page" bar below three groups (3.3; PS8 V1 L170-182 and
+# ps8-v1-standard-open.html; M14: 44px closed, panel 288 x 197 at 390,
+# scrollTop and layout unchanged when open). A <nav data-region="contents-bar">
+# holding one <details>: the <summary> is the one-line bar ("On this page",
+# then, once a script knows it, a separator and the current section's title);
+# the panel is the ContentsList, absolutely placed under the bar so opening
+# it moves nothing. With scripts off the summary reads "On this page" and the
+# disclosure and its links work natively (cs:ui_blocks.nojs.disclosure).
+# With scripts: choosing a link or pressing Escape closes the panel; Escape
+# returns focus to the summary. The band bleeds one gutter at its inline
+# start to meet the rail's border; its content stays on the column line (1.2).
+# Private to SectionedView. The sticky placement is the parent's.
+#
+# Changed from the planner's anatomy, each for a reason:
+#   - The bar's block size is the parent's: `SectionedView` sizes its `.bar`
+#     slot with --sectioned-view-bar-block-size, the length its headings'
+#     scroll margin reads, so the two cannot drift; a stylesheet reads only
+#     its own component's tokens, so the bar cannot read the parent's token
+#     itself. The disclosure and the summary fill the bar (`100%`).
+#   - The dividers under the bar and under the panel are inset shadows
+#     (`box-shadow: inset 0 calc(-1 * width) 0 color`), not borders: the
+#     DSL's roster has no key for a block-end border's colour or style, and
+#     a shadow drawn inside the box keeps the bar exactly its block size.
+#     The check reads `box-shadow` as an unkeyed property, as ContentsList's
+#     current-entry rule.
+#   - Keys are spelled as the roster spells them: `layout.stack` (z-index),
+#     `layout.align` (align-items), `layout.listStyle`, `layout.offset.*`.
+#   - The panel spans the bar by `inset-inline-start: 0` and an inline size
+#     of `100%` with border-box sizing: the roster has no key for the
+#     `inset-inline` shorthand.
+#   - The panel is at most the viewport less four space.800 steps (256px)
+#     tall and scrolls past that, through its own token in the ledger: the
+#     bar does not know how much of the viewport the shell takes above it
+#     or below the canvas, and 256px holds the strip, the bar and a footer,
+#     so every entry of a long index stays within reach on the screen. It
+#     is `max-height`: the roster's `size.max.block` takes a token only,
+#     and the bound is a calculation. A scroll that reaches either end of
+#     the panel stays in it (`overscroll-behavior: contain`), never moving
+#     the page under it.
+#   - The panel's background is color.background.layer2, the layer token
+#     the package's components read; `color.background.layer` is not one.
+#   - The separator is a dot drawn by the stylesheet (a muted circle one
+#     small step wide), and the chevron an inline SVG: neither is a string
+#     the reader reads, so neither is a catalog entry; neither shrinks.
+#
+# Token ledger (on `.ds.contents-bar`):
+#   --contents-bar-background: color.background              opaque, the page scrolls under it
+#   --contents-bar-divider-color: color.border.muted
+#   --contents-bar-divider-width: 1px                        literal hairline
+#   --contents-bar-bleed: calc(-1 * var(--grid-gutter))      the negation of grid.gutter
+#   --contents-bar-padding-inline-start: --grid-gutter
+#   --contents-bar-gap: space.100                            label, separator, current, chevron
+#   --contents-bar-label-color: color.text.muted
+#   --contents-bar-separator-size: space.050                 the dot's diameter
+#   --contents-bar-separator-color: color.text.muted
+#   --contents-bar-panel-background: color.background.layer2
+#   --contents-bar-panel-padding-block: space.100
+#   --contents-bar-panel-max-height: calc(100dvh - 4 * var(--space-800))
+#                                                            the viewport less 256px; past it the panel scrolls
+#   --contents-bar-z-index: 1                                literal: above the sections it overlays
+#   --contents-bar-focus-ring-color: color.focusRing; width 2px, offset -2px literals
+node:
+  uri: prism.subcomponent.contents_bar
+  element: nav
+  attributes: { data-region: contents-bar, aria-label: "{sectionedView.contents}" }
+  styles:
+    layout.position: sticky          # set by the parent's rule; the bar is the panel's containing block
+    layout.stack: 1
+    spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+    spacing.internal.inline.start: grid.gutter
+    appearance.background: color.background
+  edges:
+    - node:
+        role: disclosure
+        element: details
+        styles:
+          size.block: "100%"
+        edges:
+          - node:
+              role: toggle
+              element: summary
+              styles:
+                layout.type: flex
+                layout.align: center
+                spacing.gap: space.100
+                size.block: "100%"
+                layout.listStyle: none
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
+              edges:
+                - node: { role: label, element: span, styles: { typography.color: color.text.muted } }
+                  relation: { cardinality: "1", slotName: label }
+                - node:
+                    role: separator
+                    element: span
+                    attributes: { aria-hidden: "true" }
+                    styles:
+                      size.inline: space.050
+                      size.block: space.050
+                      layout.flex.shrink: 0
+                      appearance.radius: "50%"
+                      appearance.background: color.text.muted
+                  relation: { cardinality: "0..1", slotName: separator }   # only with a current section
+                - node:
+                    role: current
+                    element: span
+                    styles: { layout.overflow: hidden, typography.overflow: ellipsis, typography.whiteSpace: nowrap }
+                  relation: { cardinality: "0..1", slotName: current }
+                - node:
+                    role: chevron
+                    element: svg
+                    attributes: { aria-hidden: "true" }
+                    styles: { spacing.external.inline.start: auto, layout.flex.shrink: 0 }
+                  relation: { cardinality: "1", slotName: chevron }
+            relation: { cardinality: "1", slotName: toggle }
+          - node:
+              role: panel
+              styles:
+                layout.position: absolute
+                layout.offset.block.start: "100%"
+                layout.offset.inline.start: 0
+                size.inline: "100%"
+                size.max.height: "calc(100dvh - 4 * var(--space-800))"
+                layout.overflow.block: auto
+                layout.overscroll: contain
+                layout.boxSizing: border-box
+                spacing.internal.block.start: space.100
+                spacing.internal.block.end: space.100
+                spacing.internal.inline.start: grid.gutter
+                appearance.background: color.background.layer2
+              edges:
+                - node: { uri: prism.subcomponent.contents_list }
+                  relation: { cardinality: "1", slotName: list }
+            relation: { cardinality: "1", slotName: panel }
+      relation: { cardinality: "1", slotName: disclosure }

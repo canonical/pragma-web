@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e075a2672c82f97574a152145bb40473>>
+ * @generated SignedSource<<c3256f15f6f5966d51e84eff78a70d8b>>
  * @lightSyntaxTransform
  */
 
@@ -118,13 +118,6 @@ return {
           {
             "alias": null,
             "args": null,
-            "kind": "ScalarField",
-            "name": "version",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
             "concreteType": "EntityMeta",
             "kind": "LinkedField",
             "name": "_meta",
@@ -218,7 +211,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3420079e741a699827526a56447883d4",
+    "cacheID": "c7e00441aab67a5dd55b41f62cb65082",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -261,13 +254,12 @@ return {
         },
         "component.tier.name": (v6/*:: as any*/),
         "component.tier.uri": (v5/*:: as any*/),
-        "component.uri": (v5/*:: as any*/),
-        "component.version": (v6/*:: as any*/)
+        "component.uri": (v5/*:: as any*/)
       }
     },
     "name": "ComponentHeaderStoryQuery",
     "operationKind": "query",
-    "text": "query ComponentHeaderStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentHeader_node\n    uri\n  }\n}\n\nfragment ComponentHeader_node on Component {\n  name\n  summary\n  version\n  _meta {\n    curie\n  }\n  tier {\n    name\n    uri\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ComponentHeaderStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentHeader_node\n    uri\n  }\n}\n\nfragment ComponentHeader_node on Component {\n  name\n  summary\n  _meta {\n    curie\n  }\n  tier {\n    name\n    uri\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

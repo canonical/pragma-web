@@ -1,0 +1,80 @@
+---
+# ComponentVariants (.../ComponentEntityPage/common/ComponentVariants/): one
+# captioned matrix of the component's variants as a section's content: a
+# cell for every modifier of every modifier family the graph holds and the
+# example honours (BLOCK_EXAMPLE_FAMILIES), each cell the published
+# component rendered with that one modifier (`UIBlockExample modifiers`),
+# captioned "<family>: <modifier>". Families in the graph's order, a
+# family's modifiers in the graph's order. Each cell carries
+# data-family and data-modifier (the e2e counts cells by them, W6a-A6).
+# A cell spans two columns of the page grid, the whole row below one group.
+# No heading of its own. Reference: PS3 V1 variants matrix (12 cells drawn),
+# heuristic 3.5.
+#
+# Token ledger (on `.ds.component-variants`):
+#   --component-variants-gap: --grid-gutter
+#   --component-variants-stage-padding: component.padding.block     all four sides
+# Below one group (@container shell (width < 448px)) a cell takes the whole
+# row: a reflow of its placement only. Style keys are the roster's
+# (layout.align, layout.justify, layout.listStyle, size.min.width, the
+# four spacing sides), the planner's shorthand keys spelled out.
+#   --component-variants-stage-border-color: color.border.muted
+#   --component-variants-stage-border-width: 1px                    literal hairline
+#   --component-variants-caption-color: color.text.muted
+#   --component-variants-caption-margin-block-start: space.050
+node:
+  uri: docs.subcomponent.component_variants
+  element: ul
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+    spacing.internal.inline.start: 0
+    layout.listStyle: none
+  edges:
+    - node:
+        role: cell
+        element: li
+        attributes: { data-family: "{family}", data-modifier: "{modifier}" }
+        styles:
+          layout.grid.column: "span 2"
+          size.min.width: 0
+        edges:
+          - node:
+              role: figure
+              element: figure
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.external.inline.start: 0
+                spacing.external.inline.end: 0
+              edges:
+                - node:
+                    role: stage
+                    styles:
+                      layout.type: flex
+                      layout.align: center
+                      layout.justify: center
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.block.end: component.padding.block
+                      spacing.internal.inline.start: component.padding.block
+                      spacing.internal.inline.end: component.padding.block
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.color: color.border.muted
+                    edges:
+                      - node: { uri: docs.component.ui_block_example }
+                        relation: { cardinality: "1", slotName: default }
+                  relation: { cardinality: "1", slotName: stage }
+                - node:
+                    role: caption
+                    element: figcaption
+                    styles:
+                      typography.color: color.text.muted
+                      spacing.external.block.start: space.050
+                  relation: { cardinality: "1", slotName: caption }
+            relation: { cardinality: "1", slotName: figure }
+      relation: { cardinality: "1..*", slotName: cell }

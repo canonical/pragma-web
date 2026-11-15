@@ -20,6 +20,7 @@ export const MESSAGES = {
   "rendererSwitch.chevron": "▾",
   "renderer.page": "Page",
   "renderer.turtle": "Turtle",
+  "sectionedView.contents": "On this page",
   "filterFold.label": "Filter · {count}",
   "filterFold.name": "Filter, {count} applied",
   "filterBar.label": "Facets",

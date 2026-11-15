@@ -14,7 +14,7 @@ describe("ComponentRelations SSR", () => {
     const html = renderToString(
       entityPageAt(BUTTON_URI, componentEntityRecordsButton, createFetchSpy()),
     );
-    expect(html).toContain('class="ds page-section ds component-relations"');
+    expect(html).toContain('<div class="ds component-relations">');
     expect(html).toContain(
       '<h3 class="label" id="component-relations-modifierFamilies">',
     );

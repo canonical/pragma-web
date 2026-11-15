@@ -12,9 +12,10 @@ import { SiteRail } from "#lib/ui/SiteRail";
 import type { GuidesLayoutProps } from "./types.js";
 
 /**
- * The strip's breadcrumb trail: `Guides` on the index, `Guides / <slug>`
- * on a guide's page. The guide's crumb is the `:slug` route param, so the
- * trail reads no data.
+ * The strip's breadcrumb trail: `Guides` on the index, marked current; on
+ * a guide's page the trail ends at the parent, `Guides` linking back to the
+ * index, and the page's heading names the guide. It reads the `:slug`
+ * route param alone, so the trail reads no data.
  */
 const GuidesContext = makeLensContext({
   lensRouteName: "guides",

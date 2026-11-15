@@ -3,7 +3,8 @@
  * each anatomy is well formed, that each stylesheet transcribes its
  * anatomy, that each folder has the generator's shape and placement, that
  * each projected anatomy reads what its Relay fragment reads, and that the
- * stylesheets keep the design's token and grid rules.
+ * stylesheets keep the design's token and grid rules; and the expectation
+ * a sectioned page's tests make of its section index.
  *
  * @experimental Test infrastructure for prism's own packages, published so
  * the lens packages and the apps can run the same checks; its options and
@@ -17,6 +18,7 @@ export { default as assertProjectionMatchesFragment } from "./assertProjectionMa
 export { default as assertScaffold } from "./assertScaffold.js";
 export { default as assertStylesheets } from "./assertStylesheets.js";
 export { default as assertStylesMatchAnatomy } from "./assertStylesMatchAnatomy.js";
+export { default as expectSectionIndex } from "./expectSectionIndex.js";
 export { default as listAnatomyFolders } from "./listAnatomyFolders.js";
 export type {
   AssertScaffoldOptions,

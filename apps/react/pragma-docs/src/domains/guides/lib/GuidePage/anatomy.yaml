@@ -1,17 +1,42 @@
 ---
-# GuidePage — a guide's reading page: the prose page with the guide's
-# address as its title and its text. It renders no element of its own: the
-# prose page renders the root.
+# GuidePage — a guide's reading page, laid on core's sectioned view
+# (prism.component.sectioned_view: the page's root is the view's
+# `<article>`, with the page's class beside the view's, named by its
+# heading). It hands the view its header and its body, and nothing else:
+#   - the header: the guide's address as the page's level-1 heading;
+#   - the body: the guide's text, today one line, carrying `.editorial`
+#     and `.content-flow`, so its space is the typography layer's.
+# It passes no section and no fact, so the view draws no index, no bar and
+# no aside: the header and the body take every column.
+#
+# The view places the regions on the page's columns; the page styles what
+# it puts in them. The text spans the body, flush left, and holds the 75ch
+# reading measure (heuristic 75ch prose line), as a section's prose does.
+#
+# Token ledger:
+#   --guide-page-prose-measure: 75ch  the text's reading measure.
+#   layout.grid.column "1 / -1" (header and text): structure. The 0 resets
+#     the heading's margins.
 node:
   uri: docs.component.guide_page
   edges:
     - node:
-        uri: docs.component.prose_page
+        role: masthead (the page's header, in the view's header region)
+        element: header
+        styles:
+          layout.grid.column: "1 / -1"
         edges:
           - node:
-              role: title (the guide's address)
+              role: heading (the page's level-1 heading, the guide's address)
+              element: h1
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
             relation: { cardinality: "1", slotName: heading }
-          - node:
-              role: copy (the guide's text)
-            relation: { cardinality: "1", slotName: prose }
-      relation: { cardinality: "1" }
+      relation: { cardinality: "1", slotName: masthead }
+    - node:
+        role: prose (the guide's text, carrying .editorial and .content-flow)
+        styles:
+          layout.grid.column: "1 / -1"
+          size.max.width: "75ch"
+      relation: { cardinality: "1", slotName: prose }   # the view's body

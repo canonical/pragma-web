@@ -1,0 +1,48 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* A subgrid of the section's content over every column, its gap the
+   * grid's gutter on both axes. */
+  .ds.component-changes {
+    --component-changes-gap: var(--grid-gutter);
+    --component-changes-summary-measure: 75ch;
+    --component-changes-meta-color: var(--color-text-muted);
+    --component-changes-version-font-family: var(
+      --typography-text-primary-code-font-family
+    );
+
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    gap: var(--component-changes-gap);
+    margin-block: 0;
+    padding-inline-start: 0;
+    list-style: none;
+  }
+
+  .ds.component-changes > .entry {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    gap: var(--component-changes-gap);
+  }
+
+  .ds.component-changes > .entry > .version {
+    grid-column: 1 / -1;
+    font-family: var(--component-changes-version-font-family);
+  }
+
+  /* The summary holds a reading measure, never wider than 75
+   * characters. */
+  .ds.component-changes > .entry > .summary {
+    grid-column: 1 / -1;
+    max-inline-size: var(--component-changes-summary-measure);
+    margin-block: 0;
+  }
+
+  .ds.component-changes > .entry > .meta {
+    grid-column: 1 / -1;
+    margin-block: 0;
+    color: var(--component-changes-meta-color);
+  }
+}

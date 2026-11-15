@@ -98,13 +98,13 @@ describe("StandardProse", () => {
     expect(code?.querySelector("a, .ds.node-chip")).toBeNull();
   });
 
-  it("renders the prose's headings one level down, under the article's title", {
+  it("renders the prose's headings two levels down, under its section's", {
     timeout: STANDARDS_TEST_TIMEOUT_MS,
   }, () => {
     const prose = renderProse();
 
-    expect(prose.querySelector("h1")).toBeNull();
-    expect(prose.querySelector("h2")?.textContent).toBe("Why one prop");
+    expect(prose.querySelector("h1, h2")).toBeNull();
+    expect(prose.querySelector("h3")?.textContent).toBe("Why one prop");
   });
 
   it("states the language the provider served the prose in", {

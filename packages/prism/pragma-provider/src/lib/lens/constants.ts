@@ -15,10 +15,13 @@ const SURFACE = "sem://surface#";
 /**
  * The site's type lens. The design-system, code-standards and anatomy-dsl
  * entries are the lens those ontologies declare in Turtle from the release
- * of ke-graphql that reads it, transcribed word for word; the surface
- * entries are this site's own. Surface classes whose instances are pure
- * enumerations other classes point at (verdicts, fluencies, regions,
- * authority families and the dimension classes) are hidden.
+ * of ke-graphql that reads it, transcribed word for word; the component's
+ * two fields in the lens fixture's order lead that release: a component's
+ * page opens on its variants (a group of their own, before usage) and shows
+ * its properties before its tokens. The surface entries are this site's
+ * own. Surface classes whose instances are pure enumerations other classes
+ * point at (verdicts, fluencies, regions, authority families and the
+ * dimension classes) are hidden.
  */
 export const SITE_LENS: SiteLens = {
   groups: [
@@ -32,6 +35,7 @@ export const SITE_LENS: SiteLens = {
     { uri: `${DS}section.overview`, labels: { en: "Overview" }, order: 1 },
     { uri: `${DS}section.relations`, labels: { en: "Relations" }, order: 6 },
     { uri: `${DS}section.usage`, labels: { en: "Usage" }, order: 3 },
+    { uri: `${DS}section.variants`, labels: { en: "Variants" }, order: 2.5 },
   ],
   classes: [
     {
@@ -93,6 +97,16 @@ export const SITE_LENS: SiteLens = {
       glyph: "bundle",
       pluralLabels: { en: "Components" },
       fields: [
+        {
+          property: `${DS}hasModifierFamily`,
+          group: `${DS}section.variants`,
+          order: 1,
+        },
+        {
+          property: `${DS}hasTokenBinding`,
+          group: `${DS}section.api`,
+          order: 2,
+        },
         {
           property: `${DS}hasSubcomponent`,
           group: `${DS}section.relations`,

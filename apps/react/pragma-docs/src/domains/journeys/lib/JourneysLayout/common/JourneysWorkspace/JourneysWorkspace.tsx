@@ -15,9 +15,10 @@ import { Inspector } from "../Inspector/index.js";
 import type { JourneysWorkspaceProps } from "./types.js";
 
 /**
- * The strip's breadcrumb trail: `Journeys` on the lens, `Journeys / <job>`
- * on a job. The job's crumb is the `:job` route param, so the trail reads
- * no query and never suspends the layout.
+ * The strip's breadcrumb trail: `Journeys` on the lens, marked current; on
+ * a job the trail ends at the parent, `Journeys` linking back to the lens.
+ * It reads the `:job` route param alone, so the trail reads no query and
+ * never suspends the layout.
  */
 const JourneysTrail = makeLensContext({
   lensRouteName: "journeys",

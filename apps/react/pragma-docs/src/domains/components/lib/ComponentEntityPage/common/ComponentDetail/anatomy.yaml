@@ -1,12 +1,20 @@
 ---
 # ComponentDetail — the component page's data-bearing interior: the page's
-# one operation, read from the warm store. It renders, in order, the
-# header with the key values, the rendered example, the anatomy tree, the
-# properties and the relations. For an address the graph does not answer
-# to, it renders a status line naming the address in the published
-# InlineCode. It sets the document title either way. A subgrid of the page
-# over every column, its gap the grid's gutter on both axes; each part
-# places itself.
+# one operation, read from the warm store, laid on the sectioned view
+# (SectionedView): the header names the component with its tier, stage
+# and address, the facts (the version, when the graph records one; else
+# no facts region) stand beside it, the rendered example is the body
+# before the sections, and the usage, the guidelines, the anatomy, the
+# properties, the relations and the changes are sections in the order the
+# lens gives their anchor fields (`usage`, `guidelines`, `anatomyDsl`,
+# `properties`, `inheritsFroms`, `changeLogs`), each only when the graph
+# holds a value (the three parts that always stood keep their "none
+# recorded" line), each section's heading the view's. Under a renderer
+# other than the page (Turtle) the view gets no section and what the
+# renderer draws as its body. For an address the graph does not answer to,
+# it renders a status line naming the address in the published InlineCode.
+# It sets the document title either way. A subgrid of the page over every
+# column, its gap the grid's gutter on both axes.
 #
 # Every decision is read through a component token declared on the root
 # (`--component-detail-*`), bound to the symbol named here.
@@ -36,17 +44,42 @@ node:
             relation: { cardinality: "1" }
       relation: { cardinality: "0..1", slotName: not-found }
     - node:
-        uri: docs.subcomponent.component_header
-      relation: { cardinality: "0..1" }
-    - node:
-        uri: docs.subcomponent.component_example
-      relation: { cardinality: "0..1" }
-    - node:
-        uri: docs.subcomponent.component_anatomy
-      relation: { cardinality: "0..1" }
-    - node:
-        uri: docs.subcomponent.component_properties
-      relation: { cardinality: "0..1" }
-    - node:
-        uri: docs.subcomponent.component_relations
+        uri: prism.component.sectioned_view
+        edges:
+          - node:
+              uri: docs.subcomponent.component_header
+            relation: { cardinality: "1", slotName: header }
+          - node:
+              role: facts (the version the graph records)
+              edges:
+                - node:
+                    uri: prism.component.key_value_list
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "0..1", slotName: facts }
+          - node:
+              role: body (the example under the page renderer, else what the renderer draws)
+              edges:
+                - node:
+                    uri: docs.subcomponent.component_example
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: body }
+          - node:
+              role: sections (under the page renderer, in the lens's order of their anchor fields)
+              edges:
+                - node:
+                    uri: docs.subcomponent.component_prose
+                  relation: { cardinality: "0..2" }   # anchors usage, guidelines
+                - node:
+                    uri: docs.subcomponent.component_anatomy
+                  relation: { cardinality: "0..1" }   # anchor anatomyDsl
+                - node:
+                    uri: docs.subcomponent.component_properties
+                  relation: { cardinality: "0..1" }   # anchor properties
+                - node:
+                    uri: docs.subcomponent.component_relations
+                  relation: { cardinality: "0..1" }   # anchor inheritsFroms
+                - node:
+                    uri: docs.subcomponent.component_changes
+                  relation: { cardinality: "0..1" }   # anchor changeLogs
+            relation: { cardinality: "1", slotName: sections }
       relation: { cardinality: "0..1" }

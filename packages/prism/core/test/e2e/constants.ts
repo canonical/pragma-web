@@ -93,3 +93,77 @@ export const SCROLL_PX = 400;
  * region's rule, which bleeds across the gutter to the rail's border.
  */
 export const PAGE_BAND_CLASS_NAME = "page-band";
+
+/**
+ * The core stylesheets a sectioned view lays out with inside a document,
+ * by component folder: the layout's, then the view's and its parts'.
+ */
+export const SECTIONED_VIEW_STYLESHEETS = [
+  ...COMPONENT_STYLESHEETS,
+  "SectionedView",
+  "SectionedView/common/ContentsBar",
+  "SectionedView/common/ContentsList",
+] as const;
+
+/**
+ * The widths below three groups (1376px) at which a sectioned view opens on
+ * its "On this page" bar: a laptop just below them and a phone.
+ */
+export const CONTENTS_BAR_VIEWPORTS = [
+  { width: 1366, height: 768 },
+  { width: 390, height: 844 },
+] as const;
+
+/**
+ * The `@canonical/styles` modifiers a sectioned view reads: the density
+ * channel, whose line unit sets the bar's height and so each heading's
+ * scroll margin.
+ */
+export const SECTIONED_VIEW_MODIFIERS = ["modifiers.density.css"] as const;
+
+/**
+ * The styles context and density a docs site paints on its document
+ * element, which choose the density channel's values.
+ */
+export const DOCUMENT_CONTEXT_CLASS_NAME = "docs comfortable";
+
+/** The sections of the view the bar is read on, more than the bar needs. */
+export const SECTION_TITLES = [
+  "Variants",
+  "Usage",
+  "Guidelines",
+  "Anatomy",
+  "Properties",
+] as const;
+
+/** Paragraphs in each section, enough to scroll any heading to the bar. */
+export const SECTION_PARAGRAPHS = 12;
+
+/**
+ * How many sections the long index is read with: more entries than a
+ * phone's screen holds at comfortable density, about 44px each.
+ */
+export const LONG_INDEX_SECTIONS = 30;
+
+/**
+ * The header row of the wide table a section's prose holds: more columns
+ * than a phone's screen holds, none of whose cells wraps.
+ */
+export const WIDE_TABLE_COLUMNS = [
+  "Property",
+  "Type",
+  "Default",
+  "Required",
+  "Description",
+  "Since",
+  "Deprecated",
+] as const;
+
+/** The phone the long index and the prose's wide table are read on. */
+export const PHONE_VIEWPORT = { width: 390, height: 844 } as const;
+
+/** The address the server-rendered page is served at, never fetched. */
+export const PAGE_URL = "http://prism.test/";
+
+/** How far a heading may rest from the bar's lower edge, in pixels. */
+export const BAR_EDGE_TOLERANCE_PX = 1;

@@ -14,7 +14,7 @@ describe("ComponentAnatomy SSR", () => {
     const html = renderToString(
       entityPageAt(BUTTON_URI, componentEntityRecordsButton, createFetchSpy()),
     );
-    expect(html).toContain('class="ds page-section ds component-anatomy"');
+    expect(html).toContain('<div class="ds component-anatomy">');
     expect(html).toContain('<figure aria-label="The anatomy of Button"');
   });
 });

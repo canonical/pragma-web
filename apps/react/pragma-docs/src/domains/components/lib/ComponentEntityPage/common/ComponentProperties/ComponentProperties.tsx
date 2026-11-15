@@ -3,7 +3,6 @@
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
-import { PageSection } from "#lib/ui/PageSection";
 import nodeFragment from "#relay/__generated__/ComponentProperties_node.graphql.js";
 import { PROPERTY_COLUMNS } from "./constants.js";
 import type { ComponentPropertiesProps } from "./types.js";
@@ -29,11 +28,11 @@ void declareNodeFragment;
 const componentCssClassName = "ds component-properties";
 
 /**
- * The component page's third section: the block's configurable properties
- * as a table across the whole main column, in plain text as the graph
- * holds them, a property's name as its row's header. A table wider than
- * the column scrolls inside its own region. A block with no properties
- * leaves one muted line.
+ * The content of a section of the component page, which carries the
+ * heading: the block's configurable properties as a table across the whole
+ * main column, in plain text as the graph holds them, a property's name as
+ * its row's header. A table wider than the column scrolls inside its own
+ * region. A block with no properties leaves one muted line.
  *
  * `import { ComponentProperties } from "../ComponentProperties/index.js";`
  *
@@ -49,11 +48,9 @@ export default function ComponentProperties({
   const t = useMessages();
   const { properties } = useFragment(nodeFragment, component);
   return (
-    <PageSection
+    <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      heading={t("component.properties")}
-      headingId="component-properties-title"
     >
       {properties.length === 0 ? (
         <p className="absent">{t("component.noProperties")}</p>
@@ -95,6 +92,6 @@ export default function ComponentProperties({
           </table>
         </div>
       )}
-    </PageSection>
+    </div>
   );
 }

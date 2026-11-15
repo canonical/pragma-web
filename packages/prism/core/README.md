@@ -368,8 +368,15 @@ site's own catalog, and the factory holds no reader-facing string.
 
 ## Public API
 
-- Layouts: `WorkspaceLayout`, `DocumentLayout`; types
-  `WorkspaceLayoutProps`, `DocumentLayoutProps`.
+- Layouts: `WorkspaceLayout`, `DocumentLayout`, `SectionedView` (the
+  generic single-entity page: the header, the facts and the sections
+  given as data, with the section index built from the sections), and
+  `orderSections`, which orders a page's sections as a class's lens
+  orders their anchor fields (group order, then field order, a field the
+  lens does not place after the placed ones); types
+  `WorkspaceLayoutProps`, `DocumentLayoutProps`, `SectionedViewProps`,
+  `SectionedViewSection`, `LensFieldOrder` (a class's field as the served
+  lens describes it: its name, its order and its group's order).
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
   `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`, `KeyValueList` (key values on the

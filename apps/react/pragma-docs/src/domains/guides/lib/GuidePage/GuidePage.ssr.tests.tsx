@@ -5,11 +5,17 @@ import { describe, expect, it } from "vitest";
 import GuidePage from "./GuidePage.js";
 
 describe("GuidePage SSR", () => {
-  it("server-renders the prose page with the guide's address", () => {
+  it("server-renders the sectioned view with the guide's address over its text", () => {
     const html = renderToString(<GuidePage params={{ slug: "router-core" }} />);
+    expect(html).toContain(
+      '<article aria-labelledby="guide-title" class="ds sectioned-view ds guide-page">',
+    );
     expect(html).toContain(
       '<h1 class="heading" id="guide-title">router-core</h1>',
     );
-    expect(html).toContain("<p>Guide content for router-core.</p>");
+    expect(html).toContain(
+      '<div class="prose editorial content-flow"><p>Guide content for router-core.</p></div>',
+    );
+    expect(html).not.toContain("<aside");
   });
 });

@@ -14,6 +14,13 @@ export type BlockExampleName =
 type OwnProps = {
   /** Which published component to render. */
   readonly example: BlockExampleName;
+  /**
+   * The modifier to render it with, by family: the name of the published
+   * component's prop to its value, such as `{ importance: "secondary" }`.
+   * A family the example does not honour (`BLOCK_EXAMPLE_FAMILIES`) is
+   * ignored. Defaults to none: the component's default state.
+   */
+  readonly modifiers?: Readonly<Record<string, string>>;
 };
 
 /**

@@ -24,10 +24,6 @@
  * nothing reaches past the viewport.
  */
 
-import { readFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import {
   createMemoryAdapter,
   createRouter,
@@ -37,7 +33,6 @@ import {
 import { RouterProvider } from "@canonical/router-react";
 import type { Browser, Page } from "playwright";
 import type { ReactElement } from "react";
-import { renderToString } from "react-dom/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   CANVAS_PAGE_TILE_CLASS_NAME,
@@ -57,19 +52,12 @@ import {
 import {
   ABSOLUTE_IRI,
   ARCHETYPE_VIEWPORTS,
-  BREADCRUMBS_STYLESHEETS,
   COMPONENT_STYLESHEETS,
   LONG_LENS_LABEL,
   PAGE_BAND_CLASS_NAME,
   SCROLL_PX,
-  SHELL_RULES,
-  SKIP_LINK_STYLESHEET,
 } from "./constants.js";
-
-/** The package's own components, two levels up from this file. */
-const UI_DIRECTORY = fileURLToPath(
-  new URL("../../src/lib/ui", import.meta.url),
-);
+import { readStylesheets, renderPage } from "./serverPage.js";
 
 /** Paragraphs enough to scroll a document's canvas. */
 const PARAGRAPHS = Array.from(
@@ -97,42 +85,6 @@ const MEASURE_OPTIONS: MeasureLayoutOptions = {
   tolerance: 0.5,
   clippingOverflows: ["auto", "scroll", "hidden", "clip"],
 };
-
-/**
- * Read the stylesheets a site loads before the archetypes': the layer
- * order, the primitive tokens the shim resolves to, the spacing shim and
- * the grid presets, the published skip link's, which takes the link out of
- * the flow, then the core components' own.
- *
- * @note Impure: reads the stylesheets from the file system.
- */
-function readStylesheets(): string {
-  const require = createRequire(import.meta.url);
-  const styles = dirname(require.resolve("@canonical/styles/package.json"));
-  const tokens = createRequire(join(styles, "package.json")).resolve(
-    "@canonical/design-tokens/dist/sets.primitive.css",
-  );
-  return [
-    join(styles, "src", "layers.css"),
-    tokens,
-    join(styles, "src", "spacing.css"),
-    join(styles, "src", "grid.css"),
-    require.resolve(`@canonical/react-ds-global/${SKIP_LINK_STYLESHEET}`),
-    ...BREADCRUMBS_STYLESHEETS.map((name) =>
-      require.resolve(`@canonical/react-ds-global/${name}`),
-    ),
-    ...COMPONENT_STYLESHEETS.map((name) =>
-      join(UI_DIRECTORY, name, "styles.css"),
-    ),
-  ]
-    .map((file) => readFileSync(file, "utf8"))
-    .join("\n");
-}
-
-/** Server-render a layout inside a stand-in for a site's shell. */
-function renderPage(layout: ReactElement, css: string): string {
-  return `<!doctype html><html><head><style>${css}${SHELL_RULES}</style></head><body><div class="ds shell grid intrinsic">${renderToString(layout)}</div></body></html>`;
-}
 
 /** A workspace with every region claimed. */
 const workspaceLayout = (
@@ -404,7 +356,7 @@ let browser: Browser;
 let css: string;
 
 beforeAll(async () => {
-  css = readStylesheets();
+  css = readStylesheets(COMPONENT_STYLESHEETS);
   browser = await launchBrowser();
 });
 

@@ -2,21 +2,24 @@
 
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
-import { PageSection } from "#lib/ui/PageSection";
 import {
   BLOCK_EXAMPLES,
   UIBlockExample,
 } from "../../../UIBlockExample/index.js";
+import { TITLE_ID } from "./constants.js";
 import type { ComponentExampleProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds component-example";
 
 /**
- * The component page's first section: the block's rendered example, the
- * published React component in its default state, server-rendered on a
- * stage framed by a hairline across the main column. A block the
- * published package does not implement says so in one muted line.
+ * The component page's example, the body before its sections: the block's
+ * rendered example, the published React component in its default state,
+ * server-rendered on a stage framed by a hairline across the main column.
+ * The frame opens with a one-line bar, a hairline under it, whose title
+ * "Example" names the stage's region; the title is no heading, the page's
+ * sections carrying the headings. A block the published package does not
+ * implement says so in one muted line.
  *
  * `import { ComponentExample } from "../ComponentExample/index.js";`
  *
@@ -31,19 +34,24 @@ export default function ComponentExample({
   const t = useMessages();
   const example = BLOCK_EXAMPLES.get(address);
   return (
-    <PageSection
+    <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      heading={t("component.example")}
-      headingId="component-example-title"
     >
       {example === undefined ? (
         <p className="absent">{t("component.noExample")}</p>
       ) : (
-        <div className="stage">
-          <UIBlockExample example={example} />
-        </div>
+        <section aria-labelledby={TITLE_ID} className="stage">
+          <div className="bar">
+            <span className="title" id={TITLE_ID}>
+              {t("component.example")}
+            </span>
+          </div>
+          <div className="surface">
+            <UIBlockExample example={example} />
+          </div>
+        </section>
       )}
-    </PageSection>
+    </div>
   );
 }

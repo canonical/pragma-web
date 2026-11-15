@@ -1,10 +1,14 @@
 ---
 # ComponentHeader — the component page's header: the name as the page's
-# level-1 heading, the summary on a reading measure of six intrinsic
-# columns and at most 75 characters, then the key values on the page's grid: the compact address in
-# the published InlineCode, the tier, the version and the first
-# documentation stage. An absent value leaves no pair. Application UI, not
-# prose: the heading, the summary and the key values sit one gutter apart.
+# level-1 heading (the compact address when it has no name), the summary
+# on a reading measure of six intrinsic columns and at most 75 characters,
+# then the status line: the tier and the first documentation stage, each
+# only when the graph records it, and the compact address in the code
+# face, muted, separated by middle dots (PS3 V1 `p.mockup-status-line`),
+# each dot held on one line with the value before it.
+# The page says the three here only; its facts hold the rest.
+# Application UI, not prose: the heading and the summary sit one gutter
+# apart.
 #
 # Every decision is read through a component token declared on the root
 # (`--component-header-*`), bound to the symbol named here.
@@ -13,6 +17,11 @@
 #   layout.grid.column "1 / -1", "1 / span 6": structure. The 0 resets.
 #   --component-header-summary-measure: 75ch  the summary's reading
 #     measure (heuristic 75ch prose line).
+#   --component-header-status-gap-block: space.050, -inline: space.100
+#     the status line's gaps when it wraps and between its parts (PS3 V1).
+#   --component-header-label-size: 1px  literal: the box of a value's
+#     name, read by assistive technology and drawn nowhere (transparent,
+#     its overflow hidden, out of the flow).
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -26,13 +35,22 @@ node:
     spacing.gap: grid.gutter
   edges:
     - node:
-        role: heading (the page's level-1 heading, the block's name)
-        projection:
-          field: name
+        role: heading (the page's level-1 heading, the name, else the address)
         styles:
           layout.grid.column: "1 / -1"
           spacing.external.block.start: 0
           spacing.external.block.end: 0
+        edges:
+          - node:
+              role: name
+              projection:
+                field: name
+            relation: { cardinality: "0..1" }
+          - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation: { cardinality: "0..1" }
       relation: { cardinality: "1", slotName: heading }
     - node:
         role: summary
@@ -45,36 +63,87 @@ node:
           spacing.external.block.end: 0
       relation: { cardinality: "0..1", slotName: summary }
     - node:
-        uri: prism.component.key_value_list
+        role: status line (tier · stage · address)
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap.block: space.050
+          spacing.gap.inline: space.100
+          size.min.width: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
         edges:
           - node:
-              role: address
-              projection:
-                field: _meta.curie
+              role: tier part (the value and the dot after it, kept on one line)
+              styles:
+                layout.type: flex
+                layout.align: baseline
+                spacing.gap.inline: space.100
               edges:
                 - node:
-                    uri: global.component.inline_code
-                  relation: { cardinality: "1" }
-            relation: { cardinality: "1" }
+                    role: value
+                    projection:
+                      field: tier.name
+                    styles:
+                      typography.color: color.text
+                    edges:
+                      - node:
+                          role: label ("Tier:", for assistive technology only)
+                          styles:
+                            layout.position: absolute
+                            size.width: "1px"
+                            size.height: "1px"
+                            layout.overflow: hidden
+                            typography.whiteSpace: nowrap
+                            appearance.opacity: 0
+                        relation: { cardinality: "1", slotName: label }
+                  relation: { cardinality: "1", slotName: value }
+                - node:
+                    role: separator (a middle dot, hidden from assistive technology)
+                    attributes: { aria-hidden: "true" }
+                  relation: { cardinality: "1", slotName: separator }
+            relation: { cardinality: "0..1", slotName: part }
           - node:
-              role: tier
-              projection:
-                field: name
-            relation:
-              cardinality: "0..1"
-              projection:
-                field: tier
+              role: stage part (the first documentation stage and the dot after it)
+              styles:
+                layout.type: flex
+                layout.align: baseline
+                spacing.gap.inline: space.100
+              edges:
+                - node:
+                    role: value
+                    projection:
+                      field: documentationStages._meta.title
+                    styles:
+                      typography.color: color.text
+                    edges:
+                      - node:
+                          role: label ("Stage:", for assistive technology only)
+                          styles:
+                            layout.position: absolute
+                            size.width: "1px"
+                            size.height: "1px"
+                            layout.overflow: hidden
+                            typography.whiteSpace: nowrap
+                            appearance.opacity: 0
+                        relation: { cardinality: "1", slotName: label }
+                  relation: { cardinality: "1", slotName: value }
+                - node:
+                    role: separator (a middle dot, hidden from assistive technology)
+                    attributes: { aria-hidden: "true" }
+                  relation: { cardinality: "1", slotName: separator }
+            relation: { cardinality: "0..1", slotName: part }
           - node:
-              role: version
+              role: address
+              element: code
               projection:
-                field: version
-            relation: { cardinality: "0..1" }
-          - node:
-              role: stage
-              projection:
-                field: _meta.title
-            relation:
-              cardinality: "0..1"
-              projection:
-                field: documentationStages
-      relation: { cardinality: "1", slotName: facts }
+                field: _meta.curie
+              styles:
+                size.min.width: 0
+                typography.fontFamily: typography.text.primary.code.fontFamily
+                typography.wrap: anywhere
+            relation: { cardinality: "1", slotName: address }
+      relation: { cardinality: "1", slotName: status-line }

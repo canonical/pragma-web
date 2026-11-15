@@ -4,7 +4,6 @@ import { EntityList } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
-import { PageSection } from "#lib/ui/PageSection";
 import { SiteRowProjection } from "#lib/ui/SiteRowProjection";
 import nodeFragment from "#relay/__generated__/ComponentRelations_node.graphql.js";
 import { RELATION_FIELDS } from "../../../../constants.js";
@@ -75,13 +74,14 @@ void declareNodeFragment;
 const componentCssClassName = "ds component-relations";
 
 /**
- * The component page's last section: the block's neighbours, one group per
- * relation the graph records, in a fixed order (inherits from, specialized
- * by, variants, variant of, subcomponents, modifier families). Each group
- * is its label over the shared list view in its rows view, each neighbour
- * a row through the site's row projection, linking to its home where it
- * has one. A relation with no neighbours leaves no group; a block with none
- * leaves one muted line.
+ * The content of a section of the component page, which carries the
+ * heading: the block's neighbours, one group per relation the graph
+ * records, in a fixed order (inherits from, specialized by, variants,
+ * variant of, subcomponents, modifier families). Each group is its label
+ * over the shared list view in its rows view, each neighbour a row through
+ * the site's row projection, linking to its home where it has one. A
+ * relation with no neighbours leaves no group; a block with none leaves one
+ * muted line.
  *
  * `import { ComponentRelations } from "../ComponentRelations/index.js";`
  *
@@ -101,11 +101,9 @@ export default function ComponentRelations({
     edges: data[field].edges,
   })).filter(({ edges }) => edges.length > 0);
   return (
-    <PageSection
+    <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      heading={t("component.relations")}
-      headingId="component-relations-title"
     >
       {groups.length === 0 ? (
         <p className="absent">{t("component.noRelations")}</p>
@@ -126,6 +124,6 @@ export default function ComponentRelations({
           </div>
         ))
       )}
-    </PageSection>
+    </div>
   );
 }
