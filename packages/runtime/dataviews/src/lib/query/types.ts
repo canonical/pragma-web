@@ -183,7 +183,8 @@ export type WindowNavigation = Partial<Omit<ResultWindow, "collapsed">>;
 
 /**
  * An addressed query command: a predicate command names one conjunct by
- * its `nth`, 0 when left out, and `clear` empties whole parts.
+ * its `nth`, 0 when left out, `addPredicate` adds one beside those at its
+ * address, and `clear` empties whole parts.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -197,6 +198,14 @@ export type QueryCommand =
        * out. Where the address holds none, the 0th is added.
        */
       readonly nth?: number | undefined;
+    }
+  | {
+      readonly kind: "addPredicate";
+      /**
+       * The conjunct added beside any already at its address. One the
+       * slice already holds changes nothing, since A AND A is A.
+       */
+      readonly predicate: Predicate;
     }
   | {
       readonly kind: "removePredicate";

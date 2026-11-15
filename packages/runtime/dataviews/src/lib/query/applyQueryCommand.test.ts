@@ -722,6 +722,63 @@ describe("applyQueryCommand", () => {
       });
     });
 
+    it("adds a conjunct beside those at its address, from the first page", () => {
+      const result = accept(
+        applyQueryCommand(bounded, window({ page: 3, cursor: "ex-token" }), {
+          kind: "addPredicate",
+          predicate: gte(2),
+        }),
+      );
+      expect(result.slice.filter).toEqual([gte(8), gte(4), gte(16), gte(2)]);
+      expect(result).toMatchObject({
+        sliceChanged: true,
+        windowChanged: true,
+        window: { page: 1, cursor: null },
+      });
+      expect(
+        accept(
+          applyQueryCommand(slice(), window(), {
+            kind: "addPredicate",
+            predicate: gte(2),
+          }),
+        ).slice.filter,
+      ).toEqual([gte(2)]);
+    });
+
+    it("changes nothing for a conjunct the slice already holds", () => {
+      const tags = slice({
+        filter: [{ field: "tags", operator: "isAny", operands: ["a", "b"] }],
+      });
+      for (const [held, predicate] of [
+        [bounded, gte(4)],
+        [tags, { field: "tags", operator: "isAny", operands: ["b", "a", "b"] }],
+      ] as const) {
+        const result = accept(
+          applyQueryCommand(held, window({ page: 2 }), {
+            kind: "addPredicate",
+            predicate,
+          }),
+        );
+        expect(result).toMatchObject({
+          sliceChanged: false,
+          windowChanged: false,
+        });
+        expect(result.slice).toBe(held);
+      }
+    });
+
+    it("rejects an added conjunct outside the grammar", () => {
+      const result = applyQueryCommand(bounded, window(), {
+        kind: "addPredicate",
+        predicate: { field: "cpu", operator: "gte", operands: [1, 2] },
+      });
+      expect(result).toMatchObject({
+        status: "rejected",
+        reason: "gte predicate needs exactly one operand",
+      });
+      expect(result.slice).toBe(bounded);
+    });
+
     it("removes the conjunct at nth alone, and nothing for one already gone", () => {
       expect(
         accept(
