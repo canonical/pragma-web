@@ -1,12 +1,12 @@
 ---
 # OntologyClassGraphNode: an ontology class as a node of a graph.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 566:2357 (the classes row's
-# graph node: "ds:Layout" in the identifier face, then "Abstract class in
-# design-system" muted). The title is the compact address; the kind names
-# the class's abstraction; the location is the address's prefix.
+# Reference: the W3 graph node anatomy: the slot order mark, prefix,
+# title, kind; a class fills the mark (the class glyph), the prefix (the
+# compact address's, shown only off the page's ambient namespace), the
+# title (never the address, A10) and the kind (its abstraction).
 # Projected onto EntityGraphNode, which carries every style: this anatomy
-# binds none. The home is the link the title renders through, resolved from
-# the compact address; a class without one reads as inert text.
+# binds none. The home is the link the title renders through, resolved
+# from the compact address; a class without one reads as inert text.
 node:
   uri: prism.component.ontology_class_graph_node
   projection:
@@ -16,16 +16,28 @@ node:
         uri: prism.component.entity_graph_node
         edges:
           - node:
-              role: title
-              projection:
-                field: _meta.curie
+              role: mark
+              # The class glyph, a published Icon (CLASS_MARK_ICON).
               edges:
-                # The compact address is set in the identifier face.
                 - node:
-                    role: identifier
+                    uri: global.component.icon
                   relation:
                     cardinality: "1"
-                    slotName: identifier
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
                 - node:
                     role: home
                     projection:
@@ -42,12 +54,5 @@ node:
             relation:
               cardinality: "1"
               slotName: kind
-          - node:
-              role: location
-              projection:
-                field: _meta.curie
-            relation:
-              cardinality: "0..1"
-              slotName: location
       relation:
         cardinality: "1"

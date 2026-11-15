@@ -9,6 +9,11 @@ type OwnProps = {
    * that spreads `...OntologyClassRow_node`.
    */
   readonly node: OntologyClassRow_node$key;
+  /**
+   * How many lines the row takes: one (32px), or two (56px), the summary
+   * under the title, where an index opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

@@ -1,13 +1,17 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/OntologyClassCard_node.graphql.js";
 import { useMessages } from "../../i18n/index.js";
-import { useProjectionLink } from "../../projections/index.js";
+import {
+  useForeignPrefix,
+  useProjectionLink,
+} from "../../projections/index.js";
 import { EntityCard } from "../../ui/index.js";
-import { findCuriePrefix } from "../../utils/index.js";
+import { CLASS_MARK_ICON } from "../constants.js";
 import type { OntologyClassCardProps } from "./types.js";
 import "./styles.css";
 
@@ -39,13 +43,16 @@ void declareNodeFragment;
 const componentCssClassName = "ds ontology-class-card";
 
 /**
- * An ontology class as a card in a grid of entities: its title as the
- * heading, linked to its home when the site has one and inert text when it
- * has none, and its superclass after the subclass sign (`Layout ⊂
- * UIBlock`); then "Abstract class in ds", its abstraction in its
- * namespace's prefix; then its definition. A class whose address did not
- * compact names its abstraction alone; a class without a superclass shows
- * its title alone. A class has no key values or vitals of its own.
+ * An ontology class as a card in a grid of entities, in the slot order:
+ * the class glyph as its mark, its namespace prefix when it differs from
+ * the page's ambient one, its title as the heading, linked to its home
+ * when the site has one and inert text when it has none; then its
+ * definition, its superclass as a fact ("Subclass of UIBlock") and, for an
+ * abstract class, the word "abstract" as its status. It passes no address,
+ * which the peek's own line shows in full, and no kind, which its mark
+ * states. A class without a superclass states no fact.
+ *
+ * It is the card's arm for `OntologyClass`: `CardProjection` renders it.
  *
  * Native props reach the card's `<div>` root; a consumer `className` merges
  * after the projection's own, and the root carries the typename as
@@ -55,8 +62,8 @@ const componentCssClassName = "ds ontology-class-card";
  *
  * @implements prism.component.ontology_class_card
  * @note Impure: reads its class from the Relay store, its home from the
- *   site's homes, its link from the projection provider and its kind from
- *   the translator in scope.
+ *   site's homes, its link from the projection provider, the page's
+ *   ambient namespace and its words from the translator in scope.
  */
 export default function OntologyClassCard({
   node,
@@ -68,22 +75,29 @@ export default function OntologyClassCard({
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
   const t = useMessages();
-  const kind = t(data.isAbstract ? "class.kind.abstract" : "class.kind");
-  const prefix = findCuriePrefix(curie);
+  const prefix = useForeignPrefix(curie);
+  const superclass = data.superclass?._meta.title;
   return (
     <EntityCard
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
-      href={href}
-      kind={
-        prefix === undefined
-          ? kind
-          : t("entity.context", { kind, location: prefix })
+      facts={
+        superclass === undefined
+          ? undefined
+          : [
+              {
+                property: "superclass",
+                label: t("class.superclass"),
+                value: superclass,
+              },
+            ]
       }
+      href={href}
       LinkComponent={LinkComponent}
-      parent={data.superclass?._meta.title}
-      parentRelation="subclass"
+      mark={<Icon icon={CLASS_MARK_ICON} />}
+      prefix={prefix}
+      status={data.isAbstract ? t("class.abstract") : undefined}
       summary={data.definition ?? undefined}
       title={title}
     />

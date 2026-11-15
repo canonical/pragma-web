@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -95,12 +96,16 @@ describe("OntologyClassGraphNode", () => {
         <OntologyClassGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("ds:Layout");
-    expect(
-      container.querySelector(".title tspan.identifier")?.textContent,
-    ).toBe("ds:Layout");
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe("ds: Layout");
+    expect(container.querySelector(".title > .prefix")?.textContent).toBe(
+      "ds: ",
+    );
     expect(container.querySelector(".context")?.textContent).toBe(
-      "Abstract class in ds",
+      "Abstract class",
+    );
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/blueprint.svg#blueprint",
     );
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_CLASS_HREF,

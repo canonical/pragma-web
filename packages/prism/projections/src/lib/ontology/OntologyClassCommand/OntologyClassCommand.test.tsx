@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -14,6 +15,7 @@ import {
 import testQuery, {
   type OntologyClassCommandTestQuery,
 } from "../../../__generated__/OntologyClassCommandTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyClassCommand from "./OntologyClassCommand.js";
 import type { OntologyClassCommandProps } from "./types.js";
 
@@ -93,14 +95,27 @@ describe("OntologyClassCommand", () => {
         <OntologyClassCommand node={node} />
       </ul>
     ));
+    expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".title, .kind, .location, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["Layout", "Abstract class", "ds", "used in 88 instances"]);
+      [
+        ...container.querySelectorAll(
+          ".prefix, .title, .address, .kind, .status",
+        ),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "ds:",
+      "Layout",
+      "ds:Layout",
+      "Abstract class",
+      "used in 88 instances",
+    ]);
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/blueprint.svg#blueprint",
+    );
     expect(container.querySelector(".title")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_CLASS_HREF,
     );
+    expect(container.querySelector(".context, .vital")).toBeNull();
   });
 
   it("counts a class's one instance in the singular", () => {
@@ -112,13 +127,25 @@ describe("OntologyClassCommand", () => {
       ),
       { instanceCount: 1, isAbstract: false },
     );
-    expect(container.querySelector(".vital")?.textContent).toBe(
+    expect(container.querySelector(".status")?.textContent).toBe(
       "used in 1 instance",
     );
     expect(container.querySelector(".kind")?.textContent).toBe("Class");
   });
 
-  it("names its kind alone when the class's address did not compact", () => {
+  it("shows its prefix only when its namespace is not the page's", () => {
+    const { container } = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <ul>
+          <OntologyClassCommand node={node} />
+        </ul>
+      </AmbientNamespaceProvider>
+    ));
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".address")?.textContent).toBe("ds:Layout");
+  });
+
+  it("shows an address that did not compact in full, with no prefix", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -127,8 +154,9 @@ describe("OntologyClassCommand", () => {
       ),
       { _meta: { title: "Layout", curie: "https://ds.canonical.com/Layout" } },
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Abstract class",
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".address")?.textContent).toBe(
+      "https://ds.canonical.com/Layout",
     );
   });
 

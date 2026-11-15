@@ -1,6 +1,18 @@
 import type { MessageKey } from "../i18n/index.js";
 
 /**
+ * The glyph every ontology class's arm leads with: the published icon
+ * for a blueprint, which a class is to its instances.
+ */
+export const CLASS_MARK_ICON = "blueprint";
+
+/**
+ * The glyph every ontology property's arm leads with: the published icon
+ * for a tag, the attribute a property names on its subject.
+ */
+export const PROPERTY_MARK_ICON = "tag";
+
+/**
  * The catalog key of each property kind's label, the kind a property's
  * card, command and graph node name it by. A kind the contract adds later
  * has none, and reads `property.kind.other`.

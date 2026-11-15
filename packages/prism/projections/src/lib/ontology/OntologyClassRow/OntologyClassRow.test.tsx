@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -14,6 +15,7 @@ import {
 import testQuery, {
   type OntologyClassRowTestQuery,
 } from "../../../__generated__/OntologyClassRowTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyClassRow from "./OntologyClassRow.js";
 import type { OntologyClassRowProps } from "./types.js";
 
@@ -94,20 +96,34 @@ describe("OntologyClassRow", () => {
         <OntologyClassRow node={node} />
       </ul>
     ));
+    expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".location, .title, .meta")].map(
+      [...container.querySelectorAll(".prefix, .title, .kind")].map(
         (slot) => slot.textContent,
       ),
     ).toEqual(["ds:", "Layout", "abstract"]);
-    expect(
-      container.querySelector(".location code.identifier")?.textContent,
-    ).toBe("ds:");
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/blueprint.svg#blueprint",
+    );
     expect(container.querySelector(".title")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_CLASS_HREF,
     );
+    expect(container.querySelector(".summary")).toBeNull();
   });
 
-  it("ends in no word for a concrete class", () => {
+  it("sets the class's definition under the title when the index opts into two lines", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <OntologyClassRow lines="two" node={node} />
+      </ul>
+    ));
+    expectSlotOrder(container);
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      MOCK_ONTOLOGY_CLASS.definition,
+    );
+  });
+
+  it("names no kind for a concrete class", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -116,7 +132,19 @@ describe("OntologyClassRow", () => {
       ),
       { isAbstract: false },
     );
-    expect(container.querySelector(".meta")).toBeNull();
+    expect(container.querySelector(".kind")).toBeNull();
+  });
+
+  it("shows its prefix only when its namespace is not the page's", () => {
+    const { container } = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <ul>
+          <OntologyClassRow node={node} />
+        </ul>
+      </AmbientNamespaceProvider>
+    ));
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Layout");
   });
 
   it("leads with no prefix when the class's address did not compact", () => {
@@ -128,7 +156,7 @@ describe("OntologyClassRow", () => {
       ),
       { _meta: { title: "Layout", curie: "https://ds.canonical.com/Layout" } },
     );
-    expect(container.querySelector(".location")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("applies custom className", () => {

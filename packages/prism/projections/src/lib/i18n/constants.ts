@@ -16,6 +16,7 @@ export const MESSAGES = {
   "class.kind": "Class",
   "class.kind.abstract": "Abstract class",
   "class.abstract": "abstract",
+  "class.superclass": "Subclass of",
   "class.instances": {
     one: "used in {count} instance",
     other: "used in {count} instances",
@@ -28,6 +29,7 @@ export const MESSAGES = {
   "property.meta.datatype": "datatype",
   "property.meta.annotation": "annotation",
   "property.meta.other": "property",
+  "property.domain": "Domain",
   "property.range": "Range",
   "property.inverse": "Inverse",
   "property.functional": "functional",
