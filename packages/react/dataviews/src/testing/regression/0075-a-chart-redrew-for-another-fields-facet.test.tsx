@@ -5,39 +5,20 @@
  * exactly what the old one said, and the chart redrew every bar for it. The
  * chart holds its own facet by what it claims, not by its identity.
  *
- * The drawing counts its own renders here: nothing the DOM shows can tell a
- * redraw with identical output from no redraw at all.
+ * The drawing is counted by a pass-through counter: the real memo, its
+ * drawing spied, so every call is a render that got past the memo and still
+ * draws. Nothing the DOM shows can tell a redraw with identical output from
+ * no redraw at all.
  */
 
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import createFacetedManual from "../../../testing/createFacetedManual.js";
 import deliverFacets from "../../../testing/deliverFacets.js";
+import BarDrawing from "../../lib/_work_in_progress/DataChart/common/BarDrawing/BarDrawing.js";
+import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
-/** Every set of values the drawing was asked to draw, in order. */
-const drawn: unknown[] = [];
-
-vi.mock(
-  "../../lib/_work_in_progress/DataChart/common/BarDrawing/BarDrawing.js",
-  async (importOriginal) => {
-    const actual =
-      await importOriginal<
-        typeof import("../../lib/_work_in_progress/DataChart/common/BarDrawing/BarDrawing.js")
-      >();
-    const Drawing = actual.default;
-    const { memo, createElement } = await import("react");
-    return {
-      default: memo((props: Parameters<typeof Drawing>[0]) => {
-        drawn.push(props.values);
-        return createElement(Drawing, props);
-      }),
-    };
-  },
-);
-
-const { DataChart } = await import(
-  "../../lib/_work_in_progress/DataChart/index.js"
-);
+const draws = vi.spyOn(BarDrawing, "type");
 
 /** One status facet, minted fresh each time, saying the same thing. */
 const status = () =>
@@ -61,7 +42,7 @@ describe("a result that moved another field's facet", () => {
       status: status(),
       cores: { kind: "range", min: 1, max: 8 },
     });
-    expect(drawn).toHaveLength(1);
+    expect(draws).toHaveBeenCalledTimes(1);
 
     provider.refresh();
     // The same status counts, in a new object, beside a range that moved.
@@ -69,7 +50,7 @@ describe("a result that moved another field's facet", () => {
       status: status(),
       cores: { kind: "range", min: 1, max: 16 },
     });
-    expect(drawn).toHaveLength(1);
+    expect(draws).toHaveBeenCalledTimes(1);
 
     provider.refresh();
     // A status count that actually moved draws again.
@@ -80,6 +61,6 @@ describe("a result that moved another field's facet", () => {
       },
       cores: { kind: "range", min: 1, max: 16 },
     });
-    expect(drawn).toHaveLength(2);
+    expect(draws).toHaveBeenCalledTimes(2);
   });
 });
