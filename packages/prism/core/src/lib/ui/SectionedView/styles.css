@@ -17,6 +17,10 @@
       var(--space-050)
     );
     --sectioned-view-section-margin-block-start: var(--space-300);
+    /* The reading measure of a prose shown as a section's content, and
+     * the text size its characters are counted in: its paragraphs'. */
+    --sectioned-view-prose-measure: 75ch;
+    --sectioned-view-prose-font-size: var(--typography-text-primary-font-size);
     --sectioned-view-aside-inset-block-start: 0;
     --sectioned-view-contents-label-color: var(--color-text-muted);
     --sectioned-view-facts-key-color: var(--color-text-muted);
@@ -126,6 +130,17 @@
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     gap: var(--sectioned-view-gap);
+  }
+
+  /* A prose a section shows (an `.editorial` block, as every prose is)
+   * takes the section's every column and holds the reading measure, 75
+   * characters, whatever the columns add up to. Its text is its
+   * paragraphs' size, so the characters it counts are theirs and a
+   * paragraph reads at most 75 of its own. */
+  .ds.sectioned-view > .content > .section > .section-body > .editorial {
+    grid-column: 1 / -1;
+    max-inline-size: var(--sectioned-view-prose-measure);
+    font-size: var(--sectioned-view-prose-font-size);
   }
 
   /* With no aside, the header and the content take every column. */

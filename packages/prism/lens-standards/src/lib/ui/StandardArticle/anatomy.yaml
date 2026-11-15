@@ -17,9 +17,9 @@
 # The view places the regions on the page's columns; the article styles
 # what it puts in them. The header is application UI: the title and the
 # meta line stack one small step apart, the meta line's parts one gutter
-# apart on a shared baseline. Only the rule's prose holds a reading measure
-# of six intrinsic columns from the column's first line (a narrower subgrid
-# clamps the span), flush left. Its space is element-owned: `.editorial`
+# apart on a shared baseline. The rule's prose takes the section's every
+# column, flush left; the view holds a prose (`.editorial`) to the 75ch
+# reading measure, so the article sets none. Its space is element-owned: `.editorial`
 # gives its headings and paragraphs their space after, and `.content-flow`
 # clears the last block's. A description keeps its hand-written line
 # breaks.
@@ -31,8 +31,7 @@
 #   space.100 (8px) between the title and the meta line: they read as one
 #     heading; no gap may read a container gap.
 #   grid.gutter between the meta line's parts.
-#   layout.grid.column "1 / -1" (header) and "1 / span 6" (prose):
-#     structure, a span in columns.
+#   layout.grid.column "1 / -1" (header and prose): structure.
 #   typography.whiteSpace pre-line, layout.wrap wrap, layout.align
 #     baseline: keywords; the 0 resets on the meta line.
 #
@@ -80,11 +79,11 @@ node:
           - node:
               uri: prism.subcomponent.standard_prose
               styles:
-                layout.grid.column: "1 / span 6"
+                layout.grid.column: "1 / -1"
           - node:
               role: prose (the description, carrying .editorial and .content-flow)
               styles:
-                layout.grid.column: "1 / span 6"
+                layout.grid.column: "1 / -1"
               edges:
                 - node:
                     role: paragraph (one block of the description)
@@ -94,7 +93,7 @@ node:
           - node:
               role: prose (the catalog's line for a standard with no text)
               styles:
-                layout.grid.column: "1 / span 6"
+                layout.grid.column: "1 / -1"
       relation: { cardinality: "0..1", slotName: prose }   # the rule section's content
     - node:
         uri: prism.component.entity_source

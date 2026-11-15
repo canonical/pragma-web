@@ -28,10 +28,10 @@
     color: var(--standard-article-meta-color);
   }
 
-  /* The reading measure: six columns from the first line, clamped by a
-   * narrower subgrid. */
+  /* The rule's prose takes the section's every column; the view holds a
+   * prose to its reading measure. */
   .ds.standard-article .prose {
-    grid-column: 1 / span 6;
+    grid-column: 1 / -1;
   }
 
   /* A description keeps its hand-written line breaks. */

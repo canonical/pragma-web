@@ -11,7 +11,11 @@ export interface SectionedViewSection {
   readonly id: string;
   /** The section's heading, in the reader's language. */
   readonly title: string;
-  /** The section's body, under its heading. */
+  /**
+   * The section's body, under its heading; its own headings start at
+   * level 3. A prose given here carries `.editorial`: the view gives it
+   * the section's every column and holds it to the 75ch reading measure.
+   */
   readonly content: ReactNode;
 }
 

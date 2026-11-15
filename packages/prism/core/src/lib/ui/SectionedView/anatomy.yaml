@@ -50,16 +50,24 @@
 #   - Every section takes the top margin, the first included: the check
 #     names no positional state, and the first section follows the header
 #     or the body.
+#   - A prose given as a section's content is reached through its
+#     `.editorial` class, the class every prose carries: it takes the
+#     section's every column and holds the 75ch reading measure (M13, v3
+#     1.1). Its text is set to the paragraphs' size (text primary), so the
+#     `ch` it counts is a paragraph's own: the measure is one rule for every
+#     page kind, never a column span.
 #
 # Token ledger (component tokens on `.ds.sectioned-view`):
 #   --sectioned-view-gap: --grid-gutter                      every grid here, both axes
 #   --sectioned-view-bar-block-size: calc(var(--density-line-height) + 2 * var(--space-050))
 #                                                            PS8 L171; 44px drawn; the bound is "at most 44px"
 #   --sectioned-view-section-margin-block-start: space.300   a section after another (external spacing, A2)
+#   --sectioned-view-prose-measure: 75ch                     a section's prose (M13, heuristic 75ch line; PS8 592px)
+#   --sectioned-view-prose-font-size: typography.text.primary.fontSize   the prose's text, its paragraphs' size
 #   --sectioned-view-aside-inset-block-start: 0              literal 0
 #   --sectioned-view-contents-label-color: color.text.muted  the "On this page" label
 #   --sectioned-view-facts-key-color: color.text.muted       a fact's key (PS8 `.mockup-facts dt`)
-# Literals: none but 0.
+# Literals: 0 and the 75ch measure.
 node:
   uri: prism.component.sectioned_view
   element: article
@@ -182,6 +190,16 @@ node:
                 - node:
                     role: section content
                     styles: { layout.grid.column: "1 / -1", layout.type: grid, layout.grid.columns: subgrid, spacing.gap: grid.gutter }
+                    edges:
+                      # A prose the page passes, reached through its own
+                      # class: every column, the reading measure.
+                      - node:
+                          role: prose
+                          styles:
+                            layout.grid.column: "1 / -1"
+                            size.max.width: "75ch"
+                            typography.size: typography.text.primary.fontSize
+                        relation: { cardinality: "0..1", slotName: editorial }
                   relation: { cardinality: "1", slotName: section-body }
             relation: { cardinality: "0..*", slotName: section }
       relation: { cardinality: "1", slotName: content }

@@ -36,6 +36,7 @@ const EXTERNAL_TOKENS = [
   "--color-text-muted",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-code-font-family",
+  "--typography-text-primary-font-size",
   "--typography-text-secondary-font-size",
   "--typography-text-secondary-font-weight",
 ];
@@ -57,6 +58,7 @@ const REACHES = [
   ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair",
   ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .key",
   ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .value",
+  ".ds.sectioned-view > .content > .section > .section-body > .editorial",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
