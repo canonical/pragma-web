@@ -20,9 +20,9 @@ function pickNodeArgs({
   title,
   href,
   kind,
-  location,
+  prefix,
 }: StoryEntity): EntityGraphNodeProps {
-  return { title, href, kind, location };
+  return { title, href, kind, prefix };
 }
 
 /** The five types, in the order of the matrix's rows. */

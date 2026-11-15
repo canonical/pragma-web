@@ -48,7 +48,7 @@ export const createCatalogRouter = (url = "/components") =>
 
 /**
  * The catalog page over an environment seeded with `records` (`undefined`
- * = cold store), under the site's homes and projection maps. The page owns
+ * = cold store), under the site's homes and its link provider. The page owns
  * its Suspense/ErrorBoundary; the router carries the address the view is
  * read from (no Outlet — the lens layout stays out of component tests).
  */

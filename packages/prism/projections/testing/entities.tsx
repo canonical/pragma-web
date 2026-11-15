@@ -1,84 +1,74 @@
-import { Badge, Icon } from "@canonical/react-ds-global";
 import type { StoryEntity } from "./types.js";
 
 /** The meta type: an ontology class, with its instances counted. */
 export const CLASS_ENTITY: StoryEntity = {
   title: "Layout",
-  location: "design-system",
   prefix: "ds:",
+  address: "ds:Layout",
   kind: "Class",
   summary:
     "A layout arranges the blocks of a page on the grid: it decides where each region sits and how the regions reflow.",
-  keyValues: [{ key: "Instances", value: "12" }],
-  vitals: ["used in 88 instances"],
-  meta: "abstract",
-  chip: { value: "Layout", badge: <Badge value={88} /> },
+  facts: [{ property: "ds:instanceCount", label: "Instances", value: "12" }],
+  status: "abstract",
+  count: 88,
   href: "#layout",
 };
 
 /** A UI block: a component of the design system, under its parent. */
 export const UI_BLOCK_ENTITY: StoryEntity = {
   title: "IconButton",
-  parent: "Button",
-  location: "DS:Global",
   prefix: "ds:",
+  address: "ds:IconButton",
   kind: "Component",
   summary: "A button is an interactive element that triggers a command.",
-  keyValues: [{ key: "Tier", value: "Component" }],
-  vitals: ["v2.1", "Experimental"],
-  meta: "experimental",
-  chip: { value: "IconButton" },
+  facts: [
+    { property: "ds:tier", label: "Tier", value: "Global" },
+    { property: "ds:inheritsFrom", label: "Inherits from", value: "Button" },
+    { property: "ds:version", label: "Version", value: "2.1" },
+  ],
+  status: "experimental",
   href: "#icon-button",
 };
 
 /** A modifier, filed under its family. */
 export const MODIFIER_ENTITY: StoryEntity = {
   title: "Danger",
-  location: "DS:Global",
   prefix: "ds:",
+  address: "ds:Danger",
   kind: "Modifier",
   summary:
     "The danger modifier is part of the anticipation modifier family. It is defined in the DS:Global.",
-  keyValues: [
-    { key: "Class", value: "Modifier" },
-    { key: "Family", value: "Anticipation" },
+  facts: [
+    { property: "ds:modifierFamily", label: "Family", value: "Anticipation" },
+    { property: "ds:version", label: "Version", value: "1.11" },
   ],
-  vitals: ["v1.11"],
-  meta: "modifier",
-  chip: {
-    lead: "Modifier",
-    value: "Danger",
-    icon: <Icon icon="warning" />,
-  },
+  status: "stable",
   href: "#danger",
 };
 
 /** A modifier family, with its members counted. */
 export const MODIFIER_FAMILY_ENTITY: StoryEntity = {
   title: "Anticipation",
-  location: "DS:Global",
   prefix: "ds:",
+  address: "ds:Anticipation",
   kind: "Modifier family",
   summary:
     "The anticipation family groups the modifiers that tell a reader what an action will do before it is taken.",
-  keyValues: [{ key: "Members", value: "5" }],
-  vitals: ["5 modifiers"],
-  meta: "family",
-  chip: { value: "Anticipation", badge: <Badge value={5} /> },
+  facts: [{ property: "ds:modifiers", label: "Members", value: "5" }],
+  status: "stable",
+  count: 5,
   href: "#anticipation",
 };
 
 /** A code standard, filed under its category. */
 export const STANDARD_ENTITY: StoryEntity = {
   title: "react.component.subcomponent_export_api",
-  location: "web-code-standards",
   prefix: "cs:",
+  address: "cs:react.component.subcomponent_export_api",
   kind: "Code Standard",
   summary:
     "Subcomponents are public if they are intended to be directly used by the consumer of the parent component to construct a UI.",
-  keyValues: [{ key: "Category", value: "React" }],
-  vitals: ["React"],
-  meta: "react",
-  chip: { lead: "cs", value: "subcomponent_export_api" },
+  facts: [{ property: "cs:category", label: "Category", value: "React" }],
+  status: "stable",
   href: "#subcomponent-export-api",
 };

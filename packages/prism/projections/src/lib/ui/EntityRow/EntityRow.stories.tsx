@@ -14,14 +14,15 @@ import type { StoryEntity } from "../../../../testing/types.js";
 import Component from "./EntityRow.js";
 import type { EntityRowProps } from "./types.js";
 
-/** The row's slots for one entity of the matrix. */
+/** The row's slots for one entity of the matrix: its first fact alone. */
 function pickRowArgs({
   prefix,
   title,
   href,
-  meta,
+  facts,
+  status,
 }: StoryEntity): EntityRowProps {
-  return { location: prefix, title, href, meta };
+  return { prefix, title, href, facts: facts.slice(0, 1), status };
 }
 
 const meta: Meta<typeof Component> = {

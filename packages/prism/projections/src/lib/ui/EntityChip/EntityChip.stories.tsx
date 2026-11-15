@@ -15,9 +15,22 @@ import { EntityCard } from "../EntityCard/index.js";
 import Component from "./EntityChip.js";
 import type { EntityChipProps } from "./types.js";
 
-/** The chip's slots for one entity of the matrix. */
-function pickChipArgs({ chip, href }: StoryEntity): EntityChipProps {
-  return { ...chip, href };
+/**
+ * The chip's slots for one entity of the matrix: its one figure, where it
+ * has one, as a published `Badge` in the status.
+ */
+function pickChipArgs({
+  prefix,
+  title,
+  href,
+  count,
+}: StoryEntity): EntityChipProps {
+  return {
+    prefix,
+    title,
+    href,
+    status: count === undefined ? undefined : <Badge value={count} />,
+  };
 }
 
 const meta: Meta<typeof Component> = {
@@ -36,7 +49,7 @@ export const Class: Story = { args: pickChipArgs(CLASS_ENTITY) };
 /** A UI block: the bare mention. */
 export const UIBlock: Story = { args: pickChipArgs(UI_BLOCK_ENTITY) };
 
-/** A modifier, filed under its kind and marked by its icon. */
+/** A modifier: the bare mention. */
 export const Modifier: Story = { args: pickChipArgs(MODIFIER_ENTITY) };
 
 /** A modifier family, counted by its members. */
@@ -44,26 +57,17 @@ export const ModifierFamily: Story = {
   args: pickChipArgs(MODIFIER_FAMILY_ENTITY),
 };
 
-/** A code standard, filed under its prefix. */
+/** A code standard, led by its foreign prefix. */
 export const Standard: Story = { args: pickChipArgs(STANDARD_ENTITY) };
 
 /**
- * A value longer than the line that holds it: the pill stops at the line's
- * width and the value ends in an ellipsis.
+ * A title longer than the line that holds it: the pill stops at the line's
+ * width and the title ends in an ellipsis.
  */
-export const LongValue: Story = {
+export const LongTitle: Story = {
   args: {
     ...pickChipArgs(STANDARD_ENTITY),
-    value: "react.component.subcomponent_export_api.server_rendering",
-  },
-};
-
-/** The segmented chip: an icon, then the disclosure chevron. */
-export const Chevron: Story = {
-  args: {
-    ...pickChipArgs(MODIFIER_ENTITY),
-    icon: <Icon icon="warning" />,
-    chevron: true,
+    title: "react.component.subcomponent_export_api.server_rendering",
   },
 };
 
@@ -75,7 +79,7 @@ export const Marked: Story = {
   args: { ...pickChipArgs(UI_BLOCK_ENTITY), mark: <Icon icon="information" /> },
 };
 
-/** An entity without a home: the value is inert text. */
+/** An entity without a home: the title is inert text. */
 export const WithoutHome: Story = {
   args: { ...pickChipArgs(CLASS_ENTITY), href: undefined },
 };
@@ -89,7 +93,7 @@ export const Identity: Story = {
     href: UI_BLOCK_ENTITY.href,
     mark: <Icon icon="information" />,
     prefix: "ds",
-    title: UI_BLOCK_ENTITY.chip.value,
+    title: UI_BLOCK_ENTITY.title,
     status: <Badge value={3} />,
   },
 };
@@ -99,7 +103,7 @@ export const Unlinked: Story = {
   args: {
     href: UI_BLOCK_ENTITY.href,
     linked: false,
-    title: UI_BLOCK_ENTITY.chip.value,
+    title: UI_BLOCK_ENTITY.title,
   },
 };
 
@@ -110,12 +114,12 @@ export const Unlinked: Story = {
 export const Peeking: Story = {
   args: {
     href: UI_BLOCK_ENTITY.href,
-    title: UI_BLOCK_ENTITY.chip.value,
+    title: UI_BLOCK_ENTITY.title,
     peek: (
       <EntityCard
         href={UI_BLOCK_ENTITY.href}
-        keyValues={UI_BLOCK_ENTITY.keyValues}
-        kind={UI_BLOCK_ENTITY.kind}
+        facts={UI_BLOCK_ENTITY.facts}
+        prefix={UI_BLOCK_ENTITY.prefix}
         summary={UI_BLOCK_ENTITY.summary}
         title={UI_BLOCK_ENTITY.title}
       />

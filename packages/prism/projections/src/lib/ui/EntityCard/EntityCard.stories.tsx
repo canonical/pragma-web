@@ -18,48 +18,29 @@ import EntityChip from "../EntityChip/EntityChip.js";
 import Component from "./EntityCard.js";
 import type { EntityCardProps } from "./types.js";
 
-/** The card's slots for one entity of the matrix. */
+/**
+ * The card's slots for one entity of the matrix: a typed card passes no
+ * address and no kind, the peek's line and its index saying them.
+ */
 function pickCardArgs({
-  location,
+  prefix,
   title,
-  parent,
   href,
-  kind,
   summary,
-  keyValues,
-  vitals,
+  facts,
+  status,
 }: StoryEntity): EntityCardProps {
-  return { location, title, parent, href, kind, summary, keyValues, vitals };
+  return { prefix, title, href, summary, facts, status };
 }
 
 /**
- * A UI block's sidecar: the published Button with its default props, given
- * only its label and the native type that keeps it from submitting, an
- * example that fits the sidecar's two columns at every width.
+ * A UI block's specimen: the published Button with its default props, given
+ * only its label and the native type that keeps it from submitting.
  */
-const BUTTON_EXAMPLE = <Button type="button">Submit</Button>;
-
-/**
- * A sidecar example taller than the card's body: eight Buttons with their
- * default props, one per label.
- */
-const TALL_EXAMPLE = (
-  <>
-    {[
-      "Submit",
-      "Save draft",
-      "Preview",
-      "Publish",
-      "Schedule",
-      "Archive",
-      "Duplicate",
-      "Delete",
-    ].map((label) => (
-      <p key={label}>
-        <Button type="button">{label}</Button>
-      </p>
-    ))}
-  </>
+const BUTTON_SPECIMEN = (
+  <Component.Specimen kind="block" label="A button, drawn">
+    <Button type="button">Submit</Button>
+  </Component.Specimen>
 );
 
 const meta: Meta<typeof Component> = {
@@ -76,32 +57,24 @@ type Story = StoryObj<typeof Component>;
 /** A class, with its instances counted. */
 export const Class: Story = { args: pickCardArgs(CLASS_ENTITY) };
 
-/** A class under its superclass: the parent follows the subclass sign. */
+/** A class under its superclass: the superclass is one of its facts. */
 export const Subclass: Story = {
   args: {
     ...pickCardArgs(CLASS_ENTITY),
-    parent: "UIBlock",
-    parentRelation: "subclass",
+    facts: [
+      { property: "rdfs:subClassOf", label: "Subclass of", value: "UIBlock" },
+    ],
   },
 };
 
-/** A UI block under its parent, without a sidecar. */
+/** A UI block, without a specimen. */
 export const UIBlock: Story = { args: pickCardArgs(UI_BLOCK_ENTITY) };
 
 /**
- * A modifier family without vitals: the card has no footer, and its body
- * reaches the card's bottom edge.
+ * A card beside a card whose summary runs long: the long card grows its
+ * body only, and the card beside it keeps its own height.
  */
-export const WithoutVitals: Story = {
-  args: { ...pickCardArgs(MODIFIER_FAMILY_ENTITY), vitals: undefined },
-};
-
-/**
- * A card with vitals beside a card without them whose summary runs long:
- * the card without vitals grows its body only, and the footer beside it
- * keeps its own height.
- */
-export const MixedVitals: Story = {
+export const MixedHeights: Story = {
   render: () => (
     <>
       <Component {...pickCardArgs(MODIFIER_ENTITY)} />
@@ -111,70 +84,29 @@ export const MixedVitals: Story = {
           { length: 4 },
           () => MODIFIER_FAMILY_ENTITY.summary,
         ).join(" ")}
-        vitals={undefined}
       />
     </>
   ),
 };
 
 /**
- * A modifier whose family is a mention: the chip in the key value keeps its
- * whole pill, and the pair's line grows to hold it.
+ * A modifier whose family is a mention: the chip in the fact keeps its
+ * whole pill, and the fact's line grows to hold it.
  */
 export const WithMention: Story = {
   args: {
     ...pickCardArgs(MODIFIER_ENTITY),
-    keyValues: [
-      { key: "Class", value: "Modifier" },
+    facts: [
       {
-        key: "Family",
-        value: <EntityChip href="#anticipation" value="Anticipation" />,
+        property: "ds:modifierFamily",
+        label: "Family",
+        value: <EntityChip href="#anticipation" title="Anticipation" />,
       },
     ],
   },
 };
 
-/** A UI block with its sidecar: the rendered example beside the body. */
-export const UIBlockWithSidecar: Story = {
-  args: { ...pickCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },
-};
-
-/**
- * A UI block with its sidecar below two groups of the shell, at a phone's
- * width: the card spans the whole row and the example moves under the
- * body, the two meeting where the body ends, the footer under both. Opened
- * on its own in a frame narrower than two groups (912px), the story shows
- * the same.
- */
-export const UIBlockWithSidecarStacked: Story = {
-  args: { ...pickCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },
-  globals: { viewport: { value: "mobile2", isRotated: false } },
-};
-
-/**
- * A UI block with its sidecar and without vitals, below two groups of the
- * shell: the card has no footer, the example sits under the body and ends
- * at the card's bottom edge.
- */
-export const UIBlockWithSidecarStackedWithoutVitals: Story = {
-  args: {
-    ...pickCardArgs(UI_BLOCK_ENTITY),
-    sidecar: BUTTON_EXAMPLE,
-    vitals: undefined,
-  },
-  globals: { viewport: { value: "mobile2", isRotated: false } },
-};
-
-/**
- * A UI block whose example is taller than its body: the card grows its body
- * to hold it, the title stays at the top, and the footer keeps its own
- * height.
- */
-export const UIBlockWithTallSidecar: Story = {
-  args: { ...pickCardArgs(UI_BLOCK_ENTITY), sidecar: TALL_EXAMPLE },
-};
-
-/** A modifier, with its class and family. */
+/** A modifier, with its family and version. */
 export const Modifier: Story = { args: pickCardArgs(MODIFIER_ENTITY) };
 
 /** A modifier family, with its members counted. */
@@ -187,7 +119,7 @@ export const Standard: Story = { args: pickCardArgs(STANDARD_ENTITY) };
 
 /**
  * The five types side by side, each card at two columns, and the UI block
- * again with its sidecar: the cards' sections line up across a row.
+ * again over its specimen: the cards' sections line up across a row.
  */
 export const Matrix: Story = {
   render: () => (
@@ -201,7 +133,9 @@ export const Matrix: Story = {
       ].map((entity) => (
         <Component key={entity.href} {...pickCardArgs(entity)} />
       ))}
-      <Component {...pickCardArgs(UI_BLOCK_ENTITY)} sidecar={BUTTON_EXAMPLE} />
+      <Component {...pickCardArgs(UI_BLOCK_ENTITY)}>
+        {BUTTON_SPECIMEN}
+      </Component>
     </>
   ),
 };

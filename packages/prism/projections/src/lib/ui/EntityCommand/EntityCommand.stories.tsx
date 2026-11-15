@@ -19,10 +19,10 @@ function pickCommandArgs({
   title,
   href,
   kind,
-  location,
-  vitals,
+  address,
+  status,
 }: StoryEntity): EntityCommandProps {
-  return { title, href, kind, location, vital: vitals.at(0) };
+  return { title, href, kind, address, status };
 }
 
 const meta: Meta<typeof Component> = {
@@ -35,16 +35,16 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** A class, with its usage as the vital. */
+/** A class, marked abstract. */
 export const Class: Story = { args: pickCommandArgs(CLASS_ENTITY) };
 
-/** A UI block, with its version as the vital. */
+/** A UI block, marked by its stage. */
 export const UIBlock: Story = { args: pickCommandArgs(UI_BLOCK_ENTITY) };
 
 /** A modifier. */
 export const Modifier: Story = { args: pickCommandArgs(MODIFIER_ENTITY) };
 
-/** A modifier family, with its member count as the vital. */
+/** A modifier family. */
 export const ModifierFamily: Story = {
   args: pickCommandArgs(MODIFIER_FAMILY_ENTITY),
 };
