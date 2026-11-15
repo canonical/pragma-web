@@ -27,9 +27,9 @@
  * workspace drawn in the face it ships, the dev cell delivering its font.
  * The standards index's entries keep their address, the row's first
  * fact, on the title's one line, and a title is cut, at 390px too, only
- * once the address has given up all of its width. At 390 and 820px no
- * fact of a row shows in part: each lies wholly inside the facts' box or
- * on its hidden line.
+ * once the address has given up all of its width. At 390, 820 and 1440px
+ * no fact of a row shows in part: each lies wholly inside the facts' box
+ * or on its hidden line, and facts show where the row has room for them.
  */
 import {
   launchBrowser,
@@ -517,10 +517,11 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
 });
 
 // A fact is shown whole or not at all: where a row has no room for its
-// facts they leave whole, the last first, so none is ever cut to a stub.
+// facts they leave whole, the last first, so none is ever cut to a stub,
+// and only then: where a row has room its facts show.
 describe.each(STANDARDS_FACT_WIDTHS)(
-  "the standards index at %i px",
-  (width) => {
+  "the standards index at $width px",
+  ({ width, fewestShown }) => {
     it("shows each fact of a row whole or not at all", async () => {
       const page = await browser.newPage({ viewport: { width, height: 844 } });
       try {
@@ -539,6 +540,10 @@ describe.each(STANDARDS_FACT_WIDTHS)(
         });
         const counts = await page.evaluate(countPartFacts);
         expect(counts.rows).toBeGreaterThan(0);
+        expect(
+          counts.shown,
+          `${counts.shown} facts shown in ${counts.rows} rows`,
+        ).toBeGreaterThanOrEqual(fewestShown);
         expect(counts.partial).toEqual([]);
       } finally {
         await page.close();

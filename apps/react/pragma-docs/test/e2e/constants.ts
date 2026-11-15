@@ -96,11 +96,17 @@ export const STANDARDS_INDEX_PATH = "/standards";
 export const STANDARDS_INDEX_ROW_SELECTOR = ".ds.standards-index > *";
 
 /**
- * The widths the standards index's facts are measured at, where a row is
- * too narrow for some of them: a phone, and two groups' threshold less one
- * step, where the later facts have left and the address may stay.
+ * The widths the standards index's facts are measured at, each with the
+ * fewest facts that must show there: a phone, where a row is too narrow
+ * for most addresses and none need stay; two groups' threshold less one
+ * step, where the later facts have left and some rows keep their address;
+ * and the desktop, where rows have room for it.
  */
-export const STANDARDS_FACT_WIDTHS = [390, 820] as const;
+export const STANDARDS_FACT_WIDTHS = [
+  { width: 390, fewestShown: 0 },
+  { width: 820, fewestShown: 1 },
+  { width: 1440, fewestShown: 1 },
+] as const;
 
 /**
  * How far apart, in pixels, two edges or widths of boxes that fill the
