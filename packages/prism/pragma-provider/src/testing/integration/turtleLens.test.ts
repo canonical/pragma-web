@@ -91,3 +91,47 @@ describe("the design-system lens read from its ontology", () => {
     },
   );
 });
+
+describe("the component's lens", () => {
+  it("orders a component's sections as its page reads them", async () => {
+    const lens = await readLens(`${DS}Component`);
+    const anchors = [
+      "usage",
+      "guidelines",
+      "anatomyDsl",
+      "hasTokenBinding",
+      "hasProperty",
+      "hasModifierFamily",
+      "inheritsFrom",
+      "changeLog",
+    ].map((name) => `${DS}${name}`);
+    const ordered = lens.properties
+      .filter(({ property }) => anchors.includes(property.uri))
+      .toSorted(
+        (a, b) =>
+          (a.group?.order ?? 0) - (b.group?.order ?? 0) ||
+          (a.order ?? 0) - (b.order ?? 0),
+      )
+      .map(({ property }) => property.uri.slice(DS.length));
+    expect(ordered).toEqual([
+      "hasModifierFamily",
+      "usage",
+      "guidelines",
+      "anatomyDsl",
+      "hasProperty",
+      "hasTokenBinding",
+      "inheritsFrom",
+      "changeLog",
+    ]);
+  });
+
+  it("moves no other design-system class's fields", async () => {
+    const pattern = keyFields(await readLens(`${DS}Pattern`));
+    expect(pattern.get(`${DS}hasModifierFamily`)?.group?.uri).toBe(
+      `${DS}section.api`,
+    );
+    expect(pattern.get(`${DS}hasTokenBinding`)?.group?.uri).toBe(
+      `${DS}section.anatomy`,
+    );
+  });
+});
