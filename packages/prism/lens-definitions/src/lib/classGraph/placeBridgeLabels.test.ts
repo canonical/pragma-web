@@ -134,6 +134,37 @@ describe("placeBridgeLabels", () => {
     });
   });
 
+  it("gives the band under a pair to the first of two short bridges, and the second's label to the focus", () => {
+    // Two bridges straight across the gap, each named too long for it:
+    // both need the one place under the pair, and the band holds one label.
+    const layout = layOutClassGraph({
+      classes: SHELF_PAIR_GRAPH.classes,
+      relations: ["0", "1"].map((index) => ({
+        uri: `aa:consumesSymbolOfItsOwnBlock${index}`,
+        label: `consumesSymbolOfItsOwnBlock${index}`,
+        domain: `aa:A${index}`,
+        range: `bb:B${index}`,
+        count: 1,
+      })),
+    });
+    const { bridges, labels, omitted } = placeOn(layout);
+    const [first, second] = bridges.map((edge) => edge.id).sort();
+    const bottom = Math.max(
+      ...layout.regions.map((region) => region.y + region.h),
+    );
+    expect(labels.map((label) => label.edge)).toEqual([first]);
+    const under = requireDefined(labels.at(0), "the first bridge's label");
+    expect(under.box.y).toBeGreaterThanOrEqual(bottom);
+    expect(omitted).toEqual([second]);
+    const { onFocus } = placeBridgeLabels(layout, t);
+    expect(onFocus.map((label) => label.edge)).toEqual([second]);
+    for (const label of onFocus) {
+      for (const node of layout.nodes.values()) {
+        expect(intersectsRect(label.box, node)).toBe(false);
+      }
+    }
+  });
+
   it("counts a bridge's relations past two", () => {
     const layout = layOutClassGraph({
       ...STACKED_PAIR_GRAPH,
