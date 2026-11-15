@@ -1,7 +1,7 @@
 import { createReadStream, existsSync } from "node:fs";
 import { cp, mkdir } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { Plugin, ResolvedConfig } from "vite";
 
 /** One directory of SVGs, by exact name: no traversal, no directory listing. */
@@ -11,13 +11,19 @@ const ICON_NAME = /^[a-z0-9-]+\.svg$/;
  * Resolve the icons directory of the installed `@canonical/ds-assets`.
  *
  * @returns The absolute path of the package's `icons` directory.
+ * It resolves through `createRequire`, not `import.meta.resolve`: the dev
+ * server loads this file through Vite's module runner, which offers no
+ * `import.meta.resolve`.
+ *
  * @note Impure: it reads the module resolution of the running process, so the
  * path follows whichever version of the package is installed.
  */
 const resolveIconsDir = (): string =>
   join(
     dirname(
-      fileURLToPath(import.meta.resolve("@canonical/ds-assets/package.json")),
+      createRequire(import.meta.url).resolve(
+        "@canonical/ds-assets/package.json",
+      ),
     ),
     "icons",
   );
