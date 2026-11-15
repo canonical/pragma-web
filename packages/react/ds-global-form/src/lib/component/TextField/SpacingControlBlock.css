@@ -71,7 +71,7 @@
   grid-template-rows: auto auto;
   grid-auto-columns: max-content;
   align-items: start;
-  column-gap: 1.25rem;
+  column-gap: 0.5rem;
   row-gap: 0.375rem;
   min-inline-size: max-content;
 }

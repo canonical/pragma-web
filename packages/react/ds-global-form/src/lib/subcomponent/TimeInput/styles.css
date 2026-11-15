@@ -19,6 +19,8 @@
     &::-webkit-calendar-picker-indicator {
       box-sizing: border-box;
       block-size: var(--ds-typography-body-line-height);
+      /* Align the native clock with the text without changing control height. */
+      transform: translateY(0.3em) scale(1.75);
     }
     /* This element IS the text-bearing leaf, so it carries the inline padding
      * (`.ds.input.chrome` provides only the block padding). */

@@ -512,6 +512,13 @@ const Tier = ({
         <Button>Button</Button>
       </Measured>
       <Measured
+        label="Body paragraph"
+        ownerSelector="p.ds"
+        usesControlInset={false}
+      >
+        <p className="ds">Body text</p>
+      </Measured>
+      <Measured
         label="Button + icon"
         ownerSelector=".button"
         baselineSelector=".label"
