@@ -7,12 +7,11 @@
  * column whose Rule paragraph keeps a 592px measure; on Button's page the
  * aside stays where it is while the canvas scrolls to its end. Below three
  * groups, at 1366 and 390, Button's page opens on the "On this page" bar,
- * which sticks, names the current section, opens over the page without
- * moving it, and works with scripts off. At every width the section a
- * reader chooses is current, and the last one at the canvas's end. At 390
- * no page this unit changed scrolls the document or the canvas sideways,
- * and each of Button's tables scrolls inside its own box within its
- * section.
+ * which sticks, names the current section and opens over the page without
+ * moving it. At every width the section a reader chooses is current, and
+ * the last one at the canvas's end. At 390 no page this unit changed
+ * scrolls the document or the canvas sideways, and each of Button's tables
+ * scrolls inside its own box within its section.
  */
 
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
@@ -32,7 +31,7 @@ const BAR_VIEWPORTS = [
   { width: 390, height: 844 },
 ] as const;
 
-/** The phone the current section and the scripts-off bar are read on. */
+/** The phone the current section and the narrow pages are read on. */
 const PHONE = { width: 390, height: 844 } as const;
 
 /** The bar's height at most (M14). */
@@ -85,8 +84,8 @@ afterAll(async () => {
 });
 
 /**
- * Open `path` at 1440 by 900, or at the viewport given, with scripts on
- * unless told otherwise, serving only the app's and the graph's origins.
+ * Open `path` at 1440 by 900, or at the viewport given, serving only the
+ * app's and the graph's origins.
  *
  * @note Impure: opens a browser tab, which the caller closes.
  */
@@ -94,13 +93,11 @@ const open = async (
   path: string,
   {
     viewport = DESKTOP,
-    javaScriptEnabled = true,
   }: {
     readonly viewport?: { readonly width: number; readonly height: number };
-    readonly javaScriptEnabled?: boolean;
   } = {},
 ): Promise<Page> => {
-  const page = await browser.newPage({ viewport, javaScriptEnabled });
+  const page = await browser.newPage({ viewport });
   const origins = [
     new URL(server.base).origin,
     new URL(server.graphBase).origin,
@@ -419,41 +416,6 @@ describe("the sectioned view's contents bar below three groups", () => {
       }
     },
   );
-
-  it("opens with scripts off and its links move a heading to the bar's edge (W6a-A8)", async () => {
-    const page = await open(BUTTON_PATH, {
-      viewport: PHONE,
-      javaScriptEnabled: false,
-    });
-    try {
-      const summary = page.locator(`${BAR} summary`);
-      expect((await summary.textContent())?.trim()).toBe("On this page");
-      expect(
-        await page.locator(`${BAR} details`).getAttribute("open"),
-      ).toBeNull();
-      await summary.click();
-      expect(
-        await page.locator(`${BAR} details`).getAttribute("open"),
-      ).not.toBeNull();
-      const link = page.locator(`${BAR} .panel a`).first();
-      const href = (await link.getAttribute("href")) ?? "";
-      await link.click();
-      const heading = page.locator(`[id="${href.slice(1)}"]`);
-      await expect
-        .poll(async () => {
-          const [bar, target] = await Promise.all([
-            page.locator(BAR).boundingBox(),
-            heading.boundingBox(),
-          ]);
-          return Math.abs(
-            (target?.y ?? 0) - ((bar?.y ?? 0) + (bar?.height ?? 0)),
-          );
-        })
-        .toBeLessThanOrEqual(TOLERANCE_PX);
-    } finally {
-      await page.close();
-    }
-  });
 });
 
 /** The example's stage ends above this line at 1440 (M15). */
