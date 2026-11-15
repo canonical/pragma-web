@@ -15,8 +15,6 @@ const componentCssClassName = "ds data-table-select-all-cell";
  * says: it adds and removes exactly those identities and leaves a selection
  * made elsewhere in the collection alone.
  *
- * `import { DataTable } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.subcomponent.data_table-select_all_cell
  */
 export default function SelectAllCell({

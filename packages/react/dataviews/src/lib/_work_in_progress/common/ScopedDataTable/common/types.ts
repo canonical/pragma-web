@@ -15,32 +15,15 @@ import type { DisplayField } from "../../../../common/index.js";
  * name may change or move before the first release.
  */
 export type DataTableColumn = DisplayField & {
-  /** Declared sizing. Defaults to a flexible column with a 96px minimum. */
+  /** Declared sizing; defaults to flexible with a 96px minimum. */
   readonly sizing?: ColumnSizing;
-  /**
-   * Whether the viewer may hide this column through the collection's
-   * presentation. Defaults to true; a column declared `false` shows
-   * whatever the arrangement says, so a table always has the column an
-   * application cannot do without.
-   */
+  /** Whether the viewer may hide the column; defaults to true. */
   readonly hideable?: boolean;
-  /**
-   * Offer sorting on this column's field. Honoured only when the source's
-   * declaration, which the provider carries, names the field sortable and
-   * allows at least one sort term, so the table never offers an ordering
-   * the source would refuse; on any other field this offers nothing.
-   */
+  /** Offers sorting from the header, where the source can sort the field. */
   readonly sortable?: boolean;
   /**
-   * Offer resizing of this column from its trailing edge, by pointer or
-   * keyboard, held to the declared bounds of its sizing every time.
-   *
-   * The last column never offers it, whatever this says: its trailing edge is
-   * the table's own edge, with nothing beyond it to resize against. It takes
-   * whatever width the columns before it leave — past its own `maxPx` or
-   * fixed width when there is room to spare — so it grows and shrinks as they
-   * are resized, and keeps its resolved width once they no longer fit and the
-   * table scrolls.
+   * Offers resizing from the trailing edge, within its sizing bounds; never on
+   * the last column.
    */
   readonly resizable?: boolean;
 };

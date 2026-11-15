@@ -11,13 +11,8 @@ import type { RowProps } from "./types.js";
 const componentCssClassName = "ds data-table-row";
 
 /**
- * One data row. It observes its own selection membership — a selection
- * change reaches only the rows whose membership moved — and consumes the
- * table's shared track list rather than a width per cell.
- *
- * Memoised: every prop it takes is held at a stable reference by the
- * table, so a row re-renders for its own selection channel and for a
- * column model that actually changed, and for nothing else.
+ * One data row, re-rendered only for its own selection or a new column
+ * model, on the table's shared tracks.
  *
  * @implements ds:apps.subcomponent.data_table-row
  */

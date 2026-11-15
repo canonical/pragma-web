@@ -19,41 +19,22 @@ type OwnProps<
   /** The provider owning this collection's query, result and selection. */
   readonly provider: DataViewsProvider<TFields, TRow>;
   /**
-   * The columns, in their declared order. The provider's presentation
-   * decides which show, in what order and at what width; the declaration
-   * is the lowest layer, standing where nothing is stored.
+   * The columns, in declared order; the presentation decides which show and
+   * where.
    */
   readonly columns: readonly DataTableColumn[];
   /** The table's accessible name. */
   readonly label: string;
   /** Render a leading selection column backed by the provider's selection. */
   readonly selectable?: boolean;
-  /**
-   * Names one record, for its selection checkbox. Defaults to its
-   * identity. Written as a lambda it costs nothing: the table always calls
-   * the latest one and never re-renders a row because the function is new.
-   */
+  /** Names a record for its selection checkbox; defaults to its id. */
   readonly getRowLabel?: (row: TRow, rowId: string) => string;
-  /**
-   * Replaces the messages' text of a status: no rows to render, or rows that
-   * no longer answer the current query. The status is the core's, decided
-   * once from the collection's state. Held the same way as `getRowLabel`
-   * while rows show alone: the latest one is always called, and its
-   * identity alone never re-renders a row. While a status shows, the newest
-   * renderer is drawn at once.
-   */
+  /** Replaces a status's message text. */
   readonly renderStatus?: (status: DisplayStatus) => ReactNode;
-  /**
-   * Mount only the rows near the viewport, from `virtualizeRows`. The table
-   * becomes its own scroll viewport, no taller than the screen unless its
-   * style says otherwise, and reports each row's logical position so that
-   * a row not mounted is still counted. Omitted, every row is rendered.
-   */
+  /** Mounts only the rows near the viewport, from `virtualizeRows`. */
   readonly virtualization?: DataTableVirtualization;
   /**
-   * What the header's settings cell holds: `<DataViews.Settings />`, which
-   * the table hands its columns, their arrangement and the commands that
-   * change them. Left out, the header has no settings cell.
+   * What the header's settings cell holds, such as `<DataViews.Settings />`.
    */
   readonly settings?: ReactElement | undefined;
 };

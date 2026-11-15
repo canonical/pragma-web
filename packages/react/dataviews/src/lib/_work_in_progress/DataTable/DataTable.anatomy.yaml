@@ -140,7 +140,7 @@
 # stylesheet names the rows' trailing grid line, so a track after the data
 # tracks lands there without the solver.
 node:
-  uri: apps.pattern.data_table
+  uri: apps.pattern.datatable
   styles:
     layout.overflow: auto
     typography.color: color/text
