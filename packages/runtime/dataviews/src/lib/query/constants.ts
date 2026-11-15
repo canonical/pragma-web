@@ -22,6 +22,7 @@ export const OPERATOR_ARITY: Readonly<
   is: "one",
   isNot: "one",
   contains: "one",
+  notContains: "one",
   startsWith: "one",
 });
 

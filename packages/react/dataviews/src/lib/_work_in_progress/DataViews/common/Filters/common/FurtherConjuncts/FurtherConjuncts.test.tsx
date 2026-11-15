@@ -143,6 +143,9 @@ describe("FurtherConjuncts", () => {
     expect(readRowText("isNone", ["ex-gpu"])).toBe("Cores is none of ex-gpu");
     expect(readRowText("lte", [8])).toBe("Cores to 8");
     expect(readRowText("contains", ["ex"])).toBe("Cores contains ex");
+    expect(readRowText("notContains", ["ex"])).toBe(
+      "Cores does not contain ex",
+    );
     expect(readRowText("startsWith", ["ex"])).toBe("Cores starts with ex");
     expect(readRowText("is", ["ex"])).toBe("Cores is ex");
     expect(readRowText("isNot", ["ex"])).toBe("Cores is not ex");

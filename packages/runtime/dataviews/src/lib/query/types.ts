@@ -19,6 +19,7 @@ export type PredicateOperator =
   | "is"
   | "isNot"
   | "contains"
+  | "notContains"
   | "startsWith";
 
 /**

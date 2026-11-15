@@ -59,6 +59,7 @@ describe("useDataViews", () => {
       "is",
       "isNot",
       "contains",
+      "notContains",
       "startsWith",
     ]);
     expect(Object.keys(result.current.filters.status)).toEqual([
