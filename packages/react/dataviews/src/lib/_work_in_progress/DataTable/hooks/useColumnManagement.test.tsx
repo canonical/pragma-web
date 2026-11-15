@@ -24,13 +24,13 @@ const columns: readonly DataTableColumn[] = [
  * an announcer that records what it is told.
  */
 const mountHook = (
-  row: HTMLDivElement | null = null,
+  row: HTMLTableRowElement | null = null,
   declared: readonly DataTableColumn[] = columns,
 ) => {
   const { provider } = createMachineProvider({
     rows: [buildMachine("m-1", "a")],
   });
-  const headerRow = createRef<HTMLDivElement>();
+  const headerRow = createRef<HTMLTableRowElement>();
   Object.assign(headerRow, { current: row });
   const announce = vi.fn<(message: ReactNode) => void>();
   const hook = renderHook(() =>
@@ -46,11 +46,12 @@ const mountHook = (
 };
 
 /** A header row of cells, each holding a button named for its column, or none. */
-const buildHeaderRow = (cells: readonly (string | null)[]): HTMLDivElement => {
-  const row = document.createElement("div");
+const buildHeaderRow = (
+  cells: readonly (string | null)[],
+): HTMLTableRowElement => {
+  const row = document.createElement("tr");
   for (const name of cells) {
-    const cell = document.createElement("div");
-    cell.setAttribute("role", "columnheader");
+    const cell = document.createElement("th");
     if (name !== null) {
       const button = document.createElement("button");
       button.textContent = name;

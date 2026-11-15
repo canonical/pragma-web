@@ -15,12 +15,14 @@ import type { VIRTUALIZED } from "./constants.js";
 
 /**
  * How a virtualized body places one entry's row: the ref the row is measured
- * and kept by, and the logical position it reports, so a row not mounted
- * is still counted.
+ * and kept by, the logical position it reports, and the space of unmounted
+ * entries before it when it starts a later run.
  */
 export type EntryPlacement = {
-  readonly ref: (node: HTMLDivElement) => () => void;
+  readonly ref: (node: HTMLTableRowElement) => () => void;
   readonly position: number;
+  /** The unmounted space before this row, in pixels, as its top margin. */
+  readonly gap?: number | undefined;
 };
 
 /**

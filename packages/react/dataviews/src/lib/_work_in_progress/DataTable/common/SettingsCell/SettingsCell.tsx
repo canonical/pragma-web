@@ -23,15 +23,13 @@ export default function SettingsCell({
 }: SettingsCellProps): ReactElement {
   const rendered = useMemo(() => <SettingsMenu {...menu} />, [menu]);
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <th> is only valid inside a <table>, and this grid is deliberately not one
-    // biome-ignore lint/a11y/useFocusableInteractive: the header is structure, not a widget — its menu's button carries the focus
-    <div
+    <th
       {...rest}
-      role="columnheader"
+      scope="col"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       ref={reserve}
     >
       <SettingsMenuContext value={rendered}>{settings}</SettingsMenuContext>
-    </div>
+    </th>
   );
 }

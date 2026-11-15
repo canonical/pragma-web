@@ -26,20 +26,21 @@ const createLayoutOf = (
   });
 
 /**
- * The table's header row and header cell, as it draws them: divs with the
- * roles the handle looks for.
+ * The table's root, header row and header cell, as it draws them: the
+ * native elements the handle looks for.
  */
-const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
-  // biome-ignore lint/a11y/useSemanticElements: the table's own header row is a div with this role, which the handle looks for
-  // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, as the table's is
-  <div role="row">{children}</div>
-);
+const Table = ({
+  children,
+  label,
+}: {
+  readonly children: ReactNode;
+  readonly label?: string;
+}) => <table aria-label={label}>{children}</table>;
 
-const Table = ({ children }: { readonly children: ReactNode }) => (
-  // biome-ignore lint/a11y/useSemanticElements: the table's own root is a div with this role, which the handle looks for
-  <div role="table" aria-label="Machines">
-    {children}
-  </div>
+const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
+  <thead>
+    <tr>{children}</tr>
+  </thead>
 );
 
 const HeaderCell = ({
@@ -51,11 +52,9 @@ const HeaderCell = ({
   readonly style?: CSSProperties;
   readonly labelledBy?: string;
 }) => (
-  // biome-ignore lint/a11y/useSemanticElements: the table's own header cell is a div with this role, which the handle looks for
-  // biome-ignore lint/a11y/useFocusableInteractive: the header is structure, as the table's is
-  <div role="columnheader" aria-labelledby={labelledBy} style={style}>
+  <th aria-labelledby={labelledBy} style={style}>
     {children}
-  </div>
+  </th>
 );
 
 let frames: FrameRequestCallback[] = [];
@@ -109,25 +108,27 @@ const mount = ({
   const announce = vi.fn();
   const draw = (resolved: number) => (
     <div style={{ direction }}>
-      <HeaderRow>
-        {/* jsdom inherits no direction, so the cell states its own. */}
-        <HeaderCell labelledBy="name-label" style={{ direction }}>
-          <button id="name-label" type="button" onClick={sort}>
-            Name
-          </button>
-          <ResizeHandle
-            interaction={interaction}
-            columnId="name"
-            name="Name"
-            width={resolved}
-            min={50}
-            max={300}
-            labelledBy="name-label"
-            announce={announce}
-          />
-        </HeaderCell>
-        <HeaderCell>Status</HeaderCell>
-      </HeaderRow>
+      <Table>
+        <HeaderRow>
+          {/* jsdom inherits no direction, so the cell states its own. */}
+          <HeaderCell labelledBy="name-label" style={{ direction }}>
+            <button id="name-label" type="button" onClick={sort}>
+              Name
+            </button>
+            <ResizeHandle
+              interaction={interaction}
+              columnId="name"
+              name="Name"
+              width={resolved}
+              min={50}
+              max={300}
+              labelledBy="name-label"
+              announce={announce}
+            />
+          </HeaderCell>
+          <HeaderCell>Status</HeaderCell>
+        </HeaderRow>
+      </Table>
       <button type="button">Elsewhere</button>
     </div>
   );
@@ -746,20 +747,22 @@ describe("ResizeHandle", () => {
       ]);
       const interaction = createGridInteraction(layout);
       const { unmount } = render(
-        <HeaderRow>
-          <HeaderCell>
-            <ResizeHandle
-              interaction={interaction}
-              columnId="name"
-              name="Name"
-              width={100}
-              min={50}
-              max={Number.POSITIVE_INFINITY}
-              labelledBy="name-label"
-              announce={() => {}}
-            />
-          </HeaderCell>
-        </HeaderRow>,
+        <Table>
+          <HeaderRow>
+            <HeaderCell>
+              <ResizeHandle
+                interaction={interaction}
+                columnId="name"
+                name="Name"
+                width={100}
+                min={50}
+                max={Number.POSITIVE_INFINITY}
+                labelledBy="name-label"
+                announce={() => {}}
+              />
+            </HeaderCell>
+          </HeaderRow>
+        </Table>,
       );
       pressHandle(screen.getByRole("separator"));
       unmount();
@@ -826,7 +829,7 @@ describe("ResizeHandle", () => {
       ]);
       const interaction = createGridInteraction(layout);
       render(
-        <Table>
+        <Table label="Machines">
           <HeaderRow>
             <HeaderCell>
               <ResizeHandle

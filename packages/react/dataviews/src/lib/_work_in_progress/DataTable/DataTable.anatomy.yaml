@@ -1,5 +1,5 @@
 ---
-# DataTable — the rows of one collection, over ARIA table roles.
+# DataTable — the rows of one collection, as a native table.
 #
 # Anatomy DSL 0.3.0. No validator runs on this file yet: it is checked in
 # review against the DSL's JSON schema. Named nodes carry the design-system
@@ -16,7 +16,8 @@
 #                                         DOM `ds data-table-selection-cell`
 #   status row      DOM `ds data-table-row status`
 #   status cell     DOM `ds data-table-body-cell status`, `data-status="<status>"`
-#   gap             DOM `ds data-table-gap`, hidden from assistive technology
+#   gap             the body's block padding, or a later run's first row's
+#                   top margin; no element
 #   settings cell   design "settings action cell"
 #                   DOM `ds data-table-settings-cell`
 #   announcement    DOM `ds data-views-announcer`, beside the root, read
@@ -45,7 +46,7 @@
 #                       — CheckboxInput's own contract, plus the table's
 #                       names: "Select all displayed rows", "Select <row>"
 #   status row          "pending/failed/refused/refresh-failed/stale/no-access/no-data/no-results"
-#                       (1.3.1, 1.4.1, 4.1.3). The cell is `role=cell`, not a
+#                       (1.3.1, 1.4.1, 4.1.3). The cell is a `td`, not a
 #                       live region; a settled outcome — failed, refused, stale,
 #                       refresh-failed, no-access, no-data, no-results — wraps
 #                       its text in `role=status`, a passing state is silent.
@@ -69,9 +70,10 @@
 #                       table's end; the row holding focus stays mounted.
 #
 # Virtualized: a table given `virtualization` mounts only the entries near its
-# viewport. The body row group takes the `virtual` class and holds gaps
-# in place of the entries it does not mount: before the first run of
-# mounted entries, between runs, and after the last. The root becomes the
+# viewport. The body row group takes the `virtual` class and keeps the
+# space of the entries it does not mount: as its block padding before the
+# first run and after the last, and as the top margin of a later run's
+# first row. The root becomes the
 # scroll viewport the range is measured against. None of this changes a
 # table without `virtualization`.
 #
@@ -121,8 +123,8 @@
 #   - The header row group's stacking above the scrolled body uses z-index 1;
 #     the package has no stacking token.
 #   - A gap's height is the range's per-render publication, the height of
-#     the entries it stands for, written on the gap itself: geometry no
-#     stylesheet can know, as `--data-table-columns` is.
+#     the entries it stands for, written inline as padding or margin:
+#     geometry no stylesheet can know, as `--data-table-columns` is.
 #   - The virtualized root is positioned (`layout.position: relative`), so the
 #     body's offset is measured from it, and it opts out of the browser's
 #     scroll anchoring (`overflow-anchor: none`): the range anchors the
@@ -253,11 +255,6 @@ node:
                     cardinality: "1"
             relation:
               cardinality: "0..1"
-          # Virtualized only: the space of the entries not mounted.
-          - node:
-              role: gap
-            relation:
-              cardinality: "0..*"
       relation:
         cardinality: "1"
     - node:

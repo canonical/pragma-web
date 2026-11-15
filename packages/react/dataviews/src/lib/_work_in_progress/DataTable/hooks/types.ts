@@ -36,7 +36,7 @@ export type UseColumnManagementProps<
   /** The columns as declared, in their declared order. */
   readonly columns: readonly DataTableColumn[];
   /** The header row, whose controls take the focus a hidden column leaves. */
-  readonly headerRow: RefObject<HTMLDivElement | null>;
+  readonly headerRow: RefObject<HTMLTableRowElement | null>;
   /** The words a change to the columns is announced in. */
   readonly messages: DataViewsMessages;
   /** Say, through the table's announcer, what a change to the columns did. */
@@ -83,13 +83,13 @@ export type UseTableGeometryResult = {
    * ref callback that returns a cleanup is never called with `null`, so the
    * node is always a real one.
    */
-  readonly attach: (node: HTMLDivElement) => (() => void) | undefined;
+  readonly attach: (node: HTMLTableElement) => (() => void) | undefined;
   /**
    * Attaches a cell one of the stylesheet's own tracks sizes — the
    * selection column's, the settings cell's — whose width the columns
    * leave; the cleanup gives it back.
    */
-  readonly reserve: (cell: HTMLDivElement) => () => void;
+  readonly reserve: (cell: HTMLTableCellElement) => () => void;
   /**
    * The shared track list every row of this table consumes; undefined with
    * no columns, where there is no track to publish.

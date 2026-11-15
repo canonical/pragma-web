@@ -117,11 +117,9 @@ export default function HeaderCell({
   const interactive = sortable && (hydrated || destination !== null);
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <th> is only valid inside a <table>, and this grid is deliberately not one
-    // biome-ignore lint/a11y/useFocusableInteractive: the header is structure, not a widget — its sort control and resize handle carry the focus
-    <div
+    <th
       {...rest}
-      role="columnheader"
+      scope="col"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       // Named by its label alone: a reader hears a column's name on every
       // cell, and the menu's button, the resize handle and a refusal's
@@ -140,7 +138,7 @@ export default function HeaderCell({
       // ordering instead. Opening the menu mounts it and fires no blur at
       // all, so keeping its surface keeps every open alike. Another
       // column's menu is not this header's, and ends it.
-      onBlur={(event: FocusEvent<HTMLDivElement>) => {
+      onBlur={(event: FocusEvent<HTMLTableCellElement>) => {
         // The window losing focus, not the column: the reader comes back to
         // the same control, and the reason with it.
         if (!event.currentTarget.ownerDocument.hasFocus()) {
@@ -253,6 +251,6 @@ export default function HeaderCell({
           announce={announce}
         />
       ) : null}
-    </div>
+    </th>
   );
 }

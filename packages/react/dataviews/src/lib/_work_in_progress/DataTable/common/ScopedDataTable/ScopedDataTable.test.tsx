@@ -51,7 +51,10 @@ describe("ScopedDataTable", () => {
       />,
     );
     const table = screen.getByRole("table", { name: "Machines" });
+    expect(table.tagName).toBe("TABLE");
     const [header, body] = within(table).getAllByRole("rowgroup");
+    expect(header?.tagName).toBe("THEAD");
+    expect(body?.tagName).toBe("TBODY");
     expect(header).toHaveClass("ds", "data-table-row-group", "header");
     expect(body).toHaveClass("ds", "data-table-row-group", "body");
     expect(
@@ -63,6 +66,28 @@ describe("ScopedDataTable", () => {
     expect(rows).toHaveLength(2);
     expect(within(rows.at(0) as HTMLElement).getAllByRole("cell")).toHaveLength(
       3,
+    );
+  });
+
+  it("spans the status cell over every track the header draws", () => {
+    const { provider } = createMachineProvider({ rows: [] });
+    render(
+      <ScopedDataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        selectable
+        settings={<span>Settings</span>}
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    const [header, body] = screen.getAllByRole("rowgroup");
+    const tracks = within(header as HTMLElement).getAllByRole("columnheader");
+    expect(tracks).toHaveLength(4);
+    expect(within(body as HTMLElement).getByRole("cell")).toHaveAttribute(
+      "colspan",
+      String(tracks.length),
     );
   });
 
@@ -108,7 +133,7 @@ describe("ScopedDataTable", () => {
 
   it("takes the native props of its root, merging the class name, style and ref", () => {
     const { provider } = createMachineProvider({ rows: [] });
-    const ref = createRef<HTMLDivElement>();
+    const ref = createRef<HTMLTableElement>();
     render(
       <ScopedDataTable
         provider={provider}

@@ -3,7 +3,7 @@ import {
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { act, render, screen, within } from "@testing-library/react";
-import { createRef, type Ref } from "react";
+import { createRef, type ReactNode, type Ref } from "react";
 import { describe, expect, it, onTestFinished } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
@@ -19,7 +19,8 @@ const COLUMNS = [
 const mountRow = ({
   selectable = false,
   position = undefined as number | undefined,
-  ref = undefined as Ref<HTMLDivElement> | undefined,
+  gap = undefined as number | undefined,
+  ref = undefined as Ref<HTMLTableRowElement> | undefined,
 } = {}) => {
   const { provider } = createMachineProvider();
   const host = readProviderHost(provider);
@@ -41,8 +42,15 @@ const mountRow = ({
       selectable={selectable}
       getRowLabel={(row) => row.name}
       position={position}
+      gap={gap}
       ref={ref}
     />,
+    {
+      container: document.body.appendChild(document.createElement("table")),
+      wrapper: ({ children }: { readonly children: ReactNode }) => (
+        <tbody>{children}</tbody>
+      ),
+    },
   );
   return { provider };
 };
@@ -82,10 +90,15 @@ describe("Row", () => {
   });
 
   it("reports its position and hands its element to the ref", () => {
-    const ref = createRef<HTMLDivElement>();
+    const ref = createRef<HTMLTableRowElement>();
     mountRow({ position: 3, ref });
     const row = screen.getByRole("row");
     expect(row).toHaveAttribute("aria-rowindex", "3");
     expect(ref.current).toBe(row);
+  });
+
+  it("draws the unmounted space before it as its top margin", () => {
+    mountRow({ gap: 40 });
+    expect(screen.getByRole("row")).toHaveStyle({ marginBlockStart: "40px" });
   });
 });

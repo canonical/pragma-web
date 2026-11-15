@@ -71,7 +71,7 @@ const Composition = ({
  * most of their time there.
  */
 const findTable = (): HTMLElement => {
-  const table = document.querySelector<HTMLElement>("[role='table']");
+  const table = document.querySelector<HTMLElement>("table");
   if (table === null) {
     throw new Error("expected a table");
   }
@@ -81,7 +81,7 @@ const findTable = (): HTMLElement => {
 /** The headings of the columns shown, in their order. */
 const listShown = (): readonly (string | null)[] =>
   Array.from(
-    findTable().querySelectorAll("[role='columnheader'][aria-labelledby]"),
+    findTable().querySelectorAll("th[aria-labelledby]"),
     (cell) =>
       document.getElementById(cell.getAttribute("aria-labelledby") ?? "")
         ?.textContent ?? null,
@@ -134,7 +134,7 @@ describe("DataViews.Settings", () => {
   it("ends the header in a settings cell holding the menu, and a table without it has none", () => {
     const { provider } = createProvider();
     const view = render(<Composition provider={provider} />);
-    const cell = findTrigger().closest("[role='columnheader']");
+    const cell = findTrigger().closest("th");
     expect(cell).toHaveClass("ds", "data-table-settings-cell");
     // Last in the header row, after every column's heading.
     expect(cell?.parentElement?.lastElementChild).toBe(cell);

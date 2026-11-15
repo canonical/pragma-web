@@ -95,9 +95,7 @@ class FakeResizeObserver {
 /** The observer measuring the rows. */
 const findRowObserver = (): FakeResizeObserver => {
   const observer = FakeResizeObserver.live.find((candidate) =>
-    [...candidate.observed].some(
-      (element) => element.getAttribute("role") === "row",
-    ),
+    [...candidate.observed].some((element) => element.tagName === "TR"),
   );
   if (observer === undefined) {
     throw new Error("no observer is measuring rows");
@@ -188,7 +186,7 @@ const renderVirtualizedTable = (
     provider,
     source,
     view,
-    table: makeScrollable(screen.getByRole("table")),
+    table: makeScrollable(screen.getByRole("table", { name: "Machines" })),
   };
 };
 
@@ -201,14 +199,10 @@ const bindPageBounds = (table: HTMLElement): void => {
   let top = 0;
   const clampToPage = (value: number): number => {
     const page =
-      [...table.querySelectorAll<HTMLElement>(".ds.data-table-gap")]
-        .map((gap) => Number.parseFloat(gap.style.blockSize))
+      listGapHeights(table)
+        .map((gap) => Number.parseFloat(gap))
         .reduce((total, height) => total + height, 0) +
-      [
-        ...table.querySelectorAll(
-          '.ds.data-table-row-group.body > [role="row"]',
-        ),
-      ]
+      [...table.querySelectorAll(".ds.data-table-row-group.body > tr")]
         .map((row) => reported.get(row) ?? 10)
         .reduce((total, height) => total + height, 0);
     return Math.max(0, Math.min(value, page - 100));
@@ -238,15 +232,30 @@ const listMountedHosts = (scope: HTMLElement = document.body): string[] =>
       (row) => row.querySelector(".ds.data-table-body-cell")?.textContent ?? "",
     );
 
-/** The heights of the gaps, in order. */
-const listGapHeights = (table: HTMLElement): string[] =>
-  [...table.querySelectorAll<HTMLElement>(".ds.data-table-gap")].map(
-    (gap) => gap.style.blockSize,
+/**
+ * The heights of the gaps, in order: the body's top padding, the top margin
+ * of each later run's first row, and the body's bottom padding.
+ */
+const listGapHeights = (table: HTMLElement): string[] => {
+  const body = table.querySelector<HTMLElement>(
+    ".ds.data-table-row-group.body",
   );
+  if (body === null) {
+    return [];
+  }
+  return [
+    body.style.paddingBlockStart,
+    ...Array.from(
+      body.children,
+      (row) => (row as HTMLElement).style.marginBlockStart,
+    ),
+    body.style.paddingBlockEnd,
+  ].filter((gap) => gap !== "");
+};
 
 /** The row showing one host. */
 const getRow = (host: string): HTMLElement => {
-  const row = screen.getByText(host).closest<HTMLElement>('[role="row"]');
+  const row = screen.getByText(host).closest<HTMLElement>("tr");
   if (row === null) {
     throw new Error(`no row shows ${host}`);
   }
@@ -259,7 +268,7 @@ beforeEach(() => {
   // The table's viewport shows 100px; nothing else has a height.
   vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
     function (this: HTMLElement) {
-      return this.getAttribute("role") === "table" ? 100 : 0;
+      return this.tagName === "TABLE" ? 100 : 0;
     },
   );
   vi.spyOn(document, "hasFocus").mockReturnValue(true);
@@ -302,7 +311,7 @@ describe("virtualized DataTable", () => {
     // A 24px header above a 100px body: the rows in view are the same.
     vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
       function (this: HTMLElement) {
-        return this.getAttribute("role") === "table" ? 124 : 0;
+        return this.tagName === "TABLE" ? 124 : 0;
       },
     );
     vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(
@@ -369,7 +378,7 @@ describe("virtualized DataTable", () => {
       expect(listGapHeights(table)).toEqual(["20px", "4910px", "4850px"]);
     });
 
-    it.fails("holds its gaps as the body's padding and a row's margin, not as rows", () => {
+    it("holds its gaps as the body's padding and a row's margin, not as rows", () => {
       const { table } = renderVirtualizedTable(buildMachines(1000), {
         selectable: true,
       });
@@ -450,6 +459,29 @@ describe("virtualized DataTable", () => {
       expect(
         screen.getByRole("checkbox", { name: "Select m-3" }),
       ).toBeInTheDocument();
+    });
+
+    it("keeps its own row mounted when focus lands in a table inside a cell", () => {
+      const Nested = ({ value }: DisplayFieldCellProps) => (
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <button type="button">{`Open ${String(value)}`}</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      );
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        columns: [{ id: "name", header: "Name", cell: Nested }],
+      });
+      const button = screen.getByRole("button", { name: "Open host-3" });
+      act(() => {
+        button.focus();
+      });
+      scrollTo(table, 5000);
+      expect(button).toBeInTheDocument();
     });
 
     it("ignores focus that lands on no row", () => {
@@ -543,7 +575,7 @@ describe("virtualized DataTable", () => {
       const { table } = renderVirtualizedTable();
       vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
         function (this: HTMLElement) {
-          return this.getAttribute("role") === "table" ? 200 : 0;
+          return this.tagName === "TABLE" ? 200 : 0;
         },
       );
       report([[table, 200]]);
@@ -657,7 +689,7 @@ describe("virtualized DataTable", () => {
       scrollTo(table, 5000);
       vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
         function (this: HTMLElement) {
-          return this.getAttribute("role") === "table" ? 200 : 0;
+          return this.tagName === "TABLE" ? 200 : 0;
         },
       );
       report(
@@ -912,7 +944,7 @@ describe("virtualized DataTable", () => {
     const container = document.createElement("div");
     container.innerHTML = renderToString(table);
     document.body.append(container);
-    expect(container.querySelectorAll('[role="row"]')).toHaveLength(101);
+    expect(container.querySelectorAll("tr")).toHaveLength(101);
     const root = await act(async () => hydrateRoot(container, table));
     expect(errors).not.toHaveBeenCalled();
     // The hydrated table observes the provider: the server's rows stay on
@@ -924,7 +956,7 @@ describe("virtualized DataTable", () => {
       provider.state.get().result.provenance?.requestId,
     );
     expect(provider.state.get().result.status).toBe("ready");
-    expect(container.querySelectorAll('[role="row"]')).toHaveLength(16);
+    expect(container.querySelectorAll("tr")).toHaveLength(16);
     // A row hydrated from the server's markup is measured like any other.
     const hydrated = container.querySelector('[aria-rowindex="4"]');
     if (hydrated === null) {

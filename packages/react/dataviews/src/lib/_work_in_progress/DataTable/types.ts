@@ -119,18 +119,9 @@ type OwnProps<
 };
 
 /**
- * DataTable props. The root is a `div` carrying the table role, so it
- * extends native div props, less the ones the table owns: `children`,
- * because the table's content is its rows, which it renders itself; and
- * `role`, `aria-label`, `aria-labelledby`, `aria-busy` and `aria-rowcount`,
- * each of which the table sets from what it knows. `className`, `style` and
- * `ref` are merged with the table's own rather than clobbered by either
- * side.
- *
- * `ref` is honoured in both React forms: a callback ref that returns a
- * cleanup has that cleanup called on detach, and one that returns nothing is
- * called with `null` instead. A callback ref rebuilt on every render costs
- * nothing — the table holds the latest rather than re-attaching.
+ * DataTable props: a native table's, less `children` and the ARIA naming
+ * and state the table sets. `className`, `style` and `ref` merge with the
+ * table's own.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -140,7 +131,7 @@ export type DataTableProps<
   TRow extends object = RowRecord,
 > = OwnProps<TFields, TRow> &
   Omit<
-    ComponentProps<"div">,
+    ComponentProps<"table">,
     | keyof OwnProps<TFields, TRow>
     | "children"
     | "role"

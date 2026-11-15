@@ -9,8 +9,17 @@ import type { DisplayStatus } from "@canonical/dataviews-core";
 import { DISPLAY_STATUS_PHASES } from "@canonical/dataviews-core/bindings";
 import { readDisplayStatus } from "@canonical/dataviews-core/testing";
 import { render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import StatusRow from "./StatusRow.js";
+
+/** A body row group in a table, where a row renders as it does in the table. */
+const inBody = () => ({
+  container: document.body.appendChild(document.createElement("table")),
+  wrapper: ({ children }: { readonly children: ReactNode }) => (
+    <tbody>{children}</tbody>
+  ),
+});
 
 /** The words the table would give a status: here, the status named. */
 const describeStatus = (status: DisplayStatus): string =>
@@ -22,12 +31,16 @@ describe("StatusRow", () => {
       <StatusRow
         status={{ status: "stale", reason: "offline" }}
         renderStatus={describeStatus}
+        span={3}
       />,
+      inBody(),
     );
     const cell = screen.getByRole("cell");
     expect(cell).toHaveAttribute("data-status", "stale");
     expect(cell).toHaveClass("ds", "data-table-body-cell", "status");
     expect(cell).toHaveTextContent("stale: offline");
+    // One cell for the whole table: it spans every rendered track.
+    expect(cell).toHaveAttribute("colspan", "3");
     expect(screen.getByRole("row")).toHaveClass(
       "ds",
       "data-table-row",
@@ -45,7 +58,9 @@ describe("StatusRow", () => {
         <StatusRow
           status={readDisplayStatus(status)}
           renderStatus={describeStatus}
+          span={1}
         />,
+        inBody(),
       );
       const announced = screen.queryAllByRole("status");
       expect(announced, status).toHaveLength(
@@ -63,13 +78,16 @@ describe("StatusRow", () => {
       <StatusRow
         status={{ status: "pending" }}
         renderStatus={describeStatus}
+        span={1}
       />,
+      inBody(),
     );
     expect(screen.getByRole("row")).not.toHaveAttribute("aria-rowindex");
     rerender(
       <StatusRow
         status={{ status: "pending" }}
         renderStatus={describeStatus}
+        span={1}
         position={2}
       />,
     );

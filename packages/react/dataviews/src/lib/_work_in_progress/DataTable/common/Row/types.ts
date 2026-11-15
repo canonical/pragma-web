@@ -21,6 +21,8 @@ export type RowProps<TRow extends object> = {
   readonly getRowLabel: (row: TRow, rowId: string) => string;
   /** The row's logical position, reported only by a virtualized table. */
   readonly position?: number | undefined;
+  /** The unmounted space before the row, drawn as its top margin. */
+  readonly gap?: number | undefined;
   /** The row element, for a virtualized table to measure. */
-  readonly ref?: Ref<HTMLDivElement> | undefined;
+  readonly ref?: Ref<HTMLTableRowElement> | undefined;
 };

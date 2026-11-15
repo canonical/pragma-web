@@ -11,11 +11,13 @@ import createMachineProvider from "../../../../../../testing/createMachineProvid
 import SelectAllCell from "./SelectAllCell.js";
 import type { SelectAllCellProps } from "./types.js";
 
-/** The table's header row, as it draws it: a div with the role. */
+/** The table's header row, as it draws it. */
 const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
-  // biome-ignore lint/a11y/useSemanticElements: the table's own header row is a div with this role, which the cell sits in
-  // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, as the table's is
-  <div role="row">{children}</div>
+  <table>
+    <thead>
+      <tr>{children}</tr>
+    </thead>
+  </table>
 );
 
 /** The cell over these displayed rows, its geometry a spy. */
@@ -25,7 +27,7 @@ const mount = (
 ) => {
   const { provider } = createMachineProvider();
   const release = vi.fn();
-  const reserve = vi.fn((_cell: HTMLDivElement) => release);
+  const reserve = vi.fn((_cell: HTMLTableCellElement) => release);
   const view = render(
     <HeaderRow>
       <SelectAllCell

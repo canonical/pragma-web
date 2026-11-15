@@ -14,16 +14,16 @@ export type UseVirtualRowsResult = {
   /** The entries to mount, as runs, and the space of the rest. */
   readonly mounted: MountedRange;
   /** The body row group; its parent is the scroll viewport. */
-  readonly body: RefObject<HTMLDivElement | null>;
+  readonly body: RefObject<HTMLTableSectionElement | null>;
   /**
    * The ref one entry's row attaches by, to be measured and to keep focus.
    * The same function for as long as the row is mounted.
    */
   readonly readRowRef: (id: string) => EntryPlacement["ref"];
   /** Keeps the row focus enters mounted, wherever the viewport goes. */
-  readonly onFocus: (event: FocusEvent<HTMLDivElement>) => void;
+  readonly onFocus: (event: FocusEvent<HTMLTableSectionElement>) => void;
   /** Lets it go when focus leaves the body, not when it leaves the window. */
-  readonly onBlur: (event: FocusEvent<HTMLDivElement>) => void;
+  readonly onBlur: (event: FocusEvent<HTMLTableSectionElement>) => void;
 };
 
 /** What one virtualized body displays, and what its rows' heights hang on. */

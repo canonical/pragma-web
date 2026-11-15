@@ -2,26 +2,13 @@
 
 @layer ds.components.global {
   /**
-   * DataTable styles
-   *
-   * The specification is the anatomy beside the code: `DataTable.anatomy.yaml`
-   * and the files beside HeaderCell and BodyCell. Every value below is one it
-   * binds; what it could not bind is recorded there, never hardcoded here.
-   *
-   * The table is a stack of div rows, each a CSS grid. The solver publishes
-   * the data columns' tracks on the container as `--data-table-columns`: that
-   * one custom property is the whole of the geometry this component writes
-   * inline, derived per render from the measured container, which no
-   * stylesheet can know. Everything else about the layout is here, the
-   * selection column included.
-   *
-   * Colour, border, type and spacing come from @canonical/design-tokens. Row
-   * height and cell padding come from the density channel of
-   * @canonical/styles: the root carries the design system's `.dense`, so the
-   * table is dense wherever it sits, and it defines no density rule of its
-   * own.
+   * DataTable styles. Values bind `DataTable.anatomy.yaml`. A native table:
+   * the root and row groups are blocks; each row is a grid on the
+   * `--data-table-columns` tracks the solver writes inline. Density comes
+   * from `.dense` on the root.
    */
   .ds.data-table {
+    display: block;
     /* The columns are authoritative: when their total no longer fits, the
        table scrolls rather than compressing a column past its minimum.
        `overflow-x` alone would make the used `overflow-y` a scroll
@@ -50,6 +37,7 @@
      no cell: a max-content width would size every cell of every row on
      each layout, and paint the table too wide before the solver ran. */
   .ds.data-table-row-group {
+    display: block;
     min-inline-size: min-content;
   }
 
@@ -140,7 +128,9 @@
     /* A grid item's automatic minimum size is its content, which would let
        one long value widen the track the solver just sized. Zero here. */
     min-inline-size: 0;
+    padding-block: 0;
     padding-inline: var(--density-padding-inline);
+    text-align: start;
   }
 
   .ds.data-table-body-cell {
@@ -390,6 +380,7 @@
     align-items: center;
     justify-content: center;
     min-inline-size: 0;
+    padding-block: 0;
     padding-inline: 0;
     overflow: visible;
   }
@@ -413,6 +404,7 @@
      carry the error colour; everything else is muted, because nothing went
      wrong. */
   .ds.data-table-body-cell.status {
+    display: block;
     grid-column: 1 / -1;
     padding-block: var(--dimension-300);
     color: var(--color-text-muted);

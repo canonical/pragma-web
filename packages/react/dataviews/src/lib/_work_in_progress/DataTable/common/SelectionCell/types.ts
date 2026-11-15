@@ -22,4 +22,4 @@ type OwnProps<TRow extends object> = {
  * taken.
  */
 export type SelectionCellProps<TRow extends object> = OwnProps<TRow> &
-  Omit<ComponentProps<"div">, keyof OwnProps<TRow> | "children" | "role">;
+  Omit<ComponentProps<"td">, keyof OwnProps<TRow> | "children" | "role">;

@@ -42,9 +42,7 @@ export default function renderRefusingTable(): {
   // node held from before would still read the old text.
   const { id } = status;
   const findReason = (): Element | null =>
-    document
-      .getElementById(id)
-      ?.closest("[role='columnheader']")
-      ?.querySelector(".sort-reason") ?? null;
+    document.getElementById(id)?.closest("th")?.querySelector(".sort-reason") ??
+    null;
   return { provider, status, findReason };
 }

@@ -44,12 +44,10 @@ const choose = (name: string): void => {
 
 /** The headings carrying `aria-sort`, with the value each carries. */
 const listClaims = (): readonly (readonly [string | null, string | null])[] =>
-  [...document.querySelectorAll("[role='columnheader'][aria-sort]")].map(
-    (header) => [
-      header.querySelector(".label")?.textContent ?? null,
-      header.getAttribute("aria-sort"),
-    ],
-  );
+  [...document.querySelectorAll("th[aria-sort]")].map((header) => [
+    header.querySelector(".label")?.textContent ?? null,
+    header.getAttribute("aria-sort"),
+  ]);
 
 /** The terms the sort panel lists, as it states each. */
 const listTerms = (): readonly (string | null)[] =>

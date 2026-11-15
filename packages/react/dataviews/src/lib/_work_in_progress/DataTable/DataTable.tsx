@@ -18,8 +18,8 @@ import "./styles.css";
  * root, and never changes behaviour because some optional context happened
  * to be present.
  *
- * Its rows are divs consuming one shared track list, published once on the
- * container as a custom property. Fixed columns keep their declared width,
+ * It is a native table whose rows consume one shared track list, published
+ * once on the container as a custom property. Fixed columns keep their declared width,
  * flexible ones compress within their bounds, the last column takes whatever
  * width the others leave, and the container scrolls when the remainder no
  * longer fits — there is no automatic hiding, pairing or renderer switching.

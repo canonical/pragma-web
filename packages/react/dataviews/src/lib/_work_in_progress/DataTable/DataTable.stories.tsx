@@ -1198,7 +1198,7 @@ ${columns}`,
 
 /** The logical positions of the rows mounted right now. */
 const listMountedPositions = (table: HTMLElement): number[] =>
-  [...table.querySelectorAll('[role="row"]')].map((row) =>
+  [...table.querySelectorAll("tr")].map((row) =>
     Number(row.getAttribute("aria-rowindex")),
   );
 
@@ -1232,10 +1232,7 @@ export const Virtualized: Story = {
     await expect(listMountedPositions(table).length).toBeLessThan(40);
     table.scrollTop = table.scrollHeight;
     const last = await canvas.findByText("node-09999.example.com");
-    await expect(last.closest('[role="row"]')).toHaveAttribute(
-      "aria-rowindex",
-      "10001",
-    );
+    await expect(last.closest("tr")).toHaveAttribute("aria-rowindex", "10001");
     await expect(listMountedPositions(table).length).toBeLessThan(40);
   },
 };
@@ -1293,7 +1290,7 @@ const columns: readonly DataTableColumn[] = [
     );
     const header = table.querySelector(".ds.data-table-row-group.header");
     const listRows = () => [
-      ...table.querySelectorAll(".ds.data-table-row-group.body > [role=row]"),
+      ...table.querySelectorAll(".ds.data-table-row-group.body > tr"),
     ];
     const waitFrames = async (): Promise<void> => {
       for (let frame = 0; frame < 2; frame += 1) {
@@ -1355,9 +1352,6 @@ export const VirtualizedKeepsFocus: Story = {
     );
     await expect(checkbox).toBeInTheDocument();
     await expect(checkbox).toHaveFocus();
-    await expect(checkbox.closest('[role="row"]')).toHaveAttribute(
-      "aria-rowindex",
-      "2",
-    );
+    await expect(checkbox.closest("tr")).toHaveAttribute("aria-rowindex", "2");
   },
 };

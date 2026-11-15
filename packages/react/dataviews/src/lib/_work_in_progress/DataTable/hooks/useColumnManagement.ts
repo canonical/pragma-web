@@ -178,7 +178,7 @@ export default function useColumnManagement<
     // the DOM's iterable typings are loaded.
     const cells = Array.from(
       row.querySelectorAll<HTMLElement>(
-        ":scope > [role='columnheader']:not(.ds.data-table-select-all-cell):not(.ds.data-table-settings-cell)",
+        ":scope > th:not(.ds.data-table-select-all-cell):not(.ds.data-table-settings-cell)",
       ),
     );
     const nearest = Math.max(0, Math.min(at, cells.length - 1));

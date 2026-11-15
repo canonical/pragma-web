@@ -29,11 +29,9 @@ export default function SelectAllCell({
   const ids = useDataViewsValue(displayed);
   const { checked, mixed, toggle } = useSelectAllOnPage({ selection, ids });
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <th> is only valid inside a <table>, and this grid is deliberately not one
-    // biome-ignore lint/a11y/useFocusableInteractive: the header is structure, not a widget — its checkbox carries the focus
-    <div
+    <th
       {...rest}
-      role="columnheader"
+      scope="col"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       ref={reserve}
     >
@@ -47,6 +45,6 @@ export default function SelectAllCell({
         }}
         onChange={toggle}
       />
-    </div>
+    </th>
   );
 }

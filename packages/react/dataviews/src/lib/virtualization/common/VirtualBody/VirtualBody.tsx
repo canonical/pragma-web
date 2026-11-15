@@ -6,23 +6,10 @@ import "./styles.css";
 
 const componentCssClassName = "ds data-table-row-group body virtual";
 
-/** The space of entries not mounted: hidden, since it holds no rows. */
-const renderGap = (key: string, size: number): ReactElement => (
-  <div
-    key={key}
-    className="ds data-table-gap"
-    aria-hidden="true"
-    style={{ blockSize: size }}
-  />
-);
-
 /**
- * The table's body, virtualized: the entries near the viewport, each at its
- * logical row position, with a gap for the space of the rest. A scroll
- * that does not change the mounted entries renders nothing, and the rows
- * are memoised as they are in the table's own body, so one that stays
- * mounted is not rendered again. New tracks render the body once, to
- * forget the heights they outdate; its rows bail out.
+ * The table's body, virtualized: the entries near the viewport at their
+ * logical positions, with the space of the rest as its padding and as the
+ * top margin of a later run's first row.
  *
  * @implements ds:apps.subcomponent.data_table-body
  */
@@ -41,37 +28,47 @@ const VirtualBody = ({
     tracks,
   });
   // One flat list, keyed by entry id, so a row keeps its element as it
-  // moves between runs.
+  // moves between runs. The space before the first run and after the last
+  // is the body's block padding; the space between runs is the top margin
+  // of the later run's first row.
   const rows: ReactElement[] = [];
+  let before = 0;
   for (const [position, run] of mounted.runs.entries()) {
-    if (run.before > 0) {
-      rows.push(renderGap(`gap-${position}`, run.before));
+    if (position === 0) {
+      before = run.before;
     }
-    for (const entry of entries.slice(run.start, run.end)) {
+    for (const [offset, entry] of entries.slice(run.start, run.end).entries()) {
       rows.push(
         <Fragment key={entry.id}>
           {renderEntry(entry, {
             ref: readRowRef(entry.id),
             position: entry.index,
+            gap:
+              position > 0 && offset === 0 && run.before > 0
+                ? run.before
+                : undefined,
           })}
         </Fragment>,
       );
     }
   }
-  if (mounted.after > 0) {
-    rows.push(renderGap("gap-after", mounted.after));
-  }
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <tbody> is only valid inside a <table>, and this grid is deliberately not one
-    <div
+    <tbody
       ref={body}
-      role="rowgroup"
       className={componentCssClassName}
+      style={
+        before === 0 && mounted.after === 0
+          ? undefined
+          : {
+              paddingBlockStart: before === 0 ? undefined : before,
+              paddingBlockEnd: mounted.after === 0 ? undefined : mounted.after,
+            }
+      }
       onFocus={onFocus}
       onBlur={onBlur}
     >
       {rows}
-    </div>
+    </tbody>
   );
 };
 

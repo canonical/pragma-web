@@ -23,10 +23,8 @@ export default function SelectionCell<TRow extends object>({
   const messages = useContext(MessagesContext);
   const record = useDataViewsValue(channels.record);
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <td> is only valid inside a <table>, and this grid is deliberately not one
-    <div
+    <td
       {...rest}
-      role="cell"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <CheckboxInput
@@ -36,6 +34,6 @@ export default function SelectionCell<TRow extends object>({
           provider.selection.toggle(channels.id);
         }}
       />
-    </div>
+    </td>
   );
 }
