@@ -11,7 +11,9 @@
  * moving it. At every width the section a reader chooses is current, and
  * the last one at the canvas's end. At 390 no page this unit changed
  * scrolls the document or the canvas sideways, and each of Button's tables
- * scrolls inside its own box within its section.
+ * scrolls inside its own box, which ends within its section and on the
+ * screen. At 1440 a token's name in the Tokens table draws its digits on
+ * its letters' advance.
  */
 
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
@@ -637,7 +639,7 @@ const measureSideways = (): SidewaysMeasure => {
   };
 };
 
-/** Where a table in a section sits against its section and its scroller. */
+/** Where a table in a section sits against its section, its scroller and the screen. */
 type TableMeasure = {
   readonly section: string;
   readonly scrolls: boolean;
@@ -645,16 +647,18 @@ type TableMeasure = {
   readonly scrollerRight: number;
   readonly sectionLeft: number;
   readonly sectionRight: number;
-  readonly reach: number;
+  readonly screenRight: number;
+  readonly hidden: number;
+  readonly scrollable: number;
   readonly tableWidth: number;
 };
 
 /**
  * Measure every table in the view's sections: the nearest box that
  * scrolls it sideways (the table itself or an ancestor whose overflow is
- * `auto` or `scroll`), that box's edges against the section's body, and
- * how far the box lets a reader scroll against the table's width. Runs in
- * the page.
+ * `auto` or `scroll`), that box's edges against the section's body and
+ * the screen's, how much of the table lies past the box's visible end,
+ * and how far the box scrolls. Runs in the page.
  */
 const measureTables = (): readonly TableMeasure[] =>
   [
@@ -673,6 +677,8 @@ const measureTables = (): readonly TableMeasure[] =>
     }
     const box = (scroller ?? table).getBoundingClientRect();
     const bodyBox = (body ?? table).getBoundingClientRect();
+    const tableBox = table.getBoundingClientRect();
+    const clientWidth = scroller?.clientWidth ?? box.width;
     return {
       section: table.closest(".section")?.querySelector("h2")?.id ?? "",
       scrolls: scroller !== null && scroller !== body,
@@ -680,8 +686,10 @@ const measureTables = (): readonly TableMeasure[] =>
       scrollerRight: box.right,
       sectionLeft: bodyBox.left,
       sectionRight: bodyBox.right,
-      reach: scroller?.scrollWidth ?? 0,
-      tableWidth: table.getBoundingClientRect().width,
+      screenRight: document.documentElement.clientWidth,
+      hidden: tableBox.right - (box.left + clientWidth),
+      scrollable: (scroller?.scrollWidth ?? 0) - clientWidth,
+      tableWidth: tableBox.width,
     };
   });
 
@@ -704,7 +712,7 @@ describe("every changed page at 390px (W6a-A7)", () => {
     },
   );
 
-  it("scrolls each of Button's tables inside its own box within its section, never cut", async ({
+  it("scrolls each of Button's tables inside its own box within its section and the screen, every column reachable", async ({
     annotate,
   }) => {
     const page = await open(BUTTON_PATH, { viewport: PHONE });
@@ -729,8 +737,14 @@ describe("every changed page at 390px (W6a-A7)", () => {
         expect(table.scrollerRight, table.section).toBeLessThanOrEqual(
           table.sectionRight + TOLERANCE_PX,
         );
-        expect(table.reach, table.section).toBeGreaterThanOrEqual(
-          table.tableWidth - TOLERANCE_PX,
+        // The box ends on the screen, so no column is cut at its edge
+        // (the canvas's own inset at 390 is not asserted here), and the
+        // part of the table past the box's end is the part it scrolls.
+        expect(table.scrollerRight, table.section).toBeLessThanOrEqual(
+          table.screenRight + TOLERANCE_PX,
+        );
+        expect(table.scrollable, table.section).toBeGreaterThanOrEqual(
+          table.hidden - TOLERANCE_PX,
         );
       }
     } finally {
