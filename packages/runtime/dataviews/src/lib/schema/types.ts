@@ -16,7 +16,7 @@ import type {
  * A closed-set field, filtered by `isAny` — the value is one of the operands
  * — and `isNone` — the value is present, a string or a number, and none of
  * the operands. An absent or null value, or one of another type, is neither
- * any nor none of them.
+ * any nor none of them. A list-valued field matches by element instead.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -33,6 +33,13 @@ export type ChoicesField = {
    * spelled on the wire reads back as the option it was.
    */
   readonly options?: readonly (string | number)[];
+  /**
+   * Whether a record holds a list of options rather than one: `isAny` then
+   * matches when any element is an operand, `isNone` when a list is held
+   * and none of its elements is, and a facet counts the records holding
+   * each option. Left out, a record holds one option.
+   */
+  readonly multiple?: true;
 };
 
 /**

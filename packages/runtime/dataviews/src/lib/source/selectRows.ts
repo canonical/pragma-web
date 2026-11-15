@@ -93,14 +93,26 @@ const compilePredicate = (
           : rankOperand;
       const ranks = new Set(predicate.operands.map(identify));
       const holds = predicate.operator === "isAny";
+      // Only a choice value — a string or a number — is any or none of
+      // the options: an absent value, null or a value of another type is
+      // neither, as no predicate matches an empty value.
+      const isListed = (value: unknown): boolean =>
+        (typeof value === "string" || typeof value === "number") &&
+        ranks.has(identify(value));
+      if (definition?.kind === "choices" && definition.multiple === true) {
+        // A list matches by element: any of them listed, or a list held
+        // and none of them listed.
+        return {
+          field,
+          test: (value) =>
+            Array.isArray(value) && value.some(isListed) === holds,
+        };
+      }
       return {
         field,
-        // Only a choice value — a string or a number — is any or none of
-        // the options: an absent value, null or a value of another type is
-        // neither, as no predicate matches an empty value.
         test: (value) =>
           (typeof value === "string" || typeof value === "number") &&
-          ranks.has(identify(value)) === holds,
+          isListed(value) === holds,
       };
     }
     case "gte":
