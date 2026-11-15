@@ -27,16 +27,21 @@
 # is its content (flex 0 1 auto) and which never wraps. The facts have no
 # basis: they grow up to their content (max-width: max-content) from the
 # width the identity leaves, so when the row is
-# narrow they give way first, ending in an ellipsis, down to nothing; only
+# narrow they give way first, down to nothing; only
 # then does the identity shrink, and its title ends in an ellipsis while
 # the mark, the prefix and the kind keep their widths. The status keeps its
 # width. The width left over is the identity's end margin (auto), so the
 # facts and the status end the row as one group. Below two
 # groups (the shell's container query at 912px) the facts after the first
-# leave, so the first line keeps its first fact alone. The facts are one
-# line of text (a block, so it can end in an ellipsis), a fact after the
-# first standing the gutter from the one before; the whole word stays in
-# the text. Everything clips along its line only, so a chip in the title
+# leave, so the first line keeps its first fact alone. A fact is shown
+# whole or not at all: the facts are a wrapping flex line in a box one line
+# high (space.300) that clips, so a fact with no room on the first line
+# moves to the second, which the box hides, the last fact first, and no
+# label or value is ever cut. The first line opens with an empty item, the
+# start, of no width and a line high: a line always holds its first item,
+# so without it the first fact could not leave, and with it the first line
+# keeps its height when every fact has left. A fact after the first stands
+# the gutter from the one before. Everything clips along its line only, so a chip in the title
 # keeps its whole 28px pill and its line grows to hold it.
 #
 # A two-line row wraps, and a wrapping flex line is broken by its items'
@@ -82,7 +87,9 @@
 #   space.0 for the gap between a wrapped row's lines: the summary reads with
 #   the identity above it, its lines the 24px line apart.
 #   layout.wrap wrap, typography.whiteSpace normal and nowrap,
-#   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
+#   layout.overflow and layout.overflow.inline clip, typography.overflow
+#   ellipsis: keywords; space.300 again for the facts' box and its start,
+#   one line high;
 #   size.min.width 0 lets the identity and the facts shrink to the row.
 #   --entity-row-identifier-vertical-align: baseline,
 #   --entity-row-identifier-line-height: 0
@@ -203,15 +210,23 @@ node:
     - node:
         role: facts
         styles:
-          layout.type: block
+          layout.type: flex
+          layout.wrap: wrap
           layout.flex.grow: 1
           layout.flex.basis: 0
           size.max.width: max-content
-          layout.overflow.inline: clip
+          size.height: space.300
+          layout.overflow: clip
           size.min.width: 0
           typography.whiteSpace: nowrap
-          typography.overflow: ellipsis
         edges:
+          # The first line's start: an empty item of no width, a line high.
+          - node:
+              role: start
+              styles:
+                layout.flex.shrink: 0
+                size.height: space.300
+            relation: { cardinality: "1", slotName: start }
           - switch:
               on: internal
               cases:

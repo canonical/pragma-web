@@ -8,7 +8,8 @@
    * 32px, which never wraps; a two-line row adds the summary as its only
    * second line, with no space between the lines: 56px. The title yields
    * last: the identity keeps its content's width while the facts give
-   * theirs up first, down to nothing, and the status keeps its
+   * theirs up first, each fact leaving whole, the last first, down to
+   * nothing, and the status keeps its
    * own; whatever width is left over sets the facts and the status at
    * the row's end as one group. The row may be narrower than its
    * content, so a long identity never widens the track that holds it. */
@@ -142,17 +143,28 @@
   }
 
   /* The facts have no basis: they grow up to their content from the width
-   * the identity leaves, so they give way before the title, one line of
-   * text that ends in an ellipsis, down to nothing. */
+   * the identity leaves, so they give way before the title, down to
+   * nothing. A fact is shown whole or not at all: the facts wrap, and the
+   * box is one line high and clips, so a fact that has no room on the
+   * first line moves to the second, which is hidden, the last fact first. */
   .ds.entity-row .facts {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
     flex-grow: 1;
     flex-basis: 0;
     max-width: max-content;
-    overflow-x: clip;
+    height: var(--entity-row-line-height);
+    overflow: clip;
     min-width: 0;
     white-space: nowrap;
-    text-overflow: ellipsis;
+  }
+
+  /* The first line's start: an item of no width, a line high, so the
+   * first line is never empty and holds its height, and the first fact,
+   * too, can move to the hidden line. */
+  .ds.entity-row .start {
+    flex-shrink: 0;
+    height: var(--entity-row-line-height);
   }
 
   /* A fact after the first stands the row's gap from the one before. */

@@ -27,7 +27,9 @@
  * workspace drawn in the face it ships, the dev cell delivering its font.
  * The standards index's entries keep their address, the row's first
  * fact, on the title's one line, and a title is cut, at 390px too, only
- * once the address has given up all of its width.
+ * once the address has given up all of its width. At 390 and 820px no
+ * fact of a row shows in part: each lies wholly inside the facts' box or
+ * on its hidden line.
  */
 import {
   launchBrowser,
@@ -47,6 +49,7 @@ import {
   JOURNEYS_PATHS,
   MIN_CATALOG_CARD_WIDTH_PX,
   PAGE_SETTLE_MS,
+  STANDARDS_FACT_WIDTHS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
   WIDTH_TOLERANCE_PX,
@@ -102,6 +105,48 @@ function countCutEntries(): {
     titlesCutFirst: measured.filter(({ titleCutFirst }) => titleCutFirst)
       .length,
     addressesApart: measured.filter(({ addressApart }) => addressApart).length,
+  };
+}
+
+/**
+ * Count the standards index's rows, their facts that show, and those that
+ * show in part: a fact is shown when some of it lies inside its row's
+ * facts' box, and in part when some of it lies outside, so a fact that has
+ * left for the box's hidden line, or that is not displayed, is neither. It
+ * runs in the page.
+ *
+ * @returns The counts, and the text of each fact shown in part.
+ */
+function countPartFacts(): {
+  readonly rows: number;
+  readonly shown: number;
+  readonly partial: readonly string[];
+} {
+  const rows = [
+    ...document.querySelectorAll(".ds.standards-index .ds.entity-row"),
+  ];
+  const facts = rows.flatMap((row) => {
+    const box = row.querySelector(".facts")?.getBoundingClientRect();
+    if (!box) return [];
+    return [...row.querySelectorAll(".facts > .fact")].map((fact) => {
+      const rect = fact.getBoundingClientRect();
+      const inside =
+        Math.min(rect.right, box.right) - Math.max(rect.left, box.left) > 0 &&
+        Math.min(rect.bottom, box.bottom) - Math.max(rect.top, box.top) > 0;
+      const whole =
+        rect.left >= box.left - 0.5 &&
+        rect.right <= box.right + 0.5 &&
+        rect.top >= box.top - 0.5 &&
+        rect.bottom <= box.bottom + 0.5;
+      return { text: fact.textContent ?? "", inside, whole };
+    });
+  });
+  return {
+    rows: rows.length,
+    shown: facts.filter(({ inside }) => inside).length,
+    partial: facts
+      .filter(({ inside, whole }) => inside && !whole)
+      .map(({ text }) => text),
   };
 }
 
@@ -470,6 +515,37 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 });
+
+// A fact is shown whole or not at all: where a row has no room for its
+// facts they leave whole, the last first, so none is ever cut to a stub.
+describe.each(STANDARDS_FACT_WIDTHS)(
+  "the standards index at %i px",
+  (width) => {
+    it("shows each fact of a row whole or not at all", async () => {
+      const page = await browser.newPage({ viewport: { width, height: 844 } });
+      try {
+        const origins = [
+          new URL(server.base).origin,
+          new URL(server.graphBase).origin,
+        ];
+        await page.route("**/*", (route) =>
+          origins.includes(new URL(route.request().url()).origin)
+            ? route.continue()
+            : route.fulfill({ status: 204, body: "" }),
+        );
+        await page.goto(new URL(STANDARDS_INDEX_PATH, server.base).href, {
+          waitUntil: "networkidle",
+          timeout: PAGE_SETTLE_MS,
+        });
+        const counts = await page.evaluate(countPartFacts);
+        expect(counts.rows).toBeGreaterThan(0);
+        expect(counts.partial).toEqual([]);
+      } finally {
+        await page.close();
+      }
+    });
+  },
+);
 
 /**
  * Open the catalog at a viewport width and measure its cards against the

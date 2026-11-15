@@ -47,11 +47,12 @@ describe("EntityRow stylesheet", () => {
     );
   });
 
-  it("wraps only a row that holds a summary", () => {
-    expect(styles.match(/flex-wrap: wrap;/g)).toHaveLength(1);
+  it("wraps only a row that holds a summary, and the facts inside a row", () => {
+    expect(styles.match(/flex-wrap: wrap;/g)).toHaveLength(2);
     expect(readRule(".ds.entity-row:has(> .summary)")).toContain(
       "flex-wrap: wrap;",
     );
+    expect(readRule(".ds.entity-row .facts")).toContain("flex-wrap: wrap;");
   });
 
   it("drops the later facts below two groups", () => {
@@ -69,14 +70,39 @@ describe("EntityRow stylesheet", () => {
     expect(identity).toContain("margin-inline-end: auto;");
   });
 
-  it("lets the facts give way first, ending in an ellipsis", () => {
+  it("lets the facts give way first, down to nothing", () => {
     const rule = readRule(".ds.entity-row .facts");
     expect(rule).toContain("flex-grow: 1;");
     expect(rule).toContain("flex-basis: 0;");
     expect(rule).toContain("max-width: max-content;");
     expect(rule).toContain("min-width: 0;");
     expect(rule).toContain("white-space: nowrap;");
-    expect(rule).toContain("text-overflow: ellipsis;");
+  });
+
+  it("shows a fact whole or not at all, the facts' second line hidden", () => {
+    const rule = readRule(".ds.entity-row .facts");
+    expect(rule).toContain("display: flex;");
+    expect(rule).toContain("flex-wrap: wrap;");
+    expect(rule).toContain("height: var(--entity-row-line-height);");
+    expect(rule).toContain("overflow: clip;");
+    // Nothing in the facts ends in an ellipsis: a fact is never cut.
+    expect(styles).not.toMatch(/\.fact[^{]*\{[^}]*text-overflow/);
+    expect(rule).not.toContain("text-overflow");
+    // The start, a line high and of no width, opens the first line, so the
+    // first fact can leave it too.
+    const start = readRule(".ds.entity-row .start");
+    expect(start).toContain("height: var(--entity-row-line-height);");
+    expect(start).toContain("flex-shrink: 0;");
+    expect(start).not.toMatch(/(?:^|[^-])width:/);
+    const html = renderToString(
+      <EntityRow
+        facts={[{ property: "curie", label: "Address", value: "cs:x" }]}
+        title="Layout"
+      />,
+    );
+    expect(html).toContain(
+      '<span class="facts"><span class="start"></span><span class="fact"',
+    );
   });
 
   it("centres the mark's sign on both axes in its 16px box", () => {

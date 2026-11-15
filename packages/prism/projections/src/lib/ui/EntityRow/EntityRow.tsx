@@ -11,9 +11,9 @@ const componentCssClassName = "ds entity-row";
  * foreign prefix and title on the left and its facts and status ending
  * the row. Its height comes from `lines` alone: the first line
  * never wraps, and below two groups only the first fact stays on it. The
- * title yields last: the facts give way first, ending in an
- * ellipsis, down to nothing, the status keeps its width, and only then
- * does a title longer than what is left end in an ellipsis.
+ * title yields last: the facts give way first, each shown whole or not at
+ * all, the last leaving first, down to none, the status keeps its width,
+ * and only then does a title longer than what is left end in an ellipsis.
  * With an `href` the title links to the entity's home through
  * `LinkComponent`; without one it is inert text.
  *
@@ -73,6 +73,7 @@ export default function EntityRow({
       {lines === "two" ? <span className="summary">{summary}</span> : null}
       {facts.length === 0 ? null : (
         <span className="facts">
+          <span className="start" />
           {facts.map(({ property, label, value }, index) => (
             <span
               className={index === 0 ? "fact" : "fact is-later"}

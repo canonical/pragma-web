@@ -96,6 +96,13 @@ export const STANDARDS_INDEX_PATH = "/standards";
 export const STANDARDS_INDEX_ROW_SELECTOR = ".ds.standards-index > *";
 
 /**
+ * The widths the standards index's facts are measured at, where a row is
+ * too narrow for some of them: a phone, and two groups' threshold less one
+ * step, where the later facts have left and the address may stay.
+ */
+export const STANDARDS_FACT_WIDTHS = [390, 820] as const;
+
+/**
  * How far apart, in pixels, two edges or widths of boxes that fill the
  * same tracks may round: sub-pixel layout rounds each box on its own.
  */
