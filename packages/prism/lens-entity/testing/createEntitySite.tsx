@@ -5,6 +5,7 @@ import {
   usePageRenderers,
 } from "@canonical/prism-core";
 import {
+  AmbientNamespaceProvider,
   ProjectionLinkProvider,
   useListRenderers,
 } from "@canonical/prism-projections";
@@ -37,7 +38,8 @@ const SiteRenderers = ({
  * environment, a router over the site's two lenses at `url` (a static one,
  * as the server renders with, or one over a memory history that a reader's
  * clicks can navigate, the test's own when it reads the address back), and,
- * inside the router, the site's homes, the projection link provider, which
+ * inside the router, the site's homes, the projection link provider and the
+ * page's ambient namespace, `metro` (the metro site declares it once in its Shell), which
  * the index's rows and cards and the page's title and chip read their arms
  * and their links from, and the site's renderers over the provider
  * extensions it serves. The content sits in the lens layout when one is
@@ -67,23 +69,25 @@ export default function createEntitySite({
       <RouterProvider router={router}>
         <HomesProvider homes={HOMES}>
           <ProjectionLinkProvider>
-            <SiteRenderers extensions={extensions}>
-              {layout === undefined ? (
-                children
-              ) : (
-                <EntityLayout
-                  binding={layout.binding}
-                  className={layout.className}
-                  colophon={layout.colophon}
-                  filters={layout.filters}
-                  label={layout.label}
-                  rail={layout.rail ?? null}
-                  renderers={layout.renderers}
-                >
-                  {children}
-                </EntityLayout>
-              )}
-            </SiteRenderers>
+            <AmbientNamespaceProvider namespace="metro">
+              <SiteRenderers extensions={extensions}>
+                {layout === undefined ? (
+                  children
+                ) : (
+                  <EntityLayout
+                    binding={layout.binding}
+                    className={layout.className}
+                    colophon={layout.colophon}
+                    filters={layout.filters}
+                    label={layout.label}
+                    rail={layout.rail ?? null}
+                    renderers={layout.renderers}
+                  >
+                    {children}
+                  </EntityLayout>
+                )}
+              </SiteRenderers>
+            </AmbientNamespaceProvider>
           </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>

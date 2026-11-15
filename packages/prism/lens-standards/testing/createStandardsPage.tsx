@@ -6,6 +6,7 @@ import {
   usePageRenderers,
 } from "@canonical/prism-core";
 import {
+  AmbientNamespaceProvider,
   ProjectionLinkProvider,
   useListRenderers,
 } from "@canonical/prism-projections";
@@ -44,7 +45,8 @@ const formatDocumentTitle = (title: string): string => `${title} — Docs`;
  * cold store), and a static router over the lens's own two routes at `url`,
  * because the index's links, the breadcrumb and the trail render router
  * `Link`s whose hrefs come from the `standards` and `standardEntity` codecs.
- * The homes and the projection link provider sit inside the router, because
+ * The homes, the projection link provider and the page's ambient namespace,
+ * `cs` (the docs site declares it in its standards layout), sit inside the router, because
  * a mention in a standard's prose renders as a chip that links to its home
  * through it, and the site's renderers over a provider that serves source.
  *
@@ -68,7 +70,9 @@ export default function createStandardsPage(
         <RouterProvider router={createStaticRouter(routes, url)}>
           <HomesProvider homes={HOMES}>
             <ProjectionLinkProvider>
-              <SiteRenderers>{page}</SiteRenderers>
+              <AmbientNamespaceProvider namespace="cs">
+                <SiteRenderers>{page}</SiteRenderers>
+              </AmbientNamespaceProvider>
             </ProjectionLinkProvider>
           </HomesProvider>
         </RouterProvider>
