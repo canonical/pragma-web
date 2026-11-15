@@ -15,7 +15,7 @@ import { BodyCell } from "./index.js";
  * One row's channels over the given fields, minted as the table mints
  * them. The row is fed to the provider by hand: nothing observes it here.
  */
-const channelsOver = (fields: readonly string[]) => {
+const createChannelsOver = (fields: readonly string[]) => {
   const { provider } = createMachineProvider();
   const host = readProviderHost(provider);
   host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
@@ -39,7 +39,7 @@ const inRow = () => ({
 
 describe("BodyCell", () => {
   it("reports a field no scope channel observes instead of rendering nothing", () => {
-    const { provider, channels } = channelsOver(["name"]);
+    const { provider, channels } = createChannelsOver(["name"]);
     const failure = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() =>
       render(
@@ -56,7 +56,7 @@ describe("BodyCell", () => {
   });
 
   it("renders again for a new value, not for the same props", () => {
-    const { provider, channels } = channelsOver(["name"]);
+    const { provider, channels } = createChannelsOver(["name"]);
     const drawn = vi.fn(({ value }: DisplayFieldCellProps) => String(value));
     const column = { id: "name", header: "Name", cell: drawn };
     const { rerender } = render(

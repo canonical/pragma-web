@@ -16,7 +16,7 @@ const request: SourceRequest = {
 };
 
 /** Every delivery one execution makes, in order. */
-const deliveries = (
+const listDeliveries = (
   source: Source<Machine>,
 ): readonly SourceDelivery<Machine>[] => {
   const delivered: SourceDelivery<Machine>[] = [];
@@ -28,7 +28,7 @@ const deliveries = (
 
 describe("createForbiddingSource", () => {
   it("forbids every request, saying nothing of why", () => {
-    expect(deliveries(createForbiddingSource())).toEqual([
+    expect(listDeliveries(createForbiddingSource())).toEqual([
       { status: "forbidden", cause: null },
     ]);
   });

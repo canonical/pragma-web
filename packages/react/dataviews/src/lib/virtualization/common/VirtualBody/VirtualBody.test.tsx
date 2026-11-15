@@ -904,7 +904,7 @@ describe("virtualized DataTable", () => {
     const removed = vi.spyOn(EventTarget.prototype, "removeEventListener");
     const { table, view } = renderVirtualizedTable();
     const ours = added.mock.calls.flatMap(([type, listener], call) => {
-      const target = added.mock.contexts[call];
+      const target = added.mock.contexts.at(call);
       return type === "scroll" &&
         target instanceof Node &&
         (target === table || table.contains(target))
@@ -917,7 +917,7 @@ describe("virtualized DataTable", () => {
       expect(
         removed.mock.calls.some(
           ([removedType, removedListener], call) =>
-            removed.mock.contexts[call] === target &&
+            removed.mock.contexts.at(call) === target &&
             removedType === type &&
             removedListener === listener,
         ),

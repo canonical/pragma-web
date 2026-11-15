@@ -24,7 +24,7 @@ describe("regression 0003 — row groups sized by their content", () => {
     const rule = sheet.match(
       /\.ds\.data-table > \.header,\s*\.ds\.data-table-body\s*\{[^}]*\}/,
     );
-    expect(rule?.[0]).toMatch(/min-inline-size:\s*min-content;/);
+    expect(rule?.at(0)).toMatch(/min-inline-size:\s*min-content;/);
     expect(sheet).not.toMatch(/max-content/);
   });
 });

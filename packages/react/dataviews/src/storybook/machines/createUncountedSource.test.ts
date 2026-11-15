@@ -17,7 +17,7 @@ const request: SourceRequest = {
 };
 
 /** Every delivery one execution makes, in order. */
-const deliveries = (
+const listDeliveries = (
   source: Source<Machine>,
 ): readonly SourceDelivery<Machine>[] => {
   const delivered: SourceDelivery<Machine>[] = [];
@@ -34,7 +34,7 @@ describe("createUncountedSource", () => {
       pageable: "unknown",
       matched: "unknown",
     });
-    const [delivery] = deliveries(source);
+    const [delivery] = listDeliveries(source);
     expect(delivery).toMatchObject({
       status: "succeeded",
       page: {
@@ -47,8 +47,8 @@ describe("createUncountedSource", () => {
   });
 
   it("passes a delivery that is not a page through as it is", () => {
-    expect(deliveries(createUncountedSource(createFailingSource()))).toEqual(
-      deliveries(createFailingSource()),
-    );
+    expect(
+      listDeliveries(createUncountedSource(createFailingSource())),
+    ).toEqual(listDeliveries(createFailingSource()));
   });
 });

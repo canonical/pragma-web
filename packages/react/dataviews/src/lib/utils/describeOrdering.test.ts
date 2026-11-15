@@ -50,7 +50,7 @@ describe("describeOrdering", () => {
 
   it("words the outcome in the messages it is given, not in English", () => {
     const messages = resolveMessages({
-      sortApplied: (terms) => `Trié par ${terms[0]?.name ?? ""}`,
+      sortApplied: (terms) => `Trié par ${terms.at(0)?.name ?? ""}`,
     });
     expect(
       describeOrdering(
