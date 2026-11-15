@@ -212,3 +212,28 @@ export const BRIDGE_CHANNEL_ROOM =
  * tries, in px, from the route's arrowhead back.
  */
 export const BRIDGE_LABEL_STEP = 4;
+
+/**
+ * The narrowest a collapsed region's box is drawn, in px: its prefix over
+ * its class count, which needs more room than a class's one line.
+ */
+export const REGION_BOX_MIN_WIDTH = 128;
+
+/**
+ * What a collapsed region's box is keyed by, before its prefix: no IRI a
+ * provider serves starts so.
+ */
+export const REGION_NODE_SCHEME = "region:";
+
+/**
+ * The prefixes of the W3C vocabularies a relation may reach without their
+ * ontology being loaded, by namespace. The store serves the lens no
+ * namespace inventory beyond the loaded ontologies, and these
+ * vocabularies' IRIs carry no readable prefix.
+ */
+export const STUB_PREFIXES: ReadonlyMap<string, string> = new Map([
+  ["http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf"],
+  ["http://www.w3.org/2000/01/rdf-schema#", "rdfs"],
+  ["http://www.w3.org/2001/XMLSchema#", "xsd"],
+  ["http://www.w3.org/2002/07/owl#", "owl"],
+]);

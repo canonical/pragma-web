@@ -20,6 +20,7 @@ import {
   uniteRects,
 } from "@canonical/prism-core";
 import buildClassGraphModel from "./buildClassGraphModel.js";
+import chooseDrawnScope from "./chooseDrawnScope.js";
 import {
   ALIGNMENT_SEARCH_LIMIT,
   BRIDGE_CHANNEL_ROOM,
@@ -37,6 +38,7 @@ import {
   VIEW_MARGIN,
 } from "./constants.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
+import gatherDrawnInput from "./gatherDrawnInput.js";
 import layOutPhoneView from "./layOutPhoneView.js";
 import listRegionBridges from "./listRegionBridges.js";
 import orderRail from "./orderRail.js";
@@ -346,7 +348,11 @@ function alignShelves(
  *   legend specimen's.
  * @param options - How many barycentre sweeps order the columns (`SWEEPS`
  *   unless given; 0 keeps the label-sorted order, the baseline the
- *   crossings are measured against).
+ *   crossings are measured against), and the budget the overview keeps at
+ *   rest: with one, the largest namespaces collapse to a box each while
+ *   the drawing would exceed its drawn nodes, and a relation to a class
+ *   outside the loaded namespaces reaches an external stub (see
+ *   `chooseDrawnScope`); without one, every class given is drawn.
  * @returns The layout. Each class's column is graph-wide: its region's
  *   first column, counted over the regions in packing order, plus its
  *   column in the region.
@@ -355,8 +361,16 @@ export default function layOutClassGraph(
   input: ClassGraphInput | SpecimenGraphInput,
   options: ClassGraphLayoutOptions = {},
 ): ClassGraphLayout {
-  const { sweeps = SWEEPS } = options;
-  const model = buildClassGraphModel(input);
+  const { sweeps = SWEEPS, budget } = options;
+  const whole = buildClassGraphModel(input);
+  // Within a budget the overview draws what fits at rest: the largest
+  // namespaces collapsed to a box each, the stubs its relations reach.
+  const model =
+    budget === undefined
+      ? whole
+      : buildClassGraphModel(
+          gatherDrawnInput(input, whole, chooseDrawnScope(whole, budget)),
+        );
   // An ontology with no class is data a provider may serve: it lays out
   // as an empty floor the size of the design canvas.
   if (model.byId.size === 0) {
@@ -733,6 +747,7 @@ export default function layOutClassGraph(
 
   const regions: LaidOutRegion[] = sized.map((region) => {
     const { x, y } = originOf(region.prefix);
+    const boxes = region.ids.map((id) => requireEntry(model.byId, id));
     return {
       prefix: region.prefix,
       ids: region.ids,
@@ -741,6 +756,8 @@ export default function layOutClassGraph(
       w: region.w,
       h: region.h,
       columns: region.layout.columns.length,
+      members: boxes.reduce((sum, box) => sum + box.members, 0),
+      collapsed: boxes.some((box) => box.kind === "region"),
     };
   });
   const allEdges = [...edges, ...crossEdges];

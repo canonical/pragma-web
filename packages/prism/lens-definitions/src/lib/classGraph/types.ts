@@ -1,9 +1,17 @@
 import type {
   FontFace,
+  GraphBudget,
   LabelledBundle,
   Point,
   Rect,
 } from "@canonical/prism-core";
+
+/**
+ * What a box of the graph stands for: a class of a loaded namespace, an
+ * external stub (a class a relation reaches in a namespace no ontology
+ * loaded), or a collapsed region (a loaded namespace drawn as one box).
+ */
+export type NodeKind = "class" | "stub" | "region";
 
 /** One class the graph draws, as the explorer's query states it. */
 export interface GraphClassInput {
@@ -21,6 +29,15 @@ export interface GraphClassInput {
   readonly instanceCount: number;
   /** How many datatype properties (fields) the class has, inherited ones included. */
   readonly fields: number;
+  /** What the box stands for; a class of a loaded namespace when omitted. */
+  readonly kind?: NodeKind;
+  /** The classes a collapsed region holds; 1 when omitted. */
+  readonly members?: number;
+  /**
+   * The term a stub or a collapsed region is named by (`rdf:List`,
+   * `surface`), as no ontology names it; a class's term is its own.
+   */
+  readonly term?: string;
 }
 
 /** One object property, drawn as a relation when both its ends are drawn. */
@@ -93,6 +110,10 @@ export interface SpecimenGraphInput {
 
 /** A class as the model holds it: its input, its box and its encodings. */
 export interface ClassModel extends GraphClassInput {
+  /** What the box stands for. */
+  readonly kind: NodeKind;
+  /** The classes it stands for: 1, or a collapsed region's count. */
+  readonly members: number;
   /** The label's type size: 14, or 16 on a hub. */
   readonly size: number;
   /** The label's face: bold, or bold italic when abstract. */
@@ -157,6 +178,25 @@ export interface ClassGraphModel {
   }[];
   /** The relations both of whose ends are drawn, by IRI. */
   readonly drawnRelations: readonly DrawnRelation[];
+  /**
+   * The relations from a class to an IRI that no class of the input
+   * holds, by IRI: each reaches an external stub when it is drawn.
+   */
+  readonly external: readonly DrawnRelation[];
+}
+
+/**
+ * What the overview draws within its budget: the namespaces drawn class by
+ * class, those collapsed to one box, and the external stubs the drawn
+ * classes' relations reach.
+ */
+export interface DrawnScope {
+  /** The prefixes drawn class by class, in the model's region order. */
+  readonly expanded: readonly string[];
+  /** The prefixes drawn as one box each, in the order they collapsed. */
+  readonly collapsed: readonly string[];
+  /** The IRIs of the external stubs, by code unit. */
+  readonly stubs: readonly string[];
 }
 
 /** Where the keyboard moves from a node. */
@@ -225,6 +265,10 @@ export interface LaidOutRegion {
   readonly h: number;
   /** How many columns it has. */
   readonly columns: number;
+  /** How many classes it stands for: its collapsed box's count, or its own. */
+  readonly members: number;
+  /** Whether it is a namespace collapsed to one box. */
+  readonly collapsed: boolean;
 }
 
 /** One row of the phone view. */
@@ -314,6 +358,14 @@ export interface ClassGraphLayoutOptions {
    * label-sorted order, the baseline the crossings are measured against.
    */
   readonly sweeps?: number;
+  /**
+   * The budget the overview keeps at rest: the largest namespaces
+   * collapse to one box each while it would draw more nodes, and the
+   * relations to classes outside the input reach external stubs. Without
+   * one, every class given is drawn and nothing else, as a legend and the
+   * whole graph's measurements draw it.
+   */
+  readonly budget?: GraphBudget;
 }
 
 /** A packing of regions into shelves. */

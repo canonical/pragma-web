@@ -20,6 +20,7 @@ import {
   HUB_LOOP_EXTENT,
   HUB_MIN_DEGREE,
   LOOP_EXTENT,
+  REGION_BOX_MIN_WIDTH,
   WRAPPED_HEIGHT,
 } from "./constants.js";
 import type {
@@ -45,9 +46,18 @@ type BoxGeometry = Pick<
  * abstract) flush left at an 8px inset, then the instance count, when there
  * is one, before the right inset; the width rounded up to the lattice and
  * kept between 96 and 208px. A label too long for the widest box wraps to
- * two lines, the second ellipsised.
+ * two lines, the second ellipsised. A collapsed region's box is a hub's
+ * height, for its prefix over its class count, and at least 128px wide.
  */
 function sizeBox(klass: GraphClassInput, hub: boolean): BoxGeometry {
+  if (klass.kind === "region") {
+    const box = sizeBox({ ...klass, kind: "class" }, false);
+    return {
+      ...box,
+      w: Math.max(REGION_BOX_MIN_WIDTH, box.w),
+      h: Math.max(HUB_HEIGHT, box.h),
+    };
+  }
   const size = hub ? HUB_LABEL_SIZE : LABEL_SIZE;
   const face: FontFace = klass.abstract ? "boldItalic" : "bold";
   const count =
@@ -197,7 +207,8 @@ function breakSuperclassCycles(
  * superclass cycle broken, the subclass hierarchy split into in-region parents and cross-region joins,
  * the drawn relations (both ends drawn) bundled by pair, the hubs (four or
  * more incident edges after bundling, at most six, the subclass roots
- * always) and the regions, largest first.
+ * always) and the regions, largest first, with the relations that reach
+ * an IRI no class of the input holds.
  *
  * @param input - The data's classes and counted relations, or a legend
  *   specimen's.
@@ -237,6 +248,15 @@ export default function buildClassGraphModel(
     inputs.has(relation.range);
   const drawnRelations = relations
     .filter(isDrawn)
+    .sort((a, b) => compareText(a.uri, b.uri));
+  const external = relations
+    .filter(
+      (relation): relation is DrawnRelation =>
+        relation.domain !== null &&
+        relation.range !== null &&
+        inputs.has(relation.domain) &&
+        !inputs.has(relation.range),
+    )
     .sort((a, b) => compareText(a.uri, b.uri));
   const bundles = bundleRelations(drawnRelations, prefixOf);
 
@@ -298,6 +318,8 @@ export default function buildClassGraphModel(
         klass.uri,
         {
           ...klass,
+          kind: klass.kind ?? "class",
+          members: klass.members ?? 1,
           ...sizeBox(klass, hub),
           hub,
           degree: requireEntry(degree, klass.uri),
@@ -333,5 +355,6 @@ export default function buildClassGraphModel(
     joins,
     regionOrder,
     drawnRelations,
+    external,
   };
 }

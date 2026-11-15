@@ -53,7 +53,14 @@ export default function layOutPhoneView(
   const headers: { prefix: string; y: number; count: number }[] = [];
   let y = 0;
   for (const region of regions) {
-    headers.push({ prefix: region.prefix, y, count: region.ids.length });
+    headers.push({
+      prefix: region.prefix,
+      y,
+      count: region.ids.reduce(
+        (sum, id) => sum + requireEntry(model.byId, id).members,
+        0,
+      ),
+    });
     y += PHONE.header;
     for (const id of rail.filter(
       (candidate) => requireEntry(nodes, candidate).region === region.prefix,

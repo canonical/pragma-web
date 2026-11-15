@@ -9,6 +9,7 @@ import type {
   ClassGraphInput,
   GraphClassInput,
 } from "../src/lib/classGraph/types.js";
+import ontologyGraph from "./records/ontologyGraph.js";
 
 /** The class exemplar `records/definitionsExplorerRecords` serves. */
 export const UIBLOCK_TERM = "ds:UIBlock";
@@ -357,4 +358,57 @@ export const BRIDGE_TRIO_GRAPH: ClassGraphInput = {
       count: 2,
     },
   ],
+};
+
+/**
+ * A generated namespace of `size` classes, `<prefix>:C0` to
+ * `<prefix>:C<size - 1>`, in one tree: each class below the first a
+ * subclass of the one a quarter of its number down.
+ */
+export function defineRegion(
+  prefix: string,
+  size: number,
+): readonly GraphClassInput[] {
+  return Array.from({ length: size }, (_, index) =>
+    defineClass(`${prefix}:C${index}`, `${prefix} ${index}`, {
+      ...(index === 0
+        ? {}
+        : { superclass: `${prefix}:C${Math.floor((index - 1) / 4)}` }),
+      instanceCount: index,
+    }),
+  );
+}
+
+/**
+ * The docs site's four namespaces: the captured design-system, code
+ * standards and anatomy classes (35, whose relations reach the stubs
+ * `rdf:List` and `dt:TokenSymbol`), and a generated `surface` namespace
+ * of 31 classes in the captures' stead, whose relations reach a `ds`
+ * class and a third external class.
+ */
+export const FOUR_NAMESPACE_GRAPH: ClassGraphInput = {
+  classes: [...ontologyGraph.classes, ...defineRegion("surface", 31)],
+  relations: [
+    ...ontologyGraph.relations,
+    {
+      uri: "surface:shows",
+      label: "shows",
+      domain: "surface:C0",
+      range: "https://ds.canonical.com/UIBlock",
+      count: 4,
+    },
+    {
+      uri: "surface:lists",
+      label: "lists",
+      domain: "surface:C1",
+      range: "https://example.org/vocab/Shelf",
+      count: 0,
+    },
+  ],
+};
+
+/** One generated namespace of 60 classes: more than a budget draws. */
+export const SIXTY_CLASS_GRAPH: ClassGraphInput = {
+  classes: defineRegion("big", 60),
+  relations: [],
 };

@@ -1,6 +1,7 @@
 import { createTranslator } from "@canonical/i18n-core";
 import {
   BUS_OFFSET,
+  GRAPH_BUDGET,
   measurePathBounds,
   parsePathData,
   requireAt,
@@ -12,6 +13,7 @@ import {
   BRIDGE_TRIO_GRAPH,
   CROSS_REGION_GRAPH,
   defineClass,
+  FOUR_NAMESPACE_GRAPH,
   NARROWING_GRAPH,
   SHELF_PAIR_GRAPH,
   STACKED_PAIR_GRAPH,
@@ -220,6 +222,82 @@ describe("layOutClassGraph", () => {
     expect(countOverlaps(many).collisions).toBe(0);
   });
 
+  describe("within the budget at rest", () => {
+    const kindsOf = (input: ClassGraphInput): Record<string, number> => {
+      const kinds: Record<string, number> = {};
+      for (const node of layOutClassGraph(input, {
+        budget: GRAPH_BUDGET,
+      }).nodes.values()) {
+        kinds[node.kind] = (kinds[node.kind] ?? 0) + 1;
+      }
+      return kinds;
+    };
+
+    it("collapses the docs site's largest namespace to one box, beside 35 classes and 2 stubs", () => {
+      const layout = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        budget: GRAPH_BUDGET,
+      });
+      expect(kindsOf(FOUR_NAMESPACE_GRAPH)).toEqual({
+        class: 35,
+        stub: 2,
+        region: 1,
+      });
+      expect(layout.nodes.size).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
+      const surface = requireDefined(
+        layout.regions.find((region) => region.prefix === "surface"),
+        "the surface region",
+      );
+      expect(surface).toMatchObject({ collapsed: true, members: 31 });
+      expect(surface.ids).toEqual(["region:surface"]);
+      const box = requireEntry(layout.nodes, "region:surface");
+      expect(box).toMatchObject({
+        kind: "region",
+        members: 31,
+        term: "surface",
+      });
+      expect(box.w).toBeGreaterThanOrEqual(128);
+      // No column holds more than the budget's band.
+      const columns = new Map<number, number>();
+      for (const node of layout.nodes.values()) {
+        columns.set(node.col, (columns.get(node.col) ?? 0) + 1);
+      }
+      expect(Math.max(...columns.values())).toBe(10);
+      expect(Math.max(...columns.values())).toBeLessThanOrEqual(
+        GRAPH_BUDGET.bandMembersMax,
+      );
+      // The two bridges are the relations to the stubs; the collapsed
+      // namespace's relations are not drawn.
+      expect(
+        layout.edges
+          .filter((edge) => edge.bridge === true)
+          .map((edge) =>
+            [edge.from, ...edge.to].map(
+              (id) => requireEntry(layout.nodes, id).term ?? id,
+            ),
+          ),
+      ).toEqual([
+        ["rdf:List", "https://anatomy.canonical.com/Style"],
+        ["https://ds.canonical.com/TokenBinding", "dt:TokenSymbol"],
+      ]);
+      // The phone view counts the collapsed namespace's classes.
+      expect(
+        layout.phone.headers.find((header) => header.prefix === "surface")
+          ?.count,
+      ).toBe(31);
+      expect(layout.rail).toContain("region:surface");
+    });
+
+    it("draws the three captured namespaces whole, with their stubs", () => {
+      expect(kindsOf(ontologyGraph)).toEqual({ class: 35, stub: 2 });
+    });
+
+    it("leaves the metro as it is: its 16 classes, nothing collapsed", () => {
+      expect(
+        JSON.stringify(layOutClassGraph(metroGraph, { budget: GRAPH_BUDGET })),
+      ).toBe(JSON.stringify(layOutClassGraph(metroGraph)));
+    });
+  });
+
   it("lays an input with no class out as an empty floor", () => {
     const empty = layOutClassGraph({ classes: [], relations: [] });
     expect(empty.nodes.size).toBe(0);
@@ -352,21 +430,25 @@ describe("layOutClassGraph", () => {
   // tie-break, would let that order through to a coordinate, a route, a
   // lane or a label.
   it.each([
+    ["the docs records", ontologyGraph],
+    ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH],
     ["the metro's records", metroGraph],
     ["three bridges, one with no statements", BRIDGE_TRIO_GRAPH],
   ])("lays %s out the same whatever order they come in", (_, graph) => {
     const t = createTranslator("en", MESSAGES);
+    // The whole layout, its model and phone view included, within the
+    // budget, so the stubs and the collapsed region are laid out too.
     const serialise = (input: ClassGraphInput): string => {
-      const layout = layOutClassGraph(input);
-      return JSON.stringify({
-        nodes: [...layout.nodes],
-        edges: layout.edges,
-        regions: layout.regions,
-        rail: layout.rail,
-        view: [layout.viewBox, layout.view, layout.fitZoom, layout.channel],
-        findings: layout.findings,
-        labels: placeBridgeLabels(layout, t),
-      });
+      const layout = layOutClassGraph(input, { budget: GRAPH_BUDGET });
+      return JSON.stringify(
+        { layout, labels: placeBridgeLabels(layout, t) },
+        (_key, value: unknown) =>
+          value instanceof Map
+            ? [...value]
+            : value instanceof Set
+              ? [...value]
+              : value,
+      );
     };
     const expected = serialise(graph);
     expect(expected).toContain('"bridge":true');
