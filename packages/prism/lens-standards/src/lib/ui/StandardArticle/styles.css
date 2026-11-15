@@ -3,29 +3,14 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The article is core's sectioned view, which places its regions; the
-   * article styles what it puts in them. */
   .ds.standard-article {
-    /* The title and the meta line read as one heading. */
-    --standard-article-header-gap: var(--space-100);
-    --standard-article-meta-gap: var(--grid-gutter);
-    --standard-article-meta-color: var(--color-text-muted);
+    /* The article is core's sectioned view, which places its regions; the
+     * article styles what it puts in them and declares no token. */
   }
 
+  /* The header holds the title alone and spans the header's every column. */
   .ds.standard-article .masthead {
     grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--standard-article-header-gap);
-  }
-
-  .ds.standard-article .meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--standard-article-meta-gap);
-    margin-block: 0;
-    color: var(--standard-article-meta-color);
   }
 
   /* The rule's prose takes the section's every column; the view holds a

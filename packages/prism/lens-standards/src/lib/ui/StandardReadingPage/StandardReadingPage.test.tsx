@@ -164,14 +164,12 @@ describe("StandardReadingPage", () => {
         name: "react.component.link_component",
       });
       expect(heading.id).toBe("standard-reading-title");
-      // The compact identity still reaches the reader, in the header's
-      // meta line and in the facts…
-      expect(screen.getAllByText(LINK_COMPONENT_CURIE)).toHaveLength(2);
+      // The compact identity and the class still reach the reader, once
+      // each, in the facts.
+      expect(screen.getAllByText(LINK_COMPONENT_CURIE)).toHaveLength(1);
       expect(
         document.querySelector(".facts .ds.key-value-list")?.textContent,
       ).toBe(`Address${LINK_COMPONENT_CURIE}ClassCodeStandard`);
-      // …and so does its class.
-      expect(screen.getByText(/class: CodeStandard/)).toBeInTheDocument();
       // The breadcrumb routes back to the index.
       const breadcrumb = screen.getByRole("navigation", {
         name: "Breadcrumb",

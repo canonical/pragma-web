@@ -58,9 +58,8 @@ function splitProseBlocks(text: string): string[] {
 
 /**
  * A standard as a document, laid on core's sectioned view: its header, the
- * title as the page's heading over one meta line with the compact address
- * and the class it is an instance of; its facts, the address and the
- * class; and one section, the rule.
+ * title as the page's heading; its facts, the compact address and the class
+ * it is an instance of; and one section, the rule.
  *
  * The rule is the standard's prose when it has some, rendered as Markdown
  * with a chip for every entity it links to (`StandardProse`). Without prose
@@ -86,7 +85,6 @@ function splitProseBlocks(text: string): string[] {
 export default function StandardArticle({
   body,
   className,
-  renderBody = (prose) => prose,
   source,
   standard,
   ...props
@@ -116,6 +114,8 @@ export default function StandardArticle({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="reading-canvas"
+      /* The instance's own class is the one grouping axis the contract
+         exposes, the same axis the index groups by. */
       facts={
         <KeyValueList
           pairs={[
@@ -133,14 +133,6 @@ export default function StandardArticle({
           <h1 className="heading" id="standard-reading-title">
             {data._meta.title}
           </h1>
-          <p className="meta">
-            <InlineCode>{data._meta.curie}</InlineCode>
-            {/* The instance's own class is the one grouping axis the
-                contract exposes, the same axis the index groups by. */}
-            <span className="class">
-              {t("article.class", { class: classTitle })}
-            </span>
-          </p>
         </header>
       }
       sections={
@@ -149,7 +141,7 @@ export default function StandardArticle({
               {
                 id: "rule",
                 title: t("article.section.rule"),
-                content: renderBody(prose),
+                content: prose,
               },
             ]
           : []

@@ -10,12 +10,6 @@ type OwnProps = {
   /** Fragment ref of the standard's prose, or null when it has none. */
   readonly body: StandardProse_body$key | null;
   /**
-   * Draw the article's body from the prose it would show, under the
-   * header: the reading page hands it to the address's page renderer. The
-   * prose itself when omitted.
-   */
-  readonly renderBody?: (prose: ReactNode) => ReactNode;
-  /**
    * What stands in place of the article's sections, such as the standard's
    * statements under a renderer other than the page: the article then
    * shows it under the header and the facts, with no section and no

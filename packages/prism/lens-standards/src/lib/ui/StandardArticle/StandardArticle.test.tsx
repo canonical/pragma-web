@@ -9,6 +9,7 @@
  * verbatim.
  */
 
+import { expectSectionIndex } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
@@ -73,13 +74,17 @@ describe("StandardArticle", () => {
     expect(article).not.toBeNull();
     // The article is the reading column.
     expect(article?.getAttribute("data-slot")).toBe("reading-canvas");
-    // Identity: the compact form in code voice inside the meta line; the
-    // absolute IRI belongs in the address bar, not in front of a reader.
+    // Identity: the compact form in code voice among the facts, beside
+    // the class; the absolute IRI belongs in the address bar, not in front
+    // of a reader. The header holds the title alone.
     expect(
-      article?.querySelector(".meta code.ds.inline-code")?.textContent,
+      article?.querySelector(".facts code.ds.inline-code")?.textContent,
     ).toBe(LINK_COMPONENT_CURIE);
-    expect(article?.querySelector(".class")?.textContent).toBe(
-      "class: CodeStandard",
+    expect(article?.querySelector(".facts")?.textContent).toBe(
+      `Address${LINK_COMPONENT_CURIE}ClassCodeStandard`,
+    );
+    expect(article?.querySelector(".header")?.textContent).toBe(
+      "react.component.link_component",
     );
     // The description holds blank-line breaks, so the split yields several
     // paragraphs; the source's inline marks survive verbatim.
@@ -95,6 +100,17 @@ describe("StandardArticle", () => {
     expect(
       screen.queryByRole("heading", { level: 2, name: "Extends" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("indexes the one section it passes, the rule, with no contents list", {
+    timeout: STANDARDS_TEST_TIMEOUT_MS,
+  }, () => {
+    const { container } = renderExemplar(standardEntityRecords);
+
+    const article = container.querySelector(".ds.standard-article");
+    if (!article) throw new Error("the page has no standard's article");
+    expect(article).toHaveClass("ds", "sectioned-view");
+    expectSectionIndex(article, [{ id: "rule", title: "Rule" }]);
   });
 
   it("says so when the standard records no description", {

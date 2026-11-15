@@ -3,9 +3,7 @@
 # (prism.component.sectioned_view: the article's root is the view's, with
 # the article's class beside the view's). It hands the view its header, its
 # facts and its one section:
-#   - the header: the title as the page's level-1 heading over one meta
-#     line (the compact address in the published InlineCode, then the
-#     class it is an instance of, muted);
+#   - the header: the title as the page's level-1 heading;
 #   - the facts: a KeyValueList of the address and the class;
 #   - the section `rule`: the prose rendered from Markdown (StandardProse),
 #     or the description split into paragraphs on blank lines, or a line
@@ -15,27 +13,17 @@
 # and the page has no section and no index.
 #
 # The view places the regions on the page's columns; the article styles
-# what it puts in them. The header is application UI: the title and the
-# meta line stack one small step apart, the meta line's parts one gutter
-# apart on a shared baseline. The rule's prose takes the section's every
-# column, flush left; the view holds a prose (`.editorial`) to the 75ch
-# reading measure, so the article sets none. Its space is element-owned: `.editorial`
-# gives its headings and paragraphs their space after, and `.content-flow`
-# clears the last block's. A description keeps its hand-written line
-# breaks.
-#
-# Every decision is read through a component token declared on the root
-# (`--standard-article-*`), bound to the symbol named here.
+# what it puts in them. The header holds the title alone. The rule's
+# prose takes the section's every column,
+# flush left; the view holds a prose (`.editorial`) to the 75ch reading
+# measure, so the article sets none. Its space is element-owned:
+# `.editorial` gives its headings and paragraphs their space after, and
+# `.content-flow` clears the last block's. A description keeps its
+# hand-written line breaks.
 #
 # Token ledger:
-#   space.100 (8px) between the title and the meta line: they read as one
-#     heading; no gap may read a container gap.
-#   grid.gutter between the meta line's parts.
 #   layout.grid.column "1 / -1" (header and prose): structure.
-#   typography.whiteSpace pre-line, layout.wrap wrap, layout.align
-#     baseline: keywords; the 0 resets on the meta line.
-#
-# Roster namespaces (accepted and tracked): grid.gutter, space.100.
+#   typography.whiteSpace pre-line: a keyword.
 node:
   uri: prism.component.standard_article
   edges:
@@ -44,31 +32,10 @@ node:
         element: header
         styles:
           layout.grid.column: "1 / -1"
-          layout.type: flex
-          layout.direction: column
-          spacing.gap: space.100
         edges:
           - node:
               role: heading (the page's level-1 heading, the standard's title)
             relation: { cardinality: "1" }
-          - node:
-              role: meta (the address and the class, on one line that wraps)
-              styles:
-                layout.type: flex
-                layout.wrap: wrap
-                layout.align: baseline
-                spacing.gap: grid.gutter
-                spacing.external.block.start: 0
-                spacing.external.block.end: 0
-                typography.color: color.text.muted
-              edges:
-                - node:
-                    uri: global.component.inline_code
-                  relation: { cardinality: "1" }
-                - node:
-                    role: class (the catalog's sentence naming the class)
-                  relation: { cardinality: "1" }
-            relation: { cardinality: "1", slotName: meta }
       relation: { cardinality: "1", slotName: masthead }
     - node:
         uri: prism.component.key_value_list
