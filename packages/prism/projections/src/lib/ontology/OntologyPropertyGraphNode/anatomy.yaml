@@ -1,8 +1,8 @@
 ---
 # OntologyPropertyGraphNode: an ontology property as a node of a graph.
 # Reference: the W3 graph node anatomy: the slot order mark, prefix,
-# title, kind; a property fills the mark (the property glyph), the title
-# and the kind ("kind in location", the class it is declared on).
+# title, kind; a property fills the mark (the property glyph) and the
+# title. A typed graph node gives no kind: its mark says the type.
 # Projected onto EntityGraphNode, which carries every style: this anatomy
 # binds none. It is not dispatched: a property is not a Node, and its
 # callers render it directly.
@@ -61,21 +61,5 @@ node:
             relation:
               cardinality: "1"
               slotName: title
-          - node:
-              role: kind
-              projection:
-                field: kind
-              edges:
-                - node:
-                    role: location
-                    projection:
-                      field: _meta.title
-                  relation:
-                    cardinality: "0..1"
-                    projection:
-                      field: domain
-            relation:
-              cardinality: "1"
-              slotName: kind
       relation:
         cardinality: "1"

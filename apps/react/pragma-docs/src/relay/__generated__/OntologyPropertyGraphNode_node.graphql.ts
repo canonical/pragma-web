@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e8b2ad374472d88971b8a9e0c310ea7c>>
+ * @generated SignedSource<<c862e0af1f01999e0dcd0e20aab0f531>>
  * @lightSyntaxTransform
  */
 
@@ -8,16 +8,9 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type PropertyKind = "ANNOTATION" | "DATATYPE" | "OBJECT" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type OntologyPropertyGraphNode_node$data = {
   readonly __typename: "OntologyProperty";
-  readonly domain: {
-    readonly _meta: {
-      readonly title: string;
-    };
-  } | null | undefined;
-  readonly kind: PropertyKind;
   readonly label: string | null | undefined;
   readonly uri: string;
   readonly " $fragmentType": "OntologyPropertyGraphNode_node";
@@ -53,48 +46,12 @@ const node: ReaderFragment = {
       "kind": "ScalarField",
       "name": "label",
       "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "kind",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "OntologyClass",
-      "kind": "LinkedField",
-      "name": "domain",
-      "plural": false,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "EntityMeta",
-          "kind": "LinkedField",
-          "name": "_meta",
-          "plural": false,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "title",
-              "storageKey": null
-            }
-          ],
-          "storageKey": null
-        }
-      ],
-      "storageKey": null
     }
   ],
   "type": "OntologyProperty",
   "abstractKey": null
 };
 
-(node as any).hash = "09e7505113afbb33d1b5d4a99217c980";
+(node as any).hash = "8914d27317637765207daa5576c6a2bf";
 
 export default node;

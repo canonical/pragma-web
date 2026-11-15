@@ -2,8 +2,10 @@
 # OntologyClassGraphNode: an ontology class as a node of a graph.
 # Reference: the W3 graph node anatomy: the slot order mark, prefix,
 # title, kind; a class fills the mark (the class glyph), the prefix (the
-# compact address's, shown only off the page's ambient namespace), the
-# title (never the address, A10) and the kind (its abstraction).
+# compact address's, shown only off the page's ambient namespace) and the
+# title (never the address, A10). A typed graph node gives no kind: its
+# mark says the type. An abstract class's box is hollow (.is-hollow), the
+# graph's mark for a kind set apart.
 # Projected onto EntityGraphNode, which carries every style: this anatomy
 # binds none. The home is the link the title renders through, resolved
 # from the compact address; a class without one reads as inert text.
@@ -48,11 +50,11 @@ node:
               cardinality: "1"
               slotName: title
           - node:
-              role: kind
+              role: hollow surface (.is-hollow)
               projection:
                 field: isAbstract
             relation:
               cardinality: "1"
-              slotName: kind
+              slotName: surface
       relation:
         cardinality: "1"

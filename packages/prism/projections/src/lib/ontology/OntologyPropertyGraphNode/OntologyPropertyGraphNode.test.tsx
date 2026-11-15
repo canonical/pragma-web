@@ -115,26 +115,22 @@ describe("OntologyPropertyGraphNode", () => {
     );
     expect(container.querySelector(".title")?.textContent).toBe("Modifier");
     expect(container.querySelector(".prefix")).toBeNull();
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Object property in UIBlock",
-    );
+    expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_PROPERTY_HREF,
     );
   });
 
-  it("names its kind alone when the property is declared on no class", () => {
+  it("names a property with no label by its IRI's local name", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
           <OntologyPropertyGraphNode node={node} />
         </svg>
       ),
-      { domain: null, label: null },
-      { kind: "SYMMETRIC" },
+      { label: null },
     );
     expect(container.querySelector(".title")?.textContent).toBe("modifier");
-    expect(container.querySelector(".context")?.textContent).toBe("Property");
   });
 
   it("takes the width the graph's layout gives it", () => {

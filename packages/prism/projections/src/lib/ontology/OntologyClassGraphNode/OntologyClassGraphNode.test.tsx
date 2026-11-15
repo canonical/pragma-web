@@ -101,9 +101,8 @@ describe("OntologyClassGraphNode", () => {
     expect(container.querySelector(".title > .prefix")?.textContent).toBe(
       "ds: ",
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Abstract class",
-    );
+    expect(container.querySelector(".context")).toBeNull();
+    expect(container.querySelector(".surface")).toHaveClass("is-hollow");
     expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
       "/icons/blueprint.svg#blueprint",
     );
@@ -112,7 +111,7 @@ describe("OntologyClassGraphNode", () => {
     );
   });
 
-  it("names a concrete class whose address did not compact as a class", () => {
+  it("names no kind for a concrete class, its box filled", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
@@ -124,7 +123,9 @@ describe("OntologyClassGraphNode", () => {
         _meta: { title: "Layout", curie: "https://ds.canonical.com/Layout" },
       },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Class");
+    expect(container.querySelector(".context")).toBeNull();
+    expect(container.querySelector(".surface")).not.toHaveClass("is-hollow");
+    expect(container.querySelector(".title")?.textContent).toBe("Layout");
   });
 
   it("applies custom className", () => {

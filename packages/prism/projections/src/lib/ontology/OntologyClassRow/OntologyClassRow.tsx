@@ -40,9 +40,10 @@ const componentCssClassName = "ds ontology-class-row";
  * An ontology class as a 32px list entry, in the slot order: the class
  * glyph as its mark, its namespace prefix when it differs from the page's
  * ambient one, its title linked to its home when the site has one and
- * inert text when it has none, and, as its kind, the word "abstract" for
- * an abstract class. A row opted into two lines (`lines="two"`) sets the
- * class's definition under the title. A class whose address did not
+ * inert text when it has none, no kind, since its mark says it is a
+ * class, and, as its status, the word "abstract" for an abstract class. A
+ * row opted into two lines (`lines="two"`) sets the class's definition
+ * under the title. A class whose address did not
  * compact has no prefix.
  *
  * It is the row's arm for `OntologyClass`: `RowProjection` renders it.
@@ -75,10 +76,10 @@ export default function OntologyClassRow({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
-      kind={data.isAbstract ? t("class.abstract") : undefined}
       LinkComponent={LinkComponent}
       mark={<Icon icon={CLASS_MARK_ICON} />}
       prefix={prefix}
+      status={data.isAbstract ? t("class.abstract") : undefined}
       summary={data.definition ?? undefined}
       title={title}
     />

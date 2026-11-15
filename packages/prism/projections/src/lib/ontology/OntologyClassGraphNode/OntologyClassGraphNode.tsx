@@ -5,7 +5,6 @@ import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/OntologyClassGraphNode_node.graphql.js";
-import { useMessages } from "../../i18n/index.js";
 import {
   useForeignPrefix,
   useProjectionLink,
@@ -40,7 +39,8 @@ const componentCssClassName = "ds ontology-class-graph-node";
  * the class glyph as its mark, then on the first line its namespace
  * prefix when it differs from the page's ambient one and its title,
  * linked to its home when the site has one and inert text when it has
- * none; then its kind muted, "Class" or "Abstract class".
+ * none. It gives no kind, since its mark says it is a class; an abstract
+ * class's box is hollow, the graph's mark for a kind set apart.
  *
  * It is the graph node's arm for `OntologyClass`: `GraphNodeProjection`
  * renders it.
@@ -54,7 +54,7 @@ const componentCssClassName = "ds ontology-class-graph-node";
  * @implements prism.component.ontology_class_graph_node
  * @note Impure: reads its class from the Relay store, its home from the
  *   site's homes, its link from the projection provider, the page's
- *   ambient namespace and its kind from the translator in scope.
+ *   ambient namespace.
  */
 export default function OntologyClassGraphNode({
   node,
@@ -65,7 +65,6 @@ export default function OntologyClassGraphNode({
   const { curie, title } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
-  const t = useMessages();
   const prefix = useForeignPrefix(curie);
   return (
     <EntityGraphNode
@@ -73,7 +72,7 @@ export default function OntologyClassGraphNode({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
-      kind={t(data.isAbstract ? "class.kind.abstract" : "class.kind")}
+      hollow={data.isAbstract}
       LinkComponent={LinkComponent}
       mark={<Icon icon={CLASS_MARK_ICON} />}
       prefix={prefix}

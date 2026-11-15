@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<917d10676a98d192ae0dbe5ebddc14fd>>
+ * @generated SignedSource<<a830ef74a88da192d8954b3be92bfe27>>
  * @lightSyntaxTransform
  */
 
@@ -8,12 +8,10 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type PropertyKind = "ANNOTATION" | "DATATYPE" | "OBJECT" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type OntologyPropertyRow_node$data = {
   readonly __typename: "OntologyProperty";
   readonly definition: string | null | undefined;
-  readonly kind: PropertyKind;
   readonly label: string | null | undefined;
   readonly uri: string;
   readonly " $fragmentType": "OntologyPropertyRow_node";
@@ -54,13 +52,6 @@ const node: ReaderFragment = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "kind",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
       "name": "definition",
       "storageKey": null
     }
@@ -69,6 +60,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "484687f01a8821d5430a14aef7429af2";
+(node as any).hash = "60c1402c927a4eae79cc548cf2045cfd";
 
 export default node;

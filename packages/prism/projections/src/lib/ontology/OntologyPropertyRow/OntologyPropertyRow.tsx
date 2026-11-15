@@ -5,28 +5,26 @@ import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/OntologyPropertyRow_node.graphql.js";
-import { useMessages } from "../../i18n/index.js";
 import {
   useForeignPrefix,
   useProjectionLink,
 } from "../../projections/index.js";
 import { EntityRow } from "../../ui/index.js";
 import { findLocalName } from "../../utils/index.js";
-import { PROPERTY_KIND_WORDS, PROPERTY_MARK_ICON } from "../constants.js";
+import { PROPERTY_MARK_ICON } from "../constants.js";
 import type { OntologyPropertyRowProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields OntologyPropertyRow reads from the OntologyProperty it
- * renders: its IRI, its label, its kind and its definition.
+ * renders: its IRI, its label and its definition.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment OntologyPropertyRow_node on OntologyProperty {
     __typename
     uri
     label
-    kind
     definition
   }
 `;
@@ -38,8 +36,8 @@ const componentCssClassName = "ds ontology-property-row";
 /**
  * An ontology property as a 32px list entry, in the slot order: the
  * property glyph as its mark, its name linked to its home when the site
- * has one and inert text when it has none, and its kind's one word
- * (object, datatype or annotation). A row opted into two lines
+ * has one and inert text when it has none. It gives no kind, since its
+ * mark says it is a property. A row opted into two lines
  * (`lines="two"`) sets the property's definition under the name. The name is the property's label, or the local name of its IRI when
  * it has none. A property's address is its absolute IRI, which has no
  * compact form, so `useForeignPrefix` finds no prefix for it.
@@ -66,7 +64,6 @@ export default function OntologyPropertyRow({
   const data = useFragment(nodeFragment, node);
   const href = useHome({ __typename: data.__typename, uri: data.uri });
   const LinkComponent = useProjectionLink();
-  const t = useMessages();
   const prefix = useForeignPrefix(data.uri);
   return (
     <EntityRow
@@ -74,7 +71,6 @@ export default function OntologyPropertyRow({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
-      kind={t(PROPERTY_KIND_WORDS[data.kind] ?? "property.meta.other")}
       LinkComponent={LinkComponent}
       mark={<Icon icon={PROPERTY_MARK_ICON} />}
       prefix={prefix}

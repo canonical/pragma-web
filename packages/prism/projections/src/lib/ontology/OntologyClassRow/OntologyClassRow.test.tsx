@@ -98,10 +98,12 @@ describe("OntologyClassRow", () => {
     ));
     expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".prefix, .title, .kind")].map(
+      [...container.querySelectorAll(".prefix, .title, .kind, .status")].map(
         (slot) => slot.textContent,
       ),
     ).toEqual(["ds:", "Layout", "abstract"]);
+    expect(container.querySelector(".kind")).toBeNull();
+    expect(container.querySelector(".status")?.textContent).toBe("abstract");
     expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
       "/icons/blueprint.svg#blueprint",
     );
@@ -123,7 +125,7 @@ describe("OntologyClassRow", () => {
     );
   });
 
-  it("names no kind for a concrete class", () => {
+  it("names no kind and no status for a concrete class", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -132,7 +134,7 @@ describe("OntologyClassRow", () => {
       ),
       { isAbstract: false },
     );
-    expect(container.querySelector(".kind")).toBeNull();
+    expect(container.querySelector(".kind, .status")).toBeNull();
   });
 
   it("shows its prefix only when its namespace is not the page's", () => {

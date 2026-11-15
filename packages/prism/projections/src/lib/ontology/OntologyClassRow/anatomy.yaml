@@ -3,9 +3,9 @@
 # Reference: the W3 row anatomy: the slot order mark, prefix, title, kind,
 # summary, facts, status; a class fills the mark (the class glyph), the
 # prefix (the compact address's, shown only off the page's ambient
-# namespace), the title, the kind (the word "abstract", for an abstract
-# class alone) and, in a row opted into two lines, the summary (its
-# definition).
+# namespace), the title, in a row opted into two lines the summary (its
+# definition), and the status (the word "abstract", for an abstract class
+# alone). A typed row gives no kind: its mark says the type.
 # Projected onto EntityRow, which carries every style: this anatomy binds
 # none. The home is the link the title renders through, resolved from the
 # compact address; a class without one reads as inert text.
@@ -50,18 +50,18 @@ node:
               cardinality: "1"
               slotName: title
           - node:
-              role: kind
-              projection:
-                field: isAbstract
-            relation:
-              cardinality: "0..1"
-              slotName: kind
-          - node:
               role: summary
               projection:
                 field: definition
             relation:
               cardinality: "0..1"
               slotName: summary
+          - node:
+              role: status
+              projection:
+                field: isAbstract
+            relation:
+              cardinality: "0..1"
+              slotName: status
       relation:
         cardinality: "1"

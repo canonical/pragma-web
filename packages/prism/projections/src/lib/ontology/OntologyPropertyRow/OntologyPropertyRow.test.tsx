@@ -113,7 +113,7 @@ describe("OntologyPropertyRow", () => {
     );
   });
 
-  it("links its name to the property's home and ends in its kind's word", () => {
+  it("links its name to the property's home and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <ul>
         <OntologyPropertyRow node={node} />
@@ -123,39 +123,7 @@ describe("OntologyPropertyRow", () => {
     expect(title?.tagName).toBe("A");
     expect(title?.textContent).toBe("Modifier");
     expect(title?.getAttribute("href")).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
-    expect(container.querySelector(".kind")?.textContent).toBe("object");
-    expect(container.querySelector(".prefix, .summary")).toBeNull();
-  });
-
-  it("names each kind by its own word", () => {
-    for (const [kind, word] of [
-      ["DATATYPE", "datatype"],
-      ["ANNOTATION", "annotation"],
-    ]) {
-      const { container, unmount } = renderWithNode(
-        (node) => (
-          <ul>
-            <OntologyPropertyRow node={node} />
-          </ul>
-        ),
-        { kind },
-      );
-      expect(container.querySelector(".kind")?.textContent).toBe(word);
-      unmount();
-    }
-  });
-
-  it("names a kind the catalog does not know as a property", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <ul>
-          <OntologyPropertyRow node={node} />
-        </ul>
-      ),
-      {},
-      { kind: "SYMMETRIC" },
-    );
-    expect(container.querySelector(".kind")?.textContent).toBe("property");
+    expect(container.querySelector(".kind, .prefix, .summary")).toBeNull();
   });
 
   it("names a property without a label by its IRI's local name", () => {

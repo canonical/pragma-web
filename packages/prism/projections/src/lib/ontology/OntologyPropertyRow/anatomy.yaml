@@ -2,8 +2,8 @@
 # OntologyPropertyRow: an ontology property as a 32px list entry.
 # Reference: the W3 row anatomy: the slot order mark, prefix, title, kind,
 # summary, facts, status; a property fills the mark (the property glyph),
-# the title, the kind (its kind's one word) and, in a row opted into two
-# lines, the summary (its definition).
+# the title and, in a row opted into two lines, the summary (its
+# definition). A typed row gives no kind: its mark says the type.
 # Projected onto EntityRow, which carries every style: this anatomy
 # binds none. It is not dispatched: a property is not a Node, and its
 # callers render it directly.
@@ -62,13 +62,6 @@ node:
             relation:
               cardinality: "1"
               slotName: title
-          - node:
-              role: kind
-              projection:
-                field: kind
-            relation:
-              cardinality: "1"
-              slotName: kind
           - node:
               role: summary
               projection:

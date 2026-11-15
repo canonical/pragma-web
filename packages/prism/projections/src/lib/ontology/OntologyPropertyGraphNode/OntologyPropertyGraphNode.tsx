@@ -5,34 +5,26 @@ import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/OntologyPropertyGraphNode_node.graphql.js";
-import { useMessages } from "../../i18n/index.js";
 import {
   useForeignPrefix,
   useProjectionLink,
 } from "../../projections/index.js";
 import { EntityGraphNode } from "../../ui/index.js";
 import { findLocalName } from "../../utils/index.js";
-import { PROPERTY_KIND_LABELS, PROPERTY_MARK_ICON } from "../constants.js";
+import { PROPERTY_MARK_ICON } from "../constants.js";
 import type { OntologyPropertyGraphNodeProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields OntologyPropertyGraphNode reads from the OntologyProperty it
- * renders: its IRI, its label, its kind and the title of the class it is
- * declared on.
+ * renders: its IRI and its label.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment OntologyPropertyGraphNode_node on OntologyProperty {
     __typename
     uri
     label
-    kind
-    domain {
-      _meta {
-        title
-      }
-    }
   }
 `;
 void declareNodeFragment;
@@ -44,8 +36,7 @@ const componentCssClassName = "ds ontology-property-graph-node";
  * An ontology property as a node of a graph, native SVG, in the slot
  * order: the property glyph as its mark, its name on the first line,
  * linked to its home when the site has one and inert text when it has
- * none, then "kind in location" muted, the location the class it is
- * declared on. The name is the property's label, or the local name of its IRI when
+ * none. It gives no kind, since its mark says it is a property. The name is the property's label, or the local name of its IRI when
  * it has none. A property's address is its absolute IRI, which has no
  * compact form, so `useForeignPrefix` finds no prefix for it.
  *
@@ -71,9 +62,6 @@ export default function OntologyPropertyGraphNode({
   const data = useFragment(nodeFragment, node);
   const href = useHome({ __typename: data.__typename, uri: data.uri });
   const LinkComponent = useProjectionLink();
-  const t = useMessages();
-  const kind = t(PROPERTY_KIND_LABELS[data.kind] ?? "property.kind.other");
-  const domain = data.domain?._meta.title;
   const prefix = useForeignPrefix(data.uri);
   return (
     <EntityGraphNode
@@ -81,11 +69,6 @@ export default function OntologyPropertyGraphNode({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
-      kind={
-        domain === undefined
-          ? kind
-          : t("entity.context", { kind, location: domain })
-      }
       LinkComponent={LinkComponent}
       mark={<Icon icon={PROPERTY_MARK_ICON} />}
       prefix={prefix}
