@@ -390,6 +390,14 @@ export interface Bridge {
   readonly relations: number;
 }
 
+/** What the layered engine is given for every region of one layout. */
+export interface LayerSettings {
+  /** How many barycentre sweeps order the columns. */
+  readonly sweeps: number;
+  /** The most classes one column holds; unset, a layer is one column. */
+  readonly bandMembersMax?: number;
+}
+
 /** How the class graph is laid out, beyond its input. */
 export interface ClassGraphLayoutOptions {
   /**

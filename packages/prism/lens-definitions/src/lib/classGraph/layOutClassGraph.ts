@@ -54,6 +54,7 @@ import type {
   ClassGraphInput,
   ClassGraphLayout,
   ClassGraphLayoutOptions,
+  LayerSettings,
   ClassGraphModel,
   DrawnScope,
   LaidOutEdge,
@@ -97,19 +98,20 @@ function sizeRegion(
 
 /**
  * Lay one region out with the layered engine at a channel, its relations
- * to other regions meeting their boxes at the ports given.
+ * to other regions meeting their boxes at the ports given, with the
+ * engine's sweeps and the most classes one column holds.
  */
 function layOutLayers(
   model: ClassGraphModel,
   ids: readonly string[],
   channel: number,
-  sweeps: number,
+  engine: LayerSettings,
   crossPorts?: ReadonlyMap<string, CrossPort>,
 ): RegionLayout<Bundle> {
   return layoutLayered(model, model, {
     ids,
     channel,
-    sweeps,
+    ...engine,
     ...(crossPorts === undefined ? {} : { crossPorts }),
   });
 }
@@ -125,14 +127,14 @@ function packRegions(
     readonly ids: readonly string[];
   }[],
   channel: number,
-  sweeps: number,
+  engine: LayerSettings,
 ): {
   readonly regions: readonly SizedRegion[];
   readonly packing: ShelfPacking;
   readonly crowded: boolean;
 } {
   const regions = order.map(({ prefix, ids }) =>
-    sizeRegion(prefix, ids, layOutLayers(model, ids, channel, sweeps)),
+    sizeRegion(prefix, ids, layOutLayers(model, ids, channel, engine)),
   );
   return {
     regions,
@@ -326,7 +328,7 @@ function alignShelves(
 function layOutModel(
   model: ClassGraphModel,
   whole: ClassGraphModel,
-  sweeps: number,
+  engine: LayerSettings,
 ): ClassGraphLayout {
   // An ontology with no class is data a provider may serve: it lays out
   // as an empty floor the size of the design canvas.
@@ -359,9 +361,9 @@ function layOutModel(
     listRegionBridges(model),
   ).map((prefix) => ({ prefix, ids: requireEntry(idsOf, prefix) }));
   let channel = CHANNEL;
-  let packed = packRegions(model, order, channel, sweeps);
+  let packed = packRegions(model, order, channel, engine);
   if (packed.packing.fit < MIN_FIT) {
-    const retry = packRegions(model, order, FALLBACK_CHANNEL, sweeps);
+    const retry = packRegions(model, order, FALLBACK_CHANNEL, engine);
     findings.push(
       `G3: fit ${packed.packing.fit.toFixed(3)} at ${CHANNEL}px channels; ${retry.packing.fit.toFixed(3)} at ${FALLBACK_CHANNEL}px`,
     );
@@ -390,7 +392,7 @@ function layOutModel(
       ? sizeRegion(
           region.prefix,
           region.ids,
-          layOutLayers(model, region.ids, channel, sweeps, crossPorts),
+          layOutLayers(model, region.ids, channel, engine, crossPorts),
         )
       : region,
   );
@@ -887,7 +889,9 @@ function layOutModel(
  *   most one layout more than there are namespaces. A relation to a class
  *   outside the loaded namespaces reaches an external stub. Drilled into
  *   a namespace, it is drawn class by class and every other one as a box,
- *   whatever the fit. Without a budget, every class given is drawn.
+ *   whatever the fit. At rest and drilled, a layer of more classes than
+ *   the budget's band splits into balanced consecutive columns. Without a
+ *   budget, every class given is drawn, a layer as one column.
  * @returns The layout. Each class's column is graph-wide: its region's
  *   first column, counted over the regions in packing order, plus its
  *   column in the region.
@@ -898,12 +902,15 @@ export default function layOutClassGraph(
 ): ClassGraphLayout {
   const { sweeps = SWEEPS, budget, drill } = options;
   const whole = buildClassGraphModel(input);
-  if (budget === undefined) return layOutModel(whole, whole, sweeps);
+  if (budget === undefined) return layOutModel(whole, whole, { sweeps });
+  // Wherever a budget holds, at rest and drilled, no column holds more
+  // classes than its band: a fuller layer splits.
+  const engine = { sweeps, bandMembersMax: budget.bandMembersMax };
   const layOutScope = (scope: DrawnScope): ClassGraphLayout =>
     layOutModel(
       buildClassGraphModel(gatherDrawnInput(input, whole, scope), whole),
       whole,
-      sweeps,
+      engine,
     );
   // A drilled view is not held to the fit: the reader chose a part.
   if (drill !== undefined) {
