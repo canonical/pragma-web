@@ -5,6 +5,7 @@ import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
 import { defineConfig } from "vite";
 import relay from "vite-plugin-relay-lite";
+import { createIconsPlugin } from "./vite-plugin-ds-icons.js";
 
 // Path aliases are declared as Node subpath imports in package.json "imports",
 // resolved natively by Vite — no resolver plugin. There is one per domain and
@@ -47,7 +48,13 @@ export default defineConfig(({ mode }) => ({
   // source and artifact directories here. Its filter leaves out every file
   // outside this app's `src`, the package's included: the package imports
   // its own compiled artifacts and needs no rewrite.
+  //
+  // createIconsPlugin() serves the @canonical/ds-assets icons at /icons in
+  // dev and copies them into the client build output: an arm's mark is an
+  // Icon, which fetches its glyph at runtime from `/icons/<name>.svg#<name>`,
+  // and an unserved icon renders empty with no error.
   plugins: [
+    createIconsPlugin(),
     relay({
       codegen: false,
       relayConfig: {
