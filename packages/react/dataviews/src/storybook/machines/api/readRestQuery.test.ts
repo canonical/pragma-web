@@ -47,6 +47,19 @@ describe("readRestQuery", () => {
     });
   });
 
+  it.each([
+    "is",
+    "isNot",
+    "contains",
+    "notContains",
+    "startsWith",
+    "endsWith",
+  ] as const)("reads name__%s as text the name must match", (operator) => {
+    expect(readSearch(`name__${operator}=web`)).toMatchObject({
+      query: { text: [{ field: "name", operator, text: "web" }] },
+    });
+  });
+
   it("reads a negative bound on cores", () => {
     expect(readSearch("cores__gte=-1")).toMatchObject({
       query: { cores: { gte: -1, lte: null } },
@@ -121,7 +134,7 @@ describe("readRestQuery", () => {
   it("refuses a key it does not accept", () => {
     for (const key of [
       "owner__contains",
-      "name__endsWith",
+      "region__is",
       "name__contains__x",
       "cores__gt",
       "cores",
