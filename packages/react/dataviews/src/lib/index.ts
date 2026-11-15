@@ -37,5 +37,10 @@ export type {
   DisplayField,
   DisplayFieldCellProps,
 } from "./common/index.js";
-export type { UseDataViewsCellResult } from "./hooks/index.js";
+export type {
+  UseDataViewsCellProps,
+  UseDataViewsCellResult,
+  UseDataViewsValueProps,
+  UseDataViewsValueResult,
+} from "./hooks/index.js";
 export { useDataViewsCell, useDataViewsValue } from "./hooks/index.js";
