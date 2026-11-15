@@ -7,10 +7,15 @@ import createSourceWithoutCores from "../../../../../storybook/machines/createSo
 import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../../../storybook/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Filters.js";
 import type { DataViewsFiltersProps } from "./types.js";
+
+/** The part's props, and the words the story's root speaks. */
+type StoryArgs = DataViewsFiltersProps & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/Filters",
@@ -25,10 +30,10 @@ const meta = {
       owner: "Owner",
     },
   },
-} satisfies Meta<typeof Component>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof Component>;
+type Story = StoryObj<StoryArgs>;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
@@ -51,18 +56,25 @@ const composition = `<DataViews provider={provider}>
 
 const parts = ["DataTable", "DataViews", "type DataTableColumn"];
 
-/** A composed collection: a root, its filters and its table. */
+/** A composed collection: a root, its filters and its table, in its words. */
 function FilteredMachines({
   options,
+  messages,
   ...args
-}: DataViewsFiltersProps & {
+}: StoryArgs & {
   readonly options?: MachineProviderConfig | undefined;
 }): ReactElement {
   const provider = useMachineProvider(options);
+  const words = pickStoryWords({ messages });
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <Component {...args} />
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...words}
+      />
     </DataViews>
   );
 }

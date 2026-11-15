@@ -17,6 +17,7 @@ import type {
   MachineProviderConfig,
 } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import { DataTable, type DataTableColumn } from "../DataTable/index.js";
 import Component from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
@@ -55,7 +56,10 @@ const pageCode = `<>
   <PaginationBar provider={provider} sizes={[5, 10, 25]} />
 </>`;
 
-/** The machines five to a page, the table and its bar over one provider. */
+/**
+ * The machines five to a page, the table and its bar over one provider,
+ * both speaking the story's messages.
+ */
 function MachinesPage({
   options,
   ...args
@@ -68,7 +72,12 @@ function MachinesPage({
   });
   return (
     <>
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...pickStoryWords(args)}
+      />
       <Component {...args} provider={provider} />
     </>
   );

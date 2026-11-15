@@ -14,6 +14,7 @@ import readPaginationSummary from "../../../storybook/machines/readPaginationSum
 import ServerBackedMachines from "../../../storybook/machines/ServerBackedMachines.js";
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import Component from "./Provider.js";
 
 const meta = {
@@ -163,8 +164,11 @@ const source = createQuerySource({
  */
 export const Answered: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createRestMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createRestMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -184,8 +188,9 @@ export const Answered: Story = {
 /** A request the endpoint has not answered: the table says it is loading, and claims no count. */
 export const Loading: Story = {
   parameters: code,
-  render: () => (
+  render: (args) => (
     <ServerBackedMachines
+      {...pickStoryWords(args)}
       source={() => createRestMachineSource("unanswered")}
     />
   ),
@@ -203,8 +208,11 @@ export const Loading: Story = {
 /** An endpoint that fails every request: the reason it gives stands in place of the rows. */
 export const Failed: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createRestMachineSource("down")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createRestMachineSource("down")}
+    />
   ),
   play: async ({ canvas }) => {
     await expect(
@@ -221,8 +229,9 @@ export const Failed: Story = {
  */
 export const FailedOverKeptRows: Story = {
   parameters: code,
-  render: () => (
+  render: (args) => (
     <ServerBackedMachines
+      {...pickStoryWords(args)}
       source={() => createRestMachineSource("first-page-only")}
     />
   ),
@@ -254,8 +263,11 @@ export const FailedOverKeptRows: Story = {
  */
 export const SortLimitedToOneTerm: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createRestMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createRestMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -291,8 +303,11 @@ export const SortLimitedToOneTerm: Story = {
  */
 export const TextApplied: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createRestMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createRestMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -328,8 +343,11 @@ export const TextApplied: Story = {
  */
 export const CountsAndNoneOf: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createRestMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createRestMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -378,8 +396,11 @@ export const CountsAndNoneOf: Story = {
  */
 export const StartsWithApplied: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createRestMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createRestMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     await waitFor(() =>

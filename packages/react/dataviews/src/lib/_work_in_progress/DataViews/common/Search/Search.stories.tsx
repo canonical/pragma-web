@@ -10,10 +10,15 @@ import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
 import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../../../storybook/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";
+
+/** The part's props, and the words the story's root speaks. */
+type StoryArgs = DataViewsSearchProps & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/Search",
@@ -22,10 +27,10 @@ const meta = {
   args: {
     label: "Search machines",
   },
-} satisfies Meta<typeof Component>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof Component>;
+type Story = StoryObj<StoryArgs>;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
@@ -62,23 +67,30 @@ function QueryInTheLocation({
   );
 }
 
-/** A composed collection: a root, its search and its table. */
+/** A composed collection: a root, its search and its table, in its words. */
 function SearchedMachines({
   options,
   location,
+  messages,
   ...args
-}: DataViewsSearchProps & {
+}: StoryArgs & {
   readonly options?: MachineProviderConfig | undefined;
   readonly location?: QueryLocation | undefined;
 }): ReactElement {
   const provider = useMachineProvider({ ...options, location });
+  const words = pickStoryWords({ messages });
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <Component {...args} />
       {location === undefined ? null : (
         <QueryInTheLocation location={location} />
       )}
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...words}
+      />
     </DataViews>
   );
 }

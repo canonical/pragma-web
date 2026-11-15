@@ -16,6 +16,7 @@ import readPaginationSummary from "../../../storybook/machines/readPaginationSum
 import ServerBackedMachines from "../../../storybook/machines/ServerBackedMachines.js";
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createGraphQLMachineSource } from "../../../storybook/machines/sources/index.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import Component from "./Provider.js";
 
 const meta = {
@@ -110,8 +111,11 @@ const source = createRelaySource({
  */
 export const Answered: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createGraphQLMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createGraphQLMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -131,8 +135,9 @@ export const Answered: Story = {
 /** A request the endpoint has not answered: the table says it is loading, and claims no count. */
 export const Loading: Story = {
   parameters: code,
-  render: () => (
+  render: (args) => (
     <ServerBackedMachines
+      {...pickStoryWords(args)}
       source={() => createGraphQLMachineSource("unanswered")}
     />
   ),
@@ -150,8 +155,11 @@ export const Loading: Story = {
 /** An endpoint that fails every request: the reason it gives stands in place of the rows. */
 export const Failed: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createGraphQLMachineSource("down")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createGraphQLMachineSource("down")}
+    />
   ),
   play: async ({ canvas }) => {
     await expect(
@@ -168,8 +176,9 @@ export const Failed: Story = {
  */
 export const FailedOverKeptRows: Story = {
   parameters: code,
-  render: () => (
+  render: (args) => (
     <ServerBackedMachines
+      {...pickStoryWords(args)}
       source={() => createGraphQLMachineSource("first-page-only")}
     />
   ),
@@ -202,12 +211,13 @@ export const FailedOverKeptRows: Story = {
  */
 export const UnreachablePage: Story = {
   parameters: code,
-  render: function Render() {
+  render: function Render(args) {
     const [location] = useState(() =>
       createMemoryLocation({ href: "/machines?page=3&size=5" }),
     );
     return (
       <ServerBackedMachines
+        {...pickStoryWords(args)}
         source={() => createGraphQLMachineSource("live")}
         location={location}
       />
@@ -230,8 +240,11 @@ export const UnreachablePage: Story = {
  */
 export const TextApplied: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createGraphQLMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createGraphQLMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -264,8 +277,11 @@ export const TextApplied: Story = {
  */
 export const CountsAndNoneOf: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createGraphQLMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createGraphQLMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     const status = canvas.getByRole("group", { name: "Status is any of" });
@@ -306,8 +322,11 @@ export const CountsAndNoneOf: Story = {
  */
 export const StartsWithApplied: Story = {
   parameters: code,
-  render: () => (
-    <ServerBackedMachines source={() => createGraphQLMachineSource("live")} />
+  render: (args) => (
+    <ServerBackedMachines
+      {...pickStoryWords(args)}
+      source={() => createGraphQLMachineSource("live")}
+    />
   ),
   play: async ({ canvas }) => {
     const owner = await canvas.findByRole("textbox", {

@@ -19,6 +19,15 @@ describe("withMachineRoot", () => {
     ).toBeInTheDocument();
   });
 
+  it("speaks the story's messages arg", () => {
+    renderDecorated(withMachineRoot(), () => <DataViews.Search />, {
+      messages: { search: "Chercher" },
+    });
+    expect(
+      screen.getByRole("searchbox", { name: "Chercher" }),
+    ).toBeInTheDocument();
+  });
+
   it("builds the provider from the config, once", () => {
     const prepare = vi.fn();
     renderDecorated(withMachineRoot({ prepare }));

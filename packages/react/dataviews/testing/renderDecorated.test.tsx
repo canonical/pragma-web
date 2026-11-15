@@ -21,4 +21,16 @@ describe("renderDecorated", () => {
       "SECTION",
     );
   });
+
+  it("gives the decorator the story's args", () => {
+    const withArgs: Decorator = (Story, { args }) => (
+      <section aria-label={String(args["label"])}>
+        <Story />
+      </section>
+    );
+    renderDecorated(withArgs, undefined, { label: "Machines" });
+    expect(
+      screen.getByRole("region", { name: "Machines" }),
+    ).toBeInTheDocument();
+  });
 });
