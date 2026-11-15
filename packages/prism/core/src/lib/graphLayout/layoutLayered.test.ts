@@ -130,11 +130,7 @@ describe("layoutLayered's band limit", () => {
       drawnRelations: [],
     };
     const layout = layOut(model, 2);
-    expect(layout.columns).toEqual([
-      ["r0", "r1"],
-      ["r2", "r3"],
-      ["r4"],
-    ]);
+    expect(layout.columns).toEqual([["r0", "r1"], ["r2", "r3"], ["r4"]]);
     expect(roots.map((id) => layout.layerOf(id))).toEqual([0, 0, 0, 0, 0]);
     expect(
       [...layout.nodes.values()].map((node) => [node.id, node.x, node.y]),
