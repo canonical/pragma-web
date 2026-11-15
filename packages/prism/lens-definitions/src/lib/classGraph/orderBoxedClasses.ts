@@ -27,7 +27,8 @@ export default function orderBoxedClasses(
   const ids = model.regionOrder.find((region) => region.prefix === prefix)?.ids;
   const ordered: BoxedClass[] = [];
   const visit = (uri: string, depth: number): void => {
-    ordered.push({ uri, depth });
+    const { label, instanceCount } = requireEntry(model.byId, uri);
+    ordered.push({ uri, depth, label, instanceCount });
     for (const child of [...(model.children.get(uri) ?? [])].sort(byLabel)) {
       visit(child, depth + 1);
     }

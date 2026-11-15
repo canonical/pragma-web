@@ -299,6 +299,10 @@ export interface BoxedClass {
   readonly uri: string;
   /** How many superclass hops it is below its namespace's root. */
   readonly depth: number;
+  /** Its label, which the search matches as it matches a drawn class's. */
+  readonly label: string;
+  /** Its instances, which the instances axis reads. */
+  readonly instanceCount: number;
 }
 
 /** One row of the phone view. */

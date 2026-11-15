@@ -523,13 +523,27 @@ describe("over a layout whose rail opens on a box", () => {
     expect(stops[0]?.closest(".node")?.getAttribute("data-id")).toBe("zz:Z1");
   });
 
-  it("fades nothing for a selected or hovered class the canvas does not draw", () => {
-    const { container } = render(drawBoxed("aa:A2", "aa:A3"));
-    expect(container.querySelectorAll(".desktop .node.is-faded")).toHaveLength(
-      0,
-    );
+  it("lights the box of a hovered or focused class the canvas does not draw", () => {
+    // The rail's row of aa:A3, under the pointer or the keyboard, makes
+    // aa's box the focus: the box stays lit and what is outside its
+    // neighbourhood fades.
+    const { container } = render(drawBoxed(undefined, "aa:A3"));
+    const box = container.querySelector('.desktop .node[data-kind="region"]');
+    expect(box?.classList.contains("is-faded")).toBe(false);
+    expect(
+      [...container.querySelectorAll(".desktop .node.is-faded")].map((node) =>
+        node.getAttribute("data-id"),
+      ),
+    ).toEqual(["zz:Z1"]);
     expect(container.querySelectorAll('.desktop a[tabindex="0"]')).toHaveLength(
       1,
+    );
+  });
+
+  it("fades nothing for a selected class the canvas does not draw", () => {
+    const { container } = render(drawBoxed("aa:A2"));
+    expect(container.querySelectorAll(".desktop .node.is-faded")).toHaveLength(
+      0,
     );
   });
 });

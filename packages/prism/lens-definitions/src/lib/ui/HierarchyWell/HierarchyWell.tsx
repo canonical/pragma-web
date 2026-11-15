@@ -16,6 +16,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { REGION_NODE_SCHEME } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import type { NodeNavigation } from "../../classGraph/types.js";
 import { useMessages } from "../../i18n/index.js";
@@ -72,7 +73,8 @@ function readClosest(
  * pans the selected class into view in place of the opening. Pointing at
  * a class or focusing it, in the graph or the rail, makes it the focus:
  * everything outside its neighbourhood fades and its relations show their
- * labels. Pointing at a
+ * labels; a class a collapsed namespace's box stands for makes its box
+ * the focus. Pointing at a
  * relation shows its label and rings its ends. The filter's chips hide
  * classes, and the camera fits what is left, which the Fit control
  * restores; the search and the instances axis dim. A region a reader picks
@@ -120,8 +122,18 @@ export default function HierarchyWell({
     const uri = compact === undefined ? undefined : uris.get(compact);
     return uri !== undefined && layout.nodes.has(uri) ? uri : undefined;
   };
+  // A class a box stands for points at its box.
+  const boxOf = (compact: string | undefined): string | undefined => {
+    const uri = compact === undefined ? undefined : uris.get(compact);
+    const region = layout.regions.find((candidate) =>
+      candidate.boxed.some((klass) => klass.uri === uri),
+    );
+    return region === undefined
+      ? undefined
+      : `${REGION_NODE_SCHEME}${region.prefix}`;
+  };
   const selected = drawnOf(term);
-  const hovered = drawnOf(hoverCentre);
+  const hovered = drawnOf(hoverCentre) ?? boxOf(hoverCentre);
   // The graph's one tab stop: the selected class, else the first class in
   // the rail's order, never a box that holds no link.
   const tabStop =

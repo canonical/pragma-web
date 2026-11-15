@@ -1,4 +1,4 @@
-import { GRAPH_BUDGET } from "@canonical/prism-core";
+import { GRAPH_BUDGET, requireDefined } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
@@ -70,6 +70,26 @@ describe("classifyClasses", () => {
         abstractions: ["abstract"],
       });
       expect(on.hidden.has("region:ds")).toBe(false);
+    });
+
+    it("dims a box only when none of the classes it stands for matches", () => {
+      const search = (text: string) =>
+        classifyClasses(boxed, terms, { ...ALL, text }).dimmed;
+      // ds's box is labelled "ds" alone; a search for a class inside it
+      // keeps it lit, one for anatomy's classes alone dims it.
+      expect(search("tag").has("region:ds")).toBe(false);
+      expect(search("tag").has(uris.get("anatomy:Node") ?? "")).toBe(true);
+      expect(search("switch").has("region:ds")).toBe(true);
+      const withInstances = classifyClasses(boxed, terms, {
+        ...ALL,
+        withInstances: true,
+      }).dimmed;
+      expect(withInstances.has("region:ds")).toBe(
+        !requireDefined(
+          boxed.regions.find((region) => region.prefix === "ds"),
+          "the ds region",
+        ).boxed.some((klass) => klass.instanceCount > 0),
+      );
     });
   });
 });

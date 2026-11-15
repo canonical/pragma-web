@@ -92,6 +92,47 @@ describe("bidirectional hover — the rail and the graph share one focus", () =>
     expect(countFadedNodes(well)).toBe(0);
   });
 
+  it("a RAIL hover or focus on a class inside a box lights the box", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    const { container } = render(
+      createDefinitionsPage(
+        undefined,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
+    const well = container.querySelector<HTMLElement>(
+      '[data-slot="explorer-canvas"]',
+    );
+    if (!well) throw new Error("unreachable");
+    // At rest ds is drawn as one box; its classes are rows of the rail.
+    const box = well.querySelector<HTMLElement>(
+      '.desktop .node[data-kind="region"][data-id="ds"]',
+    );
+    if (!box) throw new Error("no ds box");
+    const componentItem = within(rail)
+      .getByRole("link", { name: "Component" })
+      .closest("li");
+    if (!componentItem) throw new Error("no Component rail item");
+
+    for (const [enter, leave] of [
+      [fireEvent.mouseEnter, fireEvent.mouseLeave],
+      [fireEvent.focus, fireEvent.blur],
+    ] as const) {
+      enter(componentItem);
+      expect(box.classList.contains(NODE_FADED_CLASS)).toBe(false);
+      const distantNode = findNodeByHref(
+        well,
+        "/definitions/cs%3ACodeStandard",
+      );
+      expect(distantNode.classList.contains(NODE_FADED_CLASS)).toBe(true);
+      leave(componentItem);
+      expect(countFadedNodes(well)).toBe(0);
+    }
+  });
+
   it("a GRAPH hover marks the RAIL: the hovered node's rail item gains is-hovered", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
