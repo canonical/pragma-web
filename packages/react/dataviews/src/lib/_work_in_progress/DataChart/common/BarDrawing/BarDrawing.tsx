@@ -61,6 +61,8 @@ const readDrawnCount = (entry: FacetValue): number | null =>
  * Memoised, and the chart holds its facet at one reference while it claims
  * the same, so a result that moved another field's facet redraws nothing
  * here.
+ *
+ * @implements ds:apps.subcomponent.data_chart-bar_drawing
  */
 const BarDrawing = ({
   label,

@@ -38,6 +38,8 @@ const place = (value: number): number => Number(value.toFixed(2));
  * Memoised, and the chart holds its facet at one reference while it claims
  * the same, so a result that moved another field's facet redraws nothing
  * here.
+ *
+ * @implements ds:apps.subcomponent.data_chart-range_drawing
  */
 const RangeDrawing = ({
   label,

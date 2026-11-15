@@ -16,6 +16,9 @@ const readOnServer = (): boolean => false;
  * What a control reads before offering behaviour only a script provides, so
  * the markup a server sends — and a browser without scripting keeps — never
  * advertises a button that does nothing.
+ *
+ * @note Impure: reads the render's environment through an external store
+ * that never changes.
  */
 export default function useIsHydrated(): UseIsHydratedResult {
   return useSyncExternalStore(subscribeToNothing, readHydrated, readOnServer);

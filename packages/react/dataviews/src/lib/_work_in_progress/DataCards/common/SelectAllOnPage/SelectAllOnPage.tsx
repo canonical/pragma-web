@@ -16,6 +16,8 @@ const componentCssClassName = "select-all";
  *
  * It holds the selection subscription alone, so a card checked or cleared
  * re-renders this control and no card but its own.
+ *
+ * @implements ds:apps.subcomponent.data_cards-select_all
  */
 export default function SelectAllOnPage({
   selection,

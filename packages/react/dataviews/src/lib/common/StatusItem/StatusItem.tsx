@@ -9,8 +9,10 @@ const componentCssClassName = "status";
  * in view, what stands over it. It carries the status as `data-status`, the
  * attribute a renderer's own stylesheet selects it by. A settled outcome is
  * a polite status message — nothing on screen moves when what is drawn is
- * kept, so nothing else would say so — and a passing state is silent. The same policy the table's status row follows,
- * for the cards and the charts.
+ * kept, so nothing else would say so — and a passing state is silent: the
+ * policy the table's status row follows, for the cards and the charts.
+ *
+ * @implements ds:apps.subcomponent.data_views-status_item
  */
 export default function StatusItem({
   status,

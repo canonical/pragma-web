@@ -16,6 +16,8 @@ import type {
  * destinations a render spells read both. Their text is what React
  * compares, so a notification that leaves both as they were redraws
  * nothing; without a location, only the open view is watched.
+ *
+ * @note Impure: subscribes to the open view and the location while mounted.
  */
 export default function useRedrawOnDestinationInputs<
   TFields extends readonly SchemaFieldDefinition[],

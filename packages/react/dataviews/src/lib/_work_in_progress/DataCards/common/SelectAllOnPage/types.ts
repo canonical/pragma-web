@@ -2,6 +2,7 @@ import type { ReadonlyChannel, Selection } from "@canonical/dataviews-core";
 import type { ComponentProps } from "react";
 
 type OwnProps = {
+  /** The collection's selection, which the checkbox changes. */
   readonly selection: Selection;
   /**
    * The displayed identities — the scope this control acts on. Passed as the

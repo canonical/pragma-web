@@ -50,6 +50,10 @@ const componentCssClassName = "ds data-chart";
  * Not exported from the package root: a work-in-progress prototype, imported
  * from its own module to find out what a chart needs.
  *
+ * @implements ds:apps.pattern.data_chart
+ *
+ * @note Impure: observes the provider while mounted.
+ *
  * @experimental Pre-release: a work-in-progress prototype, not admitted to
  * the package root; its shape may change or it may be withdrawn.
  */

@@ -17,6 +17,8 @@ const componentCssClassName = "data-card";
  * Memoised: every prop it takes is held at a stable reference by the cards,
  * so a card re-renders for its own selection, for a name that changed, and
  * for a field list that changed, and for nothing else.
+ *
+ * @implements ds:global.component.card
  */
 const CardItem = <TRow extends object>({
   provider,

@@ -16,6 +16,8 @@ import type { FieldValueProps } from "./types.js";
  * It subscribes to its own field's channel, so a record update re-renders
  * only the values that changed. Memoised, so a card re-rendering for its
  * selection re-renders none of them.
+ *
+ * @implements ds:apps.subcomponent.data_cards-field_value
  */
 const FieldValue = <TRow extends object>({
   provider,

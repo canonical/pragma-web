@@ -47,6 +47,8 @@ type Waiting = {
  * It holds what it says itself, so speaking renders the region and nothing of
  * the root. Unmounting drops what is waiting and what is shown.
  *
+ * @implements ds:apps.subcomponent.data_views-announcer
+ *
  * @note Impure: schedules timers to speak and to clear, released on unmount.
  */
 const Announcer = ({

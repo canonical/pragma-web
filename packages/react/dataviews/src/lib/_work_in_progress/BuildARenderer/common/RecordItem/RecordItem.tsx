@@ -8,6 +8,8 @@ import type { RecordItemProps } from "./types.js";
  *
  * @experimental Pre-release: a tutorial example, not exported from the
  * package.
+ *
+ * @implements ds:apps.subcomponent.record_list-record_item
  */
 const RecordItem = <TRow extends object>({
   channels,

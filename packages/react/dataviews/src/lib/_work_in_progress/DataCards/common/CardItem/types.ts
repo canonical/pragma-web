@@ -7,6 +7,7 @@ import type { ComponentProps } from "react";
 import type { DisplayField } from "../../../../common/index.js";
 
 type OwnProps<TRow extends object> = {
+  /** The provider whose selection the card's checkbox toggles. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
   /** The record's row channels, from the cards' row scopes. */
   readonly channels: RowChannels<TRow>;

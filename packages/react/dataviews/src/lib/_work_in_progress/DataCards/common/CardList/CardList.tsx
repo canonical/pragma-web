@@ -23,6 +23,8 @@ const CARD_SPAN = 4;
  * Memoised, and every prop it takes is held at one reference by the cards, so
  * a publication that changes neither the records shown nor the fields
  * re-renders no card at all.
+ *
+ * @implements ds:global.group.cards
  */
 const CardList = <TRow extends object>({
   provider,

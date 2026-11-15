@@ -13,6 +13,7 @@ import type { DisplayField } from "../../../../common/index.js";
 type RecordEntry = Extract<DisplayEntry, { readonly kind: "record" }>;
 
 type OwnProps<TRow extends object> = {
+  /** The provider whose selection the cards' checkboxes toggle. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
   /** The record entries the core displays, in its order. */
   readonly records: readonly RecordEntry[];

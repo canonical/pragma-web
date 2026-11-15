@@ -67,6 +67,8 @@ const areNamesEqual = (a: readonly string[], b: readonly string[]): boolean =>
  *
  * @implements ds:global.group.cards
  *
+ * @note Impure: observes the provider, and its rows' scopes, while mounted.
+ *
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */

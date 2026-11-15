@@ -9,6 +9,7 @@ export type UseRedrawOnDestinationInputsProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = {
+  /** The provider whose open view and location the destinations read. */
   readonly provider: DataViewsProvider<TFields, TRow>;
 };
 
