@@ -50,8 +50,6 @@
     --side-panel-content-padding-block: var(--dimension-200);
     /* Space between the header's title and close button. */
     --side-panel-header-gap: var(--dimension-200);
-    /* Space between the footer's actions. */
-    --side-panel-footer-gap: var(--dimension-200);
     /* Keyboard focus ring of the scrollable content pane, drawn inside it. */
     --side-panel-focus-ring-width: var(--dimension-stroke-thickness-large);
     --side-panel-color-focus-ring: var(--color-focus-ring);
