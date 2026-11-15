@@ -240,6 +240,24 @@
       padding-inline-end: 0;
     }
 
+    /* Holds the handle's width until hydration; dropped without scripting. */
+    & > .handle-slot {
+      display: none;
+    }
+
+    @media (scripting: enabled) {
+      &:where(:has(> .handle-slot)) {
+        padding-inline-end: 0;
+      }
+
+      & > .handle-slot {
+        display: block;
+        flex: none;
+        inline-size: var(--dimension-300);
+        margin-inline-start: auto;
+      }
+    }
+
     /* The header cell's own text ellipsizes — never a caller's content inside
        it. In a sortable header cell it sits inside the sort control, which
        shrinks with it, so the indicator stays in view when the text does
@@ -306,22 +324,15 @@
       white-space: nowrap;
     }
 
-    /* Below the heading, over the first row, and never in a pointer's way:
-       a click on the row beneath reaches the row. The reason says why an
-       activation changed nothing, while it stands; the table's announcer
-       says it. It spans the heading and wraps within it, so a trailing
-       column's never widens the table's scroll area. An empty reason takes
-       no room. */
+    /* The reason: a manual popover on the cell, clicks pass through. */
     & > .sort-reason {
-      position: absolute;
-      pointer-events: none;
-      inset-block-start: 100%;
+      position-area: block-end center;
+      inset-block: auto;
       inset-inline: 0;
-      z-index: 1;
+      inline-size: auto;
+      margin: 0;
+      pointer-events: none;
       font-weight: var(--typography-text-primary-font-weight);
-    }
-
-    & > .sort-reason:not(:empty) {
       padding-block: var(--dimension-050);
       padding-inline: var(--density-padding-inline);
       color: var(--color-text);
@@ -358,11 +369,29 @@
     }
   }
 
-  /* While a column's edge is placed, its hint stands below the heading
-     where a refused sort's reason would: the reason is hidden until placing
-     ends, so the two never draw over each other. */
+  /* Without anchor positioning the reason stands below the heading, in
+     the cell. */
+  @supports not (position-area: block-end center) {
+    .ds.data-table-header-cell > .sort-reason:where(:not(:empty)) {
+      display: block;
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      z-index: 1;
+    }
+
+    .ds.data-table-header-cell > .sort-reason:where(:empty) {
+      display: none;
+    }
+  }
+
+  /* No reason over a placing hint or this column's open menu; after the
+     fallback, so it wins on both paths. */
   .ds.data-table-header-cell:where(
-      :has(> .ds.data-table-resize-handle[data-mode="placing"])
+      :has(
+        > .ds.data-table-resize-handle[data-mode="placing"],
+        > .menu > .trigger[aria-expanded="true"]
+      )
     )
     > .sort-reason {
     display: none;

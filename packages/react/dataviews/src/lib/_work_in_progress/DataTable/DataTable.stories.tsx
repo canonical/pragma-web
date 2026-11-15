@@ -213,6 +213,14 @@ const sortableColumnsCode = `const columns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];`;
 
+const oneTermColumnsCode = `const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host", sortable: true },
+  { id: "status", header: "Status", sortable: true, resizable: true },
+  { id: "region", header: "Region" },
+  { id: "cores", header: "Cores", sortable: true },
+  { id: "owner", header: "Owner" },
+];`;
+
 const sizedColumnsCode = `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 } },
   { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
@@ -365,10 +373,12 @@ export const SortedDescending: Story = {
 export const SortLimitedToOneTerm: Story = {
   parameters: showConsumerCode({
     parts: tableParts,
-    declarations: sortableColumnsCode,
+    declarations: oneTermColumnsCode,
     render: tableCode,
   }),
-  render: renderMachines(sortableColumns, { source: createOneTermSource }),
+  render: renderMachines(markResizable(sortableColumns, ["status"]), {
+    source: createOneTermSource,
+  }),
 };
 
 /**

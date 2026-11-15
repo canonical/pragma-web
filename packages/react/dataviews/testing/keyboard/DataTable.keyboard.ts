@@ -623,17 +623,42 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(reason).toHaveText(
       "Sort unchanged: this source orders by at most 1 term.",
     );
-    // Into the menu: the reason stands for its choice to settle.
+    // Into the menu: the reason stands for its choice to settle, hidden
+    // so it does not cover the menu.
     await page.keyboard.press("Enter");
     const ascending = page.getByRole("menuitem", { name: "Sort ascending" });
     await expect(ascending).toBeFocused();
     await expect(reason).toHaveText(
       "Sort unchanged: this source orders by at most 1 term.",
     );
+    await expect(reason).toBeHidden();
     // An accepted choice clears it: Status alone, ascending.
     await page.keyboard.press("Enter");
     await expect(status).toHaveAttribute("aria-sort", "ascending");
     await expect(reason).toBeEmpty();
+  });
+
+  test("SortLimitedToOneTerm: placing a column's edge hides the refusal's reason, and the hint stands", async ({
+    page,
+  }) => {
+    await openStory(page, findStory(TABLE, "Sort Limited To One Term").id);
+    const hostSort = page.getByRole("button", { name: "Host", exact: true });
+    const status = page.getByRole("columnheader", {
+      name: "Status",
+      exact: true,
+    });
+    await tabTo(page, hostSort);
+    await page.keyboard.press("Enter");
+    await tabTo(
+      page,
+      status.getByRole("button", { name: "Status", exact: true }),
+    );
+    await page.keyboard.press("Shift+Enter");
+    const reason = status.locator(".sort-reason");
+    await expect(reason).toBeVisible();
+    await status.getByRole("separator", { name: "Status" }).click();
+    await expect(reason).toBeHidden();
+    await expect(status.locator(".resize-hint")).toBeVisible();
   });
 
   test("Sortable: Enter opens a header's menu, Enter sorts from it, focus returns to its trigger", async ({
