@@ -4,7 +4,8 @@
 # on a reading measure of six intrinsic columns and at most 75 characters,
 # then the status line: the tier and the first documentation stage, each
 # only when the graph records it, and the compact address in the code
-# face, muted, separated by middle dots (PS3 V1 `p.mockup-status-line`).
+# face, muted, separated by middle dots (PS3 V1 `p.mockup-status-line`),
+# each dot held on one line with the value before it.
 # The page says the three here only; its facts hold the rest.
 # Application UI, not prose: the heading and the summary sit one gutter
 # apart.
@@ -73,23 +74,43 @@ node:
           typography.color: color.text.muted
         edges:
           - node:
-              role: tier
-              projection:
-                field: tier.name
+              role: tier part (the value and the dot after it, kept on one line)
               styles:
-                typography.color: color.text
-            relation: { cardinality: "0..1", slotName: value }
+                layout.type: flex
+                layout.align: baseline
+                spacing.gap.inline: space.100
+              edges:
+                - node:
+                    role: value
+                    projection:
+                      field: tier.name
+                    styles:
+                      typography.color: color.text
+                  relation: { cardinality: "1", slotName: value }
+                - node:
+                    role: separator (a middle dot, hidden from assistive technology)
+                    attributes: { aria-hidden: "true" }
+                  relation: { cardinality: "1", slotName: separator }
+            relation: { cardinality: "0..1", slotName: part }
           - node:
-              role: stage (the first documentation stage)
-              projection:
-                field: documentationStages._meta.title
+              role: stage part (the first documentation stage and the dot after it)
               styles:
-                typography.color: color.text
-            relation: { cardinality: "0..1", slotName: value }
-          - node:
-              role: separator (a middle dot, hidden from assistive technology)
-              attributes: { aria-hidden: "true" }
-            relation: { cardinality: "0..2", slotName: separator }
+                layout.type: flex
+                layout.align: baseline
+                spacing.gap.inline: space.100
+              edges:
+                - node:
+                    role: value
+                    projection:
+                      field: documentationStages._meta.title
+                    styles:
+                      typography.color: color.text
+                  relation: { cardinality: "1", slotName: value }
+                - node:
+                    role: separator (a middle dot, hidden from assistive technology)
+                    attributes: { aria-hidden: "true" }
+                  relation: { cardinality: "1", slotName: separator }
+            relation: { cardinality: "0..1", slotName: part }
           - node:
               role: address
               element: code

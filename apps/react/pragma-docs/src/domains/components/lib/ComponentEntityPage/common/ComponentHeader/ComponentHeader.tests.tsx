@@ -45,18 +45,34 @@ describe("ComponentHeader", () => {
       const line = document.querySelector(
         ".ds.component-header > .summary + .status-line",
       );
+      // Each dot is a child of the part whose value it follows, so the
+      // line can wrap only between parts, never between a value and its dot.
       expect(
         [...(line?.children ?? [])].map((part) => [
           part.className,
-          part.textContent,
+          [...part.children].map((child) => [
+            child.className,
+            child.textContent,
+          ]),
         ]),
       ).toEqual([
-        ["value", "Global"],
-        ["separator", "·"],
-        ["value", "needs:documentation"],
-        ["separator", "·"],
-        ["address", BUTTON_URI],
+        [
+          "part",
+          [
+            ["value", "Global"],
+            ["separator", "·"],
+          ],
+        ],
+        [
+          "part",
+          [
+            ["value", "needs:documentation"],
+            ["separator", "·"],
+          ],
+        ],
+        ["address", []],
       ]);
+      expect(line?.querySelector(".address")).toHaveTextContent(BUTTON_URI);
       expect(line?.querySelector(".address")?.tagName).toBe("CODE");
       for (const separator of line?.querySelectorAll(".separator") ?? []) {
         expect(separator).toHaveAttribute("aria-hidden", "true");

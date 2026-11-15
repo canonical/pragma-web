@@ -52,7 +52,15 @@
     color: var(--component-header-status-color);
   }
 
-  .ds.component-header > .status-line > .value {
+  /* A tier or a stage with the dot after it: one item of the line, so
+   * the line wraps before a value, never between a value and its dot. */
+  .ds.component-header > .status-line > .part {
+    display: flex;
+    align-items: baseline;
+    column-gap: var(--component-header-status-gap-inline);
+  }
+
+  .ds.component-header > .status-line > .part > .value {
     color: var(--component-header-value-color);
   }
 
