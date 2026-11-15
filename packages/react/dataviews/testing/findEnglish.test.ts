@@ -1,8 +1,9 @@
 /**
- * Where the sweep looks: a body cell's value and a column's own heading are
- * the application's data, while the selection checkbox and the status row
- * are worded by the record and swept. The sweep's controls, that it reports
- * the record's words at all, are its integration test.
+ * The sweep's controls, and where it looks. It reports the record's words
+ * where a page speaks them and leaves alone what a story authored itself. A
+ * body cell's value and a column's own heading are the application's data,
+ * while the selection checkbox and the status row are worded by the record
+ * and swept.
  */
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
@@ -50,5 +51,49 @@ describe("findEnglish", () => {
         english,
       ),
     ).not.toEqual([]);
+  });
+
+  it("reports the record's own words where a page speaks them", () => {
+    const found = findEnglish(hold(`<p>${english.sortAbsent}</p>`), english);
+    expect(found).not.toEqual([]);
+    expect(found.join(" ")).toContain(english.sortAbsent);
+  });
+
+  it("reports them from an attribute a reader hears, not only from text", () => {
+    expect(
+      findEnglish(
+        hold(`<button aria-label="${english.sortAbsent}"></button>`),
+        english,
+      ),
+    ).not.toEqual([]);
+  });
+
+  it("leaves the application's own data alone, wherever it happens to match", () => {
+    expect(
+      findEnglish(
+        hold(
+          `<table><tbody><tr><td>${english.sortAbsent}</td></tr></tbody></table>`,
+        ),
+        english,
+      ),
+    ).toEqual([]);
+  });
+
+  it("leaves alone a phrase the page's own author wrote", () => {
+    expect(
+      findEnglish(
+        hold(`<p>${english.sortAbsent}</p>`),
+        english,
+        new Set([english.sortAbsent]),
+      ),
+    ).toEqual([]);
+  });
+
+  it("reads a replacement's token as naming a message, not as words", () => {
+    // The brackets hold a message of the record word for word: read as text
+    // it is English, read as a token it names what was replaced.
+    expect(
+      findEnglish(hold(`<p>‹${english.sortAbsent}›</p>`), english),
+    ).toEqual([]);
   });
 });
