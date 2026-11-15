@@ -473,3 +473,14 @@ export interface BridgeLabelPlacement {
    */
   readonly onFocus: readonly BridgeLabel[];
 }
+
+/**
+ * Where a bridge between two neighbours on one shelf leaves and enters its
+ * boxes: the x of each box's side that faces the gap, and each port's y.
+ */
+export interface NeighbourBridgeEnds {
+  readonly startX: number;
+  readonly portA: number;
+  readonly endX: number;
+  readonly portB: number;
+}

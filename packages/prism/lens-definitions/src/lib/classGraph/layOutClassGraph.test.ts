@@ -12,9 +12,11 @@ import { describe, expect, it } from "vitest";
 import {
   BRIDGE_TRIO_GRAPH,
   CROSS_REGION_GRAPH,
+  CROSSED_PAIR_GRAPH,
   defineClass,
   FOUR_NAMESPACE_GRAPH,
   NARROWING_GRAPH,
+  NEIGHBOUR_TRIO_GRAPH,
   SHELF_PAIR_GRAPH,
   STACKED_PAIR_GRAPH,
   TALL_GRAPH,
@@ -597,14 +599,16 @@ describe("layOutClassGraph", () => {
   });
 
   it.each([
-    ["the metro's records", metroGraph],
-    ["three bridges, one with no statements", BRIDGE_TRIO_GRAPH],
+    ["the metro's records", metroGraph, 3],
+    ["three bridges, one with no statements", BRIDGE_TRIO_GRAPH, 3],
+    ["two neighbours with crossed ports", CROSSED_PAIR_GRAPH, 2],
+    ["two neighbours with three bridges", NEIGHBOUR_TRIO_GRAPH, 3],
   ])(
     "runs no two bridges of %s along one line, and draws a dashed one last",
-    (_, graph) => {
+    (_, graph, drawn) => {
       const layout = layOutClassGraph(graph);
       const bridges = layout.edges.filter((edge) => edge.bridge === true);
-      expect(bridges.length).toBeGreaterThanOrEqual(3);
+      expect(bridges).toHaveLength(drawn);
       const runsOf = (d: string) =>
         parsePathData(d)
           .flatMap(({ segments }) => segments)

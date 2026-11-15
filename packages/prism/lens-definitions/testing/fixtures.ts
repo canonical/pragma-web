@@ -291,6 +291,41 @@ export const SHELF_PAIR_GRAPH: ClassGraphInput = {
 };
 
 /**
+ * The two regions of `SHELF_PAIR_GRAPH` side by side, joined by two
+ * bridges whose ports cross: the first leaves by the top box for the
+ * bottom one, the second, with no statements, by the bottom box for the
+ * top one.
+ */
+export const CROSSED_PAIR_GRAPH: ClassGraphInput = {
+  classes: SHELF_PAIR_GRAPH.classes,
+  relations: [
+    {
+      uri: "aa:down",
+      label: "down",
+      domain: "aa:A0",
+      range: "bb:B2",
+      count: 1,
+    },
+    { uri: "aa:up", label: "up", domain: "aa:A2", range: "bb:B0", count: 0 },
+  ],
+};
+
+/**
+ * The two regions of `SHELF_PAIR_GRAPH` side by side, joined by three
+ * bridges, box to box across, the middle one with no statements.
+ */
+export const NEIGHBOUR_TRIO_GRAPH: ClassGraphInput = {
+  classes: SHELF_PAIR_GRAPH.classes,
+  relations: ["0", "1", "2"].map((index) => ({
+    uri: `aa:to${index}`,
+    label: `to ${index}`,
+    domain: `aa:A${index}`,
+    range: `bb:B${index}`,
+    count: index === "1" ? 0 : 1,
+  })),
+};
+
+/**
  * Two regions of one class each, stacked on two shelves at the packing's
  * left margin, and one relation between them: the two boxes overlap across.
  */

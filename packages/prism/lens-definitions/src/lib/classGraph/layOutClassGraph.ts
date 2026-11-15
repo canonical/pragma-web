@@ -25,7 +25,6 @@ import {
   ALIGNMENT_SEARCH_LIMIT,
   BRIDGE_CHANNEL_ROOM,
   BRIDGE_GAP_ROOM,
-  BRIDGE_LANE,
   CHANNEL,
   CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
@@ -41,11 +40,13 @@ import frameOpeningWindow from "./frameOpeningWindow.js";
 import gatherDrawnInput from "./gatherDrawnInput.js";
 import layOutPhoneView from "./layOutPhoneView.js";
 import listRegionBridges from "./listRegionBridges.js";
+import offsetLane from "./offsetLane.js";
 import opensWhole from "./opensWhole.js";
 import orderBoxedClasses from "./orderBoxedClasses.js";
 import orderRail from "./orderRail.js";
 import orderRegionsByBridges from "./orderRegionsByBridges.js";
 import packShelves from "./packShelves.js";
+import routeNeighbourBridges from "./routeNeighbourBridges.js";
 import type {
   Bundle,
   ClassGraphInput,
@@ -56,6 +57,7 @@ import type {
   LaidOutEdge,
   LaidOutNode,
   LaidOutRegion,
+  NeighbourBridgeEnds,
   NodeNavigation,
   ShelfPacking,
   SpecimenGraphInput,
@@ -135,17 +137,6 @@ function packRegions(
     packing: packShelves(regions),
     crowded: regions.some((region) => region.layout.crowdedArcs > 0),
   };
-}
-
-/**
- * Offset a lane among `count` lanes spread about a run's middle within
- * `room` px: at most `BRIDGE_LANE` apart, an even number of px so every
- * offset is whole, and 0 for a lone lane.
- */
-function offsetLane(index: number, count: number, room: number): number {
-  if (count === 1) return 0;
-  const step = Math.min(BRIDGE_LANE, 2 * Math.floor(room / (count - 1) / 2));
-  return (index - (count - 1) / 2) * step;
 }
 
 /** Where a region sits: its top-left corner and its shelf's top. */
@@ -532,7 +523,13 @@ function layOutModel(
     return to < from || between ? undefined : { from, to };
   };
   const signs = new Map<string, number>();
-  const crossEdges: LaidOutEdge[] = [];
+  const routes: {
+    readonly bundle: Bundle;
+    readonly channel: readonly PathCommand[];
+    readonly ends: NeighbourBridgeEnds;
+    readonly gap: { readonly from: number; readonly to: number } | undefined;
+    readonly heads: readonly PathCommand[][];
+  }[] = [];
   for (const bundle of crossBundles) {
     const a = nodeOf(bundle.a);
     const b = nodeOf(bundle.b);
@@ -598,45 +595,64 @@ function layOutModel(
     // between them, at the bridge's lane, with no detour through the
     // channel above the shelf.
     const gap = step === 0 ? findSharedGap(a, sideA, b, sideB) : undefined;
-    const commands: PathCommand[] =
-      gap === undefined
-        ? [
-            ["M", startX, portA],
-            ["H", exitX],
-            ...(joiningGap === undefined
-              ? ([
-                  ["V", fromGap],
-                  ["H", -SHELF_GAP / 2 + gapLane],
-                  ["V", toGap],
-                ] as PathCommand[])
-              : ([["V", joiningGap]] as PathCommand[])),
-            ["H", entryX],
-            ["V", portB],
-            ["H", endX],
-          ]
-        : [
-            ["M", startX, portA],
-            ["H", (gap.from + gap.to) / 2 + sign * gapLane],
-            ...(portA === portB ? [] : ([["V", portB]] as PathCommand[])),
-            ["H", endX],
-          ];
     const heads: PathCommand[][] = [];
     if (bundle.heads.has(bundle.a))
       heads.push(buildArrowhead(startX, portA, sideA === "left"));
     if (bundle.heads.has(bundle.b))
       heads.push(buildArrowhead(endX, portB, sideB === "left"));
-    crossEdges.push({
+    routes.push({
+      bundle,
+      channel: [
+        ["M", startX, portA],
+        ["H", exitX],
+        ...(joiningGap === undefined
+          ? ([
+              ["V", fromGap],
+              ["H", -SHELF_GAP / 2 + gapLane],
+              ["V", toGap],
+            ] as PathCommand[])
+          : ([["V", joiningGap]] as PathCommand[])),
+        ["H", entryX],
+        ["V", portB],
+        ["H", endX],
+      ],
+      ends: { startX, portA, endX, portB },
+      gap,
+      heads,
+    });
+  }
+  // A pair of neighbours whose bridges all leave and enter by the sides
+  // that face across their gap is routed across it, each bridge keeping a
+  // stretch of its own; any other pair keeps the channel route with its
+  // lanes.
+  const across = new Map<string, readonly PathCommand[]>();
+  for (const pair of new Set(crossBundles.map(pairOf))) {
+    const group = routes.filter((route) => pairOf(route.bundle) === pair);
+    const [first] = group;
+    if (first?.gap === undefined || group.some(({ gap }) => gap === undefined))
+      continue;
+    const paths = routeNeighbourBridges(
+      group.map(({ ends }) => ends),
+      first.gap,
+      originOf(nodeOf(first.bundle.a).region).shelfY,
+    );
+    group.forEach(({ bundle }, index) => {
+      across.set(bundle.id, requireAt(paths, index));
+    });
+  }
+  const crossEdges: LaidOutEdge[] = routes.map(
+    ({ bundle, channel, heads }) => ({
       id: `rel:${bundle.id}`,
       kind: "relation",
       bridge: true,
       bundle,
       from: bundle.a,
       to: [bundle.b],
-      d: formatPathData(commands),
+      d: formatPathData(across.get(bundle.id) ?? channel),
       heads: heads.map((head) => formatPathData(head)),
-      region: a.region,
-    });
-  }
+      region: nodeOf(bundle.a).region,
+    }),
+  );
   // A dashed bridge, which no statement instantiates, is drawn after the
   // solid ones, so where it crosses one it is never under it.
   crossEdges.sort(
