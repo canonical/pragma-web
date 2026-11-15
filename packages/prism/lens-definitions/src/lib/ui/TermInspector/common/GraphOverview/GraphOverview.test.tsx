@@ -96,7 +96,7 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       ["1", "1 to 9 statements"],
       ["2", "10 to 99 statements"],
       ["4", "100 to 999 statements"],
-      ["8", "1,000 and more statements"],
+      ["8", "1000 and more statements"],
     ]);
     // Each step's width is the one the canvas draws for its decade.
     expect(
@@ -119,13 +119,15 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       "heavier the more statements the graph holds",
     );
     const dashed = zero?.querySelector("path.relation");
-    expect(dashed?.getAttribute("class")).toBe("relation is-zero");
+    expect(dashed?.getAttribute("class")).toBe("relation");
     expect(dashed?.getAttribute("stroke-dasharray")).toBe("4 4");
     expect(dashed?.getAttribute("stroke-width")).toBe("1");
-    expect(zero?.querySelector(".filled-head")?.classList).toContain("is-zero");
+    expect(zero?.querySelector(".filled-head")?.getAttribute("class")).toBe(
+      "filled-head",
+    );
     expect(zero?.querySelector(".step")).toBeNull();
     expect(zero?.textContent).toBe(
-      "A relation no statement instantiates: dashed and muted",
+      "A relation with no statements yet: dashed",
     );
   });
 

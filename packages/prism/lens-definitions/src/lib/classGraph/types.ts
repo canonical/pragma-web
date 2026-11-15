@@ -304,3 +304,12 @@ export interface StrokeWeight {
   /** Whether it is dashed: no statement instantiates it. */
   readonly dashed: boolean;
 }
+
+/** A relation's line as it is drawn: its path, heads, width and dash. */
+export interface RelationStroke {
+  readonly d: string;
+  readonly heads: readonly string[];
+  readonly width: number;
+  /** The dash pattern, where no statement instantiates the relation. */
+  readonly dash: string | undefined;
+}

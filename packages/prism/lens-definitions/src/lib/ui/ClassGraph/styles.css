@@ -19,7 +19,6 @@
       oklch(54.86% 0 0)
     );
     --class-graph-rule-color: var(--color-border-muted);
-    --class-graph-zero-color: var(--color-border-muted);
     /* The docs context has no 16px text size. */
     --class-graph-prefix-font-size: 1rem;
     --class-graph-prefix-font-weight: var(
@@ -94,10 +93,6 @@
     transition-duration: var(--class-graph-fade-duration);
   }
 
-  .ds.class-graph .relation.is-zero {
-    color: var(--class-graph-zero-color);
-  }
-
   .ds.class-graph .relation.is-focus {
     color: var(--class-graph-accent-color);
   }
@@ -112,10 +107,6 @@
 
   .ds.class-graph .filled-head {
     color: var(--class-graph-edge-color);
-  }
-
-  .ds.class-graph .filled-head.is-zero {
-    color: var(--class-graph-zero-color);
   }
 
   .ds.class-graph .filled-head.is-focus {

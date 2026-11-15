@@ -13,7 +13,9 @@ import type { StrokeWidth } from "./types.js";
  * its `HEAVY_HEAD_SIZES` size about its tip, and the line stops its own
  * width short of each tip, where the head is as wide as the line, so a
  * heavy line ends inside its head instead of overrunning the point. A
- * lighter stroke keeps the layout's path and heads. Every coordinate stays
+ * lighter stroke keeps the layout's path and heads. A line shorter than
+ * its width stops at the point it comes from, or halfway along when both
+ * its ends are tips, so it never turns inside out. Every coordinate stays
  * an integer, and the tips, where the heads touch their boxes, never move.
  *
  * @param d - The relation's path, one subpath whose ends lie at its tips.
@@ -35,18 +37,32 @@ export default function fitArrowheads(
   }
   const { start, segments } = requireAt(subpaths, 0);
   const tips = heads.map(readTip);
-  // Each end that is a head's tip steps back towards the head's base.
-  const shorten = ([x, y]: Point): Point => {
+  const isTip = ([x, y]: Point): boolean =>
+    tips.some(({ at }) => at[0] === x && at[1] === y);
+  // Each end that is a head's tip steps back towards the head's base, never
+  // past the point the line comes from (halfway to it when that point is
+  // a tip too), so a line shorter than its width shrinks to a point under
+  // its head instead of turning inside out.
+  const shorten = ([x, y]: Point, [nextX, nextY]: Point): Point => {
     const tip = tips.find(({ at }) => at[0] === x && at[1] === y);
     if (tip === undefined) return [x, y];
-    return [tip.pointsRight ? x - width : x + width, y];
+    const limit = isTip([nextX, nextY]) ? Math.floor((x + nextX) / 2) : nextX;
+    return [
+      tip.pointsRight
+        ? Math.max(x - width, Math.min(limit, x))
+        : Math.min(x + width, Math.max(limit, x)),
+      y,
+    ];
   };
   const last = segments.length - 1;
   const commands: PathCommand[] = [
-    ["M", ...shorten(start)],
+    ["M", ...shorten(start, requireAt(requireAt(segments, 0).points, 1))],
     ...segments.map((segment, index): PathCommand => {
       const points = segment.points.slice(1);
-      const end = index === last ? shorten(requireAt(points, -1)) : undefined;
+      const end =
+        index === last
+          ? shorten(requireAt(points, -1), requireAt(segment.points, -2))
+          : undefined;
       const [p1, p2, p3] = points;
       if (segment.kind === "cubic" && p1 && p2 && p3) {
         return ["C", ...p1, ...p2, ...(end ?? p3)];

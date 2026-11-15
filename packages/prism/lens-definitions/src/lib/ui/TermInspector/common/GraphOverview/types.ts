@@ -46,8 +46,11 @@ export interface Specimen {
 /** One stroke a legend row shows: stated as a stroke, not as a count. */
 export interface SpecimenStroke {
   readonly stroke: StrokeWeight;
-  /** What the stroke stands for, from the catalog, when the row has several. */
-  readonly label?: MessageKey;
+  /**
+   * The counts the stroke stands for, when the row has several: from one
+   * step's count up to the next step's, or from the last step on.
+   */
+  readonly bounds?: { readonly from: number; readonly to?: number };
 }
 
 /**

@@ -41,6 +41,41 @@ describe("fitArrowheads", () => {
     });
   });
 
+  it("ends a self-loop inside its grown head, its start left on the box", () => {
+    expect(
+      fitArrowheads("M92 40C92 8 132 48 100 48", ["M100 48L108 44V52L100 48"], 8),
+    ).toEqual({
+      d: "M92 40C92 8 132 48 108 48",
+      heads: ["M100 48L120 38V58L100 48"],
+    });
+  });
+
+  it("starts a curve that leaves from a tip inside its head", () => {
+    expect(
+      fitArrowheads(
+        "M192 88C224 88 224 72 224 56",
+        ["M192 88L200 84V92L192 88"],
+        8,
+      ),
+    ).toEqual({
+      d: "M200 88C224 88 224 72 224 56",
+      heads: ["M192 88L212 78V98L192 88"],
+    });
+  });
+
+  it("shrinks a line shorter than its width to a point, never inside out", () => {
+    expect(
+      fitArrowheads("M100 40H104", ["M104 40L96 36V44L104 40"], 8).d,
+    ).toBe("M100 40L100 40");
+    expect(
+      fitArrowheads(
+        "M100 40H104",
+        ["M100 40L108 36V44L100 40", "M104 40L96 36V44L104 40"],
+        8,
+      ).d,
+    ).toBe("M102 40L102 40");
+  });
+
   it("refuses a relation of more than one subpath", () => {
     expect(() => fitArrowheads("M0 0H8M16 0H24", HEADS, 8)).toThrow(
       "one subpath",

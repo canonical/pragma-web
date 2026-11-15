@@ -15,9 +15,8 @@ import {
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
-import { ZERO_STROKE_DASH } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
-import fitArrowheads from "../../classGraph/fitArrowheads.js";
+import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
 import weighStroke from "../../classGraph/weighStroke.js";
@@ -47,8 +46,8 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * with one hollow arrowhead at each superclass, the relations with their
  * filled arrowheads at each range, each stroked by its weight (1, 2, 4 or
  * 8px by the decade of the statements it covers, a heavy line ending
- * inside a head grown to its width; 1px dashed and muted where none
- * does; a legend's specimen, which no store counts, at the lightest solid
+ * inside a head grown to its width; 1px dashed, in the same colour, where
+ * none does; a legend's specimen, which no store counts, at the lightest solid
  * stroke with no weight attribute), the classes as `EntityGraphNode`s, and
  * the focus's edge labels on a halo. Every coordinate comes from the
  * layout, and every geometric fact and encoding is readable from its data
@@ -123,22 +122,15 @@ export default function ClassGraph({
         : isFaded(edge) && "is-faded";
     // A legend's specimen is counted by no store: the lightest solid
     // stroke, with no weight to claim.
-    const weight =
-      bundle?.weight === undefined ? undefined : weighStroke(bundle.weight);
-    const width = weight?.width ?? EDGE_STROKE;
-    // A heavy line ends inside a head grown to its width.
-    const { d, heads } =
-      weight === undefined
-        ? edge
-        : fitArrowheads(edge.d, edge.heads, weight.width);
+    const { d, heads, width, dash } = fitRelationStroke(
+      edge.d,
+      edge.heads,
+      bundle?.weight === undefined ? undefined : weighStroke(bundle.weight),
+    );
     return (
       <g data-edge={edge.id} key={edge.id}>
         <path
-          className={joinClasses(
-            role,
-            weight?.dashed === true && "is-zero",
-            state,
-          )}
+          className={joinClasses(role, state)}
           d={d}
           data-count={bundle?.relations.length ?? edge.to.length}
           data-from={termOf(edge.from)}
@@ -147,7 +139,7 @@ export default function ClassGraph({
           data-weight={bundle?.weight}
           fill="none"
           stroke="currentColor"
-          strokeDasharray={weight?.dashed ? ZERO_STROKE_DASH : undefined}
+          strokeDasharray={dash}
           strokeWidth={
             state === "is-focus" ? Math.max(width, FOCUS_STROKE) : width
           }
@@ -155,11 +147,7 @@ export default function ClassGraph({
         {heads.map((head) =>
           relation ? (
             <path
-              className={joinClasses(
-                "filled-head",
-                weight?.dashed === true && "is-zero",
-                state,
-              )}
+              className={joinClasses("filled-head", state)}
               d={head}
               fill="currentColor"
               key={head}

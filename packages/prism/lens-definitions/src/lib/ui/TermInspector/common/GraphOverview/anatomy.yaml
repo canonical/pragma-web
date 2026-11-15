@@ -3,9 +3,11 @@
 # tiny graph drawn by the graph's own layout and drawing over what it
 # means, scaled down to the inspector's width where it is wider, then the
 # relation's strokes (its weight in the canvas's four steps, each beside
-# the statements it stands for, in muted 14px; a relation no statement
-# instantiates), each step a relation's line and head alone, in the class
-# graph's own classes and fitted by its code, on the same floor; a row per namespace with its figures, each a button that fits the
+# the statements it stands for, in muted 14px, the bounds read from the
+# canvas's steps; a relation with no statements yet, dashed), each step a
+# relation's line and head alone, in the class graph's own classes, its
+# width, dash and heads from the canvas's own code, on the same floor; a
+# row per namespace with its figures, each a button that fits the
 # graph's camera to that region; and how to move about the graph. A
 # subgrid of the inspector's columns, its rows spanning them all; its
 # sections and their labels are the inspector's.

@@ -141,16 +141,21 @@ describe("ClassGraph", () => {
     expect(new Set(strokes.map(([width]) => width))).toEqual(
       new Set(["1", "2", "4", "8"]),
     );
-    // A relation nothing instantiates recedes in the muted line colour,
-    // its head with it.
-    const zeros = [...container.querySelectorAll("path.relation.is-zero")];
-    expect(zeros.map((path) => path.getAttribute("data-weight"))).toEqual(
+    // A relation nothing instantiates keeps every relation's classes: its
+    // dash alone says what it is.
+    const dashed = [
+      ...container.querySelectorAll("path.relation[stroke-dasharray]"),
+    ];
+    expect(dashed.map((path) => path.getAttribute("data-weight"))).toEqual(
       strokes.filter(([, , zero]) => zero).map(() => "0"),
     );
-    for (const path of zeros) {
+    for (const path of dashed) {
+      expect(path.getAttribute("class")).toBe("relation");
       expect(
-        path.parentElement?.querySelector(".filled-head")?.classList,
-      ).toContain("is-zero");
+        path.parentElement
+          ?.querySelector(".filled-head")
+          ?.getAttribute("class"),
+      ).toBe("filled-head");
     }
     const bus = container.querySelector("path.subclass");
     expect(bus?.getAttribute("stroke-width")).toBe("1");
@@ -267,7 +272,7 @@ describe("ClassGraph", () => {
     const zero = container.querySelector(
       'path.relation[data-from="cs:CodeStandard"][data-to="cs:Example"]',
     );
-    expect(zero?.getAttribute("class")).toBe("relation is-zero is-focus");
+    expect(zero?.getAttribute("class")).toBe("relation is-focus");
     expect(zero?.getAttribute("data-weight")).toBe("0");
     expect(zero?.getAttribute("stroke-dasharray")).toBe("4 4");
     expect(zero?.getAttribute("stroke-width")).toBe("2");

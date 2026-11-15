@@ -1,5 +1,9 @@
-import { HEAVY_HEAD_SIZES } from "../../../../classGraph/constants.js";
-import type { Specimen, StrokeSpecimen } from "./types.js";
+import {
+  HEAVY_HEAD_SIZES,
+  STROKE_MIN_WIDTH,
+  STROKE_STEPS,
+} from "../../../../classGraph/constants.js";
+import type { SpecimenStroke, Specimen, StrokeSpecimen } from "./types.js";
 
 /**
  * The legend's rows, in order: a concrete class with its count, an
@@ -106,24 +110,32 @@ export const SPECIMEN_PREFIX = "legend";
 export const SPECIMEN_MARGIN = 4;
 
 /**
+ * The weight steps, lightest first, each with the counts it stands for,
+ * read from the canvas's own steps: the lightest from 1, each up to the
+ * count below the next step's, the heaviest with no end.
+ */
+const WEIGHT_STROKES: readonly SpecimenStroke[] = [
+  { width: STROKE_MIN_WIDTH, from: 1 },
+  ...STROKE_STEPS.toReversed(),
+].map(({ width, from }, index, steps) => {
+  const next = steps.at(index + 1);
+  return {
+    stroke: { width, dashed: false },
+    bounds: next === undefined ? { from } : { from, to: next.from - 1 },
+  };
+});
+
+/**
  * The legend's rows on a relation's stroke, after the graph's: its weight
  * in the four steps the canvas draws (by decade of its statements), and a
- * relation no statement instantiates. Each states its stroke, never a
- * count: no store stands behind a specimen.
+ * relation with no statements yet. Each states its stroke, never a count:
+ * no store stands behind a specimen.
  */
 export const STROKE_SPECIMENS: readonly StrokeSpecimen[] = [
-  {
-    meaning: "legend.weight",
-    strokes: [
-      { stroke: { width: 1, dashed: false }, label: "legend.weight.ones" },
-      { stroke: { width: 2, dashed: false }, label: "legend.weight.tens" },
-      { stroke: { width: 4, dashed: false }, label: "legend.weight.hundreds" },
-      { stroke: { width: 8, dashed: false }, label: "legend.weight.thousands" },
-    ],
-  },
+  { meaning: "legend.weight", strokes: WEIGHT_STROKES },
   {
     meaning: "legend.zero",
-    strokes: [{ stroke: { width: 1, dashed: true } }],
+    strokes: [{ stroke: { width: STROKE_MIN_WIDTH, dashed: true } }],
   },
 ];
 

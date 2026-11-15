@@ -155,7 +155,7 @@ export const STROKE_STEPS: readonly {
 ];
 
 /** The stroke of a relation below the first step, in px. */
-export const STROKE_MIN_WIDTH = 1;
+export const STROKE_MIN_WIDTH: StrokeWidth = 1;
 
 /**
  * The arrowhead a heavy relation ends in, by its stroke width: its length
