@@ -1,8 +1,9 @@
 ---
 # ComponentDetail — the component page's data-bearing interior: the page's
 # one operation, read from the warm store, laid on the sectioned view
-# (SectionedView): the header names the component, the facts (address,
-# tier, version, stage) stand beside it, the rendered example is the body
+# (SectionedView): the header names the component with its tier, stage
+# and address, the facts (the version, when the graph records one; else
+# no facts region) stand beside it, the rendered example is the body
 # before the sections, and the usage, the guidelines, the anatomy, the
 # properties, the relations and the changes are sections in the order the
 # lens gives their anchor fields (`usage`, `guidelines`, `anatomyDsl`,
@@ -49,12 +50,12 @@ node:
               uri: docs.subcomponent.component_header
             relation: { cardinality: "1", slotName: header }
           - node:
-              role: facts (the address, then the tier, the version and the stage the graph records)
+              role: facts (the version the graph records)
               edges:
                 - node:
                     uri: prism.component.key_value_list
                   relation: { cardinality: "1" }
-            relation: { cardinality: "1", slotName: facts }
+            relation: { cardinality: "0..1", slotName: facts }
           - node:
               role: body (the example under the page renderer, else what the renderer draws)
               edges:

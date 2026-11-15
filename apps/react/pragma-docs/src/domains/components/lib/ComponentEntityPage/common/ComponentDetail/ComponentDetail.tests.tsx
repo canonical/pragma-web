@@ -226,7 +226,7 @@ describe("ComponentDetail", () => {
   );
 
   it(
-    "lists the address in inline code, then the tier the graph records, once",
+    "leaves the facts region out when the graph records no version",
     () => {
       render(
         entityPageAt(
@@ -235,37 +235,8 @@ describe("ComponentDetail", () => {
           createFetchSpy(),
         ),
       );
-      expect(readFacts().at(0)).toEqual(["Address", BUTTON_URI]);
-      expect(
-        readView().querySelector(".facts .pair .value code")?.textContent,
-      ).toBe(BUTTON_URI);
-      expect(readFacts().map(([term]) => term)).toContain("Tier");
-      expect(document.querySelectorAll(".ds.key-value-list")).toHaveLength(1);
-    },
-    ENTITY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    "leaves out the tier, the version and the stage the graph does not record",
-    () => {
-      const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
-        tier: null,
-        version: null,
-      }) as unknown as Record<string, Record<string, unknown>>;
-      const stages =
-        records[
-          "client:https://ds.canonical.com/global.component.button:documentationStages(first:1)"
-        ];
-      if (stages === undefined) throw new Error("the fixture lost its stages");
-      stages.edges = { __refs: [] };
-      render(
-        entityPageAt(
-          BUTTON_URI,
-          records as unknown as typeof componentEntityRecordsButton,
-          createFetchSpy(),
-        ),
-      );
-      expect(readFacts()).toEqual([["Address", BUTTON_URI]]);
+      expect(readView().querySelector(".facts")).toBeNull();
+      expect(document.querySelector(".ds.key-value-list")).toBeNull();
     },
     ENTITY_TEST_TIMEOUT_MS,
   );
@@ -277,7 +248,7 @@ describe("ComponentDetail", () => {
         version: "2.1",
       });
       render(entityPageAt(BUTTON_URI, records, createFetchSpy()));
-      expect(readFacts()).toContainEqual(["Version", "2.1"]);
+      expect(readFacts()).toEqual([["Version", "2.1"]]);
     },
     ENTITY_TEST_TIMEOUT_MS,
   );
@@ -352,7 +323,10 @@ describe("ComponentDetail", () => {
       expectSectionIndex(readView(), []);
       expect(screen.queryByRole("heading", { level: 2 })).toBeNull();
       expect(screen.queryByRole("region", { name: "Example" })).toBeNull();
-      expect(readFacts().at(0)).toEqual(["Address", BUTTON_URI]);
+      expect(
+        document.querySelector(".ds.component-header .status-line .address")
+          ?.textContent,
+      ).toBe(BUTTON_URI);
       expect(fetchFn).not.toHaveBeenCalled();
     },
     ENTITY_TEST_TIMEOUT_MS,

@@ -9,6 +9,13 @@
   .ds.component-header {
     --component-header-gap: var(--grid-gutter);
     --component-header-summary-measure: 75ch;
+    --component-header-status-gap-block: var(--space-050);
+    --component-header-status-gap-inline: var(--space-100);
+    --component-header-status-color: var(--color-text-muted);
+    --component-header-value-color: var(--color-text);
+    --component-header-address-font-family: var(
+      --typography-text-primary-code-font-family
+    );
 
     display: grid;
     grid-template-columns: subgrid;
@@ -27,5 +34,31 @@
     grid-column: 1 / span 6;
     max-inline-size: var(--component-header-summary-measure);
     margin-block: 0;
+  }
+
+  /* The status line under the summary: the tier and the stage in the
+   * text's colour, the middle dots and the address muted, the address in
+   * the code face and broken anywhere, so the line wraps at 390 rather
+   * than widen the page. */
+  .ds.component-header > .status-line {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: var(--component-header-status-gap-block);
+    column-gap: var(--component-header-status-gap-inline);
+    min-width: 0;
+    margin-block: 0;
+    color: var(--component-header-status-color);
+  }
+
+  .ds.component-header > .status-line > .value {
+    color: var(--component-header-value-color);
+  }
+
+  .ds.component-header > .status-line > .address {
+    min-width: 0;
+    font-family: var(--component-header-address-font-family);
+    overflow-wrap: anywhere;
   }
 }

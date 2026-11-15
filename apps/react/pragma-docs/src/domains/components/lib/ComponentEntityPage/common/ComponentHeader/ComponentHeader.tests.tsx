@@ -7,6 +7,7 @@ import componentEntityRecordsButton from "../../../../__fixtures__/componentEnti
 import {
   BUTTON_URI,
   ENTITY_TEST_TIMEOUT_MS,
+  editBlock,
   entityPageAt,
 } from "../../../../__fixtures__/entityPageHarness.js";
 
@@ -27,6 +28,67 @@ describe("ComponentHeader", () => {
       expect(
         document.querySelector(".ds.component-header > .summary"),
       ).toHaveTextContent("Buttons trigger actions");
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "reads the tier, the stage and the address on one status line",
+    () => {
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const line = document.querySelector(
+        ".ds.component-header > .summary + .status-line",
+      );
+      expect(
+        [...(line?.children ?? [])].map((part) => [
+          part.className,
+          part.textContent,
+        ]),
+      ).toEqual([
+        ["value", "Global"],
+        ["separator", "·"],
+        ["value", "needs:documentation"],
+        ["separator", "·"],
+        ["address", BUTTON_URI],
+      ]);
+      expect(line?.querySelector(".address")?.tagName).toBe("CODE");
+      for (const separator of line?.querySelectorAll(".separator") ?? []) {
+        expect(separator).toHaveAttribute("aria-hidden", "true");
+      }
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "leaves out the tier and the stage the graph does not record",
+    () => {
+      const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
+        tier: null,
+      }) as unknown as Record<string, Record<string, unknown>>;
+      const stages =
+        records[
+          "client:https://ds.canonical.com/global.component.button:documentationStages(first:1)"
+        ];
+      if (stages === undefined) throw new Error("the fixture lost its stages");
+      stages.edges = { __refs: [] };
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          records as unknown as typeof componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const line = document.querySelector(
+        ".ds.component-header > .status-line",
+      );
+      expect(line?.textContent).toBe(BUTTON_URI);
+      expect(line?.querySelector(".separator")).toBeNull();
     },
     ENTITY_TEST_TIMEOUT_MS,
   );

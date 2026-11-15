@@ -2,7 +2,6 @@
 
 import {
   KeyValueList,
-  type KeyValuePair,
   orderSections,
   PAGE_RENDERER_NAMES,
   SectionedView,
@@ -11,10 +10,8 @@ import {
 import { InlineCode } from "@canonical/react-ds-global";
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
-import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
+import { graphql, useLazyLoadQuery } from "react-relay";
 import { Message, useMessages } from "#i18n";
-import type { ComponentDetail_facts$key } from "#relay/__generated__/ComponentDetail_facts.graphql.js";
-import factsFragmentNode from "#relay/__generated__/ComponentDetail_facts.graphql.js";
 import type { ComponentEntityQuery } from "#relay/__generated__/ComponentEntityQuery.graphql.js";
 import componentEntityQueryNode from "#relay/__generated__/ComponentEntityQuery.graphql.js";
 import { COMPONENTS_RENDERERS } from "../../../../constants.js";
@@ -37,7 +34,8 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The page's one operation: the component's name and address, which the
- * page itself reads for the document title and the example, the fields
+ * page itself reads for the document title and the example, its version,
+ * the page's one fact, the fields
  * the lens orders its sections by, and the fragments its parts read. The hook reads the generated node, since
  * this module sits on the server's native import chain, where no transform
  * rewrites tags.
@@ -47,6 +45,7 @@ const declareEntityQuery = (): unknown => graphql`
     component(uri: $uri) {
       name
       uri
+      version
       _meta {
         curie
         fields {
@@ -78,7 +77,6 @@ const declareEntityQuery = (): unknown => graphql`
         }
       }
       ...ComponentHeader_node
-      ...ComponentDetail_facts
       ...ComponentAnatomy_node
       ...ComponentProperties_node
       ...ComponentRelations_node @arguments(count: $count)
@@ -89,33 +87,6 @@ const declareEntityQuery = (): unknown => graphql`
   }
 `;
 void declareEntityQuery;
-
-/**
- * What the page records about the component, shown as its facts: the
- * compact address, the tier, the version and the first documentation
- * stage.
- */
-const declareFactsFragment = (): unknown => graphql`
-  fragment ComponentDetail_facts on Component {
-    version
-    _meta {
-      curie
-    }
-    tier {
-      name
-    }
-    documentationStages(first: 1) {
-      edges {
-        node {
-          _meta {
-            title
-          }
-        }
-      }
-    }
-  }
-`;
-void declareFactsFragment;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds component-detail";
@@ -123,9 +94,9 @@ const componentCssClassName = "ds component-detail";
 /**
  * The component page's data-bearing interior: the page's one operation,
  * with the variables the route warms the store with, laid on the sectioned
- * view. The header names the component; its facts (the address, the tier,
- * the version and the first documentation stage, each only when the graph
- * records it) stand beside it; the rendered example is the body before the
+ * view. The header names the component and gives its tier, stage and
+ * address; its version, when the graph records one, is its one fact,
+ * beside the header, and with none the page has no facts; the rendered example is the body before the
  * sections; the usage and guidelines texts, the anatomy, the token
  * bindings, the properties, the variants, the relations and the change log
  * are sections in the order the lens gives their fields, each
@@ -179,7 +150,19 @@ export default function ComponentDetail({
         <>
           <Head title={component.name ?? component._meta.curie} />
           <SectionedView
-            facts={<ComponentFacts component={component} />}
+            facts={
+              component.version ? (
+                <KeyValueList
+                  pairs={[
+                    {
+                      id: "version",
+                      term: t("component.version"),
+                      value: component.version,
+                    },
+                  ]}
+                />
+              ) : undefined
+            }
             header={<ComponentHeader component={component} />}
             sections={
               active.name === PAGE_RENDERER_NAMES.page
@@ -296,39 +279,4 @@ export default function ComponentDetail({
       )}
     </div>
   );
-}
-
-/**
- * The component's facts as a key-value list: the compact address in the
- * published InlineCode, then the tier, the version and the first
- * documentation stage, each only when the graph records it.
- *
- * @note Impure: reads the component from the Relay store and its words
- *   from the translator in scope.
- */
-function ComponentFacts({
-  component,
-}: {
-  readonly component: ComponentDetail_facts$key;
-}): ReactElement {
-  const t = useMessages();
-  const data = useFragment(factsFragmentNode, component);
-  const stage = data.documentationStages.edges.at(0)?.node._meta.title;
-  const pairs: KeyValuePair[] = [
-    {
-      id: "address",
-      term: t("component.address"),
-      value: <InlineCode>{data._meta.curie}</InlineCode>,
-    },
-    ...(data.tier?.name
-      ? [{ id: "tier", term: t("component.tier"), value: data.tier.name }]
-      : []),
-    ...(data.version
-      ? [{ id: "version", term: t("component.version"), value: data.version }]
-      : []),
-    ...(stage
-      ? [{ id: "stage", term: t("component.stage"), value: stage }]
-      : []),
-  ];
-  return <KeyValueList pairs={pairs} />;
 }

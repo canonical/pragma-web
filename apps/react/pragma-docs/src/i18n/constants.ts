@@ -101,10 +101,8 @@ export const MESSAGES = {
   "component.notFoundTitle": "Component not found",
   "component.notFound":
     "No component found at {address}. The catalog lists every component the graph carries.",
-  "component.address": "Address",
-  "component.tier": "Tier",
+  "component.statusSeparator": "·",
   "component.version": "Version",
-  "component.stage": "Stage",
   "component.example": "Example",
   "component.noExample":
     "The published package does not implement this block, so it has no rendered example.",
