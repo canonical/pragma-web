@@ -40,6 +40,7 @@ export default function layOutSpecimen(
       label: t(relation.label),
       domain: uriOf(relation.domain),
       range: uriOf(relation.range),
+      specimen: true as const,
     })),
   });
   const only = specimen.only === undefined ? undefined : uriOf(specimen.only);

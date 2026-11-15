@@ -46,6 +46,7 @@ import type {
   LaidOutRegion,
   NodeNavigation,
   ShelfPacking,
+  SpecimenGraphInput,
 } from "./types.js";
 
 /** A region laid out in its own coordinates, with its packed size. */
@@ -298,13 +299,14 @@ function alignShelves(
  * lay out the same graph byte for byte, and every coordinate is an
  * integer.
  *
- * @param input - The classes and relations.
+ * @param input - The classes and relations: the data's, each counted, or a
+ *   legend specimen's.
  * @param sweeps - How many barycentre sweeps order the columns; 0 keeps
  *   the label-sorted order, the baseline the crossings are measured against.
  * @returns The layout.
  */
 export default function layOutClassGraph(
-  input: ClassGraphInput,
+  input: ClassGraphInput | SpecimenGraphInput,
   sweeps: number = SWEEPS,
 ): ClassGraphLayout {
   const model = buildClassGraphModel(input);

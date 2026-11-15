@@ -23,14 +23,15 @@ import {
   WRAPPED_HEIGHT,
 } from "./constants.js";
 import type {
+  AnyRelationInput,
   Bundle,
   ClassGraphInput,
   ClassGraphModel,
   ClassModel,
   DrawnRelation,
   GraphClassInput,
-  GraphRelationInput,
   RegionJoin,
+  SpecimenGraphInput,
 } from "./types.js";
 
 /** A class's box and label, before the layout places it. */
@@ -137,16 +138,39 @@ function bundleRelations(
 }
 
 /**
- * Weigh a bundle by its heaviest counted relation.
+ * Weigh a bundle by its heaviest relation's count.
  *
- * @param relations - The bundle's relations.
- * @returns The largest count, or `undefined` when none is counted.
+ * @param relations - The bundle's relations: all of the data, or all a
+ *   legend's specimens.
+ * @returns The largest count, or `undefined` for specimens.
  */
 function weighBundle(relations: readonly DrawnRelation[]): number | undefined {
   const counts = relations.flatMap((relation) =>
-    relation.count === undefined ? [] : [relation.count],
+    "count" in relation ? [relation.count] : [],
   );
   return counts.length === 0 ? undefined : Math.max(...counts);
+}
+
+/**
+ * Check that a graph's relations are all of the data, each counted, or
+ * all a legend's specimens, so a relation that lost its count is never
+ * drawn as a specimen.
+ *
+ * @param relations - The graph's relations.
+ * @throws When a relation of the data carries no integer count, or the
+ *   data's relations and specimens are mixed.
+ */
+function requireCounted(relations: readonly AnyRelationInput[]): void {
+  const specimens = relations.filter((relation) => "specimen" in relation);
+  if (specimens.length === relations.length) return;
+  const uncounted = relations.find(
+    (relation) =>
+      "specimen" in relation ||
+      !("count" in relation) ||
+      !Number.isInteger(relation.count),
+  );
+  if (uncounted !== undefined)
+    throw new Error(`the relation ${uncounted.uri} carries no count`);
 }
 
 /**
@@ -197,11 +221,16 @@ function breakSuperclassCycles(
  * more incident edges after bundling, at most six, the subclass roots
  * always) and the regions, largest first.
  *
+ * @param input - The data's classes and counted relations, or a legend
+ *   specimen's.
  * @returns The model the layout places.
+ * @throws When a relation of the data carries no count.
  */
 export default function buildClassGraphModel(
-  input: ClassGraphInput,
+  input: ClassGraphInput | SpecimenGraphInput,
 ): ClassGraphModel {
+  const relations: readonly AnyRelationInput[] = input.relations;
+  requireCounted(relations);
   const classes = breakSuperclassCycles(
     [...input.classes].sort((a, b) => compareText(a.uri, b.uri)),
   );
@@ -225,12 +254,12 @@ export default function buildClassGraphModel(
     }
   }
 
-  const isDrawn = (relation: GraphRelationInput): relation is DrawnRelation =>
+  const isDrawn = (relation: AnyRelationInput): relation is DrawnRelation =>
     relation.domain !== null &&
     relation.range !== null &&
     inputs.has(relation.domain) &&
     inputs.has(relation.range);
-  const drawnRelations = input.relations
+  const drawnRelations = relations
     .filter(isDrawn)
     .sort((a, b) => compareText(a.uri, b.uri));
   const bundles = bundleRelations(drawnRelations, prefixOf);
@@ -298,7 +327,7 @@ export default function buildClassGraphModel(
           degree: requireEntry(degree, klass.uri),
           loop,
           loopExtent: loop ? (hub ? HUB_LOOP_EXTENT : LOOP_EXTENT) : 0,
-          relationCount: input.relations.filter(
+          relationCount: relations.filter(
             (relation) =>
               relation.domain === klass.uri || relation.range === klass.uri,
           ).length,

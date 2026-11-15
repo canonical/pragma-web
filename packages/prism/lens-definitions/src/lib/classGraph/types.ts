@@ -35,11 +35,24 @@ export interface GraphRelationInput {
   readonly range: string | null;
   /**
    * The instance statements the graph counts for the property's declared
-   * edge between its domain and its range; 0 when it serves none. Absent
-   * on a legend's specimen, which no store counts.
+   * edge between its domain and its range; 0 when it serves none.
    */
-  readonly count?: number;
+  readonly count: number;
 }
+
+/**
+ * A relation a legend draws to show how one is drawn: shaped as the
+ * graph's relations are, but counted by no store, so it states a stroke
+ * and never a weight.
+ */
+export interface SpecimenRelationInput
+  extends Omit<GraphRelationInput, "count"> {
+  /** Marks the relation as a legend's specimen. */
+  readonly specimen: true;
+}
+
+/** A relation of the data, or a legend's specimen. */
+export type AnyRelationInput = GraphRelationInput | SpecimenRelationInput;
 
 /**
  * One edge between two classes as the graph's `classEdges` serves it: a
@@ -60,15 +73,22 @@ export interface ClassEdgeInput {
 }
 
 /** A relation both of whose ends are drawn classes. */
-export interface DrawnRelation extends GraphRelationInput {
+export type DrawnRelation = AnyRelationInput & {
   readonly domain: string;
   readonly range: string;
-}
+};
 
-/** What the class graph is laid out from. */
+/** What the class graph is laid out from: the data's classes and relations. */
 export interface ClassGraphInput {
   readonly classes: readonly GraphClassInput[];
+  /** Every relation, each counted by the graph. */
   readonly relations: readonly GraphRelationInput[];
+}
+
+/** What a legend's specimen is laid out from: relations no store counts. */
+export interface SpecimenGraphInput {
+  readonly classes: readonly GraphClassInput[];
+  readonly relations: readonly SpecimenRelationInput[];
 }
 
 /** A class as the model holds it: its input, its box and its encodings. */
@@ -106,8 +126,7 @@ export interface Bundle extends LabelledBundle {
   /**
    * Its heaviest relation's count: a figure the graph serves, the same
    * whether or not a store holds both directions of an inverse pair.
-   * `undefined` when no relation of it is counted, as on a legend's
-   * specimen.
+   * `undefined` on a legend's specimen, which no store counts.
    */
   readonly weight: number | undefined;
 }

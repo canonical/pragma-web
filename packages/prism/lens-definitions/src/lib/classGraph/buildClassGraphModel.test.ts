@@ -1,3 +1,4 @@
+import { requireDefined } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import { CROSS_REGION_GRAPH } from "../../../testing/fixtures.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
@@ -80,17 +81,35 @@ describe("buildClassGraphModel", () => {
     expect(realWeightOf("UIBlock", "TokenBinding")).toBe(1010);
   });
 
-  it("leaves a bundle no store counts unweighed, as a legend's specimen is", () => {
+  it("leaves a legend's specimens unweighed: no store counts them", () => {
     const specimen = buildClassGraphModel({
       ...CROSS_REGION_GRAPH,
       relations: CROSS_REGION_GRAPH.relations.map(
-        ({ count: _count, ...relation }) => relation,
+        ({ count: _count, ...relation }) => ({ ...relation, specimen: true as const }),
       ),
     });
     expect(specimen.bundles.length).toBeGreaterThan(0);
     expect(
       specimen.bundles.every((bundle) => bundle.weight === undefined),
     ).toBe(true);
+  });
+
+  it("refuses a relation of the data that lost its count", () => {
+    const uncounted = CROSS_REGION_GRAPH.relations.map(
+      ({ count: _count, ...relation }) => relation,
+    );
+    const input = { ...CROSS_REGION_GRAPH, relations: uncounted };
+    // @ts-expect-error A relation of the data must carry its count.
+    expect(() => buildClassGraphModel(input)).toThrow(/carries no count/);
+  });
+
+  it("refuses a graph that mixes the data's relations with specimens", () => {
+    const [first, ...rest] = CROSS_REGION_GRAPH.relations;
+    const { count: _count, ...uncounted } = requireDefined(first, "relation");
+    const relations = [...rest, { ...uncounted, specimen: true as const }];
+    // @ts-expect-error A graph's relations are all counted or all specimens.
+    const mixed = () => buildClassGraphModel({ ...CROSS_REGION_GRAPH, relations });
+    expect(mixed).toThrow(/carries no count/);
   });
 
   it("sizes boxes to the lattice: a count after the label, none when abstract", () => {
