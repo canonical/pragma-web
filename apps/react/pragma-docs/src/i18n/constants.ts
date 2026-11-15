@@ -1,3 +1,12 @@
+/** The locale the catalog is written in. */
+export const LOCALE = "en";
+
+/**
+ * Whole counts, in the catalog's locale: every figure a reader sees is
+ * written through it.
+ */
+export const COUNT_FORMAT = new Intl.NumberFormat(LOCALE);
+
 /**
  * Every string the app's own shell, pages and projections show a reader, in
  * English, by key. The lens packages keep their own catalogs; these are the

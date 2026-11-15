@@ -135,6 +135,27 @@ describe("Lobby", () => {
   );
 
   it(
+    "writes each count in the catalog's number format",
+    () => {
+      const records = structuredClone(lobbyRecords) as unknown as Record<
+        string,
+        Record<string, unknown> | undefined
+      >;
+      const link = records["client:root"]?.[
+        `ontologyClass(uri:"${LOBBY_STANDARD_CLASS}")`
+      ] as { __ref: string };
+      const standardClass = records[link.__ref];
+      if (standardClass === undefined) throw new Error("no standards class");
+      standardClass.instanceCount = 1234;
+      render(
+        lobbyPage(records as unknown as typeof lobbyRecords, createFetchSpy()),
+      );
+      expect(readDoorFacts().at(2)).toEqual(["standards Standards 1,234"]);
+    },
+    LOBBY_TEST_TIMEOUT_MS,
+  );
+
+  it(
     "leaves the components count and the examples out when the store lacks the class",
     () => {
       render(lobbyPage(dropClass(LOBBY_COMPONENT_CLASS), createFetchSpy()));

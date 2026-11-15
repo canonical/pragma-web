@@ -5,7 +5,7 @@ import { EntityCard, EntityList } from "@canonical/prism-projections";
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
-import { useMessages } from "#i18n";
+import { COUNT_FORMAT, useMessages } from "#i18n";
 import { DocsChipProjection } from "#lib/ui/DocsChipProjection";
 import { PageSection } from "#lib/ui/PageSection";
 import type { LobbyQuery } from "#relay/__generated__/LobbyQuery.graphql.js";
@@ -73,7 +73,7 @@ const componentCssClassName = "ds lobby";
  * to the lenses as cards in the shared list view, in the rail's order (read
  * off the same route table, so the two cannot drift), each linked to its
  * lens with a sentence on what it holds and the graph's count where the
- * schema gives one. A class the store lacks leaves its count out rather than
+ * schema gives one, written in the catalog's number format. A class the store lacks leaves its count out rather than
  * printing a zero; with no exemplars the first section is left out. The
  * Journeys door carries no count: the demand model is not in every graph
  * the site reads, and a field the graph lacks would fail the whole
@@ -113,7 +113,7 @@ export default function Lobby({
               {
                 property: "components",
                 label: t("lobby.doors.components.fact"),
-                value: componentCount,
+                value: COUNT_FORMAT.format(componentCount),
               },
             ]),
         ...(patternCount === undefined
@@ -122,7 +122,7 @@ export default function Lobby({
               {
                 property: "patterns",
                 label: t("lobby.doors.patterns.fact"),
-                value: patternCount,
+                value: COUNT_FORMAT.format(patternCount),
               },
             ]),
       ],
@@ -141,7 +141,7 @@ export default function Lobby({
               {
                 property: "standards",
                 label: t("lobby.doors.standards.fact"),
-                value: standardCount,
+                value: COUNT_FORMAT.format(standardCount),
               },
             ],
     },
