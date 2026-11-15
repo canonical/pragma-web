@@ -35,9 +35,10 @@ export interface GraphRelationInput {
   readonly range: string | null;
   /**
    * The instance statements the graph counts for the property's declared
-   * edge between its domain and its range; 0 when it serves none.
+   * edge between its domain and its range; 0 when it serves none. Absent
+   * on a legend's specimen, which no store counts.
    */
-  readonly count: number;
+  readonly count?: number;
 }
 
 /**
@@ -105,8 +106,10 @@ export interface Bundle extends LabelledBundle {
   /**
    * Its heaviest relation's count: a figure the graph serves, the same
    * whether or not a store holds both directions of an inverse pair.
+   * `undefined` when no relation of it is counted, as on a legend's
+   * specimen.
    */
-  readonly weight: number;
+  readonly weight: number | undefined;
 }
 
 /** The subclass join from a region's roots to a superclass in another region. */

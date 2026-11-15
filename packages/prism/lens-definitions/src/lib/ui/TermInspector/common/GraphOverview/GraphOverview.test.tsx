@@ -67,6 +67,17 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(entries.item(2).querySelectorAll(".node")).toHaveLength(1);
   });
 
+  it("draws its relations as specimens: the lightest solid stroke, claiming no store's weight", () => {
+    const overview = renderOverview();
+    const relations = [...overview.querySelectorAll("path.relation")];
+    expect(relations.length).toBeGreaterThan(0);
+    for (const path of relations) {
+      expect(path.getAttribute("stroke-width")).toBe("1");
+      expect(path.hasAttribute("stroke-dasharray")).toBe(false);
+    }
+    expect(overview.querySelector("[data-weight]")).toBeNull();
+  });
+
   it("names its specimens for their role, never after a class of a site's ontology", () => {
     const classes = new Set(
       [ontologyGraph, metroGraph].flatMap((graph) =>

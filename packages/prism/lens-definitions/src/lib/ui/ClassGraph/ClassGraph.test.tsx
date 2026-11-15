@@ -123,7 +123,6 @@ describe("ClassGraph", () => {
         ),
       );
       expect(path?.getAttribute("data-weight")).toBe(String(weight));
-      expect(path?.getAttribute("data-declared")).toBe("true");
       return [
         path?.getAttribute("stroke-width"),
         path?.getAttribute("stroke-dasharray") ?? null,

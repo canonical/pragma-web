@@ -46,7 +46,8 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * with one hollow arrowhead at each superclass, the relations with their
  * filled arrowheads at each range, each stroked by its weight (1, 2, 4 or
  * 8px by the decade of the statements it covers, 1px dashed where none
- * does), the classes as `EntityGraphNode`s, and
+ * does; a legend's specimen, which no store counts, at the lightest solid
+ * stroke with no weight attribute), the classes as `EntityGraphNode`s, and
  * the focus's edge labels on a halo. Every coordinate comes from the
  * layout, and every geometric fact and encoding is readable from its data
  * attributes, so a script measures the drawing with no browser.
@@ -118,8 +119,10 @@ export default function ClassGraph({
       : isFocus(edge)
         ? "is-focus"
         : isFaded(edge) && "is-faded";
+    // A legend's specimen is counted by no store: the lightest solid
+    // stroke, with no weight to claim.
     const weight =
-      bundle === undefined ? undefined : weighStroke(bundle.weight);
+      bundle?.weight === undefined ? undefined : weighStroke(bundle.weight);
     const width = weight?.width ?? EDGE_STROKE;
     return (
       <g data-edge={edge.id} key={edge.id}>
@@ -127,7 +130,6 @@ export default function ClassGraph({
           className={joinClasses(role, state)}
           d={edge.d}
           data-count={bundle?.relations.length ?? edge.to.length}
-          data-declared={relation || undefined}
           data-from={termOf(edge.from)}
           data-kind={edge.kind}
           data-to={edge.to.map(termOf).join(" ")}

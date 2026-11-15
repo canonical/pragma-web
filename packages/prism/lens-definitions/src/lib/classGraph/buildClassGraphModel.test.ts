@@ -80,6 +80,19 @@ describe("buildClassGraphModel", () => {
     expect(realWeightOf("UIBlock", "TokenBinding")).toBe(1010);
   });
 
+  it("leaves a bundle no store counts unweighed, as a legend's specimen is", () => {
+    const specimen = buildClassGraphModel({
+      ...CROSS_REGION_GRAPH,
+      relations: CROSS_REGION_GRAPH.relations.map(
+        ({ count: _count, ...relation }) => relation,
+      ),
+    });
+    expect(specimen.bundles.length).toBeGreaterThan(0);
+    expect(
+      specimen.bundles.every((bundle) => bundle.weight === undefined),
+    ).toBe(true);
+  });
+
   it("sizes boxes to the lattice: a count after the label, none when abstract", () => {
     const whole = model.byId.get("ex:Whole");
     expect(whole).toMatchObject({

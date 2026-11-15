@@ -31,7 +31,7 @@ describe("DefinitionsExplorer SSR", () => {
     const weightOf = (from: string, to: string): string | undefined =>
       html.match(
         new RegExp(
-          `data-declared="true" data-from="${from}" data-kind="relation" data-to="${to}" data-weight="(\\d+)"`,
+          `data-from="${from}" data-kind="relation" data-to="${to}" data-weight="(\\d+)"`,
         ),
       )?.[1];
     // ds:hasTokenBinding and ds:viaBlock, 1,010 statements each: the bundle

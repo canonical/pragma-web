@@ -94,7 +94,7 @@ function sizeBox(klass: GraphClassInput, hub: boolean): BoxGeometry {
 /**
  * Bundle the drawn relations by unordered pair: one bundle per pair, its
  * relations by label, its arrowheads at the ends that are some relation's
- * range, its weight its heaviest relation's count.
+ * range, its weight its heaviest counted relation's count.
  */
 function bundleRelations(
   relations: readonly DrawnRelation[],
@@ -131,9 +131,22 @@ function bundleRelations(
           a !== b &&
           sorted.some((relation) => relation.domain === a) &&
           sorted.some((relation) => relation.domain === b),
-        weight: Math.max(...sorted.map((relation) => relation.count)),
+        weight: weighBundle(sorted),
       };
     });
+}
+
+/**
+ * Weigh a bundle by its heaviest counted relation.
+ *
+ * @param relations - The bundle's relations.
+ * @returns The largest count, or `undefined` when none is counted.
+ */
+function weighBundle(relations: readonly DrawnRelation[]): number | undefined {
+  const counts = relations.flatMap((relation) =>
+    relation.count === undefined ? [] : [relation.count],
+  );
+  return counts.length === 0 ? undefined : Math.max(...counts);
 }
 
 /**

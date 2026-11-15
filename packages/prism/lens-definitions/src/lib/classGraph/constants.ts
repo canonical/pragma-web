@@ -159,9 +159,3 @@ export const STROKE_MIN_WIDTH = 1;
 
 /** The dash pattern of a relation no statement instantiates, in px. */
 export const ZERO_STROKE_DASH = "4 4";
-
-/**
- * The count a relation drawn without a store carries, as a legend draws
- * it: the lightest solid stroke.
- */
-export const UNWEIGHED_COUNT = 1;
