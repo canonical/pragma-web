@@ -28,6 +28,7 @@ export type {
   AssertStylesheetsOptions,
   ExpectSlotOrderOptions,
   GuardableMap,
+  GuardableMaps,
   SwitchCoverageOptions,
   SwitchFragment,
   SwitchSelection,

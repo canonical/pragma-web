@@ -26,18 +26,29 @@ const buildFragment = (
   ],
 });
 
-/** The maps a probe tree provides: one form, one typed arm, one site arm. */
+/**
+ * The maps a probe tree provides: the chip with one typed arm and one site
+ * arm, the four other forms with one typed arm and none for its site.
+ */
 const PROBE_MAPS = {
   chip: {
     Node: "NodeChip",
     types: { Station: (): string => "StationChip" },
     siteTypes: { Depot: (): string => "DepotChip" },
   },
+  row: { types: { Station: (): string => "StationRow" } },
+  card: { types: { Station: (): string => "StationCard" } },
+  command: { types: { Station: (): string => "StationCommand" } },
+  graphNode: { types: { Station: (): string => "StationGraphNode" } },
 } as const;
 
-/** A probe tree's render: it passes its maps through `guardTypedArms`. */
+/**
+ * A probe tree's render: it passes its maps through `guardTypedArms` and
+ * its switch reads its form from the object returned, as a provider's
+ * consumer does.
+ */
 const renderGuarded = (): void => {
-  guardTypedArms(PROBE_MAPS);
+  void guardTypedArms(PROBE_MAPS).chip;
 };
 
 describe("expectSwitchCoverage", () => {
@@ -158,9 +169,35 @@ describe("guardTypedArms", () => {
       fragment: buildFragment(["Station"]),
       cases: { Station: "station" },
       render: () => {
-        const { row } = guardTypedArms({ row: { types: { Station: 1 } } });
+        const { row } = guardTypedArms(PROBE_MAPS);
         expect(row).not.toHaveProperty("siteTypes");
+        expect(() => row.types.Station()).toThrow(
+          "the row map's arm for Station rendered",
+        );
       },
+    });
+  });
+
+  it("fails a case whose switch read its form from maps other than those it returned", () => {
+    expect(() =>
+      expectSwitchCoverage({
+        fragment: buildFragment(["Station"]),
+        cases: { Station: "station" },
+        render: () => {
+          // The tree guards a copy and hands its provider the maps it kept.
+          guardTypedArms({ ...PROBE_MAPS });
+          void PROBE_MAPS.chip;
+        },
+      }),
+    ).toThrow(
+      "ProbeProjection_node: the case Station read no form from the maps guardTypedArms returned, so its provider holds other maps whose typed arms could hide a missing case",
+    );
+  });
+
+  it("refuses a partial set of forms by its type", () => {
+    // @ts-expect-error -- a tree guards all five forms, never some of them.
+    expect(guardTypedArms({ chip: PROBE_MAPS.chip })).toEqual({
+      chip: PROBE_MAPS.chip,
     });
   });
 });

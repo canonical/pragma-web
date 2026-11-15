@@ -1,5 +1,6 @@
 import { closeCoverageGuard, openCoverageGuard } from "./coverageGuard.js";
 import type {
+  CoverageGuardResult,
   SwitchCoverageOptions,
   SwitchFragment,
   SwitchSelection,
@@ -26,13 +27,15 @@ import type {
  * `guardTypedArms`, which, while a case renders, replaces every typed
  * and site arm in them with one that throws, so a node reaches its typed
  * arm only through the switch's own case. A case whose tree did not
- * guard its maps fails.
+ * guard its maps fails, and so does a case whose switch read its form
+ * from maps other than the object `guardTypedArms` returned: the tree
+ * hands the provider that object, as it is.
  *
  * @param options - The switch's compiled fragment, one mock node per case
  *   by type condition, and how to render and check one.
  * @throws When a type condition has no case, a case names no condition,
- *   or a case rendered under maps its tree did not pass through
- *   `guardTypedArms`.
+ *   a case rendered under maps its tree did not pass through
+ *   `guardTypedArms`, or its switch read no form from the maps it returned.
  * @note Impure: calls `render`, which mounts the switch, once per condition.
  */
 export default function expectSwitchCoverage<TNode>({
@@ -61,15 +64,20 @@ export default function expectSwitchCoverage<TNode>({
       throw new Error(`the case ${condition} holds no node`);
     }
     openCoverageGuard();
-    let guarded = false;
+    let guard: CoverageGuardResult = { guarded: false, read: false };
     try {
       render(condition, node);
     } finally {
-      guarded = closeCoverageGuard();
+      guard = closeCoverageGuard();
     }
-    if (!guarded) {
+    if (!guard.guarded) {
       throw new Error(
         `${fragment.name}: the case ${condition} rendered under maps its tree did not pass through guardTypedArms, so a typed arm in them could hide a missing case`,
+      );
+    }
+    if (!guard.read) {
+      throw new Error(
+        `${fragment.name}: the case ${condition} read no form from the maps guardTypedArms returned, so its provider holds other maps whose typed arms could hide a missing case`,
       );
     }
   }

@@ -60,6 +60,30 @@ export interface GuardableMap {
   readonly siteTypes?: object;
 }
 
+/**
+ * A tree's projection maps, as `guardTypedArms` takes them: all five
+ * forms, so a tree cannot guard some forms and leave the others' typed
+ * arms in place.
+ */
+export interface GuardableMaps {
+  readonly chip: GuardableMap;
+  readonly row: GuardableMap;
+  readonly card: GuardableMap;
+  readonly command: GuardableMap;
+  readonly graphNode: GuardableMap;
+}
+
+/** What the coverage guard recorded while one case rendered. */
+export interface CoverageGuardResult {
+  /** Whether the case's tree passed its maps through `guardTypedArms`. */
+  readonly guarded: boolean;
+  /**
+   * Whether the switch read a form from the very maps `guardTypedArms`
+   * returned, so the provider received them and not other maps.
+   */
+  readonly read: boolean;
+}
+
 /** Options of `expectSwitchCoverage`. */
 export interface SwitchCoverageOptions<TNode> {
   /**
