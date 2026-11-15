@@ -28,10 +28,13 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
 
 /**
  * The tokens the app's components read beyond the shim: the semantic
- * tokens, and the intrinsic grid's column floor, which a measure that
- * follows the grid reads.
+ * tokens, the intrinsic grid's column floor, which a measure that follows
+ * the grid reads, and the published Card's content insets, which the
+ * peek's address line takes.
  */
 const EXTERNAL_TOKENS = [
+  "--card-content-padding-block-end",
+  "--card-content-padding-inline",
   "--color-background",
   "--color-background-container",
   "--color-background-layer2",
@@ -53,6 +56,12 @@ const EXTERNAL_TOKENS = [
  * column floor, at the scope the grid preset reads it.
  */
 const DOCUMENT_TOKENS = ["--grid-col-min"];
+
+/**
+ * The one reach into another component the app's components make: the
+ * peek ends the summary of the card it shows at its third line.
+ */
+const REACHES = [".ds.docs-peek .summary"];
 
 /**
  * The context providers among the app's components. A provider follows its
@@ -137,6 +146,7 @@ describe("the app's components", () => {
           layer: "ds.components.global",
           externalTokens: EXTERNAL_TOKENS,
           documentTokens: DOCUMENT_TOKENS,
+          reaches: REACHES,
         }),
       ).not.toThrow();
     },

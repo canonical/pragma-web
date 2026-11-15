@@ -6,8 +6,19 @@
 # card, then the address line under it (PS1 V4's peek; heuristic 4.3: the
 # full CURIE shows in the peek, copyable there, "Copied" announced): the
 # CURIE in monospace, muted, and core's CopyButton. The chip's peek is the
-# frame (the popover's padding and border), so the card draws no border of
-# its own inside it.
+# frame (the popover's border, no padding), so the card draws no border of
+# its own inside it and its insets are the peek's only ones: a specimen
+# meets the frame, and the address line takes the card's inline and
+# block-end insets (the published Card's content tokens), so the CURIE
+# starts on the title's edge. In the peek the card's summary ends at its
+# third line (three 24px lines; the cut falls between two lines, since the
+# anatomy has no line-clamp key); the page is one click away.
+#
+# The frame scrolls a card taller than its room; the address line is
+# pinned to its foot (position sticky, block-end 0, on the frame's
+# background), so the CURIE and Copy always show. The CURIE takes the
+# line's free width (grow 1, basis 0) and breaks anywhere inside it; the
+# line does not wrap, so Copy stays at the end of its first line.
 #
 # The query is lazy: the chip mounts the peek only while it is open, so a
 # chip's fragment never spreads a card's (no fragment cycle, no card read
@@ -26,7 +37,11 @@
 #
 # Token ledger (every decision; a literal only where no symbol exists):
 #   --projection-peek-card-border-width: 0      the frame encloses the card
-#   --projection-peek-address-spacing: space.100 (8px) above the line
+#   --projection-peek-summary-max-height: calc(3 * space.300)   three 24px lines
+#   --projection-peek-address-padding-block-start: space.100 (8px) above the line
+#   --projection-peek-address-padding-block-end: card.content.padding.block.end
+#   --projection-peek-address-padding-inline: card.content.padding.inline
+#   --projection-peek-address-background: color.background   what scrolls under it
 #   --projection-peek-address-gap: grid.gutter between the CURIE and Copy
 #   --projection-peek-curie-color: color.text.muted
 #   --projection-peek-curie-font-family: ui-monospace, monospace   literal: no mono token
@@ -42,26 +57,40 @@ node:
           on: Node
         styles:
           appearance.border.width: 0
+        edges:
+          - node:
+              role: summary
+              styles:
+                size.max.height: "calc(3 * var(--space-300))"
+                layout.overflow: hidden
+            relation: { cardinality: "0..1", slotName: summary }
       relation:
         cardinality: "1"
         slotName: card
     - node:
         role: address
         styles:
+          layout.position: sticky
+          layout.offset.block.end: 0
           layout.type: flex
-          layout.wrap: wrap
+          layout.wrap: nowrap
           layout.align: baseline
           spacing.gap.inline: grid.gutter
-          spacing.external.block.start: space.100
+          spacing.external.block.start: 0
           spacing.external.block.end: 0
-          spacing.internal.block.start: 0
-          spacing.internal.block.end: 0
+          spacing.internal.block.start: space.100
+          spacing.internal.block.end: card.content.padding.block.end
+          spacing.internal.inline.start: card.content.padding.inline
+          spacing.internal.inline.end: card.content.padding.inline
+          appearance.background: color.background
         edges:
           - node:
               role: curie
               projection:
                 field: node._meta.curie
               styles:
+                layout.flex.grow: 1
+                layout.flex.basis: 0
                 size.min.width: 0
                 typography.color: color.text.muted
                 typography.fontFamily: "ui-monospace, monospace"

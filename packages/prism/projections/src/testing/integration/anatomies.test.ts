@@ -171,10 +171,22 @@ describe("the package's components", () => {
 });
 
 /**
- * The semantic tokens the projections read beyond the shim: the peek's
- * address line is muted.
+ * The tokens the projections read beyond the shim: the peek's address line
+ * is muted, takes the published Card's content insets and paints the
+ * background a scrolled card passes under.
  */
-const PROJECTION_TOKENS = ["--color-text-muted"];
+const PROJECTION_TOKENS = [
+  "--card-content-padding-block-end",
+  "--card-content-padding-inline",
+  "--color-background",
+  "--color-text-muted",
+];
+
+/**
+ * The one reach into another component the projections make: the peek
+ * ends the summary of the card it shows at its third line.
+ */
+const PROJECTION_REACHES = [".ds.projection-peek .summary"];
 
 describe("the package's stylesheets", () => {
   it("keep the design's token and grid rules in the generic representations", () => {
@@ -194,6 +206,7 @@ describe("the package's stylesheets", () => {
           directory,
           layer: "ds.components.global",
           externalTokens: PROJECTION_TOKENS,
+          reaches: PROJECTION_REACHES,
         }),
       ).not.toThrow();
     });

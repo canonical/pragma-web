@@ -8,8 +8,8 @@ const componentCssClassName = "ds peek";
 
 /**
  * A chip's open peek: a non-modal dialog, a manual popover tethered to the
- * chip's anchor, 248px wide, framed by the popover's padding and border
- * round what it shows, and named by a hidden label, since the chip's title
+ * chip's anchor, 248px wide, framed by the popover's border, with no
+ * padding, round what it shows, and named by a hidden label, since the chip's title
  * is a node, not a string. `EntityChip` mounts it on the document's body
  * while the peek is open; nothing else renders it.
  *

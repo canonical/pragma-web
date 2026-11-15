@@ -42,8 +42,8 @@
 # wrapper; the anchor-name and position-anchor are set inline from useId
 # (an instance's ident cannot live in a stylesheet). The peek is the frame,
 # as PS1 V4's peek draws it (its anatomy is common/Peek's): the popover's
-# padding and border round the card it holds, which draws no border of its
-# own (ProjectionPeek), and the address line under the card. The
+# border, with no padding, round the card it holds, which draws no border
+# of its own (ProjectionPeek), and the address line under the card. The
 # dialog's name is a hidden label inside it (aria-labelledby), since the
 # title is a node, not a string.
 #

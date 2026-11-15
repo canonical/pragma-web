@@ -3,13 +3,23 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The peek's content inside the chip's frame: the card, which the frame
-   * already encloses, so it draws no border of its own, then the address
-   * line. */
+  /* The peek's content inside the chip's frame, which has no padding: the
+   * card, which the frame already encloses, so it draws no border of its
+   * own and its insets are the peek's only ones, then the address line,
+   * which takes the card's inline and block-end insets, so the CURIE
+   * starts on the title's edge. */
   .ds.metro-peek {
     --metro-peek-card-border-width: 0;
-    --metro-peek-address-spacing: var(--space-100);
+    /* The card's summary, three of its 24px lines at most in the peek: the
+     * page is one click away. */
+    --metro-peek-summary-max-height: calc(3 * var(--space-300));
+    --metro-peek-address-padding-block-start: var(--space-100);
+    --metro-peek-address-padding-block-end: var(
+      --card-content-padding-block-end
+    );
+    --metro-peek-address-padding-inline: var(--card-content-padding-inline);
     --metro-peek-address-gap: var(--grid-gutter);
+    --metro-peek-address-background: var(--color-background);
     --metro-peek-curie-color: var(--color-text-muted);
     /* No typography token names a monospace face. */
     --metro-peek-curie-font-family: ui-monospace, monospace;
@@ -20,19 +30,33 @@
     border-width: var(--metro-peek-card-border-width);
   }
 
-  /* The CURIE, then its Copy button and its announcement, on one line; a
-   * CURIE longer than the line breaks anywhere rather than overflowing. */
+  /* The summary ends at its third line; the cut falls between two lines. */
+  .ds.metro-peek .summary {
+    max-height: var(--metro-peek-summary-max-height);
+    overflow: hidden;
+  }
+
+  /* The address line is pinned to the foot of the frame, which scrolls a
+   * card taller than its room under it, so the CURIE and Copy always show.
+   * The CURIE takes the line's free width and breaks anywhere inside it;
+   * Copy stays at the end of its first line. */
   .ds.metro-peek > .address {
+    position: sticky;
+    inset-block-end: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: baseline;
     column-gap: var(--metro-peek-address-gap);
-    margin-block-start: var(--metro-peek-address-spacing);
-    margin-block-end: 0;
-    padding-block: 0;
+    margin-block: 0;
+    padding-block-start: var(--metro-peek-address-padding-block-start);
+    padding-block-end: var(--metro-peek-address-padding-block-end);
+    padding-inline: var(--metro-peek-address-padding-inline);
+    background: var(--metro-peek-address-background);
   }
 
   .ds.metro-peek > .address > .curie {
+    flex-grow: 1;
+    flex-basis: 0;
     min-width: 0;
     color: var(--metro-peek-curie-color);
     font-family: var(--metro-peek-curie-font-family);

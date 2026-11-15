@@ -3,13 +3,25 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The peek's content inside the chip's frame: the card, which the frame
-   * already encloses, so it draws no border of its own, then the address
-   * line. */
+  /* The peek's content inside the chip's frame, which has no padding: the
+   * card, which the frame already encloses, so it draws no border of its
+   * own and its insets are the peek's only ones, then the address line,
+   * which takes the card's inline and block-end insets, so the CURIE
+   * starts on the title's edge. */
   .ds.projection-peek {
     --projection-peek-card-border-width: 0;
-    --projection-peek-address-spacing: var(--space-100);
+    /* The card's summary, three of its 24px lines at most in the peek: the
+     * page is one click away. */
+    --projection-peek-summary-max-height: calc(3 * var(--space-300));
+    --projection-peek-address-padding-block-start: var(--space-100);
+    --projection-peek-address-padding-block-end: var(
+      --card-content-padding-block-end
+    );
+    --projection-peek-address-padding-inline: var(
+      --card-content-padding-inline
+    );
     --projection-peek-address-gap: var(--grid-gutter);
+    --projection-peek-address-background: var(--color-background);
     --projection-peek-curie-color: var(--color-text-muted);
     /* No typography token names a monospace face. */
     --projection-peek-curie-font-family: ui-monospace, monospace;
@@ -20,19 +32,33 @@
     border-width: var(--projection-peek-card-border-width);
   }
 
-  /* The CURIE, then its Copy button and its announcement, on one line; a
-   * CURIE longer than the line breaks anywhere rather than overflowing. */
+  /* The summary ends at its third line; the cut falls between two lines. */
+  .ds.projection-peek .summary {
+    max-height: var(--projection-peek-summary-max-height);
+    overflow: hidden;
+  }
+
+  /* The address line is pinned to the foot of the frame, which scrolls a
+   * card taller than its room under it, so the CURIE and Copy always show.
+   * The CURIE takes the line's free width and breaks anywhere inside it;
+   * Copy stays at the end of its first line. */
   .ds.projection-peek > .address {
+    position: sticky;
+    inset-block-end: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: baseline;
     column-gap: var(--projection-peek-address-gap);
-    margin-block-start: var(--projection-peek-address-spacing);
-    margin-block-end: 0;
-    padding-block: 0;
+    margin-block: 0;
+    padding-block-start: var(--projection-peek-address-padding-block-start);
+    padding-block-end: var(--projection-peek-address-padding-block-end);
+    padding-inline: var(--projection-peek-address-padding-inline);
+    background: var(--projection-peek-address-background);
   }
 
   .ds.projection-peek > .address > .curie {
+    flex-grow: 1;
+    flex-basis: 0;
     min-width: 0;
     color: var(--projection-peek-curie-color);
     font-family: var(--projection-peek-curie-font-family);

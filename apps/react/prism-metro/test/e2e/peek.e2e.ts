@@ -8,9 +8,10 @@
  * pointer comes to rest on the chip, and Escape closes it; focus opens it
  * at once. Open, it is a dialog inside no link, with a link a pointer
  * reaches, 248px wide, 4px from the chip, in the first of its places that
- * fits the viewport, and wholly inside it, at 1440 and at 390; for a
- * chip low in the viewport that place is above it, and a card taller than
- * the room there scrolls inside the peek. Escape
+ * fits the viewport, and wholly inside it, at 1440 and at 390, its
+ * address line and Copy inside it; for a chip low in the viewport that
+ * place is above it, and a card taller than the room there scrolls inside
+ * the peek under its address line, which stays in view. Escape
  * from inside it closes it and gives the chip's link the focus back. On a
  * touch screen at 390 a tap opens no peek and follows the chip's link.
  */
@@ -147,6 +148,29 @@ const readPeekScrolls = (selector: string): boolean => {
   });
 };
 
+/**
+ * Whether the open peek's address line, and its Copy button, lie wholly
+ * inside the peek's box: the line is pinned to the peek's foot, so the
+ * CURIE and Copy show however tall the card. Runs in the page.
+ */
+const readAddressShown = (selector: string): boolean => {
+  const peek = document.querySelector(selector);
+  const address = peek?.querySelector(":scope > * > .address");
+  const copy = address?.querySelector("button");
+  if (peek == null || address == null || copy == null) return false;
+  const frame = peek.getBoundingClientRect();
+  return [address, copy].every((part) => {
+    const box = part.getBoundingClientRect();
+    return (
+      box.height > 0 &&
+      box.top >= frame.top - 0.5 &&
+      box.bottom <= frame.bottom + 0.5 &&
+      box.left >= frame.left - 0.5 &&
+      box.right <= frame.right + 0.5
+    );
+  });
+};
+
 beforeAll(
   async () => {
     graph = await startServer("graph", CWD, {
@@ -202,6 +226,7 @@ describe("a chip's peek on a station's page", () => {
       expect(opened).toBeDefined();
       expect((opened ?? 0) - (focused ?? 0)).toBeLessThan(PEEK_OPEN_DELAY_MS);
       expect(listPeekViolations(measure)).toEqual([]);
+      expect(await page.evaluate(readAddressShown, PEEK_SELECTOR)).toBe(true);
     },
   );
 
@@ -214,6 +239,7 @@ describe("a chip's peek on a station's page", () => {
     expect(listPeekViolations(measure)).toEqual([]);
     expect(placePeek(measure).actual.block).toBe("above");
     expect(await page.evaluate(readPeekScrolls, PEEK_SELECTOR)).toBe(true);
+    expect(await page.evaluate(readAddressShown, PEEK_SELECTOR)).toBe(true);
   });
 
   it("closes on Escape from inside the peek and gives the chip's link the focus back", async () => {

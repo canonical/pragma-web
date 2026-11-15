@@ -14,10 +14,12 @@
    * chip, no taller than half the viewport the chip leaves, less the 4px
    * gap and a 4px inset from the viewport's edge: the larger side of the
    * chip always has that room, so one of its places always fits, and a
-   * taller card scrolls in it. It is the frame, the popover's padding
-   * and border round the borderless card it holds; the popover's tokens
-   * are declared where the published Popover is loaded, so each falls back
-   * to the value that component gives it. */
+   * taller card scrolls in it. It is the frame, the popover's border
+   * round the borderless card it holds, with no padding of its own: the
+   * card's own insets are the peek's only ones, so a specimen meets the
+   * frame as it meets a card's edge in a grid. The popover's tokens are
+   * declared where the published Popover is loaded, so each falls back to
+   * the value that component gives it. */
   .ds.peek {
     --peek-width: 248px;
     --peek-offset: var(--space-050);
@@ -29,8 +31,6 @@
       var(--peek-edge-inset)
     );
     --peek-background: var(--color-background);
-    --peek-padding-block: var(--popover-padding-vertical, var(--space-100));
-    --peek-padding-inline: var(--popover-padding-horizontal, var(--space-200));
     --peek-border-width: var(--popover-border-width, 1px);
     --peek-border-color: var(--popover-color-border, var(--color-border));
 
@@ -48,8 +48,8 @@
     margin-block-start: var(--peek-offset);
     margin-block-end: 0;
     margin-inline: 0;
-    padding-block: var(--peek-padding-block);
-    padding-inline: var(--peek-padding-inline);
+    padding-block: 0;
+    padding-inline: 0;
     border-width: var(--peek-border-width);
     border-style: solid;
     border-color: var(--peek-border-color);

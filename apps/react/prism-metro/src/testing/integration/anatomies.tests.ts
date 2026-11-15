@@ -31,8 +31,14 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
   .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"))
   .filter((directory) => existsSync(directory));
 
-/** The semantic tokens the app's components read beyond the shim. */
+/**
+ * The tokens the app's components read beyond the shim: the semantic
+ * tokens, and the published Card's content insets, which the peek's
+ * address line takes.
+ */
 const EXTERNAL_TOKENS = [
+  "--card-content-padding-block-end",
+  "--card-content-padding-inline",
   "--color-background",
   "--color-border",
   "--color-focus-ring",
@@ -50,6 +56,12 @@ const EXTERNAL_TOKENS = [
  * column floor, at the scope the grid preset reads it.
  */
 const DOCUMENT_TOKENS = ["--grid-col-min"];
+
+/**
+ * The one reach into another component the app's components make: the
+ * peek ends the summary of the card it shows at its third line.
+ */
+const REACHES = [".ds.metro-peek .summary"];
 
 const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
 
@@ -166,6 +178,7 @@ describe("the app's components", () => {
           layer: "ds.components.global",
           externalTokens: EXTERNAL_TOKENS,
           documentTokens: DOCUMENT_TOKENS,
+          reaches: REACHES,
         }),
       ).not.toThrow();
     },

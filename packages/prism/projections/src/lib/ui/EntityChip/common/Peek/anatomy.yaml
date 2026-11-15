@@ -8,9 +8,10 @@
 # renders it and it is not exported.
 #
 # Reference: PS1 V4 (mockups/ps1-v4-sheet-peek.html, tools/ps1v4-measured
-# "peek"): the drawn 248px peek is the popover's frame, its padding and
-# border, round a borderless card, and the address line under the card
-# (ProjectionPeek renders both). Tethered with CSS anchor positioning
+# "peek"): the drawn 248px peek is the popover's frame, its border with no
+# padding, round a borderless card, and the address line under the card
+# (ProjectionPeek renders both); the card's own insets are the only ones,
+# so a specimen meets the frame as it meets a card's edge in a grid. Tethered with CSS anchor positioning
 # (position-anchor set inline from the chip's ident), 4px below the chip,
 # from its start; from its end when the start would run past the
 # viewport's inline end, and above when the viewport has no room below
@@ -44,8 +45,6 @@
 #                                               the gap and the inset: the larger side
 #                                               of the chip always holds it
 #   --peek-background: color.background
-#   --peek-padding-block: popover.padding.vertical (8px)
-#   --peek-padding-inline: popover.padding.horizontal (16px)
 #   --peek-border-width: popover.border.width (1px)
 #   --peek-border-color: popover.color.border
 node:
@@ -59,10 +58,10 @@ node:
     spacing.external.block.end: 0
     spacing.external.inline.start: 0
     spacing.external.inline.end: 0
-    spacing.internal.block.start: [popover.padding.vertical, space.100]
-    spacing.internal.block.end: [popover.padding.vertical, space.100]
-    spacing.internal.inline.start: [popover.padding.horizontal, space.200]
-    spacing.internal.inline.end: [popover.padding.horizontal, space.200]
+    spacing.internal.block.start: 0
+    spacing.internal.block.end: 0
+    spacing.internal.inline.start: 0
+    spacing.internal.inline.end: 0
     appearance.border.width: [popover.border.width, 1px]
     appearance.border.style: solid
     appearance.border.color: [popover.color.border, color.border]
