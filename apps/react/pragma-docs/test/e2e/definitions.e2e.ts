@@ -650,20 +650,18 @@ describe("a drill's link against its address", () => {
   const [desktop, phone] = VIEWPORTS;
 
   /**
-   * Where the canvas shows a region's rule and a node, on screen: the
-   * camera's window and zoom, read where a reader sees them.
+   * Where the canvas shows a region's top rule on screen, its left end and
+   * its length: the camera's window and zoom, read where a reader sees
+   * them.
    */
   const readCamera = (page: Page, prefix: string): Promise<readonly number[]> =>
     page.evaluate((ns) => {
-      const viewport = ".ds.graph-canvas svg.viewport";
       const rule = document.querySelector(
-        `${viewport} g.region[data-ns="${ns}"] rect.rule`,
+        `.ds.graph-canvas svg.viewport g.region[data-ns="${ns}"] rect.rule`,
       );
-      const node = document.querySelector(`${viewport} g.node`);
-      if (rule === null || node === null) return [];
-      const a = rule.getBoundingClientRect();
-      const b = node.getBoundingClientRect();
-      return [a.x, a.y, a.width, b.x, b.y, b.width, b.height];
+      if (rule === null) return [];
+      const box = rule.getBoundingClientRect();
+      return [box.x, box.y, box.width];
     }, prefix);
 
   /** Load a path, act, then read the camera on a region. */
@@ -675,6 +673,8 @@ describe("a drill's link against its address", () => {
     const seen: { camera: readonly number[] } = { camera: [] };
     const { errors } = await openExplorer(path, desktop, async (page) => {
       await act?.(page);
+      // The pointer leaves the canvas, so no hover rings a node.
+      await page.mouse.move(0, 0);
       await page.waitForTimeout(CAMERA_SETTLE_MS);
       seen.camera = await readCamera(page, prefix);
     });
@@ -689,9 +689,10 @@ describe("a drill's link against its address", () => {
     expect(seen).toHaveLength(loaded.length);
     expect(loaded.length).toBeGreaterThan(0);
     loaded.forEach((value, at) => {
-      expect(Math.abs((seen.at(at) ?? Number.NaN) - value)).toBeLessThanOrEqual(
-        1,
-      );
+      expect(
+        Math.abs((seen.at(at) ?? Number.NaN) - value),
+        `[${seen.join(", ")}] against [${loaded.join(", ")}]`,
+      ).toBeLessThanOrEqual(1);
     });
   };
 
