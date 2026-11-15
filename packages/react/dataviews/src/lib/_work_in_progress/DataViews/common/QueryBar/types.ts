@@ -36,6 +36,25 @@ export type QueryPredicateClause = {
   readonly condition: PredicateCondition;
 };
 
+/**
+ * A field's one lower and one upper bound, read as one range chip where the
+ * lower stands at or below the upper. A grouping of two conjuncts only:
+ * the query holds them as two.
+ */
+export type QueryRangeClause = {
+  readonly kind: "range";
+  /** `field__range`: a field holds at most one range. */
+  readonly id: string;
+  readonly field: string;
+  /** The lower bound's place, then the upper's. */
+  readonly refs: readonly [PredicateRef, PredicateRef];
+  /** The `gte` conjunct. */
+  readonly lower: Predicate;
+  /** The `lte` conjunct. */
+  readonly upper: Predicate;
+  readonly condition: "range";
+};
+
 /** The search text, read as a one-part chip. */
 export type QuerySearchClause = {
   readonly kind: "search";
@@ -61,5 +80,6 @@ export type QueryRefusedClause = {
  */
 export type QueryClause =
   | QueryPredicateClause
+  | QueryRangeClause
   | QuerySearchClause
   | QueryRefusedClause;
