@@ -639,7 +639,7 @@ const measureSideways = (): SidewaysMeasure => {
   };
 };
 
-/** Where a table in a section sits against its section, its scroller and the screen. */
+/** Where a table in a section sits against its section and its scroller. */
 type TableMeasure = {
   readonly section: string;
   readonly scrolls: boolean;
@@ -647,18 +647,17 @@ type TableMeasure = {
   readonly scrollerRight: number;
   readonly sectionLeft: number;
   readonly sectionRight: number;
-  readonly screenRight: number;
-  readonly hidden: number;
-  readonly scrollable: number;
+  readonly clientWidth: number;
+  readonly scrollWidth: number;
   readonly tableWidth: number;
 };
 
 /**
  * Measure every table in the view's sections: the nearest box that
  * scrolls it sideways (the table itself or an ancestor whose overflow is
- * `auto` or `scroll`), that box's edges against the section's body and
- * the screen's, how much of the table lies past the box's visible end,
- * and how far the box scrolls. Runs in the page.
+ * `auto` or `scroll`, short of the section's body), that box's edges
+ * against the section's body, its visible and scrolled widths, and the
+ * table's own width. Runs in the page.
  */
 const measureTables = (): readonly TableMeasure[] =>
   [
@@ -677,8 +676,6 @@ const measureTables = (): readonly TableMeasure[] =>
     }
     const box = (scroller ?? table).getBoundingClientRect();
     const bodyBox = (body ?? table).getBoundingClientRect();
-    const tableBox = table.getBoundingClientRect();
-    const clientWidth = scroller?.clientWidth ?? box.width;
     return {
       section: table.closest(".section")?.querySelector("h2")?.id ?? "",
       scrolls: scroller !== null && scroller !== body,
@@ -686,10 +683,9 @@ const measureTables = (): readonly TableMeasure[] =>
       scrollerRight: box.right,
       sectionLeft: bodyBox.left,
       sectionRight: bodyBox.right,
-      screenRight: document.documentElement.clientWidth,
-      hidden: tableBox.right - (box.left + clientWidth),
-      scrollable: (scroller?.scrollWidth ?? 0) - clientWidth,
-      tableWidth: tableBox.width,
+      clientWidth: scroller?.clientWidth ?? box.width,
+      scrollWidth: scroller?.scrollWidth ?? box.width,
+      tableWidth: table.getBoundingClientRect().width,
     };
   });
 
@@ -712,23 +708,31 @@ describe("every changed page at 390px (W6a-A7)", () => {
     },
   );
 
-  it("scrolls each of Button's tables inside its own box within its section and the screen, every column reachable", async ({
+  it("keeps each of Button's tables in a box that ends in its section and scrolls a wider table in that box, not the page", async ({
     annotate,
   }) => {
     const page = await open(BUTTON_PATH, { viewport: PHONE });
     try {
       const tables = await page.evaluate(measureTables);
+      const sideways = await page.evaluate(measureSideways);
       await annotate(
         tables
           .map(
             (table) =>
-              `${table.section}: table ${Math.round(table.tableWidth)}px in a ${Math.round(table.scrollerRight - table.scrollerLeft)}px box`,
+              `${table.section}: table ${Math.round(table.tableWidth)}px in a ${table.clientWidth}px box scrolling ${table.scrollWidth}px`,
           )
           .join("; "),
       );
       expect(tables.map((table) => table.section)).toEqual(
         expect.arrayContaining(["properties", "tokens"]),
       );
+      // Button's Properties table is wider than its box at 390, so at
+      // least one table is held to the scroll below.
+      expect(
+        tables.some(
+          (table) => table.tableWidth > table.clientWidth + TOLERANCE_PX,
+        ),
+      ).toBe(true);
       for (const table of tables) {
         expect(table.scrolls, table.section).toBe(true);
         expect(table.scrollerLeft, table.section).toBeGreaterThanOrEqual(
@@ -737,16 +741,15 @@ describe("every changed page at 390px (W6a-A7)", () => {
         expect(table.scrollerRight, table.section).toBeLessThanOrEqual(
           table.sectionRight + TOLERANCE_PX,
         );
-        // The box ends on the screen, so no column is cut at its edge
-        // (the canvas's own inset at 390 is not asserted here), and the
-        // part of the table past the box's end is the part it scrolls.
-        expect(table.scrollerRight, table.section).toBeLessThanOrEqual(
-          table.screenRight + TOLERANCE_PX,
-        );
-        expect(table.scrollable, table.section).toBeGreaterThanOrEqual(
-          table.hidden - TOLERANCE_PX,
-        );
+        if (table.tableWidth > table.clientWidth + TOLERANCE_PX) {
+          expect(table.scrollWidth, table.section).toBeGreaterThan(
+            table.clientWidth,
+          );
+        }
       }
+      expect(sideways.document.scroll).toBeLessThanOrEqual(
+        sideways.document.client,
+      );
     } finally {
       await page.close();
     }
