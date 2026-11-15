@@ -1,13 +1,11 @@
 ---
-# UIBlockCommand: a UI block as a 56px command-palette result.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
-# title over "kind in location", one vital at the end) and the palette's
-# result rows 502:1753 and 502:1827. The kind is the block's class; the
-# location its tier; the vital its version when it has one, else its first
-# documentation stage: the first of the card's vitals.
-# Projected onto EntityCommand, which carries every style: this anatomy
-# binds none. The home is the link the title renders through, resolved from
-# the compact address; a block whose type has no home reads as inert text.
+# UIBlockCommand: a UI block as a result of the command palette: the slot
+# order mark, title, address, kind, status. The palette mixes every type,
+# so the command names its kind (the block's type) and carries its
+# compact address on its second line, and no prefix; the status is its
+# version, or its documentation stage when it has none.
+# One projection serves every UI-block type; projected onto EntityCommand,
+# which carries every style.
 node:
   uri: docs.component.ui_block_command
   projection:
@@ -16,6 +14,17 @@ node:
     - node:
         uri: prism.component.entity_command
         edges:
+          - node:
+              role: mark
+              # The UI block's glyph, a published Icon (UI_BLOCK_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
               role: title
               projection:
@@ -31,6 +40,13 @@ node:
               cardinality: "1"
               slotName: title
           - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "1"
+              slotName: address
+          - node:
               role: kind
               projection:
                 field: _meta.title
@@ -40,16 +56,7 @@ node:
               projection:
                 field: _meta.type
           - node:
-              role: location
-              projection:
-                field: _meta.title
-            relation:
-              cardinality: "0..1"
-              slotName: location
-              projection:
-                field: tier
-          - node:
-              role: vital
+              role: status
               edges:
                 - node:
                     role: version
@@ -67,6 +74,6 @@ node:
                       field: documentationStages
             relation:
               cardinality: "0..1"
-              slotName: vital
+              slotName: status
       relation:
         cardinality: "1"

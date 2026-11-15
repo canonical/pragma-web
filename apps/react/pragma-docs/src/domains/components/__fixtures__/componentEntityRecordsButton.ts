@@ -200,6 +200,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.component.dropdown_button": {
     __id: "https://ds.canonical.com/global.component.dropdown_button",
     __typename: "Component",
+    summary: null,
     uri: "https://ds.canonical.com/global.component.dropdown_button",
     _meta: {
       __ref:

@@ -3,12 +3,16 @@
 import { useHome } from "@canonical/prism-core";
 import {
   EntityRow,
-  findCuriePrefix,
+  useForeignPrefix,
   useProjectionLink,
 } from "@canonical/prism-projections";
+import { Icon } from "@canonical/react-ds-global";
+import { Markdown } from "@canonical/react-markdown";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
+import { findFirstParagraph, SUMMARY_COMPONENTS } from "#lib/markdown";
 import nodeFragment from "../../../../relay/__generated__/UIBlockRow_node.graphql.js";
+import { UI_BLOCK_MARK_ICON } from "../UIBlockChip/constants.js";
 import type { UIBlockRowProps } from "./types.js";
 import "./styles.css";
 
@@ -20,6 +24,7 @@ import "./styles.css";
 const declareNodeFragment = (): unknown => graphql`
   fragment UIBlockRow_node on UIBlock {
     __typename
+    summary
     _meta {
       title
       curie
@@ -66,7 +71,8 @@ export default function UIBlockRow({
   const { curie, title } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
-  const prefix = findCuriePrefix(curie);
+  const prefix = useForeignPrefix(curie);
+  const summary = findFirstParagraph(data.summary ?? "");
   return (
     <EntityRow
       {...props}
@@ -74,14 +80,14 @@ export default function UIBlockRow({
       data-type={data.__typename}
       href={href}
       LinkComponent={LinkComponent}
-      location={
-        prefix === undefined ? undefined : (
-          <code className="identifier">
-            {curie.slice(0, prefix.length + 1)}
-          </code>
+      mark={<Icon icon={UI_BLOCK_MARK_ICON} />}
+      prefix={prefix}
+      status={data.documentationStages.edges.at(0)?.node._meta.title}
+      summary={
+        summary === "" ? undefined : (
+          <Markdown components={SUMMARY_COMPONENTS} source={summary} />
         )
       }
-      meta={data.documentationStages.edges.at(0)?.node._meta.title}
       title={title}
     />
   );

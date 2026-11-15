@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8702166c94a9edffeeb1a9c71ce0f451>>
+ * @generated SignedSource<<35ad9a20b6008d6f3602d0a82364e60e>>
  * @lightSyntaxTransform
  */
 
@@ -14,11 +14,6 @@ export type UIBlockCard_node$data = {
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: {
-      readonly _meta: {
-        readonly title: string;
-      };
-    };
   };
   readonly documentationStages: {
     readonly edges: ReadonlyArray<{
@@ -123,16 +118,6 @@ return {
           "kind": "ScalarField",
           "name": "curie",
           "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "OntologyClass",
-          "kind": "LinkedField",
-          "name": "type",
-          "plural": false,
-          "selections": (v1/*:: as any*/),
-          "storageKey": null
         }
       ],
       "storageKey": null
@@ -217,6 +202,6 @@ return {
 };
 })();
 
-(node as any).hash = "1fc4f427f4634bb1b7cc042fe8bac9a3";
+(node as any).hash = "8d3d7f2f0c0104f4342caaa699103e76";
 
 export default node;

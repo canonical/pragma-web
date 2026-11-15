@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1450bb6ed1b88c5e2f3d53f83e32766b>>
+ * @generated SignedSource<<1aaecaa396d47ebf765180b86412e904>>
  * @lightSyntaxTransform
  */
 
@@ -128,6 +128,13 @@ return {
               {
                 "alias": null,
                 "args": null,
+                "kind": "ScalarField",
+                "name": "summary",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
                 "concreteType": "EntityMeta",
                 "kind": "LinkedField",
                 "name": "_meta",
@@ -206,7 +213,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "31e6d4cfc93050213eedc3fb29372f02",
+    "cacheID": "df05fabac3ec4843bff81b725be50b25",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -242,12 +249,18 @@ return {
         "node.documentationStages.edges.node._meta": (v4/*:: as any*/),
         "node.documentationStages.edges.node._meta.title": (v3/*:: as any*/),
         "node.documentationStages.edges.node.uri": (v5/*:: as any*/),
+        "node.summary": {
+          "enumValues": null,
+          "nullable": true,
+          "plural": false,
+          "type": "String"
+        },
         "node.uri": (v5/*:: as any*/)
       }
     },
     "name": "UIBlockRowSsrTestQuery",
     "operationKind": "query",
-    "text": "query UIBlockRowSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...UIBlockRow_node\n    uri\n  }\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query UIBlockRowSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...UIBlockRow_node\n    uri\n  }\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

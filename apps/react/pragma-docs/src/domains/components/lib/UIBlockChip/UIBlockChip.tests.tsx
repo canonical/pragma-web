@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -87,7 +88,18 @@ describe("UIBlockChip", () => {
     renderWithNode((node) => <UIBlockChip node={node} />);
     const link = screen.getByRole("link", { name: "IconButton" });
     expect(link).toHaveAttribute("href", MOCK_UI_BLOCK_HREF);
-    expect(link).toHaveClass("value");
+    expect(link).toHaveClass("title");
+  });
+
+  it("leads with the block's mark and its prefix, off the page's namespace", () => {
+    const { container } = renderWithNode((node) => <UIBlockChip node={node} />);
+    const chip = container.querySelector(".ds.ui-block-chip");
+    expect(chip?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/layout-grid.svg#layout-grid",
+    );
+    expect(chip?.querySelector(".prefix")?.textContent).toBe("ds:");
+    if (chip) expectSlotOrder(chip);
   });
 
   it("shows a pattern's title as inert text, since the site homes no pattern", () => {
@@ -96,7 +108,7 @@ describe("UIBlockChip", () => {
       { __typename: "Pattern" },
     );
     expect(screen.queryByRole("link")).toBeNull();
-    expect(container.querySelector(".value")?.textContent).toBe("IconButton");
+    expect(container.querySelector(".title")?.textContent).toBe("IconButton");
   });
 
   it("shows a passage's own link text in place of the title", () => {

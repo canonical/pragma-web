@@ -50,12 +50,11 @@ const renderPeek = (
   vi.stubGlobal("jest", vi);
   const environment = createMockEnvironment();
   const seed = createOperationDescriptor(testQuery, { id: NODE_IRI });
-  environment.commitPayload(
-    seed,
-    MockPayloadGenerator.generate(seed, {
-      Node: resolveRoot({ ...entity, uri: NODE_IRI }),
-    }).data,
-  );
+  const { data } = MockPayloadGenerator.generate(seed, {
+    Node: resolveRoot({ ...entity, uri: NODE_IRI }),
+  });
+  if (!data) throw new Error("the mock generator answered no data");
+  environment.commitPayload(seed, data);
   const variables: Record<string, unknown>[] = [];
   environment.mock.queueOperationResolver((operation) => {
     variables.push(operation.request.variables);

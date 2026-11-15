@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -93,11 +94,20 @@ describe("UIBlockCommand", () => {
         <UIBlockCommand node={node} />
       </ul>
     ));
+    const command = container.querySelector(".ds.ui-block-command");
     expect(
-      [...container.querySelectorAll(".title, .context, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["IconButton", "Component in Global", "v2.1"]);
+      [
+        ...(command?.querySelectorAll(".title, .address, .kind, .status") ??
+          []),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "IconButton",
+      "ds:global.component.icon_button",
+      "Component",
+      "v2.1",
+    ]);
+    expect(command?.querySelector(".prefix")).toBeNull();
+    if (command) expectSlotOrder(command);
     expect(screen.getByRole("link", { name: "IconButton" })).toHaveAttribute(
       "href",
       MOCK_UI_BLOCK_HREF,
@@ -113,10 +123,12 @@ describe("UIBlockCommand", () => {
       ),
       { version: null },
     );
-    expect(container.querySelector(".vital")?.textContent).toBe("experimental");
+    expect(container.querySelector(".status")?.textContent).toBe(
+      "experimental",
+    );
   });
 
-  it("names its class alone and ends in no vital with no tier, version or stage", () => {
+  it("names its kind and ends in no status with no version or stage", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -125,8 +137,8 @@ describe("UIBlockCommand", () => {
       ),
       { tier: null, version: null, documentationStages: { edges: [] } },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Component");
-    expect(container.querySelector(".vital")).toBeNull();
+    expect(container.querySelector(".kind")?.textContent).toBe("Component");
+    expect(container.querySelector(".status")).toBeNull();
   });
 
   it("shows a layout's title as inert text", () => {

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<754b91e806c37a6ba384297b126aa9b7>>
+ * @generated SignedSource<<71abf411a11718ce2df1203ff9c492eb>>
  * @lightSyntaxTransform
  */
 
@@ -140,7 +140,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "30c77676eb093ebfa247cfad5fe2192d",
+    "cacheID": "c767c5ae87d9307f66563c8236be9c04",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -170,7 +170,7 @@ return {
     },
     "name": "UIBlockChipTestQuery",
     "operationKind": "query",
-    "text": "query UIBlockChipTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...UIBlockChip_node\n    uri\n  }\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
+    "text": "query UIBlockChipTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...UIBlockChip_node\n    uri\n  }\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

@@ -1,13 +1,14 @@
 ---
-# UIBlockRow: a UI block as a 32px list entry.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 547:2227 and 547:2201 (the
-# namespace prefix muted before the title, one muted word at the end) and
-# the UI-blocks row ("ds:" before "IconButton", "experimental" at the end).
-# The prefix is the compact address's, with its colon; the word is the
-# block's first documentation stage.
-# Projected onto EntityRow, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address; a block whose type has no home reads as inert text.
+# UIBlockRow: a UI block as a 32px list entry, or a 56px two-line one where
+# an index opts in: the slot order mark, prefix, title, summary, status. The
+# summary is the first paragraph of the block's summary, the second line of
+# a two-line row; the status is the block's documentation stage.
+# One projection serves every UI-block type: it reads only what the UIBlock
+# interface declares, and the site's switches case it for Component,
+# Pattern and Layout. Its mark is the UI block's glyph, so it names no kind;
+# the prefix shows only off the page's ambient namespace (the components
+# lens declares ds). Projected onto the base form, which carries every
+# style.
 node:
   uri: docs.component.ui_block_row
   projection:
@@ -17,19 +18,23 @@ node:
         uri: prism.component.entity_row
         edges:
           - node:
-              role: location
-              projection:
-                field: _meta.curie
-              # The prefix is set in the identifier face.
+              role: mark
+              # The UI block's glyph, a published Icon (UI_BLOCK_MARK_ICON).
               edges:
                 - node:
-                    role: identifier
+                    uri: global.component.icon
                   relation:
                     cardinality: "1"
-                    slotName: identifier
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
+              projection:
+                field: _meta.curie
             relation:
               cardinality: "0..1"
-              slotName: location
+              slotName: prefix
           - node:
               role: title
               projection:
@@ -45,13 +50,20 @@ node:
               cardinality: "1"
               slotName: title
           - node:
-              role: meta
+              role: summary
+              projection:
+                field: summary
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+          - node:
+              role: status
               projection:
                 field: _meta.title
             relation:
-              # The first stage only: the row ends in one word.
+              # The block's documentation stage, a state of the block.
               cardinality: "0..1"
-              slotName: meta
+              slotName: status
               projection:
                 field: documentationStages
       relation:

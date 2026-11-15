@@ -45,7 +45,7 @@ const UIBlockCardSsrTestNode = (): ReactElement => {
 };
 
 describe("UIBlockCard SSR", () => {
-  it("renders the published component in its sidecar", () => {
+  it("renders the published component as its specimen", () => {
     // relay-test-utils wraps the mock environment's methods in `jest.fn` when
     // NODE_ENV is "test"; vitest's `vi` offers the same surface.
     vi.stubGlobal("jest", vi);
@@ -61,6 +61,8 @@ describe("UIBlockCard SSR", () => {
     expect(html).toContain("ds card ds entity-card ds ui-block-card");
     expect(html).toContain('data-type="Component"');
     expect(html).toContain(`href="${MOCK_UI_BLOCK_WITH_EXAMPLE_HREF}"`);
-    expect(html).toMatch(/<div class="sidecar"><button[^>]* class="ds button/);
+    expect(html).toMatch(
+      /data-specimen="block"[^>]*><div class="depiction" inert="">.*<button[^>]* class="ds button/s,
+    );
   });
 });

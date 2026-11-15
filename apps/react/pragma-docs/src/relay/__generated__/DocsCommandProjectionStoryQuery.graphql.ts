@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d521bd55f2d34348301ec9a51f0186b9>>
+ * @generated SignedSource<<0475b09ce6287bd22128f796fb43ced6>>
  * @lightSyntaxTransform
  */
 
@@ -75,16 +75,6 @@ v5 = [
         "args": null,
         "kind": "ScalarField",
         "name": "version",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "concreteType": "Tier",
-        "kind": "LinkedField",
-        "name": "tier",
-        "plural": false,
-        "selections": (v3/*:: as any*/),
         "storageKey": null
       },
       {
@@ -383,7 +373,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "7f90a54377f54e403d61ff535c5af2db",
+    "cacheID": "5db2445b04abfcad6ea7d79c981d85a3",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -490,15 +480,6 @@ return {
           "type": "Modifier"
         },
         "node.modifiers.edges.node.uri": (v8/*:: as any*/),
-        "node.tier": {
-          "enumValues": null,
-          "nullable": true,
-          "plural": false,
-          "type": "Tier"
-        },
-        "node.tier._meta": (v7/*:: as any*/),
-        "node.tier._meta.title": (v6/*:: as any*/),
-        "node.tier.uri": (v8/*:: as any*/),
         "node.uri": (v8/*:: as any*/),
         "node.version": {
           "enumValues": null,
@@ -510,7 +491,7 @@ return {
     },
     "name": "DocsCommandProjectionStoryQuery",
     "operationKind": "query",
-    "text": "query DocsCommandProjectionStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...DocsCommandProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardCommand_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment CommandProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeCommand_node\n  ...SiteCommandSlot_node\n  ...OntologyClassCommand_node\n}\n\nfragment DocsCommandProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...CommandProjection_node\n  ... on Component {\n    ...UIBlockCommand_node\n  }\n  ... on Pattern {\n    ...UIBlockCommand_node\n  }\n  ... on Layout {\n    ...UIBlockCommand_node\n  }\n  ...ModifierCommand_node\n  ...ModifierFamilyCommand_node\n  ...CodeStandardCommand_node\n}\n\nfragment ModifierCommand_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment ModifierFamilyCommand_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeCommand_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassCommand_node on OntologyClass {\n  __typename\n  isAbstract\n  instanceCount\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteCommandSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockCommand_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  version\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query DocsCommandProjectionStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...DocsCommandProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardCommand_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment CommandProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeCommand_node\n  ...SiteCommandSlot_node\n  ...OntologyClassCommand_node\n}\n\nfragment DocsCommandProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...CommandProjection_node\n  ... on Component {\n    ...UIBlockCommand_node\n  }\n  ... on Pattern {\n    ...UIBlockCommand_node\n  }\n  ... on Layout {\n    ...UIBlockCommand_node\n  }\n  ...ModifierCommand_node\n  ...ModifierFamilyCommand_node\n  ...CodeStandardCommand_node\n}\n\nfragment ModifierCommand_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment ModifierFamilyCommand_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeCommand_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassCommand_node on OntologyClass {\n  __typename\n  isAbstract\n  instanceCount\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteCommandSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockCommand_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  version\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

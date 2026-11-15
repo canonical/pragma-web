@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<fd8ee98bc89dc1addd19deeaf82a0cbc>>
+ * @generated SignedSource<<e62ac7f6d6ab3a4395a59d02831fbb04>>
  * @lightSyntaxTransform
  */
 
@@ -46,51 +46,23 @@ v2 = {
 },
 v3 = [
   {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
-    "selections": [
-      (v1/*:: as any*/)
-    ],
-    "storageKey": null
-  },
-  (v2/*:: as any*/)
-],
-v4 = [
-  {
-    "kind": "InlineFragment",
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "concreteType": "Tier",
-        "kind": "LinkedField",
-        "name": "tier",
-        "plural": false,
-        "selections": (v3/*:: as any*/),
-        "storageKey": null
-      }
-    ],
-    "type": "UIBlock",
+    "kind": "TypeDiscriminator",
     "abstractKey": "__isUIBlock"
   }
 ],
-v5 = {
+v4 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v6 = {
+v5 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "EntityMeta"
 },
-v7 = {
+v6 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -182,7 +154,21 @@ return {
                 "kind": "LinkedField",
                 "name": "type",
                 "plural": false,
-                "selections": (v3/*:: as any*/),
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "EntityMeta",
+                    "kind": "LinkedField",
+                    "name": "_meta",
+                    "plural": false,
+                    "selections": [
+                      (v1/*:: as any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v2/*:: as any*/)
+                ],
                 "storageKey": null
               }
             ],
@@ -205,19 +191,19 @@ return {
           },
           {
             "kind": "InlineFragment",
-            "selections": (v4/*:: as any*/),
+            "selections": (v3/*:: as any*/),
             "type": "Component",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v4/*:: as any*/),
+            "selections": (v3/*:: as any*/),
             "type": "Pattern",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v4/*:: as any*/),
+            "selections": (v3/*:: as any*/),
             "type": "Layout",
             "abstractKey": null
           }
@@ -227,7 +213,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "632e12225622b04101976ec5dc253c0f",
+    "cacheID": "aff7d4fa0bfb8cebb69db0e31cdf4524",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -237,42 +223,33 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__isNode": (v5/*:: as any*/),
-        "node.__isUIBlock": (v5/*:: as any*/),
-        "node.__typename": (v5/*:: as any*/),
-        "node._meta": (v6/*:: as any*/),
-        "node._meta.curie": (v5/*:: as any*/),
-        "node._meta.title": (v5/*:: as any*/),
+        "node.__isNode": (v4/*:: as any*/),
+        "node.__isUIBlock": (v4/*:: as any*/),
+        "node.__typename": (v4/*:: as any*/),
+        "node._meta": (v5/*:: as any*/),
+        "node._meta.curie": (v4/*:: as any*/),
+        "node._meta.title": (v4/*:: as any*/),
         "node._meta.type": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
           "type": "OntologyClass"
         },
-        "node._meta.type._meta": (v6/*:: as any*/),
-        "node._meta.type._meta.title": (v5/*:: as any*/),
-        "node._meta.type.uri": (v7/*:: as any*/),
+        "node._meta.type._meta": (v5/*:: as any*/),
+        "node._meta.type._meta.title": (v4/*:: as any*/),
+        "node._meta.type.uri": (v6/*:: as any*/),
         "node.isAbstract": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
           "type": "Boolean"
         },
-        "node.tier": {
-          "enumValues": null,
-          "nullable": true,
-          "plural": false,
-          "type": "Tier"
-        },
-        "node.tier._meta": (v6/*:: as any*/),
-        "node.tier._meta.title": (v5/*:: as any*/),
-        "node.tier.uri": (v7/*:: as any*/),
-        "node.uri": (v7/*:: as any*/)
+        "node.uri": (v6/*:: as any*/)
       }
     },
     "name": "SiteGraphNodeProjectionStoryQuery",
     "operationKind": "query",
-    "text": "query SiteGraphNodeProjectionStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...SiteGraphNodeProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment GraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeGraphNode_node\n  ...SiteGraphNodeSlot_node\n  ...OntologyClassGraphNode_node\n}\n\nfragment ModifierFamilyGraphNode_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment ModifierGraphNode_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment NodeGraphNode_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassGraphNode_node on OntologyClass {\n  __typename\n  isAbstract\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteGraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...GraphNodeProjection_node\n  ... on Component {\n    ...UIBlockGraphNode_node\n  }\n  ... on Pattern {\n    ...UIBlockGraphNode_node\n  }\n  ... on Layout {\n    ...UIBlockGraphNode_node\n  }\n  ...ModifierGraphNode_node\n  ...ModifierFamilyGraphNode_node\n  ...CodeStandardGraphNode_node\n}\n\nfragment SiteGraphNodeSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
+    "text": "query SiteGraphNodeProjectionStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...SiteGraphNodeProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment GraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeGraphNode_node\n  ...SiteGraphNodeSlot_node\n  ...OntologyClassGraphNode_node\n}\n\nfragment ModifierFamilyGraphNode_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment ModifierGraphNode_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment NodeGraphNode_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassGraphNode_node on OntologyClass {\n  __typename\n  isAbstract\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteGraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...GraphNodeProjection_node\n  ... on Component {\n    ...UIBlockGraphNode_node\n  }\n  ... on Pattern {\n    ...UIBlockGraphNode_node\n  }\n  ... on Layout {\n    ...UIBlockGraphNode_node\n  }\n  ...ModifierGraphNode_node\n  ...ModifierFamilyGraphNode_node\n  ...CodeStandardGraphNode_node\n}\n\nfragment SiteGraphNodeSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

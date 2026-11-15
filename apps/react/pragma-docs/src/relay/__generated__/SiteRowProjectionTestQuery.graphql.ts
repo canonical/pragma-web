@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6c34c347b8a7f97ad4180477021f088f>>
+ * @generated SignedSource<<b8c723d60d905d64ed52c746a6b38850>>
  * @lightSyntaxTransform
  */
 
@@ -72,6 +72,13 @@ v5 = [
     "selections": [
       {
         "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "summary",
+        "storageKey": null
+      },
+      {
+        "alias": null,
         "args": (v4/*:: as any*/),
         "concreteType": "TagConnection",
         "kind": "LinkedField",
@@ -124,6 +131,12 @@ v8 = {
   "nullable": false,
   "plural": false,
   "type": "ID"
+},
+v9 = {
+  "enumValues": null,
+  "nullable": true,
+  "plural": false,
+  "type": "String"
 };
 return {
   "fragment": {
@@ -366,7 +379,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a87ef2f8e33c6e38529b2c035c2a8e08",
+    "cacheID": "d955e6a72c95e4c25ff42bb85d64544a",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -412,12 +425,7 @@ return {
         "node.categories.edges.node._meta": (v7/*:: as any*/),
         "node.categories.edges.node._meta.title": (v6/*:: as any*/),
         "node.categories.edges.node.uri": (v8/*:: as any*/),
-        "node.definition": {
-          "enumValues": null,
-          "nullable": true,
-          "plural": false,
-          "type": "String"
-        },
+        "node.definition": (v9/*:: as any*/),
         "node.documentationStages": {
           "enumValues": null,
           "nullable": false,
@@ -473,12 +481,13 @@ return {
           "type": "Modifier"
         },
         "node.modifiers.edges.node.uri": (v8/*:: as any*/),
+        "node.summary": (v9/*:: as any*/),
         "node.uri": (v8/*:: as any*/)
       }
     },
     "name": "SiteRowProjectionTestQuery",
     "operationKind": "query",
-    "text": "query SiteRowProjectionTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...SiteRowProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query SiteRowProjectionTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...SiteRowProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

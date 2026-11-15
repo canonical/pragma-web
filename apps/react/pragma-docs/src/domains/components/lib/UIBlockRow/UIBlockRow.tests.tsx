@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -93,12 +94,17 @@ describe("UIBlockRow", () => {
         <UIBlockRow node={node} />
       </ul>
     ));
+    const row = container.querySelector(".ds.ui-block-row");
     expect(
-      [...container.querySelectorAll(".location, .title, .meta")].map(
+      [...(row?.querySelectorAll(".prefix, .title, .status") ?? [])].map(
         (slot) => slot.textContent,
       ),
     ).toEqual(["ds:", "IconButton", "experimental"]);
-    expect(container.querySelector(".location code.identifier")).not.toBeNull();
+    expect(row?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/layout-grid.svg#layout-grid",
+    );
+    if (row) expectSlotOrder(row);
     expect(screen.getByRole("link", { name: "IconButton" })).toHaveAttribute(
       "href",
       MOCK_UI_BLOCK_HREF,
@@ -164,5 +170,16 @@ describe("UIBlockRow", () => {
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");
+  });
+
+  it("puts the summary's first paragraph under the title in a two-line row", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <UIBlockRow lines="two" node={node} />
+      </ul>
+    ));
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      MOCK_UI_BLOCK.summary,
+    );
   });
 });

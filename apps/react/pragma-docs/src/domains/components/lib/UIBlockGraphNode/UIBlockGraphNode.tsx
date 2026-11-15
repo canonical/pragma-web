@@ -3,11 +3,14 @@
 import { useHome } from "@canonical/prism-core";
 import {
   EntityGraphNode,
+  useForeignPrefix,
   useProjectionLink,
 } from "@canonical/prism-projections";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../../relay/__generated__/UIBlockGraphNode_node.graphql.js";
+import { UI_BLOCK_MARK_ICON } from "../UIBlockChip/constants.js";
 import type { UIBlockGraphNodeProps } from "./types.js";
 import "./styles.css";
 
@@ -22,16 +25,6 @@ const declareNodeFragment = (): unknown => graphql`
     _meta {
       title
       curie
-      type {
-        _meta {
-          title
-        }
-      }
-    }
-    tier {
-      _meta {
-        title
-      }
     }
   }
 `;
@@ -66,15 +59,16 @@ export default function UIBlockGraphNode({
   const { curie } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   return (
     <EntityGraphNode
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
-      kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
-      location={data.tier?._meta.title}
+      mark={<Icon icon={UI_BLOCK_MARK_ICON} />}
+      prefix={prefix}
       title={data._meta.title}
     />
   );

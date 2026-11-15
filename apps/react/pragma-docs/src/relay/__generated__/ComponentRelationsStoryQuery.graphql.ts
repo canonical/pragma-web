@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f6bcea918067a9e03fa032f1b160645c>>
+ * @generated SignedSource<<11cf5aca2c7dcc943dfb10ebad234f29>>
  * @lightSyntaxTransform
  */
 
@@ -132,6 +132,13 @@ v9 = [
   {
     "kind": "InlineFragment",
     "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "summary",
+        "storageKey": null
+      },
       {
         "alias": null,
         "args": (v8/*:: as any*/),
@@ -622,7 +629,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "745423b2630b422d9153455c7bb5829b",
+    "cacheID": "cfe3fb71716be19346ef307b87400f0d",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -667,6 +674,7 @@ return {
         "component.inheritsFroms.edges.node.modifiers.edges": (v35/*:: as any*/),
         "component.inheritsFroms.edges.node.modifiers.edges.node": (v36/*:: as any*/),
         "component.inheritsFroms.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
+        "component.inheritsFroms.edges.node.summary": (v28/*:: as any*/),
         "component.inheritsFroms.edges.node.uri": (v24/*:: as any*/),
         "component.modifierFamilies": {
           "enumValues": null,
@@ -718,6 +726,7 @@ return {
         "component.modifierFamilies.edges.node.modifiers.edges": (v35/*:: as any*/),
         "component.modifierFamilies.edges.node.modifiers.edges.node": (v36/*:: as any*/),
         "component.modifierFamilies.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
+        "component.modifierFamilies.edges.node.summary": (v28/*:: as any*/),
         "component.modifierFamilies.edges.node.uri": (v24/*:: as any*/),
         "component.specializedBies": (v18/*:: as any*/),
         "component.specializedBies.edges": (v19/*:: as any*/),
@@ -754,6 +763,7 @@ return {
         "component.specializedBies.edges.node.modifiers.edges": (v35/*:: as any*/),
         "component.specializedBies.edges.node.modifiers.edges.node": (v36/*:: as any*/),
         "component.specializedBies.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
+        "component.specializedBies.edges.node.summary": (v28/*:: as any*/),
         "component.specializedBies.edges.node.uri": (v24/*:: as any*/),
         "component.subcomponents": {
           "enumValues": null,
@@ -805,6 +815,7 @@ return {
         "component.subcomponents.edges.node.modifiers.edges": (v35/*:: as any*/),
         "component.subcomponents.edges.node.modifiers.edges.node": (v36/*:: as any*/),
         "component.subcomponents.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
+        "component.subcomponents.edges.node.summary": (v28/*:: as any*/),
         "component.subcomponents.edges.node.uri": (v24/*:: as any*/),
         "component.uri": (v24/*:: as any*/),
         "component.variantOfs": (v18/*:: as any*/),
@@ -842,6 +853,7 @@ return {
         "component.variantOfs.edges.node.modifiers.edges": (v35/*:: as any*/),
         "component.variantOfs.edges.node.modifiers.edges.node": (v36/*:: as any*/),
         "component.variantOfs.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
+        "component.variantOfs.edges.node.summary": (v28/*:: as any*/),
         "component.variantOfs.edges.node.uri": (v24/*:: as any*/),
         "component.variants": (v18/*:: as any*/),
         "component.variants.edges": (v19/*:: as any*/),
@@ -878,12 +890,13 @@ return {
         "component.variants.edges.node.modifiers.edges": (v35/*:: as any*/),
         "component.variants.edges.node.modifiers.edges.node": (v36/*:: as any*/),
         "component.variants.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
+        "component.variants.edges.node.summary": (v28/*:: as any*/),
         "component.variants.edges.node.uri": (v24/*:: as any*/)
       }
     },
     "name": "ComponentRelationsStoryQuery",
     "operationKind": "query",
-    "text": "query ComponentRelationsStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentRelations_node_2bxhYB\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment ComponentRelations_node_2bxhYB on Component {\n  inheritsFroms(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  specializedBies(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  variants(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  variantOfs(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  subcomponents(first: 24) {\n    edges {\n      node {\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  modifierFamilies(first: 24) {\n    edges {\n      node {\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ComponentRelationsStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentRelations_node_2bxhYB\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment ComponentRelations_node_2bxhYB on Component {\n  inheritsFroms(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  specializedBies(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  variants(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  variantOfs(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  subcomponents(first: 24) {\n    edges {\n      node {\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  modifierFamilies(first: 24) {\n    edges {\n      node {\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();
