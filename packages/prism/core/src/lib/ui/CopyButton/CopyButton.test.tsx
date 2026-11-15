@@ -3,10 +3,23 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import CopyButton from "./CopyButton.js";
+import { COPIED_CLEAR_DELAY_MS } from "./constants.js";
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
+
+/**
+ * Click the Copy button and let the clipboard's answer settle.
+ *
+ * @note Impure: clicks the button in the document.
+ */
+const clickCopy = async (): Promise<void> => {
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+  });
+};
 
 describe("CopyButton", () => {
   it("copies its text and announces it in a live region", async () => {
@@ -21,6 +34,54 @@ describe("CopyButton", () => {
     });
     expect(writeText).toHaveBeenCalledWith("cs:global.button");
     expect(announcement?.textContent).toBe("Copied");
+  });
+
+  it("clears the announcement after the named delay, and not before", async () => {
+    vi.useFakeTimers();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    const { container } = render(<CopyButton text="cs:global.button" />);
+    const announcement = container.querySelector(".announcement");
+    await clickCopy();
+    expect(announcement?.textContent).toBe("Copied");
+    act(() => {
+      vi.advanceTimersByTime(COPIED_CLEAR_DELAY_MS - 1);
+    });
+    expect(announcement?.textContent).toBe("Copied");
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(announcement?.textContent).toBe("");
+  });
+
+  it("announces nothing when the browser refuses the write", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    const { container } = render(<CopyButton text="cs:global.button" />);
+    await clickCopy();
+    expect(writeText).toHaveBeenCalledWith("cs:global.button");
+    expect(container.querySelector(".announcement")?.textContent).toBe("");
+  });
+
+  it("announces nothing and throws nothing where there is no clipboard", async () => {
+    vi.stubGlobal("navigator", {});
+    const { container } = render(<CopyButton text="cs:global.button" />);
+    await clickCopy();
+    expect(container.querySelector(".announcement")?.textContent).toBe("");
+  });
+
+  it("clears an earlier Copied when a later write is refused", async () => {
+    const writeText = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("denied"));
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    const { container } = render(<CopyButton text="cs:global.button" />);
+    const announcement = container.querySelector(".announcement");
+    await clickCopy();
+    expect(announcement?.textContent).toBe("Copied");
+    await clickCopy();
+    expect(announcement?.textContent).toBe("");
   });
 
   it("applies custom className and passes native props through", () => {
