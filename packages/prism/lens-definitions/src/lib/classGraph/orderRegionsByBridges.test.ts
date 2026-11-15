@@ -112,6 +112,41 @@ describe("orderRegionsByBridges", () => {
     ).toEqual(["B", "b", "a"]);
   });
 
+  it("leads an opened view with the opened namespace, then the boxes, then the stubs by their bridges", () => {
+    const regions = [
+      { prefix: "anatomy", size: 12, kind: "region" as const },
+      { prefix: "surface", size: 31 },
+      { prefix: "rdf", size: 1, kind: "stub" as const },
+      { prefix: "dt", size: 1, kind: "stub" as const },
+      { prefix: "ds", size: 20, kind: "region" as const },
+      { prefix: "cs", size: 3, kind: "region" as const },
+    ];
+    const bridges = [
+      { a: "ds", b: "dt", relations: 1 },
+      { a: "surface", b: "rdf", relations: 1 },
+    ];
+    const opened = [
+      "surface",
+      "ds",
+      "anatomy",
+      "cs",
+      "dt",
+      "rdf",
+    ] as const;
+    expect(orderRegionsByBridges(regions, bridges, "surface")).toEqual(opened);
+    expect(
+      orderRegionsByBridges(
+        regions.toReversed(),
+        bridges.toReversed(),
+        "surface",
+      ),
+    ).toEqual(opened);
+    // At rest, and with a prefix no region carries, the boxes lead.
+    const rest = ["ds", "anatomy", "cs", "dt", "surface", "rdf"];
+    expect(orderRegionsByBridges(regions, bridges)).toEqual(rest);
+    expect(orderRegionsByBridges(regions, bridges, "absent")).toEqual(rest);
+  });
+
   it("orders the fixtures and the captured records", () => {
     expect(orderGraph(SHELF_PAIR_GRAPH)).toEqual(["aa", "bb"]);
     expect(orderGraph(ontologyGraph)).toEqual(["ds", "anatomy", "cs"]);

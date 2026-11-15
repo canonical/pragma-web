@@ -133,6 +133,13 @@ describe("DefinitionsExplorer SSR", () => {
     expect(
       drilled.match(/<a[^>]*class="[^"]*way-back"[^>]*href="\/definitions"/g),
     ).toHaveLength(2);
+    // What was opened leads the phone's list, in packing order: its header,
+    // with the way back, comes before every box and stub.
+    const phone = drilled.slice(drilled.indexOf('class="ds phone-graph'));
+    expect(phone.match(/<g data-ns="([^"]+)"/)?.[1]).toBe("ds");
+    expect(phone.indexOf("way-back")).toBeLessThan(
+      phone.indexOf('data-kind="region"'),
+    );
     expect(drilled).not.toContain("<script");
     // A drill is another view of the page, not the page: no link to it is
     // current.

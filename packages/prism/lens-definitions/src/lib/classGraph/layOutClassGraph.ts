@@ -323,12 +323,14 @@ function alignShelves(
 
 /**
  * Lay a model out: what `layOutClassGraph` does once it knows what is
- * drawn, the whole graph's model naming the classes a box stands for.
+ * drawn, the whole graph's model naming the classes a box stands for, and
+ * an opened view's namespace packed first.
  */
 function layOutModel(
   model: ClassGraphModel,
   whole: ClassGraphModel,
   engine: LayerSettings,
+  lead?: string,
 ): ClassGraphLayout {
   // An ontology with no class is data a provider may serve: it lays out
   // as an empty floor the size of the design canvas.
@@ -359,6 +361,7 @@ function layOutModel(
         : { prefix, size: first.members, kind: first.kind };
     }),
     listRegionBridges(model),
+    lead,
   ).map((prefix) => ({ prefix, ids: requireEntry(idsOf, prefix) }));
   let channel = CHANNEL;
   let packed = packRegions(model, order, channel, engine);
@@ -888,8 +891,8 @@ function layOutModel(
  *   it opens on a legible window. That takes at
  *   most one layout more than there are namespaces. A relation to a class
  *   outside the loaded namespaces reaches an external stub. Drilled into
- *   a namespace, it is drawn class by class and every other one as a box,
- *   whatever the fit. At rest and drilled, a layer of more classes than
+ *   a namespace, it is packed first and drawn class by class, every other
+ *   one as a box after it, whatever the fit. At rest and drilled, a layer of more classes than
  *   the budget's band splits into balanced consecutive columns. Without a
  *   budget, every class given is drawn, a layer as one column.
  * @returns The layout. Each class's column is graph-wide: its region's
@@ -906,17 +909,18 @@ export default function layOutClassGraph(
   // Wherever a budget holds, at rest and drilled, no column holds more
   // classes than its band: a fuller layer splits.
   const engine = { sweeps, bandMembersMax: budget.bandMembersMax };
-  const layOutScope = (scope: DrawnScope): ClassGraphLayout =>
+  const layOutScope = (scope: DrawnScope, lead?: string): ClassGraphLayout =>
     layOutModel(
       buildClassGraphModel(gatherDrawnInput(input, whole, scope), whole),
       whole,
       engine,
+      lead,
     );
   // A drilled view is not held to the fit: the reader chose a part, and it
-  // opens on that part's region.
+  // opens on that part's region, packed first.
   if (drill !== undefined) {
     const drilled = {
-      ...layOutScope(chooseDrawnScope(whole, budget, drill)),
+      ...layOutScope(chooseDrawnScope(whole, budget, drill), drill),
       drilled: drill,
     };
     return { ...drilled, view: frameOpeningWindow(drilled, DESIGN_CANVAS) };

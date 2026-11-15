@@ -555,12 +555,34 @@ describe("layOutClassGraph", () => {
         budget: GRAPH_BUDGET,
       });
       expect(rest.drilled).toBeUndefined();
+      // At rest the boxes lead the packing, and so the phone's list.
+      const restFirst = rest.phone.headers.at(0)?.prefix;
+      expect(
+        rest.regions.find((candidate) => candidate.prefix === restFirst)
+          ?.collapsed,
+      ).toBe(true);
       for (const drill of ["surface", "ds", "anatomy", "cs"]) {
         const layout = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
           budget: GRAPH_BUDGET,
           drill,
         });
         expect(layout.drilled).toBe(drill);
+        // What was opened is packed first: the phone's list, in packing
+        // order, starts on it, and the boxes follow, largest first.
+        expect(layout.phone.headers.at(0)?.prefix, drill).toBe(drill);
+        const boxes = layout.phone.headers
+          .slice(1)
+          .filter(
+            (header) =>
+              layout.regions.find(
+                (candidate) => candidate.prefix === header.prefix,
+              )?.collapsed,
+          );
+        expect(boxes.length, drill).toBeGreaterThan(0);
+        expect(
+          layout.phone.headers.slice(1, boxes.length + 1),
+          drill,
+        ).toEqual(boxes);
         const region = requireDefined(
           layout.regions.find((candidate) => candidate.prefix === drill),
           "the drilled region",
