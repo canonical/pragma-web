@@ -128,11 +128,13 @@
   }
 
   /* The second line of a two-line row: the summary under the title, on
-   * one line, cut by an ellipsis. */
+   * one line, cut by an ellipsis, and a line high with no summary in it,
+   * so `lines` alone sets the row's height. */
   .ds.entity-row .summary {
     order: var(--entity-row-summary-order);
     flex-basis: var(--entity-row-summary-basis);
     min-width: 0;
+    min-height: var(--entity-row-line-height);
     overflow: hidden;
     color: var(--entity-row-summary-color);
     white-space: nowrap;

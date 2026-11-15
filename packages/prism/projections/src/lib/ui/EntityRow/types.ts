@@ -25,7 +25,10 @@ type OwnProps = {
   readonly prefix?: ReactNode;
   /** The entity's kind, muted after the title. */
   readonly kind?: ReactNode;
-  /** The entity's summary: the row's second line, shown only on two lines. */
+  /**
+   * The entity's summary: the row's second line, shown only on two lines,
+   * where the line stays, empty, when there is none.
+   */
   readonly summary?: ReactNode;
   /**
    * The facts the row states at the end of its first line. An identifier

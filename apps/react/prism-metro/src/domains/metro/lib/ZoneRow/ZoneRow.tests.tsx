@@ -139,7 +139,8 @@ describe("ZoneRow", () => {
       },
     );
     expect(container.querySelector(".fact .detail")?.textContent).toBe("0");
-    expect(container.querySelector(".summary")).toBeNull();
+    // The second line stays, empty, so the row keeps its height.
+    expect(container.querySelector(".summary")?.textContent).toBe("");
     expect(container.querySelector(".title")?.textContent).toBe("Central Zone");
   });
 

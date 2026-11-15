@@ -18,7 +18,8 @@ const componentCssClassName = "ds entity-row";
  * `LinkComponent`; without one it is inert text.
  *
  * Opted into two lines (`lines="two"`, 56px), the summary takes the
- * second line under the title; on one line there is no summary.
+ * second line under the title, which stays a line high when the entity
+ * has none, so the row keeps its height; on one line there is no summary.
  *
  * It renders only the slots it is given, in the slot order every
  * representation keeps: mark, prefix, title, kind, summary, facts and
@@ -69,9 +70,7 @@ export default function EntityRow({
         )}
         {kind === undefined ? null : <span className="kind">{kind}</span>}
       </span>
-      {lines === "two" && summary !== undefined ? (
-        <span className="summary">{summary}</span>
-      ) : null}
+      {lines === "two" ? <span className="summary">{summary}</span> : null}
       {facts.length === 0 ? null : (
         <span className="facts">
           {facts.map(({ property, label, value }, index) => (

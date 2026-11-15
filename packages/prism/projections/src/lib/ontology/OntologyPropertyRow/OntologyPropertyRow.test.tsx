@@ -149,7 +149,8 @@ describe("OntologyPropertyRow", () => {
       ),
       { definition: null },
     );
-    expect(container.querySelector(".summary")).toBeNull();
+    // The second line stays, empty, so the row keeps its height.
+    expect(container.querySelector(".summary")?.textContent).toBe("");
   });
 
   it("applies custom className", () => {

@@ -19,8 +19,10 @@
 #
 # The row's height comes from `lines` alone (heuristic 2.4): the first
 # line never wraps, so a one-line row is 32px whatever its width, and the
-# summary is the only second line, rendered only when lines="two" (56px):
-# a row that holds one wraps (`:has(> .summary)`), and only it.
+# summary is the only second line, rendered only when lines="two" (56px),
+# whether or not the entity has a summary: empty, it keeps a line's height
+# (min-height space.300), so a two-line row with no summary is 56px like its
+# neighbours. A row that holds one wraps (`:has(> .summary)`), and only it.
 # In a row the title yields last. The identity is a flex line whose basis
 # is its content (flex 0 1 auto) and which never wraps. The facts have no
 # basis: they grow up to their content (max-width: max-content) from the
@@ -192,6 +194,7 @@ node:
           layout.order: 1
           layout.flex.basis: 100%
           size.min.width: 0
+          size.min.height: space.300
           layout.overflow: hidden
           typography.color: color.text.muted
           typography.whiteSpace: nowrap

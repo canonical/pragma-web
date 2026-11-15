@@ -141,7 +141,8 @@ describe("UnitRow", () => {
         <UnitRow lines="two" node={node} />
       </ul>
     ));
-    expect(container.querySelector(".summary")).toBeNull();
+    // The second line stays, empty, so the row keeps its height.
+    expect(container.querySelector(".summary")?.textContent).toBe("");
     expect(container.querySelector(".title")?.textContent).toBe(
       "Series 90 unit",
     );

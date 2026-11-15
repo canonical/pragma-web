@@ -89,6 +89,14 @@ describe("EntityRow stylesheet", () => {
     expect(readRule(".ds.entity-row .status")).toContain("flex-shrink: 0;");
   });
 
+  it("keeps a two-line row's second line a line high with no summary in it", () => {
+    expect(readRule(".ds.entity-row .summary")).toContain(
+      "min-height: var(--entity-row-line-height);",
+    );
+    const html = renderToString(<EntityRow lines="two" title="Layout" />);
+    expect(html).toContain('<span class="summary"></span>');
+  });
+
   it("never breaks a two-line row's first line", () => {
     const identity = readRule(".ds.entity-row:has(> .summary) > .identity");
     expect(identity).toContain("flex-basis: 0;");
