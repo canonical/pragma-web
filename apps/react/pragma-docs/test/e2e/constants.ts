@@ -97,17 +97,18 @@ export const STANDARDS_INDEX_ROW_SELECTOR = ".ds.standards-index > *";
 
 /**
  * The widths the standards index's facts are measured at, each with the
- * fewest facts that must show in the whole index there, or `null` where no
- * floor is asserted: a phone, where a row is too narrow for most
- * addresses; two groups' threshold less one step, where the later facts
- * have left and some rows keep their address; and the desktop, where rows
- * have room for it. At every width each row whose first fact fits beside
- * its whole title must show it.
+ * rows that must show their address, the row's one fact, there: none
+ * below two groups (912px), where the index shows no row's facts so that
+ * no row is singled out, on a phone and at two groups' threshold less one
+ * step; at that threshold, where the row decides, those that have room
+ * for it, and at least one; and every row on the desktop. At every width
+ * each row whose first fact fits beside its whole title must show it.
  */
 export const STANDARDS_FACT_WIDTHS = [
-  { width: 390, fewestShown: null },
-  { width: 820, fewestShown: 1 },
-  { width: 1440, fewestShown: 1 },
+  { width: 390, shown: "none" },
+  { width: 820, shown: "none" },
+  { width: 912, shown: "fitting" },
+  { width: 1440, shown: "every" },
 ] as const;
 
 /** The catalog's rows view, an index that opts its rows into two lines. */

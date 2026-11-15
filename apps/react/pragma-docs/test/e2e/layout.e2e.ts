@@ -27,10 +27,12 @@
  * workspace drawn in the face it ships, the dev cell delivering its font.
  * The standards index's entries keep their address, the row's first
  * fact, on the title's one line, and a title is cut, at 390px too, only
- * once the address has given up all of its width. At 390, 820 and 1440px
- * no fact of a row shows in part: each lies wholly inside the facts' box
- * and the row, or on the box's hidden line; facts show where the row has
- * room for them, and a title that fits its row is never cut. A row given
+ * once the address has given up all of its width. At 390, 820, 912 and
+ * 1440px no fact of a row shows in part: each lies wholly inside the
+ * facts' box and the row, or on the box's hidden line; below two groups
+ * (912px) no row shows its address, so the list keeps one form, and on
+ * the desktop every row does; facts show where the row has room for them,
+ * and a title that fits its row is never cut. A row given
  * more facts in the page and narrowed step by step loses them whole, the
  * last first, before its title is cut. Every row of the catalog, which
  * opts into two lines, is 56px, and every row of the standards index 32px,
@@ -785,20 +787,25 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
 // A fact is shown whole or not at all: where a row has no room for its
 // facts they leave whole, the last first, so none is ever cut to a stub,
 // and only then: in each row with room for its first fact, it shows. Once none is left
-// the title has the row's whole width.
+// the title has the row's whole width. Below two groups the index shows
+// no row's facts, so the list keeps one form.
 describe.each(STANDARDS_FACT_WIDTHS)(
   "the standards index at $width px",
-  ({ width, fewestShown }) => {
+  ({ width, shown }) => {
     it("shows each fact of a row whole or not at all", async () => {
       const page = await openPage(STANDARDS_INDEX_PATH, { width, height: 844 });
       try {
         const counts = await page.evaluate(countPartFacts);
         expect(counts.rows).toBeGreaterThan(0);
-        if (fewestShown !== null) {
-          expect(
-            counts.shown,
-            `${counts.shown} facts shown in ${counts.rows} rows`,
-          ).toBeGreaterThanOrEqual(fewestShown);
+        // Below two groups no row shows its address; on the desktop every
+        // row does; at the threshold each row that has room for it.
+        const message = `${counts.shown} facts shown in ${counts.rows} rows`;
+        if (shown === "fitting") {
+          expect(counts.shown, message).toBeGreaterThan(0);
+        } else {
+          expect(counts.shown, message).toBe(
+            shown === "none" ? 0 : counts.rows,
+          );
         }
         expect(counts.partial).toEqual([]);
         expect(counts.titlesFitting).toBeGreaterThan(0);

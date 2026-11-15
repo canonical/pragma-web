@@ -9,7 +9,11 @@
 # projections' 32px list entries (EntityRow): the standard's title linked
 # to its reading page through core's RouterLink, and its compact address,
 # in the published InlineCode, as the row's first fact (data-property
-# "curie"), which yields before the title at narrow widths. A
+# "curie"), which yields before the title at narrow widths. Below two
+# groups (`@container shell (width < 912px)`) the index shows no row's
+# facts (`facts` takes `layout.type: none`), so the list keeps one form
+# where an address would stay on some rows and leave others; from two
+# groups up the row decides, fact by fact, whether its address fits. A
 # graph with no standard shows the list view's empty line. "Load more" is
 # the published Button at secondary importance, busy while the next page
 # loads. Bespoke in its arrangement only.
@@ -21,8 +25,8 @@
 # group, so its heading reads with the entries under it rather than the
 # group above. The category links wrap, one gutter apart. An entry whose
 # title and address do not both fit, as on a phone, keeps its title whole
-# and cuts its address to an ellipsis on the same line: the row's own
-# behaviour (the title yields last), which the index does not restyle.
+# and lets its address leave whole: the row's own behaviour (the title
+# yields last, a fact is shown whole or not at all).
 #
 # Every decision is read through a component token declared on the root
 # (`--standards-index-*`), bound to the symbol named here.
@@ -85,8 +89,12 @@ node:
                     uri: prism.component.entity_row
                     edges:
                       - node:
-                          uri: global.component.inline_code
-                        relation: { cardinality: "1", slotName: fact }
+                          role: facts (the row's, none below two groups)
+                          edges:
+                            - node:
+                                uri: global.component.inline_code
+                              relation: { cardinality: "1", slotName: fact }
+                        relation: { cardinality: "1", slotName: facts }
                   relation: { cardinality: "1..*", slotName: items }
             relation: { cardinality: "1" }
       relation: { cardinality: "0..*", slotName: group }
