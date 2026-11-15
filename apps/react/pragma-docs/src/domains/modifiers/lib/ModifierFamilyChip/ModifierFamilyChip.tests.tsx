@@ -1,7 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { HomesProvider, RouterLink } from "@canonical/prism-core";
+import { expectSlotOrder, guardTypedArms } from "@canonical/prism-core/testing";
+import {
+  defaultProjectionMaps,
+  ProjectionsProvider,
+} from "@canonical/prism-projections";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -72,6 +78,33 @@ const renderWithNode = (
   );
 };
 
+/** The absolute IRI the mock family answers as its `uri`. */
+const MOCK_MODIFIER_FAMILY_URI =
+  "https://ds.canonical.com/global.modifier_family.anticipation";
+
+/** A home for a family, which the site does not give one, so its chip links. */
+const FAMILY_HOME = "/families/anticipation";
+
+/**
+ * Wrap `children` in homes that give a family a home and a projection
+ * provider whose peek records the address each chip asks it for, and
+ * renders that address as a link to look for.
+ */
+const withHomeAndPeek = (
+  peek: (uri: string) => ReactNode,
+  children: ReactElement,
+): ReactElement => (
+  <HomesProvider homes={{ ModifierFamily: () => FAMILY_HOME }}>
+    <ProjectionsProvider
+      LinkComponent={RouterLink}
+      maps={guardTypedArms(defaultProjectionMaps)}
+      peek={peek}
+    >
+      {children}
+    </ProjectionsProvider>
+  </HomesProvider>
+);
+
 describe("ModifierFamilyChip", () => {
   it("reads the ModifierFamily through its fragment", () => {
     const { container } = renderWithNode((node) => (
@@ -83,13 +116,20 @@ describe("ModifierFamilyChip", () => {
     );
   });
 
-  it("counts its members in the published Badge, beside its inert title", () => {
+  it("leads with the family's mark and its prefix, and counts its members", () => {
     const { container } = renderWithNode((node) => (
       <ModifierFamilyChip node={node} />
     ));
-    expect(container.querySelector(".value")?.textContent).toBe("Anticipation");
-    expect(container.querySelector(".ds.badge")?.textContent).toBe("5");
+    const chip = container.querySelector(".ds.modifier-family-chip");
+    expect(chip?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/bundle.svg#bundle",
+    );
+    expect(chip?.querySelector(".prefix")?.textContent).toBe("ds:");
+    expect(chip?.querySelector(".title")?.textContent).toBe("Anticipation");
+    expect(chip?.querySelector(".status .ds.badge")?.textContent).toBe("5");
     expect(screen.queryByRole("link")).toBeNull();
+    if (chip) expectSlotOrder(chip);
   });
 
   it("counts no member for a family with none", () => {
@@ -97,14 +137,52 @@ describe("ModifierFamilyChip", () => {
       (node) => <ModifierFamilyChip node={node} />,
       { modifiers: { edges: [] } },
     );
-    expect(container.querySelector(".ds.badge")?.textContent).toBe("0");
+    expect(container.querySelector(".status .ds.badge")?.textContent).toBe("0");
+  });
+
+  it("peeks at the family's absolute IRI, never its CURIE", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    renderWithNode(
+      (node) => withHomeAndPeek(peek, <ModifierFamilyChip node={node} />),
+      { uri: MOCK_MODIFIER_FAMILY_URI },
+    );
+    expect(peek).toHaveBeenCalledWith(MOCK_MODIFIER_FAMILY_URI);
+    expect(peek).not.toHaveBeenCalledWith(MOCK_MODIFIER_FAMILY._meta.curie);
+    const link = screen.getByRole("link", { name: "Anticipation" });
+    expect(link).toHaveAttribute("href", FAMILY_HOME);
+    act(() => {
+      link.focus();
+    });
+    expect(
+      screen
+        .getByRole("dialog", { hidden: true })
+        .querySelector(`a[href="${MOCK_MODIFIER_FAMILY_URI}"]`),
+    ).not.toBeNull();
+  });
+
+  it("sets its title as inert text with no peek when unlinked", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    const { container } = renderWithNode(
+      (node) =>
+        withHomeAndPeek(
+          peek,
+          <ModifierFamilyChip linked={false} node={node} />,
+        ),
+      { uri: MOCK_MODIFIER_FAMILY_URI },
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+    const title = container.querySelector(".title");
+    expect(title?.tagName).toBe("SPAN");
+    expect(title?.textContent).toBe("Anticipation");
+    if (title) fireEvent.focus(title);
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
 
   it("shows a passage's own link text in place of the title", () => {
     const { container } = renderWithNode((node) => (
       <ModifierFamilyChip node={node}>anticipation</ModifierFamilyChip>
     ));
-    expect(container.querySelector(".value")?.textContent).toBe("anticipation");
+    expect(container.querySelector(".title")?.textContent).toBe("anticipation");
   });
 
   it("applies custom className", () => {

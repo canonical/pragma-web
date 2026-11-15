@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8401023bd23fdefdfc620cc250dd82c8>>
+ * @generated SignedSource<<013268a5990c8c65e90c5cdc6edc9b3f>>
  * @lightSyntaxTransform
  */
 
@@ -22,6 +22,7 @@ export type ModifierFamilyChip_node$data = {
       };
     }>;
   };
+  readonly uri: string;
   readonly " $fragmentType": "ModifierFamilyChip_node";
 };
 export type ModifierFamilyChip_node$key = {
@@ -29,7 +30,15 @@ export type ModifierFamilyChip_node$key = {
   readonly " $fragmentSpreads": FragmentRefs<"ModifierFamilyChip_node">;
 };
 
-const node: ReaderFragment = {
+const node: ReaderFragment = (function(){
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "uri",
+  "storageKey": null
+};
+return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -42,6 +51,7 @@ const node: ReaderFragment = {
       "name": "__typename",
       "storageKey": null
     },
+    (v0/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -97,13 +107,7 @@ const node: ReaderFragment = {
               "name": "node",
               "plural": false,
               "selections": [
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "uri",
-                  "storageKey": null
-                }
+                (v0/*:: as any*/)
               ],
               "storageKey": null
             }
@@ -117,7 +121,8 @@ const node: ReaderFragment = {
   "type": "ModifierFamily",
   "abstractKey": null
 };
+})();
 
-(node as any).hash = "61a94a0bca29b3050c0de65bfbfb9294";
+(node as any).hash = "4b82f3322096e1c133c381ead83b9e3f";
 
 export default node;

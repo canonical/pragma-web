@@ -200,12 +200,13 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.component.dropdown_button": {
     __id: "https://ds.canonical.com/global.component.dropdown_button",
     __typename: "Component",
-    summary: null,
     uri: "https://ds.canonical.com/global.component.dropdown_button",
     _meta: {
       __ref:
         "client:https://ds.canonical.com/global.component.dropdown_button:_meta",
     },
+    summary:
+      "A Dropdown Button is a specialized button that includes a persistent chevron icon to indicate nested functionality. Unlike standard [Button](https://docs.superhuman.com/d/_dNyzE_TLZDh#_tugrid-20dWwIHYhx/_rui-8SdtbQUhTr)s that execute a single, immediate action, the Dropdown Button reveals a [ContextualMenu](https://docs.superhuman.com/d/_dNyzE_TLZDh#_tugrid-20dWwIHYhx/_rui-riXODq1wpR) of options or controls. This visual cue ensures users understand that an interaction will expand the interface to provide further choices rather than triggering an instantaneous system change.  \n",
     "documentationStages(first:1)": {
       __ref:
         "client:https://ds.canonical.com/global.component.dropdown_button:documentationStages(first:1)",
@@ -321,6 +322,7 @@ const componentEntityRecordsButton = {
       __ref:
         "client:https://ds.canonical.com/global.modifier_family.anticipation:_meta",
     },
+    summary: "",
     "modifiers(first:100)": {
       __ref:
         "client:https://ds.canonical.com/global.modifier_family.anticipation:modifiers(first:100)",
@@ -420,6 +422,7 @@ const componentEntityRecordsButton = {
       __ref:
         "client:https://ds.canonical.com/global.modifier_family.importance:_meta",
     },
+    summary: "",
     "modifiers(first:100)": {
       __ref:
         "client:https://ds.canonical.com/global.modifier_family.importance:modifiers(first:100)",

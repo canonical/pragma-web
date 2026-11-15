@@ -1,15 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
-import {
-  EntityCommand,
-  findCuriePrefix,
-  useProjectionLink,
-} from "@canonical/prism-projections";
+import { EntityCommand, useProjectionLink } from "@canonical/prism-projections";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
 import nodeFragment from "../../../../relay/__generated__/ModifierFamilyCommand_node.graphql.js";
+import { MODIFIER_FAMILY_MARK_ICON } from "../ModifierFamilyChip/constants.js";
 import type { ModifierFamilyCommandProps } from "./types.js";
 import "./styles.css";
 
@@ -48,11 +46,11 @@ void declareNodeFragment;
 const componentCssClassName = "ds modifier-family-command";
 
 /**
- * A modifier family as a 56px command-palette result: its title on the
- * first line, linked to its home when the site has one and inert text
- * when it has none; its class in its namespace's prefix on the second
- * (`Modifier family in ds`); and the count of its modifiers at the end.
- * A family whose address did not compact names its class alone.
+ * A modifier family as a result in the command palette: the family's
+ * mark, its title, linked to its home when the site has one and inert
+ * text when it has none, its compact address and its class on the second
+ * line, since the palette's results mix every type, and the count of its
+ * modifiers (`5 modifiers`) as its status.
  *
  * Native props reach the result's `<li>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename
@@ -62,8 +60,8 @@ const componentCssClassName = "ds modifier-family-command";
  *
  * @implements docs.component.modifier_family_command
  * @note Impure: reads its family from the Relay store, its home from the
- *   site's homes, its link from the projection provider and its words
- *   from the translator in scope.
+ *   site's homes, its words from the site's catalog and its link from the
+ *   projection provider.
  */
 export default function ModifierFamilyCommand({
   node,
@@ -78,14 +76,15 @@ export default function ModifierFamilyCommand({
   return (
     <EntityCommand
       {...props}
+      address={curie}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
       kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
-      location={findCuriePrefix(curie)}
+      mark={<Icon icon={MODIFIER_FAMILY_MARK_ICON} />}
+      status={t("family.modifiers", { count: data.modifiers.edges.length })}
       title={title}
-      vital={t("family.modifiers", { count: data.modifiers.edges.length })}
     />
   );
 }

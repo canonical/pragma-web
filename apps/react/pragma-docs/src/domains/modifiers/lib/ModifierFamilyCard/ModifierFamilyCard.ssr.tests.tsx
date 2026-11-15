@@ -60,6 +60,6 @@ describe("ModifierFamilyCard SSR", () => {
     );
     expect(html).toContain("ds card ds entity-card ds modifier-family-card");
     expect(html).toContain('data-type="ModifierFamily"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

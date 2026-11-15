@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d09b6850369f310e42da467d3ec4ca1b>>
+ * @generated SignedSource<<2c383aa2fd0979fabd3b1778a3c00ebd>>
  * @lightSyntaxTransform
  */
 
@@ -59,27 +59,28 @@ v3 = [
   },
   (v2/*:: as any*/)
 ],
-v4 = [
+v4 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "summary",
+  "storageKey": null
+},
+v5 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 1
   }
 ],
-v5 = [
+v6 = [
   {
     "kind": "InlineFragment",
     "selections": [
+      (v4/*:: as any*/),
       {
         "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "summary",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": (v4/*:: as any*/),
+        "args": (v5/*:: as any*/),
         "concreteType": "TagConnection",
         "kind": "LinkedField",
         "name": "documentationStages",
@@ -114,25 +115,25 @@ v5 = [
     "abstractKey": "__isUIBlock"
   }
 ],
-v6 = {
+v7 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v7 = {
+v8 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "EntityMeta"
 },
-v8 = {
+v9 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "ID"
 },
-v9 = {
+v10 = {
   "enumValues": null,
   "nullable": true,
   "plural": false,
@@ -254,19 +255,19 @@ return {
           },
           {
             "kind": "InlineFragment",
-            "selections": (v5/*:: as any*/),
+            "selections": (v6/*:: as any*/),
             "type": "Component",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v5/*:: as any*/),
+            "selections": (v6/*:: as any*/),
             "type": "Pattern",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v5/*:: as any*/),
+            "selections": (v6/*:: as any*/),
             "type": "Layout",
             "abstractKey": null
           },
@@ -290,6 +291,7 @@ return {
           {
             "kind": "InlineFragment",
             "selections": [
+              (v4/*:: as any*/),
               {
                 "alias": null,
                 "args": [
@@ -339,7 +341,7 @@ return {
             "selections": [
               {
                 "alias": null,
-                "args": (v4/*:: as any*/),
+                "args": (v5/*:: as any*/),
                 "concreteType": "CategoryConnection",
                 "kind": "LinkedField",
                 "name": "categories",
@@ -379,7 +381,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "aecaf4cc58620b0577415eb19cb2ae27",
+    "cacheID": "6157d12ab36457737c8b480a2091ec01",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -389,21 +391,21 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__isNode": (v6/*:: as any*/),
-        "node.__isUIBlock": (v6/*:: as any*/),
-        "node.__typename": (v6/*:: as any*/),
-        "node._meta": (v7/*:: as any*/),
-        "node._meta.curie": (v6/*:: as any*/),
-        "node._meta.title": (v6/*:: as any*/),
+        "node.__isNode": (v7/*:: as any*/),
+        "node.__isUIBlock": (v7/*:: as any*/),
+        "node.__typename": (v7/*:: as any*/),
+        "node._meta": (v8/*:: as any*/),
+        "node._meta.curie": (v7/*:: as any*/),
+        "node._meta.title": (v7/*:: as any*/),
         "node._meta.type": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
           "type": "OntologyClass"
         },
-        "node._meta.type._meta": (v7/*:: as any*/),
-        "node._meta.type._meta.title": (v6/*:: as any*/),
-        "node._meta.type.uri": (v8/*:: as any*/),
+        "node._meta.type._meta": (v8/*:: as any*/),
+        "node._meta.type._meta.title": (v7/*:: as any*/),
+        "node._meta.type.uri": (v9/*:: as any*/),
         "node.categories": {
           "enumValues": null,
           "nullable": false,
@@ -422,10 +424,10 @@ return {
           "plural": false,
           "type": "Category"
         },
-        "node.categories.edges.node._meta": (v7/*:: as any*/),
-        "node.categories.edges.node._meta.title": (v6/*:: as any*/),
-        "node.categories.edges.node.uri": (v8/*:: as any*/),
-        "node.definition": (v9/*:: as any*/),
+        "node.categories.edges.node._meta": (v8/*:: as any*/),
+        "node.categories.edges.node._meta.title": (v7/*:: as any*/),
+        "node.categories.edges.node.uri": (v9/*:: as any*/),
+        "node.definition": (v10/*:: as any*/),
         "node.documentationStages": {
           "enumValues": null,
           "nullable": false,
@@ -444,9 +446,9 @@ return {
           "plural": false,
           "type": "Tag"
         },
-        "node.documentationStages.edges.node._meta": (v7/*:: as any*/),
-        "node.documentationStages.edges.node._meta.title": (v6/*:: as any*/),
-        "node.documentationStages.edges.node.uri": (v8/*:: as any*/),
+        "node.documentationStages.edges.node._meta": (v8/*:: as any*/),
+        "node.documentationStages.edges.node._meta.title": (v7/*:: as any*/),
+        "node.documentationStages.edges.node.uri": (v9/*:: as any*/),
         "node.isAbstract": {
           "enumValues": null,
           "nullable": false,
@@ -459,9 +461,9 @@ return {
           "plural": false,
           "type": "ModifierFamily"
         },
-        "node.modifierFamily._meta": (v7/*:: as any*/),
-        "node.modifierFamily._meta.title": (v6/*:: as any*/),
-        "node.modifierFamily.uri": (v8/*:: as any*/),
+        "node.modifierFamily._meta": (v8/*:: as any*/),
+        "node.modifierFamily._meta.title": (v7/*:: as any*/),
+        "node.modifierFamily.uri": (v9/*:: as any*/),
         "node.modifiers": {
           "enumValues": null,
           "nullable": false,
@@ -480,14 +482,14 @@ return {
           "plural": false,
           "type": "Modifier"
         },
-        "node.modifiers.edges.node.uri": (v8/*:: as any*/),
-        "node.summary": (v9/*:: as any*/),
-        "node.uri": (v8/*:: as any*/)
+        "node.modifiers.edges.node.uri": (v9/*:: as any*/),
+        "node.summary": (v10/*:: as any*/),
+        "node.uri": (v9/*:: as any*/)
       }
     },
     "name": "DocsRowProjectionSsrTestQuery",
     "operationKind": "query",
-    "text": "query DocsRowProjectionSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...DocsRowProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment DocsRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query DocsRowProjectionSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...DocsRowProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment DocsRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

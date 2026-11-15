@@ -160,6 +160,7 @@ const componentEntityRecordsCard = {
         __ref:
           "client:https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card:_meta",
       },
+      summary: "Wraps Card\n\n\n\n\n\n",
       "documentationStages(first:1)": {
         __ref:
           "client:https://ds.canonical.com/apps_workplaceengineering.pattern.travel_provider_card:documentationStages(first:1)",

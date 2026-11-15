@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d51c4d3d0172fe556df1a60582e66b30>>
+ * @generated SignedSource<<3c58424dcc3f7f6b3bcd726622fd190a>>
  * @lightSyntaxTransform
  */
 
@@ -187,7 +187,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "0920af56f3545830ce1495025683ad47",
+    "cacheID": "1e51c728d3b31e54cdf71c15fb6d89f9",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -230,7 +230,7 @@ return {
     },
     "name": "ModifierFamilyChipSsrTestQuery",
     "operationKind": "query",
-    "text": "query ModifierFamilyChipSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...ModifierFamilyChip_node\n    uri\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ModifierFamilyChipSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...ModifierFamilyChip_node\n    uri\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<98d884c44a0f6586206113e2e8068ce1>>
+ * @generated SignedSource<<a4193a812fee8973954799cf8458d83f>>
  * @lightSyntaxTransform
  */
 
@@ -115,6 +115,13 @@ return {
               {
                 "alias": null,
                 "args": null,
+                "kind": "ScalarField",
+                "name": "summary",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
                 "concreteType": "EntityMeta",
                 "kind": "LinkedField",
                 "name": "_meta",
@@ -187,7 +194,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d61581431911ef89b55a16cdb19340f6",
+    "cacheID": "a8ca70196d0917b9614ff141af128cd4",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -225,12 +232,18 @@ return {
           "type": "Modifier"
         },
         "node.modifiers.edges.node.uri": (v3/*:: as any*/),
+        "node.summary": {
+          "enumValues": null,
+          "nullable": true,
+          "plural": false,
+          "type": "String"
+        },
         "node.uri": (v3/*:: as any*/)
       }
     },
     "name": "ModifierFamilyRowTestQuery",
     "operationKind": "query",
-    "text": "query ModifierFamilyRowTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...ModifierFamilyRow_node\n    uri\n  }\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ModifierFamilyRowTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...ModifierFamilyRow_node\n    uri\n  }\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();
