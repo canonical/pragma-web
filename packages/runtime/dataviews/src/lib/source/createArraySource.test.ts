@@ -73,8 +73,8 @@ describe("createArraySource", () => {
     expect({ ...createSource().capabilities }).toEqual({
       // Complete local input executes every operator each kind accepts.
       filter: {
-        id: ["contains", "startsWith"],
-        name: ["contains", "startsWith"],
+        id: ["is", "contains", "startsWith"],
+        name: ["is", "contains", "startsWith"],
         cpu: ["gte", "lte"],
       },
       search: { fields: ["name"] },

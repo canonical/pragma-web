@@ -24,6 +24,7 @@ describe("resolveFieldKind", () => {
     expect(resolveFieldKind("presence").operators).toEqual(["isSet"]);
     expect(resolveFieldKind("date").operators).toEqual(["gte", "lte"]);
     expect(resolveFieldKind("text").operators).toEqual([
+      "is",
       "contains",
       "startsWith",
     ]);

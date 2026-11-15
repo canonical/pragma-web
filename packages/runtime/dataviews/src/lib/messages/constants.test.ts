@@ -184,6 +184,7 @@ describe("constants", () => {
         "Tags is any of ex-gpu, ex-nvme",
       );
       expect(m.filterStartsWith("Name")).toBe("Name starts with");
+      expect(m.filterIs("Name")).toBe("Name is");
     });
 
     it("words why a filter edit did not apply, and whether the earlier restriction stands", () => {

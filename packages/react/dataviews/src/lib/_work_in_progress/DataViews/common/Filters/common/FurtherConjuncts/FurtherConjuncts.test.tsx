@@ -9,6 +9,7 @@ import {
   createMemoryLocation,
   declareCapabilities,
   type FurtherConjunct,
+  type PredicateOperator,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { createManualSource } from "@canonical/dataviews-core/testing";
@@ -120,7 +121,7 @@ describe("FurtherConjuncts", () => {
     const provider = follow("/machines");
     const host = readProviderHost(provider);
     const readRowText = (
-      operator: "isNone" | "lte" | "contains" | "startsWith" | "isSet",
+      operator: PredicateOperator,
       operands: readonly (string | number | boolean)[],
     ) => {
       const { container, unmount } = render(
@@ -143,6 +144,7 @@ describe("FurtherConjuncts", () => {
     expect(readRowText("lte", [8])).toBe("Cores to 8");
     expect(readRowText("contains", ["ex"])).toBe("Cores contains ex");
     expect(readRowText("startsWith", ["ex"])).toBe("Cores starts with ex");
+    expect(readRowText("is", ["ex"])).toBe("Cores is ex");
     // Presence reads as the field and the value a link spells it with.
     expect(readRowText("isSet", [true])).toBe("Cores true");
   });

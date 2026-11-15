@@ -2,6 +2,7 @@ import type { RecordTypes } from "../collection/index.js";
 import {
   canonicalizeSlice,
   type Predicate,
+  type PredicateOperator,
   rankOperand,
   type Slice,
 } from "../query/index.js";
@@ -16,6 +17,18 @@ import type { ExecuteSliceConfig } from "./types.js";
 /** Absent values never satisfy a predicate, but `isSet` with `false`. */
 const isAbsent = (value: unknown): boolean =>
   value === null || value === undefined;
+
+/** How each text operator tests a folded value against its folded operand. */
+const TEXT_MATCHES: Readonly<
+  Record<
+    Extract<PredicateOperator, "is" | "contains" | "startsWith">,
+    (folded: string, needle: string) => boolean
+  >
+> = {
+  is: (folded, needle) => folded === needle,
+  contains: (folded, needle) => folded.includes(needle),
+  startsWith: (folded, needle) => folded.startsWith(needle),
+};
 
 /** One predicate compiled to a per-row test, with its operands resolved
  * once instead of once per row. */
@@ -101,6 +114,7 @@ const compilePredicate = (
         },
       };
     }
+    case "is":
     case "contains":
     case "startsWith": {
       const [operand] = predicate.operands;
@@ -110,13 +124,11 @@ const compilePredicate = (
         return { field, test: () => false };
       }
       const needle = foldText(operand);
-      const holds =
-        predicate.operator === "contains"
-          ? (folded: string) => folded.includes(needle)
-          : (folded: string) => folded.startsWith(needle);
+      const holds = TEXT_MATCHES[predicate.operator];
       return {
         field,
-        test: (value) => typeof value === "string" && holds(foldText(value)),
+        test: (value) =>
+          typeof value === "string" && holds(foldText(value), needle),
       };
     }
   }

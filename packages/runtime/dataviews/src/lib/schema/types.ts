@@ -198,7 +198,7 @@ export type FieldKindOperators = {
   readonly number: "gte" | "lte";
   readonly presence: "isSet";
   readonly date: "gte" | "lte";
-  readonly text: "contains" | "startsWith";
+  readonly text: "is" | "contains" | "startsWith";
 };
 
 /** One text input read as an operand, or the reason it is not one. */

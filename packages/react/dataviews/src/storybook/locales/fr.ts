@@ -153,6 +153,7 @@ const fr: DataViewsMessages = {
   facetCount: spellTotal,
   filterContains: (label) => `${label} contient`,
   filterStartsWith: (label) => `${label} commence par`,
+  filterIs: (label) => `${label} est`,
   filterIncomplete: (retained) =>
     retained
       ? "Saisissez une valeur pour modifier cette restriction. La restriction précédente s’applique toujours."

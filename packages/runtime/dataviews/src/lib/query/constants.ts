@@ -19,6 +19,7 @@ export const OPERATOR_ARITY: Readonly<
   gte: "one",
   lte: "one",
   isSet: "one",
+  is: "one",
   contains: "one",
   startsWith: "one",
 });

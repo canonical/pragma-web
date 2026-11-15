@@ -59,7 +59,7 @@ describe("createFilterInputs", () => {
       "updated",
     ]);
     expect(Object.keys(handles.cpu).sort()).toEqual(["gte", "lte"]);
-    expect(Object.keys(handles.name)).toEqual(["contains", "startsWith"]);
+    expect(Object.keys(handles.name)).toEqual(["is", "contains", "startsWith"]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
     // The adoption stays with the records: a root's handle cannot impose
     // a predicate the query does not hold.
