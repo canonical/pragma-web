@@ -4,6 +4,7 @@ import {
   intersectsRect,
   parsePathData,
   type Rect,
+  requireDefined,
   samplePath,
 } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
@@ -104,7 +105,51 @@ describe("placeBridgeLabels", () => {
     const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
     expect(
       placeBridgeLabels({ ...layout, viewBox: { x: 0, y: 0, w: 0, h: 0 } }, t),
-    ).toEqual({ placed: [], omitted: ["rel:aa:A0 bb:B0"] });
+    ).toMatchObject({ placed: [], omitted: ["rel:aa:A0 bb:B0"] });
+  });
+
+  it("gives an omitted bridge the place its label takes on focus, clear of the boxes", () => {
+    const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
+    const { onFocus } = placeBridgeLabels(
+      { ...layout, viewBox: { x: 0, y: 0, w: 0, h: 0 } },
+      t,
+    );
+    expect(onFocus.map(({ edge, text }) => [edge, text])).toEqual([
+      ["rel:aa:A0 bb:B0", "reaches"],
+    ]);
+    for (const label of onFocus) {
+      for (const node of layout.nodes.values()) {
+        expect(intersectsRect(label.box, node)).toBe(false);
+      }
+    }
+  });
+
+  it("gives an omitted bridge the place at its arrowhead when no place is clear of the boxes", () => {
+    const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
+    const anyNode = requireDefined([...layout.nodes.values()].at(0), "a class");
+    // A box over the whole graph leaves no place clear.
+    const covered = {
+      ...layout,
+      viewBox: { x: 0, y: 0, w: 0, h: 0 },
+      nodes: new Map([
+        ...layout.nodes,
+        ["cover", { ...anyNode, x: -4096, y: -4096, w: 8192, h: 8192 }],
+      ]),
+    };
+    const { onFocus } = placeBridgeLabels(covered, t);
+    const bridge = requireDefined(
+      layout.edges.find((edge) => edge.bridge === true),
+      "a bridge",
+    );
+    // The route's far end, where its only head is.
+    const end = requireDefined(
+      parsePathData(bridge.d)
+        .flatMap(({ segments }) => segments)
+        .at(-1)
+        ?.points.at(-1),
+      "the route's end",
+    );
+    expect(onFocus.map(({ cx, cy }) => [cx, cy])).toEqual([end]);
   });
 
   it("keeps every bridge's label clear of every other relation's stroke", () => {

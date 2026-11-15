@@ -76,13 +76,16 @@ function touchesRun(box: Rect, { from, to }: Run): boolean {
  * first box clear of every box, every region's label row, the viewBox's
  * edge, every label placed before it, every other bridge's route and
  * every other relation's stroke, so a reader can tell which line a label
- * names. A bridge with no such place is omitted, for the focus's labels
- * to name. Bridges are placed by edge id and every centre is a whole
- * pixel, so the same layout always gives the same labels.
+ * names. A bridge with no such place is omitted, and given the place its
+ * label takes when a class at one of its ends is the focus, which fades
+ * the other lines: the first clear of every box and region label row,
+ * else the one nearest its arrowhead. Bridges are placed by edge id and every centre is
+ * a whole pixel, so the same layout always gives the same labels.
  *
  * @param layout - The class graph laid out.
  * @param t - The translator, for how "‹n› relations" reads.
- * @returns The labels placed, by edge id, and the bridges omitted.
+ * @returns The labels placed, by edge id, the bridges omitted, and the
+ *   omitted bridges' labels on focus.
  */
 export default function placeBridgeLabels(
   layout: ClassGraphLayout,
@@ -113,6 +116,7 @@ export default function placeBridgeLabels(
     .flatMap((edge) => listStrokeRuns(edge.d));
   const placed: BridgeLabel[] = [];
   const omitted: string[] = [];
+  const onFocus: BridgeLabel[] = [];
   for (const edge of bridges) {
     const bundle = requireDefined(edge.bundle, "a bridge's bundle");
     const { relations } = bundle;
@@ -180,8 +184,16 @@ export default function placeBridgeLabels(
         !others.some((run) => touchesRun(box, run)) &&
         !strokes.some((run) => touchesRun(box, run)),
     );
-    if (chosen === undefined) omitted.push(edge.id);
-    else placed.push({ edge: edge.id, text, ...chosen });
+    if (chosen !== undefined) {
+      placed.push({ edge: edge.id, text, ...chosen });
+      continue;
+    }
+    omitted.push(edge.id);
+    const focused = requireDefined(
+      boxes.find(({ box }) => isClear(box)) ?? boxes.at(0),
+      "a place on a bridge's route",
+    );
+    onFocus.push({ edge: edge.id, text, ...focused });
   }
-  return { placed, omitted };
+  return { placed, omitted, onFocus };
 }

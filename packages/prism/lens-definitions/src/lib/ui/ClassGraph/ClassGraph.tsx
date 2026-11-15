@@ -267,17 +267,30 @@ export default function ClassGraph({
 
   // A bridge's label is drawn at rest, unless the focus fades it or the
   // focus's own labels, drawn only at full zoom, name it. A bridge whose
-  // label finds no place at rest is named by the focus's labels.
+  // label finds no place at rest is named whenever a class at one of its
+  // ends is the focus, at every zoom that draws labels, unless the focus's
+  // own labels name it.
   const bridgeLabels = useMemo(() => placeBridgeLabels(layout, t), [layout, t]);
   const focusLabelled = new Set(
     bucket === "full" ? labels.placed.map((label) => label.edge) : [],
   );
-  const restingLabels = bridgeLabels.placed.filter((label) => {
-    const edge = requireDefined(
-      layout.edges.find((candidate) => candidate.id === label.edge),
+  const edgeOf = (id: string): LaidOutEdge =>
+    requireDefined(
+      layout.edges.find((candidate) => candidate.id === id),
       "a bridge's edge",
     );
+  const restingLabels = bridgeLabels.placed.filter((label) => {
+    const edge = edgeOf(label.edge);
     return !focusLabelled.has(label.edge) && !isHidden(edge) && !isFaded(edge);
+  });
+  const focusedLabels = bridgeLabels.onFocus.filter((label) => {
+    const edge = edgeOf(label.edge);
+    return (
+      focus !== undefined &&
+      [edge.from, ...edge.to].includes(focus) &&
+      !focusLabelled.has(label.edge) &&
+      !isHidden(edge)
+    );
   });
   const bridgeBaseline = findCentredBaseline(
     BRIDGE_LABEL_SIZE + 2 * LABEL_HALO,
@@ -356,7 +369,7 @@ export default function ClassGraph({
       <g className="label-layer" data-layer="labels">
         {bucket === "overview"
           ? null
-          : restingLabels.map((label) => (
+          : [...restingLabels, ...focusedLabels].map((label) => (
               <g data-edge={label.edge} key={label.edge}>
                 {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
                 <text

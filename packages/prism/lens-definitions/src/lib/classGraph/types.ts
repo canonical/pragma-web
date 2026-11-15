@@ -363,10 +363,16 @@ export interface BridgeLabel {
 
 /**
  * The bridges' labels at rest: those placed, and the bridges whose label
- * finds no clear place, which the focus's labels name instead.
+ * finds no clear place, which are named only while a class at one of
+ * their ends is the focus.
  */
 export interface BridgeLabelPlacement {
   readonly placed: readonly BridgeLabel[];
   /** The edge ids of the bridges left without a label at rest. */
   readonly omitted: readonly string[];
+  /**
+   * The omitted bridges' labels, by edge id, where they are drawn while a
+   * class at one of their ends is the focus.
+   */
+  readonly onFocus: readonly BridgeLabel[];
 }

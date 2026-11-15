@@ -380,6 +380,58 @@ describe("ClassGraph", () => {
     });
   });
 
+  describe("a bridge whose label finds no place at rest", () => {
+    // A viewBox with no room leaves every bridge without a place at rest.
+    const cramped = {
+      ...metro.layout,
+      viewBox: { x: 0, y: 0, w: 0, h: 0 },
+    };
+    const own = { layout: cramped, terms: metro.terms };
+    const bridge = requireDefined(
+      cramped.edges.find((edge) => edge.bridge === true),
+      "a bridge",
+    );
+    const name = requireAt(
+      requireDefined(bridge.bundle, "bundle").relations,
+      0,
+    ).label;
+    const labelOf = (container: HTMLElement) =>
+      container.querySelector(
+        `.label-layer [data-edge="${bridge.id}"] text.edge-label.is-bridge`,
+      );
+    afterEach(() => {
+      zoom.bucket = "full";
+    });
+
+    it("draws no label at rest", () => {
+      for (const bucket of ["hubs", "full"] as const) {
+        zoom.bucket = bucket;
+        expect(labelOf(draw(own))).toBeNull();
+      }
+    });
+
+    it("is named while a class at either end is the focus, at every zoom that draws labels", () => {
+      for (const bucket of ["hubs", "full"] as const) {
+        zoom.bucket = bucket;
+        for (const end of [bridge.from, ...bridge.to]) {
+          expect(labelOf(draw({ ...own, focus: end }))?.textContent).toBe(name);
+        }
+      }
+    });
+
+    it("is not named while the focus is elsewhere, nor at the overview", () => {
+      const elsewhere = requireDefined(
+        [...cramped.nodes.keys()].find(
+          (id) => id !== bridge.from && !bridge.to.includes(id),
+        ),
+        "a class off the bridge",
+      );
+      expect(labelOf(draw({ ...own, focus: elsewhere }))).toBeNull();
+      zoom.bucket = "overview";
+      expect(labelOf(draw({ ...own, focus: bridge.from }))).toBeNull();
+    });
+  });
+
   it("keeps a focused relation with no statements dashed, at the focus's 2px", () => {
     const container = draw({ focus: uri("cs:Example") });
     const zero = container.querySelector(
