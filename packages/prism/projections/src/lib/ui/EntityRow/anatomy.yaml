@@ -40,17 +40,24 @@
 # label or value is ever cut. The first line opens with an empty item, the
 # start, of no width and a line high: a line always holds its first item,
 # so without it the first fact could not leave, and with it the first line
-# keeps its height when every fact has left. A fact after the first stands
-# the gutter from the one before. Everything clips along its line only, so a chip in the title
+# keeps its height when every fact has left. The row sets no gap between
+# its slots: each fact stands the gutter from what comes before it, inside
+# the facts' box, and the status stands the gutter before it, so the gap
+# leaves with the last fact and a row whose facts have all left gives its
+# title the row's whole width. Everything clips along its line only, so a chip in the title
 # keeps its whole 28px pill and its line grows to hold it.
 #
 # A two-line row wraps, and a wrapping flex line is broken by its items'
 # bases: an identity with a content basis wider than the row less the
 # status would push the status onto a line of its own and the summary
 # onto a third. So in a two-line row (`:has(> .summary)`, a reflow) the
-# identity's basis is 0, it grows up to its content, and it takes the free
-# width a thousand times faster than the facts, which is the
-# same order of yielding: the first line holds every slot but the summary.
+# identity's basis is small, the mark's box (space.200), it grows up to its
+# content, and it takes the free width a thousand times faster than the
+# facts, which is the same order of yielding: the first line holds every
+# slot but the summary. The basis is never 0: the row sets no gap, so an
+# identity of no basis, beside facts that have all left and no status,
+# would leave room for the summary, a whole line, on the first line, and
+# the identity would get no width.
 #
 # The row may be narrower than its content (`size.min.width: 0`): as a
 # grid item or flex item its minimum would otherwise be its content's, so a
@@ -114,14 +121,14 @@
 #   --entity-row-summary-order: 1       literal: after every first-line slot
 #   prefix, kind, summary and fact labels: color.text.muted
 #   space.050 between the prefix, the title and the kind, and a fact's
-#   label and value; grid.gutter between facts.
+#   label and value; grid.gutter before each fact and the status.
 #   @container shell (width < 912px)   below two groups: the facts after
 #                                      the first leave the line.
 #   --entity-row-identity-grow-weight: 1000   literal: in a two-line row
 #                                      the identity takes the free width
 #                                      before the facts (a
 #                                      number, read only by the reflow).
-#   layout.flex.basis auto and 0, layout.flex.grow 0 and 1,
+#   layout.flex.basis auto, 0 and space.200, layout.flex.grow 0 and 1,
 #   size.max.width max-content, spacing.external.inline.end auto:
 #   keywords and numbers of the yielding order.
 node:
@@ -131,7 +138,6 @@ node:
     layout.align: center
     layout.wrap: nowrap
     size.min.width: 0
-    spacing.gap.inline: grid.gutter
     spacing.gap.block: space.0
     spacing.internal.block.start: space.050
     spacing.internal.block.end: space.050
@@ -233,6 +239,8 @@ node:
                 - node:
                     role: fact
                     attributes: { data-property: "{property}" }
+                    styles:
+                      spacing.external.inline.start: grid.gutter
                     edges:
                       - node:
                           role: term
@@ -255,8 +263,6 @@ node:
                 - node:
                     role: later fact (.is-later)
                     attributes: { data-property: "{property}" }
-                    styles:
-                      spacing.external.inline.start: grid.gutter
             relation: { cardinality: "1..*", slotName: fact }
       relation: { cardinality: "0..1", slotName: facts }
     - node:
@@ -264,4 +270,5 @@ node:
         styles:
           layout.type: flex
           layout.flex.shrink: 0
+          spacing.external.inline.start: grid.gutter
       relation: { cardinality: "0..1", slotName: status }

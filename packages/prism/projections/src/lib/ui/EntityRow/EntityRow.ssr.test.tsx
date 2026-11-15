@@ -105,6 +105,20 @@ describe("EntityRow stylesheet", () => {
     );
   });
 
+  it("lets the gap leave with the last fact, so the title takes the row", () => {
+    // The row sets no gap between its slots: an empty facts' box would
+    // still take one on each side and cut a title that fits.
+    expect(readRule(".ds.entity-row")).not.toMatch(/(?:^|\s)(?:column-)?gap:/);
+    // Each fact carries the gap inside the facts' box, which clips it.
+    expect(readRule(".ds.entity-row .fact")).toContain(
+      "margin-inline-start: var(--entity-row-gap);",
+    );
+    expect(styles).not.toContain(".ds.entity-row .fact.is-later {\n    margin");
+    expect(readRule(".ds.entity-row .status")).toContain(
+      "margin-inline-start: var(--entity-row-gap);",
+    );
+  });
+
   it("centres the mark's sign on both axes in its 16px box", () => {
     const mark = readRule(".ds.entity-row .mark");
     expect(mark).toContain("align-items: center;");
@@ -123,9 +137,12 @@ describe("EntityRow stylesheet", () => {
     expect(html).toContain('<span class="summary"></span>');
   });
 
-  it("never breaks a two-line row's first line", () => {
+  it("never breaks a two-line row's first line, nor sets its summary there", () => {
     const identity = readRule(".ds.entity-row:has(> .summary) > .identity");
-    expect(identity).toContain("flex-basis: 0;");
+    // A basis of nothing would let the summary, a whole line, fit beside
+    // the identity when no fact and no status is left, the row having no
+    // gap, and leave the identity no width.
+    expect(identity).toContain("flex-basis: var(--entity-row-mark-size);");
     expect(identity).toContain(
       "flex-grow: var(--entity-row-identity-grow-weight);",
     );

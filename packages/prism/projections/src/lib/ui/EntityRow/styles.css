@@ -11,7 +11,10 @@
    * theirs up first, each fact leaving whole, the last first, down to
    * nothing, and the status keeps its
    * own; whatever width is left over sets the facts and the status at
-   * the row's end as one group. The row may be narrower than its
+   * the row's end as one group. The row sets no gap between its slots:
+   * each fact and the status carry the gutter before them, so facts that
+   * have all left take no width, and the title has the row's whole
+   * width. The row may be narrower than its
    * content, so a long identity never widens the track that holds it. */
   .ds.entity-row {
     --entity-row-gap: var(--grid-gutter);
@@ -47,7 +50,6 @@
     align-items: center;
     flex-wrap: nowrap;
     min-width: 0;
-    column-gap: var(--entity-row-gap);
     row-gap: var(--entity-row-line-gap);
     padding-block: var(--entity-row-padding-block);
     list-style: none;
@@ -167,8 +169,10 @@
     height: var(--entity-row-line-height);
   }
 
-  /* A fact after the first stands the row's gap from the one before. */
-  .ds.entity-row .fact.is-later {
+  /* Each fact stands the row's gap from what comes before it, inside the
+   * facts' box, so the gap leaves with the fact: a box whose facts have
+   * all left is empty and takes nothing from the title. */
+  .ds.entity-row .fact {
     margin-inline-start: var(--entity-row-gap);
   }
 
@@ -177,22 +181,28 @@
     color: var(--entity-row-fact-label-color);
   }
 
+  /* The status keeps its width and stands the row's gap from what comes
+   * before it. */
   .ds.entity-row .status {
     display: flex;
     flex-shrink: 0;
+    margin-inline-start: var(--entity-row-gap);
   }
 
   /* A two-line row: the summary is the only slot that leaves the first
    * line. A wrapping line is broken by its items' bases, so the identity's
-   * is nothing here and it takes the free width, up to its content, before
-   * the facts take any: the first line never breaks. */
+   * is small here, the mark's box, and it takes the free width, up to its
+   * content, before the facts take any: the first line never breaks. The
+   * basis is never nothing: the row sets no gap, so beside an identity of
+   * no basis, facts that have left and no status, the summary, a whole
+   * line, would fit on the first line and leave the identity no width. */
   .ds.entity-row:has(> .summary) {
     flex-wrap: wrap;
   }
 
   .ds.entity-row:has(> .summary) > .identity {
     flex-grow: var(--entity-row-identity-grow-weight);
-    flex-basis: 0;
+    flex-basis: var(--entity-row-mark-size);
     max-width: max-content;
   }
 
