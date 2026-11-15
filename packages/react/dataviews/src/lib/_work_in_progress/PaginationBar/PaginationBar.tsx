@@ -13,17 +13,10 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { SelectInput } from "@canonical/react-ds-global-form";
-import {
-  type FocusEvent,
-  type ReactElement,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { type ReactElement, useEffect, useId, useMemo, useRef } from "react";
 import {
   useDataViewsValue,
+  useFocusRescue,
   useIsHydrated,
   useMessages,
 } from "../../hooks/index.js";
@@ -96,6 +89,9 @@ const renderHiddenFields = (
  * `import { PaginationBar } from "@canonical/dataviews-react";`
  *
  * @implements ds:apps.subcomponent.data_table-pagination_bar
+ *
+ * @note Impure: observes the provider while mounted, and moves stranded
+ * focus to the page select.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -170,31 +166,11 @@ export default function PaginationBar<
     [listed, page],
   );
 
-  // The navigation control last focused, until focus leaves it. A button
-  // disabled while focused reports no blur, and a link replaced by one
-  // leaves the document without a word, so this finds focus stranded.
-  // Tracked on the navigation group, where focus events reach it from any
-  // control — a router's own link included.
-  const focused = useRef<HTMLElement | null>(null);
+  // A navigation control disabled or replaced under the focus hands it to
+  // the page select. Tracked on the navigation group, where focus events
+  // reach it from any control — a router's own link included.
   const pageSelect = useRef<HTMLSelectElement>(null);
-  useLayoutEffect(() => {
-    const control = focused.current;
-    if (
-      control !== null &&
-      (!control.isConnected || control.matches(":disabled"))
-    ) {
-      focused.current = null;
-      pageSelect.current?.focus();
-    }
-  });
-  const trackFocus = {
-    onFocus: (event: FocusEvent<HTMLElement>) => {
-      focused.current = event.target;
-    },
-    onBlur: () => {
-      focused.current = null;
-    },
-  };
+  const trackFocus = useFocusRescue({ fallback: pageSelect });
 
   // The token goes with the page it addresses: a cursor source reaches its
   // next page only through the one its current page handed back, and an

@@ -2,8 +2,9 @@
  * Hook domain types for the hooks every part shares: the value hook that
  * observes one channel, the cell hook a column's own renderer reads, whether
  * scripts have taken over, the focus a server's link hands to the button
- * replacing it, and the words a root speaks. Each hook declares its result
- * type, and its props type where it takes a config object, here.
+ * replacing it, the focus a disabled control strands, and the words a root
+ * speaks. Each hook declares its result type, and its props type where it
+ * takes a config object, here.
  */
 
 import type {
@@ -16,7 +17,7 @@ import type {
   Selection,
 } from "@canonical/dataviews-core";
 import type { RowScopes } from "@canonical/dataviews-core/bindings";
-import type { ReactNode, RefObject } from "react";
+import type { FocusEvent, ReactNode, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
 
 /**
@@ -82,6 +83,23 @@ export type UseHydrationFocusHandoffResult = {
   readonly link: RefObject<HTMLAnchorElement | null>;
   /** The button that replaces the link once hydrated, and takes its focus. */
   readonly button: RefObject<HTMLButtonElement | null>;
+};
+
+/** What `useFocusRescue` takes: the control stranded focus goes to. */
+export type UseFocusRescueProps = {
+  /** The control that takes the focus a disabled or removed control held. */
+  readonly fallback: RefObject<HTMLElement | null>;
+};
+
+/**
+ * What `useFocusRescue` returns: the handlers to spread on the group whose
+ * controls it watches.
+ */
+export type UseFocusRescueResult = {
+  /** Records the control that took the focus. */
+  readonly onFocus: (event: FocusEvent<HTMLElement>) => void;
+  /** Forgets it once the focus leaves. */
+  readonly onBlur: () => void;
 };
 
 /**
