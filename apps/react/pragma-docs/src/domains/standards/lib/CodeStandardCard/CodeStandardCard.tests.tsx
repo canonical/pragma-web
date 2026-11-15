@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -75,11 +76,12 @@ const renderWithNode = (
   );
 };
 
-/** Read each key value of a card as its key and its value. */
-const readPairs = (container: HTMLElement): string[][] =>
-  [...container.querySelectorAll(".pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent ?? "",
-    pair.querySelector(".value")?.textContent ?? "",
+/** Read each fact of a card as its property, its term and its detail. */
+const readFacts = (container: HTMLElement): (string | null)[][] =>
+  [...container.querySelectorAll(".fact")].map((fact) => [
+    fact.getAttribute("data-property"),
+    fact.querySelector(".term")?.textContent ?? null,
+    fact.querySelector(".detail")?.textContent ?? null,
   ]);
 
 describe("CodeStandardCard", () => {
@@ -97,19 +99,24 @@ describe("CodeStandardCard", () => {
     const { container } = renderWithNode((node) => (
       <CodeStandardCard node={node} />
     ));
+    const card = container.querySelector(".ds.code-standard-card");
     expect(
-      [...container.querySelectorAll(".location, .title, .kind, .summary")].map(
+      [...(card?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
         (slot) => slot.textContent,
       ),
     ).toEqual([
-      "cs",
+      "cs:",
       "Public and private subcomponent exports",
-      "Code Standard",
       "Subcomponents are public if they are intended to be directly used by the consumer of the parent component to construct a UI.",
     ]);
-    expect(readPairs(container)).toEqual([["Category", "React"]]);
-    expect(container.querySelector(".footer")).toBeNull();
-    expect(container.querySelector(".sidecar")).toBeNull();
+    expect(readFacts(container)).toEqual([["category", "Category", "React"]]);
+    expect(card?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/code.svg#code",
+    );
+    expect(card?.querySelector(".address, .kind, .status")).toBeNull();
+    expect(card?.querySelector(".specimen")).toBeNull();
+    if (card) expectSlotOrder(card);
     expect(
       screen.getByRole("link", {
         name: "Public and private subcomponent exports",
@@ -149,12 +156,14 @@ describe("CodeStandardCard", () => {
     );
   });
 
-  it("has no key value when the standard has no category", () => {
+  it("has no fact when the standard has no category", () => {
     const { container } = renderWithNode(
       (node) => <CodeStandardCard node={node} />,
       { categories: { edges: [] } },
     );
-    expect(container.querySelector(".key-values")).toBeNull();
+    for (const slot of [".facts", ".fact", ".status", ".specimen"]) {
+      expect(container.querySelector(slot), slot).toBeNull();
+    }
   });
 
   it("has no summary when the description is empty or absent", () => {
@@ -171,7 +180,7 @@ describe("CodeStandardCard", () => {
     }
   });
 
-  it("has no location when the standard's address did not compact", () => {
+  it("has no prefix when the standard's address did not compact", () => {
     const { container } = renderWithNode(
       (node) => <CodeStandardCard node={node} />,
       {
@@ -182,7 +191,7 @@ describe("CodeStandardCard", () => {
         },
       },
     );
-    expect(container.querySelector(".location")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("applies custom className", () => {

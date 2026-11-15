@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c22ef0a59b5862884728fac5090f7fe1>>
+ * @generated SignedSource<<0ed166439eec04e500b08e5b4b5f9152>>
  * @lightSyntaxTransform
  */
 
@@ -31,36 +31,10 @@ var v0 = [
   }
 ],
 v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "uri",
-  "storageKey": null
-},
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-},
-v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
-},
-v4 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "EntityMeta"
-},
-v5 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "ID"
 };
 return {
   "fragment": {
@@ -121,7 +95,13 @@ return {
             "name": "__typename",
             "storageKey": null
           },
-          (v1/*:: as any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "uri",
+            "storageKey": null
+          },
           {
             "kind": "InlineFragment",
             "selections": [
@@ -133,36 +113,18 @@ return {
                 "name": "_meta",
                 "plural": false,
                 "selections": [
-                  (v2/*:: as any*/),
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "curie",
+                    "name": "title",
                     "storageKey": null
                   },
                   {
                     "alias": null,
                     "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": [
-                      {
-                        "alias": null,
-                        "args": null,
-                        "concreteType": "EntityMeta",
-                        "kind": "LinkedField",
-                        "name": "_meta",
-                        "plural": false,
-                        "selections": [
-                          (v2/*:: as any*/)
-                        ],
-                        "storageKey": null
-                      },
-                      (v1/*:: as any*/)
-                    ],
+                    "kind": "ScalarField",
+                    "name": "curie",
                     "storageKey": null
                   }
                 ],
@@ -178,7 +140,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "23b78daf739fa38ec4d674c74afa70b1",
+    "cacheID": "44cd37030ea459ed6d8fa4150d8da948",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -188,25 +150,26 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__typename": (v3/*:: as any*/),
-        "node._meta": (v4/*:: as any*/),
-        "node._meta.curie": (v3/*:: as any*/),
-        "node._meta.title": (v3/*:: as any*/),
-        "node._meta.type": {
+        "node.__typename": (v1/*:: as any*/),
+        "node._meta": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
-          "type": "OntologyClass"
+          "type": "EntityMeta"
         },
-        "node._meta.type._meta": (v4/*:: as any*/),
-        "node._meta.type._meta.title": (v3/*:: as any*/),
-        "node._meta.type.uri": (v5/*:: as any*/),
-        "node.uri": (v5/*:: as any*/)
+        "node._meta.curie": (v1/*:: as any*/),
+        "node._meta.title": (v1/*:: as any*/),
+        "node.uri": {
+          "enumValues": null,
+          "nullable": false,
+          "plural": false,
+          "type": "ID"
+        }
       }
     },
     "name": "CodeStandardGraphNodeSsrTestQuery",
     "operationKind": "query",
-    "text": "query CodeStandardGraphNodeSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...CodeStandardGraphNode_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n"
+    "text": "query CodeStandardGraphNodeSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...CodeStandardGraphNode_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

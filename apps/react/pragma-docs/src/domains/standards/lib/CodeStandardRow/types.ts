@@ -9,6 +9,11 @@ type OwnProps = {
    * that spreads `...CodeStandardRow_node`.
    */
   readonly node: CodeStandardRow_node$key;
+  /**
+   * How many lines the row takes: one (32px) by default, or two (56px),
+   * the standard's description under its title, where an index opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

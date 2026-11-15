@@ -1,7 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { RouterLink } from "@canonical/prism-core";
+import { expectSlotOrder, guardTypedArms } from "@canonical/prism-core/testing";
+import {
+  defaultProjectionMaps,
+  ProjectionsProvider,
+} from "@canonical/prism-projections";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -75,6 +81,27 @@ const renderWithNode = (
   );
 };
 
+/** The absolute IRI the mock standard answers as its `uri`. */
+const MOCK_CODE_STANDARD_URI =
+  "http://pragma.canonical.com/codestandards#react.component.subcomponent_export_api";
+
+/**
+ * Wrap `children` in a projection provider whose peek records the address
+ * each chip asks it for, and renders that address as a link to look for.
+ */
+const withRecordingPeek = (
+  peek: (uri: string) => ReactNode,
+  children: ReactElement,
+): ReactElement => (
+  <ProjectionsProvider
+    LinkComponent={RouterLink}
+    maps={guardTypedArms(defaultProjectionMaps)}
+    peek={peek}
+  >
+    {children}
+  </ProjectionsProvider>
+);
+
 describe("CodeStandardChip", () => {
   it("reads the CodeStandard through its fragment", () => {
     const { container } = renderWithNode((node) => (
@@ -86,19 +113,29 @@ describe("CodeStandardChip", () => {
     );
   });
 
-  it("files its title, linked to its reading page, under its prefix", () => {
+  it("links its title to a standard's reading page", () => {
+    renderWithNode((node) => <CodeStandardChip node={node} />);
+    const link = screen.getByRole("link", {
+      name: "Public and private subcomponent exports",
+    });
+    expect(link).toHaveAttribute("href", MOCK_CODE_STANDARD_HREF);
+    expect(link).toHaveClass("title");
+  });
+
+  it("leads with the standard's mark and its prefix, off the page's namespace", () => {
     const { container } = renderWithNode((node) => (
       <CodeStandardChip node={node} />
     ));
-    expect(container.querySelector(".lead")?.textContent).toBe("cs:");
-    expect(
-      screen.getByRole("link", {
-        name: "Public and private subcomponent exports",
-      }),
-    ).toHaveAttribute("href", MOCK_CODE_STANDARD_HREF);
+    const chip = container.querySelector(".ds.code-standard-chip");
+    expect(chip?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/code.svg#code",
+    );
+    expect(chip?.querySelector(".prefix")?.textContent).toBe("cs:");
+    if (chip) expectSlotOrder(chip);
   });
 
-  it("has no key when the standard's address did not compact", () => {
+  it("has no prefix when the standard's address did not compact", () => {
     const { container } = renderWithNode(
       (node) => <CodeStandardChip node={node} />,
       {
@@ -109,7 +146,48 @@ describe("CodeStandardChip", () => {
         },
       },
     );
-    expect(container.querySelector(".lead")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "Public and private subcomponent exports",
+    );
+  });
+
+  it("peeks at the standard's absolute IRI, never its CURIE", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    renderWithNode(
+      (node) => withRecordingPeek(peek, <CodeStandardChip node={node} />),
+      { uri: MOCK_CODE_STANDARD_URI },
+    );
+    expect(peek).toHaveBeenCalledWith(MOCK_CODE_STANDARD_URI);
+    expect(peek).not.toHaveBeenCalledWith(MOCK_CODE_STANDARD._meta.curie);
+    act(() => {
+      screen
+        .getByRole("link", { name: "Public and private subcomponent exports" })
+        .focus();
+    });
+    expect(
+      screen
+        .getByRole("dialog", { hidden: true })
+        .querySelector(`a[href="${MOCK_CODE_STANDARD_URI}"]`),
+    ).not.toBeNull();
+  });
+
+  it("sets its title as inert text with no peek when unlinked", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    const { container } = renderWithNode(
+      (node) =>
+        withRecordingPeek(
+          peek,
+          <CodeStandardChip linked={false} node={node} />,
+        ),
+      { uri: MOCK_CODE_STANDARD_URI },
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+    const title = container.querySelector(".title");
+    expect(title?.tagName).toBe("SPAN");
+    expect(title?.textContent).toBe("Public and private subcomponent exports");
+    if (title) fireEvent.focus(title);
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
 
   it("shows a passage's own link text in place of the title", () => {

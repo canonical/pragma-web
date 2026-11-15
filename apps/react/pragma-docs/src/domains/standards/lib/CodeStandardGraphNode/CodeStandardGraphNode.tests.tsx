@@ -76,7 +76,7 @@ const renderWithNode = (
 };
 
 describe("CodeStandardGraphNode", () => {
-  it("reads the CodeStandard through its fragment", () => {
+  it("reads the Modifier through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
         <CodeStandardGraphNode node={node} />
@@ -94,18 +94,20 @@ describe("CodeStandardGraphNode", () => {
       </svg>
     ));
     expect(container.querySelector(".title")?.textContent).toBe(
-      "Public and private subcomponent exports",
+      "cs: Public and private subcomponent exports",
     );
-    expect(container.querySelector(".title .identifier")).toBeNull();
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Code Standard in cs",
+    expect(container.querySelector(".title .prefix")?.textContent).toBe("cs: ");
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/code.svg#code",
     );
+    expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       MOCK_CODE_STANDARD_HREF,
     );
   });
 
-  it("names its class alone when the standard's address did not compact", () => {
+  it("has no prefix when the standard's address did not compact", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
@@ -120,8 +122,9 @@ describe("CodeStandardGraphNode", () => {
         },
       },
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Code Standard",
+    expect(container.querySelector(".title .prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "Public and private subcomponent exports",
     );
   });
 

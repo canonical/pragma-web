@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6fa4d390da56facab52a6e8cd66610a6>>
+ * @generated SignedSource<<f7989aec4e863b66fac76d1129b8a271>>
  * @lightSyntaxTransform
  */
 
@@ -140,7 +140,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "727528df5f92f111f1381c7e7b2db513",
+    "cacheID": "5bdc7404be1100aa0f97ba424212ef6c",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -169,7 +169,7 @@ return {
     },
     "name": "CodeStandardChipTestQuery",
     "operationKind": "query",
-    "text": "query CodeStandardChipTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...CodeStandardChip_node\n    uri\n  }\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
+    "text": "query CodeStandardChipTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...CodeStandardChip_node\n    uri\n  }\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

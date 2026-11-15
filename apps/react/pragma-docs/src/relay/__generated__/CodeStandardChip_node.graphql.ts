@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c18547b11c5d8d7ac17742d087e208b2>>
+ * @generated SignedSource<<4bd4f8af58c728019b98168f47b94ab4>>
  * @lightSyntaxTransform
  */
 
@@ -15,6 +15,7 @@ export type CodeStandardChip_node$data = {
     readonly curie: string;
     readonly title: string;
   };
+  readonly uri: string;
   readonly " $fragmentType": "CodeStandardChip_node";
 };
 export type CodeStandardChip_node$key = {
@@ -33,6 +34,13 @@ const node: ReaderFragment = {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "uri",
       "storageKey": null
     },
     {
@@ -65,6 +73,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "b7e358c4cf42ae7657aeb6ef13a55d30";
+(node as any).hash = "5d7724dbf8d7ecd2c15f6070758462c5";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d78954897ab04f4b0d1894115fc28d61>>
+ * @generated SignedSource<<23e6dcbfb5871ccbe6335462f5d8008e>>
  * @lightSyntaxTransform
  */
 
@@ -128,6 +128,13 @@ return {
               {
                 "alias": null,
                 "args": null,
+                "kind": "ScalarField",
+                "name": "description",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
                 "concreteType": "EntityMeta",
                 "kind": "LinkedField",
                 "name": "_meta",
@@ -206,7 +213,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "430eb1a828c8f6bde76b0bbe3f21905d",
+    "cacheID": "69ab703acff586b921ab97e13c84f4cc",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -241,12 +248,18 @@ return {
         "node.categories.edges.node._meta": (v4/*:: as any*/),
         "node.categories.edges.node._meta.title": (v3/*:: as any*/),
         "node.categories.edges.node.uri": (v5/*:: as any*/),
+        "node.description": {
+          "enumValues": null,
+          "nullable": true,
+          "plural": false,
+          "type": "String"
+        },
         "node.uri": (v5/*:: as any*/)
       }
     },
     "name": "CodeStandardRowSsrTestQuery",
     "operationKind": "query",
-    "text": "query CodeStandardRowSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...CodeStandardRow_node\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query CodeStandardRowSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...CodeStandardRow_node\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  description\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();
