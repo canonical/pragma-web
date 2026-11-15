@@ -56,7 +56,7 @@ describe("regression 0034 — undeclared restriction hidden while More filters o
         {
           slice: {
             ...EMPTY_SLICE,
-            filter: [{ field: "spare", operator: "isSet", operands: [] }],
+            filter: [{ field: "spare", operator: "isSet", operands: [true] }],
           },
           window: DEFAULT_WINDOW,
         },

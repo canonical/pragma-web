@@ -7,18 +7,18 @@ import type { PredicateOperator, ResultWindow, Slice } from "./types.js";
 
 /**
  * How many operands each operator carries: `isAny` and `isNone` a non-empty
- * set, `gte`, `lte`, `contains` and `startsWith` exactly one, `isSet` none.
+ * set, every other operator exactly one.
  * An operator carrying `many` is a set operator: its operands are compared,
  * canonicalized and spelled as a set.
  */
 export const OPERATOR_ARITY: Readonly<
-  Record<PredicateOperator, "none" | "one" | "many">
+  Record<PredicateOperator, "one" | "many">
 > = Object.freeze({
   isAny: "many",
   isNone: "many",
   gte: "one",
   lte: "one",
-  isSet: "none",
+  isSet: "one",
   contains: "one",
   startsWith: "one",
 });

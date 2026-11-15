@@ -405,7 +405,7 @@ describe("createFilterInputs", () => {
   it("clears a predicate on the query and answers with no refusal", () => {
     const p = provider();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
-    inputs.handles.owner.isSet.set([]);
+    inputs.handles.owner.isSet.set([true]);
     expect(p.state.get().slice.filter).toHaveLength(1);
     expect(inputs.handles.owner.isSet.clear()).toEqual([]);
     expect(p.state.get().slice.filter).toEqual([]);

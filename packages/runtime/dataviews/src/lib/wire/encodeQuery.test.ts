@@ -80,14 +80,14 @@ describe("encodeQuery", () => {
     expect(params.getAll("status")).toEqual(["cancelled", "failed"]);
   });
 
-  it("spells bounds, the zero-value operator and search", () => {
+  it("spells bounds, presence and search", () => {
     const params = encodeQuery({
       schema: machines(),
       slice: {
         filter: [
           { field: "cpu", operator: "gte", operands: [4] },
           { field: "updated", operator: "lte", operands: ["2026-01-01"] },
-          { field: "owner", operator: "isSet", operands: [] },
+          { field: "owner", operator: "isSet", operands: [true] },
         ],
         search: "yak",
         sort: [],
@@ -97,7 +97,7 @@ describe("encodeQuery", () => {
     });
     expect(params.get("cpu__gte")).toBe("4");
     expect(params.get("updated__lte")).toBe("2026-01-01");
-    expect(params.get("owner__isSet")).toBe("1");
+    expect(params.get("owner__isSet")).toBe("true");
     expect(params.get("q")).toBe("yak");
   });
 

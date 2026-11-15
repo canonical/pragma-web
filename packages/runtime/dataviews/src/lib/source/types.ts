@@ -420,7 +420,8 @@ export type CapabilityDeclaration<
  * several operators as a record keyed by operator — a number or date filter
  * as its bounds, a `choices` filter as the sets it is any and none of, a text
  * filter as the text it contains and starts with — and a presence field as
- * `true` when set, each present only when the slice carries it; plus the
+ * `true` when it asks for a value and `false` when it asks for none, each
+ * present only when the slice carries it; plus the
  * search text and the ordered sort terms. An adapter finds the status filter
  * by name instead of scanning predicates and stringifying operands.
  *

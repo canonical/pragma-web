@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import spellWireValues from "./spellWireValues.js";
 
 describe("spellWireValues", () => {
-  it("spells presence as its marker", () => {
+  it("spells presence either way as true or false", () => {
     expect(
-      spellWireValues({ field: "owner", operator: "isSet", operands: [] }),
-    ).toEqual(["1"]);
+      spellWireValues({ field: "owner", operator: "isSet", operands: [true] }),
+    ).toEqual(["true"]);
+    expect(
+      spellWireValues({ field: "owner", operator: "isSet", operands: [false] }),
+    ).toEqual(["false"]);
   });
 
   it("spells a set's options by their own string form, in order", () => {

@@ -81,7 +81,7 @@ const setOwner = (provider: Provider): void => {
     readProviderHost(provider).adopt(
       {
         slice: {
-          filter: [{ field: "owner", operator: "isSet", operands: [] }],
+          filter: [{ field: "owner", operator: "isSet", operands: [true] }],
           search: null,
           sort: [],
           group: [],
@@ -102,7 +102,7 @@ describe("PresenceFilter", () => {
     expect(owned).not.toBeChecked();
     fireEvent.click(owned);
     expect(provider.state.get().slice.filter).toEqual([
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [true] },
     ]);
     expect(owned).toBeChecked();
     fireEvent.click(owned);
@@ -113,7 +113,7 @@ describe("PresenceFilter", () => {
     mount(makeProvider());
     const owned = screen.getByRole("checkbox", { name: "Owned" });
     expect(owned).toHaveAttribute("name", "owner__isSet");
-    expect(owned).toHaveAttribute("value", "1");
+    expect(owned).toHaveAttribute("value", "true");
   });
 
   it("describes the checkbox by how many matching records set the field", () => {

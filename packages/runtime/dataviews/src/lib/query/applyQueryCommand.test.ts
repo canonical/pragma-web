@@ -55,11 +55,11 @@ describe("applyQueryCommand", () => {
     expect(result.slice.filter).toHaveLength(1);
   });
 
-  it("accepts bound and zero-value predicates with their exact arities", () => {
+  it("accepts bound and presence predicates with their exact arities", () => {
     for (const predicate of [
       { field: "updated", operator: "gte", operands: ["2026-01-01"] },
       { field: "updated", operator: "lte", operands: ["2026-12-31"] },
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [true] },
     ] as const) {
       const result = applyQueryCommand(slice(), window(), {
         kind: "setPredicate",
@@ -120,7 +120,7 @@ describe("applyQueryCommand", () => {
     const base = slice({
       filter: [
         { field: "status", operator: "isAny", operands: ["failed"] },
-        { field: "status", operator: "isSet", operands: [] },
+        { field: "status", operator: "isSet", operands: [true] },
       ],
     });
     const result = applyQueryCommand(base, window({ page: 3 }), {
@@ -132,7 +132,7 @@ describe("applyQueryCommand", () => {
       throw new Error("expected acceptance");
     }
     expect(result.slice.filter).toEqual([
-      { field: "status", operator: "isSet", operands: [] },
+      { field: "status", operator: "isSet", operands: [true] },
     ]);
     expect(result.window.page).toBe(1);
   });
@@ -565,7 +565,7 @@ describe("applyQueryCommand", () => {
       },
       {
         kind: "setPredicate",
-        predicate: { field: "owner", operator: "isSet", operands: ["x"] },
+        predicate: { field: "owner", operator: "isSet", operands: [] },
       },
       {
         kind: "setPredicate",

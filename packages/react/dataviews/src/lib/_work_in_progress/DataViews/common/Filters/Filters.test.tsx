@@ -209,7 +209,7 @@ describe("DataViews.Filters", () => {
     const owner = screen.getByRole("checkbox", { name: "owner" });
     fireEvent.click(owner);
     expect(provider.state.get().slice.filter).toEqual([
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [true] },
     ]);
     expect(owner).toBeChecked();
     fireEvent.click(owner);
@@ -380,7 +380,7 @@ describe("DataViews.Filters", () => {
     );
     expect(screen.getByRole("checkbox", { name: "owner" })).toHaveAttribute(
       "value",
-      "1",
+      "true",
     );
     expect(screen.getByLabelText("cpu from")).toHaveAttribute(
       "name",
@@ -506,7 +506,7 @@ describe("DataViews.Filters", () => {
     adopt(provider, [
       { field: "status", operator: "isAny", operands: ["failed"] },
       { field: "cpu", operator: "lte", operands: [8] },
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [true] },
     ]);
     // Nothing else removes it, so each stays offered while it stands — for
     // removal only: nothing can be added the source never declared.
@@ -1564,7 +1564,9 @@ describe("DataViews.Filters", () => {
       fireEvent.click(screen.getByRole("button", { name: "Clear cpu from" }));
       expect(group).toHaveFocus();
 
-      adopt(provider, [{ field: "owner", operator: "isSet", operands: [] }]);
+      adopt(provider, [
+        { field: "owner", operator: "isSet", operands: [true] },
+      ]);
       fireEvent.click(screen.getByRole("checkbox", { name: "owner" }));
       expect(provider.state.get().slice.filter).toEqual([]);
       expect(group).toHaveFocus();

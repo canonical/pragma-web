@@ -123,7 +123,7 @@ describe("areSlicesEqual", () => {
       areSlicesEqual(
         anyOf,
         slice({
-          filter: [{ field: "status", operator: "isSet", operands: [] }],
+          filter: [{ field: "status", operator: "isSet", operands: [true] }],
         }),
       ),
     ).toBe(false);

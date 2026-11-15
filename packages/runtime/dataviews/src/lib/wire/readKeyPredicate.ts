@@ -10,7 +10,7 @@ import {
   type SchemaFieldDefinition,
   type SchemaPredicateResult,
 } from "../schema/index.js";
-import { SUFFIXED_OPERATORS } from "./constants.js";
+import { PRESENCE_VALUES, SUFFIXED_OPERATORS } from "./constants.js";
 import readWireField from "./readWireField.js";
 import readWireKey from "./readWireKey.js";
 import type { KeyReading } from "./types.js";
@@ -19,6 +19,81 @@ const isOperator = (
   suffix: string,
 ): suffix is (typeof SUFFIXED_OPERATORS)[number] =>
   SUFFIXED_OPERATORS.some((operator) => operator === suffix);
+
+/** Whether a value is one presence is read from; own keys only. */
+const isPresenceValue = (
+  value: string,
+): value is keyof typeof PRESENCE_VALUES =>
+  Object.hasOwn(PRESENCE_VALUES, value);
+
+/** The operands a key's values read as, and the positions each was read at. */
+type ReadOperands = {
+  readonly operands: readonly PredicateOperand[];
+  readonly read: readonly number[];
+};
+
+/**
+ * Read presence values: `true` or `false`, and `1` as `true`, as links
+ * written before presence took a boolean spell it. A blank is no value; any
+ * other value is reported and read as nothing.
+ */
+const readPresence = (
+  key: string,
+  field: string,
+  values: readonly string[],
+  issues: QueryIssue[],
+): ReadOperands => {
+  const operands: PredicateOperand[] = [];
+  const read: number[] = [];
+  for (const [at, value] of values.entries()) {
+    if (isPresenceValue(value)) {
+      operands.push(PRESENCE_VALUES[value]);
+      read.push(at);
+      continue;
+    }
+    if (value === "") {
+      continue;
+    }
+    issues.push({
+      parameter: key,
+      field,
+      code: "malformed",
+      reason: `"${value}" is neither true nor false`,
+    });
+  }
+  return { operands, read };
+};
+
+/** Read text inputs through the field's kind, reporting each it cannot read. */
+const readInputs = (
+  key: string,
+  field: string,
+  values: readonly string[],
+  schema: Schema<readonly SchemaFieldDefinition[]>,
+  issues: QueryIssue[],
+): ReadOperands => {
+  const operands: PredicateOperand[] = [];
+  const read: number[] = [];
+  for (const [at, value] of values.entries()) {
+    const parsed = schema.validateInput(field, value);
+    if (parsed.status === "valid") {
+      operands.push(...parsed.operands);
+      read.push(at);
+      continue;
+    }
+    // A blank is a control left empty: no value, and nothing to report.
+    if (parsed.status === "incomplete") {
+      continue;
+    }
+    issues.push({
+      parameter: key,
+      field,
+      code: "invalid",
+      reason: parsed.reason,
+    });
+  }
+  return { operands, read };
+};
 
 /**
  * What one filter key's values read as, a blank read as no value: the
@@ -83,38 +158,15 @@ export default function readKeyPredicate(
           ],
           conjunct: null,
         };
-  if (
-    !kind.operators.includes(operator) ||
-    OPERATOR_ARITY[operator] === "none" ||
-    kind.input.kind === "none"
-  ) {
+  if (!kind.operators.includes(operator)) {
     // An operator the kind does not accept is refused for the operator,
-    // before any value is read. The zero-value operator carries no operands
-    // — its presence is the predicate, never a truthiness test on its value
-    // — and a kind that filters without a text input has none to parse: the
-    // schema answers for the operator alone.
+    // before any value is read.
     return settle(schema.predicateFor(field, operator, []), filled);
   }
-  const operands: PredicateOperand[] = [];
-  const read: number[] = [];
-  for (const [at, value] of values.entries()) {
-    const parsed = schema.validateInput(field, value);
-    if (parsed.status === "valid") {
-      operands.push(...parsed.operands);
-      read.push(at);
-      continue;
-    }
-    // A blank is a control left empty: no value, and nothing to report.
-    if (parsed.status === "incomplete") {
-      continue;
-    }
-    issues.push({
-      parameter: key,
-      field,
-      code: "invalid",
-      reason: parsed.reason,
-    });
-  }
+  const { operands, read } =
+    operator === "isSet"
+      ? readPresence(key, field, values, issues)
+      : readInputs(key, field, values, schema, issues);
   if (operands.length === 0) {
     return { issues, conjunct: null };
   }

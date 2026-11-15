@@ -49,7 +49,7 @@ export default function PresenceFilter({
         <input
           type="checkbox"
           name={spellWireKey(fieldName, "isSet")}
-          value="1"
+          value="true"
           checked={applied}
           aria-describedby={spelled === null ? undefined : countId}
           onChange={() => {
@@ -61,7 +61,7 @@ export default function PresenceFilter({
               }
               return;
             }
-            field.set([]);
+            field.set([true]);
           }}
         />
         {label}

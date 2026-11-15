@@ -40,7 +40,7 @@ const POOL: readonly Predicate[] = [
   { field: "cpu", operator: "gte", operands: [4] },
   { field: "cpu", operator: "gte", operands: [1e21] },
   { field: "updated", operator: "lte", operands: ["2026-01-02"] },
-  { field: "owner", operator: "isSet", operands: [] },
+  { field: "owner", operator: "isSet", operands: [true] },
   { field: "hostname", operator: "contains", operands: ["ex"] },
   { field: "hostname", operator: "contains", operands: ["web"] },
 ];

@@ -120,7 +120,7 @@ describe("FurtherConjuncts", () => {
     const host = readProviderHost(provider);
     const rows = (
       operator: "isNone" | "lte" | "contains" | "startsWith" | "isSet",
-      operands: readonly (string | number)[],
+      operands: readonly (string | number | boolean)[],
     ) => {
       const { container, unmount } = render(
         <DataViews provider={provider}>
@@ -142,9 +142,8 @@ describe("FurtherConjuncts", () => {
     expect(rows("lte", [8])).toBe("Cores to 8");
     expect(rows("contains", ["ex"])).toBe("Cores contains ex");
     expect(rows("startsWith", ["ex"])).toBe("Cores starts with ex");
-    // Presence holds no value: its row reads as the field, its value the
-    // marker a link spells it with.
-    expect(rows("isSet", [])).toBe("Cores 1");
+    // Presence reads as the field and the value a link spells it with.
+    expect(rows("isSet", [true])).toBe("Cores true");
   });
   it("passes native props to its list, keeping its own class first", () => {
     const provider = follow("/machines");

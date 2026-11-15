@@ -125,7 +125,7 @@ export default function createArraySource<TRow extends object = RowRecord>(
           rows,
           request.slice,
           listFacetDefinitions(request),
-          { schema, searchFields },
+          { schema, searchFields, types: collection.types },
           executed.matched,
         ),
       };

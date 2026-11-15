@@ -139,10 +139,46 @@ describe("decodeQuery", () => {
     ]);
   });
 
-  it("applies the zero-value operator on its presence, not its value", () => {
-    expect(decode("owner__isSet=0").slice.filter).toEqual([
-      { field: "owner", operator: "isSet", operands: [] },
+  it("reads presence as true or false, and 1 as true", () => {
+    expect(decode("owner__isSet=true").slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [true] },
     ]);
+    expect(decode("owner__isSet=false").slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [false] },
+    ]);
+    expect(decode("owner__isSet=1").slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [true] },
+    ]);
+  });
+
+  it("reads an empty presence value as no clause", () => {
+    expect(decode("owner__isSet=")).toMatchObject({
+      slice: { filter: [] },
+      issues: [],
+    });
+  });
+
+  it("refuses a presence value that is neither true nor false", () => {
+    expect(decode("owner__isSet=0")).toMatchObject({
+      slice: { filter: [] },
+      issues: [
+        {
+          parameter: "owner__isSet",
+          field: "owner",
+          code: "malformed",
+          reason: '"0" is neither true nor false',
+        },
+      ],
+    });
+  });
+
+  it("keeps the first of two presence values, reporting the other", () => {
+    expect(decode("owner__isSet=false&owner__isSet=true")).toMatchObject({
+      slice: {
+        filter: [{ field: "owner", operator: "isSet", operands: [false] }],
+      },
+      issues: [{ parameter: "owner__isSet", code: "malformed" }],
+    });
   });
 
   it("reads search and an ordered sort", () => {
