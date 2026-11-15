@@ -1,3 +1,4 @@
+import { createTranslator } from "@canonical/i18n-core";
 import {
   BUS_OFFSET,
   measurePathBounds,
@@ -25,9 +26,34 @@ import {
 } from "../../../testing/measureClassGraph.js";
 import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
+import { MESSAGES } from "../i18n/index.js";
 import { DESIGN_CANVAS, MIN_FIT, PHONE, SHELF_GAP } from "./constants.js";
 import layOutClassGraph from "./layOutClassGraph.js";
+import placeBridgeLabels from "./placeBridgeLabels.js";
 import type { ClassGraphInput } from "./types.js";
+
+/**
+ * A shuffle seeded by a whole number: the same seed always gives the same
+ * order (a linear congruential generator driving Fisher and Yates).
+ */
+function shuffleWith(seed: number): <T>(items: readonly T[]) => T[] {
+  let state = seed;
+  const next = (): number => {
+    state = (state * 1103515245 + 12345) % 2147483648;
+    return state / 2147483648;
+  };
+  return <T>(items: readonly T[]): T[] => {
+    const shuffled = [...items];
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const other = Math.floor(next() * (index + 1));
+      [shuffled[index], shuffled[other]] = [
+        shuffled[other] as T,
+        shuffled[index] as T,
+      ];
+    }
+    return shuffled;
+  };
+}
 
 describe("layOutClassGraph", () => {
   const layout = layOutClassGraph(CROSS_REGION_GRAPH);
@@ -314,17 +340,42 @@ describe("layOutClassGraph", () => {
     }
   });
 
-  it("lays the same graph out whatever order its classes and relations come in", () => {
-    const reordered = layOutClassGraph({
-      classes: ontologyGraph.classes.toReversed(),
-      relations: ontologyGraph.relations.toReversed(),
-    });
-    const layout = layOutClassGraph(ontologyGraph);
-    expect(reordered).toEqual(layout);
-    expect(JSON.stringify([...reordered.nodes])).toBe(
-      JSON.stringify([...layout.nodes]),
-    );
-    expect(JSON.stringify(reordered.edges)).toBe(JSON.stringify(layout.edges));
+  // Every input the layout reads, given in several orders: the regions,
+  // the classes within them and the relations, which become its edges. A
+  // Map filled in the order the input comes in, or a sort with no
+  // tie-break, would let that order through to a coordinate, a route, a
+  // lane or a label.
+  it.each([
+    ["the metro's records", metroGraph],
+    ["three bridges, one with no statements", BRIDGE_TRIO_GRAPH],
+  ])("lays %s out the same whatever order they come in", (_, graph) => {
+    const t = createTranslator("en", MESSAGES);
+    const serialise = (input: ClassGraphInput): string => {
+      const layout = layOutClassGraph(input);
+      return JSON.stringify({
+        nodes: [...layout.nodes],
+        edges: layout.edges,
+        regions: layout.regions,
+        rail: layout.rail,
+        view: [layout.viewBox, layout.view, layout.fitZoom, layout.channel],
+        findings: layout.findings,
+        labels: placeBridgeLabels(layout, t),
+      });
+    };
+    const expected = serialise(graph);
+    expect(expected).toContain('"bridge":true');
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const shuffle = shuffleWith(seed);
+      const regions = shuffle([
+        ...new Set(graph.classes.map((klass) => klass.prefix)),
+      ]);
+      const classes = regions.flatMap((prefix) =>
+        shuffle(graph.classes.filter((klass) => klass.prefix === prefix)),
+      );
+      expect(serialise({ classes, relations: shuffle(graph.relations) })).toBe(
+        expected,
+      );
+    }
   });
 
   it.each([

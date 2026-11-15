@@ -41,22 +41,40 @@ describe("DefinitionsExplorer SSR", () => {
     expect(html.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
   });
 
-  it("server-renders the overview byte for byte the same twice in one process", () => {
-    const render = (): string =>
-      renderToString(
-        createDefinitionsPage(
-          undefined,
-          definitionsExplorerRecords,
-          createFetchSpy(),
-        ),
+  it("server-renders the overview's canvas byte for byte the same from its records in any order", () => {
+    // The same records with every list the provider serves reversed: the
+    // namespaces, their classes and properties, and the class edges. A Map
+    // filled in the order the provider answers, or a sort with no
+    // tie-break, from the store to the markup would change the bytes.
+    const reversed = Object.fromEntries(
+      Object.entries(definitionsExplorerRecords).map(([id, record]) => [
+        id,
+        record === null || record === undefined
+          ? record
+          : Object.fromEntries(
+              Object.entries(record).map(([field, value]) => [
+                field,
+                typeof value === "object" &&
+                value !== null &&
+                "__refs" in value &&
+                Array.isArray(value.__refs)
+                  ? { ...value, __refs: value.__refs.toReversed() }
+                  : value,
+              ]),
+            ),
+      ]),
+    ) as typeof definitionsExplorerRecords;
+    // The canvas, from its slot to the page's end: the rail lists the
+    // namespaces in the order they are served.
+    const render = (records: typeof definitionsExplorerRecords): string => {
+      const html = renderToString(
+        createDefinitionsPage(undefined, records, createFetchSpy()),
       );
-    const first = render();
-    expect(render()).toBe(first);
-    // Each bridge drawn is named at rest. The captured namespaces draw
-    // none: their relations to other namespaces end at classes not loaded.
-    expect(first.match(/class="edge-label is-bridge"/g)?.length ?? 0).toBe(
-      first.match(/class="relation is-bridge"/g)?.length ?? 0,
-    );
+      return html.slice(html.indexOf('data-slot="explorer-canvas"'));
+    };
+    const canvas = render(definitionsExplorerRecords);
+    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(35);
+    expect(render(reversed)).toBe(canvas);
   });
 
   it("lays the graph out the same on every render", () => {
