@@ -1,6 +1,6 @@
 import type { RowRecord } from "../rows/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
-import { PROVIDER_HOSTS } from "./constants.js";
+import readProviderRegistry from "./readProviderRegistry.js";
 import type { DataViewsProvider, ProviderHost } from "./types.js";
 
 /**
@@ -15,7 +15,7 @@ export default function readProviderHost<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 >(provider: DataViewsProvider<TFields, TRow>): ProviderHost<TFields, TRow> {
-  const host = PROVIDER_HOSTS.get(provider);
+  const host = readProviderRegistry().get(provider);
   if (host === undefined) {
     throw new Error(
       "readProviderHost requires a provider created by createDataViewsProvider",

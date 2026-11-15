@@ -1,4 +1,4 @@
-import { PROVIDER_HOSTS } from "./constants.js";
+import readProviderRegistry from "./readProviderRegistry.js";
 
 /**
  * Whether a value is a provider this package built: registered with its
@@ -13,6 +13,8 @@ import { PROVIDER_HOSTS } from "./constants.js";
  */
 export default function isDataViewsProvider(value: unknown): boolean {
   return (
-    typeof value === "object" && value !== null && PROVIDER_HOSTS.has(value)
+    typeof value === "object" &&
+    value !== null &&
+    readProviderRegistry().has(value)
   );
 }
