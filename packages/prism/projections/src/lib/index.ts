@@ -103,6 +103,9 @@ export type {
   EntityListRenderer,
   EntityRowProps,
   SpecimenKind,
+  SwatchMarkProps,
+  TokenMarkProps,
+  TokenSwatchProps,
 } from "./ui/index.js";
 export {
   DEFAULT_ENTITY_LIST_RENDERER,
@@ -115,5 +118,8 @@ export {
   EntityRow,
   PEEK_CLOSE_DELAY_MS,
   PEEK_OPEN_DELAY_MS,
+  SwatchMark,
+  TokenMark,
+  TokenSwatch,
 } from "./ui/index.js";
 export { findCuriePrefix, requireArmKey } from "./utils/index.js";

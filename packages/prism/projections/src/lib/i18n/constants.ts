@@ -29,6 +29,8 @@ export const MESSAGES = {
   "property.range": "Range",
   "property.inverse": "Inverse",
   "property.functional": "functional",
+  "token.mode.light": "Light",
+  "token.mode.dark": "Dark",
   "list.empty": "Nothing to list.",
   "renderer.table": "Table",
   "renderer.cards": "Cards",

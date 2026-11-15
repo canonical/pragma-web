@@ -67,6 +67,14 @@ lays the five representations of each type out as one matrix, under
   title's line, and the graph's encodings: `hollow` (an abstract class),
   `prominent` (a hub) and `showText` (off when zoomed out), for a graph to
   place with a transform inside its `<svg>`.
+- **`SwatchMark`**, **`TokenMark`** and **`TokenSwatch`**: the marks and
+  the swatch a colour is drawn by. `SwatchMark` is a 16px disc of an
+  entity's own colour (a metro line's), ringed so a pale colour shows;
+  `TokenMark` is a 16px square split between a token's light and dark
+  values; `TokenSwatch` is the same two values as a token card's
+  specimen, under `<EntityCard.Specimen kind="swatch">`. A colour enters
+  each only from the entity's data, as an inline custom property; none
+  names a colour of its own.
 - **`EntityList`**: the shared list view of an index: its children as
   rows in an ordered list (the `table` renderer, the default) or as cards
   in the published `Cards` group, two columns each (the `cards` renderer),
@@ -432,6 +440,11 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityCardKeyValue`, `EntityFact` (one fact a card or a row states),
   `SpecimenKind`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListRenderer`.
+- Marks and swatches: `SwatchMark` (the 16px mark of an entity whose
+  colour is its own data, such as a line), `TokenMark` (a design token's
+  16px mark, its light and dark values side by side) and `TokenSwatch`
+  (a token card's swatch specimen, both values each named under its
+  well); types `SwatchMarkProps`, `TokenMarkProps`, `TokenSwatchProps`.
 - List renderers: `useListRenderers` (the table and the cards, the list
   renderers a site gives its indexes), `ENTITY_LIST_RENDERERS`,
   `DEFAULT_ENTITY_LIST_RENDERER`.

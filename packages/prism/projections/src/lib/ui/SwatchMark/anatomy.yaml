@@ -1,0 +1,29 @@
+---
+# SwatchMark (packages/prism/projections/src/lib/ui/SwatchMark/): the 16px
+# mark of an entity whose colour is instance data (a metro line), 4.2: the
+# colour enters only from data, through one declared custom property set
+# inline (--swatch-mark-colour; A9), framed by a ring at 3:1 against the
+# background so a pale colour stays visible. Optional code (a line's code)
+# is not rendered: the title names it. aria-hidden. Displayed as a block,
+# since a span takes no size of its own outside the forms' mark box.
+#
+# Token ledger:
+#   --swatch-mark-size: space.200 (16px)
+#   --swatch-mark-radius: 9999px            literal: full radius has only a primitive
+#   --swatch-mark-ring-width: 1px           literal
+#   --swatch-mark-ring-color: color.text.muted   meets 3:1 on both backgrounds
+#   --swatch-mark-colour: swatch.mark.colour   the inline channel: the
+#     entity's colour from its data (SwatchMarkChannelStyle in types.ts)
+node:
+  uri: prism.component.swatch_mark
+  element: span
+  attributes: { aria-hidden: "true" }
+  styles:
+    layout.type: block
+    size.width: space.200
+    size.height: space.200
+    appearance.radius: 9999px
+    appearance.background: swatch.mark.colour
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.color: color.text.muted
