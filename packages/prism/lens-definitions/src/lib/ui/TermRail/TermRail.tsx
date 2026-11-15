@@ -6,7 +6,6 @@ import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import type { TermRail_ontologies$key } from "../../../__generated__/TermRail_ontologies.graphql.js";
 import termRailFragmentNode from "../../../__generated__/TermRail_ontologies.graphql.js";
-import { REGION_NODE_SCHEME } from "../../classGraph/constants.js";
 import compactUri from "../../compactUri.js";
 import formatPropertyKind from "../../formatPropertyKind.js";
 import { useMessages } from "../../i18n/index.js";
@@ -143,21 +142,34 @@ export default function TermRail({
       </p>
       {data.map((ontology) => {
         const namespaces = [ontology];
-        // A namespace the graph collapses to one box is one row here too.
-        const collapsed =
-          layout.nodes.get(`${REGION_NODE_SCHEME}${ontology.prefix}`)?.kind ===
-          "region";
-        const classes = (collapsed ? [] : [...ontology.classes])
-          .sort(
-            (a, b) =>
-              requireEntry(railIndex, a.uri) - requireEntry(railIndex, b.uri),
-          )
-          .map((term) => {
+        // The rail lists every class, whatever the graph draws: a
+        // namespace the graph collapses to one box is listed in its own
+        // tree's order, under a heading that says so.
+        const boxed = layout.regions.find(
+          (region) => region.prefix === ontology.prefix && region.collapsed,
+        )?.boxed;
+        const order =
+          boxed === undefined
+            ? undefined
+            : new Map(
+                boxed.map(({ uri, depth }, index) => [uri, { index, depth }]),
+              );
+        const placeOf = (uri: string): { index: number; depth: number } => {
+          if (order !== undefined) return requireEntry(order, uri);
+          return {
+            index: requireEntry(railIndex, uri),
+            depth: requireEntry(layout.nodes, uri).depth,
+          };
+        };
+        const classes = [...ontology.classes]
+          .map((term) => ({ term, place: placeOf(term.uri) }))
+          .sort((a, b) => a.place.index - b.place.index)
+          .map(({ term, place }) => {
             const prefixed = compactUri(term.uri, namespaces);
             return {
               term,
               prefixed,
-              depth: requireEntry(layout.nodes, term.uri).depth,
+              depth: place.depth,
               dimmed:
                 !matchesDimming(
                   filter,
@@ -177,17 +189,7 @@ export default function TermRail({
               !filter.namespaces.includes(ontology.prefix),
           };
         });
-        const classMatches = collapsed
-          ? ontology.classes.filter(
-              (term) =>
-                matchesDimming(
-                  filter,
-                  term.label,
-                  compactUri(term.uri, namespaces),
-                  term.instanceCount,
-                ) && matchesChips(filter, term.isAbstract, ontology.prefix),
-            ).length
-          : classes.filter((row) => !row.dimmed).length;
+        const classMatches = classes.filter((row) => !row.dimmed).length;
         const propertyMatches = properties.filter((row) => !row.dimmed).length;
         const headingId = `term-rail-${ontology.prefix}`;
         return (
@@ -207,15 +209,11 @@ export default function TermRail({
                   total: ontology.classes.length,
                 })}
               </span>
+              {boxed === undefined ? null : (
+                <span className="boxed">{t("rail.region")}</span>
+              )}
             </h3>
             <ul className="list">
-              {collapsed ? (
-                <li className="item is-region" data-ns={ontology.prefix}>
-                  <span className="region">
-                    {t("rail.region", { count: ontology.classes.length })}
-                  </span>
-                </li>
-              ) : null}
               {classes.map(({ term, prefixed, depth, dimmed }) => (
                 <li
                   className={formatItemClassName(prefixed, dimmed)}

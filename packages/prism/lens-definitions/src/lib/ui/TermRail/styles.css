@@ -78,6 +78,7 @@
   .ds.term-rail .subheading {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     justify-content: space-between;
     margin-block-start: var(--term-rail-default);
     margin-block-end: var(--term-rail-tight);
@@ -89,6 +90,11 @@
 
   .ds.term-rail .count {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* A namespace the graph draws as one box says so under its count. */
+  .ds.term-rail .boxed {
+    flex-basis: 100%;
   }
 
   .ds.term-rail .list {

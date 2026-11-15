@@ -269,6 +269,19 @@ export interface LaidOutRegion {
   readonly members: number;
   /** Whether it is a namespace collapsed to one box. */
   readonly collapsed: boolean;
+  /**
+   * The classes a collapsed namespace's box stands for, in the rail's
+   * order, each at its depth; none for a namespace drawn class by class,
+   * whose classes the layout's rail lists.
+   */
+  readonly boxed: readonly BoxedClass[];
+}
+
+/** A class a collapsed namespace's box stands for, as the rail lists it. */
+export interface BoxedClass {
+  readonly uri: string;
+  /** How many superclass hops it is below its namespace's root. */
+  readonly depth: number;
 }
 
 /** One row of the phone view. */

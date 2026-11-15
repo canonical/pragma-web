@@ -132,13 +132,31 @@ describe("DefinitionsExplorer", {
     expect(
       container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
     ).toHaveLength(16);
+    // The rail still lists every class of ds, each a link to its term,
+    // under a heading that says the graph draws them as one box; its
+    // search counts them all.
     const rail = screen.getByRole("region", { name: "ds" });
-    expect(rail.querySelector(".item.is-region")?.textContent).toBe(
-      "20 classes, drawn as one box",
+    const [classList] = rail.querySelectorAll(".list");
+    expect(
+      classList?.querySelectorAll('.item a[href^="/definitions/ds%3A"]'),
+    ).toHaveLength(20);
+    expect(rail.querySelector(".subheading .boxed")?.textContent).toBe(
+      "drawn as one box",
     );
-    expect(rail.querySelectorAll('a[href^="/definitions/ds%3A"]').length).toBe(
-      rail.querySelectorAll(".item:not(.is-region)").length,
+    expect(rail.querySelector(".subheading .count")?.textContent).toBe(
+      "20 of 20",
     );
+    fireEvent.change(screen.getByRole("searchbox", { name: "Filter terms" }), {
+      target: { value: "concept" },
+    });
+    expect(rail.querySelector(".subheading .count")?.textContent).toBe(
+      "2 of 20",
+    );
+    expect(
+      [...(classList?.querySelectorAll(".item:not(.is-dimmed) a") ?? [])].map(
+        (link) => link.textContent,
+      ),
+    ).toEqual(["Concept", "Concept Type"]);
     expect(
       container.querySelector('.phone .row[data-kind="region"]')?.textContent,
     ).toContain("20 classes");

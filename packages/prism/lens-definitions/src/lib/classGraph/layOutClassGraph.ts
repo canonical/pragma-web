@@ -41,6 +41,7 @@ import frameLegibleWindow from "./frameLegibleWindow.js";
 import gatherDrawnInput from "./gatherDrawnInput.js";
 import layOutPhoneView from "./layOutPhoneView.js";
 import listRegionBridges from "./listRegionBridges.js";
+import orderBoxedClasses from "./orderBoxedClasses.js";
 import orderRail from "./orderRail.js";
 import orderRegionsByBridges from "./orderRegionsByBridges.js";
 import packShelves from "./packShelves.js";
@@ -758,6 +759,9 @@ export default function layOutClassGraph(
       columns: region.layout.columns.length,
       members: boxes.reduce((sum, box) => sum + box.members, 0),
       collapsed: boxes.some((box) => box.kind === "region"),
+      boxed: boxes.some((box) => box.kind === "region")
+        ? orderBoxedClasses(whole, region.prefix)
+        : [],
     };
   });
   const allEdges = [...edges, ...crossEdges];
