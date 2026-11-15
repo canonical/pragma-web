@@ -1,4 +1,5 @@
 import { HomesProvider, RouterLink } from "@canonical/prism-core";
+import { guardTypedArms } from "@canonical/prism-core/testing";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
@@ -32,7 +33,7 @@ export default function createSiteTree(
         <HomesProvider homes={homes}>
           <ProjectionsProvider
             LinkComponent={RouterLink}
-            maps={defaultProjectionMaps}
+            maps={guardTypedArms(defaultProjectionMaps)}
           >
             <SiteRenderers>{children}</SiteRenderers>
           </ProjectionsProvider>

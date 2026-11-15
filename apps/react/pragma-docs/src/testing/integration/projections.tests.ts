@@ -187,6 +187,11 @@ describe("the app's projections", () => {
       "ComponentHeader",
       "ComponentProperties",
       "ComponentRelations",
+      "DocsCardProjection",
+      "DocsChipProjection",
+      "DocsCommandProjection",
+      "DocsGraphNodeProjection",
+      "DocsRowProjection",
       "ModifierCard",
       "ModifierChip",
       "ModifierCommand",
@@ -224,10 +229,14 @@ describe("the app's projections", () => {
 });
 
 describe("the site's composites", () => {
-  it.each(SITE_DISPATCHERS)(
-    "the %s composite arms exactly what its map and its anatomy arm",
-    (form, word) => {
-      const name = `Site${word}Projection`;
+  it.each(
+    ["Site", "Docs"].flatMap((site) =>
+      SITE_DISPATCHERS.map(([form, word]) => [site, form, word] as const),
+    ),
+  )(
+    "the %s %s composite arms exactly what its map and its anatomy arm",
+    (site, form, word) => {
+      const name = `${site}${word}Projection`;
       const arms = readCompositeArms(
         readNodeFragment(join(APP_ROOT, "src", "lib", "ui", name)),
       );
