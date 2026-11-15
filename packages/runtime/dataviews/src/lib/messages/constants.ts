@@ -158,6 +158,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
       : `at least ${formatCount(count.value)}`,
   filterContains: (label) => `${label} contains`,
   filterStartsWith: (label) => `${label} starts with`,
+  filterEndsWith: (label) => `${label} ends with`,
   filterNotContains: (label) => `${label} does not contain`,
   filterIsNot: (label) => `${label} is not`,
   filterIs: (label) => `${label} is`,

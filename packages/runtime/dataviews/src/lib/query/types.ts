@@ -20,7 +20,8 @@ export type PredicateOperator =
   | "isNot"
   | "contains"
   | "notContains"
-  | "startsWith";
+  | "startsWith"
+  | "endsWith";
 
 /**
  * A semantic operand value. Field metadata owns coercion; core never guesses.

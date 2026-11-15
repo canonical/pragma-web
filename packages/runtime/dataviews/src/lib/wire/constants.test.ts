@@ -55,6 +55,22 @@ describe("the wire grammar's names", () => {
     expect(Object.isFrozen(SUFFIXED_OPERATORS)).toBe(true);
   });
 
+  it("spells every operator of the grammar after the delimiter", () => {
+    expect([...SUFFIXED_OPERATORS]).toEqual([
+      "isAny",
+      "isNone",
+      "gte",
+      "lte",
+      "isSet",
+      "is",
+      "isNot",
+      "contains",
+      "notContains",
+      "startsWith",
+      "endsWith",
+    ]);
+  });
+
   it("spells the arrangement's parameters as the presentation stores them", () => {
     // A link decodes into the presentation by name, so the two must agree.
     expect(ORDER_QUERY_KEY).toBe(ORDER_KEY);

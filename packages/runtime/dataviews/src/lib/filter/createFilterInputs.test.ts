@@ -65,6 +65,7 @@ describe("createFilterInputs", () => {
       "contains",
       "notContains",
       "startsWith",
+      "endsWith",
     ]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
     expectTypeOf(handles.name.contains.applied).toEqualTypeOf<

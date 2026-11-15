@@ -160,6 +160,7 @@ describe("declareCapabilities", () => {
             | "contains"
             | "notContains"
             | "startsWith"
+            | "endsWith"
           )[]
         | true;
     }>();

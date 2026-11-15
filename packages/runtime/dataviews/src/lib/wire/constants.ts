@@ -5,7 +5,7 @@
  * delimiter.
  */
 
-import type { PredicateOperator } from "../query/index.js";
+import { OPERATOR_ARITY, type PredicateOperator } from "../query/index.js";
 
 /**
  * The delimiter between a field's wire name and its operator, and between
@@ -78,21 +78,15 @@ export const RESERVED_QUERY_KEYS: readonly string[] = Object.freeze([
 ]);
 
 /**
- * The operators a key may carry after the delimiter. `isAny` is written as
- * the bare field name, and read under both spellings as one predicate.
+ * The operators a key may carry after the delimiter: every operator, read
+ * off the one exhaustive arity table, so an operator added to the grammar
+ * is spelled on the wire without a second list to keep. `isAny` is written
+ * as the bare field name, and read under both spellings as one predicate.
  */
-export const SUFFIXED_OPERATORS = Object.freeze([
-  "isAny",
-  "isNone",
-  "gte",
-  "lte",
-  "isSet",
-  "is",
-  "isNot",
-  "contains",
-  "notContains",
-  "startsWith",
-] as const satisfies readonly PredicateOperator[]);
+export const SUFFIXED_OPERATORS: readonly PredicateOperator[] = Object.freeze(
+  // The table is keyed by every operator, and by nothing else.
+  Object.keys(OPERATOR_ARITY) as PredicateOperator[],
+);
 
 /**
  * The values a presence key reads as: `true` and `false`, and `1`, which
