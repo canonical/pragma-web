@@ -71,11 +71,7 @@ export const Size: Story = {
         To indicate a positive and/or prominent action&nbsp;
         <Component {...args} />
       </h6>
-      <p
-        style={
-          { fontSize: "1.5rem", "--icon-size": "1em" } as CSSProperties
-        }
-      >
+      <p style={{ fontSize: "1.5rem", "--icon-size": "1em" } as CSSProperties}>
         Ancestor 1em override&nbsp;
         <Component {...args} />
       </p>

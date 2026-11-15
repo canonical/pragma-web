@@ -29,21 +29,21 @@
   /* NB `.ds.input.textarea` is EXCLUDED: the textarea seats intrinsically (its own
    * rule below) and must keep its multi-row min-height. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  .ds.input:not(
-    .textarea,
-    .text,
-    .select,
-    .number,
-    .password,
-    .phone,
-    .date,
-    .time,
-    .datetime,
-    .combobox-input,
-    .color-trigger,
-    .color-inline-seat,
-    .color
-  ) {
+    .ds.input:not(
+      .textarea,
+      .text,
+      .select,
+      .number,
+      .password,
+      .phone,
+      .date,
+      .time,
+      .datetime,
+      .combobox-input,
+      .color-trigger,
+      .color-inline-seat,
+      .color
+    ) {
     box-sizing: border-box;
     /* Same effective line-height the target-baseline uses (single source of the
        fallback chain), so a bare context class keeps a valid box height too. */
@@ -66,20 +66,20 @@
 
   /* The remaining density chromes keep their established top alignment. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  .ds.input:not(
-    .text,
-    .select,
-    .number,
-    .password,
-    .phone,
-    .date,
-    .time,
-    .datetime,
-    .combobox-input,
-    .color-trigger,
-    .color-inline-seat,
-    .color
-  ) {
+    .ds.input:not(
+      .text,
+      .select,
+      .number,
+      .password,
+      .phone,
+      .date,
+      .time,
+      .datetime,
+      .combobox-input,
+      .color-trigger,
+      .color-inline-seat,
+      .color
+    ) {
     align-items: flex-start;
   }
 
@@ -250,15 +250,15 @@
    * --end-nudge already lands its bottom on the grid. Adding a density fill on top
    * would double-pad. Prose bottom rhythm belongs to the engine / `.editorial`. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(
-    .ds.field-label:not(
-      .spacing-text-seat,
-      .field-toggle-inline-label,
-      .field-choice-label
-    ),
-    .ds.field-description:not(.p),
-    .ds.field-error:not(.p)
-  ) {
+    :is(
+      .ds.field-label:not(
+        .spacing-text-seat,
+        .field-toggle-inline-label,
+        .field-choice-label
+      ),
+      .ds.field-description:not(.p),
+      .ds.field-error:not(.p)
+    ) {
     padding-block-end: max(
       0px,
       calc(

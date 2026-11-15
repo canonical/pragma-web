@@ -113,9 +113,9 @@ const readBrowserBaseline = (
   const rig = document.createElement("span");
   rig.className = "bucket-baseline-rig";
   const clone = baselineOwner.cloneNode(true) as HTMLElement;
-  clone.querySelectorAll("[id]").forEach((element) =>
-    element.removeAttribute("id"),
-  );
+  clone
+    .querySelectorAll("[id]")
+    .forEach((element) => element.removeAttribute("id"));
   clone.removeAttribute("id");
   for (const property of baselineStyle) {
     clone.style.setProperty(property, baselineStyle.getPropertyValue(property));
@@ -577,10 +577,7 @@ const Tier = ({
       <Measured label="Time" ownerSelector=".input.time">
         <TimeInput name={`${tier}-time`} defaultValue="10:30" />
       </Measured>
-      <Measured
-        label="Date/time"
-        ownerSelector=".input.datetime"
-      >
+      <Measured label="Date/time" ownerSelector=".input.datetime">
         <DateTimeInput
           name={`${tier}-datetime`}
           defaultValue="2026-10-10T10:30"

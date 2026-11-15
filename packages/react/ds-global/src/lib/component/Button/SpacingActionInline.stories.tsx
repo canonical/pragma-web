@@ -92,9 +92,9 @@ const readBrowserBaseline = (
   const rig = document.createElement("span");
   rig.className = "action-baseline-rig";
   const clone = baselineOwner.cloneNode(true) as HTMLElement;
-  clone.querySelectorAll("[id]").forEach((element) =>
-    element.removeAttribute("id"),
-  );
+  clone
+    .querySelectorAll("[id]")
+    .forEach((element) => element.removeAttribute("id"));
   clone.removeAttribute("id");
   for (const property of style) {
     clone.style.setProperty(property, style.getPropertyValue(property));
@@ -230,7 +230,9 @@ const Measured = ({
   useEffect(() => {
     let frame = 0;
     const update = () => {
-      const owner = root.current?.querySelector(ownerSelector) as HTMLElement | null;
+      const owner = root.current?.querySelector(
+        ownerSelector,
+      ) as HTMLElement | null;
       const labelOwner = labelSelector
         ? owner?.querySelector<HTMLElement>(labelSelector)
         : owner;
