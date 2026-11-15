@@ -60,7 +60,7 @@ node:
                                 role: inherits from
                                 edges:
                                   - node:
-                                      uri: docs.component.site_row_projection
+                                      uri: docs.component.docs_row_projection
                                       projection:
                                         on: Node
                                     relation: { cardinality: "1..*", projection: { field: inheritsFroms } }
@@ -73,7 +73,7 @@ node:
                                 role: specialized by
                                 edges:
                                   - node:
-                                      uri: docs.component.site_row_projection
+                                      uri: docs.component.docs_row_projection
                                       projection:
                                         on: Node
                                     relation: { cardinality: "1..*", projection: { field: specializedBies } }
@@ -86,7 +86,7 @@ node:
                                 role: variants
                                 edges:
                                   - node:
-                                      uri: docs.component.site_row_projection
+                                      uri: docs.component.docs_row_projection
                                       projection:
                                         on: Node
                                     relation: { cardinality: "1..*", projection: { field: variants } }
@@ -99,7 +99,7 @@ node:
                                 role: variant of
                                 edges:
                                   - node:
-                                      uri: docs.component.site_row_projection
+                                      uri: docs.component.docs_row_projection
                                       projection:
                                         on: Node
                                     relation: { cardinality: "1..*", projection: { field: variantOfs } }
@@ -112,7 +112,7 @@ node:
                                 role: subcomponents
                                 edges:
                                   - node:
-                                      uri: docs.component.site_row_projection
+                                      uri: docs.component.docs_row_projection
                                       projection:
                                         on: Node
                                     relation: { cardinality: "1..*", projection: { field: subcomponents } }
@@ -125,7 +125,7 @@ node:
                                 role: modifier families
                                 edges:
                                   - node:
-                                      uri: docs.component.site_row_projection
+                                      uri: docs.component.docs_row_projection
                                       projection:
                                         on: Node
                                     relation: { cardinality: "1..*", projection: { field: modifierFamilies } }

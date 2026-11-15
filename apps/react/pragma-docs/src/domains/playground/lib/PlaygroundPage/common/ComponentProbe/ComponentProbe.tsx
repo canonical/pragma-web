@@ -6,12 +6,12 @@ import { InlineCode } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { Message, useMessages } from "#i18n";
+import { DocsCardProjection } from "#lib/ui/DocsCardProjection";
+import { DocsChipProjection } from "#lib/ui/DocsChipProjection";
+import { DocsCommandProjection } from "#lib/ui/DocsCommandProjection";
+import { DocsGraphNodeProjection } from "#lib/ui/DocsGraphNodeProjection";
+import { DocsRowProjection } from "#lib/ui/DocsRowProjection";
 import { PageSection } from "#lib/ui/PageSection";
-import { SiteCardProjection } from "#lib/ui/SiteCardProjection";
-import { SiteChipProjection } from "#lib/ui/SiteChipProjection";
-import { SiteCommandProjection } from "#lib/ui/SiteCommandProjection";
-import { SiteGraphNodeProjection } from "#lib/ui/SiteGraphNodeProjection";
-import { SiteRowProjection } from "#lib/ui/SiteRowProjection";
 import type { ComponentProbeQuery } from "#relay/__generated__/ComponentProbeQuery.graphql.js";
 import componentProbeQueryNode from "#relay/__generated__/ComponentProbeQuery.graphql.js";
 import { componentProbeVariables } from "../../../../probeQuery.js";
@@ -29,11 +29,11 @@ import "./styles.css";
 const declareProbeQuery = (): unknown => graphql`
   query ComponentProbeQuery($uri: String!) {
     component(uri: $uri) {
-      ...SiteChipProjection_node
-      ...SiteRowProjection_node
-      ...SiteCommandProjection_node
-      ...SiteGraphNodeProjection_node
-      ...SiteCardProjection_node
+      ...DocsChipProjection_node
+      ...DocsRowProjection_node
+      ...DocsCommandProjection_node
+      ...DocsGraphNodeProjection_node
+      ...DocsCardProjection_node
     }
   }
 `;
@@ -92,14 +92,14 @@ export default function ComponentProbe({
                 {
                   id: "chip",
                   term: t("playground.probe.chip"),
-                  value: <SiteChipProjection node={component} />,
+                  value: <DocsChipProjection node={component} />,
                 },
                 {
                   id: "row",
                   term: t("playground.probe.row"),
                   value: (
                     <ul className="entry">
-                      <SiteRowProjection node={component} />
+                      <DocsRowProjection node={component} />
                     </ul>
                   ),
                 },
@@ -108,7 +108,7 @@ export default function ComponentProbe({
                   term: t("playground.probe.command"),
                   value: (
                     <ul className="entry">
-                      <SiteCommandProjection node={component} />
+                      <DocsCommandProjection node={component} />
                     </ul>
                   ),
                 },
@@ -123,7 +123,7 @@ export default function ComponentProbe({
                       width={PROBE_NODE_WIDTH}
                     >
                       <title>{t("playground.probe.graphNode")}</title>
-                      <SiteGraphNodeProjection
+                      <DocsGraphNodeProjection
                         height={PROBE_NODE_HEIGHT}
                         node={component}
                         width={PROBE_NODE_WIDTH}
@@ -139,7 +139,7 @@ export default function ComponentProbe({
             headingId="component-probe-card-title"
           >
             <EntityList renderer="cards">
-              <SiteCardProjection node={component} />
+              <DocsCardProjection node={component} />
             </EntityList>
           </PageSection>
         </>

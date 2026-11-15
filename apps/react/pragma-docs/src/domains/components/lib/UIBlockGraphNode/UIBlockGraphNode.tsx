@@ -34,11 +34,12 @@ void declareNodeFragment;
 const componentCssClassName = "ds ui-block-graph-node";
 
 /**
- * A UI block as a node of a graph, native SVG: its title (`IconButton`) on
- * the first line, linked to its home when the site has one and inert text
- * when it has none, then its class in its tier muted (`Component in
- * Global`). The title, not the compact address, names the node, since an
- * address is wider than the node and would be clipped.
+ * A UI block as a node of a graph, native SVG: its mark, then its prefix
+ * when it is off the page's namespace and its title (`IconButton`),
+ * linked to its home when the site has one and inert text when it has
+ * none. Its mark says its kind, so it names none. The title, not the
+ * compact address, names the node, since an address is wider than the
+ * node and would be clipped.
  *
  * Native props reach the node's SVG `<g>` root, where a graph sets its
  * transform; a consumer `className` merges after the projection's own, and the

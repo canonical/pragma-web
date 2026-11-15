@@ -47,11 +47,12 @@ void declareNodeFragment;
 const componentCssClassName = "ds ui-block-command";
 
 /**
- * A UI block as a 56px command-palette result: its title on the first
- * line, linked to its home when the site has one and inert text when it
- * has none; its class in its tier on the second (`Component in Global`);
- * and one vital at the end, its version (`v2.1`) when it has one, else
- * its first documentation stage.
+ * A UI block as a 56px command-palette result: its mark, then its title
+ * on the first line, linked to its home when the site has one and inert
+ * text when it has none; its compact address on the second line, and no
+ * prefix; at the end its kind, the block's type (palette results mix
+ * every type), and its status, its version (`v2.1`) when it has one,
+ * else its first documentation stage.
  *
  * Native props reach the result's `<li>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename

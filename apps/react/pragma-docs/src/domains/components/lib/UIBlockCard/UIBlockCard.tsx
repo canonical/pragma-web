@@ -65,17 +65,17 @@ void declareNodeFragment;
 const componentCssClassName = "ds ui-block-card";
 
 /**
- * A UI block as a card in a grid of entities: its tier above the title,
- * the title linked to its home when the site has one and inert text when
- * it has none, after it the first block it inherits from (`IconButton ∈
- * Button`), then its class and the first paragraph of its Markdown
- * summary, rendered inline so its emphasis and code read as they do in
- * the block's documentation; the footer holds its version
- * (`v2.1`), when it has one, then its first documentation stage. A block
- * the published package renders has that component beside the body, in
- * the card's sidecar, server-rendered; any other block has no sidecar,
- * and its card lays out as any card without one. An empty summary is no
- * summary.
+ * A UI block as a card in a grid of entities: the block's mark, its
+ * prefix when it is off the page's namespace, and its title, linked to its
+ * home when the site has one and inert text when it has none; then the
+ * first paragraph of its Markdown summary, rendered inline so its emphasis
+ * and code read as they do in the block's documentation; its facts, the
+ * tier, the first block it inherits from and its version (`v2.1`), each
+ * cell naming its property; and its first documentation stage as its
+ * status. It names no address (the peek's line carries the CURIE) and no
+ * kind (its mark says it). A block the published package renders has that
+ * component as the card's specimen, server-rendered; any other block draws
+ * no specimen. An empty summary is no summary.
  *
  * Native props reach the card's `<div>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename

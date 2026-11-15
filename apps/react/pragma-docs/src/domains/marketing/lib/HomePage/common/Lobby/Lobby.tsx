@@ -6,8 +6,8 @@ import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { useMessages } from "#i18n";
+import { DocsChipProjection } from "#lib/ui/DocsChipProjection";
 import { PageSection } from "#lib/ui/PageSection";
-import { SiteChipProjection } from "#lib/ui/SiteChipProjection";
 import type { LobbyQuery } from "#relay/__generated__/LobbyQuery.graphql.js";
 import lobbyQueryNode from "#relay/__generated__/LobbyQuery.graphql.js";
 import {
@@ -47,7 +47,7 @@ const declareLobbyQuery = (): unknown => graphql`
                 name
               }
             }
-            ...SiteChipProjection_node
+            ...DocsChipProjection_node
           }
         }
       }
@@ -150,7 +150,7 @@ export default function Lobby({
           <ul className="exemplars">
             {exemplars.map((node) => (
               <li key={node.uri}>
-                <SiteChipProjection node={node} />
+                <DocsChipProjection node={node} />
               </li>
             ))}
           </ul>

@@ -4,8 +4,8 @@ import { EntityList } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
+import { DocsRowProjection } from "#lib/ui/DocsRowProjection";
 import { PageSection } from "#lib/ui/PageSection";
-import { SiteRowProjection } from "#lib/ui/SiteRowProjection";
 import nodeFragment from "#relay/__generated__/ComponentRelations_node.graphql.js";
 import { RELATION_FIELDS } from "../../../../constants.js";
 import type { ComponentRelationsProps } from "./types.js";
@@ -23,7 +23,7 @@ const declareNodeFragment = (): unknown => graphql`
       edges {
         node {
           uri
-          ...SiteRowProjection_node
+          ...DocsRowProjection_node
         }
       }
     }
@@ -31,7 +31,7 @@ const declareNodeFragment = (): unknown => graphql`
       edges {
         node {
           uri
-          ...SiteRowProjection_node
+          ...DocsRowProjection_node
         }
       }
     }
@@ -39,7 +39,7 @@ const declareNodeFragment = (): unknown => graphql`
       edges {
         node {
           uri
-          ...SiteRowProjection_node
+          ...DocsRowProjection_node
         }
       }
     }
@@ -47,7 +47,7 @@ const declareNodeFragment = (): unknown => graphql`
       edges {
         node {
           uri
-          ...SiteRowProjection_node
+          ...DocsRowProjection_node
         }
       }
     }
@@ -55,7 +55,7 @@ const declareNodeFragment = (): unknown => graphql`
       edges {
         node {
           uri
-          ...SiteRowProjection_node
+          ...DocsRowProjection_node
         }
       }
     }
@@ -63,7 +63,7 @@ const declareNodeFragment = (): unknown => graphql`
       edges {
         node {
           uri
-          ...SiteRowProjection_node
+          ...DocsRowProjection_node
         }
       }
     }
@@ -120,7 +120,7 @@ export default function ComponentRelations({
               renderer="table"
             >
               {edges.map(({ node }) => (
-                <SiteRowProjection key={node.uri} node={node} />
+                <DocsRowProjection key={node.uri} node={node} />
               ))}
             </EntityList>
           </div>

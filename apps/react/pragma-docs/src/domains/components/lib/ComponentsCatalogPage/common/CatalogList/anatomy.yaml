@@ -106,11 +106,11 @@ node:
                     on: props
                     cases:
                       - node:
-                          uri: docs.component.site_card_projection
+                          uri: docs.component.docs_card_projection
                           projection:
                             on: Node
                       - node:
-                          uri: docs.component.site_row_projection
+                          uri: docs.component.docs_row_projection
                           projection:
                             on: Node
                   relation: { cardinality: "1..*", slotName: items }

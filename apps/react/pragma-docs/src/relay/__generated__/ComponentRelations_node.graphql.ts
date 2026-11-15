@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8d8f8a3e3b20ce4466540c853c0f60bc>>
+ * @generated SignedSource<<7e1ba77251ce9b59e6984a8fc93042c7>>
  * @lightSyntaxTransform
  */
 
@@ -14,7 +14,7 @@ export type ComponentRelations_node$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"SiteRowProjection_node">;
+        readonly " $fragmentSpreads": FragmentRefs<"DocsRowProjection_node">;
       };
     }>;
   };
@@ -22,7 +22,7 @@ export type ComponentRelations_node$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"SiteRowProjection_node">;
+        readonly " $fragmentSpreads": FragmentRefs<"DocsRowProjection_node">;
       };
     }>;
   };
@@ -30,7 +30,7 @@ export type ComponentRelations_node$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"SiteRowProjection_node">;
+        readonly " $fragmentSpreads": FragmentRefs<"DocsRowProjection_node">;
       };
     }>;
   };
@@ -38,7 +38,7 @@ export type ComponentRelations_node$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"SiteRowProjection_node">;
+        readonly " $fragmentSpreads": FragmentRefs<"DocsRowProjection_node">;
       };
     }>;
   };
@@ -46,7 +46,7 @@ export type ComponentRelations_node$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"SiteRowProjection_node">;
+        readonly " $fragmentSpreads": FragmentRefs<"DocsRowProjection_node">;
       };
     }>;
   };
@@ -54,7 +54,7 @@ export type ComponentRelations_node$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"SiteRowProjection_node">;
+        readonly " $fragmentSpreads": FragmentRefs<"DocsRowProjection_node">;
       };
     }>;
   };
@@ -84,7 +84,7 @@ v1 = [
   {
     "args": null,
     "kind": "FragmentSpread",
-    "name": "SiteRowProjection_node"
+    "name": "DocsRowProjection_node"
   }
 ],
 v2 = [
@@ -232,6 +232,6 @@ return {
 };
 })();
 
-(node as any).hash = "a98c19a6ddc8a0a209cd98e4a26d2927";
+(node as any).hash = "e99aa863feceb37a401190f57490a180";
 
 export default node;

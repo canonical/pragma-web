@@ -46,11 +46,12 @@ void declareNodeFragment;
 const componentCssClassName = "ds ui-block-row";
 
 /**
- * A UI block as a 32px list entry: its namespace prefix, muted with its
- * colon (`ds:`), before its title, linked to its home when the site has
- * one and inert text when it has none; and its first documentation
- * stage at the end (`experimental`). A block whose address did not
- * compact has no prefix, and a block with no stage ends in its title.
+ * A UI block as a 32px list entry: its mark, its prefix (`ds:`) when it
+ * is off the page's namespace, and its title, linked to its home when the
+ * site has one and inert text when it has none; its first documentation
+ * stage at the end as its status (`experimental`). Where an index opts
+ * into two lines (`lines="two"`, 56px), the first paragraph of its
+ * summary goes under the title. A block with no stage ends in its title.
  *
  * Native props reach the row's `<li>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename
