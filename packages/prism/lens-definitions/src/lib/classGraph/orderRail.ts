@@ -1,7 +1,7 @@
 import {
   compareText,
+  type GraphLayoutResult,
   orderBy,
-  type RegionLayout,
   requireAt,
   requireEntry,
 } from "@canonical/prism-core";
@@ -20,7 +20,7 @@ import type { ClassGraphModel } from "./types.js";
  */
 export default function orderRail(
   model: ClassGraphModel,
-  region: RegionLayout,
+  region: GraphLayoutResult,
 ): string[] {
   // The first layer's classes, top to bottom and column by column: a
   // full first layer takes several columns.

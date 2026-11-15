@@ -1,10 +1,10 @@
 import {
   BUS_OFFSET,
   buildArrowhead,
-  type CrossPort,
   ceilTo,
   compareText,
   formatPathData,
+  type GraphLayoutResult,
   LATTICE,
   layoutLayered,
   measurePathBounds,
@@ -13,7 +13,6 @@ import {
   type PathCommand,
   REGION_LABEL_ROW,
   type Rect,
-  type RegionLayout,
   requireAt,
   requireDefined,
   requireEntry,
@@ -52,6 +51,7 @@ import routeNeighbourBridges from "./routeNeighbourBridges.js";
 import type {
   Bundle,
   ClassGraphInput,
+  CrossPort,
   ClassGraphLayout,
   ClassGraphLayoutOptions,
   ClassGraphModel,
@@ -70,7 +70,7 @@ import type {
 interface SizedRegion {
   readonly prefix: string;
   readonly ids: readonly string[];
-  readonly layout: RegionLayout<Bundle>;
+  readonly layout: GraphLayoutResult<Bundle>;
   readonly w: number;
   readonly h: number;
 }
@@ -79,7 +79,7 @@ interface SizedRegion {
 function sizeRegion(
   prefix: string,
   ids: readonly string[],
-  layout: RegionLayout<Bundle>,
+  layout: GraphLayoutResult<Bundle>,
 ): SizedRegion {
   return {
     prefix,
@@ -107,7 +107,7 @@ function layOutLayers(
   channel: number,
   engine: LayerSettings,
   crossPorts?: ReadonlyMap<string, CrossPort>,
-): RegionLayout<Bundle> {
+): GraphLayoutResult<Bundle> {
   return layoutLayered(model, model, {
     ids,
     channel,

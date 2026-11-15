@@ -1,10 +1,23 @@
 import type {
   FontFace,
   GraphBudget,
+  GraphLayoutOptions,
   LabelledBundle,
   Point,
   Rect,
 } from "@canonical/prism-core";
+
+/**
+ * Where a relation to another region meets a region's box, as the layout
+ * engine's options take it.
+ */
+export type CrossPort =
+  NonNullable<GraphLayoutOptions["crossPorts"]> extends ReadonlyMap<
+    string,
+    infer Port
+  >
+    ? Port
+    : never;
 
 /**
  * What a box of the graph stands for: a class of a loaded namespace, an
