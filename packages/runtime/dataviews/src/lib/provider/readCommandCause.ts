@@ -12,6 +12,7 @@ export default function readCommandCause(
 ): TransitionCause {
   switch (command.kind) {
     case "setPredicate":
+    case "addPredicate":
     case "removePredicate":
     case "editPredicates":
       return "filter";
