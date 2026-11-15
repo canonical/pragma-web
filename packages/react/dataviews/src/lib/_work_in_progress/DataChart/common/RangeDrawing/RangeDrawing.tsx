@@ -3,7 +3,7 @@ import { MessagesContext } from "../../../../common/index.js";
 import { listNiceTicks } from "../../../../utils/index.js";
 import type { RangeDrawingProps } from "./types.js";
 
-const componentCssClassName = "chart";
+const componentCssClassName = "drawing";
 
 /**
  * The drawing's own units. It scales to the width it is given, text included:
@@ -55,9 +55,9 @@ const RangeDrawing = ({
   const scale = (value: number): number =>
     place(INSET + ((value - low) / (high - low)) * (WIDTH - INSET * 2));
   return (
-    <>
+    <div className={componentCssClassName}>
       <svg
-        className={componentCssClassName}
+        className="chart"
         role="img"
         aria-label={messages.rangeChartSummary(label, min, max)}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -139,7 +139,7 @@ const RangeDrawing = ({
           </tr>
         </tbody>
       </table>
-    </>
+    </div>
   );
 };
 

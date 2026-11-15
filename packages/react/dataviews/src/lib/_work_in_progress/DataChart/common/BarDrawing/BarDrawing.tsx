@@ -1,9 +1,10 @@
+import type { FacetValue } from "@canonical/dataviews-core";
 import { memo, type ReactElement, useContext } from "react";
 import { MessagesContext } from "../../../../common/index.js";
 import { listNiceTicks, spellCount } from "../../../../utils/index.js";
-import type { BarDrawingProps, DrawnValue } from "./types.js";
+import type { BarDrawingProps } from "./types.js";
 
-const componentCssClassName = "chart";
+const componentCssClassName = "drawing";
 
 /**
  * The drawing's own units. It scales to the width it is given, text included:
@@ -49,7 +50,7 @@ const spellBarPath = (x0: number, x1: number, y: number): string => {
 };
 
 /** A value's count as a number to draw, where the source counted it. */
-const readDrawnCount = (entry: DrawnValue): number | null =>
+const readDrawnCount = (entry: FacetValue): number | null =>
   entry.count.kind === "unknown" ? null : entry.count.value;
 
 /**
@@ -78,9 +79,9 @@ const BarDrawing = ({ label, values }: BarDrawingProps): ReactElement => {
     place(LABEL_WIDTH + (count / domain) * plot);
   const height = values.length * BAND + AXIS;
   return (
-    <>
+    <div className={componentCssClassName}>
       <svg
-        className={componentCssClassName}
+        className="chart"
         role="img"
         aria-label={messages.barChartSummary(label)}
         viewBox={`0 0 ${WIDTH} ${height}`}
@@ -162,7 +163,7 @@ const BarDrawing = ({ label, values }: BarDrawingProps): ReactElement => {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 };
 

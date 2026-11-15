@@ -1,10 +1,4 @@
-import type { Facet } from "@canonical/dataviews-core";
-
-/** One value of a values facet, with the count of records holding it. */
-export type DrawnValue = Extract<
-  Facet,
-  { readonly kind: "values" }
->["values"][number];
+import type { FacetValue } from "@canonical/dataviews-core";
 
 /**
  * Props of the bar drawing.
@@ -16,5 +10,5 @@ export type BarDrawingProps = {
   /** The chart's label, which captions the table and names the drawing. */
   readonly label: string;
   /** The values drawn, in the source's order; never empty. */
-  readonly values: readonly DrawnValue[];
+  readonly values: readonly FacetValue[];
 };

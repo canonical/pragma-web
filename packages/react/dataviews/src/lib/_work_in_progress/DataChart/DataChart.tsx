@@ -141,12 +141,16 @@ export default function DataChart<
     // Ends that are numbers and finite: a range of NaN or of infinities has
     // no length to scale against, so it says what a range of nothing says
     // rather than drawing an axis no coordinate lands on.
+    const { min, max } = facet;
     drawing =
-      Number.isFinite(facet.min) && Number.isFinite(facet.max) ? (
+      typeof min === "number" &&
+      typeof max === "number" &&
+      Number.isFinite(min) &&
+      Number.isFinite(max) ? (
         <RangeDrawing
           label={label}
-          min={facet.min as number}
-          max={facet.max as number}
+          min={min}
+          max={max}
           lowerBound={bounds?.min}
           upperBound={bounds?.max}
         />

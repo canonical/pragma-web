@@ -1,10 +1,10 @@
+import type { FacetValue } from "@canonical/dataviews-core";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import BarDrawing from "./BarDrawing.js";
-import type { DrawnValue } from "./types.js";
 
 /** Two values, counted exactly. */
-const counted: readonly DrawnValue[] = [
+const counted: readonly FacetValue[] = [
   { value: "failed", count: { kind: "exact", value: 4 } },
   { value: "running", count: { kind: "exact", value: 8 } },
 ];

@@ -11,11 +11,7 @@ import {
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
-import {
-  type DisplayField,
-  MessagesContext,
-  StatusItem,
-} from "../../common/index.js";
+import { MessagesContext, StatusItem } from "../../common/index.js";
 import {
   useDataViewsValue,
   useMessages,
