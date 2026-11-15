@@ -14,6 +14,7 @@
  * invoke with `bun run test:e2e`.
  */
 import { describe, expect, it } from "vitest";
+import { COUNT_FORMAT } from "../../src/i18n/constants.js";
 import { startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
@@ -91,6 +92,35 @@ const CONNECTION_PAGE_CAP = 100;
  * in the home block below, which is the intent.
  */
 const LOBBY_EXEMPLAR_COUNT = 6;
+
+/** The separators the catalogue's count format groups a number's digits with. */
+const COUNT_GROUPS = COUNT_FORMAT.formatToParts(1_000_000)
+  .filter(({ type }) => type === "group")
+  .map(({ value }) => value);
+
+/**
+ * Read a count the home page writes as a card's fact: the fact's detail,
+ * in the catalogue's count format, with its grouping removed.
+ *
+ * @param html - The home page's server-rendered HTML.
+ * @param property - The fact's `data-property`.
+ * @returns The count.
+ * @throws When the page writes no such fact.
+ */
+function readHomeCount(html: string, property: string): number {
+  const match = html.match(
+    new RegExp(
+      `<div class="fact" data-property="${property}"><dt class="term">[^<]*</dt><dd class="detail">([^<]+)</dd>`,
+    ),
+  );
+  const written = match?.[1];
+  if (written === undefined) {
+    throw new Error(`the home page writes no ${property} count`);
+  }
+  return Number(
+    COUNT_GROUPS.reduce((text, group) => text.replaceAll(group, ""), written),
+  );
+}
 
 /**
  * The per-request line the GRAPH server logs — keep in sync with
@@ -635,25 +665,18 @@ describe("server matrix (2×3) serves correctly", () => {
             //     connection count, the number would silently collapse
             //     to at most 100 and this snaps. The floor is the cap
             //     itself — never the live total.
-            const standardsFigure = homeHtml.match(
-              /<span class="vital">(\d+) standards<\/span>/,
-            );
-            expect(standardsFigure).not.toBeNull();
-            expect(Number(standardsFigure?.[1])).toBeGreaterThan(
-              CONNECTION_PAGE_CAP,
-            );
+            //     Each count is a fact of its door's card, written in
+            //     the catalogue's count format (1,234), never bare digits.
+            const standardsFigure = readHomeCount(homeHtml, "standards");
+            expect(standardsFigure).toBeGreaterThan(CONNECTION_PAGE_CAP);
 
             //     The components/patterns figures render as a pair and
             //     are internally ordered: the graph holds more
             //     components than patterns (components are the larger
             //     class by construction — patterns compose them), and
             //     both are non-trivial. Structural bounds, no pins.
-            const componentsFigure = homeHtml.match(
-              /<span class="vital">(\d+) components<\/span><span class="vital">(\d+) patterns<\/span>/,
-            );
-            expect(componentsFigure).not.toBeNull();
-            const liveComponentCount = Number(componentsFigure?.[1]);
-            const livePatternCount = Number(componentsFigure?.[2]);
+            const liveComponentCount = readHomeCount(homeHtml, "components");
+            const livePatternCount = readHomeCount(homeHtml, "patterns");
             expect(liveComponentCount).toBeGreaterThan(50);
             expect(livePatternCount).toBeGreaterThan(10);
             expect(livePatternCount).toBeLessThan(liveComponentCount);
