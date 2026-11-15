@@ -67,6 +67,51 @@ describe("orderRegionsByBridges", () => {
     expect(orderRegionsByBridges(regions, bridges)).toEqual(["a", "c", "b"]);
   });
 
+  it("leads with the boxes, largest first, then places each stub beside what its bridge leaves", () => {
+    const regions = [
+      { prefix: "open", size: 12 },
+      { prefix: "small", size: 3 },
+      { prefix: "rdf", size: 1, kind: "stub" as const },
+      { prefix: "dt", size: 1, kind: "stub" as const },
+      { prefix: "vocab", size: 1, kind: "stub" as const },
+      { prefix: "ds", size: 20, kind: "region" as const },
+      { prefix: "surface", size: 31, kind: "region" as const },
+    ];
+    const bridges = [
+      { a: "ds", b: "dt", relations: 1 },
+      { a: "ds", b: "surface", relations: 5 },
+      { a: "open", b: "rdf", relations: 1 },
+      { a: "open", b: "small", relations: 1 },
+      { a: "surface", b: "vocab", relations: 1 },
+    ];
+    // The boxes lead whatever their bridges; a stub bridged to a placed
+    // region outranks the open namespaces' pull, and the stub of the open
+    // namespace follows it at once.
+    expect(orderRegionsByBridges(regions, bridges)).toEqual([
+      "surface",
+      "ds",
+      "dt",
+      "vocab",
+      "open",
+      "rdf",
+      "small",
+    ]);
+    expect(
+      orderRegionsByBridges(regions.toReversed(), bridges.toReversed()),
+    ).toEqual(orderRegionsByBridges(regions, bridges));
+    // Boxes of equal size go by prefix in code units.
+    expect(
+      orderRegionsByBridges(
+        [
+          { prefix: "b", size: 4, kind: "region" },
+          { prefix: "B", size: 4, kind: "region" },
+          { prefix: "a", size: 9 },
+        ],
+        [],
+      ),
+    ).toEqual(["B", "b", "a"]);
+  });
+
   it("orders the fixtures and the captured records", () => {
     expect(orderGraph(SHELF_PAIR_GRAPH)).toEqual(["aa", "bb"]);
     expect(orderGraph(ontologyGraph)).toEqual(["ds", "anatomy", "cs"]);

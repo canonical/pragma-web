@@ -374,7 +374,12 @@ function layOutModel(
     model.regionOrder.map(({ prefix, ids }) => [prefix, ids]),
   );
   const order = orderRegionsByBridges(
-    model.regionOrder.map(({ prefix, ids }) => ({ prefix, size: ids.length })),
+    model.regionOrder.map(({ prefix, ids }) => {
+      const first = requireEntry(model.byId, requireAt(ids, 0));
+      return first.kind === "class"
+        ? { prefix, size: ids.length }
+        : { prefix, size: first.members, kind: first.kind };
+    }),
     listRegionBridges(model),
   ).map((prefix) => ({ prefix, ids: requireEntry(idsOf, prefix) }));
   let channel = CHANNEL;

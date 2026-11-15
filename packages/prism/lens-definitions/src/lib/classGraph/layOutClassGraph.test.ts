@@ -269,6 +269,20 @@ describe("layOutClassGraph", () => {
           ["ds", 20],
         ]),
       );
+      // The boxes lead: the first shelf holds both, the larger first, so a
+      // window shorter than the design canvas cuts an open namespace's end
+      // and never a box; each stub follows on the next.
+      const top = Math.min(...layout.regions.map((region) => region.y));
+      expect(
+        layout.regions
+          .filter((region) => region.y === top)
+          .map((region) => region.prefix),
+      ).toEqual(["surface", "ds"]);
+      expect(
+        layout.regions.findIndex((region) => region.prefix === "rdf"),
+      ).toBe(
+        layout.regions.findIndex((region) => region.prefix === "anatomy") + 1,
+      );
       const surface = requireDefined(
         layout.regions.find((region) => region.prefix === "surface"),
         "the surface region",

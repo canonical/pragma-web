@@ -366,8 +366,13 @@ export interface LegibleWindowOptions {
 /** A namespace region as the packing orders it: its prefix and its size. */
 export interface RegionSize {
   readonly prefix: string;
-  /** How many classes it holds. */
+  /** How many classes it holds, a box's included. */
   readonly size: number;
+  /**
+   * What it draws: its classes (`class`, when omitted), one box for a
+   * collapsed namespace (`region`) or an external stub (`stub`).
+   */
+  readonly kind?: NodeKind;
 }
 
 /**
