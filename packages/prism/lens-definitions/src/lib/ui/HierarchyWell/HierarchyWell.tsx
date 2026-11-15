@@ -8,7 +8,7 @@ import {
   placeEdgeLabels,
   requireEntry,
 } from "@canonical/prism-core";
-import { useRouter } from "@canonical/router-react";
+import { useRouter, useSearchParams } from "@canonical/router-react";
 import {
   type KeyboardEvent,
   type ReactElement,
@@ -25,6 +25,7 @@ import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import type { NodeNavigation } from "../../classGraph/types.js";
 import { useMessages } from "../../i18n/index.js";
 import { ClassGraph } from "../ClassGraph/index.js";
+import buildDrillSearch from "./buildDrillSearch.js";
 import classifyClasses from "./classifyClasses.js";
 import { PhoneGraph } from "./common/PhoneGraph/index.js";
 import frameOpeningCamera from "./frameOpeningCamera.js";
@@ -159,16 +160,17 @@ export default function HierarchyWell({
     [layout],
   );
   const selected = drawnOf(term);
-  // The explorer's index links a box to its drill and the drill back; a
-  // term page keeps its selection's drill and links neither.
+  // The explorer's index links a box to its drill and the drill back,
+  // keeping the page's other view keys; a term page keeps its selection's
+  // drill and links neither.
   const router = useRouter();
+  const search = useSearchParams();
   const buildDrillHref = useCallback(
     (prefix: string | undefined): string =>
-      router.buildPath(
-        "definitions",
-        prefix === undefined ? {} : { search: { expand: prefix } },
-      ),
-    [router],
+      router.buildPath("definitions", {
+        search: buildDrillSearch(search, prefix),
+      }),
+    [router, search],
   );
   const drillHref = term === undefined ? buildDrillHref : undefined;
   const hovered =

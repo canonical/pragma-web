@@ -656,6 +656,38 @@ describe("over a layout whose rail opens on a box", () => {
     ).toBeNull();
   });
 
+  it("keeps the page's other view keys on a box's link and on the way back", () => {
+    const drilled = layOutClassGraph(input, {
+      budget: createGraphBudget({ drawnNodesMax: 2 }),
+      drill: "aa",
+    });
+    const draw = (shown: typeof boxed, url: string) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={shown}
+          onHoverTerm={vi.fn()}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+        url,
+      );
+    const rest = render(draw(boxed, "/definitions?q=x&sheet=filter"));
+    const href = rest.container
+      .querySelector('.desktop [data-kind="region"] a')
+      ?.getAttribute("href");
+    expect(new URL(href ?? "", "https://site.example").search).toBe(
+      "?q=x&sheet=filter&expand=aa",
+    );
+    rest.unmount();
+    const opened = render(draw(drilled, "/definitions?expand=aa&q=x"));
+    const backs = [...opened.container.querySelectorAll("a.way-back")].map(
+      (link) => link.getAttribute("href"),
+    );
+    expect(backs).toEqual(["/definitions?q=x", "/definitions?q=x"]);
+  });
+
   it("draws a box on a term page as an image, with no link", () => {
     const { container } = render(drawBoxed("zz:Z1"));
     const box = container.querySelector('.desktop .node[data-kind="region"]');
