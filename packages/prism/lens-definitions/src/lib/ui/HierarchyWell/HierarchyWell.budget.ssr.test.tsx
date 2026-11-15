@@ -112,25 +112,23 @@ describe("HierarchyWell SSR within the graph budget at rest", () => {
 
   // The docs records' box and stub are neighbours on one shelf: their
   // bridge crosses the gap between them, too short for a label beside it,
-  // so its label is named on focus.
+  // so its label sits under the pair.
   it.each([
-    ["the docs records", ontologyGraph, 2, 1],
-    ["the metro's records", metroGraph, 3, 3],
+    ["the docs records", ontologyGraph, 2],
+    ["the metro's records", metroGraph, 3],
   ])(
-    "labels the bridges of %s at rest where their routes leave room, as many as the records serve, the rest on focus, at 12px at least at the opening zoom",
-    (_, input, served, resting) => {
+    "labels every bridge of %s at rest, as many as the records serve, at 12px at least at the opening zoom",
+    (_, input, served) => {
       const measure = measureCanvas(renderCanvas(input));
       expect(countServedBridges(input)).toBe(served);
-      expect(measure.bridgeLabels).toBe(resting);
+      expect(measure.bridgeLabels).toBe(served);
       const placement = placeBridgeLabels(
         layOutClassGraph(input, { budget: GRAPH_BUDGET }),
         createTranslator("en", MESSAGES),
       );
-      expect(placement.placed).toHaveLength(resting);
-      expect(placement.onFocus.map((label) => label.edge)).toEqual(
-        placement.omitted,
-      );
-      expect(placement.omitted).toHaveLength(served - resting);
+      expect(placement.placed).toHaveLength(served);
+      expect(placement.omitted).toEqual([]);
+      expect(placement.onFocus).toEqual([]);
       expect(BRIDGE_LABEL_SIZE * measure.openingZoom).toBeGreaterThanOrEqual(
         GRAPH_BUDGET.labelPxMin,
       );

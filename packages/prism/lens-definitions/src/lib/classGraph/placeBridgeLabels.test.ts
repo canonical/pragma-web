@@ -2,6 +2,7 @@ import { createTranslator } from "@canonical/i18n-core";
 import {
   containsPoint,
   intersectsRect,
+  measurePathBounds,
   parsePathData,
   type Rect,
   requireDefined,
@@ -10,6 +11,7 @@ import {
 import { describe, expect, it } from "vitest";
 import {
   BRIDGE_TRIO_GRAPH,
+  SHELF_PAIR_GRAPH,
   STACKED_PAIR_GRAPH,
 } from "../../../testing/fixtures.js";
 import metroGraph from "../../../testing/records/metroGraph.js";
@@ -83,6 +85,53 @@ describe("placeBridgeLabels", () => {
         );
       }
     }
+  });
+
+  it("labels a bridge too short for its label under the pair it joins, centred on it, clear of boxes, label rows and routes", () => {
+    const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
+    const { bridges, labels, omitted } = placeOn(layout);
+    const bridge = requireDefined(bridges.at(0), "the bridge");
+    const route = measurePathBounds(bridge.d);
+    expect(omitted).toEqual([]);
+    const label = requireDefined(labels.at(0), "the label");
+    expect(label).toMatchObject({ edge: bridge.id, text: "reaches" });
+    expect(label.cx).toBe(Math.round(route.x + route.w / 2));
+    const bottom = Math.max(
+      ...layout.regions.map((region) => region.y + region.h),
+    );
+    expect(label.box.y).toBeGreaterThanOrEqual(bottom);
+    expect(label.box.y + label.box.h).toBeLessThanOrEqual(
+      layout.viewBox.y + layout.viewBox.h,
+    );
+    for (const node of layout.nodes.values()) {
+      expect(intersectsRect(label.box, node)).toBe(false);
+    }
+    for (const edge of layout.edges) {
+      expect(touchesRoute(label.box, edge.d)).toBe(false);
+    }
+  });
+
+  it("leaves a short bridge's label to the focus when the band under the pair is taken too", () => {
+    const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
+    const anyNode = requireDefined([...layout.nodes.values()].at(0), "a class");
+    const bottom = Math.max(
+      ...layout.regions.map((region) => region.y + region.h),
+    );
+    const taken = {
+      ...layout,
+      nodes: new Map([
+        ...layout.nodes,
+        [
+          "below",
+          { ...anyNode, x: layout.viewBox.x, y: bottom, w: layout.viewBox.w },
+        ],
+      ]),
+    };
+    expect(placeBridgeLabels(taken, t)).toMatchObject({
+      placed: [],
+      omitted: ["rel:aa:A0 bb:B0"],
+      onFocus: [{ edge: "rel:aa:A0 bb:B0", text: "reaches" }],
+    });
   });
 
   it("counts a bridge's relations past two", () => {

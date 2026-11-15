@@ -8,7 +8,10 @@
 import { createTranslator } from "@canonical/i18n-core";
 import {
   BUS_OFFSET,
+  COLLISION_MARGIN,
+  ceilTo,
   GRAPH_LABEL_PX_MIN,
+  LABEL_HALO,
   LABEL_SIZE,
   LATTICE,
   REGION_LABEL_SIZE,
@@ -214,6 +217,17 @@ export const BRIDGE_GAP_ROOM = SHELF_GAP - 2 * BRIDGE_LANE;
  */
 export const BRIDGE_CHANNEL_ROOM =
   2 * (CROSS_CHANNEL_OFFSET - BUS_OFFSET - BRIDGE_LANE / 2);
+
+/**
+ * How far below a pair of neighbours joined straight across their gap the
+ * graph reaches, in px, on the lattice: with the view margin, room for a
+ * bridge's label, its halo and its clearance from the boxes, under the
+ * pair when the route is too short to carry it.
+ */
+export const BRIDGE_LABEL_BAND = ceilTo(
+  BRIDGE_LABEL_SIZE + 2 * LABEL_HALO + COLLISION_MARGIN - VIEW_MARGIN,
+  LATTICE,
+);
 
 /**
  * How far a bridge's label slides along its route between the places it

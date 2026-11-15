@@ -12,6 +12,7 @@ import {
   orderBy,
   type PathCommand,
   REGION_LABEL_ROW,
+  type Rect,
   type RegionLayout,
   requireAt,
   requireDefined,
@@ -25,6 +26,7 @@ import {
   ALIGNMENT_SEARCH_LIMIT,
   BRIDGE_CHANNEL_ROOM,
   BRIDGE_GAP_ROOM,
+  BRIDGE_LABEL_BAND,
   CHANNEL,
   CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
@@ -796,9 +798,27 @@ function layOutModel(
     };
   });
   const allEdges = [...edges, ...crossEdges];
+  // Below a pair of neighbours joined straight across their gap, the band
+  // a bridge's label too long for so short a route sits in.
+  const bands = crossEdges
+    .filter((edge) => edge.bundle !== undefined && across.has(edge.bundle.id))
+    .map((edge): Rect => {
+      const { x, w } = measurePathBounds(edge.d);
+      const bottom = Math.max(
+        ...regions
+          .filter(
+            (region) =>
+              region.prefix === nodeOf(edge.from).region ||
+              region.prefix === nodeOf(edge.to.at(0) ?? edge.from).region,
+          )
+          .map((region) => region.y + region.h),
+      );
+      return { x, y: bottom, w, h: BRIDGE_LABEL_BAND };
+    });
   const bounds = uniteRects([
     ...regions,
     ...crossEdges.map((edge) => measurePathBounds(edge.d)),
+    ...bands,
   ]);
   const viewBox = {
     x: bounds.x - VIEW_MARGIN,

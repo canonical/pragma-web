@@ -17,6 +17,7 @@ import {
   BRIDGE_LABEL_SEPARATOR,
   BRIDGE_LABEL_SIZE,
   BRIDGE_LABEL_STEP,
+  SHELF_GAP,
 } from "./constants.js";
 import type {
   BridgeLabel,
@@ -76,7 +77,11 @@ function touchesRun(box: Rect, { from, to }: Run): boolean {
  * first box clear of every box, every region's label row, the viewBox's
  * edge, every label placed before it, every other bridge's route and
  * every other relation's stroke, so a reader can tell which line a label
- * names. A bridge with no such place is omitted, and given the place its
+ * names. A bridge between two regions side by side whose route is too
+ * short to carry its label so carries it under the pair: centred on the
+ * bridge, in the band below the two regions, from just under them down
+ * by the same few px, clear of the same. A bridge with no such place is
+ * omitted, and given the place its
  * label takes when a class at one of its ends is the focus, which fades
  * the other lines: the first clear of every box and region label row,
  * else the one nearest its arrowhead. Bridges are placed by edge id and every centre is
@@ -164,7 +169,35 @@ export default function placeBridgeLabels(
         },
       ).flat();
     });
-    const boxes = candidates.map(({ cx, cy }) => ({
+    // Under the pair of regions side by side the bridge joins, centred on
+    // it, in the band below their bottom, down to the next shelf's top.
+    const pair = layout.regions.filter(
+      (region) =>
+        region.prefix === layout.nodes.get(edge.from)?.region ||
+        region.prefix === layout.nodes.get(edge.to.at(0) ?? "")?.region,
+    );
+    const [one, two] = pair;
+    const sideBySide =
+      one !== undefined &&
+      two !== undefined &&
+      one.y < two.y + two.h &&
+      two.y < one.y + one.h;
+    const xs = route.flatMap(({ from, to }) => [from[0], to[0]]);
+    const under = sideBySide
+      ? Array.from(
+          {
+            length: Math.floor((SHELF_GAP - h) / BRIDGE_LABEL_STEP) + 1,
+          },
+          (_, step) => ({
+            cx: Math.round((Math.min(...xs) + Math.max(...xs)) / 2),
+            cy:
+              Math.max(one.y + one.h, two.y + two.h) +
+              Math.ceil(h / 2) +
+              step * BRIDGE_LABEL_STEP,
+          }),
+        )
+      : [];
+    const boxes = [...candidates, ...under].map(({ cx, cy }) => ({
       cx,
       cy,
       box: { x: cx - Math.ceil(w / 2), y: cy - Math.ceil(h / 2), w, h },
