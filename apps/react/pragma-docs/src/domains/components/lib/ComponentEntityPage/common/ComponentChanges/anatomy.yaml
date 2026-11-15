@@ -1,8 +1,11 @@
 ---
 # ComponentChanges — the component's change log as the content of a section
 # of the component page, newest first: one entry per change with its version
-# (monospace), its summary (else its change text), and a line with its type
-# and its day in a <time>. Each value only when the graph records it. It
+# (monospace), its summary (else its change text) and a line with its type
+# and its day in a <time>, one over the other across the section's columns:
+# a two-column entry would leave the text two tracks of a narrow grid. The
+# summary holds the reading measure, at most 75 characters (1.1). Each value
+# only when the graph records it. It
 # renders no heading of its own: the sectioned view renders the section's.
 # Reference: PS3 V1 "changes".
 #
@@ -10,8 +13,10 @@
 # (`--component-changes-*`), bound to the symbol named here.
 #
 # Token ledger:
-#   layout.grid.column "1 / -1", "1 / span 2", "3 / -1": structure. The 0
-#     resets and `list-style: none` (a keyword).
+#   layout.grid.column "1 / -1": structure. The 0 resets and
+#     `list-style: none` (a keyword).
+#   --component-changes-summary-measure: 75ch  the summary's reading
+#     measure (heuristic 75ch prose line).
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
 # typography.text.primary.code.fontFamily.
@@ -38,20 +43,21 @@ node:
           - node:
               role: version
               styles:
-                layout.grid.column: "1 / span 2"
+                layout.grid.column: "1 / -1"
                 typography.fontFamily: typography.text.primary.code.fontFamily
             relation: { cardinality: "0..1", slotName: version }
           - node:
               role: summary
               styles:
-                layout.grid.column: "3 / -1"
+                layout.grid.column: "1 / -1"
+                size.max.width: "75ch"
                 spacing.external.block.start: 0
                 spacing.external.block.end: 0
             relation: { cardinality: "0..1", slotName: summary }
           - node:
               role: meta (the type, then the day in a time element)
               styles:
-                layout.grid.column: "3 / -1"
+                layout.grid.column: "1 / -1"
                 spacing.external.block.start: 0
                 spacing.external.block.end: 0
                 typography.color: color.text.muted

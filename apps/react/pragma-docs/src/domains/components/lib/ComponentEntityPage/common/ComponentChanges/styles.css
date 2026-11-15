@@ -5,6 +5,7 @@
    * grid's gutter on both axes. */
   .ds.component-changes {
     --component-changes-gap: var(--grid-gutter);
+    --component-changes-summary-measure: 75ch;
     --component-changes-meta-color: var(--color-text-muted);
     --component-changes-version-font-family: var(
       --typography-text-primary-code-font-family
@@ -27,13 +28,20 @@
   }
 
   .ds.component-changes > .entry > .version {
-    grid-column: 1 / span 2;
+    grid-column: 1 / -1;
     font-family: var(--component-changes-version-font-family);
   }
 
-  .ds.component-changes > .entry > .summary,
+  /* The summary holds a reading measure, never wider than 75
+   * characters. */
+  .ds.component-changes > .entry > .summary {
+    grid-column: 1 / -1;
+    max-inline-size: var(--component-changes-summary-measure);
+    margin-block: 0;
+  }
+
   .ds.component-changes > .entry > .meta {
-    grid-column: 3 / -1;
+    grid-column: 1 / -1;
     margin-block: 0;
   }
 
