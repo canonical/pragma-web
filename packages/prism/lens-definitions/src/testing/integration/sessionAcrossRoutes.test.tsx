@@ -4,9 +4,12 @@
  * lens index to a term mounts a new layout, provider and explorer. Under
  * the real router and its outlet, a reader who turns a chip off, types a
  * search and zooms in, then picks a class from the rail, finds the chip
- * still off, the search still typed, the zoom unchanged and the camera
- * panned, not reopened; and so on the way back to the index. A visit to
- * another lens and back starts from the defaults.
+ * still off and the search still typed; and so on the way back to the
+ * index. The class's page opens its namespace, which the index draws as
+ * one box: a drawing the index's camera does not belong to, so the graph
+ * opens as loading the page does, and the index, on the way back, as
+ * loading it does. A visit to another lens and back starts from the
+ * defaults.
  */
 
 import { createEnvironment, HomesProvider } from "@canonical/prism-core";
@@ -54,11 +57,11 @@ const elsewhere = route({
   content: () => <p>Another lens</p>,
 });
 
-/** Mount the lens's two routes and another under a router at the index. */
-function mountLens() {
+/** Mount the lens's two routes and another under a router at `path`. */
+function mountLens(path = "/definitions") {
   const router = createRouter(
     { definitions, definitionsTerm, elsewhere },
-    { adapter: createMemoryAdapter("/definitions") },
+    { adapter: createMemoryAdapter(path) },
   );
   const view = render(
     <RelayEnvironmentProvider
@@ -100,10 +103,6 @@ const readScreenScale = (container: HTMLElement): number => {
   return k * Math.min(VIEWPORT.w / w, VIEWPORT.h / h);
 };
 
-/** The zoom level the canvas's controls bar reads. */
-const readZoomLevel = (container: HTMLElement): string | null | undefined =>
-  container.querySelector(".desktop .zoom-level")?.textContent;
-
 beforeEach(() => {
   vi.stubGlobal(
     "matchMedia",
@@ -129,7 +128,7 @@ afterEach(() => {
 });
 
 describe("the reader's choices across the lens's routes", () => {
-  it("keeps the chips, the search, the zoom and the pan from the index to a term and back", {
+  it("keeps the chips and the search from the index to a term and back, each graph opening as its load does", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, async () => {
     const { container, router } = mountLens();
@@ -151,10 +150,14 @@ describe("the reader's choices across the lens's routes", () => {
       ".ds.term-rail .item.is-dimmed",
     ).length;
     expect(dimmed).toBeGreaterThan(0);
+    const opened = readScreenScale(container);
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    const zoom = readZoomLevel(container);
-    const scale = readScreenScale(container);
+    const zoomed = readScreenScale(container);
+    expect(zoomed).not.toBeCloseTo(opened, 10);
+    const loaded = mountLens("/definitions/ds%3AComponent");
+    const loadedScale = readScreenScale(loaded.container);
+    loaded.unmount();
 
     await act(async () => {
       await router.navigate("definitionsTerm", {
@@ -186,15 +189,13 @@ describe("the reader's choices across the lens's routes", () => {
     expect(
       container.querySelectorAll(".ds.term-rail .item.is-dimmed"),
     ).toHaveLength(dimmed);
-    expect(readScreenScale(container)).toBeCloseTo(scale, 10);
-    expect(readZoomLevel(container)).toBe(zoom);
+    expect(readScreenScale(container)).toBeCloseTo(loadedScale, 10);
 
     await act(async () => {
       await router.navigate("definitions");
     });
     expect(screen.getByRole("searchbox")).toHaveValue("st");
-    expect(readScreenScale(container)).toBeCloseTo(scale, 10);
-    expect(readZoomLevel(container)).toBe(zoom);
+    expect(readScreenScale(container)).toBeCloseTo(opened, 10);
 
     // A visit to another lens ends the session: back on the index, the
     // reader starts from the defaults.

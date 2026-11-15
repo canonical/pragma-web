@@ -48,6 +48,15 @@ const NAVIGATION_KEYS: Readonly<Record<string, keyof NodeNavigation>> = {
 };
 
 /**
+ * The drill each camera memory was last kept for (`""` for none), beside
+ * the memory, which a well does not own: the lens's provider keeps it
+ * across the wells the router mounts, and a well reads it to forget a
+ * camera kept on another drawing. Weakly keyed, so a memory's provider
+ * takes its entry with it.
+ */
+const KEPT_DRILLS = new WeakMap<object, string>();
+
+/**
  * Read the attribute of the nearest element that carries it, from the
  * target of an event the well's root heard: every such target is an
  * element inside the well.
@@ -240,14 +249,19 @@ export default function HierarchyWell({
       frameOpeningCamera(layout, arrivalNode, visible, scale),
     [arrivalNode, layout],
   );
-  // The order is load-bearing: the new canvas reads the memory in a
-  // passive effect, and a child's passive effects run before its parent's,
-  // so only a layout effect clears it first.
-  const openedDrill = useRef(drillKey);
+  // The memory outlives the well, which the router mounts anew on each of
+  // the lens's routes, so the drill the camera was kept for is kept beside
+  // it: a well that draws another drill, on this mount or the next, forgets
+  // that camera. The order is load-bearing: the new canvas reads the memory
+  // in a passive effect, and a child's passive effects run before its
+  // parent's, so only a layout effect clears it first.
   useLayoutEffect(() => {
-    if (openedDrill.current === drillKey) return;
-    openedDrill.current = drillKey;
-    if (cameraMemory !== undefined) cameraMemory.current = undefined;
+    if (cameraMemory === undefined) return;
+    const kept = KEPT_DRILLS.get(cameraMemory);
+    KEPT_DRILLS.set(cameraMemory, drillKey);
+    if (kept !== undefined && kept !== drillKey) {
+      cameraMemory.current = undefined;
+    }
   }, [cameraMemory, drillKey]);
   const bounds = useMemo(
     () => ({

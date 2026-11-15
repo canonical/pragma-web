@@ -724,6 +724,102 @@ describe("over a layout whose rail opens on a box", () => {
     expect(viewBoxOf(container)).toBe(expected);
   });
 
+  it("keeps the arrival's frame when the selection moves within the same drill, so the camera follows", () => {
+    const four = createClassGraphSetup(FOUR_NAMESPACE_GRAPH);
+    const ds = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+      budget: GRAPH_BUDGET,
+      drill: "ds",
+    });
+    const inDs = FOUR_NAMESPACE_GRAPH.classes
+      .filter((entry) => entry.prefix === "ds")
+      .map((entry) => entry.uri);
+    const [first, last] = [inDs.at(0), inDs.at(-1)].map((uri) =>
+      requireDefined(uri, "a ds class"),
+    ) as [string, string];
+    const framed = (uri: string) => {
+      const box = frameOpeningView(ds, ds.nodes.get(uri));
+      return `${box.x} ${box.y} ${box.width} ${box.height}`;
+    };
+    // Each class, loaded, opens on a frame of its own.
+    expect(framed(last)).not.toBe(framed(first));
+    const draw = (uri: string) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["surface", "ds", "anatomy", "cs"])}
+          hoverCentre={undefined}
+          layout={ds}
+          onHoverTerm={vi.fn()}
+          term={requireEntry(four.terms, uri)}
+          terms={four.terms}
+        />,
+      );
+    const { container, rerender } = render(draw(first));
+    const canvas = container.querySelector(".desktop");
+    rerender(draw(last));
+    expect(container.querySelector(".desktop")).toBe(canvas);
+    expect(
+      container.querySelector(".desktop svg.viewport")?.getAttribute("viewBox"),
+    ).toBe(framed(first));
+  });
+
+  it("forgets a camera kept on another drill when the router mounts the well anew", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      (query: string) =>
+        ({ matches: true, media: query }) as unknown as MediaQueryList,
+    );
+    vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
+      width: 800,
+      height: 600,
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 600,
+      toJSON: () => ({}),
+    });
+    try {
+      const drilled = layOutClassGraph(input, {
+        budget: createGraphBudget({ drawnNodesMax: 2 }),
+        drill: "aa",
+      });
+      const draw = (shown: typeof boxed, memory?: { current: unknown }) =>
+        createRouterHarness(
+          <HierarchyWell
+            cameraMemory={memory as HierarchyWellProps["cameraMemory"]}
+            filter={createAllNamespacesFilter(["aa", "zz"])}
+            hoverCentre={undefined}
+            layout={shown}
+            onHoverTerm={vi.fn()}
+            term={undefined}
+            terms={boxedTerms}
+          />,
+        );
+      const camera = (container: HTMLElement) =>
+        container.querySelector(".desktop .camera")?.getAttribute("transform");
+      const zoomed = { camera: { k: 3, x: 70, y: 90 }, moved: true };
+      const fresh = render(draw(boxed));
+      const opens = camera(fresh.container);
+      fresh.unmount();
+      // A camera kept on the opened namespace's page is not resumed on the
+      // overview the router mounts next: it opens as a load does.
+      const memory = { current: undefined as unknown };
+      render(draw(drilled, memory)).unmount();
+      memory.current = zoomed;
+      const back = render(draw(boxed, memory));
+      expect(camera(back.container)).toBe(opens);
+      back.unmount();
+      // One kept on the same drawing is resumed.
+      memory.current = zoomed;
+      const again = render(draw(boxed, memory));
+      expect(camera(again.container)).not.toBe(opens);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
+  });
+
   it("links every box when every namespace is a box and the rail holds no class", () => {
     const allBoxed = layOutClassGraph(input, {
       budget: createGraphBudget({ drawnNodesMax: 1 }),
