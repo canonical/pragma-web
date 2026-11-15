@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -92,6 +93,7 @@ describe("InterchangeGraphNode", () => {
         <InterchangeGraphNode node={node} />
       </svg>
     ));
+    expectSlotOrder(container);
     expect(container.querySelector(".title")?.textContent).toBe(
       "metro: Central Exchange",
     );
