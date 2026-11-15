@@ -36,7 +36,32 @@ export type ChoicesField = {
 };
 
 /**
- * A numeric field: lower/upper bounds with optional limits.
+ * The units a number field's values are measured in: the base unit records,
+ * sources, the wire, facets and the field's limits use, and the units a
+ * reader may type a value in. SI and IEC symbols are data, never
+ * translated.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type NumberUnits = {
+  /** The unit the record, the source and the wire use. */
+  readonly base: string;
+  /**
+   * The units a value may be typed in, ascending, each with its size in
+   * base units; the base unit is one of them, with a factor of 1.
+   */
+  readonly display: readonly {
+    readonly symbol: string;
+    readonly factor: number;
+  }[];
+};
+
+/**
+ * A numeric field: lower/upper bounds with optional limits, and optionally
+ * the units its values are measured in. A typed value may carry one of its
+ * display units, matched case-insensitively, as `16 GiB`, and is read in
+ * base units; a value without one is in base units.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -46,6 +71,7 @@ export type NumberField = {
   readonly kind: "number";
   readonly min?: number;
   readonly max?: number;
+  readonly units?: NumberUnits;
 };
 
 /**
@@ -212,10 +238,29 @@ export type FieldKindOperators = {
     | "endsWith";
 };
 
-/** One text input read as an operand, or the reason it is not one. */
+/**
+ * One text input read as an operand, or that it is still being typed, or
+ * the reason it is not one.
+ */
 export type InputParse =
   | { readonly status: "valid"; readonly operand: PredicateOperand }
+  | { readonly status: "incomplete" }
   | { readonly status: "invalid"; readonly reason: string };
+
+/**
+ * Typed text read as a number in base units: the number, text a reader is
+ * still typing towards one, a unit the field does not have, or no number.
+ */
+export type NumberReading =
+  | { readonly kind: "value"; readonly value: number }
+  | { readonly kind: "incomplete" }
+  | {
+      readonly kind: "unknown-unit";
+      readonly symbol: string;
+      /** The display symbols the field does have, in order. */
+      readonly accepted: readonly string[];
+    }
+  | { readonly kind: "not-a-number" };
 
 /**
  * The comparison key of one value the kind orders: a rank the kind places

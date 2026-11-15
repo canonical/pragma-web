@@ -118,6 +118,7 @@ export type {
   FieldKindOperators,
   FieldValidation,
   NumberField,
+  NumberUnits,
   PresenceField,
   Schema,
   SchemaFieldDefinition,
