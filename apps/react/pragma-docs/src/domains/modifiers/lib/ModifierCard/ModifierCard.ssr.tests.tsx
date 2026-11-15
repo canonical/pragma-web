@@ -57,6 +57,6 @@ describe("ModifierCard SSR", () => {
     );
     expect(html).toContain("ds card ds entity-card ds modifier-card");
     expect(html).toContain('data-type="Modifier"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

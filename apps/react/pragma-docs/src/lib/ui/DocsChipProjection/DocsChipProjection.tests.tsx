@@ -132,7 +132,7 @@ describe("DocsChipProjection", () => {
       ),
       MOCK_MODIFIER,
     );
-    expect(container.querySelector(".value")?.textContent).toBe(
+    expect(container.querySelector(".title")?.textContent).toBe(
       "the danger modifier",
     );
   });

@@ -1,7 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { HomesProvider, RouterLink } from "@canonical/prism-core";
+import { expectSlotOrder, guardTypedArms } from "@canonical/prism-core/testing";
+import {
+  defaultProjectionMaps,
+  ProjectionsProvider,
+} from "@canonical/prism-projections";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -71,6 +77,32 @@ const renderWithNode = (
   );
 };
 
+/** The absolute IRI the mock modifier answers as its `uri`. */
+const MOCK_MODIFIER_URI = "https://ds.canonical.com/global.modifier.danger";
+
+/** A home for a modifier, which the site does not give one, so its chip links. */
+const MODIFIER_HOME = "/modifiers/danger";
+
+/**
+ * Wrap `children` in homes that give a modifier a home and a projection
+ * provider whose peek records the address each chip asks it for, and
+ * renders that address as a link to look for.
+ */
+const withHomeAndPeek = (
+  peek: (uri: string) => ReactNode,
+  children: ReactElement,
+): ReactElement => (
+  <HomesProvider homes={{ Modifier: () => MODIFIER_HOME }}>
+    <ProjectionsProvider
+      LinkComponent={RouterLink}
+      maps={guardTypedArms(defaultProjectionMaps)}
+      peek={peek}
+    >
+      {children}
+    </ProjectionsProvider>
+  </HomesProvider>
+);
+
 describe("ModifierChip", () => {
   it("reads the Modifier through its fragment", () => {
     const { container } = renderWithNode((node) => (
@@ -82,22 +114,62 @@ describe("ModifierChip", () => {
     );
   });
 
-  it("files its title under its class, as inert text", () => {
+  it("leads with the modifier's mark and its prefix, off the page's namespace", () => {
     const { container } = renderWithNode((node) => (
       <ModifierChip node={node} />
     ));
-    expect(container.querySelector(".lead")?.textContent).toBe("Modifier:");
-    expect(container.querySelector(".value")?.textContent).toBe("Danger");
+    const chip = container.querySelector(".ds.modifier-chip");
+    expect(chip?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/settings.svg#settings",
+    );
+    expect(chip?.querySelector(".prefix")?.textContent).toBe("ds:");
+    expect(chip?.querySelector(".title")?.textContent).toBe("Danger");
+    expect(chip?.querySelector(".kind, .status")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+    if (chip) expectSlotOrder(chip);
+  });
+
+  it("peeks at the modifier's absolute IRI, never its CURIE", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    renderWithNode(
+      (node) => withHomeAndPeek(peek, <ModifierChip node={node} />),
+      { uri: MOCK_MODIFIER_URI },
+    );
+    expect(peek).toHaveBeenCalledWith(MOCK_MODIFIER_URI);
+    expect(peek).not.toHaveBeenCalledWith(MOCK_MODIFIER._meta.curie);
+    const link = screen.getByRole("link", { name: "Danger" });
+    expect(link).toHaveAttribute("href", MODIFIER_HOME);
+    act(() => {
+      link.focus();
+    });
+    expect(
+      screen
+        .getByRole("dialog", { hidden: true })
+        .querySelector(`a[href="${MOCK_MODIFIER_URI}"]`),
+    ).not.toBeNull();
+  });
+
+  it("sets its title as inert text with no peek when unlinked", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    const { container } = renderWithNode(
+      (node) =>
+        withHomeAndPeek(peek, <ModifierChip linked={false} node={node} />),
+      { uri: MOCK_MODIFIER_URI },
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+    const title = container.querySelector(".title");
+    expect(title?.tagName).toBe("SPAN");
+    expect(title?.textContent).toBe("Danger");
+    if (title) fireEvent.focus(title);
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
 
   it("shows a passage's own link text in place of the title", () => {
     const { container } = renderWithNode((node) => (
-      <ModifierChip node={node}>the danger modifier</ModifierChip>
+      <ModifierChip node={node}>danger</ModifierChip>
     ));
-    expect(container.querySelector(".value")?.textContent).toBe(
-      "the danger modifier",
-    );
+    expect(container.querySelector(".title")?.textContent).toBe("danger");
   });
 
   it("applies custom className", () => {

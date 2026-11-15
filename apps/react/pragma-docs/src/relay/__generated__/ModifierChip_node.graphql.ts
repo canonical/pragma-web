@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c8e811e32f9bdfd5311e5341a2a9f5a6>>
+ * @generated SignedSource<<817fbd2fa2d0902c9e7c6ebf49dd52b6>>
  * @lightSyntaxTransform
  */
 
@@ -14,12 +14,8 @@ export type ModifierChip_node$data = {
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: {
-      readonly _meta: {
-        readonly title: string;
-      };
-    };
   };
+  readonly uri: string;
   readonly " $fragmentType": "ModifierChip_node";
 };
 export type ModifierChip_node$key = {
@@ -27,15 +23,7 @@ export type ModifierChip_node$key = {
   readonly " $fragmentSpreads": FragmentRefs<"ModifierChip_node">;
 };
 
-const node: ReaderFragment = (function(){
-var v0 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-};
-return {
+const node: ReaderFragment = {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -51,40 +39,30 @@ return {
     {
       "alias": null,
       "args": null,
+      "kind": "ScalarField",
+      "name": "uri",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
       "concreteType": "EntityMeta",
       "kind": "LinkedField",
       "name": "_meta",
       "plural": false,
       "selections": [
-        (v0/*:: as any*/),
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "curie",
+          "name": "title",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
-          "concreteType": "OntologyClass",
-          "kind": "LinkedField",
-          "name": "type",
-          "plural": false,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "EntityMeta",
-              "kind": "LinkedField",
-              "name": "_meta",
-              "plural": false,
-              "selections": [
-                (v0/*:: as any*/)
-              ],
-              "storageKey": null
-            }
-          ],
+          "kind": "ScalarField",
+          "name": "curie",
           "storageKey": null
         }
       ],
@@ -94,8 +72,7 @@ return {
   "type": "Modifier",
   "abstractKey": null
 };
-})();
 
-(node as any).hash = "b23ea0a0f90986fa165c02aaf76775d1";
+(node as any).hash = "fc859573e31a0b282b281c96748591b3";
 
 export default node;

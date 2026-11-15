@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9eaa87ba57303adb7675e154899a6354>>
+ * @generated SignedSource<<c812b714af1383e6264a507183305ac7>>
  * @lightSyntaxTransform
  */
 
@@ -14,11 +14,6 @@ export type ModifierGraphNode_node$data = {
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: {
-      readonly _meta: {
-        readonly title: string;
-      };
-    };
   };
   readonly " $fragmentType": "ModifierGraphNode_node";
 };
@@ -27,15 +22,7 @@ export type ModifierGraphNode_node$key = {
   readonly " $fragmentSpreads": FragmentRefs<"ModifierGraphNode_node">;
 };
 
-const node: ReaderFragment = (function(){
-var v0 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-};
-return {
+const node: ReaderFragment = {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -56,35 +43,18 @@ return {
       "name": "_meta",
       "plural": false,
       "selections": [
-        (v0/*:: as any*/),
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "curie",
+          "name": "title",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
-          "concreteType": "OntologyClass",
-          "kind": "LinkedField",
-          "name": "type",
-          "plural": false,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "EntityMeta",
-              "kind": "LinkedField",
-              "name": "_meta",
-              "plural": false,
-              "selections": [
-                (v0/*:: as any*/)
-              ],
-              "storageKey": null
-            }
-          ],
+          "kind": "ScalarField",
+          "name": "curie",
           "storageKey": null
         }
       ],
@@ -94,8 +64,7 @@ return {
   "type": "Modifier",
   "abstractKey": null
 };
-})();
 
-(node as any).hash = "d136c47b31f8061297d991ff8df34fed";
+(node as any).hash = "023eecfbbe29c44abd20600e49f221e6";
 
 export default node;

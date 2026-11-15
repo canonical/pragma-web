@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<06d5f3f9919e53f9cea58bc53386abf9>>
+ * @generated SignedSource<<65a8e38044d8e08d651093fba666e293>>
  * @lightSyntaxTransform
  */
 
@@ -37,32 +37,19 @@ v1 = {
   "name": "uri",
   "storageKey": null
 },
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-},
-v3 = [
+v2 = [
   {
     "kind": "TypeDiscriminator",
     "abstractKey": "__isUIBlock"
   }
 ],
-v4 = {
+v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v5 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "EntityMeta"
-},
-v6 = {
+v4 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -140,7 +127,13 @@ return {
             "name": "_meta",
             "plural": false,
             "selections": [
-              (v2/*:: as any*/),
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "title",
+                "storageKey": null
+              },
               {
                 "alias": null,
                 "args": null,
@@ -153,62 +146,20 @@ return {
           },
           {
             "kind": "InlineFragment",
-            "selections": (v3/*:: as any*/),
+            "selections": (v2/*:: as any*/),
             "type": "Component",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v3/*:: as any*/),
+            "selections": (v2/*:: as any*/),
             "type": "Pattern",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v3/*:: as any*/),
+            "selections": (v2/*:: as any*/),
             "type": "Layout",
-            "abstractKey": null
-          },
-          {
-            "kind": "InlineFragment",
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "EntityMeta",
-                "kind": "LinkedField",
-                "name": "_meta",
-                "plural": false,
-                "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": [
-                      {
-                        "alias": null,
-                        "args": null,
-                        "concreteType": "EntityMeta",
-                        "kind": "LinkedField",
-                        "name": "_meta",
-                        "plural": false,
-                        "selections": [
-                          (v2/*:: as any*/)
-                        ],
-                        "storageKey": null
-                      },
-                      (v1/*:: as any*/)
-                    ],
-                    "storageKey": null
-                  }
-                ],
-                "storageKey": null
-              }
-            ],
-            "type": "Modifier",
             "abstractKey": null
           },
           {
@@ -264,7 +215,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "41cafe385a5b4039d75415889968061a",
+    "cacheID": "a5bca28e0a934a47182bc371edad35c7",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -274,21 +225,17 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__isNode": (v4/*:: as any*/),
-        "node.__isUIBlock": (v4/*:: as any*/),
-        "node.__typename": (v4/*:: as any*/),
-        "node._meta": (v5/*:: as any*/),
-        "node._meta.curie": (v4/*:: as any*/),
-        "node._meta.title": (v4/*:: as any*/),
-        "node._meta.type": {
+        "node.__isNode": (v3/*:: as any*/),
+        "node.__isUIBlock": (v3/*:: as any*/),
+        "node.__typename": (v3/*:: as any*/),
+        "node._meta": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
-          "type": "OntologyClass"
+          "type": "EntityMeta"
         },
-        "node._meta.type._meta": (v5/*:: as any*/),
-        "node._meta.type._meta.title": (v4/*:: as any*/),
-        "node._meta.type.uri": (v6/*:: as any*/),
+        "node._meta.curie": (v3/*:: as any*/),
+        "node._meta.title": (v3/*:: as any*/),
         "node.modifiers": {
           "enumValues": null,
           "nullable": false,
@@ -307,13 +254,13 @@ return {
           "plural": false,
           "type": "Modifier"
         },
-        "node.modifiers.edges.node.uri": (v6/*:: as any*/),
-        "node.uri": (v6/*:: as any*/)
+        "node.modifiers.edges.node.uri": (v4/*:: as any*/),
+        "node.uri": (v4/*:: as any*/)
       }
     },
     "name": "DocsChipProjectionTestQuery",
     "operationKind": "query",
-    "text": "query DocsChipProjectionTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...DocsChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipSlot_node\n  ...OntologyClassChip_node\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment DocsChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...ChipProjection_node\n  ... on Component {\n    ...UIBlockChip_node\n  }\n  ... on Pattern {\n    ...UIBlockChip_node\n  }\n  ... on Layout {\n    ...UIBlockChip_node\n  }\n  ...ModifierChip_node\n  ...ModifierFamilyChip_node\n  ...CodeStandardChip_node\n}\n\nfragment ModifierChip_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n"
+    "text": "query DocsChipProjectionTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...DocsChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipSlot_node\n  ...OntologyClassChip_node\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment DocsChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...ChipProjection_node\n  ... on Component {\n    ...UIBlockChip_node\n  }\n  ... on Pattern {\n    ...UIBlockChip_node\n  }\n  ... on Layout {\n    ...UIBlockChip_node\n  }\n  ...ModifierChip_node\n  ...ModifierFamilyChip_node\n  ...CodeStandardChip_node\n}\n\nfragment ModifierChip_node on Modifier {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

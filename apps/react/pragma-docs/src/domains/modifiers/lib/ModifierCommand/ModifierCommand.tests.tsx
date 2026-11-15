@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -98,15 +99,28 @@ describe("ModifierCommand", () => {
         <ModifierCommand node={node} />
       </ul>
     ));
+    const command = container.querySelector(".ds.modifier-command");
     expect(
-      [...container.querySelectorAll(".title, .context, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["Danger", "Modifier in ds", "Anticipation"]);
+      [
+        ...(command?.querySelectorAll(".title, .address, .kind, .status") ??
+          []),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "Danger",
+      "ds:global.modifier.danger",
+      "Modifier",
+      "Anticipation",
+    ]);
+    expect(command?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/settings.svg#settings",
+    );
+    expect(command?.querySelector(".prefix")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+    if (command) expectSlotOrder(command);
   });
 
-  it("names its class alone and ends in no vital with no prefix or family", () => {
+  it("names its kind and ends in no status with no family", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -115,8 +129,11 @@ describe("ModifierCommand", () => {
       ),
       { ...UNCOMPACTED_MODIFIER, modifierFamily: null },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Modifier");
-    expect(container.querySelector(".vital")).toBeNull();
+    expect(container.querySelector(".kind")?.textContent).toBe("Modifier");
+    expect(container.querySelector(".address")?.textContent).toBe(
+      "https://ds.canonical.com/global.modifier.danger",
+    );
+    expect(container.querySelector(".status")).toBeNull();
   });
 
   it("applies custom className", () => {

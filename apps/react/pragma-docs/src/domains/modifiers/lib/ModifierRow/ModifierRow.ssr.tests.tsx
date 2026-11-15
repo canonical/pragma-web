@@ -57,6 +57,6 @@ describe("ModifierRow SSR", () => {
     );
     expect(html).toContain("ds entity-row ds modifier-row");
     expect(html).toContain('data-type="Modifier"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });
