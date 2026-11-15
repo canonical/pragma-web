@@ -1,5 +1,5 @@
-import fitArrowheads from "./fitArrowheads.js";
 import { STROKE_MIN_WIDTH, ZERO_STROKE_DASH } from "./constants.js";
+import fitArrowheads from "./fitArrowheads.js";
 import type { RelationStroke, StrokeWeight } from "./types.js";
 
 /**

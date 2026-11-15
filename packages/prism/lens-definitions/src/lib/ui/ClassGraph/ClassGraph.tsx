@@ -15,13 +15,13 @@ import {
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import { type ReactElement, type ReactNode, useMemo } from "react";
+import { BRIDGE_LABEL_SIZE } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
 import weighStroke from "../../classGraph/weighStroke.js";
-import { BRIDGE_LABEL_SIZE } from "../../classGraph/constants.js";
 import { useMessages } from "../../i18n/index.js";
 import {
   EDGE_HIT_WIDTH,
@@ -267,13 +267,7 @@ export default function ClassGraph({
 
   // A bridge's label is drawn at rest, unless the focus's own labels
   // name it or the focus fades it.
-  const bridgeLabels = useMemo(
-    () =>
-      placeBridgeLabels(layout, (count) =>
-        t("well.relations.count", { count }),
-      ),
-    [layout, t],
-  );
+  const bridgeLabels = useMemo(() => placeBridgeLabels(layout, t), [layout, t]);
   const focusLabelled = new Set(labels.placed.map((label) => label.edge));
   const restingLabels = bridgeLabels.filter((label) => {
     const edge = requireDefined(

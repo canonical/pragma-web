@@ -89,9 +89,9 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(bridge?.querySelector("path.relation")?.getAttribute("class")).toBe(
       "relation is-bridge",
     );
-    expect(bridge?.querySelector("text.edge-label.is-bridge")?.textContent).toBe(
-      "predicate",
-    );
+    expect(
+      bridge?.querySelector("text.edge-label.is-bridge")?.textContent,
+    ).toBe("predicate");
     // A specimen states a stroke, never a count.
     expect(bridge?.querySelector("[data-weight]")).toBeNull();
   });
@@ -141,9 +141,7 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       "filled-head",
     );
     expect(zero?.querySelector(".step")).toBeNull();
-    expect(zero?.textContent).toBe(
-      "A relation with no statements yet: dashed",
-    );
+    expect(zero?.textContent).toBe("A relation with no statements yet: dashed");
   });
 
   it("names its specimens for their role, never after a class of a site's ontology", () => {

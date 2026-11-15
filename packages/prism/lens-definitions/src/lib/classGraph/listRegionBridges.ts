@@ -1,4 +1,9 @@
-import { compareText, orderBy } from "@canonical/prism-core";
+import {
+  compareText,
+  orderBy,
+  requireAt,
+  requireEntry,
+} from "@canonical/prism-core";
 import type { Bridge, ClassGraphModel } from "./types.js";
 
 /**
@@ -12,15 +17,13 @@ import type { Bridge, ClassGraphModel } from "./types.js";
 export default function listRegionBridges(
   model: ClassGraphModel,
 ): readonly Bridge[] {
-  const prefixOf = (uri: string): string => {
-    const node = model.byId.get(uri);
-    if (node === undefined) throw new Error(`no class ${uri} in the model`);
-    return node.prefix;
-  };
+  const prefixOf = (uri: string): string =>
+    requireEntry(model.byId, uri).prefix;
   const counts = new Map<string, Bridge>();
   for (const bundle of model.bundles.filter((candidate) => candidate.cross)) {
-    const [a, b] = [prefixOf(bundle.a), prefixOf(bundle.b)].sort(compareText);
-    if (a === undefined || b === undefined) continue;
+    const ends = [prefixOf(bundle.a), prefixOf(bundle.b)].sort(compareText);
+    const a = requireAt(ends, 0);
+    const b = requireAt(ends, 1);
     const key = `${a} ${b}`;
     counts.set(key, {
       a,

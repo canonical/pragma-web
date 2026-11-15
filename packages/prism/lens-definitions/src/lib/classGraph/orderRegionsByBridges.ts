@@ -36,7 +36,8 @@ export default function orderRegionsByBridges(
     // The remaining regions are by size, then prefix, so only a stronger
     // pull displaces the first.
     const best = pulls.reduce(
-      (chosen, pull, index) => (pull > requireAt(pulls, chosen) ? index : chosen),
+      (chosen, pull, index) =>
+        pull > requireAt(pulls, chosen) ? index : chosen,
       0,
     );
     const next = requireAt(remaining.splice(best, 1), 0);

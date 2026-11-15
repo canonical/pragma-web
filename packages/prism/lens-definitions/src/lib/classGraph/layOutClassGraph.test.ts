@@ -100,7 +100,9 @@ describe("layOutClassGraph", () => {
   });
 
   it("keeps the label-sorted order without sweeps", () => {
-    expect(layOutClassGraph(CROSS_REGION_GRAPH, { sweeps: 0 }).rail).toHaveLength(8);
+    expect(
+      layOutClassGraph(CROSS_REGION_GRAPH, { sweeps: 0 }).rail,
+    ).toHaveLength(8);
   });
 
   it("retries a graph too wide for the canvas, keeps the narrower channels that lift its fit, and opens on a legible window", () => {
@@ -378,6 +380,32 @@ describe("layOutClassGraph", () => {
     expect(measurePathBounds(far.d).x).toBeGreaterThan(-SHELF_GAP / 2);
     // No relation pulls dd, so its join to aa runs past two shelves.
     expect(measurePathBounds(join.d).x).toBe(-SHELF_GAP / 2);
+    // Where bb pulls harder, cc lands two shelves below aa, and the
+    // bridge goes round the packing's left margin.
+    const pulled = layOutClassGraph({
+      classes: [...chain("aa"), ...chain("bb"), ...chain("cc")],
+      relations: [
+        ...["One", "Two"].map((label) => ({
+          uri: `bb:to${label}`,
+          label: `to${label}`,
+          domain: `bb:${label}`,
+          range: `aa:${label}`,
+          count: 1,
+        })),
+        {
+          uri: "aa:far",
+          label: "far",
+          domain: "aa:Two",
+          range: "cc:Two",
+          count: 1,
+        },
+      ],
+    });
+    const farther = requireDefined(
+      pulled.edges.find((edge) => edge.id === "rel:aa:Two cc:Two"),
+      "the farther relation",
+    );
+    expect(measurePathBounds(farther.d).x).toBe(-SHELF_GAP / 2);
   });
 
   it("routes between two shelves through the gap that joins them, never round the margin", () => {

@@ -121,7 +121,9 @@ describe("the class graph of the real ontology", () => {
 
   it("crosses fewer edges than the label-sorted order, and no subclass edges", () => {
     const crossings = countCrossings(layout);
-    const baseline = countCrossings(layOutClassGraph(ontologyGraph, { sweeps: 0 }));
+    const baseline = countCrossings(
+      layOutClassGraph(ontologyGraph, { sweeps: 0 }),
+    );
     expect(crossings.total).toBe(14);
     expect(baseline.total).toBe(42);
     expect(crossings.total).toBeLessThanOrEqual(baseline.total);
@@ -222,7 +224,9 @@ describe("the class graph of the metro ontology", () => {
       textOverlaps: 0,
     });
     expect(countCrossings(metro).total).toBe(6);
-    expect(countCrossings(layOutClassGraph(metroGraph, { sweeps: 0 })).total).toBe(7);
+    expect(
+      countCrossings(layOutClassGraph(metroGraph, { sweeps: 0 })).total,
+    ).toBe(7);
     expect(followsRailOrder(metro)).toBe(true);
   });
 

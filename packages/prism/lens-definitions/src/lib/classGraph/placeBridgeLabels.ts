@@ -10,6 +10,7 @@ import {
   type Rect,
   requireDefined,
 } from "@canonical/prism-core";
+import type { Translate } from "../i18n/index.js";
 import {
   BRIDGE_LABEL_NAMES,
   BRIDGE_LABEL_SEPARATOR,
@@ -32,12 +33,12 @@ import type { BridgeLabel, ClassGraphLayout } from "./types.js";
  * layout always gives the same labels.
  *
  * @param layout - The class graph laid out.
- * @param formatCount - How "‹n› relations" reads, from the catalog.
+ * @param t - The translator, for how "‹n› relations" reads.
  * @returns The labels placed, by edge id.
  */
 export default function placeBridgeLabels(
   layout: ClassGraphLayout,
-  formatCount: (count: number) => string,
+  t: Translate,
 ): readonly BridgeLabel[] {
   const obstacles: readonly Rect[] = [
     ...[...layout.nodes.values()].map((node) => ({
@@ -62,8 +63,10 @@ export default function placeBridgeLabels(
     const { relations } = requireDefined(edge.bundle, "a bridge's bundle");
     const text =
       relations.length > BRIDGE_LABEL_NAMES
-        ? formatCount(relations.length)
-        : relations.map((relation) => relation.label).join(BRIDGE_LABEL_SEPARATOR);
+        ? t("well.relations.count", { count: relations.length })
+        : relations
+            .map((relation) => relation.label)
+            .join(BRIDGE_LABEL_SEPARATOR);
     const w =
       Math.ceil(measureTextWidth(text, "regular", BRIDGE_LABEL_SIZE)) +
       2 * LABEL_HALO;

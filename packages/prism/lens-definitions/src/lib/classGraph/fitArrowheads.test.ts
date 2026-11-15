@@ -43,7 +43,11 @@ describe("fitArrowheads", () => {
 
   it("ends a self-loop inside its grown head, its start left on the box", () => {
     expect(
-      fitArrowheads("M92 40C92 8 132 48 100 48", ["M100 48L108 44V52L100 48"], 8),
+      fitArrowheads(
+        "M92 40C92 8 132 48 100 48",
+        ["M100 48L108 44V52L100 48"],
+        8,
+      ),
     ).toEqual({
       d: "M92 40C92 8 132 48 108 48",
       heads: ["M100 48L120 38V58L100 48"],
@@ -64,9 +68,9 @@ describe("fitArrowheads", () => {
   });
 
   it("shrinks a line shorter than its width to a point, never inside out", () => {
-    expect(
-      fitArrowheads("M100 40H104", ["M104 40L96 36V44L104 40"], 8).d,
-    ).toBe("M100 40L100 40");
+    expect(fitArrowheads("M100 40H104", ["M104 40L96 36V44L104 40"], 8).d).toBe(
+      "M100 40L100 40",
+    );
     expect(
       fitArrowheads(
         "M100 40H104",

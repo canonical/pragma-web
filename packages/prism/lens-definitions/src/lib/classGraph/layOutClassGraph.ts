@@ -107,7 +107,10 @@ function layOutLayers(
  */
 function packRegions(
   model: ClassGraphModel,
-  order: readonly { readonly prefix: string; readonly ids: readonly string[] }[],
+  order: readonly {
+    readonly prefix: string;
+    readonly ids: readonly string[];
+  }[],
   channel: number,
   sweeps: number,
 ): {

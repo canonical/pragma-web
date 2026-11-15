@@ -3,7 +3,7 @@ import {
   STROKE_MIN_WIDTH,
   STROKE_STEPS,
 } from "../../../../classGraph/constants.js";
-import type { SpecimenStroke, Specimen, StrokeSpecimen } from "./types.js";
+import type { Specimen, SpecimenStroke, StrokeSpecimen } from "./types.js";
 
 /**
  * The legend's rows, in order: a concrete class with its count, an

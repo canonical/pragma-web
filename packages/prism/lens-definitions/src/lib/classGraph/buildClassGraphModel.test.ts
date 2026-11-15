@@ -85,7 +85,10 @@ describe("buildClassGraphModel", () => {
     const specimen = buildClassGraphModel({
       ...CROSS_REGION_GRAPH,
       relations: CROSS_REGION_GRAPH.relations.map(
-        ({ count: _count, ...relation }) => ({ ...relation, specimen: true as const }),
+        ({ count: _count, ...relation }) => ({
+          ...relation,
+          specimen: true as const,
+        }),
       ),
     });
     expect(specimen.bundles.length).toBeGreaterThan(0);
@@ -107,8 +110,9 @@ describe("buildClassGraphModel", () => {
     const [first, ...rest] = CROSS_REGION_GRAPH.relations;
     const { count: _count, ...uncounted } = requireDefined(first, "relation");
     const relations = [...rest, { ...uncounted, specimen: true as const }];
+    const input = { ...CROSS_REGION_GRAPH, relations };
     // @ts-expect-error A graph's relations are all counted or all specimens.
-    const mixed = () => buildClassGraphModel({ ...CROSS_REGION_GRAPH, relations });
+    const mixed = () => buildClassGraphModel(input);
     expect(mixed).toThrow(/carries no count/);
   });
 

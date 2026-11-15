@@ -303,8 +303,7 @@ describe("ClassGraph", () => {
     zoom.bucket = "full";
     const bridge = metro.layout.edges.find((edge) => edge.bridge === true);
     const outside = [...metro.layout.nodes.keys()].find(
-      (id) =>
-        !findNeighbourhood(metro.layout, id).edges.has(bridge?.id ?? ""),
+      (id) => !findNeighbourhood(metro.layout, id).edges.has(bridge?.id ?? ""),
     );
     expect(outside).toBeDefined();
     const labelled = draw({ ...own, focus: outside }).querySelector(
