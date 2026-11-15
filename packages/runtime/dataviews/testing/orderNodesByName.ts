@@ -1,6 +1,7 @@
 import { createCollection } from "../src/lib/collection/index.js";
 import { DEFAULT_WINDOW, type Slice } from "../src/lib/query/index.js";
 import { createArraySource } from "../src/lib/source/index.js";
+import readSucceededPage from "./readSucceededPage.js";
 
 /** Named nodes, identified by id, their names text. */
 const nodes = createCollection({
@@ -29,9 +30,7 @@ export default function orderNodesByName(
   source.execute(
     { requestId: "r1", slice: byName, window: DEFAULT_WINDOW, facets: [] },
     (delivery) => {
-      if (delivery.status === "succeeded") {
-        delivered.push(...delivery.page.rows.map((row) => row.id));
-      }
+      delivered.push(...readSucceededPage(delivery).rows.map(nodes.identify));
     },
   );
   return delivered;

@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "lib": ["ES2023"],
     "rootDir": ".",
     "outDir": "dist/testing-build/esm",
     "declaration": true,

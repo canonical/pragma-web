@@ -40,13 +40,4 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/views/mintViewId.ts test",
   "src/lib/wire/readWireField.ts test",
   "src/lib/wire/rejectWireName.ts test",
-  "testing/buildRowModel.ts test",
-  "testing/createCountedRows.ts test",
-  "testing/createCountingViewStore.ts test",
-  "testing/createDeferred.ts test",
-  "testing/flushPresentation.ts test",
-  "testing/observeUntilFinished.ts test",
-  "testing/openIndexedDBTab.ts test",
-  "testing/orderNodesByName.ts test",
-  "testing/settleCalls.ts test",
 ]);
