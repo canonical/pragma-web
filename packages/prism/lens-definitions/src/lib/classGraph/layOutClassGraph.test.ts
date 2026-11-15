@@ -518,8 +518,10 @@ describe("layOutClassGraph", () => {
 
     it("draws a graph of more namespaces than the budget has nodes as one box each, over the node budget: a limit of this layout", () => {
       const many = {
-        classes: Array.from({ length: GRAPH_BUDGET.drawnNodesMax + 4 }, (_, index) =>
-          defineClass(`n${String(index).padStart(2, "0")}:A`, "A"),
+        classes: Array.from(
+          { length: GRAPH_BUDGET.drawnNodesMax + 4 },
+          (_, index) =>
+            defineClass(`n${String(index).padStart(2, "0")}:A`, "A"),
         ),
         relations: [],
       };
@@ -535,7 +537,10 @@ describe("layOutClassGraph", () => {
 
     it("draws a drilled namespace of more classes than the budget leaves room for whole, over the node budget: a limit of this layout", () => {
       const layout = layOutClassGraph(
-        { ...SIXTY_CLASS_GRAPH, classes: [...SIXTY_CLASS_GRAPH.classes, defineClass("aa:A", "A")] },
+        {
+          ...SIXTY_CLASS_GRAPH,
+          classes: [...SIXTY_CLASS_GRAPH.classes, defineClass("aa:A", "A")],
+        },
         { budget: GRAPH_BUDGET, drill: "big" },
       );
       // Its 60 classes and the other namespace's box: no subtree is folded,

@@ -212,7 +212,10 @@ describe("DefinitionsExplorer", {
     const countBand = (band: number): number => {
       const { container, unmount } = render(
         <GraphBudgetProvider
-          budget={createGraphBudget({ drawnNodesMax: 20, bandMembersMax: band })}
+          budget={createGraphBudget({
+            drawnNodesMax: 20,
+            bandMembersMax: band,
+          })}
         >
           {createDefinitionsPage(
             UIBLOCK_TERM,
