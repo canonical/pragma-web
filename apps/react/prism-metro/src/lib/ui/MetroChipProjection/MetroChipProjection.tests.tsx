@@ -117,6 +117,9 @@ describe("MetroChipProjection", () => {
     ["Station", MOCK_STATION],
     ["Interchange", MOCK_INTERCHANGE],
     ["Line", MOCK_LINE],
+    ["Zone", MOCK_ZONE],
+    ["RollingStock", MOCK_ROLLING_STOCK],
+    ["Formation", MOCK_FORMATION],
   ] as const)("hands a %s's arm its unlinked opt-out", (_typename, entity) => {
     const { container } = renderWithNode(
       (node) => <MetroChipProjection linked={false} node={node} />,

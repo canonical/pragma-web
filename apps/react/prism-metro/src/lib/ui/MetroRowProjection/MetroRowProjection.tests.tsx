@@ -101,6 +101,15 @@ const CASES = [
   ["OntologyClass", MOCK_ONTOLOGY_CLASS, "ontology-class-row"],
 ] as const;
 
+/**
+ * A mock node given a definition, which the fleet's fixtures leave null, so
+ * that a two-line row has a summary to show.
+ */
+const defineEntity = <T extends { readonly _meta: object }>(
+  entity: T,
+  definition: string,
+) => ({ ...entity, _meta: { ...entity._meta, definition } });
+
 describe("MetroRowProjection", () => {
   it.each(CASES)("renders a %s through its arm", (typename, entity, root) => {
     const { container } = renderWithNode(
@@ -118,6 +127,8 @@ describe("MetroRowProjection", () => {
     ["Interchange", MOCK_INTERCHANGE],
     ["Line", MOCK_LINE],
     ["Zone", MOCK_ZONE],
+    ["RollingStock", defineEntity(MOCK_ROLLING_STOCK, "A train type.")],
+    ["Formation", defineEntity(MOCK_FORMATION, "A train as it runs.")],
   ] as const)("hands a %s's arm its two-line opt-in", (_typename, entity) => {
     const { container } = renderWithNode(
       (node) => <MetroRowProjection lines="two" node={node} />,
