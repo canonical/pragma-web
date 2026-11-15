@@ -187,6 +187,14 @@ describe("HeaderCell", () => {
       expect(onClearRefusal).not.toHaveBeenCalled();
     });
 
+    it("is a plain span in the cell, beside the control", () => {
+      mount({ sortable: true, reason: "Refused." });
+      const reason = getHeader().querySelector(":scope > .sort-reason");
+      expect(reason?.tagName).toBe("SPAN");
+      expect(reason).not.toHaveAttribute("popover");
+      expect(reason).toHaveTextContent("Refused.");
+    });
+
     it("goes once focus leaves the column", () => {
       const { onClearRefusal } = mount({ sortable: true, reason: "Refused." });
       fireEvent.blur(screen.getByRole("button", { name: "Name" }), {
@@ -229,6 +237,10 @@ describe("HeaderCell", () => {
     it("offers no resize handle before scripts run", () => {
       mount({ resizable: true, hydrated: false });
       expect(screen.queryByRole("separator")).toBeNull();
+      // Nothing holds the handle's place: the label alone fills the cell.
+      expect(
+        Array.from(getHeader().children, (child) => child.className),
+      ).toEqual(["label"]);
     });
   });
 
