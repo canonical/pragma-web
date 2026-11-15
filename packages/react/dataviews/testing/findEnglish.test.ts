@@ -45,7 +45,7 @@ describe("findEnglish", () => {
     expect(
       findEnglish(
         hold(
-          `<table><tbody><tr><td class="ds data-table-body-cell status">${english.sortAbsent}</td></tr></tbody></table>`,
+          `<table><tbody><tr class="ds data-table-status-row"><td class="cell">${english.sortAbsent}</td></tr></tbody></table>`,
         ),
         english,
       ),

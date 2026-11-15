@@ -8,7 +8,7 @@ import { MESSAGE_MARK, MESSAGE_SAMPLES } from "./fixtures.js";
 const DATA_ZONES = [
   // A body cell's own value, but not the selection checkbox beside it nor
   // the status row's text, both of which the record words.
-  "td:not(.ds.data-table-selection-cell):not(.status)",
+  "td:not(.ds.data-table-selection-cell):not(.ds.data-table-status-row > .cell)",
   "th > .label",
   "th > .sort > .label",
   "option",

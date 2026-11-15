@@ -1455,10 +1455,10 @@ describe("DataTable", () => {
     const listed = within(body).getAllByRole("row");
     const first = elementAt(listed, 0);
     const rows = listed.slice(1);
-    expect(first).toHaveClass("status");
+    expect(first).toHaveClass("ds", "data-table-status-row");
+    expect(first).toHaveAttribute("data-status", status);
     expect(within(body).getAllByRole("row", { name: text })).toHaveLength(1);
     const cell = within(first).getByRole("cell");
-    expect(cell).toHaveAttribute("data-status", status);
     expect(cell).toHaveTextContent(text);
     if (announced) {
       expect(within(cell).getByRole("status")).toHaveTextContent(text);
@@ -1623,7 +1623,7 @@ describe("DataTable", () => {
       "true",
     );
     expect(elementAt(screen.getAllByRole("row"), 1).className).toBe(
-      "ds data-table-row selected",
+      "ds data-table-row",
     );
     fireEvent.click(screen.getByRole("checkbox", { name: "Select alpha" }));
     expect(provider.selection.state.get().ids.size).toBe(0);

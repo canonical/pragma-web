@@ -1,7 +1,7 @@
 import { CheckboxInput } from "@canonical/react-ds-global-form";
 import { type ReactElement, useContext } from "react";
 import { MessagesContext } from "../../../../common/index.js";
-import { useDataViewsValue } from "../../../../hooks/index.js";
+import { useDataViewsValue, useIsHydrated } from "../../../../hooks/index.js";
 import type { SelectionCellProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-selection-cell";
@@ -22,6 +22,8 @@ export default function SelectionCell<TRow extends object>({
 }: SelectionCellProps<TRow>): ReactElement {
   const messages = useContext(MessagesContext);
   const record = useDataViewsValue(channels.record);
+  // Selection works once scripts run: until then the box draws disabled.
+  const hydrated = useIsHydrated();
   return (
     <td
       {...rest}
@@ -29,6 +31,7 @@ export default function SelectionCell<TRow extends object>({
     >
       <CheckboxInput
         checked={selected}
+        disabled={!hydrated}
         aria-label={messages.selectRow(getRowLabel(record, channels.id))}
         onChange={() => {
           provider.selection.toggle(channels.id);

@@ -14,8 +14,8 @@
 #   body row group                        DOM `ds data-table-row-group body`
 #   selection cell  design "BodyCell: Checkbox variant"
 #                                         DOM `ds data-table-selection-cell`
-#   status row      DOM `ds data-table-row status`
-#   status cell     DOM `ds data-table-body-cell status`, `data-status="<status>"`
+#   status row      DOM `ds data-table-status-row`, `data-status="<status>"`
+#   status cell     DOM `.cell`, spanning every track
 #   gap             the body's block padding, or a later run's first row's
 #                   top margin; no element
 #   settings cell   design "settings action cell"
@@ -23,7 +23,7 @@
 #   announcement    DOM `ds data-views-announcer`, beside the root, read
 #                   and not drawn: a standalone table's own, or none, where a
 #                   connected table speaks through its root's
-# The status cell shares the body cell's class for its shared box. It and
+# The status row is its own part, its status a data state. Its cell and
 # the selection cell are role nodes here, not BodyCells: the table's
 # `selectable` prop and its outcome choose them, never a column.
 #

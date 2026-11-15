@@ -75,7 +75,7 @@ describe("DataTable SSR", () => {
     expect(html).toContain("alpha");
   });
 
-  it("draws the selection column on the server as the client first draws it", () => {
+  it("draws the selection column disabled and unselected until scripts run", () => {
     const { provider } = createMachineProvider();
     const host = readProviderHost(provider);
     host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
@@ -88,8 +88,10 @@ describe("DataTable SSR", () => {
         columns={columns}
       />,
     );
-    expect(html).toContain('aria-selected="false"');
-    expect(html).not.toContain("disabled");
+    expect(html).not.toContain("aria-selected");
+    expect(
+      html.match(/<input[^>]*type="checkbox"[^>]*disabled=""/g),
+    ).toHaveLength(2);
   });
 
   it("observes nothing on the server: the provider stays idle and the source is never asked", () => {

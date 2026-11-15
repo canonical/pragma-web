@@ -26,7 +26,7 @@ const describeStatus = (status: DisplayStatus): string =>
   "reason" in status ? `${status.status}: ${status.reason}` : status.status;
 
 describe("StatusRow", () => {
-  it("carries the status as data-status on its one cell", () => {
+  it("carries the status as data-status on its root, over one cell", () => {
     render(
       <StatusRow
         status={{ status: "stale", reason: "offline" }}
@@ -36,16 +36,12 @@ describe("StatusRow", () => {
       inBody(),
     );
     const cell = screen.getByRole("cell");
-    expect(cell).toHaveAttribute("data-status", "stale");
-    expect(cell).toHaveClass("ds", "data-table-body-cell", "status");
+    expect(screen.getByRole("row")).toHaveAttribute("data-status", "stale");
+    expect(cell.className).toBe("cell");
     expect(cell).toHaveTextContent("stale: offline");
     // One cell for the whole table: it spans every rendered track.
     expect(cell).toHaveAttribute("colspan", "3");
-    expect(screen.getByRole("row")).toHaveClass(
-      "ds",
-      "data-table-row",
-      "status",
-    );
+    expect(screen.getByRole("row").className).toBe("ds data-table-status-row");
   });
 
   it("announces every settled outcome once, and keeps every passing state silent", () => {
