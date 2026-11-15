@@ -40,7 +40,9 @@
 # it, in its own column so the second line stands under the title, and
 # spaced from the title by the chip's gap, 4px; the vital and the aside
 # stand the gutter from the identity. The first line, the headline, holds the foreign
-# prefix (muted, monospace, never shrinking) when given, then the title,
+# prefix (muted, monospace, never shrinking) when given, which is only for
+# a result without an address (an arm gives the prefix or the address,
+# never both: the address states the namespace), then the title,
 # which takes what is left and truncates. The mark leads the first line, its 16px centred
 # in the 24px line by a 4px offset. With an address, the full CURIE in
 # monospace takes the second line, and the aside at the row's end holds

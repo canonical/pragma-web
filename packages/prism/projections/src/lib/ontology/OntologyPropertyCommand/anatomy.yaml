@@ -4,7 +4,8 @@
 # Reference: the W3 command anatomy: the slot order mark, prefix, title,
 # address, kind, status; a property fills the mark (the property glyph),
 # the title, the address (its IRI), the kind ("kind in location", the
-# class it is declared on) and the status (its range).
+# class it is declared on) and the status (its range). A command gives its
+# address, never a prefix: the address states the namespace once.
 # Projected onto EntityCommand, which carries every style: this anatomy
 # binds none. It is not dispatched: a property is not a Node, and its
 # callers render it directly.
@@ -31,14 +32,6 @@ node:
             relation:
               cardinality: "1"
               slotName: mark
-          - node:
-              # Never shown: an absolute IRI has no compact prefix.
-              role: prefix
-              projection:
-                field: uri
-            relation:
-              cardinality: "0..1"
-              slotName: prefix
           - node:
               role: title
               edges:

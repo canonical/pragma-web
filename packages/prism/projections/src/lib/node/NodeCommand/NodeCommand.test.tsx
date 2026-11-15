@@ -103,22 +103,25 @@ describe("NodeCommand", () => {
     expect(container.querySelector(".context, .vital, .status")).toBeNull();
   });
 
-  it("shows its prefix only when its namespace is not the page's", () => {
+  it("states its namespace once, in its address, on any page", () => {
     const foreign = renderWithNode((node) => (
-      <ul>
-        <NodeCommand node={node} />
-      </ul>
-    ));
-    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
-    foreign.unmount();
-    const own = renderWithNode((node) => (
-      <AmbientNamespaceProvider namespace="ds">
+      <AmbientNamespaceProvider namespace="cs">
         <ul>
           <NodeCommand node={node} />
         </ul>
       </AmbientNamespaceProvider>
     ));
-    expect(own.container.querySelector(".prefix")).toBeNull();
+    expect(foreign.container.querySelector(".prefix")).toBeNull();
+    expect(foreign.container.querySelector(".address")?.textContent).toMatch(
+      /^ds:/,
+    );
+    foreign.unmount();
+    const undeclared = renderWithNode((node) => (
+      <ul>
+        <NodeCommand node={node} />
+      </ul>
+    ));
+    expect(undeclared.container.querySelector(".prefix")).toBeNull();
   });
 
   it("links its title to the home of a type the site homes", () => {

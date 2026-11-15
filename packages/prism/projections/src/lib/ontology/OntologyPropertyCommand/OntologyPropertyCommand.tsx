@@ -6,10 +6,7 @@ import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/OntologyPropertyCommand_node.graphql.js";
 import { useMessages } from "../../i18n/index.js";
-import {
-  useForeignPrefix,
-  useProjectionLink,
-} from "../../projections/index.js";
+import { useProjectionLink } from "../../projections/index.js";
 import { EntityCommand } from "../../ui/index.js";
 import { findLocalName } from "../../utils/index.js";
 import { PROPERTY_KIND_LABELS, PROPERTY_MARK_ICON } from "../constants.js";
@@ -48,8 +45,7 @@ const componentCssClassName = "ds ontology-property-command";
  * none; its IRI, the address a reader cites it by, on the second; then
  * "kind in location", the location the class it is declared on, and its
  * range as its status. The name is the property's label, or the local name of its IRI when
- * it has none. A property's address is its absolute IRI, which has no
- * compact form, so `useForeignPrefix` finds no prefix for it.
+ * it has none. The address states the namespace, so it passes no prefix.
  *
  * A property is not a `Node`, so no dispatcher renders it: a lens spreads
  * `...OntologyPropertyCommand_node` where it selects the property.
@@ -62,8 +58,8 @@ const componentCssClassName = "ds ontology-property-command";
  *
  * @implements prism.component.ontology_property_command
  * @note Impure: reads its property from the Relay store, its home from the
- *   site's homes, its link from the projection provider, the page's
- *   ambient namespace and its words from the translator in scope.
+ *   site's homes, its link from the projection provider and its words from
+ *   the translator in scope.
  */
 export default function OntologyPropertyCommand({
   node,
@@ -76,7 +72,6 @@ export default function OntologyPropertyCommand({
   const t = useMessages();
   const kind = t(PROPERTY_KIND_LABELS[data.kind] ?? "property.kind.other");
   const domain = data.domain?._meta.title;
-  const prefix = useForeignPrefix(data.uri);
   return (
     <EntityCommand
       {...props}
@@ -91,7 +86,6 @@ export default function OntologyPropertyCommand({
       }
       LinkComponent={LinkComponent}
       mark={<Icon icon={PROPERTY_MARK_ICON} />}
-      prefix={prefix}
       status={<code className="identifier">{data.range}</code>}
       title={data.label ?? findLocalName(data.uri)}
     />

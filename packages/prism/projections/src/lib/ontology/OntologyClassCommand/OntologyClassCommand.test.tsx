@@ -103,7 +103,6 @@ describe("OntologyClassCommand", () => {
         ),
       ].map((slot) => slot.textContent),
     ).toEqual([
-      "ds:",
       "Layout",
       "ds:Layout",
       "Abstract class",
@@ -133,9 +132,9 @@ describe("OntologyClassCommand", () => {
     expect(container.querySelector(".kind")?.textContent).toBe("Class");
   });
 
-  it("shows its prefix only when its namespace is not the page's", () => {
+  it("states its namespace once, in its address, on a page of another namespace", () => {
     const { container } = renderWithNode((node) => (
-      <AmbientNamespaceProvider namespace="ds">
+      <AmbientNamespaceProvider namespace="cs">
         <ul>
           <OntologyClassCommand node={node} />
         </ul>

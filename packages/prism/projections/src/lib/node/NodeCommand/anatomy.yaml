@@ -2,10 +2,10 @@
 # NodeCommand: any graph node as a 56px command-palette result.
 # Reference: the W3 command anatomy: the slot order mark, prefix, title,
 # address, kind, status; any node fills the mark (the generic node glyph),
-# the prefix (its namespace's, only off the page's ambient namespace), the
-# title, the address (the full compact address, on the second line) and
+# the title, the address (the full compact address, on the second line) and
 # the kind (its class, closing the first line). Any node carries no
-# status.
+# status. A command gives its address, never a prefix: the address states
+# the namespace once.
 # Projected onto EntityCommand, which carries every style: this anatomy
 # binds none. The home is the link the title renders through, resolved
 # from the compact address; a node without one reads as inert text.
@@ -28,13 +28,6 @@ node:
             relation:
               cardinality: "1"
               slotName: mark
-          - node:
-              role: prefix
-              projection:
-                field: _meta.curie
-            relation:
-              cardinality: "0..1"
-              slotName: prefix
           - node:
               role: title
               projection:
