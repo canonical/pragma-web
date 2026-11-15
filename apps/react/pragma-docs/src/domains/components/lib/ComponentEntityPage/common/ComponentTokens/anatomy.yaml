@@ -14,27 +14,97 @@
 #
 # Token ledger (on `.ds.component-tokens`): ComponentProperties' ledger,
 # renamed, plus:
-#   --component-tokens-symbol-font-family: ui-monospace, monospace   literal
+#   --component-tokens-symbol-font-family:
+#     typography.text.primary.code.fontFamily (the semantic code face the
+#     app already reads, in place of the planner's literal stack)
 node:
   uri: docs.subcomponent.component_tokens
-  element: div
-  styles: { layout.grid.column: "1 / -1" }
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
   edges:
     - node:
-        role: scroll
-        styles: { layout.overflow.inline: auto }
+        role: scroll (the table's own scrolling region)
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.overflow.inline: auto
+          size.min.width: 0
         edges:
           - node:
               role: table
               element: table
+              styles:
+                size.width: 100%
+                layout.table.collapse: collapse
               edges:
-                - node: { role: head, element: th, attributes: { scope: col } }
+                - node:
+                    role: head (a column's header cell)
+                    element: th
+                    attributes: { scope: col }
+                    styles:
+                      typography.align: start
+                      layout.verticalAlign: top
+                      typography.color: color.text.muted
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      spacing.internal.block.start: space.050
+                      spacing.internal.block.end: space.050
+                      spacing.internal.inline.start: 0
+                      spacing.internal.inline.end: container.gap.default
+                      appearance.border.width: 1px
+                      appearance.border.style: "none none solid"
+                      appearance.border.bottom.color: color.border.muted
                   relation: { cardinality: "3", slotName: head }
-                - node: { role: part, element: th, attributes: { scope: rowgroup } }
-                  relation: { cardinality: "1..*", slotName: part }
-                - node: { role: symbol, element: td, styles: { typography.fontFamily: "ui-monospace, monospace" } }
-                  relation: { cardinality: "1..*", slotName: symbol }
-                - node: { role: order, element: td }
-                  relation: { cardinality: "1..*", slotName: order }
+                - node:
+                    role: part group (one tbody per part)
+                    element: tbody
+                    edges:
+                      - node:
+                          role: part (the group's header cell, spanning its rows)
+                          element: th
+                          attributes: { scope: rowgroup }
+                          styles:
+                            typography.align: start
+                            layout.verticalAlign: top
+                            spacing.internal.block.start: space.050
+                            spacing.internal.block.end: space.050
+                            spacing.internal.inline.start: 0
+                            spacing.internal.inline.end: container.gap.default
+                            appearance.border.width: 1px
+                            appearance.border.style: "none none solid"
+                            appearance.border.bottom.color: color.border.muted
+                        relation: { cardinality: "1", slotName: part }
+                      - node:
+                          role: symbol (the token's name after its namespace)
+                          element: td
+                          styles:
+                            typography.align: start
+                            layout.verticalAlign: top
+                            typography.fontFamily: typography.text.primary.code.fontFamily
+                            typography.wrap: anywhere
+                            spacing.internal.block.start: space.050
+                            spacing.internal.block.end: space.050
+                            spacing.internal.inline.start: 0
+                            spacing.internal.inline.end: container.gap.default
+                            appearance.border.width: 1px
+                            appearance.border.style: "none none solid"
+                            appearance.border.bottom.color: color.border.muted
+                        relation: { cardinality: "1..*", slotName: symbol }
+                      - node:
+                          role: order (the symbol's place in the fallback order)
+                          element: td
+                          styles:
+                            typography.align: start
+                            layout.verticalAlign: top
+                            spacing.internal.block.start: space.050
+                            spacing.internal.block.end: space.050
+                            spacing.internal.inline.start: 0
+                            spacing.internal.inline.end: container.gap.default
+                            appearance.border.width: 1px
+                            appearance.border.style: "none none solid"
+                            appearance.border.bottom.color: color.border.muted
+                        relation: { cardinality: "1..*", slotName: order }
+                  relation: { cardinality: "1..*", slotName: group }
             relation: { cardinality: "1", slotName: table }
       relation: { cardinality: "1", slotName: scroll }

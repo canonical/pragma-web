@@ -63,7 +63,7 @@ export default function ComponentTokens({
             </tr>
           </thead>
           {groupBindings(tokenBindings).map(({ part, rows }) => (
-            <tbody key={part}>
+            <tbody className="group" key={part}>
               {rows.map(({ symbol, rank }, index) => (
                 <tr key={`${symbol}:${rank}`}>
                   {index === 0 ? (
