@@ -1338,6 +1338,46 @@ describe("createDataViewsProvider host", () => {
     expect(provider.state.get().slice.filter).toEqual([]);
   });
 
+  it("adds a conjunct beside one at its address, as one filter transition", () => {
+    const { provider, host } = machineProvider();
+    const atLeast = (cores: number): Predicate => ({
+      field: "cpu",
+      operator: "gte",
+      operands: [cores],
+    });
+    const heard: string[] = [];
+    host.transitions.subscribe(() => {
+      const transition = host.transitions.get();
+      heard.push(`${transition?.cause}:${transition?.history}`);
+    });
+    expect(host.addPredicate(atLeast(4))).toEqual([]);
+    expect(host.addPredicate(atLeast(8), "replace")).toEqual([]);
+    expect(provider.state.get().slice.filter).toEqual([atLeast(4), atLeast(8)]);
+    // A conjunct already held commits nothing and writes no entry.
+    const before = provider.state.get();
+    expect(host.addPredicate(atLeast(4))).toEqual([]);
+    expect(provider.state.get()).toBe(before);
+    expect(heard).toEqual(["filter:push", "filter:replace"]);
+    // A conjunct the source cannot run is refused, and nothing moves.
+    expect(
+      host.addPredicate({
+        field: "status",
+        operator: "isNone",
+        operands: ["a"],
+      }),
+    ).toEqual([
+      expect.objectContaining({
+        part: "filter",
+        field: "status",
+        operator: "isNone",
+      }),
+    ]);
+    expect(provider.state.get()).toBe(before);
+    expect(() =>
+      host.addPredicate({ field: "cpu", operator: "gte", operands: [] }),
+    ).toThrow("gte predicate needs exactly one operand");
+  });
+
   it("addresses one conjunct by its place, and edits several in one transition", () => {
     const { provider, host } = machineProvider();
     const atLeast = (cores: number): Predicate => ({
