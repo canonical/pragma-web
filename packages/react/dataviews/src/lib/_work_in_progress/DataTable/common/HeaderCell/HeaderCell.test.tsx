@@ -187,14 +187,6 @@ describe("HeaderCell", () => {
       expect(onClearRefusal).not.toHaveBeenCalled();
     });
 
-    it("is a plain span in the cell, beside the control", () => {
-      mount({ sortable: true, reason: "Refused." });
-      const reason = getHeader().querySelector(":scope > .sort-reason");
-      expect(reason?.tagName).toBe("SPAN");
-      expect(reason).not.toHaveAttribute("popover");
-      expect(reason).toHaveTextContent("Refused.");
-    });
-
     it("goes once focus leaves the column", () => {
       const { onClearRefusal } = mount({ sortable: true, reason: "Refused." });
       fireEvent.blur(screen.getByRole("button", { name: "Name" }), {
@@ -208,6 +200,125 @@ describe("HeaderCell", () => {
       vi.mocked(document.hasFocus).mockReturnValue(false);
       fireEvent.blur(screen.getByRole("button", { name: "Name" }));
       expect(onClearRefusal).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("its reason as a popover", () => {
+    const showPopover = vi.fn();
+    const hidePopover = vi.fn();
+
+    beforeEach(() => {
+      Object.assign(HTMLElement.prototype, { showPopover, hidePopover });
+      vi.stubGlobal("CSS", { supports: () => true });
+    });
+
+    afterEach(() => {
+      Reflect.deleteProperty(HTMLElement.prototype, "showPopover");
+      Reflect.deleteProperty(HTMLElement.prototype, "hidePopover");
+      vi.unstubAllGlobals();
+      showPopover.mockClear();
+      hidePopover.mockClear();
+    });
+
+    /** Draw the cell again with these props, as the table does. */
+    const redraw = (
+      rerender: (ui: ReactNode) => void,
+      props: Partial<HeaderCellProps>,
+    ) =>
+      rerender(
+        <HeaderRow>
+          <HeaderCell
+            column={{ id: "name", header: "Name" }}
+            sortable
+            precedence={null}
+            primary={false}
+            destination={null}
+            hydrated
+            reason={null}
+            removable={false}
+            offers={NONE}
+            interaction={createGridInteraction(
+              createColumnLayout({
+                columns: [],
+                presentation: createMachineProvider().provider.presentation,
+              }),
+            )}
+            resizable={false}
+            bounds={{ min: 50, max: Number.POSITIVE_INFINITY }}
+            width={120}
+            labelId="name-label"
+            onSort={() => {}}
+            onPlace={() => {}}
+            onRemoveFromSort={() => {}}
+            onChangeColumn={() => {}}
+            onClearRefusal={() => {}}
+            announce={() => {}}
+            {...props}
+          />
+        </HeaderRow>,
+      );
+
+    it("is a manual popover in the cell, beside the control", () => {
+      mount({ sortable: true, reason: "Refused." });
+      const reason = getHeader().querySelector(":scope > .sort-reason");
+      expect(reason?.tagName).toBe("SPAN");
+      expect(reason).toHaveAttribute("popover", "manual");
+      expect(reason).toHaveTextContent("Refused.");
+    });
+
+    it("shows on the cell while the reason stands, and hides once it goes", () => {
+      const { rerender } = mount({ sortable: true });
+      expect(showPopover).not.toHaveBeenCalled();
+      redraw(rerender, { reason: "Refused." });
+      redraw(rerender, { reason: "Refused again." });
+      expect(showPopover).toHaveBeenCalledTimes(1);
+      expect(showPopover).toHaveBeenCalledWith({ source: getHeader() });
+      redraw(rerender, { reason: null });
+      expect(hidePopover).toHaveBeenCalledTimes(1);
+    });
+
+    it("shows a reason again once its span is drawn anew", () => {
+      const { rerender } = mount({ sortable: true, reason: "Refused." });
+      expect(showPopover).toHaveBeenCalledTimes(1);
+      redraw(rerender, { sortable: false, reason: "Refused." });
+      redraw(rerender, { sortable: true, reason: "Refused." });
+      expect(showPopover).toHaveBeenCalledTimes(2);
+    });
+
+    it("leaves the reason in the cell where anchoring is unsupported", () => {
+      vi.stubGlobal("CSS", { supports: () => false });
+      mount({ sortable: true, reason: "Refused." });
+      expect(showPopover).not.toHaveBeenCalled();
+    });
+
+    it("leaves the reason in the cell where CSS cannot be asked", () => {
+      vi.unstubAllGlobals();
+      vi.stubGlobal("CSS", undefined);
+      mount({ sortable: true, reason: "Refused." });
+      expect(showPopover).not.toHaveBeenCalled();
+    });
+
+    it("leaves the reason in the cell where there is no popover API", () => {
+      Reflect.deleteProperty(HTMLElement.prototype, "showPopover");
+      vi.unstubAllGlobals();
+      mount({ sortable: true, reason: "Refused." });
+      expect(getHeader().querySelector(".sort-reason")).toHaveTextContent(
+        "Refused.",
+      );
+    });
+
+    it("sits beside the menu whose open state hides it", () => {
+      mount({ sortable: true, reason: "Refused." });
+      fireEvent.click(
+        screen.getByRole("button", { name: "Column options for Name" }),
+      );
+      // The stylesheet hides the reason while the column's menu is open.
+      expect(
+        getHeader().querySelector(
+          ':scope > .menu > .trigger[aria-expanded="true"]',
+        ),
+      ).not.toBeNull();
+      expect(getHeader().querySelector(":scope > .sort-reason")).not.toBeNull();
     });
   });
 
@@ -234,13 +345,17 @@ describe("HeaderCell", () => {
       );
     });
 
-    it("offers no resize handle before scripts run", () => {
+    it("offers no resize handle before scripts run, only its hidden place", () => {
       mount({ resizable: true, hydrated: false });
       expect(screen.queryByRole("separator")).toBeNull();
-      // Nothing holds the handle's place: the label alone fills the cell.
       expect(
-        Array.from(getHeader().children, (child) => child.className),
-      ).toEqual(["label"]);
+        getHeader().querySelector(":scope > .handle-slot"),
+      ).toHaveAttribute("aria-hidden", "true");
+    });
+
+    it("keeps no place for a column that does not resize", () => {
+      mount({ hydrated: false });
+      expect(getHeader().querySelector(".handle-slot")).toBeNull();
     });
   });
 

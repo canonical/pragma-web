@@ -115,10 +115,10 @@ type OwnProps = {
 };
 
 /**
- * Props of one header cell: its own, and the native props of the `div` it
+ * Props of one header cell: its own, and the native props of the `th` it
  * renders as its root. The cell owns its role, its name, its sort state,
- * its description and its blur, all derived from the column and the
- * ordering in force, so those are not taken.
+ * its description, its blur and its ref, which places its reason, all
+ * derived from the column and the ordering in force, so those are not taken.
  */
 export type HeaderCellProps = OwnProps &
   Omit<
@@ -130,4 +130,5 @@ export type HeaderCellProps = OwnProps &
     | "aria-sort"
     | "aria-describedby"
     | "onBlur"
+    | "ref"
   >;

@@ -1,10 +1,12 @@
 import type { SortDirection } from "@canonical/dataviews-core";
+import { assertInvariant } from "@canonical/dataviews-core/bindings";
 import { Icon, type IconProps } from "@canonical/react-ds-global";
 import {
   type FocusEvent,
   type KeyboardEvent,
   type ReactElement,
   useContext,
+  useEffect,
   useRef,
 } from "react";
 import { MessagesContext } from "../../../../common/index.js";
@@ -27,6 +29,12 @@ const ariaSort = {
   asc: "ascending",
   desc: "descending",
 } as const satisfies Readonly<Record<SortDirection, string>>;
+
+/** Whether a popover can be shown and anchored below its cell. */
+const canAnchorPopover = (node: HTMLElement): boolean =>
+  typeof node.showPopover === "function" &&
+  typeof globalThis.CSS?.supports === "function" &&
+  CSS.supports("position-area", "block-end center");
 
 /** Whether a key press activates a button: Enter, or Space. */
 const isActivationKey = (event: KeyboardEvent<HTMLButtonElement>): boolean =>
@@ -100,6 +108,30 @@ export default function HeaderCell({
   // the link's focus, or the reader who tabbed to the header before
   // hydration is left on nothing.
   const { link, button } = useHydrationFocusHandoff({ hydrated });
+  // The reason is a manual popover on the cell while it stands, where
+  // anchoring works; elsewhere the stylesheet draws it in the cell.
+  const cell = useRef<HTMLTableCellElement>(null);
+  const reasonRef = useRef<HTMLSpanElement>(null);
+  // The element last shown, so a remounted one starts hidden.
+  const shown = useRef<HTMLSpanElement | null>(null);
+  // The reason's span is drawn only on a sortable header once scripts run.
+  const drawsReason = sortable && hydrated;
+  useEffect(() => {
+    const node = reasonRef.current;
+    if (!drawsReason || node === null || !canAnchorPopover(node)) {
+      return;
+    }
+    const standing = reason !== null && reason !== "";
+    if (standing && shown.current !== node) {
+      node.showPopover({
+        source: assertInvariant(cell.current, "a mounted header cell"),
+      });
+      shown.current = node;
+    } else if (!standing && shown.current === node) {
+      node.hidePopover();
+      shown.current = null;
+    }
+  }, [reason, drawsReason]);
   const descriptionId = `${labelId}-sort`;
   const describedBy = precedence === null ? undefined : descriptionId;
   const indicator =
@@ -119,6 +151,7 @@ export default function HeaderCell({
   return (
     <th
       {...rest}
+      ref={cell}
       scope="col"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       // Named by its label alone: a reader hears a column's name on every
@@ -215,10 +248,12 @@ export default function HeaderCell({
           )}
         </span>
       )}
-      {sortable && hydrated ? (
-        // Shown beside the control while it stands, and no live region: the
+      {drawsReason ? (
+        // Shown below the control while it stands, and no live region: the
         // table's announcer said it when it happened, so it is heard once.
-        <span className="sort-reason">{reason}</span>
+        <span ref={reasonRef} className="sort-reason" popover="manual">
+          {reason}
+        </span>
       ) : null}
       {/* Offered once scripts run, wherever the menu has something to do. */}
       {hydrated &&
@@ -240,6 +275,11 @@ export default function HeaderCell({
       ) : null}
       {/* A focusable handle whose keys resize only once scripts run: none
           before then, so nothing is offered that does not work. */}
+      {resizable && !hydrated ? (
+        // The handle's place, kept until it arrives, so the label does not
+        // shrink at hydration. Without scripting the stylesheet drops it.
+        <span className="handle-slot" aria-hidden="true" />
+      ) : null}
       {resizable && hydrated ? (
         <ResizeHandle
           interaction={interaction}
