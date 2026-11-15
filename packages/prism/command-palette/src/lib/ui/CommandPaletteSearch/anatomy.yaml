@@ -32,7 +32,10 @@
 # site's own link, so its title links to the result's home; following it
 # chooses the result as its row does, closing the palette. The preview
 # lays its card out as the published Cards group does, on four row tracks
-# with the gutter between them, in its two columns.
+# with the gutter between them, in its two columns. The card sits flush in
+# its panel (heuristic 4.6): the preview has no padding, so the card meets
+# its top, end and bottom edges, and its last track, the card's footer,
+# takes the height left (1fr), so the card reaches the panel's bottom.
 #
 # Why not a published component: react-ds-global ships no search field (the
 # design system's global.component.search_field is still to be defined and
@@ -52,6 +55,10 @@
 #   --command-palette-search-results-basis:
 #     calc(4 * var(--grid-col-min) + 3 * var(--grid-gutter))   four columns.
 #   --command-palette-search-rule-width: 1px   stroke thickness.
+#   auto auto auto 1fr, the preview's row tracks, written raw: a card's four
+#     tracks, the last taking the panel's height left. Keywords and the
+#     grid's free space, no design decision. The preview's padding, 0 on
+#     every side, is no design token either.
 #   --command-palette-search-focus-ring-width: 2px,
 #   --command-palette-search-focus-ring-offset: -2px
 #     the field's ring, drawn inside it, since the dialog clips.
@@ -169,15 +176,16 @@ node:
               styles:
                 layout.type: grid
                 spacing.gap: grid.gutter
-                layout.alignContent: start
+                layout.grid.rows: auto auto auto 1fr
                 layout.flex.grow: 1
                 layout.flex.shrink: 1
                 layout.flex.basis: 0
                 size.min.width: 0
                 layout.overflow.block: auto
-                spacing.internal.block.start: component.padding.block
-                spacing.internal.block.end: component.padding.block
-                spacing.internal.inline.end: component.padding.inline
+                spacing.internal.block.start: 0
+                spacing.internal.block.end: 0
+                spacing.internal.inline.start: 0
+                spacing.internal.inline.end: 0
               edges:
                 - node:
                     uri: prism.component.card_projection

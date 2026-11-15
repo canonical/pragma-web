@@ -5,7 +5,7 @@
  * graph server alongside) serves the lobby, and Chromium drives the palette
  * as a reader does. Ctrl+K opens it with the field focused; a component's
  * title lists its matches with the first highlighted and its card in the
- * preview; the arrow keys move the highlight and the preview with it; Tab
+ * preview, flush in its panel; the arrow keys move the highlight and the preview with it; Tab
  * leaves the field for the preview's link, never for the scrolling results;
  * a drag in the preview selects its text, and a click there gives the field
  * the focus back;
@@ -108,6 +108,45 @@ const findPreviewLink = (page: Page) =>
     .getByRole("region", { name: "Preview" })
     .getByRole("link")
     .first();
+
+/** Where the preview's card lies in its panel, and the panel's padding. */
+interface PreviewFit {
+  /** The panel's computed padding: top, right, bottom, left. */
+  readonly padding: readonly string[];
+  /** The card's top less the panel's, in px. */
+  readonly top: number;
+  /** The panel's right less the card's, in px. */
+  readonly end: number;
+  /** The panel's bottom less the card's, in px. */
+  readonly bottom: number;
+}
+
+/**
+ * Measure the card in the preview's panel against the panel's outer box.
+ *
+ * @note Impure: reads the tab's layout.
+ */
+const measurePreviewFit = (page: Page): Promise<PreviewFit> =>
+  findPalette(page)
+    .getByRole("region", { name: "Preview" })
+    .evaluate((panel) => {
+      const card = panel.firstElementChild;
+      if (card === null) throw new Error("the preview shows no card");
+      const style = getComputedStyle(panel);
+      const outer = panel.getBoundingClientRect();
+      const inner = card.getBoundingClientRect();
+      return {
+        padding: [
+          style.paddingTop,
+          style.paddingRight,
+          style.paddingBottom,
+          style.paddingLeft,
+        ],
+        top: inner.top - outer.top,
+        end: outer.right - inner.right,
+        bottom: outer.bottom - inner.bottom,
+      };
+    });
 
 /** Whether the palette's dialog is open. */
 const readOpen = (page: Page): Promise<boolean> =>
@@ -269,6 +308,22 @@ describe("the command palette", () => {
     expect(await findPalette(page).getByRole("option").count()).toBe(0);
     await page.keyboard.press("Escape");
     expect(await readOpen(page)).toBe(false);
+  });
+
+  it("sets the highlighted result's card flush in the preview's panel", async () => {
+    const page = await openLobby();
+    await search(page, COMPONENT_TITLE);
+    expect(
+      await findPalette(page)
+        .getByRole("region", { name: "Preview" })
+        .isVisible(),
+    ).toBe(true);
+    const fit = await measurePreviewFit(page);
+    expect(fit.padding).toEqual(["0px", "0px", "0px", "0px"]);
+    // The card's top, end and bottom lie within its 1px border of the panel's.
+    for (const gap of [fit.top, fit.end, fit.bottom]) {
+      expect(Math.abs(gap)).toBeLessThanOrEqual(1);
+    }
   });
 
   it("fits a phone's viewport, scrolls nothing sideways and hides the preview", async () => {
