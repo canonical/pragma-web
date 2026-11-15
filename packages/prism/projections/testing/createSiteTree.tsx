@@ -1,4 +1,5 @@
 import { createEnvironment, HomesProvider } from "@canonical/prism-core";
+import { guardTypedArms } from "@canonical/prism-core/testing";
 import type { LinkComponent } from "@canonical/react-ds-global";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
@@ -34,6 +35,8 @@ export const createStoreOnlyEnvironment = (): Environment =>
 /**
  * Wrap `children` in the providers a site mounts: the Relay environment, a
  * router over one entity page, the site's homes and the projection maps.
+ * The maps pass through `guardTypedArms`, so under a switch's coverage a
+ * node reaches its typed arm only through the switch's own case.
  */
 export default function createSiteTree(
   environment: IEnvironment,
@@ -48,7 +51,10 @@ export default function createSiteTree(
         })}
       >
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider LinkComponent={LinkComponent} maps={maps}>
+          <ProjectionsProvider
+            LinkComponent={LinkComponent}
+            maps={guardTypedArms(maps)}
+          >
             {children}
           </ProjectionsProvider>
         </HomesProvider>

@@ -1,3 +1,4 @@
+import { closeCoverageGuard, openCoverageGuard } from "./coverageGuard.js";
 import type {
   SwitchCoverageOptions,
   SwitchFragment,
@@ -18,9 +19,20 @@ import type {
  * fail here, as it would otherwise fall through to the default arm
  * silently.
  *
+ * A switch's default branch renders through the tree's projection maps,
+ * so a typed arm in them would render the node of a case the switch
+ * lacks and hide the missing case. Each case therefore renders under a
+ * tree whose maps hold no typed arm: the tree passes its maps through
+ * `guardTypedArms`, which, while a case renders, replaces every typed
+ * and site arm in them with one that throws, so a node reaches its typed
+ * arm only through the switch's own case. A case whose tree did not
+ * guard its maps fails.
+ *
  * @param options - The switch's compiled fragment, one mock node per case
  *   by type condition, and how to render and check one.
- * @throws When a type condition has no case, or a case names no condition.
+ * @throws When a type condition has no case, a case names no condition,
+ *   or a case rendered under maps its tree did not pass through
+ *   `guardTypedArms`.
  * @note Impure: calls `render`, which mounts the switch, once per condition.
  */
 export default function expectSwitchCoverage<TNode>({
@@ -48,7 +60,18 @@ export default function expectSwitchCoverage<TNode>({
     if (node === undefined) {
       throw new Error(`the case ${condition} holds no node`);
     }
-    render(condition, node);
+    openCoverageGuard();
+    let guarded = false;
+    try {
+      render(condition, node);
+    } finally {
+      guarded = closeCoverageGuard();
+    }
+    if (!guarded) {
+      throw new Error(
+        `${fragment.name}: the case ${condition} rendered under maps its tree did not pass through guardTypedArms, so a typed arm in them could hide a missing case`,
+      );
+    }
   }
 }
 

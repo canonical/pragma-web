@@ -167,7 +167,10 @@ components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
 `expectSlotOrder` (an identity's slots in the shared order, its required
 slots present) and `expectSwitchCoverage` (a switch over a node's typename
 names one case per type condition of its compiled fragment, and renders
-one node per condition). Its `testing/browser` subpath
+one node per condition under a tree whose maps passed through
+`guardTypedArms`, which makes every typed arm in them throw, so a node
+reaches its typed arm only through the switch's own case). Its
+`testing/browser` subpath
 holds the browser side the apps' layout suites share: `launchBrowser`,
 `measurePage` and `measureLayout`, which read a page's grid, scroll model,
 overflow and spacing. Both subpaths ship as TypeScript source and import

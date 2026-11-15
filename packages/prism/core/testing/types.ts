@@ -51,6 +51,15 @@ export interface SwitchFragment {
   readonly selections: readonly SwitchSelection[];
 }
 
+/**
+ * One form's projection map, as `guardTypedArms` reads it: its typed arms
+ * by typename, and a site's arms for its own types.
+ */
+export interface GuardableMap {
+  readonly types: object;
+  readonly siteTypes?: object;
+}
+
 /** Options of `expectSwitchCoverage`. */
 export interface SwitchCoverageOptions<TNode> {
   /**
@@ -66,7 +75,8 @@ export interface SwitchCoverageOptions<TNode> {
   readonly cases: Readonly<Record<string, TNode>>;
   /**
    * Render the switch over the case's node and assert the arm it renders
-   * (by its root's class, which the caller derives: arms may be shared).
+   * (by its root's class, which the caller derives: arms may be shared),
+   * under a tree that passes its projection maps through `guardTypedArms`.
    */
   readonly render: (condition: string, node: TNode) => void;
 }
