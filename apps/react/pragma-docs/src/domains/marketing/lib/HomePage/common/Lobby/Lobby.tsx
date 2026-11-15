@@ -106,13 +106,25 @@ export default function Lobby({
     components: {
       title: t("lobby.doors.components.title"),
       summary: t("lobby.doors.components.summary"),
-      vitals: [
+      facts: [
         ...(componentCount === undefined
           ? []
-          : [t("lobby.doors.components.count", { count: componentCount })]),
+          : [
+              {
+                property: "components",
+                label: t("lobby.doors.components.fact"),
+                value: componentCount,
+              },
+            ]),
         ...(patternCount === undefined
           ? []
-          : [t("lobby.doors.patterns.count", { count: patternCount })]),
+          : [
+              {
+                property: "patterns",
+                label: t("lobby.doors.patterns.fact"),
+                value: patternCount,
+              },
+            ]),
       ],
     },
     definitions: {
@@ -122,10 +134,16 @@ export default function Lobby({
     standards: {
       title: t("lobby.doors.standards.title"),
       summary: t("lobby.doors.standards.summary"),
-      vitals:
+      facts:
         standardCount === undefined
           ? []
-          : [t("lobby.doors.standards.count", { count: standardCount })],
+          : [
+              {
+                property: "standards",
+                label: t("lobby.doors.standards.fact"),
+                value: standardCount,
+              },
+            ],
     },
     journeys: {
       title: t("lobby.doors.journeys.title"),
@@ -168,12 +186,12 @@ export default function Lobby({
             )
             .map((name) => (
               <EntityCard
+                facts={doors[name].facts}
                 href={router.buildPath(name)}
                 key={name}
                 LinkComponent={RouterLink}
                 summary={doors[name].summary}
                 title={doors[name].title}
-                vitals={doors[name].vitals}
               />
             ))}
         </EntityList>

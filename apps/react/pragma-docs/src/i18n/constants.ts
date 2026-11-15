@@ -56,24 +56,15 @@ export const MESSAGES = {
   "lobby.doors.components.title": "Components",
   "lobby.doors.components.summary":
     "Every block the design system describes — anatomy, properties, and the relations tying one to another.",
-  "lobby.doors.components.count": {
-    one: "{count} component",
-    other: "{count} components",
-  },
-  "lobby.doors.patterns.count": {
-    one: "{count} pattern",
-    other: "{count} patterns",
-  },
+  "lobby.doors.components.fact": "Components",
+  "lobby.doors.patterns.fact": "Patterns",
   "lobby.doors.definitions.title": "Definitions",
   "lobby.doors.definitions.summary":
     "The vocabulary itself: the classes and properties the other lenses are written in, with the hierarchy drawn out.",
   "lobby.doors.standards.title": "Standards",
   "lobby.doors.standards.summary":
     "The rules the code is held to, grouped by category and readable end to end.",
-  "lobby.doors.standards.count": {
-    one: "{count} standard",
-    other: "{count} standards",
-  },
+  "lobby.doors.standards.fact": "Standards",
   "lobby.doors.guides.title": "Guides",
   "lobby.doors.guides.summary":
     "Long-form orientation. A placeholder for now — the reading views are not built yet.",
@@ -181,6 +172,7 @@ export const MESSAGES = {
   "journeys.hop.pairing": "Pairing",
   "journeys.hop.surface": "Surface",
   "journeys.hop.layout": "Layout",
+  "journeys.hop.context": "{kind} in {surface}",
   "journeys.legend.title": "Reading a row",
   "journeys.legend.coordinate":
     "Coordinate: who, in what role, at what fluency",

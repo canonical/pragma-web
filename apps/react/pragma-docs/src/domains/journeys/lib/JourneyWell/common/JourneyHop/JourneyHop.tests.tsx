@@ -70,19 +70,17 @@ describe("JourneyHop", () => {
         bucket,
       ).not.toBeNull();
       expect(hop?.querySelector(".kind"), bucket).toBeNull();
-      expect(hop?.querySelector(".location"), bucket).toBeNull();
       expect(hop?.querySelector("text"), bucket).toBeNull();
       unmount();
     }
   });
 
-  it("draws its kind, location and title at the legible zoom", () => {
+  it("draws its kind, its surface's kind and its title at the legible zoom", () => {
     renderHop(
       <JourneyHop href="/components" node={SURFACE} selected={false} />,
     );
     const hop = document.querySelector(".ds.journey-hop");
-    expect(hop?.querySelector(".kind")?.textContent).toBe("Surface");
-    expect(hop?.querySelector(".location")?.textContent).toBe("View");
+    expect(hop?.querySelector(".kind")?.textContent).toBe("Surface in View");
     expect(hop?.querySelector("a")?.textContent).toContain("view.components");
   });
 
@@ -98,7 +96,7 @@ describe("JourneyHop", () => {
       />,
     );
     const hop = document.querySelector(".ds.journey-hop");
-    expect(hop?.querySelector(".location")?.textContent).toBe("Lens");
+    expect(hop?.querySelector(".kind")?.textContent).toBe("Surface in Lens");
   });
 
   it("leaves out a surface kind the catalog does not name", () => {
@@ -110,7 +108,7 @@ describe("JourneyHop", () => {
       />,
     );
     const hop = document.querySelector(".ds.journey-hop");
-    expect(hop?.querySelector(".location")).toBeNull();
+    expect(hop?.querySelector(".kind")?.textContent).toBe("Surface");
   });
 
   it("places its box at the hop's corner and names its column", () => {
@@ -118,8 +116,7 @@ describe("JourneyHop", () => {
     const hop = document.querySelector(".ds.journey-hop");
     expect(hop?.getAttribute("transform")).toBe("translate(720 64)");
     expect(hop?.getAttribute("data-kind")).toBe("surface");
-    expect(hop?.querySelector(".kind")?.textContent).toBe("Surface");
-    expect(hop?.querySelector(".location")?.textContent).toBe("View");
+    expect(hop?.querySelector(".kind")?.textContent).toBe("Surface in View");
     expect(hop?.querySelector("title")?.textContent).toBe("view.components");
   });
 

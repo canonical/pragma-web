@@ -169,12 +169,18 @@ export default function StandardsIndex({
             <EntityList>
               {group.nodes.map((node) => (
                 <EntityRow
+                  facts={[
+                    {
+                      property: "curie",
+                      label: t("index.address"),
+                      value: <InlineCode>{node._meta.curie}</InlineCode>,
+                    },
+                  ]}
                   href={router.buildPath("standardEntity", {
                     params: { uri: node.uri },
                   })}
                   key={node.uri}
                   LinkComponent={RouterLink}
-                  meta={<InlineCode>{node._meta.curie}</InlineCode>}
                   title={node._meta.title}
                 />
               ))}

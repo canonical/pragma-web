@@ -22,7 +22,7 @@ const componentCssClassName = "ds journey-hop";
  * One placed hop of the journeys graph: a `<g>` at the hop's corner
  * holding the published `EntityGraphNode`, its label cut to the box, its
  * column's name as its kind and, on a surface, the words for the surface's
- * kind as its location, from the catalog, never its type name; a pairing
+ * kind after it ("Surface in View"), from the catalog, never its type name; a pairing
  * is hollow. The selected job's hop carries a ring
  * outside its box. The hop's full label rides in its title.
  *
@@ -83,9 +83,15 @@ export default function JourneyHop({
         height={node.height}
         hollow={data.kind === "pairing"}
         href={href}
-        kind={t(HOP_MESSAGES[data.kind])}
+        kind={
+          surfaceType === undefined
+            ? t(HOP_MESSAGES[data.kind])
+            : t("journeys.hop.context", {
+                kind: t(HOP_MESSAGES[data.kind]),
+                surface: t(surfaceType),
+              })
+        }
         LinkComponent={RouterLink}
-        location={surfaceType === undefined ? undefined : t(surfaceType)}
         showText={bucket === "full"}
         title={truncateLabel(data.label, LABEL_CHARACTERS)}
         width={node.width}

@@ -58,47 +58,50 @@ import { type RunningServer, startServer } from "./serverHarness.js";
 const CWD = process.cwd();
 
 /**
- * Count the standards index's entries, those whose title is cut, and those
- * whose address is cut on the title's line. It runs in the page.
+ * Count the standards index's entries, those whose title is cut while some
+ * of its address still shows, and those whose address, the row's first
+ * fact, has left the title's line. It runs in the page.
  *
  * @returns The counts.
  * @throws When an entry has no title or no address.
  */
 function countCutEntries(): {
   readonly entries: number;
-  readonly cutTitles: number;
-  readonly cutBesideTitle: number;
+  readonly titlesCutFirst: number;
+  readonly addressesApart: number;
 } {
   const rows = [
     ...document.querySelectorAll(".ds.standards-index .ds.entity-row"),
   ];
   const measured = rows.map((row) => {
     const identity = row.querySelector(".identity");
-    const meta = row.querySelector(".meta");
-    if (!identity || !meta) {
+    const facts = row.querySelector(".facts");
+    if (!identity || !facts?.querySelector('.fact[data-property="curie"]')) {
       throw new Error("an entry has no title or no address");
     }
     return {
-      titleCut: identity.scrollWidth > identity.clientWidth,
-      addressCut: meta.scrollWidth > meta.clientWidth,
-      addressBeside:
-        meta.getBoundingClientRect().top ===
-        identity.getBoundingClientRect().top,
+      // The title yields last: it may be cut only once the address has
+      // given up all of its width.
+      titleCutFirst:
+        identity.scrollWidth > identity.clientWidth && facts.clientWidth > 0,
+      // On a line of its own, the address would start below the title's.
+      addressApart:
+        facts.getBoundingClientRect().top >=
+        identity.getBoundingClientRect().bottom,
     };
   });
   return {
     entries: measured.length,
-    cutTitles: measured.filter(({ titleCut }) => titleCut).length,
-    cutBesideTitle: measured.filter(
-      ({ addressCut, addressBeside }) => addressCut && addressBeside,
-    ).length,
+    titlesCutFirst: measured.filter(({ titleCutFirst }) => titleCutFirst)
+      .length,
+    addressesApart: measured.filter(({ addressApart }) => addressApart).length,
   };
 }
 
 /**
  * Measure the catalog's cards against the canvas: each card's left and
- * right edges, its width, and, for a card with a sidecar, the body's and
- * the sidecar's widths. It runs in the page.
+ * right edges, its width, and, for a card with a specimen, the specimen's
+ * and the body's widths. It runs in the page.
  *
  * @param selector - The catalog's cards.
  * @returns The canvas's edges and each card's measures.
@@ -121,9 +124,9 @@ function measureCatalogCards(selector: string): {
     cards: [...document.querySelectorAll(selector)].map((card) => {
       const box = card.getBoundingClientRect();
       const sections =
-        card.querySelector(":scope > .sidecar") === null
+        card.querySelector(":scope > .specimen") === null
           ? []
-          : [...card.querySelectorAll(":scope > .body, :scope > .sidecar")];
+          : [...card.querySelectorAll(":scope > .specimen, :scope > .body")];
       return {
         left: box.left,
         right: box.right,
@@ -431,7 +434,7 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
-  it("keeps every standards index title whole, its address on its own line where they do not fit", async () => {
+  it("cuts no standards index title before its address, on the row's one line", async () => {
     const page = await browser.newPage({
       viewport: { width: viewport.width, height: viewport.height },
     });
@@ -451,9 +454,10 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       });
       const counts = await page.evaluate(countCutEntries);
       expect(counts.entries).toBeGreaterThan(0);
-      expect(counts.cutTitles).toBe(0);
-      // An address is cut only on a line of its own, longer than the row.
-      expect(counts.cutBesideTitle).toBe(0);
+      // The title yields last: the address gives way first, on the row's
+      // one line.
+      expect(counts.titlesCutFirst).toBe(0);
+      expect(counts.addressesApart).toBe(0);
     } finally {
       await page.close();
     }
@@ -491,11 +495,9 @@ async function measureCatalogAt(
   }
 }
 
-// A UI block's card carries its rendered example beside its body, four
-// columns where the canvas holds six or more; where it holds two or three
-// the card takes the whole row, its example under its body. At every width
-// each card stays inside the canvas, wide enough to read, and so do its
-// body and its example.
+// A UI block's card draws its example as its specimen, above its body. At
+// every width each card stays inside the canvas, wide enough to read, and
+// so do its specimen and its body.
 describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
   it("keeps every card, and a UI block's example, inside the canvas", async () => {
     const { canvas, cards } = await measureCatalogAt(width);

@@ -2,8 +2,9 @@
 # JourneyHop — one placed hop of the journeys graph: a <g> at the hop's
 # corner holding the published projection's EntityGraphNode, 176 by 48
 # (two 24-unit lines), its label cut to the box, its column's name as its
-# kind and, on a surface, the words for the surface's kind as its
-# location, from the catalog, never its type name; a pairing is hollow.
+# kind and, on a surface, the words for the surface's kind after it, one
+# catalog sentence ("Surface in View"), never its type name; a pairing is
+# hollow.
 # The hop's full label rides in its <title>.
 #
 # The selected job's hop carries a ring 4 units off its box, 2 units wide,
@@ -11,8 +12,8 @@
 #
 # The box's text follows the canvas's zoom bucket: a hop's label is 14px,
 # so below 12/14 on screen (the overview and hubs buckets) the hop draws
-# its box alone, never shrunk text; at full zoom it draws its label, kind
-# and location. That is markup, not style: the bucket reaches the hop
+# its box alone, never shrunk text; at full zoom it draws its label and
+# kind. That is markup, not style: the bucket reaches the hop
 # through the canvas's context.
 #
 # Bespoke: no published component places a graph's node. SVG paints
