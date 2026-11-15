@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import { expectSectionIndex } from "../../../testing/index.js";
 import { SectionedView } from "../../lib/ui/SectionedView/index.js";
 
-/** Two sections, in the order a page passes them. */
+/** Three sections, in the order a page passes them. */
 const SECTIONS = [
   { id: "usage", title: "Usage", content: <p>Use it.</p> },
   { id: "anatomy", title: "Anatomy", content: <p>Its parts.</p> },
+  { id: "changes", title: "Changes", content: <p>What changed.</p> },
 ] as const;
 
 /** Render a view of the sections given and return its root. */
@@ -45,6 +46,24 @@ describe("expectSectionIndex", () => {
     heading.textContent = "How to use";
     expect(() => expectSectionIndex(root, SECTIONS)).toThrow(
       /section headings, in order/,
+    );
+  });
+
+  it("passes a view of two sections, which has no contents list", () => {
+    const sections = SECTIONS.slice(0, 2);
+    expect(() =>
+      expectSectionIndex(renderView(sections), sections),
+    ).not.toThrow();
+  });
+
+  it("fails on a contents list of fewer than three sections", () => {
+    const sections = SECTIONS.slice(0, 2);
+    const root = renderView(sections);
+    const list = document.createElement("ol");
+    list.className = "ds contents-list";
+    root.append(list);
+    expect(() => expectSectionIndex(root, sections)).toThrow(
+      /contents lists of fewer than three sections/,
     );
   });
 

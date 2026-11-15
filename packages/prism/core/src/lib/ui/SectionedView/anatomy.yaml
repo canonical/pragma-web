@@ -134,7 +134,7 @@ node:
                 - node:
                     uri: prism.subcomponent.contents_list
                   relation: { cardinality: "1", slotName: list }
-            relation: { cardinality: "0..1", slotName: contents }   # absent with no section
+            relation: { cardinality: "0..1", slotName: contents }   # sections.length >= BAR_MIN_SECTIONS (3), as the bar
           - node:
               role: facts
               styles:
@@ -165,7 +165,7 @@ node:
                         relation: { cardinality: "1..*", slotName: pair }
                   relation: { cardinality: "0..1", slotName: key-value-list }
             relation: { cardinality: "0..1", slotName: facts }      # absent when facts renders nothing
-      relation: { cardinality: "0..1", slotName: aside }            # absent with no section and no facts
+      relation: { cardinality: "0..1", slotName: aside }            # absent with fewer than 3 sections and no facts
     - node:
         role: content region
         styles:

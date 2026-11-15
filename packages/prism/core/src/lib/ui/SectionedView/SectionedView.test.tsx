@@ -74,17 +74,29 @@ describe("SectionedView", () => {
     expect(content?.firstElementChild?.textContent).toBe("Example");
   });
 
-  it("renders no index with no section, and no aside with no facts either", () => {
-    const { container, rerender } = render(
-      <SectionedView facts={<p>Facts</p>} header={HEADER} sections={[]} />,
-    );
-    expect(container.querySelector(".contents")).toBeNull();
-    expect(container.querySelector(".aside > .facts")).not.toBeNull();
-    expectSectionIndex(container, []);
+  it.each([0, 1, 2])(
+    "renders no index with %i sections, its aside the facts alone, and no aside with no facts either",
+    (count) => {
+      const sections = SECTIONS.slice(0, count);
+      const { container, rerender } = render(
+        <SectionedView
+          facts={<p>Facts</p>}
+          header={HEADER}
+          sections={sections}
+        />,
+      );
+      expect(container.querySelector(".contents")).toBeNull();
+      expect(
+        [...(container.querySelector(".aside")?.children ?? [])].map(
+          ({ className }) => className,
+        ),
+      ).toEqual(["facts"]);
+      expectSectionIndex(container, sections);
 
-    rerender(<SectionedView header={HEADER} sections={[]} />);
-    expect(container.querySelector(".aside")).toBeNull();
-  });
+      rerender(<SectionedView header={HEADER} sections={sections} />);
+      expect(container.querySelector(".aside")).toBeNull();
+    },
+  );
 
   it.each([
     ["null", null],
@@ -132,7 +144,7 @@ describe("SectionedView", () => {
 
     rerender(<SectionedView header={HEADER} sections={SECTIONS.slice(0, 2)} />);
     expect(container.querySelector("[data-region=contents-bar]")).toBeNull();
-    expect(container.querySelector(".aside > .contents")).not.toBeNull();
+    expect(container.querySelector(".aside > .contents")).toBeNull();
   });
 
   it("marks the current section in the index and names it in the bar", () => {

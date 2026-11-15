@@ -16,13 +16,14 @@ describe("SectionedView SSR", () => {
         }
         sections={[
           { id: "usage", title: "Usage", content: <p>When to use it.</p> },
+          { id: "anatomy", title: "Anatomy", content: <p>Its parts.</p> },
           { id: "changes", title: "Changes", content: <p>What changed.</p> },
         ]}
       />,
     );
     expect(html).toContain('<article class="ds sectioned-view">');
     expect(html).toContain(
-      '<ol class="ds contents-list list"><li class="entry"><a class="link" href="#usage">Usage</a></li><li class="entry"><a class="link" href="#changes">Changes</a></li></ol>',
+      '<ol class="ds contents-list list"><li class="entry"><a class="link" href="#usage">Usage</a></li><li class="entry"><a class="link" href="#anatomy">Anatomy</a></li><li class="entry"><a class="link" href="#changes">Changes</a></li></ol>',
     );
     expect(html).toContain('<div class="facts"><p>Facts</p></div>');
     expect(html).toContain(
@@ -48,6 +49,20 @@ describe("SectionedView SSR", () => {
     );
     expect(html).not.toContain('class="current"');
     expect(html).not.toContain("aria-current");
+  });
+
+  it("server-renders the facts alone in the aside of a page with one section", () => {
+    const html = renderToString(
+      <SectionedView
+        facts={<p>Facts</p>}
+        header={<h1>Rule</h1>}
+        sections={[{ id: "rule", title: "Rule", content: <p>The rule.</p> }]}
+      />,
+    );
+    expect(html).toContain(
+      '<aside class="aside"><div class="facts"><p>Facts</p></div></aside>',
+    );
+    expect(html).not.toContain("contents");
   });
 
   it("server-renders no aside for a page with no section and no facts", () => {

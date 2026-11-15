@@ -7,8 +7,9 @@
 export const CONTENTS_LABEL_ID = "sectioned-view-contents";
 
 /**
- * The fewest sections that give a page the "On this page" bar below three
- * groups: with fewer, the reader sees every section's heading without one.
+ * The fewest sections that give a page its section index: the contents
+ * list in the aside at three groups and wider, the "On this page" bar
+ * below. With fewer, the reader sees every section's heading without one.
  */
 export const BAR_MIN_SECTIONS = 3;
 

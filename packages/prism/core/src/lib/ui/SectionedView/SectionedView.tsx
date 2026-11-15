@@ -37,8 +37,10 @@ const componentCssClassName = "ds sectioned-view";
  * section's every column and holds the 75ch reading measure.
  * A body given before the sections (`children`) is off the index; facts
  * or a body given as `null`, `undefined`, a boolean or the empty string
- * leave no region (an element always does, whatever it renders), and a
- * page with no section and no facts has no aside. It adds no space at the page's end:
+ * leave no region (an element always does, whatever it renders). The
+ * index, in the aside or the bar, comes with three sections or more: a
+ * page with fewer shows every heading without one, its aside holds the
+ * facts alone, and with no facts either it has no aside. It adds no space at the page's end:
  * the page that holds it owns that.
  *
  * `import { SectionedView } from "@canonical/prism-core";`
@@ -69,6 +71,7 @@ export default function SectionedView({
     seen.add(id);
   }
   const hasFacts = isRenderedNode(facts);
+  const isIndexed = sections.length >= BAR_MIN_SECTIONS;
   const current = useCurrentSection(sections.map(({ id }) => id));
 
   return (
@@ -76,13 +79,13 @@ export default function SectionedView({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      {sections.length >= BAR_MIN_SECTIONS ? (
+      {isIndexed ? (
         <ContentsBar className="bar" current={current} sections={sections} />
       ) : null}
       <div className="header">{header}</div>
-      {sections.length > 0 || hasFacts ? (
+      {isIndexed || hasFacts ? (
         <aside className="aside">
-          {sections.length > 0 ? (
+          {isIndexed ? (
             <nav aria-labelledby={CONTENTS_LABEL_ID} className="contents">
               <h2 className="label" id={CONTENTS_LABEL_ID}>
                 {t("sectionedView.contents")}

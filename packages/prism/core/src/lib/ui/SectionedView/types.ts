@@ -35,8 +35,9 @@ type OwnProps = {
    */
   readonly facts?: ReactNode;
   /**
-   * The page's sections, in reading order; each gets its heading and an
-   * entry in the section index. No index when empty.
+   * The page's sections, in reading order; each gets its heading, and from
+   * three sections on an entry in the section index. With fewer, no index,
+   * in the aside or the bar.
    */
   readonly sections: readonly SectionedViewSection[];
   /**
