@@ -32,6 +32,8 @@
 import {
   launchBrowser,
   measurePage,
+  measureRowHeights,
+  ROW_PX,
   type ThemedMeasure,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
@@ -46,7 +48,6 @@ import {
   INDEX_ROW_SELECTOR,
   LONG_FIELD_NAME,
   PAGE_SETTLE_MS,
-  ROW_PX,
   ROWS_PATHS,
   STATION_IRI_PATH,
   TERM_IRI_PATH,
@@ -131,28 +132,6 @@ function measureFieldKeys(): {
     tagged: keys.filter((key) => key.querySelector(".inherited")).map(heightOf),
     plain: keys.filter((key) => !key.querySelector(".inherited")).map(heightOf),
   };
-}
-
-/**
- * Read the height of every row a selector matches that the page draws,
- * rounded to a tenth of a pixel, with the row's title. It runs in the page.
- *
- * @param selector - The rows.
- * @returns Each drawn row's title and height.
- */
-function measureRowHeights(
-  selector: string,
-): readonly { readonly title: string; readonly height: number }[] {
-  return [...document.querySelectorAll(selector)]
-    .map((row) => ({
-      title: row.querySelector(".title")?.textContent ?? "",
-      box: row.getBoundingClientRect(),
-    }))
-    .filter(({ box }) => box.width > 0 && box.height > 0)
-    .map(({ title, box }) => ({
-      title,
-      height: Math.round(box.height * 10) / 10,
-    }));
 }
 
 /**

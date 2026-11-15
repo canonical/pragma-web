@@ -81,6 +81,3 @@ export const ROWS_PATHS = ["/stations", "/fleet"] as const;
 
 /** An index's rows, in the canvas. */
 export const INDEX_ROW_SELECTOR = "main.ds.canvas .ds.entity-row";
-
-/** A row's height in pixels: one 24px line between 4px insets. */
-export const ROW_PX = 32;

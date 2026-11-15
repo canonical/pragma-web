@@ -40,7 +40,10 @@
 import {
   launchBrowser,
   measurePage,
+  measureRowHeights,
+  ROW_PX,
   type ThemedMeasure,
+  TWO_LINE_ROW_PX,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
@@ -59,11 +62,9 @@ import {
   MIN_CATALOG_CARD_WIDTH_PX,
   NARROWING_STEP_PX,
   PAGE_SETTLE_MS,
-  ROW_PX,
   STANDARDS_FACT_WIDTHS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
-  TWO_LINE_ROW_PX,
   WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
   WORKSPACE_PATHS,
@@ -128,10 +129,13 @@ function countCutEntries(): {
  * box's hidden line, or that is not displayed, is neither. A title fits
  * when its identity, were the title whole, is no wider than the row less
  * its status: such a title must not be cut, whether or not the row's facts
- * have left. It runs in the page.
+ * have left. A row's first fact fits when its identity, with the title
+ * whole, and the fact, with its margin, are no wider than the row less
+ * its status: such a fact must show. It runs in the page.
  *
- * @returns The counts, the text of each fact shown in part, and each
- * title cut though it fits.
+ * @returns The counts, the text of each fact shown in part, each title
+ * cut though it fits, and each row whose first fact is hidden though it
+ * fits.
  */
 function countPartFacts(): {
   readonly rows: number;
@@ -139,6 +143,7 @@ function countPartFacts(): {
   readonly partial: readonly string[];
   readonly titlesFitting: number;
   readonly cutThoughFitting: readonly string[];
+  readonly hiddenThoughFitting: readonly string[];
 } {
   const rows = [
     ...document.querySelectorAll(".ds.standards-index .ds.entity-row"),
@@ -179,11 +184,34 @@ function countPartFacts(): {
       identity.getBoundingClientRect().width -
       title.clientWidth +
       title.scrollWidth;
+    const statusMargin =
+      status === null
+        ? 0
+        : Number.parseFloat(getComputedStyle(status).marginInlineStart);
+    const fact = row.querySelector(".facts > .fact");
+    const factBox = fact?.getBoundingClientRect();
+    const factFits =
+      fact !== null &&
+      factBox !== undefined &&
+      factBox.width > 0 &&
+      identity.getBoundingClientRect().left +
+        whole +
+        Number.parseFloat(getComputedStyle(fact).marginInlineStart) +
+        factBox.width <=
+        end - statusMargin + 0.5;
+    const edge = row.getBoundingClientRect();
+    const factShown =
+      factBox !== undefined &&
+      factBox.bottom > edge.top &&
+      factBox.top < edge.bottom &&
+      factBox.right > edge.left &&
+      factBox.left < edge.right;
     return [
       {
         text: title.textContent ?? "",
         fits: identity.getBoundingClientRect().left + whole <= end + 0.5,
         cut: title.scrollWidth > title.clientWidth,
+        factHidden: factFits && !factShown,
       },
     ];
   });
@@ -197,6 +225,9 @@ function countPartFacts(): {
     cutThoughFitting: titles
       .filter(({ fits, cut }) => fits && cut)
       .map(({ text }) => text),
+    hiddenThoughFitting: titles
+      .filter(({ factHidden }) => factHidden)
+      .map(({ text }) => text),
   };
 }
 
@@ -205,7 +236,8 @@ function countPartFacts(): {
  * narrow it step by step and read, at each width, which of its facts show
  * whole (1), in part (P) or not at all (0), measured against both the
  * facts' box and the row's own edge, and whether its title is cut, and
- * would fit. It runs in the page.
+ * would fit. Each added fact is a clone of the address, marked as a later
+ * fact by the class the row's stylesheet keys on. It runs in the page.
  *
  * @param input - The facts to add and the step to narrow by.
  * @returns One reading per width, the widest first.
@@ -234,9 +266,29 @@ function narrowRowWithFacts(input: {
   if (!row || !address || !identity || !title) {
     throw new Error("the index has no row with an address");
   }
+  // The class a later fact carries is read from the row's own stylesheet,
+  // from the rule that keys on it, so a rename there renames it here.
+  const findLaterClass = (rules: CSSRuleList): string | undefined => {
+    for (const rule of rules) {
+      const found =
+        rule instanceof CSSStyleRule
+          ? /\.entity-row \.fact\.([\w-]+)/.exec(rule.selectorText)?.[1]
+          : rule instanceof CSSGroupingRule
+            ? findLaterClass(rule.cssRules)
+            : undefined;
+      if (found !== undefined) return found;
+    }
+    return undefined;
+  };
+  const later = [...document.styleSheets]
+    .map((sheet) => findLaterClass(sheet.cssRules))
+    .find((found) => found !== undefined);
+  if (later === undefined) {
+    throw new Error("no rule of the row's stylesheet keys on a later fact");
+  }
   for (const { property, label, value } of input.added) {
     const fact = address.cloneNode(true) as HTMLElement;
-    fact.className = "fact is-later";
+    fact.classList.add(later);
     fact.dataset.property = property;
     const term = fact.querySelector(".term");
     const detail = fact.querySelector(".detail");
@@ -301,28 +353,6 @@ function readComponentChips(): readonly string[] {
       (chip) => chip.querySelector('a[href^="/components/ds%3A"]') !== null,
     )
     .map((chip) => chip.textContent ?? "");
-}
-
-/**
- * Read the height of every row a selector matches that the page draws,
- * rounded to a tenth of a pixel, with the row's title. It runs in the page.
- *
- * @param selector - The rows.
- * @returns Each drawn row's title and height.
- */
-function measureRowHeights(
-  selector: string,
-): readonly { readonly title: string; readonly height: number }[] {
-  return [...document.querySelectorAll(selector)]
-    .map((row) => ({
-      title: row.querySelector(".title")?.textContent ?? "",
-      box: row.getBoundingClientRect(),
-    }))
-    .filter(({ box }) => box.width > 0 && box.height > 0)
-    .map(({ title, box }) => ({
-      title,
-      height: Math.round(box.height * 10) / 10,
-    }));
 }
 
 /**
@@ -754,7 +784,7 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
 
 // A fact is shown whole or not at all: where a row has no room for its
 // facts they leave whole, the last first, so none is ever cut to a stub,
-// and only then: where a row has room its facts show. Once none is left
+// and only then: in each row with room for its first fact, it shows. Once none is left
 // the title has the row's whole width.
 describe.each(STANDARDS_FACT_WIDTHS)(
   "the standards index at $width px",
@@ -764,13 +794,16 @@ describe.each(STANDARDS_FACT_WIDTHS)(
       try {
         const counts = await page.evaluate(countPartFacts);
         expect(counts.rows).toBeGreaterThan(0);
-        expect(
-          counts.shown,
-          `${counts.shown} facts shown in ${counts.rows} rows`,
-        ).toBeGreaterThanOrEqual(fewestShown);
+        if (fewestShown !== null) {
+          expect(
+            counts.shown,
+            `${counts.shown} facts shown in ${counts.rows} rows`,
+          ).toBeGreaterThanOrEqual(fewestShown);
+        }
         expect(counts.partial).toEqual([]);
         expect(counts.titlesFitting).toBeGreaterThan(0);
         expect(counts.cutThoughFitting).toEqual([]);
+        expect(counts.hiddenThoughFitting).toEqual([]);
       } finally {
         await page.close();
       }

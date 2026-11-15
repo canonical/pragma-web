@@ -665,8 +665,9 @@ describe("server matrix (2×3) serves correctly", () => {
             //     connection count, the number would silently collapse
             //     to at most 100 and this snaps. The floor is the cap
             //     itself — never the live total.
-            //     Each count is a fact of its door's card, written in
-            //     the catalogue's count format (1,234), never bare digits.
+            //     Each count is read from its door's card fact and must
+            //     parse as a number, grouped by the catalogue's count
+            //     format or not.
             const standardsFigure = readHomeCount(homeHtml, "standards");
             expect(standardsFigure).toBeGreaterThan(CONNECTION_PAGE_CAP);
 

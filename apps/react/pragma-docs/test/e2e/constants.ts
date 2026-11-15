@@ -97,13 +97,15 @@ export const STANDARDS_INDEX_ROW_SELECTOR = ".ds.standards-index > *";
 
 /**
  * The widths the standards index's facts are measured at, each with the
- * fewest facts that must show there: a phone, where a row is too narrow
- * for most addresses and none need stay; two groups' threshold less one
- * step, where the later facts have left and some rows keep their address;
- * and the desktop, where rows have room for it.
+ * fewest facts that must show in the whole index there, or `null` where no
+ * floor is asserted: a phone, where a row is too narrow for most
+ * addresses; two groups' threshold less one step, where the later facts
+ * have left and some rows keep their address; and the desktop, where rows
+ * have room for it. At every width each row whose first fact fits beside
+ * its whole title must show it.
  */
 export const STANDARDS_FACT_WIDTHS = [
-  { width: 390, fewestShown: 0 },
+  { width: 390, fewestShown: null },
   { width: 820, fewestShown: 1 },
   { width: 1440, fewestShown: 1 },
 ] as const;
@@ -114,12 +116,6 @@ export const CATALOG_ROWS_PATH = "/components";
 /** The catalog's rows. */
 export const CATALOG_ROW_SELECTOR =
   ".ds.components-catalog-page .ds.entity-row";
-
-/** A row's height in pixels: one 24px line between 4px insets. */
-export const ROW_PX = 32;
-
-/** A two-line row's height in pixels: the summary's line under the first. */
-export const TWO_LINE_ROW_PX = 56;
 
 /**
  * The facts a standards index row is given in the browser, after its
