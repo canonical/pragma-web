@@ -17,4 +17,17 @@ describe("buildDrillSearch", () => {
       expand: "cs",
     });
   });
+
+  it("keeps a repeated key whole, each value in order", () => {
+    const current = new URLSearchParams("tag=a&q=x&tag=b&expand=ds");
+    expect(buildDrillSearch(current, "cs")).toEqual({
+      tag: ["a", "b"],
+      q: "x",
+      expand: "cs",
+    });
+    expect(buildDrillSearch(current, undefined)).toEqual({
+      tag: ["a", "b"],
+      q: "x",
+    });
+  });
 });

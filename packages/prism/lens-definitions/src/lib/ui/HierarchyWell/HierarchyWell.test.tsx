@@ -775,19 +775,27 @@ describe("over a layout whose rail opens on a box", () => {
         />,
         url,
       );
-    const rest = render(draw(boxed, "/definitions?q=x&sheet=filter"));
+    const rest = render(
+      draw(boxed, "/definitions?q=x&tag=a&sheet=filter&tag=b"),
+    );
     const href = rest.container
       .querySelector('.desktop [data-kind="region"] a')
       ?.getAttribute("href");
+    // A repeated key is kept whole, each value in order.
     expect(new URL(href ?? "", "https://site.example").search).toBe(
-      "?q=x&sheet=filter&expand=aa",
+      "?q=x&tag=a&tag=b&sheet=filter&expand=aa",
     );
     rest.unmount();
-    const opened = render(draw(drilled, "/definitions?expand=aa&q=x"));
+    const opened = render(
+      draw(drilled, "/definitions?expand=aa&q=x&tag=a&tag=b"),
+    );
     const backs = [...opened.container.querySelectorAll("a.way-back")].map(
       (link) => link.getAttribute("href"),
     );
-    expect(backs).toEqual(["/definitions?q=x", "/definitions?q=x"]);
+    expect(backs).toEqual([
+      "/definitions?q=x&tag=a&tag=b",
+      "/definitions?q=x&tag=a&tag=b",
+    ]);
   });
 
   it("draws a box on a term page as an image, with no link", () => {
