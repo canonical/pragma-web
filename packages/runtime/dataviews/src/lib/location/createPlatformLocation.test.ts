@@ -127,7 +127,7 @@ describe("createPlatformLocation", () => {
     });
   });
 
-  describe("createPlatformLocation input normalization", () => {
+  describe("input normalization", () => {
     const createPlatform = (location: string | URL) => {
       let current = location;
       const listeners = new Set<(next: string | URL) => void>();

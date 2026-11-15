@@ -65,7 +65,7 @@ describe("server-backed stories behave", () => {
     }
   });
 
-  describe("server-backed stories behave", () => {
+  describe("the REST and GraphQL stories", () => {
     for (const [endpoint, stories] of Object.entries(endpoints)) {
       for (const [name, Story] of Object.entries(stories)) {
         it(`${endpoint} ${name}`, async () => {

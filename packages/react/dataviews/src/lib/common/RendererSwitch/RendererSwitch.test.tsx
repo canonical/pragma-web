@@ -21,7 +21,7 @@ const readPressed = (): string | null =>
   screen.getByRole("button", { pressed: true }).textContent;
 
 describe("RendererSwitch", () => {
-  describe("RendererSwitch", () => {
+  describe("on the client", () => {
     it("offers each renderer as a button in a group named by its label, the first pressed", () => {
       render(<RendererSwitch label="Show machines as" renderers={renderers} />);
       const buttons = within(readChoice()).getAllByRole("button");
@@ -171,7 +171,7 @@ describe("RendererSwitch", () => {
     });
   });
 
-  describe("RendererSwitch hydrating what the server drew", () => {
+  describe("hydrating what the server drew", () => {
     const tree = (
       <RendererSwitch label="Show machines as" renderers={renderers} />
     );
@@ -206,7 +206,7 @@ describe("RendererSwitch", () => {
     });
   });
 
-  describe("RendererSwitch hydrating with the focus elsewhere", () => {
+  describe("hydrating with the focus elsewhere", () => {
     /** The switch's markup as a server draws it, in the page. */
     const drawServerMarkup = (): HTMLElement => {
       const container = document.createElement("div");
