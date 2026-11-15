@@ -10,6 +10,6 @@ describe("buildFleet", () => {
       "running",
       "failed",
     ]);
-    expect(fleet[2]).toMatchObject({ name: "host-003", cores: 3 });
+    expect(fleet.at(2)).toMatchObject({ name: "host-003", cores: 3 });
   });
 });

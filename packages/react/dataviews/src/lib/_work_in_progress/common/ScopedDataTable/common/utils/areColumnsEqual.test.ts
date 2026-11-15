@@ -16,16 +16,22 @@ describe("areColumnsEqual", () => {
   });
 
   it("compares the header and the renderer by reference", () => {
-    const cell = () => null;
+    const renderCell = () => null;
     expect(areColumnsEqual([name], [{ ...name }])).toBe(true);
     expect(areColumnsEqual([name], [{ ...name, header: "Machine" }])).toBe(
       false,
     );
-    expect(areColumnsEqual([{ ...name, cell }], [{ ...name, cell }])).toBe(
-      true,
-    );
     expect(
-      areColumnsEqual([{ ...name, cell }], [{ ...name, cell: () => null }]),
+      areColumnsEqual(
+        [{ ...name, cell: renderCell }],
+        [{ ...name, cell: renderCell }],
+      ),
+    ).toBe(true);
+    expect(
+      areColumnsEqual(
+        [{ ...name, cell: renderCell }],
+        [{ ...name, cell: () => null }],
+      ),
     ).toBe(false);
   });
 });

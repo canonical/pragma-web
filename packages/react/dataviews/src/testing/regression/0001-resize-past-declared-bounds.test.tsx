@@ -44,14 +44,14 @@ describe("regression 0001 — a resize past the declared bounds", () => {
       { id: "status", header: "Status" },
     ]);
     const handle = screen.getByRole("separator");
-    const tracks = (): string =>
+    const readTracks = (): string =>
       screen
         .getByRole("table", { name: "Machines" })
         .style.getPropertyValue("--data-table-columns");
     fireEvent.keyDown(handle, { key: "ArrowRight" });
     fireEvent.keyDown(handle, { key: "ArrowRight" });
     fireEvent.keyDown(handle, { key: "ArrowRight" });
-    expect(tracks()).toBe("80px 96px");
+    expect(readTracks()).toBe("80px 96px");
     expect(handle).toHaveAttribute("aria-valuenow", "80");
   });
 

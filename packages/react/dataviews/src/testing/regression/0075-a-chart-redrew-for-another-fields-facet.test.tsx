@@ -21,7 +21,7 @@ import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 const draws = vi.spyOn(BarDrawing, "type");
 
 /** One status facet, minted fresh each time, saying the same thing. */
-const status = () =>
+const buildStatusFacet = () =>
   ({
     kind: "values",
     values: [{ value: "failed", count: { kind: "exact", value: 4 } }],
@@ -39,7 +39,7 @@ describe("regression 0075 — a chart redrew for another field's facet", () => {
       />,
     );
     deliverFacets(source, {
-      status: status(),
+      status: buildStatusFacet(),
       cores: { kind: "range", min: 1, max: 8 },
     });
     expect(draws).toHaveBeenCalledTimes(1);
@@ -47,7 +47,7 @@ describe("regression 0075 — a chart redrew for another field's facet", () => {
     provider.refresh();
     // The same status counts, in a new object, beside a range that moved.
     deliverFacets(source, {
-      status: status(),
+      status: buildStatusFacet(),
       cores: { kind: "range", min: 1, max: 16 },
     });
     expect(draws).toHaveBeenCalledTimes(1);

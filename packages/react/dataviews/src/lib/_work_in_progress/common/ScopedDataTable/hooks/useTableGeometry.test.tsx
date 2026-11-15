@@ -1,6 +1,6 @@
 /**
  * One table's geometry, resolved from its layout and its container: the
- * declarative tracks before the container is measured, the solved widths
+ * declarative tracks before the container is createMeasuredNode, the solved widths
  * after, the room the reserving cells take, a live resize's preview, and
  * the space past a last column that cannot grow staying the table's.
  */
@@ -15,7 +15,7 @@ import createMachineProvider from "../../../../../../testing/createMachineProvid
 import useTableGeometry from "./useTableGeometry.js";
 
 /** An element whose layout width is `width`, as jsdom measures nothing. */
-const measured = <TTag extends "table" | "th">(
+const createMeasuredNode = <TTag extends "table" | "th">(
   tag: TTag,
   width: number,
   property: "clientWidth" | "offsetWidth" = "clientWidth",
@@ -53,7 +53,7 @@ afterEach(() => {
 });
 
 describe("useTableGeometry", () => {
-  it("declares its tracks before the container is measured", () => {
+  it("declares its tracks before the container is createMeasuredNode", () => {
     const { hook } = mount([FIXED_NAME, FLEX_STATUS]);
     expect(hook.result.current.template).toBe("100px minmax(50px, 1fr)");
     // Each column's own reservation: what a resize captures before then.
@@ -63,7 +63,7 @@ describe("useTableGeometry", () => {
   it("gives a flexible last column what the others leave of the container", () => {
     const { hook } = mount([FIXED_NAME, FLEX_STATUS]);
     act(() => {
-      hook.result.current.attach(measured("table", 400));
+      hook.result.current.attach(createMeasuredNode("table", 400));
     });
     expect(hook.result.current.widths).toEqual([100, 300]);
     expect(hook.result.current.template).toBe("100px 300px");
@@ -78,7 +78,7 @@ describe("useTableGeometry", () => {
       },
     ]);
     act(() => {
-      hook.result.current.attach(measured("table", 400));
+      hook.result.current.attach(createMeasuredNode("table", 400));
     });
     expect(hook.result.current.widths).toEqual([100, 200]);
   });
@@ -92,7 +92,7 @@ describe("useTableGeometry", () => {
       FIXED_NAME,
     ]);
     act(() => {
-      hook.result.current.attach(measured("table", 400));
+      hook.result.current.attach(createMeasuredNode("table", 400));
     });
     expect(hook.result.current.widths).toEqual([150, 100]);
   });
@@ -100,11 +100,13 @@ describe("useTableGeometry", () => {
   it("shares only what the reserving cells leave, until each is released", () => {
     const { hook } = mount([FIXED_NAME, FLEX_STATUS]);
     act(() => {
-      hook.result.current.attach(measured("table", 400));
+      hook.result.current.attach(createMeasuredNode("table", 400));
     });
     let release = () => {};
     act(() => {
-      release = hook.result.current.reserve(measured("th", 48, "offsetWidth"));
+      release = hook.result.current.reserve(
+        createMeasuredNode("th", 48, "offsetWidth"),
+      );
     });
     expect(hook.result.current.widths).toEqual([100, 252]);
     act(() => {
@@ -127,7 +129,7 @@ describe("useTableGeometry", () => {
     );
     const { hook } = mount([FIXED_NAME, FLEX_STATUS]);
     act(() => {
-      hook.result.current.attach(measured("table", 400));
+      hook.result.current.attach(createMeasuredNode("table", 400));
     });
     act(() => {
       observed.at(0)?.(
@@ -143,7 +145,7 @@ describe("useTableGeometry", () => {
     const { hook } = mount([FIXED_NAME, FLEX_STATUS]);
     let detach: (() => void) | undefined = () => {};
     act(() => {
-      detach = hook.result.current.attach(measured("table", 400));
+      detach = hook.result.current.attach(createMeasuredNode("table", 400));
     });
     expect(detach).toBeUndefined();
     expect(hook.result.current.widths).toEqual([100, 300]);
@@ -155,7 +157,7 @@ describe("useTableGeometry", () => {
       FLEX_STATUS,
     ]);
     act(() => {
-      hook.result.current.attach(measured("table", 400));
+      hook.result.current.attach(createMeasuredNode("table", 400));
     });
     act(() => {
       interaction.startResize("name", 0, 200);

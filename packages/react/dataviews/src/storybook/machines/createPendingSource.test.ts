@@ -16,7 +16,7 @@ const request: SourceRequest = {
 };
 
 /** Every delivery one execution makes, in order. */
-const deliveries = (
+const listDeliveries = (
   source: Source<Machine>,
 ): readonly SourceDelivery<Machine>[] => {
   const delivered: SourceDelivery<Machine>[] = [];
@@ -28,6 +28,6 @@ const deliveries = (
 
 describe("createPendingSource", () => {
   it("never answers", () => {
-    expect(deliveries(createPendingSource())).toEqual([]);
+    expect(listDeliveries(createPendingSource())).toEqual([]);
   });
 });

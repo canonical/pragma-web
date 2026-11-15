@@ -7,14 +7,14 @@ import createMachineProvider from "../../../../../../testing/createMachineProvid
 import findFilterHandle from "./findFilterHandle.js";
 
 /** The filter records one root would build over the machine provider. */
-const rootHandles = () => {
+const listRootHandles = () => {
   const { provider } = createMachineProvider();
   return createFilterInputs({ host: readProviderHost(provider) }).handles;
 };
 
 describe("findFilterHandle", () => {
   it("reads the handle the root holds at a field and operator", () => {
-    const handles = rootHandles();
+    const handles = listRootHandles();
     expect(findFilterHandle(handles, "status", "isAny")).toBe(
       handles.status.isAny,
     );
@@ -25,7 +25,7 @@ describe("findFilterHandle", () => {
   });
 
   it("reports a field or operator the root holds no handle for", () => {
-    const handles = rootHandles();
+    const handles = listRootHandles();
     expect(() => findFilterHandle(handles, "zone", "isAny")).toThrow(
       "the root holds no filter for zone isAny",
     );

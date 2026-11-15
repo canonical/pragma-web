@@ -41,7 +41,7 @@ const mount = (
   return { ...view, provider, reserve, release };
 };
 
-const checkbox = (): HTMLInputElement =>
+const getCheckbox = (): HTMLInputElement =>
   screen.getByRole<HTMLInputElement>("checkbox", {
     name: "Select all displayed rows",
   });
@@ -49,22 +49,22 @@ const checkbox = (): HTMLInputElement =>
 describe("SelectAllCell", () => {
   it("is a column header holding the checkbox", () => {
     mount(["m-1"]);
-    expect(screen.getByRole("columnheader")).toContainElement(checkbox());
+    expect(screen.getByRole("columnheader")).toContainElement(getCheckbox());
   });
 
   it("is unchecked while none of the displayed rows is selected", () => {
     mount(["m-1", "m-2"]);
-    expect(checkbox().checked).toBe(false);
-    expect(checkbox().indeterminate).toBe(false);
+    expect(getCheckbox().checked).toBe(false);
+    expect(getCheckbox().indeterminate).toBe(false);
   });
 
   it("is mixed while some of the displayed rows are selected", () => {
     const { provider } = mount(["m-1", "m-2"]);
-    fireEvent.click(checkbox());
+    fireEvent.click(getCheckbox());
     act(() => {
       provider.selection.remove(["m-2"]);
     });
-    expect(checkbox().indeterminate).toBe(true);
+    expect(getCheckbox().indeterminate).toBe(true);
   });
 
   it("adds the displayed rows and keeps a selection made elsewhere", () => {
@@ -72,8 +72,8 @@ describe("SelectAllCell", () => {
     act(() => {
       provider.selection.add(["m-9"]);
     });
-    fireEvent.click(checkbox());
-    expect(checkbox().checked).toBe(true);
+    fireEvent.click(getCheckbox());
+    expect(getCheckbox().checked).toBe(true);
     expect([...provider.selection.state.get().ids].sort()).toEqual([
       "m-1",
       "m-2",
@@ -86,7 +86,7 @@ describe("SelectAllCell", () => {
     act(() => {
       provider.selection.add(["m-1", "m-9"]);
     });
-    fireEvent.click(checkbox());
+    fireEvent.click(getCheckbox());
     expect([...provider.selection.state.get().ids]).toEqual(["m-9"]);
   });
 
