@@ -362,7 +362,7 @@ export default function layOutClassGraph(
   input: ClassGraphInput | SpecimenGraphInput,
   options: ClassGraphLayoutOptions = {},
 ): ClassGraphLayout {
-  const { sweeps = SWEEPS, budget } = options;
+  const { sweeps = SWEEPS, budget, drill } = options;
   const whole = buildClassGraphModel(input);
   // Within a budget the overview draws what fits at rest: the largest
   // namespaces collapsed to a box each, the stubs its relations reach.
@@ -370,7 +370,11 @@ export default function layOutClassGraph(
     budget === undefined
       ? whole
       : buildClassGraphModel(
-          gatherDrawnInput(input, whole, chooseDrawnScope(whole, budget)),
+          gatherDrawnInput(
+            input,
+            whole,
+            chooseDrawnScope(whole, budget, drill),
+          ),
         );
   // An ontology with no class is data a provider may serve: it lays out
   // as an empty floor the size of the design canvas.

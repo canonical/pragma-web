@@ -83,4 +83,14 @@ describe("chooseDrawnScope", () => {
     });
     expect(drawn).toBe(5);
   });
+  it("drills into a namespace: it drawn class by class, every other one a box", () => {
+    const model = buildClassGraphModel(FOUR_NAMESPACE_GRAPH);
+    expect(chooseDrawnScope(model, GRAPH_BUDGET, "surface")).toMatchObject({
+      expanded: ["surface"],
+      collapsed: ["ds", "anatomy", "cs"],
+    });
+    expect(
+      chooseDrawnScope(buildClassGraphModel(ontologyGraph), GRAPH_BUDGET, "ds"),
+    ).toMatchObject({ expanded: ["ds"], collapsed: ["anatomy", "cs"] });
+  });
 });

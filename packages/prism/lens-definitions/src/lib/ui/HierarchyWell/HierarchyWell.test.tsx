@@ -5,7 +5,7 @@
  * lifting the fade.
  */
 
-import { requireEntry } from "@canonical/prism-core";
+import { createGraphBudget, requireEntry } from "@canonical/prism-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
@@ -13,6 +13,7 @@ import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js"
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
 import { MIN_FIT } from "../../classGraph/constants.js";
+import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import frameOpeningView from "./frameOpeningView.js";
 import HierarchyWell from "./HierarchyWell.js";
 import type { HierarchyWellProps } from "./types.js";
@@ -468,6 +469,67 @@ describe("HierarchyWell", () => {
     );
     expect(container.querySelector(".desktop .edge-label")?.textContent).toBe(
       "3 relations",
+    );
+  });
+});
+
+describe("over a layout whose rail opens on a box", () => {
+  // Within two nodes the larger namespace, aa, collapses to a box that
+  // the rail lists before zz's one class.
+  const klass = (prefix: string, local: string) => ({
+    uri: `https://${prefix}.example/${local}`,
+    label: local,
+    prefix,
+    abstract: false,
+    superclass: null,
+    instanceCount: 0,
+    fields: 0,
+  });
+  const input = {
+    classes: [
+      klass("aa", "A1"),
+      klass("aa", "A2"),
+      klass("aa", "A3"),
+      klass("zz", "Z1"),
+    ],
+    relations: [],
+  };
+  const boxed = layOutClassGraph(input, {
+    budget: createGraphBudget({ drawnNodesMax: 2 }),
+  });
+  const boxedTerms = new Map(
+    input.classes.map((entry) => [
+      entry.uri,
+      `${entry.prefix}:${entry.uri.split("/").at(-1)}`,
+    ]),
+  );
+  const drawBoxed = (term: string | undefined, hoverCentre?: string) =>
+    createRouterHarness(
+      <HierarchyWell
+        filter={createAllNamespacesFilter(["aa", "zz"])}
+        hoverCentre={hoverCentre}
+        layout={boxed}
+        onHoverTerm={vi.fn()}
+        term={term}
+        terms={boxedTerms}
+      />,
+    );
+
+  it("puts the tab stop on the first class drawn", () => {
+    expect(boxed.rail.at(0)).toBe("region:aa");
+    const { container } = render(drawBoxed(undefined));
+    const stops = container.querySelectorAll('.desktop a[tabindex="0"]');
+    expect(stops).toHaveLength(1);
+    expect(stops[0]?.closest(".node")?.getAttribute("data-id")).toBe("zz:Z1");
+  });
+
+  it("fades nothing for a selected or hovered class the canvas does not draw", () => {
+    const { container } = render(drawBoxed("aa:A2", "aa:A3"));
+    expect(container.querySelectorAll(".desktop .node.is-faded")).toHaveLength(
+      0,
+    );
+    expect(container.querySelectorAll('.desktop a[tabindex="0"]')).toHaveLength(
+      1,
     );
   });
 });

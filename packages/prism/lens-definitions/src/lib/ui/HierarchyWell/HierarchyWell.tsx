@@ -114,8 +114,19 @@ export default function HierarchyWell({
     () => new Map([...terms].map(([uri, compact]) => [compact, uri])),
     [terms],
   );
-  const selected = term === undefined ? undefined : uris.get(term);
-  const hovered = hoverCentre === undefined ? undefined : uris.get(hoverCentre);
+  // The canvas centres only on a class it draws: the rail lists the
+  // classes a collapsed namespace's box stands for too.
+  const drawnOf = (compact: string | undefined): string | undefined => {
+    const uri = compact === undefined ? undefined : uris.get(compact);
+    return uri !== undefined && layout.nodes.has(uri) ? uri : undefined;
+  };
+  const selected = drawnOf(term);
+  const hovered = drawnOf(hoverCentre);
+  // The graph's one tab stop: the selected class, else the first class in
+  // the rail's order, never a box that holds no link.
+  const tabStop =
+    selected ??
+    layout.rail.find((uri) => layout.nodes.get(uri)?.kind === "class");
   const focus = escaped ? undefined : (hovered ?? selected);
   const { hidden, dimmed } = useMemo(
     () => classifyClasses(layout, terms, filter),
@@ -268,7 +279,7 @@ export default function HierarchyWell({
           labels={labels}
           layout={layout}
           selected={selected}
-          tabStop={selected ?? layout.rail.at(0)}
+          tabStop={tabStop}
           terms={terms}
         />
       </GraphCanvas>

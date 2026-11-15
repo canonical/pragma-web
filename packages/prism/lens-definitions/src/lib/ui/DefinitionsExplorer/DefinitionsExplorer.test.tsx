@@ -161,4 +161,52 @@ describe("DefinitionsExplorer", {
       container.querySelector('.phone .row[data-kind="region"]')?.textContent,
     ).toContain("20 classes");
   });
+  it("drills a term page of a class inside a collapsed namespace into it: the class drawn, focused and the tab stop", () => {
+    // Within 20 nodes ds collapses at rest; its class's page draws ds
+    // class by class and the other namespaces as one box each.
+    const { container } = render(
+      <GraphBudgetProvider budget={createGraphBudget({ drawnNodesMax: 20 })}>
+        {createDefinitionsPage(
+          UIBLOCK_TERM,
+          definitionsExplorerRecords,
+          createFetchSpy(),
+        )}
+      </GraphBudgetProvider>,
+    );
+    const desktop = container.querySelector(".desktop");
+    expect(
+      [...(desktop?.querySelectorAll('.node[data-kind="region"]') ?? [])].map(
+        (node) => node.getAttribute("data-id"),
+      ),
+    ).toEqual(expect.arrayContaining(["anatomy", "cs"]));
+    expect(desktop?.querySelector('.node[data-id="ds"]')).toBeNull();
+    const block = desktop?.querySelector('.node[data-id="ds:UIBlock"]');
+    expect(block).not.toBeNull();
+    expect(block?.classList.contains("is-faded")).toBe(false);
+    expect(block?.querySelector(".ring.is-selected")).not.toBeNull();
+    const stops = desktop?.querySelectorAll('a[tabindex="0"]');
+    expect(stops).toHaveLength(1);
+    expect(stops?.[0]?.closest(".node")?.getAttribute("data-id")).toBe(
+      "ds:UIBlock",
+    );
+  });
+
+  it("puts the graph's tab stop on the first class drawn when the rail opens on a box", () => {
+    const { container } = render(
+      <GraphBudgetProvider budget={createGraphBudget({ drawnNodesMax: 20 })}>
+        {createDefinitionsPage(
+          undefined,
+          definitionsExplorerRecords,
+          createFetchSpy(),
+        )}
+      </GraphBudgetProvider>,
+    );
+    const desktop = container.querySelector(".desktop");
+    const stops = desktop?.querySelectorAll('a[tabindex="0"]');
+    expect(stops).toHaveLength(1);
+    expect(stops?.[0]?.closest(".node")?.getAttribute("data-kind")).not.toBe(
+      "region",
+    );
+    expect(desktop?.querySelectorAll(".node.is-faded")).toHaveLength(0);
+  });
 });

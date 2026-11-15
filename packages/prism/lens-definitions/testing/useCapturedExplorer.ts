@@ -1,5 +1,3 @@
-import { useGraphBudget } from "@canonical/prism-core";
-import { useMemo } from "react";
 import { useFragment, useLazyLoadQuery } from "react-relay";
 import type { DefinitionsExplorer_ontologies$key } from "../src/__generated__/DefinitionsExplorer_ontologies.graphql.js";
 import explorerFragmentNode from "../src/__generated__/DefinitionsExplorer_ontologies.graphql.js";
@@ -8,11 +6,9 @@ import type {
   DefinitionsExplorerQuery$data,
 } from "../src/__generated__/DefinitionsExplorerQuery.graphql.js";
 import definitionsExplorerQueryNode from "../src/__generated__/DefinitionsExplorerQuery.graphql.js";
-import layOutClassGraph from "../src/lib/classGraph/layOutClassGraph.js";
 import type { ClassGraphLayout } from "../src/lib/classGraph/types.js";
-import compactUri from "../src/lib/compactUri.js";
 import { buildDefinitionsExplorerVariables } from "../src/lib/definitionsQuery.js";
-import buildClassGraphInput from "../src/lib/ui/DefinitionsExplorer/buildClassGraphInput.js";
+import useExplorerLayout from "../src/lib/ui/DefinitionsExplorer/useExplorerLayout.js";
 
 /** The explorer's operation read from the store, and its graph laid out. */
 export interface CapturedExplorer {
@@ -41,25 +37,6 @@ export default function useCapturedExplorer(term?: string): CapturedExplorer {
     explorerFragmentNode,
     data.ontologies,
   );
-  const budget = useGraphBudget();
-  const layout = useMemo(
-    () =>
-      layOutClassGraph(buildClassGraphInput(graph, data.classEdges), {
-        budget,
-      }),
-    [graph, data.classEdges, budget],
-  );
-  const terms = useMemo(
-    () =>
-      new Map(
-        graph.flatMap((ontology) =>
-          ontology.classes.map((klass) => [
-            klass.uri,
-            compactUri(klass.uri, [ontology]),
-          ]),
-        ),
-      ),
-    [graph],
-  );
+  const { layout, terms } = useExplorerLayout(graph, data.classEdges, term);
   return { data, layout, terms };
 }

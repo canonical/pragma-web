@@ -17,13 +17,19 @@ import type { ClassGraphModel, DrawnScope } from "./types.js";
  * stubs going with it. A namespace too large for the budget alone ends
  * collapsed like the rest.
  *
+ * Drilled into a namespace, as a term page of one of its classes is, the
+ * view draws that namespace class by class and every other one as a box,
+ * whatever the budget.
+ *
  * @param model - The whole graph's model.
  * @param budget - The budget the view keeps; its `drawnNodesMax` counts.
+ * @param drill - The prefix of the namespace the view drills into, if any.
  * @returns The prefixes expanded and collapsed, and the stubs' IRIs.
  */
 export default function chooseDrawnScope(
   model: ClassGraphModel,
   budget: GraphBudget,
+  drill?: string,
 ): DrawnScope {
   const loaded = new Set(model.regionOrder.map(({ prefix }) => prefix));
   const listStubs = (expanded: ReadonlySet<string>): string[] =>
@@ -38,6 +44,14 @@ export default function chooseDrawnScope(
           .map((relation) => relation.range),
       ),
     ].sort(compareText);
+  if (drill !== undefined) {
+    const prefixes = model.regionOrder.map(({ prefix }) => prefix);
+    return {
+      expanded: prefixes.filter((prefix) => prefix === drill),
+      collapsed: prefixes.filter((prefix) => prefix !== drill),
+      stubs: listStubs(new Set([drill])),
+    };
+  }
   // The model's regions run largest first, then by prefix.
   let expanded = model.regionOrder;
   const collapsed: string[] = [];

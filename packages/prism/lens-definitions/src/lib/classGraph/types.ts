@@ -379,6 +379,12 @@ export interface ClassGraphLayoutOptions {
    * whole graph's measurements draw it.
    */
   readonly budget?: GraphBudget;
+  /**
+   * The prefix of the namespace the view drills into, within a budget: it
+   * is drawn class by class and every other namespace as one box, and the
+   * view is not held to the overview's fit.
+   */
+  readonly drill?: string;
 }
 
 /** A packing of regions into shelves. */
