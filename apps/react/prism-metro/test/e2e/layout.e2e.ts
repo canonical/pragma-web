@@ -27,7 +27,7 @@
  * field name longer than its key's track, which must clip there rather
  * than run under the value or widen the canvas, and once for its fields'
  * keys, a key carrying the inherited tag on the same line height as a
- * plain one.
+ * plain one. Every row of the station and fleet indexes is 32px.
  */
 import {
   launchBrowser,
@@ -43,8 +43,11 @@ import {
   DEV_READY_MS,
   GRAPH_READY_MS,
   INDEX_CARD_SELECTOR,
+  INDEX_ROW_SELECTOR,
   LONG_FIELD_NAME,
   PAGE_SETTLE_MS,
+  ROW_PX,
+  ROWS_PATHS,
   STATION_IRI_PATH,
   TERM_IRI_PATH,
   WIDTH_TOLERANCE_PX,
@@ -128,6 +131,28 @@ function measureFieldKeys(): {
     tagged: keys.filter((key) => key.querySelector(".inherited")).map(heightOf),
     plain: keys.filter((key) => !key.querySelector(".inherited")).map(heightOf),
   };
+}
+
+/**
+ * Read the height of every row a selector matches that the page draws,
+ * rounded to a tenth of a pixel, with the row's title. It runs in the page.
+ *
+ * @param selector - The rows.
+ * @returns Each drawn row's title and height.
+ */
+function measureRowHeights(
+  selector: string,
+): readonly { readonly title: string; readonly height: number }[] {
+  return [...document.querySelectorAll(selector)]
+    .map((row) => ({
+      title: row.querySelector(".title")?.textContent ?? "",
+      box: row.getBoundingClientRect(),
+    }))
+    .filter(({ box }) => box.width > 0 && box.height > 0)
+    .map(({ title, box }) => ({
+      title,
+      height: Math.round(box.height * 10) / 10,
+    }));
 }
 
 /**
@@ -342,6 +367,19 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       }
     },
   );
+
+  // A row's height comes from `lines` alone, and neither index opts its
+  // rows into two lines: every row is one line high.
+  it.each(ROWS_PATHS)("draws every row of %s one line high", async (path) => {
+    const page = await open(path);
+    try {
+      const rows = await page.evaluate(measureRowHeights, INDEX_ROW_SELECTOR);
+      expect(rows.length).toBeGreaterThan(0);
+      expect(rows.filter(({ height }) => height !== ROW_PX)).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
 
   it("clips a key longer than its track there, the canvas not scrolling sideways", async () => {
     const page = await open(STATION_PATH);

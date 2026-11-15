@@ -108,6 +108,32 @@ export const STANDARDS_FACT_WIDTHS = [
   { width: 1440, fewestShown: 1 },
 ] as const;
 
+/** The catalog's rows view, an index that opts its rows into two lines. */
+export const CATALOG_ROWS_PATH = "/components";
+
+/** The catalog's rows. */
+export const CATALOG_ROW_SELECTOR =
+  ".ds.components-catalog-page .ds.entity-row";
+
+/** A row's height in pixels: one 24px line between 4px insets. */
+export const ROW_PX = 32;
+
+/** A two-line row's height in pixels: the summary's line under the first. */
+export const TWO_LINE_ROW_PX = 56;
+
+/**
+ * The facts a standards index row is given in the browser, after its
+ * address, so that a row with several facts can be seen narrowing: each
+ * fact's property, label and value.
+ */
+export const ADDED_FACTS = [
+  { property: "category", label: "Category", value: "Accessibility" },
+  { property: "stage", label: "Stage", value: "Deprecated" },
+] as const;
+
+/** The step, in pixels, by which a row is narrowed while its facts leave. */
+export const NARROWING_STEP_PX = 4;
+
 /**
  * How far apart, in pixels, two edges or widths of boxes that fill the
  * same tracks may round: sub-pixel layout rounds each box on its own.

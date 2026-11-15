@@ -29,7 +29,12 @@
  * fact, on the title's one line, and a title is cut, at 390px too, only
  * once the address has given up all of its width. At 390, 820 and 1440px
  * no fact of a row shows in part: each lies wholly inside the facts' box
- * or on its hidden line, and facts show where the row has room for them.
+ * and the row, or on the box's hidden line; facts show where the row has
+ * room for them, and a title that fits its row is never cut. A row given
+ * more facts in the page and narrowed step by step loses them whole, the
+ * last first, before its title is cut. Every row of the catalog, which
+ * opts into two lines, is 56px, and every row of the standards index 32px,
+ * at 1440 and 390px.
  */
 import {
   launchBrowser,
@@ -37,21 +42,27 @@ import {
   type ThemedMeasure,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
-import type { Browser } from "playwright";
+import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  ADDED_FACTS,
   CATALOG_CARD_SELECTOR,
   CATALOG_CARD_WIDTHS,
   CATALOG_PATH,
+  CATALOG_ROW_SELECTOR,
+  CATALOG_ROWS_PATH,
   CATALOG_WHOLE_ROW_WIDTHS,
   DEV_READY_MS,
   DOCUMENT_PATHS,
   JOURNEYS_PATHS,
   MIN_CATALOG_CARD_WIDTH_PX,
+  NARROWING_STEP_PX,
   PAGE_SETTLE_MS,
+  ROW_PX,
   STANDARDS_FACT_WIDTHS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
+  TWO_LINE_ROW_PX,
   WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
   WORKSPACE_PATHS,
@@ -110,24 +121,37 @@ function countCutEntries(): {
 
 /**
  * Count the standards index's rows, their facts that show, and those that
- * show in part: a fact is shown when some of it lies inside its row's
- * facts' box, and in part when some of it lies outside, so a fact that has
- * left for the box's hidden line, or that is not displayed, is neither. It
- * runs in the page.
+ * show in part, and list the titles cut though they fit. A fact is shown
+ * when some of it lies inside both its facts' box and its row, and in part
+ * when some of it lies outside either, so a fact that has left for the
+ * box's hidden line, or that is not displayed, is neither. A title fits
+ * when its identity, were the title whole, is no wider than the row less
+ * its status: such a title must not be cut, whether or not the row's facts
+ * have left. It runs in the page.
  *
- * @returns The counts, and the text of each fact shown in part.
+ * @returns The counts, the text of each fact shown in part, and each
+ * title cut though it fits.
  */
 function countPartFacts(): {
   readonly rows: number;
   readonly shown: number;
   readonly partial: readonly string[];
+  readonly titlesFitting: number;
+  readonly cutThoughFitting: readonly string[];
 } {
   const rows = [
     ...document.querySelectorAll(".ds.standards-index .ds.entity-row"),
   ];
   const facts = rows.flatMap((row) => {
-    const box = row.querySelector(".facts")?.getBoundingClientRect();
-    if (!box) return [];
+    const own = row.querySelector(".facts")?.getBoundingClientRect();
+    if (!own) return [];
+    const edge = row.getBoundingClientRect();
+    const box = {
+      left: Math.max(own.left, edge.left),
+      right: Math.min(own.right, edge.right),
+      top: Math.max(own.top, edge.top),
+      bottom: Math.min(own.bottom, edge.bottom),
+    };
     return [...row.querySelectorAll(".facts > .fact")].map((fact) => {
       const rect = fact.getBoundingClientRect();
       const inside =
@@ -141,13 +165,148 @@ function countPartFacts(): {
       return { text: fact.textContent ?? "", inside, whole };
     });
   });
+  const titles = rows.flatMap((row) => {
+    const identity = row.querySelector(".identity");
+    const title = identity?.querySelector(".title");
+    if (!identity || !title) return [];
+    const status = row.querySelector(".status");
+    const end =
+      status?.getBoundingClientRect().left ??
+      row.getBoundingClientRect().right -
+        Number.parseFloat(getComputedStyle(row).paddingInlineEnd);
+    const whole =
+      identity.getBoundingClientRect().width -
+      title.clientWidth +
+      title.scrollWidth;
+    return [
+      {
+        text: title.textContent ?? "",
+        fits: identity.getBoundingClientRect().left + whole <= end + 0.5,
+        cut: title.scrollWidth > title.clientWidth,
+      },
+    ];
+  });
   return {
     rows: rows.length,
     shown: facts.filter(({ inside }) => inside).length,
     partial: facts
       .filter(({ inside, whole }) => inside && !whole)
       .map(({ text }) => text),
+    titlesFitting: titles.filter(({ fits }) => fits).length,
+    cutThoughFitting: titles
+      .filter(({ fits, cut }) => fits && cut)
+      .map(({ text }) => text),
   };
+}
+
+/**
+ * Give the standards index's first row more facts after its address, then
+ * narrow it step by step and read, at each width, which of its facts show
+ * whole (1), in part (P) or not at all (0), measured against both the
+ * facts' box and the row's own edge, and whether its title is cut, and
+ * would fit. It runs in the page.
+ *
+ * @param input - The facts to add and the step to narrow by.
+ * @returns One reading per width, the widest first.
+ * @throws When the index has no row with an address.
+ * @note Impure: adds facts to the page's first row and narrows it.
+ */
+function narrowRowWithFacts(input: {
+  readonly added: readonly {
+    readonly property: string;
+    readonly label: string;
+    readonly value: string;
+  }[];
+  readonly step: number;
+}): readonly {
+  readonly width: number;
+  readonly facts: string;
+  readonly titleCut: boolean;
+  readonly titleFits: boolean;
+}[] {
+  const row = document.querySelector<HTMLElement>(
+    ".ds.standards-index .ds.entity-row",
+  );
+  const address = row?.querySelector(".facts > .fact");
+  const identity = row?.querySelector(".identity");
+  const title = identity?.querySelector(".title");
+  if (!row || !address || !identity || !title) {
+    throw new Error("the index has no row with an address");
+  }
+  for (const { property, label, value } of input.added) {
+    const fact = address.cloneNode(true) as HTMLElement;
+    fact.className = "fact is-later";
+    fact.dataset.property = property;
+    const term = fact.querySelector(".term");
+    const detail = fact.querySelector(".detail");
+    if (!term || !detail) throw new Error("the address has no term or detail");
+    term.textContent = label;
+    detail.textContent = value;
+    address.parentElement?.append(fact);
+  }
+  const readings = [];
+  for (
+    let width = Math.ceil(row.getBoundingClientRect().width);
+    width > 0;
+    width -= input.step
+  ) {
+    row.style.width = `${width}px`;
+    const edge = row.getBoundingClientRect();
+    const facts = row.querySelector(".facts")?.getBoundingClientRect();
+    if (!facts) throw new Error("the row has no facts");
+    const box = {
+      left: Math.max(facts.left, edge.left),
+      right: Math.min(facts.right, edge.right),
+      top: Math.max(facts.top, edge.top),
+      bottom: Math.min(facts.bottom, edge.bottom),
+    };
+    const shown = [...row.querySelectorAll(".facts > .fact")].map((fact) => {
+      const rect = fact.getBoundingClientRect();
+      const inside =
+        Math.min(rect.right, box.right) - Math.max(rect.left, box.left) > 0 &&
+        Math.min(rect.bottom, box.bottom) - Math.max(rect.top, box.top) > 0;
+      const whole =
+        rect.left >= box.left - 0.5 &&
+        rect.right <= box.right + 0.5 &&
+        rect.top >= box.top - 0.5 &&
+        rect.bottom <= box.bottom + 0.5;
+      return !inside ? "0" : whole ? "1" : "P";
+    });
+    const whole =
+      identity.getBoundingClientRect().width -
+      title.clientWidth +
+      title.scrollWidth;
+    readings.push({
+      width,
+      facts: shown.join(""),
+      titleCut: title.scrollWidth > title.clientWidth,
+      titleFits:
+        identity.getBoundingClientRect().left + whole <= edge.right + 0.5,
+    });
+  }
+  return readings;
+}
+
+/**
+ * Read the height of every row a selector matches that the page draws,
+ * rounded to a tenth of a pixel, with the row's title. It runs in the page.
+ *
+ * @param selector - The rows.
+ * @returns Each drawn row's title and height.
+ */
+function measureRowHeights(
+  selector: string,
+): readonly { readonly title: string; readonly height: number }[] {
+  return [...document.querySelectorAll(selector)]
+    .map((row) => ({
+      title: row.querySelector(".title")?.textContent ?? "",
+      box: row.getBoundingClientRect(),
+    }))
+    .filter(({ box }) => box.width > 0 && box.height > 0)
+    .map(({ title, box }) => ({
+      title,
+      height: Math.round(box.height * 10) / 10,
+    }));
 }
 
 /**
@@ -222,6 +381,38 @@ function readJourneysCanvas(): {
 
 let server: RunningServer;
 let browser: Browser;
+
+/**
+ * Open `path` at a viewport, every request off the dev cell's own origins
+ * answered empty, once its network is idle.
+ *
+ * @param path - The page's path.
+ * @param viewport - The viewport's width and height, in pixels.
+ * @returns The open page.
+ * @note Impure: opens a browser tab, which the caller closes.
+ */
+async function openPage(
+  path: string,
+  viewport: { readonly width: number; readonly height: number },
+): Promise<Page> {
+  const page = await browser.newPage({
+    viewport: { width: viewport.width, height: viewport.height },
+  });
+  const origins = [
+    new URL(server.base).origin,
+    new URL(server.graphBase).origin,
+  ];
+  await page.route("**/*", (route) =>
+    origins.includes(new URL(route.request().url()).origin)
+      ? route.continue()
+      : route.fulfill({ status: 204, body: "" }),
+  );
+  await page.goto(new URL(path, server.base).href, {
+    waitUntil: "networkidle",
+    timeout: PAGE_SETTLE_MS,
+  });
+  return page;
+}
 
 beforeAll(async () => {
   server = await startServer("dev:bun", CWD, { timeoutMs: DEV_READY_MS });
@@ -514,30 +705,47 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       await page.close();
     }
   });
+
+  // A row's height comes from `lines` alone: the catalog opts its rows
+  // into two lines, the standards index keeps one.
+  it("draws every row of the catalog two lines high", async () => {
+    const page = await openPage(CATALOG_ROWS_PATH, viewport);
+    try {
+      const rows = await page.evaluate(measureRowHeights, CATALOG_ROW_SELECTOR);
+      expect(rows.length).toBeGreaterThan(0);
+      expect(rows.filter(({ height }) => height !== TWO_LINE_ROW_PX)).toEqual(
+        [],
+      );
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("draws every row of the standards index one line high", async () => {
+    const page = await openPage(STANDARDS_INDEX_PATH, viewport);
+    try {
+      const rows = await page.evaluate(
+        measureRowHeights,
+        ".ds.standards-index .ds.entity-row",
+      );
+      expect(rows.length).toBeGreaterThan(0);
+      expect(rows.filter(({ height }) => height !== ROW_PX)).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
 });
 
 // A fact is shown whole or not at all: where a row has no room for its
 // facts they leave whole, the last first, so none is ever cut to a stub,
-// and only then: where a row has room its facts show.
+// and only then: where a row has room its facts show. Once none is left
+// the title has the row's whole width.
 describe.each(STANDARDS_FACT_WIDTHS)(
   "the standards index at $width px",
   ({ width, fewestShown }) => {
     it("shows each fact of a row whole or not at all", async () => {
-      const page = await browser.newPage({ viewport: { width, height: 844 } });
+      const page = await openPage(STANDARDS_INDEX_PATH, { width, height: 844 });
       try {
-        const origins = [
-          new URL(server.base).origin,
-          new URL(server.graphBase).origin,
-        ];
-        await page.route("**/*", (route) =>
-          origins.includes(new URL(route.request().url()).origin)
-            ? route.continue()
-            : route.fulfill({ status: 204, body: "" }),
-        );
-        await page.goto(new URL(STANDARDS_INDEX_PATH, server.base).href, {
-          waitUntil: "networkidle",
-          timeout: PAGE_SETTLE_MS,
-        });
         const counts = await page.evaluate(countPartFacts);
         expect(counts.rows).toBeGreaterThan(0);
         expect(
@@ -545,12 +753,60 @@ describe.each(STANDARDS_FACT_WIDTHS)(
           `${counts.shown} facts shown in ${counts.rows} rows`,
         ).toBeGreaterThanOrEqual(fewestShown);
         expect(counts.partial).toEqual([]);
+        expect(counts.titlesFitting).toBeGreaterThan(0);
+        expect(counts.cutThoughFitting).toEqual([]);
       } finally {
         await page.close();
       }
     });
   },
 );
+
+// The standards index's rows carry one fact, so one of them is given more
+// in the browser, from its own address, and narrowed: the real stylesheet
+// on the real page, at a width where the later facts are drawn.
+describe("a standards index row with several facts", () => {
+  it("lets its facts leave whole, the last first, before its title is cut", async () => {
+    const page = await openPage(STANDARDS_INDEX_PATH, VIEWPORTS[0]);
+    try {
+      const readings = await page.evaluate(narrowRowWithFacts, {
+        added: ADDED_FACTS,
+        step: NARROWING_STEP_PX,
+      });
+      const count = ADDED_FACTS.length + 1;
+      const steps = readings.map((reading) => ({
+        ...reading,
+        kept: reading.facts.includes("0")
+          ? reading.facts.indexOf("0")
+          : reading.facts.length,
+      }));
+      const kept = steps.map((step) => step.kept);
+      // At each width the facts that show are the first ones, each whole.
+      expect(
+        steps.filter(
+          (step) =>
+            step.facts !==
+            "1".repeat(step.kept) + "0".repeat(count - step.kept),
+        ),
+      ).toEqual([]);
+      // Narrowing never brings a fact back, and every count from all to
+      // none is seen: each fact leaves in turn, the last first.
+      expect(kept).toEqual(kept.toSorted((a, b) => b - a));
+      expect([...new Set(kept)]).toEqual(
+        Array.from({ length: count + 1 }, (_, index) => count - index),
+      );
+      // The title is cut only once no fact is left, and then only when
+      // it does not fit the row.
+      expect(
+        steps.filter(
+          (step) => step.titleCut && (step.kept > 0 || step.titleFits),
+        ),
+      ).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
+});
 
 /**
  * Open the catalog at a viewport width and measure its cards against the
