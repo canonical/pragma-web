@@ -15,7 +15,7 @@ import { createRef } from "react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
-import { useColumnManagement } from "../../lib/_work_in_progress/DataTable/hooks/index.js";
+import { useColumnManagement } from "../../lib/_work_in_progress/common/ScopedDataTable/hooks/index.js";
 
 describe("regression 0058 — a column change renewed every header's offers", () => {
   it("keeps the offers of every column whose changes hold, through a width and a hide elsewhere", () => {

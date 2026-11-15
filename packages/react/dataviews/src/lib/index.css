@@ -15,8 +15,8 @@
  * add its line, alphabetically.
  */
 
-@import url("./_work_in_progress/DataTable/common/SettingsMenu/styles.css");
-@import url("./_work_in_progress/DataTable/styles.css");
+@import url("./_work_in_progress/common/ScopedDataTable/common/SettingsMenu/styles.css");
+@import url("./_work_in_progress/common/ScopedDataTable/styles.css");
 @import url("./_work_in_progress/DataViews/common/ActionBar/styles.css");
 @import url("./_work_in_progress/DataViews/common/Filters/common/BoundFilter/styles.css");
 @import url("./_work_in_progress/DataViews/common/Filters/common/FurtherConjuncts/common/FurtherConjunct/styles.css");

@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { ScopedDataTable } from "../../../DataTable/index.js";
+import { ScopedDataTable } from "../../../common/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import type { DataViewsDataTableProps } from "./types.js";
 

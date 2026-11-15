@@ -20,7 +20,7 @@ import declareMachineOrdering from "../../../../testing/declareMachineOrdering.j
 import deliverRows from "../../../../testing/deliverRows.js";
 import { machines } from "../../../../testing/machines.js";
 import DataTable from "./DataTable.js";
-import type { DataTableColumn } from "./types.js";
+import type { DataTableColumn } from "./index.js";
 
 const columns: readonly DataTableColumn[] = [
   {

@@ -63,7 +63,7 @@ import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";
-import type { DataTableColumn } from "./types.js";
+import type { DataTableColumn } from "./index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", sortable: true },
