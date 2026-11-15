@@ -3,6 +3,7 @@ import { type ReactElement, useContext } from "react";
 import { MessagesContext } from "../../../../common/index.js";
 import {
   useDataViewsValue,
+  useIsHydrated,
   useSelectAllOnPage,
 } from "../../../../hooks/index.js";
 import type { SelectAllCellProps } from "./types.js";
@@ -28,6 +29,8 @@ export default function SelectAllCell({
   const messages = useContext(MessagesContext);
   const ids = useDataViewsValue(displayed);
   const { checked, mixed, toggle } = useSelectAllOnPage({ selection, ids });
+  // Selection works once scripts run: until then the box draws disabled.
+  const hydrated = useIsHydrated();
   return (
     <th
       {...rest}
@@ -37,6 +40,7 @@ export default function SelectAllCell({
     >
       <CheckboxInput
         checked={checked}
+        disabled={!hydrated}
         aria-label={messages.selectAllRows}
         ref={(node) => {
           if (node !== null) {

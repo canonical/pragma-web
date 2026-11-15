@@ -1,5 +1,5 @@
 import { memo, type ReactElement } from "react";
-import { useDataViewsValue } from "../../../../hooks/index.js";
+import { useDataViewsValue, useIsHydrated } from "../../../../hooks/index.js";
 import { readFieldName } from "../../../../utils/index.js";
 import { BodyCell } from "../BodyCell/index.js";
 import { SelectionCell } from "../SelectionCell/index.js";
@@ -29,15 +29,15 @@ const Row = <TRow extends object>({
   ref,
 }: RowProps<TRow>): ReactElement => {
   const selected = useDataViewsValue(channels.selected);
+  const hydrated = useIsHydrated();
   return (
-    // aria-selected is only meaningful where selection is offered, and it
-    // must agree with the row's checkbox: both read this one channel.
+    // aria-selected only where selection works: offered, and scripts run.
+    // It agrees with the row's checkbox, as both read this one channel, and
+    // the stylesheet tints the row by it.
     <tr
       ref={ref}
-      className={[componentCssClassName, selected && "selected"]
-        .filter(Boolean)
-        .join(" ")}
-      aria-selected={selectable ? selected : undefined}
+      className={componentCssClassName}
+      aria-selected={selectable && hydrated ? selected : undefined}
       aria-rowindex={position}
       style={gap === undefined ? undefined : { marginBlockStart: gap }}
     >

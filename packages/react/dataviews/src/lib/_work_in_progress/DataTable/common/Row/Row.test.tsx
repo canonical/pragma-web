@@ -78,12 +78,11 @@ describe("Row", () => {
     const { provider } = mountRow({ selectable: true });
     const row = screen.getByRole("row");
     expect(row).toHaveAttribute("aria-selected", "false");
-    expect(row).not.toHaveClass("selected");
     act(() => {
       provider.selection.toggle("m-1");
     });
     expect(row).toHaveAttribute("aria-selected", "true");
-    expect(row).toHaveClass("selected");
+    expect(row.className).toBe("ds data-table-row");
     expect(
       within(row).getByRole("checkbox", { name: "Select alpha" }),
     ).toBeChecked();

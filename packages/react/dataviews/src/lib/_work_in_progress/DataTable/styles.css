@@ -69,33 +69,30 @@
     min-block-size: var(--density-line-height-effective);
   }
 
-  /* The status row holds one cell for the whole table: a block, so its
-     message spans the table whatever tracks the rows have — even a
-     selectable table with no columns, whose rows have one 32px track. */
-  .ds.data-table-row.status {
-    display: block;
-  }
-
   .ds.data-table-row-group.body > .ds.data-table-row {
     &:not(:last-child) {
       border-block-end: var(--dimension-stroke-thickness-medium) solid
         var(--color-border-muted);
     }
 
-    /* A record row takes the neutral ghost fill under the pointer. A
-       selected row takes the information tint, the hue of its checked
-       checkbox, a step deeper under the pointer — provisional, until the
-       tokens name a selection role. The status row is not a record, so it
-       takes none of them. */
-    &:hover:not(.status) {
+    &:hover {
       background-color: var(--color-foreground-ghost-hover);
     }
 
-    &.selected {
-      background-color: var(--color-foreground-secondary-information);
+    /* Selected: a selection token, shimmed over the information tint. */
+    &[aria-selected="true"] {
+      /* shim: design-tokens selection, rung 2.5 */
+      background-color: var(
+        --color-background-selected,
+        var(--color-foreground-secondary-information)
+      );
 
       &:hover {
-        background-color: var(--color-foreground-secondary-information-hover);
+        /* shim: design-tokens selection, rung 2.5 */
+        background-color: var(
+          --color-background-selected-hover,
+          var(--color-foreground-secondary-information-hover)
+        );
       }
     }
   }
@@ -398,21 +395,27 @@
     position: relative;
   }
 
-  /* The table's status: a single cell spanning every track, carrying which
-     outcome it is as `data-status`. It stands in place of the rows when
-     there are none, and above them when rows are kept. The two failures
-     carry the error colour; everything else is muted, because nothing went
-     wrong. */
-  .ds.data-table-body-cell.status {
+  /* One cell for the whole table, muted; the two failures in the error
+     colour. */
+  .ds.data-table-status-row {
     display: block;
-    grid-column: 1 / -1;
-    padding-block: var(--dimension-300);
-    color: var(--color-text-muted);
-    white-space: normal;
-    text-align: center;
 
-    &[data-status="failed"],
-    &[data-status="refresh-failed"] {
+    &:not(:last-child) {
+      border-block-end: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+    }
+
+    & > .cell {
+      display: block;
+      padding-block: var(--dimension-300);
+      padding-inline: var(--density-padding-inline);
+      color: var(--color-text-muted);
+      white-space: normal;
+      text-align: center;
+    }
+
+    &[data-status="failed"] > .cell,
+    &[data-status="refresh-failed"] > .cell {
       color: var(--color-text-error);
     }
   }
