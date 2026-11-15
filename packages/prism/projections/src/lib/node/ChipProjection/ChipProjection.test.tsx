@@ -1,11 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSwitchCoverage } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
+  NO_SITE_SWITCHES,
   type SiteTreeOptions,
 } from "../../../../testing/createSiteTree.js";
 import {
@@ -13,14 +15,14 @@ import {
   MOCK_ONTOLOGY_CLASS,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
+import nodeFragment from "../../../__generated__/ChipProjection_node.graphql.js";
 import testQuery, {
   type ChipProjectionTestQuery,
 } from "../../../__generated__/ChipProjectionTestQuery.graphql.js";
 import siteFragment, {
   type SiteChipSlot_node$key,
 } from "../../../__generated__/SiteChipSlot_node.graphql.js";
-import type { ArmProps, SiteArmProps } from "../../projections/index.js";
-import { defaultProjectionMaps } from "../constants.js";
+import type { ONTOLOGY_TYPES } from "../../ontology/constants.js";
 import ChipProjection from "./ChipProjection.js";
 import type { ChipArmNative, ChipProjectionProps } from "./types.js";
 
@@ -59,7 +61,7 @@ const ChipProjectionTestNode = ({
 /**
  * Render `children` with the key of the Node a Relay mock environment answers,
  * under the site's providers: `entity` over the matrix's UI block IconButton.
- * `options` replace the site's maps or link.
+ * `options` give the site's switches or link.
  */
 const renderWithNode = (
   children: (node: ChipProjectionProps["node"]) => ReactElement,
@@ -107,24 +109,22 @@ describe("ChipProjection", () => {
     expect(container.querySelector(".ds.node-chip")).toBeNull();
   });
 
-  it("renders a type the site arms through the site's arm, over the site slot's key", () => {
+  it("renders every node through the site's switch, over the site slot's key, when the site gives one", () => {
     /**
-     * A site's arm for its own type: it reads the site slot's key and marks
-     * its root with the typename it was handed and the one it read.
+     * A site's switch: it reads the site slot's key and marks its root
+     * with the typename it read.
      */
     const SiteProbe = ({
       node,
-      typename,
       ...props
-    }: SiteArmProps<
-      ArmProps<SiteChipSlot_node$key, ChipArmNative>
-    >): ReactElement => {
+    }: ChipArmNative & {
+      readonly node: SiteChipSlot_node$key;
+    }): ReactElement => {
       const data = useFragment(siteFragment, node);
       return (
         <span
           {...props}
           className="site-probe"
-          data-site-type={typename}
           data-typename={data.__typename}
         />
       );
@@ -133,43 +133,54 @@ describe("ChipProjection", () => {
       (node) => <ChipProjection node={node} />,
       {},
       {
-        maps: {
-          ...defaultProjectionMaps,
-          chip: {
-            ...defaultProjectionMaps.chip,
-            siteTypes: { Component: SiteProbe },
-          },
-        },
+        site: { ...NO_SITE_SWITCHES, chip: SiteProbe },
       },
     );
     const probe = container.querySelector(".site-probe");
-    expect(probe?.getAttribute("data-site-type")).toBe("Component");
     expect(probe?.getAttribute("data-typename")).toBe("Component");
     expect(container.querySelector(".ds.node-chip")).toBeNull();
   });
 
-  it("renders a type the site arms for another typename through the Node arm", () => {
-    const { container } = renderWithNode(
-      (node) => <ChipProjection node={node} />,
-      {},
-      {
-        maps: {
-          ...defaultProjectionMaps,
-          chip: {
-            ...defaultProjectionMaps.chip,
-            siteTypes: { Station: () => null },
-          },
-        },
+  it("covers every case of its switch", () => {
+    /** The mock node of each ontology type the switch names. */
+    const cases: Record<
+      keyof typeof ONTOLOGY_TYPES,
+      Readonly<Record<string, unknown>>
+    > = {
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
+    };
+    expectSwitchCoverage({
+      fragment: nodeFragment,
+      cases,
+      render: (typename, entity) => {
+        const kebab = typename.replace(/(?<!^)([A-Z])/g, "-$1").toLowerCase();
+        const { container, unmount } = renderWithNode(
+          (node) => <ChipProjection node={node} />,
+          entity,
+        );
+        expect(container.querySelector(`.ds.${kebab}-chip`)).toHaveAttribute(
+          "data-type",
+          typename,
+        );
+        expect(container.querySelector(".ds.node-chip")).toBeNull();
+        unmount();
       },
+    });
+  });
+
+  it("hands linked={false} to the arm, which then neither links nor peeks", () => {
+    renderWithNode(
+      (node) => <ChipProjection linked={false} node={node} />,
+      MOCK_ONTOLOGY_CLASS,
     );
-    expect(container.querySelector(".ds.node-chip")).not.toBeNull();
+    expect(screen.queryByRole("link")).toBeNull();
   });
 
   it("hands its children to the arm, in place of the title", () => {
     const { container } = renderWithNode((node) => (
       <ChipProjection node={node}>the icon button</ChipProjection>
     ));
-    expect(container.querySelector(".value")?.textContent).toBe(
+    expect(container.querySelector(".title")?.textContent).toBe(
       "the icon button",
     );
   });

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a573d8d68e8bfea339a10981adfd73eb>>
+ * @generated SignedSource<<fbd0551ae6fe33c4f7cf345e4f5b0870>>
  * @lightSyntaxTransform
  */
 
@@ -24,6 +24,7 @@ export type CodeStandardRow_node$data = {
       };
     }>;
   };
+  readonly description: string | null | undefined;
   readonly " $fragmentType": "CodeStandardRow_node";
 };
 export type CodeStandardRow_node$key = {
@@ -50,6 +51,13 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "description",
       "storageKey": null
     },
     {
@@ -128,6 +136,6 @@ return {
 };
 })();
 
-(node as any).hash = "b94206502cdca45ec6d6cef6fde0f90c";
+(node as any).hash = "44a02cac0878b36c191a0c7888960a13";
 
 export default node;

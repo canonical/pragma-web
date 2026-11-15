@@ -75,12 +75,12 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * The abstract class Layout: `ds:` muted before its title, "abstract" at the
- * end.
+ * The abstract class Layout: `ds:` muted before its title, "abstract" as
+ * its status at the end.
  */
 export const Default: Story = {};
 
-/** A concrete class: its kind is "Class". */
+/** A concrete class: no kind and no status. */
 export const Concrete: Story = {
   parameters: { relay: mockEntity({ isAbstract: false }) },
 };

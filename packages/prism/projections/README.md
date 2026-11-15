@@ -21,8 +21,10 @@ A lens that mentions nodes it knows nothing about (an ontology class's
 instances, the results of a search, the entities a passage of prose links
 to) renders them through a **dispatcher**, one per form: `ChipProjection`,
 `RowProjection`, `CardProjection`, `CommandProjection` and
-`GraphNodeProjection` render a node through the arm its site maps to the
-node's `__typename`. `NodeList` lists any nodes through the card and row
+`GraphNodeProjection` switch on the node's `__typename`: an ontology
+class renders through its own arm, any other type through the `Node` arm
+or, when the site gives its switches, the site's switch. A property is no node, so no dispatcher takes
+it. `NodeList` lists any nodes through the card and row
 dispatchers, as the shared list view. Prose links to graph nodes render as
 chips too, through the element overrides a Markdown renderer takes.
 
@@ -40,31 +42,49 @@ its height in every context: the chip 28px, the row 32px, the command
 lays the five representations of each type out as one matrix, under
 `Documentation/Projection matrix`.
 
+Every form renders a subsequence of one slot order, mark, prefix, title,
+address, kind, summary, facts, status: the chip mark, prefix, title,
+status; the row mark, prefix, title, kind, summary, facts, status; the
+card all eight, over its Specimen; the command mark, prefix, title,
+address, kind, status; the graph node mark, prefix, title, kind, count.
+A chip that peeks opens a 248px dialog 4px from it, after
+`PEEK_OPEN_DELAY_MS` of hover or at once on focus, inside the viewport;
+Escape closes it and gives the link the focus back, and a tap follows
+the link.
+
 - **`EntityChip`**: the inline mention, a pill in running text: an
-  optional mark, an optional lead filed before the catalog's separator,
-  the value, then an optional badge, icon and disclosure chevron. The
-  mark is a sign its projection draws, such as a swatch of the entity's
-  colour; the chip hides it from assistive technology, so its name never
-  depends on it.
-- **`EntityRow`**: the list entry, one row of an index: an optional mark,
-  hidden as the chip's is, the namespace prefix and the title, then one
-  muted word at the end. Where the two do not share a line, as on a
-  phone, the word moves to a line of its own under the title (56px) and a
-  long title wraps, so it is never cut.
-- **`EntityCard`**: the card, built on the published `Card`: location, the
-  title and the entity it belongs to (after `∈`, or after `⊂` with
-  `parentRelation="subclass"`), kind, summary, key values and the
-  footer's vitals, and an optional sidecar beside them, two columns wide,
-  for a rendered example of the entity.
-- **`EntityCommand`**: the command-palette result, a two-line row: the title
-  over "kind in location", and one vital at the end.
+  optional mark, the foreign prefix, the title (a link that peeks at the
+  entity's card, or inert text) and an optional status. The mark is a sign
+  its projection draws, such as a swatch of the entity's colour; the chip
+  hides it from assistive technology, so its name never depends on it.
+- **`EntityRow`**: the list entry, one 32px row of an index (56px where an
+  index opts into two lines, the summary under the title): an optional
+  mark, hidden as the chip's is, the foreign prefix, the title and the
+  kind, then the facts and the status at the end. The title yields last:
+  a fact with no room leaves whole, the last first.
+- **`EntityCard`**: the card, built on the published `Card`: the mark, the
+  foreign prefix and the title, the address, the kind, the summary, the
+  facts and the status, over its static Specimen, which depicts the
+  entity where it has a depiction.
+- **`EntityCommand`**: the command-palette result, a two-line row: the
+  mark, the foreign prefix and the title over the address, the kind and
+  the status at the end.
 - **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a box with
-  rounded corners and its `<text>`, the title over "kind in location" (50
-  units tall by default), or the title alone on the middle of a box the
-  graph sizes, an optional vital (an instance count) at the end of the
+  rounded corners and its `<text>`, the mark, the prefix and the title
+  over the kind (50 units tall by default), or the title alone on the middle of a box the
+  graph sizes, an optional count (an instance count) at the end of the
   title's line, and the graph's encodings: `hollow` (an abstract class),
   `prominent` (a hub) and `showText` (off when zoomed out), for a graph to
   place with a transform inside its `<svg>`.
+
+- **`SwatchMark`**, **`TokenMark`** and **`TokenSwatch`**: the marks and
+  the swatch a colour is drawn by. `SwatchMark` is a 16px disc of an
+  entity's own colour (a metro line's), ringed so a pale colour shows;
+  `TokenMark` is a 16px square split between a token's light and dark
+  values; `TokenSwatch` is the same two values as a token card's
+  specimen, under `<EntityCard.Specimen kind="swatch">`. A colour enters
+  each only from the entity's data, as an inline custom property; none
+  names a colour of its own.
 - **`EntityList`**: the shared list view of an index: its children as
   rows in an ordered list (the `table` renderer, the default) or as cards
   in the published `Cards` group, two columns each (the `cards` renderer),
@@ -165,27 +185,31 @@ import { OntologyClassCard } from "@canonical/prism-projections";
 ### Slots
 
 Each projection fills the slots its type has, in the representation's
-order, and leaves the others empty. A node's prefix is the compact
-address's (`ds` in `ds:Layout`); an address the provider could not compact
-has none.
+order, and leaves the others empty. A form gives the prefix or the
+address, never both: the chip, the row, the card and the graph node give
+the foreign prefix, the compact address's namespace (`ds` in `ds:Layout`)
+when it differs from the page's ambient namespace, and the command gives
+the address. A typed projection gives no kind in the chip, the row, the
+card or the graph node, because its mark says what it is; the command and
+the `Node` projections give it, since a list of nodes mixes types.
 
 | Projection | Slots |
 |---|---|
-| `NodeChip` | the title, or the passage's own text |
-| `NodeRow` | `ds:` muted, the title, the node's class at the end |
-| `NodeCard` | the prefix, the title, the class, the definition |
-| `NodeCommand` | the title over "class in prefix" |
-| `NodeGraphNode` | the compact address over "class in prefix" |
-| `OntologyClassChip` | the title, or the passage's own text |
-| `OntologyClassRow` | `ds:` muted, the title, "abstract" for an abstract class |
-| `OntologyClassCard` | "title ⊂ superclass", "Abstract class in ds", the definition |
-| `OntologyClassCommand` | the title over "Abstract class in ds", "used in 88 instances" |
-| `OntologyClassGraphNode` | the compact address over "Abstract class in ds" |
-| `OntologyPropertyChip` | the name, or the passage's own text |
-| `OntologyPropertyRow` | the name, its kind's word (object, datatype, annotation) |
-| `OntologyPropertyCard` | the name, "kind in domain", the definition, the range and the inverse, "functional" |
-| `OntologyPropertyCommand` | the name over "kind in domain", the range at the end |
-| `OntologyPropertyGraphNode` | the name over "kind in domain" |
+| `NodeChip` | the node glyph, the foreign prefix, the title, or the passage's own text; it peeks at the node |
+| `NodeRow` | the node glyph, the foreign prefix, the title, the node's class as its kind |
+| `NodeCard` | the node glyph, the foreign prefix, the title, the node's class as its kind, the definition |
+| `NodeCommand` | the node glyph, the title over the compact address, the node's class as its kind |
+| `NodeGraphNode` | the node glyph, the foreign prefix and the title over the node's class |
+| `OntologyClassChip` | the class glyph, the foreign prefix, the title, or the passage's own text; it peeks at the class |
+| `OntologyClassRow` | the class glyph, the foreign prefix, the title, "abstract" for an abstract class; the definition under it in a two-line row |
+| `OntologyClassCard` | the class glyph, the foreign prefix, the title, the definition, "Subclass of" its superclass, "abstract" as its status |
+| `OntologyClassCommand` | the class glyph, the title over the compact address, "Abstract class", "used in 88 instances" |
+| `OntologyClassGraphNode` | the class glyph, the foreign prefix and the title; an abstract class's box is hollow |
+| `OntologyPropertyChip` | the property glyph, the foreign prefix, the name, or the passage's own text; it has no peek |
+| `OntologyPropertyRow` | the property glyph, the foreign prefix, the name; the definition under it in a two-line row |
+| `OntologyPropertyCard` | the property glyph, the foreign prefix, the name, the definition, its domain, range and inverse, "functional" as its status |
+| `OntologyPropertyCommand` | the property glyph, the name over its IRI, "kind in domain", the range at the end |
+| `OntologyPropertyGraphNode` | the property glyph, the foreign prefix and the name |
 
 A property's name is its label, or the local name of its IRI when it has
 none. Every word a reader sees comes from the package's catalog.
@@ -195,7 +219,7 @@ projects `on` its type, and each slot names the field it reads. The
 anatomies suite holds each anatomy's field paths to the compiled
 fragment's.
 
-## Dispatchers and maps
+## Switches and the site's switches
 
 ```tsx
 import { ChipProjection, RowProjection } from "@canonical/prism-projections";
@@ -210,48 +234,39 @@ import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 </ul>
 ```
 
-A dispatcher renders no element of its own: its arm renders the root, and
-every arm of one form renders the same representation, so the
-dispatcher's native props are that root's. The chip takes `children`, the
-mention's text in place of the name.
+A switch renders no element of its own: its arm renders the root, and
+every arm of one form renders the same representation, so the switch's
+native props are that root's. The chip takes `children`, the mention's
+text in place of the name.
 
-A dispatcher reads a composite fragment: the node's typename, each arm's
+A switch reads a composite fragment: the node's typename, each arm's
 fragment spread aliased by the type it projects,
 `...NodeCard_node @alias(as: "Node")` and
 `...OntologyClassCard_node @alias(as: "OntologyClass")`, and the site slot,
-`...SiteCardSlot_node @alias(as: "Site")`. Each form's map holds the
-arms:
+`...SiteCardSlot_node @alias(as: "Site")`. It switches on the typename:
+an ontology class renders through its own arm, any other node through the
+`Node` arm. When the site gives its switches (below), every node renders
+through the site's switch of the form instead, over the site slot's key.
+The package's tests hold each composite's aliases and its switch's
+anatomy cases to one set.
 
-- `Node`: the arm of every type no other arm takes.
-- `types`: one arm per aliased spread besides `Node`, each typed against
-  that alias's key, so a wrong or missing arm does not compile.
-- `siteTypes`: a site's arms for its own types, by typename. Each reads
-  the site slot's key and receives the node's typename beside it
-  (`SiteArmProps`); see "Site arms" below.
-
-A typed arm wins, then a site arm, then the `Node` arm. The package's
-tests hold each composite's aliases, its map's `types` and its
-dispatcher's anatomy cases to one set.
-
-Mount the maps once, inside the router and beside the site's homes, with
-the site's router link adapter:
+Mount `ProjectionLinkProvider` once, inside the router and beside the
+site's homes, with the site's router link adapter and its peek:
 
 ```tsx
 import { HomesProvider } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 
 <HomesProvider homes={homes}>
-  <ProjectionsProvider LinkComponent={RouterLink} maps={defaultProjectionMaps}>
+  <ProjectionLinkProvider LinkComponent={RouterLink} peek={renderPeek}>
     <Outlet />
-  </ProjectionsProvider>
+  </ProjectionLinkProvider>
 </HomesProvider>;
 ```
 
-A site with types of its own extends the defaults, as "Site arms" below
-describes.
+A provider nested in another takes what it is not given from the one
+above, so a surface that renders its homes through another link keeps the
+site's peek and switches.
 
 Every link to a home renders through `LinkComponent`, typed against the
 shared `LinkComponentProps` of `@canonical/react-ds-global` and defaulting
@@ -262,79 +277,62 @@ the client and the page keeps its state. A site's own projections read the
 same link with `useProjectionLink`, so their homes navigate as the
 package's arms do.
 
+A chip peeks at its node through the site's peek: `peek`, a function from
+a node's absolute IRI (`Node.uri`, the only address `node(id:)` accepts)
+to the element the chip shows, typically the site's card switch read by a
+query of the site's. Every chip arm takes it with
+`peek={useProjectionPeek(data.uri)}`, so no arm imports its site's peek;
+without one, chips show the package's `ProjectionPeek`.
+
 A node's or a class's home is resolved with its compact address
 (`_meta.curie`) as the `uri` a site's home resolver receives, so one
 entity has one address; a property's with its IRI, its only address.
 
-### A site's own composites
+### A site's own switches
 
-A site arm reads the `Node` key alone, so it can show only what every node
-carries. A site whose types need their own fields writes a composite of its
-own on `Node` and a dispatcher over it: the composite spreads the package's
-dispatcher of that form aliased as `Node`, and each of the site's
-projections aliased by the type it is on, narrowing an interface's
-projection to each type with an aliased inline fragment
-(`... on Component @alias(as: "Component") { ...UIBlockCard_node }`). Its
-map's `Node` arm is the package's dispatcher, so every other node, ontology
-classes included, still dispatches through the maps the site provides, and
-`renderArm` keeps one precedence and one compile-time check for both:
+A site whose types need their own arms writes a switch of its own per
+form: a composite on `Node` that spreads each of its arms aliased by the
+type it is on (narrowing an interface's arm to each type with an aliased
+inline fragment, `... on Component @alias(as: "Component") { ...UIBlockCard_node }`),
+and a component that switches on the typename, with
+`requireArmKey` for each case, and renders every other node through its
+default. The site's own pages render its switches. Each switch's test is one call
+to `expectSwitchCoverage`, and each arm's slot order is held by
+`expectSlotOrder`, both from `@canonical/prism-core/testing`.
 
-```tsx
-import { renderArm } from "@canonical/prism-projections";
+## The site's switches
 
-export default function SiteCardProjection({ node, ...props }) {
-  const data = useFragment(nodeFragment, node);
-  return renderArm(siteProjectionMaps.card, data, props);
-}
-```
-
-A site's own projections read their link through `useProjectionLink` and
-their namespace prefix through `findCuriePrefix`, as the package's do.
-
-## Site arms
-
-A site projects its own types, a metro site's stations or a docsite's
-components, through the site slot every composite spreads:
-`...Site<Form>Slot_node @alias(as: "Site")`, a fragment on `Node`.
-The package ships a default of each, in `src/lib/site/`, that reads the
-typename alone, for a site with no types of its own; the package, the lens
+The lens packages' queries spread the package's switches, so a site whose
+pages render those lenses gives the package its five switches, and a node
+of the site's types reaches the site's arm through the package's switch.
+The seam is the site slot every composite spreads,
+`...Site<Form>Slot_node @alias(as: "Site")`, a fragment on `Node`. The
+package ships a default of each, in `src/lib/site/`, that reads the
+typename alone, for a site that gives no switches; the package, the lens
 packages and any site that compiles the package's documents compile it.
-The slot's names are the package's: a site's own composite, for a
-dispatcher the site renders itself, takes a name of its own, need not
-spread the slot, and then arms no type under `siteTypes`; a map that does
-over a composite with no slot throws on the first such node.
 
-A site with types of its own takes three steps: it compiles the
-package's documents against its own schema, excluding `src/lib/site/`
-from its compile; it defines the five fragments itself; and it makes its
-bundler run the package's dispatchers on its own compile, as the last
-paragraph of this section describes. Each fragment spreads its arms'
-fragments aliased by the type they are on:
+A site that gives its switches compiles the package's documents against
+its own schema, excluding `src/lib/site/` from its compile, and defines
+the five slots itself, each spreading its switch's fragment, with a
+component that hands the slot's data to the switch:
 
-```graphql
+```tsx
 fragment SiteCardSlot_node on Node {
-  __typename
-  ...StationCard_node @alias(as: "Station")
-  ...LineCard_node @alias(as: "Line")
+  ...MetroCardProjection_node
+}
+
+export default function SiteCardSlot({ node, ...props }) {
+  return <MetroCardProjection {...props} node={useFragment(nodeFragment, node)} />;
 }
 ```
 
-The component that defines that fragment is the site's dispatcher for the
-form: it reads the slot's key, switches on the typename it receives, and
-renders the arm over that type's aliased key. The site lists it in its
-maps under `siteTypes`, once per typename it arms:
+It gives the five slot components to the provider as `site`
+(`{ chip, row, card, command, graphNode }`, typed `SiteSwitches`). Its
+switches' defaults take the package's arms directly (the `Node` arm and
+the ontology class's): a site switch whose fragment spread the package's
+switch would make a fragment cycle through the slot.
 
-```tsx
-const maps: ProjectionMaps = {
-  ...defaultProjectionMaps,
-  card: {
-    ...defaultProjectionMaps.card,
-    siteTypes: { Station: SiteCardSlot, Line: SiteCardSlot },
-  },
-};
-```
-
-The package's dispatchers import the composites' artifacts their own
+The package's switches import the composites' artifacts their own
 compile writes, which spread the default slots. A site that defines the
 slots must therefore configure its bundler to resolve the package's
 artifact imports, `…/__generated__/<Name>.graphql.js` from any package
@@ -402,6 +400,11 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `NodeGraphNode`; types `NodeChipProps`, `NodeRowProps`, `NodeCardProps`,
   `NodeCommandProps`, `NodeGraphNodeProps`.
 - List view: `NodeList`; types `NodeListProps`.
+- Peek: `ProjectionPeek` (the card a chip's peek shows, read at the
+  node's absolute IRI by a lazy query of its own when the peek opens),
+  `useProjectionPeek` (the peek every chip arm passes its chip: the site's
+  own, given to the provider, or the package's); types
+  `ProjectionPeekProps`.
 - Class projections: `OntologyClassChip`, `OntologyClassRow`,
   `OntologyClassCard`, `OntologyClassCommand`,
   `OntologyClassGraphNode`; types `OntologyClassChipProps`,
@@ -412,18 +415,37 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `OntologyPropertyGraphNode`; types `OntologyPropertyChipProps`,
   `OntologyPropertyRowProps`, `OntologyPropertyCardProps`,
   `OntologyPropertyCommandProps`, `OntologyPropertyGraphNodeProps`.
-- Representations: `EntityChip`, `EntityRow`, `EntityCard`,
-  `EntityCommand`, `EntityGraphNode`, `EntityList`; types
-  `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
-  `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
+- Representations: `EntityChip`, `EntityRow`, `EntityCard` (its
+  depiction is its static Specimen), `EntityCommand`,
+  `EntityGraphNode`, `EntityList`, `PEEK_OPEN_DELAY_MS` and
+  `PEEK_CLOSE_DELAY_MS` (how long a chip's peek waits to open and to
+  close); types `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
+  `EntityFact` (one fact a card or a row states),
+  `SpecimenKind`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListRenderer`.
+- Marks and swatches: `SwatchMark` (the 16px mark of an entity whose
+  colour is its own data, such as a line), `TokenMark` (a design token's
+  16px mark, its light and dark values side by side) and `TokenSwatch`
+  (a token card's swatch specimen, both values each named under its
+  well); types `SwatchMarkProps`, `TokenMarkProps`, `TokenSwatchProps`.
 - List renderers: `useListRenderers` (the table and the cards, the list
   renderers a site gives its indexes), `ENTITY_LIST_RENDERERS`,
   `DEFAULT_ENTITY_LIST_RENDERER`.
-- Maps: `ProjectionsProvider`, `useProjectionMaps`, `useProjectionLink`,
-  `renderArm`, `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
-  `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,
-  `SiteArmProps`.
+- Site: `ProjectionLinkProvider` (the link, the peek and the site's
+  switches; a nested provider keeps what it is not given),
+  `useProjectionLink`; types `ProjectionLinkProviderProps`,
+  `SiteSwitches`.
 - Prose: `markdownComponents`, `ProseReferencesProvider`; types
   `ProseLinkProps`, `ProseReferencesProviderProps`.
-- Addresses: `findCuriePrefix`.
+- Addresses: `findCuriePrefix`; `AmbientNamespaceProvider`, which
+  declares the page's ambient namespace once (a null namespace declares
+  none, over a farther one, so every prefix shows), and `useForeignPrefix`, the
+  prefix with its colon an identity shows only when its namespace differs
+  from it, read from a compact address or, for a property, from
+  its namespace (every arm's prefix but the command's, whose address
+  states it); types `AmbientNamespaceProviderProps`.
+- Colours: `acceptColour` (a colour read from a graph when it is a plain
+  colour value, else undefined: the gate every mark passes its colour
+  through, for a site that sets a graph's colour in a style itself).
+- Switches: `requireArmKey` (the fragment key a switch's case reads,
+  throwing when the switch's fragment spreads no arm for the node's type).

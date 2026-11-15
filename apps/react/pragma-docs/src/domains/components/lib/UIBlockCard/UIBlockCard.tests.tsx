@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -86,22 +87,28 @@ describe("UIBlockCard", () => {
 
   it("fills the card's slots from the block, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => <UIBlockCard node={node} />);
+    const card = container.querySelector(".ds.ui-block-card");
     expect(
       [
-        ...container.querySelectorAll(
-          ".location, .title, .kind, .summary, .vital",
-        ),
+        ...(card?.querySelectorAll(".prefix, .title, .summary, .status") ?? []),
       ].map((slot) => slot.textContent),
+    ).toEqual(["ds:", "IconButton", MOCK_UI_BLOCK.summary, "experimental"]);
+    expect(
+      [...(card?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
     ).toEqual([
-      "Global",
-      "IconButton ∈ Button",
-      "Component",
-      MOCK_UI_BLOCK.summary,
-      "v2.1",
-      "experimental",
+      ["tier", "Global"],
+      ["inheritsFrom", "Button"],
+      ["version", "v2.1"],
     ]);
-    expect(container.querySelector(".parent")?.textContent).toBe("Button");
-    expect(container.querySelector(".key-values")).toBeNull();
+    expect(card?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/layout-grid.svg#layout-grid",
+    );
+    expect(card?.querySelector(".address, .kind")).toBeNull();
+    if (card) expectSlotOrder(card);
   });
 
   it("links its title, not its parent, to the block's home", () => {
@@ -112,22 +119,24 @@ describe("UIBlockCard", () => {
     expect(links.at(0)?.getAttribute("href")).toBe(MOCK_UI_BLOCK_HREF);
   });
 
-  it("renders the published component of a block it implements in its sidecar", () => {
+  it("renders the published component of a block it implements as its specimen", () => {
     const { container } = renderWithNode(
       (node) => <UIBlockCard node={node} />,
       MOCK_UI_BLOCK_WITH_EXAMPLE,
     );
-    const sidecar = container.querySelector(".sidecar");
-    expect(sidecar?.querySelector(".ds.button")?.textContent).toBe("Button");
-    expect(container.querySelector(".parent")).toBeNull();
-    expect(
-      [...container.querySelectorAll(".vital")].map(
-        (vital) => vital.textContent,
-      ),
-    ).toEqual(["experimental"]);
+    const specimen = container.querySelector(".specimen");
+    expect(specimen).toHaveAttribute("data-specimen", "block");
+    expect(specimen).toHaveAttribute(
+      "aria-label",
+      "Button, as the published package renders it",
+    );
+    expect(specimen?.querySelector(".ds.button")?.textContent).toBe("Button");
+    expect(container.querySelector(".status")?.textContent).toBe(
+      "experimental",
+    );
   });
 
-  it("has no sidecar for a block the published package does not render alone", () => {
+  it("draws no specimen for a block the published package does not render alone", () => {
     const { container } = renderWithNode(
       (node) => <UIBlockCard node={node} />,
       {
@@ -138,7 +147,8 @@ describe("UIBlockCard", () => {
         },
       },
     );
-    expect(container.querySelector(".sidecar")).toBeNull();
+    expect(container.querySelector(".specimen")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Tooltip");
   });
 
   it("renders the first paragraph of its Markdown summary, its emphasis kept", () => {
@@ -168,7 +178,7 @@ describe("UIBlockCard", () => {
         documentationStages: { edges: [] },
       },
     );
-    for (const slot of [".location", ".parent", ".summary", ".footer"]) {
+    for (const slot of [".summary", ".facts", ".fact", ".status"]) {
       expect(container.querySelector(slot), slot).toBeNull();
     }
     expect(container.querySelector(".title")?.textContent).toBe("IconButton");
@@ -180,9 +190,7 @@ describe("UIBlockCard", () => {
       { __typename: "Pattern" },
     );
     expect(screen.queryByRole("link")).toBeNull();
-    expect(container.querySelector(".title")?.textContent).toBe(
-      "IconButton ∈ Button",
-    );
+    expect(container.querySelector(".title")?.textContent).toBe("IconButton");
   });
 
   it("applies custom className", () => {

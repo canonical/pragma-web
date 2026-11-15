@@ -28,7 +28,8 @@ const declareSsrTestQuery = (): unknown => graphql`
 void declareSsrTestQuery;
 
 /**
- * Run the SSR test operation and render ZoneGraphNode over the Zone it returns.
+ * Run the SSR test operation and render ZoneGraphNode over the Zone it
+ * returns.
  */
 const ZoneGraphNodeSsrTestNode = (): ReactElement => {
   const data = useLazyLoadQuery<ZoneGraphNodeSsrTestQuery>(ssrTestQuery, {});
@@ -58,6 +59,6 @@ describe("ZoneGraphNode SSR", () => {
       createProjectionTree(environment, <ZoneGraphNodeSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-graph-node ds zone-graph-node"');
-    expect(html).not.toContain("<a");
+    expect(html).not.toContain("<a ");
   });
 });

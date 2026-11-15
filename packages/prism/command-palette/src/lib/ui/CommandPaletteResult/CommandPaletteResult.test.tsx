@@ -1,10 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { type Homes, HomesProvider } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -80,10 +77,7 @@ const renderResult = (
       router,
       children: (
         <HomesProvider homes={homes}>
-          <ProjectionsProvider
-            LinkComponent={CommandPaletteTitle}
-            maps={defaultProjectionMaps}
-          >
+          <ProjectionLinkProvider LinkComponent={CommandPaletteTitle}>
             <div aria-label="Results" role="listbox">
               <ResultOverNode
                 aria-selected={false}
@@ -93,7 +87,7 @@ const renderResult = (
                 {...props}
               />
             </div>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       ),
     }),

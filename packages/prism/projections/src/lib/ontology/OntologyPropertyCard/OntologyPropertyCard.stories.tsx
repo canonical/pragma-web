@@ -75,8 +75,8 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * The object property `modifier`: "kind in location", its definition, its
- * range and its inverse.
+ * The object property `modifier`: its definition and its domain, range and
+ * inverse as facts.
  */
 export const Default: Story = {};
 
@@ -86,7 +86,7 @@ export const Unlabelled: Story = {
 };
 
 /**
- * A functional datatype property with no inverse: "functional" in its footer.
+ * A functional datatype property with no inverse: "functional" as its status.
  */
 export const Functional: Story = {
   parameters: {

@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -13,13 +14,14 @@ import {
   MOCK_FORMATION,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import Component from "./FormationRow.js";
+import FormationRow from "./FormationRow.js";
 import type { FormationRowProps } from "./types.js";
 
 /**
- * The operation the tests render FormationRow under: one Formation, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render FormationRow under: one Formation, read through
+ * the `node` field. The spread is aliased because that field is typed by an
+ * interface, so a node of another type reads as null instead of as a key that
+ * does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query FormationRowTestQuery @relay_test_operation {
@@ -30,7 +32,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const FormationRowTestNode = ({
   children,
 }: {
@@ -46,8 +51,8 @@ const FormationRowTestNode = ({
 
 /**
  * Render `children` with the key of the Formation a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 six-car, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 six-car, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: FormationRowProps["node"]) => ReactElement,
@@ -74,7 +79,7 @@ describe("FormationRow", () => {
   it("reads the Formation through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <FormationRow node={node} />
       </ul>
     ));
     expect(container.querySelector(".ds.formation-row")).toHaveAttribute(
@@ -83,34 +88,73 @@ describe("FormationRow", () => {
     );
   });
 
-  it("fills its slots from the formation", () => {
+  it("fills the row's slots from the formation, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <FormationRow node={node} />
       </ul>
     ));
-    for (const text of ["Series 90 six-car", "120 m"]) {
-      expect(container.textContent).toContain(text);
+    const root = container.querySelector(".ds.formation-row");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/connected.svg#connected",
+    );
+    expect(
+      [...(root?.querySelectorAll(".prefix, .title") ?? [])].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual(["metro:", "Series 90 six-car"]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["length", "120 m"]]);
+    for (const slot of [".kind", ".summary", ".status"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
     }
+    if (root) expectSlotOrder(root);
+    expect(
+      screen.getByRole("link", { name: "Series 90 six-car" }),
+    ).toHaveAttribute("href", "/fleet/formations/metro%3Aseries-90-six-car");
   });
 
-  it("links its title to the formation's page", () => {
-    renderWithNode((node) => (
+  it("puts its definition under its name in a two-line row", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <FormationRow lines="two" node={node} />
+        </ul>
+      ),
+      {
+        _meta: {
+          ...MOCK_FORMATION._meta,
+          definition: "The long set of the Series 90.",
+        },
+      },
+    );
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "The long set of the Series 90.",
+    );
+  });
+
+  it("has no summary where the graph asserts no definition", () => {
+    const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <FormationRow lines="two" node={node} />
       </ul>
     ));
-    expect(
-      screen
-        .getByRole("link", { name: "Series 90 six-car" })
-        .getAttribute("href"),
-    ).toBe("/fleet/formations/metro%3Aseries-90-six-car");
+    // The second line stays, empty, so the row keeps its height.
+    expect(container.querySelector(".summary")?.textContent).toBe("");
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "Series 90 six-car",
+    );
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component className="custom-class" node={node} />
+        <FormationRow className="custom-class" node={node} />
       </ul>
     ));
     expect(
@@ -121,7 +165,7 @@ describe("FormationRow", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <ul>
-        <Component data-testid="test-component" node={node} />
+        <FormationRow data-testid="test-component" node={node} />
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");

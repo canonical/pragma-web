@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { EntityFact } from "../src/lib/ui/EntityCard/types.js";
 
 /**
  * A node payload as a provider answers it: what every dispatcher reads,
@@ -42,32 +42,20 @@ export interface ClassPayload extends NodePayload {
 export interface StoryEntity {
   /** The entity's name. */
   readonly title: string;
-  /** The entity the title belongs to, for a card's `∈` line. */
-  readonly parent?: string;
-  /** Where the entity is defined, as the card and the command name it. */
-  readonly location: string;
-  /** The compact address's prefix with its colon, leading a row's title. */
+  /** The foreign prefix with its colon, leading the title. */
   readonly prefix: string;
-  /** The entity's type, as the card, the command and the graph node name it. */
+  /** The compact address, as a command and a card shown alone cite it. */
+  readonly address: string;
+  /** The entity's type, as the command and the graph node name it. */
   readonly kind: string;
-  /** The card's summary. */
+  /** The two-line row's and the card's summary. */
   readonly summary: string;
-  /** The card's key values. */
-  readonly keyValues: readonly {
-    readonly key: string;
-    readonly value: ReactNode;
-  }[];
-  /** The card's footer vitals; the first is the command's vital. */
-  readonly vitals: readonly string[];
-  /** The one word at the end of a row. */
-  readonly meta: string;
-  /** The chip's own slots. */
-  readonly chip: {
-    readonly lead?: string;
-    readonly value: string;
-    readonly badge?: ReactNode;
-    readonly icon?: ReactNode;
-  };
+  /** What the row and the card state about the entity. */
+  readonly facts: readonly EntityFact[];
+  /** The entity's state, such as its stage, ending a row, a card or a command. */
+  readonly status: string;
+  /** The one figure a chip shows in its status, such as a member count. */
+  readonly count?: number;
   /** The entity's home. */
   readonly href: string;
 }

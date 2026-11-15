@@ -2,31 +2,34 @@
 
 import { useHome } from "@canonical/prism-core";
 import {
+  acceptColour,
   EntityGraphNode,
+  useForeignPrefix,
   useProjectionLink,
 } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "#relay/__generated__/LineGraphNode_node.graphql.js";
+import {
+  LINE_MARK_CENTRE,
+  LINE_MARK_RADIUS,
+  LINE_MARK_RING,
+} from "./constants.js";
 import type { LineGraphNodeProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The fields LineGraphNode reads from the Line it renders: its name, its
- * compact address and its class's title.
+ * The fields LineGraphNode reads from the Line it renders: what its slots
+ * show, and its compact address, which its home is resolved from.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment LineGraphNode_node on Line {
     __typename
+    colour
     _meta {
       title
       curie
-      type {
-        _meta {
-          title
-        }
-      }
     }
   }
 `;
@@ -36,19 +39,23 @@ void declareNodeFragment;
 const componentCssClassName = "ds line-graph-node";
 
 /**
- * A line as a node of a graph, native SVG: its name on the first line,
- * linked to the line's page, then its class alone muted, since a line has
- * no place of its own.
+ * A line as a node of a graph: its mark, its prefix off the page's
+ * namespace and its name, linked to its home. Its mark says its type, so
+ * it names no kind.
+ * Its mark is an SVG disc ringed in the muted text colour and filled
+ * with the line's colour only when the package's colour gate accepts it;
+ * a colour it refuses leaves the disc unfilled.
  *
- * Native props reach the node's SVG `<g>` root, where a graph sets its
- * transform; a consumer `className` merges after the projection's own, and
- * the root carries the typename as `data-type`.
+ * Native props reach the node's `<g>` root; a consumer `className`
+ * merges after the projection's own, and the root carries the typename
+ * as `data-type`.
  *
- * `import { LineGraphNode } from "./lib/index.js";`
+ * `import { LineGraphNode } from "#domains/metro";`
  *
  * @implements metro.component.line_graph_node
  * @note Impure: reads its line from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes, and its link and the page's namespace from the
+ *   projection providers.
  */
 export default function LineGraphNode({
   node,
@@ -56,17 +63,29 @@ export default function LineGraphNode({
   ...props
 }: LineGraphNodeProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  const { curie, title, type } = data._meta;
+  const { curie, title } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   return (
     <EntityGraphNode
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
-      kind={type._meta.title}
       LinkComponent={LinkComponent}
+      mark={
+        <circle
+          className="swatch"
+          cx={LINE_MARK_CENTRE}
+          cy={LINE_MARK_CENTRE}
+          fill={acceptColour(data.colour) ?? "none"}
+          r={LINE_MARK_RADIUS}
+          stroke="currentColor"
+          strokeWidth={LINE_MARK_RING}
+        />
+      }
+      prefix={prefix}
       title={title}
     />
   );

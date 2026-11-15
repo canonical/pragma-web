@@ -68,7 +68,9 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The Series 90 six-car, as a 32px list entry. */
+/**
+ * The Series 90 six-car: its mark, its name, linked to its page, and its length as a fact.
+ */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

@@ -9,6 +9,11 @@ type OwnProps = {
    * that spreads `...ModifierRow_node`.
    */
   readonly node: ModifierRow_node$key;
+  /**
+   * How many lines the row takes: one (32px) by default, or two (56px),
+   * the modifier's summary under its title, where an index opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

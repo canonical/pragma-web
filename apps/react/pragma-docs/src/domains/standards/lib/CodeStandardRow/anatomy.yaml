@@ -1,12 +1,12 @@
 ---
-# CodeStandardRow: a code standard as a 32px list entry.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 547:2227 and 547:2201 (the
-# namespace prefix muted before the title, one muted word at the end:
-# "react"). The prefix is the compact address's, with its colon; the word
-# is the standard's first category.
-# Projected onto EntityRow, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address; a standard without one reads as inert text.
+# CodeStandardRow: a code standard as a 32px list entry, or a 56px two-line
+# one where an index opts in: the slot order mark, prefix, title, summary,
+# facts. The summary is the first paragraph of the standard's description,
+# the second line of a two-line row; the one fact is its first category.
+# Its mark is the code standard's glyph, so it names no kind; the prefix
+# shows only off the page's ambient namespace (the standards lens declares
+# cs). The title links to the standard's reading page. Projected onto the
+# base form, which carries every style.
 node:
   uri: docs.component.code_standard_row
   projection:
@@ -16,19 +16,23 @@ node:
         uri: prism.component.entity_row
         edges:
           - node:
-              role: location
-              projection:
-                field: _meta.curie
-              # The prefix is set in the identifier face.
+              role: mark
+              # The code standard's glyph, a published Icon (CODE_STANDARD_MARK_ICON).
               edges:
                 - node:
-                    role: identifier
+                    uri: global.component.icon
                   relation:
                     cardinality: "1"
-                    slotName: identifier
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
+              projection:
+                field: _meta.curie
             relation:
               cardinality: "0..1"
-              slotName: location
+              slotName: prefix
           - node:
               role: title
               projection:
@@ -44,14 +48,26 @@ node:
               cardinality: "1"
               slotName: title
           - node:
-              role: meta
+              role: summary
               projection:
-                field: _meta.title
+                field: description
             relation:
-              # The first category only: the row ends in one word.
               cardinality: "0..1"
-              slotName: meta
-              projection:
-                field: categories
+              slotName: summary
+          - node:
+              role: facts
+              edges:
+                - node:
+                    role: category
+                    projection:
+                      field: _meta.title
+                  relation:
+                    # The standard's first category.
+                    cardinality: "0..1"
+                    projection:
+                      field: categories
+            relation:
+              cardinality: "0..1"
+              slotName: facts
       relation:
         cardinality: "1"

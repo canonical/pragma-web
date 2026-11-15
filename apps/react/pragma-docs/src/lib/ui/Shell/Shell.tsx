@@ -7,8 +7,8 @@ import {
   StoredThemeProvider,
 } from "@canonical/prism-core";
 import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
+  AmbientNamespaceProvider,
+  ProjectionLinkProvider,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
@@ -18,12 +18,20 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
+import { DocsPeek } from "../DocsPeek/index.js";
 import { SiteRenderers } from "../SiteRenderers/index.js";
-import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
+import { AMBIENT_NAMESPACE, GRID_PRESET_CLASS_NAMES } from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds shell";
+
+/**
+ * Render the site's peek at the IRI `uri`: the card the site's card
+ * switch gives the node, which every chip arm reaches through the
+ * provider (`useProjectionPeek`).
+ */
+const renderPeek = (uri: string): ReactElement => <DocsPeek uri={uri} />;
 
 /**
  * The application's provider nest and the one element it renders: the
@@ -31,9 +39,11 @@ const componentCssClassName = "ds shell";
  * the router's `Outlet`, with the document-title template and the theme
  * the reader's cookie stores, which the theme control shows on the server
  * as on the client. Inside the
- * router sit the site's homes and the projection maps, so every mention of
+ * router sit the site's homes and the projection link provider, so every mention of
  * a graph node renders through its type's arm and links to the page that
- * owns it, through the router so the link navigates on the client.
+ * owns it, through the router so the link navigates on the client, and
+ * the site's home namespace, `ds`, declared once: a design-system identity
+ * shows no prefix on any page whose lens declares no other.
  *
  * The root carries the `grid intrinsic` presets of `@canonical/styles` and
  * is the one query container, named `shell`: one viewport-high row that
@@ -68,30 +78,32 @@ export default function Shell<
         <RelayEnvironmentProvider environment={environment}>
           <RouterProvider router={router}>
             <HomesProvider homes={homes}>
-              <ProjectionsProvider
+              <ProjectionLinkProvider
                 LinkComponent={RouterLink}
-                maps={defaultProjectionMaps}
+                peek={renderPeek}
               >
-                <SiteRenderers>
-                  <div
-                    {...props}
-                    className={[
-                      componentCssClassName,
-                      ...GRID_PRESET_CLASS_NAMES,
-                      className,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <Outlet
-                      fallback={
-                        <p className="loading">{MESSAGES["shell.loading"]}</p>
-                      }
-                    />
-                    <CommandPalette />
-                  </div>
-                </SiteRenderers>
-              </ProjectionsProvider>
+                <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
+                  <SiteRenderers>
+                    <div
+                      {...props}
+                      className={[
+                        componentCssClassName,
+                        ...GRID_PRESET_CLASS_NAMES,
+                        className,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <Outlet
+                        fallback={
+                          <p className="loading">{MESSAGES["shell.loading"]}</p>
+                        }
+                      />
+                      <CommandPalette />
+                    </div>
+                  </SiteRenderers>
+                </AmbientNamespaceProvider>
+              </ProjectionLinkProvider>
             </HomesProvider>
           </RouterProvider>
         </RelayEnvironmentProvider>

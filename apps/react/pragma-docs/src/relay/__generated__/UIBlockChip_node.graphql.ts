@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<70a402a5ac9ac3e73970ab5d4869e304>>
+ * @generated SignedSource<<e056c62c26dc6c29011fc9f84c615fe9>>
  * @lightSyntaxTransform
  */
 
@@ -15,6 +15,7 @@ export type UIBlockChip_node$data = {
     readonly curie: string;
     readonly title: string;
   };
+  readonly uri: string;
   readonly " $fragmentType": "UIBlockChip_node";
 };
 export type UIBlockChip_node$key = {
@@ -33,6 +34,13 @@ const node: ReaderFragment = {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "uri",
       "storageKey": null
     },
     {
@@ -65,6 +73,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isUIBlock"
 };
 
-(node as any).hash = "fc4f4153f87af95e176cf9cd43706cb9";
+(node as any).hash = "39e790742835990e4cb34053d52a4954";
 
 export default node;

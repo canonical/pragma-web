@@ -6,8 +6,7 @@ import {
   usePageRenderers,
 } from "@canonical/prism-core";
 import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
+  ProjectionLinkProvider,
   useListRenderers,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
@@ -44,7 +43,7 @@ interface WithSiteOptions {
 /**
  * Storybook decorator that gives a story the nest a site mounts the lens
  * in: the site's document-title template, a static router over the lens's two routes
- * at `url`, the site's homes, and the default projection maps with the
+ * at `url`, the site's homes, and the projection link provider with the
  * router link adapter, so the index's entries, the back link, the trail and
  * every mention in a standard's prose build their hrefs. The Relay addon's
  * mock environment, which a story asks for through `parameters.relay`,
@@ -64,14 +63,11 @@ const withSite =
     <HeadProvider titleTemplate={formatDocumentTitle}>
       <RouterProvider router={createStaticRouter(routes, url)}>
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider
-            LinkComponent={RouterLink}
-            maps={defaultProjectionMaps}
-          >
+          <ProjectionLinkProvider LinkComponent={RouterLink}>
             <SiteRenderers>
               <Story />
             </SiteRenderers>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </HeadProvider>

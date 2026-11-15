@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -84,27 +85,43 @@ describe("LineGraphNode", () => {
     );
   });
 
-  it("fills the node's lines from the line", () => {
+  it("fills the node's lines from the line, and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
         <LineGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("North Line");
-    expect(container.querySelector(".context")?.textContent).toBe("Line");
-    expect(container.querySelector(".location")).toBeNull();
-  });
-
-  it("links its title to the line's page", () => {
-    const { container } = renderWithNode((node) => (
-      <svg aria-label="Graph" role="img">
-        <LineGraphNode node={node} />
-      </svg>
-    ));
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "metro: North Line",
+    );
+    expect(container.querySelector(".title .prefix")?.textContent).toBe(
+      "metro: ",
+    );
+    expect(
+      container.querySelector("svg.mark > circle.swatch")?.getAttribute("fill"),
+    ).toBe("#c8102e");
+    expect(container.querySelector("foreignObject")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/network/lines/metro%3Anorth-line",
     );
   });
+
+  it("leaves its disc unfilled when the gate refuses the line's colour", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <svg aria-label="Graph" role="img">
+          <LineGraphNode node={node} />
+        </svg>
+      ),
+      { colour: "url(https://example.org/paint.svg#a)" },
+    );
+    const disc = container.querySelector("svg.mark > circle.swatch");
+    expect(disc?.getAttribute("fill")).toBe("none");
+    expect(container.innerHTML).not.toContain("example.org");
+  });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<acbab30fd43c42a558bc71f214a0f15a>>
+ * @generated SignedSource<<d08cb95d7bc405b65e017c65d808ab49>>
  * @lightSyntaxTransform
  */
 
@@ -38,25 +38,12 @@ v1 = {
   "storageKey": null
 },
 v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-},
-v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v4 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "EntityMeta"
-},
-v5 = {
+v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -140,36 +127,18 @@ return {
                 "name": "_meta",
                 "plural": false,
                 "selections": [
-                  (v2/*:: as any*/),
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "curie",
+                    "name": "title",
                     "storageKey": null
                   },
                   {
                     "alias": null,
                     "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": [
-                      {
-                        "alias": null,
-                        "args": null,
-                        "concreteType": "EntityMeta",
-                        "kind": "LinkedField",
-                        "name": "_meta",
-                        "plural": false,
-                        "selections": [
-                          (v2/*:: as any*/)
-                        ],
-                        "storageKey": null
-                      },
-                      (v1/*:: as any*/)
-                    ],
+                    "kind": "ScalarField",
+                    "name": "curie",
                     "storageKey": null
                   }
                 ],
@@ -225,7 +194,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4ee6d99248e7fe0991eed1d611f99bf3",
+    "cacheID": "d43e5c3a597ac6fbe37bbbb671ae7e3a",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -235,19 +204,15 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__typename": (v3/*:: as any*/),
-        "node._meta": (v4/*:: as any*/),
-        "node._meta.curie": (v3/*:: as any*/),
-        "node._meta.title": (v3/*:: as any*/),
-        "node._meta.type": {
+        "node.__typename": (v2/*:: as any*/),
+        "node._meta": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
-          "type": "OntologyClass"
+          "type": "EntityMeta"
         },
-        "node._meta.type._meta": (v4/*:: as any*/),
-        "node._meta.type._meta.title": (v3/*:: as any*/),
-        "node._meta.type.uri": (v5/*:: as any*/),
+        "node._meta.curie": (v2/*:: as any*/),
+        "node._meta.title": (v2/*:: as any*/),
         "node.modifiers": {
           "enumValues": null,
           "nullable": false,
@@ -266,19 +231,19 @@ return {
           "plural": false,
           "type": "Modifier"
         },
-        "node.modifiers.edges.node.uri": (v5/*:: as any*/),
+        "node.modifiers.edges.node.uri": (v3/*:: as any*/),
         "node.summary": {
           "enumValues": null,
           "nullable": true,
           "plural": false,
           "type": "String"
         },
-        "node.uri": (v5/*:: as any*/)
+        "node.uri": (v3/*:: as any*/)
       }
     },
     "name": "ModifierFamilyCardStoryQuery",
     "operationKind": "query",
-    "text": "query ModifierFamilyCardStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...ModifierFamilyCard_node\n    uri\n  }\n}\n\nfragment ModifierFamilyCard_node on ModifierFamily {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ModifierFamilyCardStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...ModifierFamilyCard_node\n    uri\n  }\n}\n\nfragment ModifierFamilyCard_node on ModifierFamily {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

@@ -74,7 +74,7 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The object property `modifier`: its label, then its kind's word. */
+/** The object property `modifier`: its label, no kind. */
 export const Default: Story = {};
 
 /** A property without a label: it is named by its IRI's local name. */

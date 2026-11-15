@@ -25,28 +25,46 @@
  * to its last;
  * every gap, padding and margin of the chrome a multiple of 4px; and the
  * workspace drawn in the face it ships, the dev cell delivering its font.
- * The standards index's entries keep every title whole, at 390px too, an
- * entry whose title and address do not share a line moving its address
- * to a line of its own.
+ * The standards index's entries keep their address, the row's first
+ * fact, on the title's one line, and a title is cut, at 390px too, only
+ * once the address has given up all of its width. At 390, 820, 912 and
+ * 1440px no fact of a row shows in part: each lies wholly inside the
+ * facts' box and the row, or on the box's hidden line; below two groups
+ * (912px) no row shows its address, so the list keeps one form, and on
+ * the desktop every row does; facts show where the row has room for them,
+ * and a title that fits its row is never cut. A row given
+ * more facts in the page and narrowed step by step loses them whole, the
+ * last first, before its title is cut. Every row of the catalog, which
+ * opts into two lines, is 56px, and every row of the standards index 32px,
+ * at 1440 and 390px. The home page's chips of the site's own namespace
+ * write no `ds:`.
  */
 import {
   launchBrowser,
   measurePage,
+  measureRowHeights,
+  ROW_PX,
   type ThemedMeasure,
+  TWO_LINE_ROW_PX,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
-import type { Browser } from "playwright";
+import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  ADDED_FACTS,
   CATALOG_CARD_SELECTOR,
   CATALOG_CARD_WIDTHS,
   CATALOG_PATH,
+  CATALOG_ROW_SELECTOR,
+  CATALOG_ROWS_PATH,
   CATALOG_WHOLE_ROW_WIDTHS,
   DEV_READY_MS,
   DOCUMENT_PATHS,
   JOURNEYS_PATHS,
   MIN_CATALOG_CARD_WIDTH_PX,
+  NARROWING_STEP_PX,
   PAGE_SETTLE_MS,
+  STANDARDS_FACT_WIDTHS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
   WIDTH_TOLERANCE_PX,
@@ -58,47 +76,291 @@ import { type RunningServer, startServer } from "./serverHarness.js";
 const CWD = process.cwd();
 
 /**
- * Count the standards index's entries, those whose title is cut, and those
- * whose address is cut on the title's line. It runs in the page.
+ * Count the standards index's entries, those whose title is cut while some
+ * of its address still shows, and those whose address, the row's first
+ * fact, has left the title's line. A title is cut when its own text is
+ * wider than its box: the identity that holds it never overflows, since
+ * the title shrinks inside it. It runs in the page.
  *
  * @returns The counts.
  * @throws When an entry has no title or no address.
  */
 function countCutEntries(): {
   readonly entries: number;
-  readonly cutTitles: number;
-  readonly cutBesideTitle: number;
+  readonly titlesCutFirst: number;
+  readonly addressesApart: number;
 } {
   const rows = [
     ...document.querySelectorAll(".ds.standards-index .ds.entity-row"),
   ];
   const measured = rows.map((row) => {
     const identity = row.querySelector(".identity");
-    const meta = row.querySelector(".meta");
-    if (!identity || !meta) {
+    const title = identity?.querySelector(".title");
+    const facts = row.querySelector(".facts");
+    if (
+      !identity ||
+      !title ||
+      !facts?.querySelector('.fact[data-property="curie"]')
+    ) {
       throw new Error("an entry has no title or no address");
     }
     return {
-      titleCut: identity.scrollWidth > identity.clientWidth,
-      addressCut: meta.scrollWidth > meta.clientWidth,
-      addressBeside:
-        meta.getBoundingClientRect().top ===
-        identity.getBoundingClientRect().top,
+      // The title yields last: it may be cut only once the address has
+      // given up all of its width.
+      titleCutFirst:
+        title.scrollWidth > title.clientWidth && facts.clientWidth > 0,
+      // On a line of its own, the address would start below the title's.
+      addressApart:
+        facts.getBoundingClientRect().top >=
+        identity.getBoundingClientRect().bottom,
     };
   });
   return {
     entries: measured.length,
-    cutTitles: measured.filter(({ titleCut }) => titleCut).length,
-    cutBesideTitle: measured.filter(
-      ({ addressCut, addressBeside }) => addressCut && addressBeside,
-    ).length,
+    titlesCutFirst: measured.filter(({ titleCutFirst }) => titleCutFirst)
+      .length,
+    addressesApart: measured.filter(({ addressApart }) => addressApart).length,
   };
 }
 
 /**
+ * Count the standards index's rows, their facts that show, and those that
+ * show in part, and list the titles cut though they fit. A fact is shown
+ * when some of it lies inside both its facts' box and its row, and in part
+ * when some of it lies outside either, so a fact that has left for the
+ * box's hidden line, or that is not displayed, is neither. A title fits
+ * when its identity, were the title whole, is no wider than the row less
+ * its status: such a title must not be cut, whether or not the row's facts
+ * have left. A row's first fact fits when its identity, with the title
+ * whole, and the fact, with its margin, are no wider than the row less
+ * its status: such a fact must show. It runs in the page.
+ *
+ * @returns The counts, the text of each fact shown in part, each title
+ * cut though it fits, and each row whose first fact is hidden though it
+ * fits.
+ */
+function countPartFacts(): {
+  readonly rows: number;
+  readonly shown: number;
+  readonly partial: readonly string[];
+  readonly titlesFitting: number;
+  readonly cutThoughFitting: readonly string[];
+  readonly hiddenThoughFitting: readonly string[];
+} {
+  const rows = [
+    ...document.querySelectorAll(".ds.standards-index .ds.entity-row"),
+  ];
+  const facts = rows.flatMap((row) => {
+    const own = row.querySelector(".facts")?.getBoundingClientRect();
+    if (!own) return [];
+    const edge = row.getBoundingClientRect();
+    const box = {
+      left: Math.max(own.left, edge.left),
+      right: Math.min(own.right, edge.right),
+      top: Math.max(own.top, edge.top),
+      bottom: Math.min(own.bottom, edge.bottom),
+    };
+    return [...row.querySelectorAll(".facts > .fact")].map((fact) => {
+      const rect = fact.getBoundingClientRect();
+      const inside =
+        Math.min(rect.right, box.right) - Math.max(rect.left, box.left) > 0 &&
+        Math.min(rect.bottom, box.bottom) - Math.max(rect.top, box.top) > 0;
+      const whole =
+        rect.left >= box.left - 0.5 &&
+        rect.right <= box.right + 0.5 &&
+        rect.top >= box.top - 0.5 &&
+        rect.bottom <= box.bottom + 0.5;
+      return { text: fact.textContent ?? "", inside, whole };
+    });
+  });
+  const titles = rows.flatMap((row) => {
+    const identity = row.querySelector(".identity");
+    const title = identity?.querySelector(".title");
+    if (!identity || !title) return [];
+    const status = row.querySelector(".status");
+    const end =
+      status?.getBoundingClientRect().left ??
+      row.getBoundingClientRect().right -
+        Number.parseFloat(getComputedStyle(row).paddingInlineEnd);
+    const whole =
+      identity.getBoundingClientRect().width -
+      title.clientWidth +
+      title.scrollWidth;
+    const statusMargin =
+      status === null
+        ? 0
+        : Number.parseFloat(getComputedStyle(status).marginInlineStart);
+    const fact = row.querySelector(".facts > .fact");
+    const factBox = fact?.getBoundingClientRect();
+    const factFits =
+      fact !== null &&
+      factBox !== undefined &&
+      factBox.width > 0 &&
+      identity.getBoundingClientRect().left +
+        whole +
+        Number.parseFloat(getComputedStyle(fact).marginInlineStart) +
+        factBox.width <=
+        end - statusMargin + 0.5;
+    const edge = row.getBoundingClientRect();
+    const factShown =
+      factBox !== undefined &&
+      factBox.bottom > edge.top &&
+      factBox.top < edge.bottom &&
+      factBox.right > edge.left &&
+      factBox.left < edge.right;
+    return [
+      {
+        text: title.textContent ?? "",
+        fits: identity.getBoundingClientRect().left + whole <= end + 0.5,
+        cut: title.scrollWidth > title.clientWidth,
+        factHidden: factFits && !factShown,
+      },
+    ];
+  });
+  return {
+    rows: rows.length,
+    shown: facts.filter(({ inside }) => inside).length,
+    partial: facts
+      .filter(({ inside, whole }) => inside && !whole)
+      .map(({ text }) => text),
+    titlesFitting: titles.filter(({ fits }) => fits).length,
+    cutThoughFitting: titles
+      .filter(({ fits, cut }) => fits && cut)
+      .map(({ text }) => text),
+    hiddenThoughFitting: titles
+      .filter(({ factHidden }) => factHidden)
+      .map(({ text }) => text),
+  };
+}
+
+/**
+ * Give the standards index's first row more facts after its address, then
+ * narrow it step by step and read, at each width, which of its facts show
+ * whole (1), in part (P) or not at all (0), measured against both the
+ * facts' box and the row's own edge, and whether its title is cut, and
+ * would fit. Each added fact is a clone of the address, marked as a later
+ * fact by the class the row's stylesheet keys on. It runs in the page.
+ *
+ * @param input - The facts to add and the step to narrow by.
+ * @returns One reading per width, the widest first.
+ * @throws When the index has no row with an address.
+ * @note Impure: adds facts to the page's first row and narrows it.
+ */
+function narrowRowWithFacts(input: {
+  readonly added: readonly {
+    readonly property: string;
+    readonly label: string;
+    readonly value: string;
+  }[];
+  readonly step: number;
+}): readonly {
+  readonly width: number;
+  readonly facts: string;
+  readonly titleCut: boolean;
+  readonly titleFits: boolean;
+}[] {
+  const row = document.querySelector<HTMLElement>(
+    ".ds.standards-index .ds.entity-row",
+  );
+  const address = row?.querySelector(".facts > .fact");
+  const identity = row?.querySelector(".identity");
+  const title = identity?.querySelector(".title");
+  if (!row || !address || !identity || !title) {
+    throw new Error("the index has no row with an address");
+  }
+  // The class a later fact carries is read from the row's own stylesheet,
+  // from the rule that keys on it, so a rename there renames it here.
+  const findLaterClass = (rules: CSSRuleList): string | undefined => {
+    for (const rule of rules) {
+      const found =
+        rule instanceof CSSStyleRule
+          ? /\.entity-row \.fact\.([\w-]+)/.exec(rule.selectorText)?.[1]
+          : rule instanceof CSSGroupingRule
+            ? findLaterClass(rule.cssRules)
+            : undefined;
+      if (found !== undefined) return found;
+    }
+    return undefined;
+  };
+  const later = [...document.styleSheets]
+    .map((sheet) => findLaterClass(sheet.cssRules))
+    .find((found) => found !== undefined);
+  if (later === undefined) {
+    throw new Error("no rule of the row's stylesheet keys on a later fact");
+  }
+  for (const { property, label, value } of input.added) {
+    const fact = address.cloneNode(true) as HTMLElement;
+    fact.classList.add(later);
+    fact.dataset.property = property;
+    const term = fact.querySelector(".term");
+    const detail = fact.querySelector(".detail");
+    if (!term || !detail) throw new Error("the address has no term or detail");
+    term.textContent = label;
+    detail.textContent = value;
+    address.parentElement?.append(fact);
+  }
+  const readings = [];
+  for (
+    let width = Math.ceil(row.getBoundingClientRect().width);
+    width > 0;
+    width -= input.step
+  ) {
+    row.style.width = `${width}px`;
+    const edge = row.getBoundingClientRect();
+    const facts = row.querySelector(".facts")?.getBoundingClientRect();
+    if (!facts) throw new Error("the row has no facts");
+    const box = {
+      left: Math.max(facts.left, edge.left),
+      right: Math.min(facts.right, edge.right),
+      top: Math.max(facts.top, edge.top),
+      bottom: Math.min(facts.bottom, edge.bottom),
+    };
+    const shown = [...row.querySelectorAll(".facts > .fact")].map((fact) => {
+      const rect = fact.getBoundingClientRect();
+      const inside =
+        Math.min(rect.right, box.right) - Math.max(rect.left, box.left) > 0 &&
+        Math.min(rect.bottom, box.bottom) - Math.max(rect.top, box.top) > 0;
+      const whole =
+        rect.left >= box.left - 0.5 &&
+        rect.right <= box.right + 0.5 &&
+        rect.top >= box.top - 0.5 &&
+        rect.bottom <= box.bottom + 0.5;
+      return !inside ? "0" : whole ? "1" : "P";
+    });
+    const whole =
+      identity.getBoundingClientRect().width -
+      title.clientWidth +
+      title.scrollWidth;
+    readings.push({
+      width,
+      facts: shown.join(""),
+      titleCut: title.scrollWidth > title.clientWidth,
+      titleFits:
+        identity.getBoundingClientRect().left + whole <= edge.right + 0.5,
+    });
+  }
+  return readings;
+}
+
+/**
+ * Read the home page's chips that mention a design-system node, those that
+ * link into the components lens, each by its whole text. It runs in the
+ * page.
+ *
+ * @returns Each such chip's text.
+ */
+function readComponentChips(): readonly string[] {
+  return [...document.querySelectorAll("main.ds.canvas .ds.entity-chip")]
+    .filter(
+      (chip) => chip.querySelector('a[href^="/components/ds%3A"]') !== null,
+    )
+    .map((chip) => chip.textContent ?? "");
+}
+
+/**
  * Measure the catalog's cards against the canvas: each card's left and
- * right edges, its width, and, for a card with a sidecar, the body's and
- * the sidecar's widths. It runs in the page.
+ * right edges, its width, and, for a card with a specimen, the specimen's
+ * and the body's widths. It runs in the page.
  *
  * @param selector - The catalog's cards.
  * @returns The canvas's edges and each card's measures.
@@ -121,9 +383,9 @@ function measureCatalogCards(selector: string): {
     cards: [...document.querySelectorAll(selector)].map((card) => {
       const box = card.getBoundingClientRect();
       const sections =
-        card.querySelector(":scope > .sidecar") === null
+        card.querySelector(":scope > .specimen") === null
           ? []
-          : [...card.querySelectorAll(":scope > .body, :scope > .sidecar")];
+          : [...card.querySelectorAll(":scope > .specimen, :scope > .body")];
       return {
         left: box.left,
         right: box.right,
@@ -167,6 +429,38 @@ function readJourneysCanvas(): {
 
 let server: RunningServer;
 let browser: Browser;
+
+/**
+ * Open `path` at a viewport, every request off the dev cell's own origins
+ * answered empty, once its network is idle.
+ *
+ * @param path - The page's path.
+ * @param viewport - The viewport's width and height, in pixels.
+ * @returns The open page.
+ * @note Impure: opens a browser tab, which the caller closes.
+ */
+async function openPage(
+  path: string,
+  viewport: { readonly width: number; readonly height: number },
+): Promise<Page> {
+  const page = await browser.newPage({
+    viewport: { width: viewport.width, height: viewport.height },
+  });
+  const origins = [
+    new URL(server.base).origin,
+    new URL(server.graphBase).origin,
+  ];
+  await page.route("**/*", (route) =>
+    origins.includes(new URL(route.request().url()).origin)
+      ? route.continue()
+      : route.fulfill({ status: 204, body: "" }),
+  );
+  await page.goto(new URL(path, server.base).href, {
+    waitUntil: "networkidle",
+    timeout: PAGE_SETTLE_MS,
+  });
+  return page;
+}
 
 beforeAll(async () => {
   server = await startServer("dev:bun", CWD, { timeoutMs: DEV_READY_MS });
@@ -431,7 +725,7 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
-  it("keeps every standards index title whole, its address on its own line where they do not fit", async () => {
+  it("cuts no standards index title before its address, on the row's one line", async () => {
     const page = await browser.newPage({
       viewport: { width: viewport.width, height: viewport.height },
     });
@@ -451,9 +745,134 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       });
       const counts = await page.evaluate(countCutEntries);
       expect(counts.entries).toBeGreaterThan(0);
-      expect(counts.cutTitles).toBe(0);
-      // An address is cut only on a line of its own, longer than the row.
-      expect(counts.cutBesideTitle).toBe(0);
+      // The title yields last: the address gives way first, on the row's
+      // one line.
+      expect(counts.titlesCutFirst).toBe(0);
+      expect(counts.addressesApart).toBe(0);
+    } finally {
+      await page.close();
+    }
+  });
+
+  // A row's height comes from `lines` alone: the catalog opts its rows
+  // into two lines, the standards index keeps one.
+  it("draws every row of the catalog two lines high", async () => {
+    const page = await openPage(CATALOG_ROWS_PATH, viewport);
+    try {
+      const rows = await page.evaluate(measureRowHeights, CATALOG_ROW_SELECTOR);
+      expect(rows.length).toBeGreaterThan(0);
+      expect(rows.filter(({ height }) => height !== TWO_LINE_ROW_PX)).toEqual(
+        [],
+      );
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("draws every row of the standards index one line high", async () => {
+    const page = await openPage(STANDARDS_INDEX_PATH, viewport);
+    try {
+      const rows = await page.evaluate(
+        measureRowHeights,
+        ".ds.standards-index .ds.entity-row",
+      );
+      expect(rows.length).toBeGreaterThan(0);
+      expect(rows.filter(({ height }) => height !== ROW_PX)).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
+});
+
+// A fact is shown whole or not at all: where a row has no room for its
+// facts they leave whole, the last first, so none is ever cut to a stub,
+// and only then: in each row with room for its first fact, it shows. Once none is left
+// the title has the row's whole width. Below two groups the index shows
+// no row's facts, so the list keeps one form.
+describe.each(STANDARDS_FACT_WIDTHS)(
+  "the standards index at $width px",
+  ({ width, shown }) => {
+    it("shows each fact of a row whole or not at all", async () => {
+      const page = await openPage(STANDARDS_INDEX_PATH, { width, height: 844 });
+      try {
+        const counts = await page.evaluate(countPartFacts);
+        expect(counts.rows).toBeGreaterThan(0);
+        // Below two groups no row shows its address; on the desktop every
+        // row does; at the threshold each row that has room for it.
+        const message = `${counts.shown} facts shown in ${counts.rows} rows`;
+        if (shown === "fitting") {
+          expect(counts.shown, message).toBeGreaterThan(0);
+        } else {
+          expect(counts.shown, message).toBe(
+            shown === "none" ? 0 : counts.rows,
+          );
+        }
+        expect(counts.partial).toEqual([]);
+        expect(counts.titlesFitting).toBeGreaterThan(0);
+        expect(counts.cutThoughFitting).toEqual([]);
+        expect(counts.hiddenThoughFitting).toEqual([]);
+      } finally {
+        await page.close();
+      }
+    });
+  },
+);
+
+// The site's home namespace is `ds`, declared once by its Shell: the home
+// page's chips of design-system nodes write no `ds:`.
+describe("the home page", () => {
+  it("writes no ds: on a chip of the site's own namespace", async () => {
+    const page = await openPage("/", VIEWPORTS[0]);
+    try {
+      const chips = await page.evaluate(readComponentChips);
+      expect(chips.length).toBeGreaterThan(0);
+      expect(chips.filter((text) => text.includes("ds:"))).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
+});
+
+// The standards index's rows carry one fact, so one of them is given more
+// in the browser, from its own address, and narrowed: the real stylesheet
+// on the real page, at a width where the later facts are drawn.
+describe("a standards index row with several facts", () => {
+  it("lets its facts leave whole, the last first, before its title is cut", async () => {
+    const page = await openPage(STANDARDS_INDEX_PATH, VIEWPORTS[0]);
+    try {
+      const readings = await page.evaluate(narrowRowWithFacts, {
+        added: ADDED_FACTS,
+        step: NARROWING_STEP_PX,
+      });
+      const count = ADDED_FACTS.length + 1;
+      const steps = readings.map((reading) => ({
+        ...reading,
+        kept: reading.facts.includes("0")
+          ? reading.facts.indexOf("0")
+          : reading.facts.length,
+      }));
+      const kept = steps.map((step) => step.kept);
+      // At each width the facts that show are the first ones, each whole.
+      expect(
+        steps.filter(
+          (step) =>
+            step.facts !==
+            "1".repeat(step.kept) + "0".repeat(count - step.kept),
+        ),
+      ).toEqual([]);
+      // Narrowing never brings a fact back, and every count from all to
+      // none is seen: each fact leaves in turn, the last first.
+      expect(kept).toEqual(kept.toSorted((a, b) => b - a));
+      expect([...new Set(kept)]).toEqual(
+        Array.from({ length: count + 1 }, (_, index) => count - index),
+      );
+      // The title is cut only once no fact is left, and then only when
+      // it does not fit the row.
+      expect(
+        steps.filter(
+          (step) => step.titleCut && (step.kept > 0 || step.titleFits),
+        ),
+      ).toEqual([]);
     } finally {
       await page.close();
     }
@@ -491,11 +910,9 @@ async function measureCatalogAt(
   }
 }
 
-// A UI block's card carries its rendered example beside its body, four
-// columns where the canvas holds six or more; where it holds two or three
-// the card takes the whole row, its example under its body. At every width
-// each card stays inside the canvas, wide enough to read, and so do its
-// body and its example.
+// A UI block's card draws its example as its specimen, above its body. At
+// every width each card stays inside the canvas, wide enough to read, and
+// so do its specimen and its body.
 describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
   it("keeps every card, and a UI block's example, inside the canvas", async () => {
     const { canvas, cards } = await measureCatalogAt(width);

@@ -1,7 +1,12 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
-import { EntityCard, useProjectionLink } from "@canonical/prism-projections";
+import {
+  EntityCard,
+  SwatchMark,
+  useForeignPrefix,
+  useProjectionLink,
+} from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
@@ -11,22 +16,17 @@ import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The fields LineCard reads from the Line it renders: its name, its compact
- * address, its definition, its class's title, the stops it serves, and
- * each route's loop flag and the titles of the stops it calls at.
+ * The fields LineCard reads from the Line it renders: what its slots
+ * show, and its compact address, which its home is resolved from.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment LineCard_node on Line {
     __typename
+    colour
     _meta {
       title
       curie
       definition
-      type {
-        _meta {
-          title
-        }
-      }
     }
     servedBy {
       uri
@@ -49,22 +49,24 @@ void declareNodeFragment;
 const componentCssClassName = "ds line-card";
 
 /**
- * A line as a card in a grid of entities: its name, linked to the line's
- * page, its class and its definition; the count of its stops as a key
- * value and, for a line that runs end to end, its two end stations, the
- * first and the last calls of its first route; a loop has no ends and
- * carries "loop" as the footer's vital instead.
+ * A line as a card: its mark, its prefix off the page's namespace,
+ * its name linked to its home, its definition, and its stop count and,
+ * for a line run end to end, its ends as facts, with "loop" as its status
+ * for a line that runs one. It states no address and no kind: the peek's
+ * line carries the address, and its mark says the type.
+ * Its mark is a disc of the line's colour (`SwatchMark`), which the
+ * package paints only with a plain colour value.
  *
  * Native props reach the card's `<div>` root; a consumer `className`
- * merges after the projection's own, and the root carries the typename as
- * `data-type`.
+ * merges after the projection's own, and the root carries the typename
+ * as `data-type`.
  *
- * `import { LineCard } from "./lib/index.js";`
+ * `import { LineCard } from "#domains/metro";`
  *
  * @implements metro.component.line_card
  * @note Impure: reads its line from the Relay store, its home from the
- *   site's homes, its link from the projection provider and its words from
- *   the translator in scope.
+ *   site's homes, and its link and the page's namespace from the
+ *   projection providers, and its words from the translator in scope.
  */
 export default function LineCard({
   node,
@@ -72,36 +74,44 @@ export default function LineCard({
   ...props
 }: LineCardProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  const { curie, title, definition, type } = data._meta;
+  const { curie, definition, title } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   const t = useMessages();
   const loop = data.routes.some((route) => route.isLoop);
   const calls = loop ? [] : (data.routes.at(0)?.calls ?? []);
   const first = calls.at(0)?.stop._meta.title;
   const last = calls.at(-1)?.stop._meta.title;
+  const facts = [
+    {
+      property: "servedBy",
+      label: t("line.stops"),
+      value: data.servedBy.length,
+    },
+    ...(first === undefined || last === undefined
+      ? []
+      : [
+          {
+            property: "routes",
+            label: t("line.ends"),
+            value: t("line.ends.value", { first, last }),
+          },
+        ]),
+  ];
   return (
     <EntityCard
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
+      facts={facts}
       href={href}
-      keyValues={[
-        { key: t("line.stops"), value: data.servedBy.length },
-        ...(first === undefined || last === undefined
-          ? []
-          : [
-              {
-                key: t("line.ends"),
-                value: t("line.ends.value", { first, last }),
-              },
-            ]),
-      ]}
-      kind={type._meta.title}
       LinkComponent={LinkComponent}
+      mark={<SwatchMark colour={data.colour} />}
+      prefix={prefix}
+      status={loop ? t("line.loop") : undefined}
       summary={definition ?? undefined}
       title={title}
-      vitals={loop ? [t("line.loop")] : []}
     />
   );
 }

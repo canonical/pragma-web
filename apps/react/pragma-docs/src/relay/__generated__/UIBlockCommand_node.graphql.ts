@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4a046ee3a786b426b07fd2fc75f968a5>>
+ * @generated SignedSource<<8b1d2c4e36d15e882bf62a450162c365>>
  * @lightSyntaxTransform
  */
 
@@ -29,11 +29,6 @@ export type UIBlockCommand_node$data = {
       };
     }>;
   };
-  readonly tier: {
-    readonly _meta: {
-      readonly title: string;
-    };
-  } | null | undefined;
   readonly version: string | null | undefined;
   readonly " $fragmentType": "UIBlockCommand_node";
 };
@@ -115,16 +110,6 @@ return {
     },
     {
       "alias": null,
-      "args": null,
-      "concreteType": "Tier",
-      "kind": "LinkedField",
-      "name": "tier",
-      "plural": false,
-      "selections": (v1/*:: as any*/),
-      "storageKey": null
-    },
-    {
-      "alias": null,
       "args": [
         {
           "kind": "Literal",
@@ -167,6 +152,6 @@ return {
 };
 })();
 
-(node as any).hash = "89dbbc56a6859feca290f3ab76cd5191";
+(node as any).hash = "7bbb80b663dd37d95592c93029e5249d";
 
 export default node;

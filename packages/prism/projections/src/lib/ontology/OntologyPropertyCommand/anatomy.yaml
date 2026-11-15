@@ -1,12 +1,14 @@
 ---
 # OntologyPropertyCommand: an ontology property as a 56px command-palette
 # result.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
-# title over "kind in location", one vital at the end). The kind is the
-# property's kind; the location the class it is declared on; the vital its
-# range.
+# Reference: the W3 command anatomy: the slot order mark, prefix, title,
+# address, kind, status; a property fills the mark (the property glyph),
+# the title, the address (its IRI), the kind ("kind in location", the
+# class it is declared on) and the status (its range). A command gives its
+# address, never a prefix: the address states the namespace once.
 # Projected onto EntityCommand, which carries every style: this anatomy
-# binds none. It is not dispatched: a property is not a Node.
+# binds none. It is not dispatched: a property is not a Node, and its
+# callers render it directly.
 # The name is the label, or the local name of the IRI when the property has
 # none (a property carries no computed title). The home is the link the
 # name renders through, resolved from the absolute IRI, a property's only
@@ -19,6 +21,17 @@ node:
     - node:
         uri: prism.component.entity_command
         edges:
+          - node:
+              role: mark
+              # The property glyph, a published Icon (PROPERTY_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
               role: title
               edges:
@@ -44,26 +57,33 @@ node:
               cardinality: "1"
               slotName: title
           - node:
+              role: address
+              projection:
+                field: uri
+            relation:
+              cardinality: "1"
+              slotName: address
+          - node:
               role: kind
               projection:
                 field: kind
+              edges:
+                - node:
+                    role: location
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: domain
             relation:
               cardinality: "1"
               slotName: kind
           - node:
-              role: location
-              projection:
-                field: _meta.title
-            relation:
-              cardinality: "0..1"
-              slotName: location
-              projection:
-                field: domain
-          - node:
-              role: vital
+              # The range is set in the identifier face.
+              role: status
               projection:
                 field: range
-              # The range is set in the identifier face.
               edges:
                 - node:
                     role: identifier
@@ -72,6 +92,6 @@ node:
                     slotName: identifier
             relation:
               cardinality: "1"
-              slotName: vital
+              slotName: status
       relation:
         cardinality: "1"

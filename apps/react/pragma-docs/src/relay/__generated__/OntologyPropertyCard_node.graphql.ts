@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d78250cff36814819c0f95bc9795a2dc>>
+ * @generated SignedSource<<18022c0eb1dfe905b000ee436a45bf28>>
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,6 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type PropertyKind = "ANNOTATION" | "DATATYPE" | "OBJECT" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type OntologyPropertyCard_node$data = {
   readonly __typename: "OntologyProperty";
@@ -23,8 +22,8 @@ export type OntologyPropertyCard_node$data = {
     readonly label: string | null | undefined;
     readonly uri: string;
   } | null | undefined;
-  readonly kind: PropertyKind;
   readonly label: string | null | undefined;
+  readonly namespace: string;
   readonly range: string;
   readonly uri: string;
   readonly " $fragmentType": "OntologyPropertyCard_node";
@@ -68,7 +67,7 @@ return {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "kind",
+      "name": "namespace",
       "storageKey": null
     },
     {
@@ -140,6 +139,6 @@ return {
 };
 })();
 
-(node as any).hash = "a6936ae35593d86dab2feb5f2ff5e558";
+(node as any).hash = "36b8539dfbc89f3985ff5109f47ae3e0";
 
 export default node;

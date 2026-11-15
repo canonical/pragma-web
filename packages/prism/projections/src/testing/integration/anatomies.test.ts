@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { basename } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertAnatomy,
@@ -10,7 +10,7 @@ import {
   assertStylesMatchAnatomy,
   listAnatomyFolders,
 } from "@canonical/prism-core/testing";
-import type { ReaderFragment } from "relay-runtime";
+import type { ConcreteRequest, ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 
 /** The package's root, three levels up from this file. */
@@ -37,6 +37,22 @@ const FRAGMENTS = new Map(
   ]),
 );
 
+/**
+ * The compiled operation of every peek, by its component's name: a peek
+ * runs a query of its own, read by its operation's root fragment.
+ */
+const PEEK_FRAGMENTS = new Map(
+  Object.entries(
+    import.meta.glob<ConcreteRequest>(
+      "../../__generated__/*PeekQuery.graphql.ts",
+      { eager: true, import: "default" },
+    ),
+  ).map(([path, request]) => [
+    basename(path, ".graphql.ts").replace(/Query$/, ""),
+    request.fragment,
+  ]),
+);
+
 /** Where the projections of any node and the dispatchers live. */
 const NODE_DIRECTORY = fileURLToPath(
   new URL("../../lib/node", import.meta.url),
@@ -54,6 +70,10 @@ const UI_TOKENS = [
   "--color-foreground-ghost-hover",
   "--color-foreground-secondary",
   "--color-text-muted",
+  "--popover-border-width",
+  "--popover-color-border",
+  "--popover-padding-horizontal",
+  "--popover-padding-vertical",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-font-size",
   "--typography-text-primary-font-weight",
@@ -61,6 +81,15 @@ const UI_TOKENS = [
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
+
+/**
+ * The subcomponents, each in its parent's `common/` folder. The scaffold
+ * check places a component only under `src/lib/ui` or a subject folder, so
+ * these keep their anatomy and their styles, not that check.
+ */
+const subcomponentFolders = listAnatomyFolders(
+  folders.map((folder) => join(folder, "common")),
+);
 
 const projectionFolders = listAnatomyFolders([
   NODE_DIRECTORY,
@@ -76,6 +105,9 @@ describe("the package's components", () => {
       "EntityGraphNode",
       "EntityList",
       "EntityRow",
+      "SwatchMark",
+      "TokenMark",
+      "TokenSwatch",
     ]);
   });
 
@@ -91,6 +123,7 @@ describe("the package's components", () => {
       "NodeGraphNode",
       "NodeList",
       "NodeRow",
+      "ProjectionPeek",
       "RowProjection",
       "OntologyClassCard",
       "OntologyClassChip",
@@ -112,9 +145,23 @@ describe("the package's components", () => {
     });
   }
 
+  it("and the subcomponents: the card's specimen and the chip's peek", () => {
+    expect(subcomponentFolders.map((folder) => basename(folder))).toEqual([
+      "Specimen",
+      "Peek",
+    ]);
+  });
+
+  for (const folder of subcomponentFolders) {
+    it(`${basename(folder)} keeps its anatomy and its styles`, () => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
+    });
+  }
+
   for (const folder of projectionFolders) {
     it(`${basename(folder)} reads what its anatomy projects`, () => {
-      const fragment = FRAGMENTS.get(basename(folder));
+      const fragment =
+        FRAGMENTS.get(basename(folder)) ?? PEEK_FRAGMENTS.get(basename(folder));
       if (fragment === undefined) {
         throw new Error(`${basename(folder)} has no compiled fragment`);
       }
@@ -122,6 +169,24 @@ describe("the package's components", () => {
     });
   }
 });
+
+/**
+ * The tokens the projections read beyond the shim: the peek's address line
+ * is muted, takes the published Card's content insets and paints the
+ * background a scrolled card passes under.
+ */
+const PROJECTION_TOKENS = [
+  "--card-content-padding-block-end",
+  "--card-content-padding-inline",
+  "--color-background",
+  "--color-text-muted",
+];
+
+/**
+ * The one reach into another component the projections make: the peek
+ * ends the summary of the card it shows at its third line.
+ */
+const PROJECTION_REACHES = [".ds.projection-peek .summary"];
 
 describe("the package's stylesheets", () => {
   it("keep the design's token and grid rules in the generic representations", () => {
@@ -137,7 +202,12 @@ describe("the package's stylesheets", () => {
   for (const directory of [NODE_DIRECTORY, ONTOLOGY_DIRECTORY]) {
     it(`keep the design's token and grid rules in ${basename(directory)}'s projections`, () => {
       expect(() =>
-        assertStylesheets({ directory, layer: "ds.components.global" }),
+        assertStylesheets({
+          directory,
+          layer: "ds.components.global",
+          externalTokens: PROJECTION_TOKENS,
+          reaches: PROJECTION_REACHES,
+        }),
       ).not.toThrow();
     });
   }

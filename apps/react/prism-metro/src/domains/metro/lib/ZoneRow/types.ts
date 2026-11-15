@@ -9,6 +9,11 @@ type OwnProps = {
    * spreads `...ZoneRow_node`.
    */
   readonly node: ZoneRow_node$key;
+  /**
+   * How many lines the row takes: `"two"` sets its summary under its
+   * title, for an index that opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

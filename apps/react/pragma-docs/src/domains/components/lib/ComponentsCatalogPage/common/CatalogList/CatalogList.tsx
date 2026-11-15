@@ -5,9 +5,9 @@ import { Button } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery, usePaginationFragment } from "react-relay";
 import { useMessages } from "#i18n";
+import { DocsCardProjection } from "#lib/ui/DocsCardProjection";
+import { DocsRowProjection } from "#lib/ui/DocsRowProjection";
 import { PageSection } from "#lib/ui/PageSection";
-import { SiteCardProjection } from "#lib/ui/SiteCardProjection";
-import { SiteRowProjection } from "#lib/ui/SiteRowProjection";
 import type { CatalogList_query$key } from "#relay/__generated__/CatalogList_query.graphql.js";
 import catalogListFragmentNode from "#relay/__generated__/CatalogList_query.graphql.js";
 import type { CatalogListPaginationQuery } from "#relay/__generated__/CatalogListPaginationQuery.graphql.js";
@@ -51,8 +51,8 @@ const declareCatalogFragment = (): unknown => graphql`
           tier {
             name
           }
-          ...SiteCardProjection_node
-          ...SiteRowProjection_node
+          ...DocsCardProjection_node
+          ...DocsRowProjection_node
         }
       }
     }
@@ -92,8 +92,8 @@ const nameTierAnchor = (tier: string): string =>
  * It fills the shared list view itself rather than rendering `NodeList`: NodeList's
  * fragment spreads the core card and row projections, which select only
  * the contract's types, and a fragment's selection is fixed at compile
- * time, so a UI block would lose its tier, its vitals and the rendered
- * example in its card's sidecar. The site's projections, whose fragments
+ * time, so a UI block would lose its tier, its facts and the rendered
+ * example in its card's specimen. The site's projections, whose fragments
  * spread the design-system types' arms, keep them.
  *
  * It reads the catalog's operation, with the variables the route warms the
@@ -166,9 +166,9 @@ export default function CatalogList({
           {renderer.render({
             children: nodes.map((node) =>
               renderer.name === "cards" ? (
-                <SiteCardProjection key={node.uri} node={node} />
+                <DocsCardProjection key={node.uri} node={node} />
               ) : (
-                <SiteRowProjection key={node.uri} node={node} />
+                <DocsRowProjection key={node.uri} lines="two" node={node} />
               ),
             ),
           })}

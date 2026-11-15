@@ -37,7 +37,7 @@ export const MOCK_UI_BLOCK_HREF =
 
 /**
  * The component Button, which the published package renders: its card's
- * sidecar holds the published Button.
+ * specimen draws the published Button.
  */
 export const MOCK_UI_BLOCK_WITH_EXAMPLE = {
   ...MOCK_UI_BLOCK,

@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -76,7 +77,7 @@ const renderWithNode = (
 };
 
 describe("CodeStandardRow", () => {
-  it("reads the CodeStandard through its fragment", () => {
+  it("reads the Modifier through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
         <CodeStandardRow node={node} />
@@ -94,20 +95,33 @@ describe("CodeStandardRow", () => {
         <CodeStandardRow node={node} />
       </ul>
     ));
+    const row = container.querySelector(".ds.code-standard-row");
     expect(
-      [...container.querySelectorAll(".location, .title, .meta")].map(
+      [...(row?.querySelectorAll(".prefix, .title") ?? [])].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["cs:", "Public and private subcomponent exports", "React"]);
-    expect(container.querySelector(".location code.identifier")).not.toBeNull();
+    ).toEqual(["cs:", "Public and private subcomponent exports"]);
+    expect(
+      [...(row?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".term")?.textContent,
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["category", "Category", "React"]]);
+    expect(row?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/code.svg#code",
+    );
+    expect(row?.querySelector(".kind, .status, .summary")).toBeNull();
     expect(
       screen.getByRole("link", {
         name: "Public and private subcomponent exports",
       }),
     ).toHaveAttribute("href", MOCK_CODE_STANDARD_HREF);
+    if (row) expectSlotOrder(row);
   });
 
-  it("has no prefix when the standard's address did not compact", () => {
+  it("has no fact with no category, and no prefix when the address did not compact", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -120,21 +134,14 @@ describe("CodeStandardRow", () => {
           curie:
             "http://pragma.canonical.com/codestandards#react.component.subcomponent_export_api",
         },
+        categories: { edges: [] },
       },
     );
-    expect(container.querySelector(".location")).toBeNull();
-  });
-
-  it("ends in its title when the standard has no category", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <ul>
-          <CodeStandardRow node={node} />
-        </ul>
-      ),
-      { categories: { edges: [] } },
+    expect(container.querySelector(".facts")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "Public and private subcomponent exports",
     );
-    expect(container.querySelector(".meta")).toBeNull();
   });
 
   it("applies custom className", () => {
@@ -155,5 +162,32 @@ describe("CodeStandardRow", () => {
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");
+  });
+
+  it("puts the summary's first paragraph under the title in a two-line row", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <CodeStandardRow lines="two" node={node} />
+      </ul>
+    ));
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "Subcomponents are public if they are intended to be directly used by the consumer of the parent component to construct a UI.",
+    );
+  });
+
+  it("keeps a summary written over several lines to the row's one second line", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <CodeStandardRow lines="two" node={node} />
+        </ul>
+      ),
+      { description: "A subcomponent is public\nwhen consumers use it." },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.querySelector("br")).toBeNull();
+    expect(summary?.textContent).toBe(
+      "A subcomponent is public when consumers use it.",
+    );
   });
 });

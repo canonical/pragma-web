@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -11,12 +12,13 @@ import testQuery, {
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import { MOCK_UNIT, resolveRoot } from "../../../../../testing/fixtures.js";
 import type { UnitGraphNodeProps } from "./types.js";
-import Component from "./UnitGraphNode.js";
+import UnitGraphNode from "./UnitGraphNode.js";
 
 /**
- * The operation the tests render UnitGraphNode under: one Unit, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render UnitGraphNode under: one Unit, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query UnitGraphNodeTestQuery @relay_test_operation {
@@ -27,7 +29,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const UnitGraphNodeTestNode = ({
   children,
 }: {
@@ -43,8 +48,8 @@ const UnitGraphNodeTestNode = ({
 
 /**
  * Render `children` with the key of the Unit a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 unit, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 unit, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: UnitGraphNodeProps["node"]) => ReactElement,
@@ -71,7 +76,7 @@ describe("UnitGraphNode", () => {
   it("reads the Unit through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component node={node} />
+        <UnitGraphNode node={node} />
       </svg>
     ));
     expect(container.querySelector(".ds.unit-graph-node")).toHaveAttribute(
@@ -80,32 +85,33 @@ describe("UnitGraphNode", () => {
     );
   });
 
-  it("fills its slots from the unit", () => {
+  it("fills the node's lines from the unit, and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component node={node} />
+        <UnitGraphNode node={node} />
       </svg>
     ));
-    for (const text of ["Series 90 unit", "Unit"]) {
-      expect(container.textContent).toContain(text);
-    }
-  });
-
-  it("links its title to the unit's page", () => {
-    renderWithNode((node) => (
-      <svg aria-label="Graph" role="img">
-        <Component node={node} />
-      </svg>
-    ));
-    expect(
-      screen.getByRole("link", { name: "Series 90 unit" }).getAttribute("href"),
-    ).toBe("/fleet/units/metro%3Aunit-90");
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "metro: Series 90 unit",
+    );
+    expect(container.querySelector(".title .prefix")?.textContent).toBe(
+      "metro: ",
+    );
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/units.svg#units",
+    );
+    expect(container.querySelector(".kind, .context")).toBeNull();
+    expect(container.querySelector(".link")?.getAttribute("href")).toBe(
+      "/fleet/units/metro%3Aunit-90",
+    );
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component className="custom-class" node={node} />
+        <UnitGraphNode className="custom-class" node={node} />
       </svg>
     ));
     expect(
@@ -116,7 +122,7 @@ describe("UnitGraphNode", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component data-testid="test-component" node={node} />
+        <UnitGraphNode data-testid="test-component" node={node} />
       </svg>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("g");

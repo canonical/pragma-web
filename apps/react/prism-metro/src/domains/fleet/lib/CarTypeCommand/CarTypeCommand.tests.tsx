@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -10,13 +11,14 @@ import testQuery, {
 } from "#relay/__generated__/CarTypeCommandTestQuery.graphql.js";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import { MOCK_CAR_TYPE, resolveRoot } from "../../../../../testing/fixtures.js";
-import Component from "./CarTypeCommand.js";
+import CarTypeCommand from "./CarTypeCommand.js";
 import type { CarTypeCommandProps } from "./types.js";
 
 /**
- * The operation the tests render CarTypeCommand under: one CarType, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render CarTypeCommand under: one CarType, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query CarTypeCommandTestQuery @relay_test_operation {
@@ -27,7 +29,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const CarTypeCommandTestNode = ({
   children,
 }: {
@@ -43,8 +48,8 @@ const CarTypeCommandTestNode = ({
 
 /**
  * Render `children` with the key of the CarType a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 driving motor car, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 driving motor car, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: CarTypeCommandProps["node"]) => ReactElement,
@@ -71,7 +76,7 @@ describe("CarTypeCommand", () => {
   it("reads the CarType through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <CarTypeCommand node={node} />
       </ul>
     ));
     expect(container.querySelector(".ds.car-type-command")).toHaveAttribute(
@@ -80,34 +85,38 @@ describe("CarTypeCommand", () => {
     );
   });
 
-  it("fills its slots from the car type", () => {
+  it("fills the result's lines from the car type", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <CarTypeCommand node={node} />
       </ul>
     ));
-    for (const text of ["Series 90 driving motor car", "Car type", "20 m"]) {
-      expect(container.textContent).toContain(text);
-    }
-  });
-
-  it("links its title to the car type's page", () => {
-    renderWithNode((node) => (
-      <ul>
-        <Component node={node} />
-      </ul>
-    ));
+    const root = container.querySelector(".ds.car-type-command");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/models.svg#models",
+    );
     expect(
-      screen
-        .getByRole("link", { name: "Series 90 driving motor car" })
-        .getAttribute("href"),
-    ).toBe("/fleet/car-types/metro%3Acar-90-driving");
+      [
+        ...(root?.querySelectorAll(".title, .address, .kind, .status") ?? []),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "Series 90 driving motor car",
+      "metro:car-90-driving",
+      "Car type",
+      "20 m",
+    ]);
+    expect(root?.querySelector(".prefix")).toBeNull();
+    if (root) expectSlotOrder(root);
+    expect(
+      screen.getByRole("link", { name: "Series 90 driving motor car" }),
+    ).toHaveAttribute("href", "/fleet/car-types/metro%3Acar-90-driving");
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component className="custom-class" node={node} />
+        <CarTypeCommand className="custom-class" node={node} />
       </ul>
     ));
     expect(
@@ -118,7 +127,7 @@ describe("CarTypeCommand", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <ul>
-        <Component data-testid="test-component" node={node} />
+        <CarTypeCommand data-testid="test-component" node={node} />
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");

@@ -10,10 +10,7 @@
  */
 
 import { createEnvironment, HomesProvider } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import {
   createMemoryAdapter,
   createRouter,
@@ -69,9 +66,9 @@ function mountLens() {
     >
       <RouterProvider router={router}>
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider maps={defaultProjectionMaps}>
+          <ProjectionLinkProvider>
             <Outlet />
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>,

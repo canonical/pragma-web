@@ -1,11 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSwitchCoverage } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
+  NO_SITE_SWITCHES,
   type SiteTreeOptions,
 } from "../../../../testing/createSiteTree.js";
 import {
@@ -13,14 +15,14 @@ import {
   MOCK_ONTOLOGY_CLASS,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
+import nodeFragment from "../../../__generated__/GraphNodeProjection_node.graphql.js";
 import testQuery, {
   type GraphNodeProjectionTestQuery,
 } from "../../../__generated__/GraphNodeProjectionTestQuery.graphql.js";
 import siteFragment, {
   type SiteGraphNodeSlot_node$key,
 } from "../../../__generated__/SiteGraphNodeSlot_node.graphql.js";
-import type { ArmProps, SiteArmProps } from "../../projections/index.js";
-import { defaultProjectionMaps } from "../constants.js";
+import type { ONTOLOGY_TYPES } from "../../ontology/constants.js";
 import GraphNodeProjection from "./GraphNodeProjection.js";
 import type { GraphNodeArmNative, GraphNodeProjectionProps } from "./types.js";
 
@@ -59,7 +61,7 @@ const GraphNodeProjectionTestNode = ({
 /**
  * Render `children` with the key of the Node a Relay mock environment answers,
  * under the site's providers: `entity` over the matrix's UI block IconButton.
- * `options` replace the site's maps or link.
+ * `options` give the site's switches or link.
  */
 const renderWithNode = (
   children: (node: GraphNodeProjectionProps["node"]) => ReactElement,
@@ -112,26 +114,20 @@ describe("GraphNodeProjection", () => {
     expect(container.querySelector(".ds.node-graph-node")).toBeNull();
   });
 
-  it("renders a type the site arms through the site's arm, over the site slot's key", () => {
+  it("renders every node through the site's switch, over the site slot's key, when the site gives one", () => {
     /**
-     * A site's arm for its own type: it reads the site slot's key and marks
-     * its root with the typename it was handed and the one it read.
+     * A site's switch: it reads the site slot's key and marks its root
+     * with the typename it read.
      */
     const SiteProbe = ({
       node,
-      typename,
       ...props
-    }: SiteArmProps<
-      ArmProps<SiteGraphNodeSlot_node$key, GraphNodeArmNative>
-    >): ReactElement => {
+    }: GraphNodeArmNative & {
+      readonly node: SiteGraphNodeSlot_node$key;
+    }): ReactElement => {
       const data = useFragment(siteFragment, node);
       return (
-        <g
-          {...props}
-          className="site-probe"
-          data-site-type={typename}
-          data-typename={data.__typename}
-        />
+        <g {...props} className="site-probe" data-typename={data.__typename} />
       );
     };
     const { container } = renderWithNode(
@@ -142,40 +138,12 @@ describe("GraphNodeProjection", () => {
       ),
       {},
       {
-        maps: {
-          ...defaultProjectionMaps,
-          graphNode: {
-            ...defaultProjectionMaps.graphNode,
-            siteTypes: { Component: SiteProbe },
-          },
-        },
+        site: { ...NO_SITE_SWITCHES, graphNode: SiteProbe },
       },
     );
     const probe = container.querySelector(".site-probe");
-    expect(probe?.getAttribute("data-site-type")).toBe("Component");
     expect(probe?.getAttribute("data-typename")).toBe("Component");
     expect(container.querySelector(".ds.node-graph-node")).toBeNull();
-  });
-
-  it("renders a type the site arms for another typename through the Node arm", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <svg aria-label="Graph" role="img">
-          <GraphNodeProjection node={node} />
-        </svg>
-      ),
-      {},
-      {
-        maps: {
-          ...defaultProjectionMaps,
-          graphNode: {
-            ...defaultProjectionMaps.graphNode,
-            siteTypes: { Station: () => null },
-          },
-        },
-      },
-    );
-    expect(container.querySelector(".ds.node-graph-node")).not.toBeNull();
   });
 
   it("hands the arm the width the graph's layout gives the node", () => {
@@ -187,6 +155,36 @@ describe("GraphNodeProjection", () => {
     expect(container.querySelector(".surface")?.getAttribute("width")).toBe(
       "240",
     );
+  });
+
+  it("covers every case of its switch", () => {
+    /** The mock node of each ontology type the switch names. */
+    const cases: Record<
+      keyof typeof ONTOLOGY_TYPES,
+      Readonly<Record<string, unknown>>
+    > = {
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
+    };
+    expectSwitchCoverage({
+      fragment: nodeFragment,
+      cases,
+      render: (typename, entity) => {
+        const kebab = typename.replace(/(?<!^)([A-Z])/g, "-$1").toLowerCase();
+        const { container, unmount } = renderWithNode(
+          (node) => (
+            <svg aria-label="Graph" role="img">
+              <GraphNodeProjection node={node} />
+            </svg>
+          ),
+          entity,
+        );
+        expect(
+          container.querySelector(`.ds.${kebab}-graph-node`),
+        ).toHaveAttribute("data-type", typename);
+        expect(container.querySelector(".ds.node-graph-node")).toBeNull();
+        unmount();
+      },
+    });
   });
 
   it("applies custom className", () => {

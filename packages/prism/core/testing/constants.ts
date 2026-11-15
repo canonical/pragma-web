@@ -227,15 +227,20 @@ export const LINK_QUALIFIERS: readonly string[] = ["[href]"];
 
 /**
  * The properties no style key binds: generated content and whether forced
- * colours may repaint an element, which set no design decision, and two the
- * anatomy DSL's roster has no key for, which a component reads through its
- * own tokens: where a heading stops when a link scrolls to it, and a rule
- * drawn inside a box (an inset shadow) that must not move its content.
+ * colours may repaint an element, which set no design decision; which anchor
+ * a tethered box reads its place from and where it tries to go when the
+ * viewport has no room (the anatomy DSL has no anchor key; the gap from the
+ * anchor is the box's margin, which a key binds); and two the DSL's roster
+ * has no key for, which a component reads through its own tokens: where a
+ * heading stops when a link scrolls to it, and a rule drawn inside a box (an
+ * inset shadow) that must not move its content.
  */
 export const UNKEYED_PROPERTIES: readonly string[] = [
   "box-shadow",
   "content",
   "forced-color-adjust",
+  "position-area",
+  "position-try-fallbacks",
   "scroll-margin-block-start",
 ];
 
@@ -378,3 +383,25 @@ export const COMPONENT_PLACEMENTS: readonly RegExp[] = [
 
 /** A cardinality: one count, or a range whose upper bound may be `*`. */
 export const CARDINALITY = /^\d+(?:\.\.(?:\d+|\*))?$/;
+
+/**
+ * The slots an entity's identity is rendered in, in the order every
+ * representation keeps: a form may leave slots out, never reorder them.
+ */
+export const SLOT_ORDER: readonly string[] = [
+  "mark",
+  "prefix",
+  "title",
+  "address",
+  "kind",
+  "summary",
+  "facts",
+  "status",
+];
+
+/**
+ * The slots a typed arm's identity always renders, which `expectSlotOrder`
+ * requires unless a representation passes its own list: every anatomy
+ * starts with its mark and its title.
+ */
+export const REQUIRED_SLOTS: readonly string[] = ["mark", "title"];

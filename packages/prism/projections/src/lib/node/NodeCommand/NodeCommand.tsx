@@ -1,12 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeCommand_node.graphql.js";
 import { useProjectionLink } from "../../projections/index.js";
 import { EntityCommand } from "../../ui/index.js";
-import { findCuriePrefix } from "../../utils/index.js";
+import { NODE_MARK_ICON } from "../NodeChip/constants.js";
 import type { NodeCommandProps } from "./types.js";
 import "./styles.css";
 
@@ -36,10 +37,11 @@ const componentCssClassName = "ds node-command";
 
 /**
  * Any graph node as a 56px command-palette result, from what every node
- * carries: its title on the first line, linked to its home when the site
- * has one and inert text when it has none, then "kind in location", its
- * class's title in its namespace's prefix. A node whose address did not
- * compact names its class alone; any node has no vital.
+ * carries, in the slot order: the generic node glyph as its mark, its
+ * title on the first line, linked to its home when the site has one and
+ * inert text when it has none, its full address on the second line,
+ * which states its namespace, so it passes no prefix, and its class's
+ * title as its kind, closing the first line. Any node has no status.
  *
  * It is the command's `Node` arm: `CommandProjection` renders it for every
  * type no other arm takes.
@@ -66,12 +68,13 @@ export default function NodeCommand({
   return (
     <EntityCommand
       {...props}
+      address={curie}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
       kind={type._meta.title}
       LinkComponent={LinkComponent}
-      location={findCuriePrefix(curie)}
+      mark={<Icon icon={NODE_MARK_ICON} />}
       title={title}
     />
   );

@@ -19,6 +19,59 @@ export interface GraphStub {
   readonly close: () => Promise<void>;
 }
 
+/** Options of `expectSlotOrder`. */
+export interface ExpectSlotOrderOptions {
+  /**
+   * The slots the representation must render, by class. Defaults to
+   * `mark` and `title`, what every typed arm renders; a form, or an arm
+   * whose anatomy leaves one out, passes its own list (`[]` for none).
+   */
+  readonly requires?: readonly string[];
+}
+
+/**
+ * One selection of a compiled fragment, as `expectSwitchCoverage` reads it:
+ * an inline fragment carries its type condition as `type`, an aliased
+ * spread (`AliasedInlineFragmentSpread`, which `relay-runtime`'s types do
+ * not name) as `fragment.type`.
+ */
+export interface SwitchSelection {
+  readonly kind: string;
+  readonly type?: string;
+  readonly fragment?: unknown;
+}
+
+/**
+ * A switch's compiled fragment, as `expectSwitchCoverage` reads it: a
+ * Relay `ReaderFragment` is one.
+ */
+export interface SwitchFragment {
+  readonly name: string;
+  readonly type: string;
+  readonly selections: readonly SwitchSelection[];
+}
+
+/** Options of `expectSwitchCoverage`. */
+export interface SwitchCoverageOptions<TNode> {
+  /**
+   * The switch's compiled fragment: the default export of its Relay
+   * artefact, whose type conditions are the cases the switch must name.
+   */
+  readonly fragment: SwitchFragment;
+  /**
+   * One mock node per case, keyed by the type condition it is rendered
+   * for: an object type's name, or an interface's when one arm takes every
+   * type that implements it.
+   */
+  readonly cases: Readonly<Record<string, TNode>>;
+  /**
+   * Render the switch over the case's node and assert the arm it renders
+   * (by its root's class, which the caller derives: arms may be shared)
+   * and that the switch's default arm did not render.
+   */
+  readonly render: (condition: string, node: TNode) => void;
+}
+
 /** Options of `assertScaffold`. */
 export interface AssertScaffoldOptions {
   /**

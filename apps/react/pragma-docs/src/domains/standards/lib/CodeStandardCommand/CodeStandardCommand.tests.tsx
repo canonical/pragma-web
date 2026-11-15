@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -75,8 +76,17 @@ const renderWithNode = (
   );
 };
 
+/** The standard with an address its provider could not compact. */
+const UNCOMPACTED_STANDARD = {
+  _meta: {
+    ...MOCK_CODE_STANDARD._meta,
+    curie:
+      "http://pragma.canonical.com/codestandards#react.component.subcomponent_export_api",
+  },
+};
+
 describe("CodeStandardCommand", () => {
-  it("reads the CodeStandard through its fragment", () => {
+  it("reads the Modifier through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
         <CodeStandardCommand node={node} />
@@ -93,42 +103,45 @@ describe("CodeStandardCommand", () => {
         <CodeStandardCommand node={node} />
       </ul>
     ));
+    const command = container.querySelector(".ds.code-standard-command");
     expect(
-      [...container.querySelectorAll(".title, .context, .vital")].map(
-        (slot) => slot.textContent,
-      ),
+      [
+        ...(command?.querySelectorAll(".title, .address, .kind, .status") ??
+          []),
+      ].map((slot) => slot.textContent),
     ).toEqual([
       "Public and private subcomponent exports",
-      "Code Standard in cs",
+      "cs:react.component.subcomponent_export_api",
+      "Code Standard",
       "React",
     ]);
+    expect(command?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/code.svg#code",
+    );
+    expect(command?.querySelector(".prefix")).toBeNull();
     expect(
       screen.getByRole("link", {
         name: "Public and private subcomponent exports",
       }),
     ).toHaveAttribute("href", MOCK_CODE_STANDARD_HREF);
+    if (command) expectSlotOrder(command);
   });
 
-  it("names its class alone and ends in no vital with no prefix or category", () => {
+  it("names its kind and ends in no status with no category", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
           <CodeStandardCommand node={node} />
         </ul>
       ),
-      {
-        categories: { edges: [] },
-        _meta: {
-          ...MOCK_CODE_STANDARD._meta,
-          curie:
-            "http://pragma.canonical.com/codestandards#react.component.subcomponent_export_api",
-        },
-      },
+      { ...UNCOMPACTED_STANDARD, categories: { edges: [] } },
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Code Standard",
+    expect(container.querySelector(".kind")?.textContent).toBe("Code Standard");
+    expect(container.querySelector(".address")?.textContent).toBe(
+      "http://pragma.canonical.com/codestandards#react.component.subcomponent_export_api",
     );
-    expect(container.querySelector(".vital")).toBeNull();
+    expect(container.querySelector(".status")).toBeNull();
   });
 
   it("applies custom className", () => {

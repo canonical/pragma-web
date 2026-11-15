@@ -3,7 +3,7 @@ import {
   HomesProvider,
   RouterLink,
 } from "@canonical/prism-core";
-import { ProjectionsProvider } from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
@@ -11,7 +11,7 @@ import { type RenderResult, render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { Environment } from "relay-runtime";
-import { metroProjectionMaps } from "#domains/metro";
+import { SITE_SWITCHES } from "#lib/ui";
 import formatDocumentTitle from "../src/formatDocumentTitle.js";
 import { homes } from "../src/homes.js";
 import { SiteRenderers } from "../src/lib/ui/SiteRenderers/index.js";
@@ -22,8 +22,8 @@ import createMetroFetch from "./createMetroFetch.js";
  * Render `ui` inside the providers a page of the site reads: the document
  * title, a Relay environment, by default answered by the metro provider in
  * process, the
- * site's router over a memory adapter at `url`, the site's homes and its
- * projection maps.
+ * site's router over a memory adapter at `url`, the site's homes and the
+ * projection link provider with the site's switches.
  *
  * @param ui - What to render.
  * @param url - The address the router starts at.
@@ -47,12 +47,12 @@ export default function renderWithSite(
           })}
         >
           <HomesProvider homes={homes}>
-            <ProjectionsProvider
+            <ProjectionLinkProvider
               LinkComponent={RouterLink}
-              maps={metroProjectionMaps}
+              site={SITE_SWITCHES}
             >
               <SiteRenderers>{ui}</SiteRenderers>
-            </ProjectionsProvider>
+            </ProjectionLinkProvider>
           </HomesProvider>
         </RouterProvider>
       </RelayEnvironmentProvider>

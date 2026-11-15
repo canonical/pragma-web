@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -14,6 +15,7 @@ import {
 import testQuery, {
   type OntologyPropertyRowTestQuery,
 } from "../../../__generated__/OntologyPropertyRowTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyPropertyRow from "./OntologyPropertyRow.js";
 import type { OntologyPropertyRowProps } from "./types.js";
 
@@ -97,7 +99,22 @@ describe("OntologyPropertyRow", () => {
     ).toHaveAttribute("data-type", "OntologyProperty");
   });
 
-  it("links its name to the property's home and ends in its kind's word", () => {
+  it("leads with the property glyph, in the slot order", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <OntologyPropertyRow lines="two" node={node} />
+      </ul>
+    ));
+    expectSlotOrder(container);
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/tag.svg#tag",
+    );
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "The modifier that changes how a block looks or behaves.",
+    );
+  });
+
+  it("links its name to the property's home and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <ul>
         <OntologyPropertyRow node={node} />
@@ -107,39 +124,8 @@ describe("OntologyPropertyRow", () => {
     expect(title?.tagName).toBe("A");
     expect(title?.textContent).toBe("Modifier");
     expect(title?.getAttribute("href")).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
-    expect(container.querySelector(".meta")?.textContent).toBe("object");
-    expect(container.querySelector(".location")).toBeNull();
-  });
-
-  it("names each kind by its own word", () => {
-    for (const [kind, word] of [
-      ["DATATYPE", "datatype"],
-      ["ANNOTATION", "annotation"],
-    ]) {
-      const { container, unmount } = renderWithNode(
-        (node) => (
-          <ul>
-            <OntologyPropertyRow node={node} />
-          </ul>
-        ),
-        { kind },
-      );
-      expect(container.querySelector(".meta")?.textContent).toBe(word);
-      unmount();
-    }
-  });
-
-  it("names a kind the catalog does not know as a property", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <ul>
-          <OntologyPropertyRow node={node} />
-        </ul>
-      ),
-      {},
-      { kind: "SYMMETRIC" },
-    );
-    expect(container.querySelector(".meta")?.textContent).toBe("property");
+    expect(container.querySelector(".prefix")?.textContent).toBe("ds:");
+    expect(container.querySelector(".kind, .summary")).toBeNull();
   });
 
   it("names a property without a label by its IRI's local name", () => {
@@ -152,6 +138,19 @@ describe("OntologyPropertyRow", () => {
       { label: null },
     );
     expect(container.querySelector(".title")?.textContent).toBe("modifier");
+  });
+
+  it("sets no summary in a two-line row for a property without a definition", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <OntologyPropertyRow lines="two" node={node} />
+        </ul>
+      ),
+      { definition: null },
+    );
+    // The second line stays, empty, so the row keeps its height.
+    expect(container.querySelector(".summary")?.textContent).toBe("");
   });
 
   it("applies custom className", () => {
@@ -174,5 +173,25 @@ describe("OntologyPropertyRow", () => {
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");
+  });
+
+  it("shows its namespace's prefix only off the page's namespace", () => {
+    const foreign = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="metro">
+        <ul>
+          <OntologyPropertyRow node={node} />
+        </ul>
+      </AmbientNamespaceProvider>
+    ));
+    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
+    foreign.unmount();
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <ul>
+          <OntologyPropertyRow node={node} />
+        </ul>
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
   });
 });

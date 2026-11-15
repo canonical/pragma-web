@@ -1,25 +1,33 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
-import { EntityRow, useProjectionLink } from "@canonical/prism-projections";
+import {
+  EntityRow,
+  useForeignPrefix,
+  useProjectionLink,
+} from "@canonical/prism-projections";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
 import nodeFragment from "#relay/__generated__/InterchangeRow_node.graphql.js";
+import { INTERCHANGE_MARK_ICON } from "../InterchangeChip/constants.js";
 import type { InterchangeRowProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The fields InterchangeRow reads from the Interchange it renders: its name
- * and its compact address.
+ * The fields InterchangeRow reads from the Interchange it renders: what its slots
+ * show, and its compact address, which its home is resolved from.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment InterchangeRow_node on Interchange {
     __typename
+    platformCount
     _meta {
       title
       curie
+      definition
     }
   }
 `;
@@ -29,20 +37,21 @@ void declareNodeFragment;
 const componentCssClassName = "ds interchange-row";
 
 /**
- * An interchange as a 32px list entry: its name, linked to the
- * interchange's page, and the word "interchange" muted at the end, which
- * sets it apart from the stations it is listed with.
+ * An interchange as a list entry: its mark, its prefix off the page's
+ * namespace, its name linked to its home, its platform count as a fact; a two-line row
+ * (`lines="two"`) puts its definition under the name.
+ * Its mark is the interchange's glyph, a published icon.
  *
- * Native props reach the row's `<li>` root; a consumer `className` merges
- * after the projection's own, and the root carries the typename as
- * `data-type`.
+ * Native props reach the row's `<li>` root; a consumer `className`
+ * merges after the projection's own, and the root carries the typename
+ * as `data-type`.
  *
- * `import { InterchangeRow } from "./lib/index.js";`
+ * `import { InterchangeRow } from "#domains/metro";`
  *
  * @implements metro.component.interchange_row
- * @note Impure: reads its interchange from the Relay store, its home from
- *   the site's homes, its link from the projection provider and its words
- *   from the translator in scope.
+ * @note Impure: reads its interchange from the Relay store, its home from the
+ *   site's homes, and its link and the page's namespace from the
+ *   projection providers, and its words from the translator in scope.
  */
 export default function InterchangeRow({
   node,
@@ -50,18 +59,34 @@ export default function InterchangeRow({
   ...props
 }: InterchangeRowProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  const href = useHome({ __typename: data.__typename, uri: data._meta.curie });
+  const { curie, definition, title } = data._meta;
+  const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   const t = useMessages();
+  const platforms = data.platformCount ?? undefined;
   return (
     <EntityRow
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
+      facts={
+        platforms === undefined
+          ? undefined
+          : [
+              {
+                property: "platformCount",
+                label: t("station.platforms"),
+                value: platforms,
+              },
+            ]
+      }
       href={href}
       LinkComponent={LinkComponent}
-      meta={t("interchange.word")}
-      title={data._meta.title}
+      mark={<Icon icon={INTERCHANGE_MARK_ICON} />}
+      prefix={prefix}
+      summary={definition ?? undefined}
+      title={title}
     />
   );
 }

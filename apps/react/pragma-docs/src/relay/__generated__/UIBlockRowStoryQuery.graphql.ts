@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0c02ee66cf93640a245d1150e197337b>>
+ * @generated SignedSource<<c43cccc4cd6719cb043862d4a9b7063a>>
  * @lightSyntaxTransform
  */
 
@@ -128,6 +128,13 @@ return {
               {
                 "alias": null,
                 "args": null,
+                "kind": "ScalarField",
+                "name": "summary",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
                 "concreteType": "EntityMeta",
                 "kind": "LinkedField",
                 "name": "_meta",
@@ -206,7 +213,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "2ba128ab225b0154a19f45577450e29c",
+    "cacheID": "b959b6c88933164b188de71af3de884f",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -242,12 +249,18 @@ return {
         "node.documentationStages.edges.node._meta": (v4/*:: as any*/),
         "node.documentationStages.edges.node._meta.title": (v3/*:: as any*/),
         "node.documentationStages.edges.node.uri": (v5/*:: as any*/),
+        "node.summary": {
+          "enumValues": null,
+          "nullable": true,
+          "plural": false,
+          "type": "String"
+        },
         "node.uri": (v5/*:: as any*/)
       }
     },
     "name": "UIBlockRowStoryQuery",
     "operationKind": "query",
-    "text": "query UIBlockRowStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...UIBlockRow_node\n    uri\n  }\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query UIBlockRowStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...UIBlockRow_node\n    uri\n  }\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

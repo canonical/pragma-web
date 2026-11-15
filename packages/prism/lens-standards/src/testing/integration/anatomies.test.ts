@@ -20,6 +20,12 @@ const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
 /** The semantic tokens the components' tokens bind beyond the shim. */
 const EXTERNAL_TOKENS = ["--color-text-muted"];
 
+/**
+ * The one reach into another component the lens makes: below two groups
+ * the index hides its rows' facts.
+ */
+const REACHES = [".ds.standards-index .facts"];
+
 const folders = listAnatomyFolders([UI_DIRECTORY]);
 
 /**
@@ -73,6 +79,7 @@ describe("the lens's components", () => {
         directory: UI_DIRECTORY,
         layer: "ds.components.global",
         externalTokens: EXTERNAL_TOKENS,
+        reaches: REACHES,
       }),
     ).not.toThrow();
   });

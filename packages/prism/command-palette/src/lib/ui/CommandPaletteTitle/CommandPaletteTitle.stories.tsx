@@ -26,10 +26,10 @@ export const InACommandRow: Story = {
   render: () => (
     <ul>
       <EntityCommand
+        address="ds:global.component.layout-switcher"
         href="/things/ds%3Aglobal.component.layout-switcher"
         kind="Component"
         LinkComponent={Component}
-        location="ds"
         title="Layout switcher"
       />
     </ul>

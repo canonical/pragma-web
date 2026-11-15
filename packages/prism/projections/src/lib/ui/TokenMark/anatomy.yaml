@@ -1,0 +1,50 @@
+---
+# TokenMark (packages/prism/projections/src/lib/ui/TokenMark/): a design
+# token's mark, a 16px swatch split light | dark showing its resolved value
+# in both modes (4.2; PS1 V4 "tokenMarksTwoModes"). Built with stories only
+# in W3 (resolution 10): no arm renders it until W9. Props: light, dark
+# (CSS colour values from data). Each half is a value well (.in-light, .in-dark)
+# whose colour enters through one declared custom property per well
+# (--token-mark-value, set inline from data: A9's one declared attribute).
+# Framed with a 1px border so a value near the background stays visible.
+# Hidden from assistive technology (the title names the token).
+#
+# The halves are two flex items of equal basis and growth, not a two-column
+# grid: the package's stylesheet check admits no authored grid template
+# (a grid is the shell's subgrid only).
+#
+# The wells' classes are .in-light and .in-dark, not .light and .dark: those
+# name the design's themes, which no component stylesheet may address.
+#
+# Token ledger:
+#   --token-mark-size: space.200 (16px)
+#   --token-mark-border-width: 1px          literal: stroke has only primitives
+#   --token-mark-border-color: color.border
+#   --token-mark-value: token.mark.value    the inline channel, per well
+#     (TokenMarkChannelStyle in types.ts); never in a class rule
+node:
+  uri: prism.component.token_mark
+  element: span
+  attributes: { aria-hidden: "true" }
+  styles:
+    layout.type: flex
+    size.width: space.200
+    size.height: space.200
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.color: color.border
+  edges:
+    - node:
+        role: in-light
+        styles:
+          layout.flex.grow: 1
+          layout.flex.basis: 0
+          appearance.background: token.mark.value
+      relation: { cardinality: "1", slotName: in-light }
+    - node:
+        role: in-dark
+        styles:
+          layout.flex.grow: 1
+          layout.flex.basis: 0
+          appearance.background: token.mark.value
+      relation: { cardinality: "1", slotName: in-dark }

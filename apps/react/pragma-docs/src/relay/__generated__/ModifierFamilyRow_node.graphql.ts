@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<128f4156264fef340b6f42ab19b7e3e4>>
+ * @generated SignedSource<<b6f9eeabad095f5f898eb719f29fe159>>
  * @lightSyntaxTransform
  */
 
@@ -22,6 +22,7 @@ export type ModifierFamilyRow_node$data = {
       };
     }>;
   };
+  readonly summary: string | null | undefined;
   readonly " $fragmentType": "ModifierFamilyRow_node";
 };
 export type ModifierFamilyRow_node$key = {
@@ -40,6 +41,13 @@ const node: ReaderFragment = {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "summary",
       "storageKey": null
     },
     {
@@ -118,6 +126,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "1932d3e8c11471e105db852a34d0235c";
+(node as any).hash = "61994a2c4bb551178059156e16218175";
 
 export default node;

@@ -9,11 +9,11 @@ describe("Message", () => {
   it("renders the sentence with each element in its placeholder's place", () => {
     const { container } = render(
       <Message
-        elements={{ title: <b>IconButton</b>, parent: <i>Button</i> }}
-        id="entity.parent"
+        elements={{ kind: <b>Class</b>, location: <i>ds</i> }}
+        id="entity.context"
       />,
     );
-    expect(container.innerHTML).toBe("<b>IconButton</b> ∈ <i>Button</i>");
+    expect(container.innerHTML).toBe("<b>Class</b> in <i>ds</i>");
   });
 
   it("places the elements where the translator's sentence puts them", () => {
@@ -50,19 +50,19 @@ describe("Message", () => {
   });
 
   it("keeps a placeholder named twice apart, each in its own place", () => {
-    const translate: Translate = () => "{lead} / {lead}";
+    const translate: Translate = () => "{title} / {title}";
     const wrapper = ({ children }: { children: ReactNode }) => (
       <MessagesContext value={translate}>{children}</MessagesContext>
     );
     const { container } = render(
-      <Message elements={{ lead: <b>a</b> }} id="chip.lead" />,
+      <Message elements={{ title: <b>a</b> }} id="chip.peek" />,
       { wrapper },
     );
     expect(container.innerHTML).toBe("<b>a</b> / <b>a</b>");
   });
 
   it("leaves a placeholder no element names as text", () => {
-    const { container } = render(<Message elements={{}} id="entity.parent" />);
-    expect(container.textContent).toBe("{title} ∈ {parent}");
+    const { container } = render(<Message elements={{}} id="chip.peek" />);
+    expect(container.textContent).toBe("Preview of {title}");
   });
 });

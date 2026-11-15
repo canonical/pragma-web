@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -13,13 +14,14 @@ import {
   MOCK_ROLLING_STOCK,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import Component from "./RollingStockGraphNode.js";
+import RollingStockGraphNode from "./RollingStockGraphNode.js";
 import type { RollingStockGraphNodeProps } from "./types.js";
 
 /**
- * The operation the tests render RollingStockGraphNode under: one RollingStock, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render RollingStockGraphNode under: one RollingStock, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query RollingStockGraphNodeTestQuery @relay_test_operation {
@@ -30,7 +32,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const RollingStockGraphNodeTestNode = ({
   children,
 }: {
@@ -46,8 +51,8 @@ const RollingStockGraphNodeTestNode = ({
 
 /**
  * Render `children` with the key of the RollingStock a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: RollingStockGraphNodeProps["node"]) => ReactElement,
@@ -74,7 +79,7 @@ describe("RollingStockGraphNode", () => {
   it("reads the RollingStock through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component node={node} />
+        <RollingStockGraphNode node={node} />
       </svg>
     ));
     expect(
@@ -82,32 +87,33 @@ describe("RollingStockGraphNode", () => {
     ).toHaveAttribute("data-type", "RollingStock");
   });
 
-  it("fills its slots from the rolling stock", () => {
+  it("fills the node's lines from the rolling stock, and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component node={node} />
+        <RollingStockGraphNode node={node} />
       </svg>
     ));
-    for (const text of ["Series 90", "Rolling stock"]) {
-      expect(container.textContent).toContain(text);
-    }
-  });
-
-  it("links its title to the rolling stock's page", () => {
-    renderWithNode((node) => (
-      <svg aria-label="Graph" role="img">
-        <Component node={node} />
-      </svg>
-    ));
-    expect(
-      screen.getByRole("link", { name: "Series 90" }).getAttribute("href"),
-    ).toBe("/fleet/metro%3Aseries-90");
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "metro: Series 90",
+    );
+    expect(container.querySelector(".title .prefix")?.textContent).toBe(
+      "metro: ",
+    );
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/machines.svg#machines",
+    );
+    expect(container.querySelector(".kind, .context")).toBeNull();
+    expect(container.querySelector(".link")?.getAttribute("href")).toBe(
+      "/fleet/metro%3Aseries-90",
+    );
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component className="custom-class" node={node} />
+        <RollingStockGraphNode className="custom-class" node={node} />
       </svg>
     ));
     expect(
@@ -120,7 +126,7 @@ describe("RollingStockGraphNode", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
-        <Component data-testid="test-component" node={node} />
+        <RollingStockGraphNode data-testid="test-component" node={node} />
       </svg>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("g");

@@ -2,26 +2,29 @@
 
 import { Card } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
-import { Message } from "../../i18n/index.js";
-import { PARENT_MESSAGES } from "./constants.js";
+import { Specimen } from "./common/Specimen/index.js";
 import type { EntityCardProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds entity-card";
 
 /**
- * An entity as a card in a grid of entities: where it is defined, its title and
- * the entity it belongs to (an instance of it, or a subclass), its kind, a
- * summary, its key values and its vitals, and optionally a sidecar beside them
- * that shows a rendered example of it. With an `href` the title links to the
- * entity's home through `LinkComponent`; without one it is inert text.
+ * An entity as a card in a grid of entities: its identity, a summary, the
+ * facts it states and its status, over a depiction of it where it has one.
+ * With an `href` the title links to the entity's home through
+ * `LinkComponent`; without one it is inert text.
  *
  * It is the published `Card`: a row subgrid of its grid's section tracks, so
- * cards in a `Cards` group line their sections up. With a sidecar it also
- * becomes a column subgrid two columns wider; below two groups of the shell
- * it spans the whole row instead, the sidecar under the body. Without a
- * sidecar, below one group of the shell, it spans the whole row too. It
- * renders only the slots it is given, so it renders anywhere inside a grid.
+ * cards in a `Cards` group line their sections up. Below one group of the
+ * shell it spans the whole row. It renders only the slots it is given, so it
+ * renders anywhere inside a grid.
+ *
+ * Its identity keeps the slot order every representation shares: the mark
+ * and the foreign prefix lead the title heading, then the address, the
+ * kind, the summary, the facts (each cell naming its property in
+ * `data-property`) and the status. Its one child, an `EntityCard.Specimen`,
+ * takes the media track above the body; a card without one draws no box
+ * for it.
  *
  * Native props reach the Card's `<div>` root; a consumer `className` merges
  * after the card's own.
@@ -29,21 +32,19 @@ const componentCssClassName = "ds entity-card";
  * `import { EntityCard } from "@canonical/prism-projections";`
  *
  * @implements prism.component.entity_card
- * @note Impure: reads the translator context in scope, through `Message`, for
- *   the title with its parent.
  */
 export default function EntityCard({
-  location,
   title,
-  parent,
-  parentRelation = "instance",
   href,
   LinkComponent = "a",
   kind,
   summary,
-  keyValues = [],
-  vitals = [],
-  sidecar,
+  mark,
+  prefix,
+  address,
+  facts = [],
+  status,
+  children,
   className,
   ...props
 }: EntityCardProps): ReactElement {
@@ -60,50 +61,42 @@ export default function EntityCard({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
+      {children}
       <Card.Content className="body">
         <div className="description">
           <div className="heading">
-            {location === undefined ? null : (
-              <p className="location">{location}</p>
-            )}
-            <h3 className="title">
-              {parent === undefined ? (
-                name
-              ) : (
-                <Message
-                  elements={{
-                    title: name,
-                    parent: <span className="parent">{parent}</span>,
-                  }}
-                  id={PARENT_MESSAGES[parentRelation]}
-                />
+            <div className="headline">
+              {mark === undefined ? null : (
+                <span aria-hidden="true" className="mark">
+                  {mark}
+                </span>
               )}
-            </h3>
+              {prefix === undefined ? null : (
+                <span className="prefix">{prefix}</span>
+              )}
+              <h3 className="title">{name}</h3>
+            </div>
+            {address === undefined ? null : (
+              <p className="address">{address}</p>
+            )}
             {kind === undefined ? null : <p className="kind">{kind}</p>}
           </div>
           {summary === undefined ? null : <p className="summary">{summary}</p>}
         </div>
-        {keyValues.length === 0 ? null : (
-          <dl className="key-values">
-            {keyValues.map(({ key, value }) => (
-              <div className="pair" key={key}>
-                <dt className="key">{key}</dt>
-                <dd className="value">{value}</dd>
+        {facts.length === 0 ? null : (
+          <dl className="facts">
+            {facts.map(({ property, label, value }) => (
+              <div className="fact" data-property={property} key={property}>
+                <dt className="term">{label}</dt>
+                <dd className="detail">{value}</dd>
               </div>
             ))}
           </dl>
         )}
+        {status === undefined ? null : <div className="status">{status}</div>}
       </Card.Content>
-      {vitals.length === 0 ? null : (
-        <Card.Footer className="footer">
-          {vitals.map((vital) => (
-            <span className="vital" key={vital}>
-              {vital}
-            </span>
-          ))}
-        </Card.Footer>
-      )}
-      {sidecar === undefined ? null : <div className="sidecar">{sidecar}</div>}
     </Card>
   );
 }
+
+EntityCard.Specimen = Specimen;

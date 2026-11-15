@@ -5,12 +5,12 @@ import {
   ErrorBoundary,
   useRenderers,
 } from "@canonical/prism-core";
-import { CardProjection } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
+import { MetroCardProjection } from "#lib/ui";
 import { NETWORK_RENDERERS } from "../../constants.js";
 import useStationView from "../hooks/useStationView.js";
 import { NetworkStrip } from "../NetworkStrip/index.js";
@@ -102,7 +102,9 @@ const StationAside = ({
   address,
 }: Pick<NetworkStationPageProps, "address">): ReactElement | null => {
   const station = useStationView({ address });
-  return station === undefined ? null : <CardProjection node={station.card} />;
+  return station === undefined ? null : (
+    <MetroCardProjection node={station.card} />
+  );
 };
 
 /**

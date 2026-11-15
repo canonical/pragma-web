@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f946bc5495e5bfd182fe7600c9e35182>>
+ * @generated SignedSource<<b79bdd2948e2a8de96252bcd8c90cef4>>
  * @lightSyntaxTransform
  */
 
@@ -14,11 +14,6 @@ export type ModifierFamilyCard_node$data = {
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: {
-      readonly _meta: {
-        readonly title: string;
-      };
-    };
   };
   readonly modifiers: {
     readonly edges: ReadonlyArray<{
@@ -35,15 +30,7 @@ export type ModifierFamilyCard_node$key = {
   readonly " $fragmentSpreads": FragmentRefs<"ModifierFamilyCard_node">;
 };
 
-const node: ReaderFragment = (function(){
-var v0 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-};
-return {
+const node: ReaderFragment = {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -71,35 +58,18 @@ return {
       "name": "_meta",
       "plural": false,
       "selections": [
-        (v0/*:: as any*/),
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "curie",
+          "name": "title",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
-          "concreteType": "OntologyClass",
-          "kind": "LinkedField",
-          "name": "type",
-          "plural": false,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "EntityMeta",
-              "kind": "LinkedField",
-              "name": "_meta",
-              "plural": false,
-              "selections": [
-                (v0/*:: as any*/)
-              ],
-              "storageKey": null
-            }
-          ],
+          "kind": "ScalarField",
+          "name": "curie",
           "storageKey": null
         }
       ],
@@ -155,8 +125,7 @@ return {
   "type": "ModifierFamily",
   "abstractKey": null
 };
-})();
 
-(node as any).hash = "4b9cd6f930ae210a1b95c60159c3dea0";
+(node as any).hash = "7d9348a0692a65e49d0c3911b0a15de1";
 
 export default node;

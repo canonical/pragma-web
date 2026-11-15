@@ -59,7 +59,9 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The Series 90 driving motor car, as an inline mention. */
+/**
+ * The Series 90 driving motor car: its mark and its name in the pill, linked to its page.
+ */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

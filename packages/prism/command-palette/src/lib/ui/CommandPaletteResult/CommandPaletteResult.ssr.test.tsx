@@ -1,9 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -68,12 +65,9 @@ describe("CommandPaletteResult SSR", () => {
         environment,
         router: createSiteRouter(),
         children: (
-          <ProjectionsProvider
-            LinkComponent={CommandPaletteTitle}
-            maps={defaultProjectionMaps}
-          >
+          <ProjectionLinkProvider LinkComponent={CommandPaletteTitle}>
             <ResultOverNode />
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         ),
       }),
     );

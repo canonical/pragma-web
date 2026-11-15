@@ -11,6 +11,11 @@ type OwnProps = {
   readonly node: UIBlockChip_node$key;
   /** The mention's text, in place of the block's title. */
   readonly children?: ReactNode;
+  /**
+   * Whether the mention links to the block's home and peeks at its card:
+   * `false` sets it as inert text, for a mention of the page it sits on.
+   */
+  readonly linked?: boolean;
 };
 
 /**

@@ -9,13 +9,18 @@ type OwnProps = {
    * spreads `...UnitChip_node`.
    */
   readonly node: UnitChip_node$key;
-  /** What the pill reads instead of the name, when given. */
+  /** The mention's text, in place of the unit's name. */
   readonly children?: ReactNode;
+  /**
+   * Whether the mention links to the unit's home and peeks at its card:
+   * `false` sets it as inert text, for a mention of the page it sits on.
+   */
+  readonly linked?: boolean;
 };
 
 /**
  * Props accepted by `UnitChip`: its own, then the native props of the
- * `<span>` the EntityChip renders as its root.
+ * `<span>` the chip renders as its root.
  */
 export type UnitChipProps = OwnProps &
   Omit<ComponentProps<"span">, keyof OwnProps>;

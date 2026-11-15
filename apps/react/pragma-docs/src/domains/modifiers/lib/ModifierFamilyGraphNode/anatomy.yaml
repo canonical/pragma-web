@@ -1,14 +1,11 @@
 ---
-# ModifierFamilyGraphNode: a modifier family as a node of a graph.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2433 and 566:2357 (the
-# title, then "kind in location" muted). The title is the family's title,
-# not its compact address, which is wider than the node and would be
-# clipped.
-# The kind is the family's class; the location the address's prefix.
-# Projected onto EntityGraphNode, native SVG, which carries every style:
-# this anatomy binds none. The home is the link the title renders through,
-# resolved from the compact address; a family has no home yet and reads as
-# inert text.
+# ModifierFamilyGraphNode: a modifier family as a node of a graph drawing:
+# the slot order mark, prefix, title. A graph node has no status and a typed
+# one no kind.
+# Its mark is the modifier family's glyph, so it names no kind; the prefix
+# shows only off the page's ambient namespace (the components lens declares
+# ds). A family has no home yet and reads as inert text. Projected onto the
+# base form, which carries every style.
 node:
   uri: docs.component.modifier_family_graph_node
   projection:
@@ -17,6 +14,24 @@ node:
     - node:
         uri: prism.component.entity_graph_node
         edges:
+          - node:
+              role: mark
+              # The modifier family's glyph, a published Icon (MODIFIER_FAMILY_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
           - node:
               role: title
               projection:
@@ -31,21 +46,5 @@ node:
             relation:
               cardinality: "1"
               slotName: title
-          - node:
-              role: kind
-              projection:
-                field: _meta.title
-            relation:
-              cardinality: "1"
-              slotName: kind
-              projection:
-                field: _meta.type
-          - node:
-              role: location
-              projection:
-                field: _meta.curie
-            relation:
-              cardinality: "0..1"
-              slotName: location
       relation:
         cardinality: "1"

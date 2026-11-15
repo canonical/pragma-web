@@ -1,12 +1,14 @@
 ---
 # OntologyClassCommand: an ontology class as a 56px command-palette result.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1898 ("Layout" over
-# "Class in design-system", "used in 88 instances" at the end) and 504:327
-# (the slot names). The kind names the class's abstraction; the location is
-# the compact address's prefix; the vital counts the class's instances.
+# Reference: the W3 command anatomy: the slot order mark, prefix, title,
+# address, kind, status; a class fills the mark (the class glyph), the
+# title, the address (its compact address in full), the kind (its
+# abstraction: the palette's results mix every type) and the status (how
+# many instances it has). A command gives its address, never a prefix: the
+# address on the second line states the namespace once.
 # Projected onto EntityCommand, which carries every style: this anatomy
-# binds none. The home is the link the title renders through, resolved from
-# the compact address; a class without one reads as inert text.
+# binds none. The home is the link the title renders through, resolved
+# from the compact address; a class without one reads as inert text.
 node:
   uri: prism.component.ontology_class_command
   projection:
@@ -15,6 +17,17 @@ node:
     - node:
         uri: prism.component.entity_command
         edges:
+          - node:
+              role: mark
+              # The class glyph, a published Icon (CLASS_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
               role: title
               projection:
@@ -30,6 +43,13 @@ node:
               cardinality: "1"
               slotName: title
           - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "1"
+              slotName: address
+          - node:
               role: kind
               projection:
                 field: isAbstract
@@ -37,18 +57,11 @@ node:
               cardinality: "1"
               slotName: kind
           - node:
-              role: location
-              projection:
-                field: _meta.curie
-            relation:
-              cardinality: "0..1"
-              slotName: location
-          - node:
-              role: vital
+              role: status
               projection:
                 field: instanceCount
             relation:
               cardinality: "1"
-              slotName: vital
+              slotName: status
       relation:
         cardinality: "1"

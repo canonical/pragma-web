@@ -1,6 +1,6 @@
-import type { CardProjection_node$key } from "#relay/__generated__/CardProjection_node.graphql.js";
-import type { ChipProjection_node$key } from "#relay/__generated__/ChipProjection_node.graphql.js";
-import type { NodeList_node$key } from "#relay/__generated__/NodeList_node.graphql.js";
+import type { MetroCardProjection_node$key } from "#relay/__generated__/MetroCardProjection_node.graphql.js";
+import type { MetroChipProjection_node$key } from "#relay/__generated__/MetroChipProjection_node.graphql.js";
+import type { MetroRowProjection_node$key } from "#relay/__generated__/MetroRowProjection_node.graphql.js";
 import type { RouteStrip_node$key } from "#relay/__generated__/RouteStrip_node.graphql.js";
 
 /** A stop or a line as a link names it: its compact address and its title. */
@@ -18,8 +18,8 @@ export interface LineRef extends NodeRef {
 /** Where a station sits on one route: the stops either side of it. */
 export interface RouteNeighbourView {
   readonly line: LineRef & {
-    /** The line's key, which its chip projects. */
-    readonly chip: ChipProjection_node$key;
+    /** The line's key, which the site's chip switch projects. */
+    readonly chip: MetroChipProjection_node$key;
   };
   /** The route's label ("To Marsh End", "Clockwise"). */
   readonly label: string;
@@ -33,8 +33,8 @@ export interface RouteNeighbourView {
 export interface StationView extends NodeRef {
   /** The station's absolute IRI, which its Turtle source is asked by. */
   readonly uri: string;
-  /** The station's key, which its card projects. */
-  readonly card: CardProjection_node$key;
+  /** The station's key, which the site's card switch projects. */
+  readonly card: MetroCardProjection_node$key;
   readonly kind: "Station" | "Interchange";
   readonly zone?: string;
   readonly platformCount?: number;
@@ -85,10 +85,15 @@ export interface LineView extends LineRef {
   })[];
 }
 
-/** The inspector's lists, each item the key its list projects. */
+/** A node the inspector lists: its IRI, which keys it, and its row's key. */
+export type IndexEntry = MetroRowProjection_node$key & {
+  readonly uri: string;
+};
+
+/** The inspector's lists, each item the key the site's row switch projects. */
 export interface NetworkIndex {
   /** The network's lines, in code order. */
-  readonly lines: NodeList_node$key;
+  readonly lines: readonly IndexEntry[];
   /** Every stop a route calls at, once each, in name order. */
-  readonly stations: NodeList_node$key;
+  readonly stations: readonly IndexEntry[];
 }

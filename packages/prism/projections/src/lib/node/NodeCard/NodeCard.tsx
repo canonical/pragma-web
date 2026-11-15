@@ -1,12 +1,16 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeCard_node.graphql.js";
-import { useProjectionLink } from "../../projections/index.js";
+import {
+  useForeignPrefix,
+  useProjectionLink,
+} from "../../projections/index.js";
 import { EntityCard } from "../../ui/index.js";
-import { findCuriePrefix } from "../../utils/index.js";
+import { NODE_MARK_ICON } from "../NodeChip/constants.js";
 import type { NodeCardProps } from "./types.js";
 import "./styles.css";
 
@@ -38,10 +42,13 @@ const componentCssClassName = "ds node-card";
 
 /**
  * Any graph node as a card in a grid of entities, from what every node
- * carries: its namespace prefix above its title, the title linked to its
- * home when the site has one and inert text when it has none, then its
- * class's title and its definition. A node whose address did not compact
- * has no prefix; any node has no key values, vitals or sidecar.
+ * carries, in the slot order: the generic node glyph as its mark and its
+ * namespace prefix leading its title, the title linked to its home when
+ * the site has one and inert text when it has none, its class's title as
+ * its kind (any node's lists mix types) and its definition as its summary.
+ * It passes no address: the peek's own line shows the full CURIE. A node
+ * whose address did not compact has no prefix; any node has no facts, no
+ * status and no specimen.
  *
  * It is the card's `Node` arm: `CardProjection` renders it for every type
  * no other arm takes.
@@ -54,7 +61,8 @@ const componentCssClassName = "ds node-card";
  *
  * @implements prism.component.node_card
  * @note Impure: reads its node from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes, its link from the projection provider and the page's
+ *   ambient namespace.
  */
 export default function NodeCard({
   node,
@@ -65,6 +73,7 @@ export default function NodeCard({
   const { curie, title, definition, type } = data._meta;
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   return (
     <EntityCard
       {...props}
@@ -73,7 +82,8 @@ export default function NodeCard({
       href={href}
       kind={type._meta.title}
       LinkComponent={LinkComponent}
-      location={findCuriePrefix(curie)}
+      mark={<Icon icon={NODE_MARK_ICON} />}
+      prefix={prefix}
       summary={definition ?? undefined}
       title={title}
     />

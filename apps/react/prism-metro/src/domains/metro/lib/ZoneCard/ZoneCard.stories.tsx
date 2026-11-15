@@ -74,8 +74,8 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * The Central Zone: its name, its class and its definition, and the count of
- * its stations.
+ * The Central Zone: its mark, its prefix, its name, its definition, and the
+ * count of its stations as a fact.
  */
 export const Default: Story = {};
 

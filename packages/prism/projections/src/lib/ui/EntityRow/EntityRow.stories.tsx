@@ -14,14 +14,15 @@ import type { StoryEntity } from "../../../../testing/types.js";
 import Component from "./EntityRow.js";
 import type { EntityRowProps } from "./types.js";
 
-/** The row's slots for one entity of the matrix. */
+/** The row's slots for one entity of the matrix: its first fact alone. */
 function pickRowArgs({
   prefix,
   title,
   href,
-  meta,
+  facts,
+  status,
 }: StoryEntity): EntityRowProps {
-  return { location: prefix, title, href, meta };
+  return { prefix, title, href, facts: facts.slice(0, 1), status };
 }
 
 const meta: Meta<typeof Component> = {
@@ -74,4 +75,22 @@ export const List: Story = {
       ))}
     </>
   ),
+};
+
+/**
+ * The identity in the slot order every representation keeps, on the two
+ * lines an index opts into: the summary under the title, each fact naming
+ * its property.
+ */
+export const TwoLines: Story = {
+  args: {
+    href: "#button",
+    mark: <Icon icon="information" />,
+    prefix: "ds",
+    title: "Button",
+    kind: "Component",
+    summary: "Starts the action its label names.",
+    facts: [{ property: "ds:tier", label: "Tier", value: "Global" }],
+    lines: "two",
+  },
 };

@@ -1,27 +1,54 @@
 ---
-# LineGraphNode: a line as a node of a graph, two lines tall.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2357 and 566:2433 (the
-# title, then its kind muted). Best guess: the title is the line's name,
-# the second line its class alone, since a line has no place of its own.
-# Projected onto EntityGraphNode, which carries every style: this anatomy
-# binds none. The home is the link the title renders through, resolved
-# from the compact address.
+# LineGraphNode: A line as a node of a graph: its mark, its prefix off the
+# page's namespace and its name, linked to its home. Its mark says its type,
+# so it names no kind. Its mark is an SVG disc ringed in the muted text
+# colour, filled with the line's colour only through the colour gate.
 node:
   uri: metro.component.line_graph_node
-  projection: { on: Line }
+  projection:
+    on: Line
   edges:
     - node:
         uri: prism.component.entity_graph_node
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # Its ring is drawn in the current colour.
+              styles:
+                typography.color: color.text.muted
+              # An SVG disc (a graph node's mark is SVG, never HTML in a
+              # foreignObject): its fill is the line's colour through the
+              # gate, so a colour it refuses leaves the disc unfilled.
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    role: swatch
+                    projection:
+                      field: colour
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
-              role: kind
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
-      relation: { cardinality: "1" }
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+      relation:
+        cardinality: "1"

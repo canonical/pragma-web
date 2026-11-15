@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<615b0916b7aef3a100c936106fe0288d>>
+ * @generated SignedSource<<1f0821d74491771dd269f47ce525474b>>
  * @lightSyntaxTransform
  */
 
@@ -187,7 +187,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e9406ba83d8d84dabc23bb9e10562295",
+    "cacheID": "a4e1923c44dcc10b806347b7d9621a67",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -230,7 +230,7 @@ return {
     },
     "name": "ModifierFamilyChipTestQuery",
     "operationKind": "query",
-    "text": "query ModifierFamilyChipTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...ModifierFamilyChip_node\n    uri\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ModifierFamilyChipTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...ModifierFamilyChip_node\n    uri\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

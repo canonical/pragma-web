@@ -60,6 +60,6 @@ describe("ModifierFamilyCommand SSR", () => {
     );
     expect(html).toContain("ds entity-command ds modifier-family-command");
     expect(html).toContain('data-type="ModifierFamily"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

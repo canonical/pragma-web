@@ -4,6 +4,7 @@ import { ChipProjection } from "@canonical/prism-projections";
 import { InlineCode } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import type { InstanceItemProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds instance-item";
 

@@ -5,13 +5,15 @@
  * graph server alongside) serves the lobby, and Chromium drives the palette
  * as a reader does. Ctrl+K opens it with the field focused; a component's
  * title lists its matches with the first highlighted and its card in the
- * preview; the arrow keys move the highlight and the preview with it; Tab
+ * preview, flush in its panel; the arrow keys move the highlight and the preview with it; Tab
  * leaves the field for the preview's link, never for the scrolling results;
  * a drag in the preview selects its text, and a click there gives the field
  * the focus back;
  * Enter opens the highlighted result's home without loading a new document
  * and closes the palette, as following the preview's link does; Cmd+K
- * reopens it empty and Escape closes it. On a phone the open palette fits
+ * reopens it empty and Escape closes it. Under the site's home namespace,
+ * `ds`, the preview writes `cs:` before a standard and no prefix before a
+ * component, and no result row writes a prefix. On a phone the open palette fits
  * the viewport less a gutter at each side, scrolls nothing sideways, and
  * shows no preview.
  */
@@ -98,6 +100,49 @@ const search = async (page: Page, text: string, chord = "Control+k") => {
     .waitFor({ timeout: PAGE_SETTLE_MS });
 };
 
+/** A search whose results hold a code standard, of the `cs` namespace. */
+const STANDARD_SEARCH = "anchor positioning";
+
+/**
+ * Highlight the first result whose address is in `namespace`, and read
+ * the prefix its row and the preview's card write.
+ *
+ * @note Impure: moves the highlight with the arrow keys.
+ */
+const previewNamespace = async (
+  page: Page,
+  namespace: string,
+): Promise<{
+  readonly address: string;
+  readonly resultPrefixes: number;
+  readonly previewPrefix: string | null;
+}> => {
+  const addresses = await findPalette(page)
+    .getByRole("option")
+    .locator(".address")
+    .allTextContents();
+  const index = addresses.findIndex((address) =>
+    address.startsWith(`${namespace}:`),
+  );
+  if (index < 0) throw new Error(`no result is in ${namespace}`);
+  for (let step = 0; step < index; step += 1) {
+    await page.keyboard.press("ArrowDown");
+  }
+  const result = findPalette(page).getByRole("option", { selected: true });
+  const preview = findPalette(page).getByRole("region", { name: "Preview" });
+  await preview
+    .getByRole("link", { name: (await readSelectedTitle(page)) ?? "" })
+    .first()
+    .waitFor({ timeout: PAGE_SETTLE_MS });
+  const prefix = preview.locator(".prefix");
+  return {
+    address: (await result.locator(".address").textContent()) ?? "",
+    resultPrefixes: await result.locator(".prefix").count(),
+    previewPrefix:
+      (await prefix.count()) === 0 ? null : await prefix.first().textContent(),
+  };
+};
+
 /** The title of the highlighted result. */
 const readSelectedTitle = (page: Page): Promise<string | null> =>
   page.getByRole("option", { selected: true }).locator(".title").textContent();
@@ -108,6 +153,45 @@ const findPreviewLink = (page: Page) =>
     .getByRole("region", { name: "Preview" })
     .getByRole("link")
     .first();
+
+/** Where the preview's card lies in its panel, and the panel's padding. */
+interface PreviewFit {
+  /** The panel's computed padding: top, right, bottom, left. */
+  readonly padding: readonly string[];
+  /** The card's top less the panel's, in px. */
+  readonly top: number;
+  /** The panel's right less the card's, in px. */
+  readonly end: number;
+  /** The panel's bottom less the card's, in px. */
+  readonly bottom: number;
+}
+
+/**
+ * Measure the card in the preview's panel against the panel's outer box.
+ *
+ * @note Impure: reads the tab's layout.
+ */
+const measurePreviewFit = (page: Page): Promise<PreviewFit> =>
+  findPalette(page)
+    .getByRole("region", { name: "Preview" })
+    .evaluate((panel) => {
+      const card = panel.firstElementChild;
+      if (card === null) throw new Error("the preview shows no card");
+      const style = getComputedStyle(panel);
+      const outer = panel.getBoundingClientRect();
+      const inner = card.getBoundingClientRect();
+      return {
+        padding: [
+          style.paddingTop,
+          style.paddingRight,
+          style.paddingBottom,
+          style.paddingLeft,
+        ],
+        top: inner.top - outer.top,
+        end: outer.right - inner.right,
+        bottom: outer.bottom - inner.bottom,
+      };
+    });
 
 /** Whether the palette's dialog is open. */
 const readOpen = (page: Page): Promise<boolean> =>
@@ -155,6 +239,23 @@ describe("the command palette", () => {
     expect(await findPreviewLink(page).textContent()).toBe(
       await readSelectedTitle(page),
     );
+  });
+
+  // The palette sits under the Shell, whose home namespace is `ds`, and
+  // outside every lens: a standard is foreign there, a component is not.
+  // A result row writes its whole address and no prefix; the preview's
+  // card writes the prefix of a foreign node alone.
+  it("previews a standard with cs: and a component with no prefix", async () => {
+    const page = await openLobby();
+    await search(page, STANDARD_SEARCH);
+    const standard = await previewNamespace(page, "cs");
+    expect(standard.resultPrefixes).toBe(0);
+    expect(standard.previewPrefix).toBe("cs:");
+    await page.keyboard.press("Escape");
+    await search(page, COMPONENT_TITLE);
+    const component = await previewNamespace(page, "ds");
+    expect(component.resultPrefixes).toBe(0);
+    expect(component.previewPrefix).toBeNull();
   });
 
   it("moves the highlight and the preview with the arrow keys", async () => {
@@ -269,6 +370,22 @@ describe("the command palette", () => {
     expect(await findPalette(page).getByRole("option").count()).toBe(0);
     await page.keyboard.press("Escape");
     expect(await readOpen(page)).toBe(false);
+  });
+
+  it("sets the highlighted result's card flush in the preview's panel", async () => {
+    const page = await openLobby();
+    await search(page, COMPONENT_TITLE);
+    expect(
+      await findPalette(page)
+        .getByRole("region", { name: "Preview" })
+        .isVisible(),
+    ).toBe(true);
+    const fit = await measurePreviewFit(page);
+    expect(fit.padding).toEqual(["0px", "0px", "0px", "0px"]);
+    // The card's top, end and bottom lie within its 1px border of the panel's.
+    for (const gap of [fit.top, fit.end, fit.bottom]) {
+      expect(Math.abs(gap)).toBeLessThanOrEqual(1);
+    }
   });
 
   it("fits a phone's viewport, scrolls nothing sideways and hides the preview", async () => {

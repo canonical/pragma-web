@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c7ac0a8d56bb7c309564f72cc99b607a>>
+ * @generated SignedSource<<8f7c01f4ddfb48a11a2a4d94760927a4>>
  * @lightSyntaxTransform
  */
 
@@ -20,6 +20,7 @@ export type ModifierRow_node$data = {
       readonly title: string;
     };
   } | null | undefined;
+  readonly summary: string | null | undefined;
   readonly " $fragmentType": "ModifierRow_node";
 };
 export type ModifierRow_node$key = {
@@ -46,6 +47,13 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "summary",
       "storageKey": null
     },
     {
@@ -96,6 +104,6 @@ return {
 };
 })();
 
-(node as any).hash = "e8e755aa7341959d0e99d73dbb22e8be";
+(node as any).hash = "5016e09dee58070548723323b522451c";
 
 export default node;

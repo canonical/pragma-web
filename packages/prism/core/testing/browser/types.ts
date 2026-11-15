@@ -229,3 +229,65 @@ export interface MeasurePageOptions {
   /** The elements that must fill the page's rows, as `measureLayout` reads them. */
   readonly fillSelector?: string;
 }
+
+/** A drawn row's title and height, as `measureRowHeights` reads them. */
+export interface RowHeight {
+  /** The row's title. */
+  readonly title: string;
+  /** Its height in pixels, rounded to a tenth. */
+  readonly height: number;
+}
+
+/** A box's edges in the viewport, in pixels. */
+export interface PeekBox {
+  readonly top: number;
+  readonly right: number;
+  readonly bottom: number;
+  readonly left: number;
+}
+
+/** When a watched chip was entered, focused and its peek mounted. */
+export interface PeekTimes {
+  /** When the pointer first entered the chip, in page milliseconds. */
+  readonly entered?: number;
+  /** When focus first moved into the chip. */
+  readonly focused?: number;
+  /** When the peek was first mounted on the document's body. */
+  readonly opened?: number;
+}
+
+/** A chip and its open peek, as `measurePeek` reads them. */
+export interface PeekMeasure {
+  /** The chip's root. */
+  readonly chip: PeekBox;
+  /** The open peek, or `null` when none is shown. */
+  readonly peek:
+    | (PeekBox & { readonly width: number; readonly height: number })
+    | null;
+  /** The viewport's width and height, without scroll bars. */
+  readonly viewport: { readonly width: number; readonly height: number };
+  /** The peek's role. */
+  readonly role: string | null;
+  /** Whether the peek sits inside a link. */
+  readonly inLink: boolean;
+  /**
+   * The hrefs of the peek's links a pointer can reach: drawn, and the
+   * topmost element at their centre.
+   */
+  readonly liveLinks: readonly string[];
+  /** Whether focus is on the chip's own link. */
+  readonly chipLinkFocused: boolean;
+  /** What `watchPeek` recorded, if it was installed. */
+  readonly times: PeekTimes;
+}
+
+/** Where a peek lies against its chip. */
+export interface PeekPlace {
+  /** Below or above the chip, 4px from it. */
+  readonly block: "below" | "above" | "elsewhere";
+  /**
+   * From the chip's start, from its end, from the viewport's inline start
+   * (a peek that spans the viewport), or none of them.
+   */
+  readonly inline: "start" | "end" | "viewport" | "elsewhere";
+}

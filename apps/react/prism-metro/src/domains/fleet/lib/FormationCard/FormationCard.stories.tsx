@@ -68,7 +68,9 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The Series 90 six-car, as a card in a grid of entities. */
+/**
+ * The Series 90 six-car: its mark, its name, its facts, and its side view in the specimen.
+ */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

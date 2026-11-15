@@ -15,3 +15,9 @@ export const GRAPH_NODE_STROKE = 1;
 
 /** The box's corner radius, in SVG user units. */
 export const GRAPH_NODE_RADIUS = 4;
+
+/** The mark's side, in SVG user units. */
+export const GRAPH_NODE_MARK = 16;
+
+/** The space between the mark and the text, in SVG user units. */
+export const GRAPH_NODE_MARK_GAP = 4;

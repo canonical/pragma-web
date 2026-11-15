@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -17,10 +18,10 @@ import InterchangeRow from "./InterchangeRow.js";
 import type { InterchangeRowProps } from "./types.js";
 
 /**
- * The operation the tests render InterchangeRow under: one Interchange, read
- * through the `node` field. The spread is aliased because that field is typed
- * by an interface, so a node of another type reads as null instead of as a key
- * that does not match.
+ * The operation the tests render InterchangeRow under: one Interchange, read through
+ * the `node` field. The spread is aliased because that field is typed by an
+ * interface, so a node of another type reads as null instead of as a key that
+ * does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query InterchangeRowTestQuery @relay_test_operation {
@@ -50,8 +51,8 @@ const InterchangeRowTestNode = ({
 
 /**
  * Render `children` with the key of the Interchange a Relay mock environment
- * answers, under the site's providers: `entity` over Central Exchange, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Central Exchange, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: InterchangeRowProps["node"]) => ReactElement,
@@ -93,26 +94,62 @@ describe("InterchangeRow", () => {
         <InterchangeRow node={node} />
       </ul>
     ));
+    const root = container.querySelector(".ds.interchange-row");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/swap.svg#swap",
+    );
     expect(
-      [...container.querySelectorAll(".title, .meta")].map(
+      [...(root?.querySelectorAll(".prefix, .title") ?? [])].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["Central Exchange", "interchange"]);
-    expect(container.querySelector(".location")).toBeNull();
+    ).toEqual(["metro:", "Central Exchange"]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["platformCount", "8"]]);
+    for (const slot of [".kind", ".summary", ".status"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
+    }
+    if (root) expectSlotOrder(root);
+    expect(
+      screen.getByRole("link", { name: "Central Exchange" }),
+    ).toHaveAttribute("href", "/network/stations/metro%3Acentral-exchange");
   });
 
-  it("links its title to the interchange's page", () => {
-    renderWithNode((node) => (
+  it("puts its definition under its name in a two-line row", () => {
+    const { container } = renderWithNode((node) => (
       <ul>
-        <InterchangeRow node={node} />
+        <InterchangeRow lines="two" node={node} />
       </ul>
     ));
-    expect(
-      screen
-        .getByRole("link", { name: "Central Exchange" })
-        .getAttribute("href"),
-    ).toBe("/network/stations/metro%3Acentral-exchange");
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "The busiest transfer point on the network.",
+    );
   });
+
+  it("has no facts and no summary where the graph asserts none", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <InterchangeRow lines="two" node={node} />
+        </ul>
+      ),
+      {
+        platformCount: null,
+        _meta: { ...MOCK_INTERCHANGE._meta, definition: null },
+      },
+    );
+    expect(container.querySelector(".facts")).toBeNull();
+    // The second line stays, empty, so the row keeps its height.
+    expect(container.querySelector(".summary")?.textContent).toBe("");
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "Central Exchange",
+    );
+  });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>

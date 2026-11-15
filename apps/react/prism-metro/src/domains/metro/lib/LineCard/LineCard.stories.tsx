@@ -88,7 +88,7 @@ export const WithCustomClass: Story = {
   args: { className: "custom-class" },
 };
 
-/** A loop, the Circle Line: its stops, no ends, and "loop" as its vital. */
+/** A loop, the Circle Line: its stops, no ends, and "loop" as its status. */
 export const Loop: Story = {
   parameters: { relay: mockEntity(MOCK_LOOP_LINE) },
 };

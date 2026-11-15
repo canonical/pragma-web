@@ -48,4 +48,14 @@
   .ds.standards-index > .more {
     grid-column: 1 / -1;
   }
+
+  /* Below two groups no row shows its address, so the list keeps one
+   * form: there a fact as long as an address stays on some rows and leaves
+   * others, which would single those rows out. This sheet loads after the
+   * row's, whose rule it overrides at the same weight. */
+  @container shell (width < 912px) {
+    .ds.standards-index .facts {
+      display: none;
+    }
+  }
 }

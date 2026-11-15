@@ -5,6 +5,18 @@ import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
   /**
+   * A 16px sign that leads the first line, such as the entity's type
+   * glyph: an SVG element its projection draws (a published `Icon` is
+   * one). It names nothing, so the node hides it from assistive
+   * technology, and it stays drawn when the text does not.
+   */
+  readonly mark?: ReactNode;
+  /**
+   * The entity's foreign prefix, such as `ds`, muted in monospace before
+   * the title on its line.
+   */
+  readonly prefix?: ReactNode;
+  /**
    * The entity's name, on the first line. An identifier in it is a
    * `<tspan className="identifier">`, which sets the monospace face an SVG
    * `<text>` takes from no `<code>`.
@@ -19,17 +31,15 @@ type OwnProps = {
   readonly LinkComponent?: LinkComponent;
   /** The entity's type, opening the second line. */
   readonly kind?: ReactNode;
-  /** Where the entity is defined, on the second line. */
-  readonly location?: ReactNode;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;
   /**
    * The node's height in SVG user units; the graph's layout decides it. A
-   * node with no kind and no location sets its title on the box's middle.
+   * node with no kind sets its title on the box's middle.
    */
   readonly height?: number;
   /**
-   * The entity's vital, such as its instance count: muted tabular figures
+   * The entity's count, such as its instance count: muted tabular figures
    * at the end of the title's line.
    */
   readonly count?: ReactNode;

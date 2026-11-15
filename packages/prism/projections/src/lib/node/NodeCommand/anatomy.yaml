@@ -1,9 +1,11 @@
 ---
 # NodeCommand: any graph node as a 56px command-palette result.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
-# title over "kind in location", one vital at the end). The kind is the
-# node's class; the location the compact address's prefix. Any node
-# carries no vital, so that slot stays empty.
+# Reference: the W3 command anatomy: the slot order mark, prefix, title,
+# address, kind, status; any node fills the mark (the generic node glyph),
+# the title, the address (the full compact address, on the second line) and
+# the kind (its class, closing the first line). Any node carries no
+# status. A command gives its address, never a prefix: the address states
+# the namespace once.
 # Projected onto EntityCommand, which carries every style: this anatomy
 # binds none. The home is the link the title renders through, resolved
 # from the compact address; a node without one reads as inert text.
@@ -15,6 +17,17 @@ node:
     - node:
         uri: prism.component.entity_command
         edges:
+          - node:
+              role: mark
+              # The generic node glyph, a published Icon (NODE_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
               role: title
               projection:
@@ -30,6 +43,13 @@ node:
               cardinality: "1"
               slotName: title
           - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "1"
+              slotName: address
+          - node:
               role: kind
               projection:
                 field: _meta.title
@@ -38,12 +58,5 @@ node:
               slotName: kind
               projection:
                 field: _meta.type
-          - node:
-              role: location
-              projection:
-                field: _meta.curie
-            relation:
-              cardinality: "0..1"
-              slotName: location
       relation:
         cardinality: "1"

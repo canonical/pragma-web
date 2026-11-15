@@ -4,6 +4,21 @@ import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
+  /**
+   * A small sign that leads the first line, such as the entity's type
+   * glyph: an element its projection draws and styles. It names nothing:
+   * the result hides it from assistive technology, so its name stays its
+   * title.
+   */
+  readonly mark?: ReactNode;
+  /**
+   * The entity's foreign prefix with its colon, such as `cs:`, in monospace
+   * before the title on the first line, for a result that has no
+   * `address`: an arm gives the prefix or the address, never both, and a
+   * result with an address passes no prefix, since the address states
+   * the namespace.
+   */
+  readonly prefix?: ReactNode;
   /** The entity's name, on the first line. */
   readonly title: ReactNode;
   /**
@@ -15,13 +30,17 @@ type OwnProps = {
   readonly LinkComponent?: LinkComponent;
   /** The entity's type, opening the second line. */
   readonly kind?: ReactNode;
-  /** Where the entity is defined, in small capitals on the second line. */
-  readonly location?: ReactNode;
   /**
-   * The one vital at the end of the row: a version, a count. An identifier
-   * in it is a `<code className="identifier">`, which keeps the row's line.
+   * The entity's full address, its CURIE, in monospace on the second line.
+   * With one the kind closes the first line; without one the kind takes the
+   * second line.
    */
-  readonly vital?: ReactNode;
+  readonly address?: ReactNode;
+  /**
+   * The entity's status, closing the second line. An identifier in it is a
+   * `<code className="identifier">`, which keeps the row's line.
+   */
+  readonly status?: ReactNode;
 };
 
 /**

@@ -1,31 +1,47 @@
 ---
-# StationGraphNode: a station as a node of a graph, two lines tall.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2357 and 566:2433 (the
-# title, then "kind in location" muted). Best guess: the title is the
-# station's name, the location its fare zone.
-# Projected onto EntityGraphNode, which carries every style: this anatomy
-# binds none. The home is the link the title renders through, resolved
-# from the compact address.
+# StationGraphNode: A station as a node of a graph: its mark, its prefix off
+# the page's namespace and its name, linked to its home. Its mark says its
+# type, so it names no kind. Its mark is the station's glyph, a published
+# icon.
 node:
   uri: metro.component.station_graph_node
-  projection: { on: Station }
+  projection:
+    on: Station
   edges:
     - node:
         uri: prism.component.entity_graph_node
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # The station's glyph, a published Icon (STATION_MARK_ICON).
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
-              role: kind
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
           - node:
-              role: location
-              projection: { field: _meta.title }
-            relation: { cardinality: "0..1", slotName: location, projection: { field: inZone } }
-      relation: { cardinality: "1" }
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+      relation:
+        cardinality: "1"

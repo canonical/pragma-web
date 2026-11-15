@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<11ad5595a724082d24ea6bbb913cacd6>>
+ * @generated SignedSource<<38f986bd75bb49a303c7361534c08cf6>>
  * @lightSyntaxTransform
  */
 
@@ -13,6 +13,7 @@ export type OntologyClassGraphNode_node$data = {
   readonly __typename: "OntologyClass";
   readonly _meta: {
     readonly curie: string;
+    readonly title: string;
   };
   readonly isAbstract: boolean;
   readonly " $fragmentType": "OntologyClassGraphNode_node";
@@ -54,6 +55,13 @@ const node: ReaderFragment = {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
+          "name": "title",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
           "name": "curie",
           "storageKey": null
         }
@@ -65,6 +73,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "6667361463e1873dac2d0573b78796d8";
+(node as any).hash = "71e2d9c0871fc6ec5724680109dd8234";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9f306d73dcff4a923bf41f2424948c5c>>
+ * @generated SignedSource<<51277b22dedb023b0fd6a033c6fcc9ff>>
  * @lightSyntaxTransform
  */
 
@@ -109,25 +109,40 @@ v7 = {
       "kind": "ScalarField",
       "name": "isAbstract",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "definition",
+      "storageKey": null
     }
   ],
   "type": "OntologyClass",
   "abstractKey": null
 },
-v8 = [
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "summary",
+  "storageKey": null
+},
+v9 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 1
   }
 ],
-v9 = [
+v10 = [
   {
     "kind": "InlineFragment",
     "selections": [
+      (v8/*:: as any*/),
       {
         "alias": null,
-        "args": (v8/*:: as any*/),
+        "args": (v9/*:: as any*/),
         "concreteType": "TagConnection",
         "kind": "LinkedField",
         "name": "documentationStages",
@@ -162,27 +177,28 @@ v9 = [
     "abstractKey": "__isUIBlock"
   }
 ],
-v10 = {
-  "kind": "InlineFragment",
-  "selections": (v9/*:: as any*/),
-  "type": "Component",
-  "abstractKey": null
-},
 v11 = {
   "kind": "InlineFragment",
-  "selections": (v9/*:: as any*/),
-  "type": "Pattern",
+  "selections": (v10/*:: as any*/),
+  "type": "Component",
   "abstractKey": null
 },
 v12 = {
   "kind": "InlineFragment",
-  "selections": (v9/*:: as any*/),
-  "type": "Layout",
+  "selections": (v10/*:: as any*/),
+  "type": "Pattern",
   "abstractKey": null
 },
 v13 = {
   "kind": "InlineFragment",
+  "selections": (v10/*:: as any*/),
+  "type": "Layout",
+  "abstractKey": null
+},
+v14 = {
+  "kind": "InlineFragment",
   "selections": [
+    (v8/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -197,9 +213,10 @@ v13 = {
   "type": "Modifier",
   "abstractKey": null
 },
-v14 = {
+v15 = {
   "kind": "InlineFragment",
   "selections": [
+    (v8/*:: as any*/),
     {
       "alias": null,
       "args": [
@@ -244,12 +261,19 @@ v14 = {
   "type": "ModifierFamily",
   "abstractKey": null
 },
-v15 = {
+v16 = {
   "kind": "InlineFragment",
   "selections": [
     {
       "alias": null,
-      "args": (v8/*:: as any*/),
+      "args": null,
+      "kind": "ScalarField",
+      "name": "description",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": (v9/*:: as any*/),
       "concreteType": "CategoryConnection",
       "kind": "LinkedField",
       "name": "categories",
@@ -283,7 +307,7 @@ v15 = {
   "type": "CodeStandard",
   "abstractKey": null
 },
-v16 = [
+v17 = [
   {
     "alias": null,
     "args": null,
@@ -307,12 +331,12 @@ v16 = [
             "selections": [
               (v6/*:: as any*/),
               (v7/*:: as any*/),
-              (v10/*:: as any*/),
               (v11/*:: as any*/),
               (v12/*:: as any*/),
               (v13/*:: as any*/),
               (v14/*:: as any*/),
-              (v15/*:: as any*/)
+              (v15/*:: as any*/),
+              (v16/*:: as any*/)
             ],
             "type": "Node",
             "abstractKey": "__isNode"
@@ -324,7 +348,7 @@ v16 = [
     "storageKey": null
   }
 ],
-v17 = [
+v18 = [
   (v3/*:: as any*/),
   {
     "kind": "InlineFragment",
@@ -332,120 +356,126 @@ v17 = [
       (v2/*:: as any*/),
       (v6/*:: as any*/),
       (v7/*:: as any*/),
-      (v10/*:: as any*/),
       (v11/*:: as any*/),
       (v12/*:: as any*/),
       (v13/*:: as any*/),
       (v14/*:: as any*/),
-      (v15/*:: as any*/)
+      (v15/*:: as any*/),
+      (v16/*:: as any*/)
     ],
     "type": "Node",
     "abstractKey": "__isNode"
   }
 ],
-v18 = {
+v19 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "UIBlockConnection"
 },
-v19 = {
+v20 = {
   "enumValues": null,
   "nullable": false,
   "plural": true,
   "type": "UIBlockEdge"
 },
-v20 = {
+v21 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "UIBlock"
 },
-v21 = {
+v22 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v22 = {
+v23 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "EntityMeta"
 },
-v23 = {
+v24 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "OntologyClass"
 },
-v24 = {
+v25 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "ID"
 },
-v25 = {
+v26 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "CategoryConnection"
 },
-v26 = {
+v27 = {
   "enumValues": null,
   "nullable": false,
   "plural": true,
   "type": "CategoryEdge"
 },
-v27 = {
+v28 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "Category"
 },
-v28 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "TagConnection"
-},
 v29 = {
   "enumValues": null,
-  "nullable": false,
-  "plural": true,
-  "type": "TagEdge"
+  "nullable": true,
+  "plural": false,
+  "type": "String"
 },
 v30 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
-  "type": "Tag"
+  "type": "TagConnection"
 },
 v31 = {
   "enumValues": null,
   "nullable": false,
-  "plural": false,
-  "type": "Boolean"
+  "plural": true,
+  "type": "TagEdge"
 },
 v32 = {
   "enumValues": null,
-  "nullable": true,
+  "nullable": false,
   "plural": false,
-  "type": "ModifierFamily"
+  "type": "Tag"
 },
 v33 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
-  "type": "ModifierConnection"
+  "type": "Boolean"
 },
 v34 = {
+  "enumValues": null,
+  "nullable": true,
+  "plural": false,
+  "type": "ModifierFamily"
+},
+v35 = {
+  "enumValues": null,
+  "nullable": false,
+  "plural": false,
+  "type": "ModifierConnection"
+},
+v36 = {
   "enumValues": null,
   "nullable": false,
   "plural": true,
   "type": "ModifierEdge"
 },
-v35 = {
+v37 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -505,7 +535,7 @@ return {
             "kind": "LinkedField",
             "name": "inheritsFroms",
             "plural": false,
-            "selections": (v16/*:: as any*/),
+            "selections": (v17/*:: as any*/),
             "storageKey": "inheritsFroms(first:24)"
           },
           {
@@ -515,7 +545,7 @@ return {
             "kind": "LinkedField",
             "name": "specializedBies",
             "plural": false,
-            "selections": (v16/*:: as any*/),
+            "selections": (v17/*:: as any*/),
             "storageKey": "specializedBies(first:24)"
           },
           {
@@ -525,7 +555,7 @@ return {
             "kind": "LinkedField",
             "name": "variants",
             "plural": false,
-            "selections": (v16/*:: as any*/),
+            "selections": (v17/*:: as any*/),
             "storageKey": "variants(first:24)"
           },
           {
@@ -535,7 +565,7 @@ return {
             "kind": "LinkedField",
             "name": "variantOfs",
             "plural": false,
-            "selections": (v16/*:: as any*/),
+            "selections": (v17/*:: as any*/),
             "storageKey": "variantOfs(first:24)"
           },
           {
@@ -561,7 +591,7 @@ return {
                     "kind": "LinkedField",
                     "name": "node",
                     "plural": false,
-                    "selections": (v17/*:: as any*/),
+                    "selections": (v18/*:: as any*/),
                     "storageKey": null
                   }
                 ],
@@ -593,7 +623,7 @@ return {
                     "kind": "LinkedField",
                     "name": "node",
                     "plural": false,
-                    "selections": (v17/*:: as any*/),
+                    "selections": (v18/*:: as any*/),
                     "storageKey": null
                   }
                 ],
@@ -609,7 +639,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "5d2393d3c63d56b693c77d61e06ec3bc",
+    "cacheID": "dcc85876e40e004f7959f6979bdc9a0b",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -619,41 +649,44 @@ return {
           "plural": false,
           "type": "Component"
         },
-        "component.inheritsFroms": (v18/*:: as any*/),
-        "component.inheritsFroms.edges": (v19/*:: as any*/),
-        "component.inheritsFroms.edges.node": (v20/*:: as any*/),
-        "component.inheritsFroms.edges.node.__isNode": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node.__isUIBlock": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node.__typename": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node._meta": (v22/*:: as any*/),
-        "component.inheritsFroms.edges.node._meta.curie": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node._meta.title": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node._meta.type": (v23/*:: as any*/),
-        "component.inheritsFroms.edges.node._meta.type._meta": (v22/*:: as any*/),
-        "component.inheritsFroms.edges.node._meta.type._meta.title": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node._meta.type.uri": (v24/*:: as any*/),
-        "component.inheritsFroms.edges.node.categories": (v25/*:: as any*/),
-        "component.inheritsFroms.edges.node.categories.edges": (v26/*:: as any*/),
-        "component.inheritsFroms.edges.node.categories.edges.node": (v27/*:: as any*/),
-        "component.inheritsFroms.edges.node.categories.edges.node._meta": (v22/*:: as any*/),
-        "component.inheritsFroms.edges.node.categories.edges.node._meta.title": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node.categories.edges.node.uri": (v24/*:: as any*/),
-        "component.inheritsFroms.edges.node.documentationStages": (v28/*:: as any*/),
-        "component.inheritsFroms.edges.node.documentationStages.edges": (v29/*:: as any*/),
-        "component.inheritsFroms.edges.node.documentationStages.edges.node": (v30/*:: as any*/),
-        "component.inheritsFroms.edges.node.documentationStages.edges.node._meta": (v22/*:: as any*/),
-        "component.inheritsFroms.edges.node.documentationStages.edges.node._meta.title": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node.documentationStages.edges.node.uri": (v24/*:: as any*/),
-        "component.inheritsFroms.edges.node.isAbstract": (v31/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifierFamily": (v32/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifierFamily._meta": (v22/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifierFamily._meta.title": (v21/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifierFamily.uri": (v24/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifiers": (v33/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifiers.edges": (v34/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifiers.edges.node": (v35/*:: as any*/),
-        "component.inheritsFroms.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
-        "component.inheritsFroms.edges.node.uri": (v24/*:: as any*/),
+        "component.inheritsFroms": (v19/*:: as any*/),
+        "component.inheritsFroms.edges": (v20/*:: as any*/),
+        "component.inheritsFroms.edges.node": (v21/*:: as any*/),
+        "component.inheritsFroms.edges.node.__isNode": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node.__isUIBlock": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node.__typename": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node._meta": (v23/*:: as any*/),
+        "component.inheritsFroms.edges.node._meta.curie": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node._meta.title": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node._meta.type": (v24/*:: as any*/),
+        "component.inheritsFroms.edges.node._meta.type._meta": (v23/*:: as any*/),
+        "component.inheritsFroms.edges.node._meta.type._meta.title": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node._meta.type.uri": (v25/*:: as any*/),
+        "component.inheritsFroms.edges.node.categories": (v26/*:: as any*/),
+        "component.inheritsFroms.edges.node.categories.edges": (v27/*:: as any*/),
+        "component.inheritsFroms.edges.node.categories.edges.node": (v28/*:: as any*/),
+        "component.inheritsFroms.edges.node.categories.edges.node._meta": (v23/*:: as any*/),
+        "component.inheritsFroms.edges.node.categories.edges.node._meta.title": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node.categories.edges.node.uri": (v25/*:: as any*/),
+        "component.inheritsFroms.edges.node.definition": (v29/*:: as any*/),
+        "component.inheritsFroms.edges.node.description": (v29/*:: as any*/),
+        "component.inheritsFroms.edges.node.documentationStages": (v30/*:: as any*/),
+        "component.inheritsFroms.edges.node.documentationStages.edges": (v31/*:: as any*/),
+        "component.inheritsFroms.edges.node.documentationStages.edges.node": (v32/*:: as any*/),
+        "component.inheritsFroms.edges.node.documentationStages.edges.node._meta": (v23/*:: as any*/),
+        "component.inheritsFroms.edges.node.documentationStages.edges.node._meta.title": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node.documentationStages.edges.node.uri": (v25/*:: as any*/),
+        "component.inheritsFroms.edges.node.isAbstract": (v33/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifierFamily": (v34/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifierFamily._meta": (v23/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifierFamily._meta.title": (v22/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifierFamily.uri": (v25/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifiers": (v35/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifiers.edges": (v36/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifiers.edges.node": (v37/*:: as any*/),
+        "component.inheritsFroms.edges.node.modifiers.edges.node.uri": (v25/*:: as any*/),
+        "component.inheritsFroms.edges.node.summary": (v29/*:: as any*/),
+        "component.inheritsFroms.edges.node.uri": (v25/*:: as any*/),
         "component.modifierFamilies": {
           "enumValues": null,
           "nullable": false,
@@ -672,73 +705,79 @@ return {
           "plural": false,
           "type": "ModifierFamily"
         },
-        "component.modifierFamilies.edges.node.__isNode": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node.__isUIBlock": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node.__typename": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node._meta": (v22/*:: as any*/),
-        "component.modifierFamilies.edges.node._meta.curie": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node._meta.title": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node._meta.type": (v23/*:: as any*/),
-        "component.modifierFamilies.edges.node._meta.type._meta": (v22/*:: as any*/),
-        "component.modifierFamilies.edges.node._meta.type._meta.title": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node._meta.type.uri": (v24/*:: as any*/),
-        "component.modifierFamilies.edges.node.categories": (v25/*:: as any*/),
-        "component.modifierFamilies.edges.node.categories.edges": (v26/*:: as any*/),
-        "component.modifierFamilies.edges.node.categories.edges.node": (v27/*:: as any*/),
-        "component.modifierFamilies.edges.node.categories.edges.node._meta": (v22/*:: as any*/),
-        "component.modifierFamilies.edges.node.categories.edges.node._meta.title": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node.categories.edges.node.uri": (v24/*:: as any*/),
-        "component.modifierFamilies.edges.node.documentationStages": (v28/*:: as any*/),
-        "component.modifierFamilies.edges.node.documentationStages.edges": (v29/*:: as any*/),
-        "component.modifierFamilies.edges.node.documentationStages.edges.node": (v30/*:: as any*/),
-        "component.modifierFamilies.edges.node.documentationStages.edges.node._meta": (v22/*:: as any*/),
-        "component.modifierFamilies.edges.node.documentationStages.edges.node._meta.title": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node.documentationStages.edges.node.uri": (v24/*:: as any*/),
-        "component.modifierFamilies.edges.node.isAbstract": (v31/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifierFamily": (v32/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifierFamily._meta": (v22/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifierFamily._meta.title": (v21/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifierFamily.uri": (v24/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifiers": (v33/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifiers.edges": (v34/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifiers.edges.node": (v35/*:: as any*/),
-        "component.modifierFamilies.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
-        "component.modifierFamilies.edges.node.uri": (v24/*:: as any*/),
-        "component.specializedBies": (v18/*:: as any*/),
-        "component.specializedBies.edges": (v19/*:: as any*/),
-        "component.specializedBies.edges.node": (v20/*:: as any*/),
-        "component.specializedBies.edges.node.__isNode": (v21/*:: as any*/),
-        "component.specializedBies.edges.node.__isUIBlock": (v21/*:: as any*/),
-        "component.specializedBies.edges.node.__typename": (v21/*:: as any*/),
-        "component.specializedBies.edges.node._meta": (v22/*:: as any*/),
-        "component.specializedBies.edges.node._meta.curie": (v21/*:: as any*/),
-        "component.specializedBies.edges.node._meta.title": (v21/*:: as any*/),
-        "component.specializedBies.edges.node._meta.type": (v23/*:: as any*/),
-        "component.specializedBies.edges.node._meta.type._meta": (v22/*:: as any*/),
-        "component.specializedBies.edges.node._meta.type._meta.title": (v21/*:: as any*/),
-        "component.specializedBies.edges.node._meta.type.uri": (v24/*:: as any*/),
-        "component.specializedBies.edges.node.categories": (v25/*:: as any*/),
-        "component.specializedBies.edges.node.categories.edges": (v26/*:: as any*/),
-        "component.specializedBies.edges.node.categories.edges.node": (v27/*:: as any*/),
-        "component.specializedBies.edges.node.categories.edges.node._meta": (v22/*:: as any*/),
-        "component.specializedBies.edges.node.categories.edges.node._meta.title": (v21/*:: as any*/),
-        "component.specializedBies.edges.node.categories.edges.node.uri": (v24/*:: as any*/),
-        "component.specializedBies.edges.node.documentationStages": (v28/*:: as any*/),
-        "component.specializedBies.edges.node.documentationStages.edges": (v29/*:: as any*/),
-        "component.specializedBies.edges.node.documentationStages.edges.node": (v30/*:: as any*/),
-        "component.specializedBies.edges.node.documentationStages.edges.node._meta": (v22/*:: as any*/),
-        "component.specializedBies.edges.node.documentationStages.edges.node._meta.title": (v21/*:: as any*/),
-        "component.specializedBies.edges.node.documentationStages.edges.node.uri": (v24/*:: as any*/),
-        "component.specializedBies.edges.node.isAbstract": (v31/*:: as any*/),
-        "component.specializedBies.edges.node.modifierFamily": (v32/*:: as any*/),
-        "component.specializedBies.edges.node.modifierFamily._meta": (v22/*:: as any*/),
-        "component.specializedBies.edges.node.modifierFamily._meta.title": (v21/*:: as any*/),
-        "component.specializedBies.edges.node.modifierFamily.uri": (v24/*:: as any*/),
-        "component.specializedBies.edges.node.modifiers": (v33/*:: as any*/),
-        "component.specializedBies.edges.node.modifiers.edges": (v34/*:: as any*/),
-        "component.specializedBies.edges.node.modifiers.edges.node": (v35/*:: as any*/),
-        "component.specializedBies.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
-        "component.specializedBies.edges.node.uri": (v24/*:: as any*/),
+        "component.modifierFamilies.edges.node.__isNode": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node.__isUIBlock": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node.__typename": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node._meta": (v23/*:: as any*/),
+        "component.modifierFamilies.edges.node._meta.curie": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node._meta.title": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node._meta.type": (v24/*:: as any*/),
+        "component.modifierFamilies.edges.node._meta.type._meta": (v23/*:: as any*/),
+        "component.modifierFamilies.edges.node._meta.type._meta.title": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node._meta.type.uri": (v25/*:: as any*/),
+        "component.modifierFamilies.edges.node.categories": (v26/*:: as any*/),
+        "component.modifierFamilies.edges.node.categories.edges": (v27/*:: as any*/),
+        "component.modifierFamilies.edges.node.categories.edges.node": (v28/*:: as any*/),
+        "component.modifierFamilies.edges.node.categories.edges.node._meta": (v23/*:: as any*/),
+        "component.modifierFamilies.edges.node.categories.edges.node._meta.title": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node.categories.edges.node.uri": (v25/*:: as any*/),
+        "component.modifierFamilies.edges.node.definition": (v29/*:: as any*/),
+        "component.modifierFamilies.edges.node.description": (v29/*:: as any*/),
+        "component.modifierFamilies.edges.node.documentationStages": (v30/*:: as any*/),
+        "component.modifierFamilies.edges.node.documentationStages.edges": (v31/*:: as any*/),
+        "component.modifierFamilies.edges.node.documentationStages.edges.node": (v32/*:: as any*/),
+        "component.modifierFamilies.edges.node.documentationStages.edges.node._meta": (v23/*:: as any*/),
+        "component.modifierFamilies.edges.node.documentationStages.edges.node._meta.title": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node.documentationStages.edges.node.uri": (v25/*:: as any*/),
+        "component.modifierFamilies.edges.node.isAbstract": (v33/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifierFamily": (v34/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifierFamily._meta": (v23/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifierFamily._meta.title": (v22/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifierFamily.uri": (v25/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifiers": (v35/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifiers.edges": (v36/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifiers.edges.node": (v37/*:: as any*/),
+        "component.modifierFamilies.edges.node.modifiers.edges.node.uri": (v25/*:: as any*/),
+        "component.modifierFamilies.edges.node.summary": (v29/*:: as any*/),
+        "component.modifierFamilies.edges.node.uri": (v25/*:: as any*/),
+        "component.specializedBies": (v19/*:: as any*/),
+        "component.specializedBies.edges": (v20/*:: as any*/),
+        "component.specializedBies.edges.node": (v21/*:: as any*/),
+        "component.specializedBies.edges.node.__isNode": (v22/*:: as any*/),
+        "component.specializedBies.edges.node.__isUIBlock": (v22/*:: as any*/),
+        "component.specializedBies.edges.node.__typename": (v22/*:: as any*/),
+        "component.specializedBies.edges.node._meta": (v23/*:: as any*/),
+        "component.specializedBies.edges.node._meta.curie": (v22/*:: as any*/),
+        "component.specializedBies.edges.node._meta.title": (v22/*:: as any*/),
+        "component.specializedBies.edges.node._meta.type": (v24/*:: as any*/),
+        "component.specializedBies.edges.node._meta.type._meta": (v23/*:: as any*/),
+        "component.specializedBies.edges.node._meta.type._meta.title": (v22/*:: as any*/),
+        "component.specializedBies.edges.node._meta.type.uri": (v25/*:: as any*/),
+        "component.specializedBies.edges.node.categories": (v26/*:: as any*/),
+        "component.specializedBies.edges.node.categories.edges": (v27/*:: as any*/),
+        "component.specializedBies.edges.node.categories.edges.node": (v28/*:: as any*/),
+        "component.specializedBies.edges.node.categories.edges.node._meta": (v23/*:: as any*/),
+        "component.specializedBies.edges.node.categories.edges.node._meta.title": (v22/*:: as any*/),
+        "component.specializedBies.edges.node.categories.edges.node.uri": (v25/*:: as any*/),
+        "component.specializedBies.edges.node.definition": (v29/*:: as any*/),
+        "component.specializedBies.edges.node.description": (v29/*:: as any*/),
+        "component.specializedBies.edges.node.documentationStages": (v30/*:: as any*/),
+        "component.specializedBies.edges.node.documentationStages.edges": (v31/*:: as any*/),
+        "component.specializedBies.edges.node.documentationStages.edges.node": (v32/*:: as any*/),
+        "component.specializedBies.edges.node.documentationStages.edges.node._meta": (v23/*:: as any*/),
+        "component.specializedBies.edges.node.documentationStages.edges.node._meta.title": (v22/*:: as any*/),
+        "component.specializedBies.edges.node.documentationStages.edges.node.uri": (v25/*:: as any*/),
+        "component.specializedBies.edges.node.isAbstract": (v33/*:: as any*/),
+        "component.specializedBies.edges.node.modifierFamily": (v34/*:: as any*/),
+        "component.specializedBies.edges.node.modifierFamily._meta": (v23/*:: as any*/),
+        "component.specializedBies.edges.node.modifierFamily._meta.title": (v22/*:: as any*/),
+        "component.specializedBies.edges.node.modifierFamily.uri": (v25/*:: as any*/),
+        "component.specializedBies.edges.node.modifiers": (v35/*:: as any*/),
+        "component.specializedBies.edges.node.modifiers.edges": (v36/*:: as any*/),
+        "component.specializedBies.edges.node.modifiers.edges.node": (v37/*:: as any*/),
+        "component.specializedBies.edges.node.modifiers.edges.node.uri": (v25/*:: as any*/),
+        "component.specializedBies.edges.node.summary": (v29/*:: as any*/),
+        "component.specializedBies.edges.node.uri": (v25/*:: as any*/),
         "component.subcomponents": {
           "enumValues": null,
           "nullable": false,
@@ -757,114 +796,123 @@ return {
           "plural": false,
           "type": "Subcomponent"
         },
-        "component.subcomponents.edges.node.__isNode": (v21/*:: as any*/),
-        "component.subcomponents.edges.node.__isUIBlock": (v21/*:: as any*/),
-        "component.subcomponents.edges.node.__typename": (v21/*:: as any*/),
-        "component.subcomponents.edges.node._meta": (v22/*:: as any*/),
-        "component.subcomponents.edges.node._meta.curie": (v21/*:: as any*/),
-        "component.subcomponents.edges.node._meta.title": (v21/*:: as any*/),
-        "component.subcomponents.edges.node._meta.type": (v23/*:: as any*/),
-        "component.subcomponents.edges.node._meta.type._meta": (v22/*:: as any*/),
-        "component.subcomponents.edges.node._meta.type._meta.title": (v21/*:: as any*/),
-        "component.subcomponents.edges.node._meta.type.uri": (v24/*:: as any*/),
-        "component.subcomponents.edges.node.categories": (v25/*:: as any*/),
-        "component.subcomponents.edges.node.categories.edges": (v26/*:: as any*/),
-        "component.subcomponents.edges.node.categories.edges.node": (v27/*:: as any*/),
-        "component.subcomponents.edges.node.categories.edges.node._meta": (v22/*:: as any*/),
-        "component.subcomponents.edges.node.categories.edges.node._meta.title": (v21/*:: as any*/),
-        "component.subcomponents.edges.node.categories.edges.node.uri": (v24/*:: as any*/),
-        "component.subcomponents.edges.node.documentationStages": (v28/*:: as any*/),
-        "component.subcomponents.edges.node.documentationStages.edges": (v29/*:: as any*/),
-        "component.subcomponents.edges.node.documentationStages.edges.node": (v30/*:: as any*/),
-        "component.subcomponents.edges.node.documentationStages.edges.node._meta": (v22/*:: as any*/),
-        "component.subcomponents.edges.node.documentationStages.edges.node._meta.title": (v21/*:: as any*/),
-        "component.subcomponents.edges.node.documentationStages.edges.node.uri": (v24/*:: as any*/),
-        "component.subcomponents.edges.node.isAbstract": (v31/*:: as any*/),
-        "component.subcomponents.edges.node.modifierFamily": (v32/*:: as any*/),
-        "component.subcomponents.edges.node.modifierFamily._meta": (v22/*:: as any*/),
-        "component.subcomponents.edges.node.modifierFamily._meta.title": (v21/*:: as any*/),
-        "component.subcomponents.edges.node.modifierFamily.uri": (v24/*:: as any*/),
-        "component.subcomponents.edges.node.modifiers": (v33/*:: as any*/),
-        "component.subcomponents.edges.node.modifiers.edges": (v34/*:: as any*/),
-        "component.subcomponents.edges.node.modifiers.edges.node": (v35/*:: as any*/),
-        "component.subcomponents.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
-        "component.subcomponents.edges.node.uri": (v24/*:: as any*/),
-        "component.uri": (v24/*:: as any*/),
-        "component.variantOfs": (v18/*:: as any*/),
-        "component.variantOfs.edges": (v19/*:: as any*/),
-        "component.variantOfs.edges.node": (v20/*:: as any*/),
-        "component.variantOfs.edges.node.__isNode": (v21/*:: as any*/),
-        "component.variantOfs.edges.node.__isUIBlock": (v21/*:: as any*/),
-        "component.variantOfs.edges.node.__typename": (v21/*:: as any*/),
-        "component.variantOfs.edges.node._meta": (v22/*:: as any*/),
-        "component.variantOfs.edges.node._meta.curie": (v21/*:: as any*/),
-        "component.variantOfs.edges.node._meta.title": (v21/*:: as any*/),
-        "component.variantOfs.edges.node._meta.type": (v23/*:: as any*/),
-        "component.variantOfs.edges.node._meta.type._meta": (v22/*:: as any*/),
-        "component.variantOfs.edges.node._meta.type._meta.title": (v21/*:: as any*/),
-        "component.variantOfs.edges.node._meta.type.uri": (v24/*:: as any*/),
-        "component.variantOfs.edges.node.categories": (v25/*:: as any*/),
-        "component.variantOfs.edges.node.categories.edges": (v26/*:: as any*/),
-        "component.variantOfs.edges.node.categories.edges.node": (v27/*:: as any*/),
-        "component.variantOfs.edges.node.categories.edges.node._meta": (v22/*:: as any*/),
-        "component.variantOfs.edges.node.categories.edges.node._meta.title": (v21/*:: as any*/),
-        "component.variantOfs.edges.node.categories.edges.node.uri": (v24/*:: as any*/),
-        "component.variantOfs.edges.node.documentationStages": (v28/*:: as any*/),
-        "component.variantOfs.edges.node.documentationStages.edges": (v29/*:: as any*/),
-        "component.variantOfs.edges.node.documentationStages.edges.node": (v30/*:: as any*/),
-        "component.variantOfs.edges.node.documentationStages.edges.node._meta": (v22/*:: as any*/),
-        "component.variantOfs.edges.node.documentationStages.edges.node._meta.title": (v21/*:: as any*/),
-        "component.variantOfs.edges.node.documentationStages.edges.node.uri": (v24/*:: as any*/),
-        "component.variantOfs.edges.node.isAbstract": (v31/*:: as any*/),
-        "component.variantOfs.edges.node.modifierFamily": (v32/*:: as any*/),
-        "component.variantOfs.edges.node.modifierFamily._meta": (v22/*:: as any*/),
-        "component.variantOfs.edges.node.modifierFamily._meta.title": (v21/*:: as any*/),
-        "component.variantOfs.edges.node.modifierFamily.uri": (v24/*:: as any*/),
-        "component.variantOfs.edges.node.modifiers": (v33/*:: as any*/),
-        "component.variantOfs.edges.node.modifiers.edges": (v34/*:: as any*/),
-        "component.variantOfs.edges.node.modifiers.edges.node": (v35/*:: as any*/),
-        "component.variantOfs.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
-        "component.variantOfs.edges.node.uri": (v24/*:: as any*/),
-        "component.variants": (v18/*:: as any*/),
-        "component.variants.edges": (v19/*:: as any*/),
-        "component.variants.edges.node": (v20/*:: as any*/),
-        "component.variants.edges.node.__isNode": (v21/*:: as any*/),
-        "component.variants.edges.node.__isUIBlock": (v21/*:: as any*/),
-        "component.variants.edges.node.__typename": (v21/*:: as any*/),
-        "component.variants.edges.node._meta": (v22/*:: as any*/),
-        "component.variants.edges.node._meta.curie": (v21/*:: as any*/),
-        "component.variants.edges.node._meta.title": (v21/*:: as any*/),
-        "component.variants.edges.node._meta.type": (v23/*:: as any*/),
-        "component.variants.edges.node._meta.type._meta": (v22/*:: as any*/),
-        "component.variants.edges.node._meta.type._meta.title": (v21/*:: as any*/),
-        "component.variants.edges.node._meta.type.uri": (v24/*:: as any*/),
-        "component.variants.edges.node.categories": (v25/*:: as any*/),
-        "component.variants.edges.node.categories.edges": (v26/*:: as any*/),
-        "component.variants.edges.node.categories.edges.node": (v27/*:: as any*/),
-        "component.variants.edges.node.categories.edges.node._meta": (v22/*:: as any*/),
-        "component.variants.edges.node.categories.edges.node._meta.title": (v21/*:: as any*/),
-        "component.variants.edges.node.categories.edges.node.uri": (v24/*:: as any*/),
-        "component.variants.edges.node.documentationStages": (v28/*:: as any*/),
-        "component.variants.edges.node.documentationStages.edges": (v29/*:: as any*/),
-        "component.variants.edges.node.documentationStages.edges.node": (v30/*:: as any*/),
-        "component.variants.edges.node.documentationStages.edges.node._meta": (v22/*:: as any*/),
-        "component.variants.edges.node.documentationStages.edges.node._meta.title": (v21/*:: as any*/),
-        "component.variants.edges.node.documentationStages.edges.node.uri": (v24/*:: as any*/),
-        "component.variants.edges.node.isAbstract": (v31/*:: as any*/),
-        "component.variants.edges.node.modifierFamily": (v32/*:: as any*/),
-        "component.variants.edges.node.modifierFamily._meta": (v22/*:: as any*/),
-        "component.variants.edges.node.modifierFamily._meta.title": (v21/*:: as any*/),
-        "component.variants.edges.node.modifierFamily.uri": (v24/*:: as any*/),
-        "component.variants.edges.node.modifiers": (v33/*:: as any*/),
-        "component.variants.edges.node.modifiers.edges": (v34/*:: as any*/),
-        "component.variants.edges.node.modifiers.edges.node": (v35/*:: as any*/),
-        "component.variants.edges.node.modifiers.edges.node.uri": (v24/*:: as any*/),
-        "component.variants.edges.node.uri": (v24/*:: as any*/)
+        "component.subcomponents.edges.node.__isNode": (v22/*:: as any*/),
+        "component.subcomponents.edges.node.__isUIBlock": (v22/*:: as any*/),
+        "component.subcomponents.edges.node.__typename": (v22/*:: as any*/),
+        "component.subcomponents.edges.node._meta": (v23/*:: as any*/),
+        "component.subcomponents.edges.node._meta.curie": (v22/*:: as any*/),
+        "component.subcomponents.edges.node._meta.title": (v22/*:: as any*/),
+        "component.subcomponents.edges.node._meta.type": (v24/*:: as any*/),
+        "component.subcomponents.edges.node._meta.type._meta": (v23/*:: as any*/),
+        "component.subcomponents.edges.node._meta.type._meta.title": (v22/*:: as any*/),
+        "component.subcomponents.edges.node._meta.type.uri": (v25/*:: as any*/),
+        "component.subcomponents.edges.node.categories": (v26/*:: as any*/),
+        "component.subcomponents.edges.node.categories.edges": (v27/*:: as any*/),
+        "component.subcomponents.edges.node.categories.edges.node": (v28/*:: as any*/),
+        "component.subcomponents.edges.node.categories.edges.node._meta": (v23/*:: as any*/),
+        "component.subcomponents.edges.node.categories.edges.node._meta.title": (v22/*:: as any*/),
+        "component.subcomponents.edges.node.categories.edges.node.uri": (v25/*:: as any*/),
+        "component.subcomponents.edges.node.definition": (v29/*:: as any*/),
+        "component.subcomponents.edges.node.description": (v29/*:: as any*/),
+        "component.subcomponents.edges.node.documentationStages": (v30/*:: as any*/),
+        "component.subcomponents.edges.node.documentationStages.edges": (v31/*:: as any*/),
+        "component.subcomponents.edges.node.documentationStages.edges.node": (v32/*:: as any*/),
+        "component.subcomponents.edges.node.documentationStages.edges.node._meta": (v23/*:: as any*/),
+        "component.subcomponents.edges.node.documentationStages.edges.node._meta.title": (v22/*:: as any*/),
+        "component.subcomponents.edges.node.documentationStages.edges.node.uri": (v25/*:: as any*/),
+        "component.subcomponents.edges.node.isAbstract": (v33/*:: as any*/),
+        "component.subcomponents.edges.node.modifierFamily": (v34/*:: as any*/),
+        "component.subcomponents.edges.node.modifierFamily._meta": (v23/*:: as any*/),
+        "component.subcomponents.edges.node.modifierFamily._meta.title": (v22/*:: as any*/),
+        "component.subcomponents.edges.node.modifierFamily.uri": (v25/*:: as any*/),
+        "component.subcomponents.edges.node.modifiers": (v35/*:: as any*/),
+        "component.subcomponents.edges.node.modifiers.edges": (v36/*:: as any*/),
+        "component.subcomponents.edges.node.modifiers.edges.node": (v37/*:: as any*/),
+        "component.subcomponents.edges.node.modifiers.edges.node.uri": (v25/*:: as any*/),
+        "component.subcomponents.edges.node.summary": (v29/*:: as any*/),
+        "component.subcomponents.edges.node.uri": (v25/*:: as any*/),
+        "component.uri": (v25/*:: as any*/),
+        "component.variantOfs": (v19/*:: as any*/),
+        "component.variantOfs.edges": (v20/*:: as any*/),
+        "component.variantOfs.edges.node": (v21/*:: as any*/),
+        "component.variantOfs.edges.node.__isNode": (v22/*:: as any*/),
+        "component.variantOfs.edges.node.__isUIBlock": (v22/*:: as any*/),
+        "component.variantOfs.edges.node.__typename": (v22/*:: as any*/),
+        "component.variantOfs.edges.node._meta": (v23/*:: as any*/),
+        "component.variantOfs.edges.node._meta.curie": (v22/*:: as any*/),
+        "component.variantOfs.edges.node._meta.title": (v22/*:: as any*/),
+        "component.variantOfs.edges.node._meta.type": (v24/*:: as any*/),
+        "component.variantOfs.edges.node._meta.type._meta": (v23/*:: as any*/),
+        "component.variantOfs.edges.node._meta.type._meta.title": (v22/*:: as any*/),
+        "component.variantOfs.edges.node._meta.type.uri": (v25/*:: as any*/),
+        "component.variantOfs.edges.node.categories": (v26/*:: as any*/),
+        "component.variantOfs.edges.node.categories.edges": (v27/*:: as any*/),
+        "component.variantOfs.edges.node.categories.edges.node": (v28/*:: as any*/),
+        "component.variantOfs.edges.node.categories.edges.node._meta": (v23/*:: as any*/),
+        "component.variantOfs.edges.node.categories.edges.node._meta.title": (v22/*:: as any*/),
+        "component.variantOfs.edges.node.categories.edges.node.uri": (v25/*:: as any*/),
+        "component.variantOfs.edges.node.definition": (v29/*:: as any*/),
+        "component.variantOfs.edges.node.description": (v29/*:: as any*/),
+        "component.variantOfs.edges.node.documentationStages": (v30/*:: as any*/),
+        "component.variantOfs.edges.node.documentationStages.edges": (v31/*:: as any*/),
+        "component.variantOfs.edges.node.documentationStages.edges.node": (v32/*:: as any*/),
+        "component.variantOfs.edges.node.documentationStages.edges.node._meta": (v23/*:: as any*/),
+        "component.variantOfs.edges.node.documentationStages.edges.node._meta.title": (v22/*:: as any*/),
+        "component.variantOfs.edges.node.documentationStages.edges.node.uri": (v25/*:: as any*/),
+        "component.variantOfs.edges.node.isAbstract": (v33/*:: as any*/),
+        "component.variantOfs.edges.node.modifierFamily": (v34/*:: as any*/),
+        "component.variantOfs.edges.node.modifierFamily._meta": (v23/*:: as any*/),
+        "component.variantOfs.edges.node.modifierFamily._meta.title": (v22/*:: as any*/),
+        "component.variantOfs.edges.node.modifierFamily.uri": (v25/*:: as any*/),
+        "component.variantOfs.edges.node.modifiers": (v35/*:: as any*/),
+        "component.variantOfs.edges.node.modifiers.edges": (v36/*:: as any*/),
+        "component.variantOfs.edges.node.modifiers.edges.node": (v37/*:: as any*/),
+        "component.variantOfs.edges.node.modifiers.edges.node.uri": (v25/*:: as any*/),
+        "component.variantOfs.edges.node.summary": (v29/*:: as any*/),
+        "component.variantOfs.edges.node.uri": (v25/*:: as any*/),
+        "component.variants": (v19/*:: as any*/),
+        "component.variants.edges": (v20/*:: as any*/),
+        "component.variants.edges.node": (v21/*:: as any*/),
+        "component.variants.edges.node.__isNode": (v22/*:: as any*/),
+        "component.variants.edges.node.__isUIBlock": (v22/*:: as any*/),
+        "component.variants.edges.node.__typename": (v22/*:: as any*/),
+        "component.variants.edges.node._meta": (v23/*:: as any*/),
+        "component.variants.edges.node._meta.curie": (v22/*:: as any*/),
+        "component.variants.edges.node._meta.title": (v22/*:: as any*/),
+        "component.variants.edges.node._meta.type": (v24/*:: as any*/),
+        "component.variants.edges.node._meta.type._meta": (v23/*:: as any*/),
+        "component.variants.edges.node._meta.type._meta.title": (v22/*:: as any*/),
+        "component.variants.edges.node._meta.type.uri": (v25/*:: as any*/),
+        "component.variants.edges.node.categories": (v26/*:: as any*/),
+        "component.variants.edges.node.categories.edges": (v27/*:: as any*/),
+        "component.variants.edges.node.categories.edges.node": (v28/*:: as any*/),
+        "component.variants.edges.node.categories.edges.node._meta": (v23/*:: as any*/),
+        "component.variants.edges.node.categories.edges.node._meta.title": (v22/*:: as any*/),
+        "component.variants.edges.node.categories.edges.node.uri": (v25/*:: as any*/),
+        "component.variants.edges.node.definition": (v29/*:: as any*/),
+        "component.variants.edges.node.description": (v29/*:: as any*/),
+        "component.variants.edges.node.documentationStages": (v30/*:: as any*/),
+        "component.variants.edges.node.documentationStages.edges": (v31/*:: as any*/),
+        "component.variants.edges.node.documentationStages.edges.node": (v32/*:: as any*/),
+        "component.variants.edges.node.documentationStages.edges.node._meta": (v23/*:: as any*/),
+        "component.variants.edges.node.documentationStages.edges.node._meta.title": (v22/*:: as any*/),
+        "component.variants.edges.node.documentationStages.edges.node.uri": (v25/*:: as any*/),
+        "component.variants.edges.node.isAbstract": (v33/*:: as any*/),
+        "component.variants.edges.node.modifierFamily": (v34/*:: as any*/),
+        "component.variants.edges.node.modifierFamily._meta": (v23/*:: as any*/),
+        "component.variants.edges.node.modifierFamily._meta.title": (v22/*:: as any*/),
+        "component.variants.edges.node.modifierFamily.uri": (v25/*:: as any*/),
+        "component.variants.edges.node.modifiers": (v35/*:: as any*/),
+        "component.variants.edges.node.modifiers.edges": (v36/*:: as any*/),
+        "component.variants.edges.node.modifiers.edges.node": (v37/*:: as any*/),
+        "component.variants.edges.node.modifiers.edges.node.uri": (v25/*:: as any*/),
+        "component.variants.edges.node.summary": (v29/*:: as any*/),
+        "component.variants.edges.node.uri": (v25/*:: as any*/)
       }
     },
     "name": "ComponentRelationsStoryQuery",
     "operationKind": "query",
-    "text": "query ComponentRelationsStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentRelations_node_2bxhYB\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment ComponentRelations_node_2bxhYB on Component {\n  inheritsFroms(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  specializedBies(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  variants(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  variantOfs(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  subcomponents(first: 24) {\n    edges {\n      node {\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n  modifierFamilies(first: 24) {\n    edges {\n      node {\n        uri\n        ...SiteRowProjection_node\n      }\n    }\n  }\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ComponentRelationsStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentRelations_node_2bxhYB\n    uri\n  }\n}\n\nfragment CodeStandardRow_node on CodeStandard {\n  __typename\n  description\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment ComponentRelations_node_2bxhYB on Component {\n  inheritsFroms(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...DocsRowProjection_node\n      }\n    }\n  }\n  specializedBies(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...DocsRowProjection_node\n      }\n    }\n  }\n  variants(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...DocsRowProjection_node\n      }\n    }\n  }\n  variantOfs(first: 24) {\n    edges {\n      node {\n        __typename\n        uri\n        ...DocsRowProjection_node\n      }\n    }\n  }\n  subcomponents(first: 24) {\n    edges {\n      node {\n        uri\n        ...DocsRowProjection_node\n      }\n    }\n  }\n  modifierFamilies(first: 24) {\n    edges {\n      node {\n        uri\n        ...DocsRowProjection_node\n      }\n    }\n  }\n}\n\nfragment DocsRowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...RowProjection_node\n  ... on Component {\n    ...UIBlockRow_node\n  }\n  ... on Pattern {\n    ...UIBlockRow_node\n  }\n  ... on Layout {\n    ...UIBlockRow_node\n  }\n  ...ModifierRow_node\n  ...ModifierFamilyRow_node\n  ...CodeStandardRow_node\n}\n\nfragment ModifierFamilyRow_node on ModifierFamily {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment NodeRow_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassRow_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment RowProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeRow_node\n  ...SiteRowSlot_node\n  ...OntologyClassRow_node\n}\n\nfragment SiteRowSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

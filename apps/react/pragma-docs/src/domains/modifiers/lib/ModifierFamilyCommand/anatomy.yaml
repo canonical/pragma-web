@@ -1,14 +1,10 @@
 ---
-# ModifierFamilyCommand: a modifier family as a 56px command-palette
-# result.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 and
-# the palette's result rows 502:1753 and 502:1827 (the title over "kind in
-# location", one vital at the end). The kind is the family's class; the
-# location the compact address's prefix; the vital counts its modifiers.
-# Projected onto EntityCommand, which carries every style: this anatomy
-# binds none. The home is the link the title renders through, resolved
-# from the compact address; a family has no home yet and reads as inert
-# text.
+# ModifierFamilyCommand: a modifier family as a result in the command
+# palette: the slot order mark, title, address, kind, status. The palette's
+# results mix every type, so the result carries its compact address and its
+# class on its second line and no prefix; the status counts the family's
+# modifiers. A family has no home yet and reads as inert text. Projected
+# onto the base form, which carries every style.
 node:
   uri: docs.component.modifier_family_command
   projection:
@@ -17,6 +13,17 @@ node:
     - node:
         uri: prism.component.entity_command
         edges:
+          - node:
+              role: mark
+              # The modifier family's glyph, a published Icon (MODIFIER_FAMILY_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
               role: title
               projection:
@@ -32,6 +39,13 @@ node:
               cardinality: "1"
               slotName: title
           - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "1"
+              slotName: address
+          - node:
               role: kind
               projection:
                 field: _meta.title
@@ -41,25 +55,19 @@ node:
               projection:
                 field: _meta.type
           - node:
-              role: location
-              projection:
-                field: _meta.curie
-            relation:
-              cardinality: "0..1"
-              slotName: location
-          - node:
-              role: vital
+              role: status
               edges:
                 - node:
-                    role: member
+                    role: count
                     projection:
                       field: uri
                   relation:
+                    # Each member counts once.
                     cardinality: "0..*"
                     projection:
                       field: modifiers
             relation:
               cardinality: "1"
-              slotName: vital
+              slotName: status
       relation:
         cardinality: "1"

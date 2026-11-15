@@ -1,22 +1,30 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/OntologyClassChip_node.graphql.js";
-import { useProjectionLink } from "../../projections/index.js";
+import { useProjectionPeek } from "../../node/ProjectionPeek/index.js";
+import {
+  useForeignPrefix,
+  useProjectionLink,
+} from "../../projections/index.js";
 import { EntityChip } from "../../ui/index.js";
+import { CLASS_MARK_ICON } from "../constants.js";
 import type { OntologyClassChipProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields OntologyClassChip reads from the OntologyClass it renders: its
- * title and its compact address.
+ * absolute IRI, the address its peek reads the class at, its title and its
+ * compact address, the address its home is built from.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment OntologyClassChip_node on OntologyClass {
     __typename
+    uri
     _meta {
       title
       curie
@@ -29,10 +37,16 @@ void declareNodeFragment;
 const componentCssClassName = "ds ontology-class-chip";
 
 /**
- * An ontology class as an inline mention: its title alone in the chip's
- * pill, linked to its home when the site has one and inert text when it has
- * none. A passage's own link text, given as `children`, stands in for the
- * title.
+ * An ontology class as an inline mention: the class glyph as its mark, its
+ * namespace prefix when it differs from the page's ambient one, and its
+ * title in the chip's pill, linked to its home when the site has one and
+ * inert text when it has none or `linked` is false. A linked chip peeks at
+ * the class at its absolute IRI through the site's peek,
+ * `useProjectionPeek` (the package's `ProjectionPeek` when the site gives
+ * none), mounted when the peek opens. A passage's own link text, given as
+ * `children`, stands in for the title.
+ *
+ * It is the chip's arm for `OntologyClass`: `ChipProjection` renders it.
  *
  * Native props reach the chip's `<span>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename as
@@ -42,7 +56,8 @@ const componentCssClassName = "ds ontology-class-chip";
  *
  * @implements prism.component.ontology_class_chip
  * @note Impure: reads its class from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes, its link and peek from the projection provider and the
+ *   page's ambient namespace.
  */
 export default function OntologyClassChip({
   node,
@@ -51,8 +66,11 @@ export default function OntologyClassChip({
   ...props
 }: OntologyClassChipProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  const href = useHome({ __typename: data.__typename, uri: data._meta.curie });
+  const { curie, title } = data._meta;
+  const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const peek = useProjectionPeek(data.uri);
+  const prefix = useForeignPrefix(curie);
   return (
     <EntityChip
       {...props}
@@ -60,7 +78,10 @@ export default function OntologyClassChip({
       data-type={data.__typename}
       href={href}
       LinkComponent={LinkComponent}
-      value={children ?? data._meta.title}
+      mark={<Icon icon={CLASS_MARK_ICON} />}
+      peek={peek}
+      prefix={prefix}
+      title={children ?? title}
     />
   );
 }

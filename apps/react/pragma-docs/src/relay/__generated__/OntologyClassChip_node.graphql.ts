@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d980ac141208dfb3cfbdf773a08781fd>>
+ * @generated SignedSource<<db6012cdfdd9be4a07c4de603ab1a7a7>>
  * @lightSyntaxTransform
  */
 
@@ -15,6 +15,7 @@ export type OntologyClassChip_node$data = {
     readonly curie: string;
     readonly title: string;
   };
+  readonly uri: string;
   readonly " $fragmentType": "OntologyClassChip_node";
 };
 export type OntologyClassChip_node$key = {
@@ -33,6 +34,13 @@ const node: ReaderFragment = {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "uri",
       "storageKey": null
     },
     {
@@ -65,6 +73,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "51bde66ffec70b4a7b27446564cc797f";
+(node as any).hash = "92dc724588a2c6f06b7e5b3702fb8640";
 
 export default node;

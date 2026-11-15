@@ -3,8 +3,8 @@
 import { createEnvironment, useHome } from "@canonical/prism-core";
 import {
   ChipProjection,
-  defaultProjectionMaps,
-  useProjectionMaps,
+  useForeignPrefix,
+  useProjectionPeek,
 } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import {
@@ -13,12 +13,13 @@ import {
   route,
 } from "@canonical/router-core";
 import { fireEvent, render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { isValidElement, type ReactElement } from "react";
 import { graphql, useLazyLoadQuery, useRelayEnvironment } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import type { ShellTestsQuery } from "#relay/__generated__/ShellTestsQuery.graphql.js";
 import shellTestsQueryNode from "#relay/__generated__/ShellTestsQuery.graphql.js";
+import { DocsPeek } from "../DocsPeek/index.js";
 import Shell from "./Shell.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -43,14 +44,23 @@ const environment = createEnvironment({
 function Probe(): ReactElement {
   const provided = useRelayEnvironment();
   const home = useHome({ __typename: "OntologyClass", uri: "ds:Component" });
-  const maps = useProjectionMaps();
+  const peek = useProjectionPeek(
+    "https://ds.canonical.com/global.component.button",
+  );
+  const ownPrefix = useForeignPrefix("ds:global.component.button");
+  const foreignPrefix = useForeignPrefix("cs:react.component.props");
   return (
     <section>
       <Head title="Probe" />
       <h1>Probe content</h1>
       <p>{provided === environment ? "Environment provided" : "Other"}</p>
       <p>Home: {home ?? "none"}</p>
-      <p>{maps === defaultProjectionMaps ? "Default maps" : "Other maps"}</p>
+      <p>
+        Peek:{" "}
+        {isValidElement(peek) && peek.type === DocsPeek ? "DocsPeek" : "other"}
+      </p>
+      <p>Own prefix: {ownPrefix ?? "none"}</p>
+      <p>Foreign prefix: {foreignPrefix ?? "none"}</p>
     </section>
   );
 }
@@ -74,6 +84,12 @@ const renderShell = () =>
   );
 
 describe("Shell", () => {
+  it("declares `ds` as the site's home namespace", async () => {
+    renderShell();
+    expect(await screen.findByText("Own prefix: none")).toBeInTheDocument();
+    expect(screen.getByText("Foreign prefix: cs:")).toBeInTheDocument();
+  });
+
   it("renders exactly one intrinsic grid, its own root", async () => {
     const { container } = renderShell();
     await screen.findByRole("heading", { name: "Probe content" });
@@ -98,12 +114,16 @@ describe("Shell", () => {
     expect(await screen.findByText("Environment provided")).toBeInTheDocument();
   });
 
-  it("provides the site's homes and the default projection maps", async () => {
+  it("provides the site's homes", async () => {
     renderShell();
     expect(
       await screen.findByText("Home: /definitions/ds%3AComponent"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Default maps")).toBeInTheDocument();
+  });
+
+  it("gives every chip the site's peek, DocsPeek", async () => {
+    renderShell();
+    expect(await screen.findByText("Peek: DocsPeek")).toBeInTheDocument();
   });
 
   it("mounts the command palette once, closed", async () => {

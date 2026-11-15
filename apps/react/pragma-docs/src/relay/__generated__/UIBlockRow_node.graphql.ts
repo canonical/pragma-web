@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<91965b46c01d59395ac8898a27fff3d8>>
+ * @generated SignedSource<<00c562d8050ae1e5d0e84c6790309c2f>>
  * @lightSyntaxTransform
  */
 
@@ -24,6 +24,7 @@ export type UIBlockRow_node$data = {
       };
     }>;
   };
+  readonly summary: string | null | undefined;
   readonly " $fragmentType": "UIBlockRow_node";
 };
 export type UIBlockRow_node$key = {
@@ -50,6 +51,13 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "summary",
       "storageKey": null
     },
     {
@@ -128,6 +136,6 @@ return {
 };
 })();
 
-(node as any).hash = "b113a505e18d15dddc1b3853cb36b8c5";
+(node as any).hash = "d34b01ba1e6640a97f365ef435d1205b";
 
 export default node;

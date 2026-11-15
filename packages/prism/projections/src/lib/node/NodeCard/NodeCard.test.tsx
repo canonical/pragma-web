@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -81,19 +82,19 @@ describe("NodeCard", () => {
 
   it("fills the card's slots from the node, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => <NodeCard node={node} />);
+    expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".location, .title, .kind, .summary")].map(
+      [...container.querySelectorAll(".prefix, .address, .kind, .summary")].map(
         (slot) => slot.textContent,
       ),
     ).toEqual([
-      "ds",
-      "IconButton",
+      "ds:",
       "Component",
       "A button is an interactive element that triggers a command.",
     ]);
-    for (const slot of [".parent", ".key-values", ".footer", ".sidecar"]) {
-      expect(container.querySelector(slot), slot).toBeNull();
-    }
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/file-blank.svg#file-blank",
+    );
   });
 
   it("links its title to the home of a type the site homes", () => {
@@ -105,14 +106,14 @@ describe("NodeCard", () => {
     ).toBe("/things/ds%3Aglobal.component.icon-button");
   });
 
-  it("has no location when the node's address did not compact", () => {
+  it("has no prefix when the node's address did not compact", () => {
     const { container } = renderWithNode((node) => <NodeCard node={node} />, {
       _meta: {
         ...MOCK_NODE._meta,
         curie: "https://ds.canonical.com/global/component/icon-button",
       },
     });
-    expect(container.querySelector(".location")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("renders no summary for a node without a definition", () => {

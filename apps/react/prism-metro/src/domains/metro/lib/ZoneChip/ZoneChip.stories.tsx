@@ -67,7 +67,7 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The Central Zone: its name in the pill, as inert text. */
+/** The Central Zone: its mark, its prefix and its name, as inert text. */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

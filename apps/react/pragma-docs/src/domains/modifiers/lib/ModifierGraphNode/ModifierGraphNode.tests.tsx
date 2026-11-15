@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -90,15 +91,18 @@ describe("ModifierGraphNode", () => {
         <ModifierGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("Danger");
-    expect(container.querySelector(".title .identifier")).toBeNull();
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Modifier in ds",
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe("ds: Danger");
+    expect(container.querySelector(".title .prefix")?.textContent).toBe("ds: ");
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/settings.svg#settings",
     );
+    expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")).toBeNull();
   });
 
-  it("names its class alone when the modifier's address did not compact", () => {
+  it("has no prefix when the modifier's address did not compact", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
@@ -112,7 +116,8 @@ describe("ModifierGraphNode", () => {
         },
       },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Modifier");
+    expect(container.querySelector(".title .prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Danger");
   });
 
   it("applies custom className", () => {

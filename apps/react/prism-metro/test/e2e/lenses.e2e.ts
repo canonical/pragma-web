@@ -23,7 +23,7 @@ const INITIAL_DATA_PATTERN = /window\.__INITIAL_DATA__ = (.*?)<\/script>/s;
 
 /** An instance chip of the term inspector, linking to the network lens. */
 const INSTANCE_CHIP_PATTERN =
-  /<a class="ds router-link value" href="(\/network\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
+  /<a class="ds router-link title" href="(\/network\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
 
 const CELLS = [
   { script: "dev:bun", timeoutMs: DEV_READY_MS },
@@ -173,10 +173,10 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     const series90 = cards.find((card) =>
       card.includes('href="/fleet/metro%3Aseries-90"'),
     );
-    const sidecar = series90?.split('class="sidecar"').at(1) ?? "";
+    const specimen = series90?.split('class="ds specimen"').at(1) ?? "";
     expect(
       [
-        ...sidecar.matchAll(/<svg[^>]*class="drawing"[^>]*viewBox="([^"]+)"/g),
+        ...specimen.matchAll(/<svg[^>]*class="drawing"[^>]*viewBox="([^"]+)"/g),
       ].map(([, viewBox]) => viewBox),
     ).toEqual(["0 0 120000 3600", "0 0 120000 3600"]);
   });

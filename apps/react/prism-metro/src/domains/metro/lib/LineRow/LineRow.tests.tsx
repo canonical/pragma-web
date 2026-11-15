@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -9,7 +10,11 @@ import testQuery, {
   type LineRowTestQuery,
 } from "#relay/__generated__/LineRowTestQuery.graphql.js";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
-import { MOCK_LINE, resolveRoot } from "../../../../../testing/fixtures.js";
+import {
+  MOCK_LINE,
+  MOCK_LOOP_LINE,
+  resolveRoot,
+} from "../../../../../testing/fixtures.js";
 import LineRow from "./LineRow.js";
 import type { LineRowProps } from "./types.js";
 
@@ -84,85 +89,80 @@ describe("LineRow", () => {
     );
   });
 
-  it("fills the row's slots from the line, in the anatomy's order", () => {
-    const { container } = renderWithNode((node) => (
-      <ul>
-        <LineRow node={node} />
-      </ul>
-    ));
-    expect(
-      [...container.querySelectorAll(".title, .meta")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["North Line", "5 stops"]);
-    expect(container.querySelector(".location")).toBeNull();
-  });
-
-  it("leads with a swatch of the line's colour, set on its root", () => {
-    const { container } = renderWithNode((node) => (
-      <ul>
-        <LineRow node={node} />
-      </ul>
-    ));
-    const row = container.querySelector<HTMLElement>(".ds.line-row");
-    expect(row?.querySelector(".identity > .mark > .swatch")).not.toBeNull();
-    expect(row?.style.getPropertyValue("--line-row-swatch-color")).toBe(
-      "#c8102e",
-    );
-  });
-
-  it("paints each line in its own colour", () => {
+  it("leaves its mark uncoloured for a colour the gate refuses", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
           <LineRow node={node} />
         </ul>
       ),
-      { colour: "#f2b705" },
+      {
+        colour: "red; background: url(https://example.com/x)",
+      },
     );
-    expect(
-      container
-        .querySelector<HTMLElement>(".ds.line-row")
-        ?.style.getPropertyValue("--line-row-swatch-color"),
-    ).toBe("#f2b705");
+    const mark = container.querySelector<HTMLElement>(".mark .swatch-mark");
+    expect(mark).not.toBeNull();
+    expect(mark?.style.getPropertyValue("--swatch-mark-colour")).toBe("");
+    expect(container.innerHTML).not.toContain("url(");
   });
 
-  it("keeps its name the line's, whatever the colour", () => {
+  it("fills the row's slots from the line, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => (
       <ul>
         <LineRow node={node} />
       </ul>
     ));
-    expect(container.querySelector(".mark")).toHaveAttribute(
-      "aria-hidden",
-      "true",
+    const root = container.querySelector(".ds.line-row");
+    expect(
+      root
+        ?.querySelector<HTMLElement>(".mark .swatch-mark")
+        ?.style.getPropertyValue("--swatch-mark-colour"),
+    ).toBe("#c8102e");
+    expect(
+      [...(root?.querySelectorAll(".prefix, .title") ?? [])].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual(["metro:", "North Line"]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["servedBy", "5"]]);
+    for (const slot of [".kind", ".summary", ".status"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
+    }
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "North Line" })).toHaveAttribute(
+      "href",
+      "/network/lines/metro%3Anorth-line",
     );
-    expect(screen.getByRole("link").textContent).toBe("North Line");
   });
 
-  it("keeps a consumer's style beside the line's colour", () => {
+  it("puts its definition under its name in a two-line row", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <LineRow node={node} style={{ marginInline: "0" }} />
+        <LineRow lines="two" node={node} />
       </ul>
     ));
-    const row = container.querySelector<HTMLElement>(".ds.line-row");
-    expect(row?.style.marginInline).toBe("0px");
-    expect(row?.style.getPropertyValue("--line-row-swatch-color")).toBe(
-      "#c8102e",
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "Northgate to Marsh End, via the old cutting.",
     );
   });
 
-  it("links its title to the line's page", () => {
-    renderWithNode((node) => (
-      <ul>
-        <LineRow node={node} />
-      </ul>
-    ));
-    expect(
-      screen.getByRole("link", { name: "North Line" }).getAttribute("href"),
-    ).toBe("/network/lines/metro%3Anorth-line");
+  it("counts a loop's stops and states the loop as its status", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <LineRow node={node} />
+        </ul>
+      ),
+      MOCK_LOOP_LINE,
+    );
+    expect(container.querySelector(".fact .detail")?.textContent).toBe("6");
+    expect(container.querySelector(".status")?.textContent).toBe("loop");
   });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>

@@ -1,13 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { HomesProvider, RouterLink } from "@canonical/prism-core";
-import { ProjectionsProvider } from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import { renderToString } from "react-dom/server";
 import { RelayEnvironmentProvider } from "react-relay";
 import { describe, expect, it } from "vitest";
-import { metroProjectionMaps } from "#domains/metro";
+import { SITE_SWITCHES } from "#lib/ui";
 import {
   createRecordedEnvironment,
   readRecordedCalls,
@@ -32,9 +32,9 @@ describe("CallStop SSR", () => {
       >
         <RelayEnvironmentProvider environment={RECORDED}>
           <HomesProvider homes={homes}>
-            <ProjectionsProvider
+            <ProjectionLinkProvider
               LinkComponent={RouterLink}
-              maps={metroProjectionMaps}
+              site={SITE_SWITCHES}
             >
               <ol>
                 {central === undefined ? null : (
@@ -45,7 +45,7 @@ describe("CallStop SSR", () => {
                   />
                 )}
               </ol>
-            </ProjectionsProvider>
+            </ProjectionLinkProvider>
           </HomesProvider>
         </RelayEnvironmentProvider>
       </RouterProvider>,

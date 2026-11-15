@@ -1,33 +1,64 @@
 ---
-# FormationCommand: a formation as a 56px command-palette entry.
-# Best guess: "‹name› Formation in ‹stock›", then its length.
-# Projected onto EntityCommand, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address.
+# FormationCommand: a formation as a command-palette entry: its mark and its
+# name, linked to its home, then its compact address, its kind and its length,
+# its one figure, in the status. The address states its namespace, so it shows
+# no prefix. Its mark is the formation's glyph, a published icon.
 node:
   uri: metro.component.formation_command
-  projection: { on: Formation }
+  projection:
+    on: Formation
   edges:
     - node:
         uri: prism.component.entity_command
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # The formation's glyph, a published Icon (FORMATION_MARK_ICON).
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "1"
+              slotName: address
           - node:
               role: kind
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
           - node:
-              role: location
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: location, projection: { field: stock } }
-          - node:
-              role: vital
-              projection: { field: length }
-            relation: { cardinality: "1", slotName: vital }
-      relation: { cardinality: "1" }
+              role: status
+              # The formation's length, its one figure.
+              projection:
+                field: length
+            relation:
+              cardinality: "1"
+              slotName: status
+      relation:
+        cardinality: "1"

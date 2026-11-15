@@ -9,12 +9,17 @@ type OwnProps = {
    * spreads `...UnitRow_node`.
    */
   readonly node: UnitRow_node$key;
+  /**
+   * How many lines the row takes: `"two"` sets its summary under its
+   * title, for an index that opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**
  * Props accepted by `UnitRow`: its own, then the native props of the
- * `<li>` the EntityRow renders as its root. The native `children` are
- * excluded: the projection fills its slots from the node.
+ * `<li>` the row renders as its root. The native `children` are
+ * excluded: the projection fills the row's slots from the unit.
  */
 export type UnitRowProps = OwnProps &
   Omit<ComponentProps<"li">, keyof OwnProps | "children">;

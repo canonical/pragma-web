@@ -235,7 +235,7 @@ describe("ComponentDetail", () => {
           createFetchSpy(),
         ),
       );
-      expect(readView().querySelector(".facts")).toBeNull();
+      expect(readView().querySelector(":scope > .aside > .facts")).toBeNull();
       expect(document.querySelector(".ds.key-value-list")).toBeNull();
     },
     ENTITY_TEST_TIMEOUT_MS,

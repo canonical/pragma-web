@@ -1,24 +1,17 @@
 ---
-# UIBlockCard: a UI block as a card in a grid of entities, with its
-# rendered example beside the body.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 and 505:2254 (the
-# tier above the title, "IconButton ∈ Button", the kind, the summary, the
-# footer's vitals "v2.1" and the stage) and 502:1749 (the side panel). The
-# location is the block's tier; the parent the first block it inherits
-# from, after the catalog's ∈; the kind the block's class; the summary the
-# first paragraph of the block's Markdown summary, rendered inline, so its
-# emphasis and code read as they do in the block's documentation; the
-# vitals its version, when it has one, then its first documentation stage.
-# The sidecar renders the actual component: the published React component
-# of the block with its default props, given only what it cannot render
-# without, server-rendered. A block the published package does not
-# implement has no sidecar, and its card lays out as any card without one.
-# Projected onto EntityCard, which carries every style, the sidecar's
-# subgrid and its two columns included, but one: the summary breaks
-# anywhere, since its inline code cannot wrap at a space and would run
-# past a card at the end of a row. The home
-# is the link the title renders through, resolved from the compact address;
-# a block whose type has no home reads as inert text.
+# UIBlockCard: a UI block as a card: the slot order mark, prefix, title,
+# summary, facts, status, then the specimen. A typed card names no address
+# (the peek's line carries the CURIE) and no kind (its mark says it). The
+# facts are the tier, the block it inherits from and its version, each cell
+# naming its property in data-property; the status is its documentation
+# stage; the specimen holds the published component, for a block the site
+# renders.
+# One projection serves every UI-block type: it reads only what the UIBlock
+# interface declares, and the site's switches case it for Component,
+# Pattern and Layout. Its mark is the UI block's glyph, so it names no kind;
+# the prefix shows only off the page's ambient namespace (the components
+# lens declares ds). Projected onto the base form, which carries every
+# style.
 node:
   uri: docs.component.ui_block_card
   projection:
@@ -28,14 +21,23 @@ node:
         uri: prism.component.entity_card
         edges:
           - node:
-              role: location
+              role: mark
+              # The UI block's glyph, a published Icon (UI_BLOCK_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
               projection:
-                field: _meta.title
+                field: _meta.curie
             relation:
               cardinality: "0..1"
-              slotName: location
-              projection:
-                field: tier
+              slotName: prefix
           - node:
               role: title
               projection:
@@ -51,25 +53,6 @@ node:
               cardinality: "1"
               slotName: title
           - node:
-              role: parent
-              projection:
-                field: _meta.title
-            relation:
-              # The first block it inherits from: the title names one parent.
-              cardinality: "0..1"
-              slotName: parent
-              projection:
-                field: inheritsFroms
-          - node:
-              role: kind
-              projection:
-                field: _meta.title
-            relation:
-              cardinality: "1"
-              slotName: kind
-              projection:
-                field: _meta.type
-          - node:
               role: summary
               projection:
                 field: summary
@@ -79,31 +62,57 @@ node:
               cardinality: "0..1"
               slotName: summary
           - node:
-              role: vitals
+              role: facts
               edges:
+                - node:
+                    role: tier
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: tier
+                - node:
+                    role: inheritsFrom
+                    projection:
+                      field: _meta.title
+                  relation:
+                    # The first block it inherits from: the fact names one.
+                    cardinality: "0..1"
+                    projection:
+                      field: inheritsFroms
                 - node:
                     role: version
                     projection:
                       field: version
                   relation:
                     cardinality: "0..1"
-                - node:
-                    role: stage
-                    projection:
-                      field: _meta.title
-                  relation:
-                    cardinality: "0..1"
-                    projection:
-                      field: documentationStages
             relation:
               cardinality: "0..1"
-              slotName: footer
+              slotName: facts
           - node:
-              uri: docs.component.ui_block_example
+              role: status
               projection:
-                field: _meta.curie
+                field: _meta.title
             relation:
+              # The block's documentation stage, a state of the block.
               cardinality: "0..1"
-              slotName: sidecar
+              slotName: status
+              projection:
+                field: documentationStages
+          - node:
+              uri: prism.component.entity_card.specimen
+              edges:
+                - node:
+                    uri: docs.component.ui_block_example
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "1"
+            relation:
+              # The block as the published package renders it, for a block
+              # the site has an example of (kind block).
+              cardinality: "0..1"
+              slotName: specimen
       relation:
         cardinality: "1"

@@ -96,6 +96,42 @@ export const STANDARDS_INDEX_PATH = "/standards";
 export const STANDARDS_INDEX_ROW_SELECTOR = ".ds.standards-index > *";
 
 /**
+ * The widths the standards index's facts are measured at, each with the
+ * rows that must show their address, the row's one fact, there: none
+ * below two groups (912px), where the index shows no row's facts so that
+ * no row is singled out, on a phone and at two groups' threshold less one
+ * step; at that threshold, where the row decides, those that have room
+ * for it, and at least one; and every row on the desktop. At every width
+ * each row whose first fact fits beside its whole title must show it.
+ */
+export const STANDARDS_FACT_WIDTHS = [
+  { width: 390, shown: "none" },
+  { width: 820, shown: "none" },
+  { width: 912, shown: "fitting" },
+  { width: 1440, shown: "every" },
+] as const;
+
+/** The catalog's rows view, an index that opts its rows into two lines. */
+export const CATALOG_ROWS_PATH = "/components";
+
+/** The catalog's rows. */
+export const CATALOG_ROW_SELECTOR =
+  ".ds.components-catalog-page .ds.entity-row";
+
+/**
+ * The facts a standards index row is given in the browser, after its
+ * address, so that a row with several facts can be seen narrowing: each
+ * fact's property, label and value.
+ */
+export const ADDED_FACTS = [
+  { property: "category", label: "Category", value: "Accessibility" },
+  { property: "stage", label: "Stage", value: "Deprecated" },
+] as const;
+
+/** The step, in pixels, by which a row is narrowed while its facts leave. */
+export const NARROWING_STEP_PX = 4;
+
+/**
  * How far apart, in pixels, two edges or widths of boxes that fill the
  * same tracks may round: sub-pixel layout rounds each box on its own.
  */
@@ -106,6 +142,12 @@ export const DEFINITIONS_PATHS = [
   "/definitions",
   `/definitions/${encodeURIComponent("ds:UIBlock")}`,
 ] as const;
+
+/**
+ * A class of the design system with instances, whose term page lists them
+ * in its inspector.
+ */
+export const INSTANCES_TERM = "ds:Component";
 
 /**
  * Desktops shorter than the 1440 by 900 the layout is designed for, once

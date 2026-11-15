@@ -1,0 +1,75 @@
+---
+# EntityChip's Peek (EntityChip/common/Peek/): the chip's open peek, a
+# non-modal dialog (popover="manual", role="dialog") named by a hidden label
+# (aria-labelledby; the catalog's "chip.peek" with the chip's title, a node,
+# not a string). EntityChip mounts it through a portal on the document's
+# body while the peek is open, outside the paragraph a mention sits in, so
+# it is a component of its own, with its own root and tokens; nothing else
+# renders it and it is not exported.
+#
+# Reference: PS1 V4 (mockups/ps1-v4-sheet-peek.html, tools/ps1v4-measured
+# "peek"): the drawn 248px peek is the popover's frame, its border with no
+# padding, round a borderless card, and the address line under the card
+# (ProjectionPeek renders both); the card's own insets are the only ones,
+# so a specimen meets the frame as it meets a card's edge in a grid. Tethered with CSS anchor positioning
+# (position-anchor set inline from the chip's ident), 4px below the chip,
+# from its start; from its end when the start would run past the
+# viewport's inline end, and above when the viewport has no room below
+# (position-try-fallbacks: flip-inline, flip-block, flip-block
+# flip-inline); when neither side of the chip has room (a short chip
+# mid-line on a narrow viewport), below or above the chip across the
+# viewport, 4px from its inline start (--peek-viewport-below,
+# --peek-viewport-above, the last two fallbacks), and only there narrower
+# than 248px where the viewport is narrower than the peek and its insets;
+# so the whole frame stays in the viewport; it scrolls rather than
+# outgrowing the viewport, no taller than it less 4px at each end.
+#
+# A peek that shows nothing (its card loading, no node at the IRI, a site
+# peek that renders null) holds only its hidden label, and is then not
+# displayed (`:not(:has(> :not([hidden])))`, display none): no empty frame
+# shows and no empty dialog is announced.
+#
+# The popover's tokens are declared on :root only where the published
+# Popover is loaded, so each falls back to the value that component gives
+# it.
+#
+# Why not the published Popover: it is a click disclosure on a button; the
+# peek opens on hover-intent and focus of a link (EXPLANATIONS S5).
+#
+# Token ledger (every decision; a literal only where no symbol exists):
+#   --peek-width: 248px                         literal: the drawn peek (M9)
+#   --peek-offset: space.050 (4px)              below the chip
+#   --peek-edge-inset: space.050 (4px)          from the viewport's edges
+#   --peek-max-height: calc((100dvh - anchor-size(height)) / 2 - offset - edge-inset)
+#                                               half the viewport the chip leaves, less
+#                                               the gap and the inset: the larger side
+#                                               of the chip always holds it
+#   --peek-background: color.background
+#   --peek-border-width: popover.border.width (1px)
+#   --peek-border-color: popover.color.border
+node:
+  uri: prism.component.entity_chip.peek
+  attributes: { popover: manual, role: dialog }
+  styles:
+    size.width: 248px
+    size.max.height: "calc((100dvh - anchor-size(height)) / 2 - var(--peek-offset) - var(--peek-edge-inset))"
+    layout.overflow.block: auto
+    spacing.external.block.start: space.050
+    spacing.external.block.end: 0
+    spacing.external.inline.start: 0
+    spacing.external.inline.end: 0
+    spacing.internal.block.start: 0
+    spacing.internal.block.end: 0
+    spacing.internal.inline.start: 0
+    spacing.internal.inline.end: 0
+    appearance.border.width: [popover.border.width, 1px]
+    appearance.border.style: solid
+    appearance.border.color: [popover.color.border, color.border]
+    appearance.background: color.background
+  edges:
+    - node:
+        role: label
+      relation: { cardinality: "1", slotName: label }
+    - node:
+        uri: prism.component.projection_peek
+      relation: { cardinality: "0..1", slotName: content }

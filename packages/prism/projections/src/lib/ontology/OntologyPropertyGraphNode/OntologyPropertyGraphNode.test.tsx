@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -14,6 +15,7 @@ import {
 import testQuery, {
   type OntologyPropertyGraphNodeTestQuery,
 } from "../../../__generated__/OntologyPropertyGraphNodeTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyPropertyGraphNode from "./OntologyPropertyGraphNode.js";
 import type { OntologyPropertyGraphNodeProps } from "./types.js";
 
@@ -108,27 +110,30 @@ describe("OntologyPropertyGraphNode", () => {
         <OntologyPropertyGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("Modifier");
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Object property in UIBlock",
+    expectSlotOrder(container);
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/tag.svg#tag",
     );
+    expect(container.querySelector(".title")?.textContent).toBe("ds: Modifier");
+    expect(container.querySelector(".title > .prefix")?.textContent).toBe(
+      "ds: ",
+    );
+    expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_PROPERTY_HREF,
     );
   });
 
-  it("names its kind alone when the property is declared on no class", () => {
+  it("names a property with no label by its IRI's local name", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
           <OntologyPropertyGraphNode node={node} />
         </svg>
       ),
-      { domain: null, label: null },
-      { kind: "SYMMETRIC" },
+      { label: null },
     );
-    expect(container.querySelector(".title")?.textContent).toBe("modifier");
-    expect(container.querySelector(".context")?.textContent).toBe("Property");
+    expect(container.querySelector(".title")?.textContent).toBe("ds: modifier");
   });
 
   it("takes the width the graph's layout gives it", () => {
@@ -162,5 +167,17 @@ describe("OntologyPropertyGraphNode", () => {
       </svg>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("g");
+  });
+
+  it("shows its namespace's prefix only off the page's namespace", () => {
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <svg aria-label="Graph" role="img">
+          <OntologyPropertyGraphNode node={node} />
+        </svg>
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
+    expect(own.container.querySelector(".title")?.textContent).toBe("Modifier");
   });
 });

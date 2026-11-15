@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9d8e777b663f914fd9d2b0b6acfe7c20>>
+ * @generated SignedSource<<371df378e8a90789dcb8406cd77bc922>>
  * @lightSyntaxTransform
  */
 
@@ -178,16 +178,6 @@ return {
               },
               {
                 "alias": null,
-                "args": null,
-                "concreteType": "Tier",
-                "kind": "LinkedField",
-                "name": "tier",
-                "plural": false,
-                "selections": (v3/*:: as any*/),
-                "storageKey": null
-              },
-              {
-                "alias": null,
                 "args": [
                   {
                     "kind": "Literal",
@@ -234,7 +224,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4ec45e7bcfbf1f6e77084a15ae0d20f5",
+    "cacheID": "e1a43dcc416137b4cc6f2ce23f201537",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -279,15 +269,6 @@ return {
         "node.documentationStages.edges.node._meta": (v5/*:: as any*/),
         "node.documentationStages.edges.node._meta.title": (v4/*:: as any*/),
         "node.documentationStages.edges.node.uri": (v6/*:: as any*/),
-        "node.tier": {
-          "enumValues": null,
-          "nullable": true,
-          "plural": false,
-          "type": "Tier"
-        },
-        "node.tier._meta": (v5/*:: as any*/),
-        "node.tier._meta.title": (v4/*:: as any*/),
-        "node.tier.uri": (v6/*:: as any*/),
         "node.uri": (v6/*:: as any*/),
         "node.version": {
           "enumValues": null,
@@ -299,7 +280,7 @@ return {
     },
     "name": "UIBlockCommandStoryQuery",
     "operationKind": "query",
-    "text": "query UIBlockCommandStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...UIBlockCommand_node\n    uri\n  }\n}\n\nfragment UIBlockCommand_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  version\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query UIBlockCommandStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...UIBlockCommand_node\n    uri\n  }\n}\n\nfragment UIBlockCommand_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  version\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

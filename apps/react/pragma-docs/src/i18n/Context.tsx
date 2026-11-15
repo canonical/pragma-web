@@ -1,6 +1,6 @@
 import { createTranslator } from "@canonical/i18n-core";
 import { createContext } from "react";
-import { MESSAGES } from "./constants.js";
+import { LOCALE, MESSAGES } from "./constants.js";
 import type { Translate } from "./types.js";
 
 /**
@@ -10,7 +10,7 @@ import type { Translate } from "./types.js";
  * translator by providing this context, without touching a component.
  */
 const MessagesContext = createContext<Translate>(
-  createTranslator("en", MESSAGES),
+  createTranslator(LOCALE, MESSAGES),
 );
 
 export default MessagesContext;

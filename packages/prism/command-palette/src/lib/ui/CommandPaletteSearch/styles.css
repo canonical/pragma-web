@@ -109,20 +109,22 @@
     color: var(--command-palette-search-status-color);
   }
 
-  /* The highlighted result's card in the two columns left, laid out as the
-   * Cards group lays its cards: on four row tracks, the gutter between
-   * them, packed to the top. */
+  /* The highlighted result's card in the two columns left, flush in its
+   * panel: no padding, so the card meets the panel's top, end and bottom
+   * edges, the body's gap alone parting it from the results. It is laid
+   * out as the Cards group lays its cards, on four row tracks with the
+   * gutter between them; the last track, the card's footer, takes the
+   * panel's height that is left, so the card reaches the panel's bottom. */
   .ds.command-palette-search > .body > .preview {
     display: grid;
     gap: var(--command-palette-search-preview-gap);
-    align-content: start;
+    grid-template-rows: auto auto auto 1fr;
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
     min-width: 0;
     overflow-y: auto;
-    padding-block: var(--command-palette-search-padding-block);
-    padding-inline-end: var(--command-palette-search-padding-inline);
+    padding: 0;
   }
 
   /* Below two groups: the palette is four columns wide, the results take

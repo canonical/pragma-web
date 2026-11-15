@@ -1,0 +1,60 @@
+---
+# MetroRowProjection: any graph node of the metro site as the 32px list entry,
+# dispatched on its type.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
+# matrix: one EntityRow per type, each type filling the slots it has).
+# It renders no element of its own: the case its node's type selects
+# renders the root. A metro type reads through the site's own arm; an
+# ontology class through the package's class arm; any other node through
+# the package's Node arm. The cases are the site composite's
+# aliased arms, by the same names (METRO_ROW_TYPES).
+node:
+  uri: metro.component.metro_row_projection
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: metro.component.station_row
+              projection:
+                on: Station
+          - node:
+              uri: metro.component.interchange_row
+              projection:
+                on: Interchange
+          - node:
+              uri: metro.component.line_row
+              projection:
+                on: Line
+          - node:
+              uri: metro.component.zone_row
+              projection:
+                on: Zone
+          - node:
+              uri: metro.component.rolling_stock_row
+              projection:
+                on: RollingStock
+          - node:
+              uri: metro.component.formation_row
+              projection:
+                on: Formation
+          - node:
+              uri: metro.component.unit_row
+              projection:
+                on: Unit
+          - node:
+              uri: metro.component.car_type_row
+              projection:
+                on: CarType
+          - node:
+              uri: prism.component.ontology_class_row
+              projection:
+                on: OntologyClass
+          - node:
+              uri: prism.component.node_row
+              projection:
+                on: Node
+      relation:
+        cardinality: "1"

@@ -1,6 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
+import { expectSlotOrder } from "@canonical/prism-core/testing";
+import { act, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
@@ -14,6 +15,7 @@ import {
 import testQuery, {
   type OntologyClassChipTestQuery,
 } from "../../../__generated__/OntologyClassChipTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyClassChip from "./OntologyClassChip.js";
 import type { OntologyClassChipProps } from "./types.js";
 
@@ -67,12 +69,15 @@ const renderWithNode = (
       Node: resolveRoot({ ...MOCK_ONTOLOGY_CLASS, ...entity }),
     }),
   );
-  return render(
-    createSiteTree(
-      environment,
-      <OntologyClassChipTestNode>{children}</OntologyClassChipTestNode>,
+  return {
+    ...render(
+      createSiteTree(
+        environment,
+        <OntologyClassChipTestNode>{children}</OntologyClassChipTestNode>,
+      ),
     ),
-  );
+    environment,
+  };
 };
 
 describe("OntologyClassChip", () => {
@@ -91,6 +96,48 @@ describe("OntologyClassChip", () => {
     expect(
       screen.getByRole("link", { name: "Layout" }).getAttribute("href"),
     ).toBe(MOCK_ONTOLOGY_CLASS_HREF);
+  });
+
+  it("leads with the class glyph and peeks at the class's card, in the slot order", () => {
+    const { container, environment } = renderWithNode(
+      (node) => <OntologyClassChip node={node} />,
+      { uri: "https://ds.canonical.com/Layout" },
+    );
+    const chip = container.querySelector(".ds.ontology-class-chip");
+    if (chip === null) throw new Error("no chip rendered");
+    expectSlotOrder(chip);
+    expect(chip.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/blueprint.svg#blueprint",
+    );
+    act(() => {
+      screen.getByRole("link", { name: "Layout" }).focus();
+    });
+    expect(screen.getByRole("dialog", { hidden: true })).not.toBeNull();
+    expect(
+      environment.mock
+        .getAllOperations()
+        .map(({ request }) => [request.node.params.name, request.variables]),
+    ).toEqual([
+      ["ProjectionPeekQuery", { id: "https://ds.canonical.com/Layout" }],
+    ]);
+  });
+
+  it("shows its prefix only when its namespace is not the page's", () => {
+    const foreign = renderWithNode((node) => <OntologyClassChip node={node} />);
+    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
+    foreign.unmount();
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <OntologyClassChip node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
+  });
+
+  it("neither links nor peeks when it is not linked", () => {
+    renderWithNode((node) => <OntologyClassChip linked={false} node={node} />);
+    expect(screen.queryByRole("link")).toBeNull();
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
 
   it("shows a passage's own link text in place of the title", () => {

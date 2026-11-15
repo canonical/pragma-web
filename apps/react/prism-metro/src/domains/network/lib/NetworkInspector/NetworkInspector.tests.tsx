@@ -22,7 +22,7 @@ describe("NetworkInspector", () => {
     renderWithSite(<NetworkInspector />);
     const lines = (await screen.findByRole("heading", { name: "Lines" }))
       .parentElement as HTMLElement;
-    expect(lines.querySelector(".ds.node-list")).not.toBeNull();
+    expect(lines.querySelector(".ds.entity-list")).not.toBeNull();
     const links = within(lines).getAllByRole("link");
     expect(links).toHaveLength(LINE_COUNT);
     expect(links.map((link) => link.textContent)).toEqual([
@@ -43,7 +43,7 @@ describe("NetworkInspector", () => {
     renderWithSite(<NetworkInspector />);
     const stations = (await screen.findByRole("heading", { name: "Stations" }))
       .parentElement as HTMLElement;
-    expect(stations.querySelector(".ds.node-list")).not.toBeNull();
+    expect(stations.querySelector(".ds.entity-list")).not.toBeNull();
     const names = within(stations)
       .getAllByRole("link")
       .map((link) => link.textContent);

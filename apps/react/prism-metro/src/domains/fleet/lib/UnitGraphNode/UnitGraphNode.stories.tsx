@@ -65,7 +65,7 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The Series 90 unit, as a node of a graph. */
+/** The Series 90 unit: its mark and its name, linked to its page. */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

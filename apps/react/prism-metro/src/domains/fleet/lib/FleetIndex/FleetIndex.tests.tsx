@@ -45,7 +45,7 @@ describe("FleetIndex", () => {
     const { container } = renderMetroPage("/fleet?as=cards");
     const cards = await waitFor(() => {
       const found = container.querySelectorAll(
-        ".ds.node-list .rolling-stock-card",
+        ".ds.entity-list .rolling-stock-card",
       );
       expect(found).toHaveLength(ROLLING_STOCK_COUNT);
       return [...found];
@@ -53,7 +53,7 @@ describe("FleetIndex", () => {
     const series90 = cards.find((card) =>
       card.textContent?.includes("Series 90"),
     ) as HTMLElement;
-    const widths = [...series90.querySelectorAll(".sidecar svg.drawing")].map(
+    const widths = [...series90.querySelectorAll(".specimen svg.drawing")].map(
       (svg) => svg.getAttribute("viewBox")?.split(" ").at(2),
     );
     expect(widths).toEqual(["120000", "120000"]);
@@ -66,7 +66,7 @@ describe("FleetIndex", () => {
     const { container } = renderMetroPage("/fleet");
     await waitFor(() => {
       expect(
-        container.querySelectorAll(".ds.node-list .rolling-stock-row"),
+        container.querySelectorAll(".ds.entity-list .rolling-stock-row"),
       ).toHaveLength(ROLLING_STOCK_COUNT);
     });
     expect(container.querySelector(".rolling-stock-card")).toBeNull();
@@ -76,7 +76,7 @@ describe("FleetIndex", () => {
     const { container } = renderMetroPage("/fleet");
     const rows = await waitFor(() => {
       const found = container.querySelectorAll(
-        ".ds.node-list .rolling-stock-row",
+        ".ds.entity-list .rolling-stock-row",
       );
       expect(found).toHaveLength(ROLLING_STOCK_COUNT);
       return found;

@@ -1,6 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { ClientOnly } from "@canonical/prism-core";
+import { acceptColour } from "@canonical/prism-projections";
 import { Button } from "@canonical/react-ds-global";
 import { type CSSProperties, type ReactElement, useState } from "react";
 import { graphql, useFragment } from "react-relay";
@@ -11,6 +12,15 @@ import nodeFragment, {
 import { CallStop } from "../CallStop/index.js";
 import type { RouteStripProps } from "./types.js";
 import "./styles.css";
+
+/**
+ * The channel the strip paints its rule through, set only when the
+ * package's gate accepts `colour` as a plain colour value.
+ */
+const readChannel = (colour: string): Record<string, string> => {
+  const accepted = acceptColour(colour);
+  return accepted === undefined ? {} : { "--route-strip-colour": accepted };
+};
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
@@ -110,7 +120,9 @@ export default function RouteStrip({
     <section
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      style={{ ...style, "--route-strip-colour": colour } as CSSProperties}
+      // The line's colour is the graph's data: the package's gate takes it
+      // only as a plain colour, and a refused value leaves the channel unset.
+      style={{ ...style, ...readChannel(colour) } as CSSProperties}
     >
       {reverse === undefined ? (
         renderDirection(route)

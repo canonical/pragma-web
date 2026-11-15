@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -95,15 +96,20 @@ describe("ModifierFamilyGraphNode", () => {
         <ModifierFamilyGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("Anticipation");
-    expect(container.querySelector(".title .identifier")).toBeNull();
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Modifier family in ds",
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "ds: Anticipation",
     );
+    expect(container.querySelector(".title .prefix")?.textContent).toBe("ds: ");
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/bundle.svg#bundle",
+    );
+    expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")).toBeNull();
   });
 
-  it("names its class alone when the family's address did not compact", () => {
+  it("has no prefix when the family's address did not compact", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
@@ -117,9 +123,8 @@ describe("ModifierFamilyGraphNode", () => {
         },
       },
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Modifier family",
-    );
+    expect(container.querySelector(".title .prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Anticipation");
   });
 
   it("applies custom className", () => {

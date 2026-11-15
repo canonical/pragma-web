@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -14,8 +15,8 @@ import type { ZoneCardProps } from "./types.js";
 import ZoneCard from "./ZoneCard.js";
 
 /**
- * The operation the tests render ZoneCard under: one Zone, read through the
- * `node` field. The spread is aliased because that field is typed by an
+ * The operation the tests render ZoneCard under: one Zone, read through
+ * the `node` field. The spread is aliased because that field is typed by an
  * interface, so a node of another type reads as null instead of as a key that
  * does not match.
  */
@@ -46,8 +47,8 @@ const ZoneCardTestNode = ({
 };
 
 /**
- * Render `children` with the key of the Zone a Relay mock environment answers,
- * under the site's providers: `entity` over the Central Zone, as the graph's
+ * Render `children` with the key of the Zone a Relay mock environment
+ * answers, under the site's providers: `entity` over Central Zone, as the graph's
  * dataset holds it.
  */
 const renderWithNode = (
@@ -82,38 +83,42 @@ describe("ZoneCard", () => {
 
   it("fills the card's slots from the zone, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => <ZoneCard node={node} />);
+    const root = container.querySelector(".ds.zone-card");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/map.svg#map",
+    );
     expect(
-      [
-        ...container.querySelectorAll(
-          ".location, .title, .kind, .summary, .pair, .vital",
-        ),
-      ].map((slot) => slot.textContent),
-    ).toEqual([
-      "Central Zone",
-      "Fare zone",
-      "The innermost fare band.",
-      "2 stations",
-    ]);
+      [...(root?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual(["geo:", "Central Zone", "The innermost fare band."]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["stops", "2"]]);
+    for (const slot of [".address", ".kind", ".status", ".specimen"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
+    }
+    if (root) expectSlotOrder(root);
+    // A fare zone has no home on this site, so its title reads as text.
+    expect(root?.querySelector("a")).toBeNull();
   });
 
-  it("reads as inert text, since a fare zone has no home on this site", () => {
-    const { container } = renderWithNode((node) => <ZoneCard node={node} />);
-    expect(container.querySelector("a")).toBeNull();
-  });
-
-  it("counts no stations for a zone with none", () => {
+  it("counts no stations, and leaves out the summary, where the graph asserts none", () => {
     const { container } = renderWithNode((node) => <ZoneCard node={node} />, {
       stops: [],
-    });
-    expect(container.querySelector(".vital")?.textContent).toBe("0 stations");
-  });
-
-  it("renders no summary for a zone without a definition", () => {
-    const { container } = renderWithNode((node) => <ZoneCard node={node} />, {
       _meta: { ...MOCK_ZONE._meta, definition: null },
     });
-    expect(container.querySelector(".summary")).toBeNull();
+    expect(container.querySelector(".fact .detail")?.textContent).toBe("0");
+    for (const slot of [".summary", ".status"]) {
+      expect(container.querySelector(slot), slot).toBeNull();
+    }
+    expect(container.querySelector(".title")?.textContent).toBe("Central Zone");
   });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ZoneCard className="custom-class" node={node} />
