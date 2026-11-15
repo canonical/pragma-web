@@ -52,12 +52,14 @@ export default function frameRegionWindow(
   const most = canvas.w / (zoom * LEGIBLE_MARGIN);
   if (least > most) return undefined;
   const widths = [
-    least,
-    ...Array.from(
-      { length: Math.floor((most - least) / LATTICE) },
-      (_, step) => least + (step + 1) * LATTICE,
-    ).filter((w) => w < most),
-    ...(most > least ? [most] : []),
+    ...new Set([
+      least,
+      ...Array.from(
+        { length: Math.floor((most - least) / LATTICE) },
+        (_, step) => least + (step + 1) * LATTICE,
+      ).filter((w) => w < most),
+      most,
+    ]),
   ];
   const isClean = (window: Rect): boolean =>
     obstacles.every(

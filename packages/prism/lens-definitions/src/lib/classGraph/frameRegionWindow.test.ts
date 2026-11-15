@@ -115,6 +115,24 @@ describe("frameRegionWindow", () => {
     );
   });
 
+  it("gives no window when every window would cut a box", () => {
+    // A box straddles the frame's right side at every legible width.
+    const node = {
+      ...[...layOutClassGraph(FOUR_NAMESPACE_GRAPH).nodes.values()][0],
+      x: 90,
+      y: 0,
+      w: 60,
+      h: 10,
+    };
+    expect(
+      frameRegionWindow(
+        { nodes: new Map([["straddling", node]]), regions: [] },
+        { w: 100, h: 100 },
+        { x: 0, y: 0, w: 100, h: 100 },
+      ),
+    ).toBeUndefined();
+  });
+
   it("gives no window for a frame too large for the canvas at the legible zoom", () => {
     const layout = layOutClassGraph(FOUR_NAMESPACE_GRAPH);
     expect(

@@ -20,7 +20,6 @@ import {
 } from "react";
 import { REGION_NODE_SCHEME } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
-import frameRegionWindow from "../../classGraph/frameRegionWindow.js";
 import type { NodeNavigation } from "../../classGraph/types.js";
 import { useMessages } from "../../i18n/index.js";
 import { ClassGraph } from "../ClassGraph/index.js";
@@ -29,6 +28,7 @@ import { PhoneGraph } from "./common/PhoneGraph/index.js";
 import frameOpeningCamera from "./frameOpeningCamera.js";
 import frameOpeningView from "./frameOpeningView.js";
 import frameRefitWindow from "./frameRefitWindow.js";
+import frameRegionRequest from "./frameRegionRequest.js";
 import measureVisibleBox from "./measureVisibleBox.js";
 import type { HierarchyWellProps } from "./types.js";
 import "./styles.css";
@@ -222,35 +222,10 @@ export default function HierarchyWell({
   >(undefined);
   useEffect(() => {
     if (region === undefined) return;
-    const box = measureVisibleBox(layout, hidden, region.prefix);
+    const box = frameRegionRequest(layout, hidden, region.prefix, root.current);
     if (box === undefined) return;
-    const canvas = root.current
-      ?.querySelector(".desktop svg.viewport")
-      ?.getBoundingClientRect();
-    const shown =
-      canvas === undefined || canvas.width === 0 || canvas.height === 0
-        ? undefined
-        : frameRegionWindow(
-            {
-              nodes: new Map(
-                [...layout.nodes].filter(([uri]) => !hidden.has(uri)),
-              ),
-              regions: layout.regions,
-            },
-            { w: canvas.width, h: canvas.height },
-            { x: box.x, y: box.y, w: box.width, h: box.height },
-            {
-              wide: layout.regions.some(
-                (candidate) =>
-                  candidate.prefix === region.prefix && candidate.collapsed,
-              ),
-            },
-          );
     setFrame({
-      box:
-        shown === undefined
-          ? box
-          : { x: shown.x, y: shown.y, width: shown.w, height: shown.h },
+      box,
       serial: region.serial,
     });
   }, [hidden, layout, region]);

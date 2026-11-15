@@ -42,7 +42,7 @@ export default function classifyClasses(
     // A box is lit while any class it stands for matches.
     const matches =
       node.kind === "region"
-        ? (boxedOf.get(node.region) ?? []).some((klass) =>
+        ? requireEntry(boxedOf, node.region).some((klass) =>
             matchesDimming(
               filter,
               klass.label,
