@@ -345,6 +345,12 @@ export interface ClassGraphLayout {
    * corner at the legible floor, cutting the boxes its edge crosses.
    */
   readonly view: Rect;
+  /**
+   * The prefix of the namespace the layout is drilled into, drawn class by
+   * class with every other namespace as one box; absent at rest. The
+   * opening frames its region, not the whole graph.
+   */
+  readonly drilled?: string;
   /** The zoom at which the viewBox fits the design canvas. */
   readonly fitZoom: number;
   /** The channel the packer settled on. */

@@ -1,4 +1,8 @@
-import { GRAPH_BUDGET, requireEntry } from "@canonical/prism-core";
+import {
+  GRAPH_BUDGET,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import { FOUR_NAMESPACE_GRAPH } from "../../../testing/fixtures.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
@@ -76,6 +80,32 @@ describe("frameOpeningWindow", () => {
     const arrival = requireEntry(layout.nodes, "region:ds");
     expect(frameOpeningWindow(layout, canvas, arrival)).toEqual(
       frameLegibleWindow(layout, canvas, { arrival }),
+    );
+  });
+
+  it("opens a drilled layout on its namespace, unless a class is selected on arrival", () => {
+    const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+      budget: GRAPH_BUDGET,
+      drill: "cs",
+    });
+    const cs = requireDefined(
+      drilled.regions.find((region) => region.prefix === "cs"),
+      "the cs region",
+    );
+    const canvas = { w: 1000, h: 700 };
+    const window = frameOpeningWindow(drilled, canvas);
+    expect(containsRect(window, cs)).toBe(true);
+    // In the canvas's aspect, at the legible zoom or above, never the
+    // whole graph's frame.
+    expect(window.h / window.w).toBeCloseTo(canvas.h / canvas.w, 6);
+    expect(canvas.w / window.w).toBeGreaterThanOrEqual(MIN_FIT);
+    expect(window).not.toEqual(drilled.viewBox);
+    const arrival = requireDefined(
+      [...drilled.nodes.values()].find((node) => node.kind === "region"),
+      "a box",
+    );
+    expect(frameOpeningWindow(drilled, canvas, arrival)).toEqual(
+      frameLegibleWindow(drilled, canvas, { arrival }),
     );
   });
 });

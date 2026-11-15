@@ -24,11 +24,15 @@ export interface CapturedExplorer {
  * alone over a captured store.
  *
  * @param term - The selected term, or undefined for the explorer.
+ * @param expand - The address's `expand=` parameter, if any.
  * @returns The operation's data, the layout and the terms.
  * @note Impure: reads the Relay store, suspending while it does not hold
  *   the operation, and the graph budget from its provider.
  */
-export default function useCapturedExplorer(term?: string): CapturedExplorer {
+export default function useCapturedExplorer(
+  term?: string,
+  expand?: string,
+): CapturedExplorer {
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
     definitionsExplorerQueryNode,
     buildDefinitionsExplorerVariables(term),
@@ -37,6 +41,11 @@ export default function useCapturedExplorer(term?: string): CapturedExplorer {
     explorerFragmentNode,
     data.ontologies,
   );
-  const { layout, terms } = useExplorerLayout(graph, data.classEdges, term);
+  const { layout, terms } = useExplorerLayout(
+    graph,
+    data.classEdges,
+    term,
+    expand,
+  );
   return { data, layout, terms };
 }
