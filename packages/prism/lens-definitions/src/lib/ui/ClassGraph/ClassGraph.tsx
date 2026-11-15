@@ -127,7 +127,7 @@ export default function ClassGraph({
     return (
       <g data-edge={edge.id} key={edge.id}>
         <path
-          className={joinClasses(role, state)}
+          className={joinClasses(role, weight?.dashed === true && "is-zero", state)}
           d={edge.d}
           data-count={bundle?.relations.length ?? edge.to.length}
           data-from={termOf(edge.from)}
@@ -144,7 +144,11 @@ export default function ClassGraph({
         {edge.heads.map((head) =>
           relation ? (
             <path
-              className={joinClasses("filled-head", state)}
+              className={joinClasses(
+                "filled-head",
+                weight?.dashed === true && "is-zero",
+                state,
+              )}
               d={head}
               fill="currentColor"
               key={head}

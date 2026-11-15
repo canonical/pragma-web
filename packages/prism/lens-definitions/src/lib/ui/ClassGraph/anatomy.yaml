@@ -22,11 +22,14 @@
 #
 # Weights: an edge's stroke is its weight by decade (1px for 1 to 9, 2px
 # for 10 to 99, 4px for 100 to 999, 8px from 1,000), and 1px dashed (4 4)
-# where it is 0, never hidden. A relation's count is the one the store
-# serves for its declared edge between the two classes it is drawn
-# between; an edge bundling several relations weighs its heaviest, never
-# their sum (an inverse pair held both ways would count each link twice).
-# The weight is the edge's `data-weight`.
+# where it is 0, never hidden. A zero edge and its head draw in the muted
+# line colour (`color.border.muted`, the rule's), so a relation nothing
+# instantiates recedes; the head takes its line's colour, as every head
+# does; a focus draws it in the accent like any other. A relation's count
+# is the one the store serves for its declared edge between the two
+# classes it is drawn between; an edge bundling several relations weighs
+# its heaviest, never their sum (an inverse pair held both ways would
+# count each link twice). The weight is the edge's `data-weight`.
 #
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.
@@ -138,6 +141,10 @@ node:
                 motion.property: opacity
                 motion.duration: motion.duration.fast
           - node:
+              role: unused relation (.is-zero)
+              styles:
+                typography.color: color.border.muted
+          - node:
               role: focus relation (.is-focus)
               styles:
                 typography.color: color.text.branded
@@ -157,6 +164,10 @@ node:
               role: filled head
               styles:
                 typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+          - node:
+              role: unused filled head (.is-zero)
+              styles:
+                typography.color: color.border.muted
           - node:
               role: focus filled head (.is-focus)
               styles:
