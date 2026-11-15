@@ -3,7 +3,10 @@
  * sections as it orders these fields.
  */
 export const SECTION_ANCHORS = {
+  usage: "usage",
+  guidelines: "guidelines",
   anatomy: "anatomyDsl",
   properties: "properties",
   relations: "inheritsFroms",
+  changes: "changeLogs",
 } as const;

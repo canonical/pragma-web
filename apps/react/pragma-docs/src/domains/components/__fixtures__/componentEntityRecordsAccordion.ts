@@ -27,6 +27,17 @@ const componentEntityRecordsAccordion = {
     __typename: "Component",
     name: "Accordion",
     uri: "https://ds.canonical.com/global.component.accordion",
+    usage:
+      "The accordion can be used to pack a lot of content into a constrained space by allowing to collapse and expand the  to show or hide its contents. It also allows the user to consume the contents at their own pace and preference by not immediately showing but relying on progressive disclosure instead.\n\nTherefore when used right, accordions can help browse different pieces of related content in a more efficient way. Be wary that they can also hide content from users and are not suitable when a user is meant to read all of the page content.\n\n### Header\n\nThe header of the content contains the chevron, heading, and optional items such as a [Badge](https://docs.superhuman.com/d/_dNyzE_TLZDh#_tugrid-20dWwIHYhx/_rui-eHpgyzRyDl). The heading of the accordion should give the user a clear indication of what the contents of accordion item are going to be. The user should not have to open the   to understand what is contained inside of it.\n\n### Panel\n\nThe accordion panel is what contains the content of an  . Be mindful of what contents are put in the accordion item as an accordion does not lend itself well to containing overly complex components or patterns. The contents of an accordion will most often be just plain text or a simple component arrangement like filters (checkbox + label).\n\nIt is not allowed to nest  .\n\n### When to use\n\n- In cases where there is a lot more content than the available screen estate allows for. E.g. when there is a lot of filters to show in a sidebar.\n- When you want to allow the user to scan large amounts of contents in a smaller amount of space and dive deeper at their own choosing. E.g. in an FAQ.\n- To shorten page lengths (and scroll time) if it is not important that the user reads everything.\n\n### When not to use\n\n- When the page content must be seen at a glance by a user. \n  - Incorrect: Hiding mandatory legal terms or essential safety instructions inside collapsed Accordion panels.\n  - Remediation: Instead you might consider restructuring your content or using anchor links in the beginning of the page which redirect the user to specific sections of the page. \n- When the data you want to show is inherently nested as accordion items do not allow to be nested.\n  - Incorrect: Using an accordion to house a four-level deep directory of help articles or internal pages.\n  - Remediation: Use a side [Navigation](https://docs.superhuman.com/d/_dNyzE_TLZDh#_tugrid-20dWwIHYhx/_rui-nkDiZdUMkV) or [FileTree](https://docs.superhuman.com/d/_dNyzE_TLZDh#_tugrid-20dWwIHYhx/_rui-DAHwqGVhxp)  component, which is specifically designed to handle nested relationships and persistent state across navigation.  \n",
+    guidelines:
+      '# Animation\n\nThere is a fast (0.165s) animation of the accordion item when an accordion item is expanded / collapsed.\n\n- A fade from 0 - 100% opacity\n- The content slides upwards/downwards slightly (0.5rem)\n\n# Accessibility\n\n## Built-in\n\n### Semantic foundation: HTML and Aria labels\n\n- The accordion header is an HTML button.\n- The button which expands the accordion item has `aria-expanded=”true”` label if the accordion item is currently expanded, and `aria-expanded="false"` when it is collapsed.\n- The button which expands the accordion item has a `aria-controls` with the ID set to the ID of the panel which is being expanded by it.\n- The accordion panel uses the `aria-labelledby` label with the ID set to the ID of the button which expands the accordion item.\n- Each accordion header button is automatically wrapped in a heading element at the level specified by the required `headingLevel` prop.\n\n### Visual and motion\n\n- Text color ensures 4.5:1 contrast with the background, chevrons color ensure 3:1 contrast with the background\n- Animations are disabled when `prefers-reduced-motion: reduce` is set\n- Color alone is not and should not be used to distinguish expanded vs. collapsed state. The chevron direction change indicates the difference.\n\n### **Keyboard navigation and focus order** \n\n- `Tab` and `Shift-Tab` are used to navigate forward and backward through each accordion header and all focusable elements in the accordion should be included in the tab order.\n- `Enter` or `Space` expand and collapse each accordion panel. \n- Expanding a panel does not move keyboard focus, it stays on the header button. The user presses `Tab` to move focus to the first focusable element inside the panel, if any, or to move to the next header. \n- `Home` / `End` move focus to the first / last accordion header\n\n### Screen reader & assistive technology support\n\n- When a collapsed accordion header receives focus, a screen reader announces the button label, its role (button), and its state (”collapsed” or “expanded”)\n- When the user activates the button, the state change is announced immediately via the updated `aria-expanded` value\n- The expanded panel content is not automatically read. Expanding a panel does not move keyboard focus, it stays on the header button. The user presses Tab to move focus to the first focusable element inside the panel. Screen reader users can additionally navigate panel content using their virtual cursor (browse mode) without pressing Tab.\n\n## Consumer responsibilities\n\n### Semantic foundation: HTML and Aria labels\n\n- The accordion item heading should have an appropriate `aria-level` label, depending on its position in the hierarchy of the page.\n- Each accordion heading must have a unique and descriptive content. Vague content like “Read more” is inaccessible: the heading is all a screen reader user has to orient by when navigating.\n\n### Visual and motion \n\n- Ensure all items placed inside the accordion panel respect color contrast requirements.\n\n### **Keyboard navigation and focus order** \n\n- Avoid keyboard traps when adding components to the accordion panel. For example, the user expands an accordion, but is unable to tab to the next focusable element. \n- You can add a `Down Arrow` / `Up Arrow` option to move focus between accordion headers for accordion-heavy pages.\n\n### Screen reader & assistive technology support\n\n- Avoid placing deeply nested interactive components (nested accordions, complex forms) inside accordion panels without testing the full tab flow with a screen reader.\n\n\n\n## **Accessibility resources**\n\n- [W3C WAI-ARIA Accordion (Sections With Show/Hide Functionality)](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/)\n- [WAI-ARIA Examples: Accordion](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/examples/accordion/)\n- [Carbon design systems - Accordion accessibility](https://carbondesignsystem.com/components/accordion/accessibility)\n- Guidelines:\n  - [1.3.1: Info and Relationships](https://www.w3.org/TR/WCAG22/#info-and-relationships)\n  - [2.1.1: Keyboard](https://www.w3.org/TR/WCAG22/#keyboard)\n  - [2.1.2: No Keyboard Trap](https://www.w3.org/TR/WCAG22/#no-keyboard-trap)\n\n\n\n## **References**\n\n- [https://github.com/alphagov/govuk-design-system-backlog/issues/1#issuecomment-995675898](https://github.com/alphagov/govuk-design-system-backlog/issues/1#issuecomment-995675898)\n- [https://www.nngroup.com/articles/accordions-complex-content/](https://www.nngroup.com/articles/accordions-complex-content/)\n- [https://www.smashingmagazine.com/2017/06/designing-perfect-accordion-checklist/](https://www.smashingmagazine.com/2017/06/designing-perfect-accordion-checklist/)',
+    changeLogs: {
+      __refs: [
+        "client:https://ds.canonical.com/global.component.accordion:changeLogs:0",
+        "client:https://ds.canonical.com/global.component.accordion:changeLogs:1",
+        "client:https://ds.canonical.com/global.component.accordion:changeLogs:2",
+      ],
+    },
     _meta: {
       __ref: "client:https://ds.canonical.com/global.component.accordion:_meta",
     },
@@ -500,6 +511,33 @@ const componentEntityRecordsAccordion = {
       order: 1,
       group: { __ref: "https://ds.canonical.com/section.overview" },
     },
+  "client:https://ds.canonical.com/global.component.accordion:changeLogs:0": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:changeLogs:0",
+    __typename: "ChangeLogEntry",
+    version: null,
+    summary: null,
+    change: "Added accessibility guidelines",
+    changeType: "change",
+    timestamp: "2026-06-26T00:00:00.000+02:00",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:changeLogs:1": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:changeLogs:1",
+    __typename: "ChangeLogEntry",
+    version: null,
+    summary: null,
+    change: "Added properties",
+    changeType: "change",
+    timestamp: "2026-06-10T00:00:00.000+02:00",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:changeLogs:2": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:changeLogs:2",
+    __typename: "ChangeLogEntry",
+    version: null,
+    summary: null,
+    change: null,
+    changeType: "change",
+    timestamp: "2026-01-21T14:13:23.000+01:00",
+  },
 } as unknown as RecordMap;
 
 export default componentEntityRecordsAccordion;

@@ -34,9 +34,12 @@ const absentRecords = {
 
 /** The button's sections, in the lens's order. */
 const BUTTON_SECTIONS = [
+  { id: "usage", title: "Usage" },
+  { id: "guidelines", title: "Guidelines" },
   { id: "anatomy", title: "Anatomy" },
   { id: "properties", title: "Properties" },
   { id: "relations", title: "Relations" },
+  { id: "changes", title: "Changes" },
 ];
 
 /** The page's view, which the tests read the regions of. */
@@ -59,7 +62,7 @@ const readFacts = () =>
 
 describe("ComponentDetail", () => {
   it(
-    "lists the anatomy, the properties and the relations as sections in the lens's order",
+    "lists the usage, the guidelines, the anatomy, the properties, the relations and the changes as sections in the lens's order",
     () => {
       render(
         entityPageAt(
@@ -93,9 +96,55 @@ describe("ComponentDetail", () => {
       );
       expectSectionIndex(readView(), [
         { id: "relations", title: "Relations" },
+        { id: "usage", title: "Usage" },
+        { id: "guidelines", title: "Guidelines" },
         { id: "anatomy", title: "Anatomy" },
         { id: "properties", title: "Properties" },
+        { id: "changes", title: "Changes" },
       ]);
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "leaves out the usage, the guidelines and the changes the graph does not hold",
+    () => {
+      const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
+        usage: null,
+        guidelines: "",
+        changeLogs: { __refs: [] },
+      });
+      render(entityPageAt(BUTTON_URI, records, createFetchSpy()));
+      expectSectionIndex(readView(), [
+        { id: "anatomy", title: "Anatomy" },
+        { id: "properties", title: "Properties" },
+        { id: "relations", title: "Relations" },
+      ]);
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "shows a text as the direct child of its section's body, its headings from level 3",
+    () => {
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const guidelines = readView().querySelector(
+        ":scope > .content > .section:has(> #guidelines) > .section-body",
+      );
+      const prose = guidelines?.querySelector(":scope > .editorial");
+      expect(prose).not.toBeNull();
+      expect(prose?.classList).toContain("component-prose");
+      const levels = [
+        ...(prose?.querySelectorAll("h1,h2,h3,h4,h5,h6") ?? []),
+      ].map(({ tagName }) => Number(tagName.slice(1)));
+      expect(levels.length).toBeGreaterThan(0);
+      expect(Math.min(...levels)).toBe(3);
     },
     ENTITY_TEST_TIMEOUT_MS,
   );

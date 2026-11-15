@@ -27,6 +27,18 @@ const componentEntityRecordsCard = {
     __typename: "Component",
     name: "Card",
     uri: "https://ds.canonical.com/global.component.card",
+    usage:
+      'Cards are intended for use in "collection-based" views. They are suitable for grids and galleries where multiple data objects of the same type are displayed next to each other. \n\n### When to use\n\n- When you have a repeating data structure with a uniform set of attributes that requires high legibility across many instances.\n- When the container itself acts as a toggle or a checkbox for selecting an item from a group. (radio card) // should be linking to forms\n- When the user behavior is focused on exploration of options, rather than searching for an already identified item of the group. Cards facilitate consuming the information of an individual data object, in contrast with a table where the emphasis is on comparison and ability to scan. \n- When building a responsive table, on small viewports, the designer can choose between horizontal scroll, or converting table rows into cards. \n\n### When not to use\n\n- When a single piece of information is being highlighted on a page without any "peers".\n  - Incorrect: A single card floating in the middle of a dashboard to show "Total users".\n  - Remediation: Use a [Tile](https://docs.superhuman.com/d/_dNyzE_TLZDh#_tugrid-20dWwIHYhx/_rui-eThhoLZg3Y) component designed for individual metric display.\n- When the user needs to perform deep data analysis or multi-column sorting on regular size pages.\n  - Incorrect: Forcing 50 columns of data into a small card format.\n  - Remediation: Use a [Table](https://docs.superhuman.com/d/_dNyzE_TLZDh#_tugrid-20dWwIHYhx/_rui-Olq5LYSopF) to allow for better horizontal scanning and sorting of specific values.',
+    guidelines:
+      "Styling\n\nhttps://www.figma.com/design/WGHcOmGMEUF9hMAEoRafL8/%F0%9F%93%95-Pragma---documentation-visuals?node-id=2124-397&t=ch8BFFPUe9gCvMdg-1",
+    changeLogs: {
+      __refs: [
+        "client:https://ds.canonical.com/global.component.card:changeLogs:0",
+        "client:https://ds.canonical.com/global.component.card:changeLogs:1",
+        "client:https://ds.canonical.com/global.component.card:changeLogs:2",
+        "client:https://ds.canonical.com/global.component.card:changeLogs:3",
+      ],
+    },
     _meta: {
       __ref: "client:https://ds.canonical.com/global.component.card:_meta",
     },
@@ -609,6 +621,44 @@ const componentEntityRecordsCard = {
     name: "name",
     order: 1,
     group: { __ref: "https://ds.canonical.com/section.overview" },
+  },
+  "client:https://ds.canonical.com/global.component.card:changeLogs:0": {
+    __id: "client:https://ds.canonical.com/global.component.card:changeLogs:0",
+    __typename: "ChangeLogEntry",
+    version: null,
+    summary: null,
+    change:
+      "This usage guideline stays in the  general card, until radio cards get separated into their own components: When the container itself acts as a toggle or a checkbox for selecting an item from a group. (radio card) // should be linking to form ",
+    changeType: "change",
+    timestamp: "2026-04-06T00:00:00.000+02:00",
+  },
+  "client:https://ds.canonical.com/global.component.card:changeLogs:1": {
+    __id: "client:https://ds.canonical.com/global.component.card:changeLogs:1",
+    __typename: "ChangeLogEntry",
+    version: null,
+    summary: null,
+    change:
+      "open question: in vanilla we had the responsive behavior of tables converting into cards when appropriate. we should have this behavior also for pragma. There should be a linkage between table and data table and cards. Adrian: Would recommend against it for now as it adds complexity (Which tables get turned into cards ? How should responsiveness be enforced ?)\n→ I would recommend adding to the decision log as defered; Diana: This was the design decision - it should be an opt-in responsive behaviour. we can link to “table” and “data table” for more info",
+    changeType: "decision",
+    timestamp: "2026-04-06T00:00:00.000+02:00",
+  },
+  "client:https://ds.canonical.com/global.component.card:changeLogs:2": {
+    __id: "client:https://ds.canonical.com/global.component.card:changeLogs:2",
+    __typename: "ChangeLogEntry",
+    version: null,
+    summary: null,
+    change: "Another test",
+    changeType: "change",
+    timestamp: "2025-12-08T00:00:00.000+01:00",
+  },
+  "client:https://ds.canonical.com/global.component.card:changeLogs:3": {
+    __id: "client:https://ds.canonical.com/global.component.card:changeLogs:3",
+    __typename: "ChangeLogEntry",
+    version: null,
+    summary: null,
+    change: "testing the structure",
+    changeType: "change",
+    timestamp: "2025-12-05T00:00:00.000+01:00",
   },
 } as unknown as RecordMap;
 

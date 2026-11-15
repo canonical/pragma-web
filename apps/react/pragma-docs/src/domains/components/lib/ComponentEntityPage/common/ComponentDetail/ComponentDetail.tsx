@@ -20,9 +20,11 @@ import componentEntityQueryNode from "#relay/__generated__/ComponentEntityQuery.
 import { COMPONENTS_RENDERERS } from "../../../../constants.js";
 import { componentEntityVariables } from "../../../../entityQuery.js";
 import { ComponentAnatomy } from "../ComponentAnatomy/index.js";
+import { ComponentChanges } from "../ComponentChanges/index.js";
 import { ComponentExample } from "../ComponentExample/index.js";
 import { ComponentHeader } from "../ComponentHeader/index.js";
 import { ComponentProperties } from "../ComponentProperties/index.js";
+import { ComponentProse } from "../ComponentProse/index.js";
 import { ComponentRelations } from "../ComponentRelations/index.js";
 import { SECTION_ANCHORS } from "./constants.js";
 import type { ComponentDetailProps } from "./types.js";
@@ -51,11 +53,17 @@ const declareEntityQuery = (): unknown => graphql`
           }
         }
       }
+      usage
+      guidelines
+      changeLogs {
+        __typename
+      }
       ...ComponentHeader_node
       ...ComponentDetail_facts
       ...ComponentAnatomy_node
       ...ComponentProperties_node
       ...ComponentRelations_node @arguments(count: $count)
+      ...ComponentChanges_node
     }
   }
 `;
@@ -97,8 +105,9 @@ const componentCssClassName = "ds component-detail";
  * view. The header names the component; its facts (the address, the tier,
  * the version and the first documentation stage, each only when the graph
  * records it) stand beside it; the rendered example is the body before the
- * sections; the anatomy, the properties and the relations are sections in
- * the order the lens gives their fields. The header and the facts stand
+ * sections; the usage and guidelines texts, the anatomy, the properties,
+ * the relations and the change log are sections in the order the lens
+ * gives their fields, each only when the graph holds a value. The header and the facts stand
  * whatever the renderer: under the address's page renderer the page passes
  * its sections, under any other (Turtle, `?as=turtle`) what that renderer
  * draws, which the route warmed, stands in their place, with no index. An
@@ -149,6 +158,30 @@ export default function ComponentDetail({
               active.name === PAGE_RENDERER_NAMES.page
                 ? orderSections(
                     [
+                      ...(component.usage
+                        ? [
+                            {
+                              field: SECTION_ANCHORS.usage,
+                              id: "usage",
+                              title: t("component.section.usage"),
+                              content: (
+                                <ComponentProse source={component.usage} />
+                              ),
+                            },
+                          ]
+                        : []),
+                      ...(component.guidelines
+                        ? [
+                            {
+                              field: SECTION_ANCHORS.guidelines,
+                              id: "guidelines",
+                              title: t("component.section.guidelines"),
+                              content: (
+                                <ComponentProse source={component.guidelines} />
+                              ),
+                            },
+                          ]
+                        : []),
                       {
                         field: SECTION_ANCHORS.anatomy,
                         id: "anatomy",
@@ -167,6 +200,18 @@ export default function ComponentDetail({
                         title: t("component.relations"),
                         content: <ComponentRelations component={component} />,
                       },
+                      ...(component.changeLogs.length > 0
+                        ? [
+                            {
+                              field: SECTION_ANCHORS.changes,
+                              id: "changes",
+                              title: t("component.section.changes"),
+                              content: (
+                                <ComponentChanges component={component} />
+                              ),
+                            },
+                          ]
+                        : []),
                     ],
                     component._meta.fields,
                   )

@@ -3,15 +3,17 @@
 # one operation, read from the warm store, laid on the sectioned view
 # (SectionedView): the header names the component, the facts (address,
 # tier, version, stage) stand beside it, the rendered example is the body
-# before the sections, and the anatomy, the properties and the relations
-# are sections in the order the lens gives their anchor fields
-# (`anatomyDsl`, `properties`, `inheritsFroms`), each section's heading the
-# view's. Under a renderer other than the page (Turtle) the view gets no
-# section and what the renderer draws as its body. For an address the
-# graph does not answer to, it renders a status line naming the address in
-# the published InlineCode. It sets the document title either way. A
-# subgrid of the page over every column, its gap the grid's gutter on both
-# axes.
+# before the sections, and the usage, the guidelines, the anatomy, the
+# properties, the relations and the changes are sections in the order the
+# lens gives their anchor fields (`usage`, `guidelines`, `anatomyDsl`,
+# `properties`, `inheritsFroms`, `changeLogs`), each only when the graph
+# holds a value (the three parts that always stood keep their "none
+# recorded" line), each section's heading the view's. Under a renderer
+# other than the page (Turtle) the view gets no section and what the
+# renderer draws as its body. For an address the graph does not answer to,
+# it renders a status line naming the address in the published InlineCode.
+# It sets the document title either way. A subgrid of the page over every
+# column, its gap the grid's gutter on both axes.
 #
 # Every decision is read through a component token declared on the root
 # (`--component-detail-*`), bound to the symbol named here.
@@ -64,6 +66,9 @@ node:
               role: sections (under the page renderer, in the lens's order of their anchor fields)
               edges:
                 - node:
+                    uri: docs.subcomponent.component_prose
+                  relation: { cardinality: "0..2" }   # anchors usage, guidelines
+                - node:
                     uri: docs.subcomponent.component_anatomy
                   relation: { cardinality: "0..1" }   # anchor anatomyDsl
                 - node:
@@ -72,5 +77,8 @@ node:
                 - node:
                     uri: docs.subcomponent.component_relations
                   relation: { cardinality: "0..1" }   # anchor inheritsFroms
+                - node:
+                    uri: docs.subcomponent.component_changes
+                  relation: { cardinality: "0..1" }   # anchor changeLogs
             relation: { cardinality: "1", slotName: sections }
       relation: { cardinality: "0..1" }

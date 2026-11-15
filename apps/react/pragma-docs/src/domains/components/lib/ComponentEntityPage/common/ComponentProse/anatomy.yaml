@@ -1,0 +1,17 @@
+---
+# ComponentProse — one Markdown text of a component (its usage, its
+# guidelines) as the content of a section of the component page. Its root
+# carries `.editorial` and `.content-flow`: the typography layer spaces the
+# headings and paragraphs, and the last block none. Headings render two
+# levels down, under the section that holds the text, so they start at
+# level 3. It renders no heading of its own: the sectioned view renders the
+# section's. It binds no style of its own: as the direct child of the
+# section's body, the view gives it every column and the 75-character
+# reading measure (1.1, M13), in one place for every prose.
+# Reference: PS3 V1 (usage, guidelines); lens-standards' StandardProse.
+node:
+  uri: docs.subcomponent.component_prose
+  edges:
+    - node:
+        role: markdown block (a heading from level 3, a paragraph, a list, code)
+      relation: { cardinality: "0..*", slotName: default }
