@@ -57,7 +57,9 @@ const SEEDED_PAGES = [
     records: componentProbeRecords,
     serverMarker:
       '<h2 class="heading" id="component-probe-forms-title">Its forms</h2>',
-    liveSelector: ".ds.ui-block-chip",
+    // The playground declares no namespace, so the chip's prefix shows
+    // beside the title it reads.
+    liveSelector: ".ds.ui-block-chip > .title",
     liveText: "Button",
   },
   {
