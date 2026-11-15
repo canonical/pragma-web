@@ -13,6 +13,8 @@ import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
 import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataChart as ConnectedChart } from "../DataViews/common/DataChart/index.js";
 import { DataViews } from "../DataViews/index.js";
@@ -59,13 +61,14 @@ const connectedImports = `import { machineCollection, machines } from "./machine
 // A work-in-progress prototype: not yet exported from the package root.
 import { DataChart } from "./DataViews/DataChart.js";`;
 
-/** The chart over a provider bound to the story's own source. */
+/** The chart over a provider bound to the story's own source, in its words. */
 function MachineChart({
   type,
   field,
   label,
   options,
-}: {
+  ...words
+}: StoryWords & {
   readonly type: DataChartType;
   readonly field: string;
   readonly label: string;
@@ -76,7 +79,13 @@ function MachineChart({
     ...options,
   });
   return (
-    <Component provider={provider} type={type} field={field} label={label} />
+    <Component
+      {...words}
+      provider={provider}
+      type={type}
+      field={field}
+      label={label}
+    />
   );
 }
 
@@ -86,8 +95,13 @@ function MachineChart({
  * are in the table that follows the drawing.
  */
 export const StatusCounts: Story = {
-  render: ({ type, field, label }) => (
-    <MachineChart type={type} field={field} label={label} />
+  render: ({ type, field, label, messages }) => (
+    <MachineChart
+      type={type}
+      field={field}
+      label={label}
+      {...pickStoryWords({ messages })}
+    />
   ),
   parameters: showConsumerCode({
     // A prototype: nothing of it is exported from the package root to name.
@@ -112,8 +126,13 @@ export const StatusCounts: Story = {
  */
 export const CoresRange: Story = {
   args: { type: "range", field: "cores", label: "Cores" },
-  render: ({ type, field, label }) => (
-    <MachineChart type={type} field={field} label={label} />
+  render: ({ type, field, label, messages }) => (
+    <MachineChart
+      type={type}
+      field={field}
+      label={label}
+      {...pickStoryWords({ messages })}
+    />
   ),
   parameters: showConsumerCode({
     parts: [],
@@ -247,12 +266,13 @@ export const RangeBesideFilters: Story = {
 
 /** Loading: the source has not answered, so the chart says so and draws nothing. */
 export const Loading: Story = {
-  render: ({ type, field, label }) => (
+  render: ({ type, field, label, messages }) => (
     <MachineChart
       type={type}
       field={field}
       label={label}
       options={{ source: createPendingSource }}
+      {...pickStoryWords({ messages })}
     />
   ),
   play: async ({ canvas }) => {

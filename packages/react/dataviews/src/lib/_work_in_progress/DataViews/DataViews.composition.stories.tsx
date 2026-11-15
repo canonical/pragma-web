@@ -11,6 +11,8 @@ import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import useStoryViewStore from "../../../storybook/machines/useStoryViewStore.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import Component from "./Provider.js";
 
@@ -46,16 +48,20 @@ const getSummary = (canvas: ReturnType<typeof within>): HTMLElement =>
     "status",
   );
 
-/** The root and its parts over one provider, as an application lays them out. */
+/**
+ * The root and its parts over one provider, as an application lays them
+ * out, speaking `messages` when given.
+ */
 function Collection({
   provider,
   children,
-}: {
+  ...words
+}: StoryWords & {
   readonly provider: MachineProvider;
   readonly children?: ReactElement | undefined;
 }): ReactElement {
   return (
-    <Component provider={provider}>
+    <Component provider={provider} {...words}>
       {provider.views === null ? null : <Component.SavedViews />}
       <Component.Search label="Search machines" />
       <Component.Filters
@@ -126,7 +132,7 @@ import { platform } from "./router.js";`,
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
   }),
-  render: function Render() {
+  render: function Render(args) {
     // A memory location and a story's own store stand in for the browser's
     // here, so the story never rewrites the page's own address or its views.
     const [location] = useState(() =>
@@ -139,7 +145,7 @@ import { platform } from "./router.js";`,
       location,
       views: store,
     });
-    return <Collection provider={provider} />;
+    return <Collection provider={provider} {...pickStoryWords(args)} />;
   },
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -207,7 +213,7 @@ import { platform } from "./router.js";`,
  */
 export const QueryInTheUrl: Story = {
   parameters: queryInTheUrlCode,
-  render: function Render() {
+  render: function Render(args) {
     // A memory location stands in for the browser's here, so the story
     // never rewrites the page's own address.
     const [location] = useState(() =>
@@ -218,7 +224,7 @@ export const QueryInTheUrl: Story = {
       location,
     });
     return (
-      <Collection provider={provider}>
+      <Collection provider={provider} {...pickStoryWords(args)}>
         <QueryInTheLocation location={location} />
       </Collection>
     );
@@ -255,13 +261,13 @@ export const QueryInTheUrl: Story = {
  */
 export const LinkWithARefusedFilter: Story = {
   parameters: queryInTheUrlCode,
-  render: function Render() {
+  render: function Render(args) {
     const [location] = useState(() =>
       createMemoryLocation({ href: "/machines?status=melted" }),
     );
     const provider = useMachineProvider({ query: "page=1&size=5", location });
     return (
-      <Collection provider={provider}>
+      <Collection provider={provider} {...pickStoryWords(args)}>
         <QueryInTheLocation location={location} />
       </Collection>
     );
@@ -292,13 +298,13 @@ export const LinkWithARefusedFilter: Story = {
  */
 export const LinkWithARefusedSort: Story = {
   parameters: queryInTheUrlCode,
-  render: function Render() {
+  render: function Render(args) {
     const [location] = useState(() =>
       createMemoryLocation({ href: "/machines?sort=colour__asc" }),
     );
     const provider = useMachineProvider({ query: "page=1&size=5", location });
     return (
-      <Collection provider={provider}>
+      <Collection provider={provider} {...pickStoryWords(args)}>
         <QueryInTheLocation location={location} />
       </Collection>
     );

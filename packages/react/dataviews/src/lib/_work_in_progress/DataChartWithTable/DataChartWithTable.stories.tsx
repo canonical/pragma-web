@@ -11,6 +11,8 @@ import readPaginationSummary from "../../../storybook/machines/readPaginationSum
 import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
 import type { DataChartProps } from "../DataChart/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataChartWithTable as ConnectedChartWithTable } from "../DataViews/common/DataChartWithTable/index.js";
@@ -64,11 +66,15 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
   { id: "cores", header: "Cores" },
 ];`;
 
-/** The chart and its table over a provider bound to the story's own source. */
+/**
+ * The chart and its table over a provider bound to the story's own source,
+ * in its words.
+ */
 function MachineChartWithTable({
   chart,
   options,
-}: {
+  ...words
+}: StoryWords & {
   readonly chart: ChartProps;
   readonly options?: MachineProviderConfig | undefined;
 }): ReactElement {
@@ -78,6 +84,7 @@ function MachineChartWithTable({
   });
   return (
     <Component
+      {...words}
       provider={provider}
       chartProps={chart}
       tableProps={{
@@ -95,7 +102,9 @@ function MachineChartWithTable({
  * provider, so choosing asks the source for nothing.
  */
 export const Default: Story = {
-  render: () => <MachineChartWithTable chart={statusCounts} />,
+  render: (args) => (
+    <MachineChartWithTable {...pickStoryWords(args)} chart={statusCounts} />
+  ),
   parameters: showConsumerCode({
     parts: ["type DataTableColumn"],
     imports: prototypeImports,
@@ -132,8 +141,9 @@ export const Default: Story = {
 
 /** A number field's range in place of the counts, with the same table. */
 export const RangeOrTable: Story = {
-  render: () => (
+  render: (args) => (
     <MachineChartWithTable
+      {...pickStoryWords(args)}
       chart={{ type: "range", field: "cores", label: "Machines by cores" }}
     />
   ),
@@ -236,8 +246,9 @@ import { DataChartWithTable } from "./DataViews/DataChartWithTable.js";`,
 
 /** Loading: the source has not answered, so the chart shows the status. */
 export const Loading: Story = {
-  render: () => (
+  render: (args) => (
     <MachineChartWithTable
+      {...pickStoryWords(args)}
       chart={statusCounts}
       options={{ source: createPendingSource }}
     />

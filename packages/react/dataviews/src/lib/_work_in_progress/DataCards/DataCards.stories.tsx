@@ -20,6 +20,8 @@ import type {
   MachineProviderConfig,
 } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
@@ -293,15 +295,20 @@ import { DataCards } from "./DataViews/DataCards.js";`,
   },
 };
 
-/** A table and cards over one root, through the renderer switch. */
+/**
+ * A table and cards over one root, through the renderer switch, which is its
+ * own root and so takes the story's words itself.
+ */
 function TableOrCardsMachines({
   label,
-}: {
+  ...words
+}: StoryWords & {
   readonly label: string;
 }): ReactElement {
   return (
     <>
       <RendererSwitch
+        {...words}
         label="Show machines as"
         renderers={[
           {
@@ -344,7 +351,9 @@ function TableOrCardsMachines({
  */
 export const TableOrCards: Story = {
   decorators: [withMachineRoot({ query: "page=1&size=5" })],
-  render: ({ label }) => <TableOrCardsMachines label={label} />,
+  render: ({ label, messages }) => (
+    <TableOrCardsMachines label={label} {...pickStoryWords({ messages })} />
+  ),
   parameters: showConsumerCode({
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
