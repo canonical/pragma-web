@@ -7,7 +7,7 @@ import * as Stories from "./Filters.stories";
 
 `DataViews.Filters` edits the collection's query. It takes no query and no list of fields: which fields it offers comes from the collection's schema, and which operators each accepts comes from what the provider's source declares it can execute. It never offers a restriction the source would refuse, and it has no draft to keep in step with the applied query — each edit is the applied query.
 
-The design has not drawn the filters yet, so the part renders plain form controls: a group of checkboxes for a choices field — any of the options, or none of them — a from and a to bound for a number or date field, one checkbox for a presence field, and a text input for the text a text field must contain or start with.
+The design has not drawn the filters yet, so the part renders plain form controls: a group of checkboxes for a choices field — any of the options, or none of them — a from and a to bound for a number or date field, three radios for a presence field — any record, those that hold a value, those that hold none — and a text input for the text a text field must match, with a select beside it, once scripts run, of how it matches.
 
 ## Filters over a composed collection
 
@@ -75,9 +75,9 @@ A checked status, a filled bound or text typed into a text field is the restrict
 
 <Canvas of={Stories.BoundApplied} sourceState="none" />
 
-## Text a field contains or starts with
+## Text a field matches
 
-A text field is filtered by the text its value contains, or the text it starts with, compared case-insensitively: `web` finds `WEB-01`, and starting with `web` finds `WEB-01` but not `api.web`. The text is taken literally — `%` and `_` are characters to look for, never wildcards, and nothing is trimmed. Emptying the input is incomplete rather than a removal, so the text already applied stays until the clear button removes it. A source offers the input only on the text fields it can look through; the REST API stories show one that looks through some fields and not others, and the GraphQL API stories one that looks through all of them.
+A text field is filtered by the text its value equals, contains, starts or ends with, or by the text it differs from or lacks, compared case-insensitively; the select beside the input offers the operators the source declares, starting on contains: `web` finds `WEB-01`, and starting with `web` finds `WEB-01` but not `api.web`. The text is taken literally — `%` and `_` are characters to look for, never wildcards, and nothing is trimmed. Emptying the input is incomplete rather than a removal, so the text already applied stays until the clear button removes it. A source offers the input only on the text fields it can look through; the REST API stories show one that looks through some fields and not others, and the GraphQL API stories one that looks through all of them.
 
 ## Counts beside the options
 
@@ -99,6 +99,12 @@ A link can AND several restrictions on one field; the control edits one and show
 
 <Canvas of={Stories.FurtherConjunctsApplied} sourceState="none" />
 
+## Presence either way, units and lists
+
+A presence field restricts to records that hold a value or to those that hold none, and Any removes the restriction. A number field declaring `units` names its base unit beside the bound and reads a value typed in any display unit, so `8 GiB` is `8192` MiB. A `choices` field declaring `multiple: true` matches a record's list by element, so two any-of restrictions ask for both.
+
+<Canvas of={Stories.NewOperators} sourceState="none" />
+
 ## An invalid edit keeps the restriction
 
 A bound outside the schema's bounds is refused, not applied — by the schema, and natively by the browser, since a number bound is a native number input carrying the schema's `min` and `max`. The restriction already in force stays in force, and the message beside the input says so, because the value on screen is no longer what filters the rows. A valid edit the source refuses is kept out the same way, with the source's reason beside the input. Emptying a bound is incomplete rather than a removal; the clear button removes it.
@@ -111,7 +117,7 @@ A followed link can carry a clause the grammar, the collection or the source ref
 
 ## Before any script runs
 
-The filters are a GET form. Each control is named as the URL spells its clause — `status` repeated once per chosen option, `owner__isSet`, `cores__gte`, `name__contains` — and the rest of the applied query rides hidden beside them, so a submission lands on the destination the provider would have written, from the first page. Once scripting is enabled every edit applies as it is made, a submission is intercepted, the submit control is hidden and the clear buttons appear.
+The filters are a GET form. Each control is named as the URL spells its clause — `status` repeated once per chosen option, `owner__isSet` with `true` or `false`, `cores__gte`, `name__contains` — and the rest of the applied query rides hidden beside them, so a submission lands on the destination the provider would have written, from the first page. Once scripting is enabled every edit applies as it is made, a submission is intercepted, the submit control is hidden and the clear buttons appear.
 
 ## Primary filters
 
