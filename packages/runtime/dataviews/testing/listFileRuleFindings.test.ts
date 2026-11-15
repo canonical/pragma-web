@@ -45,6 +45,21 @@ describe("listFileRuleFindings", () => {
     ]);
   });
 
+  it.fails("finds a test of a pure type file", () => {
+    writeFile("typed/src/types.ts", "export type T = 1;");
+    writeFile("typed/src/types.test.ts", "");
+    expect(listFileRuleFindings(join(root, "typed"))).toEqual([
+      "src/types.test.ts types-test",
+    ]);
+  });
+
+  it("leaves a facet file's test to that file", () => {
+    writeFile("facet/src/a.ts", "export type A = 1;");
+    writeFile("facet/src/a.b.ts", "export const B = 1;\nexport const C = 2;");
+    writeFile("facet/src/a.b.test.ts", "");
+    expect(listFileRuleFindings(join(root, "facet"))).toEqual([]);
+  });
+
   it("skips a missing folder", () => {
     writeFile("testing/d.ts", "export default 1;");
     expect(listFileRuleFindings(join(root, "testing"))).toEqual([]);
