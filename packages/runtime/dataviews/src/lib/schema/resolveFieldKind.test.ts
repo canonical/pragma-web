@@ -25,6 +25,7 @@ describe("resolveFieldKind", () => {
     expect(resolveFieldKind("date").operators).toEqual(["gte", "lte"]);
     expect(resolveFieldKind("text").operators).toEqual([
       "is",
+      "isNot",
       "contains",
       "startsWith",
     ]);

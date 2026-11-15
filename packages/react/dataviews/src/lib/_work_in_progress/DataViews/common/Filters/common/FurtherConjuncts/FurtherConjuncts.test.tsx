@@ -145,6 +145,7 @@ describe("FurtherConjuncts", () => {
     expect(readRowText("contains", ["ex"])).toBe("Cores contains ex");
     expect(readRowText("startsWith", ["ex"])).toBe("Cores starts with ex");
     expect(readRowText("is", ["ex"])).toBe("Cores is ex");
+    expect(readRowText("isNot", ["ex"])).toBe("Cores is not ex");
     // Presence reads as the field and the value a link spells it with.
     expect(readRowText("isSet", [true])).toBe("Cores true");
   });

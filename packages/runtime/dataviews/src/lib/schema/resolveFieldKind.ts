@@ -268,7 +268,7 @@ const DATE: FieldKindRules<DateField> = {
 };
 
 const TEXT: FieldKindRules<TextField> = {
-  operators: ["is", "contains", "startsWith"],
+  operators: ["is", "isNot", "contains", "startsWith"],
   rejectDefinition: () => null,
   input: {
     kind: "text",

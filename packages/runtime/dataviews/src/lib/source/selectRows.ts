@@ -30,6 +30,13 @@ const TEXT_MATCHES: Readonly<
   startsWith: (folded, needle) => folded.startsWith(needle),
 };
 
+/** The operator each negation holds exactly where it does not. */
+const NEGATED: Readonly<
+  Record<Extract<PredicateOperator, "isNot">, Extract<PredicateOperator, "is">>
+> = {
+  isNot: "is",
+};
+
 /** One predicate compiled to a per-row test, with its operands resolved
  * once instead of once per row. */
 type CompiledPredicate = {
@@ -113,6 +120,15 @@ const compilePredicate = (
           return atLeast ? order >= 0 : order <= 0;
         },
       };
+    }
+    case "isNot": {
+      // A negation holds exactly where its operator does not, so a record
+      // without a value matches it.
+      const held = compilePredicate(
+        { ...predicate, operator: NEGATED[predicate.operator] },
+        definition,
+      );
+      return { field, test: (value) => !held.test(value) };
     }
     case "is":
     case "contains":
