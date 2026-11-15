@@ -24,4 +24,26 @@ describe("SwatchMark SSR", () => {
     );
     expect(styles).not.toMatch(/#[0-9a-f]{3,8}\b|rgb\(|hsl\(/i);
   });
+
+  it("writes a plain colour from the data, a hex or a colour function", () => {
+    expect(renderToString(<SwatchMark colour="#c8102e" />)).toContain(
+      'style="--swatch-mark-colour:#c8102e"',
+    );
+    expect(
+      renderToString(<SwatchMark colour="oklch(62% 0.21 25.3 / 0.9)" />),
+    ).toContain('style="--swatch-mark-colour:oklch(62% 0.21 25.3 / 0.9)"');
+  });
+
+  it("writes no style for a colour that would add declarations, so it draws its ring alone", () => {
+    for (const colour of [
+      "red;position:fixed;inset:0;background:url(//host/x.png)",
+      "url(//host/x.png)",
+      "var(--x)",
+    ]) {
+      const html = renderToString(<SwatchMark colour={colour} />);
+      expect(html).not.toContain("style=");
+      expect(html).not.toContain("position");
+      expect(html).not.toContain("url(");
+    }
+  });
 });

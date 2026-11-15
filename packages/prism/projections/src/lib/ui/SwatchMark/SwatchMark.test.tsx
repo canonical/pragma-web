@@ -40,4 +40,15 @@ describe("SwatchMark", () => {
       mark instanceof HTMLElement ? mark.style.marginInlineEnd : undefined,
     ).toBe("0px");
   });
+
+  it("leaves its channel unset for a colour it refuses", () => {
+    for (const colour of [
+      "red;position:fixed;inset:0;background:url(//host/x.png)",
+      "url(//host/x.png)",
+    ]) {
+      const { container } = render(<SwatchMark colour={colour} />);
+      const mark = container.firstElementChild;
+      expect(mark?.getAttribute("style")).toBeNull();
+    }
+  });
 });

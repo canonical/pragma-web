@@ -28,4 +28,18 @@ describe("TokenMark SSR", () => {
     expect(styles).toMatch(/--token-mark-border-color: var\(--color-border\);/);
     expect(styles).not.toMatch(/#[0-9a-f]{3,8}\b|rgb\(|hsl\(/i);
   });
+
+  it("writes the oklch values the tokens hold and no style for a refused one", () => {
+    const html = renderToString(
+      <TokenMark
+        dark="red;position:fixed;inset:0;background:url(//host/x.png)"
+        light="oklch(100% 0.0131 23.19)"
+      />,
+    );
+    expect(html).toContain(
+      '<span class="in-light" style="--token-mark-value:oklch(100% 0.0131 23.19)">',
+    );
+    expect(html).toContain('<span class="in-dark"></span>');
+    expect(html).not.toContain("position");
+  });
 });

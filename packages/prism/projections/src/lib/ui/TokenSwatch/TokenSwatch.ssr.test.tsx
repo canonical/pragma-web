@@ -28,4 +28,17 @@ describe("TokenSwatch SSR", () => {
     );
     expect(styles).not.toMatch(/#[0-9a-f]{3,8}\b|rgb\(|hsl\(/i);
   });
+
+  it("writes no style for a value that would add declarations", () => {
+    const html = renderToString(
+      <TokenSwatch
+        dark="#262626"
+        light="red;position:fixed;inset:0;background:url(//host/x.png)"
+      />,
+    );
+    expect(html).toContain('<span class="value"></span>');
+    expect(html).toContain('style="--token-swatch-value:#262626"');
+    expect(html).not.toContain("position");
+    expect(html).not.toContain("url(");
+  });
 });

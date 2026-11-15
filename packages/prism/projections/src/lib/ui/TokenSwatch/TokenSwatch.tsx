@@ -2,14 +2,22 @@
 
 import type { CSSProperties, ReactElement } from "react";
 import { useMessages } from "../../i18n/index.js";
+import acceptColour from "../../utils/acceptColour.js";
 import type { TokenSwatchChannelStyle, TokenSwatchProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds token-swatch";
 
-/** The inline style that paints one value well with `value`. */
-const paintWell = (value: string): CSSProperties => {
-  const channels: TokenSwatchChannelStyle = { "--token-swatch-value": value };
+/**
+ * The inline style that paints one value well with `value`, or none when
+ * `acceptColour` refuses it: the well then stays empty in its frame.
+ */
+const paintWell = (value: string): CSSProperties | undefined => {
+  const accepted = acceptColour(value);
+  if (accepted === undefined) return undefined;
+  const channels: TokenSwatchChannelStyle = {
+    "--token-swatch-value": accepted,
+  };
   // Custom properties pass through React's style to setProperty; the cast
   // admits the channel's name, which CSSProperties does not list.
   return channels as CSSProperties;
@@ -19,7 +27,9 @@ const paintWell = (value: string): CSSProperties => {
  * A design token's swatch, the depiction its card's specimen holds: two
  * halves, the token's resolved value in the light mode, then in the dark
  * one, each a framed value well with its mode's name under it. The values
- * enter only from the token's data, one inline custom property per well.
+ * enter only from the token's data, one inline custom property per well, and only as a plain colour
+ * value (`acceptColour`): a refused value leaves its well empty, never
+ * the refused text.
  * The mode names are hidden from assistive technology: the specimen's
  * label names the token and both its values.
  *

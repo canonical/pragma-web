@@ -71,4 +71,18 @@ describe("TokenSwatch", () => {
     expect(swatch?.className).toBe("ds token-swatch wide");
     expect(swatch?.getAttribute("data-testid")).toBe("swatch");
   });
+
+  it("leaves a well empty for a value it refuses, the other painted", () => {
+    const { container } = render(
+      <TokenSwatch
+        dark="red;position:fixed;inset:0;background:url(//host/x.png)"
+        light="oklch(0% 0 0 / 0.15)"
+      />,
+    );
+    const halves = [...(container.firstElementChild?.children ?? [])];
+    expect(readWell(halves.at(0) ?? null)).toBe("oklch(0% 0 0 / 0.15)");
+    expect(
+      halves.at(1)?.querySelector(".value")?.getAttribute("style"),
+    ).toBeNull();
+  });
 });

@@ -43,4 +43,13 @@ describe("TokenMark", () => {
     expect(mark?.className).toBe("ds token-mark lead");
     expect(mark?.getAttribute("data-testid")).toBe("mark");
   });
+
+  it("leaves a well empty for a value it refuses, the other painted", () => {
+    const { container } = render(
+      <TokenMark dark="url(//host/x.png)" light="#ffffff" />,
+    );
+    const [light, dark] = [...(container.firstElementChild?.children ?? [])];
+    expect(light?.getAttribute("style")).toBe("--token-mark-value: #ffffff;");
+    expect(dark?.getAttribute("style")).toBeNull();
+  });
 });
