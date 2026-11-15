@@ -9,7 +9,10 @@
  * groups, at 1366 and 390, Button's page opens on the "On this page" bar,
  * which sticks, names the current section, opens over the page without
  * moving it, and works with scripts off. At every width the section a
- * reader chooses is current, and the last one at the canvas's end.
+ * reader chooses is current, and the last one at the canvas's end. At 390
+ * no page this unit changed scrolls the document or the canvas sideways,
+ * and each of Button's tables scrolls inside its own box within its
+ * section.
  */
 
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
@@ -566,6 +569,141 @@ describe("Button's component page at 1440px (W6a-A6)", () => {
       expect(fold.captioned).toBe(fold.cells);
       expect(fold.drawn).toBe(fold.cells);
       expect(fold.contents).toEqual(BUTTON_SECTION_IDS.map((id) => `#${id}`));
+    } finally {
+      await page.close();
+    }
+  });
+});
+
+/** Every page this unit lays on the view or changes, by the tour's name. */
+const CHANGED_PATHS = {
+  standards: "/standards",
+  standard: STANDARD_PATH,
+  "standard-turtle": `${STANDARD_PATH}?as=turtle`,
+  guides: "/guides",
+  guide: "/guides/router-core",
+  button: BUTTON_PATH,
+  "button-turtle": `${BUTTON_PATH}?as=turtle`,
+} as const;
+
+/** What a page's sideways extent measures. */
+type SidewaysMeasure = {
+  readonly document: { readonly scroll: number; readonly client: number };
+  readonly canvas: { readonly scroll: number; readonly client: number };
+};
+
+/**
+ * Measure the document's and the canvas's scrolled width against their
+ * box. Runs in the page.
+ *
+ * @throws When the page has no canvas.
+ */
+const measureSideways = (): SidewaysMeasure => {
+  const canvas = document.querySelector("main.ds.canvas");
+  if (!canvas) throw new Error("the page has no canvas");
+  const root = document.documentElement;
+  return {
+    document: { scroll: root.scrollWidth, client: root.clientWidth },
+    canvas: { scroll: canvas.scrollWidth, client: canvas.clientWidth },
+  };
+};
+
+/** Where a table in a section sits against its section and its scroller. */
+type TableMeasure = {
+  readonly section: string;
+  readonly scrolls: boolean;
+  readonly scrollerLeft: number;
+  readonly scrollerRight: number;
+  readonly sectionLeft: number;
+  readonly sectionRight: number;
+  readonly reach: number;
+  readonly tableWidth: number;
+};
+
+/**
+ * Measure every table in the view's sections: the nearest box that
+ * scrolls it sideways (the table itself or an ancestor whose overflow is
+ * `auto` or `scroll`), that box's edges against the section's body, and
+ * how far the box lets a reader scroll against the table's width. Runs in
+ * the page.
+ */
+const measureTables = (): readonly TableMeasure[] =>
+  [
+    ...document.querySelectorAll(
+      ".ds.sectioned-view > .content > .section table",
+    ),
+  ].map((table) => {
+    const body = table.closest(".section-body");
+    let scroller: Element | null = table;
+    while (
+      scroller &&
+      scroller !== body &&
+      !["auto", "scroll"].includes(getComputedStyle(scroller).overflowX)
+    ) {
+      scroller = scroller.parentElement;
+    }
+    const box = (scroller ?? table).getBoundingClientRect();
+    const bodyBox = (body ?? table).getBoundingClientRect();
+    return {
+      section: table.closest(".section")?.querySelector("h2")?.id ?? "",
+      scrolls: scroller !== null && scroller !== body,
+      scrollerLeft: box.left,
+      scrollerRight: box.right,
+      sectionLeft: bodyBox.left,
+      sectionRight: bodyBox.right,
+      reach: scroller?.scrollWidth ?? 0,
+      tableWidth: table.getBoundingClientRect().width,
+    };
+  });
+
+describe("every changed page at 390px (W6a-A7)", () => {
+  it.each(Object.entries(CHANGED_PATHS))(
+    "scrolls %s neither the document nor the canvas sideways",
+    async (_name, path) => {
+      const page = await open(path, { viewport: PHONE });
+      try {
+        const sideways = await page.evaluate(measureSideways);
+        expect(sideways.document.scroll).toBeLessThanOrEqual(
+          sideways.document.client,
+        );
+        expect(sideways.canvas.scroll).toBeLessThanOrEqual(
+          sideways.canvas.client,
+        );
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
+  it("scrolls each of Button's tables inside its own box within its section, never cut", async ({
+    annotate,
+  }) => {
+    const page = await open(BUTTON_PATH, { viewport: PHONE });
+    try {
+      const tables = await page.evaluate(measureTables);
+      await annotate(
+        tables
+          .map(
+            (table) =>
+              `${table.section}: table ${Math.round(table.tableWidth)}px in a ${Math.round(table.scrollerRight - table.scrollerLeft)}px box`,
+          )
+          .join("; "),
+      );
+      expect(tables.map((table) => table.section)).toEqual(
+        expect.arrayContaining(["properties", "tokens"]),
+      );
+      for (const table of tables) {
+        expect(table.scrolls, table.section).toBe(true);
+        expect(table.scrollerLeft, table.section).toBeGreaterThanOrEqual(
+          table.sectionLeft - TOLERANCE_PX,
+        );
+        expect(table.scrollerRight, table.section).toBeLessThanOrEqual(
+          table.sectionRight + TOLERANCE_PX,
+        );
+        expect(table.reach, table.section).toBeGreaterThanOrEqual(
+          table.tableWidth - TOLERANCE_PX,
+        );
+      }
     } finally {
       await page.close();
     }
