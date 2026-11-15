@@ -14,6 +14,11 @@ type OwnProps = {
   readonly operator: PredicateOperator;
   /** The field's visible name, which the control's phrase is worded with. */
   readonly label: string;
+  /**
+   * The base unit a number bound's values are read in, named after the
+   * phrase as the bound's own control names it; none for other fields.
+   */
+  readonly unit?: string | undefined;
   /** The provider's host, which removes a conjunct and spells where that leads. */
   readonly host: Pick<ProviderHost, "state" | "spellQuery" | "removePredicate">;
   /** Move focus to the filters' group, where a cleared row hands it. */

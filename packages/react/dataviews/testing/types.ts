@@ -167,7 +167,7 @@ export type IdentifiedRecord = { readonly id: string };
 /** What a bound filter case sets; the handle, label and definition follow the field. */
 export type BoundFilterHarnessProps = Partial<
   Omit<BoundFilterProps, "handle" | "label" | "definition">
-> & { readonly field?: "cpu" | "updated" };
+> & { readonly field?: "cpu" | "updated" | "memory" };
 
 /** What a presence filter case sets; the handle, label and field are the root's. */
 export type PresenceFilterHarnessProps = Partial<
