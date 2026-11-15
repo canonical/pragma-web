@@ -372,8 +372,9 @@
      where a refused sort's reason would: the reason is hidden until placing
      ends, so the two never draw over each other. */
   .ds.data-table-header-cell:has(
-    > .ds.data-table-resize-handle[data-mode="placing"]
-  ) > .sort-reason {
+      > .ds.data-table-resize-handle[data-mode="placing"]
+    )
+    > .sort-reason {
     display: none;
   }
 
