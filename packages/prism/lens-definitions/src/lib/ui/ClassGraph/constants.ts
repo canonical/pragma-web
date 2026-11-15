@@ -18,3 +18,9 @@ export const LABEL_HALO_STROKE = 6;
 
 /** The width of a relation's invisible hover target, in px. */
 export const EDGE_HIT_WIDTH = 8;
+
+/**
+ * The corner radius of an external stub's frame, in px: the box's 4px
+ * corner, at the middle of its 1px frame, which the stub's dashes cut.
+ */
+export const STUB_FRAME_RADIUS = 4 - EDGE_STROKE / 2;

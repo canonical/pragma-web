@@ -14,7 +14,8 @@ describe("DefinitionsExplorer SSR", () => {
     expect(html).toContain('class="ds definitions-explorer"');
     expect(html).toContain('data-slot="explorer-rail"');
     expect(html).toContain('data-slot="explorer-canvas"');
-    expect(html.match(/<g class="node[ "]/g)).toHaveLength(35);
+    // The 35 classes and the two stubs their relations reach.
+    expect(html.match(/<g class="node[ "]/g)).toHaveLength(37);
     expect(html).toContain('class="ring is-selected"');
     expect(html).toContain('aria-current="page"');
     expect(fetchFn).not.toHaveBeenCalled();
@@ -73,7 +74,7 @@ describe("DefinitionsExplorer SSR", () => {
       return html.slice(html.indexOf('data-slot="explorer-canvas"'));
     };
     const canvas = render(definitionsExplorerRecords);
-    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(35);
+    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(37);
     expect(render(reversed)).toBe(canvas);
   });
 

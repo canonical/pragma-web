@@ -4,6 +4,7 @@
  * the search box dims both.
  */
 
+import { createGraphBudget, GraphBudgetProvider } from "@canonical/prism-core";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createDefinitionsPage from "../../../../testing/createDefinitionsPage.js";
@@ -33,7 +34,13 @@ describe("DefinitionsExplorer", {
     for (const prefix of ["ds", "cs", "anatomy"]) {
       expect(screen.getByRole("region", { name: prefix })).toBeInTheDocument();
     }
-    expect(container.querySelectorAll(".desktop .node")).toHaveLength(35);
+    // The 35 classes, and the two stubs their relations reach.
+    expect(
+      container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
+    ).toHaveLength(35);
+    expect(
+      container.querySelectorAll('.desktop .node[data-kind="stub"]'),
+    ).toHaveLength(2);
     const current = screen
       .getAllByRole("link", { current: "page" })
       .map((link) => link.getAttribute("href"));
@@ -94,7 +101,9 @@ describe("DefinitionsExplorer", {
         createFetchSpy(),
       ),
     );
-    expect(container.querySelectorAll(".desktop .node")).toHaveLength(35);
+    expect(
+      container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
+    ).toHaveLength(35);
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
@@ -103,5 +112,35 @@ describe("DefinitionsExplorer", {
     render(createDefinitionsPage(UIBLOCK_TERM, undefined, fetchFn));
     expect(screen.getByText("Loading the ontologies…")).toBeInTheDocument();
     expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+
+  it("lays the graph out within the site's budget: the rail, the canvas and the phone draw a collapsed namespace as one row", () => {
+    // Within 20 nodes the largest namespace, ds with 20 classes, collapses.
+    const { container } = render(
+      <GraphBudgetProvider budget={createGraphBudget({ drawnNodesMax: 20 })}>
+        {createDefinitionsPage(
+          undefined,
+          definitionsExplorerRecords,
+          createFetchSpy(),
+        )}
+      </GraphBudgetProvider>,
+    );
+    const box = container.querySelector(
+      '.desktop .node[data-kind="region"][data-id="ds"]',
+    );
+    expect(box?.getAttribute("data-classes")).toBe("20");
+    expect(
+      container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
+    ).toHaveLength(16);
+    const rail = screen.getByRole("region", { name: "ds" });
+    expect(rail.querySelector(".item.is-region")?.textContent).toBe(
+      "20 classes, drawn as one box",
+    );
+    expect(rail.querySelectorAll('a[href^="/definitions/ds%3A"]').length).toBe(
+      rail.querySelectorAll(".item:not(.is-region)").length,
+    );
+    expect(
+      container.querySelector('.phone .row[data-kind="region"]')?.textContent,
+    ).toContain("20 classes");
   });
 });

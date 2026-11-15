@@ -1,3 +1,4 @@
+import { useGraphBudget } from "@canonical/prism-core";
 import { useMemo } from "react";
 import { useFragment, useLazyLoadQuery } from "react-relay";
 import type { DefinitionsExplorer_ontologies$key } from "../src/__generated__/DefinitionsExplorer_ontologies.graphql.js";
@@ -23,13 +24,13 @@ export interface CapturedExplorer {
 
 /**
  * Read the explorer's operation at `term` from the store and lay its class
- * graph out as the explorer does, so a part of the explorer can be mounted
+ * graph out as the explorer does, within the graph budget, so a part of the explorer can be mounted
  * alone over a captured store.
  *
  * @param term - The selected term, or undefined for the explorer.
  * @returns The operation's data, the layout and the terms.
  * @note Impure: reads the Relay store, suspending while it does not hold
- *   the operation.
+ *   the operation, and the graph budget from its provider.
  */
 export default function useCapturedExplorer(term?: string): CapturedExplorer {
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
@@ -40,9 +41,13 @@ export default function useCapturedExplorer(term?: string): CapturedExplorer {
     explorerFragmentNode,
     data.ontologies,
   );
+  const budget = useGraphBudget();
   const layout = useMemo(
-    () => layOutClassGraph(buildClassGraphInput(graph, data.classEdges)),
-    [graph, data.classEdges],
+    () =>
+      layOutClassGraph(buildClassGraphInput(graph, data.classEdges), {
+        budget,
+      }),
+    [graph, data.classEdges, budget],
   );
   const terms = useMemo(
     () =>

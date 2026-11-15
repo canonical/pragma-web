@@ -50,6 +50,10 @@ export const MESSAGES = {
   "rail.properties": "Properties",
   "rail.count": "{matches} of {total}",
   "rail.abstract": "abstract",
+  "rail.region": {
+    one: "{count} class, drawn as one box",
+    other: "{count} classes, drawn as one box",
+  },
   "kind.object": "object",
   "kind.datatype": "datatype",
   "kind.annotation": "annotation",

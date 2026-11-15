@@ -113,6 +113,24 @@ node:
                         relation: { cardinality: "1" }
                   relation: { cardinality: "1", slotName: target }
           - node:
+              role: external stub row (data-kind=stub)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+                - node:
+                    role: stub frame
+                    styles:
+                      typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                      interaction.pointerEvents: none
+                  relation: { cardinality: "1", slotName: stub-frame }
+          - node:
+              role: collapsed region row (data-kind=region)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+          - node:
               role: selected row (.is-selected)
               edges:
                 - node:

@@ -15,7 +15,10 @@ import {
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import { type ReactElement, type ReactNode, useMemo } from "react";
-import { BRIDGE_LABEL_SIZE } from "../../classGraph/constants.js";
+import {
+  BRIDGE_LABEL_SIZE,
+  ZERO_STROKE_DASH,
+} from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
@@ -31,6 +34,7 @@ import {
   RING_OFFSET,
   RING_RADIUS,
   RING_STROKE,
+  STUB_FRAME_RADIUS,
 } from "./constants.js";
 import type { ClassGraphProps } from "./types.js";
 import "./styles.css";
@@ -102,7 +106,10 @@ export default function ClassGraph({
     selected === undefined || focus !== selected
       ? []
       : traceChainToRoot(layout, selected);
-  const termOf = (uri: string): string => requireEntry(terms, uri);
+  // A stub or a collapsed region carries its own term; a class's is the
+  // explorer's.
+  const termOf = (uri: string): string =>
+    layout.nodes.get(uri)?.term ?? requireEntry(terms, uri);
   const isHidden = (edge: LaidOutEdge): boolean =>
     hidden.has(edge.from) || edge.to.every((id) => hidden.has(id));
   const isFaded = (edge: LaidOutEdge): boolean =>
@@ -194,12 +201,21 @@ export default function ClassGraph({
       : isFadedNode
         ? "is-faded"
         : dimmed.has(node.uri) && "is-dimmed";
-    const showText = bucket === "full" || (bucket === "hubs" && node.hub);
+    // A stub and a collapsed region are named wherever a hub is: each
+    // stands for more than one class's box.
+    const showText =
+      bucket === "full" ||
+      (bucket === "hubs" && (node.hub || node.kind !== "class"));
     const box = (
       <EntityGraphNode
         count={bucket === "full" ? (node.count ?? undefined) : undefined}
         height={node.h}
         hollow={node.abstract}
+        kind={
+          node.kind === "region"
+            ? t("well.region.count", { count: node.members })
+            : undefined
+        }
         prominent={node.hub}
         showText={showText}
         title={node.label}
@@ -210,13 +226,20 @@ export default function ClassGraph({
     return (
       <g
         className={joinClasses("node", state)}
+        data-classes={node.kind === "region" ? node.members : undefined}
         data-col={node.col}
         data-degree={node.degree}
         data-h={node.h}
         data-hub={String(node.hub)}
         data-id={term}
         data-instances={node.instanceCount}
-        data-kind={node.abstract ? "abstract" : "concrete"}
+        data-kind={
+          node.kind !== "class"
+            ? node.kind
+            : node.abstract
+              ? "abstract"
+              : "concrete"
+        }
         data-lifecycle="none"
         data-ns={node.region}
         data-w={node.w}
@@ -225,7 +248,7 @@ export default function ClassGraph({
         key={node.uri}
         transform={`translate(${node.x},${node.y})`}
       >
-        {tabStop === undefined ? (
+        {tabStop === undefined || node.kind !== "class" ? (
           box
         ) : (
           <Link
@@ -245,6 +268,21 @@ export default function ClassGraph({
             {box}
           </Link>
         )}
+        {node.kind === "stub" ? (
+          // The floor's colour cuts the box's frame into dashes.
+          <rect
+            className="stub-frame"
+            fill="none"
+            height={node.h - EDGE_STROKE}
+            rx={STUB_FRAME_RADIUS}
+            stroke="currentColor"
+            strokeDasharray={ZERO_STROKE_DASH}
+            strokeWidth={EDGE_STROKE}
+            width={node.w - EDGE_STROKE}
+            x={EDGE_STROKE / 2}
+            y={EDGE_STROKE / 2}
+          />
+        ) : null}
         {ring ? (
           <rect
             className={joinClasses(
@@ -310,7 +348,7 @@ export default function ClassGraph({
         {layout.regions.map((region) => (
           <g
             className="region"
-            data-classes={region.ids.length}
+            data-classes={region.members}
             data-columns={region.columns}
             data-h={region.h}
             data-ns={region.prefix}
@@ -337,7 +375,7 @@ export default function ClassGraph({
                 <tspan className="prefix">{region.prefix.toUpperCase()}</tspan>
                 {bucket === "full" ? (
                   <tspan className="count" dx={REGION_LABEL_GAP}>
-                    {t("well.region.count", { count: region.ids.length })}
+                    {t("well.region.count", { count: region.members })}
                   </tspan>
                 ) : null}
               </text>

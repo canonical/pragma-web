@@ -10,13 +10,15 @@ import {
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type { ReactElement } from "react";
-import { PHONE } from "../../../../classGraph/constants.js";
+import { PHONE, ZERO_STROKE_DASH } from "../../../../classGraph/constants.js";
 import type { LaidOutEdge } from "../../../../classGraph/types.js";
 import { useMessages } from "../../../../i18n/index.js";
 import {
+  EDGE_STROKE,
   RING_OFFSET,
   RING_RADIUS,
   RING_STROKE,
+  STUB_FRAME_RADIUS,
 } from "../../../ClassGraph/constants.js";
 import type { PhoneGraphProps } from "./types.js";
 import "./styles.css";
@@ -144,8 +146,22 @@ export default function PhoneGraph({
       {layout.rail.map((uri) => {
         const row = requireEntry(phone.rows, uri);
         const node = requireEntry(layout.nodes, uri);
-        const term = requireEntry(terms, uri);
+        // A stub or a collapsed region carries its own term and is no link.
+        const term = node.term ?? requireEntry(terms, uri);
         const isSelected = uri === selected;
+        const box = (
+          <EntityGraphNode
+            count={
+              node.kind === "region"
+                ? t("well.region.count", { count: node.members })
+                : (node.count ?? undefined)
+            }
+            height={row.h}
+            hollow={node.abstract}
+            title={node.label}
+            width={row.w}
+          />
+        );
         return (
           <g
             className={[
@@ -156,18 +172,32 @@ export default function PhoneGraph({
               .filter(Boolean)
               .join(" ")}
             data-id={term}
+            data-kind={node.kind}
             key={uri}
             transform={`translate(${row.x},${row.y})`}
           >
-            <Link className="target" params={{ term }} to="definitionsTerm">
-              <EntityGraphNode
-                count={node.count ?? undefined}
-                height={row.h}
-                hollow={node.abstract}
-                title={node.label}
-                width={row.w}
+            {node.kind === "class" ? (
+              <Link className="target" params={{ term }} to="definitionsTerm">
+                {box}
+              </Link>
+            ) : (
+              box
+            )}
+            {node.kind === "stub" ? (
+              // The floor's colour cuts the box's frame into dashes.
+              <rect
+                className="stub-frame"
+                fill="none"
+                height={row.h - EDGE_STROKE}
+                rx={STUB_FRAME_RADIUS}
+                stroke="currentColor"
+                strokeDasharray={ZERO_STROKE_DASH}
+                strokeWidth={EDGE_STROKE}
+                width={row.w - EDGE_STROKE}
+                x={EDGE_STROKE / 2}
+                y={EDGE_STROKE / 2}
               />
-            </Link>
+            ) : null}
             {isSelected ? (
               <rect
                 className="ring is-selected"

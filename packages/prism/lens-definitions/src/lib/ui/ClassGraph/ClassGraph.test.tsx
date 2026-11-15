@@ -1,4 +1,5 @@
 import {
+  GRAPH_BUDGET,
   measurePathBounds,
   placeEdgeLabels,
   requireAt,
@@ -9,9 +10,11 @@ import { render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
+import { FOUR_NAMESPACE_GRAPH } from "../../../../testing/fixtures.js";
 import classEdges from "../../../../testing/records/classEdges.js";
 import metroGraph from "../../../../testing/records/metroGraph.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
+import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import weighStroke from "../../classGraph/weighStroke.js";
 import ClassGraph from "./ClassGraph.js";
 import type { ClassGraphProps } from "./types.js";
@@ -377,6 +380,57 @@ describe("ClassGraph", () => {
     it("loses its label when a class it ends is hidden", () => {
       const container = draw({ ...own, hidden: new Set([bridge.from]) });
       expect(groupsOf(container)).toHaveLength(0);
+    });
+  });
+
+  describe("the overview within its budget", () => {
+    const own = {
+      layout: layOutClassGraph(FOUR_NAMESPACE_GRAPH, { budget: GRAPH_BUDGET }),
+      terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
+      tabStop: "https://ds.canonical.com/UIBlock",
+    };
+    afterEach(() => {
+      zoom.bucket = "full";
+    });
+
+    it("draws a collapsed namespace as one inert box with its class count, named at the hubs zoom", () => {
+      for (const bucket of ["hubs", "full"] as const) {
+        zoom.bucket = bucket;
+        const region = nodeOf(draw(own), "surface");
+        expect(region.getAttribute("data-kind")).toBe("region");
+        expect(region.getAttribute("data-classes")).toBe("31");
+        expect(region.textContent).toContain("surface");
+        expect(region.textContent).toContain("31 classes");
+        expect(region.querySelector("a")).toBeNull();
+      }
+      zoom.bucket = "full";
+      expect(
+        draw(own).querySelector('.region[data-ns="surface"] .count')
+          ?.textContent,
+      ).toBe("31 classes");
+    });
+
+    it("draws each external stub as an inert box in a dashed frame, a bridge reaching it", () => {
+      const container = draw(own);
+      const stubs = [...container.querySelectorAll('.node[data-kind="stub"]')];
+      expect(stubs.map((stub) => stub.getAttribute("data-id"))).toEqual([
+        "dt:TokenSymbol",
+        "rdf:List",
+      ]);
+      for (const stub of stubs) {
+        expect(stub.querySelector("a")).toBeNull();
+        expect(
+          stub
+            .querySelector("rect.stub-frame")
+            ?.getAttribute("stroke-dasharray"),
+        ).toBe("4 4");
+        const term = stub.getAttribute("data-id") ?? "";
+        expect(
+          container.querySelector(
+            `path.relation.is-bridge[data-from="${term}"], path.relation.is-bridge[data-to="${term}"]`,
+          ),
+        ).not.toBeNull();
+      }
     });
   });
 

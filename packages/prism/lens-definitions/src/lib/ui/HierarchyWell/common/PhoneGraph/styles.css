@@ -90,4 +90,11 @@
   .ds.phone-graph .ring.is-selected {
     color: var(--phone-graph-accent-color);
   }
+
+  /* An external stub, a class no loaded namespace holds: the floor's
+   * colour cuts its box's frame into dashes. */
+  .ds.phone-graph .stub-frame {
+    color: var(--phone-graph-floor-color);
+    pointer-events: none;
+  }
 }

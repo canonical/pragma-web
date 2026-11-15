@@ -154,6 +154,13 @@
     display: none;
   }
 
+  /* An external stub, a class no loaded namespace holds: the floor's
+   * colour cuts its box's frame into dashes. */
+  .ds.class-graph .stub-frame {
+    color: var(--class-graph-floor-color);
+    pointer-events: none;
+  }
+
   /* The ring outside the box marks a focused class, so the link draws
    * none of its own. */
   .ds.class-graph .target {

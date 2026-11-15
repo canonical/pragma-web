@@ -39,6 +39,16 @@
 # the 8px head) about its tip, and the line stops its own width short of
 # the tip, where the head is as wide as it is.
 #
+# Within its budget the overview at rest draws what fits: while the
+# classes, the collapsed regions and the stubs exceed the drawn nodes, the
+# largest namespace collapses to one box (`data-kind="region"`) in its own
+# region: its prefix over its class count (`data-classes`), a hub's height,
+# at least 128px wide, inert, named wherever a hub is named. A relation to
+# a class no loaded namespace holds reaches an external stub
+# (`data-kind="stub"`): a class box named by its compact term, in a region
+# of its prefix, inert, its frame cut into dashes (4 4) by the floor's
+# colour, and the relation to it is a bridge.
+#
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.
 # A ring 2px outside a class marks the hovered or keyboard-focused class
@@ -203,6 +213,24 @@ node:
               styles:
                 motion.property: opacity
                 motion.duration: motion.duration.fast
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+          - node:
+              role: external stub (data-kind=stub)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+                - node:
+                    role: stub frame
+                    styles:
+                      typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                      interaction.pointerEvents: none
+                  relation: { cardinality: "1", slotName: stub-frame }
+          - node:
+              role: collapsed region (data-kind=region)
               edges:
                 - node:
                     uri: prism.component.entity_graph_node

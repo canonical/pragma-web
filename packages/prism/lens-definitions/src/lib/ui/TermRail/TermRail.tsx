@@ -6,6 +6,7 @@ import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import type { TermRail_ontologies$key } from "../../../__generated__/TermRail_ontologies.graphql.js";
 import termRailFragmentNode from "../../../__generated__/TermRail_ontologies.graphql.js";
+import { REGION_NODE_SCHEME } from "../../classGraph/constants.js";
 import compactUri from "../../compactUri.js";
 import formatPropertyKind from "../../formatPropertyKind.js";
 import { useMessages } from "../../i18n/index.js";
@@ -142,7 +143,11 @@ export default function TermRail({
       </p>
       {data.map((ontology) => {
         const namespaces = [ontology];
-        const classes = [...ontology.classes]
+        // A namespace the graph collapses to one box is one row here too.
+        const collapsed =
+          layout.nodes.get(`${REGION_NODE_SCHEME}${ontology.prefix}`)?.kind ===
+          "region";
+        const classes = (collapsed ? [] : [...ontology.classes])
           .sort(
             (a, b) =>
               requireEntry(railIndex, a.uri) - requireEntry(railIndex, b.uri),
@@ -172,7 +177,17 @@ export default function TermRail({
               !filter.namespaces.includes(ontology.prefix),
           };
         });
-        const classMatches = classes.filter((row) => !row.dimmed).length;
+        const classMatches = collapsed
+          ? ontology.classes.filter(
+              (term) =>
+                matchesDimming(
+                  filter,
+                  term.label,
+                  compactUri(term.uri, namespaces),
+                  term.instanceCount,
+                ) && matchesChips(filter, term.isAbstract, ontology.prefix),
+            ).length
+          : classes.filter((row) => !row.dimmed).length;
         const propertyMatches = properties.filter((row) => !row.dimmed).length;
         const headingId = `term-rail-${ontology.prefix}`;
         return (
@@ -189,11 +204,18 @@ export default function TermRail({
               <span className="count">
                 {t("rail.count", {
                   matches: classMatches,
-                  total: classes.length,
+                  total: ontology.classes.length,
                 })}
               </span>
             </h3>
             <ul className="list">
+              {collapsed ? (
+                <li className="item is-region" data-ns={ontology.prefix}>
+                  <span className="region">
+                    {t("rail.region", { count: ontology.classes.length })}
+                  </span>
+                </li>
+              ) : null}
               {classes.map(({ term, prefixed, depth, dimmed }) => (
                 <li
                   className={formatItemClassName(prefixed, dimmed)}
