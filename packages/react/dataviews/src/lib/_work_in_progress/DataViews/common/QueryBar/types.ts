@@ -1,6 +1,7 @@
 import type {
   Predicate,
   PredicateCondition,
+  PredicateEdit,
   PredicateRef,
   Query,
   QueryIssue,
@@ -83,3 +84,35 @@ export type QueryClause =
   | QueryRangeClause
   | QuerySearchClause
   | QueryRefusedClause;
+
+/**
+ * Why two or more conjuncts on one field cannot all hold:
+ * - `disjoint-options`: a single-valued choice asked to be in sets that
+ *   share no option;
+ * - `different-text`: a text asked to equal two different texts;
+ * - `crossed-bounds`: a lower bound above an upper bound;
+ * - `set-and-unset`: a field asked both to hold a value and to hold none.
+ */
+export type QueryContradictionKind =
+  | "disjoint-options"
+  | "different-text"
+  | "crossed-bounds"
+  | "set-and-unset";
+
+/**
+ * Conjuncts on one field that cannot all hold, so the query matches
+ * nothing. The query still applies; the bar explains the empty result and
+ * offers the merge where there is one.
+ */
+export type QueryContradiction = {
+  readonly field: string;
+  readonly kind: QueryContradictionKind;
+  /** The conjuncts that cannot all hold, in canonical order. */
+  readonly refs: readonly PredicateRef[];
+  /**
+   * The edit that resolves them into what was likely meant: one set of
+   * every option asked for, or the two bounds swapped. Null where no one
+   * reading stands out.
+   */
+  readonly merge: PredicateEdit | null;
+};
