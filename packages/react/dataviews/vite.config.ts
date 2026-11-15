@@ -12,23 +12,11 @@ const plugins: any[] = [react()];
 const testConfig = reactTestConfig({
   glob: "test",
   ssr: true,
-  // Unmeasured: stories, and the story and testing/ helpers without a test.
+  // Unmeasured: stories, and the testing/ helpers without a test.
   coverage: {
     include: ["src/**/*.{ts,tsx}", "testing/**/*.{ts,tsx}"],
     exclude: [
       "**/*.stories.{ts,tsx}",
-      "src/storybook/getHiddenButton.ts",
-      "src/storybook/machines/api/answerBehind.ts",
-      "src/storybook/machines/api/compareRecords.ts",
-      "src/storybook/machines/api/constants.ts",
-      "src/storybook/machines/api/foldStoredText.ts",
-      "src/storybook/machines/api/isFacetField.ts",
-      "src/storybook/machines/api/readApiFacets.ts",
-      "src/storybook/machines/api/readGraphQLQuery.ts",
-      "src/storybook/machines/api/readRestQuery.ts",
-      "src/storybook/machines/api/selectRecords.ts",
-      "src/storybook/machines/readPaginationSummary.ts",
-      "src/storybook/spellPublicImports.ts",
       "testing/**/*.d.ts",
       "testing/**/*.test.{ts,tsx}",
       "testing/keyboard/**",
