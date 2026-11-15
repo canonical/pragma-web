@@ -496,6 +496,41 @@ function layOutModel(
       lanes.set(bundle.id, { index, count: group.length });
     });
   }
+  // The gap between two regions side by side on one shelf, with no region
+  // between them, when the bridge leaves and enters by the sides that face
+  // across it from the columns next to it, so its runs to the gap cross no
+  // box.
+  const findSharedGap = (
+    a: Omit<LaidOutNode, "nav">,
+    sideA: "left" | "right",
+    b: Omit<LaidOutNode, "nav">,
+    sideB: "left" | "right",
+  ): { readonly from: number; readonly to: number } | undefined => {
+    const span = (prefix: string) => {
+      const { x } = originOf(prefix);
+      return { left: x, right: x + regionOf(prefix).w };
+    };
+    const facesGap = (
+      node: Omit<LaidOutNode, "nav">,
+      side: "left" | "right",
+    ): boolean => {
+      const { columnOf, columns } = regionOf(node.region).layout;
+      return columnOf(node.uri) === (side === "left" ? 0 : columns.length - 1);
+    };
+    if (sideA === sideB || !facesGap(a, sideA) || !facesGap(b, sideB)) {
+      return undefined;
+    }
+    const [left, right] = sideA === "right" ? [a, b] : [b, a];
+    const from = span(left.region).right;
+    const to = span(right.region).left;
+    const { shelfY } = originOf(left.region);
+    const between = [...placed.keys()].some((prefix) => {
+      if (prefix === left.region || prefix === right.region) return false;
+      const { left: x, right: end } = span(prefix);
+      return originOf(prefix).shelfY === shelfY && end > from && x < to;
+    });
+    return to < from || between ? undefined : { from, to };
+  };
   const signs = new Map<string, number>();
   const crossEdges: LaidOutEdge[] = [];
   for (const bundle of crossBundles) {
@@ -559,20 +594,32 @@ function layOutModel(
     signs.set(pairOf(bundle), sign);
     const exitX = channelOf(a, fromRegion, sideA, sign);
     const entryX = channelOf(b, toRegion, sideB, sign);
-    const commands: PathCommand[] = [
-      ["M", startX, portA],
-      ["H", exitX],
-      ...(joiningGap === undefined
-        ? ([
-            ["V", fromGap],
-            ["H", -SHELF_GAP / 2 + gapLane],
-            ["V", toGap],
-          ] as PathCommand[])
-        : ([["V", joiningGap]] as PathCommand[])),
-      ["H", entryX],
-      ["V", portB],
-      ["H", endX],
-    ];
+    // Neighbours on one shelf, facing each other: straight across the gap
+    // between them, at the bridge's lane, with no detour through the
+    // channel above the shelf.
+    const gap = step === 0 ? findSharedGap(a, sideA, b, sideB) : undefined;
+    const commands: PathCommand[] =
+      gap === undefined
+        ? [
+            ["M", startX, portA],
+            ["H", exitX],
+            ...(joiningGap === undefined
+              ? ([
+                  ["V", fromGap],
+                  ["H", -SHELF_GAP / 2 + gapLane],
+                  ["V", toGap],
+                ] as PathCommand[])
+              : ([["V", joiningGap]] as PathCommand[])),
+            ["H", entryX],
+            ["V", portB],
+            ["H", endX],
+          ]
+        : [
+            ["M", startX, portA],
+            ["H", (gap.from + gap.to) / 2 + sign * gapLane],
+            ...(portA === portB ? [] : ([["V", portB]] as PathCommand[])),
+            ["H", endX],
+          ];
     const heads: PathCommand[][] = [];
     if (bundle.heads.has(bundle.a))
       heads.push(buildArrowhead(startX, portA, sideA === "left"));

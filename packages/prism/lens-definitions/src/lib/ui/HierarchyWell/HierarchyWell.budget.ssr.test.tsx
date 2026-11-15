@@ -1,3 +1,4 @@
+import { createTranslator } from "@canonical/i18n-core";
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -11,7 +12,9 @@ import {
   DESIGN_CANVAS,
 } from "../../classGraph/constants.js";
 import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
+import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import type { ClassGraphInput } from "../../classGraph/types.js";
+import { MESSAGES } from "../../i18n/index.js";
 import HierarchyWell from "./HierarchyWell.js";
 
 /** The canvas's SVG of the well rendered at rest: its outermost `<svg>`. */
@@ -107,15 +110,27 @@ describe("HierarchyWell SSR within the graph budget at rest", () => {
     },
   );
 
+  // The docs records' box and stub are neighbours on one shelf: their
+  // bridge crosses the gap between them, too short for a label beside it,
+  // so its label is named on focus.
   it.each([
-    ["the docs records", ontologyGraph, 2],
-    ["the metro's records", metroGraph, 3],
+    ["the docs records", ontologyGraph, 2, 1],
+    ["the metro's records", metroGraph, 3, 3],
   ])(
-    "labels every bridge of %s at rest, as many as the records serve, at 12px at least at the opening zoom",
-    (_, input, served) => {
+    "labels the bridges of %s at rest where their routes leave room, as many as the records serve, the rest on focus, at 12px at least at the opening zoom",
+    (_, input, served, resting) => {
       const measure = measureCanvas(renderCanvas(input));
       expect(countServedBridges(input)).toBe(served);
-      expect(measure.bridgeLabels).toBe(served);
+      expect(measure.bridgeLabels).toBe(resting);
+      const placement = placeBridgeLabels(
+        layOutClassGraph(input, { budget: GRAPH_BUDGET }),
+        createTranslator("en", MESSAGES),
+      );
+      expect(placement.placed).toHaveLength(resting);
+      expect(placement.onFocus.map((label) => label.edge)).toEqual(
+        placement.omitted,
+      );
+      expect(placement.omitted).toHaveLength(served - resting);
       expect(BRIDGE_LABEL_SIZE * measure.openingZoom).toBeGreaterThanOrEqual(
         GRAPH_BUDGET.labelPxMin,
       );

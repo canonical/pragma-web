@@ -10,7 +10,7 @@ import {
 import { describe, expect, it } from "vitest";
 import {
   BRIDGE_TRIO_GRAPH,
-  SHELF_PAIR_GRAPH,
+  STACKED_PAIR_GRAPH,
 } from "../../../testing/fixtures.js";
 import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
@@ -48,9 +48,9 @@ function touchesRoute(box: Rect, d: string): boolean {
 
 describe("placeBridgeLabels", () => {
   it("labels a bridge with its relation's name on the route", () => {
-    const { labels } = placeOn(layOutClassGraph(SHELF_PAIR_GRAPH));
+    const { labels } = placeOn(layOutClassGraph(STACKED_PAIR_GRAPH));
     expect(labels.map(({ edge, text }) => [edge, text])).toEqual([
-      ["rel:aa:A0 bb:B0", "reaches"],
+      ["rel:aa:A bb:B", "reaches"],
     ]);
   });
 
@@ -87,12 +87,12 @@ describe("placeBridgeLabels", () => {
 
   it("counts a bridge's relations past two", () => {
     const layout = layOutClassGraph({
-      ...SHELF_PAIR_GRAPH,
+      ...STACKED_PAIR_GRAPH,
       relations: ["one", "two", "three"].map((label) => ({
         uri: `aa:${label}`,
         label,
-        domain: "aa:A0",
-        range: "bb:B0",
+        domain: "aa:A",
+        range: "bb:B",
         count: 1,
       })),
     });
@@ -102,20 +102,20 @@ describe("placeBridgeLabels", () => {
   });
 
   it("records a bridge with no clear place, for the focus's labels to name", () => {
-    const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
+    const layout = layOutClassGraph(STACKED_PAIR_GRAPH);
     expect(
       placeBridgeLabels({ ...layout, viewBox: { x: 0, y: 0, w: 0, h: 0 } }, t),
-    ).toMatchObject({ placed: [], omitted: ["rel:aa:A0 bb:B0"] });
+    ).toMatchObject({ placed: [], omitted: ["rel:aa:A bb:B"] });
   });
 
   it("gives an omitted bridge the place its label takes on focus, clear of the boxes", () => {
-    const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
+    const layout = layOutClassGraph(STACKED_PAIR_GRAPH);
     const { onFocus } = placeBridgeLabels(
       { ...layout, viewBox: { x: 0, y: 0, w: 0, h: 0 } },
       t,
     );
     expect(onFocus.map(({ edge, text }) => [edge, text])).toEqual([
-      ["rel:aa:A0 bb:B0", "reaches"],
+      ["rel:aa:A bb:B", "reaches"],
     ]);
     for (const label of onFocus) {
       for (const node of layout.nodes.values()) {
@@ -125,7 +125,7 @@ describe("placeBridgeLabels", () => {
   });
 
   it("gives an omitted bridge the place at its arrowhead when no place is clear of the boxes", () => {
-    const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
+    const layout = layOutClassGraph(STACKED_PAIR_GRAPH);
     const anyNode = requireDefined([...layout.nodes.values()].at(0), "a class");
     // A box over the whole graph leaves no place clear.
     const covered = {

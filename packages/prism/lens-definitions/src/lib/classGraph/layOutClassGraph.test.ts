@@ -820,6 +820,58 @@ describe("layOutClassGraph", () => {
       expect(endX).toBe(to.x);
     });
 
+    it.each([
+      ["two regions on one shelf", SHELF_PAIR_GRAPH, "rel:aa:A0 bb:B0"],
+      [
+        "the docs records' box and stub",
+        ontologyGraph,
+        "rel:https://dt.canonical.com/TokenSymbol region:ds",
+      ],
+      [
+        "two boxes of the four namespaces",
+        FOUR_NAMESPACE_GRAPH,
+        "rel:region:ds region:surface",
+      ],
+    ])(
+      "routes a bridge between neighbours on one shelf, %s, straight across their gap",
+      (_, input, id) => {
+        const laidOut = layOutClassGraph(input, { budget: GRAPH_BUDGET });
+        const bridge = requireDefined(
+          laidOut.edges.find((edge) => edge.id === id),
+          "the bridge",
+        );
+        const from = requireEntry(laidOut.nodes, bridge.from);
+        const to = requireEntry(laidOut.nodes, requireAt(bridge.to, 0));
+        const regionTop = (prefix: string): number =>
+          requireDefined(
+            laidOut.regions.find((region) => region.prefix === prefix),
+            "the region",
+          ).y;
+        expect(bridge.bridge).toBe(true);
+        const segments = parsePathData(bridge.d).flatMap(
+          ({ segments: runs }) => runs,
+        );
+        const points = segments.flatMap(({ points: ends }) => ends);
+        // No point above either region's top: no detour through the
+        // channel above the shelf.
+        const top = Math.max(regionTop(from.region), regionTop(to.region));
+        expect(points.every(([, y]) => y >= top)).toBe(true);
+        // No stretch walked twice, either way.
+        const walked = segments.map(({ points: [a, b] }) =>
+          [a, b]
+            .map((point) => requireDefined(point, "a stretch's end").join(","))
+            .sort()
+            .join(" "),
+        );
+        expect(new Set(walked).size).toBe(walked.length);
+        // It runs between the two boxes only, in the gap that parts them.
+        const [left, right] = from.x < to.x ? [from, to] : [to, from];
+        expect(
+          points.every(([x]) => x >= left.x + left.w && x <= right.x),
+        ).toBe(true);
+      },
+    );
+
     it("leaves and enters by the right side of both boxes when they overlap across", () => {
       const { from, to, fromShelf, toShelf, startX, endX } =
         measureCrossing(STACKED_PAIR_GRAPH);
