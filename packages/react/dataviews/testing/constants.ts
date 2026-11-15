@@ -60,7 +60,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/common/virtualization/constants.ts test",
   "src/lib/hooks/useAnnouncer.ts test",
   "src/lib/hooks/useAnsweredFacets.ts test",
-  "src/lib/hooks/useDataViewsValue.ts export:mixed",
   "src/lib/hooks/useFacets.ts test",
   "src/lib/hooks/useIsHydrated.ts test",
   "src/lib/hooks/useMergedRef.ts test",

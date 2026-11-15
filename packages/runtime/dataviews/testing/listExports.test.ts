@@ -31,7 +31,7 @@ describe("listExports", () => {
     ]);
   });
 
-  it.fails("reads a function's overload signatures as one export", () => {
+  it("reads a function's overload signatures as one export", () => {
     const source = [
       "export default function a(b: string): string;",
       "export default function a(b: number): number;",
