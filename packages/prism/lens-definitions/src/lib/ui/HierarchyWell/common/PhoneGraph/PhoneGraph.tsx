@@ -73,12 +73,19 @@ export default function PhoneGraph({
   // The drilled namespace's header is the way back to the overview at rest.
   // Its whole row takes the pointer, not only the glyphs.
   const wrapWayBack = (
-    header: { readonly prefix: string; readonly y: number },
+    header: {
+      readonly prefix: string;
+      readonly y: number;
+      readonly count: number;
+    },
     label: ReactElement,
   ): ReactElement =>
     buildDrillHref !== undefined && layout.drilled === header.prefix ? (
       <RouterLink
-        aria-label={t("well.region.back", { prefix: header.prefix })}
+        aria-label={t("well.region.back", {
+          prefix: header.prefix,
+          classes: t("well.region.count", { count: header.count }),
+        })}
         className="way-back"
         href={buildDrillHref(undefined)}
       >

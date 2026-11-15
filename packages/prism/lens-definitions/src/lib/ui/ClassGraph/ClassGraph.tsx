@@ -387,15 +387,19 @@ export default function ClassGraph({
   );
   const labelBaseline = findCentredBaseline(LABEL_LINE_PITCH, LABEL_SIZE);
   // The drilled namespace's label row is the way back to the overview at
-  // rest, wherever its boxes would open.
-  // Its whole row takes the pointer, not only the glyphs.
+  // rest, wherever its boxes would open. Its whole row takes the pointer,
+  // not only the glyphs, and stays at every zoom: zoomed out past the
+  // labels, the row is still the link, with no text.
   const wrapWayBack = (
     region: LaidOutRegion,
-    label: ReactElement,
-  ): ReactElement =>
+    label: ReactElement | null,
+  ): ReactElement | null =>
     buildDrillHref !== undefined && layout.drilled === region.prefix ? (
       <RouterLink
-        aria-label={t("well.region.back", { prefix: region.prefix })}
+        aria-label={t("well.region.back", {
+          prefix: region.prefix,
+          classes: t("well.region.count", { count: region.members }),
+        })}
         className="way-back"
         href={buildDrillHref(undefined)}
       >
@@ -438,11 +442,10 @@ export default function ClassGraph({
               x={region.x}
               y={region.y}
             />
-            {bucket === "overview"
-              ? null
-              : wrapWayBack(
-                  region,
-                  <text
+            {wrapWayBack(
+              region,
+              bucket === "overview" ? null : (
+                <text
                     className="region-label"
                     fill="currentColor"
                     x={region.x}
@@ -456,8 +459,9 @@ export default function ClassGraph({
                         {t("well.region.count", { count: region.members })}
                       </tspan>
                     ) : null}
-                  </text>,
-                )}
+                  </text>
+              ),
+            )}
           </g>
         ))}
       </g>
