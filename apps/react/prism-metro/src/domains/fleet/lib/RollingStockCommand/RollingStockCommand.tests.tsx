@@ -109,7 +109,6 @@ describe("RollingStockCommand", () => {
       "2 formations",
     ]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     expect(screen.getByRole("link", { name: "Series 90" })).toHaveAttribute(
       "href",

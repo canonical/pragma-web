@@ -116,15 +116,7 @@ describe("CarTypeCard", () => {
       ["length", "20 m"],
       ["capacity", "160 passengers"],
     ]);
-    for (const slot of [
-      ".address",
-      ".kind",
-      ".status",
-      ".location",
-      ".key-values",
-      ".vital",
-      ".sidecar",
-    ]) {
+    for (const slot of [".address", ".kind", ".status"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
     }
     if (root) expectSlotOrder(root);

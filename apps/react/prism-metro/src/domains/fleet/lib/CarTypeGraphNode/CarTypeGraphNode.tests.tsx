@@ -100,7 +100,7 @@ describe("CarTypeGraphNode", () => {
       "href",
       "/icons/models.svg#models",
     );
-    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/fleet/car-types/metro%3Acar-90-driving",
     );

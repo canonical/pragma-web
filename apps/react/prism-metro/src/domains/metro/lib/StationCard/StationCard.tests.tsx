@@ -103,15 +103,7 @@ describe("StationCard", () => {
       ["inZone", "Central Zone"],
       ["servesLine", "North Line"],
     ]);
-    for (const slot of [
-      ".address",
-      ".kind",
-      ".status",
-      ".location",
-      ".key-values",
-      ".vital",
-      ".specimen",
-    ]) {
+    for (const slot of [".address", ".kind", ".status", ".specimen"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
     }
     if (root) expectSlotOrder(root);

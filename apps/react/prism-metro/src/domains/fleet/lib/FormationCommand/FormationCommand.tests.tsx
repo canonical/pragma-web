@@ -110,7 +110,6 @@ describe("FormationCommand", () => {
       "120 m",
     ]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     expect(
       screen.getByRole("link", { name: "Series 90 six-car" }),

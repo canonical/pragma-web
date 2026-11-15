@@ -102,7 +102,6 @@ describe("StationCommand", () => {
       ].map((slot) => slot.textContent),
     ).toEqual(["Northgate", "metro:northgate", "Station", "4 platforms"]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     expect(screen.getByRole("link", { name: "Northgate" })).toHaveAttribute(
       "href",

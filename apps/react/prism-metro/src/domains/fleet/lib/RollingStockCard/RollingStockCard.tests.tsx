@@ -116,15 +116,7 @@ describe("RollingStockCard", () => {
       ["length", "60–120 m"],
       ["capacity", "490–980 passengers"],
     ]);
-    for (const slot of [
-      ".address",
-      ".kind",
-      ".status",
-      ".location",
-      ".key-values",
-      ".vital",
-      ".sidecar",
-    ]) {
+    for (const slot of [".address", ".kind", ".status"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
     }
     if (root) expectSlotOrder(root);

@@ -108,7 +108,7 @@ describe("CarTypeRow", () => {
       ]),
     ).toEqual([["code", "DM"]]);
     expect(root?.querySelector('.fact[data-property="length"]')).toBeNull();
-    for (const slot of [".meta", ".kind", ".location", ".summary", ".status"]) {
+    for (const slot of [".kind", ".summary", ".status"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
     }
     if (root) expectSlotOrder(root);

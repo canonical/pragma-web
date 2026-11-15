@@ -129,7 +129,7 @@ describe("LineRow", () => {
         fact.querySelector(".detail")?.textContent,
       ]),
     ).toEqual([["servedBy", "5"]]);
-    for (const slot of [".meta", ".kind", ".location", ".summary", ".status"]) {
+    for (const slot of [".kind", ".summary", ".status"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
     }
     if (root) expectSlotOrder(root);

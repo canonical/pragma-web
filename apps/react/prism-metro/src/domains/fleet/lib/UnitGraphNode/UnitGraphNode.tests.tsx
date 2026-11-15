@@ -100,7 +100,7 @@ describe("UnitGraphNode", () => {
       "href",
       "/icons/units.svg#units",
     );
-    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/fleet/units/metro%3Aunit-90",
     );

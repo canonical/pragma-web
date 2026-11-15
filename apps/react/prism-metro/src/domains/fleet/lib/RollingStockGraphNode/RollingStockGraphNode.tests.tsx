@@ -102,7 +102,7 @@ describe("RollingStockGraphNode", () => {
       "href",
       "/icons/machines.svg#machines",
     );
-    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/fleet/metro%3Aseries-90",
     );

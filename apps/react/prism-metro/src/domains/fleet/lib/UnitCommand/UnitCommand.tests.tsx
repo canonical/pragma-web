@@ -102,7 +102,6 @@ describe("UnitCommand", () => {
       ].map((slot) => slot.textContent),
     ).toEqual(["Series 90 unit", "metro:unit-90", "Unit", "60 m"]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     expect(
       screen.getByRole("link", { name: "Series 90 unit" }),

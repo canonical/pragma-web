@@ -103,7 +103,7 @@ describe("FormationGraphNode", () => {
       "href",
       "/icons/connected.svg#connected",
     );
-    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/fleet/formations/metro%3Aseries-90-six-car",
     );

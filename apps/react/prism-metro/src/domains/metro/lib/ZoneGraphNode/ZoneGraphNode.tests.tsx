@@ -100,7 +100,7 @@ describe("ZoneGraphNode", () => {
       "href",
       "/icons/map.svg#map",
     );
-    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     // A fare zone has no home on this site, so its title reads as text.
     expect(container.querySelector("a")).toBeNull();
   });

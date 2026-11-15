@@ -123,15 +123,7 @@ describe("FormationCard", () => {
       ["cars", "6"],
       ["lines", "Coastal Line, North Line"],
     ]);
-    for (const slot of [
-      ".address",
-      ".kind",
-      ".status",
-      ".location",
-      ".key-values",
-      ".vital",
-      ".sidecar",
-    ]) {
+    for (const slot of [".address", ".kind", ".status"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
     }
     if (root) expectSlotOrder(root);

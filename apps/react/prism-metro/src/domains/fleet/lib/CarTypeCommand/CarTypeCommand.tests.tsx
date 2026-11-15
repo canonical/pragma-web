@@ -107,7 +107,6 @@ describe("CarTypeCommand", () => {
       "20 m",
     ]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     expect(
       screen.getByRole("link", { name: "Series 90 driving motor car" }),

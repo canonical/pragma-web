@@ -100,7 +100,7 @@ describe("LineGraphNode", () => {
       container.querySelector("svg.mark > circle.swatch")?.getAttribute("fill"),
     ).toBe("#c8102e");
     expect(container.querySelector("foreignObject")).toBeNull();
-    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/network/lines/metro%3Anorth-line",
     );

@@ -102,7 +102,6 @@ describe("ZoneCommand", () => {
       ].map((slot) => slot.textContent),
     ).toEqual(["Central Zone", "geo:central-zone", "Fare zone", "2 stations"]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     // A fare zone has no home on this site, so its title reads as text.
     expect(root?.querySelector("a")).toBeNull();

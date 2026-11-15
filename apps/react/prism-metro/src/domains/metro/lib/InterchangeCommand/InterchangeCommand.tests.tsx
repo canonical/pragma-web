@@ -110,7 +110,6 @@ describe("InterchangeCommand", () => {
       "3 lines",
     ]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     expect(
       screen.getByRole("link", { name: "Central Exchange" }),

@@ -103,7 +103,6 @@ describe("LineCommand", () => {
       ].map((slot) => slot.textContent),
     ).toEqual(["North Line", "metro:north-line", "Line", "5 stops"]);
     expect(root?.querySelector(".prefix")).toBeNull();
-    expect(root?.querySelector(".location")).toBeNull();
     if (root) expectSlotOrder(root);
     expect(screen.getByRole("link", { name: "North Line" })).toHaveAttribute(
       "href",

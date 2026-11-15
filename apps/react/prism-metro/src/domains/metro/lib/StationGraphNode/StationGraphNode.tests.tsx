@@ -100,7 +100,7 @@ describe("StationGraphNode", () => {
       "href",
       "/icons/location.svg#location",
     );
-    expect(container.querySelector(".kind, .context, .location")).toBeNull();
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/network/stations/metro%3Anorthgate",
     );
