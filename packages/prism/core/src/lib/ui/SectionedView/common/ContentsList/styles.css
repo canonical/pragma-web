@@ -34,6 +34,13 @@
     padding-block-end: var(--contents-list-link-padding-block);
     padding-inline-start: var(--contents-list-link-padding-inline);
     color: var(--contents-list-link-color);
+    text-decoration: none;
+  }
+
+  /* An entry is underlined only under the pointer: at rest the current one
+   * is told by its weight and its rule alone. */
+  .ds.contents-list .link:hover {
+    text-decoration: underline;
   }
 
   /* The section the reader is in: bold, with a rule at its start drawn

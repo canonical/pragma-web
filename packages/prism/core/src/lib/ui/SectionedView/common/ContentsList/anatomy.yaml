@@ -6,7 +6,8 @@
 # server). Used twice: in the aside's contents nav and in the bar's panel.
 # Private to SectionedView (cs:react.component.subcomponent_export_api).
 # Reference: PS8 V1 `.mockup-toc` (L148: the current entry is bold with a 2px
-# inset rule at its start).
+# inset rule at its start; L118-119: no underline at rest, underlined on
+# hover).
 #
 # Token ledger (on `.ds.contents-list`):
 #   --contents-list-gap: space.050                          between entries
@@ -51,6 +52,8 @@ node:
                 spacing.internal.block.end: space.050
                 spacing.internal.inline.start: space.100
                 typography.color: color.text
+                typography.decoration: none
+                typography.decoration@hover: underline
                 typography.weight@selected: typography.text.primary.bold.fontWeight
                 appearance.outline.width@focus: 2px
                 appearance.outline.style@focus: solid
