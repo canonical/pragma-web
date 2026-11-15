@@ -86,14 +86,7 @@ const renderVirtualizedBody = (
 };
 
 /**
- * The table itself, within the UI scope it speaks through: everything
- * `DataTable` renders, given its words and its announcer rather than
- * resolving them. A standalone `DataTable` hands it its own; the connected
- * `DataViews.DataTable` hands it its root's, so a root holds one announcer
- * however many tables it places. Its private cells and menus read the words
- * from the context it installs over them.
- *
- * @implements ds:apps.pattern.data_table
+ * The table, given its words and announcer rather than resolving them.
  *
  * @note Impure: observes the provider and the grid interaction while
  * mounted.

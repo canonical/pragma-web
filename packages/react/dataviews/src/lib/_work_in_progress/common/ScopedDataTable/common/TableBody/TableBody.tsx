@@ -4,13 +4,8 @@ import type { TableBodyProps } from "./types.js";
 const componentCssClassName = "ds data-table-body";
 
 /**
- * Every entry the table displays, in order. Memoised, and both props are
- * held at one reference — the entries until a row identity or the status
- * changes, the renderer until what it closes over does — so a republication
- * that changes only the query or the request status re-renders the header
- * and stops there. While a status shows, a new `renderStatus` re-renders
- * the body, which costs the status row and, beside kept rows, one pass over
- * memoised rows that bail out.
+ * Every entry the table displays, in order, re-rendered only for new
+ * entries or a new renderer.
  *
  * @implements ds:apps.subcomponent.data_table-body
  */

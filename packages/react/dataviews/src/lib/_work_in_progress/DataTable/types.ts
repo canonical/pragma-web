@@ -19,11 +19,6 @@ export type DataTableProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = Omit<ScopedDataTableProps<TFields, TRow>, "messages" | "announce"> & {
-  /**
-   * The words the table renders and announces, over the English record: a
-   * standalone table is its own root. The connected table takes its root's
-   * instead. Define a worded message once — a new function on every render
-   * re-renders every heading, menu and row checkbox that reads it.
-   */
+  /** The words the table renders and announces, over the English record. */
   readonly messages?: Partial<DataViewsMessages>;
 };

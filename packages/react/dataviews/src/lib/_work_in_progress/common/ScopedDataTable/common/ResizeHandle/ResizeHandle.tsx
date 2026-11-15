@@ -113,30 +113,8 @@ const reveal = (control: HTMLElement): void => {
 };
 
 /**
- * One column's resize handle.
- *
- * Pointer dragging, a press then a press, and the keyboard drive the same
- * commands and the same clamping, so resizing never requires a drag. A press
- * on the handle that does not travel starts placing the edge: it commits
- * nothing, and the next press inside the header row moves the edge to that
- * point, without activating the control it lands on. A press on the handle
- * again or outside the header row, Escape, or focus leaving the header cell
- * ends placing with nothing committed; a press outside the row still does
- * its own job, and Escape ends it wherever focus is in the header cell.
- * Arrow keys step the edge and Escape abandons a drag in progress, as a
- * cancelled pointer does. A drag, the arrow keys and placing all follow the
- * cell's text direction: right to left, the edge is on the left, and moving
- * it left widens the column. Every path is held to the column's declared
- * bounds, however often the column has been resized before, and every move
- * keeps the control in view. Pointer previews are coalesced to one geometry
- * publication per animation frame, and a release publishes its own position
- * before it commits, so a drag released before the next frame commits where
- * it was released, and one that cannot have moved the edge commits nothing.
- *
- * The root has no box of its own: the strip sits at the header cell's
- * trailing edge and the hint below its heading, each placed by the cell.
- *
- * `import { DataTable } from "@canonical/dataviews-react";`
+ * One column's resize handle. A drag, a press then a press, and the arrow
+ * keys resize the column within its declared bounds, in its text direction.
  *
  * @implements ds:apps.subcomponent.data_table-resize_handle
  */

@@ -51,27 +51,7 @@ const isActivationKey = (event: KeyboardEvent<HTMLButtonElement>): boolean =>
  * editing and row actions, the header cell is responsible for column-level
  * controls that affect how the entire column behaves.
  *
- * That is the design system's description of the block. What this
- * implementation covers: sorting and resizing, and hiding and moving the
- * column from its menu; no drag reordering and no pinning.
- *
- * A sortable header is a real link to the next ordering until scripts take
- * over, and a button after: activating it sorts by this column alone,
- * cycling ascending, descending and back to the source's own order, and
- * Shift with a click, Enter or Space adds or cycles it as a further term.
- * Focus stays on the header through the change. A column the ordering
- * names shows its direction as a chevron, and its precedence as a numeral
- * once there are two terms; its control is described by both, as
- * "descending, 2nd of 3". Only the header of the ordering's first term
- * carries `aria-sort`. An activation the source refuses changes nothing
- * and shows why beside the control, which the table's announcer says. Once
- * scripts run, a menu beside the control
- * carries the same sort for a reader who uses neither a precise pointer
- * nor a modifier key, and hides the column or moves it past the column
- * beside it; a column that can be neither sorted, hidden nor moved has no
- * menu.
- *
- * `import { DataTable } from "@canonical/dataviews-react";`
+ * Covers sorting, resizing, hiding and moving; no drag reordering or pinning.
  *
  * @implements ds:apps.subcomponent.data_table-header_cell
  */

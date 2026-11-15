@@ -10,8 +10,6 @@ const componentCssClassName = "ds data-table-settings-cell";
  * was given as its settings, and hands that the table's settings menu,
  * rendered, one element while the menu's facts and commands hold.
  *
- * `import { DataTable } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.subcomponent.data_table-settings_cell
  */
 export default function SettingsCell({

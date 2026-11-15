@@ -21,16 +21,8 @@ const componentCssClassName = "ds data-table-body-cell";
  * pinning, the body cell is responsible for presenting data values and
  * providing row-level interactions such as inline editing and row actions.
  *
- * That is the design system's description of the block. What this
- * implementation covers: the text cell and a column's own renderer, with
- * no inline editing or row actions yet. One body cell subscribes to its
- * own field's channel, so a record update re-renders only the cells whose
- * values actually changed, and it installs the cell context its column's own
- * renderer reads.
- *
- * Memoised: without it the claim above would hold for the channel and be
- * undone by the row, which would re-render every cell it has whenever it
- * rendered at all.
+ * Covers the text cell and a column's renderer; no inline editing or row
+ * actions.
  *
  * @implements ds:apps.subcomponent.data_table-body_cell
  */

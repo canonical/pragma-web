@@ -9,6 +9,8 @@ const componentCssClassName = "ds data-table-status-row";
  * are no rows or, above rows kept in view, what stands over them. The row
  * carries the status as `data-status`. A settled outcome is a polite status
  * message; a passing state is silent.
+ *
+ * @implements ds:apps.subcomponent.data_table-status_row
  */
 export default function StatusRow({
   status,
