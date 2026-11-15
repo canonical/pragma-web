@@ -14,7 +14,7 @@ import {
 
 describe("ComponentEntityPage", () => {
   it(
-    "lays the header, the example, then the texts, the anatomy, the tokens, the properties, the variants, the relations and the changes on the view",
+    "lays the header, the example, then the variants, the texts, the anatomy, the properties, the tokens, the relations and the changes on the view",
     () => {
       const fetchFn = createFetchSpy();
       const { container } = render(
@@ -38,12 +38,12 @@ describe("ComponentEntityPage", () => {
       ]);
       expect(parts(":scope > .content > .section > .section-body > *")).toEqual(
         [
+          "component-variants",
           "component-prose",
           "component-prose",
           "component-anatomy",
-          "component-tokens",
           "component-properties",
-          "component-variants",
+          "component-tokens",
           "component-relations",
           "component-changes",
         ],

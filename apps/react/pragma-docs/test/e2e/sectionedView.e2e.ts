@@ -458,12 +458,12 @@ const STAGE_MAX_BOTTOM_PX = 400;
 
 /** Button's sections the graph holds, in the lens's order. */
 const BUTTON_SECTION_IDS = [
+  "variants",
   "usage",
   "guidelines",
   "anatomy",
-  "tokens",
   "properties",
-  "variants",
+  "tokens",
   "relations",
   "changes",
 ] as const;
@@ -549,7 +549,7 @@ const countButtonModifiers = async (): Promise<number> => {
 };
 
 describe("Button's component page at 1440px (W6a-A6)", () => {
-  it("ends the example's stage above 400, draws every variant captioned, and lists every section", async ({
+  it("ends the example's stage above 400, opens the Variants heading above the fold, draws every variant captioned, and lists every section", async ({
     annotate,
   }) => {
     const page = await open(BUTTON_PATH);
@@ -559,6 +559,7 @@ describe("Button's component page at 1440px (W6a-A6)", () => {
         `stage bottom ${fold.stageBottom}px; Variants heading top ${fold.variantsTop}px; aside ${fold.asideHeight}px tall`,
       );
       expect(fold.stageBottom).toBeLessThan(STAGE_MAX_BOTTOM_PX);
+      expect(fold.variantsTop).toBeLessThan(DESKTOP.height);
       const modifiers = await countButtonModifiers();
       expect(modifiers).toBeGreaterThan(0);
       expect(fold.cells).toBeGreaterThanOrEqual(modifiers);

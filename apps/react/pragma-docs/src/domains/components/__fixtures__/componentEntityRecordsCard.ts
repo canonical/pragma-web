@@ -485,8 +485,8 @@ const componentEntityRecordsCard = {
     __id: "client:https://ds.canonical.com/global.component.card:_meta:fields:1",
     __typename: "ClassProperty",
     name: "tokenBindings",
-    order: 3,
-    group: { __ref: "https://ds.canonical.com/section.anatomy" },
+    order: 2,
+    group: { __ref: "https://ds.canonical.com/section.api" },
   },
   "https://ds.canonical.com/section.anatomy": {
     __id: "https://ds.canonical.com/section.anatomy",
@@ -565,8 +565,14 @@ const componentEntityRecordsCard = {
     __id: "client:https://ds.canonical.com/global.component.card:_meta:fields:9",
     __typename: "ClassProperty",
     name: "modifierFamilies",
-    order: 2,
-    group: { __ref: "https://ds.canonical.com/section.api" },
+    order: 1,
+    group: { __ref: "https://ds.canonical.com/section.variants" },
+  },
+  "https://ds.canonical.com/section.variants": {
+    __id: "https://ds.canonical.com/section.variants",
+    __typename: "PropertyGroup",
+    order: 2.5,
+    uri: "https://ds.canonical.com/section.variants",
   },
   "client:https://ds.canonical.com/global.component.card:_meta:fields:10": {
     __id: "client:https://ds.canonical.com/global.component.card:_meta:fields:10",

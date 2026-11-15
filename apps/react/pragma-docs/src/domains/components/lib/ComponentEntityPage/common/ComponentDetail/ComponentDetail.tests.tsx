@@ -36,12 +36,12 @@ const absentRecords = {
 
 /** The button's sections, in the lens's order. */
 const BUTTON_SECTIONS = [
+  { id: "variants", title: "Variants" },
   { id: "usage", title: "Usage" },
   { id: "guidelines", title: "Guidelines" },
   { id: "anatomy", title: "Anatomy" },
-  { id: "tokens", title: "Tokens" },
   { id: "properties", title: "Properties" },
-  { id: "variants", title: "Variants" },
+  { id: "tokens", title: "Tokens" },
   { id: "relations", title: "Relations" },
   { id: "changes", title: "Changes" },
 ];
@@ -100,12 +100,12 @@ describe("ComponentDetail", () => {
       );
       expectSectionIndex(readView(), [
         { id: "relations", title: "Relations" },
+        { id: "variants", title: "Variants" },
         { id: "usage", title: "Usage" },
         { id: "guidelines", title: "Guidelines" },
         { id: "anatomy", title: "Anatomy" },
-        { id: "tokens", title: "Tokens" },
         { id: "properties", title: "Properties" },
-        { id: "variants", title: "Variants" },
+        { id: "tokens", title: "Tokens" },
         { id: "changes", title: "Changes" },
       ]);
     },
