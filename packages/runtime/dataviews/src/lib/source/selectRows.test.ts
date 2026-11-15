@@ -63,7 +63,7 @@ describe("selectRows", () => {
     });
 
     it("keeps a row of another type out of a text negation", () => {
-      const negate = (operator: "isNot") =>
+      const negate = (operator: "isNot" | "notContains") =>
         selectRows(
           rows,
           {
@@ -74,6 +74,7 @@ describe("selectRows", () => {
           null,
         ).map(({ id }) => id);
       expect(negate("isNot")).toEqual(["container"]);
+      expect(negate("notContains")).toEqual(["container"]);
     });
 
     it("reads every row's type alike where the collection has one", () => {
@@ -109,12 +110,28 @@ describe("selectRows", () => {
     });
   });
 
+  describe("notContains", () => {
+    it("selects every row whose text lacks the operand, those without text included", () => {
+      expect(
+        selectIds({
+          field: "name",
+          operator: "notContains",
+          operands: ["ALP"],
+        }),
+      ).toEqual(["b", "c", "d", "e", "g", "f"]);
+    });
+  });
+
   describe("negations", () => {
-    it.each([["isNot", "is"]] as const)(
+    it.each([
+      ["isNot", "is"],
+      ["notContains", "contains"],
+    ] as const)(
       "selects with %s exactly the rows %s does not",
       (negation, held) => {
         const every = FACETED_ROWS.map(({ id }) => id);
-        for (const operand of ["alpha", "A", "", "%", 4]) {
+        // "lp" is held inside alpha, never equal to anything.
+        for (const operand of ["alpha", "A", "lp", "", "%", 4]) {
           const negated = selectIds({
             field: "name",
             operator: negation,

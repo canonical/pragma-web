@@ -86,6 +86,7 @@ describe("readSlice", () => {
           readonly is?: string;
           readonly isNot?: string;
           readonly contains?: string;
+          readonly notContains?: string;
           readonly startsWith?: string;
         }
       | undefined

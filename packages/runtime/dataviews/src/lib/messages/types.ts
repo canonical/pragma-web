@@ -232,6 +232,8 @@ export type DataViewsMessages = {
   readonly filterContains: (label: string) => string;
   /** A text field's starts-with input, by the field's label. */
   readonly filterStartsWith: (label: string) => string;
+  /** A text field's does-not-contain input, by the field's label. */
+  readonly filterNotContains: (label: string) => string;
   /** A text field's not-equal input, by the field's label. */
   readonly filterIsNot: (label: string) => string;
   /** A text field's equals input, by the field's label. */

@@ -154,7 +154,13 @@ describe("declareCapabilities", () => {
       readonly cpu?: readonly ("gte" | "lte")[] | true;
       readonly owner?: readonly "isSet"[] | true;
       readonly name?:
-        | readonly ("is" | "isNot" | "contains" | "startsWith")[]
+        | readonly (
+            | "is"
+            | "isNot"
+            | "contains"
+            | "notContains"
+            | "startsWith"
+          )[]
         | true;
     }>();
     expect(

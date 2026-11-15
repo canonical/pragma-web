@@ -183,6 +183,7 @@ describe("createSchema", () => {
       "is",
       "isNot",
       "contains",
+      "notContains",
       "startsWith",
     ]);
     expect(schema.listOperators("zone")).toEqual([]);

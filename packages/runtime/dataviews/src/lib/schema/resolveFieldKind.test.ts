@@ -27,6 +27,7 @@ describe("resolveFieldKind", () => {
       "is",
       "isNot",
       "contains",
+      "notContains",
       "startsWith",
     ]);
   });

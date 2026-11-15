@@ -63,6 +63,7 @@ describe("createFilterInputs", () => {
       "is",
       "isNot",
       "contains",
+      "notContains",
       "startsWith",
     ]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);

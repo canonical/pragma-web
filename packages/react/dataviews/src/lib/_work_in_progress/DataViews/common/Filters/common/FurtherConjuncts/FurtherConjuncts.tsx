@@ -21,6 +21,7 @@ const PHRASE_MESSAGES = {
   lte: "filterTo",
   contains: "filterContains",
   startsWith: "filterStartsWith",
+  notContains: "filterNotContains",
   isNot: "filterIsNot",
   is: "filterIs",
   isSet: null,

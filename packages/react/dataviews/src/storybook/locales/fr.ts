@@ -150,6 +150,7 @@ export const FRENCH: DataViewsMessages = {
   facetCount: total,
   filterContains: (label) => `${label} contient`,
   filterStartsWith: (label) => `${label} commence par`,
+  filterNotContains: (label) => `${label} ne contient pas`,
   filterIsNot: (label) => `${label} n’est pas`,
   filterIs: (label) => `${label} est`,
   filterIncomplete: (retained) =>

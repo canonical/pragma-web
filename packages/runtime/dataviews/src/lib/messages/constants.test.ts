@@ -179,6 +179,7 @@ describe("DEFAULT_MESSAGES", () => {
       "Tags is any of ex-gpu, ex-nvme",
     );
     expect(m.filterStartsWith("Name")).toBe("Name starts with");
+    expect(m.filterNotContains("Name")).toBe("Name does not contain");
     expect(m.filterIsNot("Name")).toBe("Name is not");
     expect(m.filterIs("Name")).toBe("Name is");
   });

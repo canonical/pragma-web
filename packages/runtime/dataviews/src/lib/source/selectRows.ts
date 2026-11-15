@@ -32,9 +32,13 @@ const TEXT_MATCHES: Readonly<
 
 /** The operator each negation holds exactly where it does not. */
 const NEGATED: Readonly<
-  Record<Extract<PredicateOperator, "isNot">, Extract<PredicateOperator, "is">>
+  Record<
+    Extract<PredicateOperator, "isNot" | "notContains">,
+    Extract<PredicateOperator, "is" | "contains">
+  >
 > = {
   isNot: "is",
+  notContains: "contains",
 };
 
 /** One predicate compiled to a per-row test, with its operands resolved
@@ -121,7 +125,8 @@ const compilePredicate = (
         },
       };
     }
-    case "isNot": {
+    case "isNot":
+    case "notContains": {
       // A negation holds exactly where its operator does not, so a record
       // without a value matches it.
       const held = compilePredicate(
