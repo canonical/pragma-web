@@ -12,7 +12,7 @@ const plugins: any[] = [react()];
 const testConfig = reactTestConfig({
   glob: "test",
   ssr: true,
-  // Unmeasured: stories, and the testing/ helpers without a test.
+  // Unmeasured: stories, tests, types and the keyboard suites.
   coverage: {
     include: ["src/**/*.{ts,tsx}", "testing/**/*.{ts,tsx}"],
     exclude: [
@@ -22,17 +22,6 @@ const testConfig = reactTestConfig({
       "testing/keyboard/**",
       "testing/playwright.config.ts",
       "testing/types.ts",
-      "testing/answerOverHttp2.ts",
-      "testing/createFakeChannel.ts",
-      "testing/createTokenMessages.ts",
-      "testing/elementAt.ts",
-      "testing/expectNoAxeViolations.ts",
-      "testing/fakeAnnouncerClock.ts",
-      "testing/readAnnouncements.ts",
-      "testing/serveMockApi.ts",
-      "testing/silenceRenderErrors.ts",
-      "testing/toggleDisclosure.ts",
-      "testing/watchMockRequest.ts",
     ],
   },
   plugins,
