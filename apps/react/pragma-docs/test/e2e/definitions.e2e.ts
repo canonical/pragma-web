@@ -21,6 +21,8 @@
  * line. Where the map does not fit the canvas at the legible floor, it
  * opens at the map's top-left corner at that floor: the first shelf's
  * boxes whole where they fit, a box the window's edge crosses cut there.
+ * A namespace's box is a link, by pointer and by keyboard, to the page
+ * drilled into it (`expand=`), whose heading leads back to the overview.
  */
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
@@ -534,6 +536,95 @@ describe("at 1440 px", () => {
     for (const left of measure.rangeLefts) {
       expect(Math.abs(left - first)).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
     }
+  });
+});
+
+describe("the drill through the address, at 1440 px", () => {
+  const [desktop] = VIEWPORTS;
+
+  /** The namespaces the canvas draws as one box, by prefix. */
+  const listBoxes = (page: Page): Promise<string[]> =>
+    page.evaluate(() =>
+      [
+        ...document.querySelectorAll(
+          '.ds.graph-canvas svg.viewport g.node[data-kind="region"]',
+        ),
+      ].map((node) => node.getAttribute("data-id") ?? ""),
+    );
+
+  it("opens a box's namespace from its link, and Back returns to the overview", async () => {
+    const seen: { drilled?: string[]; back?: string[]; url?: string } = {};
+    const { errors } = await openExplorer("/definitions", desktop, async (page) => {
+      await page
+        .locator(
+          '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
+        )
+        .click();
+      await page.waitForURL(/[?&]expand=surface/);
+      await page.waitForTimeout(CAMERA_SETTLE_MS);
+      seen.drilled = await listBoxes(page);
+      await page.goBack();
+      await page.waitForURL((url) => !url.search.includes("expand"));
+      await page.waitForTimeout(CAMERA_SETTLE_MS);
+      seen.back = await listBoxes(page);
+      seen.url = page.url();
+    });
+    expect(errors).toEqual([]);
+    expect(seen.drilled).not.toContain("surface");
+    expect(seen.drilled).toContain("ds");
+    expect(seen.back).toEqual(expect.arrayContaining(["surface", "ds"]));
+    expect(new URL(seen.url ?? "").pathname).toBe("/definitions");
+  });
+
+  it("reaches a box by Tab from the graph's tab stop, and Enter follows it", async () => {
+    const seen: { focused?: string; url?: string } = {};
+    const { errors } = await openExplorer("/definitions", desktop, async (page) => {
+      await page
+        .locator('.ds.graph-canvas svg.viewport a.target[tabindex="0"]')
+        .focus();
+      for (let press = 0; press < 8 && seen.focused === undefined; press += 1) {
+        await page.keyboard.press("Tab");
+        seen.focused = await page.evaluate(
+          () =>
+            document.activeElement
+              ?.closest('g.node[data-kind="region"]')
+              ?.getAttribute("data-id") ?? undefined,
+        );
+      }
+      await page.keyboard.press("Enter");
+      await page.waitForURL(/[?&]expand=/);
+      seen.url = page.url();
+    });
+    expect(errors).toEqual([]);
+    expect(seen.focused).toBeDefined();
+    expect(new URL(seen.url ?? "").searchParams.get("expand")).toBe(
+      seen.focused,
+    );
+  });
+
+  it("opens the address's namespace legibly, and its heading's way back returns to the overview at rest", async () => {
+    const seen: { boxes?: string[]; url?: string } = {};
+    const { errors, measure } = await openExplorer(
+      "/definitions?expand=surface",
+      desktop,
+    );
+    expect(errors).toEqual([]);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    expect(measure.inView).toBeGreaterThan(0);
+    const back = await openExplorer(
+      "/definitions?expand=surface",
+      desktop,
+      async (page) => {
+        await page.locator(".ds.graph-canvas svg.viewport a.way-back").click();
+        await page.waitForURL((url) => !url.search.includes("expand"));
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        seen.boxes = await listBoxes(page);
+        seen.url = page.url();
+      },
+    );
+    expect(back.errors).toEqual([]);
+    expect(seen.boxes).toEqual(expect.arrayContaining(["surface", "ds"]));
+    expect(new URL(seen.url ?? "").pathname).toBe("/definitions");
   });
 });
 
