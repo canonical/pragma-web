@@ -2,6 +2,7 @@ import type {
   Predicate,
   PredicateCondition,
   PredicateEdit,
+  PredicateOperator,
   PredicateRef,
   Query,
   QueryIssue,
@@ -115,4 +116,20 @@ export type QueryContradiction = {
    * reading stands out.
    */
   readonly merge: PredicateEdit | null;
+};
+
+/**
+ * A symbol a reader types for an operator. A widened one asks for less
+ * than it says: `>` reads as at least, since bounds are never strict, and
+ * the bar says so.
+ */
+export type TypedSymbol = {
+  readonly symbol: string;
+  readonly widened: boolean;
+};
+
+/** The operator a typed symbol reads as on a field, and whether widened. */
+export type TypedSymbolReading = {
+  readonly operator: PredicateOperator;
+  readonly widened: boolean;
 };
