@@ -315,7 +315,14 @@ export default function ScopedDataTable<
       <table
         {...rest}
         ref={attach}
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+        className={[
+          componentCssClassName,
+          // A virtualized table is its own bounded scroll viewport.
+          virtualization === undefined ? null : "bounded",
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
         style={geometryStyle}
         aria-label={label}
         aria-busy={busy}
@@ -325,10 +332,10 @@ export default function ScopedDataTable<
           virtualization === undefined ? undefined : entries.length + 1
         }
       >
-        <thead className="ds data-table-row-group header">
+        <thead className="header">
           <tr
             ref={headerRow}
-            className="ds data-table-row"
+            className="row"
             aria-rowindex={virtualization === undefined ? undefined : 1}
           >
             {selectable ? (

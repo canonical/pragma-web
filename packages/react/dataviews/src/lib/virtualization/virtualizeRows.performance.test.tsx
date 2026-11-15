@@ -108,7 +108,7 @@ const countElements = (root: Element): number =>
 
 /** The body rows mounted right now. */
 const mountedRows = (table: HTMLElement): HTMLElement[] => [
-  ...table.querySelectorAll<HTMLElement>(".ds.data-table-row-group.body > tr"),
+  ...table.querySelectorAll<HTMLElement>(".ds.data-table-body > tr"),
 ];
 
 beforeEach(() => {
@@ -212,7 +212,7 @@ describe("virtualized DataTable, bounded work", () => {
     });
     scrollTo(table, 160_000);
     const before = elementAt(
-      [...table.querySelectorAll<HTMLElement>(".ds.data-table-row-group.body")],
+      [...table.querySelectorAll<HTMLElement>(".ds.data-table-body")],
       0,
     );
     const first = Number(

@@ -141,6 +141,7 @@ export { virtualizeRows } from ${quotePath("virtualization/index.ts")};`,
     expect(
       modules.filter((id) => id.includes("/runtime/dataviews/src/")),
     ).toEqual([]);
-    expect(css).toContain("virtual");
+    // A virtualized table's root rules ship with the table's own sheet.
+    expect(css).toContain(".ds.data-table.bounded");
   }, 60_000);
 });

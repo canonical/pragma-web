@@ -202,7 +202,7 @@ const bindPageBounds = (table: HTMLElement): void => {
       listGapHeights(table)
         .map((gap) => Number.parseFloat(gap))
         .reduce((total, height) => total + height, 0) +
-      [...table.querySelectorAll(".ds.data-table-row-group.body > tr")]
+      [...table.querySelectorAll(".ds.data-table-body > tr")]
         .map((row) => reported.get(row) ?? 10)
         .reduce((total, height) => total + height, 0);
     return Math.max(0, Math.min(value, page - 100));
@@ -237,9 +237,7 @@ const listMountedHosts = (scope: HTMLElement = document.body): string[] =>
  * of each later run's first row, and the body's bottom padding.
  */
 const listGapHeights = (table: HTMLElement): string[] => {
-  const body = table.querySelector<HTMLElement>(
-    ".ds.data-table-row-group.body",
-  );
+  const body = table.querySelector<HTMLElement>(".ds.data-table-body");
   if (body === null) {
     return [];
   }
@@ -316,7 +314,7 @@ describe("virtualized DataTable", () => {
     );
     vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(
       function (this: HTMLElement) {
-        return this.classList.contains("body") ? 24 : 0;
+        return this.classList.contains("data-table-body") ? 24 : 0;
       },
     );
     const { table } = renderVirtualizedTable();
@@ -332,7 +330,7 @@ describe("virtualized DataTable", () => {
   it("draws its body by its own class, its trailing gap as padding", () => {
     const { table } = renderVirtualizedTable();
     const body = table.querySelector<HTMLElement>(":scope > tbody");
-    expect(body?.className).toBe("ds data-table-row-group body virtual");
+    expect(body?.className).toBe("ds data-table-body");
     expect(body?.style.paddingBlockEnd).not.toBe("");
   });
 
@@ -341,9 +339,9 @@ describe("virtualized DataTable", () => {
     scrollTo(table, 9900);
     expect(getRow("host-999")).toHaveAttribute("aria-rowindex", "1001");
     expect(listGapHeights(table)).toEqual(["9860px"]);
-    expect(
-      table.querySelector(".ds.data-table-row-group.body")?.lastElementChild,
-    ).toBe(getRow("host-999"));
+    expect(table.querySelector(".ds.data-table-body")?.lastElementChild).toBe(
+      getRow("host-999"),
+    );
   });
 
   it("renders nothing for a scroll that keeps the same rows mounted", () => {
@@ -394,9 +392,7 @@ describe("virtualized DataTable", () => {
       });
       scrollTo(table, 5000);
       expect(table.querySelector(".ds.data-table-gap")).toBeNull();
-      const body = table.querySelector<HTMLElement>(
-        ".ds.data-table-row-group.body",
-      );
+      const body = table.querySelector<HTMLElement>(".ds.data-table-body");
       expect(body?.style.paddingBlockStart).toBe("20px");
       expect(body?.style.paddingBlockEnd).toBe("4850px");
       const margined = Array.from(
@@ -495,9 +491,7 @@ describe("virtualized DataTable", () => {
       const { table } = renderVirtualizedTable(buildMachines(1000), {
         selectable: true,
       });
-      const group = table.querySelector<HTMLElement>(
-        ".ds.data-table-row-group.body",
-      );
+      const group = table.querySelector<HTMLElement>(".ds.data-table-body");
       if (group === null) {
         throw new Error("no body row group");
       }

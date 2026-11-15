@@ -21,7 +21,9 @@ const sheet = readFileSync(
 
 describe("regression 0003 — row groups sized by their content", () => {
   it("sizes a row group by min-content and writes max-content nowhere", () => {
-    const rule = sheet.match(/\.ds\.data-table-row-group\s*\{[^}]*\}/);
+    const rule = sheet.match(
+      /\.ds\.data-table > \.header,\s*\.ds\.data-table-body\s*\{[^}]*\}/,
+    );
     expect(rule?.[0]).toMatch(/min-inline-size:\s*min-content;/);
     expect(sheet).not.toMatch(/max-content/);
   });

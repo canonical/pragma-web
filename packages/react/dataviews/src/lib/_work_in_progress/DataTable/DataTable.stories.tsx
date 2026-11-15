@@ -1288,9 +1288,9 @@ const columns: readonly DataTableColumn[] = [
         1000,
       ),
     );
-    const header = table.querySelector(".ds.data-table-row-group.header");
+    const header = table.querySelector(".ds.data-table > .header");
     const listRows = () => [
-      ...table.querySelectorAll(".ds.data-table-row-group.body > tr"),
+      ...table.querySelectorAll(".ds.data-table-body > tr"),
     ];
     const waitFrames = async (): Promise<void> => {
       for (let frame = 0; frame < 2; frame += 1) {
