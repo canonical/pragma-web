@@ -12,5 +12,5 @@ const meta: Meta<typeof GuidePage> = {
 export default meta;
 type Story = StoryObj<typeof GuidePage>;
 
-/** A guide's address over its text. */
+/** A guide on the sectioned view: its address over its text, with no section and no aside. */
 export const Default: Story = { args: { params: { slug: "router-core" } } };
