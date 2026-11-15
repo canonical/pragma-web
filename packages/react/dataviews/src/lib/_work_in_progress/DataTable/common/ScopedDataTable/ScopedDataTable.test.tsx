@@ -4,7 +4,7 @@
  * and takes its root's native props.
  */
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
@@ -34,6 +34,36 @@ describe("ScopedDataTable", () => {
       "DataTable requires a provider created by createDataViewsProvider",
     );
     failure.mockRestore();
+  });
+
+  it("draws a header row group and a body row group of rows and cells", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
+    });
+    render(
+      <ScopedDataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        selectable
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    const table = screen.getByRole("table", { name: "Machines" });
+    const [header, body] = within(table).getAllByRole("rowgroup");
+    expect(header).toHaveClass("ds", "data-table-row-group", "header");
+    expect(body).toHaveClass("ds", "data-table-row-group", "body");
+    expect(
+      within(header as HTMLElement).getAllByRole("columnheader"),
+    ).toHaveLength(3);
+    within(header as HTMLElement).getByRole("columnheader", { name: "Name" });
+    within(header as HTMLElement).getByRole("columnheader", { name: "Status" });
+    const rows = within(body as HTMLElement).getAllByRole("row");
+    expect(rows).toHaveLength(2);
+    expect(within(rows.at(0) as HTMLElement).getAllByRole("cell")).toHaveLength(
+      3,
+    );
   });
 
   it("speaks the words it is handed", () => {
