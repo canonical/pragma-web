@@ -196,6 +196,26 @@ describe("guardTypedArms", () => {
     );
   });
 
+  it("fails a case whose tree spreads the guarded maps and restores a form", () => {
+    expect(() =>
+      expectSwitchCoverage({
+        fragment: buildFragment(["Station"]),
+        cases: { Station: "station" },
+        render: () => {
+          // The spread copies no guarded form, so the switch reads the
+          // unguarded one the tree put back.
+          const provided = {
+            ...guardTypedArms(PROBE_MAPS),
+            chip: PROBE_MAPS.chip,
+          };
+          void provided.chip;
+        },
+      }),
+    ).toThrow(
+      "ProbeProjection_node: the case Station read no form from the maps guardTypedArms returned",
+    );
+  });
+
   it("refuses a partial set of forms by its type", () => {
     // @ts-expect-error -- a tree guards all five forms, never some of them.
     expect(guardTypedArms({ chip: PROBE_MAPS.chip })).toEqual({

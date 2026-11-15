@@ -17,7 +17,7 @@ import type { GuardableMap, GuardableMaps } from "./types.js";
  * records each form a switch reads from it, and `expectSwitchCoverage`
  * fails a case whose tree did not call it or whose switch read its form
  * from other maps (the maps the tree kept unguarded, while it guarded a
- * copy of them).
+ * copy of them, or a spread of the returned maps, which copies no form).
  *
  * @param maps - The maps the tree provides, one per form.
  * @returns The maps, guarded while a coverage renders a case.
@@ -38,8 +38,11 @@ export default function guardTypedArms<TMaps extends GuardableMaps>(
         ? {}
         : { siteTypes: refuseArms(form, map.siteTypes) }),
     };
+    // Not enumerable, so a spread of the returned maps copies no form: a
+    // tree that spreads them and puts an unguarded form back reads none
+    // of the guarded ones, and its case fails as unread.
     Object.defineProperty(guardedMaps, form, {
-      enumerable: true,
+      enumerable: false,
       get: () => {
         markRead(caseId);
         return guarded;
