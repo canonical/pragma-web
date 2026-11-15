@@ -4,10 +4,8 @@ import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { expect, waitFor } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
-import {
-  hostName,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import readHostName from "../../../storybook/machines/readHostName.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "./index.js";
 
 function CellContent() {
@@ -52,7 +50,7 @@ function Fixture() {
         provider={provider}
         columns={columns}
         label="Machines"
-        rowLabel={hostName}
+        rowLabel={readHostName}
       />
       <div data-portal-target="outside" />
       <table>
