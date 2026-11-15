@@ -172,10 +172,16 @@ describe("the reader's choices across the lens's routes", () => {
         .getAttribute("aria-pressed"),
     ).toBe("false");
     // The term's page drills into ds, which the index draws as one box:
-    // the chip still hides its abstract classes.
+    // the chip still hides exactly the abstract classes it draws.
+    const abstracts = container.querySelectorAll(
+      '.desktop .node[data-kind="abstract"]',
+    );
+    expect(abstracts.length).toBeGreaterThan(0);
     expect(
-      container.querySelectorAll(".desktop .node.is-hidden").length,
-    ).toBeGreaterThan(0);
+      [...container.querySelectorAll(".desktop .node.is-hidden")].map((node) =>
+        node.getAttribute("data-id"),
+      ),
+    ).toEqual([...abstracts].map((node) => node.getAttribute("data-id")));
     expect(screen.getByRole("searchbox")).toHaveValue("st");
     expect(
       container.querySelectorAll(".ds.term-rail .item.is-dimmed"),
