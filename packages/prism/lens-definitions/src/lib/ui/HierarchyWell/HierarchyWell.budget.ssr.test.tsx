@@ -17,9 +17,15 @@ import type { ClassGraphInput } from "../../classGraph/types.js";
 import { MESSAGES } from "../../i18n/index.js";
 import HierarchyWell from "./HierarchyWell.js";
 
-/** The canvas's SVG of the well rendered at rest: its outermost `<svg>`. */
-function renderCanvas(input: ClassGraphInput): string {
-  const layout = layOutClassGraph(input, { budget: GRAPH_BUDGET });
+/**
+ * The canvas's SVG of the well rendered at rest, or with a namespace
+ * drilled: its outermost `<svg>`.
+ */
+function renderCanvas(input: ClassGraphInput, drill?: string): string {
+  const layout = layOutClassGraph(input, {
+    budget: GRAPH_BUDGET,
+    ...(drill === undefined ? {} : { drill }),
+  });
   const terms = new Map(
     input.classes.map((klass) => [
       klass.uri,
@@ -107,6 +113,31 @@ describe("HierarchyWell SSR within the graph budget at rest", () => {
       );
       expect(measure.bytes).toBeLessThanOrEqual(GRAPH_BUDGET.svgBytesMax);
       expect(measure.elements).toBeLessThanOrEqual(GRAPH_BUDGET.svgElementsMax);
+    },
+  );
+
+  it.each([
+    ["the docs records", ontologyGraph],
+    ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH],
+    ["the metro's records", metroGraph],
+  ])(
+    "draws %s with each namespace drilled within the drawn nodes, the band, the bytes and the elements",
+    (_, input) => {
+      for (const prefix of new Set(input.classes.map((k) => k.prefix))) {
+        const measure = measureCanvas(renderCanvas(input, prefix));
+        expect(measure.nodes, prefix).toBeLessThanOrEqual(
+          GRAPH_BUDGET.drawnNodesMax,
+        );
+        expect(measure.largestColumn, prefix).toBeLessThanOrEqual(
+          GRAPH_BUDGET.bandMembersMax,
+        );
+        expect(measure.bytes, prefix).toBeLessThanOrEqual(
+          GRAPH_BUDGET.svgBytesMax,
+        );
+        expect(measure.elements, prefix).toBeLessThanOrEqual(
+          GRAPH_BUDGET.svgElementsMax,
+        );
+      }
     },
   );
 

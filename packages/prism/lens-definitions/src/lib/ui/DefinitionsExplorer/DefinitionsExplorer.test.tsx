@@ -206,6 +206,36 @@ describe("DefinitionsExplorer", {
     );
   });
 
+  it("splits a band fuller than the budget's on a term page that drills into its namespace", () => {
+    // Within 20 nodes ds collapses at rest; its class's page draws ds's 20
+    // classes, whose fullest layer the band of 4 splits.
+    const countBand = (band: number): number => {
+      const { container, unmount } = render(
+        <GraphBudgetProvider
+          budget={createGraphBudget({ drawnNodesMax: 20, bandMembersMax: band })}
+        >
+          {createDefinitionsPage(
+            UIBLOCK_TERM,
+            definitionsExplorerRecords,
+            createFetchSpy(),
+          )}
+        </GraphBudgetProvider>,
+      );
+      const columns = new Map<string, number>();
+      for (const node of container.querySelectorAll(".desktop g.node")) {
+        const col = node.getAttribute("data-col") ?? "";
+        columns.set(col, (columns.get(col) ?? 0) + 1);
+      }
+      expect(
+        container.querySelector('.desktop .node[data-id="ds:UIBlock"]'),
+      ).not.toBeNull();
+      unmount();
+      return Math.max(...columns.values());
+    };
+    expect(countBand(12)).toBeGreaterThan(4);
+    expect(countBand(4)).toBe(4);
+  });
+
   it("puts the graph's tab stop on the first class drawn when the rail opens on a box", () => {
     const { container } = render(
       <GraphBudgetProvider budget={createGraphBudget({ drawnNodesMax: 20 })}>

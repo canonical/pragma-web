@@ -15,12 +15,14 @@
  * at its edges, a box among its neighbours; at rest Fit brings the whole
  * graph into view, every text at 12px or more, and on a namespace a
  * selection drills into it stops at the overview's floor, on a window that
- * cuts no class; a pick in the rail keeps the chips, the search and the
- * zoom; and the inspector's field rows put their ranges on one column
+ * cuts no class; a term page of a class in the largest namespace draws
+ * it within the drawn nodes and the band; a pick in the rail keeps the
+ * chips, the search and the zoom; and the inspector's field rows put their ranges on one column
  * line. Where the map does not fit the canvas at the legible floor, it
  * opens at the map's top-left corner at that floor: the first shelf's
  * boxes whole where they fit, a box the window's edge crosses cut there.
  */
+import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
   launchBrowser,
   STRIP_VIEWPORTS,
@@ -392,6 +394,45 @@ describe("at 1440 px", () => {
       expect(measure.cut).toEqual([]);
     },
   );
+
+  // A term page of a class in surface drills into it: its 31 classes,
+  // whose fullest layer, 14 classes, is laid as two columns.
+  it("draws a surface term page within the drawn nodes and the band", async () => {
+    const drawn = { nodes: 0, band: 0, selected: false };
+    const { errors } = await openExplorer(
+      `/definitions/${encodeURIComponent("surface:Actor")}`,
+      desktop,
+      async (page) => {
+        Object.assign(
+          drawn,
+          await page.evaluate(() => {
+            const nodes = [
+              ...document.querySelectorAll(
+                ".ds.graph-canvas svg.viewport g.node",
+              ),
+            ];
+            const columns = new Map<string, number>();
+            for (const node of nodes) {
+              const col = node.getAttribute("data-col") ?? "";
+              columns.set(col, (columns.get(col) ?? 0) + 1);
+            }
+            return {
+              nodes: nodes.length,
+              band: Math.max(0, ...columns.values()),
+              selected: nodes.some(
+                (node) => node.getAttribute("data-id") === "surface:Actor",
+              ),
+            };
+          }),
+        );
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(drawn.selected).toBe(true);
+    expect(drawn.nodes).toBeGreaterThan(31);
+    expect(drawn.nodes).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
+    expect(drawn.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
+  });
 
   it("keeps the chips, the search and the zoom when a rail pick moves to a term", async () => {
     const view: {

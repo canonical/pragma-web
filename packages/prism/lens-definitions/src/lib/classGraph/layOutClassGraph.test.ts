@@ -19,6 +19,7 @@ import {
   NARROWING_GRAPH,
   NEIGHBOUR_TRIO_GRAPH,
   SHELF_PAIR_GRAPH,
+  SIXTY_CLASS_GRAPH,
   STACKED_PAIR_GRAPH,
   TALL_GRAPH,
   TANGLED_GRAPH,
@@ -422,6 +423,128 @@ describe("layOutClassGraph", () => {
       expect(layout.findings).toContain(
         "G3: opens on a legible window, the rest a pan away",
       );
+    });
+
+    /** The drawn nodes and the most of them one graph-wide column holds. */
+    const measureBands = (layout: ReturnType<typeof layOutClassGraph>) => {
+      const columns = new Map<number, number>();
+      for (const node of layout.nodes.values()) {
+        columns.set(node.col, (columns.get(node.col) ?? 0) + 1);
+      }
+      return {
+        nodes: layout.nodes.size,
+        band: Math.max(0, ...columns.values()),
+      };
+    };
+
+    it.each([
+      ["the docs records", ontologyGraph],
+      ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH],
+      ["the metro's records", metroGraph],
+      ["a graph across regions", CROSS_REGION_GRAPH],
+      ["a tangled graph", TANGLED_GRAPH],
+      ["three bridged regions", BRIDGE_TRIO_GRAPH],
+      ["two neighbours", NEIGHBOUR_TRIO_GRAPH],
+      ["a wide graph", WIDE_GRAPH],
+      ["a tall graph", TALL_GRAPH],
+    ])(
+      "draws %s within the drawn nodes and the band, at rest and with each namespace drilled",
+      (_, graph) => {
+        const prefixes = [...new Set(graph.classes.map((k) => k.prefix))];
+        for (const drill of [undefined, ...prefixes]) {
+          const measure = measureBands(
+            layOutClassGraph(graph, {
+              budget: GRAPH_BUDGET,
+              ...(drill === undefined ? {} : { drill }),
+            }),
+          );
+          expect(measure.nodes, drill).toBeLessThanOrEqual(
+            GRAPH_BUDGET.drawnNodesMax,
+          );
+          expect(measure.band, drill).toBeLessThanOrEqual(
+            GRAPH_BUDGET.bandMembersMax,
+          );
+        }
+      },
+    );
+
+    it.each([
+      ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH],
+      ["the metro's records", metroGraph],
+      ["a graph across regions", CROSS_REGION_GRAPH],
+      ["a tangled graph", TANGLED_GRAPH],
+      ["a tall graph", TALL_GRAPH],
+    ])(
+      "keeps %s to a narrow band, at rest and drilled, nothing overlapping",
+      (_, graph) => {
+        const prefixes = [...new Set(graph.classes.map((k) => k.prefix))];
+        for (const bandMembersMax of [1, 3]) {
+          for (const drill of [undefined, ...prefixes]) {
+            const layout = layOutClassGraph(graph, {
+              budget: { ...GRAPH_BUDGET, bandMembersMax },
+              ...(drill === undefined ? {} : { drill }),
+            });
+            const label = `${drill} ${bandMembersMax}`;
+            expect(measureBands(layout).band, label).toBeLessThanOrEqual(
+              bandMembersMax,
+            );
+            const overlaps = countOverlaps(layout);
+            expect(overlaps.collisions, label).toBe(0);
+          }
+        }
+      },
+    );
+
+    it("splits the band of sixteen in the docs site's surface, drilled, into two columns of eight", () => {
+      const budget = { budget: GRAPH_BUDGET, drill: "surface" } as const;
+      const unsplit = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        ...budget,
+        budget: { ...GRAPH_BUDGET, bandMembersMax: 64 },
+      });
+      const split = layOutClassGraph(FOUR_NAMESPACE_GRAPH, budget);
+      expect(measureBands(unsplit).band).toBe(16);
+      // Its fullest layer, sixteen, becomes two columns of eight; the next,
+      // ten, stays whole.
+      expect(measureBands(split)).toEqual({ nodes: 37, band: 10 });
+      // The split region is shorter by a third, and wider by a column.
+      const surfaceOf = (layout: typeof split) =>
+        requireDefined(
+          layout.regions.find((region) => region.prefix === "surface"),
+          "the surface region",
+        );
+      expect(surfaceOf(split).h).toBeLessThan(surfaceOf(unsplit).h);
+      expect(countOverlaps(split).collisions).toBe(0);
+    });
+
+    it("draws a graph of more namespaces than the budget has nodes as one box each, over the node budget: a limit of this layout", () => {
+      const many = {
+        classes: Array.from({ length: GRAPH_BUDGET.drawnNodesMax + 4 }, (_, index) =>
+          defineClass(`n${String(index).padStart(2, "0")}:A`, "A"),
+        ),
+        relations: [],
+      };
+      const layout = layOutClassGraph(many, { budget: GRAPH_BUDGET });
+      expect(
+        [...layout.nodes.values()].every((node) => node.kind === "region"),
+      ).toBe(true);
+      expect(measureBands(layout)).toEqual({
+        nodes: GRAPH_BUDGET.drawnNodesMax + 4,
+        band: 1,
+      });
+    });
+
+    it("draws a drilled namespace of more classes than the budget leaves room for whole, over the node budget: a limit of this layout", () => {
+      const layout = layOutClassGraph(
+        { ...SIXTY_CLASS_GRAPH, classes: [...SIXTY_CLASS_GRAPH.classes, defineClass("aa:A", "A")] },
+        { budget: GRAPH_BUDGET, drill: "big" },
+      );
+      // Its 60 classes and the other namespace's box: no subtree is folded,
+      // and no column holds more than the band.
+      const measure = measureBands(layout);
+      expect(measure.nodes).toBe(61);
+      expect(measure.nodes).toBeGreaterThan(GRAPH_BUDGET.drawnNodesMax);
+      expect(measure.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
+      expect(requireEntry(layout.nodes, "region:aa").kind).toBe("region");
     });
 
     it("leaves the metro as it is: its 16 classes, nothing collapsed", () => {
