@@ -24,7 +24,7 @@ import {
   resolveRoot,
 } from "../../../../testing/fixtures.js";
 import ProvidedMapReader from "../../../../testing/ProvidedMapReader.js";
-import type { METRO_COMMAND_TYPES } from "./constants.js";
+import { METRO_COMMAND_TYPES } from "./constants.js";
 import MetroCommandProjection from "./MetroCommandProjection.js";
 import type { MetroCommandProjectionProps } from "./types.js";
 
@@ -146,6 +146,8 @@ describe("MetroCommandProjection", () => {
       Unit: MOCK_UNIT,
       CarType: MOCK_CAR_TYPE,
     };
+    // The switch's cases are the site's types, one mock node each.
+    expect(Object.keys(cases)).toEqual(Object.keys(METRO_COMMAND_TYPES));
     const roots = new Map<string, string>(
       CASES.map(([typename, , root]) => [typename, root]),
     );

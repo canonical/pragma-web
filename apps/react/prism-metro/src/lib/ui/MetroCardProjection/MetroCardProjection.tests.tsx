@@ -24,7 +24,7 @@ import {
   resolveRoot,
 } from "../../../../testing/fixtures.js";
 import ProvidedMapReader from "../../../../testing/ProvidedMapReader.js";
-import type { METRO_CARD_TYPES } from "./constants.js";
+import { METRO_CARD_TYPES } from "./constants.js";
 import MetroCardProjection from "./MetroCardProjection.js";
 import type { MetroCardProjectionProps } from "./types.js";
 
@@ -144,6 +144,8 @@ describe("MetroCardProjection", () => {
       Unit: MOCK_UNIT,
       CarType: MOCK_CAR_TYPE,
     };
+    // The switch's cases are the site's types, one mock node each.
+    expect(Object.keys(cases)).toEqual(Object.keys(METRO_CARD_TYPES));
     const roots = new Map<string, string>(
       CASES.map(([typename, , root]) => [typename, root]),
     );
