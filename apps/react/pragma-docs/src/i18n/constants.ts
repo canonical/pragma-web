@@ -102,6 +102,8 @@ export const MESSAGES = {
   "component.notFound":
     "No component found at {address}. The catalog lists every component the graph carries.",
   "component.statusSeparator": "·",
+  "component.tier": "Tier:",
+  "component.stage": "Stage:",
   "component.version": "Version",
   "component.example": "Example",
   "component.noExample":

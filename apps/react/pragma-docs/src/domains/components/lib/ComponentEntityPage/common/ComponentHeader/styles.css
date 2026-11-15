@@ -13,6 +13,7 @@
     --component-header-status-gap-inline: var(--space-100);
     --component-header-status-color: var(--color-text-muted);
     --component-header-value-color: var(--color-text);
+    --component-header-label-size: 1px;
     --component-header-address-font-family: var(
       --typography-text-primary-code-font-family
     );
@@ -62,6 +63,17 @@
 
   .ds.component-header > .status-line > .part > .value {
     color: var(--component-header-value-color);
+  }
+
+  /* The value's name ("Tier:", "Stage:"), read by assistive technology
+   * and drawn nowhere: a transparent one-pixel box out of the flow. */
+  .ds.component-header > .status-line > .part > .value > .label {
+    position: absolute;
+    width: var(--component-header-label-size);
+    height: var(--component-header-label-size);
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
   }
 
   .ds.component-header > .status-line > .address {

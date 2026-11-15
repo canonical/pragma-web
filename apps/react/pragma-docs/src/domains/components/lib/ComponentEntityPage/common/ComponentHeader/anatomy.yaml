@@ -19,6 +19,9 @@
 #     measure (heuristic 75ch prose line).
 #   --component-header-status-gap-block: space.050, -inline: space.100
 #     the status line's gaps when it wraps and between its parts (PS3 V1).
+#   --component-header-label-size: 1px  literal: the box of a value's
+#     name, read by assistive technology and drawn nowhere (transparent,
+#     its overflow hidden, out of the flow).
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -86,6 +89,17 @@ node:
                       field: tier.name
                     styles:
                       typography.color: color.text
+                    edges:
+                      - node:
+                          role: label ("Tier:", for assistive technology only)
+                          styles:
+                            layout.position: absolute
+                            size.width: "1px"
+                            size.height: "1px"
+                            layout.overflow: hidden
+                            typography.whiteSpace: nowrap
+                            appearance.opacity: 0
+                        relation: { cardinality: "1", slotName: label }
                   relation: { cardinality: "1", slotName: value }
                 - node:
                     role: separator (a middle dot, hidden from assistive technology)
@@ -105,6 +119,17 @@ node:
                       field: documentationStages._meta.title
                     styles:
                       typography.color: color.text
+                    edges:
+                      - node:
+                          role: label ("Stage:", for assistive technology only)
+                          styles:
+                            layout.position: absolute
+                            size.width: "1px"
+                            size.height: "1px"
+                            layout.overflow: hidden
+                            typography.whiteSpace: nowrap
+                            appearance.opacity: 0
+                        relation: { cardinality: "1", slotName: label }
                   relation: { cardinality: "1", slotName: value }
                 - node:
                     role: separator (a middle dot, hidden from assistive technology)

@@ -48,7 +48,8 @@ const componentCssClassName = "ds component-header";
  * columns, then the status line: the tier and the first documentation
  * stage, each only when the graph records it, and the compact address in
  * monospace, muted, separated by middle dots that assistive technology
- * skips. Each dot is held on one line with the value before it, so a
+ * skips. The tier and the stage each carry their name for assistive
+ * technology, hidden on the screen. Each dot is held on one line with the value before it, so a
  * wrap never leaves a dot at a line's end or start alone. The page says
  * each of the three here only.
  *
@@ -68,8 +69,12 @@ export default function ComponentHeader({
   const summary = findFirstParagraph(data.summary ?? "");
   const stage = data.documentationStages.edges.at(0)?.node._meta.title;
   const values = [
-    ...(data.tier?.name ? [{ key: "tier", value: data.tier.name }] : []),
-    ...(stage ? [{ key: "stage", value: stage }] : []),
+    ...(data.tier?.name
+      ? [{ key: "tier", label: t("component.tier"), value: data.tier.name }]
+      : []),
+    ...(stage
+      ? [{ key: "stage", label: t("component.stage"), value: stage }]
+      : []),
   ];
   return (
     <header
@@ -85,9 +90,11 @@ export default function ComponentHeader({
         </p>
       )}
       <p className="status-line">
-        {values.map(({ key, value }) => (
+        {values.map(({ key, label, value }) => (
           <span className="part" key={key}>
-            <span className="value">{value}</span>
+            <span className="value">
+              <span className="label">{label}</span> {value}
+            </span>
             <span aria-hidden="true" className="separator">
               {t("component.statusSeparator")}
             </span>

@@ -59,14 +59,14 @@ describe("ComponentHeader", () => {
         [
           "part",
           [
-            ["value", "Global"],
+            ["value", "Tier: Global"],
             ["separator", "·"],
           ],
         ],
         [
           "part",
           [
-            ["value", "needs:documentation"],
+            ["value", "Stage: needs:documentation"],
             ["separator", "·"],
           ],
         ],
@@ -77,6 +77,35 @@ describe("ComponentHeader", () => {
       for (const separator of line?.querySelectorAll(".separator") ?? []) {
         expect(separator).toHaveAttribute("aria-hidden", "true");
       }
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "labels the tier and the stage before their values for assistive technology",
+    () => {
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const line = document.querySelector(
+        ".ds.component-header > .status-line",
+      );
+      // The text assistive technology reads: every part but the hidden dots.
+      const spoken = [...(line?.querySelectorAll(".value, .address") ?? [])]
+        .map((part) => part.textContent)
+        .join(" ");
+      expect(spoken).toBe(
+        `Tier: Global Stage: needs:documentation ${BUTTON_URI}`,
+      );
+      expect(
+        [...(line?.querySelectorAll(".value > .label") ?? [])].map(
+          (label) => label.textContent,
+        ),
+      ).toEqual(["Tier:", "Stage:"]);
     },
     ENTITY_TEST_TIMEOUT_MS,
   );
