@@ -2,28 +2,27 @@ import {
   compareText,
   type GraphBudget,
   requireAt,
-  requireEntry,
 } from "@canonical/prism-core";
-import nameStub from "./nameStub.js";
 import type { ClassGraphModel, DrawnScope } from "./types.js";
 
 /**
- * Choose what the overview draws at rest within its budget: every
- * namespace class by class, with an external stub for each class outside
- * the loaded namespaces that a drawn class's relation reaches; then, while
- * the classes, the collapsed boxes and the stubs together exceed the
- * budget's drawn nodes, the largest namespace still drawn class by class
- * (by class count, then prefix by code unit) collapses to one box, its
- * stubs going with it. A namespace too large for the budget alone ends
- * collapsed like the rest.
+ * Choose what the overview draws within its budget: an external stub for
+ * each class outside the loaded namespaces that a relation reaches, and
+ * the namespaces class by class, while the classes, the collapsed boxes
+ * and the stubs together exceed the budget's drawn nodes the largest
+ * namespace still drawn class by class (by class count, then prefix by
+ * code unit) collapsing to one box. A namespace too large for the budget
+ * alone ends collapsed like the rest. A relation from a collapsed
+ * namespace still reaches its stub, from the namespace's box, so no stub
+ * goes with a collapse.
  *
- * Drilled into a namespace, as a term page of one of its classes is, the
- * view draws that namespace class by class and every other one as a box,
- * whatever the budget.
+ * Drilled into a namespace, the view draws that namespace class by class
+ * and every other one as a box, whatever the budget.
  *
  * @param model - The whole graph's model.
  * @param budget - The budget the view keeps; its `drawnNodesMax` counts.
- * @param drill - The prefix of the namespace the view drills into, if any.
+ * @param drill - The prefix of the namespace a reader drilled into, if
+ *   any.
  * @returns The prefixes expanded and collapsed, and the stubs' IRIs.
  */
 export default function chooseDrawnScope(
@@ -31,25 +30,18 @@ export default function chooseDrawnScope(
   budget: GraphBudget,
   drill?: string,
 ): DrawnScope {
-  const loaded = new Set(model.regionOrder.map(({ prefix }) => prefix));
-  const listStubs = (expanded: ReadonlySet<string>): string[] =>
-    [
-      ...new Set(
-        model.external
-          .filter(
-            (relation) =>
-              expanded.has(requireEntry(model.byId, relation.domain).prefix) &&
-              !loaded.has(nameStub(relation.range).prefix),
-          )
-          .map((relation) => relation.range),
-      ),
-    ].sort(compareText);
+  const stubs = [
+    ...new Set(model.external.map((relation) => relation.range)),
+  ].sort(compareText);
   if (drill !== undefined) {
-    const prefixes = model.regionOrder.map(({ prefix }) => prefix);
     return {
-      expanded: prefixes.filter((prefix) => prefix === drill),
-      collapsed: prefixes.filter((prefix) => prefix !== drill),
-      stubs: listStubs(new Set([drill])),
+      expanded: model.regionOrder
+        .filter(({ prefix }) => prefix === drill)
+        .map(({ prefix }) => prefix),
+      collapsed: model.regionOrder
+        .filter(({ prefix }) => prefix !== drill)
+        .map(({ prefix }) => prefix),
+      stubs,
     };
   }
   // The model's regions run largest first, then by prefix.
@@ -58,15 +50,14 @@ export default function chooseDrawnScope(
   const countDrawn = (): number =>
     expanded.reduce((sum, region) => sum + region.ids.length, 0) +
     collapsed.length +
-    listStubs(new Set(expanded.map(({ prefix }) => prefix))).length;
+    stubs.length;
   while (expanded.length > 0 && countDrawn() > budget.drawnNodesMax) {
     collapsed.push(requireAt(expanded, 0).prefix);
     expanded = expanded.slice(1);
   }
-  const prefixes = expanded.map(({ prefix }) => prefix);
   return {
-    expanded: prefixes,
+    expanded: expanded.map(({ prefix }) => prefix),
     collapsed,
-    stubs: listStubs(new Set(prefixes)),
+    stubs,
   };
 }

@@ -71,16 +71,16 @@ describe("bidirectional hover — the rail and the graph share one focus", () =>
     expect(countFadedNodes(well)).toBe(0);
 
     const componentItem = within(rail)
-      .getByRole("link", { name: "Component" })
+      .getByRole("link", { name: "Switch" })
       .closest("li");
-    if (!componentItem) throw new Error("no Component rail item");
+    if (!componentItem) throw new Error("no Switch rail item");
 
-    // Hover the rail's "Component" item: its node and one-hop neighbours
+    // Hover the rail's "Switch" item: its node and one-hop neighbours
     // stay lit, and every other node fades.
     fireEvent.mouseEnter(componentItem);
 
     expect(countFadedNodes(well)).toBeGreaterThan(0);
-    const componentNode = findNodeByHref(well, "/definitions/ds%3AComponent");
+    const componentNode = findNodeByHref(well, "/definitions/anatomy%3ASwitch");
     // The hovered term itself is the focus: never faded.
     expect(componentNode.classList.contains(NODE_FADED_CLASS)).toBe(false);
     // CodeStandard is in a different ontology entirely — guaranteed distant.
@@ -149,9 +149,9 @@ describe("bidirectional hover — the rail and the graph share one focus", () =>
     if (!well) throw new Error("unreachable");
 
     const componentItem = within(rail)
-      .getByRole("link", { name: "Component" })
+      .getByRole("link", { name: "Switch" })
       .closest("li");
-    if (!componentItem) throw new Error("no Component rail item");
+    if (!componentItem) throw new Error("no Switch rail item");
 
     // Nothing selected, nothing focused: the well fades nothing.
     expect(countFadedNodes(well)).toBe(0);

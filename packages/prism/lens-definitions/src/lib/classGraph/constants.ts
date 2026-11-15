@@ -237,3 +237,10 @@ export const STUB_PREFIXES: ReadonlyMap<string, string> = new Map([
   ["http://www.w3.org/2001/XMLSchema#", "xsd"],
   ["http://www.w3.org/2002/07/owl#", "owl"],
 ]);
+
+/**
+ * How far a region may overrun the opening view, in px, and still count
+ * as inside it: the view's edges are fractional where it is a legible
+ * window.
+ */
+export const FIT_TOLERANCE = 1e-6;

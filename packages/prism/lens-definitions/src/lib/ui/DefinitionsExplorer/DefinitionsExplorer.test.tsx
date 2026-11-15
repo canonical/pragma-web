@@ -34,10 +34,16 @@ describe("DefinitionsExplorer", {
     for (const prefix of ["ds", "cs", "anatomy"]) {
       expect(screen.getByRole("region", { name: prefix })).toBeInTheDocument();
     }
-    // The 35 classes, and the two stubs their relations reach.
+    // At rest ds is one box; its class's page drills into it: ds's 20
+    // classes, anatomy and cs as a box each, and the two stubs.
     expect(
-      container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
-    ).toHaveLength(35);
+      container.querySelectorAll('.desktop .node[data-kind="region"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll(
+        '.desktop .node:not([data-kind="stub"]):not([data-kind="region"])',
+      ),
+    ).toHaveLength(20);
     expect(
       container.querySelectorAll('.desktop .node[data-kind="stub"]'),
     ).toHaveLength(2);
@@ -58,16 +64,24 @@ describe("DefinitionsExplorer", {
       ),
     );
     const field = screen.getByRole("searchbox", { name: "Filter terms" });
-    fireEvent.change(field, { target: { value: "  Tag " } });
-    expect(field).toHaveValue("  Tag ");
+    fireEvent.change(field, { target: { value: "  Switch " } });
+    expect(field).toHaveValue("  Switch ");
     expect(
-      container.querySelector('.desktop .node[data-id="ds:Component"]'),
+      container.querySelector('.desktop .node[data-id="anatomy:Edge"]'),
     ).toHaveClass("is-dimmed");
     expect(
-      container.querySelector('.desktop .node[data-id="ds:Tag"]'),
+      container.querySelector('.desktop .node[data-id="anatomy:Switch"]'),
     ).not.toHaveClass("is-dimmed");
     expect(
-      screen.getByRole("link", { name: "Component" }).closest("li"),
+      container
+        .querySelector('.explorer-rail a[href="/definitions/anatomy%3AEdge"]')
+        ?.closest("li"),
+    ).toHaveClass("is-dimmed");
+    // The rail dims the classes a box stands for as well.
+    expect(
+      container
+        .querySelector('.explorer-rail a[href="/definitions/ds%3AComponent"]')
+        ?.closest("li"),
     ).toHaveClass("is-dimmed");
   });
 
@@ -91,8 +105,9 @@ describe("DefinitionsExplorer", {
 
   it("draws every class of a fragment whose superclass chain loops", () => {
     const { container } = render(
+      // ds's own term page, which draws ds class by class.
       createDefinitionsPage(
-        undefined,
+        UIBLOCK_TERM,
         patchRecords(definitionsExplorerRecords, {
           "client:root:ontologies:0:classes:1:superclass": {
             uri: "https://ds.canonical.com/ConceptType",
@@ -103,7 +118,7 @@ describe("DefinitionsExplorer", {
     );
     expect(
       container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
-    ).toHaveLength(35);
+    ).toHaveLength(22);
     expect(screen.queryByRole("alert")).toBeNull();
   });
 

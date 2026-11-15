@@ -233,21 +233,46 @@ describe("layOutClassGraph", () => {
       return kinds;
     };
 
-    it("collapses the docs site's largest namespace to one box, beside 35 classes and 2 stubs", () => {
+    /** Whether the opening view holds every region whole. */
+    const opensWhole = (layout: ReturnType<typeof layOutClassGraph>) =>
+      layout.regions.every(
+        (region) =>
+          region.x >= layout.view.x &&
+          region.y >= layout.view.y &&
+          region.x + region.w <= layout.view.x + layout.view.w &&
+          region.y + region.h <= layout.view.y + layout.view.h,
+      );
+
+    it("collapses the docs site's namespaces, the largest first, until the overview opens whole", () => {
+      // Within the node budget surface alone collapses (38 nodes), but
+      // the rest fits the design canvas only at 0.715; with ds collapsed
+      // too the overview fits above the legible zoom.
       const layout = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
         budget: GRAPH_BUDGET,
       });
       expect(kindsOf(FOUR_NAMESPACE_GRAPH)).toEqual({
-        class: 35,
-        stub: 2,
-        region: 1,
+        class: 15,
+        stub: 3,
+        region: 2,
       });
       expect(layout.nodes.size).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
+      expect(layout.fitZoom).toBeGreaterThanOrEqual(MIN_FIT);
+      expect(layout.view).toEqual(layout.viewBox);
+      expect(opensWhole(layout)).toBe(true);
+      expect(
+        layout.regions
+          .filter((region) => region.collapsed)
+          .map((region) => [region.prefix, region.members]),
+      ).toEqual(
+        expect.arrayContaining([
+          ["surface", 31],
+          ["ds", 20],
+        ]),
+      );
       const surface = requireDefined(
         layout.regions.find((region) => region.prefix === "surface"),
         "the surface region",
       );
-      expect(surface).toMatchObject({ collapsed: true, members: 31 });
       expect(surface.ids).toEqual(["region:surface"]);
       const box = requireEntry(layout.nodes, "region:surface");
       expect(box).toMatchObject({
@@ -261,34 +286,96 @@ describe("layOutClassGraph", () => {
       for (const node of layout.nodes.values()) {
         columns.set(node.col, (columns.get(node.col) ?? 0) + 1);
       }
-      expect(Math.max(...columns.values())).toBe(10);
       expect(Math.max(...columns.values())).toBeLessThanOrEqual(
         GRAPH_BUDGET.bandMembersMax,
       );
-      // The two bridges are the relations to the stubs; the collapsed
-      // namespace's relations are not drawn.
-      expect(
-        layout.edges
-          .filter((edge) => edge.bridge === true)
-          .map((edge) =>
-            [edge.from, ...edge.to].map(
-              (id) => requireEntry(layout.nodes, id).term ?? id,
-            ),
-          ),
-      ).toEqual([
-        ["rdf:List", "https://anatomy.canonical.com/Style"],
-        ["https://ds.canonical.com/TokenBinding", "dt:TokenSymbol"],
-      ]);
-      // The phone view counts the collapsed namespace's classes.
+      // The phone view counts the collapsed namespaces' classes.
       expect(
         layout.phone.headers.find((header) => header.prefix === "surface")
           ?.count,
       ).toBe(31);
       expect(layout.rail).toContain("region:surface");
+      // A relation with an end in a box is drawn from the box: the docs
+      // site's two bridges leave ds's box for their stubs, and surface's
+      // relations into ds run box to box. ds holds 20 relations of its own.
+      expect(
+        layout.edges
+          .filter((edge) => edge.bridge === true)
+          .map((edge) =>
+            [edge.from, ...edge.to]
+              .map((id) => requireEntry(layout.nodes, id).term ?? id)
+              .sort(),
+          )
+          .sort(),
+      ).toEqual([
+        ["ds", "dt:TokenSymbol"],
+        ["ds", "surface"],
+        ["https://anatomy.canonical.com/Style", "rdf:List"],
+        ["surface", "vocab:Shelf"],
+      ]);
+      expect(requireEntry(layout.nodes, "region:ds")).toMatchObject({
+        members: 20,
+        held: 20,
+      });
     });
 
-    it("draws the three captured namespaces whole, with their stubs", () => {
-      expect(kindsOf(ontologyGraph)).toEqual({ class: 35, stub: 2 });
+    it("collapses ds in the three captured namespaces, which fit only at 0.715 whole", () => {
+      const layout = layOutClassGraph(ontologyGraph, { budget: GRAPH_BUDGET });
+      expect(layOutClassGraph(ontologyGraph).fitZoom).toBeLessThan(MIN_FIT);
+      expect(kindsOf(ontologyGraph)).toEqual({ class: 15, stub: 2, region: 1 });
+      expect(opensWhole(layout)).toBe(true);
+      // Each class drawn keeps the degree and the hub the whole graph gives
+      // it, and the relations it holds, whatever runs into a box: surface's
+      // classes relate to ds's, which its drill draws as one box.
+      const whole = layOutClassGraph(FOUR_NAMESPACE_GRAPH);
+      const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        budget: GRAPH_BUDGET,
+        drill: "surface",
+      });
+      expect(drilled.edges.some((edge) => edge.to.includes("region:ds"))).toBe(
+        true,
+      );
+      for (const node of drilled.nodes.values()) {
+        if (node.kind !== "class") continue;
+        const own = requireEntry(whole.nodes, node.uri);
+        expect([node.hub, node.degree, node.relationCount]).toEqual([
+          own.hub,
+          own.degree,
+          own.relationCount,
+        ]);
+      }
+    });
+
+    it("keeps every namespace of a graph that opens whole only by its margin", () => {
+      // The metro fits at 0.838 with its 16px margin, and its opening view
+      // at the legible zoom leaves part of the margin out, every box in.
+      const layout = layOutClassGraph(metroGraph, { budget: GRAPH_BUDGET });
+      expect(layout.fitZoom).toBeLessThan(MIN_FIT);
+      expect(opensWhole(layout)).toBe(true);
+      expect(kindsOf(metroGraph)).toEqual({ class: 16 });
+    });
+
+    it("keeps the legible window when every namespace is a box and it still does not fit", () => {
+      const wide = {
+        classes: Array.from({ length: 30 }, (_, index) => ({
+          uri: `https://n${index}.example/A`,
+          label: "A namespace drawn as one box",
+          prefix: `namespace${String(index).padStart(2, "0")}`,
+          abstract: false,
+          superclass: null,
+          instanceCount: 0,
+          fields: 0,
+        })),
+        relations: [],
+      };
+      const layout = layOutClassGraph(wide, { budget: GRAPH_BUDGET });
+      expect(
+        [...layout.nodes.values()].every((node) => node.kind === "region"),
+      ).toBe(true);
+      expect(opensWhole(layout)).toBe(false);
+      expect(layout.findings).toContain(
+        "G3: opens on a legible window, the rest a pan away",
+      );
     });
 
     it("leaves the metro as it is: its 16 classes, nothing collapsed", () => {

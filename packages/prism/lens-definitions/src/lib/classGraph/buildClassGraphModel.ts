@@ -212,10 +212,14 @@ function breakSuperclassCycles(
  *
  * @param input - The data's classes and counted relations, or a legend
  *   specimen's.
+ * @param whole - The whole graph's model, when the input is what a view
+ *   draws of it: each class it holds keeps its degree and hub there, so a
+ *   class whose relations run into a box stays the hub it is.
  * @returns The model the layout places.
  */
 export default function buildClassGraphModel(
   input: ClassGraphInput | SpecimenGraphInput,
+  whole?: ClassGraphModel,
 ): ClassGraphModel {
   const relations: readonly AnyRelationInput[] = input.relations;
   const classes = breakSuperclassCycles(
@@ -308,9 +312,12 @@ export default function buildClassGraphModel(
     if (!hubs.includes(root)) hubs = [...hubs.slice(0, HUB_CAP - 1), root];
   }
 
+  // A class of the whole graph keeps the whole graph's degree and hub,
+  // whatever the drawing collapses into a box.
+  const wholeOf = (uri: string): ClassModel | undefined => whole?.byId.get(uri);
   const byId = new Map<string, ClassModel>(
     classes.map((klass) => {
-      const hub = hubs.includes(klass.uri);
+      const hub = wholeOf(klass.uri)?.hub ?? hubs.includes(klass.uri);
       const loop = bundles.some(
         (bundle) => bundle.self && bundle.a === klass.uri,
       );
@@ -320,9 +327,10 @@ export default function buildClassGraphModel(
           ...klass,
           kind: klass.kind ?? "class",
           members: klass.members ?? 1,
+          held: klass.held ?? 0,
           ...sizeBox(klass, hub),
           hub,
-          degree: requireEntry(degree, klass.uri),
+          degree: wholeOf(klass.uri)?.degree ?? requireEntry(degree, klass.uri),
           loop,
           loopExtent: loop ? (hub ? HUB_LOOP_EXTENT : LOOP_EXTENT) : 0,
           relationCount: relations.filter(

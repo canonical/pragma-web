@@ -387,7 +387,7 @@ describe("ClassGraph", () => {
     const own = {
       layout: layOutClassGraph(FOUR_NAMESPACE_GRAPH, { budget: GRAPH_BUDGET }),
       terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
-      tabStop: "https://ds.canonical.com/UIBlock",
+      tabStop: "https://anatomy.canonical.com/Style",
     };
     afterEach(() => {
       zoom.bucket = "full";
@@ -413,9 +413,10 @@ describe("ClassGraph", () => {
     it("draws each external stub as an inert box in a dashed frame, a bridge reaching it", () => {
       const container = draw(own);
       const stubs = [...container.querySelectorAll('.node[data-kind="stub"]')];
-      expect(stubs.map((stub) => stub.getAttribute("data-id"))).toEqual([
+      expect(stubs.map((stub) => stub.getAttribute("data-id")).sort()).toEqual([
         "dt:TokenSymbol",
         "rdf:List",
+        "vocab:Shelf",
       ]);
       for (const stub of stubs) {
         expect(stub.querySelector("a")).toBeNull();

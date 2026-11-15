@@ -109,7 +109,7 @@ const componentCssClassName = "ds definitions-explorer";
  * store fulfils it, and lays the graph out once, the same on both sides,
  * within the site's graph budget (see `useExplorerLayout`): the largest
  * namespaces collapse to one box each while the overview would draw more
- * nodes than it allows, and a term page of a class
+ * nodes than it allows or would not open whole, and a term page of a class
  * inside a box drills into its namespace.
  *
  * It owns the hover centre the rail and the graph share, the term a

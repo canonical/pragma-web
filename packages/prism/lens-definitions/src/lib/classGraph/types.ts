@@ -38,6 +38,11 @@ export interface GraphClassInput {
    * `surface`), as no ontology names it; a class's term is its own.
    */
   readonly term?: string;
+  /**
+   * The relations a collapsed region holds, both ends inside it, which
+   * its box draws as a count; 0 when omitted.
+   */
+  readonly held?: number;
 }
 
 /** One object property, drawn as a relation when both its ends are drawn. */
@@ -114,6 +119,8 @@ export interface ClassModel extends GraphClassInput {
   readonly kind: NodeKind;
   /** The classes it stands for: 1, or a collapsed region's count. */
   readonly members: number;
+  /** The relations a collapsed region holds inside its box; else 0. */
+  readonly held: number;
   /** The label's type size: 14, or 16 on a hub. */
   readonly size: number;
   /** The label's face: bold, or bold italic when abstract. */

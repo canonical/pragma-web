@@ -29,7 +29,7 @@ function scopeOf(input: ClassGraphInput, budget: GraphBudget = GRAPH_BUDGET) {
 }
 
 describe("chooseDrawnScope", () => {
-  it("collapses the docs site's largest namespace, and keeps the stubs the rest reach", () => {
+  it("collapses the docs site's largest namespace within the drawn nodes, and keeps every stub", () => {
     const { scope, classes, drawn } = scopeOf(FOUR_NAMESPACE_GRAPH);
     expect(scope).toEqual({
       expanded: ["ds", "anatomy", "cs"],
@@ -37,10 +37,11 @@ describe("chooseDrawnScope", () => {
       stubs: [
         "http://www.w3.org/1999/02/22-rdf-syntax-ns#List",
         "https://dt.canonical.com/TokenSymbol",
+        "https://example.org/vocab/Shelf",
       ],
     });
     expect(classes).toBe(35);
-    expect(drawn).toBe(38);
+    expect(drawn).toBe(39);
     expect(drawn).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
   });
 
@@ -68,10 +69,10 @@ describe("chooseDrawnScope", () => {
     });
   });
 
-  it("collapses the largest first until the rest fit, its stubs going with it", () => {
-    // 35 classes and 2 stubs, within 16: ds (20) collapses, its stub
-    // dt:TokenSymbol with it, leaving 17; then anatomy (12), and its stub
-    // rdf:List.
+  it("collapses the largest first until the rest fit, keeping the stubs the boxes reach", () => {
+    // 35 classes and 2 stubs, within 16: ds (20) collapses, leaving 18;
+    // then anatomy (12). Their relations to the stubs leave from their
+    // boxes, so both stubs stay.
     const { scope, drawn } = scopeOf(
       ontologyGraph,
       createGraphBudget({ drawnNodesMax: 16 }),
@@ -79,10 +80,14 @@ describe("chooseDrawnScope", () => {
     expect(scope).toEqual({
       expanded: ["cs"],
       collapsed: ["ds", "anatomy"],
-      stubs: [],
+      stubs: [
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#List",
+        "https://dt.canonical.com/TokenSymbol",
+      ],
     });
-    expect(drawn).toBe(5);
+    expect(drawn).toBe(7);
   });
+
   it("drills into a namespace: it drawn class by class, every other one a box", () => {
     const model = buildClassGraphModel(FOUR_NAMESPACE_GRAPH);
     expect(chooseDrawnScope(model, GRAPH_BUDGET, "surface")).toMatchObject({

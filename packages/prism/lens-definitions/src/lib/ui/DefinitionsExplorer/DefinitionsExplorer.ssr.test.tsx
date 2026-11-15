@@ -14,8 +14,10 @@ describe("DefinitionsExplorer SSR", () => {
     expect(html).toContain('class="ds definitions-explorer"');
     expect(html).toContain('data-slot="explorer-rail"');
     expect(html).toContain('data-slot="explorer-canvas"');
-    // The 35 classes and the two stubs their relations reach.
-    expect(html.match(/<g class="node[ "]/g)).toHaveLength(37);
+    // The term's namespace drilled into: ds's 20 classes, a box for
+    // anatomy and one for cs, and the two stubs, reached from a class or
+    // from a box.
+    expect(html.match(/<g class="node[ "]/g)).toHaveLength(24);
     expect(html).toContain('class="ring is-selected"');
     expect(html).toContain('aria-current="page"');
     expect(fetchFn).not.toHaveBeenCalled();
@@ -38,7 +40,19 @@ describe("DefinitionsExplorer SSR", () => {
     // ds:hasTokenBinding and ds:viaBlock, 1,010 statements each: the bundle
     // weighs its heavier relation, not their sum.
     expect(weightOf("ds:TokenBinding", "ds:UIBlock")).toBe("1010");
-    expect(weightOf("cs:CodeStandard", "cs:Example")).toBe("0");
+    // At rest cs is drawn class by class.
+    const rest = renderToString(
+      createDefinitionsPage(
+        undefined,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    expect(
+      rest.match(
+        /data-from="cs:CodeStandard" data-kind="relation" data-to="cs:Example" data-weight="(\d+)"/,
+      )?.[1],
+    ).toBe("0");
     expect(html.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
   });
 
@@ -74,7 +88,8 @@ describe("DefinitionsExplorer SSR", () => {
       return html.slice(html.indexOf('data-slot="explorer-canvas"'));
     };
     const canvas = render(definitionsExplorerRecords);
-    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(37);
+    // anatomy's 12 classes and cs's 3, ds as one box, and the two stubs.
+    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(18);
     expect(render(reversed)).toBe(canvas);
   });
 

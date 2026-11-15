@@ -48,7 +48,13 @@ describe("chooseSelectionDrill", () => {
 
   it("drills into nothing for a drawn class, a stranger or no selection", () => {
     const rest = layOutClassGraph(ontologyGraph, { budget: GRAPH_BUDGET });
-    expect(chooseSelectionDrill(ontologyGraph, rest, UIBLOCK)).toBeUndefined();
+    expect(
+      chooseSelectionDrill(
+        ontologyGraph,
+        rest,
+        "https://anatomy.canonical.com/Style",
+      ),
+    ).toBeUndefined();
     expect(
       chooseSelectionDrill(ontologyGraph, rest, "https://x.example/Y"),
     ).toBeUndefined();

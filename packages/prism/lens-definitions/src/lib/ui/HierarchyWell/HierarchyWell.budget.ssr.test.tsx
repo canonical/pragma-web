@@ -90,8 +90,8 @@ function countServedBridges(input: ClassGraphInput): number {
 
 describe("HierarchyWell SSR within the graph budget at rest", () => {
   it.each([
-    ["the docs records", ontologyGraph, 37, 10],
-    ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH, 38, 10],
+    ["the docs records", ontologyGraph, 18, 5],
+    ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH, 20, 5],
     ["the metro's records", metroGraph, 16, 4],
   ])(
     "draws %s within the drawn nodes, the band, the bytes and the elements",

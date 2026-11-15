@@ -30,6 +30,7 @@ import {
   CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
   FALLBACK_CHANNEL,
+  FIT_TOLERANCE,
   MIN_FIT,
   REGION_ALIGNMENTS,
   SHELF_ALIGNMENTS,
@@ -51,6 +52,7 @@ import type {
   ClassGraphLayout,
   ClassGraphLayoutOptions,
   ClassGraphModel,
+  DrawnScope,
   LaidOutEdge,
   LaidOutNode,
   LaidOutRegion,
@@ -325,57 +327,31 @@ function alignShelves(
 }
 
 /**
- * Lay the class graph out: each namespace region in its own layered
- * columns by the layered engine, the regions ordered by their bridges
- * (the largest first, then the one with most relations to those placed)
- * and packed in that order into shelves for the largest fit on the
- * design canvas (retried with narrower channels when the fit would put
- * 14px labels below 12px, which are kept whenever they lift the fit and
- * no arc nests past them), placed on the lattice, then the cross-region
- * relations and subclass joins routed through the gaps, the rail order,
- * the keyboard's moves, the viewBox with its margin, the view the canvas
- * opens on (the whole viewBox, or a legible window of it whose edges cut no
- * box when the whole fits only below the legible zoom, which the findings
- * record) and the phone view.
- *
- * It is total over what a provider serves: superclass cycles are broken
- * and an input with no class lays out as an empty floor. It is a pure
- * function of the input, sorted by IRI: no randomness, no
- * trigonometry and no browser measurement, so the server and the client
- * lay out the same graph byte for byte, and every coordinate is an
- * integer.
- *
- * @param input - The classes and relations: the data's, each counted, or a
- *   legend specimen's.
- * @param options - How many barycentre sweeps order the columns (`SWEEPS`
- *   unless given; 0 keeps the label-sorted order, the baseline the
- *   crossings are measured against), and the budget the overview keeps at
- *   rest: with one, the largest namespaces collapse to a box each while
- *   the drawing would exceed its drawn nodes, and a relation to a class
- *   outside the loaded namespaces reaches an external stub (see
- *   `chooseDrawnScope`); without one, every class given is drawn.
- * @returns The layout. Each class's column is graph-wide: its region's
- *   first column, counted over the regions in packing order, plus its
- *   column in the region.
+ * Whether a layout opens on its whole graph at the design canvas: its
+ * opening view, at the legible zoom or above, holds every region, the
+ * boxes and label rows within them. The view may leave out a strip of the
+ * margin round the graph and still hold it whole.
  */
-export default function layOutClassGraph(
-  input: ClassGraphInput | SpecimenGraphInput,
-  options: ClassGraphLayoutOptions = {},
+function opensWhole(layout: ClassGraphLayout): boolean {
+  const { view } = layout;
+  return layout.regions.every(
+    (region) =>
+      region.x >= view.x - FIT_TOLERANCE &&
+      region.y >= view.y - FIT_TOLERANCE &&
+      region.x + region.w <= view.x + view.w + FIT_TOLERANCE &&
+      region.y + region.h <= view.y + view.h + FIT_TOLERANCE,
+  );
+}
+
+/**
+ * Lay a model out: what `layOutClassGraph` does once it knows what is
+ * drawn, the whole graph's model naming the classes a box stands for.
+ */
+function layOutModel(
+  model: ClassGraphModel,
+  whole: ClassGraphModel,
+  sweeps: number,
 ): ClassGraphLayout {
-  const { sweeps = SWEEPS, budget, drill } = options;
-  const whole = buildClassGraphModel(input);
-  // Within a budget the overview draws what fits at rest: the largest
-  // namespaces collapsed to a box each, the stubs its relations reach.
-  const model =
-    budget === undefined
-      ? whole
-      : buildClassGraphModel(
-          gatherDrawnInput(
-            input,
-            whole,
-            chooseDrawnScope(whole, budget, drill),
-          ),
-        );
   // An ontology with no class is data a provider may serve: it lays out
   // as an empty floor the size of the design canvas.
   if (model.byId.size === 0) {
@@ -805,4 +781,78 @@ export default function layOutClassGraph(
     findings,
     phone: layOutPhoneView(model, orderedNodes, rail, regions),
   };
+}
+
+/**
+ * Lay the class graph out: each namespace region in its own layered
+ * columns by the layered engine, the regions ordered by their bridges
+ * (the largest first, then the one with most relations to those placed)
+ * and packed in that order into shelves for the largest fit on the
+ * design canvas (retried with narrower channels when the fit would put
+ * 14px labels below 12px, which are kept whenever they lift the fit and
+ * no arc nests past them), placed on the lattice, then the cross-region
+ * relations and subclass joins routed through the gaps, the rail order,
+ * the keyboard's moves, the viewBox with its margin, the view the canvas
+ * opens on (the whole viewBox, or a legible window of it whose edges cut no
+ * box when the whole fits only below the legible zoom, which the findings
+ * record) and the phone view.
+ *
+ * It is total over what a provider serves: superclass cycles are broken
+ * and an input with no class lays out as an empty floor. It is a pure
+ * function of the input, sorted by IRI: no randomness, no
+ * trigonometry and no browser measurement, so the server and the client
+ * lay out the same graph byte for byte, and every coordinate is an
+ * integer.
+ *
+ * @param input - The classes and relations: the data's, each counted, or a
+ *   legend specimen's.
+ * @param options - How many barycentre sweeps order the columns (`SWEEPS`
+ *   unless given; 0 keeps the label-sorted order, the baseline the
+ *   crossings are measured against), and the budget the overview keeps at
+ *   rest: with one, the largest namespaces collapse to a box each while
+ *   the drawing would exceed its drawn nodes (see `chooseDrawnScope`),
+ *   then further, the largest expanded namespace first, while the packed
+ *   overview does not fit the design canvas at the legible floor
+ *   (`MIN_FIT`), its opening view leaving a region out, so the overview
+ *   opens whole; when every namespace is a box and it still does not fit,
+ *   it opens on a legible window. That takes at
+ *   most one layout more than there are namespaces. A relation to a class
+ *   outside the loaded namespaces reaches an external stub. Drilled into
+ *   a namespace, it is drawn class by class and every other one as a box,
+ *   whatever the fit. Without a budget, every class given is drawn.
+ * @returns The layout. Each class's column is graph-wide: its region's
+ *   first column, counted over the regions in packing order, plus its
+ *   column in the region.
+ */
+export default function layOutClassGraph(
+  input: ClassGraphInput | SpecimenGraphInput,
+  options: ClassGraphLayoutOptions = {},
+): ClassGraphLayout {
+  const { sweeps = SWEEPS, budget, drill } = options;
+  const whole = buildClassGraphModel(input);
+  if (budget === undefined) return layOutModel(whole, whole, sweeps);
+  const layOutScope = (scope: DrawnScope): ClassGraphLayout =>
+    layOutModel(
+      buildClassGraphModel(gatherDrawnInput(input, whole, scope), whole),
+      whole,
+      sweeps,
+    );
+  // A drilled view is not held to the fit: the reader chose a part.
+  if (drill !== undefined) {
+    return layOutScope(chooseDrawnScope(whole, budget, drill));
+  }
+  // Within the budget's drawn nodes first, then within the canvas: the
+  // largest expanded namespace collapses while the overview would open
+  // below the legible zoom.
+  let scope = chooseDrawnScope(whole, budget);
+  let layout = layOutScope(scope);
+  while (!opensWhole(layout) && scope.expanded.length > 0) {
+    scope = {
+      ...scope,
+      expanded: scope.expanded.slice(1),
+      collapsed: [...scope.collapsed, requireAt(scope.expanded, 0)],
+    };
+    layout = layOutScope(scope);
+  }
+  return layout;
 }
