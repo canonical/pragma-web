@@ -50,6 +50,25 @@ describe("SchematicMap", () => {
     ).toHaveAttribute("stroke", "#c8102e");
   });
 
+  it("strokes a track in plain text colour when the gate refuses its colour", () => {
+    const [track, ...rest] = GEOMETRY.tracks;
+    if (!track) throw new Error("the network's geometry drew no track");
+    const geometry = {
+      ...GEOMETRY,
+      tracks: [
+        { ...track, colour: "url(https://example.org/paint.svg#a)" },
+        ...rest,
+      ],
+    };
+    const { container } = renderWithSite(
+      <SchematicMap geometry={geometry} title="The network" />,
+    );
+    expect(
+      container.querySelector(`path[data-line="${track.lineUri}"]`),
+    ).toHaveAttribute("stroke", "currentColor");
+    expect(container.innerHTML).not.toContain("example.org");
+  });
+
   it("groups every station's mark, linked to its page in the network lens", () => {
     const { container } = renderWithSite(
       <SchematicMap geometry={GEOMETRY} title="The network" />,
