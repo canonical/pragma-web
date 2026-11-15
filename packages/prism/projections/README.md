@@ -444,6 +444,8 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Addresses: `findCuriePrefix`; `AmbientNamespaceProvider`, which
   declares the page's ambient namespace once, and `useForeignPrefix`, the
   prefix with its colon an identity shows only when its namespace differs
-  from it (every arm's prefix); types `AmbientNamespaceProviderProps`.
+  from it, read from a compact address or, for a property, from
+  its namespace (every arm's prefix but the command's, whose address
+  states it); types `AmbientNamespaceProviderProps`.
 - Switches: `requireArmKey` (the fragment key a switch's case reads,
   throwing when the switch's fragment spreads no arm for the node's type).
