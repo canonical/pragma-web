@@ -74,7 +74,10 @@ export type {
 } from "../rows/index.js";
 export { createRowScopes } from "../rows/index.js";
 export type { EffectiveOrdering } from "../source/index.js";
-export { resolveEffectiveOrdering } from "../source/index.js";
+export {
+  listOfferedOperators,
+  resolveEffectiveOrdering,
+} from "../source/index.js";
 export {
   isNarrowingIssue,
   QUERY_KEYS,

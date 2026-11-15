@@ -115,6 +115,7 @@ export type {
   DateField,
   EmptyOr,
   FieldKind,
+  FieldKindOperators,
   FieldValidation,
   NumberField,
   PresenceField,
