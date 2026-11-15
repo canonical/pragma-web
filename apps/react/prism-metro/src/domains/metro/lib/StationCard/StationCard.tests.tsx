@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -71,13 +72,6 @@ const renderWithNode = (
   );
 };
 
-/** Read each key value of the card as its key and its value's text. */
-const readPairs = (container: HTMLElement): (string | null)[][] =>
-  [...container.querySelectorAll(".pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent ?? null,
-    pair.querySelector(".value")?.textContent ?? null,
-  ]);
-
 describe("StationCard", () => {
   it("reads the Station through its fragment", () => {
     const { container } = renderWithNode((node) => <StationCard node={node} />);
@@ -87,88 +81,62 @@ describe("StationCard", () => {
     );
   });
 
-  it("fills the card's heading from the station, in the anatomy's order", () => {
+  it("fills the card's slots from the station, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => <StationCard node={node} />);
+    const root = container.querySelector(".ds.station-card");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/location.svg#location",
+    );
     expect(
-      [...container.querySelectorAll(".location, .title, .kind, .summary")].map(
+      [...(root?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
         (slot) => slot.textContent,
       ),
+    ).toEqual(["metro:", "Northgate", "The northern terminus."]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
     ).toEqual([
-      "Central Zone",
-      "Northgate",
-      "Station",
-      "The northern terminus.",
+      ["platformCount", "4"],
+      ["inZone", "Central Zone"],
+      ["servesLine", "North Line"],
     ]);
+    for (const slot of [
+      ".address",
+      ".kind",
+      ".status",
+      ".location",
+      ".key-values",
+      ".vital",
+      ".specimen",
+    ]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
+    }
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "Northgate" })).toHaveAttribute(
+      "href",
+      "/network/stations/metro%3Anorthgate",
+    );
   });
 
-  it("lists its platforms, its zone and its lines, and counts its platforms", () => {
-    const { container } = renderWithNode((node) => <StationCard node={node} />);
-    expect(readPairs(container)).toEqual([
-      ["Platforms", "4"],
-      ["Zone", "Central Zone"],
-      ["Lines", "North Line"],
-    ]);
-    expect(
-      [...container.querySelectorAll(".vital")].map(
-        (vital) => vital.textContent,
-      ),
-    ).toEqual(["4 platforms"]);
-  });
-
-  it("links its title to the station's page", () => {
-    renderWithNode((node) => <StationCard node={node} />);
-    expect(
-      screen.getByRole("link", { name: "Northgate" }).getAttribute("href"),
-    ).toBe("/network/stations/metro%3Anorthgate");
-  });
-
-  it("leaves out the pair and the vital of an unasserted platform count", () => {
+  it("leaves out each fact the graph does not assert, and the summary", () => {
     const { container } = renderWithNode(
       (node) => <StationCard node={node} />,
       {
         platformCount: null,
-      },
-    );
-    expect(readPairs(container).map(([key]) => key)).toEqual(["Zone", "Lines"]);
-    expect(container.querySelector(".footer")).toBeNull();
-  });
-
-  it("has no location and no zone for a station in no zone", () => {
-    const { container } = renderWithNode(
-      (node) => <StationCard node={node} />,
-      {
         inZone: null,
-      },
-    );
-    expect(container.querySelector(".location")).toBeNull();
-    expect(readPairs(container).map(([key]) => key)).toEqual([
-      "Platforms",
-      "Lines",
-    ]);
-  });
-
-  it("lists no lines for a station no line serves", () => {
-    const { container } = renderWithNode(
-      (node) => <StationCard node={node} />,
-      {
         servesLine: [],
-      },
-    );
-    expect(readPairs(container).map(([key]) => key)).toEqual([
-      "Platforms",
-      "Zone",
-    ]);
-  });
-
-  it("renders no summary for a station without a definition", () => {
-    const { container } = renderWithNode(
-      (node) => <StationCard node={node} />,
-      {
         _meta: { ...MOCK_STATION._meta, definition: null },
       },
     );
-    expect(container.querySelector(".summary")).toBeNull();
+    for (const slot of [".facts", ".fact", ".summary", ".status"]) {
+      expect(container.querySelector(slot), slot).toBeNull();
+    }
+    expect(container.querySelector(".title")?.textContent).toBe("Northgate");
   });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <StationCard className="custom-class" node={node} />

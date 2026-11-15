@@ -77,10 +77,18 @@ describe("the stations lens's cards", {
     );
     expect(container.querySelector(".ds.node-card")).toBeNull();
 
-    expect(readPairs(findCard(container, NORTHGATE_TITLE))).toEqual([
-      ["Platforms", "4"],
-      ["Zone", ZONE_TITLE],
-      ["Lines", "North Line"],
+    expect(
+      [...findCard(container, NORTHGATE_TITLE).querySelectorAll(".fact")].map(
+        (fact) => [
+          fact.getAttribute("data-property"),
+          fact.querySelector(".term")?.textContent,
+          fact.querySelector(".detail")?.textContent,
+        ],
+      ),
+    ).toEqual([
+      ["platformCount", "Platforms", "4"],
+      ["inZone", "Zone", ZONE_TITLE],
+      ["servesLine", "Lines", "North Line"],
     ]);
     const exchange = findCard(container, CENTRAL_EXCHANGE_TITLE);
     expect(readPairs(exchange)).toContainEqual(["Transfer", "4 minutes"]);
@@ -91,7 +99,7 @@ describe("the stations lens's cards", {
 describe("the lines lens's rows", {
   timeout: LENS_PAGE_TEST_TIMEOUT_MS,
 }, () => {
-  it("row every line as a line, each ending in its stops", async () => {
+  it("row every line as a line, each counting its stops", async () => {
     const { container } = renderLensPage("/lines", graph.url);
     await waitFor(() => {
       expect(container.querySelectorAll("li.line-row")).toHaveLength(
@@ -102,7 +110,11 @@ describe("the lines lens's rows", {
     const circle = [...container.querySelectorAll("li.line-row")].find(
       (row) => row.querySelector(".title")?.textContent === CIRCLE_LINE_TITLE,
     );
-    expect(circle?.querySelector(".meta")?.textContent).toBe("6 stops");
+    expect(
+      circle?.querySelector('.fact[data-property="servedBy"] .detail')
+        ?.textContent,
+    ).toBe("6");
+    expect(circle?.querySelector(".status")?.textContent).toBe("loop");
   });
 });
 

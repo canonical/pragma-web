@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -90,51 +91,38 @@ describe("StationCommand", () => {
         <StationCommand node={node} />
       </ul>
     ));
+    const root = container.querySelector(".ds.station-command");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/location.svg#location",
+    );
     expect(
-      [...container.querySelectorAll(".title, .context, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["Northgate", "Station in Central Zone", "4 platforms"]);
+      [
+        ...(root?.querySelectorAll(".title, .address, .kind, .status") ?? []),
+      ].map((slot) => slot.textContent),
+    ).toEqual(["Northgate", "metro:northgate", "Station", "4 platforms"]);
+    expect(root?.querySelector(".prefix")).toBeNull();
+    expect(root?.querySelector(".location")).toBeNull();
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "Northgate" })).toHaveAttribute(
+      "href",
+      "/network/stations/metro%3Anorthgate",
+    );
   });
 
-  it("links its title to the station's page", () => {
-    renderWithNode((node) => (
-      <ul>
-        <StationCommand node={node} />
-      </ul>
-    ));
-    expect(
-      screen.getByRole("link", { name: "Northgate" }).getAttribute("href"),
-    ).toBe("/network/stations/metro%3Anorthgate");
-  });
-
-  it("names its class alone for a station in no zone", () => {
+  it("ends in no status when the graph asserts no platform count", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
           <StationCommand node={node} />
         </ul>
       ),
-      {
-        inZone: null,
-      },
+      { platformCount: null },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Station");
+    expect(container.querySelector(".status")).toBeNull();
+    expect(container.querySelector(".kind")?.textContent).toBe("Station");
   });
 
-  it("has no vital when the graph asserts no platform count", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <ul>
-          <StationCommand node={node} />
-        </ul>
-      ),
-      {
-        platformCount: null,
-      },
-    );
-    expect(container.querySelector(".vital")).toBeNull();
-  });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>

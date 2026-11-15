@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -90,52 +91,56 @@ describe("StationRow", () => {
         <StationRow node={node} />
       </ul>
     ));
+    const root = container.querySelector(".ds.station-row");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/location.svg#location",
+    );
     expect(
-      [...container.querySelectorAll(".title, .meta")].map(
+      [...(root?.querySelectorAll(".prefix, .title") ?? [])].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["Northgate", "4 platforms"]);
-    expect(container.querySelector(".location")).toBeNull();
+    ).toEqual(["metro:", "Northgate"]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["platformCount", "4"]]);
+    for (const slot of [".meta", ".kind", ".location", ".summary", ".status"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
+    }
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "Northgate" })).toHaveAttribute(
+      "href",
+      "/network/stations/metro%3Anorthgate",
+    );
   });
 
-  it("links its title to the station's page", () => {
-    renderWithNode((node) => (
+  it("puts its definition under its name in a two-line row", () => {
+    const { container } = renderWithNode((node) => (
       <ul>
-        <StationRow node={node} />
+        <StationRow lines="two" node={node} />
       </ul>
     ));
-    expect(
-      screen.getByRole("link", { name: "Northgate" }).getAttribute("href"),
-    ).toBe("/network/stations/metro%3Anorthgate");
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "The northern terminus.",
+    );
   });
 
-  it("counts a single platform in the singular", () => {
+  it("has no facts when the graph asserts no platform count", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
           <StationRow node={node} />
         </ul>
       ),
-      {
-        platformCount: 1,
-      },
+      { platformCount: null },
     );
-    expect(container.querySelector(".meta")?.textContent).toBe("1 platform");
+    expect(container.querySelector(".facts")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Northgate");
   });
 
-  it("has no meta when the graph asserts no platform count", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <ul>
-          <StationRow node={node} />
-        </ul>
-      ),
-      {
-        platformCount: null,
-      },
-    );
-    expect(container.querySelector(".meta")).toBeNull();
-  });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
