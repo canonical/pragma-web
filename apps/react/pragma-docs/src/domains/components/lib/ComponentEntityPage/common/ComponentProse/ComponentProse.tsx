@@ -1,6 +1,6 @@
 import { Markdown } from "@canonical/react-markdown";
-import type { ReactElement } from "react";
-import { PROSE_COMPONENTS } from "./constants.js";
+import { type ReactElement, useMemo } from "react";
+import buildProseComponents from "./buildProseComponents.js";
 import type { ComponentProseProps } from "./types.js";
 
 const componentCssClassName = "ds component-prose editorial content-flow";
@@ -8,7 +8,8 @@ const componentCssClassName = "ds component-prose editorial content-flow";
 /**
  * One Markdown text of a component, its usage or its guidelines, as the
  * content of a section of the component page, which carries the heading.
- * The text's own headings start at level 3.
+ * The text's shallowest heading renders at level 3, whatever level it was
+ * written at, and the others keep their steps below it.
  *
  * Its root carries `.editorial` and `.content-flow`, so the typography
  * layer spaces the headings and paragraphs, and it is the section body's
@@ -24,12 +25,13 @@ export default function ComponentProse({
   className,
   ...props
 }: ComponentProseProps): ReactElement {
+  const components = useMemo(() => buildProseComponents(source), [source]);
   return (
     <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <Markdown components={PROSE_COMPONENTS} source={source} />
+      <Markdown components={components} source={source} />
     </div>
   );
 }

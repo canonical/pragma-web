@@ -2,9 +2,10 @@
 # ComponentProse — one Markdown text of a component (its usage, its
 # guidelines) as the content of a section of the component page. Its root
 # carries `.editorial` and `.content-flow`: the typography layer spaces the
-# headings and paragraphs, and the last block none. Headings render two
-# levels down, under the section that holds the text, so they start at
-# level 3. It renders no heading of its own: the sectioned view renders the
+# headings and paragraphs, and the last block none. Headings move by one
+# offset, under the section that holds the text, so the shallowest starts
+# at level 3 whatever level it was written at (Button's usage from ###,
+# its guidelines from #) and the others keep their steps, down to 6. It renders no heading of its own: the sectioned view renders the
 # section's. It binds no style of its own: as the direct child of the
 # section's body, the view gives it every column and the 75-character
 # reading measure (1.1, M13), in one place for every prose.

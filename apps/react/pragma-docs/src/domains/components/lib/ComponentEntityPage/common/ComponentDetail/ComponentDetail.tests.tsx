@@ -125,7 +125,7 @@ describe("ComponentDetail", () => {
   );
 
   it(
-    "shows a text as the direct child of its section's body, its headings from level 3",
+    "shows each text as the direct child of its section's body, its headings from level 3",
     () => {
       render(
         entityPageAt(
@@ -134,17 +134,19 @@ describe("ComponentDetail", () => {
           createFetchSpy(),
         ),
       );
-      const guidelines = readView().querySelector(
-        ":scope > .content > .section:has(> #guidelines) > .section-body",
-      );
-      const prose = guidelines?.querySelector(":scope > .editorial");
-      expect(prose).not.toBeNull();
-      expect(prose?.classList).toContain("component-prose");
-      const levels = [
-        ...(prose?.querySelectorAll("h1,h2,h3,h4,h5,h6") ?? []),
-      ].map(({ tagName }) => Number(tagName.slice(1)));
-      expect(levels.length).toBeGreaterThan(0);
-      expect(Math.min(...levels)).toBe(3);
+      for (const id of ["usage", "guidelines"]) {
+        const body = readView().querySelector(
+          `:scope > .content > .section:has(> #${id}) > .section-body`,
+        );
+        const prose = body?.querySelector(":scope > .editorial");
+        expect(prose).not.toBeNull();
+        expect(prose?.classList).toContain("component-prose");
+        const levels = [
+          ...(prose?.querySelectorAll("h1,h2,h3,h4,h5,h6") ?? []),
+        ].map(({ tagName }) => Number(tagName.slice(1)));
+        expect(levels.length).toBeGreaterThan(0);
+        expect(Math.min(...levels)).toBe(3);
+      }
     },
     ENTITY_TEST_TIMEOUT_MS,
   );

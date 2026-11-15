@@ -10,7 +10,7 @@ describe("ComponentProse SSR", () => {
     expect(html).toContain(
       '<div class="ds component-prose editorial content-flow">',
     );
-    expect(html).toMatch(/<h4[^>]*>Heading<\/h4>/);
+    expect(html).toMatch(/<h3[^>]*>Heading<\/h3>/);
     expect(html).toContain("<p>Text</p>");
   });
 });
