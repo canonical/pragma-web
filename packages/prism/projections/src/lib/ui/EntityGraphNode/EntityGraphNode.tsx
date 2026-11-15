@@ -24,7 +24,7 @@ const CONTEXT_Y = TITLE_Y + GRAPH_NODE_LINE;
 /**
  * An entity as a node of a graph: a box with rounded corners, the title on
  * the first line and its kind muted on the second, or the title
- * alone on the box's middle; the entity's vital, when it has one, ends the
+ * alone on the box's middle; the entity's count, when it has one, ends the
  * title's line in muted tabular figures. It is native SVG, an SVG `<g>` of
  * two rects and `<text>`, so a graph draws hundreds of them under pan and
  * zoom; it goes inside an `<svg>`, and the graph places it with a transform

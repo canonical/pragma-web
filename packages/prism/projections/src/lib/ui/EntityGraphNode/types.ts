@@ -39,7 +39,7 @@ type OwnProps = {
    */
   readonly height?: number;
   /**
-   * The entity's vital, such as its instance count: muted tabular figures
+   * The entity's count, such as its instance count: muted tabular figures
    * at the end of the title's line.
    */
   readonly count?: ReactNode;

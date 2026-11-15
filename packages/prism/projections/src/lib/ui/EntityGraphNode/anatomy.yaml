@@ -29,7 +29,7 @@
 # node names the face the reset gives `code`.
 #
 # A graph sets the box's height (a one-line node sets its title on the
-# middle) and gives it the encodings of the Definitions graph: the vital
+# middle) and gives it the encodings of the Definitions graph: the count
 # ends the title's line in muted tabular figures (an instance count); a
 # hollow box is drawn in the floor's colour with an italic title (an
 # abstract class: kind on the fill and the label style); a prominent node

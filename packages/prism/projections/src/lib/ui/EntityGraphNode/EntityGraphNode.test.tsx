@@ -96,7 +96,7 @@ describe("EntityGraphNode", () => {
   });
 
   describe("count", () => {
-    it("ends the title's line with the vital, anchored at the inner inset", () => {
+    it("ends the title's line with the count, anchored at the inner inset", () => {
       const node = renderNode(
         <EntityGraphNode
           count={139}
@@ -112,7 +112,7 @@ describe("EntityGraphNode", () => {
       expect(count?.getAttribute("y")).toBe("16");
     });
 
-    it("renders no vital when it has none", () => {
+    it("renders no count when it has none", () => {
       const node = renderNode(<EntityGraphNode title="Layout" />);
       expect(node.querySelector(".count")).toBeNull();
     });

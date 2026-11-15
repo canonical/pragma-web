@@ -42,6 +42,16 @@ its height in every context: the chip 28px, the row 32px, the command
 lays the five representations of each type out as one matrix, under
 `Documentation/Projection matrix`.
 
+Every form renders a subsequence of one slot order, mark, prefix, title,
+address, kind, summary, facts, status: the chip mark, prefix, title,
+status; the row mark, prefix, title, kind, summary, facts, status; the
+card all eight, over its Specimen; the command mark, prefix, title,
+address, kind, status; the graph node mark, prefix, title, kind, count.
+A chip that peeks opens a 248px dialog 4px from it, after
+`PEEK_OPEN_DELAY_MS` of hover or at once on focus, inside the viewport;
+Escape closes it and gives the link the focus back, and a tap follows
+the link.
+
 - **`EntityChip`**: the inline mention, a pill in running text: an
   optional mark, the foreign prefix, the title (a link that peeks at the
   entity's card, or inert text) and an optional status. The mark is a sign
@@ -62,20 +72,10 @@ lays the five representations of each type out as one matrix, under
 - **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a box with
   rounded corners and its `<text>`, the mark, the prefix and the title
   over the kind (50 units tall by default), or the title alone on the middle of a box the
-  graph sizes, an optional vital (an instance count) at the end of the
+  graph sizes, an optional count (an instance count) at the end of the
   title's line, and the graph's encodings: `hollow` (an abstract class),
   `prominent` (a hub) and `showText` (off when zoomed out), for a graph to
   place with a transform inside its `<svg>`.
-
-Every form renders a subsequence of one slot order, mark, prefix, title,
-address, kind, summary, facts, status: the chip mark, prefix, title,
-status; the row mark, prefix, title, kind, summary, facts, status; the
-card all eight, over its Specimen; the command mark, prefix, title,
-address, kind, status; the graph node mark, prefix, title, kind, count.
-A chip that peeks opens a 248px dialog 4px from it, after
-`PEEK_OPEN_DELAY_MS` of hover or at once on focus, inside the viewport;
-Escape closes it and gives the link the focus back, and a tap follows
-the link.
 
 - **`SwatchMark`**, **`TokenMark`** and **`TokenSwatch`**: the marks and
   the swatch a colour is drawn by. `SwatchMark` is a 16px disc of an
@@ -185,27 +185,31 @@ import { OntologyClassCard } from "@canonical/prism-projections";
 ### Slots
 
 Each projection fills the slots its type has, in the representation's
-order, and leaves the others empty. A node's prefix is the compact
-address's (`ds` in `ds:Layout`); an address the provider could not compact
-has none.
+order, and leaves the others empty. A form gives the prefix or the
+address, never both: the chip, the row, the card and the graph node give
+the foreign prefix, the compact address's namespace (`ds` in `ds:Layout`)
+when it differs from the page's ambient namespace, and the command gives
+the address. A typed projection gives no kind in the chip, the row, the
+card or the graph node, because its mark says what it is; the command and
+the `Node` projections give it, since a list of nodes mixes types.
 
 | Projection | Slots |
 |---|---|
-| `NodeChip` | the title, or the passage's own text |
-| `NodeRow` | `ds:` muted, the title, the node's class at the end |
-| `NodeCard` | the prefix, the title, the class, the definition |
-| `NodeCommand` | the title over "class in prefix" |
-| `NodeGraphNode` | the compact address over "class in prefix" |
+| `NodeChip` | the node glyph, the foreign prefix, the title, or the passage's own text; it peeks at the node |
+| `NodeRow` | the node glyph, the foreign prefix, the title, the node's class as its kind |
+| `NodeCard` | the node glyph, the foreign prefix, the title, the node's class as its kind, the definition |
+| `NodeCommand` | the node glyph, the title over the compact address, the node's class as its kind |
+| `NodeGraphNode` | the node glyph, the foreign prefix and the title over the node's class |
 | `OntologyClassChip` | the class glyph, the foreign prefix, the title, or the passage's own text; it peeks at the class |
 | `OntologyClassRow` | the class glyph, the foreign prefix, the title, "abstract" for an abstract class; the definition under it in a two-line row |
 | `OntologyClassCard` | the class glyph, the foreign prefix, the title, the definition, "Subclass of" its superclass, "abstract" as its status |
 | `OntologyClassCommand` | the class glyph, the title over the compact address, "Abstract class", "used in 88 instances" |
-| `OntologyClassGraphNode` | the class glyph, the foreign prefix and the title over "Abstract class" |
-| `OntologyPropertyChip` | the property glyph, the name, or the passage's own text; it has no peek |
-| `OntologyPropertyRow` | the property glyph, the name, its kind's word (object, datatype, annotation); the definition under it in a two-line row |
-| `OntologyPropertyCard` | the property glyph, the name, the definition, its domain, range and inverse, "functional" as its status |
+| `OntologyClassGraphNode` | the class glyph, the foreign prefix and the title; an abstract class's box is hollow |
+| `OntologyPropertyChip` | the property glyph, the foreign prefix, the name, or the passage's own text; it has no peek |
+| `OntologyPropertyRow` | the property glyph, the foreign prefix, the name; the definition under it in a two-line row |
+| `OntologyPropertyCard` | the property glyph, the foreign prefix, the name, the definition, its domain, range and inverse, "functional" as its status |
 | `OntologyPropertyCommand` | the property glyph, the name over its IRI, "kind in domain", the range at the end |
-| `OntologyPropertyGraphNode` | the property glyph, the name over "kind in domain" |
+| `OntologyPropertyGraphNode` | the property glyph, the foreign prefix and the name |
 
 A property's name is its label, or the local name of its IRI when it has
 none. Every word a reader sees comes from the package's catalog.
