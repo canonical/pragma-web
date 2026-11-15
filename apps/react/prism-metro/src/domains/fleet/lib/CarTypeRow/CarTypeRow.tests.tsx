@@ -106,7 +106,8 @@ describe("CarTypeRow", () => {
         fact.getAttribute("data-property"),
         fact.querySelector(".detail")?.textContent,
       ]),
-    ).toEqual([["length", "20 m"]]);
+    ).toEqual([["code", "DM"]]);
+    expect(root?.querySelector('.fact[data-property="length"]')).toBeNull();
     for (const slot of [".meta", ".kind", ".location", ".summary", ".status"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
     }

@@ -12,7 +12,6 @@ import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
 import nodeFragment from "#relay/__generated__/CarTypeRow_node.graphql.js";
 import { CAR_TYPE_MARK_ICON } from "../CarTypeChip/constants.js";
-import formatLength from "../formatLength.js";
 import type { CarTypeRowProps } from "./types.js";
 import "./styles.css";
 
@@ -24,7 +23,7 @@ import "./styles.css";
 const declareNodeFragment = (): unknown => graphql`
   fragment CarTypeRow_node on CarType {
     __typename
-    length
+    code
     _meta {
       title
       curie
@@ -39,9 +38,10 @@ const componentCssClassName = "ds car-type-row";
 
 /**
  * A car type as a list entry: its mark, its prefix off the page's
- * namespace, its name linked to its home, and its length as a fact; a
- * two-line row (`lines="two"`) puts its definition under the name.
- * Its mark is the car type's glyph, a published icon.
+ * namespace, its name linked to its home, and its code as its one fact,
+ * the identifier a stock's drawings write under each car; a two-line row
+ * (`lines="two"`) puts its definition under the name. Its mark is the car
+ * type's glyph, a published icon.
  *
  * Native props reach the row's `<li>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename
@@ -72,9 +72,9 @@ export default function CarTypeRow({
       data-type={data.__typename}
       facts={[
         {
-          property: "length",
-          label: t("fleet.fact.length"),
-          value: formatLength(data.length),
+          property: "code",
+          label: t("fleet.fact.code"),
+          value: <code className="identifier">{data.code}</code>,
         },
       ]}
       href={href}

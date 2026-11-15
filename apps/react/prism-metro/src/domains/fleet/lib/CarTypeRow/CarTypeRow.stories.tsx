@@ -66,7 +66,7 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * The Series 90 driving motor car: its mark, its name, linked to its page, and its length as a fact.
+ * The Series 90 driving motor car: its mark, its name, linked to its page, and its code as its one fact.
  */
 export const Default: Story = {};
 

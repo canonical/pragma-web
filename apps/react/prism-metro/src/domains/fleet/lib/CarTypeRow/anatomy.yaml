@@ -1,8 +1,9 @@
 ---
 # CarTypeRow: a car type as a list entry: its mark, its prefix off the
-# page's namespace, its name linked to its home, and its length as a fact; a
-# two-line row (`lines="two"`) puts its definition under the name. Its mark is
-# the car type's glyph, a published icon.
+# page's namespace, its name linked to its home, and its code as its one fact,
+# the identifier a stock's drawings write under each car; a two-line row
+# (`lines="two"`) puts its definition under the name. Its mark is the car
+# type's glyph, a published icon.
 node:
   uri: metro.component.car_type_row
   projection:
@@ -54,9 +55,9 @@ node:
               role: facts
               edges:
                 - node:
-                    role: length
+                    role: code
                     projection:
-                      field: length
+                      field: code
                   relation:
                     cardinality: "1"
             relation:
