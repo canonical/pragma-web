@@ -537,6 +537,73 @@ describe("Button's component page at 1440px (W6a-A6)", () => {
   });
 });
 
+/** What a token's name in the Tokens table measures, character by character. */
+type SymbolAdvanceMeasure = {
+  readonly name: string;
+  readonly digits: number;
+  readonly digitsWidth: number;
+  readonly letterWidth: number;
+  readonly fontFamily: string;
+  readonly fontVariantNumeric: string;
+  readonly letterSpacing: string;
+};
+
+/**
+ * Measure the first token name in the Tokens table that ends in digits:
+ * the width its trailing digits take against the width of its `d`, each
+ * read off the cell's own text, and the cell's computed face. Runs in the
+ * page.
+ *
+ * @throws When the table holds no token name that ends in digits.
+ */
+const measureSymbolAdvances = (): SymbolAdvanceMeasure => {
+  const cell = [
+    ...document.querySelectorAll(".ds.component-tokens .symbol"),
+  ].find((symbol) => /d.*\d$/.test(symbol.textContent ?? ""));
+  const text = cell?.firstChild;
+  if (!cell || !(text instanceof Text)) {
+    throw new Error("no token name ends in digits");
+  }
+  const range = document.createRange();
+  const widthOf = (start: number, end: number): number => {
+    range.setStart(text, start);
+    range.setEnd(text, end);
+    return range.getBoundingClientRect().width;
+  };
+  const digitsStart = text.data.search(/\d+$/);
+  const letter = text.data.indexOf("d");
+  const style = getComputedStyle(cell);
+  return {
+    name: text.data,
+    digits: text.data.length - digitsStart,
+    digitsWidth: widthOf(digitsStart, text.data.length),
+    letterWidth: widthOf(letter, letter + 1),
+    fontFamily: style.fontFamily,
+    fontVariantNumeric: style.fontVariantNumeric,
+    letterSpacing: style.letterSpacing,
+  };
+};
+
+describe("Button's Tokens table at 1440px", () => {
+  it("draws every character of a token's name on one monospace advance", async ({
+    annotate,
+  }) => {
+    const page = await open(`${BUTTON_PATH}#tokens`);
+    try {
+      const symbol = await page.evaluate(measureSymbolAdvances);
+      await annotate(
+        `${symbol.name}: ${symbol.digits} digits ${symbol.digitsWidth}px, "d" ${symbol.letterWidth}px; ${symbol.fontFamily}; ${symbol.fontVariantNumeric}, letter spacing ${symbol.letterSpacing}`,
+      );
+      expect(symbol.letterWidth).toBeGreaterThan(0);
+      expect(
+        Math.abs(symbol.digitsWidth - symbol.digits * symbol.letterWidth),
+      ).toBeLessThanOrEqual(TOLERANCE_PX);
+    } finally {
+      await page.close();
+    }
+  });
+});
+
 /** Every page this unit lays on the view or changes, by the tour's name. */
 const CHANGED_PATHS = {
   standards: "/standards",

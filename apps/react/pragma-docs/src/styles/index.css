@@ -2,7 +2,24 @@
 
 /* The fonts first: `@font-face` only, which the cascade does not sort. The
  * class graph sizes its boxes from Ubuntu Sans's advance widths, so the
- * face it measured is the face the page draws in. */
+ * face it measured is the face the page draws in. An `@import` must come
+ * before any other rule, so the site's own face follows the imports. */
 @import url("@canonical/styles/fonts");
 @import url("@canonical/styles");
 @import url("./app.css");
+
+/* The colour emoji face, for emoji only. The code stack names "Noto Color
+ * Emoji" third, after the two Ubuntu mono faces, which the fonts above do
+ * not declare and most systems lack; Noto Color Emoji carries the digits
+ * (keycap bases), so where it is installed it drew every digit of an
+ * identifier in its own wide glyphs, between the letters of the monospace
+ * face that follows it. Declared here, the family name means this face,
+ * and its range keeps the digits, and every other text character, for the
+ * faces after it in the stack. Emoji still draw in it. */
+@font-face {
+  font-family: "Noto Color Emoji";
+  src: local("Noto Color Emoji"), local("NotoColorEmoji");
+  unicode-range:
+    U+00A9, U+00AE, U+200D, U+203C-3299, U+FE0F, U+1F000-1FAFF, U+E0020-E007F;
+  font-display: swap;
+}
