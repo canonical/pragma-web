@@ -3,8 +3,10 @@
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/CardProjection_node.graphql.js";
+import { OntologyClassCard } from "../../ontology/index.js";
 import { useProjectionMaps } from "../../projections/index.js";
 import renderArm from "../../projections/renderArm.js";
+import { requireArmKey } from "../../utils/index.js";
 import type { CardProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -26,8 +28,9 @@ void declareNodeFragment;
 /* v8 ignore stop */
 
 /**
- * Any graph node as the card in a grid of entities, dispatched on its type: it
- * renders the arm the site's card map holds for the node's typename, or the
+ * Any graph node as the card in a grid of entities, dispatched on its type by an explicit switch: an ontology class renders
+ * through its own arm, `OntologyClassCard`, the cases being
+ * `ONTOLOGY_TYPES`; any other type through the arm the site's card map holds for the node's typename, or the
  * `Node` arm, `NodeCard`, for every type no other arm takes. A site's arm for a
  * type of its own renders over the site slot's key, the site's own compile of
  * `SiteCardSlot_node`.
@@ -46,5 +49,16 @@ export default function CardProjection({
   ...props
 }: CardProjectionProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  return renderArm(useProjectionMaps().card, data, props);
+  const { card } = useProjectionMaps();
+  switch (data.__typename) {
+    case "OntologyClass":
+      return (
+        <OntologyClassCard
+          {...props}
+          node={requireArmKey(data.OntologyClass, data.__typename)}
+        />
+      );
+    default:
+      return renderArm(card, data, props);
+  }
 }

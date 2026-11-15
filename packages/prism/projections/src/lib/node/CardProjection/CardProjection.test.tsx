@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSwitchCoverage } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
@@ -13,12 +14,14 @@ import {
   MOCK_ONTOLOGY_CLASS,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
+import nodeFragment from "../../../__generated__/CardProjection_node.graphql.js";
 import testQuery, {
   type CardProjectionTestQuery,
 } from "../../../__generated__/CardProjectionTestQuery.graphql.js";
 import siteFragment, {
   type SiteCardSlot_node$key,
 } from "../../../__generated__/SiteCardSlot_node.graphql.js";
+import type { ONTOLOGY_TYPES } from "../../ontology/constants.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import CardProjection from "./CardProjection.js";
@@ -163,6 +166,33 @@ describe("CardProjection", () => {
       },
     );
     expect(container.querySelector(".ds.node-card")).not.toBeNull();
+  });
+
+  it("covers every case of its switch", () => {
+    /** The mock node of each ontology type the switch names. */
+    const cases: Record<
+      keyof typeof ONTOLOGY_TYPES,
+      Readonly<Record<string, unknown>>
+    > = {
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
+    };
+    expectSwitchCoverage({
+      fragment: nodeFragment,
+      cases,
+      render: (typename, entity) => {
+        const kebab = typename.replace(/(?<!^)([A-Z])/g, "-$1").toLowerCase();
+        const { container, unmount } = renderWithNode(
+          (node) => <CardProjection node={node} />,
+          entity,
+        );
+        expect(container.querySelector(`.ds.${kebab}-card`)).toHaveAttribute(
+          "data-type",
+          typename,
+        );
+        expect(container.querySelector(".ds.node-card")).toBeNull();
+        unmount();
+      },
+    });
   });
 
   it("applies custom className", () => {

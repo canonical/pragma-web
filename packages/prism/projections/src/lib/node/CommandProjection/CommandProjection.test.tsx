@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSwitchCoverage } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
@@ -13,12 +14,14 @@ import {
   MOCK_ONTOLOGY_CLASS,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
+import nodeFragment from "../../../__generated__/CommandProjection_node.graphql.js";
 import testQuery, {
   type CommandProjectionTestQuery,
 } from "../../../__generated__/CommandProjectionTestQuery.graphql.js";
 import siteFragment, {
   type SiteCommandSlot_node$key,
 } from "../../../__generated__/SiteCommandSlot_node.graphql.js";
+import type { ONTOLOGY_TYPES } from "../../ontology/constants.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import CommandProjection from "./CommandProjection.js";
@@ -176,6 +179,37 @@ describe("CommandProjection", () => {
       },
     );
     expect(container.querySelector(".ds.node-command")).not.toBeNull();
+  });
+
+  it("covers every case of its switch", () => {
+    /** The mock node of each ontology type the switch names. */
+    const cases: Record<
+      keyof typeof ONTOLOGY_TYPES,
+      Readonly<Record<string, unknown>>
+    > = {
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
+    };
+    expectSwitchCoverage({
+      fragment: nodeFragment,
+      cases,
+      render: (typename, entity) => {
+        const kebab = typename.replace(/(?<!^)([A-Z])/g, "-$1").toLowerCase();
+        const { container, unmount } = renderWithNode(
+          (node) => (
+            <ul>
+              <CommandProjection node={node} />
+            </ul>
+          ),
+          entity,
+        );
+        expect(container.querySelector(`.ds.${kebab}-command`)).toHaveAttribute(
+          "data-type",
+          typename,
+        );
+        expect(container.querySelector(".ds.node-command")).toBeNull();
+        unmount();
+      },
+    });
   });
 
   it("applies custom className", () => {

@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSwitchCoverage } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
@@ -13,12 +14,14 @@ import {
   MOCK_ONTOLOGY_CLASS,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
+import nodeFragment from "../../../__generated__/GraphNodeProjection_node.graphql.js";
 import testQuery, {
   type GraphNodeProjectionTestQuery,
 } from "../../../__generated__/GraphNodeProjectionTestQuery.graphql.js";
 import siteFragment, {
   type SiteGraphNodeSlot_node$key,
 } from "../../../__generated__/SiteGraphNodeSlot_node.graphql.js";
+import type { ONTOLOGY_TYPES } from "../../ontology/constants.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import GraphNodeProjection from "./GraphNodeProjection.js";
@@ -187,6 +190,36 @@ describe("GraphNodeProjection", () => {
     expect(container.querySelector(".surface")?.getAttribute("width")).toBe(
       "240",
     );
+  });
+
+  it("covers every case of its switch", () => {
+    /** The mock node of each ontology type the switch names. */
+    const cases: Record<
+      keyof typeof ONTOLOGY_TYPES,
+      Readonly<Record<string, unknown>>
+    > = {
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
+    };
+    expectSwitchCoverage({
+      fragment: nodeFragment,
+      cases,
+      render: (typename, entity) => {
+        const kebab = typename.replace(/(?<!^)([A-Z])/g, "-$1").toLowerCase();
+        const { container, unmount } = renderWithNode(
+          (node) => (
+            <svg aria-label="Graph" role="img">
+              <GraphNodeProjection node={node} />
+            </svg>
+          ),
+          entity,
+        );
+        expect(
+          container.querySelector(`.ds.${kebab}-graph-node`),
+        ).toHaveAttribute("data-type", typename);
+        expect(container.querySelector(".ds.node-graph-node")).toBeNull();
+        unmount();
+      },
+    });
   });
 
   it("applies custom className", () => {

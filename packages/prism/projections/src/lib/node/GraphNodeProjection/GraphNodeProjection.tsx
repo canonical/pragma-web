@@ -3,8 +3,10 @@
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/GraphNodeProjection_node.graphql.js";
+import { OntologyClassGraphNode } from "../../ontology/index.js";
 import { useProjectionMaps } from "../../projections/index.js";
 import renderArm from "../../projections/renderArm.js";
+import { requireArmKey } from "../../utils/index.js";
 import type { GraphNodeProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -27,8 +29,9 @@ void declareNodeFragment;
 /* v8 ignore stop */
 
 /**
- * Any graph node as the node of a graph, dispatched on its type: it renders the
- * arm the site's graph-node map holds for the node's typename, or the `Node`
+ * Any graph node as the node of a graph, dispatched on its type by an explicit switch: an ontology class renders
+ * through its own arm, `OntologyClassGraphNode`, the cases being
+ * `ONTOLOGY_TYPES`; any other type through the arm the site's graph-node map holds for the node's typename, or the `Node`
  * arm, `NodeGraphNode`, for every type no other arm takes. A site's arm for a
  * type of its own renders over the site slot's key, the site's own compile of
  * `SiteGraphNodeSlot_node`.
@@ -48,5 +51,16 @@ export default function GraphNodeProjection({
   ...props
 }: GraphNodeProjectionProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  return renderArm(useProjectionMaps().graphNode, data, props);
+  const { graphNode } = useProjectionMaps();
+  switch (data.__typename) {
+    case "OntologyClass":
+      return (
+        <OntologyClassGraphNode
+          {...props}
+          node={requireArmKey(data.OntologyClass, data.__typename)}
+        />
+      );
+    default:
+      return renderArm(graphNode, data, props);
+  }
 }

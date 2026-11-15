@@ -9,6 +9,12 @@ type OwnProps = {
    * spreads `...RowProjection_node`.
    */
   readonly node: RowProjection_node$key;
+  /**
+   * How many lines the row takes, handed to the arm's `EntityRow`: one
+   * (32px), or two (56px), the summary under the title, where an index
+   * opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

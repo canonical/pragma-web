@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSwitchCoverage } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
@@ -13,12 +14,14 @@ import {
   MOCK_ONTOLOGY_CLASS,
   resolveRoot,
 } from "../../../../testing/fixtures.js";
+import nodeFragment from "../../../__generated__/RowProjection_node.graphql.js";
 import testQuery, {
   type RowProjectionTestQuery,
 } from "../../../__generated__/RowProjectionTestQuery.graphql.js";
 import siteFragment, {
   type SiteRowSlot_node$key,
 } from "../../../__generated__/SiteRowSlot_node.graphql.js";
+import type { ONTOLOGY_TYPES } from "../../ontology/constants.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import RowProjection from "./RowProjection.js";
@@ -177,6 +180,51 @@ describe("RowProjection", () => {
       },
     );
     expect(container.querySelector(".ds.node-row")).not.toBeNull();
+  });
+
+  it("covers every case of its switch", () => {
+    /** The mock node of each ontology type the switch names. */
+    const cases: Record<
+      keyof typeof ONTOLOGY_TYPES,
+      Readonly<Record<string, unknown>>
+    > = {
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
+    };
+    expectSwitchCoverage({
+      fragment: nodeFragment,
+      cases,
+      render: (typename, entity) => {
+        const kebab = typename.replace(/(?<!^)([A-Z])/g, "-$1").toLowerCase();
+        const { container, unmount } = renderWithNode(
+          (node) => (
+            <ul>
+              <RowProjection node={node} />
+            </ul>
+          ),
+          entity,
+        );
+        expect(container.querySelector(`.ds.${kebab}-row`)).toHaveAttribute(
+          "data-type",
+          typename,
+        );
+        expect(container.querySelector(".ds.node-row")).toBeNull();
+        unmount();
+      },
+    });
+  });
+
+  it("hands lines to the arm, which sets its summary under the title", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <RowProjection lines="two" node={node} />
+        </ul>
+      ),
+      MOCK_ONTOLOGY_CLASS,
+    );
+    expect(
+      container.querySelector(".ds.ontology-class-row > .summary"),
+    ).toHaveTextContent(MOCK_ONTOLOGY_CLASS.definition);
   });
 
   it("applies custom className", () => {
