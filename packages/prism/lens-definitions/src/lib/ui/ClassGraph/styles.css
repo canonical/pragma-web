@@ -171,6 +171,16 @@
     outline-style: none;
   }
 
+  /* The drilled namespace's label row leads back to the overview: its
+   * prefix underlined, as a link's text. */
+  .ds.class-graph .way-back {
+    cursor: pointer;
+  }
+
+  .ds.class-graph .way-back .prefix {
+    text-decoration: underline;
+  }
+
   .ds.class-graph .ring {
     color: var(--class-graph-ring-color);
   }

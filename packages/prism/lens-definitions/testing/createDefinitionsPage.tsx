@@ -36,12 +36,14 @@ import { HOMES } from "./fixtures.js";
  * @param term - The selected term, or undefined for the explorer.
  * @param records - The store to seed the environment with, or undefined.
  * @param fetchFn - The network the environment falls back to.
+ * @param search - The address's query string, `?` included; none by default.
  * @returns The page under its providers, ready to render.
  */
 export default function createDefinitionsPage(
   term: string | undefined,
   records: RecordMap | undefined,
   fetchFn: FetchFunction,
+  search = "",
 ): ReactElement {
   return (
     <RelayEnvironmentProvider
@@ -50,9 +52,11 @@ export default function createDefinitionsPage(
       <RouterProvider
         router={createStaticRouter(
           definitionsRoutes,
-          term === undefined
-            ? "/definitions"
-            : definitionsRoutes.definitionsTerm.render({ term }),
+          `${
+            term === undefined
+              ? "/definitions"
+              : definitionsRoutes.definitionsTerm.render({ term })
+          }${search}`,
         )}
       >
         <HomesProvider homes={HOMES}>

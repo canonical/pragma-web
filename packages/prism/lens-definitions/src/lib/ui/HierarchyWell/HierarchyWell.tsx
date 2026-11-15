@@ -8,6 +8,7 @@ import {
   placeEdgeLabels,
   requireEntry,
 } from "@canonical/prism-core";
+import { useRouter } from "@canonical/router-react";
 import {
   type KeyboardEvent,
   type ReactElement,
@@ -77,7 +78,10 @@ function readClosest(
  * a class or focusing it, in the graph or the rail, makes it the focus:
  * everything outside its neighbourhood fades and its relations show their
  * labels; a class a collapsed namespace's box stands for makes its box
- * the focus. Pointing at a
+ * the focus, and so does pointing at or focusing a box or a stub, which
+ * then names its bridges. On the explorer's index a box is a link to the
+ * page drilled into its namespace, a tab stop of its own, and the drilled
+ * namespace's label is the way back. Pointing at a
  * relation shows its label and rings its ends. The filter's chips hide
  * classes, and the camera fits what is left, which the Fit control
  * restores; the search and the instances axis dim. A region a reader picks
@@ -138,8 +142,35 @@ export default function HierarchyWell({
       ? undefined
       : `${REGION_NODE_SCHEME}${region.prefix}`;
   };
+  // A box or a stub the reader points at or focuses is the focus itself.
+  const boxes = useMemo(
+    () =>
+      new Map(
+        [...layout.nodes.values()].flatMap((node) =>
+          node.kind === "class" || node.term === undefined
+            ? []
+            : [[node.term, node.uri] as const],
+        ),
+      ),
+    [layout],
+  );
   const selected = drawnOf(term);
-  const hovered = drawnOf(hoverCentre) ?? boxOf(hoverCentre);
+  // The explorer's index links a box to its drill and the drill back; a
+  // term page keeps its selection's drill and links neither.
+  const router = useRouter();
+  const buildDrillHref = useCallback(
+    (prefix: string | undefined): string =>
+      router.buildPath(
+        "definitions",
+        prefix === undefined ? {} : { search: { expand: prefix } },
+      ),
+    [router],
+  );
+  const drillHref = term === undefined ? buildDrillHref : undefined;
+  const hovered =
+    drawnOf(hoverCentre) ??
+    boxOf(hoverCentre) ??
+    (hoverCentre === undefined ? undefined : boxes.get(hoverCentre));
   // The graph's one tab stop: the selected class, else the first class in
   // the rail's order, never a box that holds no link.
   const tabStop =
@@ -250,12 +281,14 @@ export default function HierarchyWell({
     onKeyDown?.(event);
     const id = readClosest(event.target, "data-id");
     if (id === undefined) return;
-    const uri = requireEntry(uris, id);
     if (event.key === "Escape") {
       if (escaped && event.target instanceof SVGElement) event.target.blur();
       setEscaped(true);
       return;
     }
+    // A box's link is a tab stop of its own, off the tree's moves.
+    const uri = uris.get(id);
+    if (uri === undefined) return;
     const move = NAVIGATION_KEYS[event.key];
     const next =
       move === undefined ? null : requireEntry(layout.nodes, uri).nav[move];
@@ -305,6 +338,7 @@ export default function HierarchyWell({
           activeEdge={activeEdge}
           data-fit-zoom={layout.fitZoom.toFixed(4)}
           dimmed={dimmed}
+          buildDrillHref={drillHref}
           focus={focus}
           hidden={hidden}
           labels={labels}
@@ -317,6 +351,7 @@ export default function HierarchyWell({
       <PhoneGraph
         className="phone"
         dimmed={dimmed}
+        buildDrillHref={drillHref}
         hidden={hidden}
         layout={layout}
         selected={selected}

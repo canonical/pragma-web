@@ -5,13 +5,19 @@
  * lifting the fade.
  */
 
-import { createGraphBudget, requireEntry } from "@canonical/prism-core";
+import {
+  createGraphBudget,
+  GRAPH_BUDGET,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
+import ontologyGraph from "../../../../testing/records/ontologyGraph.js";
 import { MIN_FIT } from "../../classGraph/constants.js";
 import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import frameOpeningView from "./frameOpeningView.js";
@@ -545,5 +551,98 @@ describe("over a layout whose rail opens on a box", () => {
     expect(container.querySelectorAll(".desktop .node.is-faded")).toHaveLength(
       0,
     );
+  });
+
+  it("makes a box a link to its namespace drilled, a tab stop of its own off the tree's moves", () => {
+    const onHoverTerm = vi.fn();
+    const { container } = render(
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={boxed}
+          onHoverTerm={onHoverTerm}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+      ),
+    );
+    const box = container.querySelector('.desktop .node[data-kind="region"]');
+    expect(box?.getAttribute("role")).toBeNull();
+    const link = box?.querySelector("a") as HTMLElement;
+    expect(link.getAttribute("href")).toBe("/definitions?expand=aa");
+    expect(link.getAttribute("aria-label")).toBe(
+      "Namespace aa, drawn as one box: 3 classes, 0 relations inside, 0 relations out. Opens the namespace",
+    );
+    // Reached by Tab: no tabindex keeps it out of the order.
+    expect(link.hasAttribute("tabindex")).toBe(false);
+    fireEvent.focus(link);
+    expect(onHoverTerm).toHaveBeenLastCalledWith("aa");
+    const before = document.activeElement;
+    fireEvent.keyDown(link, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(before);
+    // The phone view's row of the box links the same way.
+    expect(
+      container
+        .querySelector('.phone .row[data-kind="region"] a')
+        ?.getAttribute("href"),
+    ).toBe("/definitions?expand=aa");
+  });
+
+  it("draws a box on a term page as an image, with no link", () => {
+    const { container } = render(drawBoxed("zz:Z1"));
+    const box = container.querySelector('.desktop .node[data-kind="region"]');
+    expect(box?.getAttribute("role")).toBe("img");
+    expect(box?.querySelector("a")).toBeNull();
+    expect(container.querySelector('a[href*="expand="]')).toBeNull();
+  });
+
+  it("makes a hovered box or stub the focus, ringed, with its bridges named", () => {
+    const docs = layOutClassGraph(ontologyGraph, { budget: GRAPH_BUDGET });
+    const docsTerms = new Map(
+      ontologyGraph.classes.map((entry) => [
+        entry.uri,
+        `${entry.prefix}:${entry.uri.split("/").at(-1)}`,
+      ]),
+    );
+    const bridged = (centre: string) => {
+      const { container } = render(
+        createRouterHarness(
+          <HierarchyWell
+            filter={createAllNamespacesFilter(["ds", "cs", "anatomy"])}
+            hoverCentre={centre}
+            layout={docs}
+            onHoverTerm={vi.fn()}
+            term={undefined}
+            terms={docsTerms}
+          />,
+        ),
+      );
+      return container;
+    };
+    for (const node of docs.nodes.values()) {
+      if (node.kind === "class") continue;
+      const container = bridged(requireDefined(node.term, "a box's term"));
+      const drawn = container.querySelector(
+        `.desktop .node[data-id="${node.term}"]`,
+      );
+      expect(drawn?.querySelector(".ring"), node.uri).not.toBeNull();
+      expect(drawn?.classList.contains("is-faded")).toBe(false);
+      // Every bridge at the focus is named: none is left without a label.
+      const bridges = docs.edges.filter(
+        (edge) =>
+          edge.bridge === true &&
+          (edge.from === node.uri || edge.to.includes(node.uri)),
+      );
+      expect(bridges.length, node.uri).toBeGreaterThan(0);
+      for (const edge of bridges) {
+        expect(
+          container.querySelector(
+            `.desktop [data-layer="labels"] [data-edge="${edge.id}"] .edge-label`,
+          ),
+          edge.id,
+        ).not.toBeNull();
+      }
+    }
   });
 });

@@ -38,6 +38,10 @@ export const MESSAGES = {
   "well.name.stub": "Class {term}, outside the loaded namespaces, {relations}",
   "well.name.region":
     "Namespace {prefix}, drawn as one box: {classes}, {held} inside, {relations} out",
+  "well.name.region.open":
+    "Namespace {prefix}, drawn as one box: {classes}, {held} inside, {relations} out. Opens the namespace",
+  "well.region.back":
+    "Namespace {prefix}, opened: back to the overview of every namespace",
   "well.name":
     "Class {label}, in {namespace}, {subclasses} subclasses, {relations} relations, {instances} instances, {fields} fields",
   "well.name.abstract":

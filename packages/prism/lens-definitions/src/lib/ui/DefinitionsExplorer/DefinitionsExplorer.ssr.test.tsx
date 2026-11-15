@@ -104,4 +104,59 @@ describe("DefinitionsExplorer SSR", () => {
       );
     expect(render()).toBe(render());
   });
+
+  it("server-renders the namespace the address's expand names drilled into, the others as box links, with no script", () => {
+    const render = (term: string | undefined, search: string): string => {
+      const html = renderToString(
+        createDefinitionsPage(
+          term,
+          definitionsExplorerRecords,
+          createFetchSpy(),
+          search,
+        ),
+      );
+      return html.slice(html.indexOf('data-slot="explorer-canvas"'));
+    };
+    const rest = render(undefined, "");
+    // At rest ds is one box, a link to the page drilled into it.
+    expect(rest).toContain('href="/definitions?expand=ds"');
+    expect(rest).not.toContain("way-back");
+    const drilled = render(undefined, "?expand=ds");
+    // ds's 20 classes, a box for anatomy and one for cs, and the two stubs.
+    expect(drilled.match(/<g class="node[ "]/g)).toHaveLength(24);
+    // Each box once on the canvas and once in the phone view.
+    expect(drilled.match(/data-kind="region"/g)).toHaveLength(4);
+    expect(drilled).toContain('href="/definitions?expand=anatomy"');
+    expect(drilled).toContain('href="/definitions?expand=cs"');
+    // The way back, on ds's label row and on its phone header, leads to
+    // the page with no expand.
+    expect(
+      drilled.match(/<a[^>]*class="[^"]*way-back"[^>]*href="\/definitions"/g),
+    ).toHaveLength(2);
+    expect(drilled).not.toContain("<script");
+    // A drill is another view of the page, not the page: no link to it is
+    // current.
+    expect(drilled).not.toContain("aria-current");
+    // A box that links is no image: its link names it.
+    expect(drilled).not.toMatch(/data-kind="region"[^>]*role="img"/);
+    // An unknown prefix draws the overview at rest.
+    expect(render(undefined, "?expand=nowhere")).toBe(rest);
+  });
+
+  it("ignores expand on a term page, whose links carry none", () => {
+    const html = renderToString(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+        "?expand=anatomy",
+      ),
+    );
+    const canvas = html.slice(html.indexOf('data-slot="explorer-canvas"'));
+    // The selection's drill, as with no parameter: ds drawn class by class.
+    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(24);
+    expect(canvas).not.toContain("expand=");
+    expect(canvas).not.toContain("way-back");
+    expect(canvas).toMatch(/data-kind="region"[^>]*role="img"/);
+  });
 });

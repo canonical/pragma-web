@@ -31,6 +31,13 @@ type OwnProps = {
    * classes are drawn as inert boxes, as a legend draws them.
    */
   readonly tabStop?: string;
+  /**
+   * The address of the explorer drilled into a namespace (`expand=<prefix>`),
+   * or at rest for none. Given, with a tab stop, each collapsed namespace's
+   * box links to its drill and the drilled namespace's label row back to
+   * the overview at rest: on the explorer's index, never on a term page.
+   */
+  readonly buildDrillHref?: (prefix: string | undefined) => string;
 };
 
 /**

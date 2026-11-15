@@ -11,6 +11,7 @@ import {
   BRIDGE_LABEL_SIZE,
   DESIGN_CANVAS,
 } from "../../classGraph/constants.js";
+import chooseAddressDrill from "../../classGraph/chooseAddressDrill.js";
 import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import type { ClassGraphInput } from "../../classGraph/types.js";
@@ -165,4 +166,26 @@ describe("HierarchyWell SSR within the graph budget at rest", () => {
       );
     },
   );
+
+  it("draws the metro's records whole at rest with no box to open, and geo drilled with every other namespace a box that opens it", () => {
+    const rest = renderCanvas(metroGraph);
+    expect(rest).not.toContain('data-kind="region"');
+    expect(rest).not.toContain("expand=");
+    const drill = chooseAddressDrill(metroGraph, "geo", undefined);
+    expect(drill).toBe("geo");
+    const drilled = renderCanvas(metroGraph, drill);
+    const others = [
+      ...new Set(
+        metroGraph.classes
+          .map((klass) => klass.prefix)
+          .filter((prefix) => prefix !== "geo"),
+      ),
+    ];
+    expect(drilled.match(/data-kind="region"/g)).toHaveLength(others.length);
+    for (const prefix of others) {
+      expect(drilled).toContain(`href="/definitions?expand=${prefix}"`);
+    }
+    expect(drilled).toMatch(/class="[^"]*way-back"[^>]*href="\/definitions"/);
+    expect(drilled).not.toMatch(/data-kind="region"[^>]*role="img"/);
+  });
 });

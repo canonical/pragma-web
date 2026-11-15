@@ -9,6 +9,7 @@ import {
   REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
   requireDefined,
+  RouterLink,
   requireEntry,
   useGraphZoomBucket,
 } from "@canonical/prism-core";
@@ -21,6 +22,7 @@ import {
 } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
+import nameRegionBox from "../../classGraph/nameRegionBox.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
@@ -72,6 +74,11 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * With a tab stop each class is a router link to its term view, one tab
  * stop in all, named for assistive technology by its kind, namespace and
  * counts; without one the classes are inert boxes, as a legend draws them.
+ * With drill links too, on the explorer's index, a collapsed namespace's
+ * box is a link to the same page drilled into it (core's `expand=`), a
+ * tab stop of its own named by what it holds and that it opens, and the
+ * drilled namespace's label row is the way back, a link to the page
+ * without `expand=`.
  *
  * `import { ClassGraph } from "../ClassGraph/index.js";`
  *
@@ -90,6 +97,7 @@ export default function ClassGraph({
   dimmed = new Set(),
   labels = { placed: [], omitted: [] },
   tabStop,
+  buildDrillHref,
   className,
   ...props
 }: ClassGraphProps): ReactElement {
@@ -228,10 +236,16 @@ export default function ClassGraph({
       />
     );
     const ring = ringed.has(node.uri) || node.uri === selected;
+    // A box opens its namespace wherever the graph links its classes and
+    // the page drills; a stub, and a box elsewhere, hold no link.
+    const opens =
+      region && buildDrillHref !== undefined && tabStop !== undefined;
+    const regionName = region ? nameRegionBox(layout, node, t) : undefined;
     return (
       <g
         className={joinClasses("node", state)}
-        // A stub and a collapsed region hold no link: the group names them.
+        // An inert stub or box is an image the group names; a link names
+        // itself.
         aria-label={
           node.kind === "stub"
             ? t("well.name.stub", {
@@ -240,20 +254,8 @@ export default function ClassGraph({
                   count: node.relationCount,
                 }),
               })
-            : region
-              ? t("well.name.region", {
-                  prefix: node.region,
-                  classes: t("well.region.count", { count: node.members }),
-                  held: t("well.relations.count", { count: node.held }),
-                  // What leaves the box is what is drawn from it.
-                  relations: t("well.relations.count", {
-                    count: layout.edges.filter(
-                      (edge) =>
-                        edge.kind === "relation" &&
-                        (edge.from === node.uri || edge.to.includes(node.uri)),
-                    ).length,
-                  }),
-                })
+            : regionName !== undefined && !opens
+              ? t("well.name.region", regionName)
               : undefined
         }
         data-classes={node.kind === "region" ? node.members : undefined}
@@ -276,10 +278,19 @@ export default function ClassGraph({
         data-x={node.x}
         data-y={node.y}
         key={node.uri}
-        role={node.kind === "class" ? undefined : "img"}
+        role={node.kind === "class" || opens ? undefined : "img"}
         transform={`translate(${node.x},${node.y})`}
       >
-        {tabStop === undefined || node.kind !== "class" ? (
+        {opens && regionName !== undefined ? (
+          // Not the current page: the drill is another view of it.
+          <RouterLink
+            aria-label={t("well.name.region.open", regionName)}
+            className="target"
+            href={buildDrillHref(node.region)}
+          >
+            {box}
+          </RouterLink>
+        ) : tabStop === undefined || node.kind !== "class" ? (
           box
         ) : (
           <Link
@@ -370,6 +381,22 @@ export default function ClassGraph({
     REGION_LABEL_SIZE,
   );
   const labelBaseline = findCentredBaseline(LABEL_LINE_PITCH, LABEL_SIZE);
+  // The drilled namespace's label row is the way back to the overview at
+  // rest, wherever its boxes would open.
+  const wrapWayBack = (prefix: string, label: ReactElement): ReactElement =>
+    buildDrillHref !== undefined &&
+    tabStop !== undefined &&
+    layout.drilled === prefix ? (
+      <RouterLink
+        aria-label={t("well.region.back", { prefix })}
+        className="way-back"
+        href={buildDrillHref(undefined)}
+      >
+        {label}
+      </RouterLink>
+    ) : (
+      label
+    );
   return (
     <g
       {...props}
@@ -396,21 +423,26 @@ export default function ClassGraph({
               x={region.x}
               y={region.y}
             />
-            {bucket === "overview" ? null : (
-              <text
-                className="region-label"
-                fill="currentColor"
-                x={region.x}
-                y={region.y + regionBaseline}
-              >
-                <tspan className="prefix">{region.prefix.toUpperCase()}</tspan>
-                {bucket === "full" ? (
-                  <tspan className="count" dx={REGION_LABEL_GAP}>
-                    {t("well.region.count", { count: region.members })}
-                  </tspan>
-                ) : null}
-              </text>
-            )}
+            {bucket === "overview"
+              ? null
+              : wrapWayBack(
+                  region.prefix,
+                  <text
+                    className="region-label"
+                    fill="currentColor"
+                    x={region.x}
+                    y={region.y + regionBaseline}
+                  >
+                    <tspan className="prefix">
+                      {region.prefix.toUpperCase()}
+                    </tspan>
+                    {bucket === "full" ? (
+                      <tspan className="count" dx={REGION_LABEL_GAP}>
+                        {t("well.region.count", { count: region.members })}
+                      </tspan>
+                    ) : null}
+                  </text>,
+                )}
           </g>
         ))}
       </g>

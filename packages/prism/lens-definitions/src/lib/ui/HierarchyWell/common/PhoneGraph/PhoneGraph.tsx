@@ -5,12 +5,14 @@ import {
   LATTICE,
   REGION_LABEL_GAP,
   REGION_LABEL_SIZE,
+  RouterLink,
   requireEntry,
 } from "@canonical/prism-core";
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { PHONE, ZERO_STROKE_DASH } from "../../../../classGraph/constants.js";
+import nameRegionBox from "../../../../classGraph/nameRegionBox.js";
 import type { LaidOutEdge } from "../../../../classGraph/types.js";
 import { useMessages } from "../../../../i18n/index.js";
 import {
@@ -48,6 +50,7 @@ export default function PhoneGraph({
   hidden,
   dimmed,
   selected,
+  buildDrillHref,
   className,
   ...props
 }: PhoneGraphProps): ReactElement {
@@ -67,6 +70,19 @@ export default function PhoneGraph({
     );
   const isEdgeHidden = (edge: LaidOutEdge): boolean =>
     hidden.has(edge.from) || edge.to.every((id) => hidden.has(id));
+  // The drilled namespace's header is the way back to the overview at rest.
+  const wrapWayBack = (prefix: string, label: ReactElement): ReactElement =>
+    buildDrillHref !== undefined && layout.drilled === prefix ? (
+      <RouterLink
+        aria-label={t("well.region.back", { prefix })}
+        className="way-back"
+        href={buildDrillHref(undefined)}
+      >
+        {label}
+      </RouterLink>
+    ) : (
+      label
+    );
   return (
     // biome-ignore lint/a11y/useSemanticElements: an SVG drawing has no native grouping element; `group` names the drawing and keeps its links reachable.
     <svg
@@ -109,16 +125,19 @@ export default function PhoneGraph({
             width={phone.width}
             y={header.y}
           />
-          <text
-            className="header"
-            fill="currentColor"
-            y={header.y + headerBaseline}
-          >
-            <tspan className="prefix">{header.prefix.toUpperCase()}</tspan>
-            <tspan className="count" dx={REGION_LABEL_GAP}>
-              {t("well.region.count", { count: header.count })}
-            </tspan>
-          </text>
+          {wrapWayBack(
+            header.prefix,
+            <text
+              className="header"
+              fill="currentColor"
+              y={header.y + headerBaseline}
+            >
+              <tspan className="prefix">{header.prefix.toUpperCase()}</tspan>
+              <tspan className="count" dx={REGION_LABEL_GAP}>
+                {t("well.region.count", { count: header.count })}
+              </tspan>
+            </text>,
+          )}
         </g>
       ))}
       {phone.guides.map((guide) => (
@@ -146,7 +165,8 @@ export default function PhoneGraph({
       {layout.rail.map((uri) => {
         const row = requireEntry(phone.rows, uri);
         const node = requireEntry(layout.nodes, uri);
-        // A stub or a collapsed region carries its own term and is no link.
+        // A stub or a collapsed region carries its own term; a stub is no
+        // link, nor a box on a term page.
         const term = node.term ?? requireEntry(terms, uri);
         const isSelected = uri === selected;
         const box = (
@@ -180,6 +200,17 @@ export default function PhoneGraph({
               <Link className="target" params={{ term }} to="definitionsTerm">
                 {box}
               </Link>
+            ) : node.kind === "region" && buildDrillHref !== undefined ? (
+              <RouterLink
+                aria-label={t(
+                  "well.name.region.open",
+                  nameRegionBox(layout, node, t),
+                )}
+                className="target"
+                href={buildDrillHref(node.region)}
+              >
+                {box}
+              </RouterLink>
             ) : (
               box
             )}

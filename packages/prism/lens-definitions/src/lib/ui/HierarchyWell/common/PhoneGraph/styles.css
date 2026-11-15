@@ -87,6 +87,16 @@
     cursor: pointer;
   }
 
+  /* The drilled namespace's header leads back to the overview: its prefix
+   * underlined, as a link's text. */
+  .ds.phone-graph .way-back {
+    cursor: pointer;
+  }
+
+  .ds.phone-graph .way-back .prefix {
+    text-decoration: underline;
+  }
+
   .ds.phone-graph .ring.is-selected {
     color: var(--phone-graph-accent-color);
   }
