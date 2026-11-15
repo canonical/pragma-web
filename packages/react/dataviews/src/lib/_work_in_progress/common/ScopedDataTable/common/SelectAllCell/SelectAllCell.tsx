@@ -1,0 +1,54 @@
+import { CheckboxInput } from "@canonical/react-ds-global-form";
+import { type ReactElement, useContext } from "react";
+import { MessagesContext } from "../../../../../common/index.js";
+import {
+  useDataViewsValue,
+  useIsHydrated,
+  useSelectAllOnPage,
+} from "../../../../../hooks/index.js";
+import type { SelectAllCellProps } from "./types.js";
+
+const componentCssClassName = "ds data-table-select-all-cell";
+
+/**
+ * The select-all checkbox. Its scope is the displayed rows, which its name
+ * says: it adds and removes exactly those identities and leaves a selection
+ * made elsewhere in the collection alone.
+ *
+ * `import { DataTable } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.subcomponent.data_table-select_all_cell
+ */
+export default function SelectAllCell({
+  selection,
+  ids: displayed,
+  reserve,
+  className,
+  ...rest
+}: SelectAllCellProps): ReactElement {
+  const messages = useContext(MessagesContext);
+  const ids = useDataViewsValue(displayed);
+  const { checked, mixed, toggle } = useSelectAllOnPage({ selection, ids });
+  // Selection works once scripts run: until then the box draws disabled.
+  const hydrated = useIsHydrated();
+  return (
+    <th
+      {...rest}
+      scope="col"
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      ref={reserve}
+    >
+      <CheckboxInput
+        checked={checked}
+        disabled={!hydrated}
+        aria-label={messages.selectAllRows}
+        ref={(node) => {
+          if (node !== null) {
+            node.indeterminate = mixed;
+          }
+        }}
+        onChange={toggle}
+      />
+    </th>
+  );
+}

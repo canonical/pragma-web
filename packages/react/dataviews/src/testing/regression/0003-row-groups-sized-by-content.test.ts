@@ -15,7 +15,7 @@ import { describe, expect, it } from "vitest";
 // Resolved from the package root, which is where the suite runs; the
 // comments are dropped, so prose about the fix is not taken for a rule.
 const sheet = readFileSync(
-  path.resolve("src/lib/_work_in_progress/DataTable/styles.css"),
+  path.resolve("src/lib/_work_in_progress/common/ScopedDataTable/styles.css"),
   "utf8",
 ).replace(/\/\*[\s\S]*?\*\//g, "");
 

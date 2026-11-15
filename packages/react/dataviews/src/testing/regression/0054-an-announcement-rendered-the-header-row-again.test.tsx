@@ -25,11 +25,11 @@ import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 const renders = vi.hoisted(() => ({ count: 0 }));
 
 vi.mock(
-  "../../lib/_work_in_progress/DataTable/common/HeaderCell/HeaderCell.js",
+  "../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../lib/_work_in_progress/DataTable/common/HeaderCell/HeaderCell.js")
+        typeof import("../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js")
       >();
     const CountedHeaderCell = (props: Parameters<typeof actual.default>[0]) => {
       renders.count += 1;

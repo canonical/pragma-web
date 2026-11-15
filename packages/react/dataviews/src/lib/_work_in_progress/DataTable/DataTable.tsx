@@ -5,9 +5,8 @@ import type {
 import type { ReactElement } from "react";
 import { Announcer } from "../../common/index.js";
 import { useAnnouncer, useMessages } from "../../hooks/index.js";
-import { ScopedDataTable } from "./common/ScopedDataTable/index.js";
+import { ScopedDataTable } from "../common/index.js";
 import type { DataTableProps } from "./types.js";
-import "./styles.css";
 
 /**
  * DataTable renders the rows of one collection.

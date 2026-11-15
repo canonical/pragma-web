@@ -27,7 +27,7 @@ import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { virtualizeRows } from "../../virtualization/index.js";
 import Component from "./DataTable.js";
-import type { DataTableColumn, DataTableProps } from "./types.js";
+import type { DataTableColumn, DataTableProps } from "./index.js";
 
 const meta = {
   title: "_work_in_progress/DataViews/Renderers/DataTable",
