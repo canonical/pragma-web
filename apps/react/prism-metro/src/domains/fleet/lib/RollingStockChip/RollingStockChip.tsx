@@ -47,7 +47,7 @@ const componentCssClassName = "ds rolling-stock-chip";
  * merges after the projection's own, and the root carries the typename
  * as `data-type`.
  *
- * `import { RollingStockChip } from "#domains/metro";`
+ * `import { RollingStockChip } from "#domains/fleet";`
  *
  * @implements metro.component.rolling_stock_chip
  * @note Impure: reads its rolling stock from the Relay store, its home from the

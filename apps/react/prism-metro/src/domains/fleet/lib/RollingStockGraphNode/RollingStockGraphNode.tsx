@@ -43,7 +43,7 @@ const componentCssClassName = "ds rolling-stock-graph-node";
  * merges after the projection's own, and the root carries the typename
  * as `data-type`.
  *
- * `import { RollingStockGraphNode } from "#domains/metro";`
+ * `import { RollingStockGraphNode } from "#domains/fleet";`
  *
  * @implements metro.component.rolling_stock_graph_node
  * @note Impure: reads its rolling stock from the Relay store, its home from the

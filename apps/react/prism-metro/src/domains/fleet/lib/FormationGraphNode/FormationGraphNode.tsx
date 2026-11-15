@@ -43,7 +43,7 @@ const componentCssClassName = "ds formation-graph-node";
  * merges after the projection's own, and the root carries the typename
  * as `data-type`.
  *
- * `import { FormationGraphNode } from "#domains/metro";`
+ * `import { FormationGraphNode } from "#domains/fleet";`
  *
  * @implements metro.component.formation_graph_node
  * @note Impure: reads its formation from the Relay store, its home from the

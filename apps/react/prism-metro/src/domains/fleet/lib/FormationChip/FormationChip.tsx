@@ -47,7 +47,7 @@ const componentCssClassName = "ds formation-chip";
  * merges after the projection's own, and the root carries the typename
  * as `data-type`.
  *
- * `import { FormationChip } from "#domains/metro";`
+ * `import { FormationChip } from "#domains/fleet";`
  *
  * @implements metro.component.formation_chip
  * @note Impure: reads its formation from the Relay store, its home from the
