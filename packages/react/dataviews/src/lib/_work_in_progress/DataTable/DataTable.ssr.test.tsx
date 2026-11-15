@@ -75,6 +75,23 @@ describe("DataTable SSR", () => {
     expect(html).toContain("alpha");
   });
 
+  it("draws the selection column on the server as the client first draws it", () => {
+    const { provider } = createMachineProvider();
+    const host = readProviderHost(provider);
+    host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
+    const html = renderToString(
+      <DataTable
+        provider={provider}
+        label="Machines"
+        selectable
+        getRowLabel={(row) => row.name}
+        columns={columns}
+      />,
+    );
+    expect(html).toContain('aria-selected="false"');
+    expect(html).not.toContain("disabled");
+  });
+
   it("observes nothing on the server: the provider stays idle and the source is never asked", () => {
     // A source that would answer at once, were it asked. The table observes
     // its provider from an effect, which a server render never runs.
