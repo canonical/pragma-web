@@ -25,7 +25,9 @@
  * drilled into it (`expand=`), whose heading leads back to the overview;
  * that page opens by the overview's rule, at the legible floor from the
  * opened namespace's corner. A term page reached from another frames its
- * class as loading its address does.
+ * class as loading its address does, and so does a move between the
+ * overview and a term page that opens or closes a namespace; a move that
+ * keeps the drawing keeps the reader's zoom.
  */
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
@@ -446,7 +448,9 @@ describe("at 1440 px", () => {
     expect(drawn.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
   });
 
-  it("keeps the chips, the search and the zoom when a rail pick moves to a term", async () => {
+  // cs is drawn class by class at rest, so its term page draws the
+  // overview's own drawing, on which the reader's zoom still holds.
+  it("keeps the chips, the search and the zoom when a rail pick moves to a term the overview draws", async () => {
     const view: {
       before?: string | null;
       pressed?: string | null;
@@ -468,10 +472,9 @@ describe("at 1440 px", () => {
         await page.waitForTimeout(CAMERA_SETTLE_MS);
         view.before = await page.locator(zoomLevel).textContent();
         await page
-          .locator(".ds.term-rail")
-          .getByRole("link", { name: "Concept", exact: true })
+          .locator('.ds.term-rail a[href="/definitions/cs%3ACodeStandard"]')
           .click();
-        await page.waitForURL(/\/definitions\/ds%3AConcept$/);
+        await page.waitForURL(/\/definitions\/cs%3ACodeStandard$/);
         await page.waitForTimeout(CAMERA_SETTLE_MS);
         view.path = new URL(page.url()).pathname;
         view.pressed = await page
@@ -482,7 +485,7 @@ describe("at 1440 px", () => {
       },
     );
     expect(errors).toEqual([]);
-    expect(view.path).toBe("/definitions/ds%3AConcept");
+    expect(view.path).toBe("/definitions/cs%3ACodeStandard");
     expect(view.pressed).toBe("false");
     expect(view.search).toBe("st");
     expect(view.after).toBe(view.before);
@@ -819,6 +822,39 @@ describe("a drill's link against its address", () => {
     expect(clicked.errors).toEqual([]);
     expect(framed).toEqual({ loaded: true, clicked: true });
     expectSameCamera(clicked.camera, loaded.camera);
+  });
+
+  // The overview draws anatomy and cs class by class, ds and surface each
+  // as one box: a term page of a class in ds or surface opens that
+  // namespace, a drawing the overview's camera does not belong to.
+  it("opens the overview from a term page of a boxed class, by the strip's link, as loading it does", async () => {
+    const loaded = await cameraAfter("/definitions", "anatomy");
+    const back = await cameraAfter(
+      `/definitions/${encodeURIComponent("surface:Actor")}`,
+      "anatomy",
+      async (page) => {
+        await page.locator('.strip a[href="/definitions"]').first().click();
+        await page.waitForURL((url) => url.pathname === "/definitions");
+      },
+    );
+    expect(loaded.errors).toEqual([]);
+    expect(back.errors).toEqual([]);
+    expectSameCamera(back.camera, loaded.camera);
+  });
+
+  it("opens a term page of a boxed class from the zoomed overview as loading its address does", async () => {
+    const uiBlock = `/definitions/${encodeURIComponent("ds:UIBlock")}`;
+    const loaded = await cameraAfter(uiBlock, "ds");
+    const picked = await cameraAfter("/definitions", "ds", async (page) => {
+      await page.getByRole("button", { name: "Zoom in" }).click();
+      await page.getByRole("button", { name: "Zoom in" }).click();
+      await page.waitForTimeout(CAMERA_SETTLE_MS);
+      await page.locator(`.ds.term-rail a[href="${uiBlock}"]`).click();
+      await page.waitForURL((url) => url.pathname === uiBlock);
+    });
+    expect(loaded.errors).toEqual([]);
+    expect(picked.errors).toEqual([]);
+    expectSameCamera(picked.camera, loaded.camera);
   });
 
   it("lists the opened namespace first at 390, its heading the way back", async () => {
