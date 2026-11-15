@@ -127,6 +127,8 @@ describe("expectSwitchCoverage", () => {
         },
       }),
     ).toThrow("the Station arm did not render");
+    // The guard closed with the failed case: the next tree's maps are its own.
+    expect(guardTypedArms(PROBE_MAPS)).toBe(PROBE_MAPS);
   });
 
   it("fails on a case whose tree did not guard its maps", () => {
