@@ -30,7 +30,6 @@ import {
   CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
   FALLBACK_CHANNEL,
-  FIT_TOLERANCE,
   MIN_FIT,
   REGION_ALIGNMENTS,
   SHELF_ALIGNMENTS,
@@ -42,6 +41,7 @@ import frameLegibleWindow from "./frameLegibleWindow.js";
 import gatherDrawnInput from "./gatherDrawnInput.js";
 import layOutPhoneView from "./layOutPhoneView.js";
 import listRegionBridges from "./listRegionBridges.js";
+import opensWhole from "./opensWhole.js";
 import orderBoxedClasses from "./orderBoxedClasses.js";
 import orderRail from "./orderRail.js";
 import orderRegionsByBridges from "./orderRegionsByBridges.js";
@@ -324,23 +324,6 @@ function alignShelves(
     if (best === undefined || empty < best.empty) best = { places, empty };
   }
   return requireDefined(best, "region placement").places;
-}
-
-/**
- * Whether a layout opens on its whole graph at the design canvas: its
- * opening view, at the legible zoom or above, holds every region, the
- * boxes and label rows within them. The view may leave out a strip of the
- * margin round the graph and still hold it whole.
- */
-function opensWhole(layout: ClassGraphLayout): boolean {
-  const { view } = layout;
-  return layout.regions.every(
-    (region) =>
-      region.x >= view.x - FIT_TOLERANCE &&
-      region.y >= view.y - FIT_TOLERANCE &&
-      region.x + region.w <= view.x + view.w + FIT_TOLERANCE &&
-      region.y + region.h <= view.y + view.h + FIT_TOLERANCE,
-  );
 }
 
 /**

@@ -31,6 +31,7 @@ import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import { MESSAGES } from "../i18n/index.js";
 import { DESIGN_CANVAS, MIN_FIT, PHONE, SHELF_GAP } from "./constants.js";
 import layOutClassGraph from "./layOutClassGraph.js";
+import opensWhole from "./opensWhole.js";
 import placeBridgeLabels from "./placeBridgeLabels.js";
 import type { ClassGraphInput } from "./types.js";
 
@@ -232,16 +233,6 @@ describe("layOutClassGraph", () => {
       }
       return kinds;
     };
-
-    /** Whether the opening view holds every region whole. */
-    const opensWhole = (layout: ReturnType<typeof layOutClassGraph>) =>
-      layout.regions.every(
-        (region) =>
-          region.x >= layout.view.x &&
-          region.y >= layout.view.y &&
-          region.x + region.w <= layout.view.x + layout.view.w &&
-          region.y + region.h <= layout.view.y + layout.view.h,
-      );
 
     it("collapses the docs site's namespaces, the largest first, until the overview opens whole", () => {
       // Within the node budget surface alone collapses (38 nodes), but

@@ -20,6 +20,7 @@ import {
   HUB_LOOP_EXTENT,
   HUB_MIN_DEGREE,
   LOOP_EXTENT,
+  MEASURED_MESSAGES,
   REGION_BOX_MIN_WIDTH,
   WRAPPED_HEIGHT,
 } from "./constants.js";
@@ -56,7 +57,14 @@ function sizeBox(klass: GraphClassInput, hub: boolean): BoxGeometry {
     // the insets: the line measured as the catalog's English sets it.
     const box = sizeBox({ ...klass, kind: "class" }, true);
     const holds = measureTextWidth(
-      `${klass.members ?? 1} classes, ${klass.held ?? 0} relations`,
+      MEASURED_MESSAGES("well.region.holds", {
+        classes: MEASURED_MESSAGES("well.region.count", {
+          count: klass.members ?? 1,
+        }),
+        relations: MEASURED_MESSAGES("well.relations.count", {
+          count: klass.held ?? 0,
+        }),
+      }),
       "regular",
       LABEL_SIZE,
     );

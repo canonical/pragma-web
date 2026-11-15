@@ -172,7 +172,7 @@ describe("buildClassGraphModel", () => {
       members: 1,
       held: 0,
       h: 48,
-      // "1 classes, 0 relations" at 14px within the insets.
+      // "1 class, 0 relations" at 14px within the insets.
       w: 144,
     });
   });

@@ -236,14 +236,23 @@ export default function ClassGraph({
           node.kind === "stub"
             ? t("well.name.stub", {
                 term,
-                relations: node.relationCount,
+                relations: t("well.relations.count", {
+                  count: node.relationCount,
+                }),
               })
             : region
               ? t("well.name.region", {
                   prefix: node.region,
-                  classes: node.members,
-                  held: node.held,
-                  relations: node.relationCount,
+                  classes: t("well.region.count", { count: node.members }),
+                  held: t("well.relations.count", { count: node.held }),
+                  // What leaves the box is what is drawn from it.
+                  relations: t("well.relations.count", {
+                    count: layout.edges.filter(
+                      (edge) =>
+                        edge.kind === "relation" &&
+                        (edge.from === node.uri || edge.to.includes(node.uri)),
+                    ).length,
+                  }),
                 })
               : undefined
         }

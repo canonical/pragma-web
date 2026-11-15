@@ -404,8 +404,9 @@ describe("ClassGraph", () => {
       expect(resting.querySelector(".context")).toBeNull();
       expect(resting.querySelector("a")).toBeNull();
       expect(resting.getAttribute("role")).toBe("img");
-      expect(resting.getAttribute("aria-label")).toMatch(
-        /^Namespace surface, drawn as one box: 31 classes, 0 relations inside, \d+ relations out$/,
+      // What leaves the box is the edges drawn from it.
+      expect(resting.getAttribute("aria-label")).toBe(
+        "Namespace surface, drawn as one box: 31 classes, 0 relations inside, 2 relations out",
       );
       zoom.bucket = "full";
       const container = draw(own);
@@ -450,7 +451,7 @@ describe("ClassGraph", () => {
       for (const stub of stubs) {
         expect(stub.querySelector("a")).toBeNull();
         expect(stub.getAttribute("aria-label")).toBe(
-          `Class ${stub.getAttribute("data-id")}, outside the loaded namespaces, 1 relations`,
+          `Class ${stub.getAttribute("data-id")}, outside the loaded namespaces, 1 relation`,
         );
         expect(
           stub

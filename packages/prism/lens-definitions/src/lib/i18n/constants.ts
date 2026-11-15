@@ -35,10 +35,9 @@ export const MESSAGES = {
     other: "{visible} of {count} classes · {abstract} abstract",
   },
   "well.label": "Class graph",
-  "well.name.stub":
-    "Class {term}, outside the loaded namespaces, {relations} relations",
+  "well.name.stub": "Class {term}, outside the loaded namespaces, {relations}",
   "well.name.region":
-    "Namespace {prefix}, drawn as one box: {classes} classes, {held} relations inside, {relations} relations out",
+    "Namespace {prefix}, drawn as one box: {classes}, {held} inside, {relations} out",
   "well.name":
     "Class {label}, in {namespace}, {subclasses} subclasses, {relations} relations, {instances} instances, {fields} fields",
   "well.name.abstract":
@@ -47,7 +46,10 @@ export const MESSAGES = {
     one: "{count} class",
     other: "{count} classes",
   },
-  "well.relations.count": "{count} relations",
+  "well.relations.count": {
+    one: "{count} relation",
+    other: "{count} relations",
+  },
   "well.region.holds": "{classes}, {relations}",
   "well.phone.label": "Class graph, in rail order",
   "rail.label": "Ontology terms",
