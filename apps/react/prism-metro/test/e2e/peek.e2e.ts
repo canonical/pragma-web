@@ -8,7 +8,9 @@
  * pointer comes to rest on the chip, and Escape closes it; focus opens it
  * at once. Open, it is a dialog inside no link, with a link a pointer
  * reaches, 248px wide, 4px from the chip, in the first of its places that
- * fits the viewport, and wholly inside it, at 1440 and at 390. Escape
+ * fits the viewport, and wholly inside it, at 1440 and at 390; for a
+ * chip low in the viewport that place is above it, and a card taller than
+ * the room there scrolls inside the peek. Escape
  * from inside it closes it and gives the chip's link the focus back. On a
  * touch screen at 390 a tap opens no peek and follows the chip's link.
  */
@@ -16,6 +18,7 @@ import {
   launchBrowser,
   listPeekViolations,
   measurePeek,
+  placePeek,
   VIEWPORTS,
   watchPeek,
 } from "@canonical/prism-core/testing/browser";
@@ -106,6 +109,44 @@ const readOpenPeek = async (page: Page) => {
   return page.evaluate(measurePeek, CHIP_SELECTOR);
 };
 
+/** The room left under a chip brought low: two chips' heights, less than any peek. */
+const LOW_CHIP_ROOM_PX = 56;
+
+/**
+ * Bring the chip low in the viewport: scroll it to the end of every box
+ * that scrolls it, then cut the viewport's height to just under it, so the
+ * room below it is smaller than any peek and above it is the larger side.
+ *
+ * @note Impure: scrolls and resizes the tab.
+ */
+const bringChipLow = async (page: Page): Promise<void> => {
+  const bottom = await page.locator(CHIP_SELECTOR).evaluate((chip) => {
+    chip.scrollIntoView({ block: "end" });
+    return chip.getBoundingClientRect().bottom;
+  });
+  const width = page.viewportSize()?.width ?? 1440;
+  await page.setViewportSize({
+    width,
+    height: Math.ceil(bottom) + LOW_CHIP_ROOM_PX,
+  });
+};
+
+/**
+ * Whether the open peek, or a box inside it, scrolls content taller than
+ * itself. Runs in the page.
+ */
+const readPeekScrolls = (selector: string): boolean => {
+  const peek = document.querySelector(selector);
+  if (peek === null) return false;
+  return [peek, ...peek.querySelectorAll("*")].some((box) => {
+    const { overflowY } = getComputedStyle(box);
+    return (
+      (overflowY === "auto" || overflowY === "scroll") &&
+      box.scrollHeight > box.clientHeight + 1
+    );
+  });
+};
+
 beforeAll(
   async () => {
     graph = await startServer("graph", CWD, {
@@ -163,6 +204,17 @@ describe("a chip's peek on a station's page", () => {
       expect(listPeekViolations(measure)).toEqual([]);
     },
   );
+
+  it("opens above a chip low in the viewport, inside it, scrolling a card taller than its room", async () => {
+    const page = await openStation();
+    await bringChipLow(page);
+    await page.locator(CHIP_LINK_SELECTOR).focus();
+    const measure = await readOpenPeek(page);
+    expect(measure.chip.top).toBeGreaterThan(measure.viewport.height / 2);
+    expect(listPeekViolations(measure)).toEqual([]);
+    expect(placePeek(measure).actual.block).toBe("above");
+    expect(await page.evaluate(readPeekScrolls, PEEK_SELECTOR)).toBe(true);
+  });
 
   it("closes on Escape from inside the peek and gives the chip's link the focus back", async () => {
     const page = await openStation();
