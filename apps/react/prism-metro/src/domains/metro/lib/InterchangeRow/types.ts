@@ -9,6 +9,11 @@ type OwnProps = {
    * spreads `...InterchangeRow_node`.
    */
   readonly node: InterchangeRow_node$key;
+  /**
+   * How many lines the row takes: `"two"` sets its summary under its
+   * title, for an index that opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

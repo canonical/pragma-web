@@ -115,6 +115,7 @@ describe("MetroChipProjection", () => {
 
   it.each([
     ["Station", MOCK_STATION],
+    ["Interchange", MOCK_INTERCHANGE],
     ["Line", MOCK_LINE],
   ] as const)("hands a %s's arm its unlinked opt-out", (_typename, entity) => {
     const { container } = renderWithNode(

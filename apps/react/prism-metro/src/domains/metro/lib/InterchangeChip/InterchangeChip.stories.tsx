@@ -74,7 +74,7 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** Central Exchange: its name in the pill, linked to its page. */
+/** Central Exchange: its mark and its name in the pill, linked to its page. */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

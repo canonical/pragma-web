@@ -81,8 +81,8 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * Central Exchange: its name, "Interchange in Central Zone", and the count of
- * its lines.
+ * Central Exchange: its mark, its name, its compact address, its kind, and
+ * the count of its lines.
  */
 export const Default: Story = {};
 

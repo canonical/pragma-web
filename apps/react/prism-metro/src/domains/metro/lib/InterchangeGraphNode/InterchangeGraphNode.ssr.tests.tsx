@@ -16,10 +16,10 @@ import {
 import InterchangeGraphNode from "./InterchangeGraphNode.js";
 
 /**
- * The operation the SSR test renders InterchangeGraphNode under: one
- * Interchange, read through the `node` field. The spread is aliased because
- * that field is typed by an interface, so a node of another type reads as null
- * instead of as a key that does not match.
+ * The operation the SSR test renders InterchangeGraphNode under: one Interchange, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareSsrTestQuery = (): unknown => graphql`
   query InterchangeGraphNodeSsrTestQuery @relay_test_operation {
@@ -31,8 +31,8 @@ const declareSsrTestQuery = (): unknown => graphql`
 void declareSsrTestQuery;
 
 /**
- * Run the SSR test operation and render InterchangeGraphNode over the
- * Interchange it returns.
+ * Run the SSR test operation and render InterchangeGraphNode over the Interchange it
+ * returns.
  */
 const InterchangeGraphNodeSsrTestNode = (): ReactElement => {
   const data = useLazyLoadQuery<InterchangeGraphNodeSsrTestQuery>(

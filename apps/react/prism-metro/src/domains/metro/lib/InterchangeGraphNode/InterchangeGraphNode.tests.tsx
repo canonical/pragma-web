@@ -17,10 +17,10 @@ import InterchangeGraphNode from "./InterchangeGraphNode.js";
 import type { InterchangeGraphNodeProps } from "./types.js";
 
 /**
- * The operation the tests render InterchangeGraphNode under: one Interchange,
- * read through the `node` field. The spread is aliased because that field is
- * typed by an interface, so a node of another type reads as null instead of as
- * a key that does not match.
+ * The operation the tests render InterchangeGraphNode under: one Interchange, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query InterchangeGraphNodeTestQuery @relay_test_operation {
@@ -50,8 +50,8 @@ const InterchangeGraphNodeTestNode = ({
 
 /**
  * Render `children` with the key of the Interchange a Relay mock environment
- * answers, under the site's providers: `entity` over Central Exchange, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Central Exchange, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: InterchangeGraphNodeProps["node"]) => ReactElement,
@@ -86,46 +86,28 @@ describe("InterchangeGraphNode", () => {
     ).toHaveAttribute("data-type", "Interchange");
   });
 
-  it("fills the node's lines from the interchange", () => {
+  it("fills the node's lines from the interchange, and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
         <InterchangeGraphNode node={node} />
       </svg>
     ));
     expect(container.querySelector(".title")?.textContent).toBe(
-      "Central Exchange",
+      "metro: Central Exchange",
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Interchange in Central Zone",
+    expect(container.querySelector(".title .prefix")?.textContent).toBe(
+      "metro: ",
     );
-  });
-
-  it("links its title to the interchange's page", () => {
-    const { container } = renderWithNode((node) => (
-      <svg aria-label="Graph" role="img">
-        <InterchangeGraphNode node={node} />
-      </svg>
-    ));
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/swap.svg#swap",
+    );
+    expect(container.querySelector(".kind, .context, .location")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/network/stations/metro%3Acentral-exchange",
     );
   });
 
-  it("names its class alone for an interchange in no zone", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <svg aria-label="Graph" role="img">
-          <InterchangeGraphNode node={node} />
-        </svg>
-      ),
-      {
-        inZone: null,
-      },
-    );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Interchange",
-    );
-  });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">

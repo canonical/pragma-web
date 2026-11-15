@@ -81,7 +81,7 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** Central Exchange: its name, then "Interchange in Central Zone". */
+/** Central Exchange: its mark, its prefix and its name. */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

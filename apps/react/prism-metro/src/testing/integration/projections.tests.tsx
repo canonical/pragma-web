@@ -51,16 +51,13 @@ const findCard = (container: HTMLElement, title: string): Element => {
   return card;
 };
 
-/** Read each key value of a card as its key and its value's text. */
-const readPairs = (card: Element): (string | null)[][] =>
-  [...card.querySelectorAll(".pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent ?? null,
-    pair.querySelector(".value")?.textContent ?? null,
+/** Read each fact of a card as its property, its label and its value. */
+const readFacts = (card: Element): (string | null | undefined)[][] =>
+  [...card.querySelectorAll(".fact")].map((fact) => [
+    fact.getAttribute("data-property"),
+    fact.querySelector(".term")?.textContent,
+    fact.querySelector(".detail")?.textContent,
   ]);
-
-/** Read a card's vitals. */
-const readVitals = (card: Element): (string | null)[] =>
-  [...card.querySelectorAll(".vital")].map((vital) => vital.textContent);
 
 describe("the stations lens's cards", {
   timeout: LENS_PAGE_TEST_TIMEOUT_MS,
@@ -77,22 +74,17 @@ describe("the stations lens's cards", {
     );
     expect(container.querySelector(".ds.node-card")).toBeNull();
 
-    expect(
-      [...findCard(container, NORTHGATE_TITLE).querySelectorAll(".fact")].map(
-        (fact) => [
-          fact.getAttribute("data-property"),
-          fact.querySelector(".term")?.textContent,
-          fact.querySelector(".detail")?.textContent,
-        ],
-      ),
-    ).toEqual([
+    expect(readFacts(findCard(container, NORTHGATE_TITLE))).toEqual([
       ["platformCount", "Platforms", "4"],
       ["inZone", "Zone", ZONE_TITLE],
       ["servesLine", "Lines", "North Line"],
     ]);
-    const exchange = findCard(container, CENTRAL_EXCHANGE_TITLE);
-    expect(readPairs(exchange)).toContainEqual(["Transfer", "4 minutes"]);
-    expect(readVitals(exchange)).toEqual(["8 platforms", "3 lines"]);
+    expect(readFacts(findCard(container, CENTRAL_EXCHANGE_TITLE))).toEqual([
+      ["platformCount", "Platforms", "8"],
+      ["inZone", "Zone", ZONE_TITLE],
+      ["servesLine", "Lines", "North Line, Circle Line, Coastal Line"],
+      ["transferMinutes", "Transfer", "4 minutes"],
+    ]);
   });
 });
 

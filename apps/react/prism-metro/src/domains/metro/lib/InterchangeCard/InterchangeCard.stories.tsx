@@ -81,8 +81,8 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * Central Exchange: a station's card with its transfer time, and the count of
- * the lines that meet there.
+ * Central Exchange: its mark, its name, its definition, and its platforms,
+ * its fare zone, the lines it serves and its transfer time as facts.
  */
 export const Default: Story = {};
 

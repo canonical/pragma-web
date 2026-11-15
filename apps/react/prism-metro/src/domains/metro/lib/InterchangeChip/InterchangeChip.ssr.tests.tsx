@@ -16,10 +16,10 @@ import {
 import InterchangeChip from "./InterchangeChip.js";
 
 /**
- * The operation the SSR test renders InterchangeChip under: one Interchange,
- * read through the `node` field. The spread is aliased because that field is
- * typed by an interface, so a node of another type reads as null instead of as
- * a key that does not match.
+ * The operation the SSR test renders InterchangeChip under: one Interchange, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareSsrTestQuery = (): unknown => graphql`
   query InterchangeChipSsrTestQuery @relay_test_operation {

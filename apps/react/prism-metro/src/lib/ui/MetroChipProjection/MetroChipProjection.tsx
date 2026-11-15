@@ -63,8 +63,8 @@ export default function MetroChipProjection({
   ...props
 }: MetroChipProjectionProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  // The arms not yet on the identity's slots take no `linked`: it reaches
-  // the station's and the line's arms alone.
+  // The arms not yet on the identity's slots take no `linked`: every arm
+  // that is on them takes all the props.
   const { linked, ...native } = props;
   switch (data.__typename) {
     case "Station":
@@ -77,7 +77,7 @@ export default function MetroChipProjection({
     case "Interchange":
       return (
         <InterchangeChip
-          {...native}
+          {...props}
           node={requireArmKey(data.Interchange, data.__typename)}
         />
       );

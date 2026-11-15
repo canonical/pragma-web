@@ -136,7 +136,6 @@ export const MESSAGES = {
   "station.zone": "Zone",
   "station.lines": "Lines",
   "station.lines.separator": ", ",
-  "interchange.word": "interchange",
   "interchange.transfer": "Transfer",
   "interchange.transfer.minutes": {
     one: "{count} minute",
