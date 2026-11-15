@@ -3,10 +3,12 @@ import {
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import deliverRows from "../../../../../../testing/deliverRows.js";
+import type { DisplayFieldCellProps } from "../../../../common/index.js";
 import { BodyCell } from "./index.js";
 
 /**
@@ -25,6 +27,16 @@ const channelsOver = (fields: readonly string[]) => {
   return { provider, channels: scopes.readRow("m-1") };
 };
 
+/** A body row in a table, where a cell renders as it does in the table. */
+const inRow = () => ({
+  container: document.body.appendChild(document.createElement("table")),
+  wrapper: ({ children }: { readonly children: ReactNode }) => (
+    <tbody>
+      <tr>{children}</tr>
+    </tbody>
+  ),
+});
+
 describe("BodyCell", () => {
   it("reports a field no scope channel observes instead of rendering nothing", () => {
     const { provider, channels } = channelsOver(["name"]);
@@ -41,5 +53,30 @@ describe("BodyCell", () => {
     ).toThrow('no channel observes the field "zone"');
     failure.mockRestore();
     expect(screen.queryByRole("cell")).toBeNull();
+  });
+
+  it("renders again for a new value, not for the same props", () => {
+    const { provider, channels } = channelsOver(["name"]);
+    const drawn = vi.fn(({ value }: DisplayFieldCellProps) => String(value));
+    const column = { id: "name", header: "Name", cell: drawn };
+    const { rerender } = render(
+      <BodyCell
+        provider={provider}
+        channels={channels}
+        column={column}
+        field="name"
+      />,
+      inRow(),
+    );
+    rerender(
+      <BodyCell
+        provider={provider}
+        channels={channels}
+        column={column}
+        field="name"
+      />,
+    );
+    expect(drawn).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("cell")).toHaveTextContent("alpha");
   });
 });
