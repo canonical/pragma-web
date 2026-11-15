@@ -2,7 +2,9 @@
 # UIBlockExample: a UI block's rendered example, the published React
 # component of the block with its default props, given only what it cannot
 # render without (a label, a count, a key), server-rendered in the card's
-# sidecar.
+# sidecar, or with one modifier per family it honours
+# (BLOCK_EXAMPLE_FAMILIES: the published component's prop for that family)
+# when a variant cell of the component page passes `modifiers`.
 # Reference: heuristic 28 and Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 502:1749
 # (the side panel's component). Each case is one published component, and
 # fits the sidecar's two intrinsic columns at every width: a strip of

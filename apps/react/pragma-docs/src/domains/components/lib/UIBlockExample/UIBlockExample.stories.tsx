@@ -26,3 +26,11 @@ export const InlineCode: Story = { args: { example: "inlineCode" } };
 
 /** The published KeyboardKey over the Enter key. */
 export const KeyboardKey: Story = { args: { example: "keyboardKey" } };
+
+/** The published Button with one modifier of each family it honours. */
+export const ButtonWithModifiers: Story = {
+  args: {
+    example: "button",
+    modifiers: { importance: "secondary", anticipation: "destructive" },
+  },
+};
