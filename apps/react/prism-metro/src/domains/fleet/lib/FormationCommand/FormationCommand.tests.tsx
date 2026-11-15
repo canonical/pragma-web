@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -13,13 +14,14 @@ import {
   MOCK_FORMATION,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import Component from "./FormationCommand.js";
+import FormationCommand from "./FormationCommand.js";
 import type { FormationCommandProps } from "./types.js";
 
 /**
- * The operation the tests render FormationCommand under: one Formation, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render FormationCommand under: one Formation, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query FormationCommandTestQuery @relay_test_operation {
@@ -30,7 +32,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const FormationCommandTestNode = ({
   children,
 }: {
@@ -46,8 +51,8 @@ const FormationCommandTestNode = ({
 
 /**
  * Render `children` with the key of the Formation a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 six-car, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 six-car, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: FormationCommandProps["node"]) => ReactElement,
@@ -74,7 +79,7 @@ describe("FormationCommand", () => {
   it("reads the Formation through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <FormationCommand node={node} />
       </ul>
     ));
     expect(container.querySelector(".ds.formation-command")).toHaveAttribute(
@@ -83,39 +88,39 @@ describe("FormationCommand", () => {
     );
   });
 
-  it("fills its slots from the formation", () => {
+  it("fills the result's lines from the formation", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <FormationCommand node={node} />
       </ul>
     ));
-    for (const text of [
-      "Series 90 six-car",
-      "Formation",
-      "Series 90",
-      "120 m",
-    ]) {
-      expect(container.textContent).toContain(text);
-    }
-  });
-
-  it("links its title to the formation's page", () => {
-    renderWithNode((node) => (
-      <ul>
-        <Component node={node} />
-      </ul>
-    ));
+    const root = container.querySelector(".ds.formation-command");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/connected.svg#connected",
+    );
     expect(
-      screen
-        .getByRole("link", { name: "Series 90 six-car" })
-        .getAttribute("href"),
-    ).toBe("/fleet/formations/metro%3Aseries-90-six-car");
+      [
+        ...(root?.querySelectorAll(".title, .address, .kind, .status") ?? []),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "Series 90 six-car",
+      "metro:series-90-six-car",
+      "Formation",
+      "120 m",
+    ]);
+    expect(root?.querySelector(".prefix")).toBeNull();
+    expect(root?.querySelector(".location")).toBeNull();
+    if (root) expectSlotOrder(root);
+    expect(
+      screen.getByRole("link", { name: "Series 90 six-car" }),
+    ).toHaveAttribute("href", "/fleet/formations/metro%3Aseries-90-six-car");
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component className="custom-class" node={node} />
+        <FormationCommand className="custom-class" node={node} />
       </ul>
     ));
     expect(
@@ -126,7 +131,7 @@ describe("FormationCommand", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <ul>
-        <Component data-testid="test-component" node={node} />
+        <FormationCommand data-testid="test-component" node={node} />
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");

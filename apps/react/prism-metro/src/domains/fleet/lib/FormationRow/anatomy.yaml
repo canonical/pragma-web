@@ -1,25 +1,66 @@
 ---
-# FormationRow: a formation as a 32px list entry.
-# Best guess: the muted end is the formation's length.
-# Projected onto EntityRow, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address.
+# FormationRow: a formation as a list entry: its mark, its prefix off the
+# page's namespace, its name linked to its home, and its length as a fact; a
+# two-line row (`lines="two"`) puts its definition under the name. Its mark is
+# the formation's glyph, a published icon.
 node:
   uri: metro.component.formation_row
-  projection: { on: Formation }
+  projection:
+    on: Formation
   edges:
     - node:
         uri: prism.component.entity_row
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # The formation's glyph, a published Icon (FORMATION_MARK_ICON).
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
-              role: meta
-              projection: { field: length }
-            relation: { cardinality: "1", slotName: meta }
-      relation: { cardinality: "1" }
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: summary
+              projection:
+                field: _meta.definition
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+          - node:
+              role: facts
+              edges:
+                - node:
+                    role: length
+                    projection:
+                      field: length
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "0..1"
+              slotName: facts
+      relation:
+        cardinality: "1"
