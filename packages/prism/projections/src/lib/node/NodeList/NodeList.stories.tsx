@@ -9,6 +9,7 @@ import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { withProjectionSite } from "../../../../.storybook/decorators/index.js";
 import {
+  MOCK_HIDDEN_NODE,
   MOCK_NODE,
   MOCK_ONTOLOGY_CLASS,
 } from "../../../../testing/fixtures.js";
@@ -92,6 +93,15 @@ export const Default: Story = {
 /** The same nodes as cards. */
 export const Cards: Story = {
   args: { renderer: "cards" },
+};
+
+/**
+ * The same nodes with a value among them: a node whose type the graph's
+ * lens hides is skipped, so the list still shows three.
+ */
+export const WithHiddenNode: Story = {
+  args: {},
+  parameters: { relay: mockInstances([MOCK_HIDDEN_NODE, ...INSTANCES]) },
 };
 
 /** No nodes: the list's one empty line. */

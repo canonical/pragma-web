@@ -14,7 +14,11 @@ const line = { id: "line", classUri: "metro:Line", typename: "Line" } as const;
 describe("assertBindingsLive", () => {
   it("probes each binding's class with its uri, and resolves when all are known", async () => {
     const execute = vi.fn<GraphQLExecute>((_query, variables) =>
-      Promise.resolve({ data: { ontologyClass: { uri: variables.uri } } }),
+      Promise.resolve({
+        data: {
+          ontologyClass: { uri: variables.uri, visibility: "PROMINENT" },
+        },
+      }),
     );
     await expect(
       assertBindingsLive(execute, [station, line]),
@@ -31,6 +35,24 @@ describe("assertBindingsLive", () => {
     await expect(assertBindingsLive(execute, [station])).rejects.toThrow(
       'assertBindingsLive: binding "station" names class "metro:Station", which the graph does not know',
     );
+  });
+
+  it("throws, naming the binding, when the graph hides the class", async () => {
+    const execute: GraphQLExecute = (_query, variables) =>
+      Promise.resolve({
+        data: { ontologyClass: { uri: variables.uri, visibility: "HIDDEN" } },
+      });
+    await expect(assertBindingsLive(execute, [station])).rejects.toThrow(
+      'assertBindingsLive: binding "station" names class "metro:Station", which the graph hides: a hidden class\'s instances are values, never an index',
+    );
+  });
+
+  it("accepts a class whose visibility the graph does not answer", async () => {
+    const execute: GraphQLExecute = (_query, variables) =>
+      Promise.resolve({ data: { ontologyClass: { uri: variables.uri } } });
+    await expect(
+      assertBindingsLive(execute, [station]),
+    ).resolves.toBeUndefined();
   });
 
   it("throws when the answer carries no data", async () => {

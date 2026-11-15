@@ -45,7 +45,8 @@ const componentCssClassName = "ds standard-prose";
  * as its compact address (`[Link](cs:react.component.link_component)`) or
  * its absolute IRI, renders as that entity's chip, labelled with the
  * author's text and linked to its home; every other link stays the link its
- * author wrote. Headings render one level down, under the article's title.
+ * author wrote. Headings render two levels down, under the section that
+ * holds the prose: a section's content starts at level 3.
  *
  * Its root carries `.editorial` and `.content-flow`, so the typography
  * layer gives the prose's headings and paragraphs their space after, and

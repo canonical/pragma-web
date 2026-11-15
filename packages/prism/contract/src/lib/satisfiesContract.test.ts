@@ -16,6 +16,10 @@ const loadFixture = (name: string): string =>
   );
 
 const toyContract = loadFixture("toyContract");
+
+/** An emission as a provider serves it: with the class edges appended. */
+const serveEmission = (name: string): string =>
+  `${loadFixture(name)}\n${loadFixture("classEdgesExtension")}`;
 const getCodes = (sdl: string, contractSdl: string): string[] =>
   satisfiesContract(sdl, { contractSdl }).violations.map((v) => v.code);
 
@@ -161,14 +165,19 @@ describe("the real contract", () => {
         "OntologyProperty",
         "PropertyKind",
         "EntityMeta",
+        "TermVisibility",
+        "PropertyRole",
+        "PropertyGroup",
+        "ClassEdge",
       ]),
     );
   });
 
-  it("is satisfied by the post-1.6 provider emission shape", () => {
-    // The fixture embeds what ke-graphql emits for a one-class ontology once
-    // OntologyClass implements Node and carries _meta (the 1.6 change).
-    expect(satisfiesContract(loadFixture("emittedProvider"))).toEqual({
+  it("is satisfied by the provider emission shape with the class edges", () => {
+    // The fixture embeds what a ke-graphql that reads the type lens emits for
+    // a one-class ontology; no compiler emits classEdges, so a provider
+    // appends it.
+    expect(satisfiesContract(serveEmission("emittedProvider"))).toEqual({
       satisfied: true,
       violations: [],
     });
@@ -177,21 +186,64 @@ describe("the real contract", () => {
   it("is satisfied by a fully prefixed emission: the contract names no ontology terms", () => {
     // prefixing: "all" renames every GENERATED field (name -> exName). The
     // contract's surface is purely structural, so the knob cannot affect it.
-    expect(satisfiesContract(loadFixture("emittedPrefixedProvider"))).toEqual({
-      satisfied: true,
-      violations: [],
-    });
+    expect(satisfiesContract(serveEmission("emittedPrefixedProvider"))).toEqual(
+      {
+        satisfied: true,
+        violations: [],
+      },
+    );
   });
 
   it("flags a relay-less emission by exactly the field relay wiring adds", () => {
     // relay: false keeps the whole TBox (which still references Node) but
     // never claims Query.node. One violation — no more, no less — is the
     // teeth control: the gate distinguishes the two emissions precisely.
-    const result = satisfiesContract(loadFixture("emittedNoRelayProvider"));
+    const result = satisfiesContract(serveEmission("emittedNoRelayProvider"));
     expect(result.satisfied).toBe(false);
     expect(result.violations).toHaveLength(1);
     expect(result.violations[0]?.code).toBe("FIELD_REMOVED");
     expect(result.violations[0]?.message).toContain("Query.node");
+  });
+
+  it("flags an emission without the class edges by exactly that surface", () => {
+    const result = satisfiesContract(loadFixture("emittedProvider"));
+    expect(result.violations.map((v) => [v.code, v.message])).toEqual([
+      ["TYPE_REMOVED", expect.stringContaining("ClassEdge")],
+      ["FIELD_REMOVED", expect.stringContaining("Query.classEdges")],
+    ]);
+  });
+
+  it("flags a compiler that predates the lens by exactly the lens surface", () => {
+    // Why a provider on such a compiler serves the lens itself: the emission
+    // lacks every lens field, the three lens types and the class edges, and
+    // nothing else. Float goes with them: only lens fields reference it.
+    const result = satisfiesContract(loadFixture("emittedPreLensProvider"));
+    const coordinates = result.violations
+      .map((v) => {
+        const coordinate = v.message.match(/([A-Z]\w*(?:\.\w+)?) was removed/);
+        return `${v.code} ${coordinate?.[1]}`;
+      })
+      .sort();
+    expect(coordinates).toEqual([
+      "FIELD_REMOVED ClassProperty.group",
+      "FIELD_REMOVED ClassProperty.order",
+      "FIELD_REMOVED ClassProperty.role",
+      "FIELD_REMOVED ClassProperty.visibility",
+      "FIELD_REMOVED OntologyClass.glyph",
+      "FIELD_REMOVED OntologyClass.pluralLabel",
+      "FIELD_REMOVED OntologyClass.visibility",
+      "FIELD_REMOVED OntologyProperty.inverseLabel",
+      "FIELD_REMOVED OntologyProperty.inversePluralLabel",
+      "FIELD_REMOVED OntologyProperty.inverseVisibility",
+      "FIELD_REMOVED OntologyProperty.pluralLabel",
+      "FIELD_REMOVED OntologyProperty.visibility",
+      "FIELD_REMOVED Query.classEdges",
+      "TYPE_REMOVED ClassEdge",
+      "TYPE_REMOVED Float",
+      "TYPE_REMOVED PropertyGroup",
+      "TYPE_REMOVED PropertyRole",
+      "TYPE_REMOVED TermVisibility",
+    ]);
   });
 
   it("rejects a provider deficient in three independent ways", () => {

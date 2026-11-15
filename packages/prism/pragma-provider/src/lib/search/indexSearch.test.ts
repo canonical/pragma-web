@@ -42,6 +42,19 @@ describe("indexSearch", () => {
     expect(uris).not.toContain("sem://surface#jobLabel");
   });
 
+  it("leaves out the instances of a hidden class, and keeps the class", async () => {
+    const hidden = await bootCorpusSchema({
+      groups: [],
+      classes: [{ uri: `${DS}Component`, visibility: "HIDDEN" }],
+      properties: [],
+    });
+    const uris = (await indexSearch(hidden)).map((entry) => entry.uri);
+    expect(uris).not.toContain(`${DS}button`);
+    expect(uris).not.toContain(`${DS}card`);
+    expect(uris).toContain(`${DS}Component`);
+    expect(uris).toContain("sem://surface#Job");
+  });
+
   it("names the node whose read fails", async () => {
     const { context, query } = await booted;
     // Whatever it is asked, the store lists one IRI.

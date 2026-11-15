@@ -614,13 +614,13 @@ describe("server matrix (2×3) serves correctly", () => {
             //     reader could lose the `cs:` form entirely while every
             //     href assertion still passed.
             expect(standardsIndexHtml).toContain(">cs:code.array.safe_access<");
-            //     (b) the reading page's class line — the article's one
-            //     piece of graph metadata outside the prose, and what
-            //     replaced the category line when `categories` turned out
-            //     to be untraversable through the contract. The catalog
-            //     fills the class into one sentence.
+            //     (b) the reading page's class fact — the article's one
+            //     piece of graph metadata outside the prose and the
+            //     address, and what replaced the category line when
+            //     `categories` turned out to be untraversable through the
+            //     contract.
             expect(standardReadingHtml).toContain(
-              '<span class="class">class: ',
+              '<dt class="key">Class</dt><dd class="value">',
             );
             //     (c) the pagination affordance. The live graph carries
             //     131 standards against this app's 100-item page size, so

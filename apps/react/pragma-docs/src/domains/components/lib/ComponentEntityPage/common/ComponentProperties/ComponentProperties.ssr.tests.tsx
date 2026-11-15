@@ -14,7 +14,7 @@ describe("ComponentProperties SSR", () => {
     const html = renderToString(
       entityPageAt(BUTTON_URI, componentEntityRecordsButton, createFetchSpy()),
     );
-    expect(html).toContain('class="ds page-section ds component-properties"');
-    expect(html).toContain('id="component-properties-title"');
+    expect(html).toContain('<div class="ds component-properties">');
+    expect(html).toContain('<h2 class="heading" id="properties">');
   });
 });

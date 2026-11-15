@@ -14,7 +14,7 @@ type OwnProps = {
 /**
  * Props accepted by `ComponentHeader`: the component, then the native
  * props of its `<header>` root. The native `children` are excluded: the
- * header renders the component's name, summary and key values.
+ * header renders the component's name and summary.
  */
 export type ComponentHeaderProps = OwnProps &
   Omit<ComponentProps<"header">, keyof OwnProps | "children">;

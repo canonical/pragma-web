@@ -9,8 +9,8 @@ type OwnProps = {
 
 /**
  * Props accepted by `GuidePage`: the route's params, then the native props
- * of the prose page's `<section>` root, which the prose page renders. The
+ * of the sectioned view's `<article>` root, which the view renders. The
  * native `children` are excluded: the page renders the guide.
  */
 export type GuidePageProps = OwnProps &
-  Omit<ComponentProps<"section">, keyof OwnProps | "children">;
+  Omit<ComponentProps<"article">, keyof OwnProps | "children">;

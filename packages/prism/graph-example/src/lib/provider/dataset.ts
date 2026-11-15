@@ -340,6 +340,9 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: NOTE,
       labels: { "": "note" },
+      definitions: {
+        "": "A remark kept with a stop for the network's editors.",
+      },
       range: "String",
       kind: "ANNOTATION",
       functional: false,
@@ -347,6 +350,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: PLATFORM_COUNT,
       labels: { "": "platform count" },
+      definitions: { "": "How many platforms the station has." },
       domain: STATION,
       range: "Int",
       kind: "DATATYPE",
@@ -366,6 +370,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: SERVES_LINE,
       labels: { "": "serves line" },
+      definitions: { "": "A line whose trains call at the station." },
       domain: STATION,
       range: "metro:Line",
       kind: "OBJECT",
@@ -375,6 +380,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: SERVED_BY,
       labels: { "": "served by" },
+      definitions: { "": "A station the line's trains call at." },
       domain: LINE,
       range: "metro:Station",
       kind: "OBJECT",
@@ -384,6 +390,9 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: TRANSFER_MINUTES,
       labels: { "": "transfer minutes" },
+      definitions: {
+        "": "The minutes allowed for changing lines at the interchange.",
+      },
       domain: INTERCHANGE,
       range: "Int",
       kind: "DATATYPE",
@@ -392,6 +401,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: LOCATION,
       labels: { "": "location" },
+      definitions: { "": "Where the station stands, as a point on the map." },
       domain: STATION,
       range: "geo:GeoPoint",
       kind: "OBJECT",
@@ -400,6 +410,9 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: LATITUDE,
       labels: { "": "latitude" },
+      definitions: {
+        "": "Degrees north of the equator, negative to the south.",
+      },
       domain: GEO_POINT,
       range: "Float",
       kind: "DATATYPE",
@@ -408,6 +421,9 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: LONGITUDE,
       labels: { "": "longitude" },
+      definitions: {
+        "": "Degrees east of the prime meridian, negative to the west.",
+      },
       domain: GEO_POINT,
       range: "Float",
       kind: "DATATYPE",
@@ -416,6 +432,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: IN_ZONE,
       labels: { "": "in zone" },
+      definitions: { "": "The fare zone the station lies in." },
       domain: STATION,
       range: "geo:Zone",
       kind: "OBJECT",
@@ -425,6 +442,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: STOPS,
       labels: { "": "stops" },
+      definitions: { "": "A stop that lies in the fare zone." },
       domain: ZONE,
       range: "metro:Stop",
       kind: "OBJECT",
@@ -465,6 +483,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: ROUTES,
       labels: { "": "routes" },
+      definitions: { "": "A route the line's trains run, in one direction." },
       domain: LINE,
       range: "metro:Route",
       kind: "OBJECT",
@@ -473,6 +492,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: IS_LOOP,
       labels: { "": "is loop" },
+      definitions: { "": "Whether the route ends where it starts." },
       domain: ROUTE_CLASS_URI,
       range: "Boolean",
       kind: "DATATYPE",
@@ -481,6 +501,9 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: CALLS,
       labels: { "": "calls" },
+      definitions: {
+        "": "The calls of a route, in the order its trains make them.",
+      },
       domain: ROUTE_CLASS_URI,
       range: "metro:Call",
       kind: "OBJECT",
@@ -491,6 +514,7 @@ export const exampleDataset: ExampleDataset = {
       // property is its own inverse.
       uri: REVERSE,
       labels: { "": "reverse" },
+      definitions: { "": "The same route run in the other direction." },
       domain: ROUTE_CLASS_URI,
       range: "metro:Route",
       kind: "OBJECT",
@@ -509,6 +533,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: CALL_STOP,
       labels: { "": "stop" },
+      definitions: { "": "The stop a call is made at." },
       domain: CALL_CLASS_URI,
       range: "metro:Stop",
       kind: "OBJECT",
@@ -517,6 +542,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: DIAGRAM_POSITION,
       labels: { "": "diagram position" },
+      definitions: { "": "Where the station sits on the network diagram." },
       domain: STATION,
       range: "metro:DiagramPoint",
       kind: "OBJECT",
@@ -612,6 +638,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: UNIT_PROPERTY,
       labels: { "": "unit" },
+      definitions: { "": "The unit placed at this position in a formation." },
       domain: UNIT_POSITION_CLASS_URI,
       range: "metro:Unit",
       kind: "OBJECT",
@@ -640,6 +667,7 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: CAR_TYPE_PROPERTY,
       labels: { "": "car type" },
+      definitions: { "": "The car type placed at this position in a unit." },
       domain: CAR_POSITION_CLASS_URI,
       range: "metro:CarType",
       kind: "OBJECT",

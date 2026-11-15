@@ -1,3 +1,11 @@
+import {
+  BUS_OFFSET,
+  measurePathBounds,
+  parsePathData,
+  requireAt,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import {
   CROSS_REGION_GRAPH,
@@ -15,16 +23,8 @@ import {
   measurePhone,
 } from "../../../testing/measureClassGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
-import {
-  BUS_OFFSET,
-  DESIGN_CANVAS,
-  MIN_FIT,
-  PHONE,
-  SHELF_GAP,
-} from "./constants.js";
-import { measurePathBounds, parsePathData } from "./geometry.js";
+import { DESIGN_CANVAS, MIN_FIT, PHONE, SHELF_GAP } from "./constants.js";
 import layOutClassGraph from "./layOutClassGraph.js";
-import { requireAt, requireDefined, requireEntry } from "./require.js";
 import type { ClassGraphInput } from "./types.js";
 
 describe("layOutClassGraph", () => {

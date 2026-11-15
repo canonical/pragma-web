@@ -7,6 +7,7 @@ import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree from "../../../../testing/createSiteTree.js";
 import {
+  MOCK_HIDDEN_NODE,
   MOCK_NODE,
   MOCK_ONTOLOGY_CLASS,
 } from "../../../../testing/fixtures.js";
@@ -98,6 +99,39 @@ describe("NodeList", () => {
     expect(container.querySelector(".ds.node-card")).not.toBeNull();
     expect(container.querySelector(".ds.ontology-class-card")).not.toBeNull();
     expect(container.querySelector(".ds.entity-row")).toBeNull();
+  });
+
+  it("skips a node whose type the graph's lens hides", () => {
+    const { container } = renderWithNodes(
+      (nodes) => <NodeList nodes={nodes} />,
+      [
+        MOCK_HIDDEN_NODE,
+        { ...MOCK_ONTOLOGY_CLASS, uri: "https://ds.canonical.com/Layout" },
+      ],
+    );
+    expect(container.querySelectorAll("ol > li")).toHaveLength(1);
+    expect(container.querySelector(".ds.node-row")).toBeNull();
+    expect(container.querySelector(".ds.ontology-class-row")).not.toBeNull();
+  });
+
+  it("skips a hidden node in the cards too", () => {
+    const { container } = renderWithNodes(
+      (nodes) => <NodeList nodes={nodes} renderer="cards" />,
+      [
+        MOCK_HIDDEN_NODE,
+        { ...MOCK_ONTOLOGY_CLASS, uri: "https://ds.canonical.com/Layout" },
+      ],
+    );
+    expect(container.querySelector(".ds.node-card")).toBeNull();
+    expect(container.querySelector(".ds.ontology-class-card")).not.toBeNull();
+  });
+
+  it("shows the empty line when every node is hidden", () => {
+    renderWithNodes(
+      (nodes) => <NodeList empty="No instances." nodes={nodes} />,
+      [MOCK_HIDDEN_NODE],
+    );
+    expect(screen.getByText("No instances.")).toBeInTheDocument();
   });
 
   it("hands the list its empty line", () => {

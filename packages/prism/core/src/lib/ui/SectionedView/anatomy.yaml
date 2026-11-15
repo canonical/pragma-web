@@ -1,0 +1,232 @@
+---
+# SectionedView (packages/prism/core/src/lib/ui/SectionedView/): the generic
+# single-entity page (heuristics 3.1 to 3.3; PS8 V1, ps8-measured.json; M13,
+# M14). It takes the header, the facts and the sections as data and renders
+# the section index itself; nothing reads the DOM to list sections.
+# DOM order: bar (only with 3 sections or more), header, aside (contents,
+# facts), content (body, then one <section> per entry with its <h2 id>).
+# The root is one subgrid of the canvas's page grid over every column. It
+# adds no space at the page's end: the page wrapper that holds it owns that.
+#
+# Reflow, bound in styles.css (thresholds are whole groups, container `shell`):
+#   three groups and wider (default): header and content on `1 / -4`, rows 1
+#     and 2; the aside on `-4 / -1`, `grid-row: 1 / span 2`, sticky at the
+#     scroller's top, `align-self: start`; the bar is not displayed.
+#   `:not(:has(> .aside))`: header and content on `1 / -1` (1.1).
+#   @container shell (width < 1376px)  below three groups: every region on
+#     `1 / -1`; the aside is `display: contents`, its contents nav is not
+#     displayed and its facts take the row under the header (50a, 51a).
+#     With the bar (`:has(> .bar)`): `grid-template-rows` starts with one
+#     track of --sectioned-view-bar-block-size; the bar is displayed and
+#     keeps `grid-row: 1 / span 4` with `align-self: start`, so its grid
+#     area is the whole view and it sticks through the whole scroll (a
+#     sticky grid item is held by its grid area); header row 2, facts row 3,
+#     content row 4. With no facts (`:not(:has(> .aside > .facts))`) the
+#     content takes row 3 and the bar spans 3 rows, so no empty row adds a
+#     gap.
+# Every section heading carries `scroll-margin-block-start` of the bar's
+# block size, at every width; the DSL's roster has no key for it, so the
+# ledger below and the stylesheet carry it, and the anatomy check reads it
+# as an unkeyed property.
+#
+# Changed from the planner's anatomy, each for a reason:
+#   - The bar's presence is read by `:has(> .bar)`, not a `has-bar` state:
+#     the check's states are interaction states, and a root that holds a
+#     bar is a reflow, as a root without an aside is. The bar's block size
+#     is set here, on its slot, from --sectioned-view-bar-block-size, the
+#     length the headings' scroll margin reads, so the two are one value.
+#   - Keys are spelled as the DSL's roster spells them (`layout.alignSelf`,
+#     `layout.offset.block.start`); the per-width `display` values are
+#     reflow, which the stylesheet binds under its container query.
+#   - The body's slot is `body` and a section's content slot `section-body`:
+#     a slot's class is its name, and `content` names the content region.
+#   - The facts region is a subgrid, so a `KeyValueList` passed as facts
+#     keeps its terms and values on the page's column lines.
+#   - The facts stack in the aside (ruling on the facts' layout): a pair of
+#     the KeyValueList a page passes is a block there, its key muted over its
+#     value, the value wrapping anywhere (PS8 V1 `.mockup-facts`), since the
+#     aside's three columns leave a value one column; below three groups,
+#     under the header, the pair is the list's own grid again.
+#   - Every section takes the top margin, the first included: the check
+#     names no positional state, and the first section follows the header
+#     or the body.
+#   - A prose given as a section's content is reached through its
+#     `.editorial` class, the class every prose carries: it takes the
+#     section's every column and holds the 75ch reading measure (M13, v3
+#     1.1). Its text is set to the paragraphs' size (text primary), so the
+#     `ch` it counts is a paragraph's own: the measure is one rule for every
+#     page kind, never a column span. A string with no break in it (an
+#     address written as a link's text) wraps anywhere, so it never widens
+#     the section past the page. A table the published Markdown
+#     writes in the prose (`.markdown-table`) keeps to that measure: one
+#     wider scrolls sideways inside its own box, never the page and never
+#     cut (`display: block` makes the table its own scroller, since the
+#     published table has no wrapper).
+#
+# Token ledger (component tokens on `.ds.sectioned-view`):
+#   --sectioned-view-gap: --grid-gutter                      every grid here, both axes
+#   --sectioned-view-bar-block-size: calc(var(--density-line-height) + 2 * var(--space-050))
+#                                                            PS8 L171; 44px drawn; the bound is "at most 44px"
+#   --sectioned-view-section-margin-block-start: space.300   a section after another (external spacing, A2)
+#   --sectioned-view-prose-measure: 75ch                     a section's prose (M13, heuristic 75ch line; PS8 592px)
+#   --sectioned-view-prose-font-size: typography.text.primary.fontSize   the prose's text, its paragraphs' size
+#   --sectioned-view-aside-inset-block-start: 0              literal 0
+#   --sectioned-view-contents-label-color: color.text        the "On this page" label (A4: size, weight, never colour)
+#   --sectioned-view-contents-label-font-size: typography.text.secondary.fontSize   PS8 V1 L116, a small label
+#   --sectioned-view-contents-label-font-weight: typography.text.primary.bold.fontWeight
+#   --sectioned-view-contents-label-line-height: space.300  PS8 V1 L116, one line no taller than an entry
+#   --sectioned-view-facts-key-color: color.text.muted       a fact's key (PS8 `.mockup-facts dt`)
+# Literals: 0 and the 75ch measure.
+node:
+  uri: prism.component.sectioned_view
+  element: article
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        uri: prism.subcomponent.contents_bar
+        styles:
+          layout.type: none
+          layout.grid.column: "1 / -1"
+          layout.grid.row: "1 / span 4"
+          layout.alignSelf: start
+          layout.position: sticky
+          layout.offset.block.start: 0
+          size.block: "calc(var(--density-line-height) + 2 * var(--space-050))"
+      relation: { cardinality: "0..1", slotName: bar }             # sections.length >= BAR_MIN_SECTIONS (3)
+    - node:
+        role: header region
+        styles:
+          layout.grid.column: "1 / -4"
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: aside
+        element: aside
+        styles:
+          layout.grid.column: "-4 / -1"
+          layout.grid.row: "1 / span 2"
+          layout.alignSelf: start
+          layout.position: sticky
+          layout.offset.block.start: 0
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              role: contents
+              element: nav
+              attributes: { aria-labelledby: sectioned-view-contents }
+              styles: { layout.grid.column: "1 / -1" }
+              edges:
+                - node:
+                    role: label
+                    element: h2
+                    attributes: { id: sectioned-view-contents }   # fixed: SSR and hydration agree
+                    styles:
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      typography.size: typography.text.secondary.fontSize
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      typography.lineHeight: space.300
+                      typography.color: color.text
+                  relation: { cardinality: "1", slotName: label }
+                - node:
+                    uri: prism.subcomponent.contents_list
+                  relation: { cardinality: "1", slotName: list }
+            relation: { cardinality: "0..1", slotName: contents }   # sections.length >= BAR_MIN_SECTIONS (3), as the bar
+          - node:
+              role: facts
+              styles:
+                layout.grid.column: "1 / -1"
+                layout.type: grid
+                layout.grid.columns: subgrid
+                spacing.gap: grid.gutter
+              edges:
+                # The page's KeyValueList, reached through its own classes:
+                # in the aside each pair stacks, its key (muted) over its
+                # value across the aside, the value wrapping anywhere; below
+                # three groups the pair is the list's own grid again.
+                - node:
+                    uri: prism.component.key_value_list
+                    edges:
+                      - node:
+                          role: pair
+                          styles: { layout.type: block }
+                          edges:
+                            - node:
+                                role: key
+                                styles: { typography.color: color.text.muted }
+                              relation: { cardinality: "1", slotName: key }
+                            - node:
+                                role: value
+                                styles: { typography.wrap: anywhere }
+                              relation: { cardinality: "1", slotName: value }
+                        relation: { cardinality: "1..*", slotName: pair }
+                  relation: { cardinality: "0..1", slotName: key-value-list }
+            relation: { cardinality: "0..1", slotName: facts }      # absent when facts renders nothing
+      relation: { cardinality: "0..1", slotName: aside }            # absent with fewer than 3 sections and no facts
+    - node:
+        role: content region
+        styles:
+          layout.grid.column: "1 / -4"
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              role: body
+              styles: { layout.grid.column: "1 / -1", layout.type: grid, layout.grid.columns: subgrid, spacing.gap: grid.gutter }
+            relation: { cardinality: "0..1", slotName: body }       # children; absent when they render nothing
+          - node:
+              role: section
+              element: section
+              attributes: { aria-labelledby: "{id}" }
+              styles:
+                layout.grid.column: "1 / -1"
+                layout.type: grid
+                layout.grid.columns: subgrid
+                spacing.gap: grid.gutter
+                spacing.external.block.start: space.300
+              edges:
+                - node:
+                    role: heading
+                    element: h2
+                    attributes: { id: "{id}" }
+                    styles:
+                      layout.grid.column: "1 / -1"
+                  relation: { cardinality: "1", slotName: heading }
+                - node:
+                    role: section content
+                    styles: { layout.grid.column: "1 / -1", layout.type: grid, layout.grid.columns: subgrid, spacing.gap: grid.gutter }
+                    edges:
+                      # A prose the page passes, reached through its own
+                      # class: every column, the reading measure.
+                      - node:
+                          role: prose
+                          styles:
+                            layout.grid.column: "1 / -1"
+                            size.max.width: "75ch"
+                            typography.size: typography.text.primary.fontSize
+                            typography.wrap: anywhere
+                          edges:
+                            # A table the published Markdown writes in the
+                            # prose: within the measure, scrolling sideways
+                            # inside its own box when wider.
+                            - node:
+                                role: table (a Markdown table in the prose)
+                                styles:
+                                  layout.type: block
+                                  size.max.width: 100%
+                                  layout.overflow.inline: auto
+                              relation: { cardinality: "0..*", slotName: markdown-table }
+                        relation: { cardinality: "0..1", slotName: editorial }
+                  relation: { cardinality: "1", slotName: section-body }
+            relation: { cardinality: "0..*", slotName: section }
+      relation: { cardinality: "1", slotName: content }

@@ -116,6 +116,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "overflow-x": ["layout.overflow.inline"],
   "overflow-wrap": ["typography.wrap"],
   "overflow-y": ["layout.overflow.block"],
+  "overscroll-behavior": ["layout.overscroll"],
   padding: [
     "spacing.internal.block.start",
     "spacing.internal.block.end",
@@ -190,7 +191,8 @@ export const CAMEL_LIFTS: readonly (readonly [string, string])[] = [
 
 /**
  * The selector suffix each anatomy interaction state binds; a pressed
- * toggle button is selected, as a current link is. `:focus` serves
+ * toggle button is selected, as a link to the current page or the current
+ * section is. `:focus` serves
  * an element that takes focus only by script, which never shows a keyboard
  * ring; every other focusable element binds `:focus-visible`.
  */
@@ -200,6 +202,7 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":focus": "focus",
   ":focus-visible": "focus",
   ":hover": "hover",
+  '[aria-current="location"]': "selected",
   '[aria-current="page"]': "selected",
   '[aria-disabled="true"]': "disabled",
   '[aria-pressed="true"]': "selected",
@@ -223,17 +226,22 @@ export const MODIFIER_ROLE = /\((\.[a-z][a-z0-9-]*)\)\s*$/;
 export const LINK_QUALIFIERS: readonly string[] = ["[href]"];
 
 /**
- * The properties no style key binds, because they set no design decision:
- * generated content, whether forced colours may repaint an element, and
- * which anchor a tethered box reads its place from and where it tries to
- * go when the viewport has no room (the anatomy DSL has no anchor key; the
- * gap from the anchor is the box's margin, which a key binds).
+ * The properties no style key binds: generated content and whether forced
+ * colours may repaint an element, which set no design decision; which anchor
+ * a tethered box reads its place from and where it tries to go when the
+ * viewport has no room (the anatomy DSL has no anchor key; the gap from the
+ * anchor is the box's margin, which a key binds); and two the DSL's roster
+ * has no key for, which a component reads through its own tokens: where a
+ * heading stops when a link scrolls to it, and a rule drawn inside a box (an
+ * inset shadow) that must not move its content.
  */
 export const UNKEYED_PROPERTIES: readonly string[] = [
+  "box-shadow",
   "content",
   "forced-color-adjust",
   "position-area",
   "position-try-fallbacks",
+  "scroll-margin-block-start",
 ];
 
 /**

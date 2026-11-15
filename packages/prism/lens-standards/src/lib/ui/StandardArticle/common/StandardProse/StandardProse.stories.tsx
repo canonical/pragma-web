@@ -36,5 +36,5 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** Markdown prose, its headings one level down and its mention a chip. */
+/** Markdown prose, its headings two levels down and its mention a chip. */
 export const Default: Story = {};

@@ -13,8 +13,9 @@ type OwnProps = {
 
 /**
  * Props accepted by `ComponentRelations`: the component, then the native
- * props of the page section's `<section>` root. The native `children` are
- * excluded: the section renders the relations.
+ * props of its `<div>` root, the content of the page's
+ * relations section. The native `children` are excluded: the part renders
+ * the relations.
  */
 export type ComponentRelationsProps = OwnProps &
-  Omit<ComponentProps<"section">, keyof OwnProps | "children">;
+  Omit<ComponentProps<"div">, keyof OwnProps | "children">;

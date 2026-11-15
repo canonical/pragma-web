@@ -1,5 +1,6 @@
 // @vitest-environment node
 
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
@@ -35,6 +36,7 @@ const EXTERNAL_TOKENS = [
   "--color-text-muted",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-code-font-family",
+  "--typography-text-primary-font-size",
   "--typography-text-secondary-font-size",
   "--typography-text-secondary-font-weight",
 ];
@@ -43,7 +45,10 @@ const EXTERNAL_TOKENS = [
  * The rules that style markup a component does not write itself: the
  * site's utility cluster at the rail's foot, styled from the class
  * contract `Rail` documents, and the published Breadcrumbs' list and its
- * crumb's text, which `LensBreadcrumbs` keeps on one line.
+ * crumb's text, which `LensBreadcrumbs` keeps on one line, and the pairs
+ * of the `KeyValueList` a page passes as `SectionedView`'s facts, which
+ * stack in the view's aside, and the table the published Markdown writes in
+ * a section's prose, which scrolls inside the prose's measure.
  */
 const REACHES = [
   ".ds.rail .utilities-label",
@@ -51,9 +56,19 @@ const REACHES = [
   ".ds.rail .theme",
   ".ds.lens-breadcrumbs .list",
   ".ds.lens-breadcrumbs .link",
+  ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair",
+  ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .key",
+  ".ds.sectioned-view > .aside > .facts > .key-value-list > .pair > .value",
+  ".ds.sectioned-view > .content > .section > .section-body > .editorial",
+  ".ds.sectioned-view > .content > .section > .section-body > .editorial > .markdown-table",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
+
+/** The private subcomponents each component keeps under its `common/`. */
+const subcomponentFolders = listAnatomyFolders(
+  folders.map((folder) => join(folder, "common")),
+);
 
 describe("the package's components", () => {
   it("are found", () => {
@@ -66,6 +81,13 @@ describe("the package's components", () => {
       const specification = assertAnatomy(folder);
       assertStylesMatchAnatomy(folder, specification);
       assertScaffold(folder, { packageRoot: PACKAGE_ROOT, testSuffix: "test" });
+    },
+  );
+
+  it.each(subcomponentFolders)(
+    "%s keeps its anatomy and its styles",
+    (folder) => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
     },
   );
 

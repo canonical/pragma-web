@@ -342,7 +342,8 @@ binding can derive names from it. Check the bindings in two places:
   type is missing or does not implement `Node`;
 - at boot, `await assertBindingsLive(execute, bindings)` asks the running
   graph for every binding's class and throws when the graph does not know
-  one.
+  one, or when its type lens hides one (a hidden class's instances are
+  values, never an index).
 
 ## Strings
 
@@ -377,8 +378,15 @@ site's own catalog, and the factory holds no reader-facing string.
 
 ## Public API
 
-- Layouts: `WorkspaceLayout`, `DocumentLayout`; types
-  `WorkspaceLayoutProps`, `DocumentLayoutProps`.
+- Layouts: `WorkspaceLayout`, `DocumentLayout`, `SectionedView` (the
+  generic single-entity page: the header, the facts and the sections
+  given as data, with the section index built from the sections), and
+  `orderSections`, which orders a page's sections as a class's lens
+  orders their anchor fields (group order, then field order, a field the
+  lens does not place after the placed ones); types
+  `WorkspaceLayoutProps`, `DocumentLayoutProps`, `SectionedViewProps`,
+  `SectionedViewSection`, `LensFieldOrder` (a class's field as the served
+  lens describes it: its name, its order and its group's order).
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
   `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `CopyButton` (a Copy
   button for a cited text, "Copied" announced in a live region),
@@ -416,6 +424,30 @@ site's own catalog, and the factory holds no reader-facing string.
   or its top-left corner at that zoom without one, the rest a pan away), and
   the camera pans over the graph's whole bounds however
   small a window of it the viewBox opens on.
+- Graph budgets: `GRAPH_DRAWN_NODES_MAX`, `GRAPH_BAND_MEMBERS_MAX`,
+  `GRAPH_FETCHED_NODES_MAX`, `GRAPH_SVG_BYTES_MAX`, `GRAPH_SVG_ELEMENTS_MAX`,
+  `GRAPH_LABEL_PX_MIN`, `GRAPH_BUDGET` (all six as one record),
+  `createGraphBudget` (the site's budget, built once: a bare number only
+  tightens a budget, loosening one takes a reason),
+  `GraphBudgetProvider`, `useGraphBudget`; types `GraphBudget`,
+  `GraphBudgetOverrides`, `GraphBudgetRaise`, `GraphBudgetProviderProps`.
+- Graph layout: the engine contract and the layered engine, pure functions
+  of their input: `layoutLayered` (a region of nodes as layered columns,
+  root at the left, on the contract), `layOutRegion`, the lengths it places
+  by `LATTICE`, `BUS_OFFSET`, `ARC_BASE`, `ARC_NEST`, `LABEL_SIZE`,
+  `REGION_LABEL_SIZE`, `REGION_LABEL_GAP`, `REGION_LABEL_ROW`, `COLLISION_MARGIN`,
+  `LABEL_LINE_PITCH`, `LABEL_HALO`, `DIRECTION_ARROWS`, the label placer
+  `placeEdgeLabels`, and the geometry it shares `measureTextWidth`,
+  `measureTextBox`, `measureRegionLabelWidth`, `findCentredBaseline`,
+  `ceilTo`, `roundTo`, `formatPathData`, `parsePathData`, `buildArrowhead`,
+  `flattenPath`, `samplePath`, `measurePathBounds`, `insetRect`,
+  `containsPoint`, `intersectsRect`, `uniteRects`, `compareText`, `orderBy`,
+  `requireAt`, `requireEntry`, `requireDefined`; types `GraphLayout`,
+  `GraphLayoutNode`, `GraphLayoutEdge`, `GraphLayoutOptions`,
+  `GraphLayoutResult`, `LayeredNodes`, `LayeredEdges`, `LayeredModel`,
+  `LayeredBundle`, `RegionLayout`, `CrossPort`, `LabelledLayout`,
+  `LabelledBundle`, `LabelPlacement`, `Rect`, `Point`, `PathCommand`,
+  `FontFace`.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.
@@ -450,8 +482,8 @@ site's own catalog, and the factory holds no reader-facing string.
   `HomeNode`, `HomesProviderProps`.
 - Stored theme: `StoredThemeProvider`, `useStoredTheme`; types
   `StoredThemeProviderProps`.
-- Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`; types
-  `EntityBinding`, `GraphQLExecute`.
+- Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`,
+  `HIDDEN_VISIBILITY`; types `EntityBinding`, `GraphQLExecute`.
 - Relay: `createEnvironment`, `getPrefetchEnvironment`,
   `setPrefetchEnvironment`, `prefetchQuery`, `prepareRelayData`; types
   `CreateEnvironmentOptions`, `PrepareRelayDataOptions`, `PreparedRelayData`.

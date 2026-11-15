@@ -47,6 +47,29 @@ describe("UIBlockExample", () => {
     expect(button).toHaveAttribute("type", "button");
   });
 
+  it("renders the published Button with the modifiers it honours", () => {
+    render(
+      <UIBlockExample
+        example="button"
+        modifiers={{ importance: "secondary", criticality: "error" }}
+      />,
+    );
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("secondary");
+    expect(button).not.toHaveClass("error");
+  });
+
+  it("renders the published Badge and Chip with a criticality", () => {
+    const { container } = render(
+      <>
+        <UIBlockExample example="badge" modifiers={{ criticality: "error" }} />
+        <UIBlockExample example="chip" modifiers={{ release: "beta" }} />
+      </>,
+    );
+    expect(container.children[0]).toHaveClass("error");
+    expect(container.children[1]).toHaveClass("beta");
+  });
+
   it("renders the published Chip over its value", () => {
     const { container } = render(<UIBlockExample example="chip" />);
     expect(container.firstElementChild).toHaveClass("ds", "chip");

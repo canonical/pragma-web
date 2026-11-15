@@ -22,3 +22,22 @@ export const EXAMPLE_BADGE_VALUE = 8;
 
 /** The key the example KeyboardKey shows: it renders nothing without one. */
 export const EXAMPLE_KEY: Key = "enter";
+
+/**
+ * The modifier families each example honours, by the name of the published
+ * component's prop that takes a family's modifier (`importance` takes
+ * `primary`). A family the graph records for a block but its example does
+ * not list here is not drawn: the published component has no prop for it.
+ */
+export const BLOCK_EXAMPLE_FAMILIES: Readonly<
+  Record<BlockExampleName, readonly string[]>
+> = {
+  badge: ["criticality"],
+  button: ["importance", "anticipation"],
+  chip: ["criticality", "release"],
+  inlineCode: [],
+  keyboardKey: [],
+};
+
+/** No modifier: the example in the component's default state. */
+export const NO_MODIFIERS: Readonly<Record<string, string>> = {};

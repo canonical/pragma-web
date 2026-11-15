@@ -9,8 +9,8 @@ type OwnProps = {
 
 /**
  * Props accepted by `ComponentExample`: the block's address, then the
- * native props of the page section's `<section>` root. The native
- * `children` are excluded: the section renders the example.
+ * native props of its `<div>` root. The native `children` are excluded:
+ * the part renders the example.
  */
 export type ComponentExampleProps = OwnProps &
-  Omit<ComponentProps<"section">, keyof OwnProps | "children">;
+  Omit<ComponentProps<"div">, keyof OwnProps | "children">;

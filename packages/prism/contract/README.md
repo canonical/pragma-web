@@ -28,7 +28,9 @@ in its place.
 | --- | --- |
 | Relay structure | `Node`, `PageInfo`, `NodeConnection`, `NodeEdge` |
 | TBox (hand-written) | `Ontology`, `OntologyClass`, `ClassProperty`, `OntologyProperty`, `PropertyKind`, `EntityMeta` |
-| Root fields | `ontologies`, `ontology`, `ontologyClass`, `ontologyProperty`, `node(id:)` |
+| Type lens | `TermVisibility`, `PropertyRole`, `PropertyGroup`, and nullable lens fields on `OntologyClass`, `ClassProperty` and `OntologyProperty` |
+| Class edges | `ClassEdge`, `Query.classEdges` |
+| Root fields | `ontologies`, `ontology`, `ontologyClass`, `ontologyProperty`, `node(id:)`, `classEdges` |
 
 Independence from the **ontology** is unconditional — the contract names no
 ontology terms, so nothing loaded can move it. Independence from the compiler's
@@ -68,6 +70,62 @@ compiled with `prefixing: "all"` satisfies it exactly as one compiled with
 (`"ds:Component"`) and live client operations already declare
 `$uri: String!`, which `ID!` would invalidate. `node(id:)` is the strict
 lookup by absolute IRI.
+
+### The type lens
+
+The lens says how a site shows its ontology: how prominently a class, a
+property or a class's field is shown (`visibility`: a `HIDDEN` class is a
+value and never an entity), the role a field's values play (`role`), the
+ordered sections a class's fields fall into (`group`, `order`), a class's
+`glyph`, and the plural and inverse labels (`pluralLabel`, `inverseLabel`,
+`inversePluralLabel`, `inverseVisibility`). Every lens field is nullable, so
+an ontology that declares no lens answers null and its provider still
+conforms. The fields and their descriptions are the ones a ke-graphql that
+reads the type lens emits on its TBox types, so the lens has one shape across
+the compiler, this contract and every provider.
+
+A ke-graphql that predates the lens does not emit these fields, so its
+provider serves them from a **site lens**: plain data with the same structure
+as the Turtle lens, resolved by the same rules. The package ships the model
+and its resolver:
+
+```ts
+import { indexSiteLens, selectLiteral } from "@canonical/prism-contract";
+
+const lens = indexSiteLens(siteLens, outline);
+lens.classLens(classUri); // { visibility, glyph, pluralLabels }
+lens.fieldLens(classUri, propertyUri); // { group, order, role, visibility }
+lens.propertyLens(propertyUri); // plural and inverse labels, inverse visibility
+selectLiteral(lens.classLens(classUri).pluralLabels, "en");
+```
+
+- A class's `visibility` and `glyph` are its own, else those of the nearest
+  level of ancestors that declares one; disagreeing values at that level give
+  null, and a farther ancestor never fills the gap.
+- A field's `group`, `order`, `role` and `visibility` resolve the same way,
+  fact by fact, through the lens entries of the class and its ancestors;
+  `visibility` then falls back to the property's own.
+- Plural and inverse labels are never inherited. Inverse labels, inverse
+  plural labels and inverse visibility fall back to the declared inverse
+  partner's asserted labels, plural labels and visibility.
+- A language resolves to the literal tagged exactly with it, ignoring case
+  (`en` never matches `en-GB`), else the untagged one.
+- A duplicate entry, or a field in a group the lens does not declare, throws.
+  IRIs the outline does not know are listed in `unknownIris` and ignored.
+
+Once ke-graphql emits the lens, the same facts are read from Turtle and the
+site lens moves there.
+
+### Class edges
+
+`Query.classEdges` lists the edges between classes, each weighed by the
+instance statements it covers. No compiler emits it: a provider computes it
+from its store with `weighClassEdges(declarations, observations, outline)`.
+Each declaration (a property with its domain and range) gives one declared
+edge counting the statements whose subject and object classes are the domain
+and range or their subclasses, with count 0 when there is none; each observed
+class pair no declaration covers gives one edge with `declared: false`. The
+list is sorted by property, subject class and object class.
 
 ### What is deliberately excluded
 

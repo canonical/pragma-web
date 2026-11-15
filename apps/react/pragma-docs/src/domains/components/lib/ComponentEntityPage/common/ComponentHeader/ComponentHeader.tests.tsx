@@ -11,13 +11,6 @@ import {
   entityPageAt,
 } from "../../../../__fixtures__/entityPageHarness.js";
 
-/** The header's key values, each term with its value. */
-const readFacts = () =>
-  [...document.querySelectorAll(".ds.component-header .pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent,
-    pair.querySelector(".value")?.textContent,
-  ]);
-
 describe("ComponentHeader", () => {
   it(
     "names the component in the page's heading over its summary",
@@ -40,7 +33,7 @@ describe("ComponentHeader", () => {
   );
 
   it(
-    "lists the address in inline code, then the tier and the stage the graph records",
+    "reads the tier, the stage and the address on one status line",
     () => {
       render(
         entityPageAt(
@@ -49,22 +42,79 @@ describe("ComponentHeader", () => {
           createFetchSpy(),
         ),
       );
-      expect(readFacts().at(0)).toEqual(["Address", BUTTON_URI]);
+      const line = document.querySelector(
+        ".ds.component-header > .summary + .status-line",
+      );
+      // Each dot is a child of the part whose value it follows, so the
+      // line can wrap only between parts, never between a value and its dot.
       expect(
-        document.querySelector(".ds.component-header .pair .value code")
-          ?.textContent,
-      ).toBe(BUTTON_URI);
-      expect(readFacts().map(([term]) => term)).toContain("Tier");
+        [...(line?.children ?? [])].map((part) => [
+          part.className,
+          [...part.children].map((child) => [
+            child.className,
+            child.textContent,
+          ]),
+        ]),
+      ).toEqual([
+        [
+          "part",
+          [
+            ["value", "Tier: Global"],
+            ["separator", "·"],
+          ],
+        ],
+        [
+          "part",
+          [
+            ["value", "Stage: needs:documentation"],
+            ["separator", "·"],
+          ],
+        ],
+        ["address", []],
+      ]);
+      expect(line?.querySelector(".address")).toHaveTextContent(BUTTON_URI);
+      expect(line?.querySelector(".address")?.tagName).toBe("CODE");
+      for (const separator of line?.querySelectorAll(".separator") ?? []) {
+        expect(separator).toHaveAttribute("aria-hidden", "true");
+      }
     },
     ENTITY_TEST_TIMEOUT_MS,
   );
 
   it(
-    "leaves out the tier, the version and the stage the graph does not record",
+    "labels the tier and the stage before their values for assistive technology",
+    () => {
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const line = document.querySelector(
+        ".ds.component-header > .status-line",
+      );
+      // The text assistive technology reads: every part but the hidden dots.
+      const spoken = [...(line?.querySelectorAll(".value, .address") ?? [])]
+        .map((part) => part.textContent)
+        .join(" ");
+      expect(spoken).toBe(
+        `Tier: Global Stage: needs:documentation ${BUTTON_URI}`,
+      );
+      expect(
+        [...(line?.querySelectorAll(".value > .label") ?? [])].map(
+          (label) => label.textContent,
+        ),
+      ).toEqual(["Tier:", "Stage:"]);
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "leaves out the tier and the stage the graph does not record",
     () => {
       const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
         tier: null,
-        version: null,
       }) as unknown as Record<string, Record<string, unknown>>;
       const stages =
         records[
@@ -79,19 +129,28 @@ describe("ComponentHeader", () => {
           createFetchSpy(),
         ),
       );
-      expect(readFacts()).toEqual([["Address", BUTTON_URI]]);
+      const line = document.querySelector(
+        ".ds.component-header > .status-line",
+      );
+      expect(line?.textContent).toBe(BUTTON_URI);
+      expect(line?.querySelector(".separator")).toBeNull();
     },
     ENTITY_TEST_TIMEOUT_MS,
   );
 
   it(
-    "shows the version when the graph records one",
+    "leaves the component's facts to the page",
     () => {
-      const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
-        version: "2.1",
-      });
-      render(entityPageAt(BUTTON_URI, records, createFetchSpy()));
-      expect(readFacts()).toContainEqual(["Version", "2.1"]);
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      expect(
+        document.querySelector(".ds.component-header .ds.key-value-list"),
+      ).toBeNull();
     },
     ENTITY_TEST_TIMEOUT_MS,
   );

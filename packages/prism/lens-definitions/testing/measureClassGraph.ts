@@ -5,32 +5,32 @@
  */
 
 import {
-  BOX_INSET,
   COLLISION_MARGIN,
-  DESIGN_CANVAS,
-  LABEL_SIZE,
-  PHONE,
-  REGION_LABEL_GAP,
-  REGION_LABEL_ROW,
-  REGION_LABEL_SIZE,
-  WRAPPED_BASELINES,
-} from "../src/lib/classGraph/constants.js";
-import {
   containsPoint,
   findCentredBaseline,
   flattenPath,
   insetRect,
   intersectsRect,
+  LABEL_SIZE,
   measureTextBox,
   measureTextWidth,
+  type Point,
   parsePathData,
+  REGION_LABEL_GAP,
+  REGION_LABEL_ROW,
+  REGION_LABEL_SIZE,
+  type Rect,
   samplePath,
-} from "../src/lib/classGraph/geometry.js";
+} from "@canonical/prism-core";
+import {
+  BOX_INSET,
+  DESIGN_CANVAS,
+  PHONE,
+  WRAPPED_BASELINES,
+} from "../src/lib/classGraph/constants.js";
 import type {
   ClassGraphLayout,
   LaidOutNode,
-  Point,
-  Rect,
 } from "../src/lib/classGraph/types.js";
 
 /** A node's collision box: its box, 4px around, and its loop's extent. */

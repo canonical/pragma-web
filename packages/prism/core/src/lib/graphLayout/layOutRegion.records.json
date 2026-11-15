@@ -1,0 +1,2362 @@
+[
+  {
+    "input": {
+      "model": {
+        "byId": [
+          [
+            "aa:A",
+            {
+              "label": "A",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "bb:B",
+            {
+              "label": "B",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ]
+        ],
+        "parent": [],
+        "crossParent": [],
+        "children": [],
+        "bundles": [
+          {
+            "id": "aa:A bb:B",
+            "a": "aa:A",
+            "b": "bb:B",
+            "self": false,
+            "heads": ["bb:B"],
+            "cross": true
+          }
+        ],
+        "drawnRelations": [{ "domain": "aa:A", "range": "bb:B" }]
+      },
+      "ids": ["bb:B"],
+      "channel": 48,
+      "sweeps": 4,
+      "crossPorts": []
+    },
+    "output": {
+      "nodes": [
+        [
+          "bb:B",
+          {
+            "id": "bb:B",
+            "col": 0,
+            "x": 0,
+            "y": 0,
+            "w": 96,
+            "h": 32,
+            "order": 0
+          }
+        ]
+      ],
+      "edges": [],
+      "columns": [["bb:B"]],
+      "columnX": [0],
+      "columnWidth": [96],
+      "ports": [["aa:A bb:B bb:B", 16]],
+      "content": { "x": 0, "y": 0, "w": 96, "h": 32 },
+      "findings": [],
+      "crowdedArcs": 0,
+      "columnOf": [0],
+      "depthOf": [0],
+      "predecessorsOf": [[]]
+    }
+  },
+  {
+    "input": {
+      "model": {
+        "byId": [
+          [
+            "ex:Long",
+            {
+              "label": "An Extraordinarily Long Class Name That Wraps Twice Over",
+              "w": 208,
+              "h": 64,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Note",
+            {
+              "label": "Note",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": true,
+              "loopExtent": 16
+            }
+          ],
+          [
+            "ex:Part",
+            {
+              "label": "Part",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Remark",
+            {
+              "label": "Remark",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Thing",
+            {
+              "label": "Thing",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Whole",
+            {
+              "label": "Whole",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "zz:Leaf",
+            {
+              "label": "Leaf",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "zz:Root",
+            {
+              "label": "Root",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ]
+        ],
+        "parent": [
+          ["ex:Part", "ex:Thing"],
+          ["ex:Whole", "ex:Thing"],
+          ["zz:Leaf", "zz:Root"]
+        ],
+        "crossParent": [["zz:Root", "ex:Thing"]],
+        "children": [
+          ["ex:Thing", ["ex:Part", "ex:Whole"]],
+          ["zz:Root", ["zz:Leaf"]]
+        ],
+        "bundles": [
+          {
+            "id": "ex:Long ex:Note",
+            "a": "ex:Long",
+            "b": "ex:Note",
+            "self": false,
+            "heads": ["ex:Note"],
+            "cross": false
+          },
+          {
+            "id": "ex:Long ex:Remark",
+            "a": "ex:Long",
+            "b": "ex:Remark",
+            "self": false,
+            "heads": ["ex:Long"],
+            "cross": false
+          },
+          {
+            "id": "ex:Note ex:Note",
+            "a": "ex:Note",
+            "b": "ex:Note",
+            "self": true,
+            "heads": ["ex:Note"],
+            "cross": false
+          },
+          {
+            "id": "ex:Note ex:Remark",
+            "a": "ex:Note",
+            "b": "ex:Remark",
+            "self": false,
+            "heads": ["ex:Remark"],
+            "cross": false
+          },
+          {
+            "id": "ex:Part ex:Whole",
+            "a": "ex:Part",
+            "b": "ex:Whole",
+            "self": false,
+            "heads": ["ex:Part", "ex:Whole"],
+            "cross": false
+          },
+          {
+            "id": "ex:Whole zz:Leaf",
+            "a": "ex:Whole",
+            "b": "zz:Leaf",
+            "self": false,
+            "heads": ["ex:Whole"],
+            "cross": true
+          }
+        ],
+        "drawnRelations": [
+          { "domain": "ex:Note", "range": "ex:Remark" },
+          { "domain": "ex:Long", "range": "ex:Note" },
+          { "domain": "ex:Whole", "range": "ex:Part" },
+          { "domain": "zz:Leaf", "range": "ex:Whole" },
+          { "domain": "ex:Part", "range": "ex:Whole" },
+          { "domain": "ex:Remark", "range": "ex:Long" },
+          { "domain": "ex:Note", "range": "ex:Note" }
+        ]
+      },
+      "ids": [
+        "ex:Long",
+        "ex:Note",
+        "ex:Part",
+        "ex:Remark",
+        "ex:Thing",
+        "ex:Whole"
+      ],
+      "channel": 48,
+      "sweeps": 0,
+      "crossPorts": []
+    },
+    "output": {
+      "nodes": [
+        [
+          "ex:Long",
+          {
+            "id": "ex:Long",
+            "col": 0,
+            "x": 0,
+            "y": 0,
+            "w": 208,
+            "h": 64,
+            "order": 0
+          }
+        ],
+        [
+          "ex:Note",
+          {
+            "id": "ex:Note",
+            "col": 1,
+            "x": 256,
+            "y": 16,
+            "w": 96,
+            "h": 32,
+            "order": 0
+          }
+        ],
+        [
+          "ex:Part",
+          {
+            "id": "ex:Part",
+            "col": 1,
+            "x": 256,
+            "y": 64,
+            "w": 96,
+            "h": 32,
+            "order": 1
+          }
+        ],
+        [
+          "ex:Remark",
+          {
+            "id": "ex:Remark",
+            "col": 2,
+            "x": 416,
+            "y": 80,
+            "w": 96,
+            "h": 32,
+            "order": 0
+          }
+        ],
+        [
+          "ex:Thing",
+          {
+            "id": "ex:Thing",
+            "col": 0,
+            "x": 0,
+            "y": 80,
+            "w": 96,
+            "h": 48,
+            "order": 1
+          }
+        ],
+        [
+          "ex:Whole",
+          {
+            "id": "ex:Whole",
+            "col": 1,
+            "x": 256,
+            "y": 112,
+            "w": 96,
+            "h": 32,
+            "order": 2
+          }
+        ]
+      ],
+      "edges": [
+        {
+          "id": "sub:ex:Thing",
+          "kind": "subclass",
+          "from": "ex:Thing",
+          "to": ["ex:Part", "ex:Whole"],
+          "commands": [
+            ["M", 96, 104],
+            ["H", 224],
+            ["M", 224, 80],
+            ["V", 128],
+            ["M", 224, 80],
+            ["H", 256],
+            ["M", 224, 128],
+            ["H", 256]
+          ],
+          "heads": [
+            [["M", 96, 104], ["L", 104, 100], ["V", 108], ["L", 96, 104]]
+          ],
+          "busX": 224
+        },
+        {
+          "id": "rel:ex:Long ex:Note",
+          "kind": "relation",
+          "from": "ex:Long",
+          "to": ["ex:Note"],
+          "commands": [["M", 208, 32], ["C", 232, 32, 232, 32, 256, 32]],
+          "heads": [
+            [["M", 256, 32], ["L", 248, 28], ["V", 36], ["L", 256, 32]]
+          ],
+          "bundle": "ex:Long ex:Note"
+        },
+        {
+          "id": "rel:ex:Long ex:Remark",
+          "kind": "relation",
+          "from": "ex:Long",
+          "to": ["ex:Remark"],
+          "commands": [
+            ["M", 208, 56],
+            ["C", 232, 56, 232, 152, 256, 152],
+            ["H", 368],
+            ["C", 392, 152, 392, 104, 416, 104]
+          ],
+          "heads": [
+            [["M", 208, 56], ["L", 216, 52], ["V", 60], ["L", 208, 56]]
+          ],
+          "bundle": "ex:Long ex:Remark"
+        },
+        {
+          "id": "rel:ex:Note ex:Note",
+          "kind": "relation",
+          "from": "ex:Note",
+          "to": ["ex:Note"],
+          "commands": [["M", 344, 16], ["C", 344, -16, 384, 24, 352, 24]],
+          "heads": [
+            [["M", 352, 24], ["L", 360, 20], ["V", 28], ["L", 352, 24]]
+          ],
+          "self": true,
+          "apex": [364, 4],
+          "bundle": "ex:Note ex:Note"
+        },
+        {
+          "id": "rel:ex:Note ex:Remark",
+          "kind": "relation",
+          "from": "ex:Note",
+          "to": ["ex:Remark"],
+          "commands": [
+            ["M", 352, 40],
+            ["H", 368],
+            ["C", 392, 40, 392, 88, 416, 88]
+          ],
+          "heads": [
+            [["M", 416, 88], ["L", 408, 84], ["V", 92], ["L", 416, 88]]
+          ],
+          "bundle": "ex:Note ex:Remark"
+        },
+        {
+          "id": "rel:ex:Part ex:Whole",
+          "kind": "relation",
+          "from": "ex:Part",
+          "to": ["ex:Whole"],
+          "commands": [
+            ["M", 352, 88],
+            ["H", 368],
+            ["C", 384, 88, 384, 88, 384, 104],
+            ["V", 104],
+            ["C", 384, 120, 384, 120, 368, 120],
+            ["H", 352]
+          ],
+          "heads": [
+            [["M", 352, 88], ["L", 360, 84], ["V", 92], ["L", 352, 88]],
+            [["M", 352, 120], ["L", 360, 116], ["V", 124], ["L", 352, 120]]
+          ],
+          "arc": true,
+          "apex": [384, 104],
+          "bundle": "ex:Part ex:Whole"
+        }
+      ],
+      "columns": [
+        ["ex:Long", "ex:Thing"],
+        ["ex:Note", "ex:Part", "ex:Whole", "ex:Long ex:Remark@1"],
+        ["ex:Remark"]
+      ],
+      "columnX": [0, 256, 416],
+      "columnWidth": [208, 112, 96],
+      "ports": [
+        ["ex:Long ex:Note ex:Long", 32],
+        ["ex:Long ex:Remark ex:Long", 56],
+        ["ex:Long ex:Note ex:Note", 32],
+        ["ex:Note ex:Remark ex:Note", 40],
+        ["ex:Part ex:Whole ex:Part", 88],
+        ["ex:Note ex:Remark ex:Remark", 88],
+        ["ex:Long ex:Remark ex:Remark", 104],
+        ["ex:Part ex:Whole ex:Whole", 120],
+        ["ex:Whole zz:Leaf ex:Whole", 128]
+      ],
+      "content": { "x": 0, "y": 0, "w": 512, "h": 152 },
+      "findings": [],
+      "crowdedArcs": 0,
+      "columnOf": [0, 1, 1, 2, 0, 1],
+      "depthOf": [0, 0, 1, 0, 0, 1],
+      "predecessorsOf": [[], ["ex:Long"], [], ["ex:Note"], [], ["ex:Part"]]
+    }
+  },
+  {
+    "input": {
+      "model": {
+        "byId": [
+          [
+            "ex:Echo",
+            {
+              "label": "Echo",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Long",
+            {
+              "label": "An Extraordinarily Long Class Name That Wraps Twice Over",
+              "w": 208,
+              "h": 64,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Note",
+            {
+              "label": "Note",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": true,
+              "loopExtent": 32
+            }
+          ],
+          [
+            "ex:Part",
+            {
+              "label": "Part",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Piece",
+            {
+              "label": "Piece",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Remark",
+            {
+              "label": "Remark",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Thing",
+            {
+              "label": "Thing",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "ex:Whole",
+            {
+              "label": "Whole",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "yy:Solo",
+            {
+              "label": "Solo",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "zz:Leaf",
+            {
+              "label": "Leaf",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "zz:Root",
+            {
+              "label": "Root",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ]
+        ],
+        "parent": [
+          ["ex:Part", "ex:Thing"],
+          ["ex:Piece", "ex:Thing"],
+          ["ex:Whole", "ex:Thing"],
+          ["zz:Leaf", "zz:Root"]
+        ],
+        "crossParent": [["yy:Solo", "ex:Remark"], ["zz:Root", "ex:Thing"]],
+        "children": [
+          ["ex:Thing", ["ex:Part", "ex:Piece", "ex:Whole"]],
+          ["zz:Root", ["zz:Leaf"]]
+        ],
+        "bundles": [
+          {
+            "id": "ex:Echo ex:Long",
+            "a": "ex:Echo",
+            "b": "ex:Long",
+            "self": false,
+            "heads": ["ex:Echo"],
+            "cross": false
+          },
+          {
+            "id": "ex:Echo ex:Remark",
+            "a": "ex:Echo",
+            "b": "ex:Remark",
+            "self": false,
+            "heads": ["ex:Echo"],
+            "cross": false
+          },
+          {
+            "id": "ex:Long ex:Note",
+            "a": "ex:Long",
+            "b": "ex:Note",
+            "self": false,
+            "heads": ["ex:Note"],
+            "cross": false
+          },
+          {
+            "id": "ex:Long ex:Remark",
+            "a": "ex:Long",
+            "b": "ex:Remark",
+            "self": false,
+            "heads": ["ex:Long"],
+            "cross": false
+          },
+          {
+            "id": "ex:Long yy:Solo",
+            "a": "ex:Long",
+            "b": "yy:Solo",
+            "self": false,
+            "heads": ["ex:Long"],
+            "cross": true
+          },
+          {
+            "id": "ex:Note ex:Note",
+            "a": "ex:Note",
+            "b": "ex:Note",
+            "self": true,
+            "heads": ["ex:Note"],
+            "cross": false
+          },
+          {
+            "id": "ex:Note ex:Remark",
+            "a": "ex:Note",
+            "b": "ex:Remark",
+            "self": false,
+            "heads": ["ex:Remark"],
+            "cross": false
+          },
+          {
+            "id": "ex:Note yy:Solo",
+            "a": "ex:Note",
+            "b": "yy:Solo",
+            "self": false,
+            "heads": ["yy:Solo"],
+            "cross": true
+          },
+          {
+            "id": "ex:Part ex:Piece",
+            "a": "ex:Part",
+            "b": "ex:Piece",
+            "self": false,
+            "heads": ["ex:Part"],
+            "cross": false
+          },
+          {
+            "id": "ex:Part ex:Whole",
+            "a": "ex:Part",
+            "b": "ex:Whole",
+            "self": false,
+            "heads": ["ex:Part", "ex:Whole"],
+            "cross": false
+          },
+          {
+            "id": "ex:Piece ex:Whole",
+            "a": "ex:Piece",
+            "b": "ex:Whole",
+            "self": false,
+            "heads": ["ex:Piece"],
+            "cross": false
+          },
+          {
+            "id": "ex:Whole zz:Leaf",
+            "a": "ex:Whole",
+            "b": "zz:Leaf",
+            "self": false,
+            "heads": ["ex:Whole"],
+            "cross": true
+          },
+          {
+            "id": "yy:Other zz:Leaf",
+            "a": "yy:Other",
+            "b": "zz:Leaf",
+            "self": false,
+            "heads": ["yy:Other"],
+            "cross": true
+          }
+        ],
+        "drawnRelations": [
+          { "domain": "ex:Note", "range": "ex:Remark" },
+          { "domain": "ex:Remark", "range": "ex:Echo" },
+          { "domain": "ex:Long", "range": "ex:Note" },
+          { "domain": "ex:Long", "range": "ex:Echo" },
+          { "domain": "ex:Whole", "range": "ex:Part" },
+          { "domain": "ex:Whole", "range": "ex:Piece" },
+          { "domain": "zz:Leaf", "range": "ex:Whole" },
+          { "domain": "ex:Note", "range": "yy:Solo" },
+          { "domain": "ex:Piece", "range": "ex:Part" },
+          { "domain": "zz:Leaf", "range": "yy:Other" },
+          { "domain": "ex:Part", "range": "ex:Whole" },
+          { "domain": "yy:Solo", "range": "ex:Long" },
+          { "domain": "ex:Remark", "range": "ex:Long" },
+          { "domain": "ex:Note", "range": "ex:Note" }
+        ]
+      },
+      "ids": [
+        "ex:Echo",
+        "ex:Long",
+        "ex:Note",
+        "ex:Part",
+        "ex:Piece",
+        "ex:Remark",
+        "ex:Thing",
+        "ex:Whole"
+      ],
+      "channel": 48,
+      "sweeps": 4,
+      "crossPorts": []
+    },
+    "output": {
+      "nodes": [
+        [
+          "ex:Echo",
+          {
+            "id": "ex:Echo",
+            "col": 3,
+            "x": 576,
+            "y": 96,
+            "w": 96,
+            "h": 32,
+            "order": 0
+          }
+        ],
+        [
+          "ex:Long",
+          {
+            "id": "ex:Long",
+            "col": 0,
+            "x": 0,
+            "y": 128,
+            "w": 208,
+            "h": 64,
+            "order": 1
+          }
+        ],
+        [
+          "ex:Note",
+          {
+            "id": "ex:Note",
+            "col": 1,
+            "x": 256,
+            "y": 208,
+            "w": 96,
+            "h": 48,
+            "order": 5
+          }
+        ],
+        [
+          "ex:Part",
+          {
+            "id": "ex:Part",
+            "col": 1,
+            "x": 256,
+            "y": 16,
+            "w": 96,
+            "h": 32,
+            "order": 1
+          }
+        ],
+        [
+          "ex:Piece",
+          {
+            "id": "ex:Piece",
+            "col": 1,
+            "x": 256,
+            "y": 64,
+            "w": 96,
+            "h": 32,
+            "order": 2
+          }
+        ],
+        [
+          "ex:Remark",
+          {
+            "id": "ex:Remark",
+            "col": 2,
+            "x": 432,
+            "y": 96,
+            "w": 96,
+            "h": 48,
+            "order": 1
+          }
+        ],
+        [
+          "ex:Thing",
+          {
+            "id": "ex:Thing",
+            "col": 0,
+            "x": 0,
+            "y": 64,
+            "w": 96,
+            "h": 48,
+            "order": 0
+          }
+        ],
+        [
+          "ex:Whole",
+          {
+            "id": "ex:Whole",
+            "col": 1,
+            "x": 256,
+            "y": 112,
+            "w": 96,
+            "h": 48,
+            "order": 3
+          }
+        ]
+      ],
+      "edges": [
+        {
+          "id": "sub:ex:Thing",
+          "kind": "subclass",
+          "from": "ex:Thing",
+          "to": ["ex:Part", "ex:Piece", "ex:Whole"],
+          "commands": [
+            ["M", 96, 88],
+            ["H", 224],
+            ["M", 224, 32],
+            ["V", 136],
+            ["M", 224, 32],
+            ["H", 256],
+            ["M", 224, 80],
+            ["H", 256],
+            ["M", 224, 136],
+            ["H", 256]
+          ],
+          "heads": [[["M", 96, 88], ["L", 104, 84], ["V", 92], ["L", 96, 88]]],
+          "busX": 224
+        },
+        {
+          "id": "rel:ex:Echo ex:Long",
+          "kind": "relation",
+          "from": "ex:Echo",
+          "to": ["ex:Long"],
+          "commands": [
+            ["M", 208, 136],
+            ["C", 232, 136, 232, 8, 256, 8],
+            ["H", 384],
+            ["C", 408, 8, 408, 88, 432, 88],
+            ["H", 528],
+            ["C", 552, 88, 552, 104, 576, 104]
+          ],
+          "heads": [
+            [["M", 576, 104], ["L", 568, 100], ["V", 108], ["L", 576, 104]]
+          ],
+          "bundle": "ex:Echo ex:Long"
+        },
+        {
+          "id": "rel:ex:Echo ex:Remark",
+          "kind": "relation",
+          "from": "ex:Echo",
+          "to": ["ex:Remark"],
+          "commands": [["M", 528, 112], ["C", 552, 112, 552, 120, 576, 120]],
+          "heads": [
+            [["M", 576, 120], ["L", 568, 116], ["V", 124], ["L", 576, 120]]
+          ],
+          "bundle": "ex:Echo ex:Remark"
+        },
+        {
+          "id": "rel:ex:Long ex:Note",
+          "kind": "relation",
+          "from": "ex:Long",
+          "to": ["ex:Note"],
+          "commands": [["M", 208, 184], ["C", 232, 184, 232, 216, 256, 216]],
+          "heads": [
+            [["M", 256, 216], ["L", 248, 212], ["V", 220], ["L", 256, 216]]
+          ],
+          "bundle": "ex:Long ex:Note"
+        },
+        {
+          "id": "rel:ex:Long ex:Remark",
+          "kind": "relation",
+          "from": "ex:Long",
+          "to": ["ex:Remark"],
+          "commands": [
+            ["M", 208, 168],
+            ["C", 232, 168, 232, 168, 256, 168],
+            ["H", 384],
+            ["C", 408, 168, 408, 132, 432, 132]
+          ],
+          "heads": [
+            [["M", 208, 168], ["L", 216, 164], ["V", 172], ["L", 208, 168]]
+          ],
+          "bundle": "ex:Long ex:Remark"
+        },
+        {
+          "id": "rel:ex:Note ex:Note",
+          "kind": "relation",
+          "from": "ex:Note",
+          "to": ["ex:Note"],
+          "commands": [["M", 344, 208], ["C", 344, 144, 416, 216, 352, 216]],
+          "heads": [
+            [["M", 352, 216], ["L", 360, 212], ["V", 220], ["L", 352, 216]]
+          ],
+          "self": true,
+          "apex": [379, 181],
+          "bundle": "ex:Note ex:Note"
+        },
+        {
+          "id": "rel:ex:Note ex:Remark",
+          "kind": "relation",
+          "from": "ex:Note",
+          "to": ["ex:Remark"],
+          "commands": [
+            ["M", 352, 220],
+            ["H", 384],
+            ["C", 408, 220, 408, 136, 432, 136]
+          ],
+          "heads": [
+            [["M", 432, 136], ["L", 424, 132], ["V", 140], ["L", 432, 136]]
+          ],
+          "bundle": "ex:Note ex:Remark"
+        },
+        {
+          "id": "rel:ex:Part ex:Piece",
+          "kind": "relation",
+          "from": "ex:Part",
+          "to": ["ex:Piece"],
+          "commands": [
+            ["M", 352, 36],
+            ["H", 384],
+            ["C", 400, 36, 400, 36, 400, 52],
+            ["V", 56],
+            ["C", 400, 72, 400, 72, 384, 72],
+            ["H", 352]
+          ],
+          "heads": [
+            [["M", 352, 36], ["L", 360, 32], ["V", 40], ["L", 352, 36]]
+          ],
+          "arc": true,
+          "apex": [400, 54],
+          "bundle": "ex:Part ex:Piece"
+        },
+        {
+          "id": "rel:ex:Part ex:Whole",
+          "kind": "relation",
+          "from": "ex:Part",
+          "to": ["ex:Whole"],
+          "commands": [
+            ["M", 352, 40],
+            ["H", 384],
+            ["C", 408, 40, 408, 40, 408, 64],
+            ["V", 96],
+            ["C", 408, 120, 408, 120, 384, 120],
+            ["H", 352]
+          ],
+          "heads": [
+            [["M", 352, 40], ["L", 360, 36], ["V", 44], ["L", 352, 40]],
+            [["M", 352, 120], ["L", 360, 116], ["V", 124], ["L", 352, 120]]
+          ],
+          "arc": true,
+          "apex": [408, 80],
+          "bundle": "ex:Part ex:Whole"
+        },
+        {
+          "id": "rel:ex:Piece ex:Whole",
+          "kind": "relation",
+          "from": "ex:Piece",
+          "to": ["ex:Whole"],
+          "commands": [
+            ["M", 352, 88],
+            ["H", 384],
+            ["C", 400, 88, 400, 88, 400, 104],
+            ["V", 108],
+            ["C", 400, 124, 400, 124, 384, 124],
+            ["H", 352]
+          ],
+          "heads": [
+            [["M", 352, 88], ["L", 360, 84], ["V", 92], ["L", 352, 88]]
+          ],
+          "arc": true,
+          "apex": [400, 106],
+          "bundle": "ex:Piece ex:Whole"
+        }
+      ],
+      "columns": [
+        ["ex:Thing", "ex:Long"],
+        [
+          "ex:Echo ex:Long@1",
+          "ex:Part",
+          "ex:Piece",
+          "ex:Whole",
+          "ex:Long ex:Remark@1",
+          "ex:Note"
+        ],
+        ["ex:Echo ex:Long@2", "ex:Remark"],
+        ["ex:Echo"]
+      ],
+      "columnX": [0, 256, 432, 576],
+      "columnWidth": [208, 128, 96, 96],
+      "ports": [
+        ["ex:Echo ex:Long ex:Echo", 104],
+        ["ex:Echo ex:Remark ex:Echo", 120],
+        ["ex:Echo ex:Long ex:Long", 136],
+        ["ex:Long yy:Solo ex:Long", 160],
+        ["ex:Long ex:Remark ex:Long", 168],
+        ["ex:Long ex:Note ex:Long", 184],
+        ["ex:Long ex:Note ex:Note", 216],
+        ["ex:Note ex:Remark ex:Note", 220],
+        ["ex:Note yy:Solo ex:Note", 232],
+        ["ex:Part ex:Piece ex:Part", 36],
+        ["ex:Part ex:Whole ex:Part", 40],
+        ["ex:Part ex:Piece ex:Piece", 72],
+        ["ex:Piece ex:Whole ex:Piece", 88],
+        ["ex:Long ex:Remark ex:Remark", 132],
+        ["ex:Note ex:Remark ex:Remark", 136],
+        ["ex:Echo ex:Remark ex:Remark", 112],
+        ["ex:Part ex:Whole ex:Whole", 120],
+        ["ex:Piece ex:Whole ex:Whole", 124],
+        ["ex:Whole zz:Leaf ex:Whole", 136]
+      ],
+      "content": { "x": 0, "y": 8, "w": 672, "h": 248 },
+      "findings": [],
+      "crowdedArcs": 0,
+      "columnOf": [3, 0, 1, 1, 1, 2, 0, 1],
+      "depthOf": [0, 0, 0, 1, 1, 0, 0, 1],
+      "predecessorsOf": [
+        ["ex:Remark", "ex:Long"],
+        [],
+        ["ex:Long"],
+        [],
+        ["ex:Whole"],
+        ["ex:Note"],
+        [],
+        ["ex:Part"]
+      ]
+    }
+  },
+  {
+    "input": {
+      "model": {
+        "byId": [
+          [
+            "https://ds.canonical.com/ChangeLogEntry",
+            {
+              "label": "Change Log Entry",
+              "w": 144,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Component",
+            {
+              "label": "Component",
+              "w": 128,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Concept",
+            {
+              "label": "Concept",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/ConceptType",
+            {
+              "label": "Concept Type",
+              "w": 128,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Entity",
+            {
+              "label": "Entity",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Group",
+            {
+              "label": "Group",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/ImplementationLibrary",
+            {
+              "label": "Implementation Library",
+              "w": 176,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/ImplementationObject",
+            {
+              "label": "Implementation Object",
+              "w": 176,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Layout",
+            {
+              "label": "Layout",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Modifier",
+            {
+              "label": "Modifier",
+              "w": 112,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/ModifierFamily",
+            {
+              "label": "Modifier Family",
+              "w": 144,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Pattern",
+            {
+              "label": "Pattern",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Property",
+            {
+              "label": "Property",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Subcomponent",
+            {
+              "label": "Subcomponent",
+              "w": 144,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Tag",
+            {
+              "label": "Tag",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/TagCategory",
+            {
+              "label": "Tag Category",
+              "w": 128,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/Tier",
+            {
+              "label": "Tier",
+              "w": 96,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/TokenBinding",
+            {
+              "label": "Token Binding",
+              "w": 112,
+              "h": 32,
+              "hub": false,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ],
+          [
+            "https://ds.canonical.com/UIBlock",
+            {
+              "label": "UI Block",
+              "w": 96,
+              "h": 48,
+              "hub": true,
+              "loop": true,
+              "loopExtent": 32
+            }
+          ],
+          [
+            "https://ds.canonical.com/UIElement",
+            {
+              "label": "UI Element",
+              "w": 112,
+              "h": 48,
+              "hub": true,
+              "loop": false,
+              "loopExtent": 0
+            }
+          ]
+        ],
+        "parent": [
+          [
+            "https://ds.canonical.com/ChangeLogEntry",
+            "https://ds.canonical.com/Entity"
+          ],
+          [
+            "https://ds.canonical.com/Component",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          [
+            "https://ds.canonical.com/Concept",
+            "https://ds.canonical.com/Entity"
+          ],
+          [
+            "https://ds.canonical.com/ConceptType",
+            "https://ds.canonical.com/Entity"
+          ],
+          [
+            "https://ds.canonical.com/Group",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          [
+            "https://ds.canonical.com/ImplementationLibrary",
+            "https://ds.canonical.com/Entity"
+          ],
+          [
+            "https://ds.canonical.com/ImplementationObject",
+            "https://ds.canonical.com/Entity"
+          ],
+          [
+            "https://ds.canonical.com/Layout",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          [
+            "https://ds.canonical.com/Modifier",
+            "https://ds.canonical.com/UIElement"
+          ],
+          [
+            "https://ds.canonical.com/ModifierFamily",
+            "https://ds.canonical.com/UIElement"
+          ],
+          [
+            "https://ds.canonical.com/Pattern",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          [
+            "https://ds.canonical.com/Property",
+            "https://ds.canonical.com/Entity"
+          ],
+          [
+            "https://ds.canonical.com/Subcomponent",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          ["https://ds.canonical.com/Tag", "https://ds.canonical.com/Entity"],
+          [
+            "https://ds.canonical.com/TagCategory",
+            "https://ds.canonical.com/Entity"
+          ],
+          ["https://ds.canonical.com/Tier", "https://ds.canonical.com/Entity"],
+          [
+            "https://ds.canonical.com/UIBlock",
+            "https://ds.canonical.com/UIElement"
+          ],
+          [
+            "https://ds.canonical.com/UIElement",
+            "https://ds.canonical.com/Entity"
+          ]
+        ],
+        "crossParent": [],
+        "children": [
+          [
+            "https://ds.canonical.com/Entity",
+            [
+              "https://ds.canonical.com/ChangeLogEntry",
+              "https://ds.canonical.com/Concept",
+              "https://ds.canonical.com/ConceptType",
+              "https://ds.canonical.com/ImplementationLibrary",
+              "https://ds.canonical.com/ImplementationObject",
+              "https://ds.canonical.com/Property",
+              "https://ds.canonical.com/Tag",
+              "https://ds.canonical.com/TagCategory",
+              "https://ds.canonical.com/Tier",
+              "https://ds.canonical.com/UIElement"
+            ]
+          ],
+          [
+            "https://ds.canonical.com/UIBlock",
+            [
+              "https://ds.canonical.com/Component",
+              "https://ds.canonical.com/Group",
+              "https://ds.canonical.com/Layout",
+              "https://ds.canonical.com/Pattern",
+              "https://ds.canonical.com/Subcomponent"
+            ]
+          ],
+          [
+            "https://ds.canonical.com/UIElement",
+            [
+              "https://ds.canonical.com/Modifier",
+              "https://ds.canonical.com/ModifierFamily",
+              "https://ds.canonical.com/UIBlock"
+            ]
+          ]
+        ],
+        "bundles": [
+          {
+            "id": "https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/ChangeLogEntry",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "heads": ["https://ds.canonical.com/ChangeLogEntry"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+            "a": "https://ds.canonical.com/Component",
+            "b": "https://ds.canonical.com/Subcomponent",
+            "self": false,
+            "heads": [
+              "https://ds.canonical.com/Subcomponent",
+              "https://ds.canonical.com/Component"
+            ],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+            "a": "https://ds.canonical.com/Concept",
+            "b": "https://ds.canonical.com/ConceptType",
+            "self": false,
+            "heads": ["https://ds.canonical.com/ConceptType"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+            "a": "https://ds.canonical.com/ImplementationLibrary",
+            "b": "https://ds.canonical.com/ImplementationObject",
+            "self": false,
+            "heads": ["https://ds.canonical.com/ImplementationLibrary"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+            "a": "https://ds.canonical.com/ImplementationLibrary",
+            "b": "https://ds.canonical.com/Tier",
+            "self": false,
+            "heads": ["https://ds.canonical.com/Tier"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/ImplementationObject",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "heads": ["https://ds.canonical.com/UIBlock"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+            "a": "https://ds.canonical.com/Modifier",
+            "b": "https://ds.canonical.com/ModifierFamily",
+            "self": false,
+            "heads": [
+              "https://ds.canonical.com/Modifier",
+              "https://ds.canonical.com/ModifierFamily"
+            ],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/ModifierFamily",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "heads": ["https://ds.canonical.com/ModifierFamily"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/Property",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "heads": ["https://ds.canonical.com/Property"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+            "a": "https://ds.canonical.com/Tag",
+            "b": "https://ds.canonical.com/TagCategory",
+            "self": false,
+            "heads": ["https://ds.canonical.com/TagCategory"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/Tag",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "heads": ["https://ds.canonical.com/Tag"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/Tier",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "heads": ["https://ds.canonical.com/Tier"],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/TokenBinding",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": false,
+            "heads": [
+              "https://ds.canonical.com/TokenBinding",
+              "https://ds.canonical.com/UIBlock"
+            ],
+            "cross": false
+          },
+          {
+            "id": "https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+            "a": "https://ds.canonical.com/UIBlock",
+            "b": "https://ds.canonical.com/UIBlock",
+            "self": true,
+            "heads": ["https://ds.canonical.com/UIBlock"],
+            "cross": false
+          }
+        ],
+        "drawnRelations": [
+          {
+            "domain": "https://ds.canonical.com/Tag",
+            "range": "https://ds.canonical.com/TagCategory"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/ChangeLogEntry"
+          },
+          {
+            "domain": "https://ds.canonical.com/Concept",
+            "range": "https://ds.canonical.com/ConceptType"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/Tag"
+          },
+          {
+            "domain": "https://ds.canonical.com/ModifierFamily",
+            "range": "https://ds.canonical.com/Modifier"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/ModifierFamily"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/Property"
+          },
+          {
+            "domain": "https://ds.canonical.com/Component",
+            "range": "https://ds.canonical.com/Subcomponent"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/TokenBinding"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/UIBlock"
+          },
+          {
+            "domain": "https://ds.canonical.com/ImplementationObject",
+            "range": "https://ds.canonical.com/UIBlock"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/UIBlock"
+          },
+          {
+            "domain": "https://ds.canonical.com/ImplementationObject",
+            "range": "https://ds.canonical.com/ImplementationLibrary"
+          },
+          {
+            "domain": "https://ds.canonical.com/ImplementationLibrary",
+            "range": "https://ds.canonical.com/Tier"
+          },
+          {
+            "domain": "https://ds.canonical.com/Modifier",
+            "range": "https://ds.canonical.com/ModifierFamily"
+          },
+          {
+            "domain": "https://ds.canonical.com/Subcomponent",
+            "range": "https://ds.canonical.com/Component"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/UIBlock"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/Tier"
+          },
+          {
+            "domain": "https://ds.canonical.com/UIBlock",
+            "range": "https://ds.canonical.com/UIBlock"
+          },
+          {
+            "domain": "https://ds.canonical.com/TokenBinding",
+            "range": "https://ds.canonical.com/UIBlock"
+          }
+        ]
+      },
+      "ids": [
+        "https://ds.canonical.com/ChangeLogEntry",
+        "https://ds.canonical.com/Component",
+        "https://ds.canonical.com/Concept",
+        "https://ds.canonical.com/ConceptType",
+        "https://ds.canonical.com/Entity",
+        "https://ds.canonical.com/Group",
+        "https://ds.canonical.com/ImplementationLibrary",
+        "https://ds.canonical.com/ImplementationObject",
+        "https://ds.canonical.com/Layout",
+        "https://ds.canonical.com/Modifier",
+        "https://ds.canonical.com/ModifierFamily",
+        "https://ds.canonical.com/Pattern",
+        "https://ds.canonical.com/Property",
+        "https://ds.canonical.com/Subcomponent",
+        "https://ds.canonical.com/Tag",
+        "https://ds.canonical.com/TagCategory",
+        "https://ds.canonical.com/Tier",
+        "https://ds.canonical.com/TokenBinding",
+        "https://ds.canonical.com/UIBlock",
+        "https://ds.canonical.com/UIElement"
+      ],
+      "channel": 32,
+      "sweeps": 4,
+      "crossPorts": []
+    },
+    "output": {
+      "nodes": [
+        [
+          "https://ds.canonical.com/ChangeLogEntry",
+          {
+            "id": "https://ds.canonical.com/ChangeLogEntry",
+            "col": 1,
+            "x": 128,
+            "y": 304,
+            "w": 144,
+            "h": 32,
+            "order": 6
+          }
+        ],
+        [
+          "https://ds.canonical.com/Component",
+          {
+            "id": "https://ds.canonical.com/Component",
+            "col": 3,
+            "x": 512,
+            "y": 128,
+            "w": 128,
+            "h": 32,
+            "order": 1
+          }
+        ],
+        [
+          "https://ds.canonical.com/Concept",
+          {
+            "id": "https://ds.canonical.com/Concept",
+            "col": 1,
+            "x": 128,
+            "y": 0,
+            "w": 96,
+            "h": 32,
+            "order": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ConceptType",
+          {
+            "id": "https://ds.canonical.com/ConceptType",
+            "col": 1,
+            "x": 128,
+            "y": 48,
+            "w": 128,
+            "h": 32,
+            "order": 1
+          }
+        ],
+        [
+          "https://ds.canonical.com/Entity",
+          {
+            "id": "https://ds.canonical.com/Entity",
+            "col": 0,
+            "x": 0,
+            "y": 208,
+            "w": 96,
+            "h": 48,
+            "order": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/Group",
+          {
+            "id": "https://ds.canonical.com/Group",
+            "col": 3,
+            "x": 512,
+            "y": 80,
+            "w": 96,
+            "h": 32,
+            "order": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ImplementationLibrary",
+          {
+            "id": "https://ds.canonical.com/ImplementationLibrary",
+            "col": 1,
+            "x": 128,
+            "y": 208,
+            "w": 176,
+            "h": 32,
+            "order": 4
+          }
+        ],
+        [
+          "https://ds.canonical.com/ImplementationObject",
+          {
+            "id": "https://ds.canonical.com/ImplementationObject",
+            "col": 1,
+            "x": 128,
+            "y": 160,
+            "w": 176,
+            "h": 32,
+            "order": 3
+          }
+        ],
+        [
+          "https://ds.canonical.com/Layout",
+          {
+            "id": "https://ds.canonical.com/Layout",
+            "col": 3,
+            "x": 512,
+            "y": 224,
+            "w": 96,
+            "h": 32,
+            "order": 3
+          }
+        ],
+        [
+          "https://ds.canonical.com/Modifier",
+          {
+            "id": "https://ds.canonical.com/Modifier",
+            "col": 2,
+            "x": 336,
+            "y": 32,
+            "w": 112,
+            "h": 32,
+            "order": 0
+          }
+        ],
+        [
+          "https://ds.canonical.com/ModifierFamily",
+          {
+            "id": "https://ds.canonical.com/ModifierFamily",
+            "col": 2,
+            "x": 336,
+            "y": 80,
+            "w": 144,
+            "h": 32,
+            "order": 1
+          }
+        ],
+        [
+          "https://ds.canonical.com/Pattern",
+          {
+            "id": "https://ds.canonical.com/Pattern",
+            "col": 3,
+            "x": 512,
+            "y": 272,
+            "w": 96,
+            "h": 32,
+            "order": 4
+          }
+        ],
+        [
+          "https://ds.canonical.com/Property",
+          {
+            "id": "https://ds.canonical.com/Property",
+            "col": 1,
+            "x": 128,
+            "y": 352,
+            "w": 96,
+            "h": 32,
+            "order": 7
+          }
+        ],
+        [
+          "https://ds.canonical.com/Subcomponent",
+          {
+            "id": "https://ds.canonical.com/Subcomponent",
+            "col": 3,
+            "x": 512,
+            "y": 176,
+            "w": 144,
+            "h": 32,
+            "order": 2
+          }
+        ],
+        [
+          "https://ds.canonical.com/Tag",
+          {
+            "id": "https://ds.canonical.com/Tag",
+            "col": 1,
+            "x": 128,
+            "y": 400,
+            "w": 96,
+            "h": 32,
+            "order": 8
+          }
+        ],
+        [
+          "https://ds.canonical.com/TagCategory",
+          {
+            "id": "https://ds.canonical.com/TagCategory",
+            "col": 1,
+            "x": 128,
+            "y": 448,
+            "w": 128,
+            "h": 32,
+            "order": 9
+          }
+        ],
+        [
+          "https://ds.canonical.com/Tier",
+          {
+            "id": "https://ds.canonical.com/Tier",
+            "col": 1,
+            "x": 128,
+            "y": 256,
+            "w": 96,
+            "h": 32,
+            "order": 5
+          }
+        ],
+        [
+          "https://ds.canonical.com/TokenBinding",
+          {
+            "id": "https://ds.canonical.com/TokenBinding",
+            "col": 3,
+            "x": 512,
+            "y": 320,
+            "w": 112,
+            "h": 32,
+            "order": 5
+          }
+        ],
+        [
+          "https://ds.canonical.com/UIBlock",
+          {
+            "id": "https://ds.canonical.com/UIBlock",
+            "col": 2,
+            "x": 336,
+            "y": 160,
+            "w": 96,
+            "h": 48,
+            "order": 2
+          }
+        ],
+        [
+          "https://ds.canonical.com/UIElement",
+          {
+            "id": "https://ds.canonical.com/UIElement",
+            "col": 1,
+            "x": 128,
+            "y": 96,
+            "w": 112,
+            "h": 48,
+            "order": 2
+          }
+        ]
+      ],
+      "edges": [
+        {
+          "id": "sub:https://ds.canonical.com/Entity",
+          "kind": "subclass",
+          "from": "https://ds.canonical.com/Entity",
+          "to": [
+            "https://ds.canonical.com/ChangeLogEntry",
+            "https://ds.canonical.com/Concept",
+            "https://ds.canonical.com/ConceptType",
+            "https://ds.canonical.com/ImplementationLibrary",
+            "https://ds.canonical.com/ImplementationObject",
+            "https://ds.canonical.com/Property",
+            "https://ds.canonical.com/Tag",
+            "https://ds.canonical.com/TagCategory",
+            "https://ds.canonical.com/Tier",
+            "https://ds.canonical.com/UIElement"
+          ],
+          "commands": [
+            ["M", 96, 232],
+            ["H", 112],
+            ["M", 112, 16],
+            ["V", 464],
+            ["M", 112, 320],
+            ["H", 128],
+            ["M", 112, 16],
+            ["H", 128],
+            ["M", 112, 64],
+            ["H", 128],
+            ["M", 112, 224],
+            ["H", 128],
+            ["M", 112, 176],
+            ["H", 128],
+            ["M", 112, 368],
+            ["H", 128],
+            ["M", 112, 416],
+            ["H", 128],
+            ["M", 112, 464],
+            ["H", 128],
+            ["M", 112, 272],
+            ["H", 128],
+            ["M", 112, 120],
+            ["H", 128]
+          ],
+          "heads": [
+            [["M", 96, 232], ["L", 104, 228], ["V", 236], ["L", 96, 232]]
+          ],
+          "busX": 112
+        },
+        {
+          "id": "sub:https://ds.canonical.com/UIBlock",
+          "kind": "subclass",
+          "from": "https://ds.canonical.com/UIBlock",
+          "to": [
+            "https://ds.canonical.com/Component",
+            "https://ds.canonical.com/Group",
+            "https://ds.canonical.com/Layout",
+            "https://ds.canonical.com/Pattern",
+            "https://ds.canonical.com/Subcomponent"
+          ],
+          "commands": [
+            ["M", 432, 184],
+            ["H", 496],
+            ["M", 496, 96],
+            ["V", 288],
+            ["M", 496, 144],
+            ["H", 512],
+            ["M", 496, 96],
+            ["H", 512],
+            ["M", 496, 240],
+            ["H", 512],
+            ["M", 496, 288],
+            ["H", 512],
+            ["M", 496, 192],
+            ["H", 512]
+          ],
+          "heads": [
+            [["M", 432, 184], ["L", 440, 180], ["V", 188], ["L", 432, 184]]
+          ],
+          "busX": 496
+        },
+        {
+          "id": "sub:https://ds.canonical.com/UIElement",
+          "kind": "subclass",
+          "from": "https://ds.canonical.com/UIElement",
+          "to": [
+            "https://ds.canonical.com/Modifier",
+            "https://ds.canonical.com/ModifierFamily",
+            "https://ds.canonical.com/UIBlock"
+          ],
+          "commands": [
+            ["M", 240, 120],
+            ["H", 320],
+            ["M", 320, 48],
+            ["V", 184],
+            ["M", 320, 48],
+            ["H", 336],
+            ["M", 320, 96],
+            ["H", 336],
+            ["M", 320, 184],
+            ["H", 336]
+          ],
+          "heads": [
+            [["M", 240, 120], ["L", 248, 116], ["V", 124], ["L", 240, 120]]
+          ],
+          "busX": 320
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ChangeLogEntry",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [
+            ["M", 272, 312],
+            ["H", 304],
+            ["C", 320, 312, 320, 192, 336, 192]
+          ],
+          "heads": [
+            [["M", 272, 312], ["L", 280, 308], ["V", 316], ["L", 272, 312]]
+          ],
+          "bundle": "https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ImplementationObject",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [["M", 304, 180], ["C", 320, 180, 320, 176, 336, 176]],
+          "heads": [
+            [["M", 336, 176], ["L", 328, 172], ["V", 180], ["L", 336, 176]]
+          ],
+          "bundle": "https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Property https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Property",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [
+            ["M", 224, 360],
+            ["H", 304],
+            ["C", 320, 360, 320, 196, 336, 196]
+          ],
+          "heads": [
+            [["M", 224, 360], ["L", 232, 356], ["V", 364], ["L", 224, 360]]
+          ],
+          "bundle": "https://ds.canonical.com/Property https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Tag",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [
+            ["M", 224, 408],
+            ["H", 304],
+            ["C", 320, 408, 320, 200, 336, 200]
+          ],
+          "heads": [
+            [["M", 224, 408], ["L", 232, 404], ["V", 412], ["L", 224, 408]]
+          ],
+          "bundle": "https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Tier",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [
+            ["M", 224, 264],
+            ["H", 304],
+            ["C", 320, 264, 320, 188, 336, 188]
+          ],
+          "heads": [
+            [["M", 224, 264], ["L", 232, 260], ["V", 268], ["L", 224, 264]]
+          ],
+          "bundle": "https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/TokenBinding",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [
+            ["M", 432, 200],
+            ["H", 480],
+            ["C", 496, 200, 496, 328, 512, 328]
+          ],
+          "heads": [
+            [["M", 432, 200], ["L", 440, 196], ["V", 204], ["L", 432, 200]],
+            [["M", 512, 328], ["L", 504, 324], ["V", 332], ["L", 512, 328]]
+          ],
+          "bundle": "https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/UIBlock",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [["M", 424, 160], ["C", 424, 96, 496, 168, 432, 168]],
+          "heads": [
+            [["M", 432, 168], ["L", 440, 164], ["V", 172], ["L", 432, 168]]
+          ],
+          "self": true,
+          "apex": [459, 133],
+          "bundle": "https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Component",
+          "to": ["https://ds.canonical.com/Subcomponent"],
+          "commands": [
+            ["M", 640, 152],
+            ["H", 656],
+            ["C", 672, 152, 672, 152, 672, 168],
+            ["V", 168],
+            ["C", 672, 184, 672, 184, 656, 184]
+          ],
+          "heads": [
+            [["M", 640, 152], ["L", 648, 148], ["V", 156], ["L", 640, 152]],
+            [["M", 656, 184], ["L", 664, 180], ["V", 188], ["L", 656, 184]]
+          ],
+          "arc": true,
+          "apex": [672, 168],
+          "bundle": "https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Concept",
+          "to": ["https://ds.canonical.com/ConceptType"],
+          "commands": [
+            ["M", 224, 24],
+            ["H", 304],
+            ["C", 332, 24, 332, 24, 332, 40],
+            ["V", 40],
+            ["C", 332, 56, 332, 56, 304, 56],
+            ["H", 256]
+          ],
+          "heads": [
+            [["M", 256, 56], ["L", 264, 52], ["V", 60], ["L", 256, 56]]
+          ],
+          "arc": true,
+          "apex": [332, 40],
+          "bundle": "https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ImplementationLibrary",
+          "to": ["https://ds.canonical.com/ImplementationObject"],
+          "commands": [
+            ["M", 304, 216],
+            ["C", 320, 216, 320, 216, 320, 200],
+            ["V", 200],
+            ["C", 320, 184, 320, 184, 304, 184]
+          ],
+          "heads": [
+            [["M", 304, 216], ["L", 312, 212], ["V", 220], ["L", 304, 216]]
+          ],
+          "arc": true,
+          "apex": [320, 200],
+          "bundle": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ImplementationLibrary",
+          "to": ["https://ds.canonical.com/Tier"],
+          "commands": [
+            ["M", 304, 232],
+            ["C", 320, 232, 320, 232, 320, 248],
+            ["V", 252],
+            ["C", 320, 268, 320, 268, 304, 268],
+            ["H", 224]
+          ],
+          "heads": [
+            [["M", 224, 268], ["L", 232, 264], ["V", 272], ["L", 224, 268]]
+          ],
+          "arc": true,
+          "apex": [320, 250],
+          "bundle": "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Modifier",
+          "to": ["https://ds.canonical.com/ModifierFamily"],
+          "commands": [
+            ["M", 448, 56],
+            ["H", 480],
+            ["C", 496, 56, 496, 56, 496, 72],
+            ["V", 72],
+            ["C", 496, 88, 496, 88, 480, 88]
+          ],
+          "heads": [
+            [["M", 448, 56], ["L", 456, 52], ["V", 60], ["L", 448, 56]],
+            [["M", 480, 88], ["L", 488, 84], ["V", 92], ["L", 480, 88]]
+          ],
+          "arc": true,
+          "apex": [496, 72],
+          "bundle": "https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/ModifierFamily",
+          "to": ["https://ds.canonical.com/UIBlock"],
+          "commands": [
+            ["M", 480, 104],
+            ["C", 508, 104, 508, 104, 508, 132],
+            ["V", 144],
+            ["C", 508, 172, 508, 172, 480, 172],
+            ["H", 432]
+          ],
+          "heads": [
+            [["M", 480, 104], ["L", 488, 100], ["V", 108], ["L", 480, 104]]
+          ],
+          "arc": true,
+          "apex": [508, 138],
+          "bundle": "https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock"
+        },
+        {
+          "id": "rel:https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory",
+          "kind": "relation",
+          "from": "https://ds.canonical.com/Tag",
+          "to": ["https://ds.canonical.com/TagCategory"],
+          "commands": [
+            ["M", 224, 424],
+            ["H", 304],
+            ["C", 320, 424, 320, 424, 320, 440],
+            ["V", 440],
+            ["C", 320, 456, 320, 456, 304, 456],
+            ["H", 256]
+          ],
+          "heads": [
+            [["M", 256, 456], ["L", 264, 452], ["V", 460], ["L", 256, 456]]
+          ],
+          "arc": true,
+          "apex": [320, 440],
+          "bundle": "https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory"
+        }
+      ],
+      "columns": [
+        ["https://ds.canonical.com/Entity"],
+        [
+          "https://ds.canonical.com/Concept",
+          "https://ds.canonical.com/ConceptType",
+          "https://ds.canonical.com/UIElement",
+          "https://ds.canonical.com/ImplementationObject",
+          "https://ds.canonical.com/ImplementationLibrary",
+          "https://ds.canonical.com/Tier",
+          "https://ds.canonical.com/ChangeLogEntry",
+          "https://ds.canonical.com/Property",
+          "https://ds.canonical.com/Tag",
+          "https://ds.canonical.com/TagCategory"
+        ],
+        [
+          "https://ds.canonical.com/Modifier",
+          "https://ds.canonical.com/ModifierFamily",
+          "https://ds.canonical.com/UIBlock"
+        ],
+        [
+          "https://ds.canonical.com/Group",
+          "https://ds.canonical.com/Component",
+          "https://ds.canonical.com/Subcomponent",
+          "https://ds.canonical.com/Layout",
+          "https://ds.canonical.com/Pattern",
+          "https://ds.canonical.com/TokenBinding"
+        ]
+      ],
+      "columnX": [0, 128, 336, 512],
+      "columnWidth": [96, 176, 144, 144],
+      "ports": [
+        [
+          "https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock https://ds.canonical.com/ChangeLogEntry",
+          312
+        ],
+        [
+          "https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent https://ds.canonical.com/Component",
+          152
+        ],
+        [
+          "https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType https://ds.canonical.com/Concept",
+          24
+        ],
+        [
+          "https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType https://ds.canonical.com/ConceptType",
+          56
+        ],
+        [
+          "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject https://ds.canonical.com/ImplementationLibrary",
+          216
+        ],
+        [
+          "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier https://ds.canonical.com/ImplementationLibrary",
+          232
+        ],
+        [
+          "https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock https://ds.canonical.com/ImplementationObject",
+          180
+        ],
+        [
+          "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/ImplementationObject https://ds.canonical.com/ImplementationObject",
+          184
+        ],
+        [
+          "https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily https://ds.canonical.com/Modifier",
+          56
+        ],
+        [
+          "https://ds.canonical.com/Modifier https://ds.canonical.com/ModifierFamily https://ds.canonical.com/ModifierFamily",
+          88
+        ],
+        [
+          "https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock https://ds.canonical.com/ModifierFamily",
+          104
+        ],
+        [
+          "https://ds.canonical.com/Property https://ds.canonical.com/UIBlock https://ds.canonical.com/Property",
+          360
+        ],
+        [
+          "https://ds.canonical.com/Component https://ds.canonical.com/Subcomponent https://ds.canonical.com/Subcomponent",
+          184
+        ],
+        [
+          "https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock https://ds.canonical.com/Tag",
+          408
+        ],
+        [
+          "https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory https://ds.canonical.com/Tag",
+          424
+        ],
+        [
+          "https://ds.canonical.com/Tag https://ds.canonical.com/TagCategory https://ds.canonical.com/TagCategory",
+          456
+        ],
+        [
+          "https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock https://ds.canonical.com/Tier",
+          264
+        ],
+        [
+          "https://ds.canonical.com/ImplementationLibrary https://ds.canonical.com/Tier https://ds.canonical.com/Tier",
+          268
+        ],
+        [
+          "https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock https://ds.canonical.com/TokenBinding",
+          328
+        ],
+        [
+          "https://ds.canonical.com/ImplementationObject https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          176
+        ],
+        [
+          "https://ds.canonical.com/Tier https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          188
+        ],
+        [
+          "https://ds.canonical.com/ChangeLogEntry https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          192
+        ],
+        [
+          "https://ds.canonical.com/Property https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          196
+        ],
+        [
+          "https://ds.canonical.com/Tag https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          200
+        ],
+        [
+          "https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          172
+        ],
+        [
+          "https://ds.canonical.com/TokenBinding https://ds.canonical.com/UIBlock https://ds.canonical.com/UIBlock",
+          200
+        ]
+      ],
+      "content": { "x": 0, "y": 0, "w": 672, "h": 480 },
+      "findings": [
+        "G18: arc https://ds.canonical.com/Concept https://ds.canonical.com/ConceptType nests to 28px, beyond the 32px channel",
+        "G18: arc https://ds.canonical.com/ModifierFamily https://ds.canonical.com/UIBlock nests to 28px, beyond the 32px channel"
+      ],
+      "crowdedArcs": 2,
+      "columnOf": [1, 3, 1, 1, 0, 3, 1, 1, 3, 2, 2, 3, 1, 3, 1, 1, 1, 3, 2, 1],
+      "depthOf": [1, 3, 1, 1, 0, 3, 1, 1, 3, 2, 2, 3, 1, 3, 1, 1, 1, 0, 2, 1],
+      "predecessorsOf": [
+        ["https://ds.canonical.com/UIBlock"],
+        [],
+        [],
+        ["https://ds.canonical.com/Concept"],
+        [],
+        [],
+        ["https://ds.canonical.com/ImplementationObject"],
+        [],
+        [],
+        ["https://ds.canonical.com/ModifierFamily"],
+        ["https://ds.canonical.com/UIBlock"],
+        [],
+        ["https://ds.canonical.com/UIBlock"],
+        ["https://ds.canonical.com/Component"],
+        ["https://ds.canonical.com/UIBlock"],
+        ["https://ds.canonical.com/Tag"],
+        [
+          "https://ds.canonical.com/ImplementationLibrary",
+          "https://ds.canonical.com/UIBlock"
+        ],
+        ["https://ds.canonical.com/UIBlock"],
+        ["https://ds.canonical.com/ImplementationObject"],
+        []
+      ]
+    }
+  }
+]

@@ -15,9 +15,11 @@ import { CatalogCount, ComponentsView } from "./common/index.js";
 import type { ComponentsLayoutProps } from "./types.js";
 
 /**
- * The strip's breadcrumb trail: `Components` on the catalog,
- * `Components / <uri>` on a component's page. The component's crumb is the
- * `:uri` route param (the compact address), so the trail reads no query.
+ * The strip's breadcrumb trail: `Components` on the catalog, marked
+ * current; on a component's page the trail ends at the parent,
+ * `Components` linking back to the catalog, and the page's heading names
+ * the component. It reads the `:uri` route param alone, so the trail reads
+ * no query.
  */
 const ComponentsContext = makeLensContext({
   lensRouteName: "components",

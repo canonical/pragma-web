@@ -7,6 +7,7 @@ import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree from "../../../../testing/createSiteTree.js";
 import {
+  MOCK_HIDDEN_NODE,
   MOCK_NODE,
   MOCK_ONTOLOGY_CLASS,
   MOCK_ONTOLOGY_CLASS_HREF,
@@ -46,7 +47,7 @@ const NodeListSsrTestNodes = (): ReactElement => {
 };
 
 describe("NodeList SSR", () => {
-  it("renders without hydration errors", () => {
+  it("renders without hydration errors, skipping a hidden node", () => {
     // relay-test-utils wraps the mock environment's methods in `jest.fn` when
     // NODE_ENV is "test"; vitest's `vi` offers the same surface.
     vi.stubGlobal("jest", vi);
@@ -61,6 +62,7 @@ describe("NodeList SSR", () => {
                 uri: "https://ds.canonical.com/IconButton",
               },
             },
+            { node: MOCK_HIDDEN_NODE },
             {
               node: {
                 ...MOCK_ONTOLOGY_CLASS,
@@ -77,5 +79,6 @@ describe("NodeList SSR", () => {
     expect(html).toContain("ds entity-list ds node-list");
     expect(html).toContain("ds entity-row ds ontology-class-row");
     expect(html).toContain(`href="${MOCK_ONTOLOGY_CLASS_HREF}"`);
+    expect(html).not.toContain("ds:Tier");
   });
 });

@@ -1,5 +1,5 @@
+import { requireAt, requireDefined } from "@canonical/prism-core";
 import { DESIGN_CANVAS, SHELF_GAP, VIEW_MARGIN } from "./constants.js";
-import { requireAt, requireDefined } from "./require.js";
 import type { ShelfPacking } from "./types.js";
 
 /** The least stacked height of a prefix of the regions, and how it ends. */

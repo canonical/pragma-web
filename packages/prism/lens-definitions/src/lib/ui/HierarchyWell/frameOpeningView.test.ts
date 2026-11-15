@@ -1,8 +1,8 @@
+import { requireEntry } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import { DESIGN_CANVAS } from "../../classGraph/constants.js";
 import frameLegibleWindow from "../../classGraph/frameLegibleWindow.js";
-import { requireEntry } from "../../classGraph/require.js";
 import frameOpeningView from "./frameOpeningView.js";
 
 const { layout, uris } = createClassGraphSetup();

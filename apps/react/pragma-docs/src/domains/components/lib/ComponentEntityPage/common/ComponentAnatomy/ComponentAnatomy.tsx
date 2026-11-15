@@ -4,7 +4,6 @@ import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
-import { PageSection } from "#lib/ui/PageSection";
 import nodeFragment from "#relay/__generated__/ComponentAnatomy_node.graphql.js";
 import { AnatomyTree } from "../../../AnatomyTree/index.js";
 import buildAnatomyTree from "./buildAnatomyTree.js";
@@ -30,10 +29,11 @@ void declareNodeFragment;
 const componentCssClassName = "ds component-anatomy";
 
 /**
- * The component page's second section: the block's anatomy, read from the
- * graph's anatomy text and drawn as a tree, each component it names
- * linked to its page. Text the anatomy parser refuses, or a block with no
- * anatomy, leaves one muted line instead.
+ * The content of a section of the component page, which carries the
+ * heading: the block's anatomy, read from the graph's anatomy text and
+ * drawn as a tree, each component it names linked to its page. Text the
+ * anatomy parser refuses, or a block with no anatomy, leaves one muted line
+ * instead.
  *
  * `import { ComponentAnatomy } from "../ComponentAnatomy/index.js";`
  *
@@ -63,11 +63,9 @@ export default function ComponentAnatomy({
         });
   }, [data.anatomyDsl, router]);
   return (
-    <PageSection
+    <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      heading={t("component.anatomy")}
-      headingId="component-anatomy-title"
     >
       {tree === undefined ? (
         <p className="absent">{t("component.noAnatomy")}</p>
@@ -79,6 +77,6 @@ export default function ComponentAnatomy({
           tree={tree}
         />
       )}
-    </PageSection>
+    </div>
   );
 }

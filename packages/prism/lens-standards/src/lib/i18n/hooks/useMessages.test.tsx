@@ -14,14 +14,14 @@ describe("useMessages", () => {
 
   it("fills every placeholder from the values", () => {
     const { result } = renderHook(() => useMessages());
-    expect(result.current("article.class", { class: "CodeStandard" })).toBe(
-      "class: CodeStandard",
+    expect(result.current("reading.missing", { uri: "cs:x" })).toBe(
+      "No standard found at cs:x. The standards index lists every standard the graph carries.",
     );
   });
 
   it("leaves a placeholder with no value verbatim instead of throwing", () => {
     const { result } = renderHook(() => useMessages());
-    expect(result.current("article.class")).toBe("class: {class}");
+    expect(result.current("reading.missing")).toBe(MESSAGES["reading.missing"]);
   });
 
   it("returns the translator a provider supplies", () => {

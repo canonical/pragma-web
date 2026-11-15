@@ -4817,6 +4817,21 @@ type OntologyClass implements Node {
   instanceCount: Int!
   isAbstract: Boolean!
   namespace: String!
+
+  """
+  prism:visibility of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  visibility: TermVisibility
+
+  """
+  prism:glyph of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  glyph: String
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); never inherited; null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
 }
 
 """
@@ -4831,6 +4846,26 @@ type ClassProperty {
   required: Boolean!
   singular: Boolean!
   inherited: Boolean!
+
+  """
+  sh:group of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  group: PropertyGroup
+
+  """
+  sh:order of the lens shape targeting this class, else of its nearest ancestor's that declares one, ascending; null when none does.
+  """
+  order: Float
+
+  """
+  shui:propertyRole of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  role: PropertyRole
+
+  """
+  prism:visibility on this class: the lens shape's, else the property's own; null when neither declares one.
+  """
+  visibility: TermVisibility
 }
 
 type OntologyProperty {
@@ -4845,6 +4880,29 @@ type OntologyProperty {
   acceptanceCriteria: String
   completionGuidance: String
   namespace: String!
+
+  """prism:visibility of the property; null when undeclared."""
+  visibility: TermVisibility
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseLabel, else the declared inverse property's asserted rdfs:label; null when neither exists.
+  """
+  inverseLabel(lang: String = "en"): String
+
+  """
+  prism:inversePluralLabel, else the declared inverse property's prism:pluralLabel; null when neither exists.
+  """
+  inversePluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseVisibility, else the declared inverse property's prism:visibility; null when neither exists.
+  """
+  inverseVisibility: TermVisibility
 }
 
 enum PropertyKind {
@@ -5002,6 +5060,11 @@ type Query {
   The statements whose subject is `uri` (an absolute IRI), as Turtle with the provider's prefixes, or null when the graph holds none.
   """
   source(uri: ID!): String
+
+  """
+  Every edge between classes, sorted by property, subject class and object class.
+  """
+  classEdges: [ClassEdge!]!
 }
 
 type Ontology {
@@ -5293,4 +5356,67 @@ type Prose {
   Entities the prose links to across its languages, in order of first mention; destinations node(id:) does not resolve are dropped.
   """
   references: NodeConnection!
+}
+
+"""
+An edge between two classes through one property, weighed by the instance
+statements it covers. A declared edge comes from the property's domain and
+range and counts the statements whose subject is an instance of the domain or
+a subclass and whose object is an instance of the range or a subclass; it is
+served with count 0 when none exists. An undeclared edge is a pair of classes
+the store links through the property that no declaration covers.
+"""
+type ClassEdge {
+  """The property's IRI."""
+  property: ID!
+
+  """
+  The IRI of the class the statements start from: the domain when declared.
+  """
+  subjectClass: ID!
+
+  """The IRI of the class the statements point to: the range when declared."""
+  objectClass: ID!
+
+  """The number of instance statements the edge covers; 0 when none."""
+  count: Int!
+
+  """
+  Whether the ontology declares the edge through the property's domain and range.
+  """
+  declared: Boolean!
+}
+
+"""
+How prominently a term is shown: prominent leads, normal is listed, hidden is a value and never an entity (prism:visibility).
+"""
+enum TermVisibility {
+  PROMINENT
+  NORMAL
+  HIDDEN
+}
+
+"""
+The role a property's values play for their subject (SHACL UI shui:propertyRole).
+"""
+enum PropertyRole {
+  LABEL
+  DESCRIPTION
+  DEPICTION
+  ICON
+  CLASSIFICATION
+}
+
+"""A sh:PropertyGroup: a named, ordered section of a class's properties."""
+type PropertyGroup {
+  """The group's IRI."""
+  uri: ID!
+
+  """rdfs:label in `lang` (exact tag, else untagged); null when undeclared."""
+  label(lang: String = "en"): String
+
+  """
+  sh:order: the group's position among a class's groups, ascending; null when undeclared.
+  """
+  order: Float
 }
