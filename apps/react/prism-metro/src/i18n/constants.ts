@@ -59,6 +59,7 @@ export const MESSAGES = {
   "fleet.formation.caption": "{title}, {length}",
   "fleet.stock.specimen": "{title}, its formations drawn at one scale",
   "fleet.formation.specimen": "{title}, drawn from the side",
+  "fleet.unit.specimen": "{title}, drawn from the side",
   "fleet.formations.none": "No formation runs this stock.",
   "fleet.index.empty": "The graph lists no rolling stock.",
   "fleet.page.loading": "Loading…",

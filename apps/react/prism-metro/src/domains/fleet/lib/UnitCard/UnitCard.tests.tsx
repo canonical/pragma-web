@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -11,12 +12,13 @@ import testQuery, {
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import { MOCK_UNIT, resolveRoot } from "../../../../../testing/fixtures.js";
 import type { UnitCardProps } from "./types.js";
-import Component from "./UnitCard.js";
+import UnitCard from "./UnitCard.js";
 
 /**
- * The operation the tests render UnitCard under: one Unit, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render UnitCard under: one Unit, read through
+ * the `node` field. The spread is aliased because that field is typed by an
+ * interface, so a node of another type reads as null instead of as a key that
+ * does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query UnitCardTestQuery @relay_test_operation {
@@ -27,7 +29,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const UnitCardTestNode = ({
   children,
 }: {
@@ -43,8 +48,8 @@ const UnitCardTestNode = ({
 
 /**
  * Render `children` with the key of the Unit a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 unit, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 unit, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: UnitCardProps["node"]) => ReactElement,
@@ -69,36 +74,75 @@ const renderWithNode = (
 
 describe("UnitCard", () => {
   it("reads the Unit through its fragment", () => {
-    const { container } = renderWithNode((node) => <Component node={node} />);
+    const { container } = renderWithNode((node) => <UnitCard node={node} />);
     expect(container.querySelector(".ds.unit-card")).toHaveAttribute(
       "data-type",
       "Unit",
     );
   });
 
-  it("fills its slots from the unit", () => {
-    const { container } = renderWithNode((node) => <Component node={node} />);
-    for (const text of [
+  it("fills the card's slots from the unit, in the anatomy's order", () => {
+    const { container } = renderWithNode((node) => <UnitCard node={node} />, {
+      _meta: {
+        ...MOCK_UNIT._meta,
+        definition: "The three cars of the Series 90, coupled for good.",
+      },
+    });
+    const root = container.querySelector(".ds.unit-card");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/units.svg#units",
+    );
+    expect(
+      [...(root?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual([
+      "metro:",
       "Series 90 unit",
-      "Unit",
-      "60 m",
-      "490 passengers",
-      "3 cars",
+      "The three cars of the Series 90, coupled for good.",
+    ]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([
+      ["length", "60 m"],
+      ["capacity", "490 passengers"],
+      ["cars", "3"],
+    ]);
+    for (const slot of [
+      ".address",
+      ".kind",
+      ".status",
+      ".location",
+      ".key-values",
+      ".vital",
+      ".sidecar",
     ]) {
-      expect(container.textContent).toContain(text);
+      expect(root?.querySelector(slot), slot).toBeNull();
     }
+    if (root) expectSlotOrder(root);
+    expect(
+      screen.getByRole("link", { name: "Series 90 unit" }),
+    ).toHaveAttribute("href", "/fleet/units/metro%3Aunit-90");
   });
 
-  it("links its title to the unit's page", () => {
-    renderWithNode((node) => <Component node={node} />);
-    expect(
-      screen.getByRole("link", { name: "Series 90 unit" }).getAttribute("href"),
-    ).toBe("/fleet/units/metro%3Aunit-90");
+  it("draws its side view in a drawing specimen", () => {
+    const { container } = renderWithNode((node) => <UnitCard node={node} />);
+    const specimen = container.querySelector(".specimen");
+    expect(specimen).toHaveAttribute("data-specimen", "drawing");
+    expect(specimen).toHaveAttribute(
+      "aria-label",
+      "Series 90 unit, drawn from the side",
+    );
+    expect(specimen?.querySelectorAll("svg.drawing")).toHaveLength(1);
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
-      <Component className="custom-class" node={node} />
+      <UnitCard className="custom-class" node={node} />
     ));
     expect(
       container.querySelector(".ds.unit-card")?.getAttribute("class"),
@@ -107,7 +151,7 @@ describe("UnitCard", () => {
 
   it("passes through additional props", () => {
     renderWithNode((node) => (
-      <Component data-testid="test-component" node={node} />
+      <UnitCard data-testid="test-component" node={node} />
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("DIV");
   });

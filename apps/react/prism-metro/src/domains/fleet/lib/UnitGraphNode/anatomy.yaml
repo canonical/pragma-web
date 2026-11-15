@@ -1,25 +1,47 @@
 ---
-# UnitGraphNode: a unit as a node of a graph.
-# Best guess: the unit's name, linked to its page, and its class.
-# Projected onto EntityGraphNode, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address.
+# UnitGraphNode: A unit as a node of a graph: its mark, its prefix off
+# the page's namespace and its name, linked to its home. Its mark says its
+# type, so it names no kind. Its mark is the unit's glyph, a published
+# icon.
 node:
   uri: metro.component.unit_graph_node
-  projection: { on: Unit }
+  projection:
+    on: Unit
   edges:
     - node:
         uri: prism.component.entity_graph_node
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # The unit's glyph, a published Icon (UNIT_MARK_ICON).
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
-              role: kind
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
-      relation: { cardinality: "1" }
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+      relation:
+        cardinality: "1"
