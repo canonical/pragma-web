@@ -40,7 +40,7 @@ describe("StandardReadingPage on the server", () => {
     expect(html).toContain('aria-label="Breadcrumb"');
     expect(html).toContain('data-slot="reading-canvas"');
     expect(html).toContain(
-      '<h2 id="user-content-why-one-prop">Why one prop</h2>',
+      '<h3 id="user-content-why-one-prop">Why one prop</h3>',
     );
     expect(fetchFn).not.toHaveBeenCalled();
   });

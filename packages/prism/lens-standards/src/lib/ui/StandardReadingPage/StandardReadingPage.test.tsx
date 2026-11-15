@@ -182,7 +182,7 @@ describe("StandardReadingPage", () => {
       // The prose, read from the same warm store: its two references are
       // chips already, so they too needed no request.
       expect(
-        screen.getByRole("heading", { level: 2, name: "Why one prop" }),
+        screen.getByRole("heading", { level: 3, name: "Why one prop" }),
       ).toBeInTheDocument();
       expect(document.querySelectorAll(".ds.node-chip")).toHaveLength(2);
       // Head: the document title, composed from the page's own <Head> and
@@ -382,7 +382,7 @@ describe("StandardReadingPage", () => {
       expect(screen.getByRole("figure")).toHaveTextContent(TURTLE);
       // The sections and their index gave way to the document…
       expect(
-        screen.queryByRole("heading", { level: 2, name: "Why one prop" }),
+        screen.queryByRole("heading", { level: 3, name: "Why one prop" }),
       ).not.toBeInTheDocument();
       expectSectionIndex(document.body, []);
       // …and neither the standard nor its source was asked for.
@@ -427,7 +427,7 @@ describe("StandardReadingPage", () => {
       expectSectionIndex(document.body, [{ id: "rule", title: "Rule" }]);
       const rule = screen.getByRole("region", { name: "Rule" });
       expect(
-        within(rule).getByRole("heading", { level: 2, name: "Why one prop" }),
+        within(rule).getByRole("heading", { level: 3, name: "Why one prop" }),
       ).toBeInTheDocument();
     },
     STANDARDS_TEST_TIMEOUT_MS,
