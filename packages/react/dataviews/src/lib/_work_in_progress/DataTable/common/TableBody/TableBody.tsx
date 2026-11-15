@@ -3,16 +3,6 @@ import type { TableBodyProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-body";
 
-function TableBody({ entries, renderEntry }: TableBodyProps): ReactElement {
-  return (
-    <tbody className={componentCssClassName}>
-      {entries.map((entry) => (
-        <Fragment key={entry.id}>{renderEntry(entry)}</Fragment>
-      ))}
-    </tbody>
-  );
-}
-
 /**
  * Every entry the table displays, in order. Memoised, and both props are
  * held at one reference — the entries until a row identity or the status
@@ -21,5 +11,15 @@ function TableBody({ entries, renderEntry }: TableBodyProps): ReactElement {
  * and stops there. While a status shows, a new `renderStatus` re-renders
  * the body, which costs the status row and, beside kept rows, one pass over
  * memoised rows that bail out.
+ *
+ * @implements ds:apps.subcomponent.data_table-body
  */
+const TableBody = ({ entries, renderEntry }: TableBodyProps): ReactElement => (
+  <tbody className={componentCssClassName}>
+    {entries.map((entry) => (
+      <Fragment key={entry.id}>{renderEntry(entry)}</Fragment>
+    ))}
+  </tbody>
+);
+
 export default memo(TableBody);

@@ -1,4 +1,5 @@
 import type { RowModel } from "@canonical/dataviews-core";
+import { assertInvariant } from "@canonical/dataviews-core/bindings";
 import {
   createVirtualRange,
   type MountedRange,
@@ -64,7 +65,10 @@ const readMounted = (
 /** The viewport a body measures against: the table root, its parent. */
 const readViewport = (body: HTMLTableSectionElement | null): HTMLElement =>
   // A mounted body is rendered inside the table's root, so it has a parent.
-  readMounted(body).parentElement as HTMLElement;
+  assertInvariant(
+    readMounted(body).parentElement,
+    "a table root over the body",
+  );
 
 /**
  * Mount one table's entries near its viewport: the range deciding which,
