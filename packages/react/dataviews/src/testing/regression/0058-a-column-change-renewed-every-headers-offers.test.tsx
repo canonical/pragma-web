@@ -32,7 +32,7 @@ describe("regression 0058 — a column change renewed every header's offers", ()
       useColumnManagement({
         provider,
         columns,
-        headerRow: createRef<HTMLDivElement>(),
+        headerRow: createRef<HTMLTableRowElement>(),
         messages: resolveMessages(),
         announce: () => {},
       }),

@@ -5,12 +5,11 @@ const componentCssClassName = "ds data-table-row-group body";
 
 function TableBody({ entries, renderEntry }: TableBodyProps): ReactElement {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <tbody> is only valid inside a <table>, and this grid is deliberately not one
-    <div role="rowgroup" className={componentCssClassName}>
+    <tbody className={componentCssClassName}>
       {entries.map((entry) => (
         <Fragment key={entry.id}>{renderEntry(entry)}</Fragment>
       ))}
-    </div>
+    </tbody>
   );
 }
 

@@ -47,6 +47,6 @@ describe("regression 0052 — a false child drew an empty settings cell", () => 
       untyped.container.querySelector(".ds.data-table-settings-cell"),
     ).toBeNull();
     expect(container.querySelector(".ds.data-table-settings-cell")).toBeNull();
-    expect(container.querySelectorAll("[role='columnheader']")).toHaveLength(1);
+    expect(container.querySelectorAll("th")).toHaveLength(1);
   });
 });

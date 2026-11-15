@@ -22,8 +22,8 @@ describe("findEnglish", () => {
     expect(
       findEnglish(
         hold(
-          `<div role="cell" class="ds data-table-body-cell">${english.sortAbsent}</div>` +
-            `<div role="columnheader"><span class="label">${english.sortAbsent}</span></div>`,
+          `<table><thead><tr><th><span class="label">${english.sortAbsent}</span></th></tr></thead>` +
+            `<tbody><tr><td class="ds data-table-body-cell">${english.sortAbsent}</td></tr></tbody></table>`,
         ),
         english,
       ),
@@ -34,7 +34,7 @@ describe("findEnglish", () => {
     expect(
       findEnglish(
         hold(
-          `<div role="cell" class="ds data-table-selection-cell"><input aria-label="${english.selectRow("alder")}"></div>`,
+          `<table><tbody><tr><td class="ds data-table-selection-cell"><input aria-label="${english.selectRow("alder")}"></td></tr></tbody></table>`,
         ),
         english,
       ),
@@ -45,7 +45,7 @@ describe("findEnglish", () => {
     expect(
       findEnglish(
         hold(
-          `<div role="cell" class="ds data-table-body-cell status">${english.sortAbsent}</div>`,
+          `<table><tbody><tr><td class="ds data-table-body-cell status">${english.sortAbsent}</td></tr></tbody></table>`,
         ),
         english,
       ),

@@ -131,9 +131,7 @@ describe("hydrating a server render", () => {
       container.querySelector<HTMLSelectElement>('select[name="page"]')?.value,
     ).toBe("2");
     expect(
-      [...container.querySelectorAll('[role="columnheader"]')].map(
-        (header) => header.textContent,
-      ),
+      [...container.querySelectorAll("th")].map((header) => header.textContent),
     ).not.toContain("Status");
     expect(client.state.get().window.page).toBe(2);
   });

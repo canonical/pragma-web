@@ -108,9 +108,7 @@ const countElements = (root: Element): number =>
 
 /** The body rows mounted right now. */
 const mountedRows = (table: HTMLElement): HTMLElement[] => [
-  ...table.querySelectorAll<HTMLElement>(
-    '.ds.data-table-row-group.body > [role="row"]',
-  ),
+  ...table.querySelectorAll<HTMLElement>(".ds.data-table-row-group.body > tr"),
 ];
 
 beforeEach(() => {
@@ -119,7 +117,7 @@ beforeEach(() => {
   vi.stubGlobal("ResizeObserver", FakeResizeObserver);
   vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
     function (this: HTMLElement) {
-      return this.getAttribute("role") === "table" ? 640 : 0;
+      return this.tagName === "TABLE" ? 640 : 0;
     },
   );
 });
@@ -214,7 +212,7 @@ describe("virtualized DataTable, bounded work", () => {
     });
     scrollTo(table, 160_000);
     const before = elementAt(
-      [...table.querySelectorAll<HTMLElement>(".ds.data-table-gap")],
+      [...table.querySelectorAll<HTMLElement>(".ds.data-table-row-group.body")],
       0,
     );
     const first = Number(
@@ -223,7 +221,7 @@ describe("virtualized DataTable, bounded work", () => {
     // Every row before the first mounted one: the measured ones at their
     // measured heights, the rest at the estimate.
     const grown = measured.reduce((total, [, height]) => total + height, 0);
-    expect(before.style.blockSize).toBe(
+    expect(before.style.paddingBlockStart).toBe(
       `${grown + (first - 2 - measured.length) * rowHeight}px`,
     );
   });

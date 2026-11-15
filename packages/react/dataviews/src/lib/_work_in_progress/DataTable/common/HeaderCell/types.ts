@@ -122,7 +122,7 @@ type OwnProps = {
  */
 export type HeaderCellProps = OwnProps &
   Omit<
-    ComponentProps<"div">,
+    ComponentProps<"th">,
     | keyof OwnProps
     | "children"
     | "role"

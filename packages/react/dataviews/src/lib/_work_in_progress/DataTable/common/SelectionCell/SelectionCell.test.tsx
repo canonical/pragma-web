@@ -16,11 +16,13 @@ import type { Machine } from "../../../../../../testing/types.js";
 import SelectionCell from "./SelectionCell.js";
 import type { SelectionCellProps } from "./types.js";
 
-/** A body row, as the table draws it: a div with the role. */
+/** A body row, as the table draws it. */
 const BodyRow = ({ children }: { readonly children: ReactNode }) => (
-  // biome-ignore lint/a11y/useSemanticElements: the table's own rows are divs with this role, which the cell sits in
-  // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, as the table's is
-  <div role="row">{children}</div>
+  <table>
+    <tbody>
+      <tr>{children}</tr>
+    </tbody>
+  </table>
 );
 
 /** The cell over one delivered machine, named by its name. */

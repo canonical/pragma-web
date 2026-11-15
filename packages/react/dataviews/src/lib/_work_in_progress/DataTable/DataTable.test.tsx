@@ -166,11 +166,20 @@ describe("DataTable", () => {
     );
   });
 
-  it("renders the table relationships as roles over div geometry", () => {
+  it("renders the table as native elements over grid geometry", () => {
     renderLoadedTable();
     const table = screen.getByRole("table", { name: "Machines" });
-    expect(table.tagName).toBe("DIV");
-    expect(within(table).getAllByRole("rowgroup")).toHaveLength(2);
+    expect(table.tagName).toBe("TABLE");
+    expect(table).not.toHaveAttribute("role");
+    expect(
+      within(table)
+        .getAllByRole("rowgroup")
+        .map((group) => group.tagName),
+    ).toEqual(["THEAD", "TBODY"]);
+    for (const header of screen.getAllByRole("columnheader")) {
+      expect(header.tagName).toBe("TH");
+      expect(header).toHaveAttribute("scope", "col");
+    }
     expect(
       screen
         .getAllByRole("columnheader")
@@ -198,7 +207,7 @@ describe("DataTable", () => {
       expect(row.matches(".ds.data-table-row")).toBe(true);
       expect(row.getAttribute("style")).toBeNull();
     }
-    expect(table.querySelector('[role="cell"][style]')).toBeNull();
+    expect(table.querySelector("td[style]")).toBeNull();
   });
 
   it("merges the caller's class name and inline style onto the root", () => {
@@ -292,7 +301,7 @@ describe("DataTable", () => {
 
   it("fills and clears a caller's ref object", () => {
     const { provider } = createMachineProvider();
-    const ref = createRef<HTMLDivElement>();
+    const ref = createRef<HTMLTableElement>();
     const { unmount } = render(
       <DataTable
         provider={provider}
@@ -493,7 +502,7 @@ describe("DataTable", () => {
    */
   const findHeaderRow = (): HTMLElement => {
     const [row, ...rest] = document.querySelectorAll<HTMLElement>(
-      ".data-table-row-group.header [role='row']",
+      ".data-table-row-group.header tr",
     );
     if (row === undefined || rest.length > 0) {
       throw new Error("expected one table's header row");
@@ -507,7 +516,7 @@ describe("DataTable", () => {
    */
   const findHeader = (name: string): HTMLElement => {
     const headers = Array.from(
-      findHeaderRow().querySelectorAll<HTMLElement>("[role='columnheader']"),
+      findHeaderRow().querySelectorAll<HTMLElement>("th"),
     ).filter((header) => header.querySelector(".label")?.textContent === name);
     const [header, ...rest] = headers;
     if (header === undefined || rest.length > 0) {
@@ -699,9 +708,8 @@ describe("DataTable", () => {
       document.querySelector("[role='grid'], [role='treegrid']"),
     ).not.toBeInTheDocument();
     // No roving tab stop: every sort button is in the tab order.
-    const sortButtons = document.querySelectorAll<HTMLButtonElement>(
-      "[role='columnheader'] button.sort",
-    );
+    const sortButtons =
+      document.querySelectorAll<HTMLButtonElement>("th button.sort");
     expect(sortButtons.length).toBeGreaterThan(1);
     for (const sortButton of sortButtons) {
       expect(sortButton.tabIndex).toBe(0);
@@ -758,9 +766,7 @@ describe("DataTable", () => {
       // Plain attribute queries: 158 orderings through role queries would
       // spend seconds computing names the text content already states.
       const listClaimed = () => [
-        ...view.container.querySelectorAll<HTMLElement>(
-          "[role='columnheader'][aria-sort]",
-        ),
+        ...view.container.querySelectorAll<HTMLElement>("th[aria-sort]"),
       ];
       for (const ordering of orderings) {
         act(() => {
@@ -898,9 +904,7 @@ describe("DataTable", () => {
           });
           const first = (ordering.length > 0 ? ordering : defaultSort).at(0);
           const claimed = [
-            ...view.container.querySelectorAll<HTMLElement>(
-              "[role='columnheader'][aria-sort]",
-            ),
+            ...view.container.querySelectorAll<HTMLElement>("th[aria-sort]"),
           ];
           const label =
             first === undefined ? undefined : layout.claims[first.field];
@@ -922,8 +926,7 @@ describe("DataTable", () => {
     const name = findSortButton("Name");
     const status = findSortButton("Status");
     const findStatusReason = () =>
-      status.closest("[role='columnheader']")?.querySelector(".sort-reason") ??
-      null;
+      status.closest("th")?.querySelector(".sort-reason") ?? null;
     fireEvent.click(name);
     // A reader on the header, in a document that has focus: a blur with the
     // window's focus gone is the window's, not the column's.
@@ -2263,7 +2266,7 @@ describe("DataTable", () => {
     expect(screen.getByRole("table", { name: "Machines" })).toBeInTheDocument();
     expect(
       container
-        .querySelector<HTMLElement>("[role='table']")
+        .querySelector<HTMLElement>("table")
         ?.style.getPropertyValue("--data-table-columns"),
     ).toBe("96px 96px");
   });

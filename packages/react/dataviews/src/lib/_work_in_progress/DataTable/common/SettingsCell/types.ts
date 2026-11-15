@@ -10,7 +10,7 @@ type OwnProps = {
    * Attaches this cell to the table's geometry. The stylesheet sizes the
    * settings track, and the columns share whatever width it leaves.
    */
-  readonly reserve: (cell: HTMLDivElement) => () => void;
+  readonly reserve: (cell: HTMLTableCellElement) => () => void;
 };
 
 /**
@@ -19,4 +19,4 @@ type OwnProps = {
  * table's geometry, so neither is taken.
  */
 export type SettingsCellProps = OwnProps &
-  Omit<ComponentProps<"div">, keyof OwnProps | "children" | "role" | "ref">;
+  Omit<ComponentProps<"th">, keyof OwnProps | "children" | "role" | "ref">;

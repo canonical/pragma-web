@@ -37,7 +37,9 @@ describe("findEnglish", () => {
   it("leaves the application's own data alone, wherever it happens to match", () => {
     expect(
       findEnglish(
-        hold(`<div role="cell">${english.sortAbsent}</div>`),
+        hold(
+          `<table><tbody><tr><td>${english.sortAbsent}</td></tr></tbody></table>`,
+        ),
         english,
       ),
     ).toEqual([]);

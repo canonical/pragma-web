@@ -36,14 +36,13 @@ function BodyCell<TRow extends object>({
   const Content = column.cell;
   return (
     <CellContext value={cell}>
-      {/* biome-ignore lint/a11y/useSemanticElements: <td> is only valid inside a <table>, and this grid is deliberately not one */}
-      <div role="cell" className={componentCssClassName}>
+      <td className={componentCssClassName}>
         {Content === undefined ? (
           spellPrimitiveValue(value)
         ) : (
           <Content value={value} rowId={channels.id} columnId={column.id} />
         )}
-      </div>
+      </td>
     </CellContext>
   );
 }

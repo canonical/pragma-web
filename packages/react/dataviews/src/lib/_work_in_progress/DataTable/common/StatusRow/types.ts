@@ -11,8 +11,10 @@ import type { ReactNode, Ref } from "react";
 export type StatusRowProps = {
   readonly status: DisplayStatus;
   readonly renderStatus: (status: DisplayStatus) => ReactNode;
+  /** How many tracks the table renders, which the one cell spans. */
+  readonly span: number;
   /** The row's logical position, reported only by a virtualized table. */
   readonly position?: number | undefined;
   /** The row element, for a virtualized table to measure. */
-  readonly ref?: Ref<HTMLDivElement> | undefined;
+  readonly ref?: Ref<HTMLTableRowElement> | undefined;
 };

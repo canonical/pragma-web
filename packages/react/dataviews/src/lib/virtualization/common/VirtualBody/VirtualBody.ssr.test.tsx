@@ -35,9 +35,9 @@ describe("virtualized DataTable SSR", () => {
       />,
     );
     expect(html).toContain('aria-rowcount="31"');
-    expect(html.match(/role="row"/g)).toHaveLength(31);
+    expect(html.match(/<tr /g)).toHaveLength(31);
     expect(html).toContain('aria-rowindex="31"');
     expect(html).toContain("host-29");
-    expect(html).not.toContain("data-table-gap");
+    expect(html).not.toContain("padding-block");
   });
 });

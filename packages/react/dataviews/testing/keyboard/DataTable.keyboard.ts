@@ -185,8 +185,8 @@ const markControls = (page: Page): Promise<Controls> =>
       // A virtualized table reports every logical row, and its body rows
       // mount and unmount as it scrolls; its header row group never does.
       const inVirtualizedTable =
-        control.closest("[role='table'][aria-rowcount]") !== null;
-      const inHeader = control.closest("[role='rowgroup'].header") !== null;
+        control.closest("table[aria-rowcount]") !== null;
+      const inHeader = control.closest("thead.header") !== null;
       if (inVirtualizedTable && !inHeader) {
         virtualized.push(position);
         rows[position] =
@@ -312,7 +312,7 @@ const walk = async (
           (outlined || style.boxShadow !== "none"),
         markup: active.outerHTML.slice(0, 120),
         row:
-          active.closest("[role='table'][aria-rowcount]") === null
+          active.closest("table[aria-rowcount]") === null
             ? null
             : (active
                 .closest("[aria-rowindex]")
@@ -365,8 +365,8 @@ const walk = async (
     const active = document.activeElement;
     return (
       active !== null &&
-      active.closest("[role='table'][aria-rowcount]") !== null &&
-      active.closest("[role='rowgroup'].header") === null
+      active.closest("table[aria-rowcount]") !== null &&
+      active.closest("thead.header") === null
     );
   });
   return {
@@ -414,7 +414,7 @@ const listMissed = (
             miss.connected ||
             !virtualized.includes(miss.mark) ||
             (document.querySelector(
-              `[role='table'][aria-rowcount] [aria-rowindex="${rows[miss.mark]}"]`,
+              `table[aria-rowcount] [aria-rowindex="${rows[miss.mark]}"]`,
             ) !== null &&
               !reachedRows.includes(rows[miss.mark] ?? "")),
         ),
@@ -509,6 +509,23 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
       }
     });
   }
+
+  test("Sortable: Chromium exposes the native table, its headers and its cells", async ({
+    page,
+  }) => {
+    await openStory(page, findStory(TABLE, "Sortable").id);
+    const session = await page.context().newCDPSession(page);
+    const tree = (await session.send("Accessibility.getFullAXTree")) as {
+      readonly nodes: readonly {
+        readonly role?: { readonly value?: string };
+      }[];
+    };
+    const roles = new Set(tree.nodes.map((node) => node.role?.value));
+    for (const role of ["table", "rowgroup", "row", "columnheader", "cell"]) {
+      expect(roles.has(role), role).toBe(true);
+    }
+    expect(roles.has("LayoutTable")).toBe(false);
+  });
 
   test("Sortable: Enter and Space cycle a header's sort, Shift adds a term, focus stays", async ({
     page,
@@ -692,9 +709,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
       page.locator(".ds.data-views-announcer > *").last(),
     ).toHaveText("Host hidden");
     // The hidden column's controls are gone: focus stays in the header row.
-    await expect(
-      page.locator("[role='columnheader'] button:focus"),
-    ).toHaveCount(1);
+    await expect(page.locator("th button:focus")).toHaveCount(1);
   });
 
   test("Settings ArrangedByTheViewer: Enter opens the settings menu, Enter hides a column from it, focus returns to its button", async ({

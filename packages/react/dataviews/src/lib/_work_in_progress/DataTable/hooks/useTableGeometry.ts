@@ -91,7 +91,7 @@ export default function useTableGeometry({
   const interactionState = useDataViewsValue(interaction.state);
 
   const attach = useCallback(
-    (node: HTMLDivElement): (() => void) | undefined => {
+    (node: HTMLTableElement): (() => void) | undefined => {
       // Inside the border, which is no room for a column. The observer's
       // first report, which follows at once, is the exact content width.
       setContainer(node.clientWidth);
@@ -105,7 +105,7 @@ export default function useTableGeometry({
   // Each reserving cell's last measured width: the selection column's and
   // the settings cell's are the stylesheet's tracks, and the columns share
   // what both leave.
-  const reservations = useRef(new Map<HTMLDivElement, number>());
+  const reservations = useRef(new Map<HTMLTableCellElement, number>());
   const publishReserved = useCallback((): void => {
     let total = 0;
     for (const width of reservations.current.values()) {
@@ -118,7 +118,7 @@ export default function useTableGeometry({
   // width every time — never its bounding box, which an ancestor's
   // transform would scale.
   const reserve = useCallback(
-    (cell: HTMLDivElement): (() => void) => {
+    (cell: HTMLTableCellElement): (() => void) => {
       const measure = (): void => {
         reservations.current.set(cell, cell.offsetWidth);
         publishReserved();

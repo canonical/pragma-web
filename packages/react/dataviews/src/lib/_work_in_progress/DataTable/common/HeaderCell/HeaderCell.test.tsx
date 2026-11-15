@@ -22,11 +22,13 @@ const NONE: HeaderCellProps["offers"] = {
   "move-right": false,
 };
 
-/** The table's header row, as it draws it: a div with the role. */
+/** The table's header row, as it draws it. */
 const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
-  // biome-ignore lint/a11y/useSemanticElements: the table's own header row is a div with this role, which the cell sits in
-  // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, as the table's is
-  <div role="row">{children}</div>
+  <table>
+    <thead>
+      <tr>{children}</tr>
+    </thead>
+  </table>
 );
 
 const mount = (props: CaseProps = {}) => {

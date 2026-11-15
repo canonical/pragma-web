@@ -219,7 +219,7 @@ export default function ScopedDataTable<
   // The columns' visibility and places, as the settings menu offers them
   // and every change to them is announced. The header row takes the focus a
   // hidden column's own controls leave.
-  const headerRow = useRef<HTMLDivElement>(null);
+  const headerRow = useRef<HTMLTableRowElement>(null);
   const {
     settings: columnSettings,
     readOffers,
@@ -271,6 +271,10 @@ export default function ScopedDataTable<
   // once; otherwise the held one, which re-renders nothing.
   const renderer = status === null ? showStatus : statusRenderer;
 
+  // The tracks a row renders: selection, the columns, the settings cell.
+  const tracks =
+    Number(selectable) + rendered.length + Number(isValidElement(settings));
+
   // One renderer for either body, held while what it closes over holds:
   // the bodies key, place and measure rows without knowing them.
   const renderEntry = useCallback<EntryRenderer>(
@@ -281,11 +285,13 @@ export default function ScopedDataTable<
           position={placement?.position}
           status={entry.status}
           renderStatus={renderer}
+          span={tracks}
         />
       ) : (
         <Row
           ref={placement?.ref}
           position={placement?.position}
+          gap={placement?.gap}
           provider={provider}
           channels={scopes.readRow(entry.rowId)}
           columns={rendered}
@@ -293,7 +299,7 @@ export default function ScopedDataTable<
           getRowLabel={nameRow}
         />
       ),
-    [renderer, provider, scopes, rendered, selectable, nameRow],
+    [renderer, provider, scopes, rendered, selectable, nameRow, tracks],
   );
 
   // A custom property, which `CSSProperties` does not spell.
@@ -304,13 +310,13 @@ export default function ScopedDataTable<
 
   return (
     <MessagesContext value={messages}>
-      {/* biome-ignore lint/a11y/useSemanticElements: a <table> resolves each row's widths from its own content, which is exactly what this grid replaces with one shared track list */}
-      <div
+      {/* A native table, drawn on one shared track list: its stylesheet
+          lays rows out as grids, so no row sizes itself by its content. */}
+      <table
         {...rest}
         ref={attach}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
         style={geometryStyle}
-        role="table"
         aria-label={label}
         aria-busy={busy}
         // Every logical row, the header's included, so a row a virtualized
@@ -319,13 +325,9 @@ export default function ScopedDataTable<
           virtualization === undefined ? undefined : entries.length + 1
         }
       >
-        {/* biome-ignore lint/a11y/useSemanticElements: <thead> is only valid inside a <table>, and this grid is deliberately not one */}
-        <div role="rowgroup" className="ds data-table-row-group header">
-          {/* biome-ignore lint/a11y/useSemanticElements: <tr> is only valid inside a <table>, and this grid is deliberately not one */}
-          {/* biome-ignore lint/a11y/useFocusableInteractive: the row is structure, not a widget — the focusable controls live in its cells */}
-          <div
+        <thead className="ds data-table-row-group header">
+          <tr
             ref={headerRow}
-            role="row"
             className="ds data-table-row"
             aria-rowindex={virtualization === undefined ? undefined : 1}
           >
@@ -384,8 +386,8 @@ export default function ScopedDataTable<
                 reserve={geometry.reserve}
               />
             )}
-          </div>
-        </div>
+          </tr>
+        </thead>
         {virtualization === undefined ? (
           <TableBody entries={entries} renderEntry={renderEntry} />
         ) : (
@@ -396,7 +398,7 @@ export default function ScopedDataTable<
             tracks: geometry.template,
           })
         )}
-      </div>
+      </table>
     </MessagesContext>
   );
 }

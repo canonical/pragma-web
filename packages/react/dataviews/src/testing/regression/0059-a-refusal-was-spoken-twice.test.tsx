@@ -57,9 +57,7 @@ const refuseInComposition = async (): Promise<{
   const before = (await readAnnouncements()).length;
   const status = table.getByRole("button", { name: "Status" });
   fireEvent.click(status, { shiftKey: true });
-  const reason =
-    status.closest("[role='columnheader']")?.querySelector(".sort-reason") ??
-    null;
+  const reason = status.closest("th")?.querySelector(".sort-reason") ?? null;
   return { reason, before };
 };
 

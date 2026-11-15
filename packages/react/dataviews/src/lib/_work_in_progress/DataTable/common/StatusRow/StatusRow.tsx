@@ -18,26 +18,23 @@ const cellCssClassName = "ds data-table-body-cell status";
 export default function StatusRow({
   status,
   renderStatus,
+  span,
   position,
   ref,
 }: StatusRowProps): ReactElement {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <tr> is only valid inside a <table>, and this grid is deliberately not one
-    // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, not a widget — the focusable controls live in its cells
-    <div
-      ref={ref}
-      role="row"
-      className={componentCssClassName}
-      aria-rowindex={position}
-    >
-      {/* biome-ignore lint/a11y/useSemanticElements: <td> is only valid inside a <table>, and this grid is deliberately not one */}
-      <div role="cell" className={cellCssClassName} data-status={status.status}>
+    <tr ref={ref} className={componentCssClassName} aria-rowindex={position}>
+      <td
+        className={cellCssClassName}
+        colSpan={span}
+        data-status={status.status}
+      >
         {DISPLAY_STATUS_PHASES[status.status] === "terminal" ? (
           <span role="status">{renderStatus(status)}</span>
         ) : (
           renderStatus(status)
         )}
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 }

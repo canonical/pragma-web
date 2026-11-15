@@ -25,22 +25,21 @@ const Row = <TRow extends object>({
   selectable,
   getRowLabel,
   position,
+  gap,
   ref,
 }: RowProps<TRow>): ReactElement => {
   const selected = useDataViewsValue(channels.selected);
   return (
     // aria-selected is only meaningful where selection is offered, and it
     // must agree with the row's checkbox: both read this one channel.
-    // biome-ignore lint/a11y/useSemanticElements: <tr> is only valid inside a <table>, and this grid is deliberately not one
-    // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, not a widget — the focusable controls live in its cells
-    <div
+    <tr
       ref={ref}
-      role="row"
       className={[componentCssClassName, selected && "selected"]
         .filter(Boolean)
         .join(" ")}
       aria-selected={selectable ? selected : undefined}
       aria-rowindex={position}
+      style={gap === undefined ? undefined : { marginBlockStart: gap }}
     >
       {selectable ? (
         <SelectionCell
@@ -59,7 +58,7 @@ const Row = <TRow extends object>({
           field={readFieldName(column)}
         />
       ))}
-    </div>
+    </tr>
   );
 };
 

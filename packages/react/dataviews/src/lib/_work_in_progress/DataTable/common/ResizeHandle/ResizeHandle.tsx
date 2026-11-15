@@ -29,7 +29,7 @@ const ENDS_OF_A_PRESS = ["pointerdown", "pointercancel", "keydown"] as const;
 
 /** Whether the header cell a control sits in lays its text out right to left. */
 const isRightToLeft = (control: Element): boolean => {
-  const cell = control.closest('[role="columnheader"]') ?? control;
+  const cell = control.closest("th") ?? control;
   return getComputedStyle(cell).direction === "rtl";
 };
 
@@ -79,7 +79,7 @@ const isInHeaderRow = (
   if (row.contains(pressed)) {
     return true;
   }
-  const table = row.closest('[role="table"]');
+  const table = row.closest("table");
   const band = row.getBoundingClientRect();
   return (
     table !== null &&
@@ -98,7 +98,7 @@ const isInHeaderRow = (
  * @note Impure: scrolls the table the control sits in.
  */
 const reveal = (control: HTMLElement): void => {
-  const table = control.closest<HTMLElement>('[role="table"]');
+  const table = control.closest("table");
   if (table === null) {
     return;
   }
@@ -318,8 +318,8 @@ export default function ResizeHandle({
    * end. The hint is said once, as placing starts.
    */
   const beginPlacing = (target: HTMLElement): void => {
-    const cell = target.closest<HTMLElement>('[role="columnheader"]');
-    const row = cell?.closest('[role="row"]') ?? null;
+    const cell = target.closest("th");
+    const row = cell?.closest("tr") ?? null;
     const onPress = (event: PointerEvent): void => {
       const pressed = event.target;
       if (

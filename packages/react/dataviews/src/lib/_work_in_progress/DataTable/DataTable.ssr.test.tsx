@@ -67,7 +67,7 @@ describe("DataTable SSR", () => {
     expect(readPresentation).not.toHaveBeenCalled();
     expect(heard).not.toHaveBeenCalled();
     expect(html).toContain('class="ds data-table dense"');
-    expect(html).toContain('role="table"');
+    expect(html).toContain('<table class="ds data-table dense"');
     expect(html).toContain('aria-label="Machines"');
     // A resize handle's keys work only once scripts run, so none is sent.
     expect(html).not.toContain('role="separator"');
