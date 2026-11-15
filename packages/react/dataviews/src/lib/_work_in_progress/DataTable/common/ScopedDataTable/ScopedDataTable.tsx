@@ -25,6 +25,7 @@ import {
   useRef,
 } from "react";
 import {
+  type DataTableVirtualization,
   type EntryRenderer,
   MessagesContext,
   VIRTUALIZED,
@@ -45,10 +46,6 @@ import {
   useHeaderSort,
   useTableGeometry,
 } from "../../hooks/index.js";
-import type {
-  DataTableVirtualization,
-  ScopedDataTableProps,
-} from "../../types.js";
 import {
   HeaderCell,
   Row,
@@ -59,6 +56,7 @@ import {
   TableBody,
 } from "../index.js";
 import { areColumnModelsEqual, readSizing } from "../utils/index.js";
+import type { ScopedDataTableProps } from "./types.js";
 import "../../styles.css";
 
 /**

@@ -1,10 +1,6 @@
 /** The work in progress the package exports. */
 
-export type {
-  DataTableColumn,
-  DataTableProps,
-  DataTableVirtualization,
-} from "./DataTable/index.js";
+export type { DataTableColumn, DataTableProps } from "./DataTable/index.js";
 export { DataTable } from "./DataTable/index.js";
 export type {
   DataViewsActionBarProps,
