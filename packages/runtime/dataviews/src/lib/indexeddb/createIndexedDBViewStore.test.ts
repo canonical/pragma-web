@@ -346,7 +346,7 @@ describe("createIndexedDBViewStore", () => {
       expect(await store.get("failed")).toMatchObject({
         view: { pinned: true },
       });
-      expect((await store.list()).views[0]?.pinned).toBe(true);
+      expect((await store.list()).views.at(0)?.pinned).toBe(true);
       expect(await store.unpin("failed")).toEqual({ status: "saved" });
       expect(await store.unpin("failed")).toEqual({ status: "saved" });
       expect(await store.get("failed")).toMatchObject({
@@ -635,7 +635,7 @@ describe("createIndexedDBViewStore", () => {
         },
       });
       await store.create(failed);
-      forceCloseDatabase(connections[0]);
+      forceCloseDatabase(connections.at(0));
       expect((await store.list()).views).toHaveLength(1);
       expect(connections).toHaveLength(2);
     });
@@ -828,7 +828,7 @@ describe("createIndexedDBViewStore", () => {
       await closing.list();
       closing.dispose();
       await vi.waitFor(() => expect(connections).toHaveLength(1));
-      forceCloseDatabase(connections[0]);
+      forceCloseDatabase(connections.at(0));
       await expect(closing.list()).rejects.toThrow("disposed");
     });
   });

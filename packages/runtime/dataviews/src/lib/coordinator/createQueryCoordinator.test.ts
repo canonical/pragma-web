@@ -10,7 +10,6 @@ import {
 } from "../query/index.js";
 import type {
   Completion,
-  Count,
   GroupSummary,
   QueryIssue,
   SourceCounts,
@@ -20,7 +19,7 @@ import type { RowRecord } from "../rows/index.js";
 import createQueryCoordinator from "./createQueryCoordinator.js";
 import type { QueryCoordinator } from "./types.js";
 
-const slice = (overrides: Partial<Slice> = {}): Slice => ({
+const buildSlice = (overrides: Partial<Slice> = {}): Slice => ({
   filter: [],
   search: null,
   sort: [],
@@ -28,26 +27,24 @@ const slice = (overrides: Partial<Slice> = {}): Slice => ({
   ...overrides,
 });
 
-const window = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
+const buildWindow = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
   ...DEFAULT_WINDOW,
   ...overrides,
 });
 
-const statusPredicate = (...operands: string[]): Predicate => ({
+const buildStatusPredicate = (...operands: string[]): Predicate => ({
   field: "status",
   operator: "isAny",
   operands,
 });
 
-const UNKNOWN: Count = { kind: "unknown" };
-
 /** What an ungrouped source counts: the matched rows are the visible ones. */
-const counts = (matched: number): SourceCounts => ({
+const buildCounts = (matched: number): SourceCounts => ({
   pageable: { kind: "exact", value: matched },
   matched: { kind: "exact", value: matched },
 });
 
-const succeeded = (
+const buildSucceeded = (
   rows: readonly RowRecord[],
   overrides: Partial<SourcePage> = {},
 ): Completion => ({
@@ -55,7 +52,7 @@ const succeeded = (
   page: {
     rows,
     groups: null,
-    counts: counts(rows.length),
+    counts: buildCounts(rows.length),
     facets: {},
     more: null,
     cursors: null,
@@ -63,12 +60,12 @@ const succeeded = (
   },
 });
 
-const failed = (reason: string, cause: unknown = null): Completion => ({
+const buildFailed = (reason: string, cause: unknown = null): Completion => ({
   status: "failed",
   failure: { reason, cause, transient: null },
 });
 
-const refused = (reason: string): Completion => ({
+const buildRefused = (reason: string): Completion => ({
   status: "refused",
   refusals: [
     {
@@ -101,13 +98,13 @@ describe("createQueryCoordinator", () => {
   it("starts idle on the configured start's slice and window", () => {
     const coordinator = createQueryCoordinator({
       start: {
-        slice: slice({ filter: [statusPredicate("failed")] }),
-        window: window({ page: 2, size: 25 }),
+        slice: buildSlice({ filter: [buildStatusPredicate("failed")] }),
+        window: buildWindow({ page: 2, size: 25 }),
       },
     });
     const state = coordinator.state;
     expect(state.result.status).toBe("idle");
-    expect(state.window).toEqual(window({ page: 2, size: 25 }));
+    expect(state.window).toEqual(buildWindow({ page: 2, size: 25 }));
     expect(state.slice.filter).toHaveLength(1);
     expect(state.resultMatchesQuery).toBe(false);
   });
@@ -140,11 +137,11 @@ describe("createQueryCoordinator", () => {
     const coordinator = createQueryCoordinator({});
     const first = dispatchRequest(coordinator, {
       kind: "setPredicate",
-      predicate: statusPredicate("failed"),
+      predicate: buildStatusPredicate("failed"),
     });
     coordinator.complete(
       first,
-      succeeded([{ id: "machine-1" }], {
+      buildSucceeded([{ id: "machine-1" }], {
         facets: {
           status: {
             kind: "values",
@@ -156,9 +153,9 @@ describe("createQueryCoordinator", () => {
     const published = coordinator.state.result.facets;
     const second = dispatchRequest(coordinator, {
       kind: "setPredicate",
-      predicate: statusPredicate("cancelled"),
+      predicate: buildStatusPredicate("cancelled"),
     });
-    coordinator.complete(second, failed("offline"));
+    coordinator.complete(second, buildFailed("offline"));
     expect(coordinator.state.result.status).toBe("stale");
     expect(coordinator.state.result.facets).toBe(published);
     expect(published).not.toBeNull();
@@ -166,50 +163,54 @@ describe("createQueryCoordinator", () => {
 
   it("adopts a slice again once a command or a reset has moved away from it", () => {
     const failedOnly = {
-      slice: slice({ filter: [statusPredicate("failed")] }),
-      window: window(),
+      slice: buildSlice({ filter: [buildStatusPredicate("failed")] }),
+      window: buildWindow(),
     };
     const coordinator = createQueryCoordinator({});
     coordinator.adopt(failedOnly);
     dispatchRequest(coordinator, {
       kind: "setPredicate",
-      predicate: statusPredicate("cancelled"),
+      predicate: buildStatusPredicate("cancelled"),
     });
     // Back to the first query, on another page: its slice is in force again.
     expect(
-      coordinator.adopt({ ...failedOnly, window: window({ page: 2 }) }),
+      coordinator.adopt({ ...failedOnly, window: buildWindow({ page: 2 }) }),
     ).not.toBeNull();
-    expect(coordinator.state.slice.filter).toEqual([statusPredicate("failed")]);
+    expect(coordinator.state.slice.filter).toEqual([
+      buildStatusPredicate("failed"),
+    ]);
     coordinator.reset();
     expect(
-      coordinator.adopt({ ...failedOnly, window: window({ page: 3 }) }),
+      coordinator.adopt({ ...failedOnly, window: buildWindow({ page: 3 }) }),
     ).not.toBeNull();
-    expect(coordinator.state.slice.filter).toEqual([statusPredicate("failed")]);
+    expect(coordinator.state.slice.filter).toEqual([
+      buildStatusPredicate("failed"),
+    ]);
   });
 
   it("issues a request on a query change, resets the window and retains rows", () => {
     const coordinator = createQueryCoordinator({
-      start: { window: window({ page: 4 }) },
+      start: { window: buildWindow({ page: 4 }) },
     });
     const first = dispatchRequest(coordinator, {
       kind: "setPredicate",
-      predicate: statusPredicate("failed"),
+      predicate: buildStatusPredicate("failed"),
     });
-    expect(coordinator.state.window).toEqual(window());
-    coordinator.complete(first, succeeded([{ id: "machine-1" }]));
+    expect(coordinator.state.window).toEqual(buildWindow());
+    coordinator.complete(first, buildSucceeded([{ id: "machine-1" }]));
     expect(coordinator.state.result.status).toBe("ready");
     expect(coordinator.state.resultMatchesQuery).toBe(true);
 
     const second = dispatchRequest(coordinator, {
       kind: "setPredicate",
-      predicate: statusPredicate("cancelled"),
+      predicate: buildStatusPredicate("cancelled"),
     });
     expect(second).not.toBe(first);
     // Different query pending: retained rows and counts keep their old
     // provenance.
     expect(coordinator.state.result.status).toBe("pending");
     expect(coordinator.state.result.rows).toEqual([{ id: "machine-1" }]);
-    expect(coordinator.state.result.counts).toEqual(counts(1));
+    expect(coordinator.state.result.counts).toEqual(buildCounts(1));
     expect(coordinator.state.result.provenance?.requestId).toBe(first);
     expect(coordinator.state.resultMatchesQuery).toBe(false);
   });
@@ -218,9 +219,9 @@ describe("createQueryCoordinator", () => {
     const coordinator = createQueryCoordinator();
     const request = dispatchRequest(coordinator, {
       kind: "setPredicate",
-      predicate: statusPredicate("failed"),
+      predicate: buildStatusPredicate("failed"),
     });
-    coordinator.complete(request, succeeded([{ id: "machine-1" }]));
+    coordinator.complete(request, buildSucceeded([{ id: "machine-1" }]));
     expect(coordinator.state.resultMatchesQuery).toBe(true);
 
     dispatchRequest(coordinator, { kind: "navigateWindow", page: 2 });
@@ -228,7 +229,7 @@ describe("createQueryCoordinator", () => {
     expect(result.status).toBe("pending");
     expect(result.rows).toEqual([{ id: "machine-1" }]);
     expect(coordinator.state.resultMatchesQuery).toBe(false);
-    expect(coordinator.state.window).toEqual(window({ page: 2 }));
+    expect(coordinator.state.window).toEqual(buildWindow({ page: 2 }));
   });
 
   it("ignores completions for superseded requests", () => {
@@ -242,15 +243,15 @@ describe("createQueryCoordinator", () => {
       search: "zebu",
     });
     // The slower first response arrives after the second request replaced it.
-    expect(coordinator.complete(first, succeeded([{ id: "stale" }]))).toBe(
+    expect(coordinator.complete(first, buildSucceeded([{ id: "stale" }]))).toBe(
       false,
     );
     expect(coordinator.state.result.rows).toBeNull();
     expect(coordinator.state.result.problem).toBeNull();
 
-    expect(coordinator.complete(second, succeeded([{ id: "fresh" }]))).toBe(
-      true,
-    );
+    expect(
+      coordinator.complete(second, buildSucceeded([{ id: "fresh" }])),
+    ).toBe(true);
     expect(coordinator.state.result.rows).toEqual([{ id: "fresh" }]);
   });
 
@@ -264,11 +265,11 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "zebu",
     });
-    expect(coordinator.complete(first, failed("gateway"))).toBe(false);
+    expect(coordinator.complete(first, buildFailed("gateway"))).toBe(false);
     expect(coordinator.state.result.problem).toBeNull();
-    expect(coordinator.complete(second, succeeded([{ id: "fresh" }]))).toBe(
-      true,
-    );
+    expect(
+      coordinator.complete(second, buildSucceeded([{ id: "fresh" }])),
+    ).toBe(true);
   });
 
   it("publishes rows, groups, counts, more, cursors and provenance together", () => {
@@ -280,8 +281,8 @@ describe("createQueryCoordinator", () => {
     const rows = [{ id: "machine-1" }, { id: "machine-2" }];
     coordinator.complete(
       request,
-      succeeded(rows, {
-        counts: counts(9),
+      buildSucceeded(rows, {
+        counts: buildCounts(9),
         more: true,
         cursors: { next: "c:machine-2", previous: null },
       }),
@@ -291,7 +292,7 @@ describe("createQueryCoordinator", () => {
       status: "ready",
       rows: [{ id: "machine-1" }, { id: "machine-2" }],
       groups: null,
-      counts: counts(9),
+      counts: buildCounts(9),
       facets: {},
       more: true,
       cursors: { next: "c:machine-2", previous: null },
@@ -322,7 +323,7 @@ describe("createQueryCoordinator", () => {
     const page: SourcePage = {
       rows: [{ id: "machine-1" }],
       groups,
-      counts: counts(1),
+      counts: buildCounts(1),
       facets: {},
       more: null,
       cursors: { next: "c:machine-1", previous: null },
@@ -340,18 +341,18 @@ describe("createQueryCoordinator", () => {
 
   it("stamps the slice and window the rows answer, never what the source says", () => {
     const coordinator = createQueryCoordinator({
-      start: { window: window({ size: 25 }) },
+      start: { window: buildWindow({ size: 25 }) },
     });
     const request = dispatchRequest(coordinator, {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(request, succeeded([{ id: "machine-1" }]));
+    coordinator.complete(request, buildSucceeded([{ id: "machine-1" }]));
     const { result, slice: applied, window: paged } = coordinator.state;
     expect(result.provenance?.slice).toBe(applied);
     expect(result.provenance?.window).toBe(paged);
     expect(result.provenance?.slice.search).toBe("yak");
-    expect(result.provenance?.window).toEqual(window({ size: 25 }));
+    expect(result.provenance?.window).toEqual(buildWindow({ size: 25 }));
   });
 
   it("publishes a request completion at most once", () => {
@@ -361,12 +362,12 @@ describe("createQueryCoordinator", () => {
       search: "yak",
     });
     expect(
-      coordinator.complete(request, succeeded([{ id: "machine-1" }])),
+      coordinator.complete(request, buildSucceeded([{ id: "machine-1" }])),
     ).toBe(true);
     // A duplicated delivery of the same completion must not overwrite.
-    expect(coordinator.complete(request, failed("duplicate delivery"))).toBe(
-      false,
-    );
+    expect(
+      coordinator.complete(request, buildFailed("duplicate delivery")),
+    ).toBe(false);
     expect(coordinator.state.result.rows).toEqual([{ id: "machine-1" }]);
     expect(coordinator.state.result.problem).toBeNull();
   });
@@ -377,7 +378,7 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(request, succeeded([{ id: "machine-1" }]));
+    coordinator.complete(request, buildSucceeded([{ id: "machine-1" }]));
 
     const refreshId = refreshRequest(coordinator);
     expect(coordinator.state.result.status).toBe("refreshing");
@@ -385,7 +386,7 @@ describe("createQueryCoordinator", () => {
     expect(coordinator.state.resultMatchesQuery).toBe(true);
 
     const cause = new Error("gateway down");
-    coordinator.complete(refreshId, failed("gateway down", cause));
+    coordinator.complete(refreshId, buildFailed("gateway down", cause));
     const result = coordinator.state.result;
     // The rows are usable and the failure is real, so both are reported.
     expect(result.status).toBe("refresh-failed");
@@ -404,8 +405,8 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(request, succeeded([{ id: "machine-1" }]));
-    const refusal = refused('field "zone" cannot be filtered');
+    coordinator.complete(request, buildSucceeded([{ id: "machine-1" }]));
+    const refusal = buildRefused('field "zone" cannot be filtered');
     coordinator.complete(refreshRequest(coordinator), refusal);
     const result = coordinator.state.result;
     expect(result.status).toBe("refresh-failed");
@@ -430,11 +431,11 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(request, succeeded([{ id: "machine-1" }]));
+    coordinator.complete(request, buildSucceeded([{ id: "machine-1" }]));
     const refreshId = refreshRequest(coordinator);
     coordinator.complete(
       refreshId,
-      succeeded([{ id: "machine-1" }, { id: "machine-2" }]),
+      buildSucceeded([{ id: "machine-1" }, { id: "machine-2" }]),
     );
     const result = coordinator.state.result;
     expect(result.status).toBe("ready");
@@ -449,7 +450,7 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(request, failed("offline"));
+    coordinator.complete(request, buildFailed("offline"));
     const result = coordinator.state.result;
     expect(result.status).toBe("failed");
     expect(result.rows).toBeNull();
@@ -465,7 +466,7 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(request, refused("this source cannot search"));
+    coordinator.complete(request, buildRefused("this source cannot search"));
     expect(coordinator.state.result.status).toBe("failed");
     expect(coordinator.state.result.problem?.status).toBe("refused");
   });
@@ -476,12 +477,12 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(request, succeeded([{ id: "machine-1" }]));
+    coordinator.complete(request, buildSucceeded([{ id: "machine-1" }]));
     const failedRequest = dispatchRequest(coordinator, {
       kind: "setSearch",
       search: "zebu",
     });
-    coordinator.complete(failedRequest, failed("offline"));
+    coordinator.complete(failedRequest, buildFailed("offline"));
     const result = coordinator.state.result;
     // The retained rows belong to the old query; the failure is recorded and
     // the rows are never described as results of the current query.
@@ -495,11 +496,11 @@ describe("createQueryCoordinator", () => {
     const coordinator = createQueryCoordinator();
     coordinator.complete(
       dispatchRequest(coordinator, { kind: "setSearch", search: "yak" }),
-      succeeded([]),
+      buildSucceeded([]),
     );
     coordinator.complete(
       dispatchRequest(coordinator, { kind: "setSearch", search: "zebu" }),
-      failed("offline"),
+      buildFailed("offline"),
     );
     expect(coordinator.state.result.status).toBe("stale");
     expect(coordinator.state.result.rows).toEqual([]);
@@ -509,13 +510,16 @@ describe("createQueryCoordinator", () => {
     const coordinator = createQueryCoordinator();
     coordinator.complete(
       dispatchRequest(coordinator, { kind: "setSearch", search: "yak" }),
-      succeeded([{ id: "machine-1" }]),
+      buildSucceeded([{ id: "machine-1" }]),
     );
     coordinator.complete(
       dispatchRequest(coordinator, { kind: "setSearch", search: "zebu" }),
-      failed("offline"),
+      buildFailed("offline"),
     );
-    coordinator.complete(refreshRequest(coordinator), failed("still offline"));
+    coordinator.complete(
+      refreshRequest(coordinator),
+      buildFailed("still offline"),
+    );
     expect(coordinator.state.result.status).toBe("stale");
     expect(coordinator.state.result.problem).toEqual({
       status: "failed",
@@ -524,7 +528,7 @@ describe("createQueryCoordinator", () => {
 
     coordinator.complete(
       dispatchRequest(coordinator, { kind: "setSearch", search: "gnu" }),
-      succeeded([{ id: "machine-2" }]),
+      buildSucceeded([{ id: "machine-2" }]),
     );
     expect(coordinator.state.result.status).toBe("ready");
     expect(coordinator.state.result.problem).toBeNull();
@@ -534,8 +538,8 @@ describe("createQueryCoordinator", () => {
   it("issues no request for a semantically unchanged edit", () => {
     const coordinator = createQueryCoordinator({
       start: {
-        slice: slice({ search: "yak" }),
-        window: window({ page: 3, size: 25 }),
+        slice: buildSlice({ search: "yak" }),
+        window: buildWindow({ page: 3, size: 25 }),
       },
     });
     const result = coordinator.dispatch({ kind: "setSearch", search: "yak" });
@@ -544,12 +548,14 @@ describe("createQueryCoordinator", () => {
     }
     expect(result.requestId).toBeNull();
     expect(coordinator.state.result.status).toBe("idle");
-    expect(coordinator.state.window).toEqual(window({ page: 3, size: 25 }));
+    expect(coordinator.state.window).toEqual(
+      buildWindow({ page: 3, size: 25 }),
+    );
   });
 
   it("issues no request when navigating to the current window", () => {
     const coordinator = createQueryCoordinator({
-      start: { window: window({ page: 2, size: 25 }) },
+      start: { window: buildWindow({ page: 2, size: 25 }) },
     });
     const result = coordinator.dispatch({
       kind: "navigateWindow",
@@ -569,36 +575,38 @@ describe("createQueryCoordinator", () => {
       search: "yak",
     });
     const adopted = coordinator.adopt({
-      slice: slice({
+      slice: buildSlice({
         search: "zebu",
         sort: [{ field: "name", direction: "asc" }],
       }),
-      window: window({ page: 2, size: 25 }),
+      window: buildWindow({ page: 2, size: 25 }),
     });
     if (adopted === null) {
       throw new Error("expected an adopted request");
     }
     expect(coordinator.state.slice.search).toBe("zebu");
-    expect(coordinator.state.window).toEqual(window({ page: 2, size: 25 }));
+    expect(coordinator.state.window).toEqual(
+      buildWindow({ page: 2, size: 25 }),
+    );
     expect(coordinator.state.result.status).toBe("pending");
     // The superseded request's completion never publishes.
-    expect(coordinator.complete(stale, succeeded([{ id: "stale" }]))).toBe(
+    expect(coordinator.complete(stale, buildSucceeded([{ id: "stale" }]))).toBe(
       false,
     );
-    expect(coordinator.complete(adopted, succeeded([{ id: "adopted" }]))).toBe(
-      true,
-    );
+    expect(
+      coordinator.complete(adopted, buildSucceeded([{ id: "adopted" }])),
+    ).toBe(true);
   });
 
   it("adopts an identical query without issuing a request", () => {
-    const start = slice({ search: "yak" });
+    const start = buildSlice({ search: "yak" });
     const coordinator = createQueryCoordinator({
-      start: { slice: start, window: window({ page: 2, size: 25 }) },
+      start: { slice: start, window: buildWindow({ page: 2, size: 25 }) },
     });
     expect(
       coordinator.adopt({
         slice: start,
-        window: window({ page: 2, size: 25 }),
+        window: buildWindow({ page: 2, size: 25 }),
       }),
     ).toBeNull();
     expect(coordinator.state.result.status).toBe("idle");
@@ -607,38 +615,42 @@ describe("createQueryCoordinator", () => {
   it("adopts a canonically equal spelling without issuing a request", () => {
     const coordinator = createQueryCoordinator({
       start: {
-        slice: slice({ filter: [statusPredicate("failed", "cancelled")] }),
+        slice: buildSlice({
+          filter: [buildStatusPredicate("failed", "cancelled")],
+        }),
       },
     });
-    const respeled = slice({
-      filter: [statusPredicate("cancelled", "failed")],
+    const respeled = buildSlice({
+      filter: [buildStatusPredicate("cancelled", "failed")],
     });
-    expect(coordinator.adopt({ slice: respeled, window: window() })).toBeNull();
+    expect(
+      coordinator.adopt({ slice: respeled, window: buildWindow() }),
+    ).toBeNull();
     expect(coordinator.state.result.status).toBe("idle");
   });
 
   it("takes the cursor and the collapsed groups into request identity", () => {
     const coordinator = createQueryCoordinator({
-      start: { window: window({ page: 2, cursor: "c:m2" }) },
+      start: { window: buildWindow({ page: 2, cursor: "c:m2" }) },
     });
     // The same page reached by the same token is the same request…
     expect(
       coordinator.adopt({
-        slice: slice(),
-        window: window({ page: 2, cursor: "c:m2" }),
+        slice: buildSlice(),
+        window: buildWindow({ page: 2, cursor: "c:m2" }),
       }),
     ).toBeNull();
     // …while another token for that page, or a collapsed group, is not.
     expect(
       coordinator.adopt({
-        slice: slice(),
-        window: window({ page: 2, cursor: "c:m4" }),
+        slice: buildSlice(),
+        window: buildWindow({ page: 2, cursor: "c:m4" }),
       }),
     ).not.toBeNull();
     expect(
       coordinator.adopt({
-        slice: slice(),
-        window: window({
+        slice: buildSlice(),
+        window: buildWindow({
           page: 2,
           cursor: "c:m4",
           collapsed: [["failed"]],
@@ -649,56 +661,60 @@ describe("createQueryCoordinator", () => {
 
   it("distinguishes non-finite from null operands in request identity", () => {
     const coordinator = createQueryCoordinator();
-    const withNaN = slice({
+    const withNaN = buildSlice({
       filter: [{ field: "cpu", operator: "gte", operands: [Number.NaN] }],
     });
-    const withNull = slice({
+    const withNull = buildSlice({
       filter: [{ field: "cpu", operator: "gte", operands: [null] }],
     });
     expect(
-      coordinator.adopt({ slice: withNaN, window: window() }),
+      coordinator.adopt({ slice: withNaN, window: buildWindow() }),
     ).not.toBeNull();
     expect(
-      coordinator.adopt({ slice: withNull, window: window() }),
+      coordinator.adopt({ slice: withNull, window: buildWindow() }),
     ).not.toBeNull();
   });
 
   it("distinguishes NaN from Infinity and from look-alike strings", () => {
-    const withNaN = slice({
+    const withNaN = buildSlice({
       filter: [{ field: "cpu", operator: "gte", operands: [Number.NaN] }],
     });
-    const withInfinity = slice({
+    const withInfinity = buildSlice({
       filter: [
         { field: "cpu", operator: "gte", operands: [Number.POSITIVE_INFINITY] },
       ],
     });
-    const withString = slice({
+    const withString = buildSlice({
       filter: [{ field: "cpu", operator: "gte", operands: ["NaN"] }],
     });
     const first = createQueryCoordinator();
-    expect(first.adopt({ slice: withNaN, window: window() })).not.toBeNull();
     expect(
-      first.adopt({ slice: withInfinity, window: window() }),
+      first.adopt({ slice: withNaN, window: buildWindow() }),
+    ).not.toBeNull();
+    expect(
+      first.adopt({ slice: withInfinity, window: buildWindow() }),
     ).not.toBeNull();
 
     const second = createQueryCoordinator();
-    expect(second.adopt({ slice: withNaN, window: window() })).not.toBeNull();
     expect(
-      second.adopt({ slice: withString, window: window() }),
+      second.adopt({ slice: withNaN, window: buildWindow() }),
+    ).not.toBeNull();
+    expect(
+      second.adopt({ slice: withString, window: buildWindow() }),
     ).not.toBeNull();
   });
 
   it("treats a key-order respelling as a canonical no-op", () => {
     const coordinator = createQueryCoordinator({
       start: {
-        slice: slice({
-          filter: [statusPredicate("failed", "cancelled")],
+        slice: buildSlice({
+          filter: [buildStatusPredicate("failed", "cancelled")],
           sort: [{ field: "name", direction: "asc" }],
           group: [{ field: "zone" }],
         }),
       },
     });
-    const respeled = slice({
+    const respeled = buildSlice({
       filter: [
         {
           operands: ["cancelled", "failed"],
@@ -709,7 +725,9 @@ describe("createQueryCoordinator", () => {
       sort: [{ direction: "asc", field: "name" }],
       group: [{ field: "zone" }],
     });
-    expect(coordinator.adopt({ slice: respeled, window: window() })).toBeNull();
+    expect(
+      coordinator.adopt({ slice: respeled, window: buildWindow() }),
+    ).toBeNull();
     expect(coordinator.state.result.status).toBe("idle");
   });
 
@@ -721,21 +739,21 @@ describe("createQueryCoordinator", () => {
       operands: ["failed"],
     };
     const path = ["failed"];
-    const callerWindow = window({ page: 2, size: 25, collapsed: [path] });
+    const callerWindow = buildWindow({ page: 2, size: 25, collapsed: [path] });
     const request = coordinator.adopt({
-      slice: slice({ filter: [predicate] }),
+      slice: buildSlice({ filter: [predicate] }),
       window: callerWindow,
     });
     if (request === null) {
       throw new Error("expected an adopted request");
     }
-    coordinator.complete(request, succeeded([{ id: "machine-1" }]));
+    coordinator.complete(request, buildSucceeded([{ id: "machine-1" }]));
     predicate.operands.push("cancelled");
     path.push("eu-west");
     (callerWindow as { page: number }).page = 9;
-    expect(coordinator.state.slice.filter[0]?.operands).toEqual(["failed"]);
+    expect(coordinator.state.slice.filter.at(0)?.operands).toEqual(["failed"]);
     expect(coordinator.state.window).toEqual(
-      window({ page: 2, size: 25, collapsed: [["failed"]] }),
+      buildWindow({ page: 2, size: 25, collapsed: [["failed"]] }),
     );
   });
 
@@ -745,7 +763,7 @@ describe("createQueryCoordinator", () => {
     const path = ["failed"];
     coordinator.dispatch({ kind: "setSort", sort: terms });
     coordinator.dispatch({ kind: "setCollapsed", collapsed: [path] });
-    (terms[0] as { field: string }).field = "cpu";
+    (terms.at(0) as { field: string }).field = "cpu";
     path.push("eu-west");
     expect(coordinator.state.slice.sort).toEqual([
       { field: "name", direction: "asc" },
@@ -769,7 +787,7 @@ describe("createQueryCoordinator", () => {
 
   it("takes a page of one, the smallest window there is", () => {
     const coordinator = createQueryCoordinator({
-      start: { window: window({ size: 1 }) },
+      start: { window: buildWindow({ size: 1 }) },
     });
     expect(coordinator.state.window.size).toBe(1);
     const request = dispatchRequest(coordinator, {
@@ -777,29 +795,31 @@ describe("createQueryCoordinator", () => {
       page: 2,
     });
     expect(coordinator.state.pendingRequestId).toBe(request);
-    expect(coordinator.state.window).toEqual(window({ page: 2, size: 1 }));
+    expect(coordinator.state.window).toEqual(buildWindow({ page: 2, size: 1 }));
   });
 
   it("keeps the configured window immune to caller mutations", () => {
-    const callerWindow = window({ page: 3, size: 25 });
+    const callerWindow = buildWindow({ page: 3, size: 25 });
     const coordinator = createQueryCoordinator({
       start: { window: callerWindow },
     });
     (callerWindow as { page: number }).page = 7;
-    expect(coordinator.state.window).toEqual(window({ page: 3, size: 25 }));
+    expect(coordinator.state.window).toEqual(
+      buildWindow({ page: 3, size: 25 }),
+    );
   });
 
   it("freezes adopted nested state against mutation", () => {
     const coordinator = createQueryCoordinator();
     const request = coordinator.adopt({
-      slice: slice({ filter: [statusPredicate("failed")] }),
-      window: window(),
+      slice: buildSlice({ filter: [buildStatusPredicate("failed")] }),
+      window: buildWindow(),
     });
     if (request === null) {
       throw new Error("expected an adopted request");
     }
     const filter = coordinator.state.slice.filter as Predicate[];
-    expect(() => filter.push(statusPredicate("cancelled"))).toThrow();
+    expect(() => filter.push(buildStatusPredicate("cancelled"))).toThrow();
   });
 
   it("clears the problem when a new request begins", () => {
@@ -808,7 +828,7 @@ describe("createQueryCoordinator", () => {
       kind: "setSearch",
       search: "yak",
     });
-    coordinator.complete(first, failed("offline"));
+    coordinator.complete(first, buildFailed("offline"));
     expect(coordinator.state.result.problem?.status).toBe("failed");
     dispatchRequest(coordinator, { kind: "setSearch", search: "zebu" });
     expect(coordinator.state.result.problem).toBeNull();
@@ -826,12 +846,12 @@ describe("createQueryCoordinator", () => {
   it("ignores completions when idle without a request", () => {
     const coordinator = createQueryCoordinator();
     expect(
-      coordinator.complete("does-not-exist", succeeded([{ id: "bogus" }])),
+      coordinator.complete("does-not-exist", buildSucceeded([{ id: "bogus" }])),
     ).toBe(false);
     expect(
       coordinator.complete(
         null as unknown as string,
-        succeeded([{ id: "bogus" }]),
+        buildSucceeded([{ id: "bogus" }]),
       ),
     ).toBe(false);
     expect(coordinator.state.result.rows).toBeNull();
@@ -839,39 +859,52 @@ describe("createQueryCoordinator", () => {
 
   it("rejects invalid starting and adopted windows at intake", () => {
     expect(() =>
-      createQueryCoordinator({ start: { window: window({ page: 0 }) } }),
+      createQueryCoordinator({ start: { window: buildWindow({ page: 0 }) } }),
     ).toThrow("page must be a positive integer");
     expect(() =>
-      createQueryCoordinator({ start: { window: window({ size: 0 }) } }),
+      createQueryCoordinator({ start: { window: buildWindow({ size: 0 }) } }),
     ).toThrow("size must be a positive integer");
     expect(() =>
-      createQueryCoordinator({ start: { window: window({ cursor: "" }) } }),
+      createQueryCoordinator({
+        start: { window: buildWindow({ cursor: "" }) },
+      }),
     ).toThrow("cursor must not be empty; use null to clear it");
     const coordinator = createQueryCoordinator();
     expect(() =>
-      coordinator.adopt({ slice: slice(), window: window({ page: -1 }) }),
+      coordinator.adopt({
+        slice: buildSlice(),
+        window: buildWindow({ page: -1 }),
+      }),
     ).toThrow("page must be a positive integer");
     expect(() =>
-      coordinator.adopt({ slice: slice(), window: window({ size: 1.5 }) }),
+      coordinator.adopt({
+        slice: buildSlice(),
+        window: buildWindow({ size: 1.5 }),
+      }),
     ).toThrow("size must be a positive integer");
     expect(() =>
-      coordinator.adopt({ slice: slice(), window: window({ cursor: "" }) }),
+      coordinator.adopt({
+        slice: buildSlice(),
+        window: buildWindow({ cursor: "" }),
+      }),
     ).toThrow("cursor must not be empty; use null to clear it");
   });
 
   it("keeps the configured start immune to caller mutations", () => {
-    const start = slice({
-      filter: [statusPredicate("failed")],
+    const start = buildSlice({
+      filter: [buildStatusPredicate("failed")],
       sort: [{ field: "name", direction: "asc" }],
       group: [{ field: "zone" }],
     });
     const coordinator = createQueryCoordinator({ start: { slice: start } });
-    (start.filter as Predicate[]).push(statusPredicate("cancelled"));
+    (start.filter as Predicate[]).push(buildStatusPredicate("cancelled"));
     (start.sort as SortTerm[]).push({ field: "zone", direction: "desc" });
     (start.group as GroupTerm[]).push({ field: "owner" });
     coordinator.dispatch({ kind: "navigateWindow", page: 3 });
     coordinator.reset();
-    expect(coordinator.state.slice.filter).toEqual([statusPredicate("failed")]);
+    expect(coordinator.state.slice.filter).toEqual([
+      buildStatusPredicate("failed"),
+    ]);
     expect(coordinator.state.slice.sort).toEqual([
       { field: "name", direction: "asc" },
     ]);
@@ -891,7 +924,7 @@ describe("createQueryCoordinator", () => {
 
   it("never publishes an old generation's completions into the next", () => {
     const coordinator = createQueryCoordinator({
-      start: { slice: slice({ search: "yak" }) },
+      start: { slice: buildSlice({ search: "yak" }) },
     });
     const generationBefore = coordinator.state.generation;
     const staleRequest = dispatchRequest(coordinator, {
@@ -902,7 +935,10 @@ describe("createQueryCoordinator", () => {
     expect(coordinator.state.generation).toBe(generationBefore + 1);
     // A slow response from the previous generation arrives after the reset.
     expect(
-      coordinator.complete(staleRequest, succeeded([{ id: "old-generation" }])),
+      coordinator.complete(
+        staleRequest,
+        buildSucceeded([{ id: "old-generation" }]),
+      ),
     ).toBe(false);
     expect(coordinator.state.result.rows).toBeNull();
     expect(coordinator.state.slice.search).toBe("yak");
@@ -912,21 +948,24 @@ describe("createQueryCoordinator", () => {
       page: 2,
     });
     expect(
-      coordinator.complete(fresh, succeeded([{ id: "new-generation" }])),
+      coordinator.complete(fresh, buildSucceeded([{ id: "new-generation" }])),
     ).toBe(true);
     expect(coordinator.state.result.rows).toEqual([{ id: "new-generation" }]);
   });
 
   it("returns to the configured start on reset", () => {
     const coordinator = createQueryCoordinator({
-      start: { slice: slice({ search: "yak" }), window: window({ size: 25 }) },
+      start: {
+        slice: buildSlice({ search: "yak" }),
+        window: buildWindow({ size: 25 }),
+      },
     });
     coordinator.dispatch({ kind: "setSearch", search: "zebu" });
     coordinator.dispatch({ kind: "navigateWindow", page: 4 });
     coordinator.reset();
     const state = coordinator.state;
     expect(state.slice.search).toBe("yak");
-    expect(state.window).toEqual(window({ size: 25 }));
+    expect(state.window).toEqual(buildWindow({ size: 25 }));
     expect(state.result.status).toBe("idle");
     expect(state.resultMatchesQuery).toBe(false);
   });
@@ -950,7 +989,7 @@ describe("createQueryCoordinator", () => {
     // Nothing is on display to refresh: the first page is pending.
     expect(coordinator.state.result.status).toBe("pending");
     expect(coordinator.state.result.rows).toBeNull();
-    coordinator.complete(refreshId, succeeded([{ id: "machine-1" }]));
+    coordinator.complete(refreshId, buildSucceeded([{ id: "machine-1" }]));
     expect(coordinator.state.result.status).toBe("ready");
   });
 
@@ -961,7 +1000,7 @@ describe("createQueryCoordinator", () => {
     const requestId = refreshRequest(coordinator);
     expect(coordinator.state.pendingRequestId).toBe(requestId);
 
-    coordinator.complete(requestId, succeeded([]));
+    coordinator.complete(requestId, buildSucceeded([]));
     expect(coordinator.state.pendingRequestId).toBeNull();
   });
 
@@ -979,8 +1018,8 @@ describe("createQueryCoordinator", () => {
   it("names the adopted request and forgets it on reset", () => {
     const coordinator = createQueryCoordinator();
     const adopted = coordinator.adopt({
-      slice: slice({ search: "web" }),
-      window: window(),
+      slice: buildSlice({ search: "web" }),
+      window: buildWindow(),
     });
     expect(coordinator.state.pendingRequestId).toBe(adopted);
     coordinator.reset();
@@ -990,7 +1029,7 @@ describe("createQueryCoordinator", () => {
   it("keeps naming no pending request through a failed completion", () => {
     const coordinator = createQueryCoordinator();
     const requestId = refreshRequest(coordinator);
-    coordinator.complete(requestId, failed("503"));
+    coordinator.complete(requestId, buildFailed("503"));
     expect(coordinator.state.pendingRequestId).toBeNull();
     expect(coordinator.state.result.problem).toEqual({
       status: "failed",
@@ -1031,10 +1070,12 @@ describe("createQueryCoordinator", () => {
     it("withholds an adopted query, so a request in flight never publishes", () => {
       const coordinator = createQueryCoordinator();
       const first = refreshRequest(coordinator);
-      coordinator.complete(first, succeeded([{ id: "a" }]));
+      coordinator.complete(first, buildSucceeded([{ id: "a" }]));
       const late = refreshRequest(coordinator);
       expect(
-        coordinator.adopt({ slice: slice(), window: window() }, [MELTED]),
+        coordinator.adopt({ slice: buildSlice(), window: buildWindow() }, [
+          MELTED,
+        ]),
       ).toBeNull();
       const { result, pendingRequestId, resultMatchesQuery } =
         coordinator.state;
@@ -1043,11 +1084,15 @@ describe("createQueryCoordinator", () => {
       expect(result.status).toBe("stale");
       expect(result.rows).toEqual([{ id: "a" }]);
       expect(resultMatchesQuery).toBe(false);
-      expect(coordinator.complete(late, succeeded([{ id: "b" }]))).toBe(false);
+      expect(coordinator.complete(late, buildSucceeded([{ id: "b" }]))).toBe(
+        false,
+      );
       // The same clauses again move nothing.
       const before = coordinator.state;
       expect(
-        coordinator.adopt({ slice: slice(), window: window() }, [MELTED]),
+        coordinator.adopt({ slice: buildSlice(), window: buildWindow() }, [
+          MELTED,
+        ]),
       ).toBeNull();
       expect(coordinator.state).toBe(before);
     });
@@ -1055,12 +1100,15 @@ describe("createQueryCoordinator", () => {
     it("keeps what is withheld across a move of the window, and drops it with the slice", () => {
       const coordinator = createQueryCoordinator({ withheld: [MELTED] });
       expect(
-        coordinator.adopt({ slice: slice(), window: window({ page: 2 }) }),
+        coordinator.adopt({
+          slice: buildSlice(),
+          window: buildWindow({ page: 2 }),
+        }),
       ).toBeNull();
       expect(coordinator.state.result.problem?.status).toBe("refused");
       const requestId = coordinator.adopt({
-        slice: slice({ search: "al" }),
-        window: window(),
+        slice: buildSlice({ search: "al" }),
+        window: buildWindow(),
       });
       expect(requestId).not.toBeNull();
       expect(coordinator.state.result.problem).toBeNull();
@@ -1069,14 +1117,14 @@ describe("createQueryCoordinator", () => {
     it("runs the query once the link names nothing refused", () => {
       const coordinator = createQueryCoordinator({ withheld: [MELTED] });
       const requestId = coordinator.adopt(
-        { slice: slice(), window: window() },
+        { slice: buildSlice(), window: buildWindow() },
         [],
       );
       expect(requestId).toBe(coordinator.state.pendingRequestId);
       expect(requestId).not.toBeNull();
       // Unwithheld already, the same query again asks for nothing.
       expect(
-        coordinator.adopt({ slice: slice(), window: window() }, []),
+        coordinator.adopt({ slice: buildSlice(), window: buildWindow() }, []),
       ).toBeNull();
     });
 
@@ -1127,10 +1175,10 @@ describe("createQueryCoordinator", () => {
       const coordinator = createQueryCoordinator({ withheld: [MELTED] });
       dispatchRequest(coordinator, {
         kind: "setPredicate",
-        predicate: statusPredicate("failed"),
+        predicate: buildStatusPredicate("failed"),
       });
       expect(coordinator.state.slice.filter).toEqual([
-        statusPredicate("failed"),
+        buildStatusPredicate("failed"),
       ]);
     });
 
@@ -1148,7 +1196,7 @@ describe("createQueryCoordinator", () => {
     const coordinator = createQueryCoordinator();
     coordinator.complete(
       refreshRequest(coordinator),
-      succeeded([{ id: "a" }], {
+      buildSucceeded([{ id: "a" }], {
         facets: { status: { kind: "values", values: [] } },
       }),
     );
@@ -1170,6 +1218,8 @@ describe("createQueryCoordinator", () => {
     });
     expect(resultMatchesQuery).toBe(false);
     // A late success for an earlier request does not bring the rows back.
-    expect(coordinator.complete("i0:r0", succeeded([{ id: "a" }]))).toBe(false);
+    expect(coordinator.complete("i0:r0", buildSucceeded([{ id: "a" }]))).toBe(
+      false,
+    );
   });
 });

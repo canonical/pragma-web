@@ -13,7 +13,7 @@ import {
 import { createSchema } from "../schema/index.js";
 import encodeQuery from "./encodeQuery.js";
 
-const machines = () =>
+const createMachines = () =>
   createSchema([
     {
       field: "status",
@@ -39,7 +39,7 @@ describe("encodeQuery", () => {
   it("writes the window even when the query is empty", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: emptySlice,
         window: { ...DEFAULT_WINDOW, page: 2, size: 25 },
       }).toString(),
@@ -49,7 +49,7 @@ describe("encodeQuery", () => {
   it("writes no window when it is null, as a saved view keeps the query", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         window: null,
         slice: {
           ...emptySlice,
@@ -64,7 +64,7 @@ describe("encodeQuery", () => {
 
   it("repeats set operands and canonicalizes them as a set", () => {
     const params = encodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       slice: {
         ...emptySlice,
         filter: [
@@ -82,7 +82,7 @@ describe("encodeQuery", () => {
 
   it("spells bounds, the zero-value operator and search", () => {
     const params = encodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       slice: {
         filter: [
           { field: "cpu", operator: "gte", operands: [4] },
@@ -104,7 +104,7 @@ describe("encodeQuery", () => {
   it("spells the text a field contains exactly as it was given", () => {
     const text = " 50%_ a+b é";
     const params = encodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       slice: {
         ...emptySlice,
         filter: [{ field: "name", operator: "contains", operands: [text] }],
@@ -117,7 +117,7 @@ describe("encodeQuery", () => {
 
   it("writes isNone and startsWith delimited, isNone once per option as a set", () => {
     const params = encodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       slice: {
         ...emptySlice,
         filter: [
@@ -138,7 +138,7 @@ describe("encodeQuery", () => {
 
   it("writes one group parameter per nesting level, outermost first", () => {
     const params = encodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       slice: {
         ...emptySlice,
         group: [{ field: "status" }, { field: "owner" }],
@@ -151,7 +151,7 @@ describe("encodeQuery", () => {
   it("writes no group parameter for an ungrouped query", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: emptySlice,
         window: firstPage,
       }).has("group"),
@@ -161,7 +161,7 @@ describe("encodeQuery", () => {
   it("preserves sort precedence rather than ordering the terms", () => {
     const encode = (sort: Slice["sort"]) =>
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: { ...emptySlice, sort },
         window: firstPage,
       }).getAll("sort");
@@ -182,7 +182,7 @@ describe("encodeQuery", () => {
   it("writes no search parameter for an empty search", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: { ...emptySlice, search: "" },
         window: firstPage,
       }).has("q"),
@@ -192,7 +192,7 @@ describe("encodeQuery", () => {
   it("writes the cursor the window carries", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: emptySlice,
         window: { ...DEFAULT_WINDOW, page: 3, cursor: "after-page-two" },
       }).toString(),
@@ -202,7 +202,7 @@ describe("encodeQuery", () => {
   it("writes no cursor when the window carries none", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: emptySlice,
         window: { ...DEFAULT_WINDOW, page: 3 },
       }).has("cursor"),
@@ -212,7 +212,7 @@ describe("encodeQuery", () => {
   it("clears a stale cursor rather than leaving it to address another page", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: emptySlice,
         window: { ...DEFAULT_WINDOW, page: 2 },
         preserve: new URLSearchParams("cursor=stale&tab=overview"),
@@ -223,7 +223,7 @@ describe("encodeQuery", () => {
   it("never writes the collapsed groups, so a reload expands them", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: { ...emptySlice, group: [{ field: "status" }] },
         window: { ...DEFAULT_WINDOW, collapsed: [["failed"], ["ready"]] },
       }).toString(),
@@ -235,7 +235,7 @@ describe("encodeQuery", () => {
       "tab=overview&status=ready&tab=details&page=9&view=mine&sort=stale__asc",
     );
     const params = encodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       slice: {
         ...emptySlice,
         filter: [{ field: "status", operator: "isAny", operands: ["failed"] }],
@@ -257,7 +257,7 @@ describe("encodeQuery", () => {
 
   it("clears every address of a field it owns, and no host key", () => {
     const params = encodeQuery({
-      schema: machines(),
+      schema: createMachines(),
       slice: emptySlice,
       window: firstPage,
       preserve: new URLSearchParams("cpu__near=4&utm__source=mail"),
@@ -286,7 +286,7 @@ describe("encodeQuery", () => {
   });
 
   it("is stable: encoding its own output changes nothing", () => {
-    const schema = machines();
+    const schema = createMachines();
     const slice: Slice = {
       filter: [
         { field: "status", operator: "isAny", operands: ["ready", "failed"] },
@@ -304,7 +304,7 @@ describe("encodeQuery", () => {
   it("writes each further conjunct at an address under its ordinal", () => {
     expect(
       encodeQuery({
-        schema: machines(),
+        schema: createMachines(),
         slice: {
           ...emptySlice,
           filter: [

@@ -7,8 +7,8 @@ import {
   STILL_APPLIES,
 } from "./constants.js";
 
-const exact = (value: number) => ({ kind: "exact", value }) as const;
-const atLeast = (value: number) => ({ kind: "at-least", value }) as const;
+const buildExact = (value: number) => ({ kind: "exact", value }) as const;
+const buildAtLeast = (value: number) => ({ kind: "at-least", value }) as const;
 const unknown = { kind: "unknown" } as const;
 
 describe("DEFAULT_MESSAGES", () => {
@@ -172,8 +172,8 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.filterIsNoneOf("Status")).toBe("Status is none of");
     expect(m.matchAnyInstead).toBe("Match any of these instead");
     expect(m.matchNoneInstead).toBe("Match none of these instead");
-    expect(m.facetCount(exact(12))).toBe("12");
-    expect(m.facetCount(atLeast(1000))).toBe("at least 1,000");
+    expect(m.facetCount(buildExact(12))).toBe("12");
+    expect(m.facetCount(buildAtLeast(1000))).toBe("at least 1,000");
     expect(m.filterContains("Name")).toBe("Name contains");
     expect(m.filterAlso("Tags is any of", ["ex-gpu", "ex-nvme"])).toBe(
       "Tags is any of ex-gpu, ex-nvme",
@@ -230,22 +230,24 @@ describe("DEFAULT_MESSAGES", () => {
   });
 
   it("words which rows are on screen, as exactly as the source counts them", () => {
-    expect(m.rowsShown(6, 5, exact(12))).toBe("Showing 6–10 out of 12 rows");
-    expect(m.rowsShown(1, 0, exact(0))).toBe("Showing 0 out of 0 rows");
-    expect(m.rowsShown(6, 1, exact(6))).toBe("Showing row 6 out of 6");
-    expect(m.rowsShown(1, 5, atLeast(100))).toBe(
+    expect(m.rowsShown(6, 5, buildExact(12))).toBe(
+      "Showing 6–10 out of 12 rows",
+    );
+    expect(m.rowsShown(1, 0, buildExact(0))).toBe("Showing 0 out of 0 rows");
+    expect(m.rowsShown(6, 1, buildExact(6))).toBe("Showing row 6 out of 6");
+    expect(m.rowsShown(1, 5, buildAtLeast(100))).toBe(
       "Showing 1–5 out of at least 100 rows",
     );
-    expect(m.rowsShown(3, 1, atLeast(3))).toBe(
+    expect(m.rowsShown(3, 1, buildAtLeast(3))).toBe(
       "Showing row 3 out of at least 3",
     );
     expect(m.rowsShown(1, 5, unknown)).toBe("Showing 1–5 rows");
     expect(m.rowsShown(2, 1, unknown)).toBe("Showing row 2");
-    expect(m.rowsShown(1, 1, exact(1))).toBe("Showing row 1 out of 1");
+    expect(m.rowsShown(1, 1, buildExact(1))).toBe("Showing row 1 out of 1");
   });
 
   it("groups a large count as English writes it", () => {
-    expect(m.rowsShown(1, 50, exact(12345))).toBe(
+    expect(m.rowsShown(1, 50, buildExact(12345))).toBe(
       "Showing 1–50 out of 12,345 rows",
     );
     expect(m.pageCount(1200)).toBe("of 1,200 pages");

@@ -7,7 +7,7 @@ import type { ExecuteSliceConfig } from "./types.js";
 
 const emptySlice: Slice = { filter: [], search: null, sort: [], group: [] };
 
-const slice = (overrides: Partial<Slice> = {}): Slice => ({
+const buildSlice = (overrides: Partial<Slice> = {}): Slice => ({
   ...emptySlice,
   ...overrides,
 });
@@ -47,7 +47,7 @@ const rows = [
   { id: "d", name: "delta", cpu: 8, ready: false, owner: "ex:bo" },
 ];
 
-const ids = (result: readonly unknown[]) =>
+const readRowIds = (result: readonly unknown[]) =>
   result.map((row) => (row as { id: string }).id);
 
 describe("executeSlice", () => {
@@ -57,10 +57,10 @@ describe("executeSlice", () => {
 
   it("matches isAny against the operand set", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "cpu", operator: "isAny", operands: [8, 4] }],
           }),
           buildExecuteConfig(),
@@ -73,7 +73,7 @@ describe("executeSlice", () => {
     expect(
       executeSlice(
         rows,
-        slice({
+        buildSlice({
           filter: [{ field: "cpu", operator: "isAny", operands: ["4"] }],
         }),
         buildExecuteConfig(),
@@ -85,10 +85,10 @@ describe("executeSlice", () => {
     // Only a choice value — a string or a number — is any or none of the
     // operands: a null value is empty, as an absent one is.
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "owner", operator: "isAny", operands: [null] }],
           }),
           buildExecuteConfig(),
@@ -96,10 +96,10 @@ describe("executeSlice", () => {
       ),
     ).toEqual([]);
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "owner", operator: "isNone", operands: ["x"] }],
           }),
           buildExecuteConfig(),
@@ -112,7 +112,7 @@ describe("executeSlice", () => {
     expect(
       executeSlice(
         [{ id: "a", tags: ["x"] }],
-        slice({
+        buildSlice({
           filter: [{ field: "tags", operator: "isAny", operands: ["x"] }],
         }),
         buildExecuteConfig(),
@@ -122,10 +122,10 @@ describe("executeSlice", () => {
 
   it("reads presence with isSet, counting absent and null as unset", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "owner", operator: "isSet", operands: [] }],
           }),
           buildExecuteConfig(),
@@ -136,10 +136,10 @@ describe("executeSlice", () => {
 
   it("bounds numbers inclusively at both ends", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [
               { field: "cpu", operator: "gte", operands: [8] },
               { field: "cpu", operator: "lte", operands: [8] },
@@ -153,10 +153,10 @@ describe("executeSlice", () => {
 
   it("bounds text by code point, inclusively at both ends", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "name", operator: "gte", operands: ["b"] }],
           }),
           buildExecuteConfig(),
@@ -164,10 +164,10 @@ describe("executeSlice", () => {
       ),
     ).toEqual(["b", "d"]);
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "name", operator: "lte", operands: ["beta"] }],
           }),
           buildExecuteConfig(),
@@ -180,10 +180,10 @@ describe("executeSlice", () => {
     // Nothing can say how such a field's values compare, so no row is in
     // any range of it; an isAny over it still reads the row's value.
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "zone", operator: "gte", operands: ["a"] }],
           }),
           buildExecuteConfig(),
@@ -194,10 +194,10 @@ describe("executeSlice", () => {
 
   it("never satisfies a range with an absent or null value", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "owner", operator: "gte", operands: ["ex:"] }],
           }),
           buildExecuteConfig(),
@@ -207,7 +207,7 @@ describe("executeSlice", () => {
     expect(
       executeSlice(
         rows,
-        slice({
+        buildSlice({
           filter: [{ field: "owner", operator: "lte", operands: [null] }],
         }),
         buildExecuteConfig(),
@@ -217,10 +217,10 @@ describe("executeSlice", () => {
 
   it("bounds no presence field, which has no range", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "ready", operator: "gte", operands: [true] }],
           }),
           buildExecuteConfig(),
@@ -228,10 +228,10 @@ describe("executeSlice", () => {
       ),
     ).toEqual([]);
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "ready", operator: "lte", operands: [false] }],
           }),
           buildExecuteConfig(),
@@ -244,7 +244,9 @@ describe("executeSlice", () => {
     expect(
       executeSlice(
         rows,
-        slice({ filter: [{ field: "cpu", operator: "gte", operands: ["4"] }] }),
+        buildSlice({
+          filter: [{ field: "cpu", operator: "gte", operands: ["4"] }],
+        }),
         buildExecuteConfig(),
       ),
     ).toEqual([]);
@@ -254,7 +256,9 @@ describe("executeSlice", () => {
     expect(
       executeSlice(
         rows,
-        slice({ filter: [{ field: "cpu", operator: "gte", operands: [] }] }),
+        buildSlice({
+          filter: [{ field: "cpu", operator: "gte", operands: [] }],
+        }),
         buildExecuteConfig(),
       ),
     ).toEqual([]);
@@ -270,10 +274,10 @@ describe("executeSlice", () => {
       { id: "absent" },
     ];
     const findContaining = (operand: unknown) =>
-      ids(
+      readRowIds(
         executeSlice(
           named,
-          slice({
+          buildSlice({
             filter: [
               {
                 field: "name",
@@ -304,10 +308,10 @@ describe("executeSlice", () => {
       { id: "absent" },
     ];
     const findStarting = (operand: unknown) =>
-      ids(
+      readRowIds(
         executeSlice(
           named,
-          slice({
+          buildSlice({
             filter: [
               {
                 field: "name",
@@ -336,10 +340,10 @@ describe("executeSlice", () => {
       { id: "t-diaeresis", name: "T̈" },
     ];
     const findSearching = (search: string) =>
-      ids(
+      readRowIds(
         executeSlice(
           folded,
-          slice({ search }),
+          buildSlice({ search }),
           buildExecuteConfig({ searchFields: ["name"] }),
         ),
       );
@@ -349,10 +353,10 @@ describe("executeSlice", () => {
 
   it("searches case-insensitively over the declared fields only", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({ search: "AMM" }),
+          buildSlice({ search: "AMM" }),
           buildExecuteConfig({
             searchFields: ["name"],
           }),
@@ -362,7 +366,7 @@ describe("executeSlice", () => {
     expect(
       executeSlice(
         rows,
-        slice({ search: "AMM" }),
+        buildSlice({ search: "AMM" }),
         buildExecuteConfig({ searchFields: ["owner"] }),
       ),
     ).toEqual([]);
@@ -370,10 +374,10 @@ describe("executeSlice", () => {
 
   it("searches numeric values and never boolean or absent ones", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({ search: "12" }),
+          buildSlice({ search: "12" }),
           buildExecuteConfig({ searchFields: ["cpu"] }),
         ),
       ),
@@ -381,7 +385,7 @@ describe("executeSlice", () => {
     expect(
       executeSlice(
         rows,
-        slice({ search: "true" }),
+        buildSlice({ search: "true" }),
         buildExecuteConfig({
           searchFields: ["ready", "owner"],
         }),
@@ -391,22 +395,22 @@ describe("executeSlice", () => {
 
   it("searches nothing when no field is declared", () => {
     expect(
-      executeSlice(rows, slice({ search: "alpha" }), buildExecuteConfig()),
+      executeSlice(rows, buildSlice({ search: "alpha" }), buildExecuteConfig()),
     ).toEqual([]);
   });
 
   it("treats an empty search string as no search", () => {
     expect(
-      executeSlice(rows, slice({ search: "" }), buildExecuteConfig()),
+      executeSlice(rows, buildSlice({ search: "" }), buildExecuteConfig()),
     ).toEqual(rows);
   });
 
   it("applies filter and search together", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "cpu", operator: "isNone", operands: [12] }],
             search: "l",
           }),
@@ -418,19 +422,19 @@ describe("executeSlice", () => {
 
   it("orders numbers ascending and descending", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({ sort: [{ field: "cpu", direction: "asc" }] }),
+          buildSlice({ sort: [{ field: "cpu", direction: "asc" }] }),
           buildExecuteConfig(),
         ),
       ),
     ).toEqual(["a", "c", "d", "b"]);
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({ sort: [{ field: "cpu", direction: "desc" }] }),
+          buildSlice({ sort: [{ field: "cpu", direction: "desc" }] }),
           buildExecuteConfig(),
         ),
       ),
@@ -439,7 +443,7 @@ describe("executeSlice", () => {
 
   it("runs the source's declared default when the query states no term", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
           emptySlice,
@@ -454,10 +458,10 @@ describe("executeSlice", () => {
     // appended, they would order by name descending; replaced, they keep
     // the order they came in.
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({ sort: [{ field: "ready", direction: "asc" }] }),
+          buildSlice({ sort: [{ field: "ready", direction: "asc" }] }),
           buildConfigWithDefault([{ field: "name", direction: "desc" }]),
         ),
       ),
@@ -470,10 +474,10 @@ describe("executeSlice", () => {
 
   it("appends a named tiebreak the source declares, after every term", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({ sort: [{ field: "ready", direction: "asc" }] }),
+          buildSlice({ sort: [{ field: "ready", direction: "asc" }] }),
           buildExecuteConfig({
             sort: {
               ...declareSort(schema.fieldNames),
@@ -491,7 +495,9 @@ describe("executeSlice", () => {
       sort: { ...declareSort(schema.fieldNames), empties: { cpu: "first" } },
     });
     const listIds = (terms: readonly SortTerm[]) =>
-      executeSlice(rows, slice({ sort: terms }), config).map((row) => row.id);
+      executeSlice(rows, buildSlice({ sort: terms }), config).map(
+        (row) => row.id,
+      );
     expect(listIds([{ field: "cpu", direction: "asc" }])).toEqual([
       "b",
       "c",
@@ -506,10 +512,10 @@ describe("executeSlice", () => {
 
   it("collapses a field spelled twice, so the first term is the ordering", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             sort: [
               { field: "cpu", direction: "asc" },
               { field: "cpu", direction: "desc" },
@@ -527,10 +533,10 @@ describe("executeSlice", () => {
       { id: "y", name: "same" },
     ];
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           duplicates,
-          slice({ sort: [{ field: "name", direction: "desc" }] }),
+          buildSlice({ sort: [{ field: "name", direction: "desc" }] }),
           buildExecuteConfig(),
         ),
       ),
@@ -539,10 +545,10 @@ describe("executeSlice", () => {
 
   it("filters, searches and orders in one pass", () => {
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           rows,
-          slice({
+          buildSlice({
             filter: [{ field: "cpu", operator: "gte", operands: [8] }],
             sort: [{ field: "name", direction: "asc" }],
           }),
@@ -559,10 +565,10 @@ describe("executeSlice", () => {
       { id: "c", cpu: 1 },
     ];
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           metrics,
-          slice({
+          buildSlice({
             filter: [{ field: "cpu", operator: "lte", operands: [100] }],
           }),
           buildExecuteConfig(),
@@ -570,10 +576,12 @@ describe("executeSlice", () => {
       ),
     ).toEqual(["a", "c"]);
     expect(
-      ids(
+      readRowIds(
         executeSlice(
           metrics,
-          slice({ filter: [{ field: "cpu", operator: "gte", operands: [0] }] }),
+          buildSlice({
+            filter: [{ field: "cpu", operator: "gte", operands: [0] }],
+          }),
           buildExecuteConfig(),
         ),
       ),
@@ -590,11 +598,11 @@ describe("executeSlice", () => {
       { id: "d", seen: new Date("2024-01-20T00:00:00Z") },
       { id: "e", seen: null },
     ];
-    const between = (gte: string, lte: string) =>
-      ids(
+    const listBetween = (gte: string, lte: string) =>
+      readRowIds(
         executeSlice(
           seen,
-          slice({
+          buildSlice({
             filter: [
               { field: "seen", operator: "gte", operands: [gte] },
               { field: "seen", operator: "lte", operands: [lte] },
@@ -603,26 +611,26 @@ describe("executeSlice", () => {
           buildExecuteConfig(),
         ),
       );
-    expect(between("2024-01-15", "2024-02-01")).toEqual(["b", "c"]);
-    expect(between("2024-01-14", "2024-01-14")).toEqual(["a"]);
-    expect(between("2024-01-16", "2024-01-31")).toEqual([]);
+    expect(listBetween("2024-01-15", "2024-02-01")).toEqual(["b", "c"]);
+    expect(listBetween("2024-01-14", "2024-01-14")).toEqual(["a"]);
+    expect(listBetween("2024-01-16", "2024-01-31")).toEqual([]);
   });
 
   it("never mutates the caller's array", () => {
     const input = [...rows];
     executeSlice(
       input,
-      slice({ sort: [{ field: "cpu", direction: "asc" }] }),
+      buildSlice({ sort: [{ field: "cpu", direction: "asc" }] }),
       buildExecuteConfig(),
     );
-    expect(ids(input)).toEqual(["a", "b", "c", "d"]);
+    expect(readRowIds(input)).toEqual(["a", "b", "c", "d"]);
   });
 
   it("never matches a prototype member with isSet", () => {
     expect(
       executeSlice(
         rows,
-        slice({
+        buildSlice({
           filter: [{ field: "toString", operator: "isSet", operands: [] }],
         }),
         buildExecuteConfig(),

@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import type { SourceRefusal } from "../result/index.js";
 import listIncurredRefusals from "./listIncurredRefusals.js";
 
-const refusal = (overrides: Partial<SourceRefusal> = {}): SourceRefusal => ({
+const buildRefusal = (
+  overrides: Partial<SourceRefusal> = {},
+): SourceRefusal => ({
   part: "filter",
   code: "undeclared-field",
   field: "cpu",
@@ -13,23 +15,23 @@ const refusal = (overrides: Partial<SourceRefusal> = {}): SourceRefusal => ({
 
 describe("listIncurredRefusals", () => {
   it("answers with the whole list when nothing stood before", () => {
-    const after = [refusal()];
+    const after = [buildRefusal()];
     expect(listIncurredRefusals([], after)).toBe(after);
   });
 
   it("drops a refusal that stood before, whatever its reason says", () => {
     expect(
       listIncurredRefusals(
-        [refusal({ reason: "spelled one way" })],
-        [refusal({ reason: "spelled another" })],
+        [buildRefusal({ reason: "spelled one way" })],
+        [buildRefusal({ reason: "spelled another" })],
       ),
     ).toEqual([]);
   });
 
   it("keeps a refusal that differs in address or code", () => {
-    const standing = refusal();
-    const otherOperator = refusal({ operator: "lte" });
-    const otherCode = refusal({ code: "undeclared-operator" });
+    const standing = buildRefusal();
+    const otherOperator = buildRefusal({ operator: "lte" });
+    const otherCode = buildRefusal({ code: "undeclared-operator" });
     const incurred = listIncurredRefusals(
       [standing],
       [standing, otherOperator, otherCode],
