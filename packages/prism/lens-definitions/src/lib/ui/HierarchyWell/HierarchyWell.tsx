@@ -15,6 +15,7 @@ import {
   type SyntheticEvent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -81,7 +82,9 @@ function readClosest(
  * the focus, and so does pointing at or focusing a box or a stub, which
  * then names its bridges. On the explorer's index a box is a link to the
  * page drilled into its namespace, a tab stop of its own, and the drilled
- * namespace's label is the way back. Pointing at a
+ * namespace's label is the way back. A drill the address changes opens
+ * as a load of that address does, the reader's camera on the other view
+ * forgotten. Pointing at a
  * relation shows its label and rings its ends. The filter's chips hide
  * classes, and the camera fits what is left, which the Fit control
  * restores; the search and the instances axis dim. A region a reader picks
@@ -103,8 +106,9 @@ function readClosest(
  *
  * @implements prism.component.hierarchy_well
  * @note Impure: holds the pointer's edge and the keyboard's state, moves
- *   keyboard focus between the classes' links, and measures the canvas
- *   when a region is picked.
+ *   keyboard focus between the classes' links, measures the canvas
+ *   when a region is picked, and clears the camera memory when the drill
+ *   changes.
  */
 export default function HierarchyWell({
   layout,
@@ -225,6 +229,17 @@ export default function HierarchyWell({
       frameOpeningCamera(layout, arrivalNode, visible, scale),
     [arrivalNode, layout],
   );
+  // A drill the address changes, by a box, the way back or the history,
+  // opens as a load of that address does: the canvas mounts anew on the
+  // new layout, the camera kept for the other view forgotten before the
+  // new canvas reads it.
+  const drillKey = layout.drilled ?? "";
+  const openedDrill = useRef(drillKey);
+  useLayoutEffect(() => {
+    if (openedDrill.current === drillKey) return;
+    openedDrill.current = drillKey;
+    if (cameraMemory !== undefined) cameraMemory.current = undefined;
+  }, [cameraMemory, drillKey]);
   const bounds = useMemo(
     () => ({
       x: layout.viewBox.x,
@@ -324,6 +339,7 @@ export default function HierarchyWell({
       <GraphCanvas
         bounds={bounds}
         className="desktop"
+        key={drillKey}
         fit={fit}
         frame={frame}
         label={t("well.label")}

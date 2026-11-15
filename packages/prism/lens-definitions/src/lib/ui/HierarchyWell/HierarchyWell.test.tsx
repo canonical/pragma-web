@@ -589,6 +589,37 @@ describe("over a layout whose rail opens on a box", () => {
     ).toBe("/definitions?expand=aa");
   });
 
+  it("opens a drill the address changes anew, forgetting the camera kept for the other view", () => {
+    const drilled = layOutClassGraph(input, {
+      budget: createGraphBudget({ drawnNodesMax: 2 }),
+      drill: "aa",
+    });
+    const kept = { camera: { k: 2, x: 30, y: 40 }, moved: true };
+    const memory = { current: kept as typeof kept | undefined };
+    const draw = (shown: typeof boxed) =>
+      createRouterHarness(
+        <HierarchyWell
+          cameraMemory={memory}
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={shown}
+          onHoverTerm={vi.fn()}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+      );
+    const { container, rerender } = render(draw(boxed));
+    const canvas = container.querySelector(".desktop");
+    // A render on the same view keeps the canvas and the camera.
+    rerender(draw(boxed));
+    expect(container.querySelector(".desktop")).toBe(canvas);
+    expect(memory.current).toBe(kept);
+    // The drill moves: a new canvas opens on it, as a load would.
+    rerender(draw(drilled));
+    expect(container.querySelector(".desktop")).not.toBe(canvas);
+    expect(memory.current).toBeUndefined();
+  });
+
   it("draws a box on a term page as an image, with no link", () => {
     const { container } = render(drawBoxed("zz:Z1"));
     const box = container.querySelector('.desktop .node[data-kind="region"]');
