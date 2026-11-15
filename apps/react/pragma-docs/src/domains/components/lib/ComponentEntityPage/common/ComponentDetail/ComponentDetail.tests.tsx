@@ -7,8 +7,10 @@ import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../../../../testing/createFetchSpy.js";
 import componentEntityRecordsButton from "../../../../__fixtures__/componentEntityRecordsButton.js";
+import componentEntityRecordsCard from "../../../../__fixtures__/componentEntityRecordsCard.js";
 import {
   BUTTON_URI,
+  CARD_URI,
   ENTITY_TEST_TIMEOUT_MS,
   editBlock,
   entityPageAt,
@@ -37,7 +39,9 @@ const BUTTON_SECTIONS = [
   { id: "usage", title: "Usage" },
   { id: "guidelines", title: "Guidelines" },
   { id: "anatomy", title: "Anatomy" },
+  { id: "tokens", title: "Tokens" },
   { id: "properties", title: "Properties" },
+  { id: "variants", title: "Variants" },
   { id: "relations", title: "Relations" },
   { id: "changes", title: "Changes" },
 ];
@@ -62,7 +66,7 @@ const readFacts = () =>
 
 describe("ComponentDetail", () => {
   it(
-    "lists the usage, the guidelines, the anatomy, the properties, the relations and the changes as sections in the lens's order",
+    "lists the eight sections Button holds in the lens's order",
     () => {
       render(
         entityPageAt(
@@ -99,7 +103,9 @@ describe("ComponentDetail", () => {
         { id: "usage", title: "Usage" },
         { id: "guidelines", title: "Guidelines" },
         { id: "anatomy", title: "Anatomy" },
+        { id: "tokens", title: "Tokens" },
         { id: "properties", title: "Properties" },
+        { id: "variants", title: "Variants" },
         { id: "changes", title: "Changes" },
       ]);
     },
@@ -107,19 +113,48 @@ describe("ComponentDetail", () => {
   );
 
   it(
-    "leaves out the usage, the guidelines and the changes the graph does not hold",
+    "leaves out the usage, the guidelines, the tokens and the changes the graph does not hold",
     () => {
       const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
         usage: null,
         guidelines: "",
         changeLogs: { __refs: [] },
-      });
-      render(entityPageAt(BUTTON_URI, records, createFetchSpy()));
+        tokenBindings: { __refs: [] },
+      }) as unknown as Record<string, Record<string, unknown>>;
+      const families =
+        records[
+          "client:https://ds.canonical.com/global.component.button:modifierFamilies(first:24)"
+        ];
+      if (families === undefined)
+        throw new Error("the fixture lost its families");
+      families.edges = { __refs: [] };
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          records as unknown as typeof componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
       expectSectionIndex(readView(), [
         { id: "anatomy", title: "Anatomy" },
         { id: "properties", title: "Properties" },
         { id: "relations", title: "Relations" },
       ]);
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "leaves out the variants of a block with no example, keeping its tokens",
+    () => {
+      render(
+        entityPageAt(CARD_URI, componentEntityRecordsCard, createFetchSpy()),
+      );
+      const ids = [...readView().querySelectorAll(":scope > .content h2")].map(
+        ({ id }) => id,
+      );
+      expect(ids).toContain("tokens");
+      expect(ids).not.toContain("variants");
     },
     ENTITY_TEST_TIMEOUT_MS,
   );

@@ -19,6 +19,7 @@ import type { ComponentEntityQuery } from "#relay/__generated__/ComponentEntityQ
 import componentEntityQueryNode from "#relay/__generated__/ComponentEntityQuery.graphql.js";
 import { COMPONENTS_RENDERERS } from "../../../../constants.js";
 import { componentEntityVariables } from "../../../../entityQuery.js";
+import { BLOCK_EXAMPLES } from "../../../UIBlockExample/index.js";
 import { ComponentAnatomy } from "../ComponentAnatomy/index.js";
 import { ComponentChanges } from "../ComponentChanges/index.js";
 import { ComponentExample } from "../ComponentExample/index.js";
@@ -26,7 +27,10 @@ import { ComponentHeader } from "../ComponentHeader/index.js";
 import { ComponentProperties } from "../ComponentProperties/index.js";
 import { ComponentProse } from "../ComponentProse/index.js";
 import { ComponentRelations } from "../ComponentRelations/index.js";
+import { ComponentTokens } from "../ComponentTokens/index.js";
+import { ComponentVariants } from "../ComponentVariants/index.js";
 import { SECTION_ANCHORS } from "./constants.js";
+import countVariantCells from "./countVariantCells.js";
 import type { ComponentDetailProps } from "./types.js";
 import "./styles.css";
 
@@ -58,12 +62,29 @@ const declareEntityQuery = (): unknown => graphql`
       changeLogs {
         __typename
       }
+      tokenBindings {
+        __typename
+      }
+      modifierFamilies(first: $count) {
+        edges {
+          node {
+            uri
+            modifiers(first: 100) {
+              edges {
+                __typename
+              }
+            }
+          }
+        }
+      }
       ...ComponentHeader_node
       ...ComponentDetail_facts
       ...ComponentAnatomy_node
       ...ComponentProperties_node
       ...ComponentRelations_node @arguments(count: $count)
       ...ComponentChanges_node
+      ...ComponentVariants_node @arguments(count: $count)
+      ...ComponentTokens_node
     }
   }
 `;
@@ -105,9 +126,11 @@ const componentCssClassName = "ds component-detail";
  * view. The header names the component; its facts (the address, the tier,
  * the version and the first documentation stage, each only when the graph
  * records it) stand beside it; the rendered example is the body before the
- * sections; the usage and guidelines texts, the anatomy, the properties,
- * the relations and the change log are sections in the order the lens
- * gives their fields, each only when the graph holds a value. The header and the facts stand
+ * sections; the usage and guidelines texts, the anatomy, the token
+ * bindings, the properties, the variants, the relations and the change log
+ * are sections in the order the lens gives their fields, each
+ * only when the graph holds a value (the variants, when the example
+ * honours a modifier family the graph records). The header and the facts stand
  * whatever the renderer: under the address's page renderer the page passes
  * its sections, under any other (Turtle, `?as=turtle`) what that renderer
  * draws, which the route warmed, stands in their place, with no index. An
@@ -133,6 +156,10 @@ export default function ComponentDetail({
     componentEntityQueryNode,
     componentEntityVariables({ uri }),
   );
+  const example =
+    component === null || component === undefined
+      ? undefined
+      : BLOCK_EXAMPLES.get(component._meta.curie);
   return (
     <div
       {...props}
@@ -194,6 +221,37 @@ export default function ComponentDetail({
                         title: t("component.anatomy"),
                         content: <ComponentAnatomy component={component} />,
                       },
+                      ...(component.tokenBindings.length > 0
+                        ? [
+                            {
+                              field: SECTION_ANCHORS.tokens,
+                              id: "tokens",
+                              title: t("component.section.tokens"),
+                              content: (
+                                <ComponentTokens component={component} />
+                              ),
+                            },
+                          ]
+                        : []),
+                      ...(example !== undefined &&
+                      countVariantCells(
+                        example,
+                        component.modifierFamilies.edges,
+                      ) > 0
+                        ? [
+                            {
+                              field: SECTION_ANCHORS.variants,
+                              id: "variants",
+                              title: t("component.section.variants"),
+                              content: (
+                                <ComponentVariants
+                                  component={component}
+                                  example={example}
+                                />
+                              ),
+                            },
+                          ]
+                        : []),
                       {
                         field: SECTION_ANCHORS.properties,
                         id: "properties",

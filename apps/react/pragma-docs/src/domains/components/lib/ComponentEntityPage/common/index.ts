@@ -8,3 +8,5 @@ export * from "./ComponentHeader/index.js";
 export * from "./ComponentProperties/index.js";
 export * from "./ComponentProse/index.js";
 export * from "./ComponentRelations/index.js";
+export * from "./ComponentTokens/index.js";
+export * from "./ComponentVariants/index.js";

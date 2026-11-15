@@ -1,0 +1,40 @@
+---
+# ComponentTokens (.../ComponentEntityPage/common/ComponentTokens/): the
+# component's token bindings as a section's content, grouped by part
+# (TokenBinding.node) and, within a part, in fallback order (rank ascending).
+# A plain table until the dataviews rebase (30's note): Part (a row header
+# spanning its bindings, one tbody per part), Token (the symbol's name after
+# its namespace, monospace, broken anywhere so it reflows at 390), Order.
+# A binding the graph records twice for one part (one symbol, one rank,
+# read by two style properties) is one row. It scrolls sideways
+# inside its own wrapper, never the page (W6a-A7). No heading of its own.
+# Styles transcribe ComponentProperties' table (same folder level): copy its
+# token bindings name for name under the `--component-tokens-*` prefix.
+# Reference: PS3 V1 "tokens (grouped by part, with fallback order)"; 24 on Button.
+#
+# Token ledger (on `.ds.component-tokens`): ComponentProperties' ledger,
+# renamed, plus:
+#   --component-tokens-symbol-font-family: ui-monospace, monospace   literal
+node:
+  uri: docs.subcomponent.component_tokens
+  element: div
+  styles: { layout.grid.column: "1 / -1" }
+  edges:
+    - node:
+        role: scroll
+        styles: { layout.overflow.inline: auto }
+        edges:
+          - node:
+              role: table
+              element: table
+              edges:
+                - node: { role: head, element: th, attributes: { scope: col } }
+                  relation: { cardinality: "3", slotName: head }
+                - node: { role: part, element: th, attributes: { scope: rowgroup } }
+                  relation: { cardinality: "1..*", slotName: part }
+                - node: { role: symbol, element: td, styles: { typography.fontFamily: "ui-monospace, monospace" } }
+                  relation: { cardinality: "1..*", slotName: symbol }
+                - node: { role: order, element: td }
+                  relation: { cardinality: "1..*", slotName: order }
+            relation: { cardinality: "1", slotName: table }
+      relation: { cardinality: "1", slotName: scroll }

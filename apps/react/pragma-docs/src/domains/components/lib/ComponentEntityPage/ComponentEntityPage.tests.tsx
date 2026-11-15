@@ -14,7 +14,7 @@ import {
 
 describe("ComponentEntityPage", () => {
   it(
-    "lays the header, the example, then the texts, the anatomy, the properties, the relations and the changes on the view",
+    "lays the header, the example, then the texts, the anatomy, the tokens, the properties, the variants, the relations and the changes on the view",
     () => {
       const fetchFn = createFetchSpy();
       const { container } = render(
@@ -41,7 +41,9 @@ describe("ComponentEntityPage", () => {
           "component-prose",
           "component-prose",
           "component-anatomy",
+          "component-tokens",
           "component-properties",
+          "component-variants",
           "component-relations",
           "component-changes",
         ],

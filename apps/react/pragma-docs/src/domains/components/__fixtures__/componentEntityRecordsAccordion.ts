@@ -25,6 +25,32 @@ const componentEntityRecordsAccordion = {
   "https://ds.canonical.com/global.component.accordion": {
     __id: "https://ds.canonical.com/global.component.accordion",
     __typename: "Component",
+    tokenBindings: {
+      __refs: [
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:0",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:1",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:2",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:3",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:4",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:5",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:6",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:7",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:8",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:9",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:10",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:11",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:12",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:13",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:14",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:15",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:16",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:17",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:18",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:19",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:20",
+        "client:https://ds.canonical.com/global.component.accordion:tokenBindings:21",
+      ],
+    },
     name: "Accordion",
     uri: "https://ds.canonical.com/global.component.accordion",
     usage:
@@ -538,6 +564,182 @@ const componentEntityRecordsAccordion = {
     changeType: "change",
     timestamp: "2026-01-21T14:13:23.000+01:00",
   },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:0":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:0",
+      __typename: "TokenBinding",
+      node: "$root/content panel",
+      consumesSymbol: "https://dt.canonical.com/dimension.200",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:1":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:1",
+      __typename: "TokenBinding",
+      node: "$root/content panel",
+      consumesSymbol: "https://dt.canonical.com/dimension.100",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:2":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:2",
+      __typename: "TokenBinding",
+      node: "$root/content panel",
+      consumesSymbol: "https://dt.canonical.com/dimension.100",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:3":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:3",
+      __typename: "TokenBinding",
+      node: "$root/content panel",
+      consumesSymbol: "https://dt.canonical.com/color.text",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:4":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:4",
+      __typename: "TokenBinding",
+      node: "$root/header tab/heading",
+      consumesSymbol: "https://dt.canonical.com/typography.text.primary",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:5":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:5",
+      __typename: "TokenBinding",
+      node: "$root/header tab/chevron/chevron glyph",
+      consumesSymbol: "https://dt.canonical.com/color.icon",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:6":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:6",
+      __typename: "TokenBinding",
+      node: "$root/header tab/chevron",
+      consumesSymbol: "https://dt.canonical.com/dimension.200",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:7":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:7",
+      __typename: "TokenBinding",
+      node: "$root/header tab/chevron",
+      consumesSymbol: "https://dt.canonical.com/dimension.200",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:8":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:8",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/color.foreground.ghost.active",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:9":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:9",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/color.foreground.ghost.hover",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:10":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:10",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/color.foreground.ghost",
+      rank: 2,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:11":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:11",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/surface.color.foreground.ghost",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:12":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:12",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/color.text",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:13":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:13",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/dimension.200",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:14":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:14",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/dimension.200",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:15":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:15",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/dimension.100",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:16":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:16",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/dimension.100",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:17":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:17",
+      __typename: "TokenBinding",
+      node: "$root/header tab",
+      consumesSymbol: "https://dt.canonical.com/dimension.200",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:18":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:18",
+      __typename: "TokenBinding",
+      node: "$root",
+      consumesSymbol: "https://dt.canonical.com/color.border.muted",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:19":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:19",
+      __typename: "TokenBinding",
+      node: "$root",
+      consumesSymbol: "https://dt.canonical.com/dimension.radius.small",
+      rank: 1,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:20":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:20",
+      __typename: "TokenBinding",
+      node: "$root",
+      consumesSymbol: "https://dt.canonical.com/color.background",
+      rank: 2,
+    },
+  "client:https://ds.canonical.com/global.component.accordion:tokenBindings:21":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:tokenBindings:21",
+      __typename: "TokenBinding",
+      node: "$root",
+      consumesSymbol: "https://dt.canonical.com/surface.color.background",
+      rank: 1,
+    },
 } as unknown as RecordMap;
 
 export default componentEntityRecordsAccordion;

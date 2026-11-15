@@ -6,7 +6,9 @@ export const SECTION_ANCHORS = {
   usage: "usage",
   guidelines: "guidelines",
   anatomy: "anatomyDsl",
+  tokens: "tokenBindings",
   properties: "properties",
+  variants: "modifierFamilies",
   relations: "inheritsFroms",
   changes: "changeLogs",
 } as const;

@@ -25,6 +25,34 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.component.button": {
     __id: "https://ds.canonical.com/global.component.button",
     __typename: "Component",
+    tokenBindings: {
+      __refs: [
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:0",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:1",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:2",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:3",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:4",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:5",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:6",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:7",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:8",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:9",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:10",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:11",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:12",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:13",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:14",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:15",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:16",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:17",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:18",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:19",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:20",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:21",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:22",
+        "client:https://ds.canonical.com/global.component.button:tokenBindings:23",
+      ],
+    },
     name: "Button",
     uri: "https://ds.canonical.com/global.component.button",
     usage:
@@ -349,6 +377,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier_family.anticipation": {
     __id: "https://ds.canonical.com/global.modifier_family.anticipation",
     __typename: "ModifierFamily",
+    name: "Anticipation",
     uri: "https://ds.canonical.com/global.modifier_family.anticipation",
     _meta: {
       __ref:
@@ -409,6 +438,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier.caution": {
     __id: "https://ds.canonical.com/global.modifier.caution",
     __typename: "Modifier",
+    name: "Caution",
     uri: "https://ds.canonical.com/global.modifier.caution",
   },
   "client:https://ds.canonical.com/global.modifier_family.anticipation:modifiers(first:100):edges:1":
@@ -422,6 +452,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier.constructive": {
     __id: "https://ds.canonical.com/global.modifier.constructive",
     __typename: "Modifier",
+    name: "Constructive",
     uri: "https://ds.canonical.com/global.modifier.constructive",
   },
   "client:https://ds.canonical.com/global.modifier_family.anticipation:modifiers(first:100):edges:2":
@@ -435,6 +466,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier.destructive": {
     __id: "https://ds.canonical.com/global.modifier.destructive",
     __typename: "Modifier",
+    name: "Destructive",
     uri: "https://ds.canonical.com/global.modifier.destructive",
   },
   "client:https://ds.canonical.com/global.component.button:modifierFamilies(first:24):edges:1":
@@ -448,6 +480,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier_family.importance": {
     __id: "https://ds.canonical.com/global.modifier_family.importance",
     __typename: "ModifierFamily",
+    name: "Importance",
     uri: "https://ds.canonical.com/global.modifier_family.importance",
     _meta: {
       __ref:
@@ -490,6 +523,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier.primary": {
     __id: "https://ds.canonical.com/global.modifier.primary",
     __typename: "Modifier",
+    name: "Primary",
     uri: "https://ds.canonical.com/global.modifier.primary",
   },
   "client:https://ds.canonical.com/global.modifier_family.importance:modifiers(first:100):edges:1":
@@ -503,6 +537,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier.secondary": {
     __id: "https://ds.canonical.com/global.modifier.secondary",
     __typename: "Modifier",
+    name: "Secondary",
     uri: "https://ds.canonical.com/global.modifier.secondary",
   },
   "client:https://ds.canonical.com/global.modifier_family.importance:modifiers(first:100):edges:2":
@@ -516,6 +551,7 @@ const componentEntityRecordsButton = {
   "https://ds.canonical.com/global.modifier.tertiary": {
     __id: "https://ds.canonical.com/global.modifier.tertiary",
     __typename: "Modifier",
+    name: "Tertiary",
     uri: "https://ds.canonical.com/global.modifier.tertiary",
   },
   "client:https://ds.canonical.com/global.component.button:_meta:fields:0": {
@@ -713,6 +749,178 @@ const componentEntityRecordsButton = {
       "Decided to split the button into multiple components: the select and the dropdown became their own components. This means there is no need to have a right side icon for the button",
     changeType: "decision",
     timestamp: "2026-02-20T00:00:00.000+01:00",
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:0": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:0",
+    __typename: "TokenBinding",
+    node: "$root/icon",
+    consumesSymbol: "https://dt.canonical.com/color.icon.disabled",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:1": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:1",
+    __typename: "TokenBinding",
+    node: "$root/icon",
+    consumesSymbol: "https://dt.canonical.com/modifier.color.text",
+    rank: 2,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:2": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:2",
+    __typename: "TokenBinding",
+    node: "$root/icon",
+    consumesSymbol: "https://dt.canonical.com/modifier.color.icon",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:3": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:3",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.focusRing",
+    rank: 2,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:4": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:4",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/modifier.color.focusRing",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:5": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:5",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/dimension.200",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:6": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:6",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/dimension.200",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:7": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:7",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/dimension.100",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:8": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:8",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/typography.text.secondary",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:9": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:9",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/dimension.size.fontSize.300",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:10": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:10",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/typography.weight.medium",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:11": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:11",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.text.disabled",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:12": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:12",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.text",
+    rank: 2,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:13": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:13",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/modifier.color.text",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:14": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:14",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol:
+      "https://dt.canonical.com/color.border.highlighted.disabled",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:15": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:15",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.border",
+    rank: 3,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:16": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:16",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.border.highlighted",
+    rank: 2,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:17": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:17",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/modifier.color.border",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:18": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:18",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol:
+      "https://dt.canonical.com/color.foreground.primary.disabled",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:19": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:19",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.foreground.primary.active",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:20": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:20",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.foreground.primary.hover",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:21": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:21",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol: "https://dt.canonical.com/color.foreground.primary",
+    rank: 2,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:22": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:22",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol:
+      "https://dt.canonical.com/modifier.color.foreground.primary",
+    rank: 1,
+  },
+  "client:https://ds.canonical.com/global.component.button:tokenBindings:23": {
+    __id: "client:https://ds.canonical.com/global.component.button:tokenBindings:23",
+    __typename: "TokenBinding",
+    node: "$root",
+    consumesSymbol:
+      "https://dt.canonical.com/dimension.stroke.thickness.medium",
+    rank: 1,
   },
 } as unknown as RecordMap;
 
