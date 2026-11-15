@@ -319,7 +319,13 @@ describe("layOutClassGraph", () => {
         defineClass("dd:More", "More"),
       ],
       relations: [
-        { uri: "aa:far", label: "far", domain: "aa:Two", range: "cc:Two" },
+        {
+          uri: "aa:far",
+          label: "far",
+          domain: "aa:Two",
+          range: "cc:Two",
+          count: 1,
+        },
       ],
     });
     const shelfOf = (prefix: string): number =>

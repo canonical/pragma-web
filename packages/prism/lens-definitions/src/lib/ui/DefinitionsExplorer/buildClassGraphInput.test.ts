@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DefinitionsExplorer_ontologies$data } from "../../../__generated__/DefinitionsExplorer_ontologies.graphql.js";
+import type { ClassEdgeInput } from "../../classGraph/types.js";
 import buildClassGraphInput from "./buildClassGraphInput.js";
 
 /** One ontology as the explorer's fragment selects it. */
@@ -46,9 +47,34 @@ const ONTOLOGIES = [
   },
 ] as unknown as DefinitionsExplorer_ontologies$data;
 
+/** The edges the graph serves for the ontology: two declared, one not. */
+const EDGES: readonly ClassEdgeInput[] = [
+  {
+    property: "https://ds.canonical.com/taggedBy",
+    subjectClass: "https://ds.canonical.com/Tag",
+    objectClass: "https://ds.canonical.com/Tag",
+    count: 40,
+    declared: true,
+  },
+  {
+    property: "https://ds.canonical.com/taggedBy",
+    subjectClass: "https://ds.canonical.com/Entity",
+    objectClass: "https://ds.canonical.com/Tag",
+    count: 2,
+    declared: true,
+  },
+  {
+    property: "https://ds.canonical.com/taggedBy",
+    subjectClass: "https://ds.canonical.com/View",
+    objectClass: "https://ds.canonical.com/Tag",
+    count: 7,
+    declared: false,
+  },
+];
+
 describe("buildClassGraphInput", () => {
   it("names a class by its compact term when it has no label, and counts its fields", () => {
-    expect(buildClassGraphInput(ONTOLOGIES).classes).toEqual([
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES).classes).toEqual([
       {
         uri: "https://ds.canonical.com/Tag",
         label: "ds:Tag",
@@ -62,19 +88,34 @@ describe("buildClassGraphInput", () => {
   });
 
   it("keeps the object properties as relations, an unstated domain as none and a compact range expanded", () => {
-    expect(buildClassGraphInput(ONTOLOGIES).relations).toEqual([
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES).relations).toEqual([
       {
         uri: "https://ds.canonical.com/category",
         label: "ds:category",
         domain: null,
         range: "https://ds.canonical.com/TagCategory",
+        count: 0,
       },
       {
         uri: "https://ds.canonical.com/taggedBy",
         label: "taggedBy",
         domain: "https://ds.canonical.com/Tag",
         range: "https://ds.canonical.com/Tag",
+        count: 42,
       },
     ]);
+  });
+
+  it("weighs a relation by its declared edges only, 0 when none is served", () => {
+    expect(
+      buildClassGraphInput(ONTOLOGIES, []).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([0, 0]);
+    expect(
+      buildClassGraphInput(ONTOLOGIES, EDGES).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([0, 42]);
   });
 });

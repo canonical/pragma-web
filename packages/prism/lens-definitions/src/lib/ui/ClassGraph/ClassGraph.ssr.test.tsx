@@ -22,5 +22,9 @@ describe("ClassGraph SSR", () => {
     expect(html).toContain('class="ds class-graph"');
     expect(html).toContain('href="/definitions/ds%3AEntity"');
     expect(html.match(/class="node"/g)).toHaveLength(layout.nodes.size);
+    // ds:hasTokenBinding and ds:viaBlock, 1,010 statements each, bundled.
+    expect(html).toContain('data-weight="2020"');
+    expect(html).toContain('stroke-width="8"');
+    expect(html).toContain('stroke-dasharray="4 4"');
   });
 });

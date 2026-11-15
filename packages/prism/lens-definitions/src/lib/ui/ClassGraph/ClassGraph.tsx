@@ -15,9 +15,11 @@ import {
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
+import { ZERO_STROKE_DASH } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
+import weighStroke from "../../classGraph/weighStroke.js";
 import { useMessages } from "../../i18n/index.js";
 import {
   EDGE_HIT_WIDTH,
@@ -42,14 +44,16 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * The class graph drawn in native SVG, in the layers it paints in: the
  * namespace regions (a label row over a hairline rule), the subclass buses
  * with one hollow arrowhead at each superclass, the relations with their
- * filled arrowheads at each range, the classes as `EntityGraphNode`s, and
+ * filled arrowheads at each range, each stroked by its weight (1, 2, 4 or
+ * 8px by the decade of the statements it covers, 1px dashed where none
+ * does), the classes as `EntityGraphNode`s, and
  * the focus's edge labels on a halo. Every coordinate comes from the
  * layout, and every geometric fact and encoding is readable from its data
  * attributes, so a script measures the drawing with no browser.
  *
  * The reader's state never moves anything: a focus fades every class and
- * edge outside its neighbourhood and draws its relations in the accent at
- * 2px; a selection draws its lineage at 2px and rings its class in the
+ * edge outside its neighbourhood and draws its relations in the accent, at
+ * 2px at least; a selection draws its lineage at 2px and rings its class in the
  * accent; a hovered or keyboard-focused class is ringed in the focus
  * colour; the filter hides classes and the edges that lose an end; the
  * search dims. The text follows the zoom bucket of the canvas it is drawn
@@ -103,30 +107,37 @@ export default function ClassGraph({
     neighbourhood.edges.has(edge.id);
 
   const drawEdge = (edge: LaidOutEdge): ReactNode => {
-    const relation = edge.kind === "relation";
+    const bundle =
+      edge.kind === "relation"
+        ? requireDefined(edge.bundle, "bundle for a relation edge")
+        : undefined;
+    const relation = bundle !== undefined;
     const role = relation ? "relation" : "subclass";
     const state = isHidden(edge)
       ? "is-hidden"
       : isFocus(edge)
         ? "is-focus"
         : isFaded(edge) && "is-faded";
+    const weight =
+      bundle === undefined ? undefined : weighStroke(bundle.weight);
+    const width = weight?.width ?? EDGE_STROKE;
     return (
       <g data-edge={edge.id} key={edge.id}>
         <path
           className={joinClasses(role, state)}
           d={edge.d}
-          data-count={
-            relation
-              ? requireDefined(edge.bundle, "bundle for a relation edge")
-                  .relations.length
-              : edge.to.length
-          }
+          data-count={bundle?.relations.length ?? edge.to.length}
+          data-declared={relation || undefined}
           data-from={termOf(edge.from)}
           data-kind={edge.kind}
           data-to={edge.to.map(termOf).join(" ")}
+          data-weight={bundle?.weight}
           fill="none"
           stroke="currentColor"
-          strokeWidth={state === "is-focus" ? FOCUS_STROKE : EDGE_STROKE}
+          strokeDasharray={weight?.dashed ? ZERO_STROKE_DASH : undefined}
+          strokeWidth={
+            state === "is-focus" ? Math.max(width, FOCUS_STROKE) : width
+          }
         />
         {edge.heads.map((head) =>
           relation ? (

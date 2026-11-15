@@ -451,6 +451,7 @@ describe("HierarchyWell", () => {
         label,
         domain: "ex:Family",
         range: "ex:Member",
+        count: 1,
       })),
     });
     const { container } = render(

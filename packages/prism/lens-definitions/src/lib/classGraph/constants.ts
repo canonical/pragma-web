@@ -11,6 +11,7 @@ import {
   LABEL_SIZE,
   LATTICE,
 } from "@canonical/prism-core";
+import type { StrokeWidth } from "./types.js";
 
 /** A class box's height, in px. */
 export const BOX_HEIGHT = 32;
@@ -138,3 +139,29 @@ export const PHONE = {
   outPort: 24,
   loop: 16,
 } as const;
+
+/**
+ * The instance counts at which a relation's stroke steps up, heaviest
+ * first: a decade per step, so the width tells the order of magnitude of
+ * the statements it covers. A count below the last step is drawn at 1px.
+ */
+export const STROKE_STEPS: readonly {
+  readonly from: number;
+  readonly width: StrokeWidth;
+}[] = [
+  { from: 1000, width: 8 },
+  { from: 100, width: 4 },
+  { from: 10, width: 2 },
+];
+
+/** The stroke of a relation below the first step, in px. */
+export const STROKE_MIN_WIDTH = 1;
+
+/** The dash pattern of a relation no statement instantiates, in px. */
+export const ZERO_STROKE_DASH = "4 4";
+
+/**
+ * The count a relation drawn without a store carries, as a legend draws
+ * it: the lightest solid stroke.
+ */
+export const UNWEIGHED_COUNT = 1;

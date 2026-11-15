@@ -20,6 +20,26 @@ describe("DefinitionsExplorer SSR", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
+  it("weighs each relation by the class edges the store holds", () => {
+    const html = renderToString(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    const weightOf = (from: string, to: string): string | undefined =>
+      html.match(
+        new RegExp(
+          `data-declared="true" data-from="${from}" data-kind="relation" data-to="${to}" data-weight="(\\d+)"`,
+        ),
+      )?.[1];
+    // ds:hasTokenBinding and ds:viaBlock, 1,010 statements each, bundled.
+    expect(weightOf("ds:TokenBinding", "ds:UIBlock")).toBe("2020");
+    expect(weightOf("cs:CodeStandard", "cs:Example")).toBe("0");
+    expect(html.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
+  });
+
   it("lays the graph out the same on every render", () => {
     const render = (): string =>
       renderToString(

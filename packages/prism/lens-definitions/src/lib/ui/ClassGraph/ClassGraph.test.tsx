@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
+import weighStroke from "../../classGraph/weighStroke.js";
 import ClassGraph from "./ClassGraph.js";
 import type { ClassGraphProps } from "./types.js";
 
@@ -93,6 +94,34 @@ describe("ClassGraph", () => {
     );
   });
 
+  it("strokes each relation by its weight, dashed where nothing instantiates it", () => {
+    const container = draw();
+    const drawn = layout.edges.filter((edge) => edge.kind === "relation");
+    const strokes = drawn.map((edge) => {
+      const path = container.querySelector(`[data-edge="${edge.id}"] path`);
+      const weight = edge.bundle?.weight;
+      expect(path?.getAttribute("data-weight")).toBe(String(weight));
+      expect(path?.getAttribute("data-declared")).toBe("true");
+      return [
+        path?.getAttribute("stroke-width"),
+        path?.getAttribute("stroke-dasharray") ?? null,
+        weight === 0,
+      ];
+    });
+    expect(
+      strokes.every(([width, dash, zero]) =>
+        zero ? width === "1" && dash === "4 4" : dash === null,
+      ),
+    ).toBe(true);
+    expect(new Set(strokes.map(([width]) => width))).toEqual(
+      new Set(["1", "2", "4", "8"]),
+    );
+    const bus = container.querySelector("path.subclass");
+    expect(bus?.getAttribute("stroke-width")).toBe("1");
+    expect(bus?.hasAttribute("data-weight")).toBe(false);
+    expect(bus?.hasAttribute("stroke-dasharray")).toBe(false);
+  });
+
   it("names its regions, with their counts, and its classes at full zoom", () => {
     const container = draw();
     expect(container.querySelector(".region .prefix")?.textContent).toBe(
@@ -160,7 +189,10 @@ describe("ClassGraph", () => {
     const accented = [...container.querySelectorAll("path.relation.is-focus")];
     expect(accented.length).toBeGreaterThan(0);
     for (const path of accented) {
-      expect(path.getAttribute("stroke-width")).toBe("2");
+      const { width } = weighStroke(Number(path.getAttribute("data-weight")));
+      expect(path.getAttribute("stroke-width")).toBe(
+        String(Math.max(width, 2)),
+      );
     }
     expect(
       container.querySelectorAll(".is-faded.subclass, .is-faded.relation"),

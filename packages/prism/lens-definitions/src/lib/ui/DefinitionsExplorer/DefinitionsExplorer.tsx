@@ -34,7 +34,9 @@ import "./styles.css";
  *
  * The explorer's own fragment is the class graph's input: each class's
  * superclass, instance count and fields (its properties' kinds), and every
- * property's domain and range.
+ * property's domain and range. The class edges the graph counts ride the
+ * root, because the graph computes them over its whole store and not per
+ * ontology: they weigh the relations.
  */
 const declareDefinitionsExplorerDocuments = (): unknown => [
   graphql`
@@ -56,6 +58,13 @@ const declareDefinitionsExplorerDocuments = (): unknown => [
       }
       ontologyProperty(uri: $uri) @include(if: $hasTerm) {
         ...TermInspector_property
+      }
+      classEdges {
+        property
+        subjectClass
+        objectClass
+        count
+        declared
       }
     }
   `,
@@ -129,8 +138,8 @@ export default function DefinitionsExplorer({
     data.ontologies,
   );
   const layout = useMemo(
-    () => layOutClassGraph(buildClassGraphInput(graphData)),
-    [graphData],
+    () => layOutClassGraph(buildClassGraphInput(graphData, data.classEdges)),
+    [graphData, data.classEdges],
   );
   const terms = useMemo(
     () =>

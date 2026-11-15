@@ -4,6 +4,7 @@ import {
   type Rect,
   uniteRects,
 } from "@canonical/prism-core";
+import { UNWEIGHED_COUNT } from "../../../../classGraph/constants.js";
 import layOutClassGraph from "../../../../classGraph/layOutClassGraph.js";
 import type { ClassGraphLayout } from "../../../../classGraph/types.js";
 import type { Translate } from "../../../../i18n/index.js";
@@ -40,6 +41,7 @@ export default function layOutSpecimen(
       label: t(relation.label),
       domain: uriOf(relation.domain),
       range: uriOf(relation.range),
+      count: UNWEIGHED_COUNT,
     })),
   });
   const only = specimen.only === undefined ? undefined : uriOf(specimen.only);

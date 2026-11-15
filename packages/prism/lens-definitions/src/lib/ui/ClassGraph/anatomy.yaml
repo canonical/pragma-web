@@ -14,11 +14,16 @@
 # count in 14px muted) over a hairline rule in the line colour: no hull, no
 # fill, no tint. Subclass buses are 1px in the muted ink, each with one
 # hollow head at its superclass (a fill in the floor's colour under a
-# stroke). Relations are 1px in the edge colour with a filled head at each
-# range; a focus's relations draw in the accent at 2px (the width is an
-# attribute). A selection's lineage draws in the ink at 2px. Edge labels
-# are 14px, muted, or in the accent for the focus, on a 3px halo of the
-# floor's colour.
+# stroke). Relations are in the edge colour with a filled head at each
+# range; a focus's relations draw in the accent at 2px at least (the width
+# is an attribute). A selection's lineage draws in the ink at 2px. Edge
+# labels are 14px, muted, or in the accent for the focus, on a 3px halo of
+# the floor's colour.
+#
+# Weights: a relation's stroke is its summed store count by decade (1px
+# for 1 to 9, 2px for 10 to 99, 4px for 100 to 999, 8px from 1,000), and
+# 1px dashed (4 4) where the count is 0, never hidden. The count is the
+# edge's `data-weight`; `data-declared` says the ontology declares it.
 #
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.
@@ -43,8 +48,10 @@
 #   1rem: the region prefix; the docs context has no 16px text size.
 #   0.16, 0.06, 0.4: the faded class, the faded edge, the dimmed class.
 #   In constants.ts and the layout's constants (attributes, not CSS): the
-#   1px and 2px strokes, the ring's 2px offset, the 6px halo stroke, the
-#   8px hover target.
+#   weight strokes 1, 2, 4 and 8px with their decades 10, 100 and 1,000,
+#   the zero dash 4 4 (a quarter of the 16px lattice), the 1px and 2px
+#   strokes, the ring's 2px offset, the 6px halo stroke, the 8px hover
+#   target.
 #
 # Roster namespaces (accepted and tracked): the semantic typography
 # symbols typography.text.secondary.fontSize and

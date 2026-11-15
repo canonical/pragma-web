@@ -41,8 +41,8 @@ export default function useCapturedExplorer(term?: string): CapturedExplorer {
     data.ontologies,
   );
   const layout = useMemo(
-    () => layOutClassGraph(buildClassGraphInput(graph)),
-    [graph],
+    () => layOutClassGraph(buildClassGraphInput(graph, data.classEdges)),
+    [graph, data.classEdges],
   );
   const terms = useMemo(
     () =>

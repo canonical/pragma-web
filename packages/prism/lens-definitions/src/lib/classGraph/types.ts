@@ -33,6 +33,29 @@ export interface GraphRelationInput {
   readonly domain: string | null;
   /** The range's full IRI. */
   readonly range: string | null;
+  /**
+   * The instance statements the property's declared edges cover, summed
+   * over its declarations; 0 when none does.
+   */
+  readonly count: number;
+}
+
+/**
+ * One edge between two classes as the graph's `classEdges` serves it: a
+ * property's statements from one class to another, counted, and whether
+ * the ontology declares the pair.
+ */
+export interface ClassEdgeInput {
+  /** The property's full IRI. */
+  readonly property: string;
+  /** The full IRI of the class the statements start from. */
+  readonly subjectClass: string;
+  /** The full IRI of the class the statements point to. */
+  readonly objectClass: string;
+  /** The instance statements the edge covers; 0 when none. */
+  readonly count: number;
+  /** Whether the property's domain and range declare the edge. */
+  readonly declared: boolean;
 }
 
 /** A relation both of whose ends are drawn classes. */
@@ -79,6 +102,8 @@ export interface Bundle extends LabelledBundle {
   readonly relations: readonly DrawnRelation[];
   /** Whether relations run both ways. */
   readonly opposite: boolean;
+  /** The instance statements its relations cover, summed. */
+  readonly weight: number;
 }
 
 /** The subclass join from a region's roots to a superclass in another region. */
@@ -243,4 +268,14 @@ export interface ShelfPacking {
   readonly h: number;
   /** The zoom at which the packing, with its margin, fits the design canvas. */
   readonly fit: number;
+}
+
+/** A stroke width a relation is drawn at, in px: one per decade of its count. */
+export type StrokeWidth = 1 | 2 | 4 | 8;
+
+/** How a relation's stroke shows its weight. */
+export interface StrokeWeight {
+  readonly width: StrokeWidth;
+  /** Whether it is dashed: no statement instantiates it. */
+  readonly dashed: boolean;
 }

@@ -92,29 +92,63 @@ export const CROSS_REGION_GRAPH: ClassGraphInput = {
       label: "hasPart",
       domain: "ex:Whole",
       range: "ex:Part",
+      count: 1010,
     },
-    { uri: "ex:partOf", label: "partOf", domain: "ex:Part", range: "ex:Whole" },
-    { uri: "ex:about", label: "about", domain: "ex:Note", range: "ex:Remark" },
+    {
+      uri: "ex:partOf",
+      label: "partOf",
+      domain: "ex:Part",
+      range: "ex:Whole",
+      count: 0,
+    },
+    {
+      uri: "ex:about",
+      label: "about",
+      domain: "ex:Note",
+      range: "ex:Remark",
+      count: 12,
+    },
     {
       uri: "ex:refines",
       label: "refines",
       domain: "ex:Remark",
       range: "ex:Long",
+      count: 150,
     },
-    { uri: "ex:cites", label: "cites", domain: "ex:Long", range: "ex:Note" },
+    {
+      uri: "ex:cites",
+      label: "cites",
+      domain: "ex:Long",
+      range: "ex:Note",
+      count: 3,
+    },
     {
       uri: "ex:seeAlso",
       label: "seeAlso",
       domain: "ex:Note",
       range: "ex:Note",
+      count: 0,
     },
-    { uri: "ex:links", label: "links", domain: "zz:Leaf", range: "ex:Whole" },
-    { uri: "ex:loose", label: "loose", domain: null, range: "ex:Part" },
+    {
+      uri: "ex:links",
+      label: "links",
+      domain: "zz:Leaf",
+      range: "ex:Whole",
+      count: 9,
+    },
+    {
+      uri: "ex:loose",
+      label: "loose",
+      domain: null,
+      range: "ex:Part",
+      count: 1,
+    },
     {
       uri: "ex:outside",
       label: "outside",
       domain: "ex:Part",
       range: "xsd:string",
+      count: 1,
     },
   ],
 };
@@ -136,23 +170,55 @@ export const TANGLED_GRAPH: ClassGraphInput = {
   ],
   relations: [
     ...CROSS_REGION_GRAPH.relations,
-    { uri: "ex:holds", label: "holds", domain: "ex:Whole", range: "ex:Piece" },
-    { uri: "ex:near", label: "near", domain: "ex:Piece", range: "ex:Part" },
-    { uri: "ex:echoes", label: "echoes", domain: "ex:Long", range: "ex:Echo" },
+    {
+      uri: "ex:holds",
+      label: "holds",
+      domain: "ex:Whole",
+      range: "ex:Piece",
+      count: 1,
+    },
+    {
+      uri: "ex:near",
+      label: "near",
+      domain: "ex:Piece",
+      range: "ex:Part",
+      count: 1,
+    },
+    {
+      uri: "ex:echoes",
+      label: "echoes",
+      domain: "ex:Long",
+      range: "ex:Echo",
+      count: 1,
+    },
     {
       uri: "ex:answers",
       label: "answers",
       domain: "ex:Remark",
       range: "ex:Echo",
+      count: 1,
     },
     {
       uri: "ex:mentions",
       label: "mentions",
       domain: "ex:Note",
       range: "yy:Solo",
+      count: 1,
     },
-    { uri: "ex:points", label: "points", domain: "yy:Solo", range: "ex:Long" },
-    { uri: "ex:pairs", label: "pairs", domain: "zz:Leaf", range: "yy:Other" },
+    {
+      uri: "ex:points",
+      label: "points",
+      domain: "yy:Solo",
+      range: "ex:Long",
+      count: 1,
+    },
+    {
+      uri: "ex:pairs",
+      label: "pairs",
+      domain: "zz:Leaf",
+      range: "yy:Other",
+      count: 1,
+    },
   ],
 };
 
@@ -170,6 +236,7 @@ export const WIDE_GRAPH: ClassGraphInput = {
     label: `next${index}`,
     domain: `ex:C${index}`,
     range: `ex:C${index + 1}`,
+    count: index,
   })),
 };
 
@@ -186,6 +253,7 @@ export const NARROWING_GRAPH: ClassGraphInput = {
     label: `follows${index}`,
     domain: `ex:N${index}`,
     range: `ex:N${index + 1}`,
+    count: index,
   })),
 };
 
@@ -211,7 +279,13 @@ export const SHELF_PAIR_GRAPH: ClassGraphInput = {
     ...["B0", "B1", "B2"].map((label) => defineClass(`bb:${label}`, label)),
   ],
   relations: [
-    { uri: "aa:reaches", label: "reaches", domain: "aa:A0", range: "bb:B0" },
+    {
+      uri: "aa:reaches",
+      label: "reaches",
+      domain: "aa:A0",
+      range: "bb:B0",
+      count: 1,
+    },
   ],
 };
 
@@ -222,6 +296,12 @@ export const SHELF_PAIR_GRAPH: ClassGraphInput = {
 export const STACKED_PAIR_GRAPH: ClassGraphInput = {
   classes: [defineClass("aa:A", "A"), defineClass("bb:B", "B")],
   relations: [
-    { uri: "aa:reaches", label: "reaches", domain: "aa:A", range: "bb:B" },
+    {
+      uri: "aa:reaches",
+      label: "reaches",
+      domain: "aa:A",
+      range: "bb:B",
+      count: 1,
+    },
   ],
 };
