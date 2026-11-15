@@ -57,15 +57,16 @@ export default [
                   _meta: {
                     title: "Circle Line",
                     curie: "metro:circle-line",
-                    definition: null,
                     type: {
                       _meta: {
                         title: "Line",
                       },
                       uri: "https://metro.example/onto#Line",
                     },
+                    definition: null,
                   },
                   __isNode: "Line",
+                  colour: "#f2b705",
                   servedBy: [
                     {
                       __typename: "Interchange",
@@ -95,261 +96,19 @@ export default [
                   routes: [
                     {
                       isLoop: true,
-                      calls: [
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Central Exchange",
-                              curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#central-exchange",
-                            diagramPosition: {
-                              x: 0,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 8,
-                            transferMinutes: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 1,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Kilnwood",
-                              curie: "metro:kilnwood",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#kilnwood",
-                            diagramPosition: {
-                              x: 4,
-                              y: 5,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                            ],
-                          },
-                          position: 2,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Quarry Hill",
-                              curie: "metro:quarry-hill",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#quarry-hill",
-                            diagramPosition: {
-                              x: 10,
-                              y: 5,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                            ],
-                          },
-                          position: 3,
-                        },
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Tannery Lane",
-                              curie: "metro:tannery-lane",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#tannery-lane",
-                            diagramPosition: {
-                              x: 14,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 2,
-                            transferMinutes: 3,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
-                          position: 4,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Willowbank",
-                              curie: "metro:willowbank",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#willowbank",
-                            diagramPosition: {
-                              x: 10,
-                              y: 13,
-                            },
-                            __isNode: "Station",
-                            platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                            ],
-                          },
-                          position: 5,
-                        },
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Riverside Junction",
-                              curie: "metro:riverside-junction",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#riverside-junction",
-                            diagramPosition: {
-                              x: 4,
-                              y: 13,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 5,
-                            transferMinutes: 7,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 6,
-                        },
-                      ],
                       label: "Clockwise",
                       reverse: {
                         label: "Anticlockwise",
                       },
-                    },
-                    {
-                      isLoop: true,
                       calls: [
                         {
+                          position: 1,
                           stop: {
+                            uri: "https://metro.example/onto#central-exchange",
                             __typename: "Interchange",
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -357,123 +116,115 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
                               x: 0,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 8,
-                            transferMinutes: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
                           },
-                          position: 1,
                         },
                         {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Riverside Junction",
-                              curie: "metro:riverside-junction",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#riverside-junction",
-                            diagramPosition: {
-                              x: 4,
-                              y: 13,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 5,
-                            transferMinutes: 7,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
                           position: 2,
-                        },
-                        {
                           stop: {
+                            uri: "https://metro.example/onto#kilnwood",
                             __typename: "Station",
                             _meta: {
-                              title: "Willowbank",
-                              curie: "metro:willowbank",
-                              definition: null,
+                              title: "Kilnwood",
+                              curie: "metro:kilnwood",
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
+                            diagramPosition: {
+                              x: 4,
+                              y: 5,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 3,
+                          stop: {
+                            uri: "https://metro.example/onto#quarry-hill",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Quarry Hill",
+                              curie: "metro:quarry-hill",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 10,
+                              y: 5,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
+                            uri: "https://metro.example/onto#tannery-lane",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Tannery Lane",
+                              curie: "metro:tannery-lane",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
+                            diagramPosition: {
+                              x: 14,
+                              y: 9,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                        {
+                          position: 5,
+                          stop: {
                             uri: "https://metro.example/onto#willowbank",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Willowbank",
+                              curie: "metro:willowbank",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
                             diagramPosition: {
                               x: 10,
                               y: 13,
                             },
                             __isNode: "Station",
                             platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                            ],
                           },
-                          position: 3,
                         },
                         {
+                          position: 6,
                           stop: {
+                            uri: "https://metro.example/onto#riverside-junction",
                             __typename: "Interchange",
                             _meta: {
-                              title: "Tannery Lane",
-                              curie: "metro:tannery-lane",
-                              definition: null,
+                              title: "Riverside Junction",
+                              curie: "metro:riverside-junction",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -481,113 +232,164 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#tannery-lane",
                             diagramPosition: {
-                              x: 14,
+                              x: 4,
+                              y: 13,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      isLoop: true,
+                      label: "Anticlockwise",
+                      reverse: {
+                        label: "Clockwise",
+                      },
+                      calls: [
+                        {
+                          position: 1,
+                          stop: {
+                            uri: "https://metro.example/onto#central-exchange",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Central Exchange",
+                              curie: "metro:central-exchange",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
+                            diagramPosition: {
+                              x: 0,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 2,
-                            transferMinutes: 3,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
                           },
-                          position: 4,
                         },
                         {
+                          position: 2,
                           stop: {
+                            uri: "https://metro.example/onto#riverside-junction",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Riverside Junction",
+                              curie: "metro:riverside-junction",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
+                            diagramPosition: {
+                              x: 4,
+                              y: 13,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                        {
+                          position: 3,
+                          stop: {
+                            uri: "https://metro.example/onto#willowbank",
                             __typename: "Station",
                             _meta: {
-                              title: "Quarry Hill",
-                              curie: "metro:quarry-hill",
-                              definition: null,
+                              title: "Willowbank",
+                              curie: "metro:willowbank",
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
+                            diagramPosition: {
+                              x: 10,
+                              y: 13,
+                            },
+                            __isNode: "Station",
+                            platformCount: 1,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
+                            uri: "https://metro.example/onto#tannery-lane",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Tannery Lane",
+                              curie: "metro:tannery-lane",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
+                            diagramPosition: {
+                              x: 14,
+                              y: 9,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                        {
+                          position: 5,
+                          stop: {
                             uri: "https://metro.example/onto#quarry-hill",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Quarry Hill",
+                              curie: "metro:quarry-hill",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
                             diagramPosition: {
                               x: 10,
                               y: 5,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                            ],
                           },
-                          position: 5,
                         },
                         {
+                          position: 6,
                           stop: {
+                            uri: "https://metro.example/onto#kilnwood",
                             __typename: "Station",
                             _meta: {
                               title: "Kilnwood",
                               curie: "metro:kilnwood",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#kilnwood",
                             diagramPosition: {
                               x: 4,
                               y: 5,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                            ],
                           },
-                          position: 6,
                         },
                       ],
-                      label: "Anticlockwise",
-                      reverse: {
-                        label: "Clockwise",
-                      },
                     },
                   ],
                   code: "2",
-                  colour: "#f2b705",
                 },
               },
               {
@@ -597,15 +399,16 @@ export default [
                   _meta: {
                     title: "Coastal Line",
                     curie: "metro:coastal-line",
-                    definition: null,
                     type: {
                       _meta: {
                         title: "Line",
                       },
                       uri: "https://metro.example/onto#Line",
                     },
+                    definition: null,
                   },
                   __isNode: "Line",
+                  colour: "#0072ce",
                   servedBy: [
                     {
                       __typename: "Interchange",
@@ -635,409 +438,264 @@ export default [
                   routes: [
                     {
                       isLoop: false,
-                      calls: [
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Central Exchange",
-                              curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#central-exchange",
-                            diagramPosition: {
-                              x: 0,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 8,
-                            transferMinutes: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 1,
-                        },
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Riverside Junction",
-                              curie: "metro:riverside-junction",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#riverside-junction",
-                            diagramPosition: {
-                              x: 4,
-                              y: 13,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 5,
-                            transferMinutes: 7,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 2,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Harbourside",
-                              curie: "metro:harbourside",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#harbourside",
-                            diagramPosition: {
-                              x: 9,
-                              y: 18,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: {
-                              _meta: {
-                                title: "Coastal Zone",
-                              },
-                              uri: "https://geo.example/onto#coastal-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 3,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Saltford",
-                              curie: "metro:saltford",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#saltford",
-                            diagramPosition: {
-                              x: 13,
-                              y: 18,
-                            },
-                            __isNode: "Station",
-                            platformCount: 3,
-                            inZone: {
-                              _meta: {
-                                title: "Coastal Zone",
-                              },
-                              uri: "https://geo.example/onto#coastal-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 4,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Greenhithe",
-                              curie: "metro:greenhithe",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#greenhithe",
-                            diagramPosition: {
-                              x: 17,
-                              y: 18,
-                            },
-                            __isNode: "Station",
-                            platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 5,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Eastcliff",
-                              curie: "metro:eastcliff",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#eastcliff",
-                            diagramPosition: {
-                              x: 21,
-                              y: 18,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: {
-                              _meta: {
-                                title: "Coastal Zone",
-                              },
-                              uri: "https://geo.example/onto#coastal-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 6,
-                        },
-                      ],
                       label: "To Eastcliff",
                       reverse: {
                         label: "To Central Exchange",
                       },
-                    },
-                    {
-                      isLoop: false,
                       calls: [
                         {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Eastcliff",
-                              curie: "metro:eastcliff",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#eastcliff",
-                            diagramPosition: {
-                              x: 21,
-                              y: 18,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: {
-                              _meta: {
-                                title: "Coastal Zone",
-                              },
-                              uri: "https://geo.example/onto#coastal-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
                           position: 1,
-                        },
-                        {
                           stop: {
-                            __typename: "Station",
+                            uri: "https://metro.example/onto#central-exchange",
+                            __typename: "Interchange",
                             _meta: {
-                              title: "Greenhithe",
-                              curie: "metro:greenhithe",
-                              definition: null,
+                              title: "Central Exchange",
+                              curie: "metro:central-exchange",
                               type: {
                                 _meta: {
-                                  title: "Station",
+                                  title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Station",
+                                uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#greenhithe",
                             diagramPosition: {
-                              x: 17,
-                              y: 18,
+                              x: 0,
+                              y: 9,
                             },
-                            __isNode: "Station",
-                            platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
+                            __isNode: "Interchange",
                           },
+                        },
+                        {
                           position: 2,
-                        },
-                        {
                           stop: {
-                            __typename: "Station",
+                            uri: "https://metro.example/onto#riverside-junction",
+                            __typename: "Interchange",
                             _meta: {
-                              title: "Saltford",
-                              curie: "metro:saltford",
-                              definition: null,
+                              title: "Riverside Junction",
+                              curie: "metro:riverside-junction",
                               type: {
                                 _meta: {
-                                  title: "Station",
+                                  title: "Interchange",
                                 },
-                                uri: "https://metro.example/onto#Station",
+                                uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#saltford",
                             diagramPosition: {
-                              x: 13,
-                              y: 18,
+                              x: 4,
+                              y: 13,
                             },
-                            __isNode: "Station",
-                            platformCount: 3,
-                            inZone: {
-                              _meta: {
-                                title: "Coastal Zone",
-                              },
-                              uri: "https://geo.example/onto#coastal-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
+                            __isNode: "Interchange",
                           },
-                          position: 3,
                         },
                         {
+                          position: 3,
                           stop: {
+                            uri: "https://metro.example/onto#harbourside",
                             __typename: "Station",
                             _meta: {
                               title: "Harbourside",
                               curie: "metro:harbourside",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#harbourside",
                             diagramPosition: {
                               x: 9,
                               y: 18,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: {
-                              _meta: {
-                                title: "Coastal Zone",
-                              },
-                              uri: "https://geo.example/onto#coastal-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
                           },
-                          position: 4,
                         },
                         {
+                          position: 4,
                           stop: {
+                            uri: "https://metro.example/onto#saltford",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Saltford",
+                              curie: "metro:saltford",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 13,
+                              y: 18,
+                            },
+                            __isNode: "Station",
+                            platformCount: 3,
+                          },
+                        },
+                        {
+                          position: 5,
+                          stop: {
+                            uri: "https://metro.example/onto#greenhithe",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Greenhithe",
+                              curie: "metro:greenhithe",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 17,
+                              y: 18,
+                            },
+                            __isNode: "Station",
+                            platformCount: 1,
+                          },
+                        },
+                        {
+                          position: 6,
+                          stop: {
+                            uri: "https://metro.example/onto#eastcliff",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Eastcliff",
+                              curie: "metro:eastcliff",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 21,
+                              y: 18,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      isLoop: false,
+                      label: "To Central Exchange",
+                      reverse: {
+                        label: "To Eastcliff",
+                      },
+                      calls: [
+                        {
+                          position: 1,
+                          stop: {
+                            uri: "https://metro.example/onto#eastcliff",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Eastcliff",
+                              curie: "metro:eastcliff",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 21,
+                              y: 18,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 2,
+                          stop: {
+                            uri: "https://metro.example/onto#greenhithe",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Greenhithe",
+                              curie: "metro:greenhithe",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 17,
+                              y: 18,
+                            },
+                            __isNode: "Station",
+                            platformCount: 1,
+                          },
+                        },
+                        {
+                          position: 3,
+                          stop: {
+                            uri: "https://metro.example/onto#saltford",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Saltford",
+                              curie: "metro:saltford",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 13,
+                              y: 18,
+                            },
+                            __isNode: "Station",
+                            platformCount: 3,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
+                            uri: "https://metro.example/onto#harbourside",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Harbourside",
+                              curie: "metro:harbourside",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 9,
+                              y: 18,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 5,
+                          stop: {
+                            uri: "https://metro.example/onto#riverside-junction",
                             __typename: "Interchange",
                             _meta: {
                               title: "Riverside Junction",
                               curie: "metro:riverside-junction",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -1045,40 +703,21 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#riverside-junction",
                             diagramPosition: {
                               x: 4,
                               y: 13,
                             },
                             __isNode: "Interchange",
-                            platformCount: 5,
-                            transferMinutes: 7,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
                           },
-                          position: 5,
                         },
                         {
+                          position: 6,
                           stop: {
+                            uri: "https://metro.example/onto#central-exchange",
                             __typename: "Interchange",
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -1086,52 +725,17 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
                               x: 0,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 8,
-                            transferMinutes: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
                           },
-                          position: 6,
                         },
                       ],
-                      label: "To Central Exchange",
-                      reverse: {
-                        label: "To Eastcliff",
-                      },
                     },
                   ],
                   code: "3",
-                  colour: "#0072ce",
                 },
               },
               {
@@ -1141,16 +745,17 @@ export default [
                   _meta: {
                     title: "Lowland Line",
                     curie: "metro:lowland-line",
-                    definition:
-                      "Tannery Lane to Eastwick Cross through the valley; with the Upland Line it closes the eastern ring.",
                     type: {
                       _meta: {
                         title: "Line",
                       },
                       uri: "https://metro.example/onto#Line",
                     },
+                    definition:
+                      "Tannery Lane to Eastwick Cross through the valley; with the Upland Line it closes the eastern ring.",
                   },
                   __isNode: "Line",
+                  colour: "#8e3ba3",
                   servedBy: [
                     {
                       __typename: "Interchange",
@@ -1172,175 +777,19 @@ export default [
                   routes: [
                     {
                       isLoop: false,
-                      calls: [
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Tannery Lane",
-                              curie: "metro:tannery-lane",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#tannery-lane",
-                            diagramPosition: {
-                              x: 14,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 2,
-                            transferMinutes: 3,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
-                          position: 1,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Millford",
-                              curie: "metro:millford",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#millford",
-                            diagramPosition: {
-                              x: 18,
-                              y: 13,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
-                          position: 2,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Reedmere",
-                              curie: "metro:reedmere",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#reedmere",
-                            diagramPosition: {
-                              x: 24,
-                              y: 13,
-                            },
-                            __isNode: "Station",
-                            platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
-                          position: 3,
-                        },
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Eastwick Cross",
-                              curie: "metro:eastwick-cross",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#eastwick-cross",
-                            diagramPosition: {
-                              x: 28,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 4,
-                            transferMinutes: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
-                          position: 4,
-                        },
-                      ],
                       label: "To Eastwick Cross",
                       reverse: {
                         label: "To Tannery Lane",
                       },
-                    },
-                    {
-                      isLoop: false,
                       calls: [
                         {
+                          position: 1,
                           stop: {
+                            uri: "https://metro.example/onto#tannery-lane",
                             __typename: "Interchange",
                             _meta: {
-                              title: "Eastwick Cross",
-                              curie: "metro:eastwick-cross",
-                              definition: null,
+                              title: "Tannery Lane",
+                              curie: "metro:tannery-lane",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -1348,105 +797,69 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#eastwick-cross",
                             diagramPosition: {
-                              x: 28,
+                              x: 14,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 4,
-                            transferMinutes: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
                           },
-                          position: 1,
                         },
                         {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Reedmere",
-                              curie: "metro:reedmere",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#reedmere",
-                            diagramPosition: {
-                              x: 24,
-                              y: 13,
-                            },
-                            __isNode: "Station",
-                            platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
                           position: 2,
-                        },
-                        {
                           stop: {
+                            uri: "https://metro.example/onto#millford",
                             __typename: "Station",
                             _meta: {
                               title: "Millford",
                               curie: "metro:millford",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#millford",
                             diagramPosition: {
                               x: 18,
                               y: 13,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
                           },
-                          position: 3,
                         },
                         {
+                          position: 3,
                           stop: {
+                            uri: "https://metro.example/onto#reedmere",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Reedmere",
+                              curie: "metro:reedmere",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 24,
+                              y: 13,
+                            },
+                            __isNode: "Station",
+                            platformCount: 1,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
+                            uri: "https://metro.example/onto#eastwick-cross",
                             __typename: "Interchange",
                             _meta: {
-                              title: "Tannery Lane",
-                              curie: "metro:tannery-lane",
-                              definition: null,
+                              title: "Eastwick Cross",
+                              curie: "metro:eastwick-cross",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -1454,47 +867,118 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
+                            diagramPosition: {
+                              x: 28,
+                              y: 9,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      isLoop: false,
+                      label: "To Tannery Lane",
+                      reverse: {
+                        label: "To Eastwick Cross",
+                      },
+                      calls: [
+                        {
+                          position: 1,
+                          stop: {
+                            uri: "https://metro.example/onto#eastwick-cross",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Eastwick Cross",
+                              curie: "metro:eastwick-cross",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
+                            diagramPosition: {
+                              x: 28,
+                              y: 9,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                        {
+                          position: 2,
+                          stop: {
+                            uri: "https://metro.example/onto#reedmere",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Reedmere",
+                              curie: "metro:reedmere",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 24,
+                              y: 13,
+                            },
+                            __isNode: "Station",
+                            platformCount: 1,
+                          },
+                        },
+                        {
+                          position: 3,
+                          stop: {
+                            uri: "https://metro.example/onto#millford",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Millford",
+                              curie: "metro:millford",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 18,
+                              y: 13,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
                             uri: "https://metro.example/onto#tannery-lane",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Tannery Lane",
+                              curie: "metro:tannery-lane",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
                             diagramPosition: {
                               x: 14,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 2,
-                            transferMinutes: 3,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
                           },
-                          position: 4,
                         },
                       ],
-                      label: "To Tannery Lane",
-                      reverse: {
-                        label: "To Eastwick Cross",
-                      },
                     },
                   ],
                   code: "5",
-                  colour: "#8e3ba3",
                 },
               },
               {
@@ -1504,15 +988,16 @@ export default [
                   _meta: {
                     title: "North Line",
                     curie: "metro:north-line",
-                    definition: "Northgate to Marsh End, via the old cutting.",
                     type: {
                       _meta: {
                         title: "Line",
                       },
                       uri: "https://metro.example/onto#Line",
                     },
+                    definition: "Northgate to Marsh End, via the old cutting.",
                   },
                   __isNode: "Line",
+                  colour: "#c8102e",
                   servedBy: [
                     {
                       __typename: "Interchange",
@@ -1538,246 +1023,91 @@ export default [
                   routes: [
                     {
                       isLoop: false,
-                      calls: [
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Northgate",
-                              curie: "metro:northgate",
-                              definition: "The northern terminus.",
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#northgate",
-                            diagramPosition: {
-                              x: 0,
-                              y: 0,
-                            },
-                            __isNode: "Station",
-                            platformCount: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
-                          },
-                          position: 1,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Verge Park",
-                              curie: "metro:verge-park",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#verge-park",
-                            diagramPosition: {
-                              x: 0,
-                              y: 3,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
-                          },
-                          position: 2,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Foundry Row",
-                              curie: "metro:foundry-row",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#foundry-row",
-                            diagramPosition: {
-                              x: 0,
-                              y: 6,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
-                          },
-                          position: 3,
-                        },
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Central Exchange",
-                              curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#central-exchange",
-                            diagramPosition: {
-                              x: 0,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 8,
-                            transferMinutes: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
-                          },
-                          position: 4,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Marsh End",
-                              curie: "metro:marsh-end",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#marsh-end",
-                            diagramPosition: {
-                              x: 0,
-                              y: 12,
-                            },
-                            __isNode: "Station",
-                            platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
-                          },
-                          position: 5,
-                        },
-                      ],
                       label: "To Marsh End",
                       reverse: {
                         label: "To Northgate",
                       },
-                    },
-                    {
-                      isLoop: false,
                       calls: [
                         {
+                          position: 1,
                           stop: {
+                            uri: "https://metro.example/onto#northgate",
                             __typename: "Station",
                             _meta: {
-                              title: "Marsh End",
-                              curie: "metro:marsh-end",
-                              definition: null,
+                              title: "Northgate",
+                              curie: "metro:northgate",
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: "The northern terminus.",
                             },
-                            uri: "https://metro.example/onto#marsh-end",
                             diagramPosition: {
                               x: 0,
-                              y: 12,
+                              y: 0,
                             },
                             __isNode: "Station",
-                            platformCount: 1,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
+                            platformCount: 4,
                           },
-                          position: 1,
                         },
                         {
+                          position: 2,
                           stop: {
+                            uri: "https://metro.example/onto#verge-park",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Verge Park",
+                              curie: "metro:verge-park",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 0,
+                              y: 3,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 3,
+                          stop: {
+                            uri: "https://metro.example/onto#foundry-row",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Foundry Row",
+                              curie: "metro:foundry-row",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 0,
+                              y: 6,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
+                            uri: "https://metro.example/onto#central-exchange",
                             __typename: "Interchange",
                             _meta: {
                               title: "Central Exchange",
                               curie: "metro:central-exchange",
-                              definition:
-                                "The busiest transfer point on the network.",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -1785,156 +1115,168 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#central-exchange",
                             diagramPosition: {
                               x: 0,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 8,
-                            transferMinutes: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Coastal Line",
-                                },
-                                uri: "https://metro.example/onto#coastal-line",
-                              },
-                            ],
                           },
-                          position: 2,
                         },
                         {
+                          position: 5,
                           stop: {
+                            uri: "https://metro.example/onto#marsh-end",
                             __typename: "Station",
                             _meta: {
-                              title: "Foundry Row",
-                              curie: "metro:foundry-row",
-                              definition: null,
+                              title: "Marsh End",
+                              curie: "metro:marsh-end",
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
+                            diagramPosition: {
+                              x: 0,
+                              y: 12,
+                            },
+                            __isNode: "Station",
+                            platformCount: 1,
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      isLoop: false,
+                      label: "To Northgate",
+                      reverse: {
+                        label: "To Marsh End",
+                      },
+                      calls: [
+                        {
+                          position: 1,
+                          stop: {
+                            uri: "https://metro.example/onto#marsh-end",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Marsh End",
+                              curie: "metro:marsh-end",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 0,
+                              y: 12,
+                            },
+                            __isNode: "Station",
+                            platformCount: 1,
+                          },
+                        },
+                        {
+                          position: 2,
+                          stop: {
+                            uri: "https://metro.example/onto#central-exchange",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Central Exchange",
+                              curie: "metro:central-exchange",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
+                            diagramPosition: {
+                              x: 0,
+                              y: 9,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                        {
+                          position: 3,
+                          stop: {
                             uri: "https://metro.example/onto#foundry-row",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Foundry Row",
+                              curie: "metro:foundry-row",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
                             diagramPosition: {
                               x: 0,
                               y: 6,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
                           },
-                          position: 3,
                         },
                         {
+                          position: 4,
                           stop: {
+                            uri: "https://metro.example/onto#verge-park",
                             __typename: "Station",
                             _meta: {
                               title: "Verge Park",
                               curie: "metro:verge-park",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#verge-park",
                             diagramPosition: {
                               x: 0,
                               y: 3,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
                           },
-                          position: 4,
                         },
                         {
+                          position: 5,
                           stop: {
+                            uri: "https://metro.example/onto#northgate",
                             __typename: "Station",
                             _meta: {
                               title: "Northgate",
                               curie: "metro:northgate",
-                              definition: "The northern terminus.",
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: "The northern terminus.",
                             },
-                            uri: "https://metro.example/onto#northgate",
                             diagramPosition: {
                               x: 0,
                               y: 0,
                             },
                             __isNode: "Station",
                             platformCount: 4,
-                            inZone: {
-                              _meta: {
-                                title: "Central Zone",
-                              },
-                              uri: "https://geo.example/onto#central-zone",
-                            },
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "North Line",
-                                },
-                                uri: "https://metro.example/onto#north-line",
-                              },
-                            ],
                           },
-                          position: 5,
                         },
                       ],
-                      label: "To Northgate",
-                      reverse: {
-                        label: "To Marsh End",
-                      },
                     },
                   ],
                   code: "1",
-                  colour: "#c8102e",
                 },
               },
               {
@@ -1944,15 +1286,16 @@ export default [
                   _meta: {
                     title: "Ringway Anticlockwise",
                     curie: "metro:ringway-anticlockwise",
-                    definition: "The southern ring, run anticlockwise only.",
                     type: {
                       _meta: {
                         title: "Line",
                       },
                       uri: "https://metro.example/onto#Line",
                     },
+                    definition: "The southern ring, run anticlockwise only.",
                   },
                   __isNode: "Line",
+                  colour: "#7a4b2a",
                   servedBy: [
                     {
                       __typename: "Station",
@@ -1982,248 +1325,157 @@ export default [
                   routes: [
                     {
                       isLoop: true,
+                      label: "Anticlockwise",
+                      reverse: null,
                       calls: [
                         {
+                          position: 1,
                           stop: {
+                            uri: "https://metro.example/onto#dyers-green",
                             __typename: "Station",
                             _meta: {
                               title: "Dyers Green",
                               curie: "metro:dyers-green",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#dyers-green",
                             diagramPosition: {
                               x: 11,
                               y: 22,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 1,
                         },
                         {
+                          position: 2,
                           stop: {
+                            uri: "https://metro.example/onto#ropewalk",
                             __typename: "Station",
                             _meta: {
                               title: "Ropewalk",
                               curie: "metro:ropewalk",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#ropewalk",
                             diagramPosition: {
                               x: 7,
                               y: 26,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 2,
                         },
                         {
+                          position: 3,
                           stop: {
+                            uri: "https://metro.example/onto#pinfold",
                             __typename: "Station",
                             _meta: {
                               title: "Pinfold",
                               curie: "metro:pinfold",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#pinfold",
                             diagramPosition: {
                               x: 11,
                               y: 30,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 3,
                         },
                         {
+                          position: 4,
                           stop: {
+                            uri: "https://metro.example/onto#orchard-gate",
                             __typename: "Station",
                             _meta: {
                               title: "Orchard Gate",
                               curie: "metro:orchard-gate",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#orchard-gate",
                             diagramPosition: {
                               x: 19,
                               y: 30,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 4,
                         },
                         {
+                          position: 5,
                           stop: {
+                            uri: "https://metro.example/onto#nettlebed",
                             __typename: "Station",
                             _meta: {
                               title: "Nettlebed",
                               curie: "metro:nettlebed",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#nettlebed",
                             diagramPosition: {
                               x: 23,
                               y: 26,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 5,
                         },
                         {
+                          position: 6,
                           stop: {
+                            uri: "https://metro.example/onto#fernside",
                             __typename: "Station",
                             _meta: {
                               title: "Fernside",
                               curie: "metro:fernside",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#fernside",
                             diagramPosition: {
                               x: 19,
                               y: 22,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 6,
                         },
                       ],
-                      label: "Anticlockwise",
-                      reverse: null,
                     },
                   ],
                   code: "R2",
-                  colour: "#7a4b2a",
                 },
               },
               {
@@ -2233,15 +1485,16 @@ export default [
                   _meta: {
                     title: "Ringway Clockwise",
                     curie: "metro:ringway-clockwise",
-                    definition: "The southern ring, run clockwise only.",
                     type: {
                       _meta: {
                         title: "Line",
                       },
                       uri: "https://metro.example/onto#Line",
                     },
+                    definition: "The southern ring, run clockwise only.",
                   },
                   __isNode: "Line",
+                  colour: "#c46a2b",
                   servedBy: [
                     {
                       __typename: "Station",
@@ -2271,248 +1524,157 @@ export default [
                   routes: [
                     {
                       isLoop: true,
+                      label: "Clockwise",
+                      reverse: null,
                       calls: [
                         {
+                          position: 1,
                           stop: {
+                            uri: "https://metro.example/onto#dyers-green",
                             __typename: "Station",
                             _meta: {
                               title: "Dyers Green",
                               curie: "metro:dyers-green",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#dyers-green",
                             diagramPosition: {
                               x: 11,
                               y: 22,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 1,
                         },
                         {
+                          position: 2,
                           stop: {
+                            uri: "https://metro.example/onto#fernside",
                             __typename: "Station",
                             _meta: {
                               title: "Fernside",
                               curie: "metro:fernside",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#fernside",
                             diagramPosition: {
                               x: 19,
                               y: 22,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 2,
                         },
                         {
+                          position: 3,
                           stop: {
+                            uri: "https://metro.example/onto#nettlebed",
                             __typename: "Station",
                             _meta: {
                               title: "Nettlebed",
                               curie: "metro:nettlebed",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#nettlebed",
                             diagramPosition: {
                               x: 23,
                               y: 26,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 3,
                         },
                         {
+                          position: 4,
                           stop: {
+                            uri: "https://metro.example/onto#orchard-gate",
                             __typename: "Station",
                             _meta: {
                               title: "Orchard Gate",
                               curie: "metro:orchard-gate",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#orchard-gate",
                             diagramPosition: {
                               x: 19,
                               y: 30,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 4,
                         },
                         {
+                          position: 5,
                           stop: {
+                            uri: "https://metro.example/onto#pinfold",
                             __typename: "Station",
                             _meta: {
                               title: "Pinfold",
                               curie: "metro:pinfold",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#pinfold",
                             diagramPosition: {
                               x: 11,
                               y: 30,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 5,
                         },
                         {
+                          position: 6,
                           stop: {
+                            uri: "https://metro.example/onto#ropewalk",
                             __typename: "Station",
                             _meta: {
                               title: "Ropewalk",
                               curie: "metro:ropewalk",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#ropewalk",
                             diagramPosition: {
                               x: 7,
                               y: 26,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Ringway Clockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-clockwise",
-                              },
-                              {
-                                _meta: {
-                                  title: "Ringway Anticlockwise",
-                                },
-                                uri: "https://metro.example/onto#ringway-anticlockwise",
-                              },
-                            ],
                           },
-                          position: 6,
                         },
                       ],
-                      label: "Clockwise",
-                      reverse: null,
                     },
                   ],
                   code: "R1",
-                  colour: "#c46a2b",
                 },
               },
               {
@@ -2522,16 +1684,17 @@ export default [
                   _meta: {
                     title: "Upland Line",
                     curie: "metro:upland-line",
-                    definition:
-                      "Tannery Lane to Eastwick Cross over the hills; with the Lowland Line it closes the eastern ring.",
                     type: {
                       _meta: {
                         title: "Line",
                       },
                       uri: "https://metro.example/onto#Line",
                     },
+                    definition:
+                      "Tannery Lane to Eastwick Cross over the hills; with the Lowland Line it closes the eastern ring.",
                   },
                   __isNode: "Line",
+                  colour: "#00843d",
                   servedBy: [
                     {
                       __typename: "Interchange",
@@ -2553,175 +1716,19 @@ export default [
                   routes: [
                     {
                       isLoop: false,
-                      calls: [
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Tannery Lane",
-                              curie: "metro:tannery-lane",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#tannery-lane",
-                            diagramPosition: {
-                              x: 14,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 2,
-                            transferMinutes: 3,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
-                          position: 1,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Larkrise",
-                              curie: "metro:larkrise",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#larkrise",
-                            diagramPosition: {
-                              x: 18,
-                              y: 5,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                            ],
-                          },
-                          position: 2,
-                        },
-                        {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Highmoor",
-                              curie: "metro:highmoor",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#highmoor",
-                            diagramPosition: {
-                              x: 24,
-                              y: 5,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                            ],
-                          },
-                          position: 3,
-                        },
-                        {
-                          stop: {
-                            __typename: "Interchange",
-                            _meta: {
-                              title: "Eastwick Cross",
-                              curie: "metro:eastwick-cross",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Interchange",
-                                },
-                                uri: "https://metro.example/onto#Interchange",
-                              },
-                            },
-                            uri: "https://metro.example/onto#eastwick-cross",
-                            diagramPosition: {
-                              x: 28,
-                              y: 9,
-                            },
-                            __isNode: "Interchange",
-                            platformCount: 4,
-                            transferMinutes: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
-                          },
-                          position: 4,
-                        },
-                      ],
                       label: "To Eastwick Cross",
                       reverse: {
                         label: "To Tannery Lane",
                       },
-                    },
-                    {
-                      isLoop: false,
                       calls: [
                         {
+                          position: 1,
                           stop: {
+                            uri: "https://metro.example/onto#tannery-lane",
                             __typename: "Interchange",
                             _meta: {
-                              title: "Eastwick Cross",
-                              curie: "metro:eastwick-cross",
-                              definition: null,
+                              title: "Tannery Lane",
+                              curie: "metro:tannery-lane",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -2729,105 +1736,69 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
-                            uri: "https://metro.example/onto#eastwick-cross",
                             diagramPosition: {
-                              x: 28,
+                              x: 14,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 4,
-                            transferMinutes: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
                           },
-                          position: 1,
                         },
                         {
-                          stop: {
-                            __typename: "Station",
-                            _meta: {
-                              title: "Highmoor",
-                              curie: "metro:highmoor",
-                              definition: null,
-                              type: {
-                                _meta: {
-                                  title: "Station",
-                                },
-                                uri: "https://metro.example/onto#Station",
-                              },
-                            },
-                            uri: "https://metro.example/onto#highmoor",
-                            diagramPosition: {
-                              x: 24,
-                              y: 5,
-                            },
-                            __isNode: "Station",
-                            platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                            ],
-                          },
                           position: 2,
-                        },
-                        {
                           stop: {
+                            uri: "https://metro.example/onto#larkrise",
                             __typename: "Station",
                             _meta: {
                               title: "Larkrise",
                               curie: "metro:larkrise",
-                              definition: null,
                               type: {
                                 _meta: {
                                   title: "Station",
                                 },
                                 uri: "https://metro.example/onto#Station",
                               },
+                              definition: null,
                             },
-                            uri: "https://metro.example/onto#larkrise",
                             diagramPosition: {
                               x: 18,
                               y: 5,
                             },
                             __isNode: "Station",
                             platformCount: 2,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                            ],
                           },
-                          position: 3,
                         },
                         {
+                          position: 3,
                           stop: {
+                            uri: "https://metro.example/onto#highmoor",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Highmoor",
+                              curie: "metro:highmoor",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 24,
+                              y: 5,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
+                            uri: "https://metro.example/onto#eastwick-cross",
                             __typename: "Interchange",
                             _meta: {
-                              title: "Tannery Lane",
-                              curie: "metro:tannery-lane",
-                              definition: null,
+                              title: "Eastwick Cross",
+                              curie: "metro:eastwick-cross",
                               type: {
                                 _meta: {
                                   title: "Interchange",
@@ -2835,47 +1806,118 @@ export default [
                                 uri: "https://metro.example/onto#Interchange",
                               },
                             },
+                            diagramPosition: {
+                              x: 28,
+                              y: 9,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      isLoop: false,
+                      label: "To Tannery Lane",
+                      reverse: {
+                        label: "To Eastwick Cross",
+                      },
+                      calls: [
+                        {
+                          position: 1,
+                          stop: {
+                            uri: "https://metro.example/onto#eastwick-cross",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Eastwick Cross",
+                              curie: "metro:eastwick-cross",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
+                            diagramPosition: {
+                              x: 28,
+                              y: 9,
+                            },
+                            __isNode: "Interchange",
+                          },
+                        },
+                        {
+                          position: 2,
+                          stop: {
+                            uri: "https://metro.example/onto#highmoor",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Highmoor",
+                              curie: "metro:highmoor",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 24,
+                              y: 5,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 3,
+                          stop: {
+                            uri: "https://metro.example/onto#larkrise",
+                            __typename: "Station",
+                            _meta: {
+                              title: "Larkrise",
+                              curie: "metro:larkrise",
+                              type: {
+                                _meta: {
+                                  title: "Station",
+                                },
+                                uri: "https://metro.example/onto#Station",
+                              },
+                              definition: null,
+                            },
+                            diagramPosition: {
+                              x: 18,
+                              y: 5,
+                            },
+                            __isNode: "Station",
+                            platformCount: 2,
+                          },
+                        },
+                        {
+                          position: 4,
+                          stop: {
                             uri: "https://metro.example/onto#tannery-lane",
+                            __typename: "Interchange",
+                            _meta: {
+                              title: "Tannery Lane",
+                              curie: "metro:tannery-lane",
+                              type: {
+                                _meta: {
+                                  title: "Interchange",
+                                },
+                                uri: "https://metro.example/onto#Interchange",
+                              },
+                            },
                             diagramPosition: {
                               x: 14,
                               y: 9,
                             },
                             __isNode: "Interchange",
-                            platformCount: 2,
-                            transferMinutes: 3,
-                            inZone: null,
-                            servesLine: [
-                              {
-                                _meta: {
-                                  title: "Circle Line",
-                                },
-                                uri: "https://metro.example/onto#circle-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Upland Line",
-                                },
-                                uri: "https://metro.example/onto#upland-line",
-                              },
-                              {
-                                _meta: {
-                                  title: "Lowland Line",
-                                },
-                                uri: "https://metro.example/onto#lowland-line",
-                              },
-                            ],
                           },
-                          position: 4,
                         },
                       ],
-                      label: "To Tannery Lane",
-                      reverse: {
-                        label: "To Eastwick Cross",
-                      },
                     },
                   ],
                   code: "4",
-                  colour: "#00843d",
                 },
               },
             ],
@@ -3504,31 +2546,34 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          colour: "#0072ce",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Coastal Line",
                             curie: "metro:coastal-line",
                           },
+                          colour: "#0072ce",
                         },
                       ],
                       transferMinutes: 4,
@@ -3545,22 +2590,24 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          colour: "#0072ce",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Coastal Line",
                             curie: "metro:coastal-line",
                           },
+                          colour: "#0072ce",
                         },
                       ],
                       transferMinutes: 7,
@@ -3577,13 +2624,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                       ],
                       uri: "https://metro.example/onto#willowbank",
@@ -3599,31 +2647,34 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#upland-line",
-                          colour: "#00843d",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Upland Line",
                             curie: "metro:upland-line",
                           },
+                          colour: "#00843d",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#lowland-line",
-                          colour: "#8e3ba3",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Lowland Line",
                             curie: "metro:lowland-line",
                           },
+                          colour: "#8e3ba3",
                         },
                       ],
                       transferMinutes: 3,
@@ -3640,13 +2691,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                       ],
                       uri: "https://metro.example/onto#quarry-hill",
@@ -3662,13 +2714,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                       ],
                       uri: "https://metro.example/onto#kilnwood",
@@ -3687,33 +2740,36 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        colour: "#0072ce",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        colour: "#0072ce",
                         code: "3",
                       },
                     ],
@@ -3731,13 +2787,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                     ],
@@ -3754,13 +2811,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                     ],
@@ -3777,33 +2835,36 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#upland-line",
-                        colour: "#00843d",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Upland Line",
                           curie: "metro:upland-line",
                         },
+                        colour: "#00843d",
                         code: "4",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#lowland-line",
-                        colour: "#8e3ba3",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Lowland Line",
                           curie: "metro:lowland-line",
                         },
+                        colour: "#8e3ba3",
                         code: "5",
                       },
                     ],
@@ -3821,13 +2882,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                     ],
@@ -3844,23 +2906,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        colour: "#0072ce",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        colour: "#0072ce",
                         code: "3",
                       },
                     ],
@@ -3886,31 +2950,34 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          colour: "#0072ce",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Coastal Line",
                             curie: "metro:coastal-line",
                           },
+                          colour: "#0072ce",
                         },
                       ],
                       transferMinutes: 4,
@@ -3927,13 +2994,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                       ],
                       uri: "https://metro.example/onto#kilnwood",
@@ -3949,13 +3017,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                       ],
                       uri: "https://metro.example/onto#quarry-hill",
@@ -3971,31 +3040,34 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#upland-line",
-                          colour: "#00843d",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Upland Line",
                             curie: "metro:upland-line",
                           },
+                          colour: "#00843d",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#lowland-line",
-                          colour: "#8e3ba3",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Lowland Line",
                             curie: "metro:lowland-line",
                           },
+                          colour: "#8e3ba3",
                         },
                       ],
                       transferMinutes: 3,
@@ -4012,13 +3084,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                       ],
                       uri: "https://metro.example/onto#willowbank",
@@ -4034,22 +3107,24 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          colour: "#0072ce",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Coastal Line",
                             curie: "metro:coastal-line",
                           },
+                          colour: "#0072ce",
                         },
                       ],
                       transferMinutes: 7,
@@ -4069,33 +3144,36 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        colour: "#0072ce",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        colour: "#0072ce",
                         code: "3",
                       },
                     ],
@@ -4113,23 +3191,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        colour: "#0072ce",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        colour: "#0072ce",
                         code: "3",
                       },
                     ],
@@ -4147,13 +3227,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                     ],
@@ -4170,33 +3251,36 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#upland-line",
-                        colour: "#00843d",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Upland Line",
                           curie: "metro:upland-line",
                         },
+                        colour: "#00843d",
                         code: "4",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#lowland-line",
-                        colour: "#8e3ba3",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Lowland Line",
                           curie: "metro:lowland-line",
                         },
+                        colour: "#8e3ba3",
                         code: "5",
                       },
                     ],
@@ -4214,13 +3298,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                     ],
@@ -4237,13 +3322,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                     ],
@@ -4290,13 +3376,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#marsh-end",
@@ -4312,31 +3399,34 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          colour: "#0072ce",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Coastal Line",
                             curie: "metro:coastal-line",
                           },
+                          colour: "#0072ce",
                         },
                       ],
                       transferMinutes: 4,
@@ -4353,13 +3443,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#foundry-row",
@@ -4375,13 +3466,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#verge-park",
@@ -4397,13 +3489,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#northgate",
@@ -4422,13 +3515,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4445,13 +3539,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4468,13 +3563,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4491,33 +3587,36 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        colour: "#0072ce",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        colour: "#0072ce",
                         code: "3",
                       },
                     ],
@@ -4535,13 +3634,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4566,13 +3666,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#northgate",
@@ -4588,13 +3689,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#verge-park",
@@ -4610,13 +3712,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#foundry-row",
@@ -4632,31 +3735,34 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          colour: "#f2b705",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Circle Line",
                             curie: "metro:circle-line",
                           },
+                          colour: "#f2b705",
                         },
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          colour: "#0072ce",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "Coastal Line",
                             curie: "metro:coastal-line",
                           },
+                          colour: "#0072ce",
                         },
                       ],
                       transferMinutes: 4,
@@ -4673,13 +3779,14 @@ export default [
                       },
                       servesLine: [
                         {
-                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          colour: "#c8102e",
+                          __isNode: "Line",
+                          __typename: "Line",
                           _meta: {
                             title: "North Line",
                             curie: "metro:north-line",
                           },
+                          colour: "#c8102e",
                         },
                       ],
                       uri: "https://metro.example/onto#marsh-end",
@@ -4698,13 +3805,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4721,33 +3829,36 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        colour: "#f2b705",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        colour: "#f2b705",
                         code: "2",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        colour: "#0072ce",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        colour: "#0072ce",
                         code: "3",
                       },
                     ],
@@ -4765,13 +3876,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4788,13 +3900,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4811,13 +3924,14 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        colour: "#c8102e",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        colour: "#c8102e",
                         code: "1",
                       },
                     ],
@@ -4863,23 +3977,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        colour: "#c46a2b",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        colour: "#c46a2b",
                         code: "R1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        colour: "#7a4b2a",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        colour: "#7a4b2a",
                         code: "R2",
                       },
                     ],
@@ -4896,23 +4012,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        colour: "#c46a2b",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        colour: "#c46a2b",
                         code: "R1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        colour: "#7a4b2a",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        colour: "#7a4b2a",
                         code: "R2",
                       },
                     ],
@@ -4929,23 +4047,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        colour: "#c46a2b",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        colour: "#c46a2b",
                         code: "R1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        colour: "#7a4b2a",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        colour: "#7a4b2a",
                         code: "R2",
                       },
                     ],
@@ -4962,23 +4082,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        colour: "#c46a2b",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        colour: "#c46a2b",
                         code: "R1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        colour: "#7a4b2a",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        colour: "#7a4b2a",
                         code: "R2",
                       },
                     ],
@@ -4995,23 +4117,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        colour: "#c46a2b",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        colour: "#c46a2b",
                         code: "R1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        colour: "#7a4b2a",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        colour: "#7a4b2a",
                         code: "R2",
                       },
                     ],
@@ -5028,23 +4152,25 @@ export default [
                     },
                     servesLine: [
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        colour: "#c46a2b",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        colour: "#c46a2b",
                         code: "R1",
                       },
                       {
-                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        colour: "#7a4b2a",
+                        __isNode: "Line",
+                        __typename: "Line",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        colour: "#7a4b2a",
                         code: "R2",
                       },
                     ],

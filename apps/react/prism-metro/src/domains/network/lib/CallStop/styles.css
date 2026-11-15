@@ -4,16 +4,14 @@
 
 @layer ds.components.global {
   /* The tick over the name, then the connections and the transfer time.
-   * Gaps inside the stop and between a swatch and its code read --space-*
+   * Gaps inside the stop read --space-*
    * steps: no semantic name of the shim fits the inside of one stop. */
   .ds.call-stop {
     --call-stop-gap: var(--space-100);
-    --call-stop-swatch-gap: var(--space-050);
     --call-stop-fallback: var(--color-border);
     --call-stop-tick-size: 0.75rem;
     --call-stop-ring-width: 2px;
     --call-stop-ring-fill: var(--color-background);
-    --call-stop-swatch-size: 0.5rem;
     --call-stop-muted-color: var(--color-text-muted);
 
     display: flex;
@@ -50,19 +48,10 @@
     padding-inline-start: 0;
   }
 
+  /* Each connection holds the line's chip, which draws its colour's mark. */
   .ds.call-stop .connection {
     display: flex;
     align-items: center;
-    gap: var(--call-stop-swatch-gap);
-  }
-
-  .ds.call-stop .swatch {
-    width: var(--call-stop-swatch-size);
-    height: var(--call-stop-swatch-size);
-    background-color: var(
-      --call-stop-connection-colour,
-      var(--call-stop-fallback)
-    );
   }
 
   .ds.call-stop .transfer {

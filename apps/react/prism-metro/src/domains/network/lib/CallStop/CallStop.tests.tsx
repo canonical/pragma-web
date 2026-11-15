@@ -61,7 +61,9 @@ describe("CallStop", () => {
     expect(stop.querySelector(".ring")).not.toBeNull();
     expect(stop.querySelector(".tick")).toBeNull();
     expect(
-      [...stop.querySelectorAll(".connection")].map((each) => each.textContent),
+      [...stop.querySelectorAll(".connection")].map(
+        (each) => each.querySelector(".ds.line-chip .title")?.textContent,
+      ),
     ).toEqual(["Circle Line", "Coastal Line"]);
     expect(
       within(stop).getByRole("link", { name: "Circle Line" }),
@@ -116,6 +118,15 @@ describe("CallStop", () => {
     const stop = container.querySelector(".ds.call-stop") as HTMLElement;
     expect(stop.style.getPropertyValue("--call-stop-colour")).toBe("#c8102e");
     expect(stop.style.opacity).toBe("1");
+  });
+
+  it("leaves its channel unset for a colour the gate refuses", () => {
+    const { container } = renderCall(NORTHGATE, {
+      colour: "red; background: url(https://example.com/x)",
+    });
+    const stop = container.querySelector(".ds.call-stop") as HTMLElement;
+    expect(stop.style.getPropertyValue("--call-stop-colour")).toBe("");
+    expect(container.innerHTML).not.toContain("url(");
   });
 
   it("applies custom className after its own", () => {

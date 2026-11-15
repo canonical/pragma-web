@@ -1,8 +1,9 @@
 ---
 # CallStop — one call of a route as a door card reads it: a tick on the
 # strip's rule in the line's colour (a hollow ring at an interchange), the
-# stop's name linking to its home, the other lines it meets, each by its
-# name beside a swatch of its colour and linking to its home, and at an
+# stop's name linking to its home, the other lines it meets, each the
+# site's chip of the line (MetroChipProjection: its colour's mark and its
+# name, linking to its home), and at an
 # interchange the time a transfer takes. A Relay projection of a Call; RouteStrip lays the calls
 # out along its rule. Bespoke: no published component reads a call.
 #
@@ -12,14 +13,14 @@
 #
 # Every decision is read through a component token declared on the root
 # (`--call-stop-*`), bound to the symbol named here. The line's colour
-# reaches the tick and the ring through `--call-stop-colour`, and each
-# connection's swatch through `--call-stop-connection-colour`, inline
-# channels set from the graph's data. Gaps inside the stop read `--space-*`
+# reaches the tick and the ring through `--call-stop-colour`, an inline
+# channel set from the graph's data through the package's colour gate
+# (acceptColour), so a refused value leaves the fallback. Gaps inside the stop read `--space-*`
 # steps: no semantic name of the shim fits the inside of one stop.
 #
 # Token ledger:
-#   size.width / size.height 0.75rem on a tick and a ring and 0.5rem on a
-#     connection swatch: no icon-size tokens.
+#   size.width / size.height 0.75rem on a tick and a ring: no icon-size
+#     tokens.
 #   appearance.border.width 2px on a ring: no stroke token.
 node:
   uri: metro.component.call_stop
@@ -75,26 +76,16 @@ node:
       relation: { cardinality: "0..1", slotName: connections }
     - node:
         role: connection
-        # a line's swatch and its name, linking to its home; the stop's own
+        # the line's chip, through the site's chip switch; the stop's own
         # line, matched by its IRI, is left out
-        projection: { field: _meta.title }
         styles:
           layout.type: flex
           layout.align: center
-          spacing.gap: space.050
         edges:
           - node: { role: line identity, projection: { field: uri } }
             relation: { cardinality: "1" }
-          - node: { role: line home, projection: { field: _meta.curie } }
-            relation: { cardinality: "0..1" }
-          - node:
-              role: connection swatch
-              projection: { field: colour }
-              styles:
-                size.width: 0.5rem
-                size.height: 0.5rem
-                appearance.background: [call.stop.connection.colour, color.border]
-            relation: { cardinality: "1", slotName: swatch }
+          - node: { uri: metro.component.metro_chip_projection }
+            relation: { cardinality: "1", slotName: chip }
       relation:
         cardinality: "0..*"
         slotName: connection
