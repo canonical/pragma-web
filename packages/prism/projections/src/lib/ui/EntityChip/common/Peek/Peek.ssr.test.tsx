@@ -34,9 +34,34 @@ describe("Peek SSR", () => {
     );
     expect(styles).toMatch(/position-area: block-end span-inline-end;/);
     expect(styles).toMatch(
-      /position-try-fallbacks:\s*flip-inline,\s*flip-block,\s*flip-block flip-inline;/,
+      /position-try-fallbacks:\s*flip-inline,\s*flip-block,\s*flip-block flip-inline,\s*--peek-viewport-below,\s*--peek-viewport-above;/,
     );
     expect(styles).toMatch(/--peek-offset: var\(--space-050\);/);
     expect(styles).toMatch(/margin-block-start: var\(--peek-offset\);/);
+  });
+
+  it("falls back last across the viewport, 4px from its edges, so a short chip mid-line keeps its peek inside", () => {
+    const styles = readFileSync(
+      new URL("./styles.css", import.meta.url),
+      "utf8",
+    );
+    expect(styles).toMatch(/--peek-edge-inset: var\(--space-050\);/);
+    const readTry = (name: string): string =>
+      new RegExp(`@position-try ${name} \\{([^}]*)\\}`).exec(styles)?.at(1) ??
+      "";
+    const width =
+      /width: min\(var\(--peek-width\), calc\(100% - 2 \* var\(--peek-edge-inset\)\)\);/;
+    const below = readTry("--peek-viewport-below");
+    expect(below).toMatch(/position-area: block-end span-all;/);
+    expect(below).toMatch(/justify-self: start;/);
+    expect(below).toMatch(width);
+    expect(below).toMatch(/margin-inline: var\(--peek-edge-inset\);/);
+    expect(below).toMatch(/margin-block-start: var\(--peek-offset\);/);
+    const above = readTry("--peek-viewport-above");
+    expect(above).toMatch(/position-area: block-start span-all;/);
+    expect(above).toMatch(/justify-self: start;/);
+    expect(above).toMatch(width);
+    expect(above).toMatch(/margin-inline: var\(--peek-edge-inset\);/);
+    expect(above).toMatch(/margin-block-end: var\(--peek-offset\);/);
   });
 });

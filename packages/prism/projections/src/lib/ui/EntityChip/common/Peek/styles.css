@@ -6,15 +6,19 @@
   /* The peek, mounted on the document's body and shown in the top layer
    * while open: tethered below the chip, from its start; from its end
    * when the start would run past the viewport's inline end, and above it
-   * when the viewport has no room below, so the whole frame stays in the
-   * viewport; it scrolls rather than outgrowing the viewport. The drawn 248px peek, 4px below the chip, no taller than the
-   * viewport less 4px at each end. It is the frame, the popover's padding
+   * when the viewport has no room below; when neither side of the chip
+   * has room for it (a short chip mid-line on a narrow viewport), across
+   * the viewport below or above the chip, 4px from the viewport's inline
+   * start, so the whole frame stays in the viewport; it scrolls rather
+   * than outgrowing the viewport. The drawn 248px peek, 4px below the
+   * chip, no taller than the viewport less 4px at each end. It is the frame, the popover's padding
    * and border round the borderless card it holds; the popover's tokens
    * are declared where the published Popover is loaded, so each falls back
    * to the value that component gives it. */
   .ds.peek {
     --peek-width: 248px;
     --peek-offset: var(--space-050);
+    --peek-edge-inset: var(--space-050);
     --peek-max-height: calc(100dvh - var(--space-100));
     --peek-background: var(--color-background);
     --peek-padding-block: var(--popover-padding-vertical, var(--space-100));
@@ -26,7 +30,9 @@
     position-try-fallbacks:
       flip-inline,
       flip-block,
-      flip-block flip-inline;
+      flip-block flip-inline,
+      --peek-viewport-below,
+      --peek-viewport-above;
     width: var(--peek-width);
     max-height: var(--peek-max-height);
     overflow-y: auto;
@@ -39,6 +45,29 @@
     border-style: solid;
     border-color: var(--peek-border-color);
     background: var(--peek-background);
+  }
+
+  /* The last places the peek tries, when no flip of its first place fits:
+   * below the chip, else above it, spanning the viewport's whole width,
+   * 4px from its inline start and no wider than the viewport less 4px at
+   * each side. Only here may the peek be narrower than 248px, on a
+   * viewport narrower than the peek and its two insets. */
+  @position-try --peek-viewport-below {
+    position-area: block-end span-all;
+    justify-self: start;
+    width: min(var(--peek-width), calc(100% - 2 * var(--peek-edge-inset)));
+    margin-block-start: var(--peek-offset);
+    margin-block-end: 0;
+    margin-inline: var(--peek-edge-inset);
+  }
+
+  @position-try --peek-viewport-above {
+    position-area: block-start span-all;
+    justify-self: start;
+    width: min(var(--peek-width), calc(100% - 2 * var(--peek-edge-inset)));
+    margin-block-start: 0;
+    margin-block-end: var(--peek-offset);
+    margin-inline: var(--peek-edge-inset);
   }
 
   /* A peek that shows nothing, while its card loads, for a node the graph

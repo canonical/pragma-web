@@ -15,8 +15,13 @@
 # from its start; from its end when the start would run past the
 # viewport's inline end, and above when the viewport has no room below
 # (position-try-fallbacks: flip-inline, flip-block, flip-block
-# flip-inline), so the whole frame stays in the viewport; it scrolls rather than outgrowing
-# the viewport, no taller than it less 4px at each end.
+# flip-inline); when neither side of the chip has room (a short chip
+# mid-line on a narrow viewport), below or above the chip across the
+# viewport, 4px from its inline start (--peek-viewport-below,
+# --peek-viewport-above, the last two fallbacks), and only there narrower
+# than 248px where the viewport is narrower than the peek and its insets;
+# so the whole frame stays in the viewport; it scrolls rather than
+# outgrowing the viewport, no taller than it less 4px at each end.
 #
 # A peek that shows nothing (its card loading, no node at the IRI, a site
 # peek that renders null) holds only its hidden label, and is then not
@@ -33,6 +38,7 @@
 # Token ledger (every decision; a literal only where no symbol exists):
 #   --peek-width: 248px                         literal: the drawn peek (M9)
 #   --peek-offset: space.050 (4px)              below the chip
+#   --peek-edge-inset: space.050 (4px)          from the viewport's edges, last fallbacks only
 #   --peek-max-height: calc(100dvh - space.100) viewport less 8px
 #   --peek-background: color.background
 #   --peek-padding-block: popover.padding.vertical (8px)
