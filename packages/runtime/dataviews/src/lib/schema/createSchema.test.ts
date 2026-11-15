@@ -179,7 +179,11 @@ describe("createSchema", () => {
     expect(schema.listOperators("cpu")).toEqual(["gte", "lte"]);
     expect(schema.listOperators("updated")).toEqual(["gte", "lte"]);
     expect(schema.listOperators("owner")).toEqual(["isSet"]);
-    expect(schema.listOperators("name")).toEqual(["contains", "startsWith"]);
+    expect(schema.listOperators("name")).toEqual([
+      "is",
+      "contains",
+      "startsWith",
+    ]);
     expect(schema.listOperators("zone")).toEqual([]);
   });
 

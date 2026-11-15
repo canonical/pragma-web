@@ -82,7 +82,12 @@ describe("readSlice", () => {
     >();
     expectTypeOf(reading.filters.owner).toEqualTypeOf<boolean | undefined>();
     expectTypeOf(reading.filters.name).toEqualTypeOf<
-      { readonly contains?: string; readonly startsWith?: string } | undefined
+      | {
+          readonly is?: string;
+          readonly contains?: string;
+          readonly startsWith?: string;
+        }
+      | undefined
     >();
   });
 });

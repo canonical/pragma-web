@@ -65,4 +65,24 @@ describe("selectRows", () => {
       expect(select([false], false)).toEqual(["unbooted", "container"]);
     });
   });
+
+  describe("is", () => {
+    it("selects text equal to the operand once both are folded", () => {
+      expect(
+        selectIds({ field: "name", operator: "is", operands: ["ALPHA"] }),
+      ).toEqual(["a"]);
+    });
+
+    it("selects no text that only holds the operand", () => {
+      expect(
+        selectIds({ field: "name", operator: "is", operands: ["alp"] }),
+      ).toEqual([]);
+    });
+
+    it("selects nothing for an operand that is not text", () => {
+      expect(
+        selectIds({ field: "name", operator: "is", operands: [4] }),
+      ).toEqual([]);
+    });
+  });
 });

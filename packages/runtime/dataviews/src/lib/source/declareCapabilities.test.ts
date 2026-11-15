@@ -153,7 +153,7 @@ describe("declareCapabilities", () => {
       readonly status?: readonly ("isAny" | "isNone")[] | true;
       readonly cpu?: readonly ("gte" | "lte")[] | true;
       readonly owner?: readonly "isSet"[] | true;
-      readonly name?: readonly ("contains" | "startsWith")[] | true;
+      readonly name?: readonly ("is" | "contains" | "startsWith")[] | true;
     }>();
     expect(
       declareCapabilities(machines, { filter: { name: ["contains"] } }).filter,

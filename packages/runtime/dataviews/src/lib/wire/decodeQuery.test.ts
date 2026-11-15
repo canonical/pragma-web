@@ -98,6 +98,34 @@ describe("decodeQuery", () => {
     ]);
   });
 
+  it.each(["is"] as const)(
+    "reads and writes back the text a text field's %s operator takes",
+    (operator) => {
+      const decoded = decode(`name__${operator}=Web`);
+      expect(decoded.slice.filter).toEqual([
+        { field: "name", operator, operands: ["Web"] },
+      ]);
+      expect(
+        encodeQuery({
+          schema: machines(),
+          slice: decoded.slice,
+          window: null,
+        }).toString(),
+      ).toBe(`name__${operator}=Web`);
+    },
+  );
+
+  it("reads text equality only under its own key", () => {
+    expect(decode("name=web").issues).toEqual([
+      {
+        parameter: "name",
+        field: "name",
+        code: "invalid",
+        reason: 'text field "name" does not accept the isAny operator',
+      },
+    ]);
+  });
+
   it("reads the text a text field starts with, literally and once", () => {
     const decoded = decode(`name__startsWith=${encodeURIComponent(" 50%_")}`);
     expect(decoded.slice.filter).toEqual([

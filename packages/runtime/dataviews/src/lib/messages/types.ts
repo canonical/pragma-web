@@ -232,6 +232,8 @@ export type DataViewsMessages = {
   readonly filterContains: (label: string) => string;
   /** A text field's starts-with input, by the field's label. */
   readonly filterStartsWith: (label: string) => string;
+  /** A text field's equals input, by the field's label. */
+  readonly filterIs: (label: string) => string;
   /**
    * An emptied input, which removes nothing; `retained` is whether any
    * restriction stands on the field at all.

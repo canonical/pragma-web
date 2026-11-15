@@ -21,6 +21,7 @@ const PHRASE_MESSAGES = {
   lte: "filterTo",
   contains: "filterContains",
   startsWith: "filterStartsWith",
+  is: "filterIs",
   isSet: null,
 } as const satisfies Readonly<
   Record<PredicateOperator, keyof DataViewsMessages | null>
