@@ -5,8 +5,10 @@
  * Before the fix, a set of choices or a presence filter the source does not
  * declare was shown only while it stood, for removal, so unchecking its last
  * checkbox unmounted the whole control while that checkbox had focus, and
- * focus fell to the document. Focus now moves to the filters' group, as it does when
- * undeclared text or an undeclared bound is cleared.
+ * focus fell to the document. Focus now moves to the filters' group, as it
+ * does when undeclared text or an undeclared bound is cleared; a presence
+ * filter, whose radios arrow keys choose as they reach them, stays while
+ * focus is inside it and leaves once focus does.
  */
 
 import {
@@ -86,13 +88,20 @@ describe("regression 0031 — clearing an undeclared choice or flag dropped focu
     expect(screen.getByRole("group", { name: "Filters" })).toHaveFocus();
   });
 
-  it("moves focus to the filters' group when the presence filter is unchecked", () => {
+  it("keeps focus on the presence filter it clears, which leaves once focus does", () => {
     renderStanding({ field: "spare", operator: "isSet", operands: [true] });
-    const spare = screen.getByRole("checkbox", { name: "spare" });
-    spare.focus();
-    fireEvent.click(spare);
-    expect(screen.queryByRole("checkbox", { name: "spare" })).toBeNull();
-    expect(screen.getByRole("group", { name: "Filters" })).toHaveFocus();
+    const any = screen.getByRole("radio", { name: "Any" });
+    act(() => {
+      any.focus();
+    });
+    fireEvent.click(any);
+    // Arrow keys choose each radio they reach: the group stays under them.
+    expect(any).toHaveFocus();
+    expect(screen.getByRole("group", { name: "spare" })).toBeInTheDocument();
+    act(() => {
+      screen.getByRole("group", { name: "Filters" }).focus();
+    });
+    expect(screen.queryByRole("group", { name: "spare" })).toBeNull();
   });
 
   it("keeps focus on a declared choice, which stays to be checked again", () => {
@@ -107,15 +116,17 @@ describe("regression 0031 — clearing an undeclared choice or flag dropped focu
     expect(failed).toHaveFocus();
   });
 
-  it("keeps focus on a declared presence filter, which stays to be checked again", () => {
+  it("keeps focus on a declared presence filter, which stays to be set again", () => {
     renderStanding(
       { field: "spare", operator: "isSet", operands: [true] },
       DECLARED,
     );
-    const spare = screen.getByRole("checkbox", { name: "spare" });
-    spare.focus();
-    fireEvent.click(spare);
-    expect(spare).not.toBeChecked();
-    expect(spare).toHaveFocus();
+    const any = screen.getByRole("radio", { name: "Any" });
+    any.focus();
+    fireEvent.click(any);
+    expect(
+      screen.getByRole("radio", { name: "Has a value" }),
+    ).not.toBeChecked();
+    expect(any).toHaveFocus();
   });
 });

@@ -14,7 +14,7 @@ import {
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
-import { Fragment, type ReactElement, useMemo, useRef } from "react";
+import { Fragment, type ReactElement, useMemo, useRef, useState } from "react";
 import {
   type UseFacetsResult,
   useDataViewsValue,
@@ -75,6 +75,11 @@ type FilterContext = {
   readonly standing: UseStandingOperatorsResult;
   /** Whether a field's control moves elsewhere once its last restriction is cleared. */
   readonly isShownOnlyWhileRestricted: (field: string) => boolean;
+  /**
+   * Keep a field's control where it stands while focus is inside it, or let
+   * it go: a control holding focus never moves or leaves under it.
+   */
+  readonly holdField: (field: string, holding: boolean) => void;
   /** Note that a field's text is moving to an operator, for focus to follow. */
   readonly markMoved: (field: string, operator: PredicateOperator) => void;
   /** Whether a field's text just moved to an operator, once. */
@@ -253,8 +258,9 @@ const controls: {
           label={name}
           field={definition.field}
           declared={declares(context, definition, "isSet")}
-          leavesWhenCleared={leavesWhenCleared(context, definition, "isSet")}
-          onLeave={context.focusGroup}
+          onHold={(holding) => {
+            context.holdField(definition.field, holding);
+          }}
         />
         {renderFurther(context, definition.field, "isSet", name)}
       </Fragment>
@@ -406,6 +412,8 @@ export default function Filters({
     [issues],
   );
   const groupRef = useRef<HTMLFieldSetElement>(null);
+  // The field whose control holds focus, kept where it stands meanwhile.
+  const [held, setHeld] = useState<string | null>(null);
   // The address text last moved to, so the control it lands in takes the
   // focus of the choice that moved it.
   const moved = useRef<{
@@ -428,7 +436,7 @@ export default function Filters({
   const marks = marked.join("\u0000");
   /** Whether a field's control shows by default as things stand now. */
   const isShown = (field: string): boolean =>
-    marked.includes(field) || restricted.has(field);
+    marked.includes(field) || restricted.has(field) || held === field;
   const { pinned, detailsRef, handleSummaryClick, handleToggle } =
     useMoreFiltersPin({
       marks,
@@ -462,6 +470,11 @@ export default function Filters({
       pinned === null &&
       !marked.includes(field) &&
       restricted.get(field) === 1,
+    // A control lets focus go before the next takes it, so one holds at a
+    // time.
+    holdField: (field, holding) => {
+      setHeld(holding ? field : null);
+    },
     markMoved: (field, operator) => {
       moved.current = { field, operator };
     },

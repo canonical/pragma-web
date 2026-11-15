@@ -4,9 +4,10 @@
  *
  * Before the fix, a source computed the facet of a presence field when asked
  * — the records setting it, counted — and Filters never read it: the
- * checkbox stood without the count a choice's options show beside them. The
- * count now describes the checkbox while the result answers the applied
- * query, and reads none where the facet lists no record setting the field.
+ * control stood without the count a choice's options show beside them. The
+ * count now describes the choice of records holding a value while the
+ * result answers the applied query, and reads none where the facet lists no
+ * record setting the field.
  */
 
 import {
@@ -30,7 +31,7 @@ const owned = createCollection({
 });
 
 describe("regression 0043 — flag count computed but never shown", () => {
-  it("describes the checkbox with the count answering the applied query", () => {
+  it("describes the choice of a value with the count answering the applied query", () => {
     const manual = createManualSource<Owned>({
       capabilities: declareCapabilities(owned, {
         filter: { owner: true },
@@ -61,7 +62,7 @@ describe("regression 0043 — flag count computed but never shown", () => {
       });
     };
     answerWith([{ value: true, count: { kind: "exact", value: 3 } }]);
-    const owner = screen.getByRole("checkbox", { name: "owner" });
+    const owner = screen.getByRole("radio", { name: "Has a value" });
     expect(owner).toHaveAccessibleDescription("3");
     fireEvent.click(owner);
     // Pending: the count the applied query answers is not yet known.
@@ -98,7 +99,7 @@ describe("regression 0043 — flag count computed but never shown", () => {
         <DataViews.Filters />
       </DataViews>,
     );
-    const owner = screen.getByRole("checkbox", { name: "owner" });
+    const owner = screen.getByRole("radio", { name: "Has a value" });
     if (spelled === null) {
       expect(owner).not.toHaveAttribute("aria-describedby");
     } else {

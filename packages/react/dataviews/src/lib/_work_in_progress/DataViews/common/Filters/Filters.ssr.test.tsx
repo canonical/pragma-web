@@ -118,6 +118,26 @@ describe("DataViews.Filters SSR", () => {
     expect(source.calls).toHaveLength(0);
   });
 
+  it("renders presence as three radios named as the wire spells it", () => {
+    const provider = createDataViewsProvider({
+      collection,
+      source: createManualSource<Row>({ capabilities: everything }).source,
+      location: createMemoryLocation({ href: "/machines?owner__isSet=false" }),
+    });
+    const html = renderToString(
+      <DataViews provider={provider}>
+        <Filters />
+      </DataViews>,
+    );
+    const radios = html.match(/<input type="radio"[^>]*\/>/g) ?? [];
+    expect(radios).toHaveLength(3);
+    for (const radio of radios) {
+      expect(radio).toContain('name="owner__isSet"');
+    }
+    expect(radios.at(2)).toMatch(/checked=""[^>]*value="false"/);
+    expect(radios.at(0)).not.toContain("checked");
+  });
+
   it("renders applied text into its input, so a submission keeps it", () => {
     const input = readTextInput(renderWithTextApplied(withText));
     expect(input).toContain('value="web"');
