@@ -13,8 +13,10 @@ export interface SectionedViewSection {
   readonly title: string;
   /**
    * The section's body, under its heading; its own headings start at
-   * level 3. A prose given here carries `.editorial`: the view gives it
-   * the section's every column and holds it to the 75ch reading measure.
+   * level 3. A prose given here is the direct child of the section's body
+   * and carries `.editorial`: the view gives it the section's every column
+   * and holds it to the 75ch reading measure. A prose nested deeper keeps
+   * neither.
    */
   readonly content: ReactNode;
 }
