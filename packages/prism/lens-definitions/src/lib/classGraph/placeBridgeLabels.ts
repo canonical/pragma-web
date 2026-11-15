@@ -171,10 +171,11 @@ export default function placeBridgeLabels(
     });
     // Under the pair of regions side by side the bridge joins, centred on
     // it, in the band below their bottom, down to the next shelf's top.
-    const pair = layout.regions.filter(
-      (region) =>
-        region.prefix === layout.nodes.get(edge.from)?.region ||
-        region.prefix === layout.nodes.get(edge.to.at(0) ?? "")?.region,
+    const ends = [bundle.a, bundle.b].map(
+      (end) => requireEntry(layout.nodes, end).region,
+    );
+    const pair = layout.regions.filter((region) =>
+      ends.includes(region.prefix),
     );
     const [one, two] = pair;
     const sideBySide =

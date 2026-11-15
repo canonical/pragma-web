@@ -56,6 +56,19 @@ describe("routeNeighbourBridges", () => {
     ).toEqual(["M96 56H108V-28H132V136H144", "M96 136H116V-20H124V56H144"]);
   });
 
+  it("arches the same way for bridges leaving the right region", () => {
+    expect(
+      draw(
+        [
+          { startX: 144, portA: 56, endX: 96, portB: 136 },
+          { startX: 144, portA: 136, endX: 96, portB: 56 },
+        ],
+        GAP,
+        0,
+      ),
+    ).toEqual(["M144 56H132V-28H108V136H96", "M144 136H124V-20H116V56H96"]);
+  });
+
   it("spreads lanes at most a lane apart, whole, and none for a lone lane", () => {
     expect(offsetLane(0, 1, 32)).toBe(0);
     expect([0, 1, 2].map((index) => offsetLane(index, 3, 32))).toEqual([

@@ -33,14 +33,13 @@ function sharesLine(p: Run, q: Run): boolean {
   const overlaps = (a1: number, a2: number, b1: number, b2: number) =>
     Math.min(Math.max(a1, a2), Math.max(b1, b2)) >
     Math.max(Math.min(a1, a2), Math.min(b1, b2));
-  const [px1, py1, px2, py2] = p;
-  const [qx1, qy1, qx2, qy2] = q;
+  const across = ([, y1, , y2]: Run): boolean => y1 === y2;
+  if (across(p) !== across(q)) return false;
+  // The coordinate the line keeps, and the one it runs along.
+  const [line, along] = across(p) ? [1, 0] : [0, 1];
   return (
-    (py1 === py2 &&
-      qy1 === qy2 &&
-      py1 === qy1 &&
-      overlaps(px1, px2, qx1, qx2)) ||
-    (px1 === px2 && qx1 === qx2 && px1 === qx1 && overlaps(py1, py2, qy1, qy2))
+    p[line] === q[line] &&
+    overlaps(p[along], p[along + 2], q[along], q[along + 2])
   );
 }
 

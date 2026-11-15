@@ -400,7 +400,7 @@ describe("layOutClassGraph", () => {
       expect(layout.edges.filter((edge) => edge.bridge)).toHaveLength(1);
     });
 
-    it("keeps the legible window when every namespace is a box and it still does not fit", () => {
+    it("opens at the legible floor when every namespace is a box and it still does not fit", () => {
       const wide = {
         classes: Array.from({ length: 30 }, (_, index) => ({
           uri: `https://n${index}.example/A`,

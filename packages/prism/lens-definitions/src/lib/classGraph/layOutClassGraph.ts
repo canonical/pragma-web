@@ -800,21 +800,18 @@ function layOutModel(
   const allEdges = [...edges, ...crossEdges];
   // Below a pair of neighbours joined straight across their gap, the band
   // a bridge's label too long for so short a route sits in.
-  const bands = crossEdges
-    .filter((edge) => edge.bundle !== undefined && across.has(edge.bundle.id))
-    .map((edge): Rect => {
-      const { x, w } = measurePathBounds(edge.d);
-      const bottom = Math.max(
-        ...regions
-          .filter(
-            (region) =>
-              region.prefix === nodeOf(edge.from).region ||
-              region.prefix === nodeOf(edge.to.at(0) ?? edge.from).region,
-          )
-          .map((region) => region.y + region.h),
-      );
-      return { x, y: bottom, w, h: BRIDGE_LABEL_BAND };
-    });
+  const bands = crossEdges.flatMap((edge): Rect[] => {
+    const { bundle } = edge;
+    if (bundle === undefined || !across.has(bundle.id)) return [];
+    const ends = [nodeOf(bundle.a).region, nodeOf(bundle.b).region];
+    const { x, w } = measurePathBounds(edge.d);
+    const bottom = Math.max(
+      ...regions
+        .filter((region) => ends.includes(region.prefix))
+        .map((region) => region.y + region.h),
+    );
+    return [{ x, y: bottom, w, h: BRIDGE_LABEL_BAND }];
+  });
   const bounds = uniteRects([
     ...regions,
     ...crossEdges.map((edge) => measurePathBounds(edge.d)),
