@@ -191,9 +191,12 @@ export type EmptyOr<T> =
 export type FieldKind = SchemaFieldDefinition["kind"];
 
 /**
- * The operators each kind accepts, at the type level: what the runtime
- * table declares, spelled so a provider's field handles can be keyed by
- * operator from a definition's kind alone.
+ * The operators each field kind accepts, by kind: a binding names a kind's
+ * operators as `FieldKindOperators["text"]` rather than listing them, and
+ * `listOfferedOperators` answers in these terms.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export type FieldKindOperators = {
   readonly choices: "isAny" | "isNone";

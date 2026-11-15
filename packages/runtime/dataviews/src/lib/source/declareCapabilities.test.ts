@@ -129,6 +129,11 @@ describe("declareCapabilities", () => {
     ).toThrow('field "status" cannot be filtered with contains');
     expect(() =>
       declareCapabilities(machines, {
+        filter: { cpu: ["is"] },
+      } as unknown as Declaration),
+    ).toThrow('field "cpu" cannot be filtered with is');
+    expect(() =>
+      declareCapabilities(machines, {
         sort: { fields: ["zone"], terms: null },
       } as unknown as Declaration),
     ).toThrow('the schema has no field "zone" to sort by');
@@ -167,6 +172,11 @@ describe("declareCapabilities", () => {
     expect(
       declareCapabilities(machines, { filter: { name: ["contains"] } }).filter,
     ).toEqual({ name: ["contains"] });
+    expect(
+      declareCapabilities(machines, {
+        filter: { name: ["isNot", "endsWith"], owner: ["isSet"] },
+      }).filter,
+    ).toEqual({ name: ["isNot", "endsWith"], owner: ["isSet"] });
     expectTypeOf<
       NonNullable<Declaration["sort"]>["fields"][number]
     >().toEqualTypeOf<"status" | "cpu" | "owner" | "name">();

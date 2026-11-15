@@ -7,7 +7,8 @@
  * the filter records a root builds, the check a binding tells a provider
  * by, the provider's internal host, the query transition a command makes
  * with the command and its result, the list comparison, the comparison of
- * one field's facet, the ordering in force and the next one a header's
+ * one field's facet, the operators a control may offer on a field, the
+ * ordering in force and the next one a header's
  * activation, or its menu's choice, leads to, the wire key a form control
  * is named by, the parameters a query's members are spelled under, which
  * of a followed link's refused clauses narrow the result
@@ -90,7 +91,10 @@ export type {
 } from "../rows/index.js";
 export { createRowScopes } from "../rows/index.js";
 export type { EffectiveOrdering } from "../source/index.js";
-export { resolveEffectiveOrdering } from "../source/index.js";
+export {
+  listOfferedOperators,
+  resolveEffectiveOrdering,
+} from "../source/index.js";
 export {
   isNarrowingIssue,
   QUERY_KEYS,
