@@ -208,6 +208,36 @@ describe("EntityChip", () => {
       expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
     });
 
+    it("stays open while the pointer crosses from the chip into the peek", () => {
+      renderPeeking();
+      const chip = screen.getByTestId("chip");
+      fireEvent.pointerEnter(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_OPEN_DELAY_MS);
+      });
+      const dialog = screen.getByRole("dialog", { hidden: true });
+      // The peek is mounted on the body, a sibling of the chip in the DOM.
+      expect(chip.contains(dialog)).toBe(false);
+      fireEvent.pointerLeave(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_CLOSE_DELAY_MS - 1);
+      });
+      fireEvent.pointerEnter(dialog, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_CLOSE_DELAY_MS);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBe(dialog);
+      fireEvent.pointerLeave(dialog, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_CLOSE_DELAY_MS - 1);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBe(dialog);
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+    });
+
     it("opens at once on focus and closes on Escape, focus on the link", () => {
       const link = renderPeeking();
       act(() => {
