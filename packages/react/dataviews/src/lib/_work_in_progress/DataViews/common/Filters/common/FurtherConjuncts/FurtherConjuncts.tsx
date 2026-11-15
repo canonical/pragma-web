@@ -18,6 +18,7 @@ export default function FurtherConjuncts({
   field,
   operator,
   label,
+  unit,
   host,
   onLeave,
   className,
@@ -29,7 +30,9 @@ export default function FurtherConjuncts({
     return null;
   }
   const key = PHRASE_MESSAGES[operator];
-  const phrase = key === null ? label : messages[key](label);
+  const named = key === null ? label : messages[key](label);
+  const phrase =
+    unit === undefined ? named : messages.filterInUnit(named, unit);
   return (
     <ul
       {...rest}

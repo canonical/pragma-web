@@ -122,6 +122,7 @@ describe("FurtherConjuncts", () => {
     const rows = (
       operator: PredicateOperator,
       operands: readonly (string | number | boolean)[],
+      unit?: string,
     ) => {
       const { container, unmount } = render(
         <DataViews provider={provider}>
@@ -130,6 +131,7 @@ describe("FurtherConjuncts", () => {
             field="cpu"
             operator={operator}
             label="Cores"
+            unit={unit}
             host={host}
             onLeave={() => {}}
           />
@@ -141,6 +143,8 @@ describe("FurtherConjuncts", () => {
     };
     expect(rows("isNone", ["ex-gpu"])).toBe("Cores is none of ex-gpu");
     expect(rows("lte", [8])).toBe("Cores to 8");
+    // A bound with units names its base unit, as its control does.
+    expect(rows("gte", [16_384], "MiB")).toBe("Cores from (MiB) 16384");
     expect(rows("contains", ["ex"])).toBe("Cores contains ex");
     expect(rows("notContains", ["ex"])).toBe("Cores does not contain ex");
     expect(rows("startsWith", ["ex"])).toBe("Cores starts with ex");

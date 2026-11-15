@@ -119,12 +119,14 @@ const renderFurther = (
   field: string,
   operator: PredicateOperator,
   label: string,
+  unit?: string,
 ): ReactElement => (
   <FurtherConjuncts
     handle={findFilterHandle<unknown>(context.filters, field, operator)}
     field={field}
     operator={operator}
     label={label}
+    unit={unit}
     host={context.host}
     onLeave={context.focusGroup}
   />
@@ -162,7 +164,13 @@ const renderBounds = (
             leavesWhenCleared={leavesWhenCleared(context, definition, bound)}
             onLeave={context.focusGroup}
           />
-          {renderFurther(context, definition.field, bound, name)}
+          {renderFurther(
+            context,
+            definition.field,
+            bound,
+            name,
+            definition.kind === "number" ? definition.units?.base : undefined,
+          )}
         </Fragment>
       ))}
     </Fragment>
@@ -363,7 +371,9 @@ const renderControl = (
  *
  * At baseline the controls are a GET form: each is named as the wire
  * grammar spells its clause, a number bound is a native number input with
- * the schema's bounds, the text a field must match is a native text input
+ * the schema's bounds, or, where the field declares units, a text input
+ * named with its base unit that reads a value typed in any display unit,
+ * the text a field must match is a native text input
  * for each operator text stands under, or one while none does, a set
  * standing any-of or none-of moves to the other by a real link, hidden
  * controls carry the rest of the query, and the submit control leads to the
