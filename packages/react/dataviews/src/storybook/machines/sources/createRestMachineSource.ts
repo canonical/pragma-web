@@ -76,8 +76,8 @@ const readAnsweredFacets = (
 
 /**
  * What the REST endpoint executes, and so all the parts may offer: the
- * statuses a machine is any or none of, bounds on cores, text the name and
- * the region contain or start with but none in the owner, search over the
+ * statuses a machine is any or none of, bounds on cores, every text operator
+ * on the name, text the region contains or starts with, none on the owner, search over the
  * name and the owner, one ordered term, pages by number, exact counts, and
  * the facets of the status and the cores.
  */
@@ -85,7 +85,7 @@ const REST_CAPABILITIES = declareCapabilities(machineCollection, {
   filter: {
     status: ["isAny", "isNone"],
     cores: ["gte", "lte"],
-    name: ["contains", "startsWith"],
+    name: ["is", "isNot", "contains", "notContains", "startsWith", "endsWith"],
     region: ["contains", "startsWith"],
   },
   search: ["name", "owner"],

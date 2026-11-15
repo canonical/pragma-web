@@ -11,7 +11,7 @@ import type {
 const TEXT_OPERATORS: Readonly<
   Record<string, readonly ApiTextMatch["operator"][]>
 > = {
-  name: ["contains", "startsWith"],
+  name: ["is", "isNot", "contains", "notContains", "startsWith", "endsWith"],
   region: ["contains", "startsWith"],
 };
 
@@ -39,7 +39,7 @@ type RestRequest = {
  * Read the REST endpoint's query parameters, as its own backend would:
  * `status` repeated, or `status__isAny`, for the statuses a machine is any
  * of, `status__isNone` for those it is none of, `cores__gte` and
- * `cores__lte`, `<field>__contains` and `<field>__startsWith` on the text
+ * `cores__lte`, `<field>__<operator>` with a text operator on the text
  * fields it can look through, `q`, one `sort=<field>__<direction>`, `page`
  * and `size`, and `facet` repeated for each field whose facet it must
  * answer. A blank value is a control left empty and is dropped on its own,
