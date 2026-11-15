@@ -35,6 +35,14 @@ describe("ClassGraph styles", () => {
       ".ds.class-graph .filled-head.is-focus",
     ]);
     expect(css).not.toMatch(/is-zero|zero-color/);
+    // Nor a colour keyed on what marks such a relation: its weight, its
+    // count or its dash.
+    const keyed = rules.filter(
+      ({ selector, body }) =>
+        /data-weight|data-count|stroke-dasharray/.test(selector) &&
+        /(^|[;\s])(color|stroke|fill)\s*:/.test(body),
+    );
+    expect(keyed).toEqual([]);
   });
 
   it("lets a focus's accent win over a bridge's strong line", () => {

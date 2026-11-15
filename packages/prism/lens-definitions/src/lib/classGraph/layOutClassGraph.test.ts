@@ -325,20 +325,26 @@ describe("layOutClassGraph", () => {
     expect(bounds.y + bounds.h).toBeLessThanOrEqual(lower.y + lower.h);
   });
 
-  it("numbers columns graph-wide: each region's after the regions packed before it", () => {
-    const layout = layOutClassGraph(ontologyGraph);
-    let first = 0;
-    for (const region of layout.regions) {
-      const columns = new Set(
-        [...layout.nodes.values()]
-          .filter((node) => node.region === region.prefix)
-          .map((node) => node.col),
-      );
-      expect(Math.min(...columns)).toBe(first);
-      expect(Math.max(...columns)).toBeLessThan(first + region.columns);
-      first += region.columns;
-    }
-  });
+  it.each([
+    ["the docs' records", ontologyGraph],
+    ["the metro's records", metroGraph],
+  ])(
+    "numbers the columns of %s graph-wide: each region's after the regions packed before it",
+    (_, graph) => {
+      const layout = layOutClassGraph(graph);
+      let first = 0;
+      for (const region of layout.regions) {
+        const columns = new Set(
+          [...layout.nodes.values()]
+            .filter((node) => node.region === region.prefix)
+            .map((node) => node.col),
+        );
+        expect(Math.min(...columns)).toBe(first);
+        expect(Math.max(...columns)).toBeLessThan(first + region.columns);
+        first += region.columns;
+      }
+    },
+  );
 
   // Every input the layout reads, given in several orders: the regions,
   // the classes within them and the relations, which become its edges. A
