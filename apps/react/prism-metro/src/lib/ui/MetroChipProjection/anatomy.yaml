@@ -1,0 +1,56 @@
+---
+# MetroChipProjection: any graph node of the metro site as the inline mention,
+# dispatched on its type.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
+# matrix: one EntityChip per type, each type filling the slots it has).
+# It renders no element of its own: the case its node's type selects
+# renders the root. A metro type reads through the site's own arm; every
+# other type through the package's switch, which takes ontology classes
+# and any node through its own arms. The cases are the site composite's
+# aliased arms, by the same names (METRO_CHIP_TYPES).
+node:
+  uri: metro.component.metro_chip_projection
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: metro.component.station_chip
+              projection:
+                on: Station
+          - node:
+              uri: metro.component.interchange_chip
+              projection:
+                on: Interchange
+          - node:
+              uri: metro.component.line_chip
+              projection:
+                on: Line
+          - node:
+              uri: metro.component.zone_chip
+              projection:
+                on: Zone
+          - node:
+              uri: metro.component.rolling_stock_chip
+              projection:
+                on: RollingStock
+          - node:
+              uri: metro.component.formation_chip
+              projection:
+                on: Formation
+          - node:
+              uri: metro.component.unit_chip
+              projection:
+                on: Unit
+          - node:
+              uri: metro.component.car_type_chip
+              projection:
+                on: CarType
+          - node:
+              uri: prism.component.chip_projection
+              projection:
+                on: Node
+      relation:
+        cardinality: "1"

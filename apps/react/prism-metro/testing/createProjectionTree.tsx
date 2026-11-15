@@ -1,4 +1,5 @@
 import { HomesProvider, RouterLink } from "@canonical/prism-core";
+import { guardTypedArms } from "@canonical/prism-core/testing";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
@@ -15,7 +16,8 @@ import { appRoutes } from "../src/routes.js";
 /**
  * Wrap `children` in the nest a projection renders under on the site: the
  * Relay environment, the site's router at its landing, its homes, and the
- * default projection maps with the router's link, so a projection's home
+ * default projection maps, guarded so a switch's coverage test meets no
+ * typed arm but through its own case, with the router's link, so a projection's home
  * is the href the site's own route builds and a title links through it.
  *
  * @param environment - The Relay environment the projection reads from.
@@ -34,7 +36,7 @@ export default function createProjectionTree(
         <HomesProvider homes={homes}>
           <ProjectionsProvider
             LinkComponent={RouterLink}
-            maps={defaultProjectionMaps}
+            maps={guardTypedArms(defaultProjectionMaps)}
           >
             <SiteRenderers>{children}</SiteRenderers>
           </ProjectionsProvider>

@@ -1,0 +1,56 @@
+---
+# MetroCardProjection: any graph node of the metro site as the card,
+# dispatched on its type.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
+# matrix: one EntityCard per type, each type filling the slots it has).
+# It renders no element of its own: the case its node's type selects
+# renders the root. A metro type reads through the site's own arm; every
+# other type through the package's switch, which takes ontology classes
+# and any node through its own arms. The cases are the site composite's
+# aliased arms, by the same names (METRO_CARD_TYPES).
+node:
+  uri: metro.component.metro_card_projection
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: metro.component.station_card
+              projection:
+                on: Station
+          - node:
+              uri: metro.component.interchange_card
+              projection:
+                on: Interchange
+          - node:
+              uri: metro.component.line_card
+              projection:
+                on: Line
+          - node:
+              uri: metro.component.zone_card
+              projection:
+                on: Zone
+          - node:
+              uri: metro.component.rolling_stock_card
+              projection:
+                on: RollingStock
+          - node:
+              uri: metro.component.formation_card
+              projection:
+                on: Formation
+          - node:
+              uri: metro.component.unit_card
+              projection:
+                on: Unit
+          - node:
+              uri: metro.component.car_type_card
+              projection:
+                on: CarType
+          - node:
+              uri: prism.component.card_projection
+              projection:
+                on: Node
+      relation:
+        cardinality: "1"

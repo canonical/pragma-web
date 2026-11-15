@@ -759,3 +759,19 @@ export const MOCK_CAR_TYPE = {
     type: { _meta: { title: "Car type" } },
   },
 } as const;
+
+/**
+ * The Station class as a Relay mock environment answers an
+ * `OntologyClass`: a node no metro arm takes, which a site switch hands to
+ * the package's own switch.
+ */
+export const MOCK_ONTOLOGY_CLASS = {
+  __typename: "OntologyClass",
+  uri: "https://metro.example/onto#Station",
+  _meta: {
+    title: "Station",
+    curie: STATION_CLASS_CURIE,
+    definition: "A place where trains stop.",
+    type: { _meta: { title: "Class" } },
+  },
+} as const;
