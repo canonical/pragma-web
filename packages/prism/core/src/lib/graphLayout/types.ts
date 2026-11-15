@@ -193,6 +193,11 @@ export interface LayeredOptions {
    * by `<bundle> <node>`; an end not named meets its box at the middle.
    */
   readonly crossPorts?: ReadonlyMap<string, CrossPort>;
+  /**
+   * The most nodes one column holds: a layer of more splits into balanced
+   * consecutive columns, in its order. Unset, a layer is one column.
+   */
+  readonly bandMembersMax?: number;
 }
 
 /** One relation drawn in a bundle, as the labels name it. */

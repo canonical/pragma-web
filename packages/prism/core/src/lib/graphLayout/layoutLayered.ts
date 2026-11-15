@@ -7,8 +7,8 @@ import type { GraphLayout } from "./types.js";
  *
  * @param nodes - The nodes to place, with their hierarchy.
  * @param edges - The bundles to route and the relations in them.
- * @param options - The region's nodes, its channel, its sweeps and the
- *   ports of its relations to other regions.
+ * @param options - The region's nodes, its channel, its sweeps, the ports
+ *   of its relations to other regions and the most nodes a column holds.
  * @returns The region's layout: positions, routes and findings.
  */
 const layoutLayered: GraphLayout = (nodes, edges, options) =>
@@ -18,6 +18,7 @@ const layoutLayered: GraphLayout = (nodes, edges, options) =>
     options.channel,
     options.sweeps,
     options.crossPorts,
+    options.bandMembersMax,
   );
 
 export default layoutLayered;
