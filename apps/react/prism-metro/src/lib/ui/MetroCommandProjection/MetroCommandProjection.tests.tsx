@@ -87,7 +87,8 @@ const renderWithNode = (
 };
 
 /**
- * Each type the site arms, then an ontology class: the entity a mock
+ * Each type the site arms, then an ontology class and a type no case
+ * takes: the entity a mock
  * environment answers, and the root class its arm renders.
  */
 const CASES = [
@@ -100,6 +101,8 @@ const CASES = [
   ["Unit", MOCK_UNIT, "unit-command"],
   ["CarType", MOCK_CAR_TYPE, "car-type-command"],
   ["OntologyClass", MOCK_ONTOLOGY_CLASS, "ontology-class-command"],
+  // A type the switch does not case falls to the package's Node arm.
+  ["Depot", { ...MOCK_STATION, __typename: "Depot" }, "node-command"],
 ] as const;
 
 describe("MetroCommandProjection", () => {
