@@ -653,10 +653,7 @@ describe("a drill's link against its address", () => {
    * Where the canvas shows a region's rule and a node, on screen: the
    * camera's window and zoom, read where a reader sees them.
    */
-  const readCamera = (
-    page: Page,
-    prefix: string,
-  ): Promise<readonly number[]> =>
+  const readCamera = (page: Page, prefix: string): Promise<readonly number[]> =>
     page.evaluate((ns) => {
       const viewport = ".ds.graph-canvas svg.viewport";
       const rule = document.querySelector(
@@ -700,14 +697,18 @@ describe("a drill's link against its address", () => {
 
   it("lands a box's click on the window and zoom that loading its address opens", async () => {
     const loaded = await cameraAfter("/definitions?expand=surface", "surface");
-    const clicked = await cameraAfter("/definitions", "surface", async (page) => {
-      await page
-        .locator(
-          '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
-        )
-        .click();
-      await page.waitForURL(/[?&]expand=surface/);
-    });
+    const clicked = await cameraAfter(
+      "/definitions",
+      "surface",
+      async (page) => {
+        await page
+          .locator(
+            '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
+          )
+          .click();
+        await page.waitForURL(/[?&]expand=surface/);
+      },
+    );
     expect(loaded.errors).toEqual([]);
     expect(clicked.errors).toEqual([]);
     expectSameCamera(clicked.camera, loaded.camera);
