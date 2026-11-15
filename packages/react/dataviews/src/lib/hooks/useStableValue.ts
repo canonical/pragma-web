@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { UseStableValueResult } from "./types.js";
+import type { UseStableValueProps, UseStableValueResult } from "./types.js";
 
 /**
  * Hold a value rebuilt every render at one stable reference.
@@ -11,8 +11,7 @@ import type { UseStableValueResult } from "./types.js";
  * because a caller wrote an array literal in its own render.
  */
 export default function useStableValue<TValue>(
-  value: TValue,
-  equals: (held: TValue, next: TValue) => boolean,
+  ...[value, equals]: UseStableValueProps<TValue>
 ): UseStableValueResult<TValue> {
   // Written during render: the write is idempotent for one value, so a
   // render React discards leaves the ref as the committed one would.
