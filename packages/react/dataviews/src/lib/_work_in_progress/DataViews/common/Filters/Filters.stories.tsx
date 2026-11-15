@@ -1,12 +1,22 @@
+import {
+  createArraySource,
+  createDataViewsProvider,
+} from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactElement } from "react";
+import { type ReactElement, useState } from "react";
+import { renderToString } from "react-dom/server";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators.js";
 import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import createSourceWithoutCores from "../../../../../storybook/machines/createSourceWithoutCores.js";
+import {
+  spareMachineCollection,
+  spareMachines,
+} from "../../../../../storybook/machines/fixtures.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
+import "../../../../../storybook/noScripts.css";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Filters.js";
@@ -341,5 +351,204 @@ export const PrimaryFilters: Story = {
     await expect(host).not.toBeVisible();
     await userEvent.click(canvas.getByText("More filters"));
     await waitFor(() => expect(host).toBeVisible());
+  },
+};
+
+/** The spare machines' columns: the host, its memory and its owner. */
+const spareColumns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "memory", header: "Memory" },
+  { id: "owner", header: "Owner" },
+];
+
+/** A root over the spare machines, starting on one query. */
+function FilteredSpareMachines({
+  query,
+  ...args
+}: DataViewsFiltersProps & { readonly query: string }): ReactElement {
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: spareMachineCollection,
+      source: createArraySource({
+        rows: spareMachines,
+        collection: spareMachineCollection,
+      }),
+      snapshot: { query, presentation: {} },
+    }),
+  );
+  return (
+    <DataViews provider={provider}>
+      <Component {...args} />
+      <DataTable
+        provider={provider}
+        columns={spareColumns}
+        label="Spare machines"
+      />
+    </DataViews>
+  );
+}
+
+/**
+ * The query the new operators story starts on: hosts not containing `db`
+ * and ending with `.com`, at least 8 GiB of memory, tagged both `ex-gpu`
+ * and `ex-nvme`.
+ */
+const newOperators =
+  "name__notContains=db&name__endsWith=.com&memory__gte=8192&tags=ex-gpu&tags__isAny__1=ex-nvme";
+
+/**
+ * The operators beyond containing and starting with. A text field matches
+ * by the operator chosen beside its input — here, hosts that do not contain
+ * `db` and end with `.com`, each with a control of its own. Memory is measured in MiB and typed in MiB or GiB, so `8 GiB` and
+ * `8192` are one bound. Tags are a list, so two any-of restrictions ask for
+ * both. Presence is filtered either way: Has a value, or Has no value.
+ */
+export const NewOperators: Story = {
+  args: {
+    labels: { name: "Host", memory: "Memory", owner: "Owner", tags: "Tags" },
+  },
+  render: (args) => <FilteredSpareMachines {...args} query={newOperators} />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("textbox", { name: "Host does not contain" }),
+    ).toHaveValue("db");
+    await expect(
+      canvas
+        .getAllByRole("combobox", { name: "How Host matches" })
+        .map((select) => (select as HTMLSelectElement).value),
+    ).toEqual(["notContains", "endsWith"]);
+    await expect(
+      canvas.getByRole("textbox", { name: "Memory from (MiB)" }),
+    ).toHaveValue("8192");
+    await expect(canvas.getByText("Tags is any of ex-nvme")).toBeVisible();
+    await waitFor(() => expect(recordRows(canvas)).toBe(1));
+    await expect(
+      canvas.getByRole("cell", { name: "cache-01.example.com" }),
+    ).toBeVisible();
+    const owner = within(canvas.getByRole("group", { name: "Owner" }));
+    await userEvent.click(owner.getByRole("radio", { name: "Has no value" }));
+    // Its one machine has an owner, so none is left.
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole("cell", { name: "cache-01.example.com" }),
+      ).toBeNull(),
+    );
+    await userEvent.click(owner.getByRole("radio", { name: "Any" }));
+    await waitFor(() => expect(recordRows(canvas)).toBe(1));
+    const memory = canvas.getByRole("textbox", { name: "Memory from (MiB)" });
+    await userEvent.clear(memory);
+    await userEvent.type(memory, "16 GiB");
+    // 16 GiB is 16384 MiB, more than its 8192.
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole("cell", { name: "cache-01.example.com" }),
+      ).toBeNull(),
+    );
+    await userEvent.clear(memory);
+    await userEvent.type(memory, "8 GiB");
+    await waitFor(() => expect(recordRows(canvas)).toBe(1));
+  },
+};
+
+/**
+ * Presence restricted outside the primary filters: the host is marked
+ * primary, so the owner's control shows only because the link restricts
+ * it. Arrow keys choose each radio they reach, so moving onto Any removes
+ * the restriction; the control stays where it stands while focus is inside
+ * it, and moves under More filters once focus leaves.
+ */
+export const PresenceOutsideThePrimaryFilters: Story = {
+  args: {
+    primary: ["name"],
+    labels: { name: "Host", memory: "Memory", owner: "Owner", tags: "Tags" },
+  },
+  render: (args) => (
+    <FilteredSpareMachines {...args} query="owner__isSet=true" />
+  ),
+  play: async ({ canvas }) => {
+    const owner = canvas.getByRole("group", { name: "Owner" });
+    await expect(
+      within(owner).getByRole("radio", { name: "Has a value" }),
+    ).toBeChecked();
+    await waitFor(() => expect(recordRows(canvas)).toBe(3));
+  },
+};
+
+/** The spare machines' filters as a server renders them, never hydrated. */
+function ServerRenderedSpareFilters({
+  query,
+  ...args
+}: DataViewsFiltersProps & { readonly query: string }): ReactElement {
+  const [markup] = useState(() => {
+    const provider = createDataViewsProvider({
+      collection: spareMachineCollection,
+      source: createArraySource({
+        rows: spareMachines,
+        collection: spareMachineCollection,
+      }),
+      snapshot: { query, presentation: {} },
+    });
+    return renderToString(
+      <DataViews provider={provider}>
+        <Component {...args} />
+      </DataViews>,
+    );
+  });
+  // Shown as a page with scripting disabled shows it: the enhancement's
+  // controls hidden, the baseline's submit shown.
+  return (
+    <div
+      className="no-scripts"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: the story shows the server's own markup, before any script takes it over
+      dangerouslySetInnerHTML={{ __html: markup }}
+    />
+  );
+}
+
+/** The query the no-JavaScript story starts on: a clause on each new operator. */
+const newOperatorsWithoutScripts =
+  "name__notContains=db&owner__isSet=false&memory__gte=8+GiB&tags=ex-gpu&tags__isAny__1=ex-nvme";
+
+/**
+ * Before any script runs, under the memory default: the server's markup of
+ * the new controls, never hydrated. Each shows the state the provider
+ * started on — the text the host must not contain, Has no value chosen,
+ * the bound read in MiB, the second tag read-only after the set — and none
+ * offers what needs a script: there is no select of how text matches and
+ * no Clear button, the form's Apply filters submits it, and, with no
+ * location to lead to, the further tag has no Clear link. The page is shown
+ * as one with scripting disabled shows it.
+ */
+export const NoJavaScriptMemoryFilters: Story = {
+  name: "No JavaScript, memory: Filters",
+  args: {
+    labels: { name: "Host", memory: "Memory", owner: "Owner", tags: "Tags" },
+  },
+  render: (args) => (
+    <ServerRenderedSpareFilters {...args} query={newOperatorsWithoutScripts} />
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("textbox", { name: "Host does not contain" }),
+    ).toHaveValue("db");
+    await expect(
+      canvas.queryByRole("combobox", { name: "How Host matches" }),
+    ).toBeNull();
+    await expect(
+      canvas.getByRole("radio", { name: "Has no value" }),
+    ).toBeChecked();
+    await expect(
+      canvas.getByRole("textbox", { name: "Memory from (MiB)" }),
+    ).toHaveValue("8192");
+    await expect(canvas.getByText("Tags is any of ex-nvme")).toBeVisible();
+    await expect(canvas.queryByRole("link", { name: /^Clear/ })).toBeNull();
+    for (const clear of canvas
+      .getAllByRole("button", { hidden: true })
+      .filter((button) => button.textContent?.startsWith("Clear"))) {
+      await expect(clear).not.toBeVisible();
+    }
+    await expect(
+      canvas.getByRole("button", { name: "Apply filters" }),
+    ).toBeVisible();
   },
 };

@@ -40,10 +40,11 @@ const REFUSED_LINK_STORIES: ReadonlySet<string> = new Set([
   "LinkWithARefusedSort",
 ]);
 
-/** The filters' stories checked once played: faceted, or clearing a row. */
+/** The filters' stories checked once played: faceted, clearing a row, or the new operators. */
 const PLAYED_FILTER_STORIES: ReadonlySet<string> = new Set([
   ...FACETED_FILTER_STORIES,
   "FurtherConjunctsApplied",
+  "NewOperators",
 ]);
 
 const filters = Object.entries(composeStories(filtersStories));

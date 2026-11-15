@@ -1,0 +1,15 @@
+/*
+ * Story-only: what a page with scripting disabled shows, inside a
+ * `.no-scripts` container in a browser that has scripting enabled. The
+ * controls' own sheets reveal the enhancement's controls under
+ * `@media (scripting: enabled)` and hide the baseline's submit there; this
+ * undoes both, as `@media (scripting: none)` would leave them.
+ */
+.no-scripts .ds.data-views-filters-text > .clear,
+.no-scripts .ds.data-views-filters-bound > .clear {
+  display: none;
+}
+
+.no-scripts .ds.data-views-filters > .submit {
+  display: inline-flex;
+}
