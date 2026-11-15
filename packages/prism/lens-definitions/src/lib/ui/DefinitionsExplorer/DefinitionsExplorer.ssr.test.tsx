@@ -166,4 +166,27 @@ describe("DefinitionsExplorer SSR", () => {
     expect(canvas).not.toContain("way-back");
     expect(canvas).toMatch(/data-kind="region"[^>]*role="img"/);
   });
+
+  it("leads the phone's list with a term page's namespace, which its selection opens", () => {
+    for (const search of ["", "?expand=anatomy"]) {
+      const html = renderToString(
+        createDefinitionsPage(
+          UIBLOCK_TERM,
+          definitionsExplorerRecords,
+          createFetchSpy(),
+          search,
+        ),
+      );
+      const phone = html.slice(html.indexOf('class="ds phone-graph'));
+      // ds, a box at rest, is opened by the selection and packed first:
+      // its header comes before every box and stub.
+      expect(phone.match(/<g data-ns="([^"]+)"/)?.[1], search).toBe("ds");
+      expect(phone.indexOf('data-ns="ds"'), search).toBeLessThan(
+        phone.indexOf('data-kind="region"'),
+      );
+      expect(phone.indexOf('data-ns="ds"'), search).toBeLessThan(
+        phone.indexOf('data-kind="stub"'),
+      );
+    }
+  });
 });
