@@ -8,13 +8,16 @@ import readFileRole from "./readFileRole.js";
 const TYPES_TEST = /\.types\.test\.tsx?$/;
 
 /**
- * Whether a folder holds `stem.test.ts(x)` or `stem.<facet>.test.ts(x)`, a
- * type test aside.
+ * The tests in a folder named `stem.test.ts(x)` or `stem.<facet>.test.ts(x)`,
+ * type tests aside.
  */
-function hasColocatedTest(stem: string, siblings: readonly string[]): boolean {
+function listColocatedTests(
+  stem: string,
+  siblings: readonly string[],
+): readonly string[] {
   const escaped = stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const test = new RegExp(`^${escaped}(?:\\.[\\w-]+)*\\.test\\.tsx?$`);
-  return siblings.some((name) => test.test(name) && !TYPES_TEST.test(name));
+  return siblings.filter((name) => test.test(name) && !TYPES_TEST.test(name));
 }
 
 /** Judge every source file under one folder, depth first, into `findings`. */
@@ -36,7 +39,21 @@ function judgeFolder(root: string, folder: string, findings: string[]): void {
       }
       const isPureType =
         exports.length > 0 && exports.every((record) => record.kind === "type");
-      if (!isPureType && !hasColocatedTest(stem, siblings)) {
+      const tests = listColocatedTests(stem, siblings);
+      if (isPureType) {
+        // A pure type file gets no test: one beside it is a type test,
+        // unless a longer sibling source, such as `a.b.ts`, claims it.
+        const claimed = siblings
+          .filter((name) => name !== entry.name && name.startsWith(`${stem}.`))
+          .filter((name) => readFileRole(name) === "source")
+          .flatMap((name) =>
+            listColocatedTests(name.replace(/\.tsx?$/, ""), siblings),
+          );
+        for (const name of tests.filter((test) => !claimed.includes(test))) {
+          const test = relative(root, join(folder, name)).split(sep).join("/");
+          findings.push(`${test} types-test`);
+        }
+      } else if (tests.length === 0) {
         findings.push(`${file} test`);
       }
     }

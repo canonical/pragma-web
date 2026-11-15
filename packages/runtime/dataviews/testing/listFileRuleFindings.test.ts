@@ -45,7 +45,7 @@ describe("listFileRuleFindings", () => {
     ]);
   });
 
-  it.fails("finds a test of a pure type file", () => {
+  it("finds a test of a pure type file", () => {
     writeFile("typed/src/types.ts", "export type T = 1;");
     writeFile("typed/src/types.test.ts", "");
     expect(listFileRuleFindings(join(root, "typed"))).toEqual([
