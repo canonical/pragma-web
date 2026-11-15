@@ -64,6 +64,7 @@ export default function StationCommand({
   const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
   const t = useMessages();
+  const platforms = data.platformCount ?? undefined;
   return (
     <EntityCommand
       {...props}
@@ -75,9 +76,9 @@ export default function StationCommand({
       LinkComponent={LinkComponent}
       mark={<Icon icon={STATION_MARK_ICON} />}
       status={
-        data.platformCount === null || data.platformCount === undefined
+        platforms === undefined
           ? undefined
-          : t("station.platforms.count", { count: data.platformCount })
+          : t("station.platforms.count", { count: platforms })
       }
       title={title}
     />

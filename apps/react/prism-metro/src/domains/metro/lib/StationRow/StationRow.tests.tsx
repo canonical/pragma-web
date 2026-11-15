@@ -128,16 +128,20 @@ describe("StationRow", () => {
     );
   });
 
-  it("has no facts when the graph asserts no platform count", () => {
+  it("has no facts and no summary where the graph asserts none", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
-          <StationRow node={node} />
+          <StationRow lines="two" node={node} />
         </ul>
       ),
-      { platformCount: null },
+      {
+        platformCount: null,
+        _meta: { ...MOCK_STATION._meta, definition: null },
+      },
     );
     expect(container.querySelector(".facts")).toBeNull();
+    expect(container.querySelector(".summary")).toBeNull();
     expect(container.querySelector(".title")?.textContent).toBe("Northgate");
   });
 
