@@ -859,8 +859,8 @@ function layOutModel(
 /**
  * Lay the class graph out: each namespace region in its own layered
  * columns by the layered engine, the regions ordered by their bridges
- * (the largest first, then the one with most relations to those placed)
- * and packed in that order into shelves for the largest fit on the
+ * (an opened view's namespace first, then the boxes, largest first, then
+ * the one with most relations to those placed) and packed in that order into shelves for the largest fit on the
  * design canvas (retried with narrower channels when the fit would put
  * 14px labels below 12px, which are kept whenever they lift the fit and
  * no arc nests past them), placed on the lattice, then the cross-region
@@ -869,6 +869,14 @@ function layOutModel(
  * opens on (the whole viewBox, or a legible window of it whose edges cut no
  * box when the whole fits only below the legible zoom, which the findings
  * record) and the phone view.
+ *
+ * Boxes, columns, regions and waypoints sit on the 16px lattice; routes
+ * need not. A route runs in the gaps between boxes, and its runs keep
+ * half-step offsets from the lattice (a relation into another region 24px
+ * into its channel, past the subclass bus at 16px; bridges between the
+ * same two regions 8px apart; an arc 16px out, 8px more per nesting), so
+ * that in a 48px or 32px channel no two routes share a line: on the
+ * lattice the bus and the relation would run as one.
  *
  * It is total over what a provider serves: superclass cycles are broken
  * and an input with no class lays out as an empty floor. It is a pure
