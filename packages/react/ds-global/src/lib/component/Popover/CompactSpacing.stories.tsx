@@ -67,11 +67,8 @@ export const CompactSurface: Story = {
           </table>
         </section>
         <section className="site" data-wrapped="">
-          <Popover trigger="Wrapped" open>
-            <span
-              data-wrapped-text=""
-              style={{ display: "block", width: "120px" }}
-            >
+          <Popover trigger="Wrapped" open maxWidth="120px">
+            <span data-wrapped-text="" style={{ display: "block" }}>
               This deliberately long message wraps across several lines inside
               the compact popover.
             </span>
@@ -312,6 +309,15 @@ export const CompactSurface: Story = {
       range.detach();
       if (lines.size < 2) throw new Error("Popover body did not wrap");
       const bounds = wrapped.getBoundingClientRect();
+      const wrappedStyle = win.getComputedStyle(wrapped);
+      near(px(wrappedStyle.maxWidth), 120, "wrapped Popover max width");
+      const inlineEdges =
+        px(wrappedStyle.paddingLeft) +
+        px(wrappedStyle.paddingRight) +
+        px(wrappedStyle.borderLeftWidth) +
+        px(wrappedStyle.borderRightWidth);
+      if (bounds.width - inlineEdges > 120.6)
+        throw new Error("wrapped Popover content exceeds its max width");
       if (
         bounds.left < -0.5 ||
         bounds.top < -0.5 ||
