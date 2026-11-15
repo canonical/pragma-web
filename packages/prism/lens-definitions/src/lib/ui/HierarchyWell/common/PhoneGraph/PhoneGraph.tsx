@@ -71,13 +71,24 @@ export default function PhoneGraph({
   const isEdgeHidden = (edge: LaidOutEdge): boolean =>
     hidden.has(edge.from) || edge.to.every((id) => hidden.has(id));
   // The drilled namespace's header is the way back to the overview at rest.
-  const wrapWayBack = (prefix: string, label: ReactElement): ReactElement =>
-    buildDrillHref !== undefined && layout.drilled === prefix ? (
+  // Its whole row takes the pointer, not only the glyphs.
+  const wrapWayBack = (
+    header: { readonly prefix: string; readonly y: number },
+    label: ReactElement,
+  ): ReactElement =>
+    buildDrillHref !== undefined && layout.drilled === header.prefix ? (
       <RouterLink
-        aria-label={t("well.region.back", { prefix })}
+        aria-label={t("well.region.back", { prefix: header.prefix })}
         className="way-back"
         href={buildDrillHref(undefined)}
       >
+        <rect
+          fill="none"
+          height={PHONE.header}
+          pointerEvents="all"
+          width={phone.width}
+          y={header.y}
+        />
         {label}
       </RouterLink>
     ) : (
@@ -126,7 +137,7 @@ export default function PhoneGraph({
             y={header.y}
           />
           {wrapWayBack(
-            header.prefix,
+            header,
             <text
               className="header"
               fill="currentColor"

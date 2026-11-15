@@ -586,20 +586,26 @@ describe("the drill through the address, at 1440 px", () => {
       "/definitions",
       desktop,
       async (page) => {
-        await page
-          .locator('.ds.graph-canvas svg.viewport a.target[tabindex="0"]')
-          .focus();
-        for (
-          let press = 0;
-          press < 8 && seen.focused === undefined;
-          press += 1
-        ) {
-          await page.keyboard.press("Tab");
-          seen.focused = await page.evaluate(
-            () =>
-              document.activeElement
-                ?.closest('g.node[data-kind="region"]')
-                ?.getAttribute("data-id") ?? undefined,
+        // The boxes follow or precede the classes in the drawing's order.
+        for (const key of ["Tab", "Shift+Tab"]) {
+          await page
+            .locator('.ds.graph-canvas svg.viewport a.target[tabindex="0"]')
+            .focus();
+          for (let press = 0; press < 6; press += 1) {
+            await page.keyboard.press(key);
+            seen.focused ??= await page.evaluate(
+              () =>
+                document.activeElement
+                  ?.closest('g.node[data-kind="region"]')
+                  ?.getAttribute("data-id") ?? undefined,
+            );
+            if (seen.focused !== undefined) break;
+          }
+          if (seen.focused !== undefined) break;
+        }
+        if (seen.focused === undefined) {
+          throw new Error(
+            `no box took the focus; it is on ${await page.evaluate(() => document.activeElement?.outerHTML.slice(0, 160))}`,
           );
         }
         await page.keyboard.press("Enter");

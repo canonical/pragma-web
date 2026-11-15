@@ -5,6 +5,7 @@ import {
   LABEL_HALO,
   LABEL_LINE_PITCH,
   LABEL_SIZE,
+  measureRegionLabelWidth,
   REGION_LABEL_GAP,
   REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
@@ -25,7 +26,11 @@ import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
 import nameRegionBox from "../../classGraph/nameRegionBox.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
-import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
+import type {
+  LaidOutEdge,
+  LaidOutNode,
+  LaidOutRegion,
+} from "../../classGraph/types.js";
 import weighStroke from "../../classGraph/weighStroke.js";
 import { useMessages } from "../../i18n/index.js";
 import {
@@ -383,15 +388,27 @@ export default function ClassGraph({
   const labelBaseline = findCentredBaseline(LABEL_LINE_PITCH, LABEL_SIZE);
   // The drilled namespace's label row is the way back to the overview at
   // rest, wherever its boxes would open.
-  const wrapWayBack = (prefix: string, label: ReactElement): ReactElement =>
+  // Its whole row takes the pointer, not only the glyphs.
+  const wrapWayBack = (
+    region: LaidOutRegion,
+    label: ReactElement,
+  ): ReactElement =>
     buildDrillHref !== undefined &&
     tabStop !== undefined &&
-    layout.drilled === prefix ? (
+    layout.drilled === region.prefix ? (
       <RouterLink
-        aria-label={t("well.region.back", { prefix })}
+        aria-label={t("well.region.back", { prefix: region.prefix })}
         className="way-back"
         href={buildDrillHref(undefined)}
       >
+        <rect
+          fill="none"
+          height={REGION_LABEL_ROW}
+          pointerEvents="all"
+          width={measureRegionLabelWidth(region.prefix, region.members)}
+          x={region.x}
+          y={region.y}
+        />
         {label}
       </RouterLink>
     ) : (
@@ -426,7 +443,7 @@ export default function ClassGraph({
             {bucket === "overview"
               ? null
               : wrapWayBack(
-                  region.prefix,
+                  region,
                   <text
                     className="region-label"
                     fill="currentColor"
