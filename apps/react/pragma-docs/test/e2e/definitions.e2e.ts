@@ -554,21 +554,25 @@ describe("the drill through the address, at 1440 px", () => {
 
   it("opens a box's namespace from its link, and Back returns to the overview", async () => {
     const seen: { drilled?: string[]; back?: string[]; url?: string } = {};
-    const { errors } = await openExplorer("/definitions", desktop, async (page) => {
-      await page
-        .locator(
-          '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
-        )
-        .click();
-      await page.waitForURL(/[?&]expand=surface/);
-      await page.waitForTimeout(CAMERA_SETTLE_MS);
-      seen.drilled = await listBoxes(page);
-      await page.goBack();
-      await page.waitForURL((url) => !url.search.includes("expand"));
-      await page.waitForTimeout(CAMERA_SETTLE_MS);
-      seen.back = await listBoxes(page);
-      seen.url = page.url();
-    });
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        await page
+          .locator(
+            '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
+          )
+          .click();
+        await page.waitForURL(/[?&]expand=surface/);
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        seen.drilled = await listBoxes(page);
+        await page.goBack();
+        await page.waitForURL((url) => !url.search.includes("expand"));
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        seen.back = await listBoxes(page);
+        seen.url = page.url();
+      },
+    );
     expect(errors).toEqual([]);
     expect(seen.drilled).not.toContain("surface");
     expect(seen.drilled).toContain("ds");
@@ -578,23 +582,31 @@ describe("the drill through the address, at 1440 px", () => {
 
   it("reaches a box by Tab from the graph's tab stop, and Enter follows it", async () => {
     const seen: { focused?: string; url?: string } = {};
-    const { errors } = await openExplorer("/definitions", desktop, async (page) => {
-      await page
-        .locator('.ds.graph-canvas svg.viewport a.target[tabindex="0"]')
-        .focus();
-      for (let press = 0; press < 8 && seen.focused === undefined; press += 1) {
-        await page.keyboard.press("Tab");
-        seen.focused = await page.evaluate(
-          () =>
-            document.activeElement
-              ?.closest('g.node[data-kind="region"]')
-              ?.getAttribute("data-id") ?? undefined,
-        );
-      }
-      await page.keyboard.press("Enter");
-      await page.waitForURL(/[?&]expand=/);
-      seen.url = page.url();
-    });
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        await page
+          .locator('.ds.graph-canvas svg.viewport a.target[tabindex="0"]')
+          .focus();
+        for (
+          let press = 0;
+          press < 8 && seen.focused === undefined;
+          press += 1
+        ) {
+          await page.keyboard.press("Tab");
+          seen.focused = await page.evaluate(
+            () =>
+              document.activeElement
+                ?.closest('g.node[data-kind="region"]')
+                ?.getAttribute("data-id") ?? undefined,
+          );
+        }
+        await page.keyboard.press("Enter");
+        await page.waitForURL(/[?&]expand=/);
+        seen.url = page.url();
+      },
+    );
     expect(errors).toEqual([]);
     expect(seen.focused).toBeDefined();
     expect(new URL(seen.url ?? "").searchParams.get("expand")).toBe(
