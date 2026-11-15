@@ -1,29 +1,65 @@
 ---
-# RollingStockCommand: a rolling stock as a 56px command-palette entry.
-# Best guess: "‹name› Rolling stock", then the count of its formations.
-# Projected onto EntityCommand, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address.
+# RollingStockCommand: a rolling stock as a command-palette entry: its mark
+# and its name, linked to its home, then its compact address, its kind and the
+# count of the formations it runs in, its one figure, in the status. The
+# address states its namespace, so it shows no prefix. Its mark is the rolling
+# stock's glyph, a published icon.
 node:
   uri: metro.component.rolling_stock_command
-  projection: { on: RollingStock }
+  projection:
+    on: RollingStock
   edges:
     - node:
         uri: prism.component.entity_command
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # The rolling stock's glyph, a published Icon (ROLLING_STOCK_MARK_ICON).
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "1"
+              slotName: address
           - node:
               role: kind
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
           - node:
-              role: vital
-              projection: { field: uri }
-            relation: { cardinality: "1", slotName: vital, projection: { field: formations } }
-      relation: { cardinality: "1" }
+              role: status
+              # The count of the formations the stock runs in.
+              projection:
+                field: formations.uri
+            relation:
+              cardinality: "1"
+              slotName: status
+      relation:
+        cardinality: "1"
