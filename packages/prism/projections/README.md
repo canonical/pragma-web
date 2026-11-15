@@ -461,7 +461,7 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   its namespace (every arm's prefix but the command's, whose address
   states it); types `AmbientNamespaceProviderProps`.
 - Colours: `acceptColour` (a colour read from a graph when it is a plain
-  colour value, else `undefined`: the gate every mark passes its colour
+  colour value, else undefined: the gate every mark passes its colour
   through, for a site that sets a graph's colour in a style itself).
 - Switches: `requireArmKey` (the fragment key a switch's case reads,
   throwing when the switch's fragment spreads no arm for the node's type).
