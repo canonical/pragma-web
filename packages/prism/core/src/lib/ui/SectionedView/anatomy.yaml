@@ -65,7 +65,10 @@
 #   --sectioned-view-prose-measure: 75ch                     a section's prose (M13, heuristic 75ch line; PS8 592px)
 #   --sectioned-view-prose-font-size: typography.text.primary.fontSize   the prose's text, its paragraphs' size
 #   --sectioned-view-aside-inset-block-start: 0              literal 0
-#   --sectioned-view-contents-label-color: color.text.muted  the "On this page" label
+#   --sectioned-view-contents-label-color: color.text        the "On this page" label (A4: size, weight, never colour)
+#   --sectioned-view-contents-label-font-size: typography.text.secondary.fontSize   PS8 V1 L116, a small label
+#   --sectioned-view-contents-label-font-weight: typography.text.primary.bold.fontWeight
+#   --sectioned-view-contents-label-line-height: space.300  PS8 V1 L116, one line no taller than an entry
 #   --sectioned-view-facts-key-color: color.text.muted       a fact's key (PS8 `.mockup-facts dt`)
 # Literals: 0 and the 75ch measure.
 node:
@@ -120,7 +123,13 @@ node:
                     role: label
                     element: h2
                     attributes: { id: sectioned-view-contents }   # fixed: SSR and hydration agree
-                    styles: { typography.color: color.text.muted }
+                    styles:
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      typography.size: typography.text.secondary.fontSize
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      typography.lineHeight: space.300
+                      typography.color: color.text
                   relation: { cardinality: "1", slotName: label }
                 - node:
                     uri: prism.subcomponent.contents_list

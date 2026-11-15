@@ -22,7 +22,16 @@
     --sectioned-view-prose-measure: 75ch;
     --sectioned-view-prose-font-size: var(--typography-text-primary-font-size);
     --sectioned-view-aside-inset-block-start: 0;
-    --sectioned-view-contents-label-color: var(--color-text-muted);
+    /* The index's label is a small bold label, one line of the list's
+     * scale, never a heading's size. */
+    --sectioned-view-contents-label-color: var(--color-text);
+    --sectioned-view-contents-label-font-size: var(
+      --typography-text-secondary-font-size
+    );
+    --sectioned-view-contents-label-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+    --sectioned-view-contents-label-line-height: var(--space-300);
     --sectioned-view-facts-key-color: var(--color-text-muted);
 
     display: grid;
@@ -72,6 +81,11 @@
   }
 
   .ds.sectioned-view > .aside > .contents > .label {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    font-size: var(--sectioned-view-contents-label-font-size);
+    font-weight: var(--sectioned-view-contents-label-font-weight);
+    line-height: var(--sectioned-view-contents-label-line-height);
     color: var(--sectioned-view-contents-label-color);
   }
 
