@@ -149,6 +149,11 @@ describe("EntityRow stylesheet", () => {
     expect(identity).toContain(
       "flex-grow: var(--entity-row-identity-grow-weight);",
     );
+    // Without the weight on the root the grow is invalid at computed time,
+    // falls back to 0, and the facts take the identity's width.
+    expect(readRule(".ds.entity-row")).toContain(
+      "--entity-row-identity-grow-weight: 1000;",
+    );
     expect(identity).toContain("max-width: max-content;");
   });
 });
