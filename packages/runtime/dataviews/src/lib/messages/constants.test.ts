@@ -187,6 +187,7 @@ describe("constants", () => {
       expect(m.filterIs("Name")).toBe("Name is");
       expect(m.filterIsNot("Name")).toBe("Name is not");
       expect(m.filterNotContains("Name")).toBe("Name does not contain");
+      expect(m.filterEndsWith("Name")).toBe("Name ends with");
     });
 
     it("words why a filter edit did not apply, and whether the earlier restriction stands", () => {

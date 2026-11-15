@@ -21,13 +21,14 @@ const isAbsent = (value: unknown): boolean =>
 /** How each text operator tests a folded value against its folded operand. */
 const TEXT_MATCHES: Readonly<
   Record<
-    Extract<PredicateOperator, "is" | "contains" | "startsWith">,
+    Extract<PredicateOperator, "is" | "contains" | "startsWith" | "endsWith">,
     (folded: string, needle: string) => boolean
   >
 > = {
   is: (folded, needle) => folded === needle,
   contains: (folded, needle) => folded.includes(needle),
   startsWith: (folded, needle) => folded.startsWith(needle),
+  endsWith: (folded, needle) => folded.endsWith(needle),
 };
 
 /** The operator each negation holds exactly where it does not. */
@@ -137,7 +138,8 @@ const compilePredicate = (
     }
     case "is":
     case "contains":
-    case "startsWith": {
+    case "startsWith":
+    case "endsWith": {
       const [operand] = predicate.operands;
       // Text looks for text: an operand that is not a string is held by no
       // value, and neither is text in a value that is not a string.

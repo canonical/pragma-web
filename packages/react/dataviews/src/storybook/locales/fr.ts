@@ -153,6 +153,7 @@ const fr: DataViewsMessages = {
   facetCount: spellTotal,
   filterContains: (label) => `${label} contient`,
   filterStartsWith: (label) => `${label} commence par`,
+  filterEndsWith: (label) => `${label} finit par`,
   filterNotContains: (label) => `${label} ne contient pas`,
   filterIsNot: (label) => `${label} n’est pas`,
   filterIs: (label) => `${label} est`,

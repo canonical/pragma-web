@@ -225,6 +225,14 @@ describe("selectRows", () => {
     });
   });
 
+  describe("endsWith", () => {
+    it("selects text ending with the operand once both are folded", () => {
+      expect(
+        selectIds([{ field: "name", operator: "endsWith", operands: ["TA"] }]),
+      ).toEqual(["b", "d"]);
+    });
+  });
+
   describe("negations", () => {
     it.each([
       ["isNot", "is"],

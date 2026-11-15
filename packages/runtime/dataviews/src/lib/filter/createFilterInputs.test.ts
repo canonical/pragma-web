@@ -65,6 +65,7 @@ describe("createFilterInputs", () => {
       "contains",
       "notContains",
       "startsWith",
+      "endsWith",
     ]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
     // The adoption stays with the records: a root's handle cannot impose

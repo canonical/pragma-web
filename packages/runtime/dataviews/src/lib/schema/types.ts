@@ -81,12 +81,14 @@ export type DateField = {
 
 /**
  * A free-text field: ordered through the source's collator, and filtered by
- * `contains` — the value holds the operand — and `startsWith` — the value
- * begins with it — once both are folded: normalised to NFC, lowercased
- * without a locale, final sigma read as sigma, and normalised to NFC again.
- * The operand is literal: `%`, `_` and `\` are characters to look for,
- * never wildcards, and nothing is trimmed. Only a string value can hold one;
- * an absent, null or non-string value never does.
+ * `is` — the value equals the operand — `contains` — the value holds it —
+ * `startsWith` and `endsWith` — the value begins or ends with it — once both
+ * are folded: normalised to NFC, lowercased without a locale, final sigma
+ * read as sigma, and normalised to NFC again. `isNot` and `notContains`
+ * hold exactly where `is` and `contains` do not. The operand is literal:
+ * `%`, `_` and `\` are characters to look for, never wildcards, and nothing
+ * is trimmed. Only a string value can hold one; an absent, null or
+ * non-string value never does, so it matches both negations.
  *
  * @experimental Pre-release: the operators a text field accepts may change
  * before the first release.
@@ -143,7 +145,7 @@ export type FieldValidation =
 /**
  * The applied semantic value a field's predicate carries: a `choices` set,
  * a number or date bound, whether a presence field is set, or the text a
- * text field contains or starts with.
+ * text field's operator matches.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -198,7 +200,13 @@ export type FieldKindOperators = {
   readonly number: "gte" | "lte";
   readonly presence: "isSet";
   readonly date: "gte" | "lte";
-  readonly text: "is" | "isNot" | "contains" | "notContains" | "startsWith";
+  readonly text:
+    | "is"
+    | "isNot"
+    | "contains"
+    | "notContains"
+    | "startsWith"
+    | "endsWith";
 };
 
 /** One text input read as an operand, or the reason it is not one. */
