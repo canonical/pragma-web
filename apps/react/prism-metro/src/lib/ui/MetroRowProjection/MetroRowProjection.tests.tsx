@@ -129,6 +129,8 @@ describe("MetroRowProjection", () => {
     ["Zone", MOCK_ZONE],
     ["RollingStock", defineEntity(MOCK_ROLLING_STOCK, "A train type.")],
     ["Formation", defineEntity(MOCK_FORMATION, "A train as it runs.")],
+    ["Unit", defineEntity(MOCK_UNIT, "Cars coupled for good.")],
+    ["CarType", defineEntity(MOCK_CAR_TYPE, "A car as it is built.")],
   ] as const)("hands a %s's arm its two-line opt-in", (_typename, entity) => {
     const { container } = renderWithNode(
       (node) => <MetroRowProjection lines="two" node={node} />,

@@ -58,9 +58,6 @@ export default function MetroRowProjection({
   ...props
 }: MetroRowProjectionProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  // The unit and car type arms, not yet on the identity's slots, take no
-  // `lines`: every arm that is on them takes all the props.
-  const { lines, ...native } = props;
   switch (data.__typename) {
     case "Station":
       return (
@@ -100,12 +97,12 @@ export default function MetroRowProjection({
       );
     case "Unit":
       return (
-        <UnitRow {...native} node={requireArmKey(data.Unit, data.__typename)} />
+        <UnitRow {...props} node={requireArmKey(data.Unit, data.__typename)} />
       );
     case "CarType":
       return (
         <CarTypeRow
-          {...native}
+          {...props}
           node={requireArmKey(data.CarType, data.__typename)}
         />
       );

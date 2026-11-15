@@ -120,6 +120,8 @@ describe("MetroChipProjection", () => {
     ["Zone", MOCK_ZONE],
     ["RollingStock", MOCK_ROLLING_STOCK],
     ["Formation", MOCK_FORMATION],
+    ["Unit", MOCK_UNIT],
+    ["CarType", MOCK_CAR_TYPE],
   ] as const)("hands a %s's arm its unlinked opt-out", (_typename, entity) => {
     const { container } = renderWithNode(
       (node) => <MetroChipProjection linked={false} node={node} />,
