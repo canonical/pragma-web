@@ -452,3 +452,121 @@ describe("the sectioned view's contents bar below three groups", () => {
     }
   });
 });
+
+/** The example's stage ends above this line at 1440 (M15). */
+const STAGE_MAX_BOTTOM_PX = 400;
+
+/** Button's sections the graph holds, in the lens's order. */
+const BUTTON_SECTION_IDS = [
+  "usage",
+  "guidelines",
+  "anatomy",
+  "tokens",
+  "properties",
+  "variants",
+  "relations",
+  "changes",
+] as const;
+
+/** The modifier families Button's example honours, by the graph's name. */
+const BUTTON_FAMILIES = ["importance", "anticipation"] as const;
+
+/** What Button's page shows on its first screen at 1440. */
+type FoldMeasure = {
+  readonly stageBottom: number;
+  readonly variantsTop: number;
+  readonly cells: number;
+  readonly captioned: number;
+  readonly drawn: number;
+  readonly contents: readonly string[];
+  readonly asideHeight: number;
+};
+
+/**
+ * Measure the example's stage, the Variants heading, the variant cells
+ * and the aside's contents on Button's page. Runs in the page.
+ *
+ * @throws When the page has no example stage or no Variants heading.
+ */
+const measureFold = (): FoldMeasure => {
+  const stage = document.querySelector(".ds.component-example > .stage");
+  const variants = document.getElementById("variants");
+  if (!stage || !variants) throw new Error("no stage or no Variants heading");
+  const cells = [...document.querySelectorAll("[data-family][data-modifier]")];
+  return {
+    stageBottom: stage.getBoundingClientRect().bottom,
+    variantsTop: variants.getBoundingClientRect().top,
+    cells: cells.length,
+    captioned: cells.filter(
+      (cell) => cell.querySelector("figcaption")?.textContent,
+    ).length,
+    drawn: cells.filter((cell) => cell.querySelector(".stage > .ds.button"))
+      .length,
+    contents: [
+      ...document.querySelectorAll(".ds.sectioned-view > .aside .contents a"),
+    ].map((link) => link.getAttribute("href") ?? ""),
+    asideHeight:
+      document
+        .querySelector(".ds.sectioned-view > .aside")
+        ?.getBoundingClientRect().height ?? 0,
+  };
+};
+
+/**
+ * How many modifiers the graph records for Button in the families its
+ * example honours: the fewest variant cells its page may draw.
+ *
+ * @note Impure: queries the running graph server.
+ */
+const countButtonModifiers = async (): Promise<number> => {
+  const response = await fetch(new URL("/graphql", server.graphBase), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      query: `{ component(uri: "ds:global.component.button") {
+        modifierFamilies(first: 24) { edges { node { uri
+          modifiers(first: 100) { edges { node { uri } } } } } } } }`,
+    }),
+  });
+  const { data } = (await response.json()) as {
+    data: {
+      component: {
+        modifierFamilies: {
+          edges: {
+            node: { uri: string; modifiers: { edges: unknown[] } };
+          }[];
+        };
+      };
+    };
+  };
+  return data.component.modifierFamilies.edges
+    .filter(({ node }) =>
+      (BUTTON_FAMILIES as readonly string[]).includes(
+        node.uri.slice(node.uri.lastIndexOf(".") + 1),
+      ),
+    )
+    .reduce((count, { node }) => count + node.modifiers.edges.length, 0);
+};
+
+describe("Button's component page at 1440px (W6a-A6)", () => {
+  it("ends the example's stage above 400, draws every variant captioned, and lists every section", async ({
+    annotate,
+  }) => {
+    const page = await open(BUTTON_PATH);
+    try {
+      const fold = await page.evaluate(measureFold);
+      await annotate(
+        `stage bottom ${fold.stageBottom}px; Variants heading top ${fold.variantsTop}px; aside ${fold.asideHeight}px tall`,
+      );
+      expect(fold.stageBottom).toBeLessThan(STAGE_MAX_BOTTOM_PX);
+      const modifiers = await countButtonModifiers();
+      expect(modifiers).toBeGreaterThan(0);
+      expect(fold.cells).toBeGreaterThanOrEqual(modifiers);
+      expect(fold.captioned).toBe(fold.cells);
+      expect(fold.drawn).toBe(fold.cells);
+      expect(fold.contents).toEqual(BUTTON_SECTION_IDS.map((id) => `#${id}`));
+    } finally {
+      await page.close();
+    }
+  });
+});
