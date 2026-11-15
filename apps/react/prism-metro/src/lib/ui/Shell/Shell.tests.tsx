@@ -4,6 +4,7 @@ import { createEnvironment, useHome } from "@canonical/prism-core";
 import {
   useForeignPrefix,
   useProjectionMaps,
+  useProjectionPeek,
 } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import {
@@ -12,7 +13,7 @@ import {
   route,
 } from "@canonical/router-core";
 import { render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { isValidElement, type ReactElement } from "react";
 import { useRelayEnvironment } from "react-relay";
 import { describe, expect, it } from "vitest";
 import { metroProjectionMaps } from "#domains/metro";
@@ -21,6 +22,7 @@ import {
   NORTHGATE_CURIE,
   STATION_CLASS_CURIE,
 } from "../../../../testing/fixtures.js";
+import { MetroPeek } from "../MetroPeek/index.js";
 import Shell from "./Shell.js";
 
 // The nest only provides the environment; nothing here queries, so a fetch
@@ -39,6 +41,7 @@ function Probe(): ReactElement {
     uri: STATION_CLASS_CURIE,
   });
   const maps = useProjectionMaps();
+  const peek = useProjectionPeek("https://metro.example/onto#northgate");
   const ownPrefix = useForeignPrefix(NORTHGATE_CURIE);
   const foreignPrefix = useForeignPrefix("geo:Place");
   return (
@@ -50,6 +53,12 @@ function Probe(): ReactElement {
       <p>Line home: {lineHome}</p>
       <p>Class home: {classHome}</p>
       <p>{maps === metroProjectionMaps ? "Metro maps" : "Other maps"}</p>
+      <p>
+        Peek:{" "}
+        {isValidElement(peek) && peek.type === MetroPeek
+          ? "MetroPeek"
+          : "other"}
+      </p>
       <p>Own prefix: {ownPrefix ?? "none"}</p>
       <p>Foreign prefix: {foreignPrefix ?? "none"}</p>
     </section>
@@ -125,6 +134,11 @@ describe("Shell", () => {
   it("provides the site's projection maps", async () => {
     renderShell();
     expect(await screen.findByText("Metro maps")).toBeInTheDocument();
+  });
+
+  it("gives every chip the site's peek, MetroPeek", async () => {
+    renderShell();
+    expect(await screen.findByText("Peek: MetroPeek")).toBeInTheDocument();
   });
 
   it("declares `metro` as the site's ambient namespace", async () => {

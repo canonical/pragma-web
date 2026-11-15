@@ -22,9 +22,17 @@ import { homes } from "../../../homes.js";
 import { AMBIENT_NAMESPACE, GRID_PRESET_CLASS_NAMES } from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
+import { MetroPeek } from "../MetroPeek/index.js";
 import { SiteRenderers } from "../SiteRenderers/index.js";
 
 const componentCssClassName = "ds shell";
+
+/**
+ * Render the site's peek at the IRI `uri`: the card the site's card
+ * switch gives the node, which every chip arm reaches through the
+ * provider (`useProjectionPeek`).
+ */
+const renderPeek = (uri: string): ReactElement => <MetroPeek uri={uri} />;
 
 /**
  * The application's provider nest and the one element it renders: the
@@ -34,7 +42,8 @@ const componentCssClassName = "ds shell";
  * as on the client. Inside the
  * router sit the site's homes and its projection maps, so every mention of
  * a graph node renders through its type's arm and links to the page that
- * owns it, and the site's one ambient namespace, `metro`, so a metro
+ * owns it, with the site's peek, `MetroPeek`, which every chip opens, and
+ * the site's one ambient namespace, `metro`, so a metro
  * identity shows no prefix and a foreign one shows its own.
  *
  * The projections render a home through prism-core's `RouterLink`, so every
@@ -77,6 +86,7 @@ export default function Shell<
               <ProjectionsProvider
                 LinkComponent={RouterLink}
                 maps={metroProjectionMaps}
+                peek={renderPeek}
               >
                 <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
                   <SiteRenderers>

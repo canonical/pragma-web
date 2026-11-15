@@ -67,6 +67,20 @@ const fragments = Object.fromEntries(
 );
 
 /**
+ * Every compiled peek query of the app, by its operation's name: a peek
+ * projects on the root \`Query\` type through an operation of its own, so
+ * its anatomy is matched to that operation's reader.
+ */
+const peekQueries = Object.fromEntries(
+  Object.values(
+    import.meta.glob<{ readonly default: { fragment: ReaderFragment } }>(
+      "../../relay/__generated__/*PeekQuery.graphql.ts",
+      { eager: true },
+    ),
+  ).map((module) => [module.default.fragment.name, module.default.fragment]),
+);
+
+/**
  * The projections among the components: those whose anatomy's root
  * narrows to a type through `projection.on`.
  */
@@ -106,7 +120,8 @@ describe("the app's components", () => {
     "%s reads the fields its fragment reads",
     (folder) => {
       const name = `${basename(folder)}_node`;
-      const fragment = fragments[name];
+      const fragment =
+        fragments[name] ?? peekQueries[`${basename(folder)}Query`];
       if (fragment === undefined) {
         throw new Error(`${name} is not compiled: run \`bun run relay\``);
       }
