@@ -181,6 +181,7 @@ describe("createSchema", () => {
     expect(schema.listOperators("owner")).toEqual(["isSet"]);
     expect(schema.listOperators("name")).toEqual([
       "is",
+      "isNot",
       "contains",
       "startsWith",
     ]);

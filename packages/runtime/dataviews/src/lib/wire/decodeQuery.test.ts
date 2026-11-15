@@ -98,7 +98,7 @@ describe("decodeQuery", () => {
     ]);
   });
 
-  it.each(["is"] as const)(
+  it.each(["is", "isNot"] as const)(
     "reads and writes back the text a text field's %s operator takes",
     (operator) => {
       const decoded = decode(`name__${operator}=Web`);

@@ -17,6 +17,7 @@ export type PredicateOperator =
   | "lte"
   | "isSet"
   | "is"
+  | "isNot"
   | "contains"
   | "startsWith";
 

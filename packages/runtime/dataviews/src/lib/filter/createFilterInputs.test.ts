@@ -59,7 +59,12 @@ describe("createFilterInputs", () => {
       "updated",
     ]);
     expect(Object.keys(handles.cpu).sort()).toEqual(["gte", "lte"]);
-    expect(Object.keys(handles.name)).toEqual(["is", "contains", "startsWith"]);
+    expect(Object.keys(handles.name)).toEqual([
+      "is",
+      "isNot",
+      "contains",
+      "startsWith",
+    ]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
     expectTypeOf(handles.name.contains.applied).toEqualTypeOf<
       ReadonlyChannel<EmptyOr<string>>

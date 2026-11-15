@@ -38,11 +38,12 @@ describe("selectRows", () => {
     const schema = createSchema([
       { field: "type", kind: "choices", options: ["vm", "container"] },
       { field: "secureboot", kind: "presence", appliesTo: ["vm"] },
+      { field: "image", kind: "text", appliesTo: ["container"] },
     ]);
     const rows = [
       { id: "booted", type: "vm", secureboot: true },
       { id: "unbooted", type: "vm" },
-      { id: "container", type: "container" },
+      { id: "container", type: "container", image: "ubuntu" },
     ];
     const types = { field: "type", names: ["vm", "container"] };
     const select = (operands: readonly boolean[], scoped = true) =>
@@ -59,6 +60,20 @@ describe("selectRows", () => {
     it("keeps a row of another type out of isSet with false", () => {
       expect(select([false])).toEqual(["unbooted"]);
       expect(select([true])).toEqual(["booted"]);
+    });
+
+    it("keeps a row of another type out of a text negation", () => {
+      const negate = (operator: "isNot") =>
+        selectRows(
+          rows,
+          {
+            ...EMPTY_SLICE,
+            filter: [{ field: "image", operator, operands: ["debian"] }],
+          },
+          { schema, types },
+          null,
+        ).map(({ id }) => id);
+      expect(negate("isNot")).toEqual(["container"]);
     });
 
     it("reads every row's type alike where the collection has one", () => {
@@ -84,5 +99,35 @@ describe("selectRows", () => {
         selectIds({ field: "name", operator: "is", operands: [4] }),
       ).toEqual([]);
     });
+  });
+
+  describe("isNot", () => {
+    it("selects every row the equal operand does not, those without text included", () => {
+      expect(
+        selectIds({ field: "name", operator: "isNot", operands: ["ALPHA"] }),
+      ).toEqual(["b", "c", "d", "e", "g", "f"]);
+    });
+  });
+
+  describe("negations", () => {
+    it.each([["isNot", "is"]] as const)(
+      "selects with %s exactly the rows %s does not",
+      (negation, held) => {
+        const every = FACETED_ROWS.map(({ id }) => id);
+        for (const operand of ["alpha", "A", "", "%", 4]) {
+          const negated = selectIds({
+            field: "name",
+            operator: negation,
+            operands: [operand],
+          });
+          const kept = selectIds({
+            field: "name",
+            operator: held,
+            operands: [operand],
+          });
+          expect(every.filter((id) => !kept.includes(id))).toEqual(negated);
+        }
+      },
+    );
   });
 });

@@ -534,6 +534,7 @@ export const MESSAGE_SAMPLES: {
   facetCount: [[{ kind: "exact", value: 7 }], [{ kind: "at-least", value: 7 }]],
   filterContains: [[MESSAGE_MARK]],
   filterStartsWith: [[MESSAGE_MARK]],
+  filterIsNot: [[MESSAGE_MARK]],
   filterIs: [[MESSAGE_MARK]],
   filterIncomplete: [[false], [true]],
   filterRefused: [

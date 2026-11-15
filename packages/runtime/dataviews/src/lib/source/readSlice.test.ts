@@ -84,6 +84,7 @@ describe("readSlice", () => {
     expectTypeOf(reading.filters.name).toEqualTypeOf<
       | {
           readonly is?: string;
+          readonly isNot?: string;
           readonly contains?: string;
           readonly startsWith?: string;
         }
