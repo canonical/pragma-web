@@ -57,7 +57,8 @@
     "check:biome:fix": "biome check --write",
     "check:ts": "tsc --noEmit",
     "storybook": "storybook dev -p 6010 --no-open --host 0.0.0.0",
-    "test": "vitest run --coverage",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:keyboard": "playwright test --config testing/playwright.config.ts",
     "test:watch": "vitest"
   },
