@@ -10,7 +10,7 @@ describe("ComponentExample SSR", () => {
       <ComponentExample address="ds:global.component.button" />,
     );
     expect(html).toContain(
-      '<section aria-label="Example" class="stage"><button class="ds button',
+      '<section aria-labelledby="component-example-title" class="stage"><div class="bar"><span class="title" id="component-example-title">Example</span></div><div class="surface"><button class="ds button',
     );
   });
 });

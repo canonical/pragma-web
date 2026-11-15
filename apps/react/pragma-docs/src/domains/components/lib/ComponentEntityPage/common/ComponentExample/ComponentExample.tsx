@@ -6,6 +6,7 @@ import {
   BLOCK_EXAMPLES,
   UIBlockExample,
 } from "../../../UIBlockExample/index.js";
+import { TITLE_ID } from "./constants.js";
 import type { ComponentExampleProps } from "./types.js";
 import "./styles.css";
 
@@ -15,9 +16,10 @@ const componentCssClassName = "ds component-example";
  * The component page's example, the body before its sections: the block's
  * rendered example, the published React component in its default state,
  * server-rendered on a stage framed by a hairline across the main column.
- * The stage is a region named "Example", the page's sections carrying the
- * headings. A block the published package does not implement says so in
- * one muted line.
+ * The frame opens with a one-line bar, a hairline under it, whose title
+ * "Example" names the stage's region; the title is no heading, the page's
+ * sections carrying the headings. A block the published package does not
+ * implement says so in one muted line.
  *
  * `import { ComponentExample } from "../ComponentExample/index.js";`
  *
@@ -39,8 +41,15 @@ export default function ComponentExample({
       {example === undefined ? (
         <p className="absent">{t("component.noExample")}</p>
       ) : (
-        <section aria-label={t("component.example")} className="stage">
-          <UIBlockExample example={example} />
+        <section aria-labelledby={TITLE_ID} className="stage">
+          <div className="bar">
+            <span className="title" id={TITLE_ID}>
+              {t("component.example")}
+            </span>
+          </div>
+          <div className="surface">
+            <UIBlockExample example={example} />
+          </div>
         </section>
       )}
     </div>

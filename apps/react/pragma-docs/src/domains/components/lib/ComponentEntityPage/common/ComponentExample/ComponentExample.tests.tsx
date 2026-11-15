@@ -9,9 +9,19 @@ describe("ComponentExample", () => {
     render(<ComponentExample address="ds:global.component.button" />);
     const stage = screen.getByRole("region", { name: "Example" });
     expect(stage).toHaveClass("stage");
-    expect(stage.querySelector(".ds.button")).not.toBeNull();
+    expect(stage.querySelector(":scope > .surface .ds.button")).not.toBeNull();
     expect(screen.queryByRole("heading")).toBeNull();
     expect(document.querySelector(".absent")).toBeNull();
+  });
+
+  it("opens the frame with a bar whose title names the stage", () => {
+    render(<ComponentExample address="ds:global.component.button" />);
+    const stage = screen.getByRole("region", { name: "Example" });
+    const title = stage.querySelector(":scope > .bar:first-child > .title");
+    expect(title).toHaveTextContent("Example");
+    expect(stage).toHaveAttribute("aria-labelledby", title?.id);
+    expect(stage).not.toHaveAttribute("aria-label");
+    expect(stage.querySelector(".bar button, .bar a")).toBeNull();
   });
 
   it("says a block the published package does not implement has no example", () => {

@@ -12,6 +12,13 @@
     --component-example-stage-border-width: 1px;
     --component-example-stage-border-color: var(--color-border-muted);
     --component-example-absent-color: var(--color-text-muted);
+    --component-example-bar-padding-block: var(--space-050);
+    --component-example-title-font-size: var(
+      --typography-text-secondary-font-size
+    );
+    --component-example-title-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
 
     display: grid;
     grid-template-columns: subgrid;
@@ -19,19 +26,40 @@
     gap: var(--component-example-gap);
   }
 
-  /* The stage spans the main column, framed by a hairline, the component
-   * one loose step from its top and bottom and one inline padding from
-   * its sides. */
+  /* The stage spans the main column, framed by a hairline. */
   .ds.component-example > .stage {
     grid-column: 1 / -1;
+    min-width: 0;
+    border-width: var(--component-example-stage-border-width);
+    border-style: solid;
+    border-color: var(--component-example-stage-border-color);
+  }
+
+  /* The frame's first row: one line bleeding to the frame's edges, a
+   * hairline under it, its title at its start, small and bold. */
+  .ds.component-example > .stage > .bar {
+    display: flex;
+    align-items: center;
+    padding-block: var(--component-example-bar-padding-block);
+    padding-inline: var(--component-example-stage-padding-inline);
+    border-width: var(--component-example-stage-border-width);
+    border-style: none none solid;
+    border-bottom-color: var(--component-example-stage-border-color);
+  }
+
+  .ds.component-example > .stage > .bar > .title {
+    font-size: var(--component-example-title-font-size);
+    font-weight: var(--component-example-title-font-weight);
+  }
+
+  /* Under the bar the component, one loose step from the bar and the
+   * frame's bottom and one inline padding from its sides. */
+  .ds.component-example > .stage > .surface {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     padding-block: var(--component-example-stage-padding-block);
     padding-inline: var(--component-example-stage-padding-inline);
-    border-width: var(--component-example-stage-border-width);
-    border-style: solid;
-    border-color: var(--component-example-stage-border-color);
   }
 
   .ds.component-example > .absent {
