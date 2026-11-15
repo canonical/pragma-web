@@ -312,6 +312,26 @@ export const CROSSED_PAIR_GRAPH: ClassGraphInput = {
 
 /**
  * The two regions of `SHELF_PAIR_GRAPH` side by side, joined by three
+ * bridges whose ports cross: the top box to the bottom one and back,
+ * and the middle box to the middle one.
+ */
+export const CROSSED_TRIO_GRAPH: ClassGraphInput = {
+  classes: SHELF_PAIR_GRAPH.classes,
+  relations: [
+    ["0", "2"],
+    ["2", "0"],
+    ["1", "1"],
+  ].map(([from, to]) => ({
+    uri: `aa:from${from}`,
+    label: `from ${from}`,
+    domain: `aa:A${from}`,
+    range: `bb:B${to}`,
+    count: 1,
+  })),
+};
+
+/**
+ * The two regions of `SHELF_PAIR_GRAPH` side by side, joined by three
  * bridges, box to box across, the middle one with no statements.
  */
 export const NEIGHBOUR_TRIO_GRAPH: ClassGraphInput = {

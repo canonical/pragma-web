@@ -11,6 +11,8 @@ import {
 import { describe, expect, it } from "vitest";
 import {
   BRIDGE_TRIO_GRAPH,
+  CROSSED_PAIR_GRAPH,
+  CROSSED_TRIO_GRAPH,
   SHELF_PAIR_GRAPH,
   STACKED_PAIR_GRAPH,
 } from "../../../testing/fixtures.js";
@@ -56,8 +58,13 @@ describe("placeBridgeLabels", () => {
     ]);
   });
 
-  it("labels every bridge of the captured graphs clear of boxes and of each other, beside its own route", () => {
-    for (const graph of [ontologyGraph, metroGraph, BRIDGE_TRIO_GRAPH]) {
+  it("labels every bridge of the captured graphs and of nested arches clear of boxes and of each other, beside its own route", () => {
+    for (const graph of [
+      ontologyGraph,
+      metroGraph,
+      BRIDGE_TRIO_GRAPH,
+      CROSSED_PAIR_GRAPH,
+    ]) {
       const layout = layOutClassGraph(graph);
       const { bridges, labels, omitted } = placeOn(layout);
       expect(labels.map((label) => label.edge)).toEqual(
@@ -85,6 +92,38 @@ describe("placeBridgeLabels", () => {
         );
       }
     }
+  });
+
+  it("labels two of three nested arches at rest and leaves the innermost to the focus", () => {
+    // In a 48px gap the innermost arch runs between the others' verticals
+    // with no stretch of its own wide enough for a label: the outermost
+    // carries its label beside its descent, the middle one under the pair.
+    const layout = layOutClassGraph(CROSSED_TRIO_GRAPH);
+    const { bridges, labels, omitted } = placeOn(layout);
+    expect(labels.map((label) => label.edge)).toEqual([
+      "rel:aa:A0 bb:B2",
+      "rel:aa:A1 bb:B1",
+    ]);
+    expect(omitted).toEqual(["rel:aa:A2 bb:B0"]);
+    for (const label of labels) {
+      for (const bridge of bridges) {
+        if (bridge.id !== label.edge)
+          expect(touchesRoute(label.box, bridge.d)).toBe(false);
+      }
+      for (const node of layout.nodes.values()) {
+        expect(intersectsRect(label.box, node)).toBe(false);
+      }
+    }
+    const [first, second] = labels;
+    expect(
+      intersectsRect(
+        requireDefined(first, "a label").box,
+        requireDefined(second, "a label").box,
+      ),
+    ).toBe(false);
+    expect(
+      placeBridgeLabels(layout, t).onFocus.map((label) => label.edge),
+    ).toEqual(["rel:aa:A2 bb:B0"]);
   });
 
   it("labels a bridge too short for its label under the pair it joins, centred on it, clear of boxes, label rows and routes", () => {

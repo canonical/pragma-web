@@ -13,6 +13,7 @@ import {
   BRIDGE_TRIO_GRAPH,
   CROSS_REGION_GRAPH,
   CROSSED_PAIR_GRAPH,
+  CROSSED_TRIO_GRAPH,
   defineClass,
   FOUR_NAMESPACE_GRAPH,
   NARROWING_GRAPH,
@@ -652,6 +653,55 @@ describe("layOutClassGraph", () => {
       expect(
         bridges.slice(dashed).every((edge) => edge.bundle?.weight === 0),
       ).toBe(true);
+    },
+  );
+
+  it.each([
+    ["two crossed bridges on the first shelf", CROSSED_PAIR_GRAPH, []],
+    ["three crossed bridges on the first shelf", CROSSED_TRIO_GRAPH, []],
+    [
+      "three crossed bridges under a shelf",
+      CROSSED_TRIO_GRAPH,
+      // A chain of classes as wide as the canvas fills the shelf above.
+      Array.from({ length: 10 }, (_, index) =>
+        defineClass(`cc:C${index}`, `Chain ${index}`, {
+          superclass: index === 0 ? undefined : `cc:C${index - 1}`,
+        }),
+      ),
+    ],
+  ])(
+    "arches %s inside the viewBox and below the shelf above",
+    (_, graph, above) => {
+      const layout = layOutClassGraph({
+        ...graph,
+        classes: [...above, ...graph.classes],
+      });
+      const pairTop = Math.min(
+        ...layout.regions
+          .filter((region) => region.prefix !== "cc")
+          .map((region) => region.y),
+      );
+      const shelfAbove = Math.max(
+        layout.viewBox.y,
+        ...layout.regions
+          .filter((region) => region.y + region.h <= pairTop)
+          .map((region) => region.y + region.h),
+      );
+      const bridges = layout.edges.filter((edge) => edge.bridge === true);
+      expect(bridges).toHaveLength(graph.relations.length);
+      for (const bridge of bridges) {
+        const bounds = measurePathBounds(bridge.d);
+        // Each arch rises over its own shelf, never into the one above.
+        expect(bounds.y).toBeLessThan(pairTop);
+        expect(bounds.y).toBeGreaterThan(shelfAbove);
+        expect(bounds.x).toBeGreaterThanOrEqual(layout.viewBox.x);
+        expect(bounds.x + bounds.w).toBeLessThanOrEqual(
+          layout.viewBox.x + layout.viewBox.w,
+        );
+        expect(bounds.y + bounds.h).toBeLessThanOrEqual(
+          layout.viewBox.y + layout.viewBox.h,
+        );
+      }
     },
   );
 
