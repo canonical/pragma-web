@@ -25,9 +25,9 @@
  * to its last;
  * every gap, padding and margin of the chrome a multiple of 4px; and the
  * workspace drawn in the face it ships, the dev cell delivering its font.
- * The standards index's entries keep every title whole, at 390px too, an
- * entry whose title and address do not share a line moving its address
- * to a line of its own.
+ * The standards index's entries keep their address, the row's first
+ * fact, on the title's one line, and a title is cut, at 390px too, only
+ * once the address has given up all of its width.
  */
 import {
   launchBrowser,
@@ -60,7 +60,9 @@ const CWD = process.cwd();
 /**
  * Count the standards index's entries, those whose title is cut while some
  * of its address still shows, and those whose address, the row's first
- * fact, has left the title's line. It runs in the page.
+ * fact, has left the title's line. A title is cut when its own text is
+ * wider than its box: the identity that holds it never overflows, since
+ * the title shrinks inside it. It runs in the page.
  *
  * @returns The counts.
  * @throws When an entry has no title or no address.
@@ -75,15 +77,20 @@ function countCutEntries(): {
   ];
   const measured = rows.map((row) => {
     const identity = row.querySelector(".identity");
+    const title = identity?.querySelector(".title");
     const facts = row.querySelector(".facts");
-    if (!identity || !facts?.querySelector('.fact[data-property="curie"]')) {
+    if (
+      !identity ||
+      !title ||
+      !facts?.querySelector('.fact[data-property="curie"]')
+    ) {
       throw new Error("an entry has no title or no address");
     }
     return {
       // The title yields last: it may be cut only once the address has
       // given up all of its width.
       titleCutFirst:
-        identity.scrollWidth > identity.clientWidth && facts.clientWidth > 0,
+        title.scrollWidth > title.clientWidth && facts.clientWidth > 0,
       // On a line of its own, the address would start below the title's.
       addressApart:
         facts.getBoundingClientRect().top >=
