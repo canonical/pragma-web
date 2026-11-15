@@ -22,7 +22,10 @@
  * opens at the map's top-left corner at that floor: the first shelf's
  * boxes whole where they fit, a box the window's edge crosses cut there.
  * A namespace's box is a link, by pointer and by keyboard, to the page
- * drilled into it (`expand=`), whose heading leads back to the overview.
+ * drilled into it (`expand=`), whose heading leads back to the overview;
+ * that page opens by the overview's rule, at the legible floor from the
+ * opened namespace's corner. A term page reached from another frames its
+ * class as loading its address does.
  */
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
@@ -46,6 +49,13 @@ import {
 import { type RunningServer, startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
+
+/**
+ * How far from the canvas's top-left corner an opened namespace's heading
+ * may start, in screen px: the view's 16px margin at the legible floor,
+ * with a lattice step to spare.
+ */
+const CORNER_ROOM_PX = 32;
 
 let server: RunningServer;
 let browser: Browser;
@@ -620,15 +630,52 @@ describe("the drill through the address, at 1440 px", () => {
     );
   });
 
-  it("opens the address's namespace legibly, and its heading's way back returns to the overview at rest", async () => {
+  it.each(["1440", "912"])(
+    "opens the address's namespace at %s px by the overview's rule: the legible floor, its heading at the window's top-left corner",
+    async (width) => {
+      const viewport = [...VIEWPORTS, ...STRIP_VIEWPORTS].find(
+        (candidate) => candidate.name === width,
+      );
+      if (viewport === undefined) throw new Error(`no ${width} viewport`);
+      const seen: { zoom?: string | null; corner?: readonly number[] } = {};
+      const { errors, measure } = await openExplorer(
+        "/definitions?expand=surface",
+        viewport,
+        async (page) => {
+          seen.zoom = await page
+            .locator(".ds.graph-canvas .zoom-level")
+            .textContent();
+          seen.corner = await page.evaluate(() => {
+            const frame = document
+              .querySelector(".ds.graph-canvas svg.viewport")
+              ?.getBoundingClientRect();
+            const heading = document
+              .querySelector(".ds.graph-canvas svg.viewport a.way-back")
+              ?.getBoundingClientRect();
+            return frame === undefined || heading === undefined
+              ? []
+              : [heading.left - frame.left, heading.top - frame.top];
+          });
+        },
+      );
+      expect(errors).toEqual([]);
+      // The map does not fit the canvas at the legible floor: it opens
+      // there, from the map's top-left corner, which is the opened
+      // namespace's own, never zoomed to the namespace's height.
+      expect(seen.zoom).toBe("86%");
+      const [left = Number.NaN, top = Number.NaN] = seen.corner ?? [];
+      for (const offset of [left, top]) {
+        expect(offset).toBeGreaterThanOrEqual(0);
+        expect(offset).toBeLessThanOrEqual(CORNER_ROOM_PX);
+      }
+      expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+      expect(measure.unlabelled).toBe(0);
+      expect(measure.inView).toBeGreaterThan(1);
+    },
+  );
+
+  it("leads the way back from the address's namespace to the overview at rest", async () => {
     const seen: { boxes?: string[]; url?: string } = {};
-    const { errors, measure } = await openExplorer(
-      "/definitions?expand=surface",
-      desktop,
-    );
-    expect(errors).toEqual([]);
-    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
-    expect(measure.inView).toBeGreaterThan(0);
     const back = await openExplorer(
       "/definitions?expand=surface",
       desktop,
@@ -727,6 +774,51 @@ describe("a drill's link against its address", () => {
     );
     expect(back.errors).toEqual([]);
     expectSameCamera(back.camera, loaded.camera);
+  });
+
+  it("frames a class of a collapsed namespace reached from another term page as loading its address does", async () => {
+    const actor = `/definitions/${encodeURIComponent("surface:Actor")}`;
+    /** Whether the class's box lies wholly in the canvas's viewport. */
+    const isFramed = (page: Page): Promise<boolean> =>
+      page.evaluate(() => {
+        const frame = document
+          .querySelector(".ds.graph-canvas svg.viewport")
+          ?.getBoundingClientRect();
+        const node = document
+          .querySelector(
+            '.ds.graph-canvas svg.viewport g.node[data-id="surface:Actor"] .surface',
+          )
+          ?.getBoundingClientRect();
+        return (
+          frame !== undefined &&
+          node !== undefined &&
+          node.width > 0 &&
+          node.left >= frame.left &&
+          node.right <= frame.right &&
+          node.top >= frame.top &&
+          node.bottom <= frame.bottom
+        );
+      });
+    const framed: { loaded?: boolean; clicked?: boolean } = {};
+    const loaded = await cameraAfter(actor, "surface", async (page) => {
+      framed.loaded = await isFramed(page);
+    });
+    // ds:UIBlock's page opens ds and draws surface as one box; the rail
+    // lists surface's classes all the same.
+    const clicked = await cameraAfter(
+      `/definitions/${encodeURIComponent("ds:UIBlock")}`,
+      "surface",
+      async (page) => {
+        await page.locator(`.ds.term-rail a[href="${actor}"]`).click();
+        await page.waitForURL((url) => url.pathname === actor);
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        framed.clicked = await isFramed(page);
+      },
+    );
+    expect(loaded.errors).toEqual([]);
+    expect(clicked.errors).toEqual([]);
+    expect(framed).toEqual({ loaded: true, clicked: true });
+    expectSameCamera(clicked.camera, loaded.camera);
   });
 
   it("lists the opened namespace first at 390, its heading the way back", async () => {
