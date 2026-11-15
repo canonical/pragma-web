@@ -11,7 +11,10 @@
    * the viewport below or above the chip, 4px from the viewport's inline
    * start, so the whole frame stays in the viewport; it scrolls rather
    * than outgrowing the viewport. The drawn 248px peek, 4px below the
-   * chip, no taller than the viewport less 4px at each end. It is the frame, the popover's padding
+   * chip, no taller than half the viewport the chip leaves, less the 4px
+   * gap and a 4px inset from the viewport's edge: the larger side of the
+   * chip always has that room, so one of its places always fits, and a
+   * taller card scrolls in it. It is the frame, the popover's padding
    * and border round the borderless card it holds; the popover's tokens
    * are declared where the published Popover is loaded, so each falls back
    * to the value that component gives it. */
@@ -19,7 +22,12 @@
     --peek-width: 248px;
     --peek-offset: var(--space-050);
     --peek-edge-inset: var(--space-050);
-    --peek-max-height: calc(100dvh - var(--space-100));
+    --peek-max-height: calc(
+      (100dvh - anchor-size(height)) /
+      2 -
+      var(--peek-offset) -
+      var(--peek-edge-inset)
+    );
     --peek-background: var(--color-background);
     --peek-padding-block: var(--popover-padding-vertical, var(--space-100));
     --peek-padding-inline: var(--popover-padding-horizontal, var(--space-200));
@@ -27,6 +35,7 @@
     --peek-border-color: var(--popover-color-border, var(--color-border));
 
     position-area: block-end span-inline-end;
+    /* Chromium tries no more than five fallbacks: a sixth is never used. */
     position-try-fallbacks:
       flip-inline,
       flip-block,

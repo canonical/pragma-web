@@ -38,8 +38,11 @@
 # Token ledger (every decision; a literal only where no symbol exists):
 #   --peek-width: 248px                         literal: the drawn peek (M9)
 #   --peek-offset: space.050 (4px)              below the chip
-#   --peek-edge-inset: space.050 (4px)          from the viewport's edges, last fallbacks only
-#   --peek-max-height: calc(100dvh - space.100) viewport less 8px
+#   --peek-edge-inset: space.050 (4px)          from the viewport's edges
+#   --peek-max-height: calc((100dvh - anchor-size(height)) / 2 - offset - edge-inset)
+#                                               half the viewport the chip leaves, less
+#                                               the gap and the inset: the larger side
+#                                               of the chip always holds it
 #   --peek-background: color.background
 #   --peek-padding-block: popover.padding.vertical (8px)
 #   --peek-padding-inline: popover.padding.horizontal (16px)
@@ -50,7 +53,7 @@ node:
   attributes: { popover: manual, role: dialog }
   styles:
     size.width: 248px
-    size.max.height: "calc(100dvh - var(--space-100))"
+    size.max.height: "calc((100dvh - anchor-size(height)) / 2 - var(--peek-offset) - var(--peek-edge-inset))"
     layout.overflow.block: auto
     spacing.external.block.start: space.050
     spacing.external.block.end: 0
