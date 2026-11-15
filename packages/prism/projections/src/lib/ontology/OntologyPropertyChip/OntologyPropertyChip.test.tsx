@@ -1,6 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
+import { expectSlotOrder } from "@canonical/prism-core/testing";
+import { act, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
@@ -89,6 +90,30 @@ describe("OntologyPropertyChip", () => {
     expect(
       screen.getByRole("link", { name: "Modifier" }).getAttribute("href"),
     ).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
+  });
+
+  it("leads with the property glyph, in the slot order, and has no peek", () => {
+    const { container } = renderWithNode((node) => (
+      <OntologyPropertyChip node={node} />
+    ));
+    const chip = container.querySelector(".ds.ontology-property-chip");
+    if (chip === null) throw new Error("no chip rendered");
+    expectSlotOrder(chip);
+    expect(chip.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/tag.svg#tag",
+    );
+    expect(chip.querySelector(".prefix")).toBeNull();
+    act(() => {
+      screen.getByRole("link", { name: "Modifier" }).focus();
+    });
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+  });
+
+  it("sets its name as inert text when it is not linked", () => {
+    renderWithNode((node) => (
+      <OntologyPropertyChip linked={false} node={node} />
+    ));
+    expect(screen.queryByRole("link")).toBeNull();
   });
 
   it("names a property without a label by its IRI's local name", () => {

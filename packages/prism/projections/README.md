@@ -21,8 +21,10 @@ A lens that mentions nodes it knows nothing about (an ontology class's
 instances, the results of a search, the entities a passage of prose links
 to) renders them through a **dispatcher**, one per form: `ChipProjection`,
 `RowProjection`, `CardProjection`, `CommandProjection` and
-`GraphNodeProjection` render a node through the arm its site maps to the
-node's `__typename`. `NodeList` lists any nodes through the card and row
+`GraphNodeProjection` switch on the node's `__typename`: an ontology
+class renders through its own arm, any other type through the arm its
+site maps to the typename. A property is no node, so no dispatcher takes
+it. `NodeList` lists any nodes through the card and row
 dispatchers, as the shared list view. Prose links to graph nodes render as
 chips too, through the element overrides a Markdown renderer takes.
 
@@ -176,16 +178,16 @@ has none.
 | `NodeCard` | the prefix, the title, the class, the definition |
 | `NodeCommand` | the title over "class in prefix" |
 | `NodeGraphNode` | the compact address over "class in prefix" |
-| `OntologyClassChip` | the title, or the passage's own text |
-| `OntologyClassRow` | `ds:` muted, the title, "abstract" for an abstract class |
-| `OntologyClassCard` | "title ⊂ superclass", "Abstract class in ds", the definition |
-| `OntologyClassCommand` | the title over "Abstract class in ds", "used in 88 instances" |
-| `OntologyClassGraphNode` | the compact address over "Abstract class in ds" |
-| `OntologyPropertyChip` | the name, or the passage's own text |
-| `OntologyPropertyRow` | the name, its kind's word (object, datatype, annotation) |
-| `OntologyPropertyCard` | the name, "kind in domain", the definition, the range and the inverse, "functional" |
-| `OntologyPropertyCommand` | the name over "kind in domain", the range at the end |
-| `OntologyPropertyGraphNode` | the name over "kind in domain" |
+| `OntologyClassChip` | the class glyph, the foreign prefix, the title, or the passage's own text; it peeks at the class |
+| `OntologyClassRow` | the class glyph, the foreign prefix, the title, "abstract" for an abstract class; the definition under it in a two-line row |
+| `OntologyClassCard` | the class glyph, the foreign prefix, the title, the definition, "Subclass of" its superclass, "abstract" as its status |
+| `OntologyClassCommand` | the class glyph, the title over the compact address, "Abstract class", "used in 88 instances" |
+| `OntologyClassGraphNode` | the class glyph, the foreign prefix and the title over "Abstract class" |
+| `OntologyPropertyChip` | the property glyph, the name, or the passage's own text; it has no peek |
+| `OntologyPropertyRow` | the property glyph, the name, its kind's word (object, datatype, annotation); the definition under it in a two-line row |
+| `OntologyPropertyCard` | the property glyph, the name, the definition, its domain, range and inverse, "functional" as its status |
+| `OntologyPropertyCommand` | the property glyph, the name over its IRI, "kind in domain", the range at the end |
+| `OntologyPropertyGraphNode` | the property glyph, the name over "kind in domain" |
 
 A property's name is its label, or the local name of its IRI when it has
 none. Every word a reader sees comes from the package's catalog.

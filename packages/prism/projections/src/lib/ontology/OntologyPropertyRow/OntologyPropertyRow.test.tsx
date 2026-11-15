@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -97,6 +98,21 @@ describe("OntologyPropertyRow", () => {
     ).toHaveAttribute("data-type", "OntologyProperty");
   });
 
+  it("leads with the property glyph, in the slot order", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <OntologyPropertyRow lines="two" node={node} />
+      </ul>
+    ));
+    expectSlotOrder(container);
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/tag.svg#tag",
+    );
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "The modifier that changes how a block looks or behaves.",
+    );
+  });
+
   it("links its name to the property's home and ends in its kind's word", () => {
     const { container } = renderWithNode((node) => (
       <ul>
@@ -107,8 +123,8 @@ describe("OntologyPropertyRow", () => {
     expect(title?.tagName).toBe("A");
     expect(title?.textContent).toBe("Modifier");
     expect(title?.getAttribute("href")).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
-    expect(container.querySelector(".meta")?.textContent).toBe("object");
-    expect(container.querySelector(".location")).toBeNull();
+    expect(container.querySelector(".kind")?.textContent).toBe("object");
+    expect(container.querySelector(".prefix, .summary")).toBeNull();
   });
 
   it("names each kind by its own word", () => {
@@ -124,7 +140,7 @@ describe("OntologyPropertyRow", () => {
         ),
         { kind },
       );
-      expect(container.querySelector(".meta")?.textContent).toBe(word);
+      expect(container.querySelector(".kind")?.textContent).toBe(word);
       unmount();
     }
   });
@@ -139,7 +155,7 @@ describe("OntologyPropertyRow", () => {
       {},
       { kind: "SYMMETRIC" },
     );
-    expect(container.querySelector(".meta")?.textContent).toBe("property");
+    expect(container.querySelector(".kind")?.textContent).toBe("property");
   });
 
   it("names a property without a label by its IRI's local name", () => {

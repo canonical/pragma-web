@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -108,17 +109,29 @@ describe("OntologyPropertyCommand", () => {
         <OntologyPropertyCommand node={node} />
       </ul>
     ));
+    expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".title, .kind, .location, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["Modifier", "Object property", "UIBlock", "ds:Modifier"]);
+      [
+        ...container.querySelectorAll(
+          ".prefix, .title, .address, .kind, .status",
+        ),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "Modifier",
+      "https://ds.canonical.com/modifier",
+      "Object property in UIBlock",
+      "ds:Modifier",
+    ]);
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/tag.svg#tag",
+    );
     expect(container.querySelector(".title")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_PROPERTY_HREF,
     );
-    expect(container.querySelector(".vital code.identifier")?.textContent).toBe(
-      "ds:Modifier",
-    );
+    expect(
+      container.querySelector(".status code.identifier")?.textContent,
+    ).toBe("ds:Modifier");
+    expect(container.querySelector(".context, .vital")).toBeNull();
   });
 
   it("names its kind alone when the property is declared on no class", () => {
@@ -130,10 +143,9 @@ describe("OntologyPropertyCommand", () => {
       ),
       { domain: null, kind: "ANNOTATION" },
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
+    expect(container.querySelector(".kind")?.textContent).toBe(
       "Annotation property",
     );
-    expect(container.querySelector(".location")).toBeNull();
   });
 
   it("names a kind the catalog does not know as a property", () => {
@@ -146,7 +158,9 @@ describe("OntologyPropertyCommand", () => {
       {},
       { kind: "SYMMETRIC" },
     );
-    expect(container.querySelector(".kind")?.textContent).toBe("Property");
+    expect(container.querySelector(".kind")?.textContent).toBe(
+      "Property in UIBlock",
+    );
   });
 
   it("names a property without a label by its IRI's local name", () => {
