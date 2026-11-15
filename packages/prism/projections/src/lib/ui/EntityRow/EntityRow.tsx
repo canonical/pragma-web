@@ -8,10 +8,10 @@ const componentCssClassName = "ds entity-row";
 
 /**
  * The list entry of an entity: one 32px row of an index, its mark,
- * namespace prefix and title on the left and its facts, meta and status
- * ending the row. Its height comes from `lines` alone: the first line
+ * foreign prefix and title on the left and its facts and status ending
+ * the row. Its height comes from `lines` alone: the first line
  * never wraps, and below two groups only the first fact stays on it. The
- * title yields last: the facts and the meta give way first, ending in an
+ * title yields last: the facts give way first, ending in an
  * ellipsis, down to nothing, the status keeps its width, and only then
  * does a title longer than what is left end in an ellipsis.
  * With an `href` the title links to the entity's home through
@@ -22,9 +22,8 @@ const componentCssClassName = "ds entity-row";
  *
  * It renders only the slots it is given, in the slot order every
  * representation keeps: mark, prefix, title, kind, summary, facts and
- * status, each fact cell naming its property in `data-property`; the
- * transitional location and meta keep their places before the title and
- * the status. The mark names nothing, so it is hidden from
+ * status, each fact cell naming its property in `data-property`. The mark
+ * names nothing, so it is hidden from
  * assistive technology. It is a list item, so its list is the consumer's
  * `<ol>` or `<ul>`. It reads no context, so it renders anywhere.
  *
@@ -37,11 +36,9 @@ const componentCssClassName = "ds entity-row";
  */
 export default function EntityRow({
   mark,
-  location,
   title,
   href,
   LinkComponent = "a",
-  meta,
   prefix,
   kind,
   summary,
@@ -63,9 +60,6 @@ export default function EntityRow({
           </span>
         )}
         {prefix === undefined ? null : <span className="prefix">{prefix}</span>}
-        {location === undefined ? null : (
-          <span className="location">{location}</span>
-        )}
         {href === undefined ? (
           <span className="title">{title}</span>
         ) : (
@@ -92,7 +86,6 @@ export default function EntityRow({
           ))}
         </span>
       )}
-      {meta === undefined ? null : <span className="meta">{meta}</span>}
       {status === undefined ? null : <span className="status">{status}</span>}
     </li>
   );

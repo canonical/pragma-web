@@ -31,17 +31,11 @@ type OwnProps = {
   readonly LinkComponent?: LinkComponent;
   /** The entity's type, opening the second line. */
   readonly kind?: ReactNode;
-  /**
-   * Where the entity is defined, on the second line.
-   *
-   * @deprecated Use `prefix`.
-   */
-  readonly location?: ReactNode;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;
   /**
    * The node's height in SVG user units; the graph's layout decides it. A
-   * node with no kind and no location sets its title on the box's middle.
+   * node with no kind sets its title on the box's middle.
    */
   readonly height?: number;
   /**

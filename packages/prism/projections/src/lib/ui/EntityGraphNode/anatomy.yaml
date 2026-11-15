@@ -2,9 +2,8 @@
 # EntityGraphNode — an entity as a node of a graph: a box with rounded
 # corners, two lines tall by default, drawn in native SVG.
 # Reference: the projection matrix's graph-node column (the title, then
-# "kind in location" muted, in a bordered box with 8px inline insets and no
-# block insets: two 24px lines inside a 1px border). Slot order: title, then
-# kind and location on the second line.
+# the kind muted, in a bordered box with 8px inline insets and no block
+# insets: two 24px lines inside a 1px border).
 #
 # Why not a published component: no published graph node exists. It is SVG
 # because a graph draws hundreds of nodes under pan and zoom: the root is a
@@ -153,7 +152,4 @@ node:
           - node:
               role: kind
             relation: { cardinality: "0..1", slotName: kind }
-          - node:
-              role: location
-            relation: { cardinality: "0..1", slotName: location }
       relation: { cardinality: "0..1", slotName: context }

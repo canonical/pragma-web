@@ -31,25 +31,15 @@ type OwnProps = {
   /** The entity's type, opening the second line. */
   readonly kind?: ReactNode;
   /**
-   * Where the entity is defined, in small capitals on the second line.
-   *
-   * @deprecated Use `address`.
-   */
-  readonly location?: ReactNode;
-  /**
-   * The one vital at the end of the row: a version, a count. An identifier
-   * in it is a `<code className="identifier">`, which keeps the row's line.
-   *
-   * @deprecated Use `status`.
-   */
-  readonly vital?: ReactNode;
-  /**
    * The entity's full address, its CURIE, in monospace on the second line.
-   * With one the kind closes the first line; without one the second line is
-   * the transitional "kind in location".
+   * With one the kind closes the first line; without one the kind takes the
+   * second line.
    */
   readonly address?: ReactNode;
-  /** The entity's status, closing the second line. */
+  /**
+   * The entity's status, closing the second line. An identifier in it is a
+   * `<code className="identifier">`, which keeps the row's line.
+   */
   readonly status?: ReactNode;
 };
 

@@ -30,21 +30,21 @@ describe("EntityRow", () => {
       const row = renderRow(<EntityRow title="Layout" />);
       expect(row.querySelector(".identity")?.children).toHaveLength(1);
       expect(screen.getByText("Layout").tagName).toBe("SPAN");
-      expect(row.querySelector(".meta")).toBeNull();
+      expect(row.querySelector(".facts")).toBeNull();
       expect(screen.queryByRole("link")).toBeNull();
     });
   });
 
-  describe("location and meta", () => {
-    it("renders the location before the title and the meta at the end", () => {
+  describe("prefix and status", () => {
+    it("renders the prefix before the title and the status at the end", () => {
       const row = renderRow(
-        <EntityRow location="ds:" meta="abstract" title="Layout" />,
+        <EntityRow prefix="ds:" status="abstract" title="Layout" />,
       );
       expect(
-        [...row.querySelectorAll(".location, .title, .meta")].map(
+        [...row.querySelectorAll(".prefix, .title, .status")].map(
           (element) => element.className,
         ),
-      ).toEqual(["location", "title", "meta"]);
+      ).toEqual(["prefix", "title", "status"]);
       expect(row.querySelector(".identity")?.textContent).toBe("ds:Layout");
       expect(row.lastElementChild?.textContent).toBe("abstract");
     });
@@ -56,7 +56,7 @@ describe("EntityRow", () => {
         <EntityRow
           href="#north"
           mark={<span className="swatch" />}
-          meta="5 stops"
+          status="5 stops"
           title="North Line"
         />,
       );
@@ -77,7 +77,7 @@ describe("EntityRow", () => {
 
   describe("href and LinkComponent", () => {
     it("links the title to the home through an intrinsic anchor by default", () => {
-      renderRow(<EntityRow href="#layout" location="ds:" title="Layout" />);
+      renderRow(<EntityRow href="#layout" prefix="ds:" title="Layout" />);
       const link = screen.getByRole("link", { name: "Layout" });
       expect(link.getAttribute("href")).toBe("#layout");
       expect(link.className).toBe("title");
@@ -88,8 +88,8 @@ describe("EntityRow", () => {
         <EntityRow
           href="#layout"
           LinkComponent={RouterLink}
-          location="ds:"
-          meta="abstract"
+          prefix="ds:"
+          status="abstract"
           title="Layout"
         />,
       );

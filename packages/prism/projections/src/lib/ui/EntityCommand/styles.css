@@ -4,8 +4,8 @@
 
 @layer ds.components.global {
   /* A palette result on two lines of the context's primary text with 4px
-   * above and below them: the identity on the left, one vital on the second
-   * line at the right. */
+   * above and below them: the identity on the left, the kind and the status
+   * at the right. */
   .ds.entity-command {
     --entity-command-gap: var(--grid-gutter);
     --entity-command-padding-inline: var(--component-padding-inline);
@@ -20,10 +20,6 @@
       --typography-text-primary-bold-font-weight
     );
     --entity-command-context-color: var(--color-text-muted);
-    --entity-command-location-letter-spacing: var(
-      --typography-text-primary-smallcaps-letter-spacing
-    );
-    --entity-command-vital-color: var(--color-text-muted);
     /* The mark is the 16px box every form gives it, centred on the first
      * 24px line by the offset, and spaced from the title by the chip's
      * gap. */
@@ -84,7 +80,6 @@
   }
 
   /* What ends the row stands the row's gap from the identity. */
-  .ds.entity-command .vital,
   .ds.entity-command .aside {
     margin-inline-start: var(--entity-command-gap);
   }
@@ -171,19 +166,7 @@
     margin-block-start: auto;
   }
 
-  .ds.entity-command .location {
-    font-variant-caps: all-small-caps;
-    letter-spacing: var(--entity-command-location-letter-spacing);
-  }
-
-  .ds.entity-command .vital {
-    align-self: flex-end;
-    color: var(--entity-command-vital-color);
-    text-align: end;
-    white-space: nowrap;
-  }
-
-  /* An identifier sets the monospace face on the row's line and stands on
+  /* An identifier in the status sets the monospace face on the row's line and stands on
    * the sans text's baseline: its inline box takes no height, so the face's
    * other metrics never grow the line. */
   .ds.entity-command .identifier {

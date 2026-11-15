@@ -18,24 +18,17 @@ const RouterLink = ({
   </a>
 );
 
-/** Every slot the card can fill, for the entity the matrix calls a modifier. */
+/** The slots a typed card fills, for the entity the matrix calls a modifier. */
 const MODIFIER = {
-  location: "DS:Global",
   title: "Danger",
   kind: "Modifier",
   summary: "The danger modifier is part of the anticipation family.",
-  keyValues: [
-    { key: "Class", value: "Modifier" },
-    { key: "Family", value: "Anticipation" },
+  facts: [
+    { property: "ds:modifierFamily", label: "Family", value: "Anticipation" },
+    { property: "ds:version", label: "Version", value: "1.11" },
   ],
-  vitals: ["v1.11", "Stable"],
+  status: "stable",
 } as const;
-
-/**
- * The stylesheet's reflow that has a card without a footer's body reach
- * across the gutter before the footer's track.
- */
-const NO_FOOTER_BODY = ".ds.entity-card:not(:has(> .footer)) > .body";
 
 describe("EntityCard", () => {
   describe("title", () => {
@@ -46,36 +39,9 @@ describe("EntityCard", () => {
         screen.getByRole("heading", { level: 3, name: "Layout" }),
       ).toBeInTheDocument();
       expect(screen.queryByRole("link")).toBeNull();
-      for (const slot of [
-        ".location",
-        ".kind",
-        ".summary",
-        ".key-values",
-        ".footer",
-        ".sidecar",
-      ]) {
+      for (const slot of [".kind", ".summary", ".facts", ".status"]) {
         expect(card.querySelector(slot), slot).toBeNull();
       }
-    });
-
-    it("follows the title with its parent after the catalog's ∈", () => {
-      render(<EntityCard parent="Button" title="IconButton" />);
-      const heading = screen.getByRole("heading", { level: 3 });
-      expect(heading.textContent).toBe("IconButton ∈ Button");
-      expect(heading.querySelector(".parent")?.textContent).toBe("Button");
-    });
-
-    it("follows a subclass's title with its superclass after the catalog's ⊂", () => {
-      render(
-        <EntityCard
-          parent="UIBlock"
-          parentRelation="subclass"
-          title="Layout"
-        />,
-      );
-      const heading = screen.getByRole("heading", { level: 3 });
-      expect(heading.textContent).toBe("Layout ⊂ UIBlock");
-      expect(heading.querySelector(".parent")?.textContent).toBe("UIBlock");
     });
   });
 
@@ -87,12 +53,12 @@ describe("EntityCard", () => {
       ).toBe("#danger");
     });
 
-    it("links only the title, not its parent, through the LinkComponent", () => {
+    it("links only the title through the LinkComponent", () => {
       render(
         <EntityCard
           href="#icon-button"
           LinkComponent={RouterLink}
-          parent="Button"
+          prefix="ds:"
           title="IconButton"
         />,
       );
@@ -104,109 +70,25 @@ describe("EntityCard", () => {
   });
 
   describe("slots", () => {
-    it("renders every slot in the anatomy's order", () => {
-      render(<EntityCard data-testid="card" {...MODIFIER} />);
-      const card = screen.getByTestId("card");
-      expect(
-        [
-          ...card.querySelectorAll(
-            ".location, .title, .kind, .summary, .key-values, .vital",
-          ),
-        ].map((element) => element.className),
-      ).toEqual([
-        "location",
-        "title",
-        "kind",
-        "summary",
-        "key-values",
-        "vital",
-        "vital",
-      ]);
-    });
-
-    it("lists each key value as a term and its description", () => {
+    it("lists each fact as a term and its description", () => {
       render(<EntityCard {...MODIFIER} />);
       const terms = screen.getAllByRole("term");
       expect(terms.map((term) => term.textContent)).toEqual([
-        "Class",
         "Family",
+        "Version",
       ]);
       expect(
         screen.getAllByRole("definition").map((value) => value.textContent),
-      ).toEqual(["Modifier", "Anticipation"]);
+      ).toEqual(["Anticipation", "1.11"]);
     });
 
-    it("renders no footer without vitals, so the body reaches the card's edge", () => {
-      render(<EntityCard data-testid="card" {...MODIFIER} vitals={[]} />);
+    it("ends with its body, the Card's content, as its last child", () => {
+      render(<EntityCard data-testid="card" {...MODIFIER} />);
       const card = screen.getByTestId("card");
       expect(card.querySelector(".card-footer")).toBeNull();
-      expect(card.querySelector(NO_FOOTER_BODY)).toBe(
-        card.querySelector(":scope > .card-content"),
+      expect(card.lastElementChild).toBe(
+        card.querySelector(":scope > .card-content.body"),
       );
-    });
-
-    it("leaves the footer's track to the footer when there are vitals", () => {
-      render(<EntityCard data-testid="card" {...MODIFIER} />);
-      expect(
-        screen.getByTestId("card").querySelector(NO_FOOTER_BODY),
-      ).toBeNull();
-    });
-
-    it("puts the vitals in the published Card's footer", () => {
-      render(<EntityCard data-testid="card" {...MODIFIER} />);
-      const footer = screen.getByTestId("card").querySelector(".card-footer");
-      expect(footer?.classList.contains("footer")).toBe(true);
-      expect(footer?.textContent).toBe("v1.11Stable");
-    });
-  });
-
-  describe("sidecar", () => {
-    it("renders the sidecar last, after the body and the footer, holding its content", () => {
-      render(
-        <EntityCard
-          data-testid="card"
-          sidecar={<button type="button">Submit</button>}
-          title="IconButton"
-          vitals={["v2.1"]}
-        />,
-      );
-      const card = screen.getByTestId("card");
-      expect([...card.children].map((section) => section.className)).toEqual([
-        "ds card-content body",
-        "ds card-footer footer",
-        "sidecar",
-      ]);
-      const sidecar = card.lastElementChild;
-      expect(sidecar?.className).toBe("sidecar");
-      expect(sidecar?.textContent).toBe("Submit");
-    });
-
-    it("follows the body with the sidecar when there are no vitals", () => {
-      render(
-        <EntityCard
-          data-testid="card"
-          sidecar={<button type="button">Submit</button>}
-          title="IconButton"
-        />,
-      );
-      const card = screen.getByTestId("card");
-      expect(card.firstElementChild?.classList.contains("body")).toBe(true);
-      expect(card.lastElementChild?.className).toBe("sidecar");
-    });
-
-    it("lets the keyboard reach the title before the sidecar's controls", () => {
-      render(
-        <EntityCard
-          href="/ds/icon-button"
-          sidecar={<button type="button">Submit</button>}
-          title="IconButton"
-        />,
-      );
-      const link = screen.getByRole("link", { name: "IconButton" });
-      const button = screen.getByRole("button", { name: "Submit" });
-      expect(
-        link.compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
     });
   });
 

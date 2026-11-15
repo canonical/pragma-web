@@ -7,14 +7,14 @@ import EntityChip from "./EntityChip.js";
 
 describe("EntityChip SSR", () => {
   it("renders a real link to a homed entity, so it navigates without scripts", () => {
-    const html = renderToString(<EntityChip href="#layout" value="Layout" />);
+    const html = renderToString(<EntityChip href="#layout" title="Layout" />);
     expect(html).toContain("ds entity-chip");
-    expect(html).toContain('<a class="value" href="#layout">Layout</a>');
+    expect(html).toContain('<a class="title" href="#layout">Layout</a>');
   });
 
   it("renders inert text for an entity without a home", () => {
-    const html = renderToString(<EntityChip lead="cs" value="props" />);
-    expect(html).toContain('<span class="value">props</span>');
+    const html = renderToString(<EntityChip prefix="cs" title="props" />);
+    expect(html).toContain('<span class="title">props</span>');
     expect(html).not.toContain("<a");
   });
 });

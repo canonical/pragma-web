@@ -30,45 +30,17 @@ describe("EntityCommand", () => {
       const row = renderCommand(<EntityCommand title="Danger" />);
       expect(screen.getByText("Danger").className).toBe("title");
       expect(row.querySelector(".context")).toBeNull();
-      expect(row.querySelector(".vital")).toBeNull();
+      expect(row.querySelector(".aside")).toBeNull();
       expect(screen.queryByRole("link")).toBeNull();
     });
   });
 
-  describe("kind and location", () => {
-    it("reads kind and location as the catalog's one sentence", () => {
-      const row = renderCommand(
-        <EntityCommand kind="Modifier" location="DS:Global" title="Danger" />,
-      );
-      const context = row.querySelector(".context");
-      expect(context?.textContent).toBe("Modifier in DS:Global");
-      expect(
-        [...(context?.children ?? [])].map((child) => child.className),
-      ).toEqual(["kind", "location"]);
-    });
-
-    it("renders a lone kind alone", () => {
+  describe("kind", () => {
+    it("renders the kind alone on the second line without an address", () => {
       const row = renderCommand(<EntityCommand kind="Class" title="Layout" />);
       expect(row.querySelector(".context")?.innerHTML).toBe(
         '<span class="kind">Class</span>',
       );
-    });
-
-    it("renders a lone location alone", () => {
-      const row = renderCommand(
-        <EntityCommand location="design-system" title="Layout" />,
-      );
-      expect(row.querySelector(".context")?.innerHTML).toBe(
-        '<span class="location">design-system</span>',
-      );
-    });
-  });
-
-  describe("vital", () => {
-    it("ends the row with the vital, after the identity", () => {
-      const row = renderCommand(<EntityCommand title="Danger" vital="v1.11" />);
-      expect(row.lastElementChild?.className).toBe("vital");
-      expect(row.lastElementChild?.textContent).toBe("v1.11");
     });
   });
 
@@ -86,9 +58,8 @@ describe("EntityCommand", () => {
           href="#danger"
           kind="Modifier"
           LinkComponent={RouterLink}
-          location="DS:Global"
+          status="v1.11"
           title="Danger"
-          vital="v1.11"
         />,
       );
       const links = screen.getAllByRole("link");
@@ -136,7 +107,7 @@ describe("EntityCommand", () => {
       expect(row.querySelector(".aside")?.textContent).toBe("ComponentNew");
     });
 
-    it("keeps the kind in the transitional context without an address", () => {
+    it("keeps the kind in the context without an address", () => {
       const row = renderCommand(
         <EntityCommand kind="Component" status="New" title="Button" />,
       );

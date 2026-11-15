@@ -22,13 +22,12 @@
     --entity-chip-radius: 9999px;
     /* No wider than the line that holds it. */
     --entity-chip-max-width: 100%;
-    --entity-chip-lead-color: var(--color-text-muted);
     --entity-chip-prefix-color: var(--color-text-muted);
     /* No typography token names a monospace face. */
     --entity-chip-prefix-font-family: ui-monospace, monospace;
     /* The mark is a 16px sign on the pill's line. */
     --entity-chip-mark-size: var(--space-200);
-    /* The ring sits inside the value, on the pill's fill. */
+    /* The ring sits inside the title, on the pill's fill. */
     --entity-chip-focus-ring-width: 2px;
     --entity-chip-focus-ring-offset: -2px;
     --entity-chip-focus-ring-color: var(--color-focus-ring);
@@ -68,14 +67,9 @@
     font-family: var(--entity-chip-prefix-font-family);
   }
 
-  .ds.entity-chip .lead {
-    color: var(--entity-chip-lead-color);
-  }
-
   /* A long title truncates inside the pill, which is no wider than its
    * line, rather than widening it. */
-  .ds.entity-chip .title,
-  .ds.entity-chip .value {
+  .ds.entity-chip .title {
     overflow: hidden;
     color: inherit;
     text-decoration: none;
@@ -83,13 +77,11 @@
   }
 
   /* A linked title reads as the pill's text, underlined on approach. */
-  .ds.entity-chip .title[href]:hover,
-  .ds.entity-chip .value[href]:hover {
+  .ds.entity-chip .title[href]:hover {
     text-decoration: underline;
   }
 
-  .ds.entity-chip .title[href]:focus-visible,
-  .ds.entity-chip .value[href]:focus-visible {
+  .ds.entity-chip .title[href]:focus-visible {
     outline-width: var(--entity-chip-focus-ring-width);
     outline-style: solid;
     outline-color: var(--entity-chip-focus-ring-color);

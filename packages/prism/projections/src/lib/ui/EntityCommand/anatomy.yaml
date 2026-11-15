@@ -1,9 +1,8 @@
 ---
 # EntityCommand — an entity as a command-palette result: a 56px row.
-# Reference: the projection matrix's highlighted palette row (the title over
-# "kind in LOCATION", one vital right-aligned on the second line, two 24px
-# lines with 4px block insets and 16px inline insets). Slot order: title,
-# then kind and location on the second line; the vital at the end.
+# Reference: the projection matrix's highlighted palette row (two 24px
+# lines with 4px block insets and 16px inline insets) and PS1 V4's result:
+# the title over the address, the kind and the status at the end.
 #
 # The row sets the context's primary text on the matrix's 24px line, the
 # line every representation shares, so it is 56px in every context. Each
@@ -14,9 +13,9 @@
 # hold is cut above or below: a chip in the title is 28px, and its line
 # grows to hold it (the row is then 60px).
 #
-# An identifier in the vital, a `<code class="identifier">`, sets the
+# An identifier in the status, a `<code class="identifier">`, sets the
 # monospace face on the row's line and stands on the sans text's baseline:
-# it is aligned to the baseline, so its glyphs share the line the context's
+# it is aligned to the baseline, so its glyphs share the line the address's
 # stand on, and its own line height is 0, so its inline box takes no height
 # and the face's other ascent and descent never grow the line past 24px.
 # (Aligning its box to the line's top would keep the line at 24px too, but
@@ -38,8 +37,8 @@
 # The identity slots (heuristic 4.1), in their order: mark, prefix, title,
 # address, kind, status. The mark is the 16px box every HTML form gives
 # it, in its own column so the second line stands under the title, and
-# spaced from the title by the chip's gap, 4px; the vital and the aside
-# stand the gutter from the identity. The first line, the headline, holds the foreign
+# spaced from the title by the chip's gap, 4px; the aside stands the
+# gutter from the identity. The first line, the headline, holds the foreign
 # prefix (muted, monospace, never shrinking) when given, which is only for
 # a result without an address (an arm gives the prefix or the address,
 # never both: the address states the namespace), then the title,
@@ -47,9 +46,8 @@
 # in the 24px line by a 4px offset. With an address, the full CURIE in
 # monospace takes the second line, and the aside at the row's end holds
 # the kind on the first line and the status on the second (pushed down by
-# an automatic margin); without one, the transitional context keeps "kind
-# in location" on the second line. The identity grows, so the vital and
-# the aside end the row.
+# an automatic margin); without one, the context keeps the kind on the
+# second line. The identity grows, so the aside ends the row.
 #
 # Every decision is read through a component token declared on the root
 # (`--entity-command-*`), bound to the symbol named here.
@@ -75,9 +73,8 @@
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
 # component.padding.inline, space.050, space.300 (a line height), and the
-# semantic typography symbols typography.text.primary.fontSize,
-# typography.text.primary.bold.fontWeight and
-# typography.text.primary.smallcaps.letter.spacing.
+# semantic typography symbols typography.text.primary.fontSize and
+# typography.text.primary.bold.fontWeight.
 node:
   uri: prism.component.entity_command
   styles:
@@ -169,30 +166,8 @@ node:
                 - node:
                     role: kind
                   relation: { cardinality: "0..1", slotName: kind }
-                - node:
-                    role: location
-                    styles:
-                      typography.variant.caps: all-small-caps
-                      typography.letterSpacing: typography.text.primary.smallcaps.letter.spacing
-                  relation: { cardinality: "0..1", slotName: location }
             relation: { cardinality: "0..1", slotName: context }
       relation: { cardinality: "1", slotName: identity }
-    - node:
-        role: vital
-        styles:
-          spacing.external.inline.start: grid.gutter
-          layout.alignSelf: flex-end
-          typography.color: color.text.muted
-          typography.align: end
-          typography.whiteSpace: nowrap
-        edges:
-          - node:
-              role: identifier
-              styles:
-                layout.verticalAlign: baseline
-                typography.lineHeight: 0
-            relation: { cardinality: "0..*", slotName: identifier }
-      relation: { cardinality: "0..1", slotName: vital }
     - node:
         role: aside
         styles:
@@ -212,5 +187,12 @@ node:
               styles:
                 layout.type: flex
                 spacing.external.block.start: auto
+              edges:
+                - node:
+                    role: identifier
+                    styles:
+                      layout.verticalAlign: baseline
+                      typography.lineHeight: 0
+                  relation: { cardinality: "0..*", slotName: identifier }
             relation: { cardinality: "0..1", slotName: status }
       relation: { cardinality: "0..1", slotName: aside }

@@ -8,10 +8,7 @@
  * there, so a translation may reorder the sentence around it.
  */
 export const MESSAGES = {
-  "chip.lead": "{lead}:",
   "chip.peek": "Preview of {title}",
-  "entity.parent": "{title} ∈ {parent}",
-  "entity.subclass": "{title} ⊂ {parent}",
   "entity.context": "{kind} in {location}",
   "class.kind": "Class",
   "class.kind.abstract": "Abstract class",

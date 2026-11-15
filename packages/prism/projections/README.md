@@ -43,26 +43,25 @@ lays the five representations of each type out as one matrix, under
 `Documentation/Projection matrix`.
 
 - **`EntityChip`**: the inline mention, a pill in running text: an
-  optional mark, an optional lead filed before the catalog's separator,
-  the value, then an optional badge, icon and disclosure chevron. The
-  mark is a sign its projection draws, such as a swatch of the entity's
-  colour; the chip hides it from assistive technology, so its name never
-  depends on it.
-- **`EntityRow`**: the list entry, one row of an index: an optional mark,
-  hidden as the chip's is, the namespace prefix and the title, then one
-  muted word at the end. Where the two do not share a line, as on a
-  phone, the word moves to a line of its own under the title (56px) and a
-  long title wraps, so it is never cut.
-- **`EntityCard`**: the card, built on the published `Card`: location, the
-  title and the entity it belongs to (after `∈`, or after `⊂` with
-  `parentRelation="subclass"`), kind, summary, key values and the
-  footer's vitals, and an optional sidecar beside them, two columns wide,
-  for a rendered example of the entity.
-- **`EntityCommand`**: the command-palette result, a two-line row: the title
-  over "kind in location", and one vital at the end.
+  optional mark, the foreign prefix, the title (a link that peeks at the
+  entity's card, or inert text) and an optional status. The mark is a sign
+  its projection draws, such as a swatch of the entity's colour; the chip
+  hides it from assistive technology, so its name never depends on it.
+- **`EntityRow`**: the list entry, one 32px row of an index (56px where an
+  index opts into two lines, the summary under the title): an optional
+  mark, hidden as the chip's is, the foreign prefix, the title and the
+  kind, then the facts and the status at the end. The title yields last:
+  the facts give way first, ending in an ellipsis.
+- **`EntityCard`**: the card, built on the published `Card`: the mark, the
+  foreign prefix and the title, the address, the kind, the summary, the
+  facts and the status, over its static Specimen, which depicts the
+  entity where it has a depiction.
+- **`EntityCommand`**: the command-palette result, a two-line row: the
+  mark, the foreign prefix and the title over the address, the kind and
+  the status at the end.
 - **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a box with
-  rounded corners and its `<text>`, the title over "kind in location" (50
-  units tall by default), or the title alone on the middle of a box the
+  rounded corners and its `<text>`, the mark, the prefix and the title
+  over the kind (50 units tall by default), or the title alone on the middle of a box the
   graph sizes, an optional vital (an instance count) at the end of the
   title's line, and the graph's encodings: `hollow` (an abstract class),
   `prominent` (a hub) and `showText` (off when zoomed out), for a graph to
@@ -402,7 +401,7 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityGraphNode`, `EntityList`, `PEEK_OPEN_DELAY_MS` and
   `PEEK_CLOSE_DELAY_MS` (how long a chip's peek waits to open and to
   close); types `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
-  `EntityCardKeyValue`, `EntityFact` (one fact a card or a row states),
+  `EntityFact` (one fact a card or a row states),
   `SpecimenKind`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListRenderer`.
 - Marks and swatches: `SwatchMark` (the 16px mark of an entity whose

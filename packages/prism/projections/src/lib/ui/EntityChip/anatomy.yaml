@@ -36,12 +36,6 @@
 # Why not the published Popover: it is a click disclosure on a button; the
 # peek opens on hover-intent and focus of a link (EXPLANATIONS S5).
 #
-# While callers still pass them, the transitional slots keep their places: lead
-# (the key, then the catalog's separator) before the title, value in the
-# title's place when no title is given, and badge, icon and chevron between
-# the peek and the status. The status slot is the 4.1 slot that replaces
-# them.
-#
 # Choices, with their reasons: the peek's anchor is
 # the chip's root (the pill), not the link, so "4px below the chip" holds
 # and the published LinkComponent, which takes no ref or style, needs no
@@ -108,11 +102,6 @@ node:
           typography.fontFamily: "ui-monospace, monospace"
       relation: { cardinality: "0..1", slotName: prefix }
     - node:
-        role: lead
-        styles:
-          typography.color: color.text.muted
-      relation: { cardinality: "0..1", slotName: lead }
-    - node:
         role: title
         styles:
           layout.overflow: hidden
@@ -124,34 +113,10 @@ node:
           appearance.outline.style@focus: solid
           appearance.outline.color@focus: color.focusRing
           appearance.outline.offset@focus: -2px
-      relation: { cardinality: "0..1", slotName: title }
-    - node:
-        role: value
-        styles:
-          layout.overflow: hidden
-          typography.overflow: ellipsis
-          typography.color: inherit
-          typography.decoration: none
-          typography.decoration@hover: underline
-          appearance.outline.width@focus: 2px
-          appearance.outline.style@focus: solid
-          appearance.outline.color@focus: color.focusRing
-          appearance.outline.offset@focus: -2px
-      relation: { cardinality: "0..1", slotName: value }
+      relation: { cardinality: "1", slotName: title }
     - node:
         uri: prism.component.entity_chip.peek
       relation: { cardinality: "0..1", slotName: peek }
-    - node:
-        uri: global.component.badge
-      relation: { cardinality: "0..1", slotName: badge }
-    - node:
-        uri: global.component.icon
-      relation: { cardinality: "0..1", slotName: icon }
-    - node:
-        uri: global.component.icon
-        props:
-          icon: chevron-down
-      relation: { cardinality: "0..1", slotName: chevron }
     - node:
         role: status
       relation: { cardinality: "0..1", slotName: status }

@@ -2,7 +2,7 @@
 # EntityRow — the list entry of an entity: a 32px row in an index.
 # Reference: the projection matrix's in-page list entry (the namespace prefix
 # muted, the title, and a muted word right-aligned, on a 24px line with 4px
-# block insets). Slot order: mark, location, title, then meta at the end.
+# block insets).
 #
 # The mark is a small sign that leads the identity, such as a swatch of the
 # entity's colour, drawn by the projection that fills it in the 16px box
@@ -22,14 +22,14 @@
 # summary is the only second line, rendered only when lines="two" (56px):
 # a row that holds one wraps (`:has(> .summary)`), and only it.
 # In a row the title yields last. The identity is a flex line whose basis
-# is its content (flex 0 1 auto) and which never wraps. The facts and the
-# meta have no basis: each grows up to its content (max-width:
-# max-content) from the width the identity leaves, so when the row is
+# is its content (flex 0 1 auto) and which never wraps. The facts have no
+# basis: they grow up to their content (max-width: max-content) from the
+# width the identity leaves, so when the row is
 # narrow they give way first, ending in an ellipsis, down to nothing; only
 # then does the identity shrink, and its title ends in an ellipsis while
 # the mark, the prefix and the kind keep their widths. The status keeps its
 # width. The width left over is the identity's end margin (auto), so the
-# facts, the meta and the status end the row as one group. Below two
+# facts and the status end the row as one group. Below two
 # groups (the shell's container query at 912px) the facts after the first
 # leave, so the first line keeps its first fact alone. The facts are one
 # line of text (a block, so it can end in an ellipsis), a fact after the
@@ -42,7 +42,7 @@
 # status would push the status onto a line of its own and the summary
 # onto a third. So in a two-line row (`:has(> .summary)`, a reflow) the
 # identity's basis is 0, it grows up to its content, and it takes the free
-# width a thousand times faster than the facts and the meta, which is the
+# width a thousand times faster than the facts, which is the
 # same order of yielding: the first line holds every slot but the summary.
 #
 # The row may be narrower than its content (`size.min.width: 0`): as a
@@ -50,7 +50,7 @@
 # long identity would widen the track that holds the row past its column
 # instead of wrapping.
 #
-# An identifier in the location, a `<code class="identifier">`, sets the
+# An identifier in a fact, a `<code class="identifier">`, sets the
 # monospace face on the row's line and stands on the sans text's baseline:
 # it is aligned to the baseline, so its glyphs share the line the title's
 # stand on, and its own line height is 0, so its inline box takes no height
@@ -77,11 +77,11 @@
 #                                      the link's ring, drawn inside it since the identity clips.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
-#   space.0 for the gap between a wrapped row's lines: the meta reads with
+#   space.0 for the gap between a wrapped row's lines: the summary reads with
 #   the identity above it, its lines the 24px line apart.
 #   layout.wrap wrap, typography.whiteSpace normal and nowrap,
 #   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
-#   size.min.width 0 lets the identity and the meta shrink to the row.
+#   size.min.width 0 lets the identity and the facts shrink to the row.
 #   --entity-row-identifier-vertical-align: baseline,
 #   --entity-row-identifier-line-height: 0
 #                                      the identifier on the text's baseline,
@@ -96,8 +96,7 @@
 # summary is the second line of a row an index opts into two lines
 # (lines="two", 56px): it is rendered only then, ordered after every slot
 # of the first line and spanning the row. Each fact cell names its
-# property in data-property (Annex D). The transitional location and meta
-# keep their places while callers still pass them. The row stays a flex line
+# property in data-property (Annex D). The row stays a flex line
 # rather than a subgrid: its lists do not lay their rows on a subgrid.
 #
 # Token ledger (the identity slots):
@@ -111,7 +110,7 @@
 #                                      the first leave the line.
 #   --entity-row-identity-grow-weight: 1000   literal: in a two-line row
 #                                      the identity takes the free width
-#                                      before the facts and the meta (a
+#                                      before the facts (a
 #                                      number, read only by the reflow).
 #   layout.flex.basis auto and 0, layout.flex.grow 0 and 1,
 #   size.max.width max-content, spacing.external.inline.end auto:
@@ -165,18 +164,6 @@ node:
                 typography.color: color.text.muted
                 typography.fontFamily: "ui-monospace, monospace"
             relation: { cardinality: "0..1", slotName: prefix }
-          - node:
-              role: location
-              styles:
-                typography.color: color.text.muted
-              edges:
-                - node:
-                    role: identifier
-                    styles:
-                      layout.verticalAlign: baseline
-                      typography.lineHeight: 0
-                  relation: { cardinality: "0..*", slotName: identifier }
-            relation: { cardinality: "0..1", slotName: location }
           - node:
               role: title
               styles:
@@ -237,6 +224,13 @@ node:
                         relation: { cardinality: "1", slotName: term }
                       - node:
                           role: detail
+                          edges:
+                            - node:
+                                role: identifier
+                                styles:
+                                  layout.verticalAlign: baseline
+                                  typography.lineHeight: 0
+                              relation: { cardinality: "0..*", slotName: identifier }
                         relation: { cardinality: "1", slotName: detail }
                 # Every fact after the first: below two groups it leaves
                 # the line.
@@ -247,19 +241,6 @@ node:
                       spacing.external.inline.start: grid.gutter
             relation: { cardinality: "1..*", slotName: fact }
       relation: { cardinality: "0..1", slotName: facts }
-    - node:
-        role: meta
-        styles:
-          layout.flex.grow: 1
-          layout.flex.basis: 0
-          size.max.width: max-content
-          typography.color: color.text.muted
-          typography.align: end
-          typography.whiteSpace: nowrap
-          layout.overflow.inline: clip
-          size.min.width: 0
-          typography.overflow: ellipsis
-      relation: { cardinality: "0..1", slotName: meta }
     - node:
         role: status
         styles:

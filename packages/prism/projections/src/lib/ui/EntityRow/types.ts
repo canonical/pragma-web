@@ -12,14 +12,6 @@ type OwnProps = {
    * its title.
    */
   readonly mark?: ReactNode;
-  /**
-   * The namespace the entity sits in, leading the title: the compact
-   * address's prefix with its colon. An identifier in it is a
-   * `<code className="identifier">`, which keeps the row's line.
-   *
-   * @deprecated Use `prefix`, the foreign prefix, before the title.
-   */
-  readonly location?: ReactNode;
   /** The entity's name. */
   readonly title: ReactNode;
   /**
@@ -29,19 +21,17 @@ type OwnProps = {
   readonly href?: string;
   /** The link the home renders through; the intrinsic anchor by default. */
   readonly LinkComponent?: LinkComponent;
-  /**
-   * One word about the entity at the end of the row: its abstraction, its stage.
-   *
-   * @deprecated Use `kind`, `facts` or `status`, by what the word says.
-   */
-  readonly meta?: ReactNode;
   /** The entity's foreign prefix, such as `ds`, in monospace before the title. */
   readonly prefix?: ReactNode;
   /** The entity's kind, muted after the title. */
   readonly kind?: ReactNode;
   /** The entity's summary: the row's second line, shown only on two lines. */
   readonly summary?: ReactNode;
-  /** The facts the row states at the end of its first line. */
+  /**
+   * The facts the row states at the end of its first line. An identifier
+   * in a fact's value is a `<code className="identifier">`, which keeps the
+   * row's line.
+   */
   readonly facts?: readonly EntityFact[];
   /** The entity's status, closing the first line. */
   readonly status?: ReactNode;

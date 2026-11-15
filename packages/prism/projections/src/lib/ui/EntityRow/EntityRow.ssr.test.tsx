@@ -37,7 +37,7 @@ describe("EntityRow stylesheet", () => {
     const root = readRule(".ds.entity-row");
     expect(root).toContain("flex-wrap: nowrap;");
     expect(root).toContain("line-height: var(--entity-row-line-height);");
-    for (const slot of ["identity", "summary", "facts", "meta"]) {
+    for (const slot of ["identity", "summary", "facts"]) {
       expect(readRule(`.ds.entity-row .${slot}`)).toContain(
         "white-space: nowrap;",
       );
@@ -69,16 +69,14 @@ describe("EntityRow stylesheet", () => {
     expect(identity).toContain("margin-inline-end: auto;");
   });
 
-  it("lets the facts and the meta give way first, ending in an ellipsis", () => {
-    for (const slot of ["facts", "meta"]) {
-      const rule = readRule(`.ds.entity-row .${slot}`);
-      expect(rule).toContain("flex-grow: 1;");
-      expect(rule).toContain("flex-basis: 0;");
-      expect(rule).toContain("max-width: max-content;");
-      expect(rule).toContain("min-width: 0;");
-      expect(rule).toContain("white-space: nowrap;");
-      expect(rule).toContain("text-overflow: ellipsis;");
-    }
+  it("lets the facts give way first, ending in an ellipsis", () => {
+    const rule = readRule(".ds.entity-row .facts");
+    expect(rule).toContain("flex-grow: 1;");
+    expect(rule).toContain("flex-basis: 0;");
+    expect(rule).toContain("max-width: max-content;");
+    expect(rule).toContain("min-width: 0;");
+    expect(rule).toContain("white-space: nowrap;");
+    expect(rule).toContain("text-overflow: ellipsis;");
   });
 
   it("centres the mark's sign on both axes in its 16px box", () => {

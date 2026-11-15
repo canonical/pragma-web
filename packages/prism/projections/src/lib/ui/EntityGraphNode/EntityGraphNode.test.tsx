@@ -66,28 +66,14 @@ describe("EntityGraphNode", () => {
     });
   });
 
-  describe("kind and location", () => {
-    it("reads kind and location as the catalog's one sentence", () => {
-      const node = renderNode(
-        <EntityGraphNode kind="Modifier" location="DS:Global" title="Danger" />,
-      );
-      const context = node.querySelector(".context");
-      expect(context?.textContent).toBe("Modifier in DS:Global");
-      expect(
-        [...(context?.children ?? [])].map((child) => child.tagName),
-      ).toEqual(["tspan", "tspan"]);
-    });
-
-    it("renders a lone kind alone", () => {
+  describe("kind", () => {
+    it("sets the kind alone on the second line", () => {
       const node = renderNode(<EntityGraphNode kind="Class" title="Layout" />);
-      expect(node.querySelector(".context")?.textContent).toBe("Class");
-    });
-
-    it("renders a lone location alone", () => {
-      const node = renderNode(
-        <EntityGraphNode location="design-system" title="Layout" />,
-      );
-      expect(node.querySelector(".context")?.textContent).toBe("design-system");
+      const context = node.querySelector(".context");
+      expect(context?.textContent).toBe("Class");
+      expect(
+        [...(context?.children ?? [])].map((child) => child.getAttribute("class")),
+      ).toEqual(["kind"]);
     });
   });
 

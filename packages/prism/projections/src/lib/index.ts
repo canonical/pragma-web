@@ -86,7 +86,6 @@ export {
 } from "./projections/index.js";
 export { useListRenderers } from "./renderers/index.js";
 export type {
-  EntityCardKeyValue,
   EntityCardProps,
   EntityChipProps,
   EntityCommandProps,

@@ -2,7 +2,6 @@
 
 import { expectSlotOrder } from "@canonical/prism-core/testing";
 import type { LinkComponentProps } from "@canonical/react-ds-global";
-import { Badge, Icon } from "@canonical/react-ds-global";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -26,31 +25,31 @@ function listSlots(root: Element): string[] {
 }
 
 describe("EntityChip", () => {
-  describe("value", () => {
-    it("renders the value alone, as inert text", () => {
-      render(<EntityChip data-testid="chip" value="Layout" />);
+  describe("title", () => {
+    it("renders the title alone, as inert text", () => {
+      render(<EntityChip data-testid="chip" title="Layout" />);
       const chip = screen.getByTestId("chip");
-      expect(listSlots(chip)).toEqual(["value"]);
+      expect(listSlots(chip)).toEqual(["title"]);
       expect(screen.getByText("Layout").tagName).toBe("SPAN");
       expect(screen.queryByRole("link")).toBeNull();
     });
   });
 
   describe("href and LinkComponent", () => {
-    it("links the value to the home through an intrinsic anchor by default", () => {
-      render(<EntityChip href="#layout" value="Layout" />);
+    it("links the title to the home through an intrinsic anchor by default", () => {
+      render(<EntityChip href="#layout" title="Layout" />);
       const link = screen.getByRole("link", { name: "Layout" });
       expect(link.getAttribute("href")).toBe("#layout");
-      expect(link.className).toBe("value");
+      expect(link.className).toBe("title");
     });
 
-    it("links the value through the LinkComponent it is given, and nothing else", () => {
+    it("links the title through the LinkComponent it is given, and nothing else", () => {
       render(
         <EntityChip
           href="#danger"
-          lead="Modifier"
           LinkComponent={RouterLink}
-          value="Danger"
+          prefix="ds"
+          title="Danger"
         />,
       );
       const links = screen.getAllByRole("link");
@@ -60,26 +59,18 @@ describe("EntityChip", () => {
     });
   });
 
-  describe("lead", () => {
-    it("files the value under its lead, the catalog's separator after it", () => {
-      render(<EntityChip data-testid="chip" lead="Modifier" value="Danger" />);
-      const lead = screen.getByTestId("chip").querySelector(".lead");
-      expect(lead?.textContent).toBe("Modifier:");
-    });
-  });
-
   describe("mark", () => {
-    it("leads the chip with its mark, hidden and outside the value's link", () => {
+    it("leads the chip with its mark, hidden and outside the title's link", () => {
       render(
         <EntityChip
           data-testid="chip"
           href="#north"
           mark={<span className="swatch" />}
-          value="North Line"
+          title="North Line"
         />,
       );
       const chip = screen.getByTestId("chip");
-      expect(listSlots(chip)).toEqual(["mark", "value"]);
+      expect(listSlots(chip)).toEqual(["mark", "title"]);
       expect(chip.querySelector(".mark > .swatch")).not.toBeNull();
       expect(chip.querySelector(".mark")?.getAttribute("aria-hidden")).toBe(
         "true",
@@ -88,37 +79,9 @@ describe("EntityChip", () => {
         "North Line",
       );
     });
-  });
-
-  describe("badge, icon and chevron", () => {
-    it("renders every slot in the anatomy's order", () => {
-      render(
-        <EntityChip
-          badge={<Badge className="count" value={88} />}
-          chevron
-          data-testid="chip"
-          icon={<Icon className="glyph" icon="warning" />}
-          lead="Modifier"
-          mark={<span className="swatch" />}
-          value="Danger"
-        />,
-      );
-      const slots = listSlots(screen.getByTestId("chip"));
-      expect(slots.slice(0, 3)).toEqual(["mark", "lead", "value"]);
-      expect(slots.at(3)).toContain("count");
-      expect(slots.at(4)).toContain("glyph");
-      expect(slots).toHaveLength(6);
-    });
-
-    it("ends in the chevron-down icon when asked", () => {
-      render(<EntityChip chevron data-testid="chip" value="Danger" />);
-      const chevron = screen.getByTestId("chip").lastElementChild;
-      expect(chevron?.tagName.toLowerCase()).toBe("svg");
-      expect(chevron?.innerHTML).toContain("chevron-down");
-    });
 
     it("renders no element for an absent slot", () => {
-      render(<EntityChip data-testid="chip" value="Danger" />);
+      render(<EntityChip data-testid="chip" title="Danger" />);
       expect(screen.getByTestId("chip").children).toHaveLength(1);
     });
   });
@@ -130,7 +93,7 @@ describe("EntityChip", () => {
           className="mention"
           data-testid="chip"
           lang="en"
-          value="Layout"
+          title="Layout"
         />,
       );
       const chip = screen.getByTestId("chip");

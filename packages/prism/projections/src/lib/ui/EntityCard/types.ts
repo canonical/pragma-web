@@ -3,7 +3,6 @@
 import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import type { SpecimenProps } from "./common/Specimen/types.js";
-import type { PARENT_MESSAGES } from "./constants.js";
 
 /**
  * One fact about an entity, as a card or a row lists it: the property it
@@ -19,44 +18,9 @@ export interface EntityFact {
   readonly value: ReactNode;
 }
 
-/**
- * One key value of a card: the key is its React key too, so it is a string.
- *
- * @deprecated Use `EntityFact`, which names the property it states.
- */
-export interface EntityCardKeyValue {
-  /** What the value is, muted on the left half. */
-  readonly key: string;
-  /**
-   * The value, on the right half. An identifier in it is a
-   * `<code className="identifier">`, which keeps the pair's line.
-   */
-  readonly value: ReactNode;
-}
-
 type OwnProps = {
-  /**
-   * Where the entity is defined, in small capitals above the title.
-   *
-   * @deprecated Use `prefix`, and `address` where the reader cites the entity.
-   */
-  readonly location?: ReactNode;
   /** The entity's name: the card's heading. */
   readonly title: ReactNode;
-  /**
-   * The entity the title belongs to, after the catalog's `∈`, or after its
-   * `⊂` for a subclass.
-   *
-   * @deprecated State the parent as one of `facts`.
-   */
-  readonly parent?: ReactNode;
-  /**
-   * How the title relates to its parent: an instance of it (`∈`, the
-   * default) or a subclass of it (`⊂`).
-   *
-   * @deprecated State the parent as one of `facts`, its property naming the relation.
-   */
-  readonly parentRelation?: keyof typeof PARENT_MESSAGES;
   /**
    * The entity's home: with one the title links to it, without one the title
    * is inert text.
@@ -64,29 +28,10 @@ type OwnProps = {
   readonly href?: string;
   /** The link the home renders through; the intrinsic anchor by default. */
   readonly LinkComponent?: LinkComponent;
-  /** The entity's type, under the title. */
+  /** The entity's type, under the title: for a list that mixes types. */
   readonly kind?: ReactNode;
   /** One or two sentences about the entity. */
   readonly summary?: ReactNode;
-  /**
-   * The entity's key values, one pair each under a rule.
-   *
-   * @deprecated Use `facts`.
-   */
-  readonly keyValues?: readonly EntityCardKeyValue[];
-  /**
-   * The footer's vitals: a version, a stage, a count.
-   *
-   * @deprecated Use `facts`, and `status` for a stage.
-   */
-  readonly vitals?: readonly string[];
-  /**
-   * What sits beside the body: a rendered example of the entity, two
-   * columns wide at least. The entity's type decides whether it has one.
-   *
-   * @deprecated Pass an `EntityCard.Specimen` as `children`.
-   */
-  readonly sidecar?: ReactNode;
   /** A small sign that leads the title, hidden from assistive technology. */
   readonly mark?: ReactNode;
   /** The entity's foreign prefix, such as `ds`, in monospace before the title. */
