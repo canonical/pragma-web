@@ -29,6 +29,15 @@ export type Machine = {
   readonly note: string;
 };
 
+/** One spare machine: its memory in MiB, an owner it may lack, its tags. */
+export type SpareMachine = {
+  readonly id: string;
+  readonly name: string;
+  readonly memory: number;
+  readonly owner?: string;
+  readonly tags: readonly string[];
+};
+
 /** The collection's field definitions, for typing a provider over it. */
 export type MachineFields = typeof machineCollection.schema.fields;
 
