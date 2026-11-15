@@ -495,7 +495,7 @@ describe("layOutClassGraph", () => {
       },
     );
 
-    it("splits the band of sixteen in the docs site's surface, drilled, into two columns of eight", () => {
+    it("splits the generated four-namespace fixture's band of sixteen in surface, drilled, into two columns of eight", () => {
       const budget = { budget: GRAPH_BUDGET, drill: "surface" } as const;
       const unsplit = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
         ...budget,
@@ -514,6 +514,83 @@ describe("layOutClassGraph", () => {
         );
       expect(surfaceOf(split).h).toBeLessThan(surfaceOf(unsplit).h);
       expect(countOverlaps(split).collisions).toBe(0);
+    });
+
+    it("lists a namespace whose first layer splits over several columns in the rail column by column, each root before its subclasses", () => {
+      const roots = Array.from({ length: 14 }, (_, index) =>
+        defineClass(`aa:R${String(index).padStart(2, "0")}`, `R${index}`),
+      );
+      const layout = layOutClassGraph(
+        {
+          classes: [
+            ...roots,
+            defineClass("aa:C00", "C0", { superclass: "aa:R00" }),
+            defineClass("aa:C13", "C13", { superclass: "aa:R13" }),
+          ],
+          relations: [],
+        },
+        { budget: GRAPH_BUDGET },
+      );
+      const placed = roots.map((root) => requireEntry(layout.nodes, root.uri));
+      // Fourteen roots over a band of twelve: two columns of seven.
+      expect(new Set(placed.map((node) => node.col)).size).toBe(2);
+      const byColumn = placed
+        .toSorted((a, b) => a.col - b.col || a.y - b.y)
+        .map((node) => node.uri);
+      expect(
+        layout.rail.filter((uri) => roots.some((root) => root.uri === uri)),
+      ).toEqual(byColumn);
+      for (const [child, parent] of [
+        ["aa:C00", "aa:R00"],
+        ["aa:C13", "aa:R13"],
+      ] as const) {
+        expect(layout.rail.indexOf(child)).toBe(
+          layout.rail.indexOf(parent) + 1,
+        );
+      }
+    });
+
+    it("opens a drilled view on its namespace, not on the whole graph's fit, and records the drill", () => {
+      const rest = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        budget: GRAPH_BUDGET,
+      });
+      expect(rest.drilled).toBeUndefined();
+      for (const drill of ["surface", "ds", "anatomy", "cs"]) {
+        const layout = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+          budget: GRAPH_BUDGET,
+          drill,
+        });
+        expect(layout.drilled).toBe(drill);
+        const region = requireDefined(
+          layout.regions.find((candidate) => candidate.prefix === drill),
+          "the drilled region",
+        );
+        const zoom = Math.min(
+          DESIGN_CANVAS.w / layout.view.w,
+          DESIGN_CANVAS.h / layout.view.h,
+        );
+        // At the legible zoom at least, in the canvas's aspect.
+        expect(zoom, drill).toBeGreaterThanOrEqual(MIN_FIT - 1e-9);
+        // The region's top-left corner is in view; the region is whole
+        // where it fits at the legible zoom.
+        expect(layout.view.x, drill).toBeLessThanOrEqual(region.x);
+        expect(layout.view.y, drill).toBeLessThanOrEqual(region.y);
+        expect(layout.view.x + layout.view.w, drill).toBeGreaterThan(region.x);
+        expect(layout.view.y + layout.view.h, drill).toBeGreaterThan(region.y);
+        if (
+          Math.min(
+            DESIGN_CANVAS.w / (region.w + 32),
+            DESIGN_CANVAS.h / (region.h + 32),
+          ) >= MIN_FIT * LEGIBLE_MARGIN
+        ) {
+          expect(layout.view.x + layout.view.w, drill).toBeGreaterThanOrEqual(
+            region.x + region.w,
+          );
+          expect(layout.view.y + layout.view.h, drill).toBeGreaterThanOrEqual(
+            region.y + region.h,
+          );
+        }
+      }
     });
 
     it("draws a graph of more namespaces than the budget has nodes as one box each, over the node budget: a limit of this layout", () => {
