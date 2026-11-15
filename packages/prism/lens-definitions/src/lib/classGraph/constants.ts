@@ -157,5 +157,16 @@ export const STROKE_STEPS: readonly {
 /** The stroke of a relation below the first step, in px. */
 export const STROKE_MIN_WIDTH = 1;
 
+/**
+ * The arrowhead a heavy relation ends in, by its stroke width: its length
+ * and width, in px, grown from the 8px head so the head stays wider than
+ * its line (half again as wide at 4px, two and a half times at 8px). The
+ * line stops its own width short of the tip, where the head is as wide
+ * as the line, so it ends inside the head instead of overrunning its
+ * point. Lighter strokes keep the 8px head and run to the tip.
+ */
+export const HEAVY_HEAD_SIZES: Readonly<Partial<Record<StrokeWidth, number>>> =
+  { 4: 12, 8: 20 };
+
 /** The dash pattern of a relation no statement instantiates, in px. */
 export const ZERO_STROKE_DASH = "4 4";

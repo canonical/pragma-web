@@ -29,7 +29,10 @@
 # is the one the store serves for its declared edge between the two
 # classes it is drawn between; an edge bundling several relations weighs
 # its heaviest, never their sum (an inverse pair held both ways would
-# count each link twice). The weight is the edge's `data-weight`.
+# count each link twice). The weight is the edge's `data-weight`. A 4px
+# or 8px line ends inside its head: the head grows to 12px or 20px (from
+# the 8px head) about its tip, and the line stops its own width short of
+# the tip, where the head is as wide as it is.
 #
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.
@@ -55,9 +58,9 @@
 #   0.16, 0.06, 0.4: the faded class, the faded edge, the dimmed class.
 #   In constants.ts and the layout's constants (attributes, not CSS): the
 #   weight strokes 1, 2, 4 and 8px with their decades 10, 100 and 1,000,
-#   the zero dash 4 4 (a quarter of the 16px lattice), the 1px and 2px
-#   strokes, the ring's 2px offset, the 6px halo stroke, the 8px hover
-#   target.
+#   the zero dash 4 4 (a quarter of the 16px lattice), the heavy heads'
+#   12px and 20px, the 1px and 2px strokes, the ring's 2px offset, the 6px
+#   halo stroke, the 8px hover target.
 #
 # Roster namespaces (accepted and tracked): the semantic typography
 # symbols typography.text.secondary.fontSize and

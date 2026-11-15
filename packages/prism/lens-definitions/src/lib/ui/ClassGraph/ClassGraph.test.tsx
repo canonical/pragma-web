@@ -1,4 +1,8 @@
-import { placeEdgeLabels, requireEntry } from "@canonical/prism-core";
+import {
+  measurePathBounds,
+  placeEdgeLabels,
+  requireEntry,
+} from "@canonical/prism-core";
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
@@ -230,6 +234,32 @@ describe("ClassGraph", () => {
       container.querySelectorAll(".is-faded.subclass, .is-faded.relation"),
     ).toHaveLength(layout.edges.length - near.edges.size);
     expect(container.querySelector(".chain")).toBeNull();
+  });
+
+  it("ends a heavy line inside an arrowhead grown to its width", () => {
+    const container = draw();
+    const heavy = [...container.querySelectorAll("path.relation")].filter(
+      (path) => path.getAttribute("stroke-width") === "8",
+    );
+    expect(heavy.length).toBeGreaterThan(0);
+    for (const path of heavy) {
+      const heads = [
+        ...(path.parentElement?.querySelectorAll(".filled-head") ?? []),
+      ];
+      expect(heads.length).toBeGreaterThan(0);
+      for (const head of heads) {
+        const tip = head.getAttribute("d")?.match(/^M(\d+) (\d+)/);
+        const bounds = measurePathBounds(head.getAttribute("d") ?? "");
+        expect([bounds.w, bounds.h]).toEqual([20, 20]);
+        // The line stops 8px short of the tip, where the head is 8px wide.
+        const d = path.getAttribute("d") ?? "";
+        expect(d.includes(`${tip?.[1]} ${tip?.[2]}`)).toBe(false);
+      }
+    }
+    const light = container.querySelector(
+      'path.relation[stroke-width="1"] ~ .filled-head',
+    );
+    expect(measurePathBounds(light?.getAttribute("d") ?? "").w).toBe(8);
   });
 
   it("keeps a focused relation with no statements dashed, at the focus's 2px", () => {

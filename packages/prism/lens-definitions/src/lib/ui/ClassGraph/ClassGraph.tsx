@@ -17,6 +17,7 @@ import { Link } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { ZERO_STROKE_DASH } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
+import fitArrowheads from "../../classGraph/fitArrowheads.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
 import weighStroke from "../../classGraph/weighStroke.js";
@@ -45,7 +46,8 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * namespace regions (a label row over a hairline rule), the subclass buses
  * with one hollow arrowhead at each superclass, the relations with their
  * filled arrowheads at each range, each stroked by its weight (1, 2, 4 or
- * 8px by the decade of the statements it covers, 1px dashed where none
+ * 8px by the decade of the statements it covers, a heavy line ending
+ * inside a head grown to its width; 1px dashed and muted where none
  * does; a legend's specimen, which no store counts, at the lightest solid
  * stroke with no weight attribute), the classes as `EntityGraphNode`s, and
  * the focus's edge labels on a halo. Every coordinate comes from the
@@ -124,11 +126,20 @@ export default function ClassGraph({
     const weight =
       bundle?.weight === undefined ? undefined : weighStroke(bundle.weight);
     const width = weight?.width ?? EDGE_STROKE;
+    // A heavy line ends inside a head grown to its width.
+    const { d, heads } =
+      weight === undefined
+        ? edge
+        : fitArrowheads(edge.d, edge.heads, weight.width);
     return (
       <g data-edge={edge.id} key={edge.id}>
         <path
-          className={joinClasses(role, weight?.dashed === true && "is-zero", state)}
-          d={edge.d}
+          className={joinClasses(
+            role,
+            weight?.dashed === true && "is-zero",
+            state,
+          )}
+          d={d}
           data-count={bundle?.relations.length ?? edge.to.length}
           data-from={termOf(edge.from)}
           data-kind={edge.kind}
@@ -141,7 +152,7 @@ export default function ClassGraph({
             state === "is-focus" ? Math.max(width, FOCUS_STROKE) : width
           }
         />
-        {edge.heads.map((head) =>
+        {heads.map((head) =>
           relation ? (
             <path
               className={joinClasses(
