@@ -1,4 +1,5 @@
-import type { Specimen } from "./types.js";
+import { HEAVY_HEAD_SIZES } from "../../../../classGraph/constants.js";
+import type { Specimen, StrokeSpecimen } from "./types.js";
 
 /**
  * The legend's rows, in order: a concrete class with its count, an
@@ -103,3 +104,35 @@ export const SPECIMEN_PREFIX = "legend";
 
 /** The margin a specimen's drawing keeps around it, in px. */
 export const SPECIMEN_MARGIN = 4;
+
+/**
+ * The legend's rows on a relation's stroke, after the graph's: its weight
+ * in the four steps the canvas draws (by decade of its statements), and a
+ * relation no statement instantiates. Each states its stroke, never a
+ * count: no store stands behind a specimen.
+ */
+export const STROKE_SPECIMENS: readonly StrokeSpecimen[] = [
+  {
+    meaning: "legend.weight",
+    strokes: [
+      { stroke: { width: 1, dashed: false }, label: "legend.weight.ones" },
+      { stroke: { width: 2, dashed: false }, label: "legend.weight.tens" },
+      { stroke: { width: 4, dashed: false }, label: "legend.weight.hundreds" },
+      { stroke: { width: 8, dashed: false }, label: "legend.weight.thousands" },
+    ],
+  },
+  {
+    meaning: "legend.zero",
+    strokes: [{ stroke: { width: 1, dashed: true } }],
+  },
+];
+
+/** A stroke specimen's line, from its start to its head's tip, in px. */
+export const STROKE_SPECIMEN_LENGTH = 48;
+
+/**
+ * How far a stroke specimen reaches above and below its line, in px: half
+ * the largest head, so every step's drawing is as tall and the rows align.
+ */
+export const STROKE_SPECIMEN_REACH =
+  Math.max(...Object.values(HEAVY_HEAD_SIZES)) / 2;

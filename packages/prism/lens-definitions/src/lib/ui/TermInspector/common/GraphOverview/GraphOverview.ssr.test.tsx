@@ -4,7 +4,7 @@ import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
 import createStripHarness from "../../../../../../testing/createStripHarness.js";
 import InspectorProbe from "../../../../../../testing/InspectorProbe.js";
 import definitionsExplorerRecords from "../../../../../../testing/records/definitionsExplorerRecords.js";
-import { SPECIMENS } from "./constants.js";
+import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 
 describe("GraphOverview SSR", () => {
   it("server-renders every specimen and namespace", () => {
@@ -17,6 +17,10 @@ describe("GraphOverview SSR", () => {
       ),
     );
     expect(html).toContain('class="ds graph-overview"');
-    expect(html.match(/class="entry"/g)).toHaveLength(SPECIMENS.length);
+    expect(html.match(/class="entry"/g)).toHaveLength(
+      SPECIMENS.length + STROKE_SPECIMENS.length,
+    );
+    expect(html.match(/class="stroke"/g)).toHaveLength(5);
+    expect(html).not.toContain("data-weight");
   });
 });

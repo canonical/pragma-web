@@ -72,6 +72,13 @@ export const MESSAGES = {
   "legend.bundle":
     "Every relation between two classes as one path, a head at each range",
   "legend.loop": "Relations from a class to itself, as one loop",
+  "legend.weight":
+    "A relation's line is heavier the more statements the graph holds for it",
+  "legend.weight.ones": "1 to 9 statements",
+  "legend.weight.tens": "10 to 99 statements",
+  "legend.weight.hundreds": "100 to 999 statements",
+  "legend.weight.thousands": "1,000 and more statements",
+  "legend.zero": "A relation no statement instantiates: dashed and muted",
   "legend.specimen.concrete": "Concrete class",
   "legend.specimen.abstract": "Abstract class",
   "legend.specimen.hub": "Hub",

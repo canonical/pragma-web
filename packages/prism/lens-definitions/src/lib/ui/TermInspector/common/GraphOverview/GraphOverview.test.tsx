@@ -11,9 +11,10 @@ import ontologyGraph from "../../../../../../testing/records/ontologyGraph.js";
 import useCapturedExplorer from "../../../../../../testing/useCapturedExplorer.js";
 import type { TermInspector_ontologies$key } from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
 import termInspectorOntologiesFragmentNode from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
+import weighStroke from "../../../../classGraph/weighStroke.js";
 import { MESSAGES } from "../../../../i18n/index.js";
 import { useLensFilter } from "../../../LensFilterProvider/index.js";
-import { SPECIMENS } from "./constants.js";
+import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 import GraphOverview from "./GraphOverview.js";
 
 /** The overview over the store, beside a readout of the asked region. */
@@ -56,7 +57,7 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     const overview = renderOverview();
     expect(overview.className).toBe("ds graph-overview custom-class");
     const entries = overview.querySelectorAll(".entry");
-    expect(entries).toHaveLength(SPECIMENS.length);
+    expect(entries).toHaveLength(SPECIMENS.length + STROKE_SPECIMENS.length);
     for (const entry of entries) {
       expect(entry.querySelector("svg .ds.class-graph")).not.toBeNull();
     }
@@ -69,13 +70,63 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
 
   it("draws its relations as specimens: the lightest solid stroke, claiming no store's weight", () => {
     const overview = renderOverview();
-    const relations = [...overview.querySelectorAll("path.relation")];
+    const relations = [...overview.querySelectorAll(".entry")]
+      .slice(0, SPECIMENS.length)
+      .flatMap((entry) => [...entry.querySelectorAll("path.relation")]);
     expect(relations.length).toBeGreaterThan(0);
     for (const path of relations) {
       expect(path.getAttribute("stroke-width")).toBe("1");
       expect(path.hasAttribute("stroke-dasharray")).toBe(false);
     }
     expect(overview.querySelector("[data-weight]")).toBeNull();
+  });
+
+  it("shows a relation's weight in the canvas's four steps, each over the statements it stands for", () => {
+    const overview = renderOverview();
+    const [weight, zero] = [...overview.querySelectorAll(".entry")].slice(
+      SPECIMENS.length,
+    );
+    const steps = [...(weight?.querySelectorAll(".stroke") ?? [])].map(
+      (step) => [
+        step.querySelector("path.relation")?.getAttribute("stroke-width"),
+        step.querySelector(".step")?.textContent,
+      ],
+    );
+    expect(steps).toEqual([
+      ["1", "1 to 9 statements"],
+      ["2", "10 to 99 statements"],
+      ["4", "100 to 999 statements"],
+      ["8", "1,000 and more statements"],
+    ]);
+    // Each step's width is the one the canvas draws for its decade.
+    expect(
+      [
+        [1, 9],
+        [10, 99],
+        [100, 999],
+        [1000, 1_000_000],
+      ].map((bounds) => [
+        ...new Set(bounds.map((count) => String(weighStroke(count).width))),
+      ]),
+    ).toEqual(steps.map(([width]) => [width]));
+    // An 8px line ends inside a head grown to 20px, as on the canvas.
+    expect(
+      weight
+        ?.querySelector('path.relation[stroke-width="8"]')
+        ?.getAttribute("d"),
+    ).toBe("M0 0L40 0");
+    expect(weight?.textContent).toContain(
+      "heavier the more statements the graph holds",
+    );
+    const dashed = zero?.querySelector("path.relation");
+    expect(dashed?.getAttribute("class")).toBe("relation is-zero");
+    expect(dashed?.getAttribute("stroke-dasharray")).toBe("4 4");
+    expect(dashed?.getAttribute("stroke-width")).toBe("1");
+    expect(zero?.querySelector(".filled-head")?.classList).toContain("is-zero");
+    expect(zero?.querySelector(".step")).toBeNull();
+    expect(zero?.textContent).toBe(
+      "A relation no statement instantiates: dashed and muted",
+    );
   });
 
   it("names its specimens for their role, never after a class of a site's ontology", () => {
