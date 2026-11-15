@@ -1,8 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { expectSlotOrder } from "@canonical/prism-core/testing";
-import { render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { RouterLink } from "@canonical/prism-core";
+import { expectSlotOrder, guardTypedArms } from "@canonical/prism-core/testing";
+import {
+  defaultProjectionMaps,
+  ProjectionsProvider,
+} from "@canonical/prism-projections";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -75,6 +80,27 @@ const renderWithNode = (
   );
 };
 
+/** The absolute IRI the mock block answers as its `uri`. */
+const MOCK_UI_BLOCK_URI =
+  "https://ds.canonical.com/global.component.icon_button";
+
+/**
+ * Wrap `children` in a projection provider whose peek records the address
+ * each chip asks it for, and renders that address as a link to look for.
+ */
+const withRecordingPeek = (
+  peek: (uri: string) => ReactNode,
+  children: ReactElement,
+): ReactElement => (
+  <ProjectionsProvider
+    LinkComponent={RouterLink}
+    maps={guardTypedArms(defaultProjectionMaps)}
+    peek={peek}
+  >
+    {children}
+  </ProjectionsProvider>
+);
+
 describe("UIBlockChip", () => {
   it("reads the UIBlock through its fragment", () => {
     const { container } = renderWithNode((node) => <UIBlockChip node={node} />);
@@ -109,6 +135,39 @@ describe("UIBlockChip", () => {
     );
     expect(screen.queryByRole("link")).toBeNull();
     expect(container.querySelector(".title")?.textContent).toBe("IconButton");
+  });
+
+  it("peeks at the block's absolute IRI, never its CURIE", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    renderWithNode(
+      (node) => withRecordingPeek(peek, <UIBlockChip node={node} />),
+      { uri: MOCK_UI_BLOCK_URI },
+    );
+    expect(peek).toHaveBeenCalledWith(MOCK_UI_BLOCK_URI);
+    expect(peek).not.toHaveBeenCalledWith(MOCK_UI_BLOCK._meta.curie);
+    act(() => {
+      screen.getByRole("link", { name: "IconButton" }).focus();
+    });
+    expect(
+      screen
+        .getByRole("dialog", { hidden: true })
+        .querySelector(`a[href="${MOCK_UI_BLOCK_URI}"]`),
+    ).not.toBeNull();
+  });
+
+  it("sets its title as inert text with no peek when unlinked", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    const { container } = renderWithNode(
+      (node) =>
+        withRecordingPeek(peek, <UIBlockChip linked={false} node={node} />),
+      { uri: MOCK_UI_BLOCK_URI },
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+    const title = container.querySelector(".title");
+    expect(title?.tagName).toBe("SPAN");
+    expect(title?.textContent).toBe("IconButton");
+    if (title) fireEvent.focus(title);
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
 
   it("shows a passage's own link text in place of the title", () => {
