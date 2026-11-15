@@ -23,7 +23,7 @@ describe("TableBody", () => {
       inTable(),
     );
     const group = screen.getByRole("rowgroup");
-    expect(group).toHaveClass("ds", "data-table-row-group", "body");
+    expect(group.className).toBe("ds data-table-body");
     expect(group).toHaveTextContent("ab");
   });
 

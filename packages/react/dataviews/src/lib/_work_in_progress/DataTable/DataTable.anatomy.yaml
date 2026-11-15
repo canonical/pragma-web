@@ -8,10 +8,10 @@
 #
 # Names — one per part, the same in the design, the DOM and here:
 #   DataTable       design "DataTable"    DOM `ds data-table dense`
-#   header row group                      DOM `ds data-table-row-group header`
+#   header row group                      DOM `thead.header`, a part of the root
 #   header row, row                       DOM `ds data-table-row`
 #   select-all cell                       DOM `ds data-table-select-all-cell`
-#   body row group                        DOM `ds data-table-row-group body`
+#   body row group                        DOM `ds data-table-body`
 #   selection cell  design "BodyCell: Checkbox variant"
 #                                         DOM `ds data-table-selection-cell`
 #   status row      DOM `ds data-table-status-row`, `data-status="<status>"`
@@ -70,7 +70,7 @@
 #                       table's end; the row holding focus stays mounted.
 #
 # Virtualized: a table given `virtualization` mounts only the entries near its
-# viewport. The body row group takes the `virtual` class and keeps the
+# viewport. Its root takes the `bounded` class, and its body keeps the
 # space of the entries it does not mount: as its block padding before the
 # first run and after the last, and as the top margin of a later run's
 # first row. The root becomes the

@@ -2,9 +2,8 @@ import { Fragment, memo, type ReactElement } from "react";
 import { useDataViewsValue } from "../../../hooks/index.js";
 import { useVirtualRows } from "../../hooks/index.js";
 import type { VirtualBodyProps } from "./types.js";
-import "./styles.css";
 
-const componentCssClassName = "ds data-table-row-group body virtual";
+const componentCssClassName = "ds data-table-body";
 
 /**
  * The table's body, virtualized: the entries near the viewport at their

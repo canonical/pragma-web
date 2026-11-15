@@ -204,7 +204,9 @@ describe("DataTable", () => {
     const table = screen.getByRole("table", { name: "Machines" });
     expect(table.style.getPropertyValue("--data-table-columns")).not.toBe("");
     for (const row of screen.getAllByRole("row")) {
-      expect(row.matches(".ds.data-table-row")).toBe(true);
+      expect(
+        row.matches(".ds.data-table-row, .ds.data-table > .header > .row"),
+      ).toBe(true);
       expect(row.getAttribute("style")).toBeNull();
     }
     expect(table.querySelector("td[style]")).toBeNull();
@@ -502,7 +504,7 @@ describe("DataTable", () => {
    */
   const findHeaderRow = (): HTMLElement => {
     const [row, ...rest] = document.querySelectorAll<HTMLElement>(
-      ".data-table-row-group.header tr",
+      ".ds.data-table > .header tr",
     );
     if (row === undefined || rest.length > 0) {
       throw new Error("expected one table's header row");

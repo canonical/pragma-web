@@ -55,8 +55,8 @@ describe("ScopedDataTable", () => {
     const [header, body] = within(table).getAllByRole("rowgroup");
     expect(header?.tagName).toBe("THEAD");
     expect(body?.tagName).toBe("TBODY");
-    expect(header).toHaveClass("ds", "data-table-row-group", "header");
-    expect(body).toHaveClass("ds", "data-table-row-group", "body");
+    expect(header?.className).toBe("header");
+    expect(body?.className).toBe("ds data-table-body");
     expect(
       within(header as HTMLElement).getAllByRole("columnheader"),
     ).toHaveLength(3);

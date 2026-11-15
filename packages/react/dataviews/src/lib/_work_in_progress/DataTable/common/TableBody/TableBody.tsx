@@ -1,7 +1,7 @@
 import { Fragment, memo, type ReactElement } from "react";
 import type { TableBodyProps } from "./types.js";
 
-const componentCssClassName = "ds data-table-row-group body";
+const componentCssClassName = "ds data-table-body";
 
 function TableBody({ entries, renderEntry }: TableBodyProps): ReactElement {
   return (

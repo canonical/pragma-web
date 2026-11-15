@@ -30,18 +30,26 @@
       var(--color-border-muted);
   }
 
+  /* Bounded: own scroll viewport, capped at 100svh, no browser anchoring. */
+  .ds.data-table.bounded {
+    position: relative;
+    overflow-anchor: none;
+    max-block-size: 100svh;
+  }
+
   /* Rows take their width from the track list, not from the scroll
      container, so a hovered or selected fill covers every column of a table
      that is wider than its viewport. The min-content width of a track list
      is its minimums added up, and every minimum is a length, so this reads
      no cell: a max-content width would size every cell of every row on
      each layout, and paint the table too wide before the solver ran. */
-  .ds.data-table-row-group {
+  .ds.data-table > .header,
+  .ds.data-table-body {
     display: block;
     min-inline-size: min-content;
   }
 
-  .ds.data-table-row-group.header {
+  .ds.data-table > .header {
     /* Sticky only bites when the caller caps the table's height; it costs a
        table that scrolls only horizontally nothing. */
     position: sticky;
@@ -52,7 +60,8 @@
       var(--color-border-muted);
   }
 
-  .ds.data-table-row {
+  .ds.data-table-row,
+  .ds.data-table > .header > .row {
     display: grid;
     /* The one geometry publication, written on the container and read here,
        between the stylesheet's own tracks: the selection column's before it
@@ -69,7 +78,7 @@
     min-block-size: var(--density-line-height-effective);
   }
 
-  .ds.data-table-row-group.body > .ds.data-table-row {
+  :where(.ds.data-table-body) > .ds.data-table-row {
     &:not(:last-child) {
       border-block-end: var(--dimension-stroke-thickness-medium) solid
         var(--color-border-muted);
@@ -101,10 +110,8 @@
      ones, in a table whose header holds the select-all cell. The table reads
      its width back from the cell it sizes, and the solver shares what is
      left among the data columns. */
-  .ds.data-table:has(
-    > .ds.data-table-row-group.header
-      > .ds.data-table-row
-      > .ds.data-table-select-all-cell
+  .ds.data-table:where(
+    :has(> .header > .row > .ds.data-table-select-all-cell)
   ) {
     --data-table-selection-track: var(--dimension-400);
   }
@@ -112,11 +119,7 @@
   /* The settings cell is the stylesheet's own track too, after the solved
      ones, in a table whose header holds it. Every row keeps the track, empty
      in the body, so each column's boundary is the same in every row. */
-  .ds.data-table:has(
-    > .ds.data-table-row-group.header
-      > .ds.data-table-row
-      > .ds.data-table-settings-cell
-  ) {
+  .ds.data-table:where(:has(> .header > .row > .ds.data-table-settings-cell)) {
     --data-table-settings-track: var(--dimension-400);
   }
 
@@ -233,7 +236,7 @@
 
     /* The resize handle carries the trailing inset itself, so a header cell
        that has one does not pay for that padding twice. */
-    &:has(> .ds.data-table-resize-handle) {
+    &:where(:has(> .ds.data-table-resize-handle)) {
       padding-inline-end: 0;
     }
 
@@ -358,8 +361,8 @@
   /* While a column's edge is placed, its hint stands below the heading
      where a refused sort's reason would: the reason is hidden until placing
      ends, so the two never draw over each other. */
-  .ds.data-table-header-cell:has(
-      > .ds.data-table-resize-handle[data-mode="placing"]
+  .ds.data-table-header-cell:where(
+      :has(> .ds.data-table-resize-handle[data-mode="placing"])
     )
     > .sort-reason {
     display: none;
