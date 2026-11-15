@@ -32,13 +32,16 @@ const isSameRange = (a: MountedRange, b: MountedRange): boolean =>
 /**
  * Create one table's virtual range.
  *
- * It is pure arithmetic over entry sizes: estimates until entries are
+ * It is arithmetic over entry sizes: estimates until entries are
  * measured, then their measurements. It reads no DOM and schedules
  * nothing, so every framework binding shares it; the binding reports the
  * viewport and the measurements, and scrolls by the corrections returned.
  *
  * A scroll costs O(log n) and publishes only when the mounted entries or
  * the space around them change.
+ *
+ * @note Impure: holds the entries, their measured sizes, the viewport and
+ * its anchor, and notifies subscribers when the mounted range moves.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

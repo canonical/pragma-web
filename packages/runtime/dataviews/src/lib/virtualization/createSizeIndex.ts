@@ -6,6 +6,9 @@ import type { SizeIndex } from "./types.js";
  * entry starts, finding the entry at an offset and replacing one size each
  * cost O(log n), so neither a scroll nor a measurement walks the sequence.
  * Building costs O(n), once per sequence.
+ *
+ * @note Impure: `set` replaces a size in place, and every later read
+ * sees it.
  */
 export default function createSizeIndex(sizes: readonly number[]): SizeIndex {
   const count = sizes.length;

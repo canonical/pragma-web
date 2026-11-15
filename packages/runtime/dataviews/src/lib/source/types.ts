@@ -147,7 +147,7 @@ export type EffectiveOrdering = {
  * `declareCapabilities` refuses it for every source, so a grouped or
  * collapsing request is refused rather than answered ungrouped.
  *
- * @seam grouping — read by the grouping work's array-source declaration
+ * The array source's grouping declaration reads this.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

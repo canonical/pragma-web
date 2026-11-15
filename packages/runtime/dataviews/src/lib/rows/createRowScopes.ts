@@ -32,6 +32,9 @@ type ScopeRecord<TRow extends object> = {
  * Observation is a separate step: the registry is readable as soon as it is
  * built, and only `observe()` subscribes.
  *
+ * @note Impure: holds a scope and its channels per row, and publishes
+ * row and selection changes into them.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

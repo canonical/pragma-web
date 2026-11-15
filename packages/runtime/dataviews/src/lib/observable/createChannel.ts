@@ -12,6 +12,8 @@ const isStrictlyEqual = <T>(a: T, b: T): boolean => a === b;
 /**
  * Create an observation channel.
  *
+ * @note Impure: holds the current value and notifies its subscribers.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

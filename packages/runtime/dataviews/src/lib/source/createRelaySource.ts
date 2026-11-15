@@ -58,6 +58,10 @@ const describeUnreachable = (page: number): string =>
  * rather than counting zero; a page with a missing record fails rather than
  * delivering a shorter page.
  *
+ * @note Impure: remembers each query's cursor trail and the pages a fetch
+ * was forbidden for, and each request retains, subscribes to and fetches
+ * from the Relay environment.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

@@ -15,6 +15,8 @@ const LOCAL_BASE = "http://localhost/";
  * the port. There is no history stack; the write `history` option is
  * accepted and ignored.
  *
+ * @note Impure: holds the current URL and notifies its subscribers.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

@@ -20,6 +20,8 @@ const areSetsEqual = (
  * Create one selection record: explicit record identities with a valid
  * empty state. The record owns only the identity set; row data, counts and
  * operations stay with their own owners.
+ *
+ * @note Impure: holds the selected identities and publishes each change.
  */
 export default function createSelection(
   initial: readonly string[] = [],

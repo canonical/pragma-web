@@ -135,14 +135,14 @@ export type DataViewsProvider<
    * Replace the grouping levels. Reserved: refused while no source declares
    * a groupable field.
    *
-   * @seam grouping — read by the group header row
+   * The group header row calls this.
    */
   readonly setGroup: (group: readonly GroupTerm[]) => readonly SourceRefusal[];
   /**
    * Replace the collapsed group paths. Reserved: refused while no source
    * honours collapse.
    *
-   * @seam grouping — read by the group header's disclosure
+   * The group header's disclosure calls this.
    */
   readonly setCollapsed: (
     collapsed: readonly GroupPath[],
@@ -459,8 +459,8 @@ export type ProviderHost<
    * Always "applies" on a monomorphic collection, and on a field the schema
    * does not scope.
    *
-   * @seam typed cells — read by the body cell, whose not-applicable cell is
-   * the third state beside value and empty
+   * The body cell reads this: a not-applicable cell is the third state
+   * beside value and empty.
    */
   readonly applicability: (field: string, row: TRow) => Applicability;
   /**
@@ -473,8 +473,8 @@ export type ProviderHost<
    * and it changes only with a `rows` or a `selection` publication: watching
    * those is watching this.
    *
-   * @seam actions — read by `useDataViewsAction`, which decides an action's
-   * applicability to records selected on an earlier page from here
+   * `useDataViewsAction` reads this to decide whether an action applies to
+   * records selected on an earlier page.
    */
   readonly recordType: (id: string) => string | null;
 };

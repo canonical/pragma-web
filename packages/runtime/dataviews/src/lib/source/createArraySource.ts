@@ -25,6 +25,9 @@ const createExactCount = (value: number) => ({ kind: "exact" as const, value });
  * executed here, so a grouped query is refused rather than answered with
  * ungrouped rows.
  *
+ * @note Impure: holds its rows and the requests delivered from them, and
+ * keeps the last slice it executed, so paging it does not run it again.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

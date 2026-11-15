@@ -14,6 +14,9 @@ import type {
  * Preview coalescing to animation frames is the renderer's concern — the
  * machine clamps and publishes per preview call.
  *
+ * @note Impure: holds the sizing a resize started from, writes the
+ * column layout, and subscribes to it while observed.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

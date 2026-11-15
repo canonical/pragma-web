@@ -25,6 +25,9 @@ type Delivered<TRow extends object> =
  * Unchanged observations are recognised by reference, so the client must
  * hand back the same `data` reference while the payload has not changed.
  *
+ * @note Impure: remembers the pages a fetch was forbidden for, and each
+ * request subscribes to the query client.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
