@@ -7,52 +7,64 @@
  * object, so every column's menu rendered again though its own changes had
  * not moved. Offers are now read from one resolution of the arrangement, and
  * a column keeps its offers object while its changes hold.
+ *
+ * The open menu is counted by a pass-through counter on the design system's
+ * menu, as regression 0014 counts it: a menu given new offers renders again.
  */
 
-import { resolveMessages } from "@canonical/dataviews-core/bindings";
-import { act, renderHook } from "@testing-library/react";
-import { createRef } from "react";
-import { describe, expect, it } from "vitest";
+import { ContextualMenu } from "@canonical/react-ds-global";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
-import { useColumnManagement } from "../../lib/_work_in_progress/common/ScopedDataTable/hooks/index.js";
+import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+
+// Each call of the spied menu is a render of the open column menu.
+vi.mock("@canonical/react-ds-global", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@canonical/react-ds-global")>();
+  return { ...actual, ContextualMenu: vi.fn(actual.ContextualMenu) };
+});
+
+const renders = vi.mocked(ContextualMenu);
 
 describe("regression 0058 — a column change renewed every header's offers", () => {
-  it("keeps the offers of every column whose changes hold, through a width and a hide elsewhere", () => {
+  it("renders no open menu whose column's changes hold, through a width and a hide elsewhere", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });
-    const columns = [
-      { id: "name", header: "Name" },
-      { id: "status", header: "Status" },
-      { id: "cores", header: "Cores" },
-      { id: "owner", header: "Owner" },
-    ];
-    const hook = renderHook(() =>
-      useColumnManagement({
-        provider,
-        columns,
-        headerRow: createRef<HTMLTableRowElement>(),
-        messages: resolveMessages(),
-        announce: () => {},
-      }),
+    render(
+      <DataTable
+        provider={provider}
+        columns={[
+          { id: "name", header: "Name" },
+          { id: "status", header: "Status" },
+          { id: "cores", header: "Cores" },
+          { id: "owner", header: "Owner" },
+        ]}
+        label="Machines"
+      />,
     );
-    const read = (id: string) => hook.result.current.readOffers(id);
-    const before = columns.map(({ id }) => read(id));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Column options for Status" }),
+    );
+    expect(screen.getByRole("menu", { hidden: true })).toBeInTheDocument();
+    renders.mockClear();
     act(() => {
       provider.presentation.arrange({ "table.width.name": 240 });
     });
-    columns.forEach(({ id }, at) => {
-      expect(read(id)).toBe(before.at(at));
-    });
-    // Owner hidden: Cores is now last shown, Owner hidden; Name and Status
-    // take the same changes as before.
+    expect(renders).not.toHaveBeenCalled();
+    // Owner hidden: Cores is now last shown, and Status takes the same
+    // changes as before.
     act(() => {
-      hook.result.current.changeColumn("owner", "hide");
+      provider.presentation.arrange({ "table.hidden": ["owner"] });
     });
-    expect(read("name")).toBe(before.at(0));
-    expect(read("status")).toBe(before.at(1));
-    expect(read("cores")).not.toBe(before.at(2));
-    expect(read("owner")).not.toBe(before.at(3));
+    expect(renders).not.toHaveBeenCalled();
+    // Cores hidden too: Status is now last shown, and can move right no
+    // more, so its menu renders its new offers.
+    act(() => {
+      provider.presentation.arrange({ "table.hidden": ["owner", "cores"] });
+    });
+    expect(renders).toHaveBeenCalled();
   });
 });
