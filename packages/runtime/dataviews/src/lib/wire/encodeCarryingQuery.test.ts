@@ -334,7 +334,7 @@ describe("encodeCarryingQuery", () => {
   it.each([
     "status=failed&status__isAny__1=failed&status__isAny__1=ready&status__isAny__1=melted",
     "cpu__lte=4&cpu__lte__1=x&cpu__lte__1=8&cpu__lte__1=4",
-    "gpu__isSet=yes&gpu__isSet__0=yes",
+    "gpu__isSet=true&gpu__isSet__0=true",
   ])("claims each refused slot by the conjunct it reads: %s", (link) => {
     const { decoded, reread } = respell(link);
     expect(canonicalizeSlice(reread.slice)).toEqual(

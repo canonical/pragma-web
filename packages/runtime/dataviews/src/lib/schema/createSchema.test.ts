@@ -359,9 +359,13 @@ describe("createSchema", () => {
         operands: ["2026-12-31"],
       },
     });
-    expect(schema.buildPredicate("owner", "isSet", [])).toEqual({
+    expect(schema.buildPredicate("owner", "isSet", [true])).toEqual({
       status: "valid",
-      predicate: { field: "owner", operator: "isSet", operands: [] },
+      predicate: { field: "owner", operator: "isSet", operands: [true] },
+    });
+    expect(schema.buildPredicate("owner", "isSet", [false])).toEqual({
+      status: "valid",
+      predicate: { field: "owner", operator: "isSet", operands: [false] },
     });
   });
 
@@ -454,9 +458,9 @@ describe("createSchema", () => {
       status: "invalid",
       reason: "lte predicate needs exactly one operand",
     });
-    expect(schema.buildPredicate("owner", "isSet", ["x"])).toEqual({
+    expect(schema.buildPredicate("owner", "isSet", [])).toEqual({
       status: "invalid",
-      reason: "isSet predicate takes no operands",
+      reason: "isSet predicate needs exactly one operand",
     });
   });
 
@@ -495,7 +499,7 @@ describe("createSchema", () => {
     });
     expect(schema.buildPredicate("owner", "isSet", ["x"])).toEqual({
       status: "invalid",
-      reason: "isSet predicate takes no operands",
+      reason: '"x" is neither true nor false',
     });
     expect(schema.buildPredicate("updated", "gte", ["2026-13-01"])).toEqual({
       status: "invalid",

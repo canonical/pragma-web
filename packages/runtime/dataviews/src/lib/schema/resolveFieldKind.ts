@@ -199,7 +199,7 @@ const NUMBER: FieldKindRules<NumberField> = {
  * A presence field orders in two ranks: unset, then set. Its domain is
  * presence — the one thing it filters on — so anything but an absent or
  * null value is set, `false` included, and ordering and `isSet` agree about
- * which rows are set. `false` and `true` share the set rank, so the next
+ * which rows are set and which are not. `false` and `true` share the set rank, so the next
  * term or the tiebreak orders them. No value is empty to this kind; a row
  * the field does not apply to is placed by the ordering, not by the kind.
  */
@@ -216,10 +216,19 @@ const PRESENCE: FieldKindRules<PresenceField> = {
     kind: "none",
     reason: "presence fields edit through direct commands",
   },
-  // Neither carries an operand to check; operand arity is the operator's
-  // concern, and the grammar checks it.
-  rejectOperands: () => null,
-  readApplied: () => true,
+  // `true` asks for a value, `false` for none; operand arity is the
+  // operator's concern, and the grammar checks it.
+  rejectOperands: (_definition, operands) => {
+    for (const operand of operands) {
+      if (typeof operand !== "boolean") {
+        return `${describeOperand(operand)} is neither true nor false`;
+      }
+    }
+    return null;
+  },
+  // A presence predicate without its operand asks for a value, as a link
+  // spelled before presence took a boolean does.
+  readApplied: (predicate) => predicate.operands.at(0) !== false,
   areAppliedEqual: isSameValue,
   // Presence has no range: it orders in two ranks, and a set `false` and a
   // set `true` tie, so no bound compares with either.

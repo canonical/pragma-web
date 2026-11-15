@@ -147,7 +147,8 @@ export default function readFacets(
   rows: readonly object[],
   slice: Slice,
   definitions: readonly SchemaFieldDefinition[],
-  config: Pick<ExecuteSliceConfig, "schema" | "searchFields">,
+  config: Pick<ExecuteSliceConfig, "schema" | "searchFields"> &
+    Partial<Pick<ExecuteSliceConfig, "types">>,
   selected: readonly object[],
 ): Readonly<Record<string, Facet>> {
   const restricted = new Set(slice.filter.map(({ field }) => field));

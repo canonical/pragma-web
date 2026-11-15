@@ -9,17 +9,14 @@ describe("rejectOperandArity", () => {
     );
   });
 
-  it("needs exactly one operand for a single-operand operator", () => {
+  it("needs exactly one operand for every other operator", () => {
     expect(rejectOperandArity("gte", 1)).toBeNull();
+    expect(rejectOperandArity("isSet", 1)).toBeNull();
+    expect(rejectOperandArity("isSet", 0)).toBe(
+      "isSet predicate needs exactly one operand",
+    );
     expect(rejectOperandArity("contains", 2)).toBe(
       "contains predicate needs exactly one operand",
-    );
-  });
-
-  it("takes no operands for isSet", () => {
-    expect(rejectOperandArity("isSet", 0)).toBeNull();
-    expect(rejectOperandArity("isSet", 1)).toBe(
-      "isSet predicate takes no operands",
     );
   });
 });

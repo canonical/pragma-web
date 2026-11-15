@@ -82,7 +82,7 @@ describe("regression 0031 — clearing an undeclared choice or flag dropped focu
   });
 
   it("moves focus to the filters' group when the presence filter is unchecked", () => {
-    renderStanding({ field: "spare", operator: "isSet", operands: [] });
+    renderStanding({ field: "spare", operator: "isSet", operands: [true] });
     const spare = screen.getByRole("checkbox", { name: "spare" });
     spare.focus();
     fireEvent.click(spare);
@@ -104,7 +104,7 @@ describe("regression 0031 — clearing an undeclared choice or flag dropped focu
 
   it("keeps focus on a declared presence filter, which stays to be checked again", () => {
     renderStanding(
-      { field: "spare", operator: "isSet", operands: [] },
+      { field: "spare", operator: "isSet", operands: [true] },
       DECLARED,
     );
     const spare = screen.getByRole("checkbox", { name: "spare" });

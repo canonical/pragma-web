@@ -43,14 +43,15 @@ describe("readKeyPredicate", () => {
     expect(issues.map((issue) => issue.code)).toEqual(["invalid", "malformed"]);
   });
 
-  it("reads a presence key as its marker, whatever it holds", () => {
-    const { conjunct } = read("gpu__isSet", "gpu", ["yes"]);
+  it("reads a presence key as a boolean, and reports any other value", () => {
+    const { conjunct, issues } = read("gpu__isSet", "gpu", ["yes", "", "1"]);
     expect(conjunct?.predicate).toEqual({
       field: "gpu",
       operator: "isSet",
-      operands: [],
+      operands: [true],
     });
-    expect(conjunct?.taken).toEqual([0]);
+    expect(conjunct?.taken).toEqual([2]);
+    expect(issues.map((issue) => issue.code)).toEqual(["malformed"]);
   });
 
   it("reads a blank as no value, and nothing from blanks alone", () => {

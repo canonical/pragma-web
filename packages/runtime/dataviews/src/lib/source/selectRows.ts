@@ -1,3 +1,4 @@
+import type { RecordTypes } from "../collection/index.js";
 import {
   canonicalizeSlice,
   type Predicate,
@@ -12,7 +13,7 @@ import {
 import foldText from "./foldText.js";
 import type { ExecuteSliceConfig } from "./types.js";
 
-/** Absent values never satisfy a predicate. */
+/** Absent values never satisfy a predicate, but `isSet` with `false`. */
 const isAbsent = (value: unknown): boolean =>
   value === null || value === undefined;
 
@@ -21,6 +22,22 @@ const isAbsent = (value: unknown): boolean =>
 type CompiledPredicate = {
   readonly field: string;
   readonly test: (value: unknown) => boolean;
+};
+
+/**
+ * Whether a field applies to a row, read from the row's type, or null when
+ * it applies to every row: the field names no types, or the collection has
+ * one.
+ */
+const compileApplicability = (
+  definition: SchemaFieldDefinition | undefined,
+  types: RecordTypes | null,
+): ((row: object) => boolean) | null => {
+  if (definition?.appliesTo === undefined || types === null) {
+    return null;
+  }
+  const scope = new Set<unknown>(definition.appliesTo);
+  return (row) => scope.has(readField(row, types.field));
 };
 
 /**
@@ -36,8 +53,11 @@ const compilePredicate = (
     definition === undefined ? null : resolveFieldKind(definition.kind);
   const { field } = predicate;
   switch (predicate.operator) {
-    case "isSet":
-      return { field, test: (value) => !isAbsent(value) };
+    case "isSet": {
+      // Without its operand, presence asks for a value.
+      const wanted = predicate.operands.at(0) !== false;
+      return { field, test: (value) => !isAbsent(value) === wanted };
+    }
     case "isAny":
     case "isNone": {
       // The server's options are text: a value is compared by its text, so
@@ -128,25 +148,36 @@ const matchesSearch = (
 /**
  * The rows a query's filter and search select, in the order given. The
  * predicates over `lifted` are left out, as a facet over that field is
- * computed — null lifts none.
+ * computed — null lifts none. A row of a type a field does not apply to
+ * satisfies none of that field's predicates, `isSet` with `false` included,
+ * though it holds no value there.
  */
 export default function selectRows<TRow extends object>(
   rows: readonly TRow[],
   slice: Slice,
-  config: Pick<ExecuteSliceConfig, "schema" | "searchFields">,
+  config: Pick<ExecuteSliceConfig, "schema" | "searchFields"> &
+    Partial<Pick<ExecuteSliceConfig, "types">>,
   lifted: string | null,
 ): readonly TRow[] {
   const searchFields = config.searchFields ?? [];
+  const types = config.types ?? null;
   const query = canonicalizeSlice(slice);
   const needle = query.search === null ? null : foldText(query.search);
   const predicates = query.filter
     .filter((predicate) => predicate.field !== lifted)
-    .map((predicate) =>
-      compilePredicate(predicate, config.schema.findField(predicate.field)),
-    );
+    .map((predicate) => {
+      const definition = config.schema.findField(predicate.field);
+      return {
+        compiled: compilePredicate(predicate, definition),
+        applies: compileApplicability(definition, types),
+      };
+    });
   return rows.filter((row) => {
-    for (const predicate of predicates) {
-      if (!predicate.test(readField(row, predicate.field))) {
+    for (const { compiled, applies } of predicates) {
+      if (applies !== null && !applies(row)) {
+        return false;
+      }
+      if (!compiled.test(readField(row, compiled.field))) {
         return false;
       }
     }

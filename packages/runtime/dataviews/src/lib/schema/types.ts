@@ -49,9 +49,9 @@ export type NumberField = {
 };
 
 /**
- * A presence field: whether a record sets it, filtered by the zero-value
- * `isSet` operator. Any value but an absent or null one is set, `false`
- * included. It orders in two ranks, unset before set; `false` and `true`
+ * A presence field: whether a record sets it, filtered by `isSet` with
+ * `true` for records that set it and `false` for those that do not. Any
+ * value but an absent or null one is set, `false` included. It orders in two ranks, unset before set; `false` and `true`
  * are both set and tie.
  *
  * @experimental Pre-release: the whole surface is still settling, and this

@@ -28,10 +28,24 @@ describe("selectRows", () => {
     expect(selectIds([])).toEqual(["a", "b", "c", "d", "e", "g", "f"]);
   });
 
-  it("selects the rows holding a value for isSet", () => {
-    expect(
-      selectIds([{ field: "owner", operator: "isSet", operands: [] }]),
-    ).toEqual(["a", "d"]);
+  describe("isSet", () => {
+    it("selects the rows holding a value with true, false included", () => {
+      expect(
+        selectIds([{ field: "owner", operator: "isSet", operands: [true] }]),
+      ).toEqual(["a", "d"]);
+    });
+
+    it("selects the rows holding none with false, null and absent alike", () => {
+      expect(
+        selectIds([{ field: "owner", operator: "isSet", operands: [false] }]),
+      ).toEqual(["b", "c", "e", "g", "f"]);
+    });
+
+    it("asks for a value when the operand is missing", () => {
+      expect(
+        selectIds([{ field: "owner", operator: "isSet", operands: [] }]),
+      ).toEqual(["a", "d"]);
+    });
   });
 
   it("selects only choice values for isAny and isNone", () => {
@@ -119,5 +133,37 @@ describe("selectRows", () => {
     expect(selectIds([failed], null, "status")).toHaveLength(
       FACETED_ROWS.length,
     );
+  });
+
+  describe("a field scoped to record types", () => {
+    const schema = createSchema([
+      { field: "type", kind: "choices", options: ["vm", "container"] },
+      { field: "secureboot", kind: "presence", appliesTo: ["vm"] },
+    ]);
+    const rows = [
+      { id: "booted", type: "vm", secureboot: true },
+      { id: "unbooted", type: "vm" },
+      { id: "container", type: "container" },
+    ];
+    const types = { field: "type", names: ["vm", "container"] };
+    const select = (operands: readonly boolean[], scoped = true) =>
+      selectRows(
+        rows,
+        {
+          ...EMPTY_SLICE,
+          filter: [{ field: "secureboot", operator: "isSet", operands }],
+        },
+        { schema, types: scoped ? types : null },
+        null,
+      ).map(({ id }) => id);
+
+    it("keeps a row of another type out of isSet with false", () => {
+      expect(select([false])).toEqual(["unbooted"]);
+      expect(select([true])).toEqual(["booted"]);
+    });
+
+    it("reads every row's type alike where the collection has one", () => {
+      expect(select([false], false)).toEqual(["unbooted", "container"]);
+    });
   });
 });

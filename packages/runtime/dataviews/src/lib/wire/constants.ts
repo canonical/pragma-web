@@ -90,3 +90,13 @@ export const SUFFIXED_OPERATORS = Object.freeze([
   "contains",
   "startsWith",
 ] as const satisfies readonly PredicateOperator[]);
+
+/**
+ * The values a presence key reads as: `true` and `false`, and `1`, which
+ * links spelled before presence took a boolean carry, as `true`.
+ */
+export const PRESENCE_VALUES = Object.freeze({
+  true: true,
+  false: false,
+  "1": true,
+} as const);
