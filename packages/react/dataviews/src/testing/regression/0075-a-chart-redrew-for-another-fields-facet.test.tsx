@@ -27,7 +27,7 @@ const status = () =>
     values: [{ value: "failed", count: { kind: "exact", value: 4 } }],
   }) as const;
 
-describe("a result that moved another field's facet", () => {
+describe("regression 0075 — a chart redrew for another field's facet", () => {
   it("redraws no bar of the chart that reads this one", () => {
     const { provider, source } = createFacetedManual();
     render(
