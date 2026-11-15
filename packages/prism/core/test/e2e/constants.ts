@@ -145,7 +145,21 @@ export const SECTION_PARAGRAPHS = 12;
  */
 export const LONG_INDEX_SECTIONS = 30;
 
-/** The phone the long index is read on. */
+/**
+ * The header row of the wide table a section's prose holds: more columns
+ * than a phone's screen holds, none of whose cells wraps.
+ */
+export const WIDE_TABLE_COLUMNS = [
+  "Property",
+  "Type",
+  "Default",
+  "Required",
+  "Description",
+  "Since",
+  "Deprecated",
+] as const;
+
+/** The phone the long index and the prose's wide table are read on. */
 export const PHONE_VIEWPORT = { width: 390, height: 844 } as const;
 
 /** The address the server-rendered page is served at, never fetched. */
