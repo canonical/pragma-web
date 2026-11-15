@@ -31,9 +31,10 @@ const componentCssClassName = "ds sectioned-view";
  * with three sections or more the "On this page" bar comes first, sticky
  * at the scroller's top through the whole view, naming the current section
  * and opening the index over the page.
- * A body given before the sections (`children`) is off the index; a facts
- * node or a body that renders nothing leaves no region, and a page with no
- * section and no facts has no aside. It adds no space at the page's end:
+ * A body given before the sections (`children`) is off the index; facts
+ * or a body given as `null`, `undefined`, a boolean or the empty string
+ * leave no region (an element always does, whatever it renders), and a
+ * page with no section and no facts has no aside. It adds no space at the page's end:
  * the page that holds it owns that.
  *
  * `import { SectionedView } from "@canonical/prism-core";`

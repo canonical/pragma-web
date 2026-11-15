@@ -23,8 +23,11 @@ type OwnProps = {
    * rendered once, in the aside at three groups and wider and under the
    * header below. In the aside a `KeyValueList`'s pairs stack, each key,
    * muted, over its value across the aside, the value wrapping anywhere;
-   * under the header the list keeps its own layout. No facts region when
-   * omitted or when it renders nothing.
+   * under the header the list keeps its own layout. Only `null`,
+   * `undefined`, a boolean or the empty string leave no facts region: an
+   * element is a region even when the component it names renders nothing.
+   * A page that may record no fact decides so before it renders and
+   * passes `undefined`; a `KeyValueList` needs at least one pair.
    */
   readonly facts?: ReactNode;
   /**
@@ -34,8 +37,9 @@ type OwnProps = {
   readonly sections: readonly SectionedViewSection[];
   /**
    * The body before the first section, off the index, such as an example
-   * or what a renderer draws in place of the sections. No body region when
-   * omitted or when it renders nothing.
+   * or what a renderer draws in place of the sections. Only `null`,
+   * `undefined`, a boolean or the empty string leave no body region: an
+   * element is a region even when the component it names renders nothing.
    */
   readonly children?: ReactNode;
 };
