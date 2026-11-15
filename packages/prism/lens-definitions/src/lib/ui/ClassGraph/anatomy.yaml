@@ -60,8 +60,8 @@
 # it opens (no `img` role once it is a link), and a tab stop of its own;
 # hovered or focused, it is the focus: ringed, its bridges named. A stub
 # takes the focus by hover. Drilled, the drilled region's label row is the
-# way back (`way-back`): a link to the same page without `expand=`, its
-# prefix underlined. A term page ignores `expand=` and draws neither link.
+# way back (`way-back`): a link to the same page without `expand=`,
+# underlined. A term page ignores `expand=` and draws neither link.
 #
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.

@@ -12,8 +12,8 @@
 # On the explorer's index a collapsed namespace's row is a link (`target`)
 # to the same page drilled into it (core's `expand=<prefix>`), named by
 # what it holds and that it opens; drilled, the drilled namespace's header
-# is the way back (`way-back`), a link to the page without `expand=`, its
-# prefix underlined. A term page draws neither link.
+# is the way back (`way-back`), a link to the page without `expand=`,
+# underlined. A term page draws neither link.
 # Reference: the graph heuristics' phone view (G28).
 #
 # Why not a published component: no published component draws a graph;
