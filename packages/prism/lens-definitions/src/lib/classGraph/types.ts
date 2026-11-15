@@ -34,8 +34,8 @@ export interface GraphRelationInput {
   /** The range's full IRI. */
   readonly range: string | null;
   /**
-   * The instance statements the property's declared edges cover, summed
-   * over its declarations; 0 when none does.
+   * The instance statements the graph counts for the property's declared
+   * edge between its domain and its range; 0 when it serves none.
    */
   readonly count: number;
 }
@@ -102,7 +102,10 @@ export interface Bundle extends LabelledBundle {
   readonly relations: readonly DrawnRelation[];
   /** Whether relations run both ways. */
   readonly opposite: boolean;
-  /** The instance statements its relations cover, summed. */
+  /**
+   * Its heaviest relation's count: a figure the graph serves, the same
+   * whether or not a store holds both directions of an inverse pair.
+   */
   readonly weight: number;
 }
 

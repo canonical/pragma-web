@@ -3,6 +3,9 @@ import { CROSS_REGION_GRAPH } from "../../../testing/fixtures.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import buildClassGraphModel from "./buildClassGraphModel.js";
 
+/** The design-system ontology's namespace. */
+const DS = "https://ds.canonical.com/";
+
 describe("buildClassGraphModel", () => {
   const model = buildClassGraphModel(CROSS_REGION_GRAPH);
 
@@ -53,6 +56,28 @@ describe("buildClassGraphModel", () => {
       model.bundles.find((bundle) => bundle.id === "ex:Note ex:Remark")
         ?.opposite,
     ).toBe(false);
+  });
+
+  it("weighs a bundle by its heaviest relation, not their sum", () => {
+    const weightOf = (id: string): number | undefined =>
+      model.bundles.find((bundle) => bundle.id === id)?.weight;
+    // hasPart 1,010 and its inverse partOf 0: a store that holds one
+    // direction only.
+    expect(weightOf("ex:Part ex:Whole")).toBe(1010);
+    expect(weightOf("ex:Note ex:Note")).toBe(0);
+    expect(weightOf("ex:Note ex:Remark")).toBe(12);
+    const real = buildClassGraphModel(ontologyGraph);
+    const realWeightOf = (a: string, b: string): number | undefined =>
+      real.bundles.find(
+        (bundle) =>
+          bundle.id === `${DS}${a} ${DS}${b}` ||
+          bundle.id === `${DS}${b} ${DS}${a}`,
+      )?.weight;
+    // An inverse pair the store holds both ways, 28 links each way.
+    expect(realWeightOf("Component", "Subcomponent")).toBe(28);
+    // Two properties, 1,010 statements each, between a block and its
+    // token bindings.
+    expect(realWeightOf("UIBlock", "TokenBinding")).toBe(1010);
   });
 
   it("sizes boxes to the lattice: a count after the label, none when abstract", () => {

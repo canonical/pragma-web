@@ -10,7 +10,8 @@
  * model's `surface` package), and keep each class's IRI, label, prefix,
  * abstractness, superclass, instance count and field count, and each
  * object property's IRI, label, domain and range, with its count: the
- * statements its declared edges in `classEdges` cover, summed.
+ * one `classEdges` serves for its declared edge between its domain and
+ * its range.
  */
 
 import type { ClassGraphInput } from "../../src/lib/classGraph/types.js";

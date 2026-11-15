@@ -20,10 +20,13 @@
 # labels are 14px, muted, or in the accent for the focus, on a 3px halo of
 # the floor's colour.
 #
-# Weights: a relation's stroke is its summed store count by decade (1px
-# for 1 to 9, 2px for 10 to 99, 4px for 100 to 999, 8px from 1,000), and
-# 1px dashed (4 4) where the count is 0, never hidden. The count is the
-# edge's `data-weight`; `data-declared` says the ontology declares it.
+# Weights: an edge's stroke is its weight by decade (1px for 1 to 9, 2px
+# for 10 to 99, 4px for 100 to 999, 8px from 1,000), and 1px dashed (4 4)
+# where it is 0, never hidden. A relation's count is the one the store
+# serves for its declared edge between the two classes it is drawn
+# between; an edge bundling several relations weighs its heaviest, never
+# their sum (an inverse pair held both ways would count each link twice).
+# The weight is the edge's `data-weight`.
 #
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.

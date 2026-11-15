@@ -47,7 +47,11 @@ const ONTOLOGIES = [
   },
 ] as unknown as DefinitionsExplorer_ontologies$data;
 
-/** The edges the graph serves for the ontology: two declared, one not. */
+/**
+ * The edges the graph serves for the ontology: the declared edge between
+ * `taggedBy`'s domain and range, a declared edge between other classes,
+ * and an observed pair nothing declares.
+ */
 const EDGES: readonly ClassEdgeInput[] = [
   {
     property: "https://ds.canonical.com/taggedBy",
@@ -101,12 +105,12 @@ describe("buildClassGraphInput", () => {
         label: "taggedBy",
         domain: "https://ds.canonical.com/Tag",
         range: "https://ds.canonical.com/Tag",
-        count: 42,
+        count: 40,
       },
     ]);
   });
 
-  it("weighs a relation by its declared edges only, 0 when none is served", () => {
+  it("weighs a relation by the declared edge between its domain and range, 0 when none is served", () => {
     expect(
       buildClassGraphInput(ONTOLOGIES, []).relations.map(
         (relation) => relation.count,
@@ -116,6 +120,17 @@ describe("buildClassGraphInput", () => {
       buildClassGraphInput(ONTOLOGIES, EDGES).relations.map(
         (relation) => relation.count,
       ),
-    ).toEqual([0, 42]);
+    ).toEqual([0, 40]);
+    expect(
+      buildClassGraphInput(ONTOLOGIES, EDGES.slice(1)).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([0, 0]);
+  });
+
+  it("builds the same input whatever order the edges come in", () => {
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES.toReversed())).toEqual(
+      buildClassGraphInput(ONTOLOGIES, EDGES),
+    );
   });
 });

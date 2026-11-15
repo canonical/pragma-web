@@ -34,8 +34,9 @@ describe("DefinitionsExplorer SSR", () => {
           `data-declared="true" data-from="${from}" data-kind="relation" data-to="${to}" data-weight="(\\d+)"`,
         ),
       )?.[1];
-    // ds:hasTokenBinding and ds:viaBlock, 1,010 statements each, bundled.
-    expect(weightOf("ds:TokenBinding", "ds:UIBlock")).toBe("2020");
+    // ds:hasTokenBinding and ds:viaBlock, 1,010 statements each: the bundle
+    // weighs its heavier relation, not their sum.
+    expect(weightOf("ds:TokenBinding", "ds:UIBlock")).toBe("1010");
     expect(weightOf("cs:CodeStandard", "cs:Example")).toBe("0");
     expect(html.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
   });

@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
+import classEdges from "../../../../testing/records/classEdges.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import weighStroke from "../../classGraph/weighStroke.js";
 import ClassGraph from "./ClassGraph.js";
@@ -30,6 +31,22 @@ function draw(props: Partial<ClassGraphProps> = {}): HTMLElement {
     ),
   );
   return container;
+}
+
+/**
+ * The count the captured store serves for a property's declared edge
+ * between two classes; 0 when it serves none.
+ */
+function serveCount(property: string, subject: string, object: string): number {
+  return (
+    classEdges.find(
+      (edge) =>
+        edge.declared &&
+        edge.property === property &&
+        edge.subjectClass === subject &&
+        edge.objectClass === object,
+    )?.count ?? 0
+  );
 }
 
 /** The group of a class, by its compact term. */
@@ -99,7 +116,12 @@ describe("ClassGraph", () => {
     const drawn = layout.edges.filter((edge) => edge.kind === "relation");
     const strokes = drawn.map((edge) => {
       const path = container.querySelector(`[data-edge="${edge.id}"] path`);
-      const weight = edge.bundle?.weight;
+      // The heaviest of the bundle's relations, as the store serves each.
+      const weight = Math.max(
+        ...(edge.bundle?.relations ?? []).map((relation) =>
+          serveCount(relation.uri, relation.domain, relation.range),
+        ),
+      );
       expect(path?.getAttribute("data-weight")).toBe(String(weight));
       expect(path?.getAttribute("data-declared")).toBe("true");
       return [
@@ -198,6 +220,17 @@ describe("ClassGraph", () => {
       container.querySelectorAll(".is-faded.subclass, .is-faded.relation"),
     ).toHaveLength(layout.edges.length - near.edges.size);
     expect(container.querySelector(".chain")).toBeNull();
+  });
+
+  it("keeps a focused relation with no statements dashed, at the focus's 2px", () => {
+    const container = draw({ focus: uri("cs:Example") });
+    const zero = container.querySelector(
+      'path.relation[data-from="cs:CodeStandard"][data-to="cs:Example"]',
+    );
+    expect(zero?.getAttribute("class")).toBe("relation is-focus");
+    expect(zero?.getAttribute("data-weight")).toBe("0");
+    expect(zero?.getAttribute("stroke-dasharray")).toBe("4 4");
+    expect(zero?.getAttribute("stroke-width")).toBe("2");
   });
 
   it("rings the selection in the accent and draws its lineage while it is the focus", () => {
