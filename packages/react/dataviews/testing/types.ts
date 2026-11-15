@@ -174,9 +174,12 @@ export type PresenceFilterHarnessProps = Partial<
   Omit<PresenceFilterProps, "handle" | "label" | "field">
 >;
 
-/** What a text filter case sets; the handle, label and field are the root's. */
+/**
+ * What a text filter case sets; the handles, label, field and host are the
+ * harness's.
+ */
 export type TextFilterHarnessProps = Partial<
-  Omit<TextFilterProps, "handle" | "label" | "field">
+  Omit<TextFilterProps, "findHandle" | "label" | "field" | "host">
 >;
 
 /** A record with an identity and a name. */

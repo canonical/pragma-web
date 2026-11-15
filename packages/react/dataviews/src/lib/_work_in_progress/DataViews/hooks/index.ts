@@ -9,3 +9,4 @@ export { default as useFilterHandle } from "./useFilterHandle.js";
 export { default as useMoreFiltersPin } from "./useMoreFiltersPin.js";
 export { default as useProviderState } from "./useProviderState.js";
 export { default as useRestrictedFields } from "./useRestrictedFields.js";
+export { default as useStandingOperators } from "./useStandingOperators.js";
