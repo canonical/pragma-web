@@ -139,6 +139,15 @@ export const SECTION_TITLES = [
 /** Paragraphs in each section, enough to scroll any heading to the bar. */
 export const SECTION_PARAGRAPHS = 12;
 
+/**
+ * How many sections the long index is read with: more entries than a
+ * phone's screen holds at comfortable density, about 44px each.
+ */
+export const LONG_INDEX_SECTIONS = 30;
+
+/** The phone the long index is read on. */
+export const PHONE_VIEWPORT = { width: 390, height: 844 } as const;
+
 /** The address the server-rendered page is served at, never fetched. */
 export const PAGE_URL = "http://prism.test/";
 

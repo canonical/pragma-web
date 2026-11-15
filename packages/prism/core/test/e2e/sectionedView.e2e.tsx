@@ -10,7 +10,9 @@
  * whose entries are fragment links, so what is asserted needs no script:
  * the summary reads the label, a click on it opens the list, and choosing
  * an entry scrolls the canvas until that section's heading rests on the
- * bar's lower edge.
+ * bar's lower edge. On a phone, a view with more sections than the screen
+ * holds opens a panel that ends on the screen and scrolls on its own, so
+ * its last entry is within reach.
  */
 
 import type { Browser, Page } from "playwright";
@@ -25,7 +27,9 @@ import {
   BAR_EDGE_TOLERANCE_PX,
   CONTENTS_BAR_VIEWPORTS,
   DOCUMENT_CONTEXT_CLASS_NAME,
+  LONG_INDEX_SECTIONS,
   PAGE_URL,
+  PHONE_VIEWPORT,
   SECTION_PARAGRAPHS,
   SECTION_TITLES,
   SECTIONED_VIEW_MODIFIERS,
@@ -69,13 +73,40 @@ const sectionedDocument = (
   </DocumentLayout>
 );
 
+/** A document whose view has more sections than a phone's screen holds. */
+const longIndexDocument = (
+  <DocumentLayout
+    rail={<nav aria-label="Rail">Rail</nav>}
+    strip={<ModeStrip trail="Document" />}
+  >
+    <SectionedView
+      header={
+        <header>
+          <h1>Button</h1>
+        </header>
+      }
+      sections={Array.from({ length: LONG_INDEX_SECTIONS }, (_, index) => ({
+        id: `section-${index + 1}`,
+        title: `Section ${index + 1}`,
+        content: <p>{`Section ${index + 1}.`}</p>,
+      }))}
+    />
+  </DocumentLayout>
+);
+
 let browser: Browser;
 let html: string;
+let longIndexHtml: string;
 
 beforeAll(async () => {
-  html = renderPage(
-    sectionedDocument,
-    readStylesheets(SECTIONED_VIEW_STYLESHEETS, SECTIONED_VIEW_MODIFIERS),
+  const css = readStylesheets(
+    SECTIONED_VIEW_STYLESHEETS,
+    SECTIONED_VIEW_MODIFIERS,
+  );
+  html = renderPage(sectionedDocument, css, DOCUMENT_CONTEXT_CLASS_NAME);
+  longIndexHtml = renderPage(
+    longIndexDocument,
+    css,
     DOCUMENT_CONTEXT_CLASS_NAME,
   );
   browser = await launchBrowser();
@@ -135,6 +166,47 @@ describe.each(CONTENTS_BAR_VIEWPORTS)("at $width px", (viewport) => {
           );
         })
         .toBeLessThanOrEqual(BAR_EDGE_TOLERANCE_PX);
+    } finally {
+      await page.close();
+    }
+  });
+});
+
+describe(`at ${PHONE_VIEWPORT.width} by ${PHONE_VIEWPORT.height} px`, () => {
+  it("ends a long index's panel on the screen and scrolls it to its last entry", async () => {
+    const page = await browser.newPage({
+      viewport: PHONE_VIEWPORT,
+      javaScriptEnabled: false,
+    });
+    try {
+      await page.route(PAGE_URL, (route) =>
+        route.fulfill({ contentType: "text/html", body: longIndexHtml }),
+      );
+      await page.goto(PAGE_URL);
+      await page.locator(`${BAR} summary`).click();
+      const panel = page.locator(`${BAR} .panel`);
+      const links = panel.locator("a");
+      expect(await links.count()).toBe(LONG_INDEX_SECTIONS);
+      const opened = await panel.boundingBox();
+      expect(opened).not.toBeNull();
+      expect((opened?.y ?? 0) + (opened?.height ?? 0)).toBeLessThanOrEqual(
+        PHONE_VIEWPORT.height,
+      );
+      const last = links.last();
+      await last.scrollIntoViewIfNeeded();
+      const [box, entry] = await Promise.all([
+        panel.boundingBox(),
+        last.boundingBox(),
+      ]);
+      expect(box).not.toBeNull();
+      expect(entry).not.toBeNull();
+      // The panel scrolled, not the page: it stays where it opened, and
+      // the last entry lies inside it, on the screen.
+      expect(box?.y).toBe(opened?.y);
+      expect((entry?.y ?? 0) + (entry?.height ?? 0)).toBeLessThanOrEqual(
+        (box?.y ?? 0) + (box?.height ?? 0) + BAR_EDGE_TOLERANCE_PX,
+      );
+      expect(entry?.y ?? -1).toBeGreaterThanOrEqual(box?.y ?? 0);
     } finally {
       await page.close();
     }

@@ -30,11 +30,13 @@
 #   - The panel spans the bar by `inset-inline-start: 0` and an inline size
 #     of `100%` with border-box sizing: the roster has no key for the
 #     `inset-inline` shorthand.
-#   - The panel has no maximum block size and does not scroll: the check
-#     takes a size only as a token or an unthemable literal, and no token
-#     holds a fraction of the shell (`50cqb`). The longest index the pages
-#     pass, a component's eight sections, is about 300px tall, well inside
-#     the shortest toured viewport.
+#   - The panel is at most the viewport less four space.800 steps (256px)
+#     tall and scrolls past that, through its own token in the ledger: the
+#     bar does not know how much of the viewport the shell takes above it
+#     or below the canvas, and 256px holds the strip, the bar and a footer,
+#     so every entry of a long index stays within reach on the screen. It
+#     is `max-height`: the roster's `size.max.block` takes a token only,
+#     and the bound is a calculation.
 #   - The panel's background is color.background.layer2, the layer token
 #     the package's components read; `color.background.layer` is not one.
 #   - The separator is a dot drawn by the stylesheet (a muted circle one
@@ -53,6 +55,8 @@
 #   --contents-bar-separator-color: color.text.muted
 #   --contents-bar-panel-background: color.background.layer2
 #   --contents-bar-panel-padding-block: space.100
+#   --contents-bar-panel-max-height: calc(100dvh - 4 * var(--space-800))
+#                                                            the viewport less 256px; past it the panel scrolls
 #   --contents-bar-z-index: 1                                literal: above the sections it overlays
 #   --contents-bar-focus-ring-color: color.focusRing; width 2px, offset -2px literals
 node:
@@ -118,6 +122,8 @@ node:
                 layout.offset.block.start: "100%"
                 layout.offset.inline.start: 0
                 size.inline: "100%"
+                size.max.height: "calc(100dvh - 4 * var(--space-800))"
+                layout.overflow.block: auto
                 layout.boxSizing: border-box
                 spacing.internal.block.start: space.100
                 spacing.internal.block.end: space.100
