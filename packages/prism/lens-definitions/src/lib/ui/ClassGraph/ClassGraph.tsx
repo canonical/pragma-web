@@ -8,8 +8,8 @@ import {
   REGION_LABEL_GAP,
   REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
-  requireDefined,
   RouterLink,
+  requireDefined,
   requireEntry,
   useGraphZoomBucket,
 } from "@canonical/prism-core";

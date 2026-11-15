@@ -581,7 +581,8 @@ describe("layOutClassGraph", () => {
           Math.min(
             DESIGN_CANVAS.w / (region.w + 32),
             DESIGN_CANVAS.h / (region.h + 32),
-          ) >= MIN_FIT * LEGIBLE_MARGIN
+          ) >=
+          MIN_FIT * LEGIBLE_MARGIN
         ) {
           expect(layout.view.x + layout.view.w, drill).toBeGreaterThanOrEqual(
             region.x + region.w,

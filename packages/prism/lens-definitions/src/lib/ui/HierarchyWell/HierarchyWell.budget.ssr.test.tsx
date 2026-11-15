@@ -7,11 +7,11 @@ import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import { FOUR_NAMESPACE_GRAPH } from "../../../../testing/fixtures.js";
 import metroGraph from "../../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../../testing/records/ontologyGraph.js";
+import chooseAddressDrill from "../../classGraph/chooseAddressDrill.js";
 import {
   BRIDGE_LABEL_SIZE,
   DESIGN_CANVAS,
 } from "../../classGraph/constants.js";
-import chooseAddressDrill from "../../classGraph/chooseAddressDrill.js";
 import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import type { ClassGraphInput } from "../../classGraph/types.js";
