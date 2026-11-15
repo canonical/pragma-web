@@ -33,15 +33,28 @@ const FRAGMENT_MODULES = import.meta.glob<{ default: ReaderFragment }>(
 );
 
 /**
+ * Every compiled peek query of the app, by the artifact's file name: a peek
+ * projects on the root `Query` type through an operation of its own.
+ */
+const PEEK_QUERY_MODULES = import.meta.glob<{
+  default: { fragment: ReaderFragment };
+}>("../../relay/__generated__/*PeekQuery.graphql.ts", { eager: true });
+
+/**
  * Read the compiled fragment a component's projection reads: `<Name>_query`
- * for a projection on the root `Query` type, `<Name>_node` for any other.
+ * for a projection on the root `Query` type, or the reader of its own
+ * `<Name>Query` operation for a peek, and `<Name>_node` for any other.
  *
  * @throws When the app compiled no such fragment.
  */
 function readNodeFragment(folder: string, on?: string): ReaderFragment {
   const name = `${basename(folder)}_${on === "Query" ? "query" : "node"}`;
   const path = `../../relay/__generated__/${name}.graphql.ts`;
-  const fragment = FRAGMENT_MODULES[path]?.default;
+  const fragment =
+    FRAGMENT_MODULES[path]?.default ??
+    PEEK_QUERY_MODULES[
+      `../../relay/__generated__/${basename(folder)}Query.graphql.ts`
+    ]?.default.fragment;
   if (fragment === undefined) {
     throw new Error(`${folder}: the app compiled no ${name}`);
   }
@@ -191,6 +204,7 @@ describe("the app's projections", () => {
       "DocsChipProjection",
       "DocsCommandProjection",
       "DocsGraphNodeProjection",
+      "DocsPeek",
       "DocsRowProjection",
       "ModifierCard",
       "ModifierChip",

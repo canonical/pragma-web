@@ -5,6 +5,7 @@ import {
   ChipProjection,
   defaultProjectionMaps,
   useProjectionMaps,
+  useProjectionPeek,
 } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import {
@@ -13,12 +14,13 @@ import {
   route,
 } from "@canonical/router-core";
 import { fireEvent, render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { isValidElement, type ReactElement } from "react";
 import { graphql, useLazyLoadQuery, useRelayEnvironment } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import type { ShellTestsQuery } from "#relay/__generated__/ShellTestsQuery.graphql.js";
 import shellTestsQueryNode from "#relay/__generated__/ShellTestsQuery.graphql.js";
+import { DocsPeek } from "../DocsPeek/index.js";
 import Shell from "./Shell.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -44,6 +46,9 @@ function Probe(): ReactElement {
   const provided = useRelayEnvironment();
   const home = useHome({ __typename: "OntologyClass", uri: "ds:Component" });
   const maps = useProjectionMaps();
+  const peek = useProjectionPeek(
+    "https://ds.canonical.com/global.component.button",
+  );
   return (
     <section>
       <Head title="Probe" />
@@ -51,6 +56,10 @@ function Probe(): ReactElement {
       <p>{provided === environment ? "Environment provided" : "Other"}</p>
       <p>Home: {home ?? "none"}</p>
       <p>{maps === defaultProjectionMaps ? "Default maps" : "Other maps"}</p>
+      <p>
+        Peek:{" "}
+        {isValidElement(peek) && peek.type === DocsPeek ? "DocsPeek" : "other"}
+      </p>
     </section>
   );
 }
@@ -104,6 +113,11 @@ describe("Shell", () => {
       await screen.findByText("Home: /definitions/ds%3AComponent"),
     ).toBeInTheDocument();
     expect(screen.getByText("Default maps")).toBeInTheDocument();
+  });
+
+  it("gives every chip the site's peek, DocsPeek", async () => {
+    renderShell();
+    expect(await screen.findByText("Peek: DocsPeek")).toBeInTheDocument();
   });
 
   it("mounts the command palette once, closed", async () => {

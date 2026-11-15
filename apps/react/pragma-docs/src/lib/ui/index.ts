@@ -4,6 +4,7 @@ export * from "./DocsCardProjection/index.js";
 export * from "./DocsChipProjection/index.js";
 export * from "./DocsCommandProjection/index.js";
 export * from "./DocsGraphNodeProjection/index.js";
+export * from "./DocsPeek/index.js";
 export * from "./DocsRowProjection/index.js";
 export * from "./NotFoundPage/index.js";
 export * from "./PageSection/index.js";

@@ -18,12 +18,20 @@ import { RelayEnvironmentProvider } from "react-relay";
 import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
+import { DocsPeek } from "../DocsPeek/index.js";
 import { SiteRenderers } from "../SiteRenderers/index.js";
 import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds shell";
+
+/**
+ * Render the site's peek at the IRI `uri`: the card the site's card
+ * switch gives the node, which every chip arm reaches through the
+ * provider (`useProjectionPeek`).
+ */
+const renderPeek = (uri: string): ReactElement => <DocsPeek uri={uri} />;
 
 /**
  * The application's provider nest and the one element it renders: the
@@ -71,6 +79,7 @@ export default function Shell<
               <ProjectionsProvider
                 LinkComponent={RouterLink}
                 maps={defaultProjectionMaps}
+                peek={renderPeek}
               >
                 <SiteRenderers>
                   <div
