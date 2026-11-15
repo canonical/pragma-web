@@ -1,8 +1,10 @@
-import { requireEntry } from "@canonical/prism-core";
+import { GRAPH_BUDGET, requireEntry } from "@canonical/prism-core";
 import { cleanup, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../../../testing/createRouterHarness.js";
+import ontologyGraph from "../../../../../../testing/records/ontologyGraph.js";
+import layOutClassGraph from "../../../../classGraph/layOutClassGraph.js";
 import PhoneGraph from "./PhoneGraph.js";
 import type { PhoneGraphProps } from "./types.js";
 
@@ -135,5 +137,22 @@ describe("PhoneGraph", () => {
     const phone = renderPhone({ className: "phone", id: "rows" });
     expect(phone.getAttribute("class")).toBe("ds phone-graph phone");
     expect(phone.id).toBe("rows");
+  });
+
+  it("draws a stub as an inert row in a dashed frame, and a box as one row with its count", () => {
+    const phone = renderPhone({
+      layout: layOutClassGraph(ontologyGraph, { budget: GRAPH_BUDGET }),
+    });
+    const stub = phone.querySelector(
+      '.row[data-kind="stub"][data-id="rdf:List"]',
+    );
+    expect(stub).not.toBeNull();
+    expect(stub?.querySelector("a")).toBeNull();
+    expect(
+      stub?.querySelector("rect.stub-frame")?.getAttribute("stroke-dasharray"),
+    ).toBe("4 4");
+    const box = phone.querySelector('.row[data-kind="region"][data-id="ds"]');
+    expect(box?.querySelector("a")).toBeNull();
+    expect(box?.textContent).toContain("20 classes");
   });
 });

@@ -10,10 +10,10 @@
  * ships; the term rail's ontology headings are laid out; and, on a phone,
  * the inspector's drawer trigger covers nothing of the explorer, its search
  * field least of all. A filter chip's refit and a namespace's keep every
- * class in view labelled and cut none; Fit brings the graph into view
- * whole, or a window of it from its top-left corner at the overview's
- * floor where the whole fits only below it, keeping the hub and region
- * labels and cutting no class; a pick in
+ * class in view labelled and cut none; at rest Fit brings the whole graph
+ * into view, every text at 12px or more, and on a namespace a selection
+ * drills into it stops at the overview's floor, on a window that cuts no
+ * class; a pick in
  * the rail keeps the chips, the search and the zoom; and the inspector's
  * field rows put their ranges on one column line.
  */
@@ -313,17 +313,23 @@ describe("at 1440 px", () => {
     expect(measure.cut).toEqual([]);
   });
 
-  it("fits a namespace a reader picks legibly, cutting no class", async () => {
+  it("fits a namespace a reader picks legibly, cutting none of its classes", async () => {
     const { errors, measure } = await openExplorer(
       "/definitions",
       desktop,
       (page) =>
-        page.getByRole("button", { name: "Fit the graph to ds" }).click(),
+        // ds is one box at rest; anatomy is drawn class by class.
+        page.getByRole("button", { name: "Fit the graph to anatomy" }).click(),
     );
     expect(errors).toEqual([]);
     expect(measure.inView).toBeGreaterThan(0);
     expect(measure.unlabelled).toBe(0);
-    expect(measure.cut).toEqual([]);
+    // The frame zooms past the whole map's fit onto the namespace, so a
+    // neighbouring namespace's box may meet the window's edge; none of
+    // the picked namespace's classes is cut.
+    expect(measure.cut.filter((term) => term.startsWith("anatomy:"))).toEqual(
+      [],
+    );
   });
 
   it("keeps the chips, the search and the zoom when a rail pick moves to a term", async () => {
@@ -369,10 +375,30 @@ describe("at 1440 px", () => {
     expect(measure.inView).toBeGreaterThan(0);
   });
 
-  it("never fits into the overview: Fit keeps the hub and region labels", async () => {
-    const view: { zoom?: string | null } = {};
+  it("opens on the whole map at rest: Fit shows every box, every text at 12px or more", async () => {
     const { errors, measure } = await openExplorer(
       "/definitions",
+      desktop,
+      async (page) => {
+        await page.getByRole("button", { name: "Fit", exact: true }).click();
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+      },
+    );
+    expect(errors).toEqual([]);
+    // The overview collapses its largest namespaces until it fits the
+    // canvas at the legible zoom, so Fit frames the whole graph: every
+    // box drawn is in view, none cut, every visible text at 12px or more.
+    expect(measure.drawn).toBeGreaterThan(0);
+    expect(measure.inView).toBe(measure.drawn);
+    expect(measure.textCount).toBeGreaterThan(0);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    expect(measure.cut).toEqual([]);
+  });
+
+  it("keeps Fit at the overview's floor on a namespace a selection drills into", async () => {
+    const view: { zoom?: string | null } = {};
+    const { errors, measure } = await openExplorer(
+      `/definitions/${encodeURIComponent("ds:UIBlock")}`,
       desktop,
       async (page) => {
         await page.getByRole("button", { name: "Fit", exact: true }).click();
@@ -383,11 +409,11 @@ describe("at 1440 px", () => {
       },
     );
     expect(errors).toEqual([]);
-    // At 1440 the docsite's graph fits whole only below the overview zoom,
-    // so Fit stops at its floor, on a window from the graph's top-left
-    // corner whose edges fall between classes, the rest a pan away: every
-    // class in view drawn, the hubs and the regions labelled, none cut on
-    // the left, top or right.
+    // The term page draws ds class by class, which the overview draws as
+    // one box, and the other namespaces as a box each. A drilled view is
+    // not held to the fit: where it fits only below the overview's floor,
+    // Fit stops there, on a window whose edges cut no class, every text
+    // in view at 12px or more.
     expect(Number.parseInt(view.zoom ?? "", 10)).toBeGreaterThanOrEqual(75);
     expect(measure.inView).toBeGreaterThan(0);
     expect(measure.inView).toBeLessThanOrEqual(measure.drawn);

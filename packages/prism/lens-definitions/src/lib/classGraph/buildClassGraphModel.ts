@@ -47,14 +47,26 @@ type BoxGeometry = Pick<
  * is one, before the right inset; the width rounded up to the lattice and
  * kept between 96 and 208px. A label too long for the widest box wraps to
  * two lines, the second ellipsised. A collapsed region's box is a hub's
- * height, for its prefix over its class count, and at least 128px wide.
+ * height, for its prefix at a hub's size over the classes and relations
+ * it holds, and at least 128px wide.
  */
 function sizeBox(klass: GraphClassInput, hub: boolean): BoxGeometry {
   if (klass.kind === "region") {
-    const box = sizeBox({ ...klass, kind: "class" }, false);
+    // Its prefix at a hub's 16px over what it holds at 14px, both within
+    // the insets: the line measured as the catalog's English sets it.
+    const box = sizeBox({ ...klass, kind: "class" }, true);
+    const holds = measureTextWidth(
+      `${klass.members ?? 1} classes, ${klass.held ?? 0} relations`,
+      "regular",
+      LABEL_SIZE,
+    );
     return {
       ...box,
-      w: Math.max(REGION_BOX_MIN_WIDTH, box.w),
+      w: Math.max(
+        REGION_BOX_MIN_WIDTH,
+        box.w,
+        ceilTo(2 * BOX_INSET + holds, LATTICE),
+      ),
       h: Math.max(HUB_HEIGHT, box.h),
     };
   }

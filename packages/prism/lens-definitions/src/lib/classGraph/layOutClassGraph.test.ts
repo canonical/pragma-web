@@ -355,6 +355,41 @@ describe("layOutClassGraph", () => {
       expect(kindsOf(metroGraph)).toEqual({ class: 16 });
     });
 
+    it("keeps a stub whose prefix a loaded namespace has, under a fuller name", () => {
+      const layout = layOutClassGraph(
+        {
+          classes: [
+            {
+              uri: "https://a.example/ds/A",
+              label: "A",
+              prefix: "ds",
+              abstract: false,
+              superclass: null,
+              instanceCount: 0,
+              fields: 0,
+            },
+          ],
+          relations: [
+            {
+              uri: "https://a.example/ds/reaches",
+              label: "reaches",
+              domain: "https://a.example/ds/A",
+              range: "https://ds.example.org/X",
+              count: 0,
+            },
+          ],
+        },
+        { budget: GRAPH_BUDGET },
+      );
+      const stub = requireEntry(layout.nodes, "https://ds.example.org/X");
+      expect(stub).toMatchObject({
+        kind: "stub",
+        term: "https://ds.example.org/X",
+      });
+      expect(stub.region).not.toBe("ds");
+      expect(layout.edges.filter((edge) => edge.bridge)).toHaveLength(1);
+    });
+
     it("keeps the legible window when every namespace is a box and it still does not fit", () => {
       const wide = {
         classes: Array.from({ length: 30 }, (_, index) => ({
@@ -379,9 +414,9 @@ describe("layOutClassGraph", () => {
     });
 
     it("leaves the metro as it is: its 16 classes, nothing collapsed", () => {
-      expect(
-        JSON.stringify(layOutClassGraph(metroGraph, { budget: GRAPH_BUDGET })),
-      ).toBe(JSON.stringify(layOutClassGraph(metroGraph)));
+      expect(layOutClassGraph(metroGraph, { budget: GRAPH_BUDGET })).toEqual(
+        layOutClassGraph(metroGraph),
+      );
     });
   });
 

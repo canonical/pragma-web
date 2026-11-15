@@ -1,6 +1,6 @@
 import { requireEntry } from "@canonical/prism-core";
 import { REGION_NODE_SCHEME } from "./constants.js";
-import nameStub from "./nameStub.js";
+import nameStubs from "./nameStubs.js";
 import type {
   AnyRelationInput,
   ClassGraphInput,
@@ -15,7 +15,8 @@ import type {
  * the expanded namespaces, one box per collapsed namespace (keyed by
  * `REGION_NODE_SCHEME` and its prefix, named by its prefix, standing for
  * its classes and the relations it holds) and one per external stub (named
- * by its compact term, in a region of its own prefix). A relation with an
+ * by its compact term, which no other stub and no loaded namespace
+ * shares, in a region of its own prefix). A relation with an
  * end inside a collapsed namespace is drawn from that namespace's box,
  * keeping its count: a bridge when its other end lies in another
  * namespace or is a stub. A relation with both ends inside one box is not
@@ -41,6 +42,11 @@ export default function gatherDrawnInput<
       ? `${REGION_NODE_SCHEME}${prefix}`
       : uri;
   };
+  // No two stubs share a name, and none takes a loaded prefix.
+  const stubNames = nameStubs(
+    scope.stubs,
+    new Set(model.regionOrder.map(({ prefix }) => prefix)),
+  );
   const held = new Map<string, number>();
   const relations: AnyRelationInput[] = [];
   for (const relation of input.relations as readonly AnyRelationInput[]) {
@@ -89,7 +95,7 @@ export default function gatherDrawnInput<
         ),
       ),
       ...scope.stubs.map((iri) => {
-        const { prefix, term } = nameStub(iri);
+        const { prefix, term } = requireEntry(stubNames, iri);
         return box(iri, prefix, term, "stub", 1);
       }),
     ],

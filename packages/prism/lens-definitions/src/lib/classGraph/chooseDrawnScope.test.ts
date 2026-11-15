@@ -98,4 +98,29 @@ describe("chooseDrawnScope", () => {
       chooseDrawnScope(buildClassGraphModel(ontologyGraph), GRAPH_BUDGET, "ds"),
     ).toMatchObject({ expanded: ["ds"], collapsed: ["anatomy", "cs"] });
   });
+
+  it("collapses the lower prefix first between namespaces of one size", () => {
+    const klass = (prefix: string, index: number) => ({
+      uri: `https://${prefix}.example/C${index}`,
+      label: `C${index}`,
+      prefix,
+      abstract: false,
+      superclass: null,
+      instanceCount: 0,
+      fields: 0,
+    });
+    const twins = {
+      classes: [0, 1, 2].flatMap((index) => [
+        klass("bb", index),
+        klass("aa", index),
+      ]),
+      relations: [],
+    };
+    expect(
+      chooseDrawnScope(
+        buildClassGraphModel(twins),
+        createGraphBudget({ drawnNodesMax: 4 }),
+      ),
+    ).toEqual({ expanded: ["bb"], collapsed: ["aa"], stubs: [] });
+  });
 });

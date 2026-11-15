@@ -393,21 +393,50 @@ describe("ClassGraph", () => {
       zoom.bucket = "full";
     });
 
-    it("draws a collapsed namespace as one inert box with its class count, named at the hubs zoom", () => {
-      for (const bucket of ["hubs", "full"] as const) {
-        zoom.bucket = bucket;
-        const region = nodeOf(draw(own), "surface");
-        expect(region.getAttribute("data-kind")).toBe("region");
-        expect(region.getAttribute("data-classes")).toBe("31");
-        expect(region.textContent).toContain("surface");
-        expect(region.textContent).toContain("31 classes");
-        expect(region.querySelector("a")).toBeNull();
-      }
+    it("draws a collapsed namespace as one inert box: its name at the hubs zoom, what it holds at full", () => {
+      zoom.bucket = "hubs";
+      const resting = nodeOf(draw(own), "surface");
+      expect(resting.getAttribute("data-kind")).toBe("region");
+      expect(resting.getAttribute("data-classes")).toBe("31");
+      expect(resting.querySelector(".title.is-prominent")?.textContent).toBe(
+        "surface",
+      );
+      expect(resting.querySelector(".context")).toBeNull();
+      expect(resting.querySelector("a")).toBeNull();
+      expect(resting.getAttribute("role")).toBe("img");
+      expect(resting.getAttribute("aria-label")).toMatch(
+        /^Namespace surface, drawn as one box: 31 classes, 0 relations inside, \d+ relations out$/,
+      );
       zoom.bucket = "full";
+      const container = draw(own);
       expect(
-        draw(own).querySelector('.region[data-ns="surface"] .count')
+        nodeOf(container, "surface").querySelector(".context")?.textContent,
+      ).toBe("31 classes, 0 relations");
+      expect(
+        nodeOf(container, "ds").querySelector(".context")?.textContent,
+      ).toBe("20 classes, 20 relations");
+      expect(
+        container.querySelector('.region[data-ns="surface"] .count')
           ?.textContent,
       ).toBe("31 classes");
+    });
+
+    it("draws no text under 12px at the hubs zoom: only 16px names, a stub's none", () => {
+      // At the hubs zoom a 14px text would fall under 12px on screen.
+      zoom.bucket = "hubs";
+      const container = draw(own);
+      const texts = [...container.querySelectorAll(".node text")];
+      expect(texts.length).toBeGreaterThan(0);
+      for (const text of texts) {
+        expect(text.classList.contains("is-prominent")).toBe(true);
+      }
+      for (const stub of container.querySelectorAll(
+        '.node[data-kind="stub"]',
+      )) {
+        expect(stub.querySelector("text")).toBeNull();
+      }
+      zoom.bucket = "overview";
+      expect(draw(own).querySelectorAll(".node text")).toHaveLength(0);
     });
 
     it("draws each external stub as an inert box in a dashed frame, a bridge reaching it", () => {
@@ -420,6 +449,9 @@ describe("ClassGraph", () => {
       ]);
       for (const stub of stubs) {
         expect(stub.querySelector("a")).toBeNull();
+        expect(stub.getAttribute("aria-label")).toBe(
+          `Class ${stub.getAttribute("data-id")}, outside the loaded namespaces, 1 relations`,
+        );
         expect(
           stub
             .querySelector("rect.stub-frame")

@@ -151,4 +151,29 @@ describe("buildClassGraphModel", () => {
       loopExtent: 32,
     });
   });
+
+  it("sizes a collapsed region's box for what it holds, one class and none inside when unstated", () => {
+    const model = buildClassGraphModel({
+      classes: [
+        {
+          uri: "region:aa",
+          label: "aa",
+          prefix: "aa",
+          abstract: false,
+          superclass: null,
+          instanceCount: 0,
+          fields: 0,
+          kind: "region",
+        },
+      ],
+      relations: [],
+    });
+    expect(model.byId.get("region:aa")).toMatchObject({
+      members: 1,
+      held: 0,
+      h: 48,
+      // "1 classes, 0 relations" at 14px within the insets.
+      w: 144,
+    });
+  });
 });

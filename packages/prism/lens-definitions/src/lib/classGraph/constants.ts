@@ -226,16 +226,21 @@ export const REGION_BOX_MIN_WIDTH = 128;
 export const REGION_NODE_SCHEME = "region:";
 
 /**
- * The prefixes of the W3C vocabularies a relation may reach without their
- * ontology being loaded, by namespace. The store serves the lens no
- * namespace inventory beyond the loaded ontologies, and these
- * vocabularies' IRIs carry no readable prefix.
+ * The prefixes of the well-known vocabularies a relation may reach without
+ * their ontology being loaded, by namespace: the W3C's, FOAF, SKOS and
+ * Dublin Core. The store serves the lens no namespace inventory beyond
+ * the loaded ontologies, and these vocabularies' IRIs carry no readable
+ * prefix.
  */
 export const STUB_PREFIXES: ReadonlyMap<string, string> = new Map([
   ["http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf"],
   ["http://www.w3.org/2000/01/rdf-schema#", "rdfs"],
   ["http://www.w3.org/2001/XMLSchema#", "xsd"],
   ["http://www.w3.org/2002/07/owl#", "owl"],
+  ["http://www.w3.org/2004/02/skos/core#", "skos"],
+  ["http://xmlns.com/foaf/0.1/", "foaf"],
+  ["http://purl.org/dc/terms/", "dcterms"],
+  ["http://purl.org/dc/elements/1.1/", "dc"],
 ]);
 
 /**

@@ -40,14 +40,19 @@
 # the tip, where the head is as wide as it is.
 #
 # Within its budget the overview at rest draws what fits: while the
-# classes, the collapsed regions and the stubs exceed the drawn nodes, the
-# largest namespace collapses to one box (`data-kind="region"`) in its own
-# region: its prefix over its class count (`data-classes`), a hub's height,
-# at least 128px wide, inert, named wherever a hub is named. A relation to
-# a class no loaded namespace holds reaches an external stub
-# (`data-kind="stub"`): a class box named by its compact term, in a region
-# of its prefix, inert, its frame cut into dashes (4 4) by the floor's
-# colour, and the relation to it is a bridge.
+# classes, the collapsed regions and the stubs exceed the drawn nodes, or
+# the overview would not open whole at the legible zoom, the largest
+# namespace collapses to one box (`data-kind="region"`) in its own region:
+# its prefix at a hub's 16px, named wherever a hub is named, over what it
+# holds (its classes, `data-classes`, and the relations with both ends
+# inside it) at 14px, drawn only at full; a hub's height, at least 128px
+# wide, inert. A relation with an end inside it is drawn from the box. A
+# relation to a class no loaded namespace holds reaches an external stub
+# (`data-kind="stub"`): a class box named by its compact term at 14px,
+# drawn at full as a class's name is, in a region of its prefix, inert,
+# its frame cut into dashes (4 4) by the floor's colour, and the relation
+# to it is a bridge. A term page of a class inside a box draws its
+# namespace class by class and every other one as a box.
 #
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.

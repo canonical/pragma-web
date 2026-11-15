@@ -201,22 +201,27 @@ export default function ClassGraph({
       : isFadedNode
         ? "is-faded"
         : dimmed.has(node.uri) && "is-dimmed";
-    // A stub and a collapsed region are named wherever a hub is: each
-    // stands for more than one class's box.
+    // Every text follows the zoom buckets, so none is drawn under 12px on
+    // screen: a collapsed region's 16px name is drawn wherever a hub's is,
+    // and what it holds, at 14px, only at full; a stub's 14px name at full,
+    // as a class's.
+    const region = node.kind === "region";
     const showText =
-      bucket === "full" ||
-      (bucket === "hubs" && (node.hub || node.kind !== "class"));
+      bucket === "full" || (bucket === "hubs" && (node.hub || region));
     const box = (
       <EntityGraphNode
         count={bucket === "full" ? (node.count ?? undefined) : undefined}
         height={node.h}
         hollow={node.abstract}
         kind={
-          node.kind === "region"
-            ? t("well.region.count", { count: node.members })
+          region && bucket === "full"
+            ? t("well.region.holds", {
+                classes: t("well.region.count", { count: node.members }),
+                relations: t("well.relations.count", { count: node.held }),
+              })
             : undefined
         }
-        prominent={node.hub}
+        prominent={node.hub || region}
         showText={showText}
         title={node.label}
         width={node.w}
@@ -226,6 +231,22 @@ export default function ClassGraph({
     return (
       <g
         className={joinClasses("node", state)}
+        // A stub and a collapsed region hold no link: the group names them.
+        aria-label={
+          node.kind === "stub"
+            ? t("well.name.stub", {
+                term,
+                relations: node.relationCount,
+              })
+            : region
+              ? t("well.name.region", {
+                  prefix: node.region,
+                  classes: node.members,
+                  held: node.held,
+                  relations: node.relationCount,
+                })
+              : undefined
+        }
         data-classes={node.kind === "region" ? node.members : undefined}
         data-col={node.col}
         data-degree={node.degree}
@@ -246,6 +267,7 @@ export default function ClassGraph({
         data-x={node.x}
         data-y={node.y}
         key={node.uri}
+        role={node.kind === "class" ? undefined : "img"}
         transform={`translate(${node.x},${node.y})`}
       >
         {tabStop === undefined || node.kind !== "class" ? (

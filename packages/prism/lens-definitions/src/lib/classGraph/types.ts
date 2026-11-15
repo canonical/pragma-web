@@ -284,6 +284,16 @@ export interface LaidOutRegion {
   readonly boxed: readonly BoxedClass[];
 }
 
+/** How an external stub is named. */
+export interface StubName {
+  /** The prefix its region is keyed by. */
+  readonly prefix: string;
+  /** Its local name, after the IRI's last `#` or `/`. */
+  readonly local: string;
+  /** Its compact term, `prefix:local`, or the IRI when it has no prefix. */
+  readonly term: string;
+}
+
 /** A class a collapsed namespace's box stands for, as the rail lists it. */
 export interface BoxedClass {
   readonly uri: string;

@@ -1,6 +1,9 @@
+import { GRAPH_BUDGET } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
+import ontologyGraph from "../../../../testing/records/ontologyGraph.js";
+import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import classifyClasses from "./classifyClasses.js";
 
 const { layout, terms, uris } = createClassGraphSetup();
@@ -34,5 +37,39 @@ describe("classifyClasses", () => {
       (node) => node.instanceCount === 0,
     );
     expect(dimmed.size).toBe(empty.length);
+  });
+
+  describe("over boxes and stubs", () => {
+    // At rest ds is one box and two stubs lie outside every namespace.
+    const boxed = layOutClassGraph(ontologyGraph, { budget: GRAPH_BUDGET });
+    const stubs = [...boxed.nodes.values()]
+      .filter((node) => node.kind === "stub")
+      .map((node) => node.uri);
+
+    it("never hides a stub, even with every namespace chip off", () => {
+      expect(stubs).toHaveLength(2);
+      const { hidden } = classifyClasses(
+        boxed,
+        terms,
+        createAllNamespacesFilter([]),
+      );
+      for (const stub of stubs) expect(hidden.has(stub)).toBe(false);
+      expect(hidden.has("region:ds")).toBe(true);
+    });
+
+    it("hides a collapsed region by its namespace's chip alone", () => {
+      const off = classifyClasses(
+        boxed,
+        terms,
+        createAllNamespacesFilter(["cs"]),
+      );
+      expect(off.hidden.has("region:ds")).toBe(true);
+      const on = classifyClasses(boxed, terms, {
+        ...createAllNamespacesFilter(["ds"]),
+        // A class would follow the abstraction chips too; a box does not.
+        abstractions: ["abstract"],
+      });
+      expect(on.hidden.has("region:ds")).toBe(false);
+    });
   });
 });
