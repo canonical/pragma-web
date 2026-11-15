@@ -1,8 +1,8 @@
 import { useRenderers } from "@canonical/prism-core";
-import { ChipProjection } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useId } from "react";
 import { useMessages } from "#i18n";
+import { MetroChipProjection } from "#lib/ui";
 import type { FormationPageQuery } from "#relay/__generated__/FormationPageQuery.graphql.js";
 import formationPageQueryNode from "#relay/__generated__/FormationPageQuery.graphql.js";
 import { FLEET_RENDERERS } from "../../../../constants.js";
@@ -73,7 +73,7 @@ export default function FormationDetail({
         children: (
           <>
             <p className="entry">
-              <ChipProjection node={node.stock} />
+              <MetroChipProjection node={node.stock} />
             </p>
             <FormationSideView
               cars={orientCars(
@@ -95,7 +95,7 @@ export default function FormationDetail({
                     <span className="vital">
                       {t("fleet.unit", { position })}
                     </span>
-                    <ChipProjection node={unit} />
+                    <MetroChipProjection node={unit} />
                     <span className="vital">{formatLength(unit.length)}</span>
                     {reversed ? (
                       <span className="vital">{t("fleet.reversed")}</span>
@@ -109,7 +109,7 @@ export default function FormationDetail({
               <PlatformFit
                 fits={fits}
                 renderName={({ code }) => (
-                  <ChipProjection node={readFitLine(lines, code)} />
+                  <MetroChipProjection node={readFitLine(lines, code)} />
                 )}
               />
             </section>

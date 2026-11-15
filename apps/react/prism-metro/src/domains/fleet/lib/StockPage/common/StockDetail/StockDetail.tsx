@@ -1,8 +1,8 @@
 import { useRenderers } from "@canonical/prism-core";
-import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useId } from "react";
 import { useMessages } from "#i18n";
+import { MetroChipProjection, MetroRowProjection } from "#lib/ui";
 import type { StockPageQuery } from "#relay/__generated__/StockPageQuery.graphql.js";
 import stockPageQueryNode from "#relay/__generated__/StockPageQuery.graphql.js";
 import { FLEET_RENDERERS } from "../../../../constants.js";
@@ -76,7 +76,7 @@ export default function StockDetail({
                     cars: orientCars(readFormationTrain(formation)),
                     caption: (
                       <>
-                        <ChipProjection node={formation} />
+                        <MetroChipProjection node={formation} />
                         <span className="vital">
                           {formatLength(formation.length)}
                         </span>
@@ -91,7 +91,7 @@ export default function StockDetail({
                 <h2 id={carTypesId}>{t("fleet.carTypes")}</h2>
                 <ul className="rows">
                   {carTypes.map((carType) => (
-                    <RowProjection key={carType.uri} node={carType} />
+                    <MetroRowProjection key={carType.uri} node={carType} />
                   ))}
                 </ul>
               </section>

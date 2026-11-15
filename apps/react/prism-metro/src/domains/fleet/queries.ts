@@ -18,8 +18,8 @@ const declareFleetNamespacesQuery = (): unknown => graphql`
 void declareFleetNamespacesQuery;
 
 /**
- * The index: every instance of the rolling-stock class, each as the list
- * view's card and row, which draw its formations and count them.
+ * The index: every instance of the rolling-stock class, each as the site's
+ * card and row, which draw its formations and count them.
  */
 const declareFleetIndexQuery = (): unknown => graphql`
   query FleetIndexQuery($classUri: String!, $count: Int!) {
@@ -28,7 +28,9 @@ const declareFleetIndexQuery = (): unknown => graphql`
         edges {
           node {
             __typename
-            ...NodeList_node
+            uri
+            ...MetroRowProjection_node
+            ...MetroCardProjection_node
           }
         }
       }
@@ -54,13 +56,13 @@ const declareStockPageQuery = (): unknown => graphql`
           uri
           length
           capacity
-          ...ChipProjection_node
+          ...MetroChipProjection_node
           units {
             unit {
               cars {
                 carType {
                   uri
-                  ...RowProjection_node
+                  ...MetroRowProjection_node
                 }
               }
             }
@@ -93,19 +95,19 @@ const declareFormationPageQuery = (): unknown => graphql`
           _meta {
             title
           }
-          ...ChipProjection_node
+          ...MetroChipProjection_node
         }
         units {
           position
           reversed
           unit {
             length
-            ...ChipProjection_node
+            ...MetroChipProjection_node
           }
         }
         lines {
           code
-          ...ChipProjection_node
+          ...MetroChipProjection_node
         }
         ...readFormationTrain_formation @alias
         ...readFormationLines_formation @alias
