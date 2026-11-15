@@ -126,10 +126,13 @@ under it (the filter chips), the explorer in the canvas and the term
 inspector in the inspector region, a drawer below three groups of columns.
 Below two groups the bar folds into the strip's "Filter · n" link, which
 opens the filter sheet through the address (`?sheet=filter`). The router mounts the layout
-again on each of the lens's routes, so the lens keeps the reader's chips,
-search, zoom and pan for the router's life while the reader stays in the
-lens: a pick in the rail pans the graph to the selection and changes
-nothing else, and a visit to another lens and back starts afresh.
+again on each of the lens's routes, so the lens keeps the reader's chips
+and search for the router's life while the reader stays in the lens, and
+the zoom and pan while the graph keeps its drawing: a pick in the rail of
+a class the graph already draws pans the graph to the selection and
+changes nothing else; a move that opens or closes a namespace (see
+below) opens the graph as loading its address does; and a visit to
+another lens and back starts afresh.
 
 - **The term rail** lists each ontology's classes in the graph's own order,
   a parent before its children, each with its depth and its kind's mark,
@@ -163,6 +166,60 @@ nothing else, and a visit to another lens and back starts afresh.
   With no term it explains the graph with a legend drawn by the graph's own
   code, a row per namespace that fits the camera to it, and the gestures.
 
+## The overview
+
+The class graph is an overview of every namespace the graph serves, drawn
+within prism-core's graph budget (`GRAPH_BUDGET`) and laid out on the
+server, deterministically: two renders of a page give the same SVG.
+
+- **Namespaces, packed by their bridges.** Each namespace is a region of
+  layered columns; the regions are packed on shelves, those that share
+  the most bridges side by side. A bridge is a relation from a class of
+  one namespace to a class of another, or to a class no loaded ontology
+  holds. Bridges are drawn in the strong line and named at rest by their
+  property, near their head; bridges between the same two namespaces each
+  keep a lane of their own, and a label with no room of its own is named
+  when either end is in focus.
+- **Weights.** A relation's line states how many statements the graph
+  holds for it (`Query.classEdges`): 1px below 10, 2px from 10, 4px from
+  100 and 8px from 1000; a relation with no statements yet is dashed. A
+  line that bundles several relations between two classes weighs the
+  heaviest of them.
+- **Stubs.** A class the relations reach that no loaded ontology holds is
+  a dashed stub, named by its well-known prefix (`rdf:List`), else by its
+  host and last segment, never two alike.
+- **The budget.** The overview draws at most `drawnNodesMax` (40) nodes,
+  `bandMembersMax` (12) in any column, and an SVG of at most `svgBytesMax`
+  (64 KiB) and `svgElementsMax` (500) elements. Past the node budget, and
+  for as long as its opening on the design canvas (the canvas at 1440 by
+  900) does not hold every namespace, the largest namespace still drawn
+  class by class is drawn as one box instead, and so on. A box says how
+  many classes and relations it holds, leads the first shelf, and carries
+  the relations with one end inside it; the rail still lists every class.
+  A layer of more than twelve classes is laid as balanced consecutive
+  columns.
+- **An opened view.** A box links to its namespace opened, at the
+  address `/definitions?expand=<prefix>` (`/definitions?expand=surface`):
+  the namespace drawn class by class and packed first, the others as
+  boxes. Its heading is the way back to the overview at rest, keeping the
+  address's other view keys. A term page of a class inside a box opens
+  that namespace too. Every view opens by one rule: the whole map where it
+  fits the canvas with every label at 12px or more on screen (a zoom of
+  12/14), otherwise the map's top-left corner at that zoom; a term page
+  frames its class instead.
+- **The stated limits.** Three lanes between two namespaces: a fourth
+  bridge between them runs closer than 4px to its neighbour, and from six
+  they lie on one line. A namespace with more classes than the budget
+  leaves room for is drawn whole, over the budget, when it is opened.
+  More namespaces than the budget has nodes are all drawn as boxes, over
+  the budget. Neither site's data reaches these limits.
+
+Not in this package yet: the term page's neighbourhood across namespaces
+(the classes of other namespaces a class relates to, drawn around it);
+the counts as links to the rows they count; the inspector's count line
+with nothing selected; and the list of the relations the graph observes
+that no ontology declares.
+
 ## Styling
 
 Every component is scaffolded by the React component generator under
@@ -193,7 +250,12 @@ reshapes only through the shell's container queries at whole groups of
 columns.
 
 The package has a Storybook (`bun run storybook`) with a story for every
-component, each over a captured store.
+component, each over a captured store; the class graph's and the phone
+view's stories show the overview's states (weighted strokes, bridges in
+lanes, boxes and stubs, an opened namespace, a split band). The graph
+checks the sites' Definitions browser tests share, which read the
+canvas's served SVG and what a site's graph serves, are exported for the
+repository's own tests from `@canonical/prism-lens-definitions/testing/browser`.
 
 ## Public API
 
