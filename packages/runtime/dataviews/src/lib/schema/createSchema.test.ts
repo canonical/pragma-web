@@ -130,6 +130,18 @@ describe("createSchema", () => {
     ).toEqual(["cpu"]);
   });
 
+  it("keeps whether a choices field holds a list", () => {
+    const schema = createSchema([
+      { field: "tags", kind: "choices", options: ["ex-gpu"], multiple: true },
+    ]);
+    expect(schema.findField("tags")).toEqual({
+      field: "tags",
+      kind: "choices",
+      options: ["ex-gpu"],
+      multiple: true,
+    });
+  });
+
   it("rejects number units that cannot be read back", () => {
     const memory =
       (display: readonly { symbol: string; factor: number }[]) => () =>

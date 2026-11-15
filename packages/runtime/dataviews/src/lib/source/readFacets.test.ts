@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import countExactly from "../../../testing/countExactly.js";
 import { FACETED_ROWS, FACETED_SCHEMA } from "../../../testing/fixtures.js";
 import { EMPTY_SLICE, type Slice } from "../query/index.js";
-import type { SchemaFieldDefinition } from "../schema/index.js";
+import { createSchema, type SchemaFieldDefinition } from "../schema/index.js";
 import readFacets from "./readFacets.js";
 import selectRows from "./selectRows.js";
 
@@ -46,6 +46,38 @@ describe("readFacets", () => {
           { value: "archived", count: countExactly(1) },
           { value: "unlisted", count: countExactly(1) },
         ],
+      },
+    });
+  });
+
+  it("counts a list-valued field's records once under each option they list", () => {
+    const schema = createSchema([
+      {
+        field: "tags",
+        kind: "choices",
+        options: ["ex-gpu", "ex-nvme"],
+        multiple: true,
+      },
+      { field: "labels", kind: "choices", multiple: true },
+    ]);
+    const rows = [
+      { id: "a", tags: ["ex-nvme", "ex-gpu", "ex-gpu"], labels: [42, "42"] },
+      { id: "b", tags: ["ex-nvme", null], labels: "x" },
+      { id: "c" },
+    ];
+    expect(
+      readFacets(rows, EMPTY_SLICE, schema.fields, { schema }, rows),
+    ).toEqual({
+      tags: {
+        kind: "values",
+        values: [
+          { value: "ex-gpu", count: countExactly(1) },
+          { value: "ex-nvme", count: countExactly(2) },
+        ],
+      },
+      labels: {
+        kind: "values",
+        values: [{ value: "42", count: countExactly(1) }],
       },
     });
   });

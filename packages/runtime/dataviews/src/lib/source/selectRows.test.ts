@@ -4,6 +4,35 @@ import { EMPTY_SLICE, type Predicate } from "../query/index.js";
 import { createSchema } from "../schema/index.js";
 import selectRows from "./selectRows.js";
 
+/** Records holding a list of tags, or something that is not one. */
+const TAGGED = [
+  { id: "gpu", tags: ["ex-gpu", "ex-nvme"] },
+  { id: "nvme", tags: ["ex-nvme"] },
+  { id: "bare", tags: [] },
+  { id: "single", tags: "ex-gpu" },
+  { id: "absent" },
+];
+
+/** The tagged records' schema: tags from a closed list, labels the server's. */
+const TAGGED_SCHEMA = createSchema([
+  {
+    field: "tags",
+    kind: "choices",
+    options: ["ex-gpu", "ex-nvme"],
+    multiple: true,
+  },
+  { field: "labels", kind: "choices", multiple: true },
+]);
+
+/** The ids of the tagged records one predicate selects. */
+const selectTagged = (predicate: Predicate): readonly unknown[] =>
+  selectRows(
+    TAGGED,
+    { ...EMPTY_SLICE, filter: [predicate] },
+    { schema: TAGGED_SCHEMA },
+    null,
+  ).map(({ id }) => id);
+
 /** The ids of the rows one predicate selects from the faceted rows. */
 const selectIds = (predicate: Predicate): readonly unknown[] =>
   selectRows(
@@ -154,5 +183,58 @@ describe("selectRows", () => {
         }
       },
     );
+  });
+
+  describe("list-valued choices", () => {
+    it("selects with isAny the lists holding any operand", () => {
+      expect(
+        selectTagged({
+          field: "tags",
+          operator: "isAny",
+          operands: ["ex-gpu"],
+        }),
+      ).toEqual(["gpu"]);
+    });
+
+    it("selects with isNone the lists holding no operand, an empty list included", () => {
+      expect(
+        selectTagged({
+          field: "tags",
+          operator: "isNone",
+          operands: ["ex-gpu"],
+        }),
+      ).toEqual(["nvme", "bare"]);
+    });
+
+    it("gives two conjuncts every operand", () => {
+      expect(
+        selectRows(
+          TAGGED,
+          {
+            ...EMPTY_SLICE,
+            filter: [
+              { field: "tags", operator: "isAny", operands: ["ex-gpu"] },
+              { field: "tags", operator: "isAny", operands: ["ex-nvme"] },
+            ],
+          },
+          { schema: TAGGED_SCHEMA },
+          null,
+        ).map(({ id }) => id),
+      ).toEqual(["gpu"]);
+    });
+
+    it("matches the server's options by their text", () => {
+      expect(
+        selectRows(
+          [{ id: "n", labels: [42] }],
+          {
+            ...EMPTY_SLICE,
+            filter: [{ field: "labels", operator: "isAny", operands: ["42"] }],
+          },
+          { schema: TAGGED_SCHEMA },
+          null,
+        ),
+      ).toHaveLength(1);
+    });
   });
 });
