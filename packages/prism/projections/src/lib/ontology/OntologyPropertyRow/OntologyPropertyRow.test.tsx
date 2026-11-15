@@ -170,6 +170,18 @@ describe("OntologyPropertyRow", () => {
     expect(container.querySelector(".title")?.textContent).toBe("modifier");
   });
 
+  it("sets no summary in a two-line row for a property without a definition", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <OntologyPropertyRow lines="two" node={node} />
+        </ul>
+      ),
+      { definition: null },
+    );
+    expect(container.querySelector(".summary")).toBeNull();
+  });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>

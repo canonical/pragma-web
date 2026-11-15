@@ -159,6 +159,18 @@ describe("OntologyClassRow", () => {
     expect(container.querySelector(".prefix")).toBeNull();
   });
 
+  it("sets no summary in a two-line row for a class without a definition", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <OntologyClassRow lines="two" node={node} />
+        </ul>
+      ),
+      { definition: null },
+    );
+    expect(container.querySelector(".summary")).toBeNull();
+  });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
