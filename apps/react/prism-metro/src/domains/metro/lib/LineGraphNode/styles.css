@@ -3,7 +3,15 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The mark's disc is ringed in the current colour, the muted text
+   * colour, which holds 3:1 against the background, so a colour near the
+   * background still shows; its fill is the line's colour, set from the
+   * data through the gate. */
   .ds.line-graph-node {
-    /* Component styles */
+    --line-graph-node-ring-color: var(--color-text-muted);
+  }
+
+  .ds.line-graph-node > .mark {
+    color: var(--line-graph-node-ring-color);
   }
 }

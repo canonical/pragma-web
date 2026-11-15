@@ -2,14 +2,19 @@
 
 import { useHome } from "@canonical/prism-core";
 import {
+  acceptColour,
   EntityGraphNode,
-  SwatchMark,
   useForeignPrefix,
   useProjectionLink,
 } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "#relay/__generated__/LineGraphNode_node.graphql.js";
+import {
+  LINE_MARK_CENTRE,
+  LINE_MARK_RADIUS,
+  LINE_MARK_RING,
+} from "./constants.js";
 import type { LineGraphNodeProps } from "./types.js";
 import "./styles.css";
 
@@ -37,8 +42,9 @@ const componentCssClassName = "ds line-graph-node";
  * A line as a node of a graph: its mark, its prefix off the page's
  * namespace and its name, linked to its home. Its mark says its type, so
  * it names no kind.
- * Its mark is a disc of the line's colour (`SwatchMark`), which the
- * package paints only with a plain colour value.
+ * Its mark is an SVG disc ringed in the muted text colour and filled
+ * with the line's colour only when the package's colour gate accepts it;
+ * a colour it refuses leaves the disc unfilled.
  *
  * Native props reach the node's `<g>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename
@@ -69,9 +75,15 @@ export default function LineGraphNode({
       href={href}
       LinkComponent={LinkComponent}
       mark={
-        <foreignObject height="100%" width="100%">
-          <SwatchMark colour={data.colour} />
-        </foreignObject>
+        <circle
+          className="swatch"
+          cx={LINE_MARK_CENTRE}
+          cy={LINE_MARK_CENTRE}
+          fill={acceptColour(data.colour) ?? "none"}
+          r={LINE_MARK_RADIUS}
+          stroke="currentColor"
+          strokeWidth={LINE_MARK_RING}
+        />
       }
       prefix={prefix}
       title={title}

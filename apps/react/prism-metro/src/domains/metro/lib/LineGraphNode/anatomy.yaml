@@ -1,8 +1,8 @@
 ---
 # LineGraphNode: A line as a node of a graph: its mark, its prefix off the
 # page's namespace and its name, linked to its home. Its mark says its type,
-# so it names no kind. Its mark is a disc of the line's colour
-# (`SwatchMark`), which the package paints only with a plain colour value.
+# so it names no kind. Its mark is an SVG disc ringed in the muted text
+# colour, filled with the line's colour only through the colour gate.
 node:
   uri: metro.component.line_graph_node
   projection:
@@ -13,11 +13,15 @@ node:
         edges:
           - node:
               role: mark
-              # The line's colour, a SwatchMark: the package gates the
-              # value, so a colour it refuses leaves the disc uncoloured.
+              # Its ring is drawn in the current colour.
+              styles:
+                typography.color: color.text.muted
+              # An SVG disc (a graph node's mark is SVG, never HTML in a
+              # foreignObject): its fill is the line's colour through the
+              # gate, so a colour it refuses leaves the disc unfilled.
               edges:
                 - node:
-                    uri: prism.component.swatch_mark
+                    role: swatch
                     projection:
                       field: colour
                   relation:

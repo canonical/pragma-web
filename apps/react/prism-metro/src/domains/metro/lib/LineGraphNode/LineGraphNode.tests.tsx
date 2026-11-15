@@ -97,14 +97,27 @@ describe("LineGraphNode", () => {
       "metro: ",
     );
     expect(
-      container
-        .querySelector<HTMLElement>("svg.mark .swatch-mark")
-        ?.style.getPropertyValue("--swatch-mark-colour"),
+      container.querySelector("svg.mark > circle.swatch")?.getAttribute("fill"),
     ).toBe("#c8102e");
+    expect(container.querySelector("foreignObject")).toBeNull();
     expect(container.querySelector(".kind, .context, .location")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/network/lines/metro%3Anorth-line",
     );
+  });
+
+  it("leaves its disc unfilled when the gate refuses the line's colour", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <svg aria-label="Graph" role="img">
+          <LineGraphNode node={node} />
+        </svg>
+      ),
+      { colour: "url(https://example.org/paint.svg#a)" },
+    );
+    const disc = container.querySelector("svg.mark > circle.swatch");
+    expect(disc?.getAttribute("fill")).toBe("none");
+    expect(container.innerHTML).not.toContain("example.org");
   });
 
   it("applies custom className", () => {
