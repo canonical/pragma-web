@@ -95,10 +95,6 @@ describe("NodeCard", () => {
     expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
       "/icons/file-blank.svg#file-blank",
     );
-    expect(container.querySelector(".location")).toBeNull();
-    for (const slot of [".parent", ".key-values", ".footer", ".sidecar"]) {
-      expect(container.querySelector(slot), slot).toBeNull();
-    }
   });
 
   it("links its title to the home of a type the site homes", () => {

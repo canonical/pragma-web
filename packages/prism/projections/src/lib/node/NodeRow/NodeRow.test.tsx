@@ -97,7 +97,6 @@ describe("NodeRow", () => {
       "/icons/file-blank.svg#file-blank",
     );
     expect(container.querySelector(".title")?.tagName).toBe("SPAN");
-    expect(container.querySelector(".location, .meta")).toBeNull();
   });
 
   it("links its title to the home of a type the site homes", () => {

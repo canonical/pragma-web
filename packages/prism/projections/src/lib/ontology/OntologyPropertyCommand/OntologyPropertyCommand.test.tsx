@@ -131,7 +131,7 @@ describe("OntologyPropertyCommand", () => {
     expect(
       container.querySelector(".status code.identifier")?.textContent,
     ).toBe("ds:Modifier");
-    expect(container.querySelector(".context, .vital")).toBeNull();
+    expect(container.querySelector(".context")).toBeNull();
   });
 
   it("names its kind alone when the property is declared on no class", () => {

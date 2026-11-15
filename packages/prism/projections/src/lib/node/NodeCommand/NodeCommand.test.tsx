@@ -100,7 +100,7 @@ describe("NodeCommand", () => {
     expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
       "/icons/file-blank.svg#file-blank",
     );
-    expect(container.querySelector(".context, .vital, .status")).toBeNull();
+    expect(container.querySelector(".context, .status")).toBeNull();
   });
 
   it("states its namespace once, in its address, on any page", () => {

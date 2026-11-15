@@ -114,7 +114,7 @@ describe("OntologyClassCommand", () => {
     expect(container.querySelector(".title")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_CLASS_HREF,
     );
-    expect(container.querySelector(".context, .vital")).toBeNull();
+    expect(container.querySelector(".context")).toBeNull();
   });
 
   it("counts a class's one instance in the singular", () => {

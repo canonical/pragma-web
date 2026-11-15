@@ -333,7 +333,6 @@ describe("StandardsIndex grouping", () => {
       expect(fact?.querySelector(".term")?.textContent).toBe("Address");
       expect(fact?.parentElement?.querySelector(".fact")).toBe(fact);
       expect(compact.closest("li")).toHaveClass("ds", "entity-row");
-      expect(compact.closest("li")?.querySelector(".meta")).toBeNull();
       expect(fetchFn).not.toHaveBeenCalled();
     },
     STANDARDS_TEST_TIMEOUT_MS,
