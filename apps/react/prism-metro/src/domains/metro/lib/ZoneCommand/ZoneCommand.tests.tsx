@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -14,10 +15,10 @@ import type { ZoneCommandProps } from "./types.js";
 import ZoneCommand from "./ZoneCommand.js";
 
 /**
- * The operation the tests render ZoneCommand under: one Zone, read through the
- * `node` field. The spread is aliased because that field is typed by an
- * interface, so a node of another type reads as null instead of as a key that
- * does not match.
+ * The operation the tests render ZoneCommand under: one Zone, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query ZoneCommandTestQuery @relay_test_operation {
@@ -46,8 +47,8 @@ const ZoneCommandTestNode = ({
 };
 
 /**
- * Render `children` with the key of the Zone a Relay mock environment answers,
- * under the site's providers: `entity` over the Central Zone, as the graph's
+ * Render `children` with the key of the Zone a Relay mock environment
+ * answers, under the site's providers: `entity` over Central Zone, as the graph's
  * dataset holds it.
  */
 const renderWithNode = (
@@ -90,20 +91,21 @@ describe("ZoneCommand", () => {
         <ZoneCommand node={node} />
       </ul>
     ));
+    const root = container.querySelector(".ds.zone-command");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/map.svg#map",
+    );
     expect(
-      [...container.querySelectorAll(".title, .context, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["Central Zone", "Fare zone", "2 stations"]);
-  });
-
-  it("reads as inert text, since a fare zone has no home on this site", () => {
-    const { container } = renderWithNode((node) => (
-      <ul>
-        <ZoneCommand node={node} />
-      </ul>
-    ));
-    expect(container.querySelector("a")).toBeNull();
+      [
+        ...(root?.querySelectorAll(".title, .address, .kind, .status") ?? []),
+      ].map((slot) => slot.textContent),
+    ).toEqual(["Central Zone", "geo:central-zone", "Fare zone", "2 stations"]);
+    expect(root?.querySelector(".prefix")).toBeNull();
+    expect(root?.querySelector(".location")).toBeNull();
+    if (root) expectSlotOrder(root);
+    // A fare zone has no home on this site, so its title reads as text.
+    expect(root?.querySelector("a")).toBeNull();
   });
 
   it("counts no stations for a zone with none", () => {
@@ -113,12 +115,12 @@ describe("ZoneCommand", () => {
           <ZoneCommand node={node} />
         </ul>
       ),
-      {
-        stops: [],
-      },
+      { stops: [] },
     );
-    expect(container.querySelector(".vital")?.textContent).toBe("0 stations");
+    expect(container.querySelector(".status")?.textContent).toBe("0 stations");
+    expect(container.querySelector(".kind")?.textContent).toBe("Fare zone");
   });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>

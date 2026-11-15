@@ -122,7 +122,9 @@ describe("a fare zone", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
       ).not.toBeNull();
     }, WAIT);
     const chips = [...container.querySelectorAll(".term-inspector .zone-chip")];
-    expect(chips.map((chip) => chip.textContent)).toContain(ZONE_TITLE);
+    expect(
+      chips.map((chip) => chip.querySelector(".title")?.textContent),
+    ).toContain(ZONE_TITLE);
     for (const chip of chips) {
       expect(chip.querySelector("a")).toBeNull();
       expect(chip.className).toBe("ds entity-chip ds zone-chip");

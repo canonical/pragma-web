@@ -117,6 +117,7 @@ describe("MetroRowProjection", () => {
     ["Station", MOCK_STATION],
     ["Interchange", MOCK_INTERCHANGE],
     ["Line", MOCK_LINE],
+    ["Zone", MOCK_ZONE],
   ] as const)("hands a %s's arm its two-line opt-in", (_typename, entity) => {
     const { container } = renderWithNode(
       (node) => <MetroRowProjection lines="two" node={node} />,

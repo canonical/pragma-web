@@ -87,10 +87,7 @@ export default function MetroChipProjection({
       );
     case "Zone":
       return (
-        <ZoneChip
-          {...native}
-          node={requireArmKey(data.Zone, data.__typename)}
-        />
+        <ZoneChip {...props} node={requireArmKey(data.Zone, data.__typename)} />
       );
     case "RollingStock":
       return (

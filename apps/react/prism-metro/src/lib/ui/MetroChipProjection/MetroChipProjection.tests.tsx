@@ -151,7 +151,7 @@ describe("MetroChipProjection", () => {
       ),
       MOCK_ZONE,
     );
-    expect(container.querySelector(".zone-chip")?.textContent).toBe(
+    expect(container.querySelector(".zone-chip .title")?.textContent).toBe(
       "the central zone",
     );
   });

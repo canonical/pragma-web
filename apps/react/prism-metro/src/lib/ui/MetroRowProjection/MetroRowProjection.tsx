@@ -82,7 +82,7 @@ export default function MetroRowProjection({
       );
     case "Zone":
       return (
-        <ZoneRow {...native} node={requireArmKey(data.Zone, data.__typename)} />
+        <ZoneRow {...props} node={requireArmKey(data.Zone, data.__typename)} />
       );
     case "RollingStock":
       return (

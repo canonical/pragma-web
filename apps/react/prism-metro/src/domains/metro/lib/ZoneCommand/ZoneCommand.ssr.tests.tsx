@@ -13,10 +13,10 @@ import { MOCK_ZONE, resolveRoot } from "../../../../../testing/fixtures.js";
 import ZoneCommand from "./ZoneCommand.js";
 
 /**
- * The operation the SSR test renders ZoneCommand under: one Zone, read through
- * the `node` field. The spread is aliased because that field is typed by an
- * interface, so a node of another type reads as null instead of as a key that
- * does not match.
+ * The operation the SSR test renders ZoneCommand under: one Zone, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareSsrTestQuery = (): unknown => graphql`
   query ZoneCommandSsrTestQuery @relay_test_operation {
@@ -28,7 +28,8 @@ const declareSsrTestQuery = (): unknown => graphql`
 void declareSsrTestQuery;
 
 /**
- * Run the SSR test operation and render ZoneCommand over the Zone it returns.
+ * Run the SSR test operation and render ZoneCommand over the Zone it
+ * returns.
  */
 const ZoneCommandSsrTestNode = (): ReactElement => {
   const data = useLazyLoadQuery<ZoneCommandSsrTestQuery>(ssrTestQuery, {});
@@ -58,6 +59,6 @@ describe("ZoneCommand SSR", () => {
       createProjectionTree(environment, <ZoneCommandSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-command ds zone-command"');
-    expect(html).not.toContain("<a");
+    expect(html).not.toContain("<a ");
   });
 });
