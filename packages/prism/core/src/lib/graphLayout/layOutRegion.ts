@@ -489,12 +489,14 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
     }
     // A column with no sibling group holds only relation-placed classes and
     // waypoints, each linked to the column on its left: its predecessor's
-    // chain arrives from there. It centres on those neighbours.
+    // chain arrives from there. It centres on those neighbours. A root a
+    // full first layer moved on has none and does not pull.
     if (deltas.length === 0 && column > 0) {
       stack.forEach((item, index) => {
         const near = requireEntry(neighbours, item.id).filter(
           (id) => columnOfItem(id) === column - 1,
         );
+        if (near.length === 0) return;
         const ownCentre =
           requireAt(offsets, index) +
           item.top +
@@ -918,6 +920,7 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
     findings,
     crowdedArcs,
     columnOf,
+    layerOf,
     depthOf,
     predecessorsOf,
   };

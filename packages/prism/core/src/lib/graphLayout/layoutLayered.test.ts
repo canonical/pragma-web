@@ -118,4 +118,32 @@ describe("layoutLayered's band limit", () => {
       }
     }
   });
+
+  it("splits a first layer of unrelated roots, a root moved on staying where its column starts", () => {
+    const roots = Array.from({ length: 5 }, (_, index) => `r${index}`);
+    const model: LayeredModel = {
+      byId: new Map(roots.map((id) => [id, { ...BOX, label: id }])),
+      parent: new Map(),
+      crossParent: new Map(),
+      children: new Map(),
+      bundles: [],
+      drawnRelations: [],
+    };
+    const layout = layOut(model, 2);
+    expect(layout.columns).toEqual([
+      ["r0", "r1"],
+      ["r2", "r3"],
+      ["r4"],
+    ]);
+    expect(roots.map((id) => layout.layerOf(id))).toEqual([0, 0, 0, 0, 0]);
+    expect(
+      [...layout.nodes.values()].map((node) => [node.id, node.x, node.y]),
+    ).toEqual([
+      ["r0", 0, 0],
+      ["r1", 0, 48],
+      ["r2", 144, 0],
+      ["r3", 144, 48],
+      ["r4", 288, 0],
+    ]);
+  });
 });

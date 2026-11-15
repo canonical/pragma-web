@@ -118,6 +118,11 @@ export interface RegionLayout<TBundle extends LayeredBundle = LayeredBundle> {
   readonly crowdedArcs: number;
   /** A class's column. */
   readonly columnOf: (id: string) => number;
+  /**
+   * A class's layer: its column before a full layer split, so the classes
+   * of layer 0 are the region's roots however many columns they take.
+   */
+  readonly layerOf: (id: string) => number;
   /** A class's superclass hops to its root. */
   readonly depthOf: (id: string) => number;
   /** A relation-placed class's predecessors, back edges removed. */
