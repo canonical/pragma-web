@@ -103,6 +103,12 @@ export const LEGIBLE_MARGIN = 1 + 1e-6;
  */
 export const CLEAN_EDGE_ZOOM = 1.2;
 
+/**
+ * The camera's greatest zoom, as the graph canvas clamps it: a region's
+ * window is never so small that the camera would show more than it.
+ */
+export const FRAME_ZOOM_MAX = 2.4;
+
 /** A self-loop's extent above and right of its box, in px. */
 export const LOOP_EXTENT = 16;
 

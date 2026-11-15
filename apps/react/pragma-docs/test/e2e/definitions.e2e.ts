@@ -9,13 +9,15 @@
  * through no class; every class's label fits its box in the font the page
  * ships; the term rail's ontology headings are laid out; and, on a phone,
  * the inspector's drawer trigger covers nothing of the explorer, its search
- * field least of all. A filter chip's refit and a namespace's keep every
- * class in view labelled and cut none; at rest Fit brings the whole graph
- * into view, every text at 12px or more, and on a namespace a selection
- * drills into it stops at the overview's floor, on a window that cuts no
- * class; a pick in
- * the rail keeps the chips, the search and the zoom; and the inspector's
- * field rows put their ranges on one column line.
+ * field least of all. A filter chip's refit keeps every class in view
+ * labelled and cuts none; a namespace a reader picks, drawn class by class
+ * or as one box, is fitted on a window that holds it whole and cuts no box
+ * at its edges, a box among its neighbours; at rest Fit brings the whole
+ * graph into view, every text at 12px or more, and on a namespace a
+ * selection drills into it stops at the overview's floor, on a window that
+ * cuts no class; a pick in the rail keeps the chips, the search and the
+ * zoom; and the inspector's field rows put their ranges on one column
+ * line.
  */
 import {
   launchBrowser,
@@ -313,24 +315,27 @@ describe("at 1440 px", () => {
     expect(measure.cut).toEqual([]);
   });
 
-  it("fits a namespace a reader picks legibly, cutting none of its classes", async () => {
-    const { errors, measure } = await openExplorer(
-      "/definitions",
-      desktop,
-      (page) =>
-        // ds is one box at rest; anatomy is drawn class by class.
-        page.getByRole("button", { name: "Fit the graph to anatomy" }).click(),
-    );
-    expect(errors).toEqual([]);
-    expect(measure.inView).toBeGreaterThan(0);
-    expect(measure.unlabelled).toBe(0);
-    // The frame zooms past the whole map's fit onto the namespace, so a
-    // neighbouring namespace's box may meet the window's edge; none of
-    // the picked namespace's classes is cut.
-    expect(measure.cut.filter((term) => term.startsWith("anatomy:"))).toEqual(
-      [],
-    );
-  });
+  // anatomy and cs are drawn class by class at rest, ds and surface each
+  // as one box.
+  it.each(["anatomy", "cs", "ds", "surface"])(
+    "fits %s when a reader picks it, legibly and cutting no box at the window's edge",
+    async (prefix) => {
+      const { errors, measure } = await openExplorer(
+        "/definitions",
+        desktop,
+        (page) =>
+          page
+            .getByRole("button", { name: `Fit the graph to ${prefix}` })
+            .click(),
+      );
+      expect(errors).toEqual([]);
+      // A box's window holds its neighbours too, never the box alone.
+      expect(measure.inView).toBeGreaterThan(1);
+      expect(measure.unlabelled).toBe(0);
+      expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+      expect(measure.cut).toEqual([]);
+    },
+  );
 
   it("keeps the chips, the search and the zoom when a rail pick moves to a term", async () => {
     const view: {

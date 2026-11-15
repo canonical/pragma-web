@@ -13,11 +13,14 @@ import {
   type ReactElement,
   type SyntheticEvent,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { REGION_NODE_SCHEME } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
+import frameRegionWindow from "../../classGraph/frameRegionWindow.js";
 import type { NodeNavigation } from "../../classGraph/types.js";
 import { useMessages } from "../../i18n/index.js";
 import { ClassGraph } from "../ClassGraph/index.js";
@@ -78,7 +81,9 @@ function readClosest(
  * relation shows its label and rings its ends. The filter's chips hide
  * classes, and the camera fits what is left, which the Fit control
  * restores; the search and the instances axis dim. A region a reader picks
- * in the inspector is fitted once per pick. Neither refit zooms a legible
+ * in the inspector is fitted once per pick, on a window of the canvas's
+ * aspect whose edges cut no box: an open region as large as it fits, a
+ * collapsed one's box among its neighbours. Neither refit zooms a legible
  * view out to an illegible one: what is too large for the legible zoom
  * shows from its top-left corner, in a window whose edges cut no class.
  *
@@ -93,8 +98,9 @@ function readClosest(
  * `import { HierarchyWell } from "../HierarchyWell/index.js";`
  *
  * @implements prism.component.hierarchy_well
- * @note Impure: holds the pointer's edge and the keyboard's state, and moves
- *   keyboard focus between the classes' links.
+ * @note Impure: holds the pointer's edge and the keyboard's state, moves
+ *   keyboard focus between the classes' links, and measures the canvas
+ *   when a region is picked.
  */
 export default function HierarchyWell({
   layout,
@@ -206,10 +212,47 @@ export default function HierarchyWell({
       frameRefitWindow(layout, hidden, box, visible, scale, zoom),
     [hidden, layout],
   );
-  const frame = useMemo(() => {
-    if (region === undefined) return undefined;
+  // A region a reader picks is framed once the canvas's size is known: in
+  // its aspect, so the camera shows exactly that window and no edge of it
+  // cuts a box; a box too large for that, or a canvas not yet measured,
+  // is fitted as it is.
+  const root = useRef<HTMLDivElement>(null);
+  const [frame, setFrame] = useState<
+    { readonly box: GraphBox; readonly serial: number } | undefined
+  >(undefined);
+  useEffect(() => {
+    if (region === undefined) return;
     const box = measureVisibleBox(layout, hidden, region.prefix);
-    return box === undefined ? undefined : { box, serial: region.serial };
+    if (box === undefined) return;
+    const canvas = root.current
+      ?.querySelector(".desktop svg.viewport")
+      ?.getBoundingClientRect();
+    const shown =
+      canvas === undefined || canvas.width === 0 || canvas.height === 0
+        ? undefined
+        : frameRegionWindow(
+            {
+              nodes: new Map(
+                [...layout.nodes].filter(([uri]) => !hidden.has(uri)),
+              ),
+              regions: layout.regions,
+            },
+            { w: canvas.width, h: canvas.height },
+            { x: box.x, y: box.y, w: box.width, h: box.height },
+            {
+              wide: layout.regions.some(
+                (candidate) =>
+                  candidate.prefix === region.prefix && candidate.collapsed,
+              ),
+            },
+          );
+    setFrame({
+      box:
+        shown === undefined
+          ? box
+          : { x: shown.x, y: shown.y, width: shown.w, height: shown.h },
+      serial: region.serial,
+    });
   }, [hidden, layout, region]);
   const selectedNode =
     selected === undefined ? undefined : layout.nodes.get(selected);
@@ -257,6 +300,7 @@ export default function HierarchyWell({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-canvas"
+      ref={root}
       onBlur={() => {
         onHoverTerm(undefined);
         setEscaped(false);
