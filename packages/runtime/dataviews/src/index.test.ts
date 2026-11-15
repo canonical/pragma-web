@@ -28,6 +28,7 @@ describe("public surface", () => {
       "declareCapabilities",
       "decodeQuery",
       "encodeQuery",
+      "readCondition",
       "readSlice",
     ]);
   });
@@ -131,11 +132,13 @@ describe("public surface", () => {
       "areListsEqual",
       "areSizingsEqual",
       "buildColumnTemplate",
+      "canonicalizeSlice",
       "createColumnLayout",
       "createFilterInputs",
       "createGridInteraction",
       "createRowScopes",
       "cycleSortTerm",
+      "foldText",
       "hideColumn",
       "isDataViewsProvider",
       "isNarrowingIssue",

@@ -72,6 +72,8 @@ export type {
   GroupPath,
   GroupTerm,
   Predicate,
+  PredicateCondition,
+  PredicateEdit,
   PredicateOperand,
   PredicateOperator,
   PredicateRef,
@@ -83,7 +85,11 @@ export type {
   SortTerm,
   WindowNavigation,
 } from "./query/index.js";
-export { DEFAULT_WINDOW, EMPTY_SLICE } from "./query/index.js";
+export {
+  DEFAULT_WINDOW,
+  EMPTY_SLICE,
+  readCondition,
+} from "./query/index.js";
 export type {
   Completion,
   Count,

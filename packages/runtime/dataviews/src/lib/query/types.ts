@@ -24,6 +24,22 @@ export type PredicateOperator =
   | "endsWith";
 
 /**
+ * What a predicate's operator asserts about a record: that its value is one
+ * of the operands (`inclusion`), that the test is negated (`exclusion`),
+ * that its value holds the operand as text (`match`), that it lies at or
+ * beyond a bound (`range`), or that the field holds a value (`presence`).
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type PredicateCondition =
+  | "inclusion"
+  | "exclusion"
+  | "match"
+  | "range"
+  | "presence";
+
+/**
  * A semantic operand value. Field metadata owns coercion; core never guesses.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -59,6 +75,24 @@ export type PredicateRef = {
   readonly operator: PredicateOperator;
   /** Zero-based among the conjuncts at this address, in canonical order. */
   readonly nth: number;
+};
+
+/**
+ * Conjuncts to remove and conjuncts to add, as one edit: each ref names a
+ * conjunct as the slice stands before the edit, and each added conjunct
+ * stands beside whatever remains.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type PredicateEdit = {
+  /**
+   * The conjuncts removed, each named as the slice stands before the
+   * edit, so removing one never moves the place of another.
+   */
+  readonly remove: readonly PredicateRef[];
+  /** The conjuncts added, beside whatever already stands. */
+  readonly add: readonly Predicate[];
 };
 
 /**
@@ -214,16 +248,7 @@ export type QueryCommand =
       /** The conjunct at the address it removes, 0 when left out. */
       readonly nth?: number | undefined;
     }
-  | {
-      readonly kind: "editPredicates";
-      /**
-       * The conjuncts removed, each named as the slice stands before the
-       * edit, so removing one never moves the place of another.
-       */
-      readonly remove: readonly PredicateRef[];
-      /** The conjuncts added, beside whatever already stands. */
-      readonly add: readonly Predicate[];
-    }
+  | ({ readonly kind: "editPredicates" } & PredicateEdit)
   | { readonly kind: "setSearch"; readonly search: string }
   | {
       readonly kind: "clear";
