@@ -7,12 +7,12 @@ import { describe, expect, it } from "vitest";
 import buildColumnTemplate from "./buildColumnTemplate.js";
 import type { ColumnToSize, ResolvedColumn } from "./types.js";
 
-const fixed = (id: string, px: number): ColumnToSize => ({
+const buildFixed = (id: string, px: number): ColumnToSize => ({
   id,
   sizing: { kind: "fixed", px },
 });
 
-const flex = (
+const buildFlex = (
   id: string,
   weight: number,
   minPx: number,
@@ -26,7 +26,7 @@ const flex = (
 });
 
 /** A solved vector, as the caller that already ran the solver holds it. */
-const solved = (...widths: readonly (readonly [string, number])[]) =>
+const buildSolved = (...widths: readonly (readonly [string, number])[]) =>
   widths.map(([id, width]): ResolvedColumn => ({ id, width }));
 
 describe("buildColumnTemplate", () => {
@@ -37,12 +37,15 @@ describe("buildColumnTemplate", () => {
 
   it("publishes declarative tracks before a width is measured", () => {
     expect(
-      buildColumnTemplate([fixed("select", 40), flex("name", 2, 120)], null),
+      buildColumnTemplate(
+        [buildFixed("select", 40), buildFlex("name", 2, 120)],
+        null,
+      ),
     ).toBe("40px minmax(120px, 2fr)");
   });
 
   it("caps a bounded flexible column declaratively", () => {
-    expect(buildColumnTemplate([flex("status", 1, 80, 200)], null)).toBe(
+    expect(buildColumnTemplate([buildFlex("status", 1, 80, 200)], null)).toBe(
       "minmax(80px, 200px)",
     );
   });
@@ -50,8 +53,8 @@ describe("buildColumnTemplate", () => {
   it("publishes the solver's resolved vector once a width is measured", () => {
     expect(
       buildColumnTemplate(
-        [fixed("select", 40), flex("name", 1, 100)],
-        solved(["select", 40], ["name", 260]),
+        [buildFixed("select", 40), buildFlex("name", 1, 100)],
+        buildSolved(["select", 40], ["name", 260]),
       ),
     ).toBe("40px 260px");
   });

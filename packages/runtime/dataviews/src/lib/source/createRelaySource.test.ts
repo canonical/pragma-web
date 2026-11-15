@@ -180,7 +180,7 @@ const connectionMetadata = {
 };
 
 /** `MachinesQuery` with other normalization selections and parameters. */
-const withSelections = (
+const buildWithSelections = (
   selections: readonly unknown[],
   metadata: Record<string, unknown> = {},
 ): ConcreteRequest =>
@@ -264,7 +264,7 @@ const createRelay = () => {
   });
   /** The nth fetch, or a failure rather than a skipped assertion. */
   const fetchAt = (index: number): Fetch => {
-    const fetch = fetches[index];
+    const fetch = fetches.at(index);
     if (fetch === undefined) {
       throw new Error(`expected a fetch at index ${index}`);
     }
@@ -1176,21 +1176,21 @@ describe("createRelaySource", () => {
     it.each([
       [
         "on the query itself",
-        withSelections(
+        buildWithSelections(
           [...MachinesQuery.operation.selections, connectionHandle],
           connectionMetadata,
         ),
       ],
       [
         "through an unmasked fragment spread",
-        withSelections([
+        buildWithSelections([
           ...MachinesQuery.operation.selections,
           connectionHandle,
         ]),
       ],
       [
         "under a parent field",
-        withSelections(
+        buildWithSelections(
           [
             buildField("viewer", false, [
               ...MachinesQuery.operation.selections,
@@ -1224,7 +1224,7 @@ describe("createRelaySource", () => {
       // deleted record, a client field. Only `@connection` merges pages, so
       // only `@connection` is refused.
       const { environment, fetches } = createRelay();
-      const otherHandle = withSelections([
+      const otherHandle = buildWithSelections([
         ...MachinesQuery.operation.selections,
         { ...connectionHandle, handle: "deleteRecord", key: "" },
       ]);
@@ -1244,7 +1244,7 @@ describe("createRelaySource", () => {
 
     it("never refuses a query for a row's own @connection list", () => {
       const { environment, fetches } = createRelay();
-      const rowsWithLists = withSelections([
+      const rowsWithLists = buildWithSelections([
         buildField("machines", false, [
           buildField("edges", true, [
             buildField("node", false, [connectionHandle]),
@@ -1267,7 +1267,7 @@ describe("createRelaySource", () => {
 
     it("never lets a refused @connection query push another query's cursors out", () => {
       const { environment, fetchAt } = createRelay();
-      const merging = withSelections(
+      const merging = buildWithSelections(
         [...MachinesQuery.operation.selections, connectionHandle],
         connectionMetadata,
       );

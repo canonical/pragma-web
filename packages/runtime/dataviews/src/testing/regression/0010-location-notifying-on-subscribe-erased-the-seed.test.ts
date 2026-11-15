@@ -25,7 +25,7 @@ const machines = createCollection({
 });
 
 /** A location whose subscription calls the listener at once, as some adapters do. */
-const notifyingOnSubscribe = (href: string): QueryLocation => {
+const createNotifyingLocation = (href: string): QueryLocation => {
   const memory = createMemoryLocation({ href });
   return {
     ...memory,
@@ -39,7 +39,7 @@ const notifyingOnSubscribe = (href: string): QueryLocation => {
 
 describe("regression 0010 — a location notifying on subscribe erased the snapshot's query", () => {
   it("writes the snapshot's query and adopts nothing from the notification", () => {
-    const location = notifyingOnSubscribe("/machines");
+    const location = createNotifyingLocation("/machines");
     const provider = createDataViewsProvider({
       collection: machines,
       source: createManualSource({

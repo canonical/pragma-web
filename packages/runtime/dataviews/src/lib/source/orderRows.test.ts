@@ -464,7 +464,7 @@ describe("orderRows", () => {
     // Comparing one field twice can only tie, so the second key is never
     // read rather than read and discarded.
     let reads = 0;
-    const counted = (id: string, cores: number) =>
+    const buildCounted = (id: string, cores: number) =>
       Object.defineProperty({ id }, "cores", {
         enumerable: true,
         get: () => {
@@ -472,7 +472,7 @@ describe("orderRows", () => {
           return cores;
         },
       });
-    const rows = [counted("a", 2), counted("b", 1)];
+    const rows = [buildCounted("a", 2), buildCounted("b", 1)];
     expect(
       order(rows, [buildAscTerm("cores")], {
         tiebreak: [buildDescTerm("cores")],

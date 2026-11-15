@@ -9,7 +9,7 @@ import createPlatformLocation from "./createPlatformLocation.js";
  * is an integration test under `src/testing/integration`.
  */
 
-const harness = () => {
+const createHarness = () => {
   const adapter = createMemoryAdapter();
   adapter.navigate("/machines");
   const location = createPlatformLocation(adapter);
@@ -18,7 +18,7 @@ const harness = () => {
 
 describe("URL transport over the platform adapter", () => {
   it("preserves repeated query values through write and read", () => {
-    const { location } = harness();
+    const { location } = createHarness();
     const next = new URLSearchParams();
     next.append("status", "failed");
     next.append("status", "cancelled");
@@ -28,7 +28,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("preserves repeated values when paging", () => {
-    const { location } = harness();
+    const { location } = createHarness();
     const base = new URLSearchParams("status=failed&status=cancelled");
     location.write(base);
     const paged = location.read();
@@ -39,7 +39,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("preserves repeated values when sorting", () => {
-    const { location } = harness();
+    const { location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"));
     const sorted = location.read();
     sorted.append("sort", "status__asc");
@@ -53,7 +53,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("preserves repeated values through back and forward", () => {
-    const { adapter, location } = harness();
+    const { adapter, location } = createHarness();
     location.write(new URLSearchParams("status=failed&status=cancelled"), {
       history: "push",
     });
@@ -67,7 +67,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("honours the history option on writes", () => {
-    const { adapter, location } = harness();
+    const { adapter, location } = createHarness();
     location.write(new URLSearchParams("status=failed"));
     location.write(new URLSearchParams("status=cancelled"), {
       history: "push",
@@ -79,7 +79,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("replaces by default so continuous input does not flood history", () => {
-    const { adapter, location } = harness();
+    const { adapter, location } = createHarness();
     location.write(new URLSearchParams("status=failed"));
     location.write(new URLSearchParams("status=cancelled"));
     location.write(new URLSearchParams("status=deployed"));
@@ -89,7 +89,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("writes an empty query as a clean href", () => {
-    const { adapter, location } = harness();
+    const { adapter, location } = createHarness();
     location.write(new URLSearchParams("status=failed"));
     location.write(new URLSearchParams());
     expect(location.read().toString()).toBe("");
@@ -97,7 +97,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("propagates a throwing listener to the writer", () => {
-    const { location } = harness();
+    const { location } = createHarness();
     location.subscribe(() => {
       throw new Error("listener exploded");
     });
@@ -108,7 +108,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("preserves the host's hash across writes", () => {
-    const { adapter, location } = harness();
+    const { adapter, location } = createHarness();
     adapter.navigate("/machines#table");
     location.write(new URLSearchParams("status=failed"));
     expect(adapter.getLocation().hash).toBe("#table");
@@ -116,7 +116,7 @@ describe("URL transport over the platform adapter", () => {
   });
 
   it("notifies subscribers on adapter-driven writes", () => {
-    const { location } = harness();
+    const { location } = createHarness();
     let notifications = 0;
     location.subscribe(() => {
       notifications += 1;
@@ -127,7 +127,7 @@ describe("URL transport over the platform adapter", () => {
 });
 
 describe("createPlatformLocation input normalization", () => {
-  const platformOf = (location: string | URL) => {
+  const createPlatform = (location: string | URL) => {
     let current = location;
     const listeners = new Set<(next: string | URL) => void>();
     const platform = {
@@ -149,19 +149,21 @@ describe("createPlatformLocation input normalization", () => {
   };
 
   it("resolves URL instances", () => {
-    const { location } = platformOf(
+    const { location } = createPlatform(
       new URL("/machines?status=failed", "http://localhost"),
     );
     expect(location.read().get("status")).toBe("failed");
   });
 
   it("resolves absolute URL strings", () => {
-    const { location } = platformOf("http://localhost/machines?status=failed");
+    const { location } = createPlatform(
+      "http://localhost/machines?status=failed",
+    );
     expect(location.read().get("status")).toBe("failed");
   });
 
   it("resolves relative hrefs against the local base", () => {
-    const { location } = platformOf("/machines?status=failed");
+    const { location } = createPlatform("/machines?status=failed");
     expect(location.read().get("status")).toBe("failed");
   });
 });
