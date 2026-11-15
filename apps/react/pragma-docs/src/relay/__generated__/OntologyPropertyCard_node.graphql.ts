@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e2157958b8b9d08d6ef2528cd3077674>>
+ * @generated SignedSource<<18022c0eb1dfe905b000ee436a45bf28>>
  * @lightSyntaxTransform
  */
 
@@ -23,6 +23,7 @@ export type OntologyPropertyCard_node$data = {
     readonly uri: string;
   } | null | undefined;
   readonly label: string | null | undefined;
+  readonly namespace: string;
   readonly range: string;
   readonly uri: string;
   readonly " $fragmentType": "OntologyPropertyCard_node";
@@ -62,6 +63,13 @@ return {
     },
     (v0/*:: as any*/),
     (v1/*:: as any*/),
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "namespace",
+      "storageKey": null
+    },
     {
       "alias": null,
       "args": null,
@@ -131,6 +139,6 @@ return {
 };
 })();
 
-(node as any).hash = "8ca3299f6b1296315a70db9d6e10e802";
+(node as any).hash = "36b8539dfbc89f3985ff5109f47ae3e0";
 
 export default node;

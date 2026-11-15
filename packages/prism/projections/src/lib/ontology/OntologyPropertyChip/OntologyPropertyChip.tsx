@@ -19,13 +19,14 @@ import "./styles.css";
 /**
  * The fields OntologyPropertyChip reads from the OntologyProperty it
  * renders: its IRI, its address and the local name its name falls back to,
- * and its label.
+ * its label and its namespace.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment OntologyPropertyChip_node on OntologyProperty {
     __typename
     uri
     label
+    namespace
   }
 `;
 void declareNodeFragment;
@@ -39,8 +40,10 @@ const componentCssClassName = "ds ontology-property-chip";
  * its home when the site has one and inert text when it has none or
  * `linked` is false. It has no peek: the peek reads a `Node`, which a
  * property is not. The name is the property's label, or the local name of its IRI when
- * it has none. A property's address is its absolute IRI, which has no
- * compact form, so `useForeignPrefix` finds no prefix for it. A passage's own link text, given as
+ * it has none. Its prefix is its namespace's, through
+ * `useForeignPrefix({ namespace })`: shown off the page's ambient
+ * namespace when the provider serves the namespace as a prefix name, and
+ * never when it serves an IRI. A passage's own link text, given as
  * `children`, stands in for the name.
  *
  * A property is not a `Node`, so no dispatcher renders it: a lens spreads
@@ -66,7 +69,7 @@ export default function OntologyPropertyChip({
   const data = useFragment(nodeFragment, node);
   const href = useHome({ __typename: data.__typename, uri: data.uri });
   const LinkComponent = useProjectionLink();
-  const prefix = useForeignPrefix(data.uri);
+  const prefix = useForeignPrefix({ namespace: data.namespace });
   return (
     <EntityChip
       {...props}

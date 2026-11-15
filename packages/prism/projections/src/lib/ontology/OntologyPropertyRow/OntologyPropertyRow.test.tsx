@@ -15,6 +15,7 @@ import {
 import testQuery, {
   type OntologyPropertyRowTestQuery,
 } from "../../../__generated__/OntologyPropertyRowTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyPropertyRow from "./OntologyPropertyRow.js";
 import type { OntologyPropertyRowProps } from "./types.js";
 
@@ -123,7 +124,8 @@ describe("OntologyPropertyRow", () => {
     expect(title?.tagName).toBe("A");
     expect(title?.textContent).toBe("Modifier");
     expect(title?.getAttribute("href")).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
-    expect(container.querySelector(".kind, .prefix, .summary")).toBeNull();
+    expect(container.querySelector(".prefix")?.textContent).toBe("ds:");
+    expect(container.querySelector(".kind, .summary")).toBeNull();
   });
 
   it("names a property without a label by its IRI's local name", () => {
@@ -170,5 +172,25 @@ describe("OntologyPropertyRow", () => {
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");
+  });
+
+  it("shows its namespace's prefix only off the page's namespace", () => {
+    const foreign = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="metro">
+        <ul>
+          <OntologyPropertyRow node={node} />
+        </ul>
+      </AmbientNamespaceProvider>
+    ));
+    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
+    foreign.unmount();
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <ul>
+          <OntologyPropertyRow node={node} />
+        </ul>
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
   });
 });

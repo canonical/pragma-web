@@ -15,6 +15,7 @@ import {
 import testQuery, {
   type OntologyPropertyChipTestQuery,
 } from "../../../__generated__/OntologyPropertyChipTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyPropertyChip from "./OntologyPropertyChip.js";
 import type { OntologyPropertyChipProps } from "./types.js";
 
@@ -102,9 +103,9 @@ describe("OntologyPropertyChip", () => {
     expect(chip.querySelector(".mark use")?.getAttribute("href")).toBe(
       "/icons/tag.svg#tag",
     );
-    expect(chip.querySelector(".prefix")).toBeNull();
+    expect(chip.querySelector(".prefix")?.textContent).toBe("ds:");
     act(() => {
-      screen.getByRole("link", { name: "Modifier" }).focus();
+      screen.getByRole("link", { name: /Modifier/ }).focus();
     });
     expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
   });
@@ -147,5 +148,29 @@ describe("OntologyPropertyChip", () => {
       <OntologyPropertyChip data-testid="test-component" node={node} />
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("SPAN");
+  });
+
+  it("shows its namespace's prefix only off the page's namespace", () => {
+    const foreign = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="metro">
+        <OntologyPropertyChip node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
+    foreign.unmount();
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <OntologyPropertyChip node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
+  });
+
+  it("shows no prefix for a namespace served as an IRI", () => {
+    const { container } = renderWithNode(
+      (node) => <OntologyPropertyChip node={node} />,
+      { namespace: "https://ds.canonical.com/" },
+    );
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 });

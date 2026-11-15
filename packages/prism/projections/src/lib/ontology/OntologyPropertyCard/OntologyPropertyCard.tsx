@@ -19,7 +19,7 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields OntologyPropertyCard reads from the OntologyProperty it
- * renders: its IRI, label and definition, its range, whether it is
+ * renders: its IRI, label, namespace and definition, its range, whether it is
  * functional, the title of the class it is declared on and its inverse.
  */
 const declareNodeFragment = (): unknown => graphql`
@@ -27,6 +27,7 @@ const declareNodeFragment = (): unknown => graphql`
     __typename
     uri
     label
+    namespace
     definition
     range
     functional
@@ -53,8 +54,10 @@ const componentCssClassName = "ds ontology-property-card";
  * definition; as facts, the class it is declared on, its range and, when
  * it has one, its inverse; and "functional" as the status of a functional
  * property. It passes no address and no kind, which its mark states. The name is the property's label, or the local name of its IRI when
- * it has none. A property's address is its absolute IRI, which has no
- * compact form, so `useForeignPrefix` finds no prefix for it.
+ * it has none. Its prefix is its namespace's, through
+ * `useForeignPrefix({ namespace })`: shown off the page's ambient
+ * namespace when the provider serves the namespace as a prefix name, and
+ * never when it serves an IRI.
  *
  * A property is not a `Node`, so no dispatcher renders it: a lens spreads
  * `...OntologyPropertyCard_node` where it selects the property.
@@ -81,7 +84,7 @@ export default function OntologyPropertyCard({
   const t = useMessages();
   const domain = data.domain?._meta.title;
   const { inverse } = data;
-  const prefix = useForeignPrefix(data.uri);
+  const prefix = useForeignPrefix({ namespace: data.namespace });
   return (
     <EntityCard
       {...props}

@@ -3,7 +3,8 @@
 # entities.
 # Reference: the W3 card anatomy: the slot order mark, prefix, title,
 # address, kind, summary, facts, status; a property fills the mark (the
-# property glyph), the title, the summary (its definition), the facts (the
+# property glyph), the prefix (its namespace's, off the page's ambient
+# one), the title, the summary (its definition), the facts (the
 # class it is declared on, its range and its inverse) and the status
 # ("functional", for a functional property alone). It passes no address
 # and no kind, which its mark states.
@@ -34,10 +35,11 @@ node:
               cardinality: "1"
               slotName: mark
           - node:
-              # Never shown: an absolute IRI has no compact prefix.
+              # The namespace's prefix name, shown only off the page's
+              # ambient namespace; a namespace served as an IRI shows none.
               role: prefix
               projection:
-                field: uri
+                field: namespace
             relation:
               cardinality: "0..1"
               slotName: prefix

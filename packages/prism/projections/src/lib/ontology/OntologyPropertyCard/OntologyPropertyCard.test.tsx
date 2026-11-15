@@ -15,6 +15,7 @@ import {
 import testQuery, {
   type OntologyPropertyCardTestQuery,
 } from "../../../__generated__/OntologyPropertyCardTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyPropertyCard from "./OntologyPropertyCard.js";
 import type { OntologyPropertyCardProps } from "./types.js";
 
@@ -126,9 +127,8 @@ describe("OntologyPropertyCard", () => {
     expect(
       container.querySelector(".detail code.identifier")?.textContent,
     ).toBe("ds:Modifier");
-    expect(
-      container.querySelector(".prefix, .address, .kind, .status"),
-    ).toBeNull();
+    expect(container.querySelector(".prefix")?.textContent).toBe("ds:");
+    expect(container.querySelector(".address, .kind, .status")).toBeNull();
   });
 
   it("links its name to the property's home", () => {
@@ -202,5 +202,21 @@ describe("OntologyPropertyCard", () => {
       <OntologyPropertyCard data-testid="test-component" node={node} />
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("DIV");
+  });
+
+  it("shows its namespace's prefix only off the page's namespace", () => {
+    const foreign = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="metro">
+        <OntologyPropertyCard node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(foreign.container.querySelector(".prefix")?.textContent).toBe("ds:");
+    foreign.unmount();
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <OntologyPropertyCard node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
   });
 });

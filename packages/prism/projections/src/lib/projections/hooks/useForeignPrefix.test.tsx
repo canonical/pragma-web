@@ -2,11 +2,12 @@ import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import AmbientNamespaceProvider from "../AmbientNamespaceProvider.js";
+import type { ForeignPrefixSource } from "./types.js";
 import useForeignPrefix from "./useForeignPrefix.js";
 
-/** Render the hook for `curie` on a page whose ambient namespace is `namespace`. */
-const renderPrefix = (curie: string, namespace?: string) =>
-  renderHook(() => useForeignPrefix(curie), {
+/** Render the hook for `source` on a page whose ambient namespace is `namespace`. */
+const renderPrefix = (source: ForeignPrefixSource, namespace?: string) =>
+  renderHook(() => useForeignPrefix(source), {
     wrapper:
       namespace === undefined
         ? undefined
@@ -33,6 +34,20 @@ describe("useForeignPrefix", () => {
   it("shows no prefix for an address that did not compact", () => {
     expect(
       renderPrefix("https://ds.canonical.com/global.component.button", "ds"),
+    ).toBeUndefined();
+  });
+
+  it("shows a namespace's prefix name, with its colon, off the page's namespace", () => {
+    expect(renderPrefix({ namespace: "ds" }, "metro")).toBe("ds:");
+  });
+
+  it("shows no prefix for a namespace that is the page's own", () => {
+    expect(renderPrefix({ namespace: "ds" }, "ds")).toBeUndefined();
+  });
+
+  it("shows no prefix for a namespace served as an IRI", () => {
+    expect(
+      renderPrefix({ namespace: "http://example.org/metro#" }),
     ).toBeUndefined();
   });
 

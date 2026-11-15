@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a830ef74a88da192d8954b3be92bfe27>>
+ * @generated SignedSource<<7d5c16ff6b923d6b6a8b6dd27110dd62>>
  * @lightSyntaxTransform
  */
 
@@ -13,6 +13,7 @@ export type OntologyPropertyRow_node$data = {
   readonly __typename: "OntologyProperty";
   readonly definition: string | null | undefined;
   readonly label: string | null | undefined;
+  readonly namespace: string;
   readonly uri: string;
   readonly " $fragmentType": "OntologyPropertyRow_node";
 };
@@ -52,6 +53,13 @@ const node: ReaderFragment = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
+      "name": "namespace",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
       "name": "definition",
       "storageKey": null
     }
@@ -60,6 +68,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "60c1402c927a4eae79cc548cf2045cfd";
+(node as any).hash = "90725f3bfc2921cdff5727221e54c9f7";
 
 export default node;

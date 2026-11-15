@@ -15,6 +15,7 @@ import {
 import testQuery, {
   type OntologyPropertyGraphNodeTestQuery,
 } from "../../../__generated__/OntologyPropertyGraphNodeTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyPropertyGraphNode from "./OntologyPropertyGraphNode.js";
 import type { OntologyPropertyGraphNodeProps } from "./types.js";
 
@@ -113,8 +114,10 @@ describe("OntologyPropertyGraphNode", () => {
     expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
       "/icons/tag.svg#tag",
     );
-    expect(container.querySelector(".title")?.textContent).toBe("Modifier");
-    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("ds: Modifier");
+    expect(container.querySelector(".title > .prefix")?.textContent).toBe(
+      "ds: ",
+    );
     expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_PROPERTY_HREF,
@@ -130,7 +133,7 @@ describe("OntologyPropertyGraphNode", () => {
       ),
       { label: null },
     );
-    expect(container.querySelector(".title")?.textContent).toBe("modifier");
+    expect(container.querySelector(".title")?.textContent).toBe("ds: modifier");
   });
 
   it("takes the width the graph's layout gives it", () => {
@@ -164,5 +167,17 @@ describe("OntologyPropertyGraphNode", () => {
       </svg>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("g");
+  });
+
+  it("shows its namespace's prefix only off the page's namespace", () => {
+    const own = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <svg aria-label="Graph" role="img">
+          <OntologyPropertyGraphNode node={node} />
+        </svg>
+      </AmbientNamespaceProvider>
+    ));
+    expect(own.container.querySelector(".prefix")).toBeNull();
+    expect(own.container.querySelector(".title")?.textContent).toBe("Modifier");
   });
 });

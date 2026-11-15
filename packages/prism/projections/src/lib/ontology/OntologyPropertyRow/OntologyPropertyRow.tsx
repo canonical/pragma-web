@@ -18,13 +18,14 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields OntologyPropertyRow reads from the OntologyProperty it
- * renders: its IRI, its label and its definition.
+ * renders: its IRI, its label, its namespace and its definition.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment OntologyPropertyRow_node on OntologyProperty {
     __typename
     uri
     label
+    namespace
     definition
   }
 `;
@@ -39,8 +40,10 @@ const componentCssClassName = "ds ontology-property-row";
  * has one and inert text when it has none. It gives no kind, since its
  * mark says it is a property. A row opted into two lines
  * (`lines="two"`) sets the property's definition under the name. The name is the property's label, or the local name of its IRI when
- * it has none. A property's address is its absolute IRI, which has no
- * compact form, so `useForeignPrefix` finds no prefix for it.
+ * it has none. Its prefix is its namespace's, through
+ * `useForeignPrefix({ namespace })`: shown off the page's ambient
+ * namespace when the provider serves the namespace as a prefix name, and
+ * never when it serves an IRI.
  *
  * A property is not a `Node`, so no dispatcher renders it: a lens spreads
  * `...OntologyPropertyRow_node` where it selects the property.
@@ -64,7 +67,7 @@ export default function OntologyPropertyRow({
   const data = useFragment(nodeFragment, node);
   const href = useHome({ __typename: data.__typename, uri: data.uri });
   const LinkComponent = useProjectionLink();
-  const prefix = useForeignPrefix(data.uri);
+  const prefix = useForeignPrefix({ namespace: data.namespace });
   return (
     <EntityRow
       {...props}

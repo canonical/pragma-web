@@ -67,6 +67,7 @@ export const MOCK_ONTOLOGY_CLASS = {
 export const MOCK_ONTOLOGY_PROPERTY = {
   __typename: "OntologyProperty",
   uri: "https://ds.canonical.com/modifier",
+  namespace: "ds",
   label: "Modifier",
   kind: "OBJECT",
   range: "ds:Modifier",
