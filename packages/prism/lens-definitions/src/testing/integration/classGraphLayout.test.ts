@@ -50,13 +50,12 @@ describe("the class graph of the real ontology", () => {
     // The 32px channels would lift the fit a little but nest three arcs
     // past them, so the 48px channels stay.
     expect(layout.channel).toBe(48);
-    // The widest legible window that cuts no box on two sides ends half a
-    // lattice step past the ds region's second column, and its bottom edge
-    // falls half a step above Tag Category, in the gap before it: one
-    // ending past the third column would cut Anonymous Node in its corner.
-    expect(layout.view).toMatchObject({ x: -16, y: -16, h: 488 });
-    expect(layout.view.w).toBeCloseTo(
-      (488 * DESIGN_CANVAS.w) / DESIGN_CANVAS.h,
+    // The boxes lead: the window shows the first shelf, the ds region,
+    // from its left edge, as many of its boxes whole as fit at the legible
+    // zoom and none of them cut, and ends half a lattice step past a box.
+    expect(layout.view).toMatchObject({ x: -16, y: -16, w: 552 });
+    expect(layout.view.h).toBeCloseTo(
+      (552 * DESIGN_CANVAS.h) / DESIGN_CANVAS.w,
       10,
     );
     const zoom = Math.min(
@@ -64,18 +63,24 @@ describe("the class graph of the real ontology", () => {
       DESIGN_CANVAS.h / layout.view.h,
     );
     expect(zoom).toBeGreaterThanOrEqual(MIN_FIT);
-    expect(zoom).toBeCloseTo(1.5943, 4);
+    expect(zoom).toBeCloseTo(1.0688, 4);
+    const ds = requireDefined(
+      layout.regions.find((region) => region.prefix === "ds"),
+      "the ds region",
+    );
+    expect(ds.y).toBe(Math.min(...layout.regions.map((region) => region.y)));
     const right = layout.view.x + layout.view.w;
     const bottom = layout.view.y + layout.view.h;
-    const inView = [...layout.nodes.values()].filter(
-      (node) => node.x < right && node.y < bottom,
+    const shelf = [...layout.nodes.values()].filter(
+      (node) => node.region === "ds",
     );
+    const inView = shelf.filter((node) => node.x < right && node.y < bottom);
     expect(
       inView.filter(
         (node) => node.x + node.w > right || node.y + node.h > bottom,
       ),
     ).toEqual([]);
-    expect(inView).toHaveLength(10);
+    expect(inView).toHaveLength(14);
   });
 
   it("covers the canvas densely, with no holes", () => {

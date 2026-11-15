@@ -21,6 +21,7 @@
  */
 import {
   launchBrowser,
+  STRIP_VIEWPORTS,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
@@ -207,6 +208,59 @@ function measureExplorer({
     drawn: shown.length,
     rangeLefts,
   };
+}
+
+/** A box of the overview's first shelf, and how the viewport shows it. */
+interface ShelfBox {
+  readonly id: string;
+  /** Whether it lies wholly in the viewport. */
+  readonly whole: boolean;
+  /** Whether any part of it lies in the viewport. */
+  readonly met: boolean;
+}
+
+/**
+ * Measure the overview's first shelf in the page: the boxes whose tops lie
+ * above the bottom of the topmost region, grown by every region that
+ * starts above it, from the left, each whole in the canvas's viewport,
+ * partly in it, or out of it, to within the tolerance of sub-pixel
+ * rounding.
+ */
+function measureFirstShelf(tolerance: number): ShelfBox[] {
+  const svg = document.querySelector(".ds.graph-canvas .viewport");
+  const viewport = svg?.getBoundingClientRect();
+  if (svg === null || viewport === undefined) return [];
+  const read = (element: Element, name: string): number =>
+    Number(element.getAttribute(`data-${name}`));
+  const regions = [...svg.querySelectorAll("g.region")]
+    .map((region) => ({ y: read(region, "y"), h: read(region, "h") }))
+    .sort((a, b) => a.y - b.y);
+  let bottom = Number.NEGATIVE_INFINITY;
+  for (const region of regions) {
+    if (bottom !== Number.NEGATIVE_INFINITY && region.y >= bottom) break;
+    bottom = Math.max(bottom, region.y + region.h);
+  }
+  return [...svg.querySelectorAll(".node:not(.is-hidden)")]
+    .filter((node) => read(node, "y") < bottom)
+    .sort((a, b) => read(a, "x") - read(b, "x"))
+    .map((node) => {
+      const box = (
+        node.querySelector(".surface") ?? node
+      ).getBoundingClientRect();
+      return {
+        id: node.getAttribute("data-id") ?? "",
+        whole:
+          box.left >= viewport.left - tolerance &&
+          box.right <= viewport.right + tolerance &&
+          box.top >= viewport.top - tolerance &&
+          box.bottom <= viewport.bottom + tolerance,
+        met:
+          box.left < viewport.right - tolerance &&
+          box.right > viewport.left + tolerance &&
+          box.top < viewport.bottom - tolerance &&
+          box.bottom > viewport.top + tolerance,
+      };
+    });
 }
 
 /**
@@ -437,5 +491,33 @@ describe("at 1440 px", () => {
     for (const left of measure.rangeLefts) {
       expect(Math.abs(left - first)).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
     }
+  });
+});
+
+describe("at 912 px, on a canvas narrower than the drawing", () => {
+  const tablet = STRIP_VIEWPORTS.find((viewport) => viewport.name === "912");
+
+  it("opens on the first shelf's boxes from the left, whole and legible, and no part of the next", async () => {
+    if (tablet === undefined) throw new Error("no 912 viewport");
+    const view: { shelf?: ShelfBox[] } = {};
+    const { errors, measure } = await openExplorer(
+      "/definitions",
+      tablet,
+      async (page) => {
+        view.shelf = await page.evaluate(measureFirstShelf, WIDTH_TOLERANCE_PX);
+      },
+    );
+    expect(errors).toEqual([]);
+    // The boxes lead: surface and ds, each drawn as one box, fit whole at
+    // a legible zoom on this canvas; the dt stub after them does not, and
+    // no part of it shows.
+    expect(view.shelf?.map(({ id, whole }) => [id, whole])).toEqual([
+      ["surface", true],
+      ["ds", true],
+      ["dt:TokenSymbol", false],
+    ]);
+    expect(view.shelf?.every(({ whole, met }) => whole || !met)).toBe(true);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    expect(measure.unlabelled).toBe(0);
   });
 });

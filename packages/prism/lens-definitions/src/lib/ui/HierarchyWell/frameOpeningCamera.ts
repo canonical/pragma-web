@@ -1,12 +1,13 @@
 import type { GraphBox, GraphTransform, Rect } from "@canonical/prism-core";
-import frameLegibleWindow from "../../classGraph/frameLegibleWindow.js";
+import frameOpeningWindow from "../../classGraph/frameOpeningWindow.js";
 import type { ClassGraphLayout } from "../../classGraph/types.js";
 
 /**
  * Compute the camera the canvas opens on once the client has measured it:
  * the window the canvas's real size calls for (the whole graph when it
- * fits there at a legible zoom, else a legible window whose edges cut
- * through no box, around the class selected on arrival), flush with the
+ * fits there at a legible zoom, else a legible window around the class
+ * selected on arrival, or showing the first shelf's boxes from the left,
+ * none of them cut), flush with the
  * viewport's top-left corner. A canvas the size of the design canvas finds
  * the server's own window, at or next to the identity.
  *
@@ -23,7 +24,7 @@ export default function frameOpeningCamera(
   scale: number,
 ): GraphTransform {
   const canvas = { w: visible.width * scale, h: visible.height * scale };
-  const window = frameLegibleWindow(layout, canvas, { arrival: selected });
+  const window = frameOpeningWindow(layout, canvas, selected);
   const k = Math.min(canvas.w / window.w, canvas.h / window.h) / scale;
   return { k, x: visible.x - k * window.x, y: visible.y - k * window.y };
 }

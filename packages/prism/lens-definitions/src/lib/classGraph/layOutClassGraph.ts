@@ -37,7 +37,7 @@ import {
   SWEEPS,
   VIEW_MARGIN,
 } from "./constants.js";
-import frameLegibleWindow from "./frameLegibleWindow.js";
+import frameOpeningWindow from "./frameOpeningWindow.js";
 import gatherDrawnInput from "./gatherDrawnInput.js";
 import layOutPhoneView from "./layOutPhoneView.js";
 import listRegionBridges from "./listRegionBridges.js";
@@ -752,7 +752,7 @@ function layOutModel(
   );
   // A graph that fits only below the legible zoom opens on a legible
   // window of it, so no first paint drops the labels.
-  const view = frameLegibleWindow(
+  const view = frameOpeningWindow(
     { nodes: orderedNodes, regions, viewBox },
     DESIGN_CANVAS,
   );
