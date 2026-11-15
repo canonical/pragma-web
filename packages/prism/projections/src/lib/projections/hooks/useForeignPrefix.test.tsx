@@ -51,6 +51,19 @@ describe("useForeignPrefix", () => {
     ).toBeUndefined();
   });
 
+  it("shows every prefix under a page that declares none inside a site's namespace", () => {
+    const { result } = renderHook(() => useForeignPrefix("ds:x"), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AmbientNamespaceProvider namespace="ds">
+          <AmbientNamespaceProvider namespace={null}>
+            {children}
+          </AmbientNamespaceProvider>
+        </AmbientNamespaceProvider>
+      ),
+    });
+    expect(result.current).toBe("ds:");
+  });
+
   it("reads the nearest page's namespace", () => {
     const { result } = renderHook(() => useForeignPrefix("cs:x"), {
       wrapper: ({ children }: { children: ReactNode }) => (

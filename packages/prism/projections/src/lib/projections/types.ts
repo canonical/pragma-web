@@ -95,9 +95,11 @@ export interface ProjectionsContextValue {
 export interface AmbientNamespaceProviderProps {
   /**
    * The prefix of the page's namespace as its CURIEs write it, without its
-   * colon: `ds` for a page of `ds:` entities.
+   * colon: `ds` for a page of `ds:` entities; or `null` for pages that list
+   * the nodes of several namespaces, which declare none, so that every
+   * prefix shows on them whatever a farther provider declares.
    */
-  readonly namespace: string;
+  readonly namespace: string | null;
   /** The content whose identities read it. */
   readonly children: ReactNode;
 }

@@ -9,7 +9,7 @@ import type { ForeignPrefixSource, UseForeignPrefixResult } from "./types.js";
  * with its colon (`cs:`) when that namespace differs from the page's
  * ambient one, which the nearest `AmbientNamespaceProvider` declares, and
  * nothing when it is the same (heuristic 4.3). Where no page declares
- * one, every prefix shows.
+ * one, or the nearest declares none, every prefix shows.
  *
  * It takes the node's compact address, `_meta.curie`, whose prefix it
  * reads: an address that did not compact has none to show. An entity

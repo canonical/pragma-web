@@ -33,7 +33,7 @@ function PrefixProbe(): ReactElement {
 }
 
 describe("ComponentsLayout", () => {
-  it("declares `ds` as its pages' ambient namespace", () => {
+  it("declares no namespace of its own: its pages are of the shell's", () => {
     render(
       createSiteTree(
         createMockEnvironment(),
@@ -43,7 +43,7 @@ describe("ComponentsLayout", () => {
         "/components",
       ),
     );
-    expect(screen.getByTestId("own")).toHaveTextContent("none");
+    expect(screen.getByTestId("own")).toHaveTextContent("ds:");
     expect(screen.getByTestId("foreign")).toHaveTextContent("cs:");
   });
 

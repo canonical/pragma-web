@@ -6,7 +6,10 @@ import {
   RouterLink,
   StoredThemeProvider,
 } from "@canonical/prism-core";
-import { ProjectionLinkProvider } from "@canonical/prism-projections";
+import {
+  AmbientNamespaceProvider,
+  ProjectionLinkProvider,
+} from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
@@ -17,7 +20,7 @@ import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
 import { DocsPeek } from "../DocsPeek/index.js";
 import { SiteRenderers } from "../SiteRenderers/index.js";
-import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
+import { AMBIENT_NAMESPACE, GRID_PRESET_CLASS_NAMES } from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
 
@@ -38,7 +41,9 @@ const renderPeek = (uri: string): ReactElement => <DocsPeek uri={uri} />;
  * as on the client. Inside the
  * router sit the site's homes and the projection link provider, so every mention of
  * a graph node renders through its type's arm and links to the page that
- * owns it, through the router so the link navigates on the client.
+ * owns it, through the router so the link navigates on the client, and
+ * the site's home namespace, `ds`, declared once: a design-system identity
+ * shows no prefix on any page whose lens declares no other.
  *
  * The root carries the `grid intrinsic` presets of `@canonical/styles` and
  * is the one query container, named `shell`: one viewport-high row that
@@ -77,25 +82,27 @@ export default function Shell<
                 LinkComponent={RouterLink}
                 peek={renderPeek}
               >
-                <SiteRenderers>
-                  <div
-                    {...props}
-                    className={[
-                      componentCssClassName,
-                      ...GRID_PRESET_CLASS_NAMES,
-                      className,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <Outlet
-                      fallback={
-                        <p className="loading">{MESSAGES["shell.loading"]}</p>
-                      }
-                    />
-                    <CommandPalette />
-                  </div>
-                </SiteRenderers>
+                <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
+                  <SiteRenderers>
+                    <div
+                      {...props}
+                      className={[
+                        componentCssClassName,
+                        ...GRID_PRESET_CLASS_NAMES,
+                        className,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <Outlet
+                        fallback={
+                          <p className="loading">{MESSAGES["shell.loading"]}</p>
+                        }
+                      />
+                      <CommandPalette />
+                    </div>
+                  </SiteRenderers>
+                </AmbientNamespaceProvider>
               </ProjectionLinkProvider>
             </HomesProvider>
           </RouterProvider>

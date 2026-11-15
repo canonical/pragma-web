@@ -3,6 +3,7 @@
 import { createEnvironment, useHome } from "@canonical/prism-core";
 import {
   ChipProjection,
+  useForeignPrefix,
   useProjectionPeek,
 } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
@@ -46,6 +47,8 @@ function Probe(): ReactElement {
   const peek = useProjectionPeek(
     "https://ds.canonical.com/global.component.button",
   );
+  const ownPrefix = useForeignPrefix("ds:global.component.button");
+  const foreignPrefix = useForeignPrefix("cs:react.component.props");
   return (
     <section>
       <Head title="Probe" />
@@ -56,6 +59,8 @@ function Probe(): ReactElement {
         Peek:{" "}
         {isValidElement(peek) && peek.type === DocsPeek ? "DocsPeek" : "other"}
       </p>
+      <p>Own prefix: {ownPrefix ?? "none"}</p>
+      <p>Foreign prefix: {foreignPrefix ?? "none"}</p>
     </section>
   );
 }
@@ -79,6 +84,12 @@ const renderShell = () =>
   );
 
 describe("Shell", () => {
+  it("declares `ds` as the site's home namespace", async () => {
+    renderShell();
+    expect(await screen.findByText("Own prefix: none")).toBeInTheDocument();
+    expect(screen.getByText("Foreign prefix: cs:")).toBeInTheDocument();
+  });
+
   it("renders exactly one intrinsic grid, its own root", async () => {
     const { container } = renderShell();
     await screen.findByRole("heading", { name: "Probe content" });
