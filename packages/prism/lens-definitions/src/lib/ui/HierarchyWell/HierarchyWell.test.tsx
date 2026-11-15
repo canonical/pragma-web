@@ -627,6 +627,61 @@ describe("over a layout whose rail opens on a box", () => {
     expect(container.querySelector(".desktop")).not.toBe(opened);
   });
 
+  it("clears the kept camera before the new canvas resumes it, in a layout effect", () => {
+    // The canvas measures, so its passive effect reads the memory on mount:
+    // a clear in the well's own passive effect would come after it, and the
+    // new canvas would resume the old view's camera.
+    vi.stubGlobal(
+      "matchMedia",
+      (query: string) =>
+        ({ matches: true, media: query }) as unknown as MediaQueryList,
+    );
+    vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
+      width: 800,
+      height: 600,
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 600,
+      toJSON: () => ({}),
+    });
+    try {
+      const drilled = layOutClassGraph(input, {
+        budget: createGraphBudget({ drawnNodesMax: 2 }),
+        drill: "aa",
+      });
+      const draw = (shown: typeof boxed, memory?: { current: unknown }) =>
+        createRouterHarness(
+          <HierarchyWell
+            cameraMemory={memory as HierarchyWellProps["cameraMemory"]}
+            filter={createAllNamespacesFilter(["aa", "zz"])}
+            hoverCentre={undefined}
+            layout={shown}
+            onHoverTerm={vi.fn()}
+            term={undefined}
+            terms={boxedTerms}
+          />,
+        );
+      const camera = (container: HTMLElement) =>
+        container.querySelector(".desktop .camera")?.getAttribute("transform");
+      const fresh = render(draw(drilled));
+      const opens = camera(fresh.container);
+      fresh.unmount();
+      const memory = {
+        current: { camera: { k: 3, x: 70, y: 90 }, moved: true } as unknown,
+      };
+      const { container, rerender } = render(draw(boxed, memory));
+      memory.current = { camera: { k: 3, x: 70, y: 90 }, moved: true };
+      rerender(draw(drilled, memory));
+      expect(camera(container)).toBe(opens);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
+  });
+
   it("frames the class selected when a term page's drill moves, as loading its address does", () => {
     const four = createClassGraphSetup(FOUR_NAMESPACE_GRAPH);
     const firstOf = (prefix: string): string =>
