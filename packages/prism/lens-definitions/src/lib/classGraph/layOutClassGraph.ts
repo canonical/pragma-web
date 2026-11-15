@@ -9,6 +9,7 @@ import {
   layoutLayered,
   measurePathBounds,
   measureRegionLabelWidth,
+  orderBy,
   type PathCommand,
   REGION_LABEL_ROW,
   type RegionLayout,
@@ -21,6 +22,9 @@ import {
 import buildClassGraphModel from "./buildClassGraphModel.js";
 import {
   ALIGNMENT_SEARCH_LIMIT,
+  BRIDGE_CHANNEL_ROOM,
+  BRIDGE_GAP_ROOM,
+  BRIDGE_LANE,
   CHANNEL,
   CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
@@ -126,6 +130,17 @@ function packRegions(
     packing: packShelves(regions),
     crowded: regions.some((region) => region.layout.crowdedArcs > 0),
   };
+}
+
+/**
+ * Offset a lane among `count` lanes spread about a run's middle within
+ * `room` px: at most `BRIDGE_LANE` apart, an even number of px so every
+ * offset is whole, and 0 for a lone lane.
+ */
+function offsetLane(index: number, count: number, room: number): number {
+  if (count === 1) return 0;
+  const step = Math.min(BRIDGE_LANE, 2 * Math.floor(room / (count - 1) / 2));
+  return (index - (count - 1) / 2) * step;
 }
 
 /** Where a region sits: its top-left corner and its shelf's top. */
@@ -471,32 +486,54 @@ export default function layOutClassGraph(
   const nodeOf = (id: string) => requireEntry(placedNodes, id);
 
   // Cross-region routes: orthogonal, through the gaps between regions.
+  // Bridges between the same two regions each run in a lane of their own
+  // through the channels and the gap they share, numbered by their ports
+  // where they leave the first region, so none is drawn over another.
   const shelfTops = [
     ...new Set([...placed.values()].map((place) => place.shelfY)),
   ].sort((a, b) => a - b);
   const shelfIndexOf = (prefix: string): number =>
     shelfTops.indexOf(originOf(prefix).shelfY);
+  const crossBundles = model.bundles.filter((candidate) => candidate.cross);
+  const portOf = (bundle: Bundle, end: string): number =>
+    requireEntry(
+      regionOf(nodeOf(end).region).layout.ports,
+      `${bundle.id} ${end}`,
+    ) + originOf(nodeOf(end).region).oy;
+  const pairOf = (bundle: Bundle): string =>
+    `${nodeOf(bundle.a).region} ${nodeOf(bundle.b).region}`;
+  const lanes = new Map<string, { index: number; count: number }>();
+  for (const pair of new Set(crossBundles.map(pairOf))) {
+    const group = crossBundles
+      .filter((bundle) => pairOf(bundle) === pair)
+      .sort((x, y) =>
+        orderBy(portOf(x, x.a) - portOf(y, y.a), compareText(x.id, y.id)),
+      );
+    group.forEach((bundle, index) => {
+      lanes.set(bundle.id, { index, count: group.length });
+    });
+  }
+  const signs = new Map<string, number>();
   const crossEdges: LaidOutEdge[] = [];
-  for (const bundle of model.bundles.filter((candidate) => candidate.cross)) {
+  for (const bundle of crossBundles) {
     const a = nodeOf(bundle.a);
     const b = nodeOf(bundle.b);
     const fromRegion = regionOf(a.region);
     const toRegion = regionOf(b.region);
-    const portA =
-      requireEntry(fromRegion.layout.ports, `${bundle.id} ${bundle.a}`) +
-      originOf(a.region).oy;
-    const portB =
-      requireEntry(toRegion.layout.ports, `${bundle.id} ${bundle.b}`) +
-      originOf(b.region).oy;
+    const portA = portOf(bundle, bundle.a);
+    const portB = portOf(bundle, bundle.b);
     const sideA = requireEntry(crossPorts, `${bundle.id} ${bundle.a}`).side;
     const sideB = requireEntry(crossPorts, `${bundle.id} ${bundle.b}`).side;
-    // The channel beside a box's column on one side: past a subclass bus
-    // on the right, before the next column's boxes, or the region's margin
-    // left of its first column.
+    const { index, count } = requireEntry(lanes, bundle.id);
+    const laneIn = (room: number): number => offsetLane(index, count, room);
+    // The channel beside a box's column on one side, at the bridge's lane:
+    // past a subclass bus on the right, before the next column's boxes, or
+    // the region's margin left of its first column.
     const channelOf = (
       node: Omit<LaidOutNode, "nav">,
       region: SizedRegion,
       side: "left" | "right",
+      sign: number,
     ): number => {
       const { ox, x } = originOf(node.region);
       const col = region.layout.columnOf(node.uri);
@@ -505,35 +542,47 @@ export default function layOutClassGraph(
           ox +
           requireAt(region.layout.columnX, col) +
           requireAt(region.layout.columnWidth, col) +
-          CROSS_CHANNEL_OFFSET
+          CROSS_CHANNEL_OFFSET +
+          sign * laneIn(BRIDGE_CHANNEL_ROOM)
         );
       }
       return col === 0
-        ? x - SHELF_GAP / 2
+        ? x - SHELF_GAP / 2 + sign * laneIn(BRIDGE_GAP_ROOM)
         : ox +
             requireAt(region.layout.columnX, col - 1) +
             requireAt(region.layout.columnWidth, col - 1) +
-            CROSS_CHANNEL_OFFSET;
+            CROSS_CHANNEL_OFFSET +
+            sign * laneIn(BRIDGE_CHANNEL_ROOM);
     };
     const startX = sideA === "right" ? a.x + a.w : a.x;
     const endX = sideB === "right" ? b.x + b.w : b.x;
-    const exitX = channelOf(a, fromRegion, sideA);
-    const fromGap = originOf(a.region).shelfY - SHELF_GAP / 2;
-    const toGap = originOf(b.region).shelfY - SHELF_GAP / 2;
-    const entryX = channelOf(b, toRegion, sideB);
+    const gapLane = laneIn(BRIDGE_GAP_ROOM);
+    const fromGap = originOf(a.region).shelfY - SHELF_GAP / 2 + gapLane;
+    const toGap = originOf(b.region).shelfY - SHELF_GAP / 2 + gapLane;
     // The gap that joins the two shelves: the one above a shared shelf or
     // above the lower of two adjacent ones. Only shelves further apart go
     // round the packing's left margin.
     const step = shelfIndexOf(b.region) - shelfIndexOf(a.region);
     const joiningGap =
       step === 1 ? toGap : step === 0 || step === -1 ? fromGap : undefined;
+    // Which way the channels' lanes are numbered: towards the box for a
+    // route that runs up from its port, away from it for one that runs
+    // down, so the lanes nest instead of crossing. One way for every
+    // bridge of a pair, at both ends, so no two of them meet in a channel
+    // one leaves by and another enters by.
+    const turn =
+      (sideA === "left" ? -1 : 1) * ((joiningGap ?? fromGap) < portA ? 1 : -1);
+    const sign = signs.get(pairOf(bundle)) ?? turn;
+    signs.set(pairOf(bundle), sign);
+    const exitX = channelOf(a, fromRegion, sideA, sign);
+    const entryX = channelOf(b, toRegion, sideB, sign);
     const commands: PathCommand[] = [
       ["M", startX, portA],
       ["H", exitX],
       ...(joiningGap === undefined
         ? ([
             ["V", fromGap],
-            ["H", -SHELF_GAP / 2],
+            ["H", -SHELF_GAP / 2 + gapLane],
             ["V", toGap],
           ] as PathCommand[])
         : ([["V", joiningGap]] as PathCommand[])),
@@ -558,6 +607,11 @@ export default function layOutClassGraph(
       region: a.region,
     });
   }
+  // A dashed bridge, which no statement instantiates, is drawn after the
+  // solid ones, so where it crosses one it is never under it.
+  crossEdges.sort(
+    (x, y) => Number(x.bundle?.weight === 0) - Number(y.bundle?.weight === 0),
+  );
   for (const join of model.joins) {
     const target = nodeOf(join.target);
     const joined = originOf(join.prefix);

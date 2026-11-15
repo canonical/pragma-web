@@ -8,6 +8,7 @@ import {
 } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
 import {
+  BRIDGE_TRIO_GRAPH,
   CROSS_REGION_GRAPH,
   defineClass,
   NARROWING_GRAPH,
@@ -22,6 +23,7 @@ import {
   followsRailOrder,
   measurePhone,
 } from "../../../testing/measureClassGraph.js";
+import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import { DESIGN_CANVAS, MIN_FIT, PHONE, SHELF_GAP } from "./constants.js";
 import layOutClassGraph from "./layOutClassGraph.js";
@@ -324,6 +326,61 @@ describe("layOutClassGraph", () => {
     );
     expect(JSON.stringify(reordered.edges)).toBe(JSON.stringify(layout.edges));
   });
+
+  it.each([
+    ["the metro's records", metroGraph],
+    ["three bridges, one with no statements", BRIDGE_TRIO_GRAPH],
+  ])(
+    "runs no two bridges of %s along one line, and draws a dashed one last",
+    (_, graph) => {
+      const layout = layOutClassGraph(graph);
+      const bridges = layout.edges.filter((edge) => edge.bridge === true);
+      expect(bridges.length).toBeGreaterThanOrEqual(3);
+      const runsOf = (d: string) =>
+        parsePathData(d)
+          .flatMap(({ segments }) => segments)
+          .flatMap(({ points: [from, to] }) =>
+            from === undefined || to === undefined ? [] : [{ from, to }],
+          );
+      // Two stretches share a line when they lie on one horizontal or one
+      // vertical and their extents overlap by more than a point.
+      const share = (
+        p: { from: readonly number[]; to: readonly number[] },
+        q: { from: readonly number[]; to: readonly number[] },
+      ): boolean =>
+        [0, 1].some((axis) => {
+          const other = 1 - axis;
+          const onOne =
+            p.from[other] === p.to[other] &&
+            q.from[other] === q.to[other] &&
+            p.from[other] === q.from[other];
+          const [pLow, pHigh] = [p.from[axis] ?? 0, p.to[axis] ?? 0].sort(
+            (a, b) => a - b,
+          );
+          const [qLow, qHigh] = [q.from[axis] ?? 0, q.to[axis] ?? 0].sort(
+            (a, b) => a - b,
+          );
+          return (
+            onOne &&
+            Math.min(pHigh ?? 0, qHigh ?? 0) > Math.max(pLow ?? 0, qLow ?? 0)
+          );
+        });
+      for (const bridge of bridges) {
+        for (const other of bridges.filter((edge) => edge !== bridge)) {
+          for (const run of runsOf(bridge.d)) {
+            expect(runsOf(other.d).some((theirs) => share(run, theirs))).toBe(
+              false,
+            );
+          }
+        }
+      }
+      const dashed = bridges.findIndex((edge) => edge.bundle?.weight === 0);
+      expect(dashed).toBeGreaterThan(-1);
+      expect(
+        bridges.slice(dashed).every((edge) => edge.bundle?.weight === 0),
+      ).toBe(true);
+    },
+  );
 
   it("packs a bridged region next to its partner, and routes round the margin only past a shelf", () => {
     // Three chains each too wide to share a shelf, so each takes its own.

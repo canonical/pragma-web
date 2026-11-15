@@ -353,7 +353,20 @@ export interface BridgeLabel {
   readonly text: string;
   /** The label's box with its halo. */
   readonly box: Rect;
-  /** The label's centre: on the route's longest clear horizontal run. */
+  /**
+   * The label's centre: on or beside a stretch of route only its bridge
+   * runs on, as near its arrowhead as it fits.
+   */
   readonly cx: number;
   readonly cy: number;
+}
+
+/**
+ * The bridges' labels at rest: those placed, and the bridges whose label
+ * finds no clear place, which the focus's labels name instead.
+ */
+export interface BridgeLabelPlacement {
+  readonly placed: readonly BridgeLabel[];
+  /** The edge ids of the bridges left without a label at rest. */
+  readonly omitted: readonly string[];
 }

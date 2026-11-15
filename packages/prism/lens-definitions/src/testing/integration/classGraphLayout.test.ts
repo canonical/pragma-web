@@ -223,16 +223,16 @@ describe("the class graph of the metro ontology", () => {
       edgesThroughBoxes: [],
       textOverlaps: 0,
     });
-    expect(countCrossings(metro).total).toBe(6);
+    expect(countCrossings(metro).total).toBe(10);
     expect(
       countCrossings(layOutClassGraph(metroGraph, { sweeps: 0 })).total,
-    ).toBe(7);
+    ).toBe(12);
     expect(followsRailOrder(metro)).toBe(true);
   });
 
   it("routes a relation between its shelves through the gap between them", () => {
     const crossing = metro.edges.filter((edge) => edge.bundle?.cross === true);
-    expect(crossing).toHaveLength(2);
+    expect(crossing).toHaveLength(3);
     for (const edge of crossing) {
       expect(measurePathBounds(edge.d).x).toBeGreaterThanOrEqual(0);
     }

@@ -272,7 +272,20 @@ describe("ClassGraph", () => {
 
   it("draws a bridge in the strong line, its label at rest at a prefix's size", () => {
     const bridges = metro.layout.edges.filter((edge) => edge.bridge === true);
-    expect(bridges).toHaveLength(2);
+    // As many bridges as the records hold relations between two prefixes,
+    // the one with no statements among them.
+    const prefixOf = new Map(
+      metroGraph.classes.map((klass) => [klass.uri, klass.prefix]),
+    );
+    const served = metroGraph.relations.filter(
+      ({ domain, range }) =>
+        domain !== null &&
+        range !== null &&
+        prefixOf.get(domain) !== prefixOf.get(range),
+    );
+    expect(served).toHaveLength(3);
+    expect(served.filter((relation) => relation.count === 0)).toHaveLength(1);
+    expect(bridges).toHaveLength(served.length);
     const container = draw({ layout: metro.layout, terms: metro.terms });
     for (const edge of bridges) {
       const group = container.querySelector(`[data-edge="${edge.id}"]`);

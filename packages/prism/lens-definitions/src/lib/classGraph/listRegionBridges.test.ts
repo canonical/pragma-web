@@ -7,7 +7,7 @@ import listRegionBridges from "./listRegionBridges.js";
 describe("listRegionBridges", () => {
   it("counts the relations crossing between each pair of regions", () => {
     expect(listRegionBridges(buildClassGraphModel(metroGraph))).toEqual([
-      { a: "geo", b: "metro", relations: 2 },
+      { a: "geo", b: "metro", relations: 3 },
     ]);
   });
 

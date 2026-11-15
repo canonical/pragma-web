@@ -305,3 +305,56 @@ export const STACKED_PAIR_GRAPH: ClassGraphInput = {
     },
   ],
 };
+
+/**
+ * Three regions of three classes each, two of them in a subclass chain,
+ * and three bridges: two between the same two regions, one of those with
+ * no statements and the other bundling two relations of one name, and one
+ * on to the third region.
+ */
+export const BRIDGE_TRIO_GRAPH: ClassGraphInput = {
+  classes: ["aa", "bb", "cc"].flatMap((prefix) =>
+    ["0", "1", "2"].map((label) =>
+      defineClass(`${prefix}:${label}`, `${prefix} ${label}`, {
+        ...(label === "2" ? { superclass: `${prefix}:1` } : {}),
+      }),
+    ),
+  ),
+  relations: [
+    {
+      uri: "aa:holds",
+      label: "holds",
+      domain: "aa:0",
+      range: "bb:0",
+      count: 3,
+    },
+    {
+      uri: "bb:holds",
+      label: "holds",
+      domain: "bb:0",
+      range: "aa:0",
+      count: 1,
+    },
+    {
+      uri: "aa:lacks",
+      label: "lacks",
+      domain: "aa:1",
+      range: "bb:2",
+      count: 0,
+    },
+    {
+      uri: "bb:feeds",
+      label: "feeds",
+      domain: "bb:1",
+      range: "cc:0",
+      count: 12,
+    },
+    {
+      uri: "cc:loops",
+      label: "loops",
+      domain: "cc:0",
+      range: "cc:1",
+      count: 2,
+    },
+  ],
+};

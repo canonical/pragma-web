@@ -68,7 +68,7 @@ export default function layOutSpecimen(
     })),
     ...edges.flatMap((edge) => [edge.d, ...edge.heads].map(measurePathBounds)),
     // A bridge's label, drawn at rest, as the canvas places it.
-    ...placeBridgeLabels(layout, t).map((label) => label.box),
+    ...placeBridgeLabels(layout, t).placed.map((label) => label.box),
   ]);
   return {
     layout,

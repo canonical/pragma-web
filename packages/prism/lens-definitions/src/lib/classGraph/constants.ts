@@ -183,3 +183,32 @@ export const BRIDGE_LABEL_NAMES = 2;
 
 /** What a bridge's label joins the names of its relations with. */
 export const BRIDGE_LABEL_SEPARATOR = " · ";
+
+/**
+ * How far apart the lanes of bridges between the same two regions run, in
+ * px, where the gap or channel they share has room: each bridge keeps a
+ * stretch of route of its own, so no line is drawn over another.
+ */
+export const BRIDGE_LANE = 8;
+
+/**
+ * How much of a gap between regions, or of the margin left of a region's
+ * first column, the lanes of one pair of regions may spread over, in px:
+ * the gap less a lane's clearance from the boxes on either side.
+ */
+export const BRIDGE_GAP_ROOM = SHELF_GAP - 2 * BRIDGE_LANE;
+
+/**
+ * How much of a channel between two columns the lanes of one pair of
+ * regions may spread over, in px: the room either side of the channel's
+ * middle, short of the subclass bus before it and of the next column's
+ * boxes after it, in the narrower of the two channels the packer uses.
+ */
+export const BRIDGE_CHANNEL_ROOM =
+  2 * (CROSS_CHANNEL_OFFSET - BUS_OFFSET - BRIDGE_LANE / 2);
+
+/**
+ * How far a bridge's label slides along its route between the places it
+ * tries, in px, from the route's arrowhead back.
+ */
+export const BRIDGE_LABEL_STEP = 4;

@@ -269,7 +269,7 @@ export default function ClassGraph({
   // name it or the focus fades it.
   const bridgeLabels = useMemo(() => placeBridgeLabels(layout, t), [layout, t]);
   const focusLabelled = new Set(labels.placed.map((label) => label.edge));
-  const restingLabels = bridgeLabels.filter((label) => {
+  const restingLabels = bridgeLabels.placed.filter((label) => {
     const edge = requireDefined(
       layout.edges.find((candidate) => candidate.id === label.edge),
       "a bridge's edge",

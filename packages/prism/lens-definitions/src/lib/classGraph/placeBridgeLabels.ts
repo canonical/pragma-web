@@ -4,42 +4,76 @@ import {
   intersectsRect,
   LABEL_HALO,
   measureTextWidth,
-  orderBy,
   parsePathData,
   REGION_LABEL_ROW,
   type Rect,
   requireDefined,
+  requireEntry,
 } from "@canonical/prism-core";
 import type { Translate } from "../i18n/index.js";
 import {
   BRIDGE_LABEL_NAMES,
   BRIDGE_LABEL_SEPARATOR,
   BRIDGE_LABEL_SIZE,
+  BRIDGE_LABEL_STEP,
 } from "./constants.js";
-import type { BridgeLabel, ClassGraphLayout } from "./types.js";
+import type {
+  BridgeLabel,
+  BridgeLabelPlacement,
+  ClassGraphLayout,
+} from "./types.js";
+
+/** A straight stretch of a route, from one point to the next. */
+interface Run {
+  readonly from: readonly [number, number];
+  readonly to: readonly [number, number];
+}
+
+/**
+ * List the straight stretches of a bridge's path data, in route order: a
+ * bridge is drawn of straight lines only.
+ */
+function listRuns(d: string): Run[] {
+  return parsePathData(d)
+    .flatMap(({ segments }) => segments)
+    .map(({ points: [from, to] }) => ({
+      from: requireDefined(from, "a stretch's start"),
+      to: requireDefined(to, "a stretch's end"),
+    }));
+}
+
+/** Whether a stretch passes through a box or along its edge. */
+function touchesRun(box: Rect, { from, to }: Run): boolean {
+  return (
+    Math.min(from[0], to[0]) <= box.x + box.w &&
+    box.x <= Math.max(from[0], to[0]) &&
+    Math.min(from[1], to[1]) <= box.y + box.h &&
+    box.y <= Math.max(from[1], to[1])
+  );
+}
 
 /**
  * Place each bridge's label at rest: the names of its relations, or how
- * many there are past two, at a region prefix's size, centred on the
- * first place along its route that keeps it clear of every box, every
- * region's label row, the viewBox's edge and every label placed before
- * it: the middle of its longest horizontal run (the gap between two
- * shelves, or a channel), then of its shorter ones, then a quarter along
- * from either end of each, then the same along its vertical runs, then
- * each corner of the route in turn, then just above or below a
- * horizontal run, where two bridges share one. A bridge with no clear
- * place is left to the inspector. Bridges are placed by
- * edge id and every centre is rounded to a whole pixel, so the same
- * layout always gives the same labels.
+ * many there are past two, at a region prefix's size, on or beside a
+ * stretch of route that only its bridge runs on, as near its arrowhead as
+ * it fits. From the arrowhead back along the route, every few px, it tries
+ * the label centred on the route, then beside it (above and below a
+ * horizontal stretch, left and right of a vertical one), and keeps the
+ * first box clear of every box, every region's label row, the viewBox's
+ * edge, every label placed before it and every other bridge's route, so a
+ * reader can tell which line a label names. A bridge with no such place is
+ * omitted, for the focus's labels to name. Bridges are placed by edge id
+ * and every centre is a whole pixel, so the same layout always gives the
+ * same labels.
  *
  * @param layout - The class graph laid out.
  * @param t - The translator, for how "‹n› relations" reads.
- * @returns The labels placed, by edge id.
+ * @returns The labels placed, by edge id, and the bridges omitted.
  */
 export default function placeBridgeLabels(
   layout: ClassGraphLayout,
   t: Translate,
-): readonly BridgeLabel[] {
+): BridgeLabelPlacement {
   const obstacles: readonly Rect[] = [
     ...[...layout.nodes.values()].map((node) => ({
       x: node.x - COLLISION_MARGIN,
@@ -55,12 +89,15 @@ export default function placeBridgeLabels(
     })),
   ];
   const { viewBox } = layout;
-  const placed: BridgeLabel[] = [];
   const bridges = layout.edges
     .filter((edge) => edge.bridge === true)
     .sort((a, b) => compareText(a.id, b.id));
+  const routes = new Map(bridges.map((edge) => [edge.id, listRuns(edge.d)]));
+  const placed: BridgeLabel[] = [];
+  const omitted: string[] = [];
   for (const edge of bridges) {
-    const { relations } = requireDefined(edge.bundle, "a bridge's bundle");
+    const bundle = requireDefined(edge.bundle, "a bridge's bundle");
+    const { relations } = bundle;
     const text =
       relations.length > BRIDGE_LABEL_NAMES
         ? t("well.relations.count", { count: relations.length })
@@ -71,64 +108,46 @@ export default function placeBridgeLabels(
       Math.ceil(measureTextWidth(text, "regular", BRIDGE_LABEL_SIZE)) +
       2 * LABEL_HALO;
     const h = BRIDGE_LABEL_SIZE + 2 * LABEL_HALO;
-    // Where the label may sit: along the route's horizontal runs (their
-    // middles, longest first, then a quarter from either end), then its
-    // vertical runs alike, then its corners, in route order, then just
-    // beside its horizontal runs.
-    const segments = parsePathData(edge.d).flatMap(({ segments }) => segments);
-    const runsOf = (axis: 0 | 1) =>
-      segments
-        .flatMap((segment, index) => {
-          const [from, to] = segment.points;
-          return segment.kind === "line" &&
-            from !== undefined &&
-            to !== undefined &&
-            from[1 - axis] === to[1 - axis] &&
-            from[axis] !== to[axis]
+    const others = bridges
+      .filter((other) => other.id !== edge.id)
+      .flatMap((other) => requireEntry(routes, other.id));
+    // The route walked from its arrowhead: from its far end, unless its
+    // only head is at its start.
+    const route = requireEntry(routes, edge.id);
+    const walk = bundle.heads.has(bundle.b)
+      ? route.map(({ from, to }) => ({ from: to, to: from })).reverse()
+      : route;
+    // Every few px along each stretch: centred on it, then beside it, with
+    // the centre on whole pixels.
+    const candidates = walk.flatMap(({ from, to }) => {
+      const length = Math.abs(to[0] - from[0]) + Math.abs(to[1] - from[1]);
+      const across = from[1] === to[1];
+      return Array.from(
+        { length: Math.floor(length / BRIDGE_LABEL_STEP) + 1 },
+        (_, step) => {
+          const share = length === 0 ? 0 : (step * BRIDGE_LABEL_STEP) / length;
+          const x = Math.round(from[0] + (to[0] - from[0]) * share);
+          const y = Math.round(from[1] + (to[1] - from[1]) * share);
+          return across
             ? [
-                ...[2, 1, 3].map((quarter) => ({
-                  index,
-                  quarter,
-                  x: from[0] + ((to[0] - from[0]) * quarter) / 4,
-                  y: from[1] + ((to[1] - from[1]) * quarter) / 4,
-                  length: Math.abs(to[axis] - from[axis]),
-                })),
+                { cx: x, cy: y },
+                { cx: x, cy: y - Math.floor(h / 2) },
+                { cx: x, cy: y + Math.ceil(h / 2) },
               ]
-            : [];
-        })
-        .sort((a, b) =>
-          orderBy(
-            Number(a.quarter !== 2) - Number(b.quarter !== 2),
-            b.length - a.length,
-            a.index - b.index,
-            a.quarter - b.quarter,
-          ),
-        );
-    const corners = segments.flatMap((segment) =>
-      segment.points.slice(1).map(([x, y]) => ({ x, y })),
-    );
-    const across = runsOf(0);
-    const runs = [
-      ...across,
-      ...runsOf(1),
-      ...corners.slice(0, -1),
-      // Beside a horizontal run, above then below it, where another
-      // bridge's label already sits on a run they share.
-      ...across.flatMap(({ x, y }) => [
-        { x, y: y - h },
-        { x, y: y + h },
-      ]),
-    ];
-    const chosen = runs
-      .map(({ x, y }) => {
-        const cx = Math.round(x);
-        const cy = Math.round(y);
-        return {
-          cx,
-          cy,
-          box: { x: cx - Math.ceil(w / 2), y: cy - Math.ceil(h / 2), w, h },
-        };
-      })
+            : [
+                { cx: x, cy: y },
+                { cx: x - Math.floor(w / 2), cy: y },
+                { cx: x + Math.ceil(w / 2), cy: y },
+              ];
+        },
+      ).flat();
+    });
+    const chosen = candidates
+      .map(({ cx, cy }) => ({
+        cx,
+        cy,
+        box: { x: cx - Math.ceil(w / 2), y: cy - Math.ceil(h / 2), w, h },
+      }))
       .find(
         ({ box }) =>
           box.x >= viewBox.x &&
@@ -136,9 +155,11 @@ export default function placeBridgeLabels(
           box.x + box.w <= viewBox.x + viewBox.w &&
           box.y + box.h <= viewBox.y + viewBox.h &&
           !obstacles.some((obstacle) => intersectsRect(obstacle, box)) &&
-          !placed.some((label) => intersectsRect(label.box, box)),
+          !placed.some((label) => intersectsRect(label.box, box)) &&
+          !others.some((run) => touchesRun(box, run)),
       );
-    if (chosen !== undefined) placed.push({ edge: edge.id, text, ...chosen });
+    if (chosen === undefined) omitted.push(edge.id);
+    else placed.push({ edge: edge.id, text, ...chosen });
   }
-  return placed;
+  return { placed, omitted };
 }

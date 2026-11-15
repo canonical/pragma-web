@@ -1,7 +1,14 @@
 import { createTranslator } from "@canonical/i18n-core";
-import { intersectsRect } from "@canonical/prism-core";
+import {
+  intersectsRect,
+  parsePathData,
+  type Rect,
+} from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
-import { SHELF_PAIR_GRAPH } from "../../../testing/fixtures.js";
+import {
+  BRIDGE_TRIO_GRAPH,
+  SHELF_PAIR_GRAPH,
+} from "../../../testing/fixtures.js";
 import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import { MESSAGES } from "../i18n/index.js";
@@ -14,10 +21,26 @@ const t = createTranslator("en", MESSAGES);
 
 /** The bridges of a layout and the labels placed on them. */
 function placeOn(layout: ClassGraphLayout) {
+  const placement = placeBridgeLabels(layout, t);
   return {
     bridges: layout.edges.filter((edge) => edge.bridge === true),
-    labels: placeBridgeLabels(layout, t),
+    labels: placement.placed,
+    omitted: placement.omitted,
   };
+}
+
+/** Whether a route runs through a box or along its edge. */
+function touchesRoute(box: Rect, d: string): boolean {
+  return parsePathData(d)
+    .flatMap(({ segments }) => segments)
+    .some(({ points: [from, to] }) =>
+      from === undefined || to === undefined
+        ? false
+        : Math.min(from[0], to[0]) <= box.x + box.w &&
+          box.x <= Math.max(from[0], to[0]) &&
+          Math.min(from[1], to[1]) <= box.y + box.h &&
+          box.y <= Math.max(from[1], to[1]),
+    );
 }
 
 describe("placeBridgeLabels", () => {
@@ -28,14 +51,22 @@ describe("placeBridgeLabels", () => {
     ]);
   });
 
-  it("labels every bridge of the captured graphs clear of boxes and of each other", () => {
-    for (const graph of [ontologyGraph, metroGraph]) {
+  it("labels every bridge of the captured graphs clear of boxes and of each other, beside its own route", () => {
+    for (const graph of [ontologyGraph, metroGraph, BRIDGE_TRIO_GRAPH]) {
       const layout = layOutClassGraph(graph);
-      const { bridges, labels } = placeOn(layout);
+      const { bridges, labels, omitted } = placeOn(layout);
       expect(labels.map((label) => label.edge)).toEqual(
         bridges.map((edge) => edge.id).sort(),
       );
+      expect(omitted).toEqual([]);
       for (const label of labels) {
+        // It lies on or beside a stretch of its own bridge, and touches no
+        // other bridge's route, so a reader can tell which line it names.
+        for (const bridge of bridges) {
+          expect(touchesRoute(label.box, bridge.d)).toBe(
+            bridge.id === label.edge,
+          );
+        }
         for (const node of layout.nodes.values()) {
           expect(intersectsRect(label.box, node)).toBe(false);
         }
@@ -67,10 +98,19 @@ describe("placeBridgeLabels", () => {
     ]);
   });
 
-  it("leaves a bridge with no clear place to the inspector", () => {
+  it("records a bridge with no clear place, for the focus's labels to name", () => {
     const layout = layOutClassGraph(SHELF_PAIR_GRAPH);
     expect(
       placeBridgeLabels({ ...layout, viewBox: { x: 0, y: 0, w: 0, h: 0 } }, t),
-    ).toEqual([]);
+    ).toEqual({ placed: [], omitted: ["rel:aa:A0 bb:B0"] });
+  });
+
+  it("names the metro's bridges near their arrowheads", () => {
+    const { labels } = placeOn(layOutClassGraph(metroGraph));
+    expect(labels.map(({ text, box }) => [text, box.x, box.y])).toEqual([
+      ["location", 304, 365],
+      ["in zone", 384, 265],
+      ["stops", 91, 197],
+    ]);
   });
 });

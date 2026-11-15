@@ -22,7 +22,7 @@ const metroGraph: ClassGraphInput = {
       prefix: "metro",
       abstract: true,
       superclass: null,
-      instanceCount: 27,
+      instanceCount: 26,
       fields: 1,
     },
     {
@@ -31,7 +31,7 @@ const metroGraph: ClassGraphInput = {
       prefix: "metro",
       abstract: false,
       superclass: "https://metro.example/onto#Stop",
-      instanceCount: 27,
+      instanceCount: 26,
       fields: 3,
     },
     {
@@ -273,6 +273,13 @@ const metroGraph: ClassGraphInput = {
       domain: "https://metro.example/onto#Station",
       range: "https://geo.example/onto#Zone",
       count: 5,
+    },
+    {
+      uri: "https://geo.example/onto#stops",
+      label: "stops",
+      domain: "https://geo.example/onto#Zone",
+      range: "https://metro.example/onto#Stop",
+      count: 0,
     },
   ],
 };
