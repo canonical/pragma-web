@@ -52,8 +52,9 @@ export interface GraphClassInput {
    */
   readonly term?: string;
   /**
-   * The relations a collapsed region holds, both ends inside it, which
-   * its box draws as a count; 0 when omitted.
+   * The relations a collapsed region's box states: the namespace's figure
+   * (`ClassGraphInput.namespaceRelations`), else those with both ends
+   * inside it; 0 when omitted.
    */
   readonly held?: number;
 }
@@ -120,6 +121,13 @@ export type DrawnRelation = AnyRelationInput & {
 
 /** What the class graph is laid out from: the data's classes and relations. */
 export interface ClassGraphInput {
+  /**
+   * The relations each namespace states, by prefix
+   * (`countNamespaceRelations`): the figure its box states, as the
+   * inspector's Namespaces row does. A namespace with none states the
+   * relations with both ends inside its box.
+   */
+  readonly namespaceRelations?: ReadonlyMap<string, number>;
   readonly classes: readonly GraphClassInput[];
   /** Every relation, each counted by the graph. */
   readonly relations: readonly GraphRelationInput[];
@@ -137,7 +145,7 @@ export interface ClassModel extends GraphClassInput {
   readonly kind: NodeKind;
   /** The classes it stands for: 1, or a collapsed region's count. */
   readonly members: number;
-  /** The relations a collapsed region holds inside its box; else 0. */
+  /** The relations a collapsed region's box states; else 0. */
   readonly held: number;
   /** The label's type size: 14, or 16 on a hub. */
   readonly size: number;

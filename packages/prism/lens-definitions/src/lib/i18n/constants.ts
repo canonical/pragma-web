@@ -37,9 +37,9 @@ export const MESSAGES = {
   "well.label": "Class graph",
   "well.name.stub": "Class {term}, outside the loaded namespaces, {relations}",
   "well.name.region":
-    "Namespace {prefix}, drawn as one box: {classes}, {held} inside, {relations} out",
+    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it",
   "well.name.region.open":
-    "Namespace {prefix}, drawn as one box: {classes}, {held} inside, {relations} out. Opens the namespace",
+    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it. Opens the namespace",
   "well.region.back.words": "· all namespaces",
   "well.region.back":
     "Namespace {prefix}, opened, {classes}: back to the overview of every namespace",

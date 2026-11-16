@@ -20,7 +20,8 @@ import type {
  * end inside a collapsed namespace is drawn from that namespace's box,
  * keeping its count: a bridge when its other end lies in another
  * namespace or is a stub. A relation with both ends inside one box is not
- * drawn; the box counts it. A superclass link whose end is not drawn is
+ * drawn; the box counts it, unless the input states each namespace's
+ * relations, which its box then states. A superclass link whose end is not drawn is
  * left out by the model.
  *
  * @param input - The whole graph's input.
@@ -47,6 +48,9 @@ export default function gatherDrawnInput<
     scope.stubs,
     new Set(model.regionOrder.map(({ prefix }) => prefix)),
   );
+  // What each namespace's box states, when the input says.
+  const figures: ReadonlyMap<string, number> | undefined =
+    "namespaceRelations" in input ? input.namespaceRelations : undefined;
   const held = new Map<string, number>();
   const relations: AnyRelationInput[] = [];
   for (const relation of input.relations as readonly AnyRelationInput[]) {
@@ -79,7 +83,7 @@ export default function gatherDrawnInput<
     kind,
     members,
     term,
-    held: held.get(uri) ?? 0,
+    held: figures?.get(prefix) ?? held.get(uri) ?? 0,
   });
   return {
     ...input,

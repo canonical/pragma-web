@@ -144,6 +144,12 @@ describe("DefinitionsExplorer", {
       '.desktop .node[data-kind="region"][data-id="ds"]',
     );
     expect(box?.getAttribute("data-classes")).toBe("20");
+    // The box states the relations figure the inspector's row states for
+    // ds (its 21 object properties), not only those drawn inside it.
+    const name =
+      box?.getAttribute("aria-label") ??
+      box?.querySelector("a")?.getAttribute("aria-label");
+    expect(name).toContain("20 classes, 21 relations,");
     expect(
       container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
     ).toHaveLength(16);

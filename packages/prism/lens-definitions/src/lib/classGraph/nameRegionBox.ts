@@ -4,8 +4,8 @@ import type { ClassGraphLayout, LaidOutNode } from "./types.js";
 /**
  * Name what a collapsed namespace's box holds, for the messages that name
  * it to assistive technology on the canvas and in the phone view: its
- * prefix, its classes, the relations with both ends inside it, and the
- * relations drawn from it, which are what leaves the box.
+ * prefix, its classes, the relations it states, and the relations drawn
+ * from it, which are what leaves the box.
  *
  * @param layout - The edges drawn.
  * @param node - The box.

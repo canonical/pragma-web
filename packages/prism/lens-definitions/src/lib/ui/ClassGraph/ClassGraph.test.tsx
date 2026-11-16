@@ -438,7 +438,7 @@ describe("ClassGraph", () => {
       expect(resting.getAttribute("role")).toBe("img");
       // What leaves the box is the edges drawn from it.
       expect(resting.getAttribute("aria-label")).toBe(
-        "Namespace surface, drawn as one box: 31 classes, 0 relations inside, 2 relations out",
+        "Namespace surface, drawn as one box: 31 classes, 0 relations, 2 relations drawn from it",
       );
       zoom.bucket = "full";
       const container = draw(own);

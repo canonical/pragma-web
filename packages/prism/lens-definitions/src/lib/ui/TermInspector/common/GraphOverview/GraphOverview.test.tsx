@@ -191,6 +191,8 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       "Fit the graph to anatomy",
     ]);
     expect(buttons.at(1)?.textContent).toMatch(/^cs3 classes/);
+    // The figure a namespace's box on the canvas states too.
+    expect(buttons.at(0)?.textContent).toMatch(/ · 21 relations$/);
   });
 
   it("asks the graph to fit the namespace a reader picks, each time", () => {

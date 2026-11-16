@@ -161,6 +161,12 @@ describe("buildClassGraphInput", () => {
     ).toEqual([12]);
   });
 
+  it("states each namespace's relations as its object properties, the figure its box states", () => {
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES).namespaceRelations).toEqual(
+      new Map([["ds", 2]]),
+    );
+  });
+
   it("builds the same input whatever order the edges come in", () => {
     expect(buildClassGraphInput(ONTOLOGIES, EDGES.toReversed())).toEqual(
       buildClassGraphInput(ONTOLOGIES, EDGES),

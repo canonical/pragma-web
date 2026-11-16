@@ -3,6 +3,7 @@ import type {
   ClassEdgeInput,
   ClassGraphInput,
 } from "../../classGraph/types.js";
+import countNamespaceRelations from "../../classGraph/countNamespaceRelations.js";
 import compactUri from "../../compactUri.js";
 import expandUri from "../../expandUri.js";
 
@@ -40,6 +41,12 @@ export default function buildClassGraphInput(
       ]),
   );
   return {
+    namespaceRelations: new Map(
+      ontologies.map((ontology) => [
+        ontology.prefix,
+        countNamespaceRelations(ontology.properties),
+      ]),
+    ),
     classes: ontologies.flatMap((ontology) =>
       ontology.classes.map((klass) => ({
         uri: klass.uri,
