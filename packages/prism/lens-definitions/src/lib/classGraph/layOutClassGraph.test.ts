@@ -1014,6 +1014,62 @@ describe("layOutClassGraph", () => {
     expect(measurePathBounds(farther.d).x).toBe(-SHELF_GAP / 2);
   });
 
+  it("passes a shelf by the nearer margin, leaving and entering by the gaps that face each other", () => {
+    // Three chains each too wide to share a shelf; bb pulls on aa harder
+    // than cc does, so cc lands two shelves below aa.
+    const chain = (prefix: string) =>
+      ["One", "Two", "Three", "Four", "Five"].map((label, index) =>
+        defineClass(`${prefix}:${label}`, `${prefix} ${label}`, {
+          ...(index === 0
+            ? {}
+            : {
+                superclass: `${prefix}:${["One", "Two", "Three", "Four"].at(index - 1)}`,
+              }),
+        }),
+      );
+    const relate = (domain: string, range: string) => ({
+      uri: `${domain}-${range}`,
+      label: "relates",
+      domain,
+      range,
+      count: 1,
+    });
+    const layout = layOutClassGraph({
+      classes: [...chain("aa"), ...chain("bb"), ...chain("cc")],
+      relations: [
+        relate("bb:One", "aa:One"),
+        relate("bb:Two", "aa:Two"),
+        relate("aa:Two", "cc:Two"),
+        relate("aa:Five", "cc:Five"),
+      ],
+    });
+    const regionOf = (prefix: string) =>
+      requireDefined(
+        layout.regions.find((region) => region.prefix === prefix),
+        "the region",
+      );
+    const [aa, bb, cc] = ["aa", "bb", "cc"].map(regionOf);
+    expect([aa?.y, bb?.y, cc?.y]).toEqual(
+      [aa?.y, bb?.y, cc?.y].toSorted((a = 0, b = 0) => a - b),
+    );
+    const right = Math.max(...layout.regions.map((region) => region.x + region.w));
+    const boundsOf = (id: string) =>
+      measurePathBounds(
+        requireDefined(
+          layout.edges.find((edge) => edge.id === id),
+          "the bridge",
+        ).d,
+      );
+    // Near the left, round the left margin; near the right, the right.
+    expect(boundsOf("rel:aa:Two cc:Two").x).toBeLessThan(0);
+    const far = boundsOf("rel:aa:Five cc:Five");
+    expect(far.x).toBeGreaterThanOrEqual(0);
+    expect(far.x + far.w).toBeGreaterThan(right);
+    // Out by the gap below aa's shelf and in by the gap above cc's: the
+    // route never rises above aa.
+    expect(far.y).toBeGreaterThan(requireDefined(aa, "aa").y);
+  });
+
   it("routes between two shelves through the gap that joins them, never round the margin", () => {
     const tangled = layOutClassGraph(TANGLED_GRAPH);
     const regionOf = (id: string) =>

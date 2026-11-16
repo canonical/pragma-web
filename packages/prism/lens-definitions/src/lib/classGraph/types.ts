@@ -516,6 +516,28 @@ export interface BridgeLabelPlacement {
 }
 
 /**
+ * A channel a bridge runs along: a channel beside a column, a gap between
+ * regions or shelves, or a margin, by the line through its middle and the
+ * room its lanes may spread over about that line, in px.
+ */
+export interface LaneChannel {
+  readonly base: number;
+  readonly room: number;
+}
+
+/**
+ * A bridge's orthogonal route before its lanes are numbered: its two fixed
+ * ends, each a port on a box's side, and the channels it runs along in
+ * turn, the first and the last down (an x), the others across and down by
+ * turns. Drawn as `M start H c0 V c1 H c2 … H cn V end.y H end.x`.
+ */
+export interface LaneRoute {
+  readonly start: readonly [x: number, y: number];
+  readonly end: readonly [x: number, y: number];
+  readonly channels: readonly LaneChannel[];
+}
+
+/**
  * Where a bridge between two neighbours on one shelf leaves and enters its
  * boxes: the x of each box's side that faces the gap, and each port's y.
  */

@@ -177,9 +177,12 @@ server, deterministically: two renders of a page give the same SVG.
   the most bridges side by side. A bridge is a relation from a class of
   one namespace to a class of another, or to a class no loaded ontology
   holds. Bridges are drawn in the strong line and named at rest by their
-  property, near their head; bridges between the same two namespaces each
-  keep a lane of their own, and a label with no room of its own is named
-  when either end is in focus.
+  property, near their head. A bridge runs through the channels beside
+  columns and the gaps between regions and shelves; past a shelf it goes
+  out by the gap facing the other end and round the nearer margin. Every
+  bridge keeps a lane of its own in each channel, gap and margin it runs
+  along, whatever namespaces it joins, so no two share a line. A label
+  with no room of its own is named when either end is in focus.
 - **Weights.** A relation's line states how many statements the graph
   holds for it (`Query.classEdges`): 1px below 10, 2px from 10, 4px from
   100 and 8px from 1000; a relation with no statements yet is dashed. A
@@ -212,9 +215,9 @@ server, deterministically: two renders of a page give the same SVG.
   fits the canvas with every label at 12px or more on screen (a zoom of
   12/14), otherwise the map's top-left corner at that zoom; a term page
   frames its class instead.
-- **The stated limits.** Three lanes between two namespaces: a fourth
-  bridge between them runs closer than 4px to its neighbour, and from six
-  they lie on one line. A namespace with more classes than the budget
+- **The stated limits.** Three lanes in a channel beside a column: a
+  fourth bridge there runs closer than 4px to its neighbour, and from six
+  they lie on one line; a gap or a margin keeps nine 4px apart. A namespace with more classes than the budget
   leaves room for is drawn whole, over the budget, when it is opened.
   More namespaces than the budget has nodes are all drawn as boxes, over
   the budget. The explorer reads every class of every loaded namespace,

@@ -194,27 +194,34 @@ export const BRIDGE_LABEL_NAMES = 2;
 export const BRIDGE_LABEL_SEPARATOR = " · ";
 
 /**
- * How far apart the lanes of bridges between the same two regions run, in
- * px, where the gap or channel they share has room: each bridge keeps a
- * stretch of route of its own, so no line is drawn over another.
+ * How far apart the lanes of the bridges that run along one channel, gap
+ * or margin run, in px, where it has room: each bridge keeps a stretch of
+ * route of its own, so no line is drawn over another.
  */
 export const BRIDGE_LANE = 8;
 
 /**
- * How much of a gap between regions, or of the margin left of a region's
- * first column, the lanes of one pair of regions may spread over, in px:
- * the gap less a lane's clearance from the boxes on either side.
+ * How much of a gap between regions or shelves, or of a margin, the lanes
+ * of the bridges that run along it may spread over, in px: the gap less a
+ * lane's clearance from the boxes on either side.
  */
 export const BRIDGE_GAP_ROOM = SHELF_GAP - 2 * BRIDGE_LANE;
 
 /**
- * How much of a channel between two columns the lanes of one pair of
- * regions may spread over, in px: the room either side of the channel's
+ * How much of a channel between two columns the lanes of the bridges that
+ * run along it may spread over, in px: the room either side of the channel's
  * middle, short of the subclass bus before it and of the next column's
  * boxes after it, in the narrower of the two channels the packer uses.
  */
 export const BRIDGE_CHANNEL_ROOM =
   2 * (CROSS_CHANNEL_OFFSET - BUS_OFFSET - BRIDGE_LANE / 2);
+
+/**
+ * How many bridges a channel may hold for its lanes to be ordered by
+ * trying every order (720 at six); a fuller channel keeps its runs in the
+ * order they start along it.
+ */
+export const LANE_ORDER_SEARCH_LIMIT = 6;
 
 /**
  * How far below a pair of neighbours joined straight across their gap the
