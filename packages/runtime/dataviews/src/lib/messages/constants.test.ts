@@ -486,4 +486,58 @@ describe("STILL_APPLIES", () => {
     expect(m.operatorSpoken("isSet", [])).toBe("has a value");
     expect(m.operatorSpoken("isSet", [false])).toBe("has no value");
   });
+
+  it("words the query bar, its clauses and what its commits did", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(m.queryBar(noun)).toBe("Filter machines");
+    expect(m.queryBarDescription).toBe(
+      "Left and Right to move between filters, Enter to edit, Backspace or Delete to remove",
+    );
+    expect(m.queryBarPlaceholder).toBe("Search or filter");
+    expect(m.appliedFilters).toBe("Applied filters");
+    expect(m.clearFiltersAndSearch).toBe("Clear filters and search");
+    expect(m.queryCleared(exact(60), noun)).toBe(
+      "Cleared the filters and the search. 60 machines.",
+    );
+    // A noun with a form of its own after a count takes it.
+    expect(
+      m.recordCount(exact(3), { ...noun, counted: (n) => `machine×${n}` }),
+    ).toBe("3 machine×3");
+    expect(m.queryClause("status", "is any of", ["ready", "deployed"])).toBe(
+      "status is any of ready, deployed",
+    );
+    expect(m.queryClause("owner", "has a value", [])).toBe("owner has a value");
+    expect(m.searchClause("ex web")).toBe("Search for ex web");
+    expect(m.removeClause("status is ready")).toBe("Remove status is ready");
+    expect(m.hiddenChips(3)).toBe("+3 more");
+    expect(m.loadingSuggestions).toBe("Loading suggestions");
+    expect(m.noSuggestions).toBe("No matches");
+    expect(m.clauseField).toBe("Field");
+    expect(m.clauseOperator("status")).toBe("Operator for status");
+    expect(m.clauseValue("status")).toBe("Value for status");
+    expect(m.recordCount(exact(1), noun)).toBe("1 machine");
+    expect(m.recordCount(atLeast(1000), noun)).toBe("at least 1,000 machines");
+    expect(m.clauseAdded("status is ready", exact(12), noun)).toBe(
+      "Added status is ready. 12 machines.",
+    );
+    expect(m.clauseChanged("status is ready", unknown, noun)).toBe(
+      "Changed to status is ready.",
+    );
+    expect(m.clauseRemoved("status is ready", atLeast(2), noun)).toBe(
+      "Removed status is ready. At least 2 machines.",
+    );
+    expect(m.readAsAtLeast).toBe("Read as at least");
+    expect(m.readAsAtMost).toBe("Read as at most");
+    expect(m.valuePicked("status is any of ready, deployed")).toBe(
+      "status is any of ready, deployed. Enter again to apply it.",
+    );
+    expect(m.multipleValuesHint).toBe(
+      "Enter adds a value; Enter again applies them",
+    );
+    expect(m.dateFormat).toBe("Date, format YYYY-MM-DD");
+    expect(m.numberFormat([])).toBe("Number");
+    expect(m.numberFormat(["MiB", "GiB"])).toBe("Number, in MiB or GiB");
+    expect(m.clauseInvalid("not a number.")).toBe("Invalid: not a number");
+    expect(m.decimalSeparator).toBe(".");
+  });
 });

@@ -10,6 +10,7 @@ import type {
   DataViewsMessages,
   PredicateOperand,
   PredicateOperator,
+  RecordNoun,
   SortDirection,
   ViewCommand,
 } from "@canonical/dataviews-core";
@@ -98,6 +99,16 @@ const OPERATORS_SPOKEN: OperatorWords = {
 /** A total as French states it: exact, or "au moins". */
 const total = (counted: Exclude<Count, { readonly kind: "unknown" }>): string =>
   `${counted.kind === "at-least" ? "au moins " : ""}${count(counted.value)}`;
+
+/** The noun after a count, in the form the noun gives for it, if any. */
+const countedNoun = (value: number, noun: RecordNoun): string =>
+  noun.counted?.(value) ?? plural(value, noun.singular, noun.plural);
+
+/** An outcome's sentence, then the result count where one is known. */
+const outcome = (sentence: string, counted: Count, noun: RecordNoun): string =>
+  counted.kind === "unknown"
+    ? sentence
+    : `${sentence} ${counted.kind === "at-least" ? "Au moins " : ""}${count(counted.value)} ${countedNoun(counted.value, noun)}.`;
 
 /** Every DataViews message, in French. */
 export const FRENCH: DataViewsMessages = {
@@ -216,6 +227,45 @@ export const FRENCH: DataViewsMessages = {
 
   operatorShown: (operator, operands) => OPERATORS_SHOWN[operator](operands),
   operatorSpoken: (operator, operands) => OPERATORS_SPOKEN[operator](operands),
+
+  queryBar: (noun) => `Filtrer les ${noun.plural}`,
+  queryBarDescription:
+    "Gauche et Droite pour passer d’un filtre à l’autre, Entrée pour modifier, Retour arrière ou Suppr pour retirer",
+  queryBarPlaceholder: "Rechercher ou filtrer",
+  appliedFilters: "Filtres appliqués",
+  clearFiltersAndSearch: "Effacer les filtres et la recherche",
+  queryCleared: (counted, noun) =>
+    outcome("Filtres et recherche effacés.", counted, noun),
+  queryClause: (label, operator, values) =>
+    values.length === 0
+      ? `${label} ${operator}`
+      : `${label} ${operator} ${values.join(", ")}`,
+  searchClause: (text) => `Recherche de ${text}`,
+  removeClause: (spoken) => `Retirer ${spoken}`,
+  hiddenChips: (hidden) => `+${count(hidden)} de plus`,
+  loadingSuggestions: "Chargement des suggestions",
+  noSuggestions: "Aucune correspondance",
+  clauseField: "Champ",
+  clauseOperator: (label) => `Opérateur de ${label}`,
+  clauseValue: (label) => `Valeur de ${label}`,
+  recordCount: (counted, noun) =>
+    `${total(counted)} ${countedNoun(counted.value, noun)}`,
+  clauseAdded: (spoken, counted, noun) =>
+    outcome(`${spoken} ajouté.`, counted, noun),
+  clauseChanged: (spoken, counted, noun) =>
+    outcome(`Remplacé par ${spoken}.`, counted, noun),
+  clauseRemoved: (spoken, counted, noun) =>
+    outcome(`${spoken} retiré.`, counted, noun),
+  readAsAtLeast: "Lu comme au moins",
+  readAsAtMost: "Lu comme au plus",
+  valuePicked: (spoken) => `${spoken}. Entrée à nouveau pour l’appliquer.`,
+  multipleValuesHint:
+    "Entrée ajoute une valeur ; Entrée à nouveau les applique",
+  dateFormat: "Date, au format YYYY-MM-DD",
+  numberFormat: (units) =>
+    units.length === 0 ? "Nombre" : `Nombre, en ${units.join(" ou ")}`,
+  clauseInvalid: (reason) => `Non valide : ${clause(reason)}`,
+  decimalSeparator: ",",
 
   pagination: "Pagination",
   rowsPerPage: "Lignes par page",
