@@ -9,7 +9,7 @@ import * as Stories from "./PaginationBar.stories";
 
 It takes its provider explicitly, as `DataTable` does. A table used on its own gets the same footer as one composed inside a `DataViews` root, and the bar never behaves differently because some context happened to be present. Inside a root, `DataViews.Pagination` renders this same bar for the root's provider.
 
-The page size and page selects are the design system's `SelectInput`, and the page controls are drawn as its `Button` — a real link where the page can be reached, a disabled button where it cannot. The select's chrome comes from the `@canonical/react-ds-global-form` stylesheet, so load it on the page beside `@canonical/styles`:
+The bar is dense wherever it sits: its root carries the design system's `.dense` class. The page size and page selects are the design system's `SelectInput`, and each page control is a real link where the page can be reached and the design system's `IconButton`, disabled, where it cannot. The select's chrome comes from the `@canonical/react-ds-global-form` stylesheet, so load it on the page beside `@canonical/styles`:
 
 ```css
 @import url("@canonical/styles");

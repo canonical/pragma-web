@@ -747,7 +747,7 @@ describe("PaginationBar", () => {
     expect(nav).toHaveAttribute("id", "machines-pages");
   });
 
-  it.fails("sets the Dense modifier after its base class", () => {
+  it("sets the Dense modifier after its base class", () => {
     mount(makeProvider().provider, { className: "footer" });
     const nav = screen.getByRole("navigation", { name: "Pagination" });
     expect([...nav.classList]).toEqual([
