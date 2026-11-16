@@ -459,9 +459,10 @@ site's own catalog, and the factory holds no reader-facing string.
 - Renderers: `RenderersProvider`, `useRenderers`, `resolveRenderers`,
   `readRenderer`, `buildRendererSearch`, `viewSearch` (the search schema
   every route with a strip declares), `VIEW_PARAMS` (the address's view grammar: the renderer, the search
-  text, the open sheet and the graph's kind, selection and expansion; `expand`
-  holds what the graph defines: a relation on an entity's neighbourhood, a
-  namespace's prefix on the Definitions overview), `FILTER_SHEET`, `FILTER_PLACEMENTS`,
+  text, the open sheet and the graph's kind, selection and expansion; the
+  expansion is what the graph defines: a relation on an entity's
+  neighbourhood, a namespace's prefix on the Definitions overview),
+  `FILTER_SHEET`, `FILTER_PLACEMENTS`,
   `DEFAULT_FILTER_PLACEMENT`, `RENDERER_KINDS`, `PAGE_RENDERER_NAMES`,
   `RENDERER_LABEL_KEYS`, `usePageRenderers` (core's page renderers, Page
   and Turtle), `warmPageRenderer` (a route's warm calls it so the server
