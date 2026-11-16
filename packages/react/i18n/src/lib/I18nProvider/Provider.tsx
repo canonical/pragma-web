@@ -4,9 +4,9 @@ import { useProviderState } from "./hooks/index.js";
 import type { I18nProviderProps } from "./types.js";
 
 /**
- * Provide the i18n runtime to the `useTranslation`, `useLocale`, and
- * `useFormatters` hooks. Mount once around the subtree that renders localized
- * content.
+ * Provide the i18n runtime to the `useLocalized`, `useLocale`,
+ * `useFormatters` and `useTranslation` hooks. Mount once around the subtree
+ * that renders localized content.
  *
  * Pass the SSR-negotiated `locale` so the server and first client render agree.
  * Supply an external `source` only to share one locale value across frameworks;

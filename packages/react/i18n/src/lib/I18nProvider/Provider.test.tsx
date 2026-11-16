@@ -1,5 +1,6 @@
 import { createLocaleSource, type Locale } from "@canonical/i18n-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { memo } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   greetingCatalogs as catalogs,
@@ -101,6 +102,35 @@ describe("I18nProvider", () => {
     rerender(buildApp("ar"));
     expect(screen.getByText("fr")).toBeTruthy();
     expect(screen.getByText("Bonjour, Ada !")).toBeTruthy();
+  });
+
+  it("needs no catalogs", () => {
+    render(
+      <I18nProvider config={config} locale="fr">
+        <ShowLocale />
+      </I18nProvider>,
+    );
+    expect(screen.getByText("fr")).toBeTruthy();
+  });
+
+  it("keeps the context value stable across re-renders without catalogs", () => {
+    let renders = 0;
+    const Reader = memo(function Reader(): React.ReactElement {
+      const { locale } = useLocale();
+      renders += 1;
+      return <span>{locale}</span>;
+    });
+    const { rerender } = render(
+      <I18nProvider config={config}>
+        <Reader />
+      </I18nProvider>,
+    );
+    rerender(
+      <I18nProvider config={config}>
+        <Reader />
+      </I18nProvider>,
+    );
+    expect(renders).toBe(1);
   });
 
   it("propagates a shared external source switch to every provider tree", () => {

@@ -34,3 +34,43 @@ describe("effectsOff", () => {
     expect(fixtures.effectsOff).toEqual({ persist: false, reflect: false });
   });
 });
+
+describe("nameLabels", () => {
+  it("words the label in every configured locale", () => {
+    expect(Object.keys(fixtures.nameLabels)).toEqual(
+      fixtures.localeConfig.locales,
+    );
+  });
+});
+
+describe("greetings", () => {
+  it("words each message in English and French", () => {
+    expect(fixtures.greetings.en.heading).toBe("Welcome");
+    expect(fixtures.greetings.en.greeting("Ada")).toBe(
+      "Hello, \u2068Ada\u2069!",
+    );
+    expect(fixtures.greetings.en.items(1)).toBe("1 item");
+    expect(fixtures.greetings.fr.heading).toBe("Bienvenue");
+    expect(fixtures.greetings.fr.greeting("Ada")).toBe(
+      "Bonjour, \u2068Ada\u2069 !",
+    );
+    expect(fixtures.greetings.fr.items(1_000_000)).toBe(
+      "1\u202f000\u202f000 d’articles",
+    );
+  });
+
+  it("has no Arabic entry, on purpose", () => {
+    expect(Object.keys(fixtures.greetings)).toEqual(["en", "fr"]);
+  });
+});
+
+describe("rows", () => {
+  it("words the selection in English and French", () => {
+    expect(fixtures.rows.en.rowsSelected(2)).toBe("2 rows selected");
+    expect(fixtures.rows.fr.rowsSelected(1)).toBe("1 ligne sélectionnée");
+  });
+
+  it("has no Arabic entry, on purpose", () => {
+    expect(Object.keys(fixtures.rows)).toEqual(["en", "fr"]);
+  });
+});

@@ -55,6 +55,15 @@ describe("useTranslation", () => {
     expect(result.current.translation.direction).toBe("rtl");
   });
 
+  it("returns the key when the provider has no catalogs", () => {
+    const { result } = renderHook(() => useTranslation(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <I18nProvider config={config}>{children}</I18nProvider>
+      ),
+    });
+    expect(result.current.t("greeting")).toBe("greeting");
+  });
+
   it("throws when used outside a provider", () => {
     expect(() => renderHook(() => useTranslation())).toThrow(
       "I18nProvider is required",

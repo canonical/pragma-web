@@ -12,7 +12,12 @@ export interface I18nContextValue {
   source: LocaleSource;
   /** Active locale configuration. */
   config: I18nConfig;
-  /** Message catalogs keyed by locale. */
+  /**
+   * Message catalogs keyed by locale; empty when the provider was given none.
+   *
+   * @deprecated Read only by the deprecated `useTranslation`. Typed message
+   * records are read with `useLocalized` and need no catalogs.
+   */
   catalogs: Record<Locale, Messages>;
 }
 
@@ -22,8 +27,15 @@ export interface I18nProviderProps {
   children: ReactNode;
   /** Active locale configuration. */
   config: I18nConfig;
-  /** Message catalogs keyed by locale. */
-  catalogs: Record<Locale, Messages>;
+  /**
+   * Message catalogs keyed by locale, read by `useTranslation`. Optional: an
+   * app that reads typed message records needs none.
+   *
+   * @deprecated Write typed message records and read them with
+   * `useLocalized` instead. Catalogs keep working until a later release
+   * removes them.
+   */
+  catalogs?: Record<Locale, Messages>;
   /**
    * Initial locale (e.g. SSR-negotiated). Defaults to `config.defaultLocale`.
    * Stored as given, unlike a tag passed to `setLocale`, so pass a configured
