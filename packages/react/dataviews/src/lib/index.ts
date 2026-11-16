@@ -20,6 +20,7 @@ export type {
   DataViewsFiltersProps,
   DataViewsPaginationProps,
   DataViewsProps,
+  DataViewsQueryBarProps,
   DataViewsSavedViewsProps,
   DataViewsSearchProps,
   DataViewsSortPanelProps,
