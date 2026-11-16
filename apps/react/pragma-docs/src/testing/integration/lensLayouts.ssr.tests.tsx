@@ -700,7 +700,9 @@ describe("the not-found route", () => {
 
   it("renders the not-found copy for an unrouted URL", () => {
     expect(body).toContain("Page not found");
-    expect(body).toContain("The page you are looking for does not exist.");
+    expect(body).toContain(
+      "No page lives at this address. Start again from a lens:",
+    );
   });
 
   it("renders in the document archetype, with the rail, the canvas and the colophon", () => {

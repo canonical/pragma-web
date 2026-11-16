@@ -1,19 +1,12 @@
 ---
 # NotFoundPage — the page every URL no route matches renders: the prose
-# page with the catalog's title, which is also the document's, and one
-# line. The not-found route renders no strip, so the canvas starts at the
-# viewport's top: the page carries one gutter of external space above it,
-# so its title sits one gutter under the top, as a page under a strip sits
-# one gutter under the strip's rule. Its root is the prose page's.
-#
-# Every decision is read through a component token declared on the root
-# (`--not-found-page-*`), bound to the symbol named here.
-#
-# Roster namespaces (accepted and tracked): grid.gutter.
+# page with the catalog's title, which is also the document's, then core's
+# not-found body (one sentence, then each lens's home as a link). The
+# not-found route renders it under an empty strip, so its title sits at
+# the canvas's top like any other page's. Its root is the prose page's,
+# and it binds no styles of its own.
 node:
   uri: docs.component.not_found_page
-  styles:
-    spacing.external.block.start: grid.gutter
   edges:
     - node:
         uri: docs.component.prose_page
@@ -22,6 +15,6 @@ node:
               role: title
             relation: { cardinality: "1", slotName: heading }
           - node:
-              role: copy (one paragraph)
+              uri: prism.component.not_found_body
             relation: { cardinality: "1", slotName: prose }
       relation: { cardinality: "1" }

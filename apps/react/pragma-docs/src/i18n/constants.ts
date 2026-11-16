@@ -220,7 +220,6 @@ export const MESSAGES = {
   "journeys.arrival.viewKept": "view kept",
   "journeys.arrival.noMove": "no move",
   "notFound.title": "Page not found",
-  "notFound.body": "The page you are looking for does not exist.",
   "block.version": "v{version}",
   "block.versionLabel": "Version",
   "block.tier": "Tier",
