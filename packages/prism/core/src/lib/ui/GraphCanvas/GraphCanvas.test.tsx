@@ -14,7 +14,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HUBS_SCALE, OVERVIEW_SCALE } from "./constants.js";
 import GraphCanvas from "./GraphCanvas.js";
 import useGraphZoomBucket from "./hooks/useGraphZoomBucket.js";
-import type { GraphBox, GraphCameraMemory, GraphOpening } from "./types.js";
+import type {
+  GraphBox,
+  GraphCameraMemory,
+  GraphLegibleWindow,
+  GraphOpening,
+} from "./types.js";
 
 const VIEW_BOX: GraphBox = { x: 0, y: 0, width: 800, height: 600 };
 
@@ -820,7 +825,7 @@ describe("GraphCanvas", () => {
   it("keeps Fit at the legible zoom with `legibleFit`, a box too large shown by its legible window", () => {
     const large: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
     const window: GraphBox = { x: 160, y: 80, width: 800, height: 600 };
-    const legibleWindow = vi.fn(() => window);
+    const legibleWindow = vi.fn<GraphLegibleWindow>(() => window);
     const draw = (fit: GraphBox) => (
       <GraphCanvas
         fit={fit}
