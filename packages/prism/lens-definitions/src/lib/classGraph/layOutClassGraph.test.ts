@@ -402,7 +402,11 @@ describe("layOutClassGraph", () => {
       expect(layout.edges.filter((edge) => edge.bridge)).toHaveLength(1);
     });
 
-    it("opens at the legible floor when every namespace is a box and it still does not fit", () => {
+    // Thirty namespaces collapse one by one, a layout each: the slowest case of this file (about a second
+    // alone), so it keeps room for a machine that runs the whole workspace's tests at once.
+    it("opens at the legible floor when every namespace is a box and it still does not fit", {
+      timeout: 20_000,
+    }, () => {
       const wide = {
         classes: Array.from({ length: 30 }, (_, index) => ({
           uri: `https://n${index}.example/A`,
