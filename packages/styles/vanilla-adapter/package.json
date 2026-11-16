@@ -42,7 +42,7 @@
     "@canonical/styles": "^0.47.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.6",
+    "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
     "@canonical/react-ds-global": "^0.47.0",
     "@canonical/react-ds-global-form": "^0.47.0",
