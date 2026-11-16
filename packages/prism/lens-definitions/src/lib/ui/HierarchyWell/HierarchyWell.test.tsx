@@ -394,6 +394,51 @@ describe("HierarchyWell", () => {
       expect(readCamera(container)).toBe(region);
     });
 
+    it.each([
+      ["an opened view", "surface", undefined],
+      ["a term page", "ds", "ds"],
+    ] as const)(
+      "restores %s's opening with Fit, at the legible floor or above, never by a namespace's height",
+      (_, drill, termPrefix) => {
+        const four = createClassGraphSetup(FOUR_NAMESPACE_GRAPH);
+        const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+          budget: GRAPH_BUDGET,
+          drill,
+        });
+        const uri = FOUR_NAMESPACE_GRAPH.classes.find(
+          (entry) => entry.prefix === termPrefix,
+        )?.uri;
+        stubViewport({ w: 1000, h: 700 });
+        const { container } = render(
+          createRouterHarness(
+            <HierarchyWell
+              filter={createAllNamespacesFilter(
+                drilled.regions.map((region) => region.prefix),
+              )}
+              hoverCentre={undefined}
+              layout={drilled}
+              onHoverTerm={() => {}}
+              term={
+                uri === undefined ? undefined : requireEntry(four.terms, uri)
+              }
+              terms={four.terms}
+            />,
+          ),
+        );
+        const opened = readCamera(container);
+        const percent = screen.getByRole("status").textContent;
+        expect(Number.parseInt(percent ?? "", 10)).toBeGreaterThanOrEqual(
+          Math.floor(MIN_FIT * 100),
+        );
+        fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+        fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+        expect(readCamera(container)).not.toBe(opened);
+        fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+        expect(readCamera(container)).toBe(opened);
+        expect(screen.getByRole("status").textContent).toBe(percent);
+      },
+    );
+
     it("leaves the camera alone for a region the graph does not draw", () => {
       stubViewport();
       const { container, rerender } = render(drawWell({}));
@@ -733,15 +778,17 @@ describe("over a layout whose rail opens on a box", () => {
     const inDs = FOUR_NAMESPACE_GRAPH.classes
       .filter((entry) => entry.prefix === "ds")
       .map((entry) => entry.uri);
-    const [first, last] = [inDs.at(0), inDs.at(-1)].map((uri) =>
-      requireDefined(uri, "a ds class"),
-    ) as [string, string];
     const framed = (uri: string) => {
       const box = frameOpeningView(ds, ds.nodes.get(uri));
       return `${box.x} ${box.y} ${box.width} ${box.height}`;
     };
-    // Each class, loaded, opens on a frame of its own.
-    expect(framed(last)).not.toBe(framed(first));
+    // Each class, loaded, opens centred on itself: the first ds class and
+    // the next whose own frame differs.
+    const first = requireDefined(inDs.at(0), "a ds class");
+    const last = requireDefined(
+      inDs.find((uri) => framed(uri) !== framed(first)),
+      "a ds class framed apart from the first",
+    );
     const draw = (uri: string) =>
       createRouterHarness(
         <HierarchyWell

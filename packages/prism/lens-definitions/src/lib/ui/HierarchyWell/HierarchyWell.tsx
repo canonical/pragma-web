@@ -225,9 +225,8 @@ export default function HierarchyWell({
   }, [activeEdge, focus, hidden, layout, t]);
   // The server paints the whole graph, or a legible window of it around
   // the class selected on arrival, for the design canvas; the client opens
-  // on the window its own canvas calls for. Fit fits the whole, or shows a
-  // window of it at the overview's floor whose edges cut no class, never
-  // below.
+  // on the window its own canvas calls for, and Fit restores it: never
+  // below the legible floor, never by a namespace's height.
   //
   // A drill the address changes, by a box, the way back, a term page
   // reached from another or the history, opens as a load of that address
@@ -244,10 +243,14 @@ export default function HierarchyWell({
     () => frameOpeningView(layout, arrivalNode),
     [arrivalNode, layout],
   );
+  // The opening, which the Fit control and `0` restore too: the selected
+  // class framed as on arrival, or the map by the overview's rule.
+  const selectedNode =
+    selected === undefined ? undefined : layout.nodes.get(selected);
   const opening = useCallback(
     (visible: GraphBox, scale: number): GraphTransform =>
-      frameOpeningCamera(layout, arrivalNode, visible, scale),
-    [arrivalNode, layout],
+      frameOpeningCamera(layout, selectedNode, visible, scale),
+    [selectedNode, layout],
   );
   // The memory outlives the well, which the router mounts anew on each of
   // the lens's routes, so the drill the camera was kept for is kept beside
@@ -272,9 +275,11 @@ export default function HierarchyWell({
     }),
     [layout],
   );
+  // Under a filter, Fit fits the classes it leaves; else it restores the
+  // opening.
   const fit = useMemo(
-    () => measureVisibleBox(layout, hidden, undefined) ?? bounds,
-    [bounds, hidden, layout],
+    () => measureVisibleBox(layout, hidden, undefined),
+    [hidden, layout],
   );
   const legibleWindow = useCallback(
     (box: GraphBox, visible: GraphBox, scale: number, zoom: number): GraphBox =>
@@ -298,8 +303,6 @@ export default function HierarchyWell({
       serial: region.serial,
     });
   }, [hidden, layout, region]);
-  const selectedNode =
-    selected === undefined ? undefined : layout.nodes.get(selected);
   const reveal =
     selectedNode === undefined
       ? undefined
