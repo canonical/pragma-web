@@ -973,7 +973,11 @@ describe("at 912 px, on a canvas narrower than the drawing", () => {
 
 describe("the overview's record, on the docs site", () => {
   const [desktop] = VIEWPORTS;
-  const served: { weights?: ServedWeights; prefixes?: readonly string[] } = {};
+  const served: {
+    weights?: ServedWeights;
+    prefixes?: readonly string[];
+    classes?: number;
+  } = {};
   const canvases = new Map<string, string>();
 
   /** The canvas's SVG the server renders for `path`, fetched afresh. */
@@ -999,6 +1003,10 @@ describe("the overview's record, on the docs site", () => {
     );
     served.weights = weighServedRelations(graph);
     served.prefixes = graph.ontologies.map((ontology) => ontology.prefix);
+    served.classes = graph.ontologies.reduce(
+      (sum, ontology) => sum + ontology.classes.length,
+      0,
+    );
     for (const path of listViews()) canvases.set(path, await serveCanvas(path));
   }, PAGE_SETTLE_MS);
 
@@ -1095,5 +1103,12 @@ describe("the overview's record, on the docs site", () => {
         GRAPH_BUDGET.svgElementsMax,
       );
     }
+  });
+
+  // The explorer's query reads every class of every loaded namespace, and
+  // nothing bounds it: a site past the budget's figure is a stated limit.
+  it("fetches no more classes than the budget's figure for fetched nodes", () => {
+    expect(served.classes).toBeGreaterThan(0);
+    expect(served.classes).toBeLessThanOrEqual(GRAPH_BUDGET.fetchedNodesMax);
   });
 });
