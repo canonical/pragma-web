@@ -4,8 +4,8 @@ import { VIEW_PARAMS } from "./constants.js";
  * The search parameters of the address that shows a view in another
  * renderer: every current parameter kept, `as` set to the renderer (left
  * out for the default, so the default's address carries none), and
- * `expand` dropped, since an expanded relation belongs to the renderer
- * that drew it.
+ * `expand` dropped, since what a graph has expanded (a relation, a
+ * namespace) belongs to the renderer that drew it.
  *
  * @param current - The address's search parameters.
  * @param name - The renderer to show.

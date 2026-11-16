@@ -98,6 +98,11 @@ export interface ViewSearch {
   readonly sheet?: string;
   readonly graph?: string;
   readonly select?: string;
+  /**
+   * What the graph has expanded, as the graph defines it: a relation on an
+   * entity's neighbourhood, a namespace's prefix on the Definitions
+   * overview.
+   */
   readonly expand?: string;
 }
 
