@@ -39,17 +39,19 @@ function judgeFolder(root: string, folder: string, findings: string[]): void {
       }
       const isPureType =
         exports.length > 0 && exports.every((record) => record.kind === "type");
-      const tests = listColocatedTests(stem, siblings);
+      // A longer sibling source, such as `a.b.ts`, claims `a.b.test.ts`.
+      const claimed = siblings
+        .filter((name) => name !== entry.name && name.startsWith(`${stem}.`))
+        .filter((name) => readFileRole(name) === "source")
+        .flatMap((name) =>
+          listColocatedTests(name.replace(/\.tsx?$/, ""), siblings),
+        );
+      const tests = listColocatedTests(stem, siblings).filter(
+        (test) => !claimed.includes(test),
+      );
       if (isPureType) {
-        // A pure type file gets no test: one beside it is a type test,
-        // unless a longer sibling source, such as `a.b.ts`, claims it.
-        const claimed = siblings
-          .filter((name) => name !== entry.name && name.startsWith(`${stem}.`))
-          .filter((name) => readFileRole(name) === "source")
-          .flatMap((name) =>
-            listColocatedTests(name.replace(/\.tsx?$/, ""), siblings),
-          );
-        for (const name of tests.filter((test) => !claimed.includes(test))) {
+        // A pure type file gets no test: one beside it is a type test.
+        for (const name of tests) {
           const test = relative(root, join(folder, name)).split(sep).join("/");
           findings.push(`${test} types-test`);
         }
