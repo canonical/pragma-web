@@ -142,7 +142,6 @@ export const MESSAGES = {
   "journeys.title": "Journeys",
   "journeys.documentTitle": "{job} — Journeys",
   "journeys.loading": "Loading the demand model…",
-  "journeys.view.label": "Journey view",
   "journeys.view.table": "Table",
   "journeys.view.graph": "Graph",
   "journeys.personaNote":

@@ -8,6 +8,7 @@ import journeysExplorerRecordsJob from "../../__fixtures__/journeysExplorerRecor
 import {
   JOURNEYS_TEST_TIMEOUT_MS,
   journeysLayoutAt,
+  viewTab,
 } from "../../__fixtures__/journeysPageHarness.js";
 
 const JOB = "sem://design-system-docs#job.l3";
@@ -28,7 +29,7 @@ describe("JourneysLayout", () => {
     expect(layout).not.toBeNull();
     const strip = layout?.querySelector('[data-region="mode-strip"]');
     expect(strip?.textContent).toContain("Journeys");
-    expect(strip?.contains(screen.getByRole("button", { name: "Graph" }))).toBe(
+    expect(strip?.contains(viewTab("Graph"))).toBe(
       true,
     );
   });
@@ -39,11 +40,11 @@ describe("JourneysLayout", () => {
     const fetchFn = createFetchSpy();
     render(journeysLayoutAt(undefined, journeysExplorerRecords, fetchFn));
     expect(readExplorerView()).toBe("table");
-    fireEvent.click(screen.getByRole("button", { name: "Graph" }));
+    fireEvent.click(viewTab("Graph"));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Graph" })).toHaveAttribute(
-        "aria-pressed",
-        "true",
+      expect(viewTab("Graph")).toHaveAttribute(
+        "aria-current",
+        "page",
       ),
     );
     expect(readExplorerView()).toBe("graph");
@@ -60,7 +61,7 @@ describe("JourneysLayout", () => {
     expect(
       container.querySelector(".workspace-layout > .inspector"),
     ).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Graph" }));
+    fireEvent.click(viewTab("Graph"));
     await waitFor(() =>
       expect(
         container.querySelector(

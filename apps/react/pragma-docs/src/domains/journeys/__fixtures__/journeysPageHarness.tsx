@@ -5,8 +5,8 @@
  * routes at the page's own URL, because the rail, the table and the well
  * render router links whose hrefs and `aria-current` come from the
  * `journeysJob` route. The router is an in-memory one, hydrated at the
- * page's URL as the static router is, so the strip's switch can write the
- * view to its address as it does in a browser.
+ * page's URL as the static router is, so following one of the strip's
+ * view links changes the address as it does in a browser.
  *
  * The view the strip's switch and the canvas share lives in
  * `JourneyViewProvider`, which the layout holds around both, so every
@@ -23,6 +23,7 @@ import { createEnvironment } from "@canonical/prism-core";
 import { HeadProvider } from "@canonical/react-head";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
+import { screen, within } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
@@ -43,6 +44,17 @@ import type { JourneyView } from "../types.js";
  * Per test only: the config default stands.
  */
 export const JOURNEYS_TEST_TIMEOUT_MS = 20_000;
+
+/**
+ * The strip's view link to the reading `name`: core's switch draws each
+ * reading twice, as a tab in its row and as an option in its folded menu,
+ * and this is the tab.
+ */
+export const viewTab = (name: string): HTMLElement =>
+  within(screen.getByRole("navigation", { name: "Show as" })).getByRole(
+    "link",
+    { name },
+  );
 
 /**
  * A router over the real app routes in memory at `url`, hydrated there at

@@ -222,6 +222,8 @@ const EXPECTED_SWITCH_CURRENT: Readonly<Record<string, readonly string[]>> = {
   "/components": ["/components", "/components"],
   [BUTTON_ENTITY_URL]: [BUTTON_ENTITY_URL, BUTTON_ENTITY_URL],
   [STANDARD_READING_URL]: [STANDARD_READING_URL, STANDARD_READING_URL],
+  "/journeys": ["/journeys", "/journeys"],
+  [JOURNEYS_JOB_URL]: [JOURNEYS_JOB_URL, JOURNEYS_JOB_URL],
 };
 
 /**
@@ -325,15 +327,15 @@ const EXPECTED_STRIP_CLAIMS: Readonly<
   "/components": { view: "renderer-switch", count: "catalog-count" },
   "/definitions": { view: false, count: "explorer-status" },
   "/standards": { view: false, count: false },
-  // Journeys claims the trail and the view group, which holds the table
-  // and graph switch; the coordinate chooser and the persona filter stay in
-  // the explorer's rail.
-  "/journeys": { view: "journey-view-switch", count: false },
+  // Journeys claims the trail and the view group, which holds core's
+  // renderer switch over the table and the graph; the coordinate chooser
+  // and the persona filter stay in the explorer's rail.
+  "/journeys": { view: "renderer-switch", count: false },
   "/guides": { view: false, count: false },
   [BUTTON_ENTITY_URL]: { view: "renderer-switch", count: false },
   [DEFINITIONS_TERM_URL]: { view: false, count: "explorer-status" },
   [STANDARD_READING_URL]: { view: "renderer-switch", count: false },
-  [JOURNEYS_JOB_URL]: { view: "journey-view-switch", count: false },
+  [JOURNEYS_JOB_URL]: { view: "renderer-switch", count: false },
   ...Object.fromEntries(
     NON_LENS_URLS.map((url) => [url, { view: false, count: false }]),
   ),
@@ -522,7 +524,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet("/journeys").canvas).toContain('scope="row"');
     expect(mustGet("/journeys").canvas).toContain("Group by");
     expect(mustGet("/journeys").canvas).not.toContain(
-      'aria-label="Journey view"',
+      'class="ds renderer-switch"',
     );
     expect(mustGet("/journeys").canvas).not.toContain('class="ds journey-hop');
     expect(mustGet(JOURNEYS_JOB_URL).canvas).toContain(

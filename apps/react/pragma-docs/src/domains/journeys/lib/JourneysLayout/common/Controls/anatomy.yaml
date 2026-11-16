@@ -1,10 +1,11 @@
 ---
-# Controls — the journeys strip's controls tenant: the view switch over the
-# view the layout's provider shares. It renders no element of its own and
-# styles nothing.
+# Controls — the journeys strip's controls tenant: the table and the graph
+# as core's shared renderer switch over the view the layout's provider
+# reads from the address. It renders no element of its own and styles
+# nothing.
 node:
   uri: docs.subcomponent.controls
   edges:
     - node:
-        uri: docs.component.journey_view_switch
+        uri: prism.component.renderer_switch
       relation: { cardinality: "1" }

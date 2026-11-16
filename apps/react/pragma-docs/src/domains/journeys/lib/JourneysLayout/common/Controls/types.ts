@@ -2,6 +2,6 @@
 
 /**
  * Props accepted by `Controls`, which renders no element of its own: it
- * renders the view switch, and takes no prop.
+ * renders core's renderer switch, and takes no prop.
  */
 export type ControlsProps = Record<never, never>;
