@@ -6,6 +6,8 @@ const ROLES: readonly { readonly pattern: RegExp; readonly role: FileRole }[] =
     { pattern: /\.d\.ts$/, role: "d.ts" },
     { pattern: /\.stories\.tsx?$/, role: "stories" },
     { pattern: /\.spec\.tsx?$/, role: "spec" },
+    // A browser suite, run by Playwright rather than the unit runner.
+    { pattern: /\.keyboard\.tsx?$/, role: "spec" },
     { pattern: /\.config\.(?:ts|mts|js|mjs)$/, role: "config" },
     { pattern: /^index\.tsx?$/, role: "barrel" },
     { pattern: /\.css$/, role: "css" },
