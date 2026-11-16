@@ -25,7 +25,8 @@
 # The actions a caller places are the design system's Button, and the
 # deselect its IconButton. The Button reads `color/text` for its label rather
 # than the surface text channel, so on this surface the bar sets the
-# Button's own text channel (`--button-color-text`) to `--surface-color-text`. A tertiary Button's ghost
+# Button's own text channel (`--button-color-text`) to `--surface-color-text`,
+# until the Button reads the surface channel itself. A tertiary Button's ghost
 # fill already reads the surface channel. A destructive action (the design's
 # red Delete) is the Button's `destructive` anticipation, whose ghost fill and
 # text do not read the surface channel: on this surface it paints the light
