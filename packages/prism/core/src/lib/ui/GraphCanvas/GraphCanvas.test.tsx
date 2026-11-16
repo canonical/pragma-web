@@ -433,6 +433,43 @@ describe("GraphCanvas", () => {
     expect(opening).toHaveBeenCalledOnce();
   });
 
+  it("restores where `opening` asks with Fit and 0 when no fit box is given, and fits the fit box when one is", () => {
+    const resize = stubResizeObserver();
+    stubViewportSize(400, 300);
+    const opening = vi.fn<GraphOpening>(() => ({ k: 1.5, x: -40, y: -30 }));
+    const draw = (fit?: GraphBox) => (
+      <GraphCanvas
+        data-testid="canvas"
+        label="Class graph"
+        opening={opening}
+        viewBox={VIEW_BOX}
+        {...(fit === undefined ? {} : { fit })}
+      >
+        <BucketProbe />
+      </GraphCanvas>
+    );
+    const { rerender } = render(draw());
+    act(() => resize());
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(readCamera()).not.toBe("translate(-40,-30) scale(1.5)");
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(-40,-30) scale(1.5)");
+    expect(opening).toHaveBeenLastCalledWith(VIEW_BOX, 0.5);
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.keyDown(screen.getByTestId("canvas"), { key: "0" });
+    expect(readCamera()).toBe("translate(-40,-30) scale(1.5)");
+    // An opening that asks for nothing is the server's paint, the identity.
+    opening.mockReturnValueOnce(undefined);
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    // With a fit box, Fit fits it: the viewBox, shown at 50% on this
+    // viewport, from its top-left corner at the overview's floor.
+    rerender(draw(VIEW_BOX));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toMatch(/^translate\(0,0\) scale\(1\.5\d*\)$/);
+  });
+
   it("opens a 390px canvas at the legible zoom on its first region", () => {
     // The map fits a phone's canvas at 40%, below the legible zoom; it
     // opens on its top-left corner at 12/14, every label at 12px or more,

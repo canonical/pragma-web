@@ -39,7 +39,8 @@ function nameLattice(label: string): string {
  * client has measured the viewport the camera moves to where `opening`
  * asks, if anywhere, or, without one, when the viewBox would show below
  * the legible zoom, as on a phone, to a legible window of the graph's
- * first region, the rest a pan away. When `fit` changes the
+ * first region, the rest a pan away. Without a `fit`, the Fit control and
+ * `0` restore where `opening` asks, if given. When `fit` changes the
  * camera fits it, and the Fit control and `0` fit it again, whole, but
  * never into the overview bucket: a box too large for its floor shows the
  * window of it that `legibleWindow` chooses at that floor, or its top-left

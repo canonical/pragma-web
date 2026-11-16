@@ -112,7 +112,9 @@ type OwnProps = {
    * one, and never into the overview: a box too large for the overview's
    * floor shows the window of it `legibleWindow` chooses at that floor, or
    * its top-left corner at that floor. The visible part of the graph under
-   * a filter; the graph's whole bounds when omitted.
+   * a filter. When omitted, the Fit control and the `0` key restore the
+   * view `opening` asks for, where one is given, and otherwise fit the
+   * graph's whole bounds.
    */
   readonly fit?: GraphBox;
   /**
