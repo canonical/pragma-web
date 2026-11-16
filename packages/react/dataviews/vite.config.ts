@@ -12,14 +12,11 @@ const plugins: any[] = [react()];
 const testConfig = reactTestConfig({
   glob: "test",
   ssr: true,
-  // Unmeasured: stories, tests, types, the keyboard suites, and the query
-  // builder's component and barrel.
+  // Unmeasured: stories, tests, types and the keyboard suites.
   coverage: {
     include: ["src/**/*.{ts,tsx}", "testing/**/*.{ts,tsx}"],
     exclude: [
       "**/*.stories.{ts,tsx}",
-      "src/storybook/QueryBuilder/QueryBuilder.tsx",
-      "src/storybook/QueryBuilder/index.ts",
       "testing/**/*.d.ts",
       "testing/**/*.test.{ts,tsx}",
       "testing/keyboard/**",
