@@ -217,7 +217,11 @@ server, deterministically: two renders of a page give the same SVG.
   they lie on one line. A namespace with more classes than the budget
   leaves room for is drawn whole, over the budget, when it is opened.
   More namespaces than the budget has nodes are all drawn as boxes, over
-  the budget. Neither site's data reaches these limits.
+  the budget. The explorer reads every class of every loaded namespace,
+  however many: nothing bounds what it fetches, so a graph of more
+  classes than `fetchedNodesMax` (200) is fetched whole, over the budget,
+  and each site's acceptance tests assert that its graph holds no more.
+  Neither site's data reaches these limits.
 
 Not in this package yet: the term page's neighbourhood across namespaces
 (the classes of other namespaces a class relates to, drawn around it);
