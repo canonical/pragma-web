@@ -178,7 +178,7 @@ export default function useColumnManagement<
     // the DOM's iterable typings are loaded.
     const cells = Array.from(
       row.querySelectorAll<HTMLElement>(
-        ":scope > [role='columnheader']:not(.selection):not(.settings)",
+        ":scope > [role='columnheader']:not(.ds.data-table-select-all-cell):not(.ds.data-table-settings-cell)",
       ),
     );
     const nearest = Math.max(0, Math.min(at, cells.length - 1));
@@ -188,7 +188,11 @@ export default function useColumnManagement<
     const candidates = [
       ...cells.slice(nearest),
       ...cells.slice(0, nearest).reverse(),
-      ...Array.from(row.querySelectorAll<HTMLElement>(":scope > .settings")),
+      ...Array.from(
+        row.querySelectorAll<HTMLElement>(
+          ":scope > .ds.data-table-settings-cell",
+        ),
+      ),
     ];
     for (const cell of candidates) {
       const control = cell.querySelector<HTMLElement>("button, a[href]");

@@ -6,8 +6,8 @@ API. Zero runtime dependencies.
 
 `i18n-core` owns everything that is not framework reactivity — locale
 negotiation, message catalogs and translation, memoized formatters, and a live
-locale source. React, Svelte, and Lit bindings stay thin and share this one
-engine.
+locale source. The React binding, `@canonical/i18n-react`, stays thin and
+shares this one engine; a binding for another framework would do the same.
 
 ## Installation
 
@@ -32,13 +32,13 @@ const config: I18nConfig = {
 ## Locale negotiation (pure, SSR-safe)
 
 ```ts
-import { directionOf, negotiateLocale } from "@canonical/i18n-core";
+import { getDirection, negotiateLocale } from "@canonical/i18n-core";
 
 const locale = negotiateLocale(config, {
   cookieHeader: request.headers.get("cookie"),
   acceptLanguage: request.headers.get("accept-language"),
 });
-const dir = directionOf(config, locale); // "ltr" | "rtl"
+const dir = getDirection(config, locale); // "ltr" | "rtl"
 ```
 
 An explicit cookie wins, then `Accept-Language` negotiation, then the default
@@ -70,10 +70,10 @@ itself, an absent placeholder is left verbatim.
 import { createFormatters } from "@canonical/i18n-core";
 
 const f = createFormatters("en-US");
-f.number(1234.5); // "1,234.5"
-f.currency(1234.5, "USD"); // "$1,234.50"
-f.relativeTime(-3, "day", { numeric: "auto" }); // "3 days ago"
-f.list(["A", "B", "C"]); // "A, B, and C"
+f.formatNumber(1234.5); // "1,234.5"
+f.formatCurrency(1234.5, "USD"); // "$1,234.50"
+f.formatRelativeTime(-3, "day", { numeric: "auto" }); // "3 days ago"
+f.formatList(["A", "B", "C"]); // "A, B, and C"
 ```
 
 Formatters memoize their `Intl` instances by options, since constructing them
@@ -93,35 +93,55 @@ import { createLocaleSource } from "@canonical/i18n-core";
 const source = createLocaleSource(config, { initial: locale });
 const unsubscribe = source.subscribe((next) => render(next));
 source.set("ar"); // notifies subscribers; persists + reflects dir="rtl"
+source.set("fr-CA"); // stores "fr": matched by language
+source.set("de"); // throws a RangeError: no configured locale matches
 ```
 
-On the server, create one source **per request** — the React/Svelte/Lit
-bindings already do this. A module-level singleton shared across concurrent
-requests leaks locale state between them.
+`set` matches a tag as `negotiateLocale` matches an `Accept-Language` tag: the
+exact configured tag first, then its base language, ignoring case. A cookie is
+matched only exactly, ignoring case, so a `locale=fr-CA` cookie selects nothing
+when only `fr` is configured. A locale `set` stores is always a
+configured tag, so `<html lang>` names the language the words are in. A tag that
+matches nothing throws a `RangeError`; negotiate requests and cookies first. A
+tag that matches the current locale, such as `FR` or `fr-CA` while on `fr`,
+changes nothing. `initial` is stored as given, so pass it a negotiated locale
+too.
+
+A tag from elsewhere, such as a URL segment, either goes through negotiation,
+as in `source.set(negotiateLocale(config, { acceptLanguage: segment }))`, which
+falls back to the default locale when the tag matches nothing, or is set inside
+a `try`/`catch` for the `RangeError` that `set` throws instead.
+`isSupportedLocale` checks the exact tag only, so it refuses `FR` and `fr-CA`,
+which `set` accepts.
+
+On the server, create one source **per request** — the React binding's
+`I18nProvider` already does this. A module-level singleton shared across
+concurrent requests leaks locale state between them.
 
 ## Server-side rendering
 
 The source can only set `<html lang dir>` from the client. For a correct first
 paint and assistive technology, render `<html lang dir>` on the server from the
-negotiated locale with `documentAttrs`:
+negotiated locale with `getDocumentAttributes`:
 
 ```ts
-import { documentAttrs, negotiateLocale } from "@canonical/i18n-core";
+import { getDocumentAttributes, negotiateLocale } from "@canonical/i18n-core";
 
 const locale = negotiateLocale(config, {
   cookieHeader: request.headers.get("cookie"),
   acceptLanguage: request.headers.get("accept-language"),
 });
-const { lang, dir } = documentAttrs(config, locale);
+const { lang, dir } = getDocumentAttributes(config, locale);
 // render: <html lang={lang} dir={dir}> … </html>
 ```
 
-Pass the same `locale` to the client (`createLocaleSource({ initial: locale })`)
-so the server and first client render agree.
+Pass the same `locale` to the client
+(`createLocaleSource(config, { initial: locale })`) so the server and first
+client render agree.
 
 ## Right-to-left & accessibility
 
-`directionOf` resolves writing direction from `rtlLocales` (base languages); a
+`getDirection` resolves writing direction from `rtlLocales` (base languages); a
 sensible default set is `["ar", "he", "fa", "ur"]`. Flipping `dir` is necessary
 but not sufficient — author UI with CSS **logical properties**
 (`margin-inline-start`, `inset-inline`, `text-align: start`) and mirror

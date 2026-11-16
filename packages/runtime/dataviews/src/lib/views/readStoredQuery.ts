@@ -1,4 +1,5 @@
-import { decodeQuery, isOwnedKey, type QueryIssue } from "../wire/index.js";
+import type { QueryIssue } from "../result/index.js";
+import { decodeQuery, isOwnedKey, readWireField } from "../wire/index.js";
 import type { SavedView, SavedViewsHost, StoredQuery } from "./types.js";
 
 /**
@@ -21,6 +22,7 @@ export default function readStoredQuery(
     .map(
       (key): QueryIssue => ({
         parameter: key,
+        field: readWireField(key),
         code: "unknown-field",
         reason: `"${key}" names no field of this collection`,
       }),

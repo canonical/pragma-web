@@ -1,5 +1,6 @@
 export { default as applyRef } from "./applyRef.js";
 export { default as areDisplayFieldsEqual } from "./areDisplayFieldsEqual.js";
+export { default as areSortListsEqual } from "./areSortListsEqual.js";
 export { default as areSortTermsEqual } from "./areSortTermsEqual.js";
 export { default as composeMessage } from "./composeMessage.js";
 export { default as describeOrdering } from "./describeOrdering.js";

@@ -12,11 +12,9 @@
 import { declareCapabilities } from "@canonical/dataviews-core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-  machines,
-} from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { machines } from "../../../testing/machines.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 afterEach(cleanup);
@@ -27,7 +25,7 @@ afterEach(cleanup);
  */
 const mountTable = (columns: Parameters<typeof DataTable>[0]["columns"]) => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
     capabilities: declareCapabilities(machines, {}),
   });
   render(<DataTable provider={provider} columns={columns} label="Machines" />);

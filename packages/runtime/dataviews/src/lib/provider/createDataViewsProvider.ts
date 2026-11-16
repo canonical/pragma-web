@@ -1,8 +1,9 @@
 import {
   createQueryCoordinator,
   type DataViewsState,
+  readWithheld,
 } from "../coordinator/index.js";
-import type { QueryLocation } from "../location/index.js";
+import type { HistoryMode, QueryLocation } from "../location/index.js";
 import {
   createChannel,
   protectChannel,
@@ -19,6 +20,7 @@ import type {
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
+import type { QueryIssue } from "../result/index.js";
 import {
   type Applicability,
   EMPTY_ROW_MODEL,
@@ -30,11 +32,11 @@ import { createSelection } from "../selection/index.js";
 import { createSnapshot, type DataViewsSnapshot } from "../snapshot/index.js";
 import { copyCapabilities } from "../source/index.js";
 import { createSavedViews } from "../views/index.js";
-import type { QueryIssue } from "../wire/index.js";
 import createActionRunner from "./createActionRunner.js";
 import createQueryCommands from "./createQueryCommands.js";
 import createRecordTyping from "./createRecordTyping.js";
 import createRequestCompleter from "./createRequestCompleter.js";
+import listCarriedIssues from "./listCarriedIssues.js";
 import observePorts from "./observePorts.js";
 import readStartingPoint from "./readStartingPoint.js";
 import registerProviderHost from "./registerProviderHost.js";
@@ -151,6 +153,7 @@ export default function createDataViewsProvider<
   const coordinator = createQueryCoordinator<TRow>({
     start: starting.start,
     initial: starting.initial,
+    withheld: starting.withheld,
   });
   const openView = createChannel<string | null>(starting.view);
   const selection = createSelection();
@@ -203,8 +206,11 @@ export default function createDataViewsProvider<
     capabilities,
     state: protectChannel(state),
     refusals,
-    setPredicate: (predicate: Predicate, replaces?: SetOperator) =>
-      command({ kind: "setPredicate", predicate, replaces }),
+    setPredicate: (
+      predicate: Predicate,
+      replaces?: SetOperator,
+      history?: HistoryMode,
+    ) => command({ kind: "setPredicate", predicate, replaces }, history),
     removePredicate: (field: string, operator: PredicateOperator) =>
       command({ kind: "removePredicate", field, operator }),
     refresh: issueRefresh,
@@ -220,7 +226,29 @@ export default function createDataViewsProvider<
             query,
             view: openView.get(),
             preserve: config.location.read(),
+            // A destination drawn over a withheld query keeps the refused
+            // clauses it does not replace, so following it widens nothing.
+            carry: {
+              keys: listCarriedIssues(
+                readWithheld(coordinator.state),
+                coordinator.state.slice,
+                query.slice,
+              ).map((issue) => issue.parameter),
+              applied: coordinator.state.slice,
+            },
           });
+    },
+    clearRefused(parameter: string): void {
+      const issue = location?.issues
+        .get()
+        .find((refused) => refused.parameter === parameter);
+      if (location === null || issue === undefined) {
+        return;
+      }
+      location.clearRefused(
+        parameter,
+        issue.field === null ? history.search : history.filter,
+      );
     },
     complete,
     applicability(field: string, row: TRow): Applicability {
@@ -295,8 +323,10 @@ export default function createDataViewsProvider<
       if (
         pendingRequestId === null &&
         coordinator.state === before &&
-        // Ready rows are the source run's to take up, not to ask for again.
-        result.status !== "ready"
+        // Ready rows are the source run's to take up, not to ask for again,
+        // and a withheld query is never asked for.
+        result.status !== "ready" &&
+        readWithheld(coordinator.state).length === 0
       ) {
         issueRefresh();
       }
@@ -334,6 +364,11 @@ export default function createDataViewsProvider<
     setCollapsed: (collapsed: readonly GroupPath[]) =>
       command({ kind: "setCollapsed", collapsed }),
     refresh(): void {
+      // A withheld query is never asked for: its rows would be wider than
+      // the link asked for.
+      if (readWithheld(coordinator.state).length > 0) {
+        return;
+      }
       issueRefresh();
       // Unobserved, the source is read here: one that answers from what it
       // holds has published before this returns.

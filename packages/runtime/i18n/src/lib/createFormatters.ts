@@ -6,7 +6,7 @@ import type { Formatters, Locale } from "./types.js";
  * same options, so memoizing by serialized options keeps reuse cheap
  * (Constitution IX — optimise only where it pays).
  */
-function cached<TOptions, TFormatter>(
+function memoizeByOptions<TOptions, TFormatter>(
   build: (options: TOptions | undefined) => TFormatter,
 ): (options?: TOptions) => TFormatter {
   const cache = new Map<string, TFormatter>();
@@ -21,6 +21,46 @@ function cached<TOptions, TFormatter>(
   };
 }
 
+/** Options that already ask for a part of the time of day. */
+const TIME_FIELDS = [
+  "hour",
+  "minute",
+  "second",
+  "dayPeriod",
+  "fractionalSecondDigits",
+  "timeStyle",
+] as const;
+
+/**
+ * Options that ask for a part of the date or for the time zone's name. `Intl`
+ * refuses a time style beside any of them, so they gain the hour and minute.
+ */
+const NON_STYLE_FIELDS = [
+  "weekday",
+  "era",
+  "year",
+  "month",
+  "day",
+  "timeZoneName",
+] as const;
+
+/**
+ * Make sure date-time options ask for the time of day. Options that already
+ * name a time field pass through; options that name a date field or the time
+ * zone's name gain the hour and minute; any other options gain the short time
+ * style.
+ */
+function ensureTimeFields(
+  options: Intl.DateTimeFormatOptions | undefined,
+): Intl.DateTimeFormatOptions {
+  if (options === undefined) return { timeStyle: "short" };
+  if (TIME_FIELDS.some((field) => options[field] !== undefined)) return options;
+  if (NON_STYLE_FIELDS.some((field) => options[field] !== undefined)) {
+    return { ...options, hour: "numeric", minute: "2-digit" };
+  }
+  return { ...options, timeStyle: "short" };
+}
+
 /**
  * Create locale-aware {@link Formatters} backed by memoized native `Intl`
  * instances. Framework-agnostic and SSR-safe — `Intl` is a platform global.
@@ -28,31 +68,33 @@ function cached<TOptions, TFormatter>(
  * @param locale - BCP 47 tag every formatter is bound to.
  */
 export default function createFormatters(locale: Locale): Formatters {
-  const numberFormat = cached(
+  const getNumberFormat = memoizeByOptions(
     (options?: Intl.NumberFormatOptions) =>
       new Intl.NumberFormat(locale, options),
   );
-  const dateFormat = cached(
+  const getDateFormat = memoizeByOptions(
     (options?: Intl.DateTimeFormatOptions) =>
       new Intl.DateTimeFormat(locale, options),
   );
-  const relativeTimeFormat = cached(
+  const getRelativeTimeFormat = memoizeByOptions(
     (options?: Intl.RelativeTimeFormatOptions) =>
       new Intl.RelativeTimeFormat(locale, options),
   );
-  const listFormat = cached(
+  const getListFormat = memoizeByOptions(
     (options?: Intl.ListFormatOptions) => new Intl.ListFormat(locale, options),
   );
 
   return {
-    number: (value, options) => numberFormat(options).format(value),
-    currency: (value, currency, options) =>
-      numberFormat({ ...options, style: "currency", currency }).format(value),
-    date: (value, options) => dateFormat(options).format(value),
-    time: (value, options) =>
-      dateFormat(options ?? { timeStyle: "short" }).format(value),
-    relativeTime: (value, unit, options) =>
-      relativeTimeFormat(options).format(value, unit),
-    list: (items, options) => listFormat(options).format([...items]),
+    formatNumber: (value, options) => getNumberFormat(options).format(value),
+    formatCurrency: (value, currency, options) =>
+      getNumberFormat({ ...options, style: "currency", currency }).format(
+        value,
+      ),
+    formatDate: (value, options) => getDateFormat(options).format(value),
+    formatTime: (value, options) =>
+      getDateFormat(ensureTimeFields(options)).format(value),
+    formatRelativeTime: (value, unit, options) =>
+      getRelativeTimeFormat(options).format(value, unit),
+    formatList: (items, options) => getListFormat(options).format([...items]),
   };
 }

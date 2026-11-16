@@ -13,6 +13,10 @@ import type {
   Slice,
   SortDirection,
 } from "@canonical/dataviews-core";
+import type {
+  ColumnLayout,
+  GridInteraction,
+} from "@canonical/dataviews-core/bindings";
 import type { ReactNode, RefObject } from "react";
 import type { AnnouncerTopic } from "../../../common/index.js";
 import type {
@@ -59,6 +63,16 @@ export type UseColumnManagementResult = {
    * one reading of the query, or null without a location.
    */
   readonly listDestinations: () => SettingsDestinations | null;
+};
+
+/** What one table's geometry is resolved from. */
+export type UseTableGeometryProps = {
+  /** The table's column layout: each column's declared and overridden sizing. */
+  readonly layout: ColumnLayout;
+  /** The table's grid interaction, whose live resize is previewed. */
+  readonly interaction: GridInteraction;
+  /** The ids of the columns shown, in the arrangement's order. */
+  readonly columnIds: readonly string[];
 };
 
 /** One table's resolved geometry. */

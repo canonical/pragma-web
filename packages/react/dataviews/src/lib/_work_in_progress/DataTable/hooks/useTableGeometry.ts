@@ -1,41 +1,50 @@
 import {
   buildColumnTemplate,
-  type ColumnLayout,
+  type ColumnLayoutState,
+  type ColumnSizing,
   type ColumnToSize,
-  type GridInteraction,
   type ResolvedColumn,
   resolveColumns,
 } from "@canonical/dataviews-core/bindings";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useDataViewsValue, useStableValue } from "../../../hooks/index.js";
+import { useDataViewsValue } from "../../../hooks/index.js";
 import { areTracksEqual } from "../common/utils/index.js";
-import type { UseTableGeometryResult } from "./types.js";
+import type { UseTableGeometryProps, UseTableGeometryResult } from "./types.js";
 
 /**
- * Give the last column whatever width the others leave, even past its own
- * maximum: its trailing edge is the table's own edge, so it is never resized
- * on its own and grows and shrinks as the columns before it are. Nothing
- * changes once the columns no longer fit, or before the container is
- * measured.
+ * Give a flexible last column whatever width the others leave, up to its
+ * own maximum: its trailing edge is the table's own edge, so it is never
+ * resized on its own and grows and shrinks as the columns before it are.
+ * Space past a capped or fixed last column is the table's, not a column's,
+ * and stays empty rather than stretching the column past its declaration.
+ * Nothing changes once the columns no longer fit, or before the container
+ * is measured.
  */
 const fillLast = (
   columns: readonly ResolvedColumn[],
   available: number | null,
+  sizing: ColumnSizing | undefined,
 ): readonly ResolvedColumn[] => {
   const last = columns.at(-1);
-  if (available === null || last === undefined) {
+  if (available === null || last === undefined || sizing?.kind !== "flex") {
     return columns;
   }
   const spare =
     available - columns.reduce((total, column) => total + column.width, 0);
-  return spare > 0
-    ? [...columns.slice(0, -1), { id: last.id, width: last.width + spare }]
+  const width = Math.min(
+    last.width + spare,
+    sizing.maxPx ?? Number.POSITIVE_INFINITY,
+  );
+  return width > last.width
+    ? [...columns.slice(0, -1), { id: last.id, width }]
     : columns;
 };
 
 /**
  * Call `onResize` with each resize of one element. Returns the disconnect,
  * or nothing where there is no observer.
+ *
+ * @note Impure: observes the element until the returned disconnect is called.
  */
 const observeResize = (
   element: HTMLElement,
@@ -72,15 +81,13 @@ const observeResize = (
  * Two tables on one provider read one presentation, so they share the
  * arrangement while resolving their own widths against their own container.
  */
-export default function useTableGeometry(
-  layout: ColumnLayout,
-  interaction: GridInteraction,
-  columnIds: readonly string[],
-): UseTableGeometryResult {
+export default function useTableGeometry({
+  layout,
+  interaction,
+  columnIds,
+}: UseTableGeometryProps): UseTableGeometryResult {
   const [container, setContainer] = useState<number | null>(null);
   const [reserved, setReserved] = useState(0);
-  // The snapshot keys the track list.
-  const snapshot = useDataViewsValue(layout.state);
   const interactionState = useDataViewsValue(interaction.state);
 
   const attach = useCallback(
@@ -129,10 +136,11 @@ export default function useTableGeometry(
 
   const width = container === null ? null : Math.max(0, container - reserved);
 
-  // Rebuilt only when a width or the column list changes, never per frame
-  // of a preview, which moves neither.
-  const declared = useMemo<readonly ColumnToSize[]>(
-    () =>
+  // Rebuilt only when the column list changes, so it runs once per layout
+  // publication — never per frame of a preview, which publishes none — and
+  // the tracks keep one reference while they read the same.
+  const selectTracks = useCallback(
+    (snapshot: ColumnLayoutState): readonly ColumnToSize[] =>
       columnIds.map((id) => ({
         id,
         // The snapshot's own override, else the declaration — whose guard
@@ -143,9 +151,9 @@ export default function useTableGeometry(
             ? snapshot.overrides[id]
             : undefined) ?? layout.readDeclared(id),
       })),
-    [columnIds, layout, snapshot],
+    [columnIds, layout],
   );
-  const tracks = useStableValue(declared, areTracksEqual);
+  const tracks = useDataViewsValue(layout.state, selectTracks, areTracksEqual);
 
   // Resolving against zero yields each column's own reservation, which is
   // exactly the width a resize should capture before the container is
@@ -154,7 +162,11 @@ export default function useTableGeometry(
     () => resolveColumns(tracks, width ?? 0),
     [tracks, width],
   );
-  const filled = useMemo(() => fillLast(resolved, width), [resolved, width]);
+  const lastSizing = tracks.at(-1)?.sizing;
+  const filled = useMemo(
+    () => fillLast(resolved, width, lastSizing),
+    [resolved, width, lastSizing],
+  );
   const widths = useMemo(() => filled.map((column) => column.width), [filled]);
 
   const preview =
@@ -182,6 +194,7 @@ export default function useTableGeometry(
                 : column,
             ),
             width,
+            lastSizing,
           );
   return {
     attach,

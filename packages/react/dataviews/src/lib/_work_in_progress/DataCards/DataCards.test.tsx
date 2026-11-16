@@ -9,16 +9,13 @@ import { createRef, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import buildMachine from "../../../../testing/buildMachine.js";
+import buildPage from "../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
-import { pageOf } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type Machine,
-  type MachineFields,
-  machine,
-  machines,
-} from "../../../../testing/machines.js";
+import { machines } from "../../../../testing/machines.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
+import type { Machine, MachineFields } from "../../../../testing/types.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
@@ -37,8 +34,8 @@ const fields: readonly DisplayField[] = [
 ];
 
 const rows: readonly Machine[] = [
-  machine("m-1", "alpha", "running", 4),
-  machine("m-2", "beta", "failed", 8),
+  buildMachine("m-1", "alpha", "running", 4),
+  buildMachine("m-2", "beta", "failed", 8),
 ];
 
 /** DataCards whose source answers every request at once with `answered`. */
@@ -328,7 +325,7 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
@@ -366,7 +363,7 @@ describe("DataCards", () => {
       provider.setSearch("nothing-at-all");
     });
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: pageOf([]) });
+      source.latest().deliver({ status: "succeeded", page: buildPage([]) });
     });
     expect(screen.getByRole("status")).toHaveTextContent("nothing: no-results");
   });
@@ -382,7 +379,7 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.refresh();
@@ -412,7 +409,7 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");
@@ -509,7 +506,7 @@ describe("DataCards", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.setSearch("alp");

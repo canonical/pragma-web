@@ -1,7 +1,9 @@
+import type { PresentationState } from "@canonical/dataviews-core";
 import { resolveColumnArrangement } from "@canonical/dataviews-core/bindings";
-import { useMemo } from "react";
-import { useDataViewsValue, useStableValue } from "../../../hooks/index.js";
+import { useCallback } from "react";
+import { useDataViewsValue } from "../../../hooks/index.js";
 import { areColumnsEqual } from "../common/utils/index.js";
+import type { DataTableColumn } from "../types.js";
 import type {
   UseColumnArrangementProps,
   UseColumnArrangementResult,
@@ -19,17 +21,15 @@ export default function useColumnArrangement({
   presentation,
   columns,
 }: UseColumnArrangementProps): UseColumnArrangementResult {
-  // The arrangement alone: a change to the reason re-renders no table.
-  const arrangement = useDataViewsValue(
-    presentation.state,
-    (shown) => shown.presentation,
-  );
-  const visible = useMemo(
-    () =>
-      resolveColumnArrangement(columns, arrangement)
+  // Rebuilt only with the declared columns, so it runs once per
+  // publication of the presentation, and once per render that passes new
+  // columns.
+  const selectVisible = useCallback(
+    (shown: PresentationState): readonly DataTableColumn[] =>
+      resolveColumnArrangement(columns, shown.presentation)
         .filter(({ hidden }) => !hidden)
         .map(({ column }) => column),
-    [columns, arrangement],
+    [columns],
   );
-  return useStableValue(visible, areColumnsEqual);
+  return useDataViewsValue(presentation.state, selectVisible, areColumnsEqual);
 }

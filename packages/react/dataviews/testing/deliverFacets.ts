@@ -1,7 +1,7 @@
 import { createPage, type Facet } from "@canonical/dataviews-core";
 import { act } from "@testing-library/react";
-import { type Machine, machine } from "./machines.js";
-import type { ManualSource } from "./types.js";
+import buildMachine from "./buildMachine.js";
+import type { Machine, ManualSource } from "./types.js";
 
 /**
  * Answer a manual source's latest request with one machine and these facets:
@@ -17,9 +17,8 @@ export default function deliverFacets(
     source.latest().deliver({
       status: "succeeded",
       page: createPage({
-        rows: [machine("m-1", "alpha")],
+        rows: [buildMachine("m-1", "alpha")],
         matched: 1,
-        total: 1,
         facets,
       }),
     });

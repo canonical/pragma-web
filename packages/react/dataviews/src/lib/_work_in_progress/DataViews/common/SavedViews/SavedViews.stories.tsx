@@ -16,11 +16,9 @@ import {
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
-import {
-  type MachineProvider,
-  useMachineProvider,
-  useStoryViewStore,
-} from "../../../../../storybook/machines/story-utils.js";
+import type { MachineProvider } from "../../../../../storybook/machines/types.js";
+import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
+import useStoryViewStore from "../../../../../storybook/machines/useStoryViewStore.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./SavedViews.js";

@@ -13,11 +13,9 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import {
-  createMachineProvider,
-  type MachineFixture,
-  machines,
-} from "../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../testing/createMachineProvider.js";
+import { machines } from "../../../../../testing/machines.js";
+import type { MachineFixture } from "../../../../../testing/types.js";
 import DataViews from "../Provider.js";
 import useDataViewsFilter from "./useDataViewsFilter.js";
 

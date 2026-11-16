@@ -9,7 +9,6 @@ describe("createPage", () => {
       counts: {
         pageable: { kind: "exact", value: 12 },
         matched: { kind: "exact", value: 12 },
-        total: { kind: "unknown" },
       },
       facets: {},
       more: null,
@@ -32,11 +31,10 @@ describe("createPage", () => {
     expect(Object.isFrozen(page.facets)).toBe(true);
   });
 
-  it("carries the total, whether more exists and the cursors as given", () => {
+  it("carries whether more exists and the cursors as given", () => {
     expect(
       createPage({
         rows: [],
-        total: 40,
         more: true,
         cursors: { next: "n", previous: null },
       }),
@@ -46,7 +44,6 @@ describe("createPage", () => {
       counts: {
         pageable: { kind: "unknown" },
         matched: { kind: "unknown" },
-        total: { kind: "exact", value: 40 },
       },
       facets: {},
       more: true,

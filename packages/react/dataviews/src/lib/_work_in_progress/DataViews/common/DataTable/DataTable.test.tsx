@@ -5,11 +5,9 @@
  */
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import buildPage from "../../../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import DataTable from "./DataTable.js";
@@ -39,7 +37,7 @@ describe("DataViews.DataTable", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m1", "alpha")]),
+        page: buildPage([buildMachine("m1", "alpha")]),
       });
     });
     const table = screen.getByRole("table", { name: "Machines" });
@@ -49,7 +47,7 @@ describe("DataViews.DataTable", () => {
 
   it("shows a source's synchronous answer on the render after its effect", () => {
     const { provider, source } = createMachineProvider({
-      rows: [machine("m1", "alpha"), machine("m2", "beta")],
+      rows: [buildMachine("m1", "alpha"), buildMachine("m2", "beta")],
     });
     render(
       <DataViews provider={provider}>

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it } from "vitest";
-import { createFacetedFleet } from "../../../../testing/createFacetedProviders.js";
+import createFacetedFleet from "../../../../testing/createFacetedFleet.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import DataChartWithTable from "./DataChartWithTable.js";
 

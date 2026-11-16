@@ -19,7 +19,13 @@ import type { RowScopes } from "@canonical/dataviews-core/bindings";
 import type { ReactNode, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
 
-/** What `useDataViewsValue` returns: the channel's current value, or the part `select` picks. */
+/**
+ * What `useDataViewsValue` returns: the channel's current value, or the part
+ * `select` picks, held at one reference while `isEqual` says it is the same.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export type UseDataViewsValueResult<T> = T;
 
 /**

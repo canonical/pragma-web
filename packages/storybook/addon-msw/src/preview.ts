@@ -1,29 +1,19 @@
-/**
- * A decorator is a way to wrap a story in extra “rendering” functionality. Many addons define decorators
- * in order to augment stories:
- * - with extra rendering
- * - gather details about how a story is rendered
- *
- * When writing stories, decorators are typically used to wrap stories with extra markup or context mocking.
- *
- * https://storybook.js.org/docs/react/writing-stories/decorators
- */
 import type { ProjectAnnotations, Renderer } from "storybook/internal/types";
-
 import { KEY } from "./constants.js";
-import { mswLoader, withMSW } from "./withMSW.js";
+import { createStoryRegistry } from "./lib/worker/index.js";
+
+const registry = createStoryRegistry();
 
 /**
- * Note: if you want to use JSX in this file, rename it to `preview.tsx`
- * and update the entry prop in tsup.config.ts to use "src/preview.tsx",
+ * The addon's preview annotations: MSW on by default, and each story's
+ * handlers served before its own loaders run, until it is torn down.
+ *
+ * `import preview from "@canonical/storybook-addon-msw/preview";`
  */
-
-const preview: ProjectAnnotations<Renderer> = {
-  loaders: [mswLoader],
-  decorators: [withMSW],
-  initialGlobals: {
-    [KEY]: true,
-  },
-};
+const preview = {
+  loaders: [registry.serveStory],
+  beforeEach: [registry.scheduleWithdrawal],
+  initialGlobals: { [KEY]: true },
+} satisfies ProjectAnnotations<Renderer>;
 
 export default preview;

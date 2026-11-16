@@ -1,31 +1,14 @@
 /**
- * Story fixtures for the machine collection. Story-only: this folder is
- * excluded from the package build, and the unit tests take their own
- * collection and pages from `testing/`.
- *
- * The stories drive a real `createArraySource` rather than a frozen page of
- * rows, so sorting, searching and paging in a story run the same path a
- * consumer's source runs. Hosts are `example.com` and people are `ex:*`
- * personas, as in the package's tests.
+ * Story fixtures for the machine collection: the twelve records and the
+ * collection they belong to. Story-only: this folder is excluded from the
+ * package build, and the unit tests take their own collection and pages from
+ * `testing/`. Hosts are `example.com` and people are `ex:*` personas, as in
+ * the package's tests; each story's source is built by its own factory beside
+ * this file.
  */
 
-import {
-  createArraySource,
-  createCollection,
-  type SortTerm,
-  type Source,
-} from "@canonical/dataviews-core";
-
-/** One machine record, as a source would deliver it. */
-export type Machine = {
-  readonly id: string;
-  readonly name: string;
-  readonly status: "running" | "failed" | "pending";
-  readonly region: string;
-  readonly cores: number;
-  readonly owner: string;
-  readonly note: string;
-};
+import { createCollection } from "@canonical/dataviews-core";
+import type { Machine } from "./types.js";
 
 /** Twelve machines, every status represented; one story pages them by five. */
 export const machines = [
@@ -159,139 +142,4 @@ export const machineCollection = createCollection({
     { field: "region", kind: "text" },
     { field: "owner", kind: "text" },
   ],
-});
-
-/** The collection's field definitions, for typing a provider over it. */
-export type MachineFields = typeof machineCollection.schema.fields;
-
-/**
- * A field the source can order by — the only kind a story may sort. The
- * source orders by every field of its schema, so a column offering a sort
- * outside it would offer a dead control.
- */
-export type SortableField = MachineFields[number]["field"];
-
-/**
- * `count` machines for the virtualized stories, made from the twelve above in
- * turn — their statuses, regions, owners and notes — each host numbered.
- */
-export const manyMachines = (count: number): readonly Machine[] =>
-  Array.from({ length: count }, (_, position) => ({
-    ...(machines[position % machines.length] as Machine),
-    id: `n-${position}`,
-    name: `node-${String(position).padStart(5, "0")}.example.com`,
-  }));
-
-/** How a story's machine source is built. */
-type MachineSourceConfig = {
-  /** The records; every machine by default. */
-  readonly rows?: readonly Machine[] | undefined;
-  /** The order the source documents for a query with no term; none by default. */
-  readonly defaultSort?: readonly SortTerm[] | undefined;
-};
-
-/** A local-array source over the machines, or over a caller's own rows. */
-export const createMachineSource = ({
-  rows = machines,
-  defaultSort,
-}: MachineSourceConfig = {}): Source<Machine> =>
-  createArraySource<Machine>({
-    rows,
-    collection: machineCollection,
-    searchFields: ["name", "owner"],
-    ...(defaultSort === undefined ? {} : { defaultSort }),
-  });
-
-/**
- * A source that cannot filter or order by cores: its declaration leaves
- * the field out, so no part may offer it, though the collection has it.
- */
-export const createSourceWithoutCores = (): Source<Machine> => {
-  const source = createMachineSource();
-  const { cores: _cores, ...filter } = source.capabilities.filter;
-  return {
-    ...source,
-    capabilities: {
-      ...source.capabilities,
-      filter,
-      sort: {
-        ...source.capabilities.sort,
-        fields: source.capabilities.sort.fields.filter(
-          (field) => field !== "cores",
-        ),
-      },
-    },
-  };
-};
-
-/**
- * A source that orders by one term at a time: a further term is refused, and
- * the heading that asked for it says why.
- */
-export const createOneTermSource = (): Source<Machine> => {
-  const source = createMachineSource();
-  return {
-    ...source,
-    capabilities: {
-      ...source.capabilities,
-      sort: { ...source.capabilities.sort, terms: 1 },
-    },
-  };
-};
-
-/** A source whose collection has nothing in it. */
-export const createEmptySource = (): Source<Machine> =>
-  createMachineSource({ rows: [] });
-
-/**
- * A source that pages without counting, as many backends do: it declares no
- * total and publishes none, so nothing can offer a last page.
- */
-export const createUncountedSource = (): Source<Machine> => {
-  const source = createMachineSource();
-  const counts = {
-    pageable: "unknown",
-    matched: "unknown",
-    total: "unknown",
-  } as const;
-  return {
-    capabilities: { ...source.capabilities, counts },
-    execute: (request, deliver) =>
-      source.execute(request, (delivery) => {
-        if (delivery.status !== "succeeded") {
-          deliver(delivery);
-          return;
-        }
-        const unknown = { kind: "unknown" } as const;
-        deliver({
-          status: "succeeded",
-          page: {
-            ...delivery.page,
-            counts: { pageable: unknown, matched: unknown, total: unknown },
-          },
-        });
-      }),
-  };
-};
-
-/** A source that accepts a request and never answers it. */
-export const createPendingSource = (): Source<Machine> => ({
-  ...createMachineSource(),
-  execute: () => () => undefined,
-});
-
-/** A source that fails every request: the inventory cannot be reached. */
-export const createFailingSource = (): Source<Machine> => ({
-  ...createMachineSource(),
-  execute: (_request, deliver) => {
-    deliver({
-      status: "failed",
-      failure: {
-        reason: "the machine inventory could not be reached",
-        cause: null,
-        transient: null,
-      },
-    });
-    return () => undefined;
-  },
 });

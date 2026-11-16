@@ -50,6 +50,7 @@ export default function useProviderState<
     () => ({
       provider: widest,
       filters: inputs.handles,
+      endSessions: inputs.endSessions,
       messages: words,
       announce,
     }),

@@ -10,16 +10,18 @@
 
 import { IDBFactory } from "fake-indexeddb";
 import { describe, expect, it, vi } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import { answering, byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
 import openIndexedDBTab from "../../../testing/openIndexedDBTab.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 
 const collection = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "running"] },
     { field: "cores", kind: "number", min: 1 },
@@ -44,7 +46,7 @@ describe("regression 0029 — a restored view arrangement became the default", (
       collection,
       source: createManualSource({
         capabilities: declare({ filter: { status: ["isAny"] } }),
-        answer: answering([]),
+        answer: answerWith([]),
       }).source,
       location,
       views,

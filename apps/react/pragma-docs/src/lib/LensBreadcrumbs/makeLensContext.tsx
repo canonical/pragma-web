@@ -34,6 +34,7 @@ export const makeLensContext = ({
   readonly lensRouteName: LensRouteName;
   readonly paramKey?: string;
 }): (() => React.ReactElement) => {
+  // biome-ignore lint/correctness/noComponentHookFactories: called once per lens at module load, never during render
   const LensContext = (): React.ReactElement => {
     const { match } = useRouterState();
     const params =

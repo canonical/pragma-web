@@ -15,19 +15,22 @@ import type {
   Facet,
   GroupSummary,
   PageCursors,
+  QueryIssue,
   ResultProblem,
   ResultProvenance,
   SourceCounts,
 } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
+
 /**
  * Display status of the result projection.
  *
  * `refresh-failed` is a settled problem over rows that still answer the
  * current query, as after a failed refresh: the rows are usable and the
  * problem is real, so both are reported. `stale` is the same over rows an
- * earlier query produced. `failed` is a problem with no rows to keep. A
- * result that does not match the current query never reports `ready`.
+ * earlier query produced, and over any rows kept while the query is
+ * withheld. `failed` is a problem with no rows to keep. A result that does
+ * not match the current query never reports `ready`.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -69,7 +72,11 @@ export type ResultState<TRow extends object = RowRecord> = {
   readonly more: boolean | null;
   readonly cursors: PageCursors | null;
   readonly provenance: ResultProvenance | null;
-  /** The last refusal or failure, structurally; null after a success. */
+  /**
+   * The last refusal or failure, structurally — a followed link's refused
+   * clauses, while they withhold the query, among them; null after a
+   * success.
+   */
   readonly problem: ResultProblem | null;
 };
 
@@ -89,6 +96,11 @@ export type QueryCoordinatorConfig = {
    * the first generation stands on the start; a reset always returns to it.
    */
   readonly initial?: Query | undefined;
+  /**
+   * The narrowing clauses the initial query's link was refused for: while
+   * any is given, the initial query is withheld and no request runs for it.
+   */
+  readonly withheld?: readonly QueryIssue[] | undefined;
 };
 
 /** Result of dispatching one command through the coordinator. */
@@ -133,12 +145,18 @@ export type QueryCoordinator<TRow extends object = RowRecord> = {
    * Apply one addressed command coherently. An accepted change that moves
    * the query or window issues a new request identity and retains previous
    * rows with their old provenance until a matching completion arrives.
+   * While the query is withheld, a command on a refused clause's field —
+   * the search for a refused `q` — removes that clause, moving the query or
+   * not, and the query stays withheld, with no request, while any other
+   * stands.
    */
   readonly dispatch: (command: QueryCommand) => DispatchResult;
   /**
    * Refresh the current query: retained rows stay displayed with a
    * refreshing status until a matching completion arrives; with no rows
-   * to retain the request is pending, as the first one is.
+   * to retain the request is pending, as the first one is. A withheld
+   * query is never asked for, so refreshing one throws: its rows would be
+   * wider than the link asked for.
    */
   readonly refresh: () => string;
   /**
@@ -146,9 +164,17 @@ export type QueryCoordinator<TRow extends object = RowRecord> = {
    * or a restored view. Invalid windows throw, the same rejections the
    * addressed command layer applies. Supersedes any pending request,
    * discards stale input sessions above this layer, and returns a request
-   * identity when the adopted query differs from the current one.
+   * identity when the adopted query differs from the current one. Given the
+   * narrowing clauses its link was refused for, the query is withheld
+   * instead: no request is issued, one in flight is obsolete, and any rows
+   * shown stay as `stale`. Given none, nothing is withheld any longer;
+   * left out, what is withheld stands while the slice stays where it is,
+   * and goes once it moves.
    */
-  readonly adopt: (query: Query) => string | null;
+  readonly adopt: (
+    query: Query,
+    withheld?: readonly QueryIssue[],
+  ) => string | null;
   /**
    * Publish a completion for the most recently issued request, at most
    * once. Completions for superseded requests or an earlier generation are
@@ -156,7 +182,9 @@ export type QueryCoordinator<TRow extends object = RowRecord> = {
    * cursors and provenance together. A refusal or a failure keeps the rows
    * with the problem recorded — `failed` when no rows have been published,
    * `refresh-failed` while the kept rows still answer the current query,
-   * `stale` when an earlier query produced them, even an empty set.
+   * `stale` when an earlier query produced them, even an empty set. A
+   * forbidden request withdraws every row, count and facet, and is
+   * `failed` with the forbidden delivery as its problem.
    */
   readonly complete: (
     requestId: string,
@@ -164,8 +192,8 @@ export type QueryCoordinator<TRow extends object = RowRecord> = {
   ) => boolean;
   /**
    * Begin the next generation: query, window and result return to the
-   * configured start and the pending request dies. Completions from the
-   * old generation never publish into the new one.
+   * configured start and the pending request dies, and nothing is withheld.
+   * Completions from the old generation never publish into the new one.
    */
   readonly reset: () => void;
 };

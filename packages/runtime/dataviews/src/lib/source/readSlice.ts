@@ -14,9 +14,9 @@ import type { SliceReading } from "./types.js";
  * A field whose kind accepts several operators reads as a record of them,
  * each present only when the slice carries it: a number or date filter as
  * its bounds, `gte` and `lte`; a `choices` filter as the sets `isAny` and
- * `isNone`; a text filter as the text it `contains` and `startsWith`. A flag,
- * whose kind accepts one, reads as `true`. The search text and the ordered
- * sort terms come as they are, canonicalized.
+ * `isNone`; a text filter as the text it `contains` and `startsWith`. A
+ * presence field, whose kind accepts one, reads as `true`. The search text
+ * and the ordered sort terms come as they are, canonicalized.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

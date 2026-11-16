@@ -1,7 +1,7 @@
 {
   "name": "@canonical/ds-types",
   "description": "Types and related type utilities for Pragma.",
-  "version": "0.45.0",
+  "version": "0.47.0",
   "type": "module",
   "main": "dist/esm/index.js",
   "module": "dist/esm/index.js",
@@ -45,8 +45,8 @@
     "test": "echo 'Type-only package — no runtime tests'"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@canonical/biome-config": "0.43.0",
+    "@biomejs/biome": "2.6.8",
+    "@canonical/biome-config": "0.46.0",
     "@canonical/typescript-config": "0.44.0",
     "@canonical/webarchitect": "0.44.0",
     "typescript": "^7.0.2"

@@ -48,6 +48,9 @@ const DATA_CHART = "_work_in_progress/DataViews/Renderers/DataChart";
 const DATA_CHART_WITH_TABLE =
   "_work_in_progress/DataViews/Renderers/DataChartWithTable";
 
+/** The whole composition's stories, links with a refused clause among them. */
+const COMPOSITION = "_work_in_progress/Composition";
+
 /** The stories over a REST endpoint, through TanStack Query. */
 const REST_API = "_work_in_progress/REST API";
 
@@ -57,7 +60,7 @@ const GRAPHQL_API = "_work_in_progress/GraphQL API";
 /**
  * The stories this pass walks: the table's own, the sort panel's, the
  * filters', the table settings', the cards', the chart prototypes', the
- * renderer switch's, and the whole composition over each mock endpoint.
+ * chart with its table's, and the whole composition over each mock endpoint.
  */
 const TITLES: readonly string[] = [
   TABLE,
@@ -87,9 +90,13 @@ if (index.entries === undefined) {
   );
 }
 
-const stories = Object.values(index.entries).filter(
-  (entry) => entry.type === "story" && TITLES.includes(entry.title),
+/** Every story the build indexed, which a journey may open. */
+const indexed = Object.values(index.entries).filter(
+  (entry) => entry.type === "story",
 );
+
+/** The stories the walk takes. */
+const stories = indexed.filter((entry) => TITLES.includes(entry.title));
 
 /** The render phases after which a story is drawn and its play function done. */
 const SETTLED_PHASES: readonly string[] = ["completed", "finished"];
@@ -130,7 +137,7 @@ const openStory = async (page: Page, id: string): Promise<void> => {
 
 /** The story with this title and name. */
 const findStory = (title: string, name: string): IndexedStory => {
-  const story = stories.find(
+  const story = indexed.find(
     (entry) => entry.title === title && entry.name === name,
   );
   if (story === undefined) {
@@ -453,7 +460,7 @@ const tabTo = async (page: Page, control: Locator): Promise<void> => {
   }
 };
 
-test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes, renderer switch and server-backed stories, keyboard only", () => {
+test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes, chart with table and server-backed stories, keyboard only", () => {
   for (const story of stories) {
     test(`${story.title} ${story.name}: every control is reached both ways, focus visible`, async ({
       page,
@@ -876,6 +883,24 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await page.keyboard.press("Enter");
     await expect(terms.nth(1)).toHaveText(/^cores, descending/);
     await expect(moveDown).toBeFocused();
+  });
+
+  test("Composition LinkWithARefusedFilter: Enter on Clear Status removes the refused clause, focus goes to the filters", async ({
+    page,
+  }) => {
+    await openStory(
+      page,
+      findStory(COMPOSITION, "Link With A Refused Filter").id,
+    );
+    const clear = page.getByRole("button", { name: "Clear Status" });
+    await tabTo(page, clear);
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("navigation", { name: "Pagination" }).getByRole("status"),
+    ).toHaveText("Showing 1–12 out of 12 rows");
+    // The list empties with the clause, so focus goes to the filters' group.
+    await expect(clear).toHaveCount(0);
+    await expect(page.getByRole("group", { name: "Filters" })).toBeFocused();
   });
 
   test("REST API Answered: text typed into a filter narrows the table, and Enter on its clear restores it", async ({

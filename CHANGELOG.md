@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.47.0](https://github.com/canonical/pragma-web/compare/v0.46.0...v0.47.0) (2026-11-14)
+
+* feat(i18n-core,i18n-react,react-boilerplate-vite)!: renames functions (#1613) ([6cf9760](https://github.com/canonical/pragma-web/commit/6cf97609c34b93ec9f7ad1d9865089f580f618b7)), closes [#1613](https://github.com/canonical/pragma-web/issues/1613)
+
+### Bug Fixes
+
+* **ci:** forces stable releases through --force-conventional-graduate ([#1611](https://github.com/canonical/pragma-web/issues/1611)) ([3c11671](https://github.com/canonical/pragma-web/commit/3c116717e9deff9355033df59d3ebcd19cd15275))
+* **ci:** restores npm publishing on ubuntu-26.04 runners ([#1598](https://github.com/canonical/pragma-web/issues/1598)) ([c732996](https://github.com/canonical/pragma-web/commit/c73299615dd8a9743b270f2a8828da98a6ae464b))
+* **i18n-react:** creates no own source beside an external one ([#1566](https://github.com/canonical/pragma-web/issues/1566)) ([c628ff9](https://github.com/canonical/pragma-web/commit/c628ff9d8d22cf2f0200cbf35802d92a841c95e0))
+* **react-ds-global:** accept conditional children in Tile, Accordion and Timeline.Content ([#1593](https://github.com/canonical/pragma-web/issues/1593)) ([aee3649](https://github.com/canonical/pragma-web/commit/aee3649742f07bc6d62e0fb69c2b8e7edf33b046))
+* **react-ds-global:** recompute useWindowFitment placement on open and ref mount ([#1596](https://github.com/canonical/pragma-web/issues/1596)) ([960ab65](https://github.com/canonical/pragma-web/commit/960ab652169bf359ff77eb818ac93fd69df434b8))
+* **storybook-addon-msw:** keeps every shown story's handlers ([#1568](https://github.com/canonical/pragma-web/issues/1568)) ([d1dd164](https://github.com/canonical/pragma-web/commit/d1dd164b6d0b67bf9608ce3aa9140bf064cee048))
+
+### Features
+
+* **ci:** adds a force_publish input to the release workflow ([#1600](https://github.com/canonical/pragma-web/issues/1600)) ([c6542f0](https://github.com/canonical/pragma-web/commit/c6542f0dde643fb5ddf428a1dff6028ac1b9dccf))
+
+### BREAKING CHANGES
+
+* @canonical/i18n-core renames its public functions so
+  each starts with a verb. The Formatters members number, currency,
+  date, time, relativeTime and list become formatNumber,
+  formatCurrency, formatDate, formatTime, formatRelativeTime and
+  formatList, and the document helpers directionOf and documentAttrs
+  become getDirection and getDocumentAttributes. Callers of
+  createFormatters, useFormatters and the helpers must use the new
+  names; the old ones are removed.
+
+
+# [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
+
+### Bug Fixes
+
+* **deps:** bumps dependency @canonical/svelte-icons to ^0.1.0 ([#1530](https://github.com/canonical/pragma-web/issues/1530)) ([85f5077](https://github.com/canonical/pragma-web/commit/85f5077169cf956b57bd4f1aefd85b4ba7dee5cd))
+* **deps:** bumps pragma-core to v0.44.0 ([#1531](https://github.com/canonical/pragma-web/issues/1531)) ([e9552b2](https://github.com/canonical/pragma-web/commit/e9552b221e5e0f8cbac3aaca468685aca73fc75d))
+* keep tooltip chaining active while any tooltip is visible ([#1517](https://github.com/canonical/pragma-web/issues/1517)) ([9a7f0a8](https://github.com/canonical/pragma-web/commit/9a7f0a816269678c635aef151fc3d4ebc97a5ac1))
+* **react-ds-global:** raise Tooltip above overlay-tier surfaces ([#1471](https://github.com/canonical/pragma-web/issues/1471)) ([cb3608e](https://github.com/canonical/pragma-web/commit/cb3608ec4e0f81d59fff556376a4956bd63afcd7))
+* **react-ds-global:** use the typography.text.primary composite token for the Button label ([#1486](https://github.com/canonical/pragma-web/issues/1486)) ([0eb4e09](https://github.com/canonical/pragma-web/commit/0eb4e094ccf3fae14a1de7d0a5ac75de0eb47c09))
+* **storybook-hub:** declare autodocs tag inline so component docs pages are generated ([#1577](https://github.com/canonical/pragma-web/issues/1577)) ([ca6fbe3](https://github.com/canonical/pragma-web/commit/ca6fbe36160c30d1d52315be2607ad2f474b0fd3))
+
+### Features
+
+* **dataviews-core,dataviews-react:** adds DataViews ([#1548](https://github.com/canonical/pragma-web/issues/1548)) ([dd976ec](https://github.com/canonical/pragma-web/commit/dd976ecaff89c1a322f95dc3c41e942c3853f74b))
+* **dataviews-react:** groups the stories under DataViews and adds DataChartWithTable ([#1550](https://github.com/canonical/pragma-web/issues/1550)) ([de1eb56](https://github.com/canonical/pragma-web/commit/de1eb5660597096916783ce568fa1aaea5f09332))
+* **ds-app:** SidePanel overflow lines via scroll-driven CSS, JavaScript as fallback ([#1483](https://github.com/canonical/pragma-web/issues/1483)) ([fed63c8](https://github.com/canonical/pragma-web/commit/fed63c865cdab787c548a985a7e26d7e089b11aa))
+* **ds-assets:** add edit-off icon ([#1587](https://github.com/canonical/pragma-web/issues/1587)) ([3c8cc16](https://github.com/canonical/pragma-web/commit/3c8cc1623e905aec533297b4114b84773de3e2a7))
+* **ds-assets:** add storage and status-small icons ([#1579](https://github.com/canonical/pragma-web/issues/1579)) ([0033464](https://github.com/canonical/pragma-web/commit/00334648a77f654ed830fa9233b3a72efd5dbb61))
+* **react-hooks:** add useScrollOverflow hook for scroll container edge flags ([#1482](https://github.com/canonical/pragma-web/issues/1482)) ([6c12794](https://github.com/canonical/pragma-web/commit/6c127942677d7a1d132537391b7d65d790474342))
+
+
 # [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
 
 ### Bug Fixes

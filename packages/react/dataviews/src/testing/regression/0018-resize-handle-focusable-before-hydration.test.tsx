@@ -9,13 +9,14 @@
 
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 describe("regression 0018 — a resize handle focusable before hydration", () => {
   it("sends no separator and nothing focusable for a resizable column", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     const markup = renderToString(
       <DataTable

@@ -1,0 +1,12 @@
+name: Publish packages
+description: Publishes every public package whose manifest version the registry does not have yet.
+inputs:
+  version:
+    description: "The released version number (without tag prefix)."
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Publish packages to npm
+      shell: bash
+      run: ${{ github.action_path }}/publish.sh "${{ inputs.version }}"

@@ -10,14 +10,12 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import {
-  type Machine,
   machineCollection,
   machines,
 } from "../../../../../storybook/machines/fixtures.js";
-import {
-  hostName,
-  useMachineProvider,
-} from "../../../../../storybook/machines/story-utils.js";
+import readHostName from "../../../../../storybook/machines/readHostName.js";
+import type { Machine } from "../../../../../storybook/machines/types.js";
+import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import { useDataViewsValue } from "../../../../hooks/index.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import { useDataViews } from "../../hooks/index.js";
@@ -114,7 +112,7 @@ function ManagedMachines({
         columns={columns}
         label="Machines"
         selectable
-        rowLabel={hostName}
+        rowLabel={readHostName}
       />
       <Component indicator={indicator}>
         <SelectionAction action="archive">Archive</SelectionAction>

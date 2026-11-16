@@ -12,6 +12,7 @@ import type {
   Completion,
   Count,
   GroupSummary,
+  QueryIssue,
   SourceCounts,
   SourcePage,
 } from "../result/index.js";
@@ -44,7 +45,6 @@ const UNKNOWN: Count = { kind: "unknown" };
 const counts = (matched: number): SourceCounts => ({
   pageable: { kind: "exact", value: matched },
   matched: { kind: "exact", value: matched },
-  total: UNKNOWN,
 });
 
 const succeeded = (
@@ -996,5 +996,180 @@ describe("createQueryCoordinator", () => {
       status: "failed",
       failure: { reason: "503", cause: null, transient: null },
     });
+  });
+
+  describe("a query withheld for a link's refused clauses", () => {
+    const MELTED: QueryIssue = {
+      parameter: "status",
+      field: "status",
+      code: "invalid",
+      reason: '"melted" is not an option',
+    };
+    const SEARCH: QueryIssue = {
+      parameter: "q",
+      field: null,
+      code: "undeclared-field",
+      reason: "this source cannot search",
+    };
+
+    it("starts withheld, with nothing pending and nothing to refresh", () => {
+      const coordinator = createQueryCoordinator({ withheld: [MELTED] });
+      const { result, pendingRequestId } = coordinator.state;
+      expect(pendingRequestId).toBeNull();
+      expect(result.status).toBe("failed");
+      expect(result.problem).toEqual({ status: "refused", issues: [MELTED] });
+      expect(() => coordinator.refresh()).toThrow(
+        "a withheld query is not asked for again",
+      );
+    });
+
+    it("starts on its query when nothing is withheld", () => {
+      const coordinator = createQueryCoordinator({ withheld: [] });
+      expect(coordinator.state.result.status).toBe("idle");
+    });
+
+    it("withholds an adopted query, so a request in flight never publishes", () => {
+      const coordinator = createQueryCoordinator();
+      const first = refreshRequest(coordinator);
+      coordinator.complete(first, succeeded([{ id: "a" }]));
+      const late = refreshRequest(coordinator);
+      expect(
+        coordinator.adopt({ slice: slice(), window: window() }, [MELTED]),
+      ).toBeNull();
+      const { result, pendingRequestId, resultMatchesQuery } =
+        coordinator.state;
+      expect(pendingRequestId).toBeNull();
+      // The rows shown answer no query the reader asked for.
+      expect(result.status).toBe("stale");
+      expect(result.rows).toEqual([{ id: "a" }]);
+      expect(resultMatchesQuery).toBe(false);
+      expect(coordinator.complete(late, succeeded([{ id: "b" }]))).toBe(false);
+      // The same clauses again move nothing.
+      const before = coordinator.state;
+      expect(
+        coordinator.adopt({ slice: slice(), window: window() }, [MELTED]),
+      ).toBeNull();
+      expect(coordinator.state).toBe(before);
+    });
+
+    it("keeps what is withheld across a move of the window, and drops it with the slice", () => {
+      const coordinator = createQueryCoordinator({ withheld: [MELTED] });
+      expect(
+        coordinator.adopt({ slice: slice(), window: window({ page: 2 }) }),
+      ).toBeNull();
+      expect(coordinator.state.result.problem?.status).toBe("refused");
+      const requestId = coordinator.adopt({
+        slice: slice({ search: "al" }),
+        window: window(),
+      });
+      expect(requestId).not.toBeNull();
+      expect(coordinator.state.result.problem).toBeNull();
+    });
+
+    it("runs the query once the link names nothing refused", () => {
+      const coordinator = createQueryCoordinator({ withheld: [MELTED] });
+      const requestId = coordinator.adopt(
+        { slice: slice(), window: window() },
+        [],
+      );
+      expect(requestId).toBe(coordinator.state.pendingRequestId);
+      expect(requestId).not.toBeNull();
+      // Unwithheld already, the same query again asks for nothing.
+      expect(
+        coordinator.adopt({ slice: slice(), window: window() }, []),
+      ).toBeNull();
+    });
+
+    it("keeps withholding through a command that replaces no refused clause", () => {
+      const coordinator = createQueryCoordinator({ withheld: [MELTED] });
+      const result = coordinator.dispatch({
+        kind: "setSort",
+        sort: [{ field: "cpu", direction: "desc" }],
+      });
+      expect(result.requestId).toBeNull();
+      expect(coordinator.state.slice.sort).toEqual([
+        { field: "cpu", direction: "desc" },
+      ]);
+      expect(coordinator.state.result.problem).toEqual({
+        status: "refused",
+        issues: [MELTED],
+      });
+      // A command that moves nothing and replaces nothing is no change.
+      const before = coordinator.state;
+      coordinator.dispatch({ kind: "setGroup", group: [] });
+      expect(coordinator.state).toBe(before);
+    });
+
+    it("replaces a refused clause through a command on its field, moving the query or not", () => {
+      const coordinator = createQueryCoordinator({
+        withheld: [MELTED, SEARCH],
+      });
+      // Nothing to remove from the slice, and still the clause is gone.
+      expect(
+        coordinator.dispatch({
+          kind: "removePredicate",
+          field: "status",
+          operator: "isAny",
+        }).requestId,
+      ).toBeNull();
+      expect(coordinator.state.result.problem).toEqual({
+        status: "refused",
+        issues: [SEARCH],
+      });
+      const requestId = dispatchRequest(coordinator, {
+        kind: "setSearch",
+        search: "",
+      });
+      expect(coordinator.state.pendingRequestId).toBe(requestId);
+    });
+
+    it("replaces a refused clause with a predicate set on its field", () => {
+      const coordinator = createQueryCoordinator({ withheld: [MELTED] });
+      dispatchRequest(coordinator, {
+        kind: "setPredicate",
+        predicate: statusPredicate("failed"),
+      });
+      expect(coordinator.state.slice.filter).toEqual([
+        statusPredicate("failed"),
+      ]);
+    });
+
+    it("withholds nothing after a reset", () => {
+      const coordinator = createQueryCoordinator({ withheld: [MELTED] });
+      coordinator.reset();
+      expect(coordinator.state.result.problem).toBeNull();
+      expect(refreshRequest(coordinator)).toBe(
+        coordinator.state.pendingRequestId,
+      );
+    });
+  });
+
+  it("withdraws every row, count and facet a forbidden request was shown", () => {
+    const coordinator = createQueryCoordinator();
+    coordinator.complete(
+      refreshRequest(coordinator),
+      succeeded([{ id: "a" }], {
+        facets: { status: { kind: "values", values: [] } },
+      }),
+    );
+    const cause = new Error("403");
+    expect(
+      coordinator.complete(refreshRequest(coordinator), {
+        status: "forbidden",
+        cause,
+      }),
+    ).toBe(true);
+    const { result, resultMatchesQuery } = coordinator.state;
+    expect(result).toMatchObject({
+      status: "failed",
+      rows: null,
+      counts: null,
+      facets: null,
+      provenance: null,
+      problem: { status: "forbidden", cause },
+    });
+    expect(resultMatchesQuery).toBe(false);
+    // A late success for an earlier request does not bring the rows back.
+    expect(coordinator.complete("i0:r0", succeeded([{ id: "a" }]))).toBe(false);
   });
 });

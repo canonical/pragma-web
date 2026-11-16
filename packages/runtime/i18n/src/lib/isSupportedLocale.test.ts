@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { negotiationConfig as config } from "../../testing/fixtures.js";
 import isSupportedLocale from "./isSupportedLocale.js";
-import type { I18nConfig } from "./types.js";
-
-const config: I18nConfig = { locales: ["en", "fr", "ar"], defaultLocale: "en" };
 
 describe("isSupportedLocale", () => {
   it("accepts a configured locale", () => {

@@ -7,13 +7,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, type ReactNode, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type MachineProvider,
-  machine,
-  machines,
-} from "../../../../testing/machines.js";
+import buildMachine from "../../../../testing/buildMachine.js";
+import buildPage from "../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import { machines } from "../../../../testing/machines.js";
+import type { MachineProvider } from "../../../../testing/types.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import useDataViewsFilter from "./hooks/useDataViewsFilter.js";
 import DataViews from "./Provider.js";
@@ -113,7 +111,7 @@ describe("DataViews root", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m1", "alpha")]),
+        page: buildPage([buildMachine("m1", "alpha")]),
       });
     });
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
@@ -140,7 +138,7 @@ describe("DataViews root", () => {
     act(() => {
       second.source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m1", "alpha")]),
+        page: buildPage([buildMachine("m1", "alpha")]),
       });
     });
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
@@ -153,7 +151,7 @@ describe("DataViews root", () => {
     // the source; the kept mount must bring it back, or a later delivery of
     // the same query would never reach the rows.
     const { provider, source } = createMachineProvider({
-      rows: [machine("m1", "alpha")],
+      rows: [buildMachine("m1", "alpha")],
     });
     render(
       <StrictMode>
@@ -167,7 +165,7 @@ describe("DataViews root", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m2", "beta")]),
+        page: buildPage([buildMachine("m2", "beta")]),
       });
     });
     expect(screen.getByRole("cell", { name: "beta" })).toBeInTheDocument();

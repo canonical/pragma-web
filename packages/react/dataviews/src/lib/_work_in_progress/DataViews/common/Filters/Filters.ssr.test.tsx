@@ -33,7 +33,7 @@ const collection = createCollection({
     },
     { field: "cpu", kind: "number", min: 0, max: 64 },
     { field: "updated", kind: "date" },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
     { field: "name", kind: "text" },
   ],
 });

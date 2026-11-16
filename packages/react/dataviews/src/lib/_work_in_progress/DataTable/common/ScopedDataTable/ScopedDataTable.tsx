@@ -93,6 +93,10 @@ const renderVirtualizedBody = (
  * `DataViews.DataTable` hands it its root's, so a root holds one announcer
  * however many tables it places. Its private cells and menus read the words
  * from the context it installs over them.
+ *
+ * `import { DataTable } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.pattern.data_table
  */
 export default function ScopedDataTable<
   TFields extends readonly SchemaFieldDefinition[],
@@ -177,7 +181,7 @@ export default function ScopedDataTable<
   // construction would outlive the interaction nothing else holds.
   useEffect(() => interaction.observe(), [interaction]);
 
-  const geometry = useTableGeometry(layout, interaction, columnIds);
+  const geometry = useTableGeometry({ layout, interaction, columnIds });
   const scopes = useRowScopes(provider, fields);
   const state = useDataViewsValue(provider.state);
   // The core's answer, held at one reference while it says the same thing,
@@ -364,6 +368,7 @@ export default function ScopedDataTable<
                   // Solved for every rendered column, in the same order.
                   width={geometry.widths[position] as number}
                   labelId={`${baseId}-${column.id}`}
+                  announce={announce}
                 />
               );
             })}

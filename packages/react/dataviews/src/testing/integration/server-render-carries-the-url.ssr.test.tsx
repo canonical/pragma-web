@@ -15,13 +15,11 @@ import {
 } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import buildFleet from "../../../testing/buildFleet.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { SERVER_RENDER_HREF } from "../../../testing/fixtures.js";
 import MachineComposition from "../../../testing/MachineComposition.js";
-import {
-  buildFleet,
-  createMachineProvider,
-  machines,
-} from "../../../testing/machines.js";
+import { machines } from "../../../testing/machines.js";
 
 /** The pagination bar's markup, where the page and its forms live. */
 const readPagination = (markup: string): string =>

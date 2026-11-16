@@ -5,7 +5,6 @@ import type {
   SortTerm,
 } from "@canonical/dataviews-core";
 import {
-  areListsEqual,
   cycleSortTerm,
   placeSortTerm,
   readProviderHost,
@@ -15,7 +14,7 @@ import { type ReactNode, useMemo, useState } from "react";
 import { ORDERING_TOPIC, SORT_REFUSAL_TOPIC } from "../../../common/index.js";
 import { useStableCallback } from "../../../hooks/index.js";
 import {
-  areSortTermsEqual,
+  areSortListsEqual,
   composeMessage,
   describeOrdering,
   readFieldName,
@@ -190,7 +189,7 @@ export default function useHeaderSort<
   // not bring back a reason nobody asked for.
   const standing =
     refusal !== null &&
-    areListsEqual(refusal.sort, slice.sort, areSortTermsEqual) &&
+    areSortListsEqual(refusal.sort, slice.sort) &&
     columns.some((column) => column.id === refusal.columnId)
       ? refusal
       : null;

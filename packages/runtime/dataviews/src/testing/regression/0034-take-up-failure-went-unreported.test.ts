@@ -9,13 +9,15 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { byId, declare, pageOf } from "../../../testing/fixtures.js";
+import buildPage from "../../../testing/buildPage.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 import type { Source } from "../../lib/source/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "cpu", kind: "number" }],
 });
 
@@ -26,7 +28,7 @@ describe("regression 0034 — a take-up failure went unreported", () => {
       capabilities: declare({}),
       readDelivery: () => ({
         status: "succeeded",
-        page: pageOf([{ id: "a" }]),
+        page: buildPage([{ id: "a" }]),
       }),
       execute() {
         executions += 1;

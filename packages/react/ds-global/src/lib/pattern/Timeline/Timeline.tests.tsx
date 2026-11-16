@@ -120,4 +120,18 @@ describe("Timeline", () => {
     expect(children?.[1]).toHaveClass("datetime");
     expect(children?.[2]).toHaveClass("payload");
   });
+
+  it("accepts conditional events in Timeline.Content", () => {
+    const showSecond: boolean = false;
+    render(
+      <Timeline>
+        <Timeline.Content data-testid="content">
+          <Timeline.Event>Event 1</Timeline.Event>
+          {showSecond && <Timeline.Event>Event 2</Timeline.Event>}
+        </Timeline.Content>
+      </Timeline>,
+    );
+    expect(screen.getByText("Event 1")).toBeInTheDocument();
+    expect(screen.queryByText("Event 2")).not.toBeInTheDocument();
+  });
 });

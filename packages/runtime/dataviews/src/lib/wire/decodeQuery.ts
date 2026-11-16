@@ -11,6 +11,7 @@ import {
   type Slice,
   type SortTerm,
 } from "../query/index.js";
+import type { QueryIssue } from "../result/index.js";
 import {
   resolveFieldKind,
   type Schema,
@@ -20,12 +21,13 @@ import {
 import { refusalsOf, type SourceCapabilities } from "../source/index.js";
 import {
   OPERATOR_DELIMITER,
+  QUERY_KEYS,
   RESERVED_QUERY_KEYS,
   SUFFIXED_OPERATORS,
 } from "./constants.js";
+import readUndeclaredField from "./readUndeclaredField.js";
 import readWireField from "./readWireField.js";
-import spellWireKey from "./spellWireKey.js";
-import type { DecodedQuery, DecodeQueryConfig, QueryIssue } from "./types.js";
+import type { DecodedQuery, DecodeQueryConfig } from "./types.js";
 
 const DIGITS = /^\d+$/;
 
@@ -43,6 +45,7 @@ const singletonOf = (
   if (values.length > 1) {
     issues.push({
       parameter: key,
+      field: null,
       code: "malformed",
       reason: `"${key}" takes one value; the extra values were ignored`,
     });
@@ -63,6 +66,7 @@ const windowValueOf = (
   if (!DIGITS.test(value) || parsed < 1) {
     issues.push({
       parameter: key,
+      field: null,
       code: "malformed",
       reason: `"${value}" is not a positive integer`,
     });
@@ -73,6 +77,7 @@ const windowValueOf = (
   if (!Number.isSafeInteger(parsed)) {
     issues.push({
       parameter: key,
+      field: null,
       code: "malformed",
       reason: `"${value}" is too large`,
     });
@@ -95,34 +100,52 @@ const sortTermOf = (value: string): SortTerm | null => {
 };
 
 /**
+ * One predicate as the parameters spelled it: the keys it was read from, so
+ * a refusal of the predicate is reported under each key the link holds.
+ */
+type ReadPredicate = {
+  readonly predicate: Predicate;
+  readonly keys: readonly string[];
+};
+
+/**
  * Keep an enforced predicate, or report why the parameter was refused. A set
  * operator read under a second spelling of its address — `status` and
- * `status__isAny` — is one predicate, holding the operands of both.
+ * `status__isAny` — is one predicate, holding the operands of both and
+ * read from both keys.
  */
 const record = (
   result: SchemaPredicateResult,
   key: string,
-  filter: Predicate[],
+  filter: ReadPredicate[],
   issues: QueryIssue[],
 ): void => {
   if (result.status === "valid") {
     const { predicate } = result;
     const kept = filter.find(
-      (candidate) =>
+      ({ predicate: candidate }) =>
         candidate.field === predicate.field &&
         candidate.operator === predicate.operator,
     );
     if (kept === undefined) {
-      filter.push(predicate);
+      filter.push({ predicate, keys: [key] });
       return;
     }
     filter.splice(filter.indexOf(kept), 1, {
-      ...predicate,
-      operands: [...kept.operands, ...predicate.operands],
+      predicate: {
+        ...predicate,
+        operands: [...kept.predicate.operands, ...predicate.operands],
+      },
+      keys: [...kept.keys, key],
     });
     return;
   }
-  issues.push({ parameter: key, code: "invalid", reason: result.reason });
+  issues.push({
+    parameter: key,
+    field: readWireField(key),
+    code: "invalid",
+    reason: result.reason,
+  });
 };
 
 /** Read one field's parameter into a schema-enforced predicate. */
@@ -131,7 +154,7 @@ const readPredicate = (
   values: readonly string[],
   schema: Schema<readonly SchemaFieldDefinition[]>,
   definition: SchemaFieldDefinition,
-  filter: Predicate[],
+  filter: ReadPredicate[],
   issues: QueryIssue[],
 ): void => {
   const { field } = definition;
@@ -142,6 +165,7 @@ const readPredicate = (
     if (!isOperator(suffix)) {
       issues.push({
         parameter: key,
+        field,
         code: "malformed",
         reason: `unknown operator "${suffix}"`,
       });
@@ -175,7 +199,12 @@ const readPredicate = (
     if (parsed.status === "incomplete") {
       continue;
     }
-    issues.push({ parameter: key, code: "invalid", reason: parsed.reason });
+    issues.push({
+      parameter: key,
+      field,
+      code: "invalid",
+      reason: parsed.reason,
+    });
   }
   if (operands.length === 0) {
     return;
@@ -184,6 +213,7 @@ const readPredicate = (
   if (!isSet && operands.length > 1) {
     issues.push({
       parameter: key,
+      field,
       code: "malformed",
       reason: `"${key}" takes one value; the extra values were ignored`,
     });
@@ -209,10 +239,15 @@ const readPredicate = (
  */
 const executableOf = (
   slice: Slice,
+  filter: readonly ReadPredicate[],
   capabilities: SourceCapabilities,
   issues: QueryIssue[],
 ): Slice => {
-  const keeps = (parameter: string, clause: Slice): boolean => {
+  const keeps = (
+    parameters: readonly string[],
+    field: string | null,
+    clause: Slice,
+  ): boolean => {
     const refusals = refusalsOf(capabilities, {
       slice: clause,
       window: DEFAULT_WINDOW,
@@ -220,23 +255,39 @@ const executableOf = (
     if (refusals.length === 0) {
       return true;
     }
-    for (const refusal of refusals) {
-      issues.push({ parameter, code: refusal.code, reason: refusal.reason });
+    // Reported under every key the clause was read from, as the link spells
+    // it, so carrying or clearing it finds what the URL holds.
+    for (const parameter of parameters) {
+      for (const refusal of refusals) {
+        issues.push({
+          parameter,
+          field,
+          code: refusal.code,
+          reason: refusal.reason,
+        });
+      }
     }
     return false;
   };
   return {
-    filter: slice.filter.filter((predicate) =>
-      keeps(spellWireKey(predicate.field, predicate.operator), {
-        ...EMPTY_SLICE,
-        filter: [predicate],
-      }),
-    ),
-    search: keeps("q", { ...EMPTY_SLICE, search: slice.search })
+    filter: filter
+      .filter(({ predicate, keys }) =>
+        keeps(keys, predicate.field, { ...EMPTY_SLICE, filter: [predicate] }),
+      )
+      .map(({ predicate }) => predicate),
+    search: keeps([QUERY_KEYS.search], null, {
+      ...EMPTY_SLICE,
+      search: slice.search,
+    })
       ? slice.search
       : null,
-    sort: keeps("sort", { ...EMPTY_SLICE, sort: slice.sort }) ? slice.sort : [],
-    group: keeps("group", { ...EMPTY_SLICE, group: slice.group })
+    sort: keeps([QUERY_KEYS.sort], null, { ...EMPTY_SLICE, sort: slice.sort })
+      ? slice.sort
+      : [],
+    group: keeps([QUERY_KEYS.group], null, {
+      ...EMPTY_SLICE,
+      group: slice.group,
+    })
       ? slice.group
       : [],
   };
@@ -262,7 +313,8 @@ const addressableWindow = (
   }
   for (const refusal of refusals) {
     issues.push({
-      parameter: "cursor",
+      parameter: QUERY_KEYS.cursor,
+      field: null,
       code: refusal.code,
       reason: refusal.reason,
     });
@@ -276,9 +328,11 @@ const addressableWindow = (
  * The schema enforces every owned clause: values are parsed to their field's
  * type, operators are checked against the field's kind, and a clause that
  * fails is left out and reported. With the source's capabilities, a clause
- * it cannot execute is refused the same way. A parameter naming no field of
- * this collection — delimited or not — belongs to the host and is left
- * alone: unknown, not invalid. A blank value is a form control left empty
+ * it cannot execute is refused the same way. A key spelled `name__operator`
+ * with one of the grammar's operators is a filter even when the collection
+ * declares no such field, and is refused as `undeclared-field`; any other
+ * parameter naming no field of this collection belongs to the host and is
+ * left alone: unknown, not invalid. A blank value is a form control left empty
  * and reads as no clause, so a GET form submits cleanly.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -288,7 +342,7 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
   const { schema, params, capabilities } = config;
 
   const issues: QueryIssue[] = [];
-  const filter: Predicate[] = [];
+  const filter: ReadPredicate[] = [];
   let sort: readonly SortTerm[] = [];
   let search: string | null = null;
   let group: GroupTerm[] = [];
@@ -304,17 +358,18 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
     if (values.length === 0) {
       continue;
     }
-    if (key === "q") {
+    if (key === QUERY_KEYS.search) {
       search = singletonOf(key, values, issues);
       continue;
     }
-    if (key === "sort") {
+    if (key === QUERY_KEYS.sort) {
       const terms: SortTerm[] = [];
       for (const value of values) {
         const term = sortTermOf(value);
         if (term === null) {
           issues.push({
             parameter: key,
+            field: null,
             code: "malformed",
             reason: `"${value}" is not an ordered sort term`,
           });
@@ -323,6 +378,7 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
           // refuses the ordering as a term with no direction does.
           issues.push({
             parameter: key,
+            field: null,
             code: "unknown-field",
             reason: `"${term.field}" is not a field of this collection`,
           });
@@ -337,19 +393,19 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       sort = terms.length === values.length ? collapseSortTerms(terms) : [];
       continue;
     }
-    if (key === "group") {
+    if (key === QUERY_KEYS.group) {
       group = values.map((value) => ({ field: value }));
       continue;
     }
-    if (key === "cursor") {
+    if (key === QUERY_KEYS.cursor) {
       cursor = singletonOf(key, values, issues);
       continue;
     }
-    if (key === "page") {
+    if (key === QUERY_KEYS.page) {
       page = windowValueOf(key, values, issues, page);
       continue;
     }
-    if (key === "size") {
+    if (key === QUERY_KEYS.size) {
       size = windowValueOf(key, values, issues, size);
       continue;
     }
@@ -360,19 +416,36 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
     }
     const definition = schema.findField(readWireField(key));
     if (definition === undefined) {
+      // A filter on a field the collection does not declare — one since
+      // removed — is refused, so the query does not quietly widen. A bare
+      // name is the host's: it cannot be told from a field.
+      const undeclared = readUndeclaredField(key, schema);
+      if (undeclared !== null) {
+        issues.push({
+          parameter: key,
+          field: undeclared,
+          code: "undeclared-field",
+          reason: `"${undeclared}" is not a field of this collection`,
+        });
+      }
       continue;
     }
     readPredicate(key, values, schema, definition, filter, issues);
   }
 
-  const read: Slice = { filter, search, sort, group };
+  const read: Slice = {
+    filter: filter.map(({ predicate }) => predicate),
+    search,
+    sort,
+    group,
+  };
   // Collapse has no spelling, so a decoded window never collapses anything.
   const readWindow: ResultWindow = { page, size, cursor, collapsed: [] };
   if (capabilities === undefined || capabilities === null) {
     return { slice: read, window: readWindow, issues };
   }
   return {
-    slice: executableOf(read, capabilities, issues),
+    slice: executableOf(read, filter, capabilities, issues),
     window: addressableWindow(readWindow, capabilities, issues),
     issues,
   };

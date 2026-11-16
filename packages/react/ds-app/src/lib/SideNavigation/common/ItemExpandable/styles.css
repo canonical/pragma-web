@@ -122,7 +122,7 @@
   /* Collapsed rail: sub-items degrade into a floating popover on the
      inline-end; the expanded state keeps its inline disclosure. */
   .ds.side-navigation[data-expanded="false"]
-  .ds.side-navigation-item-expandable {
+    .ds.side-navigation-item-expandable {
     position: relative;
 
     .children {

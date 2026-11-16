@@ -1,0 +1,14 @@
+{
+  "extends": "@canonical/typescript-config-svelte",
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
+  "include": [
+    "../ds-app-workplace/src/**/*.ts",
+    "../ds-app-workplace/src/**/*.svelte",
+    "../ds-app-workplace/src/**/*.d.ts",
+    "../ds-app-workplace/.storybook/**/*.ts",
+    "../ds-app-workplace/.storybook/**/*.svelte",
+    "../ds-app-workplace/testing/**/*.ts"
+  ]
+}

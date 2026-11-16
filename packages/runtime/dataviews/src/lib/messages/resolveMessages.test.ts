@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { DEFAULT_MESSAGES } from "./DEFAULT_MESSAGES.js";
+import { DEFAULT_MESSAGES } from "./constants.js";
 import resolveMessages from "./resolveMessages.js";
 import type { DataViewsMessages } from "./types.js";
 

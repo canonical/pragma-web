@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  exactly,
-  FACETED_ROWS,
-  FACETED_SCHEMA,
-} from "../../../testing/fixtures.js";
+import countExactly from "../../../testing/countExactly.js";
+import { FACETED_ROWS, FACETED_SCHEMA } from "../../../testing/fixtures.js";
 import { EMPTY_SLICE, type Slice } from "../query/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
 import readFacets from "./readFacets.js";
@@ -44,19 +41,22 @@ describe("readFacets", () => {
         // not list follow them, by code unit; a value that is no choice is
         // not counted.
         values: [
-          { value: "running", count: exactly(1) },
-          { value: "failed", count: exactly(2) },
-          { value: "archived", count: exactly(1) },
-          { value: "unlisted", count: exactly(1) },
+          { value: "running", count: countExactly(1) },
+          { value: "failed", count: countExactly(2) },
+          { value: "archived", count: countExactly(1) },
+          { value: "unlisted", count: countExactly(1) },
         ],
       },
     });
   });
 
-  it("counts a flag field's set records as one value, and none when none is set", () => {
+  it("counts a presence field's set records as one value, and none when none is set", () => {
     // Set as isSet reads it: false is a value, null and absent are not.
     expect(readFacetsOver(EMPTY_SLICE, "owner")).toEqual({
-      owner: { kind: "values", values: [{ value: true, count: exactly(2) }] },
+      owner: {
+        kind: "values",
+        values: [{ value: true, count: countExactly(2) }],
+      },
     });
     expect(
       readFacetsOver(
@@ -105,8 +105,8 @@ describe("readFacets", () => {
       status: {
         kind: "values",
         values: [
-          { value: "failed", count: exactly(2) },
-          { value: "unlisted", count: exactly(1) },
+          { value: "failed", count: countExactly(2) },
+          { value: "unlisted", count: countExactly(1) },
         ],
       },
       // Over failed machines, whatever their cores.
@@ -119,8 +119,8 @@ describe("readFacets", () => {
       status: {
         kind: "values",
         values: [
-          { value: "failed", count: exactly(1) },
-          { value: "unlisted", count: exactly(1) },
+          { value: "failed", count: countExactly(1) },
+          { value: "unlisted", count: countExactly(1) },
         ],
       },
     });
