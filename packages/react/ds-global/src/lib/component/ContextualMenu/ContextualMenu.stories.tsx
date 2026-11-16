@@ -31,20 +31,12 @@ const stage: Decorator = (Story) => (
 
 /**
  * Every story renders its menu open — a story is first a picture of the
- * pattern, and a preview has nothing else to click. The open is deferred one
- * effect after mount rather than `useState(true)`: it must land like a click,
- * once the trigger and the portalled menu both exist — opened on the very
- * first render, the fitment positioning runs before either ref is attached
- * and the menu lands unpositioned. Real state rather than a static
- * `open: true` keeps the story interactive: Escape, an outside click, or
- * choosing an item closes the menu, and the trigger reopens it. Open
- * previews stack safely because each docs preview is its own iframe.
+ * pattern, and a preview has nothing else to click. State keeps the story
+ * interactive: Escape, an outside click, or choosing an item closes the menu,
+ * and the trigger reopens it. Each docs preview has its own iframe.
  */
 const openByDefault: Decorator = (Story, context) => {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    setOpen(true);
-  }, []);
+  const [open, setOpen] = useState(true);
   // Args passed here REPLACE the story's args, so the story's own args must be
   // spread back in — without them the trigger and the items vanish.
   return <Story args={{ ...context.args, open, onOpenChange: setOpen }} />;

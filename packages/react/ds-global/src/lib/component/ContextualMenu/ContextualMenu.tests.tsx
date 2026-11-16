@@ -143,6 +143,82 @@ describe("ContextualMenu", () => {
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
 
+  it("keeps roving focus within the active menu when two menus are open", async () => {
+    const menus = (secondOpen: boolean) => (
+      <>
+        <ContextualMenu items={items} open>
+          First
+        </ContextualMenu>
+        <ContextualMenu items={items} open={secondOpen}>
+          Second
+        </ContextualMenu>
+      </>
+    );
+    const { rerender } = render(menus(false));
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole("menu", { name: "First" })).getByRole(
+          "menuitem",
+          { name: "Cut" },
+        ),
+      ).toHaveFocus(),
+    );
+
+    rerender(menus(true));
+    const second = screen.getByRole("menu", { name: "Second" });
+    const cut = within(second).getByRole("menuitem", { name: "Cut" });
+    await waitFor(() => expect(cut).toHaveFocus());
+
+    fireEvent.keyDown(cut, { key: "ArrowDown" });
+
+    await waitFor(() =>
+      expect(
+        within(second).getByRole("menuitem", { name: "Copy" }),
+      ).toHaveFocus(),
+    );
+  });
+
+  it("cancels pending opening focus when closed between animation frames", () => {
+    vi.useFakeTimers();
+    try {
+      renderMenu();
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      fireEvent.click(trigger);
+      act(() => vi.advanceTimersByTime(16));
+
+      fireEvent.keyDown(document, { key: "Escape" });
+      act(() => vi.advanceTimersByTime(16));
+
+      expect(trigger).toHaveFocus();
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not focus a selected item in a previously closed menu", async () => {
+    render(
+      <>
+        <ContextualMenu items={items}>First</ContextualMenu>
+        <ContextualMenu items={items}>Second</ContextualMenu>
+      </>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "First" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Copy" }));
+    fireEvent.click(screen.getByRole("button", { name: "Second" }));
+    const second = screen.getByRole("menu", { name: "Second" });
+    const cut = within(second).getByRole("menuitem", { name: "Cut" });
+    await waitFor(() => expect(cut).toHaveFocus());
+
+    fireEvent.keyDown(cut, { key: "ArrowDown" });
+
+    await waitFor(() =>
+      expect(
+        within(second).getByRole("menuitem", { name: "Copy" }),
+      ).toHaveFocus(),
+    );
+  });
+
   describe("accessible menu labels", () => {
     it("uses a string label directly", () => {
       renderMenu({ label: "Action menu" });

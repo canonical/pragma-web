@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import Popover from "./Popover.js";
@@ -149,6 +155,30 @@ describe("Popover", () => {
     );
   });
 
+  it("waits for the opening visibility transition before moving focus", () => {
+    vi.useFakeTimers();
+    try {
+      render(
+        <Popover trigger="Filter" label="Filters">
+          <input aria-label="Search" />
+        </Popover>,
+      );
+      fireEvent.click(screen.getByText("Filter"));
+      const dialog = screen.getByRole("dialog", { name: "Filters" });
+      const input = screen.getByRole("textbox", { name: "Search" });
+      dialog.style.visibility = "hidden";
+
+      act(() => vi.advanceTimersByTime(16));
+      expect(input).not.toHaveFocus();
+      dialog.style.visibility = "visible";
+      act(() => vi.advanceTimersByTime(16));
+
+      expect(input).toHaveFocus();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("uses an explicit initial focus target and falls back if it is hidden", async () => {
     const requested = createRef<HTMLInputElement>();
     const { rerender } = render(
@@ -222,5 +252,47 @@ describe("Popover", () => {
     await waitFor(() =>
       expect(screen.getByRole("textbox", { name: "Search" })).toHaveFocus(),
     );
+  });
+
+  it("remeasures an external anchor when its DOM node is replaced", () => {
+    const anchorRef = createRef<HTMLButtonElement>();
+    const measure = vi
+      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.tagName === "BUTTON"
+          ? new DOMRect(100, this.textContent === "First" ? 100 : 200, 80, 20)
+          : new DOMRect(0, 0, 100, 60);
+      });
+    const popover = (anchor: string, open: boolean) => (
+      <>
+        <button key={anchor} type="button" ref={anchorRef}>
+          {anchor}
+        </button>
+        <Popover
+          anchorRef={anchorRef}
+          label="Filters"
+          open={open}
+          onOpenChange={vi.fn()}
+          preferredDirections={["block-end"]}
+        >
+          <input aria-label="Search" />
+        </Popover>
+      </>
+    );
+    try {
+      const { rerender } = render(popover("First", true));
+      expect(screen.getByRole("dialog", { name: "Filters" })).toHaveStyle({
+        top: "120px",
+      });
+
+      rerender(popover("Second", false));
+      rerender(popover("Second", true));
+
+      expect(screen.getByRole("dialog", { name: "Filters" })).toHaveStyle({
+        top: "220px",
+      });
+    } finally {
+      measure.mockRestore();
+    }
   });
 });

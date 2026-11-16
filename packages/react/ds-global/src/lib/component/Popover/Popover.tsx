@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   OVERLAY_PLACEMENT,
@@ -70,9 +70,6 @@ const Popover = ({
   const isAnchored = !!anchorRef;
   const isButton = !!triggerProps;
   const focusPendingRef = useRef(false);
-  // A ref's identity does not change when its menu item attaches. Rerender
-  // once so the fitment hook observes that newly attached external anchor.
-  const [, setAnchorVersion] = useState(0);
   const {
     isOpen,
     close,
@@ -98,12 +95,6 @@ const Popover = ({
     onShow: () => onOpenChange?.(true),
     onHide: () => onOpenChange?.(false),
   });
-
-  useEffect(() => {
-    if (!anchorRef) return;
-    targetRef.current = anchorRef.current;
-    if (isOpen) setAnchorVersion((value) => value + 1);
-  }, [anchorRef, isOpen, targetRef]);
 
   const dialogId = dialogProps?.id ?? popupId;
   const triggerId = `${popupId}-trigger`;
@@ -164,7 +155,7 @@ const Popover = ({
     // on a hidden control is ignored, so wait for its positioned render.
     if (!isOpen || !mounted || !bestPosition || !focusPendingRef.current)
       return;
-    const frame = requestAnimationFrame(() => {
+    const focusDialog = () => {
       if (!focusPendingRef.current) return;
       const dialog = popupRef.current;
       if (!dialog) return;
@@ -178,6 +169,10 @@ const Popover = ({
           ? requested
           : firstFocusable(dialog);
       (target ?? dialog).focus();
+    };
+    // Let the opening visibility transition start before focusing controls.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(focusDialog);
     });
     return () => cancelAnimationFrame(frame);
   }, [bestPosition, initialFocusRef, isOpen, mounted, popupRef]);
@@ -203,7 +198,10 @@ const Popover = ({
       tabIndex={-1}
       data-positioned={bestPosition ? "true" : undefined}
       style={{ ...dialogProps?.style, ...popupPositionStyle }}
-      ref={popupRef}
+      ref={(node) => {
+        popupRef.current = node;
+        if (anchorRef) targetRef.current = anchorRef.current;
+      }}
       onKeyDown={handleDialogKeyDown}
     >
       {children}

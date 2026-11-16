@@ -137,12 +137,16 @@ const useContextualMenu = ({
   // @note Impure — moves DOM focus.
   useEffect(() => {
     if (typeof window === "undefined" || !isOpen) return;
-    const menu = popupRef.current;
-    if (!menu) return;
     const focusMenu = () => {
+      // Initial open renders inline before hydration moves the surface into
+      // its portal. Read the committed ref rather than the detached first node.
+      const menu = popupRef.current;
+      if (!menu) return;
       // An attached dialog may have taken focus before the menu's second
       // animation frame. Do not pull it back into roving menu navigation.
-      if (document.activeElement?.closest('[role="dialog"]')) return;
+      const dialog =
+        document.activeElement?.closest<HTMLElement>('[role="dialog"]');
+      if (dialog?.dataset.contextualMenuOwner === popupId) return;
       if (!highlightFirstItem) {
         menu.focus();
         return;
@@ -150,17 +154,18 @@ const useContextualMenu = ({
       const focusTarget = getHighlightedMenuEntry(menu);
       (focusTarget ?? menu).focus();
     };
-    const id = requestAnimationFrame(() => requestAnimationFrame(focusMenu));
-    return () => cancelAnimationFrame(id);
-  }, [isOpen, popupRef, highlightFirstItem]);
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(focusMenu);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen, popupRef, highlightFirstItem, popupId]);
 
   // Keep DOM focus on the currently-highlighted item as the keyboard highlight
   // moves. The tree only updates the roving `tabindex`; without moving focus too
   // the new item is not scrolled into view — so navigating to an item below a
   // long menu's fold would move the highlight to an item that stays off-screen.
-  // Focusing it (menu + submenus are portalled, so search the whole document)
-  // scrolls it into view natively. Guarded so it only runs while focus is
-  // already inside a menu (never steals focus when the menu is not in use).
+  // Scope focus to the active surface owned by this menu; other instances
+  // may retain highlighted items even while their surfaces are hidden.
   // @note Impure — moves DOM focus.
   const highlightedTail = nav.highlightedItems.at(-1);
   useEffect(() => {
@@ -173,9 +178,10 @@ const useContextualMenu = ({
       // Focus may have moved into a separately portalled dialog since this
       // frame was queued by a menu-item click.
       const now = document.activeElement;
-      if (!(now instanceof HTMLElement) || !now.closest('[role="menu"]'))
-        return;
-      const item = getHighlightedMenuEntry(document);
+      if (!(now instanceof HTMLElement)) return;
+      const surface = now.closest<HTMLElement>('[role="menu"]');
+      if (surface?.dataset.contextualMenuOwner !== popupId) return;
+      const item = getHighlightedMenuEntry(surface);
       if (item && item !== document.activeElement) {
         item.focus();
         if (typeof item.scrollIntoView === "function") {
@@ -184,7 +190,7 @@ const useContextualMenu = ({
       }
     });
     return () => cancelAnimationFrame(id);
-  }, [isOpen, highlightedTail]);
+  }, [isOpen, highlightedTail, popupId]);
 
   // The trigger must drive the DISCLOSURE (the source of truth for open) while
   // keeping the disclosure's click/keyboard handlers. The tree's toggle is not

@@ -1,5 +1,4 @@
 import type React from "react";
-import { forwardRef } from "react";
 import { Spinner } from "../../subcomponent/Spinner/index.js";
 import { Icon } from "../Icon/index.js";
 import type Props from "./types.js";
@@ -16,22 +15,19 @@ const componentCssClassName = "ds button";
  *
  * @implements ds:global.component.button
  */
-const Button = forwardRef<HTMLButtonElement, Props>(function Button(
-  {
-    id,
-    className,
-    children,
-    style,
-    importance = "primary",
-    anticipation,
-    variant,
-    icon,
-    loading = false,
-    disabled,
-    ...props
-  },
-  ref,
-): React.ReactElement {
+const Button = ({
+  id,
+  className,
+  children,
+  style,
+  importance = "primary",
+  anticipation,
+  variant,
+  icon,
+  loading = false,
+  disabled,
+  ...props
+}: Props): React.ReactElement => {
   // Booleans and nullish children render nothing; everything else (including
   // the number 0) produces visible text that names the button.
   const hasVisibleChildren =
@@ -60,7 +56,6 @@ const Button = forwardRef<HTMLButtonElement, Props>(function Button(
 
   return (
     <button
-      ref={ref}
       id={id}
       className={[
         componentCssClassName,
@@ -91,8 +86,6 @@ const Button = forwardRef<HTMLButtonElement, Props>(function Button(
       )}
     </button>
   );
-});
-
-Button.displayName = "Button";
+};
 
 export default Button;

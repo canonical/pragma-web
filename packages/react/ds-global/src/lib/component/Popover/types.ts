@@ -50,7 +50,7 @@ type ButtonPopoverProps = OwnProps & {
   anchorRef?: never;
 } & Omit<ComponentProps<"div">, keyof OwnProps | "children">;
 
-/** External launcher, such as a menu item, owns open state and ARIA wiring. */
+/** A portal without a root wrapper; the external launcher owns state and ARIA. */
 type AnchoredPopoverProps = OwnProps & {
   anchorRef: RefObject<HTMLElement | null>;
   trigger?: never;

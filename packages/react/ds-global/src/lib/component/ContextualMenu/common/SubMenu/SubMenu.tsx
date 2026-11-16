@@ -169,7 +169,6 @@ const SubMenuParent = ({
   const [hovered, setHovered] = useState(false);
   const [childDialogOpen, setChildDialogOpen] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [, refreshFitmentRefs] = useState(0);
   // Gate on the ROOT open state: `hovered` is local, so a mouse-selected
   // nested leaf (which closes the root disclosure) would otherwise leave the
   // still-hovered submenu surface mounted and visible on its own.
@@ -177,14 +176,6 @@ const SubMenuParent = ({
   // Portal only after mount so the server and first client render agree —
   // `typeof window` is already truthy on the first client render.
   const mounted = useIsMounted();
-
-  // The popup mounts conditionally when `open` becomes true. Refresh once after
-  // that commit so useWindowFitment sees popupRef.current and starts observing
-  // the surface; otherwise no state change follows the ref assignment and the
-  // submenu remains hidden at its fallback position.
-  useEffect(() => {
-    if (open) refreshFitmentRefs((version) => version + 1);
-  }, [open]);
 
   // The pointer never "leaves" a surface that is hidden under it, so clear
   // the hover state when the menu closes — otherwise the submenu would pop
@@ -282,12 +273,12 @@ const SubMenuParent = ({
       return;
     const surface = surfaceRef.current;
     if (!surface) return;
-    const id = requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => {
         getHighlightedMenuEntry(surface)?.focus();
-      }),
-    );
-    return () => cancelAnimationFrame(id);
+      });
+    });
+    return () => cancelAnimationFrame(frame);
   }, [open, keyboardOpen, positioned]);
 
   const menuProps = getMenuProps({

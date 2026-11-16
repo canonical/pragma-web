@@ -212,12 +212,13 @@ describe("useWindowFitment scroll positioning", () => {
     vi.unstubAllGlobals();
   });
 
-  const renderOpenFitment = (scrollDelay = 150) => {
+  const renderOpenFitment = (scrollDelay = 150, autoFit = false) => {
     const hook = renderHook(() =>
       useWindowFitment({
         isOpen: true,
         preferredDirections: ["block-end"],
         scrollDelay,
+        autoFit,
       }),
     );
     hook.result.current.targetRef.current = target;
@@ -317,7 +318,7 @@ describe("useWindowFitment scroll positioning", () => {
 
   it("keeps a fully off-screen trigger at its natural popup position", () => {
     targetTop = 900;
-    const hook = renderOpenFitment();
+    const hook = renderOpenFitment(150, true);
 
     expect(hook.result.current.bestPosition).toMatchObject({
       position: { top: 920, left: 90 },
