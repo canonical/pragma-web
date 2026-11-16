@@ -184,7 +184,7 @@ const Popover = ({
       className={[
         "ds",
         "popover__content",
-        "contrasted",
+        isAnchored ? "surface" : "contrasted",
         isAnchored && className,
         dialogProps?.className,
       ]

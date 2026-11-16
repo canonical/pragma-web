@@ -50,7 +50,10 @@ type ButtonPopoverProps = OwnProps & {
   anchorRef?: never;
 } & Omit<ComponentProps<"div">, keyof OwnProps | "children">;
 
-/** A portal without a root wrapper; the external launcher owns state and ARIA. */
+/**
+ * An ambient-theme portal without a root wrapper.
+ * The external launcher owns state and ARIA.
+ */
 type AnchoredPopoverProps = OwnProps & {
   anchorRef: RefObject<HTMLElement | null>;
   trigger?: never;

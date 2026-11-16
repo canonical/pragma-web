@@ -25,6 +25,16 @@ describe("Popover", () => {
     expect(screen.getByText("Popover body")).toBeInTheDocument();
   });
 
+  it("preserves the contrasted surface for a standalone popover", () => {
+    renderPopover();
+    expect(screen.getByRole("dialog", { hidden: true })).toHaveClass(
+      "contrasted",
+    );
+    expect(screen.getByRole("dialog", { hidden: true })).not.toHaveClass(
+      "surface",
+    );
+  });
+
   it("is closed by default", () => {
     renderPopover();
     const details = screen.getByText("Open").closest("details");

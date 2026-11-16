@@ -736,6 +736,16 @@ describe("ContextualMenu", () => {
       expect(launcher).toHaveAttribute("aria-haspopup", "dialog");
     });
 
+    it("uses the ambient surface instead of contrasting with the menu", () => {
+      render(<ContextualMenu items={dialogItems}>Filters</ContextualMenu>);
+      fireEvent.click(screen.getByRole("button", { name: "Filters" }));
+      fireEvent.click(screen.getByRole("menuitem", { name: "Status" }));
+
+      const dialog = screen.getByRole("dialog", { name: "Filter status" });
+      expect(dialog).toHaveClass("surface");
+      expect(dialog).not.toHaveClass("contrasted");
+    });
+
     it("keeps controls outside menu semantics and closes in Escape order", async () => {
       render(<ContextualMenu items={dialogItems}>Filters</ContextualMenu>);
       const trigger = screen.getByRole("button", { name: "Filters" });
