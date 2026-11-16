@@ -6,14 +6,22 @@ describe("OPERATOR_SYMBOLS", () => {
     expect(OPERATOR_SYMBOLS).toEqual({
       isAny: [{ symbol: ":", widened: false }],
       is: [{ symbol: ":", widened: false }],
-      isNone: [{ symbol: "!=", widened: false }],
-      isNot: [{ symbol: "!=", widened: false }],
+      isNone: [
+        { symbol: "!=", widened: false },
+        { symbol: "≠", widened: false },
+      ],
+      isNot: [
+        { symbol: "!=", widened: false },
+        { symbol: "≠", widened: false },
+      ],
       gte: [
         { symbol: ">=", widened: false },
+        { symbol: "≥", widened: false },
         { symbol: ">", widened: true },
       ],
       lte: [
         { symbol: "<=", widened: false },
+        { symbol: "≤", widened: false },
         { symbol: "<", widened: true },
       ],
       isSet: [],
