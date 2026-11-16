@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  barMachineCollection,
+  barMachines,
   machineCollection,
   spareMachineCollection,
   spareMachines,
@@ -52,5 +54,22 @@ describe("fixtures", () => {
       });
       expect(schema.findField("tags")).toMatchObject({ multiple: true });
     });
+  });
+});
+
+describe("barMachineCollection", () => {
+  it("declares one field of each kind over the query bar's sixty machines", () => {
+    expect(barMachines).toHaveLength(60);
+    expect(barMachineCollection.schema.fields.map(({ kind }) => kind)).toEqual([
+      "choices",
+      "number",
+      "choices",
+      "presence",
+      "text",
+      "date",
+    ]);
+    expect(barMachineCollection.identify(barMachines.at(0) as never)).toBe(
+      "bm-01",
+    );
   });
 });
