@@ -150,9 +150,10 @@ describe("the overview's record, on the metro", () => {
     }
   });
 
-  it("keeps every two arches over a shelf off one line, at rest and with each namespace opened", () => {
+  it("draws no two bridges on one line, and none along three sides of a region it joins, at rest and with each namespace opened", () => {
     for (const [path, measure] of measureViews()) {
-      expect(measure.sharedArchLines, path).toEqual([]);
+      expect(measure.sharedBridgeLines, path).toEqual([]);
+      expect(measure.framingBridges, path).toEqual([]);
     }
   });
 
