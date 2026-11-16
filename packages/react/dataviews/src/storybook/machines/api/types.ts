@@ -5,7 +5,7 @@
  */
 
 import type { Facet } from "@canonical/dataviews-core";
-import type { API_SCENARIOS, FACET_FIELDS } from "./constants.js";
+import type { API_SCENARIOS } from "./constants.js";
 
 /** One value a values facet lists, with how many matching records hold it. */
 export type FacetValue = Extract<
@@ -34,9 +34,6 @@ export type MockApiConfig = {
   readonly latency?: number | undefined;
 };
 
-/** A field either endpoint computes a facet for. */
-export type ApiFacetField = (typeof FACET_FIELDS)[number];
-
 /** What one text field's value must contain or start with. */
 export type ApiTextMatch = {
   readonly field: string;
@@ -61,7 +58,7 @@ export type ApiQuery = {
   /** Free text looked for in the searched fields, or null. */
   readonly search: string | null;
   /** The fields whose facets the answer must carry. */
-  readonly facets: readonly ApiFacetField[];
+  readonly facets: readonly string[];
   /** The one ordered term, or null for the endpoint's own order. */
   readonly sort: {
     readonly field: string;
@@ -85,6 +82,16 @@ export type MachinesData = {
       readonly node: ApiRecord;
     }[];
   };
+};
+
+/** What the executor answers one query with. */
+export type ApiAnswer = {
+  /** The records from the offset asked for, at most as many as the limit. */
+  readonly rows: readonly ApiRecord[];
+  /** Records matching the query. */
+  readonly matched: number;
+  /** The facets the query asked for, keyed by field. */
+  readonly facets: Readonly<Record<string, Facet>>;
 };
 
 /** Why a request cannot be run, as either endpoint's reader returns it. */

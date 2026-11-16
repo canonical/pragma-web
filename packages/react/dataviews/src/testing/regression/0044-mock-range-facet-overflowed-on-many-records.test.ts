@@ -9,32 +9,28 @@
  */
 
 import { describe, expect, it } from "vitest";
-import {
-  type ApiQuery,
-  type ApiRecord,
-  readApiFacets,
-} from "../../storybook/machines/api/index.js";
+import { requestRest, serveMockApi } from "../../../testing/index.js";
+import { createRestHandlers } from "../../storybook/machines/api/index.js";
+
+const server = serveMockApi([]);
 
 const RECORD_COUNT = 200_000;
 
-const query: ApiQuery = {
-  text: [],
-  statuses: { isAny: [], isNone: [] },
-  cores: { gte: null, lte: null },
-  search: null,
-  facets: ["cores"],
-  sort: null,
-};
-
 describe("regression 0044 — mock range facet overflowed on many records", () => {
-  it("bounds the cores of two hundred thousand records", () => {
+  it("bounds the cores of two hundred thousand records", async () => {
     // Built within the case, so a run that filters it out pays nothing.
-    const records: readonly ApiRecord[] = Array.from(
-      { length: RECORD_COUNT },
-      (_unused, at) => ({ id: `m${at}`, cores: at }),
+    server.use(
+      ...createRestHandlers({
+        records: Array.from({ length: RECORD_COUNT }, (_unused, at) => ({
+          id: `m${at}`,
+          cores: at,
+        })),
+      }),
     );
-    expect(readApiFacets(records, query, records, () => () => true)).toEqual({
-      cores: { kind: "range", min: 0, max: RECORD_COUNT - 1 },
+    const { body } = await requestRest("live", "size=1&facet=cores");
+    expect(body).toMatchObject({
+      matched: RECORD_COUNT,
+      facets: { cores: { kind: "range", min: 0, max: RECORD_COUNT - 1 } },
     });
   });
 });

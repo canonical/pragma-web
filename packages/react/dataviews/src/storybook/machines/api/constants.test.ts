@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { machineCollection } from "../fixtures.js";
 import {
+  API_COLLECTION,
   API_SCENARIOS,
   FACET_FIELDS,
   MACHINES_QUERY_TEXT,
   MACHINES_QUERY_VARIABLES,
+  SEARCHED_FIELDS,
   SORTED_FIELDS,
-  STATUS_ORDER,
+  STATUSES,
 } from "./constants.js";
 
 describe("constants", () => {
@@ -16,6 +19,17 @@ describe("constants", () => {
       "down",
       "first-page-only",
     ]);
+  });
+
+  it("identifies a record by its id over the machine fields", () => {
+    expect(API_COLLECTION.identify({ id: "m-01" })).toBe("m-01");
+    expect(API_COLLECTION.schema.fields).toEqual(
+      machineCollection.schema.fields,
+    );
+  });
+
+  it("searches the name and the owner", () => {
+    expect(SEARCHED_FIELDS).toEqual(["name", "owner"]);
   });
 
   it("orders by every record field and computes facets for two of them", () => {
@@ -31,8 +45,8 @@ describe("constants", () => {
     );
   });
 
-  it("lists the statuses running, failed, then pending", () => {
-    expect(STATUS_ORDER).toEqual(["running", "failed", "pending"]);
+  it("accepts the collection's statuses: running, failed and pending", () => {
+    expect(STATUSES).toEqual(["running", "failed", "pending"]);
   });
 
   it("declares in the query text exactly the variables it lists", () => {

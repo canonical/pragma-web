@@ -1,11 +1,5 @@
-import { SORTED_FIELDS, STATUS_ORDER } from "./constants.js";
-import isFacetField from "./isFacetField.js";
-import type {
-  ApiFacetField,
-  ApiProblem,
-  ApiQuery,
-  ApiTextMatch,
-} from "./types.js";
+import { FACET_FIELDS, SORTED_FIELDS, STATUSES } from "./constants.js";
+import type { ApiProblem, ApiQuery, ApiTextMatch } from "./types.js";
 
 /** The text fields this endpoint looks through, with how it matches each. */
 const TEXT_OPERATORS: Readonly<
@@ -51,7 +45,7 @@ export default function readRestQuery(
   params: URLSearchParams,
 ): RestRequest | ApiProblem {
   const text: ApiTextMatch[] = [];
-  const facets = new Set<ApiFacetField>();
+  const facets = new Set<string>();
   const statuses: { isAny: string[]; isNone: string[] } = {
     isAny: [],
     isNone: [],
@@ -68,7 +62,7 @@ export default function readRestQuery(
     const values = params.getAll(key).filter((value) => value !== "");
     if (key === "facet") {
       for (const field of values) {
-        if (!isFacetField(field)) {
+        if (!FACET_FIELDS.includes(field)) {
           return {
             reason: `this endpoint computes no facet for ${JSON.stringify(field)}`,
           };
@@ -82,7 +76,7 @@ export default function readRestQuery(
       ? STATUS_KEYS[key]
       : undefined;
     if (statusOperator !== undefined) {
-      const unknown = values.find((status) => !STATUS_ORDER.includes(status));
+      const unknown = values.find((status) => !STATUSES.includes(status));
       if (unknown !== undefined) {
         return { reason: `${JSON.stringify(unknown)} is not a status` };
       }

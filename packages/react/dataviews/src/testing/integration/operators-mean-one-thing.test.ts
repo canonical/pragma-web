@@ -1,9 +1,7 @@
 /**
  * Every filter operator means one thing wherever it is executed: each case
- * of the one fixture table, run through each executor that claims the
- * operator — the local array source, the REST endpoint matching text with an
- * escaped `LIKE` pattern, and the GraphQL endpoint matching it with a
- * substring or prefix test.
+ * of the one fixture table, run through the local array source and over the
+ * wire, through the REST and the GraphQL endpoints that answer from it.
  */
 
 import {
