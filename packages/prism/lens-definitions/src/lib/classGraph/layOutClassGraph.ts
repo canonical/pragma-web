@@ -380,13 +380,7 @@ function layOutModel(
   let channel = CHANNEL;
   let packed = packRegions(model, order, channel, engine, lead);
   if (packed.packing.fit < MIN_FIT) {
-    const retry = packRegions(
-      model,
-      order,
-      FALLBACK_CHANNEL,
-      engine,
-      lead,
-    );
+    const retry = packRegions(model, order, FALLBACK_CHANNEL, engine, lead);
     findings.push(
       `G3: fit ${packed.packing.fit.toFixed(3)} at ${CHANNEL}px channels; ${retry.packing.fit.toFixed(3)} at ${FALLBACK_CHANNEL}px`,
     );

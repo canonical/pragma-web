@@ -22,6 +22,7 @@ import {
 } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
+import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
 import nameRegionBox from "../../classGraph/nameRegionBox.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
@@ -30,7 +31,6 @@ import type {
   LaidOutNode,
   LaidOutRegion,
 } from "../../classGraph/types.js";
-import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
 import weighStroke from "../../classGraph/weighStroke.js";
 import { useMessages } from "../../i18n/index.js";
 import {

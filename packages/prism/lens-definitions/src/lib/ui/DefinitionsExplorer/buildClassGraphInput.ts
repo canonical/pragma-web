@@ -1,9 +1,9 @@
 import type { DefinitionsExplorer_ontologies$data } from "../../../__generated__/DefinitionsExplorer_ontologies.graphql.js";
+import countNamespaceRelations from "../../classGraph/countNamespaceRelations.js";
 import type {
   ClassEdgeInput,
   ClassGraphInput,
 } from "../../classGraph/types.js";
-import countNamespaceRelations from "../../classGraph/countNamespaceRelations.js";
 import compactUri from "../../compactUri.js";
 import expandUri from "../../expandUri.js";
 

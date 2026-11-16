@@ -109,7 +109,9 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     const stub = entries.find((entry) =>
       entry.textContent?.includes("not loaded"),
     );
-    expect(stub?.querySelector('.node[data-kind="stub"] .stub-frame')).not.toBeNull();
+    expect(
+      stub?.querySelector('.node[data-kind="stub"] .stub-frame'),
+    ).not.toBeNull();
     expect(stub?.textContent).toContain("its relations are not counted");
     const line = stub?.querySelector("path.relation");
     expect(line?.getAttribute("class")).toBe("relation is-bridge");

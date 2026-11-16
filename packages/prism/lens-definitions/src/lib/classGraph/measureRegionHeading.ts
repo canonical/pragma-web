@@ -32,7 +32,11 @@ export default function measureRegionHeading(
     ? Math.ceil(
         label +
           REGION_LABEL_GAP +
-          measureTextWidth(measured("well.region.back.words"), "regular", LABEL_SIZE),
+          measureTextWidth(
+            measured("well.region.back.words"),
+            "regular",
+            LABEL_SIZE,
+          ),
       )
     : label;
 }
