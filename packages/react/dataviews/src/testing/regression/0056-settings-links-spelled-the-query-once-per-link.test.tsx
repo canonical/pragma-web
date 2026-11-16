@@ -36,7 +36,7 @@ describe("regression 0056 — settings links spelled the query once per link", (
         settings={<DataViews.Settings />}
       />,
     );
-    expect(markup.match(/<a href=/g)?.length).toBeGreaterThan(3);
+    expect(markup.match(/<a [^>]*href=/g)?.length).toBeGreaterThan(3);
     expect(spellQuery).toHaveBeenCalledTimes(1);
   });
 });

@@ -18,3 +18,16 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 }
 
 standInDialogs();
+
+/**
+ * jsdom hides every popover, since it never matches `:popover-open`, so a
+ * menu opened through the Popover stand-in would be inaccessible. A panel
+ * holds a `menu` role only while open, so tests draw those panels; a suite
+ * on the node environment has no document.
+ */
+if (typeof document !== "undefined") {
+  const showPopovers = document.createElement("style");
+  showPopovers.textContent =
+    "[popover]:has(> [role='menu']) { display: block !important; }";
+  document.head.append(showPopovers);
+}

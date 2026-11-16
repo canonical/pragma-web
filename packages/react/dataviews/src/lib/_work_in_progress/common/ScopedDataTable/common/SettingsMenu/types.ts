@@ -24,18 +24,15 @@ export type SettingsDestinations = {
  * Props of the table's settings menu.
  *
  * Exempt from the native-prop extension convention: an internal renderer
- * whose root is a disclosure before scripts run and the design system's
- * menu after, forwarding no caller's native props.
+ * whose root is the design system's menu button, forwarding no caller's
+ * native props.
  */
 export type SettingsMenuProps = {
   /** Every declared column, in the arrangement's order, hidden ones included. */
   readonly settings: readonly ColumnSetting[];
   /** Whether a reset would change the viewer's own layer. */
   readonly resettable: boolean;
-  /**
-   * Whether scripts have taken over. Before then the menu is a disclosure
-   * of real links; after, the design system's menu.
-   */
+  /** Whether scripts have taken over; before then the items are links. */
   readonly hydrated: boolean;
   /** Apply one change to one column. One identity while the table holds. */
   readonly onChange: (columnId: string, change: ColumnChange) => void;
