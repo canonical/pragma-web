@@ -43,3 +43,6 @@ export const OPERATOR_SYMBOLS: Readonly<
   startsWith: [],
   endsWith: [],
 });
+
+/** The roving id of the chip a clause is built in, before it applies. */
+export const DRAFT_ID = "draft";
