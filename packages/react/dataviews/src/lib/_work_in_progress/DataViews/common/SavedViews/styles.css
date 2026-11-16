@@ -51,12 +51,13 @@
       inline-size: auto;
     }
 
+    /* A name the collection refuses: the input's own error channel, set
+       on its chrome from the native validity state. */
     &
       > .ds.data-views-saved-views-name-form
       > form
-      > .ds.input.text
-      > input:user-invalid {
-      border-color: var(--form-input-border-color-error);
+      > .ds.input.chrome:has(> input:user-invalid) {
+      --form-input-border-color-bottom: var(--form-input-border-color-error);
     }
 
     & > .picker > .modified,

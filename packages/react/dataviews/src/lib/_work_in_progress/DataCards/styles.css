@@ -44,11 +44,9 @@
       gap: var(--data-cards-select-all-gap);
     }
 
-    & .data-card > .header {
-      justify-content: flex-start;
-    }
-
+    /* The title takes the header's room, so it starts beside the checkbox. */
     & .data-card .title {
+      flex: 1 1 auto;
       overflow-wrap: anywhere;
     }
 

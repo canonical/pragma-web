@@ -31,11 +31,10 @@
 #   --form-input-padding-block   dimension/050
 #   --form-input-padding-inline  dimension/100
 # The chrome comes from the `@canonical/react-ds-global-form` stylesheet,
-# which the page loads. The one channel read from it here:
-#   --form-input-border-color-error   the name input's border once the user
-#                                     has given a name the collection refuses
-#                                     (`:user-invalid`, set through the
-#                                     validity API)
+# which the page loads. Once the user has given a name the collection refuses
+# (`:user-invalid`, set through the validity API), the chrome's bottom border
+# takes the form layer's error channel, `--form-input-border-color-error`,
+# as a Field in error does.
 #
 # Deviations the DSL cannot express, recorded here:
 #   - Conditional display is deferred in the DSL. The modified mark shows only
