@@ -1,0 +1,105 @@
+import type React from "react";
+import { useEffect } from "react";
+import { useIsMounted } from "../hooks/index.js";
+import { MenuItem } from "../MenuItem/index.js";
+import { MenuList } from "../MenuList/index.js";
+import { usePanelContext } from "../Panel/hooks/index.js";
+import { isMenuSeparator } from "../utils/index.js";
+import type { DropdownMenuEntry, DropdownMenuProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds dropdown-button-menu";
+
+/**
+ * Finds the separators that would dangle while scripting is off, when the
+ * action items around them are hidden.
+ *
+ * @param items The menu's entries, in order.
+ * @returns The keys of the separators that need a script.
+ */
+function findScriptOnlySeparators(items: DropdownMenuEntry[]): Set<string> {
+  // Each separator opens a group; the first group has none.
+  const groups = [{ separator: "", hasLink: false }];
+  for (const entry of items) {
+    const current = groups.at(-1) as { hasLink: boolean }; // never empty
+    if (isMenuSeparator(entry)) {
+      groups.push({ separator: entry.key, hasLink: false });
+    } else if (entry.url !== undefined) {
+      current.hasLink = true;
+    }
+  }
+  const keys = new Set<string>();
+  groups.slice(1).forEach((after, index) => {
+    // `index` is the group before `after`, since the slice drops the first.
+    const before = groups.at(index) as { hasLink: boolean }; // index < length
+    if (!(before.hasLink && after.hasLink)) keys.add(after.separator);
+  });
+  return keys;
+}
+
+/**
+ * A flat menu of actions, links and separators inside a DropdownPanel,
+ * following the menu button pattern once hydrated.
+ * An item with a `url` is a link that works with no script; an item without one
+ * is hidden until scripting is on.
+ */
+export default function Menu({
+  items,
+  onSelect,
+  className,
+  ...props
+}: DropdownMenuProps): React.ReactElement {
+  const panel = usePanelContext();
+  const isMounted = useIsMounted();
+  const registerMenu = panel?.registerMenu;
+
+  // The panel's trigger then advertises a menu rather than a dialog.
+  useEffect(() => registerMenu?.(), [registerMenu]);
+
+  const hasLink = items.some(
+    (entry) => !isMenuSeparator(entry) && entry.url !== undefined,
+  );
+  const rootProps = {
+    ...props,
+    className: [componentCssClassName, className].filter(Boolean).join(" "),
+    "data-requires-script": hasLink ? undefined : "",
+  };
+
+  // The keyboard hook mounts only while the panel is open, so a closed menu,
+  // and a menu before hydration, is a static list with no listener.
+  if (isMounted && panel?.isOpen) {
+    return (
+      <MenuList
+        {...rootProps}
+        items={items}
+        onSelect={onSelect}
+        hide={panel.hide}
+        focusIntent={panel.focusIntent}
+        label={panel.label}
+        labelledBy={panel.labelledBy}
+      />
+    );
+  }
+
+  const scriptOnlySeparators = findScriptOnlySeparators(items);
+
+  return (
+    <div {...rootProps}>
+      {items.map((entry) =>
+        isMenuSeparator(entry) ? (
+          <hr
+            key={entry.key}
+            className="separator"
+            data-requires-script={
+              scriptOnlySeparators.has(entry.key) ? "" : undefined
+            }
+          />
+        ) : (
+          <MenuItem key={entry.key ?? entry.url} item={entry} />
+        ),
+      )}
+    </div>
+  );
+}
+
+Menu.displayName = "DropdownPanel.Menu";

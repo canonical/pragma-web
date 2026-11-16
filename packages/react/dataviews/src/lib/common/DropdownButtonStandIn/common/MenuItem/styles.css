@@ -1,0 +1,91 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * DropdownPanel.Menu item styles, copied from the design system's draft.
+   *
+   * ContextualMenu's item look: the ghost fills, the padding and the gap.
+   */
+  .ds.dropdown-button-menu-item {
+    --dropdown-button-menu-item-padding-block: var(--space-050);
+    --dropdown-button-menu-item-padding-inline: var(--space-200);
+    --dropdown-button-menu-item-gap: var(--space-050);
+    --dropdown-button-menu-item-color-text: var(--color-text);
+    --dropdown-button-menu-item-color-text-disabled: var(--color-text-disabled);
+    --dropdown-button-menu-item-color-background-hover: var(
+      --color-foreground-ghost-hover
+    );
+    --dropdown-button-menu-item-color-background-active: var(
+      --color-foreground-ghost-active
+    );
+    --dropdown-button-menu-item-slot-color: var(--color-text-muted);
+    --dropdown-button-menu-item-focus-ring-color: var(
+      --color-focus-ring,
+      currentColor
+    );
+    /* shim: design-tokens stroke */
+    --dropdown-button-menu-item-focus-ring-width: var(
+      --stroke-width-focus,
+      var(--dimension-stroke-thickness-large)
+    );
+
+    display: flex;
+    align-items: center;
+    gap: var(--dropdown-button-menu-item-gap);
+    padding-block: var(--dropdown-button-menu-item-padding-block);
+    padding-inline: var(--dropdown-button-menu-item-padding-inline);
+    color: var(--dropdown-button-menu-item-color-text);
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: var(--dropdown-button-menu-item-color-background-hover);
+    }
+
+    /* The highlighted item takes the active fill; keyboard focus adds an
+       inset ring, because the fill alone is below the 3:1 contrast minimum. */
+    &[tabindex="0"] {
+      background-color: var(
+        --dropdown-button-menu-item-color-background-active
+      );
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--dropdown-button-menu-item-focus-ring-width) solid
+        var(--dropdown-button-menu-item-focus-ring-color);
+      outline-offset: calc(
+        -1 *
+        var(--dropdown-button-menu-item-focus-ring-width)
+      );
+    }
+
+    > .label {
+      flex: 1 1 auto;
+    }
+
+    > .slot {
+      flex: 0 0 auto;
+      margin-inline-start: auto;
+      color: var(--dropdown-button-menu-item-slot-color);
+    }
+
+    &.disabled {
+      color: var(--dropdown-button-menu-item-color-text-disabled);
+      background-color: transparent;
+      cursor: not-allowed;
+
+      > .slot {
+        color: inherit;
+      }
+    }
+  }
+
+  /* An item that acts only through a script is hidden before scripts run. */
+  @media (scripting: none) {
+    .ds.dropdown-button-menu-item[data-requires-script] {
+      display: none;
+    }
+  }
+}
