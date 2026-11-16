@@ -96,6 +96,27 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(bridge?.querySelector("[data-weight]")).toBeNull();
   });
 
+  it("draws a namespace as one box and a class of a namespace that is not loaded, as the canvas draws them", () => {
+    const overview = renderOverview();
+    const entries = [...overview.querySelectorAll(".entry")];
+    const region = entries.find((entry) =>
+      entry.textContent?.includes("A namespace drawn as one box"),
+    );
+    const box = region?.querySelector('.node[data-kind="region"]');
+    expect(box?.textContent).toContain("12 classes, 9 relations");
+    // The specimen opens nothing: it is no link.
+    expect(region?.querySelector("a")).toBeNull();
+    const stub = entries.find((entry) =>
+      entry.textContent?.includes("not loaded"),
+    );
+    expect(stub?.querySelector('.node[data-kind="stub"] .stub-frame')).not.toBeNull();
+    expect(stub?.textContent).toContain("its relations are not counted");
+    const line = stub?.querySelector("path.relation");
+    expect(line?.getAttribute("class")).toBe("relation is-bridge");
+    expect(line?.getAttribute("stroke-width")).toBe("1");
+    expect(line?.hasAttribute("stroke-dasharray")).toBe(false);
+  });
+
   it("shows a relation's weight in the canvas's four steps, each over the statements it stands for", () => {
     const overview = renderOverview();
     const [weight, zero] = [...overview.querySelectorAll(".entry")].slice(

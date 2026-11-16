@@ -80,6 +80,22 @@ describe("buildClassGraphModel", () => {
     expect(realWeightOf("UIBlock", "TokenBinding")).toBe(1010);
   });
 
+  it("leaves a bundle of relations no store counted unweighed, and weighs one counted among them", () => {
+    const counted = (uri: string): number | null =>
+      uri === "ex:hasPart" ? 3 : null;
+    const partly = buildClassGraphModel({
+      ...CROSS_REGION_GRAPH,
+      relations: CROSS_REGION_GRAPH.relations.map((relation) => ({
+        ...relation,
+        count: counted(relation.uri),
+      })),
+    });
+    const weightOf = (id: string): number | undefined =>
+      partly.bundles.find((bundle) => bundle.id === id)?.weight;
+    expect(weightOf("ex:Note ex:Remark")).toBeUndefined();
+    expect(weightOf("ex:Part ex:Whole")).toBe(3);
+  });
+
   it("leaves a legend's specimens unweighed: no store counts them", () => {
     const specimen = buildClassGraphModel({
       ...CROSS_REGION_GRAPH,

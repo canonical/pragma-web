@@ -11,7 +11,9 @@
  * abstractness, superclass, instance count and field count, and each
  * object property's IRI, label, domain and range, with its count: the
  * one `classEdges` serves for its declared edge between its domain and
- * its range.
+ * its range, `null` where that is 0 and the range is in no loaded
+ * namespace (`rdf:List`, `dt:TokenSymbol`): the store does not type their
+ * instances, so it counts none.
  */
 
 import type { ClassGraphInput } from "../../src/lib/classGraph/types.js";
@@ -375,7 +377,7 @@ const ontologyGraph: ClassGraphInput = {
       label: "consumes",
       domain: "https://anatomy.canonical.com/Style",
       range: "http://www.w3.org/1999/02/22-rdf-syntax-ns#List",
-      count: 0,
+      count: null,
     },
     {
       uri: "https://anatomy.canonical.com/edgeSwitch",
@@ -466,7 +468,7 @@ const ontologyGraph: ClassGraphInput = {
       label: "consumesSymbol",
       domain: "https://ds.canonical.com/TokenBinding",
       range: "https://dt.canonical.com/TokenSymbol",
-      count: 0,
+      count: null,
     },
     {
       uri: "https://ds.canonical.com/documentationStage",

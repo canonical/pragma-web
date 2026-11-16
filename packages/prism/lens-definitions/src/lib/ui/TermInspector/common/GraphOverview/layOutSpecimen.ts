@@ -38,6 +38,14 @@ export default function layOutSpecimen(
         klass.superclass === undefined ? null : uriOf(klass.superclass),
       instanceCount: klass.instanceCount ?? 0,
       fields: 0,
+      ...(klass.kind === undefined
+        ? {}
+        : {
+            kind: klass.kind,
+            term: t(klass.label),
+            members: klass.members ?? 1,
+            held: klass.held ?? 0,
+          }),
     })),
     relations: specimen.relations.map((relation) => ({
       uri: uriOf(`${relation.domain}-${relation.range}`),

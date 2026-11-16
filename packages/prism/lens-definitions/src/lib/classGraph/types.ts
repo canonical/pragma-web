@@ -70,9 +70,14 @@ export interface GraphRelationInput {
   readonly range: string | null;
   /**
    * The instance statements the graph counts for the property's declared
-   * edge between its domain and its range; 0 when it serves none.
+   * edge between its domain and its range; 0 when it serves none. `null`
+   * when one end is a class of a namespace that is not loaded and the
+   * graph counts no statement: a store counts a statement under its
+   * object's class, and the instances of a namespace it does not load are
+   * not typed in it, so such a 0 measures nothing and the relation makes
+   * no claim of weight.
    */
-  readonly count: number;
+  readonly count: number | null;
 }
 
 /**

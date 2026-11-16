@@ -15,7 +15,10 @@ import expandUri from "../../expandUri.js";
  * the full IRI the classes carry, weighed by the count the graph serves
  * for its declared edge between its domain and its range (0 when it
  * serves none). A declared edge between other classes, and an observed
- * pair nothing declares, add nothing to a relation's count.
+ * pair nothing declares, add nothing to a relation's count. A relation
+ * with an end in no loaded namespace is not counted (`null`) unless the
+ * graph counts statements for it: the store counts a statement under its
+ * object's class, which it does not know for a namespace it does not load.
  *
  * @param ontologies - The explorer fragment's data.
  * @param edges - The graph's class edges.
@@ -25,6 +28,9 @@ export default function buildClassGraphInput(
   ontologies: DefinitionsExplorer_ontologies$data,
   edges: readonly ClassEdgeInput[],
 ): ClassGraphInput {
+  const loaded = new Set(
+    ontologies.flatMap((ontology) => ontology.classes.map(({ uri }) => uri)),
+  );
   const counts = new Map(
     edges
       .filter((edge) => edge.declared)
@@ -53,15 +59,20 @@ export default function buildClassGraphInput(
         .map((property) => {
           const domain = property.domain?.uri ?? null;
           const range = expandUri(property.range, ontologies);
+          const count =
+            domain === null
+              ? 0
+              : (counts.get(keyEdge(property.uri, domain, range)) ?? 0);
+          const measured =
+            count > 0 ||
+            domain === null ||
+            (loaded.has(domain) && loaded.has(range));
           return {
             uri: property.uri,
             label: property.label ?? compactUri(property.uri, [ontology]),
             domain,
             range,
-            count:
-              domain === null
-                ? 0
-                : (counts.get(keyEdge(property.uri, domain, range)) ?? 0),
+            count: measured ? count : null,
           };
         }),
     ),

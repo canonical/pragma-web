@@ -457,7 +457,7 @@ export const FOUR_NAMESPACE_GRAPH: ClassGraphInput = {
       label: "lists",
       domain: "surface:C1",
       range: "https://example.org/vocab/Shelf",
-      count: 0,
+      count: null,
     },
   ],
 };

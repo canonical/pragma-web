@@ -26,6 +26,12 @@ export interface SpecimenClass {
   readonly instanceCount?: number;
   /** The namespace it is drawn in, when not the legend's own. */
   readonly prefix?: string;
+  /** What its box stands for, when not one class. */
+  readonly kind?: "region" | "stub";
+  /** The classes a namespace's box stands for. */
+  readonly members?: number;
+  /** The relations a namespace's box states. */
+  readonly held?: number;
 }
 
 /** One specimen relation: its predicate's message, domain and range keys. */

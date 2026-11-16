@@ -128,6 +128,39 @@ describe("buildClassGraphInput", () => {
     ).toEqual([0, 0]);
   });
 
+  it("counts no relation into a class of a namespace that is not loaded unless the graph counts its statements", () => {
+    const [ontology] = ONTOLOGIES;
+    const symbol = {
+      uri: "https://ds.canonical.com/consumesSymbol",
+      label: "consumesSymbol",
+      kind: "OBJECT",
+      domain: { uri: "https://ds.canonical.com/Tag" },
+      range: "https://dt.canonical.com/TokenSymbol",
+    };
+    const outward = [
+      { ...ontology, properties: [symbol] },
+    ] as unknown as DefinitionsExplorer_ontologies$data;
+    const served = (count: number): ClassEdgeInput[] => [
+      {
+        property: symbol.uri,
+        subjectClass: symbol.domain.uri,
+        objectClass: symbol.range,
+        count,
+        declared: true,
+      },
+    ];
+    expect(
+      buildClassGraphInput(outward, served(0)).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([null]);
+    expect(
+      buildClassGraphInput(outward, served(12)).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([12]);
+  });
+
   it("builds the same input whatever order the edges come in", () => {
     expect(buildClassGraphInput(ONTOLOGIES, EDGES.toReversed())).toEqual(
       buildClassGraphInput(ONTOLOGIES, EDGES),

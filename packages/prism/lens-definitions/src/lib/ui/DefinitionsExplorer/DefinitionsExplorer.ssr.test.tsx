@@ -54,6 +54,16 @@ describe("DefinitionsExplorer SSR", () => {
       )?.[1],
     ).toBe("0");
     expect(html.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
+    // ds:consumesSymbol reaches dt:TokenSymbol, a class of a namespace the
+    // store does not load: its 0 measures nothing, so the bridge claims no
+    // weight and is drawn as the plain line, neither weighed nor dashed.
+    const stub = [
+      ...html.matchAll(/<path class="relation is-bridge[^>]*>/g),
+    ].filter(([tag]) => tag.includes("dt:TokenSymbol"));
+    expect(stub).toHaveLength(1);
+    expect(stub.at(0)?.at(0)).not.toContain("data-weight");
+    expect(stub.at(0)?.at(0)).not.toContain("stroke-dasharray");
+    expect(stub.at(0)?.at(0)).toContain('stroke-width="1"');
   });
 
   it("server-renders the overview's canvas byte for byte the same from its records in any order", () => {

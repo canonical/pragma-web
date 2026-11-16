@@ -187,7 +187,11 @@ server, deterministically: two renders of a page give the same SVG.
   heaviest of them.
 - **Stubs.** A class the relations reach that no loaded ontology holds is
   a dashed stub, named by its well-known prefix (`rdf:List`), else by its
-  host and last segment, never two alike.
+  host and last segment, never two alike. A store counts a statement
+  under its object's class, and the instances of a namespace it does not
+  load are not typed in it, so a relation into a stub with no statements
+  counted claims no weight: it is drawn as the plain line, neither
+  weighed nor dashed.
 - **The budget.** The overview draws at most `drawnNodesMax` (40) nodes,
   `bandMembersMax` (12) in any column, and an SVG of at most `svgBytesMax`
   (64 KiB) and `svgElementsMax` (500) elements. Past the node budget, and

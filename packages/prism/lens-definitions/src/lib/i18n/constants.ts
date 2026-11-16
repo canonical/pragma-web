@@ -91,6 +91,10 @@ export const MESSAGES = {
   "legend.weight.range": "{from} to {to} statements",
   "legend.weight.from": "{from} and more statements",
   "legend.zero": "A relation with no statements yet: dashed",
+  "legend.region":
+    "A namespace drawn as one box, with its classes and relations: select it to open",
+  "legend.stub":
+    "A class of a namespace that is not loaded, in a dashed frame: its relations are not counted, so their line is plain",
   "legend.specimen.concrete": "Concrete class",
   "legend.specimen.abstract": "Abstract class",
   "legend.specimen.hub": "Hub",
@@ -105,6 +109,8 @@ export const MESSAGES = {
   "legend.specimen.of": "toA",
   "legend.specimen.standard": "Class C",
   "legend.specimen.extends": "toItself",
+  "legend.specimen.namespace": "ns",
+  "legend.specimen.external": "other:Class",
   "inspector.unknown":
     "No term at {term}. The rail lists every term the ontologies carry.",
   "inspector.tag.class": "class",

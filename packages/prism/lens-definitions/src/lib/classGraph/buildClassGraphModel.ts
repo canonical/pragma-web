@@ -175,15 +175,16 @@ function bundleRelations(
 }
 
 /**
- * Weigh a bundle by its heaviest relation's count.
+ * Weigh a bundle by its heaviest counted relation's count.
  *
  * @param relations - The bundle's relations: all of the data, or all a
  *   legend's specimens.
- * @returns The largest count, or `undefined` for specimens.
+ * @returns The largest count, or `undefined` for specimens and for a
+ *   bundle none of whose relations is counted.
  */
 function weighBundle(relations: readonly DrawnRelation[]): number | undefined {
   const counts = relations.flatMap((relation) =>
-    "count" in relation ? [relation.count] : [],
+    "count" in relation && relation.count !== null ? [relation.count] : [],
   );
   return counts.length === 0 ? undefined : Math.max(...counts);
 }
