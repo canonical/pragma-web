@@ -10,13 +10,26 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { buildMachine, createMachineProvider } from "../../../testing/index.js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  buildMachine,
+  createMachineProvider,
+  installPopoverStandIn,
+  openMenuFrom,
+} from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0057 — hiding a column left focus on a heading with no control", () => {
-  it("hands focus to the table's settings when no heading has a control", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
+  it("hands focus to the table's settings when no heading has a control", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });
@@ -31,7 +44,7 @@ describe("regression 0057 — hiding a column left focus on a heading with no co
         settings={<DataViews.Settings />}
       />,
     );
-    fireEvent.click(
+    await openMenuFrom(
       screen.getByRole("button", { name: "Column options for Status" }),
     );
     fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));

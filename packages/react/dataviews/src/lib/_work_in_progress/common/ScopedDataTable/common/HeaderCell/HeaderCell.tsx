@@ -13,7 +13,6 @@ import { MessagesContext } from "../../../../../common/index.js";
 import { useHydrationFocusHandoff } from "../../../../../hooks/index.js";
 import { HeaderMenu } from "../HeaderMenu/index.js";
 import { ResizeHandle } from "../ResizeHandle/index.js";
-import isFocusWithinOwnColumn from "./isFocusWithinOwnColumn.js";
 import type { HeaderCellProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-header-cell";
@@ -145,25 +144,15 @@ export default function HeaderCell({
       }
       // A header with no control of its own is described itself.
       aria-describedby={interactive ? undefined : describedBy}
-      // A refusal's reason stands while focus is in the header or in this
-      // column's own menu, whose surface is portalled outside it, and goes
-      // once focus leaves both: a choice from the menu settles it through the
-      // ordering instead. Opening the menu mounts it and fires no blur at
-      // all, so keeping its surface keeps every open alike. Another
-      // column's menu is not this header's, and ends it.
+      // A refusal's reason stands while focus stays in the header cell,
+      // which holds the column's menu.
       onBlur={(event: FocusEvent<HTMLTableCellElement>) => {
         // The window losing focus, not the column: the reader comes back to
         // the same control, and the reason with it.
         if (!event.currentTarget.ownerDocument.hasFocus()) {
           return;
         }
-        const next = event.relatedTarget;
-        if (
-          !(
-            next instanceof Element &&
-            isFocusWithinOwnColumn(event.currentTarget, next)
-          )
-        ) {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
           onClearRefusal();
         }
       }}

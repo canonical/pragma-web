@@ -8,14 +8,27 @@
  * was unmounted and mounted again. Every item now renders one shared label.
  */
 
-import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { buildMachine, createMachineProvider } from "../../../testing/index.js";
+import { act, render, screen } from "@testing-library/react";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  buildMachine,
+  createMachineProvider,
+  installPopoverStandIn,
+  openMenuFrom,
+} from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0055 — an open settings menu remounted its labels", () => {
-  it("keeps an item's label mounted through a change to another column", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
+  it("keeps an item's label mounted through a change to another column", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });
@@ -31,7 +44,7 @@ describe("regression 0055 — an open settings menu remounted its labels", () =>
         settings={<DataViews.Settings />}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "Table settings" }));
+    await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));
     const label = screen
       .getByRole("menuitem", { name: "Hide Name" })
       .querySelector(".label");

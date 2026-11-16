@@ -1,5 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import type { ReactNode } from "react";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+  installPopoverStandIn,
+  openMenuFrom,
+} from "../../../../../../../testing/index.js";
 import HeaderMenu from "./HeaderMenu.js";
 import type { HeaderMenuProps } from "./types.js";
 
@@ -11,11 +16,13 @@ const MIDDLE: HeaderMenuProps["offers"] = {
 };
 
 const mount = ({
+  header = "Status",
   sortable = true,
   removable = false,
   hideable = true,
   offers = MIDDLE,
 }: {
+  readonly header?: ReactNode;
   readonly sortable?: boolean;
   readonly removable?: boolean;
   readonly hideable?: boolean;
@@ -27,7 +34,7 @@ const mount = ({
   render(
     <HeaderMenu
       columnId="state"
-      header="Status"
+      header={header}
       sortable={sortable}
       removable={removable}
       hideable={hideable}
@@ -40,123 +47,32 @@ const mount = ({
   return { onPlace, onRemoveFromSort, onChangeColumn };
 };
 
-/** The menu's trigger, as it stands now: the menu replaces it while open. */
 const findTrigger = (): HTMLElement =>
   screen.getByRole("button", { name: "Column options for Status" });
+
+/** Open the menu from its button, and wait for focus to move into it. */
+const openMenu = (): Promise<HTMLElement> => openMenuFrom(findTrigger());
 
 /** The items of the open menu, as they read. */
 const listItemNames = (): readonly (string | null)[] =>
   screen.getAllByRole("menuitem").map((item) => item.textContent);
 
 describe("HeaderMenu", () => {
-  it("holds only its button while closed, named for the column", () => {
+  let uninstall: () => void;
+  beforeAll(() => {
+    uninstall = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstall();
+  });
+
+  it("holds a closed menu behind its button, named for the column", () => {
     mount();
-    // Drawn as the menu's own trigger, before it mounts and after.
-    expect(findTrigger()).toBe(
-      document.querySelector(".ds.contextual-menu.menu > button.trigger"),
-    );
     expect(findTrigger()).toHaveAttribute("aria-haspopup", "menu");
     expect(findTrigger()).toHaveAttribute("aria-expanded", "false");
     expect(
       screen.queryByRole("menu", { hidden: true }),
     ).not.toBeInTheDocument();
-    expect(
-      document.querySelector(".contextual-menu__surface"),
-    ).not.toBeInTheDocument();
-  });
-
-  it("opens a menu of the column's sort, visibility and place when activated, focusing the first", async () => {
-    mount();
-    fireEvent.click(findTrigger());
-    expect(listItemNames()).toEqual([
-      "Sort ascending",
-      "Sort descending",
-      "Hide column",
-      "Move column left",
-      "Move column right",
-    ]);
-    expect(findTrigger()).toBe(
-      document.querySelector(".ds.contextual-menu.menu > button.trigger"),
-    );
-    expect(findTrigger()).toHaveAttribute("aria-expanded", "true");
-    await waitFor(() =>
-      expect(
-        screen.getByRole("menuitem", { name: "Sort ascending" }),
-      ).toHaveFocus(),
-    );
-  });
-
-  it("takes no focus on opening from a button that did not have it", () => {
-    mount();
-    fireEvent.click(findTrigger());
-    expect(findTrigger()).not.toHaveFocus();
-  });
-
-  it("offers remove only while the reader's ordering names the column", () => {
-    mount({ removable: true });
-    fireEvent.click(findTrigger());
-    expect(
-      screen.getByRole("menuitem", { name: "Remove from sort" }),
-    ).toBeInTheDocument();
-  });
-
-  it("offers no sort on a column that offers none, and no hide on a column that may not be hidden", () => {
-    mount({ sortable: false, hideable: false });
-    fireEvent.click(findTrigger());
-    expect(listItemNames()).toEqual(["Move column left", "Move column right"]);
-  });
-
-  it("disables the changes a column does not take now, and chooses nothing from them", () => {
-    const { onChangeColumn } = mount({
-      sortable: false,
-      offers: {
-        hide: false,
-        "move-left": false,
-        "move-right": true,
-      },
-    });
-    fireEvent.click(findTrigger());
-    const disabled = screen
-      .getAllByRole("menuitem")
-      .filter((item) => item.classList.contains("disabled"))
-      .map((item) => item.textContent);
-    expect(disabled).toEqual(["Hide column", "Move column left"]);
-    fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Move column left" }));
-    expect(onChangeColumn).not.toHaveBeenCalled();
-  });
-
-  it("places the column in the direction chosen and returns focus to the trigger", () => {
-    const { onPlace } = mount();
-    fireEvent.click(findTrigger());
-    fireEvent.click(screen.getByRole("menuitem", { name: "Sort descending" }));
-    expect(onPlace).toHaveBeenCalledWith("state", "desc");
-    expect(findTrigger()).toHaveFocus();
-    // Closed, it has dropped back to its button, and opens again the same way.
-    fireEvent.click(findTrigger());
-    fireEvent.click(screen.getByRole("menuitem", { name: "Sort ascending" }));
-    expect(onPlace).toHaveBeenLastCalledWith("state", "asc");
-  });
-
-  it("closes on Escape, returning focus to the trigger", async () => {
-    mount();
-    findTrigger().focus();
-    fireEvent.click(findTrigger());
-    await waitFor(() =>
-      expect(screen.getAllByRole("menuitem").at(0)).toHaveFocus(),
-    );
-    fireEvent.keyDown(document.activeElement ?? document, { key: "Escape" });
-    await waitFor(() => expect(screen.queryAllByRole("menuitem")).toEqual([]));
-    expect(findTrigger()).toHaveFocus();
-  });
-
-  it("removes the column when remove is chosen", () => {
-    const { onPlace, onRemoveFromSort } = mount({ removable: true });
-    fireEvent.click(findTrigger());
-    fireEvent.click(screen.getByRole("menuitem", { name: "Remove from sort" }));
-    expect(onRemoveFromSort).toHaveBeenCalledWith("state");
-    expect(onPlace).not.toHaveBeenCalled();
-    expect(findTrigger()).toHaveFocus();
   });
 
   it("adds no window listener while closed", () => {
@@ -166,7 +82,7 @@ describe("HeaderMenu", () => {
     listen.mockRestore();
   });
 
-  it.fails("is an icon button with no chevron that opens a popover menu", () => {
+  it("is an icon button with no chevron that opens a popover menu", () => {
     mount();
     const trigger = findTrigger();
     expect(trigger).toHaveClass("ds", "button", "tertiary", "icon-button");
@@ -185,17 +101,103 @@ describe("HeaderMenu", () => {
     ).toBeInTheDocument();
   });
 
-  it("hands back each change to the column's visibility and place, returning focus to the trigger", () => {
+  it("names its menu by a heading that is not text", async () => {
+    mount({ header: <b>Status</b> });
+    const menu = await openMenu();
+    expect(menu).toHaveAccessibleName("Column options for Status");
+    expect(menu).toHaveAttribute(
+      "aria-labelledby",
+      findTrigger().getAttribute("aria-labelledby"),
+    );
+  });
+
+  it("opens a menu of the column's sort, visibility and place, focusing the first", async () => {
+    mount();
+    await openMenu();
+    expect(listItemNames()).toEqual([
+      "Sort ascending",
+      "Sort descending",
+      "Hide column",
+      "Move column left",
+      "Move column right",
+    ]);
+    expect(findTrigger()).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("offers remove only while the reader's ordering names the column", async () => {
+    mount({ removable: true });
+    await openMenu();
+    expect(
+      screen.getByRole("menuitem", { name: "Remove from sort" }),
+    ).toBeInTheDocument();
+  });
+
+  it("offers no sort on a column that offers none, and no hide on a column that may not be hidden", async () => {
+    mount({ sortable: false, hideable: false });
+    await openMenu();
+    expect(listItemNames()).toEqual(["Move column left", "Move column right"]);
+  });
+
+  it("disables the changes a column does not take now, and chooses nothing from them", async () => {
+    const { onChangeColumn } = mount({
+      sortable: false,
+      offers: {
+        hide: false,
+        "move-left": false,
+        "move-right": true,
+      },
+    });
+    await openMenu();
+    const disabled = screen
+      .getAllByRole("menuitem")
+      .filter((item) => item.classList.contains("disabled"))
+      .map((item) => item.textContent);
+    expect(disabled).toEqual(["Hide column", "Move column left"]);
+    fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Move column left" }));
+    expect(onChangeColumn).not.toHaveBeenCalled();
+  });
+
+  it("places the column in the direction chosen and returns focus to the trigger", async () => {
+    const { onPlace } = mount();
+    await openMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Sort descending" }));
+    expect(onPlace).toHaveBeenCalledWith("state", "desc");
+    await waitFor(() => expect(findTrigger()).toHaveFocus());
+    await openMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Sort ascending" }));
+    expect(onPlace).toHaveBeenLastCalledWith("state", "asc");
+  });
+
+  it("closes on Escape, returning focus to the trigger", async () => {
+    mount();
+    findTrigger().focus();
+    await openMenu();
+    fireEvent.keyDown(document.activeElement ?? document, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+    expect(findTrigger()).toHaveFocus();
+  });
+
+  it("removes the column when remove is chosen", async () => {
+    const { onPlace, onRemoveFromSort } = mount({ removable: true });
+    await openMenu();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Remove from sort" }));
+    expect(onRemoveFromSort).toHaveBeenCalledWith("state");
+    expect(onPlace).not.toHaveBeenCalled();
+    await waitFor(() => expect(findTrigger()).toHaveFocus());
+  });
+
+  it("hands back each change to the column's visibility and place, returning focus to the trigger", async () => {
     const { onChangeColumn, onPlace } = mount();
     for (const [name, change] of [
       ["Hide column", "hide"],
       ["Move column left", "move-left"],
       ["Move column right", "move-right"],
     ] as const) {
-      fireEvent.click(findTrigger());
+      await openMenu();
       fireEvent.click(screen.getByRole("menuitem", { name }));
       expect(onChangeColumn).toHaveBeenLastCalledWith("state", change);
-      expect(findTrigger()).toHaveFocus();
+      await waitFor(() => expect(findTrigger()).toHaveFocus());
     }
     expect(onChangeColumn).toHaveBeenCalledTimes(3);
     expect(onPlace).not.toHaveBeenCalled();

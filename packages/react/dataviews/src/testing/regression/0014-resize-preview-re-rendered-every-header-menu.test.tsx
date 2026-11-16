@@ -6,33 +6,48 @@
  * new callback on every render — so a wide table paid a whole menu's hooks
  * per column per frame of the drag.
  *
- * The design system's menu is a pass-through counter: a spy that runs the
- * real menu on every render and counts the calls. React offers no
- * per-component render count to read otherwise, so the module is replaced
- * at the package boundary with the real one, its menu spied.
+ * The open menu's list is a pass-through counter: a spy that runs the real
+ * list on every render and counts the calls. React offers no per-component
+ * render count to read otherwise, so its module is replaced with the real
+ * one, spied.
  */
 
-import { ContextualMenu } from "@canonical/react-ds-global";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
   declareMachineOrdering,
+  installPopoverStandIn,
+  openMenuFrom,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import MenuList from "../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js";
 
-// Each call of the spied menu is a render of a column's menu.
-vi.mock("@canonical/react-ds-global", async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import("@canonical/react-ds-global")>();
-  return { ...actual, ContextualMenu: vi.fn(actual.ContextualMenu) };
-});
+// Each call of the spied list is a render of the open column menu.
+vi.mock(
+  "../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js")
+      >();
+    return { default: vi.fn(actual.default) };
+  },
+);
 
-const renders = vi.mocked(ContextualMenu);
+const renders = vi.mocked(MenuList);
 
 describe("regression 0014 — a resize preview re-rendered every header menu", () => {
-  it("renders no opened menu again for a resize step", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
+  it("renders no opened menu again for a resize step", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
@@ -55,10 +70,9 @@ describe("regression 0014 — a resize preview re-rendered every header menu", (
     );
     // Status's menu stays open through the resize: a closed menu is only its
     // button, so an open one is the menu a resize could render again.
-    fireEvent.click(
+    await openMenuFrom(
       screen.getByRole("button", { name: "Column options for Status" }),
     );
-    expect(screen.getByRole("menu", { hidden: true })).toBeInTheDocument();
     expect(renders).toHaveBeenCalled();
     const readTracks = () =>
       screen

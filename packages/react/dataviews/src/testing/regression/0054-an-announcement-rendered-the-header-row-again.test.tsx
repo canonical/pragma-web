@@ -13,11 +13,21 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import {
   buildMachine,
   createMachineProvider,
   fakeAnnouncerClock,
+  installPopoverStandIn,
+  openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
 import HeaderCell from "../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js";
@@ -42,6 +52,14 @@ beforeEach(() => {
 });
 
 describe("regression 0054 — an announcement rendered the header row again", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("renders no header cell to say that a column is always shown", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
@@ -57,7 +75,7 @@ describe("regression 0054 — an announcement rendered the header row again", ()
         settings={<DataViews.Settings />}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "Table settings" }));
+    await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));
     const item = screen.getByRole("menuitem", {
       name: "Name is always shown",
     });

@@ -1,13 +1,16 @@
 /**
- * The table's settings menu, given its props: a button while closed; the
- * design system's menu of each column's toggle and moves, then the reset,
- * once open; the change chosen handed back and focus returned; and, before
- * scripts run, a disclosure of the links each change leads to.
+ * The table's settings menu, given its props: an icon button opening a
+ * popover menu of each column's toggle and moves, then the reset; the change
+ * chosen handed back and focus returned; and, before scripts run, links.
  */
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-import { expectNoAxeViolations } from "../../../../../../../testing/index.js";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+  expectNoAxeViolations,
+  installPopoverStandIn,
+  openMenuFrom,
+} from "../../../../../../../testing/index.js";
 import type { ColumnChange, ColumnSetting } from "../types.js";
 import SettingsMenu from "./SettingsMenu.js";
 import type { SettingsMenuProps } from "./types.js";
@@ -67,21 +70,29 @@ const mount = (overrides: Partial<SettingsMenuProps> = {}) => {
 const findTrigger = (): HTMLElement =>
   screen.getByRole("button", { name: "Table settings" });
 
-/** Open the menu from its button. */
-const openMenu = (): void => {
-  fireEvent.click(findTrigger());
+/** Open the menu from its button, and wait for focus to move into it. */
+const openMenu = (): Promise<HTMLElement> => openMenuFrom(findTrigger());
+
+/** Choose an item of the open menu, and wait for focus back on the button. */
+const choose = async (name: string): Promise<void> => {
+  await openMenu();
+  fireEvent.click(screen.getByRole("menuitem", { name }));
+  await waitFor(() => expect(findTrigger()).toHaveFocus());
 };
 
 describe("SettingsMenu", () => {
-  it("holds only its button while closed, named for what it opens", () => {
+  let uninstall: () => void;
+  beforeAll(() => {
+    uninstall = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstall();
+  });
+
+  it("holds a closed menu behind its button, named for what it opens", () => {
     mount();
     expect(findTrigger()).toHaveAttribute("aria-haspopup", "menu");
     expect(findTrigger()).toHaveAttribute("aria-expanded", "false");
-    expect(findTrigger()).toBe(
-      document.querySelector(
-        ".ds.contextual-menu.data-table-settings-menu > button.trigger",
-      ),
-    );
     expect(
       screen.queryByRole("menu", { hidden: true }),
     ).not.toBeInTheDocument();
@@ -89,7 +100,7 @@ describe("SettingsMenu", () => {
 
   it("lists each column's toggle and moves in the arrangement's order, then the reset", async () => {
     mount();
-    openMenu();
+    await openMenu();
     const items = screen.getAllByRole("menuitem");
     expect(items.map((item) => item.textContent)).toEqual([
       "Name is always shown",
@@ -116,34 +127,22 @@ describe("SettingsMenu", () => {
       "Move Cores right",
     ]);
     expect(screen.getByRole("menu", { name: "Table settings" })).toBeVisible();
-    await waitFor(() =>
-      expect(
-        screen.getByRole("menuitem", { name: "Name is always shown" }),
-      ).toHaveFocus(),
-    );
+    expect(
+      screen.getByRole("menuitem", { name: "Name is always shown" }),
+    ).toHaveFocus();
   });
 
-  it("hands back the change chosen and returns focus to its button", () => {
+  it("hands back the change chosen and returns focus to its button", async () => {
     const { props } = mount();
-    openMenu();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Hide Status" }));
+    await choose("Hide Status");
     expect(props.onChange).toHaveBeenCalledWith("status", "hide");
-    expect(findTrigger()).toHaveFocus();
-    openMenu();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Show Cores" }));
+    await choose("Show Cores");
     expect(props.onChange).toHaveBeenLastCalledWith("cores", "show");
-    openMenu();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Move Name right" }));
+    await choose("Move Name right");
     expect(props.onChange).toHaveBeenLastCalledWith("name", "move-right");
-    openMenu();
-    fireEvent.click(
-      screen.getByRole("menuitem", { name: "Name is always shown" }),
-    );
+    await choose("Name is always shown");
     expect(props.onChange).toHaveBeenLastCalledWith("name", "hide");
-    openMenu();
-    fireEvent.click(
-      screen.getByRole("menuitem", { name: "Reset table settings" }),
-    );
+    await choose("Reset table settings");
     expect(props.onReset).toHaveBeenCalledTimes(1);
     expect(props.onChange).toHaveBeenCalledTimes(4);
   });
@@ -151,18 +150,15 @@ describe("SettingsMenu", () => {
   it("closes on Escape, returning focus to its button", async () => {
     mount();
     findTrigger().focus();
-    openMenu();
-    await waitFor(() =>
-      expect(screen.getAllByRole("menuitem").at(0)).toHaveFocus(),
-    );
+    await openMenu();
     fireEvent.keyDown(document.activeElement ?? document, { key: "Escape" });
-    await waitFor(() => expect(screen.queryAllByRole("menuitem")).toEqual([]));
+    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
     expect(findTrigger()).toHaveFocus();
   });
 
-  it("chooses nothing from a disabled item", () => {
+  it("chooses nothing from a disabled item", async () => {
     const { props } = mount({ resettable: false });
-    openMenu();
+    await openMenu();
     fireEvent.click(screen.getByRole("menuitem", { name: "Move Name left" }));
     fireEvent.click(
       screen.getByRole("menuitem", { name: "Reset table settings" }),
@@ -174,7 +170,7 @@ describe("SettingsMenu", () => {
   it("has no axe violations closed or open", async () => {
     const { view } = mount();
     await expectNoAxeViolations(view.container);
-    openMenu();
+    await openMenu();
     await expectNoAxeViolations(document.body);
   });
 
@@ -185,7 +181,7 @@ describe("SettingsMenu", () => {
     listen.mockRestore();
   });
 
-  it.fails("is an icon button with no chevron that opens a popover menu", () => {
+  it("is an icon button with no chevron that opens a popover menu", () => {
     mount();
     const trigger = findTrigger();
     expect(trigger).toHaveClass("ds", "button", "tertiary", "icon-button");
@@ -197,15 +193,13 @@ describe("SettingsMenu", () => {
   });
 
   describe("before scripts run", () => {
-    it("is a disclosure of the links each available change leads to", async () => {
+    it("is a closed popover of the links each available change leads to", async () => {
       const { props, view } = mount({ hydrated: false });
-      expect(screen.queryByRole("button")).not.toBeInTheDocument();
-      const disclosure = view.container.querySelector(
-        "details.ds.data-table-settings-menu",
+      const trigger = findTrigger();
+      const panel = document.getElementById(
+        String(trigger.getAttribute("popovertarget")),
       );
-      expect(disclosure?.querySelector("summary")?.textContent).toBe(
-        "Table settings",
-      );
+      expect(view.container).toContainElement(panel);
       expect(
         screen
           .getAllByRole("link", { hidden: true })
@@ -217,22 +211,11 @@ describe("SettingsMenu", () => {
         ["Show Cores", "?show=cores"],
         ["Reset table settings", "?reset"],
       ]);
-      expect(disclosure?.textContent).toContain("Name is always shown");
+      // The column that cannot be hidden says so, on an item scripts drive.
+      expect(panel).toHaveTextContent("Name is always shown");
       // Every destination is spelled over one reading of the query.
       expect(props.listDestinations).toHaveBeenCalledTimes(1);
       await expectNoAxeViolations(view.container);
-    });
-
-    it.fails("is a closed popover of the links each change leads to", () => {
-      const { view } = mount({ hydrated: false });
-      const trigger = screen.getByRole("button", { name: "Table settings" });
-      const panel = document.getElementById(
-        String(trigger.getAttribute("popovertarget")),
-      );
-      expect(view.container).toContainElement(panel);
-      expect(
-        screen.getByRole("link", { name: "Hide Status", hidden: true }),
-      ).toHaveAttribute("href", "?hide=status");
     });
 
     it("offers no reset link while there is nothing to reset", () => {
@@ -243,6 +226,12 @@ describe("SettingsMenu", () => {
           hidden: true,
         }),
       ).not.toBeInTheDocument();
+      // The disabled reset waits for scripts, hidden until they run.
+      expect(
+        screen
+          .getByText("Reset table settings")
+          .closest("[data-requires-script]"),
+      ).not.toBeNull();
     });
 
     it("offers nothing where no link leads anywhere", () => {
@@ -255,7 +244,7 @@ describe("SettingsMenu", () => {
 
     // A reader already on a link as scripts take over is handed to the
     // button: proven through a real hydration in the settings part's tests.
-    it("leaves focus alone as scripts take over when the disclosure had none", () => {
+    it("leaves focus alone as scripts take over", () => {
       const { props, view } = mount({ hydrated: false });
       view.rerender(<SettingsMenu {...props} hydrated />);
       expect(findTrigger()).not.toHaveFocus();

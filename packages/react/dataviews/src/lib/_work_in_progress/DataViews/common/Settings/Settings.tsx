@@ -20,9 +20,8 @@ import { SettingsMenuContext } from "../../../../common/index.js";
  * and it throws anywhere else. It works the same inside a standalone
  * `DataTable` and a `DataViews.DataTable`.
  *
- * Without scripting it is a disclosure of real links, each to the page the
- * change leads to, where the provider has a location; once scripts run,
- * the design system's contextual menu.
+ * Without scripting its popover still opens, each change a real link where
+ * the provider has a location.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *

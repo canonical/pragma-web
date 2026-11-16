@@ -44,6 +44,7 @@ export {
   MACHINE_DECLARATION,
   machines,
 } from "./machines.js";
+export { default as openMenuFrom } from "./openMenuFrom.js";
 export { default as readAnnouncements } from "./readAnnouncements.js";
 export { default as readFailureReason } from "./readFailureReason.js";
 export { default as renderDecorated } from "./renderDecorated.js";
@@ -56,4 +57,6 @@ export { default as silenceRenderErrors } from "./silenceRenderErrors.js";
 export { default as standInDialogs } from "./standInDialogs.js";
 export { default as toggleDisclosure } from "./toggleDisclosure.js";
 export type * from "./types.js";
+export { default as waitForFocus } from "./waitForFocus.js";
+export { default as waitForFrames } from "./waitForFrames.js";
 export { default as watchMockRequest } from "./watchMockRequest.js";

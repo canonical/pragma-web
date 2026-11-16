@@ -18,7 +18,14 @@ import {
 import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { describe, expect, it, onTestFinished } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+} from "vitest";
 import {
   buildMachine,
   createMachineProvider,
@@ -26,7 +33,9 @@ import {
   createTokenMessages,
   declareMachineOrdering,
   findEnglish,
+  installPopoverStandIn,
   type MachineProvider,
+  openMenuFrom,
 } from "../../../testing/index.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
@@ -96,6 +105,14 @@ const renderListed = async (
 };
 
 describe("a whole replacement leaves no English", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("in what a server renders before any script runs", () => {
     const html = renderToString(<Composition provider={createProvider()} />);
     const container = document.createElement("div");
@@ -141,7 +158,7 @@ describe("a whole replacement leaves no English", () => {
 
   it("in the settings menu its button opens", async () => {
     await renderListed(createProvider());
-    fireEvent.click(screen.getByRole("button", { name: "‹tableSettings›" }));
+    await openMenuFrom(screen.getByRole("button", { name: "‹tableSettings›" }));
     expect(screen.getByRole("menu")).toBeVisible();
     expect(findEnglish(document.body, english)).toEqual([]);
   });

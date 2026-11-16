@@ -1,7 +1,7 @@
 /**
- * On the server the settings are a disclosure of real links, each to the page
- * its change leads to, keeping the rest of the query: nothing to press until
- * scripts run. A destination draws the arrangement its change names, read by
+ * On the server the settings are a closed popover of real links, each to the
+ * page its change leads to, keeping the rest of the query: the popover opens
+ * with no script. A destination draws the arrangement its change names, read by
  * a provider standing on it, and nothing is offered without a location.
  */
 
@@ -44,10 +44,12 @@ const renderSettings = (href: string | null): string =>
 /** The destination of each link in server markup, by its text. */
 const listLinks = (markup: string): ReadonlyMap<string, URLSearchParams> =>
   new Map(
-    [...markup.matchAll(/<a href="\?([^"]*)">(.*?)<\/a>/g)].map((match) => [
-      (match.at(2) ?? "").replaceAll("<!-- -->", ""),
-      new URLSearchParams((match.at(1) ?? "").replaceAll("&amp;", "&")),
-    ]),
+    [...markup.matchAll(/<a [^>]*href="\?([^"]*)"[^>]*>(.*?)<\/a>/g)].map(
+      (match) => [
+        (match.at(2) ?? "").replaceAll(/<[^>]*>/g, ""),
+        new URLSearchParams((match.at(1) ?? "").replaceAll("&amp;", "&")),
+      ],
+    ),
   );
 
 /** The headings a provider standing on a destination shows, in order. */
@@ -60,9 +62,9 @@ const listShownAt = (params: URLSearchParams): readonly string[] =>
     .map((placed) => String(placed.column.header));
 
 describe("DataViews.Settings SSR", () => {
-  it("renders a disclosure of links keeping the query, and no menu button", () => {
+  it("renders a closed popover of links keeping the query, before the menu's roles", () => {
     const markup = renderSettings("/machines?status=running&page=1&tab=a");
-    expect(markup).toContain("<details");
+    expect(markup).toContain('popover="auto"');
     expect(markup).not.toContain('aria-haspopup="menu"');
     const links = listLinks(markup);
     expect([...links.keys()]).toEqual([
@@ -116,6 +118,6 @@ describe("DataViews.Settings SSR", () => {
   it("offers no link without a location to lead to", () => {
     const markup = renderSettings(null);
     expect(markup).not.toContain("<a ");
-    expect(markup).not.toContain("<details");
+    expect(markup).not.toContain("popover");
   });
 });
