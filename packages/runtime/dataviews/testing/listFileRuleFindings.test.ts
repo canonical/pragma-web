@@ -60,6 +60,15 @@ describe("listFileRuleFindings", () => {
     expect(listFileRuleFindings(join(root, "facet"))).toEqual([]);
   });
 
+  it.fails("owes a value file its own test, not a facet file's", () => {
+    writeFile("value/src/a.ts", "export default function a() {}");
+    writeFile("value/src/a.b.ts", "export const B = 1;\nexport const C = 2;");
+    writeFile("value/src/a.b.test.ts", "");
+    expect(listFileRuleFindings(join(root, "value"))).toEqual([
+      "src/a.ts test",
+    ]);
+  });
+
   it("skips a missing folder", () => {
     writeFile("testing/d.ts", "export default 1;");
     expect(listFileRuleFindings(join(root, "testing"))).toEqual([]);
