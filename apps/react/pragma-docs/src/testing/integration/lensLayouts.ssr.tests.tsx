@@ -304,9 +304,10 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
 /**
  * Per-URL expectation for the strip's view group and count. Only the
  * Components, Standards and Journeys layouts fill the view group, and only
- * the Definitions explorer and the Components catalog count, each through
- * its own tenant, named by its `data-slot`; every other URL renders the view
- * group EMPTY and no count, and this model is what says so.
+ * the three indexes with a set to count do: the Definitions explorer, the
+ * Components catalog and the Standards index, each through its own tenant,
+ * named by its `data-slot`; every other URL renders the view group EMPTY
+ * and no count, and this model is what says so.
  *
  * The slots are asserted STRUCTURALLY, never as pinned strings. The count
  * reports a live figure off the graph, so pinning its text would make this
@@ -326,7 +327,7 @@ const EXPECTED_STRIP_CLAIMS: Readonly<
   "/": { view: false, count: false },
   "/components": { view: "renderer-switch", count: "catalog-count" },
   "/definitions": { view: false, count: "explorer-status" },
-  "/standards": { view: false, count: false },
+  "/standards": { view: false, count: "standards-count" },
   // Journeys claims the trail and the view group, which holds core's
   // renderer switch over the table and the graph; the coordinate chooser
   // and the persona filter stay in the explorer's rail.
