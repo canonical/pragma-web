@@ -60,6 +60,12 @@
     }
   }
 
+  @media (forced-colors: active) {
+    .ds.tabs > .list > .item > .link {
+      border-block-end-color: Canvas;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .ds.tabs > .list > .item > .link {
       transition: border-block-end-color var(--motion-duration-fast, 100ms)

@@ -19,11 +19,6 @@
       "aria-label": "Directory sections",
       navigationRoot,
       currentUrl: "#people",
-      onclick(event) {
-        if (event.target instanceof Element) {
-          event.target.closest("a")?.setAttribute("target", "_self");
-        }
-      },
     },
     parameters: {
       docs: {
@@ -45,10 +40,17 @@
     currentUrl = window.location.hash || "#people";
   }
 
+  function keepTabLinksInPreview(event: MouseEvent): void {
+    if (event.target instanceof Element) {
+      event.target.closest(".ds.tabs a")?.setAttribute("target", "_self");
+    }
+  }
+
   onMount(syncLocation);
 </script>
 
 <svelte:window onhashchange={syncLocation} />
+<svelte:document onclick={keepTabLinksInPreview} />
 
 <Story name="Default" />
 
