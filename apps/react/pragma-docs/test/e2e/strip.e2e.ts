@@ -8,7 +8,8 @@
  * line at 1440 and 1366, the facet bar one band of the strip's height on the
  * Definitions lens, its controls inside the band, and absent below two
  * groups, the folded renderer menu's
- * options as links that change only `as`, each a full target, the folded
+ * options as links that change only `as`, each a full target and painted
+ * above a page's sticky contents bar, the folded
  * sheet covering a phone's viewport, and no link to the retired `view=`
  * anywhere.
  */
@@ -62,6 +63,15 @@ const COUNTED_PATHS = ["/components", WORKSPACE_PATH] as const;
 
 /** A page that offers more than one renderer. */
 const SWITCHED_PATH = "/components";
+
+/**
+ * A page that offers more than one renderer and whose sectioned view keeps
+ * its sticky contents bar under the strip below 1376px: the Button page.
+ */
+const SECTIONED_PATH = `/components/${encodeURIComponent("ds:global.component.button")}`;
+
+/** The widths the open menu is checked over the contents bar at. */
+const MENU_OVER_BAR_WIDTHS: readonly number[] = [820, 390];
 
 let server: RunningServer;
 let browser: Browser;
@@ -233,6 +243,39 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
             here.searchParams.toString(),
           );
           expect(height).toBeGreaterThanOrEqual(MIN_TARGET_PX);
+        }
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
+  it.runIf(MENU_OVER_BAR_WIDTHS.includes(viewport.width))(
+    "paints the open menu's options above the page's contents bar",
+    async () => {
+      const page = await open(SECTIONED_PATH);
+      try {
+        await page.click('[data-slot="view"] summary');
+        const options = await page.evaluate(() =>
+          [
+            ...document.querySelectorAll<HTMLAnchorElement>(
+              '[data-slot="view"] details[open] a[href]',
+            ),
+          ].map((option) => {
+            const box = option.getBoundingClientRect();
+            const hit = document.elementFromPoint(
+              box.left + box.width / 2,
+              box.top + box.height / 2,
+            );
+            return {
+              text: option.textContent,
+              hit: hit !== null && option.contains(hit),
+            };
+          }),
+        );
+        expect(options.length).toBeGreaterThanOrEqual(2);
+        for (const { text, hit } of options) {
+          expect(hit, text ?? "").toBe(true);
         }
       } finally {
         await page.close();
