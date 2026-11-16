@@ -64,6 +64,7 @@ export {
   areListsEqual,
   canonicalizeSlice,
   cycleSortTerm,
+  listConjuncts,
   placeSortTerm,
 } from "../query/index.js";
 export { areFieldFacetsEqual } from "../result/index.js";
