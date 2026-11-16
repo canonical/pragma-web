@@ -38,11 +38,11 @@ describe("resolveFieldKind", () => {
     if (rules.input.kind !== "text") {
       throw new Error("choices edit through a text input");
     }
-    expect(rules.input.parse(definition, "2")).toEqual({
+    expect(rules.input.parse(definition, "2", ".")).toEqual({
       status: "valid",
       operand: 2,
     });
-    expect(rules.input.parse(definition, "ready")).toEqual({
+    expect(rules.input.parse(definition, "ready", ".")).toEqual({
       status: "invalid",
       reason: '"ready" is not an option of "status"',
     });
@@ -55,7 +55,7 @@ describe("resolveFieldKind", () => {
       throw new Error("text edits through a text input");
     }
     // Literal: nothing is trimmed, and no character is a wildcard.
-    expect(text.rules.input.parse(text.definition, " 50%_ ")).toEqual({
+    expect(text.rules.input.parse(text.definition, " 50%_ ", ".")).toEqual({
       status: "valid",
       operand: " 50%_ ",
     });
@@ -168,7 +168,7 @@ describe("resolveFieldKind", () => {
     if (choices.input.kind !== "text") {
       throw new Error("choices edit through a text input");
     }
-    expect(choices.input.parse(region, "eu-west")).toEqual({
+    expect(choices.input.parse(region, "eu-west", ".")).toEqual({
       status: "valid",
       operand: "eu-west",
     });

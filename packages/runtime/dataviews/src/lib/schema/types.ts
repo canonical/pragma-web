@@ -317,7 +317,11 @@ export type FieldKindRules<
   readonly input:
     | {
         readonly kind: "text";
-        readonly parse: (definition: TDefinition, input: string) => InputParse;
+        readonly parse: (
+          definition: TDefinition,
+          input: string,
+          decimalSeparator: string,
+        ) => InputParse;
       }
     | { readonly kind: "none"; readonly reason: string };
   /** Why operands are outside the kind's domain, or null when they are in it. */
@@ -382,9 +386,15 @@ export type Schema<TFields extends readonly SchemaFieldDefinition[]> = {
   readonly listOperators: (name: string) => readonly PredicateOperator[];
   /**
    * Validate one text input for the field's single-value editing path.
-   * Presence fields do not edit through a text input.
+   * Presence fields do not edit through a text input. A number reads `.` as
+   * its decimal point, and `decimalSeparator` too where a reader's locale
+   * writes another, such as `,`.
    */
-  readonly validateInput: (name: string, input: string) => FieldValidation;
+  readonly validateInput: (
+    name: string,
+    input: string,
+    decimalSeparator?: string,
+  ) => FieldValidation;
   /**
    * Build the addressed predicate for a field, enforcing the kind's legal
    * operators, the operator's grammar arity, and schema semantics beyond

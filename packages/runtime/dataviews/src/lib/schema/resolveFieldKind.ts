@@ -205,8 +205,12 @@ const NUMBER: FieldKindRules<NumberField> = {
   },
   input: {
     kind: "text",
-    parse: (definition, input) => {
-      const read = parseNumberWithUnit(input, definition.units);
+    parse: (definition, input, decimalSeparator) => {
+      const read = parseNumberWithUnit(
+        input,
+        definition.units,
+        decimalSeparator,
+      );
       switch (read.kind) {
         case "value":
           return { status: "valid", operand: read.value };
