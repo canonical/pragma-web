@@ -14,6 +14,10 @@ const PLACEHOLDER = /\{(\w+)\}/g;
  *
  * @param locale - BCP 47 tag driving plural selection.
  * @param messages - Catalog for that locale.
+ * @deprecated Write a typed message record instead: a factory per locale
+ * that takes `createFormatters(locale)` and returns a `MessageRecord`, with
+ * `selectPlural` in place of plural entries. Catalogs keep working until a later
+ * release removes them.
  */
 export default function createTranslator(
   locale: Locale,

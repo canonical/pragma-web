@@ -8,6 +8,9 @@ import type { Messages } from "./types.js";
  *
  * @param base - Default messages (e.g. a component's built-in catalog).
  * @param overrides - Messages that take precedence (e.g. app or locale data).
+ * @deprecated Spread a typed message record over its defaults instead
+ * (`{ ...defaults, ...overrides }`), so `tsc` checks each override. Catalogs
+ * keep working until a later release removes them.
  */
 export default function mergeCatalogs(
   base: Messages,
