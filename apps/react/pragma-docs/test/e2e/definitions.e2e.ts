@@ -992,6 +992,10 @@ describe("the overview's record, on the docs site", () => {
     // Two bridges, each to a stub: anatomy to rdf:List, ds to dt:TokenSymbol.
     expect(rest.bridges).toBe(served.weights?.bridges);
     expect(rest.bridgeLabels).toBe(rest.bridges);
+    // Every opened view names every bridge it draws at rest too.
+    for (const [path, measure] of measureViews()) {
+      expect(measure.bridgeLabels, path).toBe(measure.bridges);
+    }
     const seen: { labels?: readonly BridgeLabelMeasure[] } = {};
     const { errors } = await openExplorer(
       "/definitions",
