@@ -229,7 +229,18 @@ server, deterministically: two renders of a page give the same SVG.
   however many: nothing bounds what it fetches, so a graph of more
   classes than `fetchedNodesMax` (200) is fetched whole, over the budget,
   and each site's acceptance tests assert that its graph holds no more.
-  Neither site's data reaches these limits.
+  Neither site's data reaches these limits. Of the budget's four drawing
+  figures, two are enforced: the drawn nodes, by drawing namespaces as
+  boxes, and a column's members, by splitting a layer. The SVG's bytes
+  and elements are not: they are asserted on both sites' data and on the
+  test graphs, so a namespace of few classes and hundreds of relations
+  could draw past them. The layout sizes a namespace's heading and the
+  way back's words by the English catalogue (`MEASURED_LOCALE`), so the
+  server and the client lay out alike; a longer translation would run
+  past the box sized for the English words. The layout's cost grows with
+  the number of namespaces: the overview lays the whole graph out again
+  each time it draws one more namespace as a box, so thirty namespaces
+  take thirty layouts (about 0.7s on a developer's machine).
 
 Not in this package yet: the term page's neighbourhood across namespaces
 (the classes of other namespaces a class relates to, drawn around it);
