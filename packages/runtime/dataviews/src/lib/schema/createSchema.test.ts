@@ -254,6 +254,11 @@ describe("createSchema", () => {
       status: "invalid",
       reason: "131072 is above the maximum of 65536",
     });
+    // A reader whose locale writes `,` for the point types it so.
+    expect(schema.validateInput("memory", "1,5 GiB", ",")).toEqual({
+      status: "valid",
+      operands: [1536],
+    });
   });
 
   it("answers lookups from frozen copies, immune to input mutation", () => {

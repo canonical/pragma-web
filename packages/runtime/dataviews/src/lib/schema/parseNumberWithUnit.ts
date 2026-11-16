@@ -38,13 +38,20 @@ const scale = (whole: string, fraction: string, factor: number): number => {
  * factor's, so `4.03 kB` at a factor of 1000 is exactly 4030. Where the
  * field has units, spaces around the text are not part of it, and text on
  * its way to a value — `16 `, `16 G`, `-`, `1.` — is incomplete rather than
- * wrong; a whole symbol the field does not have is its own reading.
+ * wrong; a whole symbol the field does not have is its own reading. The
+ * decimal point is `.` or the reader's own decimal separator, which the
+ * caller passes in, so `16,5 GiB` reads where the separator is `,`; a
+ * grouping separator is never read.
  */
 export default function parseNumberWithUnit(
   input: string,
   units: NumberUnits | undefined,
+  decimalSeparator = ".",
 ): NumberReading {
-  const text = units === undefined ? input : input.trim();
+  // The reader's separator stands for the point once, where it is typed.
+  const typed =
+    decimalSeparator === "." ? input : input.replace(decimalSeparator, ".");
+  const text = units === undefined ? typed : typed.trim();
   if (units !== undefined && PARTIAL_DECIMAL.test(text)) {
     return { kind: "incomplete" };
   }
@@ -55,7 +62,7 @@ export default function parseNumberWithUnit(
   const [, whole = "", fraction = "", symbol] = read;
   if (symbol === undefined) {
     // A space after the digits, where the field has units: a unit is next.
-    return units !== undefined && input.trimEnd() !== input
+    return units !== undefined && typed.trimEnd() !== typed
       ? { kind: "incomplete" }
       : { kind: "value", value: Number(`${whole}.${fraction}`) };
   }

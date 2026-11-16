@@ -107,7 +107,11 @@ export default function createSchema<
         ? []
         : resolveFieldKind(definition.kind).operators;
     },
-    validateInput(name: string, input: string): FieldValidation {
+    validateInput(
+      name: string,
+      input: string,
+      decimalSeparator = ".",
+    ): FieldValidation {
       const definition = byName.get(name);
       if (definition === undefined) {
         return { status: "invalid", reason: `unknown field "${name}"` };
@@ -119,7 +123,7 @@ export default function createSchema<
       if (input === "") {
         return { status: "incomplete" };
       }
-      const parsed = kind.input.parse(definition, input);
+      const parsed = kind.input.parse(definition, input, decimalSeparator);
       if (parsed.status !== "valid") {
         return parsed;
       }
