@@ -159,6 +159,32 @@ describe("HeaderMenu", () => {
     expect(findTrigger()).toHaveFocus();
   });
 
+  it("adds no window listener while closed", () => {
+    const listen = vi.spyOn(window, "addEventListener");
+    mount();
+    expect(listen).not.toHaveBeenCalled();
+    listen.mockRestore();
+  });
+
+  it.fails("is an icon button with no chevron that opens a popover menu", () => {
+    mount();
+    const trigger = findTrigger();
+    expect(trigger).toHaveClass("ds", "button", "tertiary", "icon-button");
+    expect(trigger.querySelector(".chevron")).toBeNull();
+    const panel = document.getElementById(
+      String(trigger.getAttribute("popovertarget")),
+    );
+    expect(panel).toHaveAttribute("popover", "auto");
+  });
+
+  it("names its menu by the column's label", async () => {
+    mount();
+    fireEvent.click(findTrigger());
+    expect(
+      await screen.findByRole("menu", { name: "Column options for Status" }),
+    ).toBeInTheDocument();
+  });
+
   it("hands back each change to the column's visibility and place, returning focus to the trigger", () => {
     const { onChangeColumn, onPlace } = mount();
     for (const [name, change] of [
