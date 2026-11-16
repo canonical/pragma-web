@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7fccd2d40d08695cc1e26d894eb72ef5>>
+ * @generated SignedSource<<4d8f426fde020fef0c089a1b760bd07a>>
  * @lightSyntaxTransform
  */
 
@@ -28,7 +28,7 @@ export type LobbyQuery$data = {
             readonly name: string | null | undefined;
           } | null | undefined;
           readonly uri: string;
-          readonly " $fragmentSpreads": FragmentRefs<"SiteChipProjection_node">;
+          readonly " $fragmentSpreads": FragmentRefs<"DocsChipProjection_node">;
         };
       }>;
     };
@@ -104,46 +104,34 @@ v8 = {
 v9 = {
   "alias": null,
   "args": null,
-  "concreteType": "EntityMeta",
-  "kind": "LinkedField",
-  "name": "_meta",
-  "plural": false,
-  "selections": [
-    (v8/*:: as any*/)
-  ],
-  "storageKey": null
-},
-v10 = {
-  "alias": null,
-  "args": null,
   "kind": "ScalarField",
   "name": "name",
   "storageKey": null
 },
-v11 = [
+v10 = [
   {
     "kind": "Variable",
     "name": "uri",
     "variableName": "patternClass"
   }
 ],
-v12 = [
+v11 = [
   (v5/*:: as any*/)
 ],
-v13 = [
+v12 = [
   {
     "kind": "Variable",
     "name": "uri",
     "variableName": "standardClass"
   }
 ],
-v14 = [
+v13 = [
   {
     "kind": "TypeDiscriminator",
     "abstractKey": "__isUIBlock"
   }
 ],
-v15 = [
+v14 = [
   (v5/*:: as any*/),
   (v7/*:: as any*/)
 ];
@@ -193,7 +181,18 @@ return {
                     "plural": false,
                     "selections": [
                       (v7/*:: as any*/),
-                      (v9/*:: as any*/),
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "EntityMeta",
+                        "kind": "LinkedField",
+                        "name": "_meta",
+                        "plural": false,
+                        "selections": [
+                          (v8/*:: as any*/)
+                        ],
+                        "storageKey": null
+                      },
                       {
                         "kind": "InlineFragment",
                         "selections": [
@@ -205,7 +204,7 @@ return {
                             "name": "tier",
                             "plural": false,
                             "selections": [
-                              (v10/*:: as any*/)
+                              (v9/*:: as any*/)
                             ],
                             "storageKey": null
                           }
@@ -216,7 +215,7 @@ return {
                       {
                         "args": null,
                         "kind": "FragmentSpread",
-                        "name": "SiteChipProjection_node"
+                        "name": "DocsChipProjection_node"
                       }
                     ],
                     "storageKey": null
@@ -232,22 +231,22 @@ return {
       },
       {
         "alias": "patternClass",
-        "args": (v11/*:: as any*/),
+        "args": (v10/*:: as any*/),
         "concreteType": "OntologyClass",
         "kind": "LinkedField",
         "name": "ontologyClass",
         "plural": false,
-        "selections": (v12/*:: as any*/),
+        "selections": (v11/*:: as any*/),
         "storageKey": null
       },
       {
         "alias": "standardClass",
-        "args": (v13/*:: as any*/),
+        "args": (v12/*:: as any*/),
         "concreteType": "OntologyClass",
         "kind": "LinkedField",
         "name": "ontologyClass",
         "plural": false,
-        "selections": (v12/*:: as any*/),
+        "selections": (v11/*:: as any*/),
         "storageKey": null
       }
     ],
@@ -340,7 +339,7 @@ return {
                             "name": "tier",
                             "plural": false,
                             "selections": [
-                              (v10/*:: as any*/),
+                              (v9/*:: as any*/),
                               (v7/*:: as any*/)
                             ],
                             "storageKey": null
@@ -351,51 +350,20 @@ return {
                       },
                       {
                         "kind": "InlineFragment",
-                        "selections": (v14/*:: as any*/),
+                        "selections": (v13/*:: as any*/),
                         "type": "Component",
                         "abstractKey": null
                       },
                       {
                         "kind": "InlineFragment",
-                        "selections": (v14/*:: as any*/),
+                        "selections": (v13/*:: as any*/),
                         "type": "Pattern",
                         "abstractKey": null
                       },
                       {
                         "kind": "InlineFragment",
-                        "selections": (v14/*:: as any*/),
+                        "selections": (v13/*:: as any*/),
                         "type": "Layout",
-                        "abstractKey": null
-                      },
-                      {
-                        "kind": "InlineFragment",
-                        "selections": [
-                          {
-                            "alias": null,
-                            "args": null,
-                            "concreteType": "EntityMeta",
-                            "kind": "LinkedField",
-                            "name": "_meta",
-                            "plural": false,
-                            "selections": [
-                              {
-                                "alias": null,
-                                "args": null,
-                                "concreteType": "OntologyClass",
-                                "kind": "LinkedField",
-                                "name": "type",
-                                "plural": false,
-                                "selections": [
-                                  (v9/*:: as any*/),
-                                  (v7/*:: as any*/)
-                                ],
-                                "storageKey": null
-                              }
-                            ],
-                            "storageKey": null
-                          }
-                        ],
-                        "type": "Modifier",
                         "abstractKey": null
                       },
                       {
@@ -460,37 +428,37 @@ return {
       },
       {
         "alias": "patternClass",
-        "args": (v11/*:: as any*/),
+        "args": (v10/*:: as any*/),
         "concreteType": "OntologyClass",
         "kind": "LinkedField",
         "name": "ontologyClass",
         "plural": false,
-        "selections": (v15/*:: as any*/),
+        "selections": (v14/*:: as any*/),
         "storageKey": null
       },
       {
         "alias": "standardClass",
-        "args": (v13/*:: as any*/),
+        "args": (v12/*:: as any*/),
         "concreteType": "OntologyClass",
         "kind": "LinkedField",
         "name": "ontologyClass",
         "plural": false,
-        "selections": (v15/*:: as any*/),
+        "selections": (v14/*:: as any*/),
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "92885a4b458a96a4c0dd5a10e5cf399d",
+    "cacheID": "6278d76d9f3bffb277012a768e5eca3f",
     "id": null,
     "metadata": {},
     "name": "LobbyQuery",
     "operationKind": "query",
-    "text": "query LobbyQuery(\n  $componentClass: String!\n  $patternClass: String!\n  $standardClass: String!\n  $exemplarPool: Int!\n) {\n  componentClass: ontologyClass(uri: $componentClass) {\n    instanceCount\n    instances(first: $exemplarPool) {\n      edges {\n        node {\n          __typename\n          uri\n          _meta {\n            title\n          }\n          ... on Component {\n            tier {\n              name\n              uri\n            }\n          }\n          ...SiteChipProjection_node\n        }\n      }\n    }\n    uri\n  }\n  patternClass: ontologyClass(uri: $patternClass) {\n    instanceCount\n    uri\n  }\n  standardClass: ontologyClass(uri: $standardClass) {\n    instanceCount\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipSlot_node\n  ...OntologyClassChip_node\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment ModifierChip_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...ChipProjection_node\n  ... on Component {\n    ...UIBlockChip_node\n  }\n  ... on Pattern {\n    ...UIBlockChip_node\n  }\n  ... on Layout {\n    ...UIBlockChip_node\n  }\n  ...ModifierChip_node\n  ...ModifierFamilyChip_node\n  ...CodeStandardChip_node\n}\n\nfragment SiteChipSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
+    "text": "query LobbyQuery(\n  $componentClass: String!\n  $patternClass: String!\n  $standardClass: String!\n  $exemplarPool: Int!\n) {\n  componentClass: ontologyClass(uri: $componentClass) {\n    instanceCount\n    instances(first: $exemplarPool) {\n      edges {\n        node {\n          __typename\n          uri\n          _meta {\n            title\n          }\n          ... on Component {\n            tier {\n              name\n              uri\n            }\n          }\n          ...DocsChipProjection_node\n        }\n      }\n    }\n    uri\n  }\n  patternClass: ontologyClass(uri: $patternClass) {\n    instanceCount\n    uri\n  }\n  standardClass: ontologyClass(uri: $standardClass) {\n    instanceCount\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipSlot_node\n  ...OntologyClassChip_node\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment DocsChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...ChipProjection_node\n  ... on Component {\n    ...UIBlockChip_node\n  }\n  ... on Pattern {\n    ...UIBlockChip_node\n  }\n  ... on Layout {\n    ...UIBlockChip_node\n  }\n  ...ModifierChip_node\n  ...ModifierFamilyChip_node\n  ...CodeStandardChip_node\n}\n\nfragment ModifierChip_node on Modifier {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ea8bf3a2d90480de34a765e6b015a801";
+(node as any).hash = "12f43d14fb641e68e4e27ba1b6fb4cbb";
 
 export default node;

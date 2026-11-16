@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -14,6 +15,7 @@ import {
 import testQuery, {
   type OntologyClassCardTestQuery,
 } from "../../../__generated__/OntologyClassCardTestQuery.graphql.js";
+import { AmbientNamespaceProvider } from "../../projections/index.js";
 import OntologyClassCard from "./OntologyClassCard.js";
 import type { OntologyClassCardProps } from "./types.js";
 
@@ -90,19 +92,24 @@ describe("OntologyClassCard", () => {
     const { container } = renderWithNode((node) => (
       <OntologyClassCard node={node} />
     ));
+    expectSlotOrder(container);
     expect(
-      [...container.querySelectorAll(".title, .kind, .summary")].map(
+      [...container.querySelectorAll(".prefix, .title, .summary, .status")].map(
         (slot) => slot.textContent,
       ),
     ).toEqual([
-      "Layout ⊂ UIBlock",
-      "Abstract class in ds",
+      "ds:",
+      "Layout",
       "Layouts are an opinionated division of space to navigate a domain of information.",
+      "abstract",
     ]);
-    expect(container.querySelector(".parent")?.textContent).toBe("UIBlock");
-    for (const slot of [".location", ".key-values", ".footer", ".sidecar"]) {
-      expect(container.querySelector(slot), slot).toBeNull();
-    }
+    expect(container.querySelector(".mark use")?.getAttribute("href")).toBe(
+      "/icons/blueprint.svg#blueprint",
+    );
+    const fact = container.querySelector(".fact");
+    expect(fact).toHaveAttribute("data-property", "superclass");
+    expect(fact?.textContent).toBe("Subclass ofUIBlock");
+    expect(container.querySelector(".address, .kind")).toBeNull();
   });
 
   it("links its title, not its superclass, to the class's home", () => {
@@ -113,31 +120,37 @@ describe("OntologyClassCard", () => {
     expect(links.at(0)?.getAttribute("href")).toBe(MOCK_ONTOLOGY_CLASS_HREF);
   });
 
-  it("names a concrete class's kind as a class", () => {
+  it("shows no status for a concrete class", () => {
     const { container } = renderWithNode(
       (node) => <OntologyClassCard node={node} />,
       { isAbstract: false },
     );
-    expect(container.querySelector(".kind")?.textContent).toBe("Class in ds");
+    expect(container.querySelector(".status")).toBeNull();
   });
 
-  it("shows its title alone when the class has no superclass", () => {
+  it("states no fact when the class has no superclass", () => {
     const { container } = renderWithNode(
       (node) => <OntologyClassCard node={node} />,
       { superclass: null },
     );
-    expect(container.querySelector(".title")?.textContent).toBe("Layout");
-    expect(container.querySelector(".parent")).toBeNull();
+    expect(container.querySelector(".facts")).toBeNull();
   });
 
-  it("names its kind alone when the class's address did not compact", () => {
+  it("shows its prefix only when its namespace is not the page's", () => {
+    const { container } = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="ds">
+        <OntologyClassCard node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(container.querySelector(".prefix")).toBeNull();
+  });
+
+  it("leads with no prefix when the class's address did not compact", () => {
     const { container } = renderWithNode(
       (node) => <OntologyClassCard node={node} />,
       { _meta: { title: "Layout", curie: "https://ds.canonical.com/Layout" } },
     );
-    expect(container.querySelector(".kind")?.textContent).toBe(
-      "Abstract class",
-    );
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("renders no summary for a class without a definition", () => {

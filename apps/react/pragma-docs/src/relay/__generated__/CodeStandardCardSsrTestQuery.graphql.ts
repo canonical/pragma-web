@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<99b6149b5b7ca9735b26e1c51d315c93>>
+ * @generated SignedSource<<a04d3366486d3cde0562880be1a8a57f>>
  * @lightSyntaxTransform
  */
 
@@ -44,34 +44,19 @@ v2 = {
   "name": "title",
   "storageKey": null
 },
-v3 = [
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
-    "selections": [
-      (v2/*:: as any*/)
-    ],
-    "storageKey": null
-  },
-  (v1/*:: as any*/)
-],
-v4 = {
+v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v5 = {
+v4 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "EntityMeta"
 },
-v6 = {
+v5 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -162,16 +147,6 @@ return {
                     "kind": "ScalarField",
                     "name": "curie",
                     "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": (v3/*:: as any*/),
-                    "storageKey": null
                   }
                 ],
                 "storageKey": null
@@ -205,7 +180,21 @@ return {
                         "kind": "LinkedField",
                         "name": "node",
                         "plural": false,
-                        "selections": (v3/*:: as any*/),
+                        "selections": [
+                          {
+                            "alias": null,
+                            "args": null,
+                            "concreteType": "EntityMeta",
+                            "kind": "LinkedField",
+                            "name": "_meta",
+                            "plural": false,
+                            "selections": [
+                              (v2/*:: as any*/)
+                            ],
+                            "storageKey": null
+                          },
+                          (v1/*:: as any*/)
+                        ],
                         "storageKey": null
                       }
                     ],
@@ -224,7 +213,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9bb83b6dca0a34ff571f7bc5a4062a26",
+    "cacheID": "897c35591e23b407cbaaa90c9a6d0995",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -234,19 +223,10 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__typename": (v4/*:: as any*/),
-        "node._meta": (v5/*:: as any*/),
-        "node._meta.curie": (v4/*:: as any*/),
-        "node._meta.title": (v4/*:: as any*/),
-        "node._meta.type": {
-          "enumValues": null,
-          "nullable": false,
-          "plural": false,
-          "type": "OntologyClass"
-        },
-        "node._meta.type._meta": (v5/*:: as any*/),
-        "node._meta.type._meta.title": (v4/*:: as any*/),
-        "node._meta.type.uri": (v6/*:: as any*/),
+        "node.__typename": (v3/*:: as any*/),
+        "node._meta": (v4/*:: as any*/),
+        "node._meta.curie": (v3/*:: as any*/),
+        "node._meta.title": (v3/*:: as any*/),
         "node.categories": {
           "enumValues": null,
           "nullable": false,
@@ -265,21 +245,21 @@ return {
           "plural": false,
           "type": "Category"
         },
-        "node.categories.edges.node._meta": (v5/*:: as any*/),
-        "node.categories.edges.node._meta.title": (v4/*:: as any*/),
-        "node.categories.edges.node.uri": (v6/*:: as any*/),
+        "node.categories.edges.node._meta": (v4/*:: as any*/),
+        "node.categories.edges.node._meta.title": (v3/*:: as any*/),
+        "node.categories.edges.node.uri": (v5/*:: as any*/),
         "node.description": {
           "enumValues": null,
           "nullable": true,
           "plural": false,
           "type": "String"
         },
-        "node.uri": (v6/*:: as any*/)
+        "node.uri": (v5/*:: as any*/)
       }
     },
     "name": "CodeStandardCardSsrTestQuery",
     "operationKind": "query",
-    "text": "query CodeStandardCardSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...CodeStandardCard_node\n    uri\n  }\n}\n\nfragment CodeStandardCard_node on CodeStandard {\n  __typename\n  description\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query CodeStandardCardSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...CodeStandardCard_node\n    uri\n  }\n}\n\nfragment CodeStandardCard_node on CodeStandard {\n  __typename\n  description\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

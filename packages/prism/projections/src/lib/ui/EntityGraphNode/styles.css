@@ -22,6 +22,10 @@
     --entity-graph-node-prominent-font-size: 1rem;
     --entity-graph-node-count-color: var(--color-text-muted);
     --entity-graph-node-context-color: var(--color-text-muted);
+    --entity-graph-node-prefix-color: var(--color-text-muted);
+    --entity-graph-node-prefix-font-weight: var(
+      --typography-text-primary-font-weight
+    );
     /* The ring sits inside the link, since the node clips its lines. */
     --entity-graph-node-focus-ring-width: 2px;
     --entity-graph-node-focus-ring-offset: -2px;
@@ -75,6 +79,13 @@
    * from no `<code>`. */
   .ds.entity-graph-node .identifier {
     font-family: var(--entity-graph-node-identifier-font-family);
+  }
+
+  /* The foreign prefix, muted in monospace at the text's own weight. */
+  .ds.entity-graph-node .prefix {
+    color: var(--entity-graph-node-prefix-color);
+    font-family: var(--entity-graph-node-identifier-font-family);
+    font-weight: var(--entity-graph-node-prefix-font-weight);
   }
 
   .ds.entity-graph-node .count {

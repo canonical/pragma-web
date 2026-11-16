@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -98,16 +99,41 @@ describe("ModifierFamilyCommand", () => {
         <ModifierFamilyCommand node={node} />
       </ul>
     ));
+    const command = container.querySelector(".ds.modifier-family-command");
     expect(
-      [...container.querySelectorAll(".title, .context, .vital")].map(
-        (slot) => slot.textContent,
-      ),
-    ).toEqual(["Anticipation", "Modifier family in ds", "5 modifiers"]);
+      [
+        ...(command?.querySelectorAll(".title, .address, .kind, .status") ??
+          []),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "Anticipation",
+      "ds:global.modifier_family.anticipation",
+      "Modifier family",
+      "5 modifiers",
+    ]);
+    expect(command?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/bundle.svg#bundle",
+    );
+    expect(command?.querySelector(".prefix")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+    if (command) expectSlotOrder(command);
   });
 
-  it("names its class alone with no prefix, and counts no member", () => {
-    const { container } = renderWithNode(
+  it("counts one member in the singular, and none in the plural", () => {
+    const { container, unmount } = renderWithNode(
+      (node) => (
+        <ul>
+          <ModifierFamilyCommand node={node} />
+        </ul>
+      ),
+      {
+        modifiers: { edges: [{ node: { uri: "ds:global.modifier.danger" } }] },
+      },
+    );
+    expect(container.querySelector(".status")?.textContent).toBe("1 modifier");
+    unmount();
+    const empty = renderWithNode(
       (node) => (
         <ul>
           <ModifierFamilyCommand node={node} />
@@ -115,10 +141,12 @@ describe("ModifierFamilyCommand", () => {
       ),
       { modifiers: { edges: [] }, ...UNCOMPACTED_FAMILY },
     );
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Modifier family",
+    expect(empty.container.querySelector(".status")?.textContent).toBe(
+      "0 modifiers",
     );
-    expect(container.querySelector(".vital")?.textContent).toBe("0 modifiers");
+    expect(empty.container.querySelector(".address")?.textContent).toBe(
+      "https://ds.canonical.com/global.modifier_family.anticipation",
+    );
   });
 
   it("applies custom className", () => {

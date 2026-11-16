@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -84,42 +85,29 @@ describe("StationGraphNode", () => {
     );
   });
 
-  it("fills the node's lines from the station", () => {
+  it("fills the node's lines from the station, and names no kind", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">
         <StationGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("Northgate");
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Station in Central Zone",
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "metro: Northgate",
     );
-  });
-
-  it("links its title to the station's page", () => {
-    const { container } = renderWithNode((node) => (
-      <svg aria-label="Graph" role="img">
-        <StationGraphNode node={node} />
-      </svg>
-    ));
+    expect(container.querySelector(".title .prefix")?.textContent).toBe(
+      "metro: ",
+    );
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/location.svg#location",
+    );
+    expect(container.querySelector(".kind, .context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       "/network/stations/metro%3Anorthgate",
     );
   });
 
-  it("names its class alone for a station in no zone", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <svg aria-label="Graph" role="img">
-          <StationGraphNode node={node} />
-        </svg>
-      ),
-      {
-        inZone: null,
-      },
-    );
-    expect(container.querySelector(".context")?.textContent).toBe("Station");
-  });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <svg aria-label="Graph" role="img">

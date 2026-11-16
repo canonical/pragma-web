@@ -57,6 +57,6 @@ describe("ModifierCommand SSR", () => {
     );
     expect(html).toContain("ds entity-command ds modifier-command");
     expect(html).toContain('data-type="Modifier"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

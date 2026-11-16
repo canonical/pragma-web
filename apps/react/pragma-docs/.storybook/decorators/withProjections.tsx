@@ -1,15 +1,12 @@
 import { HomesProvider, RouterLink } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import type { ElementType } from "react";
 import { homes } from "../../src/homes.js";
 import { SiteRenderers } from "../../src/lib/ui/SiteRenderers/index.js";
 
 /**
- * Storybook decorator that provides the site's homes, the default
- * projection maps, the router link adapter and the site's renderers, as
+ * Storybook decorator that provides the site's homes, the projection
+ * link provider, the router link adapter and the site's renderers, as
  * `Shell` does, so a
  * story's entity chips dispatch on their node's type and link to its home.
  *
@@ -23,14 +20,11 @@ import { SiteRenderers } from "../../src/lib/ui/SiteRenderers/index.js";
  */
 const withProjections = () => (Story: ElementType) => (
   <HomesProvider homes={homes}>
-    <ProjectionsProvider
-      LinkComponent={RouterLink}
-      maps={defaultProjectionMaps}
-    >
+    <ProjectionLinkProvider LinkComponent={RouterLink}>
       <SiteRenderers>
         <Story />
       </SiteRenderers>
-    </ProjectionsProvider>
+    </ProjectionLinkProvider>
   </HomesProvider>
 );
 

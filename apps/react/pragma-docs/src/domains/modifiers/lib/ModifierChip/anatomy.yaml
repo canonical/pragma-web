@@ -1,12 +1,13 @@
 ---
-# ModifierChip: a modifier as an inline mention.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 449:22408 and 462:280 (the
-# chip with its key before the separator: "Modifier: Danger"). The key is
-# the modifier's class; a passage's own link text, when given, stands in
-# for the title.
-# Projected onto EntityChip, which carries every style: this anatomy binds
-# none. The home is the link the value renders through, resolved from the
-# compact address; a modifier has no home yet and reads as inert text.
+# ModifierChip: a modifier as an inline mention: the slot order mark,
+# prefix, title. A passage's own link text, when given, stands in for the
+# title. A linked chip peeks at the modifier: the peek useProjectionPeek
+# returns for its absolute IRI (uri, the only address node(id:) accepts),
+# mounted only when the peek opens.
+# Its mark is the modifier's glyph, so it names no kind; the prefix shows
+# only off the page's ambient namespace (the components lens declares ds). A
+# modifier has no home yet and reads as inert text. Projected onto the base
+# form, which carries every style.
 node:
   uri: docs.component.modifier_chip
   projection:
@@ -16,16 +17,25 @@ node:
         uri: prism.component.entity_chip
         edges:
           - node:
-              role: lead
-              projection:
-                field: _meta.title
+              role: mark
+              # The modifier's glyph, a published Icon (MODIFIER_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
             relation:
               cardinality: "1"
-              slotName: lead
-              projection:
-                field: _meta.type
+              slotName: mark
           - node:
-              role: value
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
+          - node:
+              role: title
               projection:
                 field: _meta.title
               edges:
@@ -35,8 +45,15 @@ node:
                       field: _meta.curie
                   relation:
                     cardinality: "0..1"
+                # The peek: the entity's card, read by its own query when open.
+                - node:
+                    uri: prism.component.projection_peek
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
             relation:
               cardinality: "1"
-              slotName: value
+              slotName: title
       relation:
         cardinality: "1"

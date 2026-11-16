@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -13,13 +14,14 @@ import {
   MOCK_ROLLING_STOCK,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import Component from "./RollingStockCommand.js";
+import RollingStockCommand from "./RollingStockCommand.js";
 import type { RollingStockCommandProps } from "./types.js";
 
 /**
- * The operation the tests render RollingStockCommand under: one RollingStock, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render RollingStockCommand under: one RollingStock, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query RollingStockCommandTestQuery @relay_test_operation {
@@ -30,7 +32,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const RollingStockCommandTestNode = ({
   children,
 }: {
@@ -46,8 +51,8 @@ const RollingStockCommandTestNode = ({
 
 /**
  * Render `children` with the key of the RollingStock a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: RollingStockCommandProps["node"]) => ReactElement,
@@ -74,7 +79,7 @@ describe("RollingStockCommand", () => {
   it("reads the RollingStock through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <RollingStockCommand node={node} />
       </ul>
     ));
     expect(
@@ -82,32 +87,52 @@ describe("RollingStockCommand", () => {
     ).toHaveAttribute("data-type", "RollingStock");
   });
 
-  it("fills its slots from the rolling stock", () => {
+  it("fills the result's lines from the rolling stock", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <RollingStockCommand node={node} />
       </ul>
     ));
-    for (const text of ["Series 90", "Rolling stock", "2 formations"]) {
-      expect(container.textContent).toContain(text);
-    }
+    const root = container.querySelector(".ds.rolling-stock-command");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/machines.svg#machines",
+    );
+    expect(
+      [
+        ...(root?.querySelectorAll(".title, .address, .kind, .status") ?? []),
+      ].map((slot) => slot.textContent),
+    ).toEqual([
+      "Series 90",
+      "metro:series-90",
+      "Rolling stock",
+      "2 formations",
+    ]);
+    expect(root?.querySelector(".prefix")).toBeNull();
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "Series 90" })).toHaveAttribute(
+      "href",
+      "/fleet/metro%3Aseries-90",
+    );
   });
 
-  it("links its title to the rolling stock's page", () => {
-    renderWithNode((node) => (
-      <ul>
-        <Component node={node} />
-      </ul>
-    ));
-    expect(
-      screen.getByRole("link", { name: "Series 90" }).getAttribute("href"),
-    ).toBe("/fleet/metro%3Aseries-90");
+  it("counts one formation where the stock runs in one", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <RollingStockCommand node={node} />
+        </ul>
+      ),
+      { formations: MOCK_ROLLING_STOCK.formations.slice(0, 1) },
+    );
+    expect(container.querySelector(".status")?.textContent).toBe("1 formation");
+    expect(container.querySelector(".kind")?.textContent).toBe("Rolling stock");
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component className="custom-class" node={node} />
+        <RollingStockCommand className="custom-class" node={node} />
       </ul>
     ));
     expect(
@@ -120,7 +145,7 @@ describe("RollingStockCommand", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <ul>
-        <Component data-testid="test-component" node={node} />
+        <RollingStockCommand data-testid="test-component" node={node} />
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");

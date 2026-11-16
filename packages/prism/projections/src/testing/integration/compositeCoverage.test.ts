@@ -9,15 +9,15 @@ import chipProjectionFragmentNode from "../../__generated__/ChipProjection_node.
 import commandProjectionFragmentNode from "../../__generated__/CommandProjection_node.graphql.js";
 import graphNodeProjectionFragmentNode from "../../__generated__/GraphNodeProjection_node.graphql.js";
 import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.graphql.js";
-import { defaultProjectionMaps, type ProjectionMaps } from "../../lib/index.js";
+import { ONTOLOGY_TYPES } from "../../lib/ontology/constants.js";
 
 /**
- * Each form's map, beside the composite fragment its dispatcher reads, the
- * dispatcher's folder, whose anatomy names its cases, and the site slot the
- * composite spreads.
+ * Each form, beside the composite fragment its switch reads, the switch's
+ * folder, whose anatomy names its cases, and the site slot the composite
+ * spreads.
  */
 const COMPOSITES: readonly {
-  readonly form: keyof ProjectionMaps;
+  readonly form: string;
   readonly fragment: ReaderFragment;
   readonly dispatcher: string;
   readonly slot: string;
@@ -143,13 +143,13 @@ describe("each form's composite fragment", () => {
         });
       });
 
-      it(`arms exactly the types the ${form} map types`, () => {
+      it(`arms exactly the package's types in the ${form} form`, () => {
         expect(
           arms
             .map(({ alias }) => alias)
             .filter((alias) => alias !== "Node" && alias !== "Site")
             .sort(),
-        ).toEqual(Object.keys(defaultProjectionMaps[form].types).sort());
+        ).toEqual(Object.keys(ONTOLOGY_TYPES).sort());
       });
 
       it(`arms exactly the cases ${dispatcher}'s anatomy switches on`, () => {
@@ -161,10 +161,14 @@ describe("each form's composite fragment", () => {
   }
 });
 
-describe("the list view's two dispatchers", () => {
+describe("the list view's two switches", () => {
   it("arm the same types, so a list's cards and rows project each node alike", () => {
-    expect(Object.keys(defaultProjectionMaps.row.types).sort()).toEqual(
-      Object.keys(defaultProjectionMaps.card.types).sort(),
+    const aliases = (fragment: ReaderFragment): string[] =>
+      listArms(fragment)
+        .map(({ alias }) => alias)
+        .sort();
+    expect(aliases(rowProjectionFragmentNode)).toEqual(
+      aliases(cardProjectionFragmentNode),
     );
   });
 });

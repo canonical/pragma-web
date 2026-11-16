@@ -6,22 +6,36 @@ import {
   RouterLink,
   StoredThemeProvider,
 } from "@canonical/prism-core";
-import { ProjectionsProvider } from "@canonical/prism-projections";
+import {
+  AmbientNamespaceProvider,
+  ProjectionLinkProvider,
+} from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import { metroProjectionMaps } from "#domains/metro";
 import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
-import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
+import {
+  AMBIENT_NAMESPACE,
+  GRID_PRESET_CLASS_NAMES,
+  SITE_SWITCHES,
+} from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
+import { MetroPeek } from "../MetroPeek/index.js";
 import { SiteRenderers } from "../SiteRenderers/index.js";
 
 const componentCssClassName = "ds shell";
+
+/**
+ * Render the site's peek at the IRI `uri`: the card the site's card
+ * switch gives the node, which every chip arm reaches through the
+ * provider (`useProjectionPeek`).
+ */
+const renderPeek = (uri: string): ReactElement => <MetroPeek uri={uri} />;
 
 /**
  * The application's provider nest and the one element it renders: the
@@ -29,9 +43,12 @@ const componentCssClassName = "ds shell";
  * the router's `Outlet`, with the document-title template and the theme
  * the reader's cookie stores, which the theme control shows on the server
  * as on the client. Inside the
- * router sit the site's homes and its projection maps, so every mention of
- * a graph node renders through its type's arm and links to the page that
- * owns it.
+ * router sit the site's homes and the projection link provider, with the
+ * site's five switches, so every mention of a graph node, a lens's
+ * included, renders through its type's arm and links to the page that
+ * owns it, with the site's peek, `MetroPeek`, which every chip opens, and
+ * the site's one ambient namespace, `metro`, so a metro
+ * identity shows no prefix and a foreign one shows its own.
  *
  * The projections render a home through prism-core's `RouterLink`, so every
  * mention navigates on the client through the router: a plain click loads
@@ -70,30 +87,33 @@ export default function Shell<
         <RelayEnvironmentProvider environment={environment}>
           <RouterProvider router={router}>
             <HomesProvider homes={homes}>
-              <ProjectionsProvider
+              <ProjectionLinkProvider
                 LinkComponent={RouterLink}
-                maps={metroProjectionMaps}
+                peek={renderPeek}
+                site={SITE_SWITCHES}
               >
-                <SiteRenderers>
-                  <div
-                    {...props}
-                    className={[
-                      componentCssClassName,
-                      ...GRID_PRESET_CLASS_NAMES,
-                      className,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <Outlet
-                      fallback={
-                        <p className="loading">{MESSAGES["shell.loading"]}</p>
-                      }
-                    />
-                    <CommandPalette />
-                  </div>
-                </SiteRenderers>
-              </ProjectionsProvider>
+                <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
+                  <SiteRenderers>
+                    <div
+                      {...props}
+                      className={[
+                        componentCssClassName,
+                        ...GRID_PRESET_CLASS_NAMES,
+                        className,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <Outlet
+                        fallback={
+                          <p className="loading">{MESSAGES["shell.loading"]}</p>
+                        }
+                      />
+                      <CommandPalette />
+                    </div>
+                  </SiteRenderers>
+                </AmbientNamespaceProvider>
+              </ProjectionLinkProvider>
             </HomesProvider>
           </RouterProvider>
         </RelayEnvironmentProvider>

@@ -59,15 +59,22 @@ const dropClass = (classUri: string): typeof lobbyRecords => {
   return records as unknown as typeof lobbyRecords;
 };
 
-/** Each door's vitals, in the doors' order. */
-const readDoorVitals = (): string[][] =>
+/**
+ * Each door's facts, in the doors' order: each its property, its label and
+ * its value.
+ */
+const readDoorFacts = (): string[][] =>
   [
     ...screen
       .getByRole("region", { name: "The lenses" })
       .querySelectorAll(".ds.entity-card"),
   ].map((card) =>
-    [...card.querySelectorAll(".vital")].map(
-      (vital) => vital.textContent ?? "",
+    [...card.querySelectorAll(".fact")].map((fact) =>
+      [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".term")?.textContent,
+        fact.querySelector(".detail")?.textContent,
+      ].join(" "),
     ),
   );
 
@@ -110,16 +117,13 @@ describe("Lobby", () => {
         "/journeys",
         "/guides",
       ]);
-      const vitals = cards.map((card) =>
-        [...card.querySelectorAll(".vital")].map((vital) => vital.textContent),
-      );
-      expect(vitals).toEqual([
+      expect(readDoorFacts()).toEqual([
         [
-          `${readCapturedCount(LOBBY_COMPONENT_CLASS)} components`,
-          `${readCapturedCount(LOBBY_PATTERN_CLASS)} patterns`,
+          `components Components ${readCapturedCount(LOBBY_COMPONENT_CLASS)}`,
+          `patterns Patterns ${readCapturedCount(LOBBY_PATTERN_CLASS)}`,
         ],
         [],
-        [`${readCapturedCount(LOBBY_STANDARD_CLASS)} standards`],
+        [`standards Standards ${readCapturedCount(LOBBY_STANDARD_CLASS)}`],
         [],
         [],
       ]);
@@ -131,16 +135,37 @@ describe("Lobby", () => {
   );
 
   it(
+    "writes each count in the catalog's number format",
+    () => {
+      const records = structuredClone(lobbyRecords) as unknown as Record<
+        string,
+        Record<string, unknown> | undefined
+      >;
+      const link = records["client:root"]?.[
+        `ontologyClass(uri:"${LOBBY_STANDARD_CLASS}")`
+      ] as { __ref: string };
+      const standardClass = records[link.__ref];
+      if (standardClass === undefined) throw new Error("no standards class");
+      standardClass.instanceCount = 1234;
+      render(
+        lobbyPage(records as unknown as typeof lobbyRecords, createFetchSpy()),
+      );
+      expect(readDoorFacts().at(2)).toEqual(["standards Standards 1,234"]);
+    },
+    LOBBY_TEST_TIMEOUT_MS,
+  );
+
+  it(
     "leaves the components count and the examples out when the store lacks the class",
     () => {
       render(lobbyPage(dropClass(LOBBY_COMPONENT_CLASS), createFetchSpy()));
       expect(
         screen.queryByRole("region", { name: "A few of the components" }),
       ).toBeNull();
-      expect(readDoorVitals()).toEqual([
-        [`${readCapturedCount(LOBBY_PATTERN_CLASS)} patterns`],
+      expect(readDoorFacts()).toEqual([
+        [`patterns Patterns ${readCapturedCount(LOBBY_PATTERN_CLASS)}`],
         [],
-        [`${readCapturedCount(LOBBY_STANDARD_CLASS)} standards`],
+        [`standards Standards ${readCapturedCount(LOBBY_STANDARD_CLASS)}`],
         [],
         [],
       ]);
@@ -152,10 +177,10 @@ describe("Lobby", () => {
     "leaves the patterns count out when the store lacks the class",
     () => {
       render(lobbyPage(dropClass(LOBBY_PATTERN_CLASS), createFetchSpy()));
-      expect(readDoorVitals()).toEqual([
-        [`${readCapturedCount(LOBBY_COMPONENT_CLASS)} components`],
+      expect(readDoorFacts()).toEqual([
+        [`components Components ${readCapturedCount(LOBBY_COMPONENT_CLASS)}`],
         [],
-        [`${readCapturedCount(LOBBY_STANDARD_CLASS)} standards`],
+        [`standards Standards ${readCapturedCount(LOBBY_STANDARD_CLASS)}`],
         [],
         [],
       ]);
@@ -167,10 +192,10 @@ describe("Lobby", () => {
     "leaves the standards count out when the store lacks the class",
     () => {
       render(lobbyPage(dropClass(LOBBY_STANDARD_CLASS), createFetchSpy()));
-      expect(readDoorVitals()).toEqual([
+      expect(readDoorFacts()).toEqual([
         [
-          `${readCapturedCount(LOBBY_COMPONENT_CLASS)} components`,
-          `${readCapturedCount(LOBBY_PATTERN_CLASS)} patterns`,
+          `components Components ${readCapturedCount(LOBBY_COMPONENT_CLASS)}`,
+          `patterns Patterns ${readCapturedCount(LOBBY_PATTERN_CLASS)}`,
         ],
         [],
         [],

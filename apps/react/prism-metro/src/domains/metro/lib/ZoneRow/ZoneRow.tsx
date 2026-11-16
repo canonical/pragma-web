@@ -1,18 +1,24 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
-import { EntityRow, useProjectionLink } from "@canonical/prism-projections";
+import {
+  EntityRow,
+  useForeignPrefix,
+  useProjectionLink,
+} from "@canonical/prism-projections";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
 import nodeFragment from "#relay/__generated__/ZoneRow_node.graphql.js";
+import { ZONE_MARK_ICON } from "../ZoneChip/constants.js";
 import type { ZoneRowProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The fields ZoneRow reads from the Zone it renders: the stops inside it,
- * its name and its compact address.
+ * The fields ZoneRow reads from the Zone it renders: what its slots
+ * show, and its compact address, which its home is resolved from.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment ZoneRow_node on Zone {
@@ -23,6 +29,7 @@ const declareNodeFragment = (): unknown => graphql`
     _meta {
       title
       curie
+      definition
     }
   }
 `;
@@ -32,20 +39,22 @@ void declareNodeFragment;
 const componentCssClassName = "ds zone-row";
 
 /**
- * A fare zone as a 32px list entry: its name, and the count of the
- * stations inside it muted at the end. A fare zone has no home on this
- * site, so the name reads as inert text.
+ * A fare zone as a list entry: its mark, its prefix off the page's
+ * namespace, its name, linked to its home where the site gives it one, and
+ * its count of stations as a fact; a two-line row (`lines="two"`) puts its
+ * definition under the name.
+ * Its mark is the zone's glyph, a published icon.
  *
- * Native props reach the row's `<li>` root; a consumer `className` merges
- * after the projection's own, and the root carries the typename as
- * `data-type`.
+ * Native props reach the row's `<li>` root; a consumer `className`
+ * merges after the projection's own, and the root carries the typename
+ * as `data-type`.
  *
- * `import { ZoneRow } from "./lib/index.js";`
+ * `import { ZoneRow } from "#domains/metro";`
  *
  * @implements metro.component.zone_row
  * @note Impure: reads its zone from the Relay store, its home from the
- *   site's homes, its link from the projection provider and its words from
- *   the translator in scope.
+ *   site's homes, and its link and the page's namespace from the
+ *   projection providers, and its words from the translator in scope.
  */
 export default function ZoneRow({
   node,
@@ -53,18 +62,29 @@ export default function ZoneRow({
   ...props
 }: ZoneRowProps): ReactElement {
   const data = useFragment(nodeFragment, node);
-  const href = useHome({ __typename: data.__typename, uri: data._meta.curie });
+  const { curie, definition, title } = data._meta;
+  const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix(curie);
   const t = useMessages();
   return (
     <EntityRow
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
+      facts={[
+        {
+          property: "stops",
+          label: t("zone.stations"),
+          value: data.stops.length,
+        },
+      ]}
       href={href}
       LinkComponent={LinkComponent}
-      meta={t("zone.stations.count", { count: data.stops.length })}
-      title={data._meta.title}
+      mark={<Icon icon={ZONE_MARK_ICON} />}
+      prefix={prefix}
+      summary={definition ?? undefined}
+      title={title}
     />
   );
 }

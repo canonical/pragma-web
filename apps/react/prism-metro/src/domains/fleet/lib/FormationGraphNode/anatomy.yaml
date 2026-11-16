@@ -1,29 +1,47 @@
 ---
-# FormationGraphNode: a formation as a node of a graph.
-# Best guess: the formation's name, linked to its page, its class and its stock.
-# Projected onto EntityGraphNode, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address.
+# FormationGraphNode: A formation as a node of a graph: its mark, its prefix off
+# the page's namespace and its name, linked to its home. Its mark says its
+# type, so it names no kind. Its mark is the formation's glyph, a published
+# icon.
 node:
   uri: metro.component.formation_graph_node
-  projection: { on: Formation }
+  projection:
+    on: Formation
   edges:
     - node:
         uri: prism.component.entity_graph_node
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # The formation's glyph, a published Icon (FORMATION_MARK_ICON).
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
-              role: kind
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
           - node:
-              role: location
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: location, projection: { field: stock } }
-      relation: { cardinality: "1" }
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+      relation:
+        cardinality: "1"

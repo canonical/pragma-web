@@ -1,8 +1,5 @@
 import { HomesProvider, RouterLink } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
@@ -15,7 +12,7 @@ import { appRoutes } from "../src/routes.js";
 /**
  * Wrap `children` in the providers the site's `Shell` mounts around a
  * projection: the Relay environment, a router over the site's own routes at
- * `url` (`/` by default), the site's homes, and the default projection maps
+ * `url` (`/` by default), the site's homes, and the projection link provider
  * with the router's link, so a homed entity's title links to its page as on
  * the site.
  */
@@ -30,12 +27,9 @@ export default function createSiteTree(
         router={createRouter(appRoutes, { adapter: createMemoryAdapter(url) })}
       >
         <HomesProvider homes={homes}>
-          <ProjectionsProvider
-            LinkComponent={RouterLink}
-            maps={defaultProjectionMaps}
-          >
+          <ProjectionLinkProvider LinkComponent={RouterLink}>
             <SiteRenderers>{children}</SiteRenderers>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

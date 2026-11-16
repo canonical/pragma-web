@@ -1,0 +1,11 @@
+---
+# SiteChipSlot: the site's chip switch as the package's chip switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to MetroChipProjection,
+# whose case renders the root.
+node:
+  uri: metro.component.site_chip_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: metro.component.metro_chip_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

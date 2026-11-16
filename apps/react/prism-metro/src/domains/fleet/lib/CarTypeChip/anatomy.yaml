@@ -1,25 +1,56 @@
 ---
-# CarTypeChip: a car type as an inline mention.
-# Best guess: the car type's code as the pill's lead, then its name.
-# Projected onto EntityChip, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address.
+# CarTypeChip: A car type as an inline mention: its mark, its prefix when the
+# car type is off the page's namespace, and its name, linked to its home; a
+# linked chip peeks at the car type's card, the peek the site's provider
+# gives. A passage's own link text, given as `children`, stands in for the
+# name; `linked={false}` sets the chip as inert text. Its mark is the
+# car type's glyph, a published icon.
 node:
   uri: metro.component.car_type_chip
-  projection: { on: CarType }
+  projection:
+    on: CarType
   edges:
     - node:
         uri: prism.component.entity_chip
         edges:
           - node:
-              role: code
-              projection: { field: code }
-            relation: { cardinality: "1", slotName: lead }
-          - node:
-              role: value
-              projection: { field: _meta.title }
+              role: mark
+              # The car type's glyph, a published Icon (CAR_TYPE_MARK_ICON).
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: value }
-      relation: { cardinality: "1" }
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+                # The peek: the node's card, read by its own query when open.
+                - node:
+                    uri: prism.component.projection_peek
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+      relation:
+        cardinality: "1"

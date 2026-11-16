@@ -97,6 +97,25 @@ describe("LinePanel", () => {
     ).toBe("#f2b705");
   });
 
+  it("leaves its channel unset for a colour the gate refuses", () => {
+    const { container } = renderWithSite(
+      <LinePanel
+        line={{
+          ...CIRCLE,
+          colour: "red; background: url(https://example.com/x)",
+        }}
+      />,
+      "/network",
+      RECORDED,
+    );
+    expect(
+      (
+        container.querySelector("section") as HTMLElement
+      ).style.getPropertyValue("--line-panel-colour"),
+    ).toBe("");
+    expect(container.innerHTML).not.toContain("url(");
+  });
+
   it("applies custom className after its own", () => {
     const { container } = renderWithSite(
       <LinePanel className="custom-class" line={NORTH} />,

@@ -3,10 +3,7 @@ import {
   createStaticRouter,
   HomesProvider,
 } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
@@ -25,7 +22,7 @@ import { HOMES } from "./fixtures.js";
  * router `Link`s whose hrefs and `aria-current` selection come from the
  * `definitionsTerm` codec.
  *
- * The homes and the default projection maps sit inside the router, because
+ * The homes and the projection link provider sit inside the router, because
  * the inspector mentions a class's instances as entity chips that link to
  * their homes through it. `LensFilterProvider` is part of the stack because
  * `DefinitionsLayout` wraps the page in it on every real render; without it
@@ -60,14 +57,14 @@ export default function createDefinitionsPage(
         )}
       >
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider maps={defaultProjectionMaps}>
+          <ProjectionLinkProvider>
             <LensFilterProvider>
               <DefinitionsPage
                 params={term === undefined ? {} : { term }}
                 search={{}}
               />
             </LensFilterProvider>
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

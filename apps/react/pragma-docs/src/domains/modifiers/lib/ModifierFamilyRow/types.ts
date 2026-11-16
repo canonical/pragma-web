@@ -9,6 +9,11 @@ type OwnProps = {
    * that spreads `...ModifierFamilyRow_node`.
    */
   readonly node: ModifierFamilyRow_node$key;
+  /**
+   * How many lines the row takes: one (32px) by default, or two (56px),
+   * the family's summary under its title, where an index opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**

@@ -106,3 +106,13 @@ export interface FleetFact {
   readonly term: string;
   readonly value: string;
 }
+
+/**
+ * One fact of a rolling stock's card: the graph property it reads, its
+ * label and its value, as a reader reads them.
+ */
+export interface StockFact {
+  readonly property: string;
+  readonly label: string;
+  readonly value: string;
+}

@@ -11,6 +11,11 @@ type OwnProps = {
   readonly node: OntologyPropertyChip_node$key;
   /** The mention's text, in place of the property's name. */
   readonly children?: ReactNode;
+  /**
+   * Whether the title links to the property's home:
+   * `false` sets it as inert text, for a mention of the page it sits on.
+   */
+  readonly linked?: boolean;
 };
 
 /**

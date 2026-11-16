@@ -21,7 +21,7 @@ describe("useMessages", () => {
 
   it("leaves a placeholder with no value verbatim instead of throwing", () => {
     const { result } = renderHook(() => useMessages());
-    expect(result.current("chip.lead")).toBe("{lead}:");
+    expect(result.current("chip.peek")).toBe("Preview of {title}");
   });
 
   it("returns the translator a provider supplies", () => {

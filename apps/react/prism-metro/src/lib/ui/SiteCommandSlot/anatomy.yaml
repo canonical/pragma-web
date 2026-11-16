@@ -1,0 +1,11 @@
+---
+# SiteCommandSlot: the site's command switch as the package's command switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to MetroCommandProjection,
+# whose case renders the root.
+node:
+  uri: metro.component.site_command_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: metro.component.metro_command_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

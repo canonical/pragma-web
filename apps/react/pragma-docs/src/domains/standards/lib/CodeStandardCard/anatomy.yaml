@@ -1,17 +1,13 @@
 ---
-# CodeStandardCard: a code standard as a card in a grid of entities.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 505:2140 (the location above
-# the title, the kind "Code Standard", the summary with its emphasis kept,
-# and the key value "Category: React" under its rule). The location is the
-# compact address's prefix; the summary the first paragraph of the
-# standard's Markdown description, rendered inline, so its emphasis and
-# code read as they do in the standard; the Category value its first
-# category. The category already says what a footer would, so the card has
-# none.
-# Projected onto EntityCard, which carries every style: this anatomy binds
-# none. A standard has no sidecar. The home is the link the title renders
-# through, resolved from the compact address; a standard without one reads
-# as inert text.
+# CodeStandardCard: a code standard as a card in a grid of entities: the
+# slot order mark, prefix, title, summary, facts. The summary is the first
+# paragraph of the standard's Markdown description; the one fact is its
+# first category. A standard has no depiction, so the card draws no
+# specimen, and a card carries no address (the peek's line does).
+# Its mark is the code standard's glyph, so it names no kind; the prefix
+# shows only off the page's ambient namespace (the standards lens declares
+# cs). The title links to the standard's reading page. Projected onto the
+# base form, which carries every style.
 node:
   uri: docs.component.code_standard_card
   projection:
@@ -21,12 +17,23 @@ node:
         uri: prism.component.entity_card
         edges:
           - node:
-              role: location
+              role: mark
+              # The code standard's glyph, a published Icon (CODE_STANDARD_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
               projection:
                 field: _meta.curie
             relation:
               cardinality: "0..1"
-              slotName: location
+              slotName: prefix
           - node:
               role: title
               projection:
@@ -42,15 +49,6 @@ node:
               cardinality: "1"
               slotName: title
           - node:
-              role: kind
-              projection:
-                field: _meta.title
-            relation:
-              cardinality: "1"
-              slotName: kind
-              projection:
-                field: _meta.type
-          - node:
               role: summary
               projection:
                 field: description
@@ -58,18 +56,19 @@ node:
               cardinality: "0..1"
               slotName: summary
           - node:
-              role: key values
+              role: facts
               edges:
                 - node:
                     role: category
                     projection:
                       field: _meta.title
                   relation:
-                    cardinality: "1"
+                    # The standard's first category.
+                    cardinality: "0..1"
                     projection:
                       field: categories
             relation:
               cardinality: "0..1"
-              slotName: key-values
+              slotName: facts
       relation:
         cardinality: "1"

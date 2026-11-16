@@ -8,6 +8,10 @@
 # command palette, mounted once: a dialog that is not displayed while closed
 # and sits in the top layer while open, so it is never a grid item.
 #
+# Inside the router it declares the site's home namespace, `ds`, once
+# (AmbientNamespaceProvider): a design-system identity shows no prefix on
+# any page whose lens declares no other.
+#
 # styles.css also declares `:root { --grid-col-min: min(100px,
 # calc((100% - 3 * var(--grid-gutter)) / 4)) }`: the preset's own token at
 # the scope the preset reads it (grid.css substitutes --grid-intrinsic on

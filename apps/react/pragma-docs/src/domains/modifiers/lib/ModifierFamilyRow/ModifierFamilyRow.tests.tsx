@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -99,40 +100,39 @@ describe("ModifierFamilyRow", () => {
         <ModifierFamilyRow node={node} />
       </ul>
     ));
+    const row = container.querySelector(".ds.modifier-family-row");
     expect(
-      [...container.querySelectorAll(".location, .title, .meta")].map(
+      [...(row?.querySelectorAll(".prefix, .title") ?? [])].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["ds:", "Anticipation", "5 modifiers"]);
-    expect(container.querySelector(".location code.identifier")).not.toBeNull();
+    ).toEqual(["ds:", "Anticipation"]);
+    expect(
+      [...(row?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".term")?.textContent,
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["modifiers", "Members", "5"]]);
+    expect(row?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/bundle.svg#bundle",
+    );
+    expect(row?.querySelector(".kind, .status, .summary")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+    if (row) expectSlotOrder(row);
   });
 
-  it("counts one member in the singular", () => {
+  it("counts no member, and has no prefix when the address did not compact", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
           <ModifierFamilyRow node={node} />
         </ul>
       ),
-      {
-        modifiers: { edges: [{ node: { uri: "ds:global.modifier.danger" } }] },
-      },
+      { ...UNCOMPACTED_FAMILY, modifiers: { edges: [] } },
     );
-    expect(container.querySelector(".meta")?.textContent).toBe("1 modifier");
-  });
-
-  it("counts no member in the plural, and has no prefix when the address did not compact", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <ul>
-          <ModifierFamilyRow node={node} />
-        </ul>
-      ),
-      { modifiers: { edges: [] }, ...UNCOMPACTED_FAMILY },
-    );
-    expect(container.querySelector(".meta")?.textContent).toBe("0 modifiers");
-    expect(container.querySelector(".location")).toBeNull();
+    expect(container.querySelector(".fact .detail")?.textContent).toBe("0");
+    expect(container.querySelector(".prefix")).toBeNull();
   });
 
   it("applies custom className", () => {
@@ -153,5 +153,32 @@ describe("ModifierFamilyRow", () => {
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");
+  });
+
+  it("puts the summary's first paragraph under the title in a two-line row", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <ModifierFamilyRow lines="two" node={node} />
+      </ul>
+    ));
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      MOCK_MODIFIER_FAMILY.summary,
+    );
+  });
+
+  it("keeps a summary written over several lines to the row's one second line", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <ModifierFamilyRow lines="two" node={node} />
+        </ul>
+      ),
+      { summary: "The anticipation family\ngroups modifiers." },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.querySelector("br")).toBeNull();
+    expect(summary?.textContent).toBe(
+      "The anticipation family groups modifiers.",
+    );
   });
 });

@@ -1,8 +1,15 @@
 ---
 # InstanceItem — one instance of the class, mentioned as an entity chip,
 # its compact address after it.
+#
+# An item of the inspector's wrapping list (`size.min.width: 0`) may shrink
+# to the list's width: the chip is no wider than its line (its own
+# `max-width: 100%`) and cuts its title to an ellipsis, the address wraps
+# under it, so a long chip never runs past the inspector's column.
 node:
   uri: prism.component.instance_item
+  styles:
+    size.min.width: 0
   edges:
     - node:
         uri: prism.component.chip_projection

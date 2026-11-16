@@ -1,7 +1,6 @@
 import type { Translate } from "#i18n";
-import { COUNT_FORMAT, LENGTH_FORMAT } from "../constants.js";
 import type { FleetFact } from "../types.js";
-import describeRange from "./describeRange.js";
+import buildStockFacts from "./buildStockFacts.js";
 
 /**
  * Read a rolling stock's formations as facts: how many there are, then the
@@ -17,30 +16,8 @@ export default function describeFormations(
   formations: readonly { readonly length: number; readonly capacity: number }[],
   t: Translate,
 ): readonly FleetFact[] {
-  const count: FleetFact = {
-    term: t("fleet.fact.formations"),
-    value: COUNT_FORMAT.format(formations.length),
-  };
-  if (formations.length === 0) return [count];
-  const capacities = formations.map(({ capacity }) => capacity);
-  const least = Math.min(...capacities);
-  return [
-    count,
-    {
-      term: t("fleet.fact.length"),
-      value: describeRange(
-        formations.map(({ length }) => length / 1000),
-        LENGTH_FORMAT,
-      ),
-    },
-    {
-      term: t("fleet.fact.capacity"),
-      value:
-        least === Math.max(...capacities)
-          ? t("fleet.passengers.count", { count: least })
-          : t("fleet.passengers.range", {
-              range: describeRange(capacities, COUNT_FORMAT),
-            }),
-    },
-  ];
+  return buildStockFacts(formations, t).map(({ label, value }) => ({
+    term: label,
+    value,
+  }));
 }

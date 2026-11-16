@@ -78,10 +78,10 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The abstract class Layout: `ds:Layout` over "Abstract class in ds". */
+/** The abstract class Layout: `ds: Layout` in a hollow box. */
 export const Default: Story = {};
 
-/** A concrete class: its kind is "Class". */
+/** A concrete class: its box filled, no kind. */
 export const Concrete: Story = {
   parameters: { relay: mockEntity({ isAbstract: false }) },
 };

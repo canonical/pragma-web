@@ -163,10 +163,20 @@ Every component folder carries an `anatomy.yaml` in the anatomy DSL, and
 its stylesheet transcribes it. The experimental `@canonical/prism-core/testing`
 subpath holds the checks the prism packages and apps run over their own
 components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
-`assertStylesheets` and `listAnatomyFolders`. Its `testing/browser` subpath
+`assertStylesheets` and `listAnatomyFolders`; and over their projections:
+`expectSlotOrder` (an identity's slots in the shared order, its required
+slots present) and `expectSwitchCoverage` (a switch over a node's typename
+names one case per type condition of its compiled fragment, and renders
+one node per condition through the caller, which asserts the case's own
+arm and the absence of the default's). Its
+`testing/browser` subpath
 holds the browser side the apps' layout suites share: `launchBrowser`,
 `measurePage` and `measureLayout`, which read a page's grid, scroll model,
-overflow and spacing. Both subpaths ship as TypeScript source and import
+overflow and spacing; `measureRowHeights`, each drawn row's height
+against `ROW_PX` and `TWO_LINE_ROW_PX`; and, for the apps' peek suites,
+`watchPeek` and `measurePeek`, which time and measure a chip's open peek
+in the page, with `placePeek` and `listPeekViolations`, which hold it to
+the peek's size and its first place that fits. Both subpaths ship as TypeScript source and import
 what only a test run needs, so a consumer installs those optional peer
 dependencies itself: `@canonical/anatomy-dsl`, `@canonical/summon-core`,
 `vitest` and `yaml` for `testing`, and `playwright` for `testing/browser`.
@@ -282,7 +292,7 @@ provider is a wiring bug, not a node without a home.
 A home is an ordinary href, so a component that renders it through a plain
 `<a>` loads the destination as a document. Hand such a component
 `RouterLink` as its `LinkComponent` (for the projections,
-`<ProjectionsProvider LinkComponent={RouterLink}>`) and a plain click on a
+`<ProjectionLinkProvider LinkComponent={RouterLink}>`) and a plain click on a
 path of the site (an href that starts with `/` and that the browser resolves
 to the page's own origin) that a route matches navigates on the client,
 while hovering it warms the destination. Any other href (an absolute or
@@ -378,12 +388,15 @@ site's own catalog, and the factory holds no reader-facing string.
   `SectionedViewSection`, `LensFieldOrder` (a class's field as the served
   lens describes it: its name, its order and its group's order).
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
-  `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+  `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `CopyButton` (a Copy
+  button for a cited text, "Copied" announced in a live region),
+  `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`, `KeyValueList` (key values on the
   page's grid, each key on the main column's first two columns and its
   value from the third); types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
-  `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
+  `CanvasSkipLinkProps`, `ClientOnlyProps`, `CopyButtonProps`,
+  `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
   `ThemeSelectorProps`, `KeyValueListProps`, `KeyValuePair`.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot

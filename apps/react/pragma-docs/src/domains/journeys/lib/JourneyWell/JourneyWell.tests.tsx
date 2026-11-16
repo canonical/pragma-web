@@ -133,7 +133,10 @@ describe("JourneyWell", () => {
     expect(pairing?.querySelector(".kind")?.textContent).toBe("Pairing");
     expect(pairing?.querySelector(".surface.is-hollow")).not.toBeNull();
     const surface = document.querySelector('[data-kind="surface"]');
-    expect(surface?.querySelector(".location")).not.toBeNull();
+    // A surface's kind names its surface's kind after it, "Surface in View".
+    expect(surface?.querySelector(".kind")?.textContent).toMatch(
+      /^Surface in \S/,
+    );
   });
 
   it("rings the selected job and weighs its edges by role", () => {

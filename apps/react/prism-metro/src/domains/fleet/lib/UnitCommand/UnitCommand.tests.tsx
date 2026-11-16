@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -11,12 +12,13 @@ import testQuery, {
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import { MOCK_UNIT, resolveRoot } from "../../../../../testing/fixtures.js";
 import type { UnitCommandProps } from "./types.js";
-import Component from "./UnitCommand.js";
+import UnitCommand from "./UnitCommand.js";
 
 /**
- * The operation the tests render UnitCommand under: one Unit, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render UnitCommand under: one Unit, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query UnitCommandTestQuery @relay_test_operation {
@@ -27,7 +29,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const UnitCommandTestNode = ({
   children,
 }: {
@@ -43,8 +48,8 @@ const UnitCommandTestNode = ({
 
 /**
  * Render `children` with the key of the Unit a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90 unit, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90 unit, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: UnitCommandProps["node"]) => ReactElement,
@@ -71,7 +76,7 @@ describe("UnitCommand", () => {
   it("reads the Unit through its fragment", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <UnitCommand node={node} />
       </ul>
     ));
     expect(container.querySelector(".ds.unit-command")).toHaveAttribute(
@@ -80,32 +85,33 @@ describe("UnitCommand", () => {
     );
   });
 
-  it("fills its slots from the unit", () => {
+  it("fills the result's lines from the unit", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component node={node} />
+        <UnitCommand node={node} />
       </ul>
     ));
-    for (const text of ["Series 90 unit", "Unit", "60 m"]) {
-      expect(container.textContent).toContain(text);
-    }
-  });
-
-  it("links its title to the unit's page", () => {
-    renderWithNode((node) => (
-      <ul>
-        <Component node={node} />
-      </ul>
-    ));
+    const root = container.querySelector(".ds.unit-command");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/units.svg#units",
+    );
     expect(
-      screen.getByRole("link", { name: "Series 90 unit" }).getAttribute("href"),
-    ).toBe("/fleet/units/metro%3Aunit-90");
+      [
+        ...(root?.querySelectorAll(".title, .address, .kind, .status") ?? []),
+      ].map((slot) => slot.textContent),
+    ).toEqual(["Series 90 unit", "metro:unit-90", "Unit", "60 m"]);
+    expect(root?.querySelector(".prefix")).toBeNull();
+    if (root) expectSlotOrder(root);
+    expect(
+      screen.getByRole("link", { name: "Series 90 unit" }),
+    ).toHaveAttribute("href", "/fleet/units/metro%3Aunit-90");
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ul>
-        <Component className="custom-class" node={node} />
+        <UnitCommand className="custom-class" node={node} />
       </ul>
     ));
     expect(
@@ -116,7 +122,7 @@ describe("UnitCommand", () => {
   it("passes through additional props", () => {
     renderWithNode((node) => (
       <ul>
-        <Component data-testid="test-component" node={node} />
+        <UnitCommand data-testid="test-component" node={node} />
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");

@@ -76,8 +76,8 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * Northgate: its zone, its name, its class and its definition, its key values
- * and its platform count.
+ * Northgate: its name and definition, and its platforms, its fare zone and
+ * the lines it serves as facts.
  */
 export const Default: Story = {};
 

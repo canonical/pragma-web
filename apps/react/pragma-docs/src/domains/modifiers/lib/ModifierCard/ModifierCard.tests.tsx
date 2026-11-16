@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -71,11 +72,12 @@ const renderWithNode = (
   );
 };
 
-/** Read each key value of a card as its key and its value. */
-const readPairs = (container: HTMLElement): string[][] =>
-  [...container.querySelectorAll(".pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent ?? "",
-    pair.querySelector(".value")?.textContent ?? "",
+/** Read each fact of a card as its property, its term and its detail. */
+const readFacts = (container: HTMLElement): (string | null)[][] =>
+  [...container.querySelectorAll(".fact")].map((fact) => [
+    fact.getAttribute("data-property"),
+    fact.querySelector(".term")?.textContent ?? null,
+    fact.querySelector(".detail")?.textContent ?? null,
   ]);
 
 describe("ModifierCard", () => {
@@ -93,19 +95,24 @@ describe("ModifierCard", () => {
     const { container } = renderWithNode((node) => (
       <ModifierCard node={node} />
     ));
+    const card = container.querySelector(".ds.modifier-card");
     expect(
-      [
-        ...container.querySelectorAll(
-          ".location, .title, .kind, .summary, .vital",
-        ),
-      ].map((slot) => slot.textContent),
-    ).toEqual(["ds", "Danger", "Modifier", MOCK_MODIFIER.summary, "v1.11"]);
-    expect(readPairs(container)).toEqual([
-      ["Class", "Modifier"],
-      ["Family", "Anticipation"],
+      [...(card?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual(["ds:", "Danger", MOCK_MODIFIER.summary]);
+    expect(readFacts(container)).toEqual([
+      ["modifierFamily", "Family", "Anticipation"],
+      ["version", "Version", "v1.11"],
     ]);
-    expect(container.querySelector(".sidecar")).toBeNull();
+    expect(card?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/settings.svg#settings",
+    );
+    expect(card?.querySelector(".address, .kind, .status")).toBeNull();
+    expect(card?.querySelector(".specimen")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+    if (card) expectSlotOrder(card);
   });
 
   it("renders the first paragraph of its Markdown summary, its links kept", () => {
@@ -113,43 +120,52 @@ describe("ModifierCard", () => {
       (node) => <ModifierCard node={node} />,
       {
         summary:
-          "A default [Badge](https://example.com/badge) is used informationally.\n  \nA second paragraph.",
+          "The [danger](https://example.com/danger) modifier warns a reader.\n\nIt is red.",
       },
     );
     const summary = container.querySelector(".summary");
-    expect(summary?.textContent).toBe(
-      "A default Badge is used informationally.",
-    );
+    expect(summary?.textContent).toBe("The danger modifier warns a reader.");
     expect(summary?.querySelector("a")).toHaveAttribute(
       "href",
-      "https://example.com/badge",
+      "https://example.com/danger",
     );
     expect(summary?.querySelector("p")).toBeNull();
   });
 
-  it("has its class alone as a key value when the modifier has no family", () => {
-    const { container } = renderWithNode(
-      (node) => <ModifierCard node={node} />,
-      { modifierFamily: null },
-    );
-    expect(readPairs(container)).toEqual([["Class", "Modifier"]]);
-  });
-
-  it("leaves out the slots a modifier with no prefix, summary or version has no data for", () => {
+  it("leaves out the slots a modifier with no prefix, summary, family or version has no data for", () => {
     const { container } = renderWithNode(
       (node) => <ModifierCard node={node} />,
       {
-        summary: "",
-        version: null,
         _meta: {
           ...MOCK_MODIFIER._meta,
           curie: "https://ds.canonical.com/global.modifier.danger",
         },
+        summary: "",
+        version: null,
+        modifierFamily: null,
       },
     );
-    for (const slot of [".location", ".summary", ".footer"]) {
+    for (const slot of [
+      ".prefix",
+      ".summary",
+      ".facts",
+      ".fact",
+      ".status",
+      ".specimen",
+    ]) {
       expect(container.querySelector(slot), slot).toBeNull();
     }
+    expect(container.querySelector(".title")?.textContent).toBe("Danger");
+  });
+
+  it("names its family alone when it has no version", () => {
+    const { container } = renderWithNode(
+      (node) => <ModifierCard node={node} />,
+      { version: null },
+    );
+    expect(readFacts(container)).toEqual([
+      ["modifierFamily", "Family", "Anticipation"],
+    ]);
   });
 
   it("applies custom className", () => {

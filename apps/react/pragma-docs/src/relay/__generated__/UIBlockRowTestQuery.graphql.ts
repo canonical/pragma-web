@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<94cc85aea836864fc2cfa63d3b7337bf>>
+ * @generated SignedSource<<cad112cbc8819f5fb6c37cefab36bcde>>
  * @lightSyntaxTransform
  */
 
@@ -128,6 +128,13 @@ return {
               {
                 "alias": null,
                 "args": null,
+                "kind": "ScalarField",
+                "name": "summary",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
                 "concreteType": "EntityMeta",
                 "kind": "LinkedField",
                 "name": "_meta",
@@ -206,7 +213,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e2f356d3c98ed2566147350cd59d5476",
+    "cacheID": "e74300d31387a0ddaf70750c4bfa0709",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -242,12 +249,18 @@ return {
         "node.documentationStages.edges.node._meta": (v4/*:: as any*/),
         "node.documentationStages.edges.node._meta.title": (v3/*:: as any*/),
         "node.documentationStages.edges.node.uri": (v5/*:: as any*/),
+        "node.summary": {
+          "enumValues": null,
+          "nullable": true,
+          "plural": false,
+          "type": "String"
+        },
         "node.uri": (v5/*:: as any*/)
       }
     },
     "name": "UIBlockRowTestQuery",
     "operationKind": "query",
-    "text": "query UIBlockRowTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...UIBlockRow_node\n    uri\n  }\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query UIBlockRowTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...UIBlockRow_node\n    uri\n  }\n}\n\nfragment UIBlockRow_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

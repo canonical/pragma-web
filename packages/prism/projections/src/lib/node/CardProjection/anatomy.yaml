@@ -8,9 +8,8 @@
 # projection; every other type through the Node projection, from what every
 # node carries. The cases are the composite fragment's aliased spreads, one
 # per type, and the map's arms, by the same names.
-# A site's own types read through the site slot, the site's own compile
-# of `SiteCardSlot_node`, for the typenames its map lists under
-# `siteTypes`.
+# A site that gives its switches takes every node: its switch reads the
+# site slot, the site's own compile of `SiteCardSlot_node`.
 node:
   uri: prism.component.card_projection
   projection:

@@ -6,7 +6,7 @@
  * @module
  */
 
-export { MESSAGES } from "./constants.js";
+export { COUNT_FORMAT, LOCALE, MESSAGES } from "./constants.js";
 export { default as useMessages } from "./hooks/useMessages.js";
 export type { MessageProps } from "./Message/index.js";
 export { Message } from "./Message/index.js";

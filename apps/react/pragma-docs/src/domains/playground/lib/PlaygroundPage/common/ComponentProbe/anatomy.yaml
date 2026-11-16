@@ -45,7 +45,7 @@ node:
               uri: prism.component.key_value_list
               edges:
                 - node:
-                    uri: docs.component.site_chip_projection
+                    uri: docs.component.docs_chip_projection
                   relation: { cardinality: "1" }
                 - node:
                     role: entry (an unmarked list of one, around the list entry or the command)
@@ -59,9 +59,9 @@ node:
                           on: internal
                           cases:
                             - node:
-                                uri: docs.component.site_row_projection
+                                uri: docs.component.docs_row_projection
                             - node:
-                                uri: docs.component.site_command_projection
+                                uri: docs.component.docs_command_projection
                         relation: { cardinality: "1" }
                   relation: { cardinality: "2", slotName: entry }
                 - node:
@@ -70,7 +70,7 @@ node:
                       layout.type: block
                     edges:
                       - node:
-                          uri: docs.component.site_graph_node_projection
+                          uri: docs.component.docs_graph_node_projection
                         relation: { cardinality: "1" }
                   relation: { cardinality: "1", slotName: graph-frame }
             relation: { cardinality: "1" }
@@ -82,7 +82,7 @@ node:
               uri: prism.component.entity_list
               edges:
                 - node:
-                    uri: docs.component.site_card_projection
+                    uri: docs.component.docs_card_projection
                   relation: { cardinality: "1", slotName: items }
             relation: { cardinality: "1" }
       relation: { cardinality: "0..1" }

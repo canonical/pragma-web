@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d2fb6f0ab6d8013006c9d6eb34acb802>>
+ * @generated SignedSource<<9aca5fc7a6dda04df771622c1850760d>>
  * @lightSyntaxTransform
  */
 
@@ -44,40 +44,25 @@ v2 = {
   "name": "title",
   "storageKey": null
 },
-v3 = [
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
-    "selections": [
-      (v2/*:: as any*/)
-    ],
-    "storageKey": null
-  },
-  (v1/*:: as any*/)
-],
-v4 = {
+v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v5 = {
+v4 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "EntityMeta"
 },
-v6 = {
+v5 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "ID"
 },
-v7 = {
+v6 = {
   "enumValues": null,
   "nullable": true,
   "plural": false,
@@ -175,16 +160,6 @@ return {
                     "kind": "ScalarField",
                     "name": "curie",
                     "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": (v3/*:: as any*/),
-                    "storageKey": null
                   }
                 ],
                 "storageKey": null
@@ -196,7 +171,21 @@ return {
                 "kind": "LinkedField",
                 "name": "modifierFamily",
                 "plural": false,
-                "selections": (v3/*:: as any*/),
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "EntityMeta",
+                    "kind": "LinkedField",
+                    "name": "_meta",
+                    "plural": false,
+                    "selections": [
+                      (v2/*:: as any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v1/*:: as any*/)
+                ],
                 "storageKey": null
               }
             ],
@@ -209,7 +198,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "894ba89daaa8d90bf8f25e5c6cbb9989",
+    "cacheID": "1d35bd8f8d49185b40ece8733a73e4bb",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -219,36 +208,27 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__typename": (v4/*:: as any*/),
-        "node._meta": (v5/*:: as any*/),
-        "node._meta.curie": (v4/*:: as any*/),
-        "node._meta.title": (v4/*:: as any*/),
-        "node._meta.type": {
-          "enumValues": null,
-          "nullable": false,
-          "plural": false,
-          "type": "OntologyClass"
-        },
-        "node._meta.type._meta": (v5/*:: as any*/),
-        "node._meta.type._meta.title": (v4/*:: as any*/),
-        "node._meta.type.uri": (v6/*:: as any*/),
+        "node.__typename": (v3/*:: as any*/),
+        "node._meta": (v4/*:: as any*/),
+        "node._meta.curie": (v3/*:: as any*/),
+        "node._meta.title": (v3/*:: as any*/),
         "node.modifierFamily": {
           "enumValues": null,
           "nullable": true,
           "plural": false,
           "type": "ModifierFamily"
         },
-        "node.modifierFamily._meta": (v5/*:: as any*/),
-        "node.modifierFamily._meta.title": (v4/*:: as any*/),
-        "node.modifierFamily.uri": (v6/*:: as any*/),
-        "node.summary": (v7/*:: as any*/),
-        "node.uri": (v6/*:: as any*/),
-        "node.version": (v7/*:: as any*/)
+        "node.modifierFamily._meta": (v4/*:: as any*/),
+        "node.modifierFamily._meta.title": (v3/*:: as any*/),
+        "node.modifierFamily.uri": (v5/*:: as any*/),
+        "node.summary": (v6/*:: as any*/),
+        "node.uri": (v5/*:: as any*/),
+        "node.version": (v6/*:: as any*/)
       }
     },
     "name": "ModifierCardSsrTestQuery",
     "operationKind": "query",
-    "text": "query ModifierCardSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...ModifierCard_node\n    uri\n  }\n}\n\nfragment ModifierCard_node on Modifier {\n  __typename\n  version\n  summary\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
+    "text": "query ModifierCardSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...ModifierCard_node\n    uri\n  }\n}\n\nfragment ModifierCard_node on Modifier {\n  __typename\n  version\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
   }
 };
 })();

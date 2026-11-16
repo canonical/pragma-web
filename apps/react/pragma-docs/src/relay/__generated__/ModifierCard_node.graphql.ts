@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8d2189b5b3de3cf535817b4a929165ff>>
+ * @generated SignedSource<<4799a861cdb562858739033434ddf65d>>
  * @lightSyntaxTransform
  */
 
@@ -14,11 +14,6 @@ export type ModifierCard_node$data = {
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: {
-      readonly _meta: {
-        readonly title: string;
-      };
-    };
   };
   readonly modifierFamily: {
     readonly _meta: {
@@ -41,21 +36,7 @@ var v0 = {
   "kind": "ScalarField",
   "name": "title",
   "storageKey": null
-},
-v1 = [
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
-    "selections": [
-      (v0/*:: as any*/)
-    ],
-    "storageKey": null
-  }
-];
+};
 return {
   "argumentDefinitions": [],
   "kind": "Fragment",
@@ -98,16 +79,6 @@ return {
           "kind": "ScalarField",
           "name": "curie",
           "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "OntologyClass",
-          "kind": "LinkedField",
-          "name": "type",
-          "plural": false,
-          "selections": (v1/*:: as any*/),
-          "storageKey": null
         }
       ],
       "storageKey": null
@@ -119,7 +90,20 @@ return {
       "kind": "LinkedField",
       "name": "modifierFamily",
       "plural": false,
-      "selections": (v1/*:: as any*/),
+      "selections": [
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "EntityMeta",
+          "kind": "LinkedField",
+          "name": "_meta",
+          "plural": false,
+          "selections": [
+            (v0/*:: as any*/)
+          ],
+          "storageKey": null
+        }
+      ],
       "storageKey": null
     }
   ],
@@ -128,6 +112,6 @@ return {
 };
 })();
 
-(node as any).hash = "bdd84b970093b24d5bb1550a02f66c28";
+(node as any).hash = "1e086f467aae5e101a37cc97903e9113";
 
 export default node;

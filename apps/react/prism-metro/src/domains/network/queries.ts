@@ -43,7 +43,7 @@ const declareNetworkQueries = (): unknown => [
                 title
                 curie
               }
-              ...NodeList_node
+              ...MetroRowProjection_node
               ... on Line {
                 code
                 colour
@@ -66,7 +66,7 @@ const declareNetworkQueries = (): unknown => [
                         x
                         y
                       }
-                      ...NodeList_node
+                      ...MetroRowProjection_node
                     }
                   }
                 }
@@ -86,7 +86,7 @@ const declareNetworkQueries = (): unknown => [
           title
           curie
         }
-        ...CardProjection_node
+        ...MetroCardProjection_node
         ... on Stop {
           platformCount
           inZone {
@@ -102,7 +102,7 @@ const declareNetworkQueries = (): unknown => [
               title
               curie
             }
-            ...ChipProjection_node
+            ...MetroChipProjection_node
             routes {
               label
               isLoop

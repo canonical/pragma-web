@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9a65146d99639bc4f64d091b9286e03c>>
+ * @generated SignedSource<<342399788e4e840c2964b8795b22ceb5>>
  * @lightSyntaxTransform
  */
 
@@ -31,51 +31,10 @@ var v0 = [
   }
 ],
 v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "uri",
-  "storageKey": null
-},
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-},
-v3 = [
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
-    "selections": [
-      (v2/*:: as any*/)
-    ],
-    "storageKey": null
-  },
-  (v1/*:: as any*/)
-],
-v4 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
-},
-v5 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "EntityMeta"
-},
-v6 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "ID"
 };
 return {
   "fragment": {
@@ -136,7 +95,13 @@ return {
             "name": "__typename",
             "storageKey": null
           },
-          (v1/*:: as any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "uri",
+            "storageKey": null
+          },
           {
             "kind": "InlineFragment",
             "selections": [
@@ -148,35 +113,21 @@ return {
                 "name": "_meta",
                 "plural": false,
                 "selections": [
-                  (v2/*:: as any*/),
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "title",
+                    "storageKey": null
+                  },
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
                     "name": "curie",
                     "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": (v3/*:: as any*/),
-                    "storageKey": null
                   }
                 ],
-                "storageKey": null
-              },
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "Tier",
-                "kind": "LinkedField",
-                "name": "tier",
-                "plural": false,
-                "selections": (v3/*:: as any*/),
                 "storageKey": null
               }
             ],
@@ -189,7 +140,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "97f5417fcae90364579e1dce7df9729b",
+    "cacheID": "6e5b68540ce1f45f57078b2484d44972",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -199,35 +150,27 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__isUIBlock": (v4/*:: as any*/),
-        "node.__typename": (v4/*:: as any*/),
-        "node._meta": (v5/*:: as any*/),
-        "node._meta.curie": (v4/*:: as any*/),
-        "node._meta.title": (v4/*:: as any*/),
-        "node._meta.type": {
+        "node.__isUIBlock": (v1/*:: as any*/),
+        "node.__typename": (v1/*:: as any*/),
+        "node._meta": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
-          "type": "OntologyClass"
+          "type": "EntityMeta"
         },
-        "node._meta.type._meta": (v5/*:: as any*/),
-        "node._meta.type._meta.title": (v4/*:: as any*/),
-        "node._meta.type.uri": (v6/*:: as any*/),
-        "node.tier": {
+        "node._meta.curie": (v1/*:: as any*/),
+        "node._meta.title": (v1/*:: as any*/),
+        "node.uri": {
           "enumValues": null,
-          "nullable": true,
+          "nullable": false,
           "plural": false,
-          "type": "Tier"
-        },
-        "node.tier._meta": (v5/*:: as any*/),
-        "node.tier._meta.title": (v4/*:: as any*/),
-        "node.tier.uri": (v6/*:: as any*/),
-        "node.uri": (v6/*:: as any*/)
+          "type": "ID"
+        }
       }
     },
     "name": "UIBlockGraphNodeStoryQuery",
     "operationKind": "query",
-    "text": "query UIBlockGraphNodeStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...UIBlockGraphNode_node\n    uri\n  }\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
+    "text": "query UIBlockGraphNodeStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...UIBlockGraphNode_node\n    uri\n  }\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -13,13 +14,14 @@ import {
   MOCK_ROLLING_STOCK,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import Component from "./RollingStockCard.js";
+import RollingStockCard from "./RollingStockCard.js";
 import type { RollingStockCardProps } from "./types.js";
 
 /**
- * The operation the tests render RollingStockCard under: one RollingStock, read through the
- * `node` field, the spread aliased because that field is typed by an
- * interface.
+ * The operation the tests render RollingStockCard under: one RollingStock, read through
+ * the `node` field. The spread is aliased because that field is typed by an
+ * interface, so a node of another type reads as null instead of as a key that
+ * does not match.
  */
 const declareTestQuery = (): unknown => graphql`
   query RollingStockCardTestQuery @relay_test_operation {
@@ -30,7 +32,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const RollingStockCardTestNode = ({
   children,
 }: {
@@ -46,8 +51,8 @@ const RollingStockCardTestNode = ({
 
 /**
  * Render `children` with the key of the RollingStock a Relay mock environment
- * answers, under the site's providers: `entity` over the Series 90, as the
- * graph's dataset holds it.
+ * answers, under the site's providers: `entity` over Series 90, as the graph's
+ * dataset holds it.
  */
 const renderWithNode = (
   children: (node: RollingStockCardProps["node"]) => ReactElement,
@@ -72,62 +77,94 @@ const renderWithNode = (
 
 describe("RollingStockCard", () => {
   it("reads the RollingStock through its fragment", () => {
-    const { container } = renderWithNode((node) => <Component node={node} />);
+    const { container } = renderWithNode((node) => (
+      <RollingStockCard node={node} />
+    ));
     expect(container.querySelector(".ds.rolling-stock-card")).toHaveAttribute(
       "data-type",
       "RollingStock",
     );
   });
 
-  it("fills its slots from the rolling stock", () => {
-    const { container } = renderWithNode((node) => <Component node={node} />);
-    for (const text of [
-      "Series 90",
-      "Rolling stock",
-      "60–120 m",
-      "490–980 passengers",
-      "2 formations",
-    ]) {
-      expect(container.textContent).toContain(text);
-    }
-  });
-
-  it("links its title to the rolling stock's page", () => {
-    renderWithNode((node) => <Component node={node} />);
-    expect(
-      screen.getByRole("link", { name: "Series 90" }).getAttribute("href"),
-    ).toBe("/fleet/metro%3Aseries-90");
-  });
-
-  it("draws its formations at one scale in the sidecar", () => {
-    const { container } = renderWithNode((node) => <Component node={node} />);
-    const widths = [...container.querySelectorAll(".sidecar svg.drawing")].map(
-      (svg) => svg.getAttribute("viewBox")?.split(" ").at(2),
+  it("fills the card's slots from the rolling stock, in the anatomy's order", () => {
+    const { container } = renderWithNode(
+      (node) => <RollingStockCard node={node} />,
+      {
+        _meta: {
+          ...MOCK_ROLLING_STOCK._meta,
+          definition: "The workhorse of the network.",
+        },
+      },
     );
-    expect(widths).toEqual(["120000", "120000"]);
-  });
-
-  it("captions each formation it draws by its title", () => {
-    const { container } = renderWithNode((node) => <Component node={node} />);
+    const root = container.querySelector(".ds.rolling-stock-card");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/machines.svg#machines",
+    );
     expect(
-      [...container.querySelectorAll(".sidecar figcaption")].map(
-        (caption) => caption.textContent,
+      [...(root?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
+        (slot) => slot.textContent,
       ),
-    ).toHaveLength(2);
+    ).toEqual(["metro:", "Series 90", "The workhorse of the network."]);
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([
+      ["formations", "2"],
+      ["length", "60–120 m"],
+      ["capacity", "490–980 passengers"],
+    ]);
+    for (const slot of [".address", ".kind", ".status"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
+    }
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "Series 90" })).toHaveAttribute(
+      "href",
+      "/fleet/metro%3Aseries-90",
+    );
   });
 
-  it("reads a stock with no formation as its count alone", () => {
-    const { container } = renderWithNode((node) => <Component node={node} />, {
-      formations: [],
-    });
-    expect(container.querySelector(".sidecar")).toBeNull();
-    expect(container.textContent).toContain("0 formations");
-    expect(container.textContent).not.toContain("Length");
+  it("draws its formations at one scale in a drawing specimen", () => {
+    const { container } = renderWithNode((node) => (
+      <RollingStockCard node={node} />
+    ));
+    const specimen = container.querySelector(".specimen");
+    expect(specimen).toHaveAttribute("data-specimen", "drawing");
+    expect(specimen).toHaveAttribute(
+      "aria-label",
+      "Series 90, its formations drawn at one scale",
+    );
+    expect(
+      [...(specimen?.querySelectorAll("svg.drawing") ?? [])].map((svg) =>
+        svg.getAttribute("viewBox")?.split(" ").at(2),
+      ),
+    ).toEqual(["120000", "120000"]);
+    expect(
+      [...(specimen?.querySelectorAll("figcaption") ?? [])].map((caption) =>
+        caption.textContent?.split(", ").at(-1),
+      ),
+    ).toEqual(["60 m", "120 m"]);
+  });
+
+  it("reads a stock with no formation as its count alone, with no specimen", () => {
+    const { container } = renderWithNode(
+      (node) => <RollingStockCard node={node} />,
+      { formations: [] },
+    );
+    expect(container.querySelector(".specimen")).toBeNull();
+    expect(
+      [...container.querySelectorAll(".fact")].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["formations", "0"]]);
   });
 
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
-      <Component className="custom-class" node={node} />
+      <RollingStockCard className="custom-class" node={node} />
     ));
     expect(
       container.querySelector(".ds.rolling-stock-card")?.getAttribute("class"),
@@ -136,7 +173,7 @@ describe("RollingStockCard", () => {
 
   it("passes through additional props", () => {
     renderWithNode((node) => (
-      <Component data-testid="test-component" node={node} />
+      <RollingStockCard data-testid="test-component" node={node} />
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("DIV");
   });

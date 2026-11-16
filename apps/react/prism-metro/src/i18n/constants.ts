@@ -57,6 +57,9 @@ export const MESSAGES = {
   "fleet.index.error": "The fleet could not be loaded.",
   "fleet.stocks.kind": { one: "rolling stock", other: "rolling stocks" },
   "fleet.formation.caption": "{title}, {length}",
+  "fleet.stock.specimen": "{title}, its formations drawn at one scale",
+  "fleet.formation.specimen": "{title}, drawn from the side",
+  "fleet.unit.specimen": "{title}, drawn from the side",
   "fleet.formations.none": "No formation runs this stock.",
   "fleet.index.empty": "The graph lists no rolling stock.",
   "fleet.page.loading": "Loading…",
@@ -136,7 +139,6 @@ export const MESSAGES = {
   "station.zone": "Zone",
   "station.lines": "Lines",
   "station.lines.separator": ", ",
-  "interchange.word": "interchange",
   "interchange.transfer": "Transfer",
   "interchange.transfer.minutes": {
     one: "{count} minute",
@@ -148,6 +150,7 @@ export const MESSAGES = {
   "line.ends": "Ends",
   "line.ends.value": "{first} to {last}",
   "line.loop": "loop",
+  "zone.stations": "Stations",
   "zone.stations.count": {
     one: "{count} station",
     other: "{count} stations",

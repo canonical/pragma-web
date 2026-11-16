@@ -1,13 +1,12 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
-import { useProjectionLink } from "@canonical/prism-projections";
+import { acceptColour, useProjectionLink } from "@canonical/prism-projections";
 import type { CSSProperties, ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
-import nodeFragment, {
-  type CallStop_node$data,
-} from "#relay/__generated__/CallStop_node.graphql.js";
+import { MetroChipProjection } from "#lib/ui";
+import nodeFragment from "#relay/__generated__/CallStop_node.graphql.js";
 import type { CallStopProps } from "./types.js";
 import "./styles.css";
 
@@ -26,13 +25,8 @@ const declareNodeFragment = (): unknown => graphql`
         curie
       }
       servesLine {
-        __typename
         uri
-        colour
-        _meta {
-          title
-          curie
-        }
+        ...MetroChipProjection_node
       }
       ... on Interchange {
         transferMinutes
@@ -45,43 +39,20 @@ void declareNodeFragment;
 
 const componentCssClassName = "ds call-stop";
 
-/** Another line the stop meets, as the fragment reads it. */
-type ConnectionLine = CallStop_node$data["stop"]["servesLine"][number];
-
 /**
- * Another line the stop meets: a swatch of its colour and its name,
- * linking to its home when it has one.
+ * The channel the stop paints its tick or ring through, set only when the
+ * package's gate accepts `colour` as a plain colour value.
  */
-const Connection = ({
-  line,
-}: {
-  readonly line: ConnectionLine;
-}): ReactElement => {
-  const href = useHome({ __typename: line.__typename, uri: line._meta.curie });
-  const LinkComponent = useProjectionLink();
-  return (
-    <li className="connection">
-      <span
-        aria-hidden="true"
-        className="swatch"
-        style={
-          { "--call-stop-connection-colour": line.colour } as CSSProperties
-        }
-      />
-      {href === undefined ? (
-        line._meta.title
-      ) : (
-        <LinkComponent href={href}>{line._meta.title}</LinkComponent>
-      )}
-    </li>
-  );
+const readChannel = (colour: string): Record<string, string> => {
+  const accepted = acceptColour(colour);
+  return accepted === undefined ? {} : { "--call-stop-colour": accepted };
 };
 
 /**
  * One call of a route as a door card reads it: a tick on the strip's rule
  * in the line's colour (a hollow ring at an interchange), the stop's name
- * linking to its home, the other lines it meets, each by its name beside a
- * swatch of its colour and linking to its home, and at an interchange the
+ * linking to its home, the other lines it meets, each as the site's chip of
+ * the line (its colour's mark and its name, linked to its home), and at an interchange the
  * time a transfer takes.
  * Below two groups of columns it lays its tick beside its name.
  *
@@ -113,7 +84,7 @@ export default function CallStop({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={stop.__typename}
-      style={{ ...style, "--call-stop-colour": colour } as CSSProperties}
+      style={{ ...style, ...readChannel(colour) } as CSSProperties}
     >
       <span
         aria-hidden="true"
@@ -129,7 +100,9 @@ export default function CallStop({
       {connections.length > 0 ? (
         <ul className="connections">
           {connections.map((line) => (
-            <Connection key={line.uri} line={line} />
+            <li className="connection" key={line.uri}>
+              <MetroChipProjection node={line} />
+            </li>
           ))}
         </ul>
       ) : null}

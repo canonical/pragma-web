@@ -9,12 +9,17 @@ type OwnProps = {
    * spreads `...RollingStockRow_node`.
    */
   readonly node: RollingStockRow_node$key;
+  /**
+   * How many lines the row takes: `"two"` sets its summary under its
+   * title, for an index that opts in.
+   */
+  readonly lines?: "one" | "two";
 };
 
 /**
  * Props accepted by `RollingStockRow`: its own, then the native props of the
- * `<li>` the EntityRow renders as its root. The native `children` are
- * excluded: the projection fills its slots from the node.
+ * `<li>` the row renders as its root. The native `children` are
+ * excluded: the projection fills the row's slots from the rolling stock.
  */
 export type RollingStockRowProps = OwnProps &
   Omit<ComponentProps<"li">, keyof OwnProps | "children">;

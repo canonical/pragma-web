@@ -70,7 +70,7 @@ const [stations, stationsEntity] = group(stationsLayout, [
 
 The lens renders inside the site's provider nest: `HeadProvider`,
 `RelayEnvironmentProvider`, `RouterProvider`, and inside the router
-`HomesProvider` and `ProjectionsProvider`, which the index's rows and cards
+`HomesProvider` and `ProjectionLinkProvider`, which the index's rows and cards
 and the page's title and class chip read their homes and arms from.
 `EntityLayout` mounts the lens's own filter provider, shared by the strip's
 search box and the index.

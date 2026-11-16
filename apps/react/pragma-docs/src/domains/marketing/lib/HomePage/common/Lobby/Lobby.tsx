@@ -5,9 +5,9 @@ import { EntityCard, EntityList } from "@canonical/prism-projections";
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
-import { useMessages } from "#i18n";
+import { COUNT_FORMAT, useMessages } from "#i18n";
+import { DocsChipProjection } from "#lib/ui/DocsChipProjection";
 import { PageSection } from "#lib/ui/PageSection";
-import { SiteChipProjection } from "#lib/ui/SiteChipProjection";
 import type { LobbyQuery } from "#relay/__generated__/LobbyQuery.graphql.js";
 import lobbyQueryNode from "#relay/__generated__/LobbyQuery.graphql.js";
 import {
@@ -47,7 +47,7 @@ const declareLobbyQuery = (): unknown => graphql`
                 name
               }
             }
-            ...SiteChipProjection_node
+            ...DocsChipProjection_node
           }
         }
       }
@@ -73,7 +73,7 @@ const componentCssClassName = "ds lobby";
  * to the lenses as cards in the shared list view, in the rail's order (read
  * off the same route table, so the two cannot drift), each linked to its
  * lens with a sentence on what it holds and the graph's count where the
- * schema gives one. A class the store lacks leaves its count out rather than
+ * schema gives one, written in the catalog's number format. A class the store lacks leaves its count out rather than
  * printing a zero; with no exemplars the first section is left out. The
  * Journeys door carries no count: the demand model is not in every graph
  * the site reads, and a field the graph lacks would fail the whole
@@ -106,13 +106,25 @@ export default function Lobby({
     components: {
       title: t("lobby.doors.components.title"),
       summary: t("lobby.doors.components.summary"),
-      vitals: [
+      facts: [
         ...(componentCount === undefined
           ? []
-          : [t("lobby.doors.components.count", { count: componentCount })]),
+          : [
+              {
+                property: "components",
+                label: t("lobby.doors.components.fact"),
+                value: COUNT_FORMAT.format(componentCount),
+              },
+            ]),
         ...(patternCount === undefined
           ? []
-          : [t("lobby.doors.patterns.count", { count: patternCount })]),
+          : [
+              {
+                property: "patterns",
+                label: t("lobby.doors.patterns.fact"),
+                value: COUNT_FORMAT.format(patternCount),
+              },
+            ]),
       ],
     },
     definitions: {
@@ -122,10 +134,16 @@ export default function Lobby({
     standards: {
       title: t("lobby.doors.standards.title"),
       summary: t("lobby.doors.standards.summary"),
-      vitals:
+      facts:
         standardCount === undefined
           ? []
-          : [t("lobby.doors.standards.count", { count: standardCount })],
+          : [
+              {
+                property: "standards",
+                label: t("lobby.doors.standards.fact"),
+                value: COUNT_FORMAT.format(standardCount),
+              },
+            ],
     },
     journeys: {
       title: t("lobby.doors.journeys.title"),
@@ -150,7 +168,7 @@ export default function Lobby({
           <ul className="exemplars">
             {exemplars.map((node) => (
               <li key={node.uri}>
-                <SiteChipProjection node={node} />
+                <DocsChipProjection node={node} />
               </li>
             ))}
           </ul>
@@ -168,12 +186,12 @@ export default function Lobby({
             )
             .map((name) => (
               <EntityCard
+                facts={doors[name].facts}
                 href={router.buildPath(name)}
                 key={name}
                 LinkComponent={RouterLink}
                 summary={doors[name].summary}
                 title={doors[name].title}
-                vitals={doors[name].vitals}
               />
             ))}
         </EntityList>

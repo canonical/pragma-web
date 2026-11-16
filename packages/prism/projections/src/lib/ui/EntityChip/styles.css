@@ -22,8 +22,12 @@
     --entity-chip-radius: 9999px;
     /* No wider than the line that holds it. */
     --entity-chip-max-width: 100%;
-    --entity-chip-lead-color: var(--color-text-muted);
-    /* The ring sits inside the value, on the pill's fill. */
+    --entity-chip-prefix-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-chip-prefix-font-family: ui-monospace, monospace;
+    /* The mark is a 16px sign on the pill's line. */
+    --entity-chip-mark-size: var(--space-200);
+    /* The ring sits inside the title, on the pill's fill. */
     --entity-chip-focus-ring-width: 2px;
     --entity-chip-focus-ring-offset: -2px;
     --entity-chip-focus-ring-color: var(--color-focus-ring);
@@ -46,30 +50,38 @@
     white-space: nowrap;
   }
 
-  /* The mark is as tall as what it holds, so the pill centres it. */
+  /* The mark is a 16px box the pill centres on its line; it never
+   * shrinks, so a long title cannot squeeze it. */
   .ds.entity-chip .mark {
     display: flex;
+    flex-shrink: 0;
+    /* A sign smaller than the box sits on its middle. */
+    align-items: center;
+    justify-content: center;
+    width: var(--entity-chip-mark-size);
+    height: var(--entity-chip-mark-size);
   }
 
-  .ds.entity-chip .lead {
-    color: var(--entity-chip-lead-color);
+  .ds.entity-chip .prefix {
+    color: var(--entity-chip-prefix-color);
+    font-family: var(--entity-chip-prefix-font-family);
   }
 
-  /* A long value truncates inside the pill, which is no wider than its
+  /* A long title truncates inside the pill, which is no wider than its
    * line, rather than widening it. */
-  .ds.entity-chip .value {
+  .ds.entity-chip .title {
     overflow: hidden;
     color: inherit;
     text-decoration: none;
     text-overflow: ellipsis;
   }
 
-  /* A linked value reads as the pill's text, underlined on approach. */
-  .ds.entity-chip .value[href]:hover {
+  /* A linked title reads as the pill's text, underlined on approach. */
+  .ds.entity-chip .title[href]:hover {
     text-decoration: underline;
   }
 
-  .ds.entity-chip .value[href]:focus-visible {
+  .ds.entity-chip .title[href]:focus-visible {
     outline-width: var(--entity-chip-focus-ring-width);
     outline-style: solid;
     outline-color: var(--entity-chip-focus-ring-color);

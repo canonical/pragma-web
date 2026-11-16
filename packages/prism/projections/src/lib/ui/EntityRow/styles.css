@@ -3,13 +3,19 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* One entry of an index: the identity on the left, one muted word on the
-   * right, on one 24px line of the context's primary text with 4px above
-   * and below it: 32px. It sets no inline inset, so its text sits on the column line
-   * of its list. When the two do not fit on one line the meta wraps to a
-   * line of its own under the identity, the lines with no space between
-   * them: 56px. It may be narrower than its content, so a long identity
-   * never widens the track that holds it. */
+  /* One entry of an index, whose height comes from `lines` alone: one
+   * 24px line of the context's primary text with 4px above and below it,
+   * 32px, which never wraps; a two-line row adds the summary as its only
+   * second line, with no space between the lines: 56px. The title yields
+   * last: the identity keeps its content's width while the facts give
+   * theirs up first, each fact leaving whole, the last first, down to
+   * nothing, and the status keeps its
+   * own; whatever width is left over sets the facts and the status at
+   * the row's end as one group. The row sets no gap between its slots:
+   * each fact and the status carry the gutter before them, so facts that
+   * have all left take no width, and the title has the row's whole
+   * width. The row may be narrower than its
+   * content, so a long identity never widens the track that holds it. */
   .ds.entity-row {
     --entity-row-gap: var(--grid-gutter);
     --entity-row-line-gap: var(--space-0);
@@ -19,21 +25,31 @@
     --entity-row-line-height: var(--space-300);
     /* The chip's gap between its slots. */
     --entity-row-mark-gap: var(--space-050);
-    --entity-row-location-color: var(--color-text-muted);
+    /* The mark is the 16px box every form gives it. */
+    --entity-row-mark-size: var(--space-200);
     --entity-row-identifier-vertical-align: baseline;
     --entity-row-identifier-line-height: 0;
-    --entity-row-meta-color: var(--color-text-muted);
+    --entity-row-prefix-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-row-prefix-font-family: ui-monospace, monospace;
+    --entity-row-kind-color: var(--color-text-muted);
+    --entity-row-summary-color: var(--color-text-muted);
+    --entity-row-fact-label-color: var(--color-text-muted);
+    /* The second line spans the row, after every slot of the first. */
+    --entity-row-summary-basis: 100%;
+    --entity-row-summary-order: 1;
+    /* How much faster than the facts the identity takes the
+     * free width of a two-line row, where it cannot keep a content basis. */
+    --entity-row-identity-grow-weight: 1000;
     /* The ring sits inside the title, since the identity clips. */
     --entity-row-focus-ring-width: 2px;
     --entity-row-focus-ring-offset: -2px;
     --entity-row-focus-ring-color: var(--color-focus-ring);
 
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    align-items: center;
+    flex-wrap: nowrap;
     min-width: 0;
-    column-gap: var(--entity-row-gap);
     row-gap: var(--entity-row-line-gap);
     padding-block: var(--entity-row-padding-block);
     list-style: none;
@@ -41,19 +57,30 @@
     line-height: var(--entity-row-line-height);
   }
 
-  /* A title longer than its line wraps between its words, so it is never
-   * cut; a single word longer than the row clips at its end. It clips
-   * only along its line, so a chip in it keeps its whole pill, and the
-   * line grows to hold it. */
+  /* The identity's basis is its content and it never wraps: it shrinks
+   * only once the facts, whose basis is nothing, have none
+   * left to give, and then its title ends in an ellipsis. The width left
+   * over falls after it, so what follows it ends the row. It clips only
+   * along its line, so a chip in it keeps its whole pill. */
   .ds.entity-row .identity {
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-items: center;
+    overflow-x: clip;
+    min-width: 0;
+    margin-inline-end: auto;
+    white-space: nowrap;
+  }
+
+  /* The title gives way first, ending in an ellipsis; it clips only along
+   * its line. A linked title reads as the row's text, underlined on
+   * approach. */
+  .ds.entity-row .title {
     overflow-x: clip;
     min-width: 0;
     text-overflow: ellipsis;
-    white-space: normal;
-  }
-
-  /* A linked title reads as the row's text, underlined on approach. */
-  .ds.entity-row .title {
     color: inherit;
     text-decoration: none;
   }
@@ -69,31 +96,124 @@
     outline-offset: var(--entity-row-focus-ring-offset);
   }
 
-  /* The mark leads the identity, set apart from the text after it. */
+  /* The mark leads the identity, a 16px box centred on its line, set
+   * apart from the text after it by the chip's gap; it never shrinks. */
   .ds.entity-row .mark {
+    display: flex;
+    flex-shrink: 0;
+    /* A sign smaller than the box sits on its middle. */
+    align-items: center;
+    justify-content: center;
+    width: var(--entity-row-mark-size);
+    height: var(--entity-row-mark-size);
     margin-inline-end: var(--entity-row-mark-gap);
   }
 
-  .ds.entity-row .location {
-    color: var(--entity-row-location-color);
-  }
-
-  /* An identifier sets the monospace face on the row's line and stands on
-   * the sans text's baseline: its inline box takes no height, so the face's
+  /* An identifier in a fact sets the monospace face on the row's line and
+   * stands on the sans text's baseline: its inline box takes no height, so the face's
    * other metrics never grow the line. */
   .ds.entity-row .identifier {
     vertical-align: var(--entity-row-identifier-vertical-align);
     line-height: var(--entity-row-identifier-line-height);
   }
 
-  /* The meta stays on its one line and, longer than the row on a line of
-   * its own, clips at its end; the whole word stays in the text. */
-  .ds.entity-row .meta {
-    color: var(--entity-row-meta-color);
-    text-align: end;
-    white-space: nowrap;
-    overflow-x: clip;
+  .ds.entity-row .prefix {
+    flex-shrink: 0;
+    margin-inline-end: var(--entity-row-mark-gap);
+    color: var(--entity-row-prefix-color);
+    font-family: var(--entity-row-prefix-font-family);
+  }
+
+  .ds.entity-row .kind {
+    flex-shrink: 0;
+    margin-inline-start: var(--entity-row-mark-gap);
+    color: var(--entity-row-kind-color);
+  }
+
+  /* The second line of a two-line row: the summary under the title, on
+   * one line, cut by an ellipsis, and a line high with no summary in it,
+   * so `lines` alone sets the row's height. */
+  .ds.entity-row .summary {
+    order: var(--entity-row-summary-order);
+    flex-basis: var(--entity-row-summary-basis);
     min-width: 0;
+    min-height: var(--entity-row-line-height);
+    overflow: hidden;
+    color: var(--entity-row-summary-color);
+    white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  /* The facts have no basis: they grow up to their content from the width
+   * the identity leaves, so they give way before the title, down to
+   * nothing. A fact is shown whole or not at all: the facts wrap, and the
+   * box is one line high and clips, so a fact that has no room on the
+   * first line moves to the second, which is hidden, the last fact first. */
+  .ds.entity-row .facts {
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    flex-basis: 0;
+    max-width: max-content;
+    height: var(--entity-row-line-height);
+    overflow: clip;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  /* The first line's start: an item of no width, a line high, so the
+   * first line is never empty and holds its height, and the first fact,
+   * too, can move to the hidden line. */
+  .ds.entity-row .start {
+    flex-shrink: 0;
+    height: var(--entity-row-line-height);
+  }
+
+  /* Each fact stands the row's gap from what comes before it, inside the
+   * facts' box, so the gap leaves with the fact: a box whose facts have
+   * all left is empty and takes nothing from the title. Its label and its
+   * value are items of a line, so they are read apart, and the spaces the
+   * markup sets between them and before a later fact, for a reader and a
+   * copy, take no width: margins alone space them. */
+  .ds.entity-row .fact {
+    display: flex;
+    margin-inline-start: var(--entity-row-gap);
+  }
+
+  .ds.entity-row .term {
+    margin-inline-end: var(--entity-row-mark-gap);
+    color: var(--entity-row-fact-label-color);
+  }
+
+  /* The status keeps its width and stands the row's gap from what comes
+   * before it. */
+  .ds.entity-row .status {
+    display: flex;
+    flex-shrink: 0;
+    margin-inline-start: var(--entity-row-gap);
+  }
+
+  /* A two-line row: the summary is the only slot that leaves the first
+   * line. A wrapping line is broken by its items' bases, so the identity's
+   * is small here, the mark's box, and it takes the free width, up to its
+   * content, before the facts take any: the first line never breaks. The
+   * basis is never nothing: the row sets no gap, so beside an identity of
+   * no basis, facts that have left and no status, the summary, a whole
+   * line, would fit on the first line and leave the identity no width. */
+  .ds.entity-row:has(> .summary) {
+    flex-wrap: wrap;
+  }
+
+  .ds.entity-row:has(> .summary) > .identity {
+    flex-grow: var(--entity-row-identity-grow-weight);
+    flex-basis: var(--entity-row-mark-size);
+    max-width: max-content;
+  }
+
+  /* Below two groups the first line keeps the first fact alone. */
+  @container shell (width < 912px) {
+    .ds.entity-row .fact.is-later {
+      display: none;
+    }
   }
 }

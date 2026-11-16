@@ -8,13 +8,12 @@
  * there, so a translation may reorder the sentence around it.
  */
 export const MESSAGES = {
-  "chip.lead": "{lead}:",
-  "entity.parent": "{title} ∈ {parent}",
-  "entity.subclass": "{title} ⊂ {parent}",
+  "chip.peek": "Preview of {title}",
   "entity.context": "{kind} in {location}",
   "class.kind": "Class",
   "class.kind.abstract": "Abstract class",
   "class.abstract": "abstract",
+  "class.superclass": "Subclass of",
   "class.instances": {
     one: "used in {count} instance",
     other: "used in {count} instances",
@@ -23,13 +22,12 @@ export const MESSAGES = {
   "property.kind.datatype": "Datatype property",
   "property.kind.annotation": "Annotation property",
   "property.kind.other": "Property",
-  "property.meta.object": "object",
-  "property.meta.datatype": "datatype",
-  "property.meta.annotation": "annotation",
-  "property.meta.other": "property",
+  "property.domain": "Domain",
   "property.range": "Range",
   "property.inverse": "Inverse",
   "property.functional": "functional",
+  "token.mode.light": "Light",
+  "token.mode.dark": "Dark",
   "list.empty": "Nothing to list.",
   "renderer.table": "Table",
   "renderer.cards": "Cards",

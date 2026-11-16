@@ -57,6 +57,6 @@ describe("ModifierChip SSR", () => {
     );
     expect(html).toContain("ds entity-chip ds modifier-chip");
     expect(html).toContain('data-type="Modifier"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

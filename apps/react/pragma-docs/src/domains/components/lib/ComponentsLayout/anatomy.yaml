@@ -4,7 +4,8 @@
 # or to a component, its renderers and, on the catalog, the catalog's
 # count closing the filtering group, the routed page in the canvas, and the site's
 # colophon. It renders no element of its own: DocumentLayout renders the
-# root.
+# root. Its pages are of the site's home namespace, `ds`, which the shell
+# declares, so it declares none of its own.
 node:
   uri: docs.component.components_layout
   edges:

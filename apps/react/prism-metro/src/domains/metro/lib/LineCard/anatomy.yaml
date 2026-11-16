@@ -1,49 +1,93 @@
 ---
-# LineCard: a line as a card in a grid of entities.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 and 505:1956. Best
-# guess: the kind is the line's class; the summary its definition; the key
-# values the count of its stops and, for a line that runs end to end, its
-# two end stations, the first and last calls of its first route; a loop
-# line has no ends and carries "loop" as its vital instead.
-# Projected onto EntityCard, which carries every style: this anatomy binds
-# none. The home is the link the title renders through, resolved from the
-# compact address.
+# LineCard: A line as a card: its mark, its prefix off the page's namespace,
+# its name linked to its home, its definition, and its stop count and, for a
+# line run end to end, its ends as facts, with "loop" as its status for a
+# line that runs one. It states no address and no kind: the peek's line
+# carries the address, and its mark says the type. Its mark is a disc of the
+# line's colour (`SwatchMark`), which the package paints only with a plain
+# colour value.
 node:
   uri: metro.component.line_card
-  projection: { on: Line }
+  projection:
+    on: Line
   edges:
     - node:
         uri: prism.component.entity_card
         edges:
           - node:
-              role: title
-              projection: { field: _meta.title }
+              role: mark
+              # The line's colour, a SwatchMark: the package gates the
+              # value, so a colour it refuses leaves the disc uncoloured.
               edges:
-                - node: { role: home, projection: { field: _meta.curie } }
-                  relation: { cardinality: "0..1" }
-            relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: prism.component.swatch_mark
+                    projection:
+                      field: colour
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
           - node:
-              role: kind
-              projection: { field: _meta.title }
-            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+              role: prefix
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: prefix
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
           - node:
               role: summary
-              projection: { field: _meta.definition }
-            relation: { cardinality: "0..1", slotName: summary }
+              projection:
+                field: _meta.definition
+            relation:
+              cardinality: "0..1"
+              slotName: summary
           - node:
-              role: key values
+              role: facts
               edges:
-                - node: { role: stops, projection: { field: uri } }
-                  relation: { cardinality: "1", projection: { field: servedBy } }
                 - node:
-                    role: ends
-                    edges:
-                      - node: { role: terminus, projection: { field: _meta.title } }
-                        relation: { cardinality: "2", projection: { field: calls.stop } }
-                  relation: { cardinality: "0..1", projection: { field: routes } }
-            relation: { cardinality: "1", slotName: key-values }
+                    role: servedBy
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "1"
+                    projection:
+                      field: servedBy
+                - node:
+                    role: routes
+                    # The first route's first and last stops, on a line
+                    # that runs no loop.
+                    projection:
+                      field: stop._meta.title
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: routes.calls
+            relation:
+              cardinality: "0..1"
+              slotName: facts
           - node:
-              role: vital
-              projection: { field: isLoop }
-            relation: { cardinality: "0..1", slotName: footer, projection: { field: routes } }
-      relation: { cardinality: "1" }
+              role: status
+              projection:
+                field: isLoop
+            relation:
+              cardinality: "0..1"
+              slotName: status
+              projection:
+                field: routes
+      relation:
+        cardinality: "1"

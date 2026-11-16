@@ -113,7 +113,7 @@ describe("CatalogList", () => {
   );
 
   it(
-    "keeps a UI block's rendered example beside its card",
+    "keeps a UI block's rendered example as its card's specimen",
     () => {
       render(
         catalogPage(
@@ -126,7 +126,25 @@ describe("CatalogList", () => {
         .getAllByRole("link", { name: "Button" })
         .at(0)
         ?.closest(".ds.entity-card");
-      expect(button?.querySelector(".sidecar .ds.button")).not.toBeNull();
+      expect(
+        button?.querySelector('.specimen[data-specimen="block"] .ds.button'),
+      ).not.toBeNull();
+    },
+    HARNESS_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "lists its rows in two lines, each block's summary under its title",
+    () => {
+      const { container } = render(
+        catalogPage(catalogRecords, createFetchSpy(), createCatalogRouter()),
+      );
+      const rows = [...container.querySelectorAll(".ds.ui-block-row")];
+      const summaries = rows.flatMap((row) => [
+        ...row.querySelectorAll(":scope > .summary"),
+      ]);
+      expect(rows.length).toBeGreaterThan(0);
+      expect(summaries.length).toBeGreaterThan(0);
     },
     HARNESS_TEST_TIMEOUT_MS,
   );

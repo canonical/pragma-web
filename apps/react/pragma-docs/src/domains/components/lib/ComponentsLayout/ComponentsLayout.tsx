@@ -40,6 +40,10 @@ const ComponentsContext = makeLensContext({
  * scrolls, and the colophon in the band under it. It renders no element of
  * its own: `DocumentLayout` renders the root.
  *
+ * Its pages are about the design system's components, of the site's home
+ * namespace, `ds`, which the shell declares: a `ds:` identity on them
+ * shows no prefix.
+ *
  * `import { ComponentsLayout } from "./lib/ComponentsLayout/index.js";`
  *
  * @implements docs.component.components_layout

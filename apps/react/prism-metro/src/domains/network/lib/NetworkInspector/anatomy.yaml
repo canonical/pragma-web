@@ -1,7 +1,7 @@
 ---
 # NetworkInspector — the network workspace's inspector: a one-line hint,
-# then the network's lines and its stations, each list the shared NodeList
-# view in rows, each row its node's projection linking to its page.
+# then the network's lines and its stations, each an EntityList of
+# the site's rows (MetroRowProjection), each linking to its page.
 # Bespoke as the inspector's arrangement.
 #
 # Every decision is read through a component token declared on the root
@@ -35,6 +35,6 @@ node:
       relation: { cardinality: "2", slotName: section }
     - node:
         role: list
-        # NodeList in rows: the lines in code order, the stations in name
+        # MetroRowProjection rows: the lines in code order, the stations in name
         # order
       relation: { cardinality: "2" }

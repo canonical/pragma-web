@@ -1,10 +1,12 @@
 ---
 # NodeCard: any graph node as a card in a grid of entities.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 and 505:2254 (the
-# instance card: the namespace on top, the title, its class, the summary).
-# The location is the compact address's prefix; the kind is the node's
-# class; the summary its asserted definition. Any node carries no key
-# values, vitals or preview, so those slots stay empty.
+# Reference: the W3 card anatomy: the slot order mark, prefix, title,
+# address, kind, summary, facts, status; any node fills the mark (the
+# generic node glyph), the prefix (the compact address's; a node whose
+# address did not compact has none), the title, the kind (its class: any
+# node's lists mix types) and the summary (its asserted definition); it
+# passes no address, which the peek's own line shows in full. Any node
+# carries no facts, status or depiction, so it draws no specimen.
 # Projected onto EntityCard, which carries every style: this anatomy binds
 # none. The home is the link the title renders through, resolved from the
 # compact address; a node without one reads as inert text.
@@ -17,12 +19,23 @@ node:
         uri: prism.component.entity_card
         edges:
           - node:
-              role: location
+              role: mark
+              # The generic node glyph, a published Icon (NODE_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
               projection:
                 field: _meta.curie
             relation:
               cardinality: "0..1"
-              slotName: location
+              slotName: prefix
           - node:
               role: title
               projection:

@@ -2,10 +2,12 @@
 
 import { useHome } from "@canonical/prism-core";
 import { EntityCommand, useProjectionLink } from "@canonical/prism-projections";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
 import nodeFragment from "../../../../relay/__generated__/UIBlockCommand_node.graphql.js";
+import { UI_BLOCK_MARK_ICON } from "../UIBlockChip/constants.js";
 import type { UIBlockCommandProps } from "./types.js";
 import "./styles.css";
 
@@ -28,11 +30,6 @@ const declareNodeFragment = (): unknown => graphql`
         }
       }
     }
-    tier {
-      _meta {
-        title
-      }
-    }
     documentationStages(first: 1) {
       edges {
         node {
@@ -50,11 +47,12 @@ void declareNodeFragment;
 const componentCssClassName = "ds ui-block-command";
 
 /**
- * A UI block as a 56px command-palette result: its title on the first
- * line, linked to its home when the site has one and inert text when it
- * has none; its class in its tier on the second (`Component in Global`);
- * and one vital at the end, its version (`v2.1`) when it has one, else
- * its first documentation stage.
+ * A UI block as a 56px command-palette result: its mark, then its title
+ * on the first line, linked to its home when the site has one and inert
+ * text when it has none; its compact address on the second line, and no
+ * prefix; at the end its kind, the block's type (palette results mix
+ * every type), and its status, its version (`v2.1`) when it has one,
+ * else its first documentation stage.
  *
  * Native props reach the result's `<li>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename
@@ -80,18 +78,19 @@ export default function UIBlockCommand({
   return (
     <EntityCommand
       {...props}
+      address={curie}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-type={data.__typename}
       href={href}
       kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
-      location={data.tier?._meta.title}
-      title={title}
-      vital={
+      mark={<Icon icon={UI_BLOCK_MARK_ICON} />}
+      status={
         data.version
           ? t("block.version", { version: data.version })
           : data.documentationStages.edges.at(0)?.node._meta.title
       }
+      title={title}
     />
   );
 }

@@ -323,10 +323,15 @@ describe("StandardsIndex grouping", () => {
       ).toBe(
         "/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23code.api.stability",
       );
-      // …and the reader still sees the compact form at the end of its row,
-      // in code voice: each entry is the projections' list entry.
+      // …and the reader still sees the compact form in its row, in code
+      // voice, as the row's first fact, which names the property it states:
+      // each entry is the projections' list entry.
       const compact = screen.getByText("cs:code.api.stability");
       expect(compact).toHaveClass("ds", "inline-code");
+      const fact = compact.closest(".fact");
+      expect(fact?.getAttribute("data-property")).toBe("curie");
+      expect(fact?.querySelector(".term")?.textContent).toBe("Address");
+      expect(fact?.parentElement?.querySelector(".fact")).toBe(fact);
       expect(compact.closest("li")).toHaveClass("ds", "entity-row");
       expect(fetchFn).not.toHaveBeenCalled();
     },

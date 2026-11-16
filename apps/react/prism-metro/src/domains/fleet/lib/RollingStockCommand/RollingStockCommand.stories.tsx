@@ -68,7 +68,9 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The Series 90, as a 56px command-palette entry. */
+/**
+ * The Series 90: its mark, its name, its address and kind, and its formation count.
+ */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */

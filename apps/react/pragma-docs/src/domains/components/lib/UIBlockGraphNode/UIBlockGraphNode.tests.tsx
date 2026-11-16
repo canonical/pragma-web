@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -93,17 +94,22 @@ describe("UIBlockGraphNode", () => {
         <UIBlockGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("IconButton");
-    expect(container.querySelector(".title .identifier")).toBeNull();
-    expect(container.querySelector(".context")?.textContent).toBe(
-      "Component in Global",
+    expectSlotOrder(container);
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "ds: IconButton",
     );
+    expect(container.querySelector(".title .prefix")?.textContent).toBe("ds: ");
+    expect(container.querySelector("svg.mark use")).toHaveAttribute(
+      "href",
+      "/icons/layout-grid.svg#layout-grid",
+    );
+    expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
       MOCK_UI_BLOCK_HREF,
     );
   });
 
-  it("names its class alone with no tier, and a pattern's title is inert", () => {
+  it("names no kind, and a pattern's title is inert", () => {
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
@@ -112,7 +118,7 @@ describe("UIBlockGraphNode", () => {
       ),
       { __typename: "Pattern", tier: null },
     );
-    expect(container.querySelector(".context")?.textContent).toBe("Component");
+    expect(container.querySelector(".context")).toBeNull();
     expect(container.querySelector(".link")).toBeNull();
   });
 

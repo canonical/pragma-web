@@ -4,9 +4,9 @@ import type { ComponentProps } from "react";
 import type { CallStop_node$key } from "#relay/__generated__/CallStop_node.graphql.js";
 
 /**
- * The inline channels the stop sets from the graph's data: its line's
- * colour as `"--call-stop-colour"` on the root, and each connection's line
- * colour as `"--call-stop-connection-colour"` on its swatch.
+ * The inline channel the stop sets from the graph's data: its line's
+ * colour as `"--call-stop-colour"` on the root, through the package's
+ * colour gate, so a refused value leaves it unset.
  */
 type OwnProps = {
   /**

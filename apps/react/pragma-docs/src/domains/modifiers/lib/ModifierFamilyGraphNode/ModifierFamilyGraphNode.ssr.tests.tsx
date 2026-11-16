@@ -66,6 +66,6 @@ describe("ModifierFamilyGraphNode SSR", () => {
       "ds entity-graph-node ds modifier-family-graph-node",
     );
     expect(html).toContain('data-type="ModifierFamily"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

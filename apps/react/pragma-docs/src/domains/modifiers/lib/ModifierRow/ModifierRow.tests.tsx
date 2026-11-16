@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -90,16 +91,29 @@ describe("ModifierRow", () => {
         <ModifierRow node={node} />
       </ul>
     ));
+    const row = container.querySelector(".ds.modifier-row");
     expect(
-      [...container.querySelectorAll(".location, .title, .meta")].map(
+      [...(row?.querySelectorAll(".prefix, .title") ?? [])].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["ds:", "Danger", "Anticipation"]);
-    expect(container.querySelector(".location code.identifier")).not.toBeNull();
+    ).toEqual(["ds:", "Danger"]);
+    expect(
+      [...(row?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".term")?.textContent,
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([["modifierFamily", "Family", "Anticipation"]]);
+    expect(row?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/settings.svg#settings",
+    );
+    expect(row?.querySelector(".kind, .status, .summary")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+    if (row) expectSlotOrder(row);
   });
 
-  it("has no prefix when the modifier's address did not compact", () => {
+  it("has no fact with no family, and no prefix when the address did not compact", () => {
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -111,21 +125,12 @@ describe("ModifierRow", () => {
           ...MOCK_MODIFIER._meta,
           curie: "https://ds.canonical.com/global.modifier.danger",
         },
+        modifierFamily: null,
       },
     );
-    expect(container.querySelector(".location")).toBeNull();
-  });
-
-  it("ends in its title when the modifier has no family", () => {
-    const { container } = renderWithNode(
-      (node) => (
-        <ul>
-          <ModifierRow node={node} />
-        </ul>
-      ),
-      { modifierFamily: null },
-    );
-    expect(container.querySelector(".meta")).toBeNull();
+    expect(container.querySelector(".facts")).toBeNull();
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Danger");
   });
 
   it("applies custom className", () => {
@@ -146,5 +151,30 @@ describe("ModifierRow", () => {
       </ul>
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("LI");
+  });
+
+  it("puts the summary's first paragraph under the title in a two-line row", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <ModifierRow lines="two" node={node} />
+      </ul>
+    ));
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      MOCK_MODIFIER.summary,
+    );
+  });
+
+  it("keeps a summary written over several lines to the row's one second line", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <ModifierRow lines="two" node={node} />
+        </ul>
+      ),
+      { summary: "The danger modifier\nwarns a reader." },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.querySelector("br")).toBeNull();
+    expect(summary?.textContent).toBe("The danger modifier warns a reader.");
   });
 });

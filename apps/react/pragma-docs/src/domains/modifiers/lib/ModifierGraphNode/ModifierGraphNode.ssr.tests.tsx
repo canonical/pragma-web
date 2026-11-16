@@ -64,6 +64,6 @@ describe("ModifierGraphNode SSR", () => {
     );
     expect(html).toContain("ds entity-graph-node ds modifier-graph-node");
     expect(html).toContain('data-type="Modifier"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

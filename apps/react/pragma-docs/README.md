@@ -216,9 +216,10 @@ install of this app will not fully resolve until they land on npm.
 ## Projections
 
 The site renders every graph node in five forms, chip, row, card, command
-and graph node, through `@canonical/prism-projections`. The `Shell` provides
-the package's `defaultProjectionMaps`, so the lenses' mentions and indexes
-dispatch as the package does. The design-system types the site's own graph
+and graph node, through `@canonical/prism-projections`. The `Shell` mounts
+the package's `ProjectionLinkProvider` with the router's link and the
+site's peek, so the lenses' mentions and indexes dispatch as the package
+does. The design-system types the site's own graph
 serves get projections of their own, one folder each under the domain
 libraries, each filling the package's generic `Entity*` component from its
 own Relay fragment and checked against its `anatomy.yaml`:
@@ -227,35 +228,43 @@ own Relay fragment and checked against its `anatomy.yaml`:
   `UIBlockCommand` and `UIBlockGraphNode`, on the `UIBlock` interface, so one
   projection serves a component, a pattern and a layout; and
   `UIBlockExample`, the published React component a block's card renders in
-  its sidecar, server-rendered, for a block the package implements.
+  its specimen, server-rendered, for a block the package implements.
 - `src/domains/modifiers/lib/`: the `Modifier*` and `ModifierFamily*`
   projections.
 - `src/domains/standards/lib/`: the `CodeStandard*` projections.
 
 A projection reads only what its own fragment spreads, and the package's
-composites spread only the contract's types, so the site dispatches these
-types itself: `SiteChipProjection`, `SiteRowProjection`,
-`SiteCardProjection`, `SiteCommandProjection` and `SiteGraphNodeProjection`
+composites spread only the contract's types, so the site switches on these
+types itself: `DocsChipProjection`, `DocsRowProjection`,
+`DocsCardProjection`, `DocsCommandProjection` and `DocsGraphNodeProjection`
 in `src/lib/ui/` each read a composite of the site's own. It spreads the
-package's dispatcher of that form aliased as `Node`, and each design-system
+package's switch of that form aliased as `Node`, and each design-system
 projection aliased by the type it is on; the three UI-block types narrow to
 their type with an aliased inline fragment
 (`... on Component @alias(as: "Component") { ...UIBlockCard_node }`), so
-each alias holds a key for its own type alone. `siteProjectionMaps`
-(`src/lib/ui/constants.ts`) holds the arms by the same names and dispatches
-through the package's `renderArm`: a design-system type renders through
-its projection, and every other node through the package's dispatcher,
-which renders ontology classes and any type the provided maps arm.
+each alias holds a key for its own type alone. Each switch cases the types
+its `DOCS_<FORM>_TYPES` constant lists, and renders every other node
+through the package's switch, which renders ontology classes through their
+arm and any other node through its `Node` arm.
+
+The `Shell` gives the provider the site's peek, `DocsPeek`, and no
+switches, so the package's screens (the palette, the entity lens,
+`NodeList`) render the site's types through the package's arms. It
+declares the site's home namespace, `ds`, once (`AMBIENT_NAMESPACE` in
+`src/lib/ui/Shell/constants.ts`), so a design-system node's prefix is
+hidden; `SiteStandardsLayout` declares `cs` for the standards lens, and
+`SiteDefinitionsLayout` declares none (`namespace={null}`), since
+Definitions lists terms of several namespaces and shows every prefix.
 
 ```tsx
-import { SiteCardProjection } from "#lib/ui";
+import { DocsCardProjection } from "#lib/ui";
 
-<SiteCardProjection node={node} />;
+<DocsCardProjection node={node} />;
 ```
 
 `src/testing/integration/projections.tests.ts` holds each composite's
-aliases, its map's arms and its dispatcher anatomy's cases to one set, and
-every projection's fragment to the fields its anatomy reads.
+aliases, its switch's cases and its anatomy's cases to one set, and every
+projection's fragment to the fields its anatomy reads.
 
 The site's own strings, these projections' words among them, come from its
 catalog (`src/i18n/constants.ts`) through `useMessages` from `#i18n`, whose

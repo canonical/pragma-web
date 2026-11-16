@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<314c9a9fea4e02c9b44506d19a1c6dc0>>
+ * @generated SignedSource<<bc598babb70a15d25eba8f38911114f0>>
  * @lightSyntaxTransform
  */
 
@@ -31,36 +31,10 @@ var v0 = [
   }
 ],
 v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "uri",
-  "storageKey": null
-},
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-},
-v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
-},
-v4 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "EntityMeta"
-},
-v5 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "ID"
 };
 return {
   "fragment": {
@@ -121,7 +95,13 @@ return {
             "name": "__typename",
             "storageKey": null
           },
-          (v1/*:: as any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "uri",
+            "storageKey": null
+          },
           {
             "kind": "InlineFragment",
             "selections": [
@@ -133,36 +113,18 @@ return {
                 "name": "_meta",
                 "plural": false,
                 "selections": [
-                  (v2/*:: as any*/),
                   {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
-                    "name": "curie",
+                    "name": "title",
                     "storageKey": null
                   },
                   {
                     "alias": null,
                     "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": [
-                      {
-                        "alias": null,
-                        "args": null,
-                        "concreteType": "EntityMeta",
-                        "kind": "LinkedField",
-                        "name": "_meta",
-                        "plural": false,
-                        "selections": [
-                          (v2/*:: as any*/)
-                        ],
-                        "storageKey": null
-                      },
-                      (v1/*:: as any*/)
-                    ],
+                    "kind": "ScalarField",
+                    "name": "curie",
                     "storageKey": null
                   }
                 ],
@@ -178,7 +140,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "c3e52ad5daa882e3b2dda8411b308c8e",
+    "cacheID": "26e37701069629c83e17fedc8ecc7542",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -188,25 +150,26 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__typename": (v3/*:: as any*/),
-        "node._meta": (v4/*:: as any*/),
-        "node._meta.curie": (v3/*:: as any*/),
-        "node._meta.title": (v3/*:: as any*/),
-        "node._meta.type": {
+        "node.__typename": (v1/*:: as any*/),
+        "node._meta": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
-          "type": "OntologyClass"
+          "type": "EntityMeta"
         },
-        "node._meta.type._meta": (v4/*:: as any*/),
-        "node._meta.type._meta.title": (v3/*:: as any*/),
-        "node._meta.type.uri": (v5/*:: as any*/),
-        "node.uri": (v5/*:: as any*/)
+        "node._meta.curie": (v1/*:: as any*/),
+        "node._meta.title": (v1/*:: as any*/),
+        "node.uri": {
+          "enumValues": null,
+          "nullable": false,
+          "plural": false,
+          "type": "ID"
+        }
       }
     },
     "name": "ModifierFamilyGraphNodeSsrTestQuery",
     "operationKind": "query",
-    "text": "query ModifierFamilyGraphNodeSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...ModifierFamilyGraphNode_node\n    uri\n  }\n}\n\nfragment ModifierFamilyGraphNode_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n"
+    "text": "query ModifierFamilyGraphNodeSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...ModifierFamilyGraphNode_node\n    uri\n  }\n}\n\nfragment ModifierFamilyGraphNode_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

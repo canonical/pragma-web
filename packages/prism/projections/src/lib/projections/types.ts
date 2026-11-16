@@ -14,117 +14,92 @@ import type {
 } from "../node/index.js";
 
 /**
- * What a composite fragment's data holds: the typename dispatch reads, the
- * `Node` arm's key, spread aliased as `Node`, and the site slot's key,
- * spread aliased as `Site`. Every composite the package writes spreads the
- * slot; a site's own composite, dispatched through `renderArm`, may spread
- * none, and then arms no type under `siteTypes`.
+ * A site's switch for one form, as the package's switch of that form
+ * renders it: the switch's native props, and the key of its site slot,
+ * the site's own compile of `Site<Form>Slot_node`, as the package's
+ * composite reads it (its `Site` alias), so a site's slot typed by its own
+ * compile takes it.
  */
-export interface DispatchedNode {
-  readonly __typename: string;
-  readonly Node: unknown;
-  readonly Site?: unknown;
-}
-
-/**
- * The typenames a composite arms besides `Node`: its other spreads but the
- * site slot, each aliased by the type it is on.
- */
-export type ArmedTypename<TData> = Exclude<
-  keyof TData,
-  "__typename" | "Node" | "Site" | " $fragmentType"
-> &
-  string;
-
-/**
- * What an arm receives: the dispatcher's native props, and its own fragment
- * key.
- */
-export type ArmProps<TKey, TNative> = TNative & { readonly node: TKey };
-
-/** An arm: the projection of one type in one form. */
-export type ProjectionArm<TKey, TNative> = ComponentType<
-  ArmProps<TKey, TNative>
+export type SiteSwitch<TKey, TNative> = ComponentType<
+  TNative & { readonly node: TKey }
 >;
 
 /**
- * What a site's arm receives: an arm's props over the site slot's key, and
- * the typename of the node it renders.
+ * A site's five switches, one per form, each over its site slot. A site
+ * whose pages render the package's lenses (their queries spread the
+ * package's switches) gives them, so a node of the site's own types
+ * reaches the site's arm through the package's switch.
  */
-export type SiteArmProps<TProps> = TProps & { readonly typename: string };
-
-/** One form's arms. */
-export interface ProjectionMap<TData extends DispatchedNode, TNative> {
-  /**
-   * The arm of every type no other arm takes, reading what every node carries.
-   */
-  readonly Node: ProjectionArm<TData["Node"], TNative>;
-  /**
-   * One arm per type the composite arms, each reading its own aliased key:
-   * a wrong or missing arm does not compile.
-   */
-  readonly types: {
-    readonly [T in ArmedTypename<TData>]-?: ProjectionArm<
-      NonNullable<TData[T]>,
-      TNative
-    >;
-  };
-  /**
-   * A site's arms for its own types, by typename: each reads the site
-   * slot's key, the site's own compile of `Site<Form>Slot_node`
-   * spread aliased as `Site`, and takes the node's typename.
-   */
-  readonly siteTypes?: Readonly<
-    Record<
-      string,
-      ComponentType<SiteArmProps<ArmProps<NonNullable<TData["Site"]>, TNative>>>
-    >
-  >;
-}
-
-/** The arms of every form, one map each. */
-export interface ProjectionMaps {
-  /** The inline mention: a node named in running text. */
-  readonly chip: ProjectionMap<ChipProjection_node$data, ChipArmNative>;
-  /** The list row: a node as one entry of a list of results. */
-  readonly row: ProjectionMap<RowProjection_node$data, RowArmNative>;
-  /** The card: a node as a self-contained tile in a grid of entities. */
-  readonly card: ProjectionMap<CardProjection_node$data, CardArmNative>;
-  /** The command-palette entry: a node offered as a destination. */
-  readonly command: ProjectionMap<
-    CommandProjection_node$data,
+export interface SiteSwitches {
+  /** The inline mention. */
+  readonly chip: SiteSwitch<ChipProjection_node$data["Site"], ChipArmNative>;
+  /** The list row. */
+  readonly row: SiteSwitch<RowProjection_node$data["Site"], RowArmNative>;
+  /** The card. */
+  readonly card: SiteSwitch<CardProjection_node$data["Site"], CardArmNative>;
+  /** The command-palette entry. */
+  readonly command: SiteSwitch<
+    CommandProjection_node$data["Site"],
     CommandArmNative
   >;
-  /** The graph node: a node of a graph, native SVG. */
-  readonly graphNode: ProjectionMap<
-    GraphNodeProjection_node$data,
+  /** The graph node. */
+  readonly graphNode: SiteSwitch<
+    GraphNodeProjection_node$data["Site"],
     GraphNodeArmNative
   >;
 }
 
-/** Props accepted by `ProjectionsProvider`. */
-export interface ProjectionsProviderProps {
-  /**
-   * The site's maps: `defaultProjectionMaps`, or a site's copy that adds
-   * arms for its own types under `siteTypes`. A typed arm reads only what
-   * its form's composite spreads, and only the package writes the
-   * composites.
-   */
-  readonly maps: ProjectionMaps;
+/** Props accepted by `ProjectionLinkProvider`. */
+export interface ProjectionLinkProviderProps {
   /**
    * The link every projection renders a node's home through: the site's
    * router link adapter, so following a mention navigates on the client.
-   * Defaults to the intrinsic `"a"`, a full document load.
+   * Defaults to the link of the provider above, or the intrinsic `"a"`, a
+   * full document load.
    */
   readonly LinkComponent?: LinkComponent;
-  /** The content whose projections read the maps. */
+  /**
+   * The site's peek: the element a chip shows for the node at an absolute
+   * IRI, such as the site's own card switch read by a query of the site's.
+   * Every chip arm takes it through `useProjectionPeek`, so no arm imports
+   * it. Without one (here or above), chips show the package's
+   * `ProjectionPeek`. A peek that renders nothing for an IRI (`null`, or a
+   * component that renders `null`, as one does while loading or for a
+   * node it cannot find) shows nothing: the chip's peek is not displayed,
+   * frame and dialog alike, and the chip stays a link.
+   */
+  readonly peek?: (uri: string) => ReactNode;
+  /**
+   * The site's five switches, each over its site slot: a node the
+   * package's switch of a form reaches renders through the site's switch
+   * of that form. Without them (here or above), the package's switches
+   * render an ontology class through its arm and any other node through
+   * its `Node` arm.
+   */
+  readonly site?: SiteSwitches;
+  /** The content whose projections read them. */
   readonly children: ReactNode;
 }
 
-/** What a `ProjectionsProvider` holds for the projections below it. */
+/** What a `ProjectionLinkProvider` holds for the projections below it. */
 export interface ProjectionsContextValue {
-  /** The site's maps, one per form. */
-  readonly maps: ProjectionMaps;
   /** The link a node's home renders through. */
   readonly LinkComponent: LinkComponent;
+  /** The site's peek for the node at an absolute IRI, when it gives one. */
+  readonly peek?: (uri: string) => ReactNode;
+  /** The site's switches, when it gives them. */
+  readonly site?: SiteSwitches;
+}
+
+/** Props accepted by `AmbientNamespaceProvider`. */
+export interface AmbientNamespaceProviderProps {
+  /**
+   * The prefix of the page's namespace as its CURIEs write it, without its
+   * colon: `ds` for a page of `ds:` entities; or `null` for pages that list
+   * the nodes of several namespaces, which declare none, so that every
+   * prefix shows on them whatever a farther provider declares.
+   */
+  readonly namespace: string | null;
+  /** The content whose identities read it. */
+  readonly children: ReactNode;
 }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a86706791543222f6804725565d11382>>
+ * @generated SignedSource<<db1dd86e570725aef17d81aca6b95296>>
  * @lightSyntaxTransform
  */
 
@@ -184,16 +184,6 @@ return {
                     "kind": "ScalarField",
                     "name": "curie",
                     "storageKey": null
-                  },
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "OntologyClass",
-                    "kind": "LinkedField",
-                    "name": "type",
-                    "plural": false,
-                    "selections": (v5/*:: as any*/),
-                    "storageKey": null
                   }
                 ],
                 "storageKey": null
@@ -286,7 +276,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a5646baa7e65c4401a26d8169d70508a",
+    "cacheID": "d335fe744c8228dc19db3c7a0b0f1c60",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -301,15 +291,6 @@ return {
         "node._meta": (v8/*:: as any*/),
         "node._meta.curie": (v7/*:: as any*/),
         "node._meta.title": (v7/*:: as any*/),
-        "node._meta.type": {
-          "enumValues": null,
-          "nullable": false,
-          "plural": false,
-          "type": "OntologyClass"
-        },
-        "node._meta.type._meta": (v8/*:: as any*/),
-        "node._meta.type._meta.title": (v7/*:: as any*/),
-        "node._meta.type.uri": (v9/*:: as any*/),
         "node.documentationStages": {
           "enumValues": null,
           "nullable": false,
@@ -369,7 +350,7 @@ return {
     },
     "name": "UIBlockCardSsrTestQuery",
     "operationKind": "query",
-    "text": "query UIBlockCardSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...UIBlockCard_node\n    uri\n  }\n}\n\nfragment UIBlockCard_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  version\n  summary\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n  inheritsFroms(first: 1) {\n    edges {\n      node {\n        __typename\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query UIBlockCardSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...UIBlockCard_node\n    uri\n  }\n}\n\nfragment UIBlockCard_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  version\n  summary\n  _meta {\n    title\n    curie\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n  inheritsFroms(first: 1) {\n    edges {\n      node {\n        __typename\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

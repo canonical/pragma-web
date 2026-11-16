@@ -2,12 +2,12 @@
 # UIBlockExample: a UI block's rendered example, the published React
 # component of the block with its default props, given only what it cannot
 # render without (a label, a count, a key), server-rendered in the card's
-# sidecar, or with one modifier per family it honours
+# specimen, or with one modifier per family it honours
 # (BLOCK_EXAMPLE_FAMILIES: the published component's prop for that family)
 # when a variant cell of the component page passes `modifiers`.
 # Reference: heuristic 28 and Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 502:1749
 # (the side panel's component). Each case is one published component, and
-# fits the sidecar's two intrinsic columns at every width: a strip of
+# fits the specimen's well at every width: a strip of
 # variants would not, so a case is the component alone.
 # It renders no element of its own: the published component is the root,
 # styled by its own package, so this anatomy binds no style.

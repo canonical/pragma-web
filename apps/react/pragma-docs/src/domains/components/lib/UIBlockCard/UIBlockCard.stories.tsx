@@ -79,18 +79,18 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * The matrix's IconButton: its tier, "IconButton ∈ Button", its class,
- * its summary, and its version and stage in the footer. The published
- * package does not render it alone, so it has no sidecar.
+ * The matrix's IconButton: its summary, its facts (its tier, the block it
+ * inherits from, "Button", and its version) and its stage as its status.
+ * The published package does not render it alone, so it has no specimen.
  */
 export const Default: Story = {};
 
-/** The Button, which the published package renders in the sidecar. */
+/** The Button, which the published package renders in the card's specimen. */
 export const WithExample: Story = {
   parameters: { relay: mockEntity(MOCK_UI_BLOCK_WITH_EXAMPLE) },
 };
 
-/** A pattern: no example, so no sidecar, and no home, so an inert title. */
+/** A pattern: no example, so no specimen, and no home, so an inert title. */
 export const Pattern: Story = {
   parameters: { relay: mockEntity({ __typename: "Pattern" }) },
 };

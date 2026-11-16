@@ -4,6 +4,7 @@ export * from "./Canvas/index.js";
 export * from "./CanvasSkipLink/index.js";
 export * from "./ChipLegend/index.js";
 export * from "./ClientOnly/index.js";
+export * from "./CopyButton/index.js";
 export * from "./CountLine/index.js";
 export * from "./DocumentLayout/index.js";
 export * from "./EntitySource/index.js";

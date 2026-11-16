@@ -4,7 +4,7 @@
  * seeded — or not — `HeadProvider`, and a static router over the app's
  * routes at the entity's address), so every section test exercises the
  * exact fragment fan-out production renders. The router, the site's homes
- * and its projection maps are there for the anatomy's and the relations'
+ * and its projection link provider are there for the anatomy's and the relations'
  * links, which build their hrefs through them.
  *
  * Lives in `__fixtures__` beside the captured record maps: imported by
@@ -19,10 +19,7 @@ import {
   RenderersProvider,
   RouterLink,
 } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionLinkProvider } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
@@ -79,10 +76,7 @@ export const entityPageAt = (
         )}
       >
         <HomesProvider homes={homes}>
-          <ProjectionsProvider
-            LinkComponent={RouterLink}
-            maps={defaultProjectionMaps}
-          >
+          <ProjectionLinkProvider LinkComponent={RouterLink}>
             {renderers === undefined ? (
               <SiteRenderers>
                 <ComponentEntityPage params={{ uri }} />
@@ -92,7 +86,7 @@ export const entityPageAt = (
                 <ComponentEntityPage params={{ uri }} />
               </RenderersProvider>
             )}
-          </ProjectionsProvider>
+          </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

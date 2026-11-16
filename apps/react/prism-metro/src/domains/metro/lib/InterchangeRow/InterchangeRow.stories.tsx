@@ -79,7 +79,8 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /**
- * Central Exchange: its name, linked to its page, and the word "interchange".
+ * Central Exchange: its mark, its name, linked to its page, and its
+ * platforms as a fact.
  */
 export const Default: Story = {};
 

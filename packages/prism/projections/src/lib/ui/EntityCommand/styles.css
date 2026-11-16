@@ -4,8 +4,8 @@
 
 @layer ds.components.global {
   /* A palette result on two lines of the context's primary text with 4px
-   * above and below them: the identity on the left, one vital on the second
-   * line at the right. */
+   * above and below them: the identity on the left, the kind and the status
+   * at the right. */
   .ds.entity-command {
     --entity-command-gap: var(--grid-gutter);
     --entity-command-padding-inline: var(--component-padding-inline);
@@ -20,10 +20,19 @@
       --typography-text-primary-bold-font-weight
     );
     --entity-command-context-color: var(--color-text-muted);
-    --entity-command-location-letter-spacing: var(
-      --typography-text-primary-smallcaps-letter-spacing
-    );
-    --entity-command-vital-color: var(--color-text-muted);
+    /* The mark is the 16px box every form gives it, centred on the first
+     * 24px line by the offset, and spaced from the title by the chip's
+     * gap. */
+    --entity-command-mark-size: var(--space-200);
+    --entity-command-mark-offset: var(--space-050);
+    --entity-command-mark-gap: var(--space-050);
+    --entity-command-prefix-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-command-prefix-font-family: ui-monospace, monospace;
+    --entity-command-address-color: var(--color-text-muted);
+    /* No typography token names a monospace face. */
+    --entity-command-address-font-family: ui-monospace, monospace;
+    --entity-command-aside-color: var(--color-text-muted);
     --entity-command-identifier-vertical-align: baseline;
     --entity-command-identifier-line-height: 0;
     /* The ring sits inside the title, which clips. */
@@ -34,7 +43,6 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--entity-command-gap);
     padding-inline: var(--entity-command-padding-inline);
     padding-block: var(--entity-command-padding-block);
     list-style: none;
@@ -57,19 +65,56 @@
     color: var(--entity-command-disabled-color);
   }
 
+  /* The mark sits on the first line, its 16px box centred in the 24px
+   * line, the chip's gap from the title; it never shrinks. */
+  .ds.entity-command .mark {
+    display: flex;
+    flex-shrink: 0;
+    /* A sign smaller than the box sits on its middle. */
+    align-items: center;
+    justify-content: center;
+    width: var(--entity-command-mark-size);
+    height: var(--entity-command-mark-size);
+    margin-block-start: var(--entity-command-mark-offset);
+    margin-inline-end: var(--entity-command-mark-gap);
+  }
+
+  /* What ends the row stands the row's gap from the identity. */
+  .ds.entity-command .aside {
+    margin-inline-start: var(--entity-command-gap);
+  }
+
   /* The identity and the title clip only along their line, so a chip in
-   * the title keeps its whole pill, and the line grows to hold it. */
+   * the title keeps its whole pill, and the line grows to hold it. The
+   * identity takes the free width, so what follows it ends the row. */
   .ds.entity-command .identity {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
     overflow-x: clip;
     min-width: 0;
+  }
+
+  /* The first line: the prefix, then the title, which takes what is left
+   * and truncates, so the line never wraps. */
+  .ds.entity-command .headline {
+    display: flex;
+    overflow-x: clip;
+    min-width: 0;
+  }
+
+  /* The foreign prefix, muted in monospace, keeps its whole width. */
+  .ds.entity-command .prefix {
+    flex-shrink: 0;
+    color: var(--entity-command-prefix-color);
+    font-family: var(--entity-command-prefix-font-family);
   }
 
   /* The title truncates on its line, as the second line does; linked, it
    * reads as the row's text, underlined on approach. */
   .ds.entity-command .title {
     overflow-x: clip;
+    min-width: 0;
     color: inherit;
     white-space: nowrap;
     text-decoration: none;
@@ -96,19 +141,32 @@
     text-overflow: ellipsis;
   }
 
-  .ds.entity-command .location {
-    font-variant-caps: all-small-caps;
-    letter-spacing: var(--entity-command-location-letter-spacing);
+  /* The full address on the second line, truncating rather than wrapping. */
+  .ds.entity-command .address {
+    overflow: hidden;
+    color: var(--entity-command-address-color);
+    font-family: var(--entity-command-address-font-family);
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
-  .ds.entity-command .vital {
-    align-self: flex-end;
-    color: var(--entity-command-vital-color);
-    text-align: end;
+  /* The end of the row beside an address, muted: the kind closes the first
+   * line, the status the second. */
+  .ds.entity-command .aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    align-self: stretch;
+    color: var(--entity-command-aside-color);
     white-space: nowrap;
   }
 
-  /* An identifier sets the monospace face on the row's line and stands on
+  .ds.entity-command .status {
+    display: flex;
+    margin-block-start: auto;
+  }
+
+  /* An identifier in the status sets the monospace face on the row's line and stands on
    * the sans text's baseline: its inline box takes no height, so the face's
    * other metrics never grow the line. */
   .ds.entity-command .identifier {

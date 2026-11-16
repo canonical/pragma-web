@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a291257d5add125ef473974e576f3d0d>>
+ * @generated SignedSource<<19c82cd85fa45c3cdd2b82b9cf895618>>
  * @lightSyntaxTransform
  */
 
@@ -14,11 +14,6 @@ export type CodeStandardCard_node$data = {
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: {
-      readonly _meta: {
-        readonly title: string;
-      };
-    };
   };
   readonly categories: {
     readonly edges: ReadonlyArray<{
@@ -44,21 +39,7 @@ var v0 = {
   "kind": "ScalarField",
   "name": "title",
   "storageKey": null
-},
-v1 = [
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
-    "selections": [
-      (v0/*:: as any*/)
-    ],
-    "storageKey": null
-  }
-];
+};
 return {
   "argumentDefinitions": [],
   "kind": "Fragment",
@@ -94,16 +75,6 @@ return {
           "kind": "ScalarField",
           "name": "curie",
           "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "OntologyClass",
-          "kind": "LinkedField",
-          "name": "type",
-          "plural": false,
-          "selections": (v1/*:: as any*/),
-          "storageKey": null
         }
       ],
       "storageKey": null
@@ -137,7 +108,20 @@ return {
               "kind": "LinkedField",
               "name": "node",
               "plural": false,
-              "selections": (v1/*:: as any*/),
+              "selections": [
+                {
+                  "alias": null,
+                  "args": null,
+                  "concreteType": "EntityMeta",
+                  "kind": "LinkedField",
+                  "name": "_meta",
+                  "plural": false,
+                  "selections": [
+                    (v0/*:: as any*/)
+                  ],
+                  "storageKey": null
+                }
+              ],
               "storageKey": null
             }
           ],
@@ -152,6 +136,6 @@ return {
 };
 })();
 
-(node as any).hash = "4afb5e843d6533fd3b39fae8fe6c05a1";
+(node as any).hash = "ee1b13302486abe713ad0b05ea401760";
 
 export default node;

@@ -13,10 +13,10 @@ import { MOCK_ZONE, resolveRoot } from "../../../../../testing/fixtures.js";
 import ZoneRow from "./ZoneRow.js";
 
 /**
- * The operation the SSR test renders ZoneRow under: one Zone, read through the
- * `node` field. The spread is aliased because that field is typed by an
- * interface, so a node of another type reads as null instead of as a key that
- * does not match.
+ * The operation the SSR test renders ZoneRow under: one Zone, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareSsrTestQuery = (): unknown => graphql`
   query ZoneRowSsrTestQuery @relay_test_operation {
@@ -27,7 +27,9 @@ const declareSsrTestQuery = (): unknown => graphql`
 `;
 void declareSsrTestQuery;
 
-/** Run the SSR test operation and render ZoneRow over the Zone it returns. */
+/**
+ * Run the SSR test operation and render ZoneRow over the Zone it returns.
+ */
 const ZoneRowSsrTestNode = (): ReactElement => {
   const data = useLazyLoadQuery<ZoneRowSsrTestQuery>(ssrTestQuery, {});
   const node = data.node?.ZoneRow_node;
@@ -56,6 +58,6 @@ describe("ZoneRow SSR", () => {
       createProjectionTree(environment, <ZoneRowSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-row ds zone-row"');
-    expect(html).not.toContain("<a");
+    expect(html).not.toContain("<a ");
   });
 });

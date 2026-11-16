@@ -1,0 +1,91 @@
+---
+# TokenSwatch (packages/prism/projections/src/lib/ui/TokenSwatch/): the
+# swatch depiction a token card's specimen holds, rendered as the child of
+# <EntityCard.Specimen kind="swatch" label="…">. Two halves, light | dark,
+# each a value well with its mode's name under it (catalog keys
+# "token.mode.light", "token.mode.dark"; the names are aria-hidden, the
+# Specimen's label carries both values). Stories only in W3 (resolution 10).
+#
+# Each half is a column holding its value well (.value) and, under it, its
+# mode's name (.mode), so the name sits on the specimen's well and never on
+# the token's colour, against which no contrast is known. The halves are two
+# flex items of equal basis and growth, not a two-column grid: the
+# package's stylesheet check admits no authored grid template. Each value
+# well is framed with a 1px border, as the token mark is, so a value near
+# the specimen's background still shows.
+#
+# The wells' classes are .in-light and .in-dark, not .light and .dark: those
+# name the design's themes, which no component stylesheet may address.
+#
+# Token ledger:
+#   --token-swatch-height: space.800              the media track's height
+#   --token-swatch-label-color: color.text.muted
+#   --token-swatch-label-padding: space.100 (8px)
+#   --token-swatch-border-width: 1px              literal: stroke has only primitives
+#   --token-swatch-border-color: color.border
+#   --token-swatch-value: token.swatch.value      the inline channel, per well
+#     (TokenSwatchChannelStyle in types.ts)
+node:
+  uri: prism.component.token_swatch
+  element: span
+  styles:
+    layout.type: flex
+    size.width: 100%
+    size.min.height: space.800
+  edges:
+    - node:
+        role: in-light
+        styles:
+          layout.type: flex
+          layout.direction: column
+          layout.flex.grow: 1
+          layout.flex.basis: 0
+        edges:
+          - node:
+              role: value
+              styles:
+                layout.flex.grow: 1
+                appearance.background: token.swatch.value
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border
+            relation: { cardinality: "1", slotName: value }
+          - node:
+              role: mode
+              attributes: { aria-hidden: "true" }
+              styles:
+                typography.color: color.text.muted
+                spacing.internal.block.start: space.100
+                spacing.internal.block.end: space.100
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+            relation: { cardinality: "1", slotName: mode }
+      relation: { cardinality: "1", slotName: in-light }
+    - node:
+        role: in-dark
+        styles:
+          layout.type: flex
+          layout.direction: column
+          layout.flex.grow: 1
+          layout.flex.basis: 0
+        edges:
+          - node:
+              role: value
+              styles:
+                layout.flex.grow: 1
+                appearance.background: token.swatch.value
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border
+            relation: { cardinality: "1", slotName: value }
+          - node:
+              role: mode
+              attributes: { aria-hidden: "true" }
+              styles:
+                typography.color: color.text.muted
+                spacing.internal.block.start: space.100
+                spacing.internal.block.end: space.100
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+            relation: { cardinality: "1", slotName: mode }
+      relation: { cardinality: "1", slotName: in-dark }

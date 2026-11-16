@@ -1,9 +1,11 @@
 ---
 # OntologyClassRow: an ontology class as a 32px list entry.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 547:2201 (the classes row's
-# list entries: "ds:" muted before "UIBlock", and "abstract" muted at the
-# end of an abstract class). The prefix is the compact address's, with its
-# colon; the word renders only for an abstract class.
+# Reference: the W3 row anatomy: the slot order mark, prefix, title, kind,
+# summary, facts, status; a class fills the mark (the class glyph), the
+# prefix (the compact address's, shown only off the page's ambient
+# namespace), the title, in a row opted into two lines the summary (its
+# definition), and the status (the word "abstract", for an abstract class
+# alone). A typed row gives no kind: its mark says the type.
 # Projected onto EntityRow, which carries every style: this anatomy binds
 # none. The home is the link the title renders through, resolved from the
 # compact address; a class without one reads as inert text.
@@ -16,19 +18,23 @@ node:
         uri: prism.component.entity_row
         edges:
           - node:
-              role: location
-              projection:
-                field: _meta.curie
-              # The prefix is set in the identifier face.
+              role: mark
+              # The class glyph, a published Icon (CLASS_MARK_ICON).
               edges:
                 - node:
-                    role: identifier
+                    uri: global.component.icon
                   relation:
                     cardinality: "1"
-                    slotName: identifier
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
+              projection:
+                field: _meta.curie
             relation:
               cardinality: "0..1"
-              slotName: location
+              slotName: prefix
           - node:
               role: title
               projection:
@@ -44,11 +50,18 @@ node:
               cardinality: "1"
               slotName: title
           - node:
-              role: meta
+              role: summary
+              projection:
+                field: definition
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+          - node:
+              role: status
               projection:
                 field: isAbstract
             relation:
               cardinality: "0..1"
-              slotName: meta
+              slotName: status
       relation:
         cardinality: "1"

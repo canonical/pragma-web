@@ -17,10 +17,12 @@
  * selection drills into it stops at the overview's floor, on a window that
  * cuts no class; a term page of a class in the largest namespace draws
  * it within the drawn nodes and the band; a pick in the rail keeps the
- * chips, the search and the zoom; and the inspector's field rows put their ranges on one column
- * line. Where the map does not fit the canvas at the legible floor, it
- * opens at the map's top-left corner at that floor: the first shelf's
- * boxes whole where they fit, a box the window's edge crosses cut there.
+ * chips, the search and the zoom; the inspector's field rows put their
+ * ranges on one column line; and, the lens declaring no namespace, every
+ * instance chip of a term's page writes its prefix. Where the map does
+ * not fit the canvas at the legible floor, it opens at the map's top-left
+ * corner at that floor: the first shelf's boxes whole where they fit, a
+ * box the window's edge crosses cut there.
  * A namespace's box is a link, by pointer and by keyboard, to the page
  * drilled into it (`expand=`), whose heading leads back to the overview;
  * that page opens by the overview's rule, at the legible floor from the
@@ -53,6 +55,7 @@ import {
   CAMERA_SETTLE_MS,
   DEFINITIONS_PATHS,
   GRAPH_NODE_TEXT_INSET,
+  INSTANCES_TERM,
   MIN_SCREEN_TEXT_PX,
   PAGE_SETTLE_MS,
   PREVIEW_READY_MS,
@@ -383,6 +386,34 @@ describe.each([...VIEWPORTS, ...SHORT_DESKTOP_VIEWPORTS])(
 
 describe("at 1440 px", () => {
   const [desktop] = VIEWPORTS;
+
+  // The Definitions lens lists terms of several namespaces and declares
+  // none, so every instance chip of a term's inspector writes its prefix,
+  // the site's own `ds:` included.
+  it("writes each instance chip's prefix on a term's page", async () => {
+    let instances: readonly { prefix: string; address: string }[] = [];
+    const { errors } = await openExplorer(
+      `/definitions/${encodeURIComponent(INSTANCES_TERM)}`,
+      desktop,
+      async (page) => {
+        instances = await page
+          .locator(".ds.term-inspector .ds.instance-item")
+          .evaluateAll((items) =>
+            items.map((item) => ({
+              prefix:
+                item.querySelector(".ds.entity-chip .prefix")?.textContent ??
+                "",
+              address: item.querySelector("code")?.textContent ?? "",
+            })),
+          );
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(instances.length).toBeGreaterThan(0);
+    for (const { prefix, address } of instances) {
+      expect(prefix, address).toBe(`${address.split(":").at(0)}:`);
+    }
+  });
 
   it("keeps every class in view labelled and none cut when a chip hides some and the camera refits", async () => {
     const { errors, measure } = await openExplorer(

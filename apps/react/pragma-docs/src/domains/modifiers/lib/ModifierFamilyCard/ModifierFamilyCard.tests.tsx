@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -72,11 +73,12 @@ const renderWithNode = (
   );
 };
 
-/** Read each key value of a card as its key and its value. */
-const readPairs = (container: HTMLElement): string[][] =>
-  [...container.querySelectorAll(".pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent ?? "",
-    pair.querySelector(".value")?.textContent ?? "",
+/** Read each fact of a card as its property, its term and its detail. */
+const readFacts = (container: HTMLElement): (string | null)[][] =>
+  [...container.querySelectorAll(".fact")].map((fact) => [
+    fact.getAttribute("data-property"),
+    fact.querySelector(".term")?.textContent ?? null,
+    fact.querySelector(".detail")?.textContent ?? null,
   ]);
 
 describe("ModifierFamilyCard", () => {
@@ -94,22 +96,21 @@ describe("ModifierFamilyCard", () => {
     const { container } = renderWithNode((node) => (
       <ModifierFamilyCard node={node} />
     ));
+    const card = container.querySelector(".ds.modifier-family-card");
     expect(
-      [
-        ...container.querySelectorAll(
-          ".location, .title, .kind, .summary, .vital",
-        ),
-      ].map((slot) => slot.textContent),
-    ).toEqual([
-      "ds",
-      "Anticipation",
-      "Modifier family",
-      MOCK_MODIFIER_FAMILY.summary,
-      "5 modifiers",
-    ]);
-    expect(readPairs(container)).toEqual([["Members", "5"]]);
-    expect(container.querySelector(".sidecar")).toBeNull();
+      [...(card?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual(["ds:", "Anticipation", MOCK_MODIFIER_FAMILY.summary]);
+    expect(readFacts(container)).toEqual([["modifiers", "Members", "5"]]);
+    expect(card?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/bundle.svg#bundle",
+    );
+    expect(card?.querySelector(".address, .kind, .status")).toBeNull();
+    expect(card?.querySelector(".specimen")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+    if (card) expectSlotOrder(card);
   });
 
   it("renders the first paragraph of its Markdown summary, its links kept", () => {
@@ -117,44 +118,37 @@ describe("ModifierFamilyCard", () => {
       (node) => <ModifierFamilyCard node={node} />,
       {
         summary:
-          "A default [Badge](https://example.com/badge) is used informationally.\n  \nA second paragraph.",
+          "The [anticipation](https://example.com/anticipation) family groups modifiers.\n\nIt has five.",
       },
     );
     const summary = container.querySelector(".summary");
     expect(summary?.textContent).toBe(
-      "A default Badge is used informationally.",
+      "The anticipation family groups modifiers.",
     );
     expect(summary?.querySelector("a")).toHaveAttribute(
       "href",
-      "https://example.com/badge",
+      "https://example.com/anticipation",
     );
     expect(summary?.querySelector("p")).toBeNull();
   });
 
-  it("counts one member in the singular", () => {
+  it("counts no member, and leaves out the slots a family with no prefix or summary has no data for", () => {
     const { container } = renderWithNode(
       (node) => <ModifierFamilyCard node={node} />,
       {
-        modifiers: { edges: [{ node: { uri: "ds:global.modifier.danger" } }] },
-      },
-    );
-    expect(readPairs(container)).toEqual([["Members", "1"]]);
-    expect(container.querySelector(".vital")?.textContent).toBe("1 modifier");
-  });
-
-  it("leaves out the slots a family with no prefix or summary has no data for", () => {
-    const { container } = renderWithNode(
-      (node) => <ModifierFamilyCard node={node} />,
-      {
-        summary: "",
         _meta: {
           ...MOCK_MODIFIER_FAMILY._meta,
           curie: "https://ds.canonical.com/global.modifier_family.anticipation",
         },
+        summary: "",
+        modifiers: { edges: [] },
       },
     );
-    expect(container.querySelector(".location")).toBeNull();
-    expect(container.querySelector(".summary")).toBeNull();
+    expect(readFacts(container)).toEqual([["modifiers", "Members", "0"]]);
+    for (const slot of [".prefix", ".summary", ".status", ".specimen"]) {
+      expect(container.querySelector(slot), slot).toBeNull();
+    }
+    expect(container.querySelector(".title")?.textContent).toBe("Anticipation");
   });
 
   it("applies custom className", () => {

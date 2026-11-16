@@ -72,3 +72,12 @@ export const CLOSE_ICON_PATH = "/icons/close.svg";
 
 /** The fragment of `CLOSE_ICON_PATH` holding the glyph itself. */
 export const CLOSE_ICON_ID = "close";
+
+/**
+ * The indexes drawn as rows by default, none of which opts its rows into
+ * two lines: the stations and the fleet.
+ */
+export const ROWS_PATHS = ["/stations", "/fleet"] as const;
+
+/** An index's rows, in the canvas. */
+export const INDEX_ROW_SELECTOR = "main.ds.canvas .ds.entity-row";

@@ -10,8 +10,11 @@ import {
 } from "@canonical/prism-core/testing";
 import type { ReaderFragment, ReaderSelection } from "relay-runtime";
 import { describe, expect, it } from "vitest";
-import { siteProjectionMaps } from "../../lib/ui/constants.js";
-import type { SiteProjectionMaps } from "../../lib/ui/types.js";
+import { DOCS_CARD_TYPES } from "../../lib/ui/DocsCardProjection/constants.js";
+import { DOCS_CHIP_TYPES } from "../../lib/ui/DocsChipProjection/constants.js";
+import { DOCS_COMMAND_TYPES } from "../../lib/ui/DocsCommandProjection/constants.js";
+import { DOCS_GRAPH_NODE_TYPES } from "../../lib/ui/DocsGraphNodeProjection/constants.js";
+import { DOCS_ROW_TYPES } from "../../lib/ui/DocsRowProjection/constants.js";
 
 /** The app's root, three levels up from this file. */
 const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
@@ -33,15 +36,28 @@ const FRAGMENT_MODULES = import.meta.glob<{ default: ReaderFragment }>(
 );
 
 /**
+ * Every compiled peek query of the app, by the artifact's file name: a peek
+ * projects on the root `Query` type through an operation of its own.
+ */
+const PEEK_QUERY_MODULES = import.meta.glob<{
+  default: { fragment: ReaderFragment };
+}>("../../relay/__generated__/*PeekQuery.graphql.ts", { eager: true });
+
+/**
  * Read the compiled fragment a component's projection reads: `<Name>_query`
- * for a projection on the root `Query` type, `<Name>_node` for any other.
+ * for a projection on the root `Query` type, or the reader of its own
+ * `<Name>Query` operation for a peek, and `<Name>_node` for any other.
  *
  * @throws When the app compiled no such fragment.
  */
 function readNodeFragment(folder: string, on?: string): ReaderFragment {
   const name = `${basename(folder)}_${on === "Query" ? "query" : "node"}`;
   const path = `../../relay/__generated__/${name}.graphql.ts`;
-  const fragment = FRAGMENT_MODULES[path]?.default;
+  const fragment =
+    FRAGMENT_MODULES[path]?.default ??
+    PEEK_QUERY_MODULES[
+      `../../relay/__generated__/${basename(folder)}Query.graphql.ts`
+    ]?.default.fragment;
   if (fragment === undefined) {
     throw new Error(`${folder}: the app compiled no ${name}`);
   }
@@ -145,16 +161,16 @@ function readCompositeArms(
   );
 }
 
-/** The site's dispatcher of each form, by the form's key in its maps. */
-const SITE_DISPATCHERS: readonly (readonly [
-  keyof SiteProjectionMaps,
+/** The site's switch of each form, by the form's word, with its cases. */
+const SITE_SWITCHES: readonly (readonly [
   string,
+  Readonly<Record<string, true>>,
 ])[] = [
-  ["chip", "Chip"],
-  ["row", "Row"],
-  ["card", "Card"],
-  ["command", "Command"],
-  ["graphNode", "GraphNode"],
+  ["Chip", DOCS_CHIP_TYPES],
+  ["Row", DOCS_ROW_TYPES],
+  ["Card", DOCS_CARD_TYPES],
+  ["Command", DOCS_COMMAND_TYPES],
+  ["GraphNode", DOCS_GRAPH_NODE_TYPES],
 ];
 
 /** The app's component folders, with their private subcomponents. */
@@ -187,6 +203,12 @@ describe("the app's projections", () => {
       "ComponentHeader",
       "ComponentProperties",
       "ComponentRelations",
+      "DocsCardProjection",
+      "DocsChipProjection",
+      "DocsCommandProjection",
+      "DocsGraphNodeProjection",
+      "DocsPeek",
+      "DocsRowProjection",
       "ModifierCard",
       "ModifierChip",
       "ModifierCommand",
@@ -197,11 +219,6 @@ describe("the app's projections", () => {
       "ModifierFamilyRow",
       "ModifierGraphNode",
       "ModifierRow",
-      "SiteCardProjection",
-      "SiteChipProjection",
-      "SiteCommandProjection",
-      "SiteGraphNodeProjection",
-      "SiteRowProjection",
       "UIBlockCard",
       "UIBlockChip",
       "UIBlockCommand",
@@ -224,19 +241,20 @@ describe("the app's projections", () => {
 });
 
 describe("the site's composites", () => {
-  it.each(SITE_DISPATCHERS)(
-    "the %s composite arms exactly what its map and its anatomy arm",
-    (form, word) => {
-      const name = `Site${word}Projection`;
+  it.each(SITE_SWITCHES)(
+    "the Docs %s composite arms exactly what its cases and its anatomy arm",
+    (word, types) => {
+      const name = `Docs${word}Projection`;
       const arms = readCompositeArms(
         readNodeFragment(join(APP_ROOT, "src", "lib", "ui", name)),
       );
       expect(arms.get("Node")).toEqual([`${word}Projection_node`]);
-      const types = siteProjectionMaps[form].types;
       const typed = [...arms.keys()].filter((alias) => alias !== "Node");
       expect(typed.sort()).toEqual(Object.keys(types).sort());
-      for (const [alias, Arm] of Object.entries(types)) {
-        expect(arms.get(alias), alias).toEqual([`${Arm.name}_node`]);
+      for (const alias of typed) {
+        expect(arms.get(alias), alias).toEqual([
+          expect.stringMatching(new RegExp(`${word}_node$`)),
+        ]);
       }
       const { root } = assertAnatomy(join(APP_ROOT, "src", "lib", "ui", name));
       const cases = (root.edges ?? []).flatMap(({ target }) =>

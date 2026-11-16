@@ -1,0 +1,11 @@
+---
+# SiteGraphNodeSlot: the site's graph node switch as the package's graph node switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to MetroGraphNodeProjection,
+# whose case renders the root.
+node:
+  uri: metro.component.site_graph_node_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: metro.component.metro_graph_node_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

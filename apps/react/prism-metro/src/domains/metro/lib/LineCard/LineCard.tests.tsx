@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { expectSlotOrder } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
@@ -75,13 +76,6 @@ const renderWithNode = (
   );
 };
 
-/** Read each key value of the card as its key and its value's text. */
-const readPairs = (container: HTMLElement): (string | null)[][] =>
-  [...container.querySelectorAll(".pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent ?? null,
-    pair.querySelector(".value")?.textContent ?? null,
-  ]);
-
 describe("LineCard", () => {
   it("reads the Line through its fragment", () => {
     const { container } = renderWithNode((node) => <LineCard node={node} />);
@@ -91,39 +85,63 @@ describe("LineCard", () => {
     );
   });
 
-  it("fills the card's heading from the line, in the anatomy's order", () => {
+  it("leaves its mark uncoloured for a colour the gate refuses", () => {
+    const { container } = renderWithNode((node) => <LineCard node={node} />, {
+      colour: "red; background: url(https://example.com/x)",
+    });
+    const mark = container.querySelector<HTMLElement>(".mark .swatch-mark");
+    expect(mark).not.toBeNull();
+    expect(mark?.style.getPropertyValue("--swatch-mark-colour")).toBe("");
+    expect(container.innerHTML).not.toContain("url(");
+  });
+
+  it("fills the card's slots from the line, in the anatomy's order", () => {
     const { container } = renderWithNode((node) => <LineCard node={node} />);
+    const root = container.querySelector(".ds.line-card");
     expect(
-      [...container.querySelectorAll(".location, .title, .kind, .summary")].map(
+      root
+        ?.querySelector<HTMLElement>(".mark .swatch-mark")
+        ?.style.getPropertyValue("--swatch-mark-colour"),
+    ).toBe("#c8102e");
+    expect(
+      [...(root?.querySelectorAll(".prefix, .title, .summary") ?? [])].map(
         (slot) => slot.textContent,
       ),
     ).toEqual([
+      "metro:",
       "North Line",
-      "Line",
       "Northgate to Marsh End, via the old cutting.",
     ]);
-  });
-
-  it("counts its stops and names the ends of a line run end to end", () => {
-    const { container } = renderWithNode((node) => <LineCard node={node} />);
-    expect(readPairs(container)).toEqual([
-      ["Stops", "5"],
-      ["Ends", "Northgate to Marsh End"],
+    expect(
+      [...(root?.querySelectorAll(".fact") ?? [])].map((fact) => [
+        fact.getAttribute("data-property"),
+        fact.querySelector(".detail")?.textContent,
+      ]),
+    ).toEqual([
+      ["servedBy", "5"],
+      ["routes", "Northgate to Marsh End"],
     ]);
-    expect(container.querySelector(".footer")).toBeNull();
+    for (const slot of [".address", ".kind", ".status", ".specimen"]) {
+      expect(root?.querySelector(slot), slot).toBeNull();
+    }
+    if (root) expectSlotOrder(root);
+    expect(screen.getByRole("link", { name: "North Line" })).toHaveAttribute(
+      "href",
+      "/network/lines/metro%3Anorth-line",
+    );
   });
 
-  it("carries no ends and the vital loop for a loop", () => {
+  it("names no ends for a loop and states the loop as its status", () => {
     const { container } = renderWithNode(
       (node) => <LineCard node={node} />,
       MOCK_LOOP_LINE,
     );
-    expect(readPairs(container)).toEqual([["Stops", "6"]]);
     expect(
-      [...container.querySelectorAll(".vital")].map(
-        (vital) => vital.textContent,
+      [...container.querySelectorAll(".fact")].map((fact) =>
+        fact.getAttribute("data-property"),
       ),
-    ).toEqual(["loop"]);
+    ).toEqual(["servedBy"]);
+    expect(container.querySelector(".status")?.textContent).toBe("loop");
     expect(container.querySelector(".summary")).toBeNull();
   });
 
@@ -131,16 +149,14 @@ describe("LineCard", () => {
     const { container } = renderWithNode((node) => <LineCard node={node} />, {
       routes: [],
     });
-    expect(readPairs(container)).toEqual([["Stops", "5"]]);
-    expect(container.querySelector(".footer")).toBeNull();
+    expect(
+      [...container.querySelectorAll(".fact")].map((fact) =>
+        fact.getAttribute("data-property"),
+      ),
+    ).toEqual(["servedBy"]);
+    expect(container.querySelector(".status")).toBeNull();
   });
 
-  it("links its title to the line's page", () => {
-    renderWithNode((node) => <LineCard node={node} />);
-    expect(
-      screen.getByRole("link", { name: "North Line" }).getAttribute("href"),
-    ).toBe("/network/lines/metro%3Anorth-line");
-  });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <LineCard className="custom-class" node={node} />

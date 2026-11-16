@@ -2,10 +2,11 @@
 # EntityRow — the list entry of an entity: a 32px row in an index.
 # Reference: the projection matrix's in-page list entry (the namespace prefix
 # muted, the title, and a muted word right-aligned, on a 24px line with 4px
-# block insets). Slot order: mark, location, title, then meta at the end.
+# block insets).
 #
 # The mark is a small sign that leads the identity, such as a swatch of the
-# entity's colour, drawn and styled by the projection that fills it. The
+# entity's colour, drawn by the projection that fills it in the 16px box
+# every form gives it, centred on the identity's line (a flex line). The
 # row hides it from assistive technology, so the row's name is its title
 # alone, and spaces it from the text after it by the chip's gap, 4px.
 #
@@ -16,23 +17,54 @@
 # the row sets none, so its text sits on the column line of the list that
 # holds it.
 #
-# When the identity and the meta do not fit on one line, as on a phone,
-# the row wraps: the meta moves to a line of its own under the identity,
-# flush left, with no space between the two lines (the row is then 56px),
-# and a title longer than its line wraps between its words rather than
-# being cut, so the title is always whole. The meta stays on its one line
-# and clips at its end with an ellipsis only when it alone is longer than
-# the row; the whole word stays in the text. The identity clips along its
-# line only, for a single word longer than the row, so nothing it holds is
-# cut above or below: a chip in the title is 28px, and its line grows to
-# hold it (the row is then 36px).
+# The row's height comes from `lines` alone (heuristic 2.4): the first
+# line never wraps, so a one-line row is 32px whatever its width, and the
+# summary is the only second line, rendered only when lines="two" (56px),
+# whether or not the entity has a summary: empty, it keeps a line's height
+# (min-height space.300), so a two-line row with no summary is 56px like its
+# neighbours. A row that holds one wraps (`:has(> .summary)`), and only it.
+# In a row the title yields last. The identity is a flex line whose basis
+# is its content (flex 0 1 auto) and which never wraps. The facts have no
+# basis: they grow up to their content (max-width: max-content) from the
+# width the identity leaves, so when the row is
+# narrow they give way first, down to nothing; only
+# then does the identity shrink, and its title ends in an ellipsis while
+# the mark, the prefix and the kind keep their widths. The status keeps its
+# width. The width left over is the identity's end margin (auto), so the
+# facts and the status end the row as one group. Below two
+# groups (the shell's container query at 912px) the facts after the first
+# leave, so the first line keeps its first fact alone. A fact is shown
+# whole or not at all: the facts are a wrapping flex line in a box one line
+# high (space.300) that clips, so a fact with no room on the first line
+# moves to the second, which the box hides, the last fact first, and no
+# label or value is ever cut. The first line opens with an empty item, the
+# start, of no width and a line high: a line always holds its first item,
+# so without it the first fact could not leave, and with it the first line
+# keeps its height when every fact has left. The row sets no gap between
+# its slots: each fact stands the gutter from what comes before it, inside
+# the facts' box, and the status stands the gutter before it, so the gap
+# leaves with the last fact and a row whose facts have all left gives its
+# title the row's whole width. Everything clips along its line only, so a chip in the title
+# keeps its whole 28px pill and its line grows to hold it.
+#
+# A two-line row wraps, and a wrapping flex line is broken by its items'
+# bases: an identity with a content basis wider than the row less the
+# status would push the status onto a line of its own and the summary
+# onto a third. So in a two-line row (`:has(> .summary)`, a reflow) the
+# identity's basis is small, the mark's box (space.200), it grows up to its
+# content, and it takes the free width a thousand times faster than the
+# facts, which is the same order of yielding: the first line holds every
+# slot but the summary. The basis is never 0: the row sets no gap, so an
+# identity of no basis, beside facts that have all left and no status,
+# would leave room for the summary, a whole line, on the first line, and
+# the identity would get no width.
 #
 # The row may be narrower than its content (`size.min.width: 0`): as a
 # grid item or flex item its minimum would otherwise be its content's, so a
 # long identity would widen the track that holds the row past its column
 # instead of wrapping.
 #
-# An identifier in the location, a `<code class="identifier">`, sets the
+# An identifier in a fact, a `<code class="identifier">`, sets the
 # monospace face on the row's line and stands on the sans text's baseline:
 # it is aligned to the baseline, so its glyphs share the line the title's
 # stand on, and its own line height is 0, so its inline box takes no height
@@ -59,11 +91,13 @@
 #                                      the link's ring, drawn inside it since the identity clips.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
-#   space.0 for the gap between a wrapped row's lines: the meta reads with
+#   space.0 for the gap between a wrapped row's lines: the summary reads with
 #   the identity above it, its lines the 24px line apart.
 #   layout.wrap wrap, typography.whiteSpace normal and nowrap,
-#   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
-#   size.min.width 0 lets the identity and the meta shrink to the row.
+#   layout.overflow and layout.overflow.inline clip, typography.overflow
+#   ellipsis: keywords; space.300 again for the facts' box and its start,
+#   one line high;
+#   size.min.width 0 lets the identity and the facts shrink to the row.
 #   --entity-row-identifier-vertical-align: baseline,
 #   --entity-row-identifier-line-height: 0
 #                                      the identifier on the text's baseline,
@@ -73,15 +107,40 @@
 # Roster namespaces (accepted and tracked): grid.gutter, space.0,
 # space.050, space.300 (a line height), and the semantic typography symbol
 # typography.text.primary.fontSize.
+# The identity slots (heuristic 4.1), in their order: mark, prefix, title,
+# kind, summary, facts, status (address is not shown in a row). The
+# summary is the second line of a row an index opts into two lines
+# (lines="two", 56px): it is rendered only then, ordered after every slot
+# of the first line and spanning the row. Each fact cell names its
+# property in data-property (Annex D). A space stands between a fact's
+# label and value and before each later fact, so a reader and a copy keep
+# them apart; the fact is a flex line, so the spaces take no width and its
+# margins alone space it. The row stays a flex line
+# rather than a subgrid: its lists do not lay their rows on a subgrid.
+#
+# Token ledger (the identity slots):
+#   --entity-row-prefix-font-family: ui-monospace, monospace   literal: no mono token
+#   --entity-row-summary-basis: 100%    literal: the second line spans the row
+#   --entity-row-summary-order: 1       literal: after every first-line slot
+#   prefix, kind, summary and fact labels: color.text.muted
+#   space.050 between the prefix, the title and the kind, and a fact's
+#   label and value; grid.gutter before each fact and the status.
+#   @container shell (width < 912px)   below two groups: the facts after
+#                                      the first leave the line.
+#   --entity-row-identity-grow-weight: 1000   literal: in a two-line row
+#                                      the identity takes the free width
+#                                      before the facts (a
+#                                      number, read only by the reflow).
+#   layout.flex.basis auto, 0 and space.200, layout.flex.grow 0 and 1,
+#   size.max.width max-content, spacing.external.inline.end auto:
+#   keywords and numbers of the yielding order.
 node:
   uri: prism.component.entity_row
   styles:
     layout.type: flex
-    layout.align: baseline
-    layout.justify: space-between
-    layout.wrap: wrap
+    layout.align: center
+    layout.wrap: nowrap
     size.min.width: 0
-    spacing.gap.inline: grid.gutter
     spacing.gap.block: space.0
     spacing.internal.block.start: space.050
     spacing.internal.block.end: space.050
@@ -92,31 +151,43 @@ node:
     - node:
         role: identity
         styles:
+          layout.type: flex
+          layout.flex.grow: 0
+          layout.flex.shrink: 1
+          layout.flex.basis: auto
+          layout.align: center
           layout.overflow.inline: clip
           size.min.width: 0
-          typography.overflow: ellipsis
-          typography.whiteSpace: normal
+          spacing.external.inline.end: auto
+          typography.whiteSpace: nowrap
         edges:
+          # The mark centres its sign on both axes in its 16px box, so a sign
+          # smaller than the box, such as a line's swatch, sits on its middle.
           - node:
               role: mark
               styles:
+                layout.type: flex
+                layout.flex.shrink: 0
+                layout.align: center
+                layout.justify: center
+                size.width: space.200
+                size.height: space.200
                 spacing.external.inline.end: space.050
             relation: { cardinality: "0..1", slotName: mark }
           - node:
-              role: location
+              role: prefix
               styles:
+                layout.flex.shrink: 0
+                spacing.external.inline.end: space.050
                 typography.color: color.text.muted
-              edges:
-                - node:
-                    role: identifier
-                    styles:
-                      layout.verticalAlign: baseline
-                      typography.lineHeight: 0
-                  relation: { cardinality: "0..*", slotName: identifier }
-            relation: { cardinality: "0..1", slotName: location }
+                typography.fontFamily: "ui-monospace, monospace"
+            relation: { cardinality: "0..1", slotName: prefix }
           - node:
               role: title
               styles:
+                layout.overflow.inline: clip
+                size.min.width: 0
+                typography.overflow: ellipsis
                 typography.color: inherit
                 typography.decoration: none
                 typography.decoration@hover: underline
@@ -125,14 +196,83 @@ node:
                 appearance.outline.color@focus: color.focusRing
                 appearance.outline.offset@focus: -2px
             relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              styles:
+                layout.flex.shrink: 0
+                spacing.external.inline.start: space.050
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: kind }
       relation: { cardinality: "1", slotName: identity }
     - node:
-        role: meta
+        role: summary
         styles:
-          typography.color: color.text.muted
-          typography.align: end
-          typography.whiteSpace: nowrap
-          layout.overflow.inline: clip
+          layout.order: 1
+          layout.flex.basis: 100%
           size.min.width: 0
+          size.min.height: space.300
+          layout.overflow: hidden
+          typography.color: color.text.muted
+          typography.whiteSpace: nowrap
           typography.overflow: ellipsis
-      relation: { cardinality: "0..1", slotName: meta }
+      relation: { cardinality: "0..1", slotName: summary }
+    - node:
+        role: facts
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.flex.grow: 1
+          layout.flex.basis: 0
+          size.max.width: max-content
+          size.height: space.300
+          layout.overflow: clip
+          size.min.width: 0
+          typography.whiteSpace: nowrap
+        edges:
+          # The first line's start: an empty item of no width, a line high.
+          - node:
+              role: start
+              styles:
+                layout.flex.shrink: 0
+                size.height: space.300
+            relation: { cardinality: "1", slotName: start }
+          - switch:
+              on: internal
+              cases:
+                - node:
+                    role: fact
+                    attributes: { data-property: "{property}" }
+                    styles:
+                      layout.type: flex
+                      spacing.external.inline.start: grid.gutter
+                    edges:
+                      - node:
+                          role: term
+                          styles:
+                            spacing.external.inline.end: space.050
+                            typography.color: color.text.muted
+                        relation: { cardinality: "1", slotName: term }
+                      - node:
+                          role: detail
+                          edges:
+                            - node:
+                                role: identifier
+                                styles:
+                                  layout.verticalAlign: baseline
+                                  typography.lineHeight: 0
+                              relation: { cardinality: "0..*", slotName: identifier }
+                        relation: { cardinality: "1", slotName: detail }
+                # Every fact after the first: below two groups it leaves
+                # the line.
+                - node:
+                    role: later fact (.is-later)
+                    attributes: { data-property: "{property}" }
+            relation: { cardinality: "1..*", slotName: fact }
+      relation: { cardinality: "0..1", slotName: facts }
+    - node:
+        role: status
+        styles:
+          layout.type: flex
+          layout.flex.shrink: 0
+          spacing.external.inline.start: grid.gutter
+      relation: { cardinality: "0..1", slotName: status }

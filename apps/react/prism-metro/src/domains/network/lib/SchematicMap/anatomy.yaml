@@ -11,7 +11,8 @@
 # module, not CSS. Paint goes through currentColor: each slot sets `color`
 # and its shapes fill or stroke with currentColor, since the style-key
 # roster has no fill or stroke key. A track's stroke is its line's colour
-# from the graph: data, not a design decision.
+# from the graph, through the colour gate: data, not a design decision; a
+# colour the gate refuses leaves the track in currentColor.
 #
 # The drawing lies in prism-core's GraphCanvas, which owns the floor, the
 # 16px dot lattice, the fit and the pan and zoom. Every station, interchange
@@ -43,7 +44,8 @@ node:
   edges:
     - node:
         role: line track
-        # one <path> per drawn track, stroked in its line's colour
+        # one <path> per drawn track, stroked in its line's colour through
+        # the colour gate, or in currentColor when the gate refuses it
       relation: { cardinality: "1..*", slotName: track }
     - node:
         role: station mark

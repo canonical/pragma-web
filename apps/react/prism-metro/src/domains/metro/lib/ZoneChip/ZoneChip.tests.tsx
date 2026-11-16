@@ -1,7 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { render, screen } from "@testing-library/react";
-import type { ReactElement } from "react";
+import { RouterLink } from "@canonical/prism-core";
+import { expectSlotOrder } from "@canonical/prism-core/testing";
+import {
+  AmbientNamespaceProvider,
+  ProjectionLinkProvider,
+} from "@canonical/prism-projections";
+import { fireEvent, render, screen } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -14,8 +20,8 @@ import type { ZoneChipProps } from "./types.js";
 import ZoneChip from "./ZoneChip.js";
 
 /**
- * The operation the tests render ZoneChip under: one Zone, read through the
- * `node` field. The spread is aliased because that field is typed by an
+ * The operation the tests render ZoneChip under: one Zone, read through
+ * the `node` field. The spread is aliased because that field is typed by an
  * interface, so a node of another type reads as null instead of as a key that
  * does not match.
  */
@@ -46,8 +52,8 @@ const ZoneChipTestNode = ({
 };
 
 /**
- * Render `children` with the key of the Zone a Relay mock environment answers,
- * under the site's providers: `entity` over the Central Zone, as the graph's
+ * Render `children` with the key of the Zone a Relay mock environment
+ * answers, under the site's providers: `entity` over Central Zone, as the graph's
  * dataset holds it.
  */
 const renderWithNode = (
@@ -71,6 +77,19 @@ const renderWithNode = (
   );
 };
 
+/**
+ * Wrap `children` in a projection provider whose peek records the address
+ * each chip asks it for, and renders that address as a link to look for.
+ */
+const withRecordingPeek = (
+  peek: (uri: string) => ReactNode,
+  children: ReactElement,
+): ReactElement => (
+  <ProjectionLinkProvider LinkComponent={RouterLink} peek={peek}>
+    {children}
+  </ProjectionLinkProvider>
+);
+
 describe("ZoneChip", () => {
   it("reads the Zone through its fragment", () => {
     const { container } = renderWithNode((node) => <ZoneChip node={node} />);
@@ -80,24 +99,68 @@ describe("ZoneChip", () => {
     );
   });
 
-  it("fills the pill with the zone's name", () => {
-    const { container } = renderWithNode((node) => <ZoneChip node={node} />);
-    expect(container.querySelector(".value")?.textContent).toBe("Central Zone");
-  });
-
   it("reads as inert text, since a fare zone has no home on this site", () => {
     const { container } = renderWithNode((node) => <ZoneChip node={node} />);
     expect(container.querySelector("a")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Central Zone");
   });
 
-  it("takes a passage's link text in place of the name", () => {
+  it("leads with its mark, then its prefix off the page's namespace", () => {
+    const { container } = renderWithNode((node) => <ZoneChip node={node} />);
+    const root = container.querySelector(".ds.zone-chip");
+    expect(root?.querySelector(".mark use")).toHaveAttribute(
+      "href",
+      "/icons/map.svg#map",
+    );
+    expect(root?.querySelector(".mark")).toHaveAttribute("aria-hidden", "true");
+    expect(root?.querySelector(".prefix")?.textContent).toBe("geo:");
+    if (root) expectSlotOrder(root);
+  });
+
+  it("shows no prefix on a page of the zone's own namespace", () => {
+    const { container } = renderWithNode((node) => (
+      <AmbientNamespaceProvider namespace="geo">
+        <ZoneChip node={node} />
+      </AmbientNamespaceProvider>
+    ));
+    expect(container.querySelector(".prefix")).toBeNull();
+    expect(container.querySelector(".title")?.textContent).toBe("Central Zone");
+  });
+
+  it("asks for its peek by the zone's absolute IRI, never its CURIE", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    renderWithNode(
+      (node) => withRecordingPeek(peek, <ZoneChip node={node} />),
+      { uri: "https://geo.example/onto#central-zone" },
+    );
+    expect(peek).toHaveBeenCalledWith("https://geo.example/onto#central-zone");
+    expect(peek).not.toHaveBeenCalledWith("geo:central-zone");
+    // With no home to link to, the chip opens no peek.
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+  });
+
+  it("sets its title as inert text with no peek when unlinked", () => {
+    const peek = vi.fn((uri: string) => <a href={uri}>Peek at {uri}</a>);
+    const { container } = renderWithNode((node) =>
+      withRecordingPeek(peek, <ZoneChip linked={false} node={node} />),
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+    const title = container.querySelector(".title");
+    expect(title?.tagName).toBe("SPAN");
+    expect(title?.textContent).toBe("Central Zone");
+    if (title) fireEvent.focus(title);
+    expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+  });
+
+  it("shows a passage's own link text in place of its name", () => {
     const { container } = renderWithNode((node) => (
       <ZoneChip node={node}>the inner zone</ZoneChip>
     ));
-    expect(container.querySelector(".value")?.textContent).toBe(
+    expect(container.querySelector(".title")?.textContent).toBe(
       "the inner zone",
     );
   });
+
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (
       <ZoneChip className="custom-class" node={node} />

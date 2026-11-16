@@ -1,8 +1,8 @@
 /**
  * The Entity projections of a Prism documentation site: generic slotted
  * components for the five forms an entity takes, the projections that fill
- * them from a type's Relay fragment, and the dispatchers that render any
- * graph node through the arm its site maps to the node's type.
+ * them from a type's Relay fragment, and the switches that render any
+ * graph node through the arm of its type.
  *
  * @module
  */
@@ -30,6 +30,7 @@ export type {
   NodeGraphNodeProps,
   NodeListProps,
   NodeRowProps,
+  ProjectionPeekProps,
   RowArmNative,
   RowProjectionProps,
 } from "./node/index.js";
@@ -37,7 +38,6 @@ export {
   CardProjection,
   ChipProjection,
   CommandProjection,
-  defaultProjectionMaps,
   GraphNodeProjection,
   NodeCard,
   NodeChip,
@@ -45,7 +45,9 @@ export {
   NodeGraphNode,
   NodeList,
   NodeRow,
+  ProjectionPeek,
   RowProjection,
+  useProjectionPeek,
 } from "./node/index.js";
 export type {
   OntologyClassCardProps,
@@ -72,29 +74,30 @@ export {
   OntologyPropertyRow,
 } from "./ontology/index.js";
 export type {
-  ArmProps,
-  ProjectionArm,
-  ProjectionMap,
-  ProjectionMaps,
-  ProjectionsProviderProps,
-  SiteArmProps,
+  AmbientNamespaceProviderProps,
+  ProjectionLinkProviderProps,
+  SiteSwitches,
 } from "./projections/index.js";
 export {
-  ProjectionsProvider,
-  renderArm,
+  AmbientNamespaceProvider,
+  ProjectionLinkProvider,
+  useForeignPrefix,
   useProjectionLink,
-  useProjectionMaps,
 } from "./projections/index.js";
 export { useListRenderers } from "./renderers/index.js";
 export type {
-  EntityCardKeyValue,
   EntityCardProps,
   EntityChipProps,
   EntityCommandProps,
+  EntityFact,
   EntityGraphNodeProps,
   EntityListProps,
   EntityListRenderer,
   EntityRowProps,
+  SpecimenKind,
+  SwatchMarkProps,
+  TokenMarkProps,
+  TokenSwatchProps,
 } from "./ui/index.js";
 export {
   DEFAULT_ENTITY_LIST_RENDERER,
@@ -105,5 +108,14 @@ export {
   EntityGraphNode,
   EntityList,
   EntityRow,
+  PEEK_CLOSE_DELAY_MS,
+  PEEK_OPEN_DELAY_MS,
+  SwatchMark,
+  TokenMark,
+  TokenSwatch,
 } from "./ui/index.js";
-export { findCuriePrefix } from "./utils/index.js";
+export {
+  acceptColour,
+  findCuriePrefix,
+  requireArmKey,
+} from "./utils/index.js";

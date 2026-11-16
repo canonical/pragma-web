@@ -13,10 +13,10 @@ import { MOCK_ZONE, resolveRoot } from "../../../../../testing/fixtures.js";
 import ZoneChip from "./ZoneChip.js";
 
 /**
- * The operation the SSR test renders ZoneChip under: one Zone, read through the
- * `node` field. The spread is aliased because that field is typed by an
- * interface, so a node of another type reads as null instead of as a key that
- * does not match.
+ * The operation the SSR test renders ZoneChip under: one Zone, read
+ * through the `node` field. The spread is aliased because that field is typed
+ * by an interface, so a node of another type reads as null instead of as a key
+ * that does not match.
  */
 const declareSsrTestQuery = (): unknown => graphql`
   query ZoneChipSsrTestQuery @relay_test_operation {
@@ -27,7 +27,10 @@ const declareSsrTestQuery = (): unknown => graphql`
 `;
 void declareSsrTestQuery;
 
-/** Run the SSR test operation and render ZoneChip over the Zone it returns. */
+/**
+ * Run the SSR test operation and render ZoneChip over the Zone it
+ * returns.
+ */
 const ZoneChipSsrTestNode = (): ReactElement => {
   const data = useLazyLoadQuery<ZoneChipSsrTestQuery>(ssrTestQuery, {});
   const node = data.node?.ZoneChip_node;
@@ -52,6 +55,6 @@ describe("ZoneChip SSR", () => {
       createProjectionTree(environment, <ZoneChipSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-chip ds zone-chip"');
-    expect(html).not.toContain("<a");
+    expect(html).not.toContain("<a ");
   });
 });

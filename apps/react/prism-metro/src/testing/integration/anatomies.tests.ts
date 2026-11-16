@@ -31,8 +31,14 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
   .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"))
   .filter((directory) => existsSync(directory));
 
-/** The semantic tokens the app's components read beyond the shim. */
+/**
+ * The tokens the app's components read beyond the shim: the semantic
+ * tokens, and the published Card's content insets, which the peek's
+ * address line takes.
+ */
 const EXTERNAL_TOKENS = [
+  "--card-content-padding-block-end",
+  "--card-content-padding-inline",
   "--color-background",
   "--color-border",
   "--color-focus-ring",
@@ -51,6 +57,12 @@ const EXTERNAL_TOKENS = [
  */
 const DOCUMENT_TOKENS = ["--grid-col-min"];
 
+/**
+ * The one reach into another component the app's components make: the
+ * peek ends the summary of the card it shows at its third line.
+ */
+const REACHES = [".ds.metro-peek .summary"];
+
 const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
 
 /**
@@ -64,6 +76,20 @@ const fragments = Object.fromEntries(
       { eager: true },
     ),
   ).map((module) => [module.default.name, module.default]),
+);
+
+/**
+ * Every compiled peek query of the app, by its operation's name: a peek
+ * projects on the root \`Query\` type through an operation of its own, so
+ * its anatomy is matched to that operation's reader.
+ */
+const peekQueries = Object.fromEntries(
+  Object.values(
+    import.meta.glob<{ readonly default: { fragment: ReaderFragment } }>(
+      "../../relay/__generated__/*PeekQuery.graphql.ts",
+      { eager: true },
+    ),
+  ).map((module) => [module.default.fragment.name, module.default.fragment]),
 );
 
 /**
@@ -106,7 +132,8 @@ describe("the app's components", () => {
     "%s reads the fields its fragment reads",
     (folder) => {
       const name = `${basename(folder)}_node`;
-      const fragment = fragments[name];
+      const fragment =
+        fragments[name] ?? peekQueries[`${basename(folder)}Query`];
       if (fragment === undefined) {
         throw new Error(`${name} is not compiled: run \`bun run relay\``);
       }
@@ -151,6 +178,7 @@ describe("the app's components", () => {
           layer: "ds.components.global",
           externalTokens: EXTERNAL_TOKENS,
           documentTokens: DOCUMENT_TOKENS,
+          reaches: REACHES,
         }),
       ).not.toThrow();
     },

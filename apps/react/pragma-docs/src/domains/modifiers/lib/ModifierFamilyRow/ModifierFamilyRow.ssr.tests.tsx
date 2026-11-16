@@ -60,6 +60,6 @@ describe("ModifierFamilyRow SSR", () => {
     );
     expect(html).toContain("ds entity-row ds modifier-family-row");
     expect(html).toContain('data-type="ModifierFamily"');
-    expect(html).not.toContain("href=");
+    expect(html).not.toContain("<a ");
   });
 });

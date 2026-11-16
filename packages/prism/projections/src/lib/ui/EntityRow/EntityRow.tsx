@@ -8,16 +8,25 @@ const componentCssClassName = "ds entity-row";
 
 /**
  * The list entry of an entity: one 32px row of an index, its mark,
- * namespace prefix and title on the left and one muted word about it on
- * the right.
- * Where the two do not share a line the word moves to a line of its own
- * under the title, and a title longer than its line wraps rather than
- * being cut.
+ * foreign prefix and title on the left and its facts and status ending
+ * the row. Its height comes from `lines` alone: the first line
+ * never wraps, and below two groups only the first fact stays on it. The
+ * title yields last: the facts give way first, each shown whole or not at
+ * all, the last leaving first, down to none, the status keeps its width,
+ * and only then does a title longer than what is left end in an ellipsis.
  * With an `href` the title links to the entity's home through
  * `LinkComponent`; without one it is inert text.
  *
- * It renders only the slots it is given, in their fixed order: mark,
- * location, title, meta. The mark names nothing, so it is hidden from
+ * Opted into two lines (`lines="two"`, 56px), the summary takes the
+ * second line under the title, which stays a line high when the entity
+ * has none, so the row keeps its height; on one line there is no summary.
+ *
+ * It renders only the slots it is given, in the slot order every
+ * representation keeps: mark, prefix, title, kind, summary, facts and
+ * status, each fact cell naming its property in `data-property`. A space
+ * stands between a fact's label and value and before each later fact, so
+ * a reader and a copy keep them apart; the row draws none. The mark
+ * names nothing, so it is hidden from
  * assistive technology. It is a list item, so its list is the consumer's
  * `<ol>` or `<ul>`. It reads no context, so it renders anywhere.
  *
@@ -30,11 +39,15 @@ const componentCssClassName = "ds entity-row";
  */
 export default function EntityRow({
   mark,
-  location,
   title,
   href,
   LinkComponent = "a",
-  meta,
+  prefix,
+  kind,
+  summary,
+  facts = [],
+  status,
+  lines = "one",
   className,
   ...props
 }: EntityRowProps): ReactElement {
@@ -49,9 +62,7 @@ export default function EntityRow({
             {mark}
           </span>
         )}
-        {location === undefined ? null : (
-          <span className="location">{location}</span>
-        )}
+        {prefix === undefined ? null : <span className="prefix">{prefix}</span>}
         {href === undefined ? (
           <span className="title">{title}</span>
         ) : (
@@ -59,8 +70,26 @@ export default function EntityRow({
             {title}
           </LinkComponent>
         )}
+        {kind === undefined ? null : <span className="kind">{kind}</span>}
       </span>
-      {meta === undefined ? null : <span className="meta">{meta}</span>}
+      {lines === "two" ? <span className="summary">{summary}</span> : null}
+      {facts.length === 0 ? null : (
+        <span className="facts">
+          <span className="start" />
+          {facts.map(({ property, label, value }, index) => (
+            <span
+              className={index === 0 ? "fact" : "fact is-later"}
+              data-property={property}
+              key={property}
+            >
+              {index === 0 ? null : " "}
+              <span className="term">{label}</span>{" "}
+              <span className="detail">{value}</span>
+            </span>
+          ))}
+        </span>
+      )}
+      {status === undefined ? null : <span className="status">{status}</span>}
     </li>
   );
 }

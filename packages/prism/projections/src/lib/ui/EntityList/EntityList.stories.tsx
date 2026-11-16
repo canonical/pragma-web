@@ -27,22 +27,21 @@ function renderItems(renderer: EntityListRenderer) {
   return ENTITIES.map((entity) =>
     renderer === "cards" ? (
       <EntityCard
+        facts={entity.facts}
         href={entity.href}
         key={entity.href}
-        keyValues={entity.keyValues}
-        kind={entity.kind}
-        location={entity.location}
-        parent={entity.parent}
+        prefix={entity.prefix}
+        status={entity.status}
         summary={entity.summary}
         title={entity.title}
-        vitals={entity.vitals}
       />
     ) : (
       <EntityRow
+        facts={entity.facts.slice(0, 1)}
         href={entity.href}
         key={entity.href}
-        location={entity.prefix}
-        meta={entity.meta}
+        prefix={entity.prefix}
+        status={entity.status}
         title={entity.title}
       />
     ),

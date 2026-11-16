@@ -111,26 +111,34 @@ the colour on its root per line as a custom property, so no stylesheet
 names a colour. The mark is hidden from assistive technology: the name
 is the line's whatever its colour.
 
-| Type        | Card                                                                                   | Row           | Command result                                   | Chip, graph node                    |
-| ----------- | -------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------ | ----------------------------------- |
-| Station     | its zone above its name; Platforms, Zone and Lines as key values; its platform count  | "4 platforms" | "Northgate / Station in Central Zone · 4 platforms" | its name; "Station in Central Zone" |
-| Interchange | a station's card, with its transfer time, and the count of its lines as a second vital | "interchange" | "… / Interchange in Central Zone · 3 lines"      | as a station's                      |
-| Line        | Stops, and Ends for a line run end to end; "loop" as the vital of a loop               | its colour's swatch; "5 stops" | "North Line / Line · 5 stops"                    | its colour's swatch and its name; its class |
-| Fare zone   | the count of its stations as its vital                                                 | "2 stations"  | "Central Zone / Fare zone · 2 stations"          | its name; its class                 |
+| Type        | Card                                                                                         | Row                                         | Command result                                              | Chip, graph node                      |
+| ----------- | -------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------- | ------------------------------------- |
+| Station     | its name and definition; Platforms, Zone and Lines as facts                                  | its platform count as a fact                | "Northgate / metro:northgate / Station", "4 platforms"      | its mark and its name                 |
+| Interchange | a station's card, with its transfer time as a further fact                                   | its platform count as a fact                | "Central Exchange / metro:central-exchange / Interchange", "3 lines" | as a station's                        |
+| Line        | Stops, and Ends for a line run end to end, as facts; "loop" as the status of a loop          | its stop count as a fact; "loop" as status  | "North Line / metro:north-line / Line", "5 stops"           | its colour's disc and its name        |
+| Fare zone   | the count of its stations as a fact                                                          | its station count as a fact                 | "Central Zone / geo:central-zone / Fare zone", "2 stations" | its name                              |
 
-A value the graph does not assert leaves its slot, its pair or its vital
+A value the graph does not assert leaves its slot or its fact
 out. A station, an interchange and a line link to their page; a fare zone
 has no home on the site, so its name reads as inert text.
 
-The package's dispatchers render them through the site slot every
-composite spreads, `...Site<Form>Slot_node @alias(as: "Site")`. The
-app defines the five slots itself, `SiteChipSlot` to
-`SiteGraphNodeSlot` in `src/domains/metro/lib/`, each spreading its
-form's four arms aliased by their type and rendering the one the node's
-typename selects; `relay.config.json` leaves the package's default slots
-out of the app's compile. `metroProjectionMaps`, exported from
-`#domains/metro`, lists each slot under its form's `siteTypes` for the four
-metro types and keeps the package's arms for every other type.
+The site's own switches, `MetroChipProjection` to
+`MetroGraphNodeProjection` in `src/lib/ui/`, case each metro type and the
+ontology class through its arm and render every other node through the
+package's `Node` arm. The package's switches, which the lenses' queries
+spread, reach them through the site slot every composite spreads,
+`...Site<Form>Slot_node @alias(as: "Site")`. The app defines the five slots
+itself, `SiteChipSlot` to `SiteGraphNodeSlot` in `src/lib/ui/`, each
+spreading its form's metro switch and handing it the node;
+`relay.config.json` leaves the package's default slots out of the app's
+compile, and the `Shell` gives the five slots to `ProjectionLinkProvider`
+as the site's switches (`SITE_SWITCHES`), with the site's peek,
+`MetroPeek`.
+
+The `Shell` declares the site's home namespace, `metro`, once
+(`AMBIENT_NAMESPACE` in `src/lib/ui/Shell/constants.ts`), so a metro
+node's prefix is hidden and a `geo:` one shows; `MetroDefinitionsLayout`
+declares none (`namespace={null}`), so every prefix shows in Definitions.
 
 The packages run on the app's own Relay compile: a Vite plugin,
 `src/relay/redirectPackageArtifacts.ts`, resolves each artifact a lens or

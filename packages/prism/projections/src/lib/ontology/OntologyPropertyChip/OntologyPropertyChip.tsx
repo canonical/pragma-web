@@ -1,25 +1,32 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { useHome } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/OntologyPropertyChip_node.graphql.js";
-import { useProjectionLink } from "../../projections/index.js";
+import {
+  useForeignPrefix,
+  useProjectionLink,
+} from "../../projections/index.js";
 import { EntityChip } from "../../ui/index.js";
 import { findLocalName } from "../../utils/index.js";
+import { PROPERTY_MARK_ICON } from "../constants.js";
 import type { OntologyPropertyChipProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields OntologyPropertyChip reads from the OntologyProperty it
- * renders: its IRI, its only address, and its label.
+ * renders: its IRI, its address and the local name its name falls back to,
+ * its label and its namespace.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment OntologyPropertyChip_node on OntologyProperty {
     __typename
     uri
     label
+    namespace
   }
 `;
 void declareNodeFragment;
@@ -28,11 +35,16 @@ void declareNodeFragment;
 const componentCssClassName = "ds ontology-property-chip";
 
 /**
- * An ontology property as an inline mention: its name in the chip's pill,
- * linked to its home when the site has one and inert text when it has none.
- * The name is the property's label, or the local name of its IRI when it
- * has none; a passage's own link text, given as `children`, stands in for
- * it.
+ * An ontology property as an inline mention, in the slot order: the
+ * property glyph as its mark, then its name in the chip's pill, linked to
+ * its home when the site has one and inert text when it has none or
+ * `linked` is false. It has no peek: the peek reads a `Node`, which a
+ * property is not. The name is the property's label, or the local name of its IRI when
+ * it has none. Its prefix is its namespace's, through
+ * `useForeignPrefix({ namespace })`: shown off the page's ambient
+ * namespace when the provider serves the namespace as a prefix name, and
+ * never when it serves an IRI. A passage's own link text, given as
+ * `children`, stands in for the name.
  *
  * A property is not a `Node`, so no dispatcher renders it: a lens spreads
  * `...OntologyPropertyChip_node` where it selects the property.
@@ -45,7 +57,8 @@ const componentCssClassName = "ds ontology-property-chip";
  *
  * @implements prism.component.ontology_property_chip
  * @note Impure: reads its property from the Relay store, its home from the
- *   site's homes and its link from the projection provider.
+ *   site's homes, its link from the projection provider and the page's
+ *   ambient namespace.
  */
 export default function OntologyPropertyChip({
   node,
@@ -56,6 +69,7 @@ export default function OntologyPropertyChip({
   const data = useFragment(nodeFragment, node);
   const href = useHome({ __typename: data.__typename, uri: data.uri });
   const LinkComponent = useProjectionLink();
+  const prefix = useForeignPrefix({ namespace: data.namespace });
   return (
     <EntityChip
       {...props}
@@ -63,7 +77,9 @@ export default function OntologyPropertyChip({
       data-type={data.__typename}
       href={href}
       LinkComponent={LinkComponent}
-      value={children ?? data.label ?? findLocalName(data.uri)}
+      mark={<Icon icon={PROPERTY_MARK_ICON} />}
+      prefix={prefix}
+      title={children ?? data.label ?? findLocalName(data.uri)}
     />
   );
 }

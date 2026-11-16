@@ -21,7 +21,7 @@ node:
                 - node:
                     role: entry
                     edges:
-                      - node: { uri: prism.component.chip_projection }
+                      - node: { uri: metro.component.metro_chip_projection }
                         relation: { cardinality: "1", slotName: chip }
                       - node: { role: vital }
                         relation: { cardinality: "1", slotName: vital }
@@ -32,7 +32,7 @@ node:
           - node:
               role: list of rows
               edges:
-                - node: { uri: prism.component.row_projection }
+                - node: { uri: metro.component.metro_row_projection }
                   relation: { cardinality: "1..*", slotName: row }
             relation: { cardinality: "0..1", slotName: rows }
       relation: { cardinality: "0..2", slotName: section }

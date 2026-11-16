@@ -21,7 +21,7 @@ interface Titled {
 }
 
 /**
- * What a stop's card reads to list its key values: its platform count, its
+ * What a stop's card reads to list its facts: its platform count, its
  * fare zone and the lines it serves, each as the graph asserts it.
  */
 export interface StopFacts {

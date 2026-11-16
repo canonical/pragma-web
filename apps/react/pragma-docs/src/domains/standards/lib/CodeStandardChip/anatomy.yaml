@@ -1,13 +1,13 @@
 ---
-# CodeStandardChip: a code standard as an inline mention.
-# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 449:22408 and 505:2140 (the
-# chip with its key before the separator: "cs: …"). The key is the compact
-# address's prefix, the value the standard's title; a passage's own link
-# text, when given, stands in for the title.
-# Projected onto EntityChip, which carries every style: this anatomy binds
-# none. The home is the link the value renders through, resolved from the
-# compact address (the site's home expands the prefix to the standard's
-# IRI); a standard without one reads as inert text.
+# CodeStandardChip: a code standard as an inline mention: the slot order
+# mark, prefix, title. A passage's own link text, when given, stands in for
+# the title. A linked chip peeks at the standard: the peek
+# useProjectionPeek returns for its absolute IRI (uri, the only address
+# node(id:) accepts), mounted only when the peek opens.
+# Its mark is the code standard's glyph, so it names no kind; the prefix
+# shows only off the page's ambient namespace (the standards lens declares
+# cs). The title links to the standard's reading page. Projected onto the
+# base form, which carries every style.
 node:
   uri: docs.component.code_standard_chip
   projection:
@@ -17,14 +17,25 @@ node:
         uri: prism.component.entity_chip
         edges:
           - node:
-              role: lead
+              role: mark
+              # The code standard's glyph, a published Icon (CODE_STANDARD_MARK_ICON).
+              edges:
+                - node:
+                    uri: global.component.icon
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: mark
+          - node:
+              role: prefix
               projection:
                 field: _meta.curie
             relation:
               cardinality: "0..1"
-              slotName: lead
+              slotName: prefix
           - node:
-              role: value
+              role: title
               projection:
                 field: _meta.title
               edges:
@@ -34,8 +45,15 @@ node:
                       field: _meta.curie
                   relation:
                     cardinality: "0..1"
+                # The peek: the entity's card, read by its own query when open.
+                - node:
+                    uri: prism.component.projection_peek
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
             relation:
               cardinality: "1"
-              slotName: value
+              slotName: title
       relation:
         cardinality: "1"

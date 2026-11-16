@@ -149,6 +149,21 @@ describe("RouteStrip", () => {
     expect(root.style.opacity).toBe("1");
   });
 
+  it("leaves its channel unset for a colour the gate refuses", () => {
+    const { container } = renderWithSite(
+      <RouteStrip
+        colour="red; background: url(https://example.com/x)"
+        lineUri={NORTH.uri}
+        node={NORTH_STRIP.route}
+      />,
+      "/network",
+      RECORDED,
+    );
+    const root = container.querySelector("section") as HTMLElement;
+    expect(root.style.getPropertyValue("--route-strip-colour")).toBe("");
+    expect(container.innerHTML).not.toContain("url(");
+  });
+
   it("applies custom className after its own", () => {
     const { container } = renderWithSite(
       <RouteStrip

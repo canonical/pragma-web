@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1bf37fc574d98c2ed6ed352334ccefdd>>
+ * @generated SignedSource<<43ef3fef70dc2f829003964803356eb6>>
  * @lightSyntaxTransform
  */
 
@@ -128,6 +128,13 @@ return {
               {
                 "alias": null,
                 "args": null,
+                "kind": "ScalarField",
+                "name": "summary",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
                 "concreteType": "EntityMeta",
                 "kind": "LinkedField",
                 "name": "_meta",
@@ -178,7 +185,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "806bf4b0271d1e1a0ba55da51333b7e6",
+    "cacheID": "677c28882ea34a457578e11ea497d68e",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -201,12 +208,18 @@ return {
         "node.modifierFamily._meta": (v4/*:: as any*/),
         "node.modifierFamily._meta.title": (v3/*:: as any*/),
         "node.modifierFamily.uri": (v5/*:: as any*/),
+        "node.summary": {
+          "enumValues": null,
+          "nullable": true,
+          "plural": false,
+          "type": "String"
+        },
         "node.uri": (v5/*:: as any*/)
       }
     },
     "name": "ModifierRowStoryQuery",
     "operationKind": "query",
-    "text": "query ModifierRowStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...ModifierRow_node\n    uri\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
+    "text": "query ModifierRowStoryQuery {\n  node(id: \"story\") {\n    __typename\n    ...ModifierRow_node\n    uri\n  }\n}\n\nfragment ModifierRow_node on Modifier {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
   }
 };
 })();

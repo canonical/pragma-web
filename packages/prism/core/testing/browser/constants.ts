@@ -102,3 +102,24 @@ export const CHROME_SELECTOR = [
   ".ds.mode-strip",
   ".ds.mode-strip > *",
 ].join(", ");
+
+/** A row's height in pixels: one 24px line between 4px insets. */
+export const ROW_PX = 32;
+
+/** A two-line row's height in pixels: the summary's line under the first. */
+export const TWO_LINE_ROW_PX = 56;
+
+/** A chip's open peek's width in pixels, wherever it has room for it. */
+export const PEEK_WIDTH_PX = 248;
+
+/** The gap between a chip and its open peek, in pixels. */
+export const PEEK_OFFSET_PX = 4;
+
+/**
+ * The inset a peek keeps from the viewport's edges, in pixels: at each end
+ * of its height, and at the inline start when it spans the viewport.
+ */
+export const PEEK_EDGE_INSET_PX = 4;
+
+/** The tolerance a measured edge of the peek may be off by, in pixels. */
+export const PEEK_TOLERANCE_PX = 0.5;

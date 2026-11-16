@@ -52,7 +52,7 @@ const [definitions, definitionsTerm] = group(definitionsLayout, [
 
 The lens renders inside the site's provider nest: `HeadProvider`,
 `RelayEnvironmentProvider`, `RouterProvider`, and inside the router
-`HomesProvider` and `ProjectionsProvider`, which the inspector's instance
+`HomesProvider` and `ProjectionLinkProvider`, which the inspector's instance
 chips read their homes and arms from. `DefinitionsLayout` mounts the lens's
 own filter provider, shared by the facet bar's chips and the explorer.
 
@@ -92,7 +92,7 @@ The lens ships no projection arms. An arm reads only what its
 representation's composite fragment selects, and only
 `@canonical/prism-projections` writes the composites, so an
 `OntologyClass` or `OntologyProperty` arm here could render nothing the
-`Node` arm does not. A site mounts `defaultProjectionMaps`: its `Node` arms
+`Node` arm does not. A site mounts `ProjectionLinkProvider`: the `Node` arms
 render a mentioned class or property by its title and compact address, and
 the homes above link the mention to the term view.
 
