@@ -211,7 +211,7 @@ export const FailedOverKeptRows: Story = {
  */
 export const UnreachablePage: Story = {
   parameters: code,
-  render: function Render(args) {
+  render: function RenderUnreachablePage(args) {
     const [location] = useState(() =>
       createMemoryLocation({ href: "/machines?page=3&size=5" }),
     );
