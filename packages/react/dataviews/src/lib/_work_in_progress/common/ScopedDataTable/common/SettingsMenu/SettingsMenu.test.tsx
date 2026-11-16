@@ -178,6 +178,24 @@ describe("SettingsMenu", () => {
     await expectNoAxeViolations(document.body);
   });
 
+  it("adds no window listener while closed", () => {
+    const listen = vi.spyOn(window, "addEventListener");
+    mount();
+    expect(listen).not.toHaveBeenCalled();
+    listen.mockRestore();
+  });
+
+  it.fails("is an icon button with no chevron that opens a popover menu", () => {
+    mount();
+    const trigger = findTrigger();
+    expect(trigger).toHaveClass("ds", "button", "tertiary", "icon-button");
+    expect(trigger.querySelector(".chevron")).toBeNull();
+    const panel = document.getElementById(
+      String(trigger.getAttribute("popovertarget")),
+    );
+    expect(panel).toHaveAttribute("popover", "auto");
+  });
+
   describe("before scripts run", () => {
     it("is a disclosure of the links each available change leads to", async () => {
       const { props, view } = mount({ hydrated: false });
@@ -203,6 +221,18 @@ describe("SettingsMenu", () => {
       // Every destination is spelled over one reading of the query.
       expect(props.listDestinations).toHaveBeenCalledTimes(1);
       await expectNoAxeViolations(view.container);
+    });
+
+    it.fails("is a closed popover of the links each change leads to", () => {
+      const { view } = mount({ hydrated: false });
+      const trigger = screen.getByRole("button", { name: "Table settings" });
+      const panel = document.getElementById(
+        String(trigger.getAttribute("popovertarget")),
+      );
+      expect(view.container).toContainElement(panel);
+      expect(
+        screen.getByRole("link", { name: "Hide Status", hidden: true }),
+      ).toHaveAttribute("href", "?hide=status");
     });
 
     it("offers no reset link while there is nothing to reset", () => {

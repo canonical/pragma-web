@@ -687,6 +687,28 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(trigger).toBeFocused();
   });
 
+  test("Sortable: Escape closes a header's menu, and focus returns to its trigger", async ({
+    page,
+  }) => {
+    await openStory(page, findStory(TABLE, "Sortable").id);
+    const trigger = page.getByRole("button", {
+      name: "Column options for Host",
+      exact: true,
+    });
+    await tabTo(page, trigger);
+    await page.keyboard.press("Enter");
+    const menu = page.getByRole("menu", {
+      name: "Column options for Host",
+      exact: true,
+    });
+    await expect(
+      page.getByRole("menuitem", { name: "Sort ascending" }),
+    ).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
   test("Sortable: a header's menu hides its column, and focus goes to the next heading's control", async ({
     page,
   }) => {
