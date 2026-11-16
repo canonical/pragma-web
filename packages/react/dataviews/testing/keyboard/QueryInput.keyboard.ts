@@ -103,11 +103,15 @@ test.describe("QueryInput, keyboard only", () => {
     expect(await readChips(page)).toEqual(["status is deployed", "pool"]);
     await chooseFirst(page);
     await expect(findPartEntry(page, "Value", "pool")).toBeFocused();
+    // The value joins the chip; Enter again applies it.
     await chooseFirst(page);
+    await expect(findPartEntry(page, "Value", "pool")).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(findEntry(page)).toBeFocused();
+    // The chips stand in the query's canonical order.
     expect(await readChips(page)).toEqual([
-      "status is deployed",
       "pool is default",
+      "status is deployed",
     ]);
     await expectNoEditOpen(page);
   });
@@ -120,7 +124,9 @@ test.describe("QueryInput, keyboard only", () => {
     await expect(ready).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(findPartEntry(page, "Value", "status")).toBeFocused();
+    // A pick replaces the held value; Enter again applies it.
     await chooseFirst(page);
+    await page.keyboard.press("Enter");
     await expect(
       page.getByRole("button", { name: "deployed", exact: true }),
     ).toBeFocused();
@@ -156,13 +162,13 @@ test.describe("QueryInput, keyboard only", () => {
     await page.keyboard.type("owner");
     await page.keyboard.press("Enter");
     await expect(findPartEntry(page, "Operator", "owner")).toBeFocused();
-    await page.keyboard.type("is");
-    await page.keyboard.press("Tab");
+    // A typed `:` settles the operator and moves on to the value.
+    await page.keyboard.type(":");
     await expect(findPartEntry(page, "Value", "owner")).toBeFocused();
     await page.keyboard.type("bob");
     await page.keyboard.press("Tab");
     await expect(findEntry(page)).toBeFocused();
-    expect(await readChips(page)).toEqual(["status is ready", "owner is bob"]);
+    expect(await readChips(page)).toEqual(["owner is bob", "status is ready"]);
     await expectNoEditOpen(page);
     // Shift+Tab from a draft's operator returns its field to the entry.
     await page.keyboard.type("pool");
@@ -171,7 +177,7 @@ test.describe("QueryInput, keyboard only", () => {
     await page.keyboard.press("Shift+Tab");
     await expect(findEntry(page)).toBeFocused();
     await expect(findEntry(page)).toHaveValue("pool");
-    expect(await readChips(page)).toEqual(["status is ready", "owner is bob"]);
+    expect(await readChips(page)).toEqual(["owner is bob", "status is ready"]);
     await page.keyboard.press("Escape");
     await page.keyboard.press("Tab");
     await expect(findEntry(page)).not.toBeFocused();
@@ -202,8 +208,7 @@ test.describe("QueryInput, keyboard only", () => {
     await expect(findEntry(page)).toBeFocused();
     await page.keyboard.type("pool");
     await page.keyboard.press("Enter");
-    await page.keyboard.type("is");
-    await page.keyboard.press("Tab");
+    await page.keyboard.type(":");
     await page.keyboard.type("gpu");
     await page.keyboard.press("Tab");
     await expect(findEntry(page)).toBeFocused();
@@ -242,18 +247,24 @@ test.describe("QueryInput, keyboard only", () => {
     await chooseFirst(page);
     await chooseFirst(page);
     await chooseFirst(page);
+    await page.keyboard.press("Enter");
     await expect(findEntry(page)).toBeFocused();
     expect(await readChips(page)).toEqual(["pool is default"]);
     await page.keyboard.press("ArrowLeft");
     const pool = page.getByRole("button", { name: "pool", exact: true });
     await expect(pool).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(findPartEntry(page, "Field", "pool")).toBeFocused();
+    await expect(
+      page.getByRole("combobox", { name: "Field", exact: true }),
+    ).toBeFocused();
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     await expect(findPartEntry(page, "Value", "pool")).toBeFocused();
+    // A pick replaces the held value.
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
     await page.keyboard.press("Enter");
     await expect(
       page.getByRole("button", { name: "storage", exact: true }),

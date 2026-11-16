@@ -4,6 +4,8 @@ import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withServerMarkup } from "../../../storybook/decorators.js";
 import { QueryBuilder } from "../../../storybook/QueryBuilder/index.js";
+import { QueryChip } from "../QueryChip/index.js";
+import { QueryChips } from "../QueryChips/index.js";
 import Component from "./QueryInput.js";
 import type { QueryInputOption, QueryInputProps } from "./types.js";
 
@@ -27,13 +29,9 @@ const FIELDS: QueryInputOption[] = [
   { id: "cpu", label: "≥ cpu", name: "at least cpu", group: "ranges" },
 ];
 
-const DEPLOYED = {
-  id: "clause-1",
-  field: "status",
-  operator: "is",
-  value: "deployed",
-};
-const GPU = { id: "clause-2", field: "pool", operator: "is", value: "gpu" };
+/** The clauses a story starts on: a status, and a pool beside it. */
+const DEPLOYED = "status=deployed";
+const DEPLOYED_AND_GPU = "status=deployed&pool=gpu";
 
 /** A host that holds the text and shows a fixed list of suggestions. */
 const TextHost = (props: Partial<QueryInputProps>): ReactElement => {
@@ -81,8 +79,10 @@ BuildAChip.play = async ({ canvasElement }) => {
   await userEvent.type(findEntry(canvasElement), "status");
   // Enter with nothing highlighted chooses the field typed exactly.
   await userEvent.keyboard("{Enter}");
-  await userEvent.click(await findOption(canvasElement, "is"));
+  await userEvent.click(await findOption(canvasElement, /^is any of/));
   await userEvent.click(await findOption(canvasElement, "deployed"));
+  // A choice takes several values: Enter again applies them.
+  await userEvent.keyboard("{Enter}");
   await waitFor(() =>
     expect(
       canvas.getByRole("group", { name: "status is deployed" }),
@@ -91,8 +91,11 @@ BuildAChip.play = async ({ canvasElement }) => {
   await waitFor(() => expect(findEntry(canvasElement)).toHaveFocus());
 };
 
-/** Activate a part of a chip to edit it, and choose its new value. */
-export const EditAChip: StoryFn = () => <QueryBuilder initial={[DEPLOYED]} />;
+/**
+ * Activate a part of a chip to edit it: the Entry takes its place, a pick
+ * replaces it, and Enter applies it.
+ */
+export const EditAChip: StoryFn = () => <QueryBuilder initial={DEPLOYED} />;
 EditAChip.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(canvas.getByRole("button", { name: "deployed" }));
@@ -101,6 +104,7 @@ EditAChip.play = async ({ canvasElement }) => {
   });
   await waitFor(() => expect(part).toHaveFocus());
   await userEvent.click(await findOption(canvasElement, "ready"));
+  await userEvent.keyboard("{Enter}");
   await waitFor(() =>
     expect(
       canvas.getByRole("group", { name: "status is ready" }),
@@ -118,7 +122,7 @@ EditAChip.play = async ({ canvasElement }) => {
 
 /** Remove a chip with its remove control. */
 export const RemoveAChip: StoryFn = () => (
-  <QueryBuilder initial={[DEPLOYED, GPU]} />
+  <QueryBuilder initial={DEPLOYED_AND_GPU} />
 );
 RemoveAChip.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
@@ -133,8 +137,12 @@ RemoveAChip.play = async ({ canvasElement }) => {
   expect(
     canvas.getByRole("group", { name: "pool is gpu" }),
   ).toBeInTheDocument();
+  // The stop moves to the chip before it, the last one left.
   await waitFor(() =>
-    expect(canvas.getByRole("button", { name: "pool" })).toHaveFocus(),
+    expect(canvas.getByRole("button", { name: "pool" })).toHaveAttribute(
+      "tabindex",
+      "0",
+    ),
   );
 };
 
@@ -143,7 +151,7 @@ RemoveAChip.play = async ({ canvasElement }) => {
  * edited chip gets its clause back and takes the stop.
  */
 export const RemoveAnotherChipMidEdit: StoryFn = () => (
-  <QueryBuilder initial={[DEPLOYED, GPU]} />
+  <QueryBuilder initial={DEPLOYED_AND_GPU} />
 );
 RemoveAnotherChipMidEdit.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
@@ -164,7 +172,7 @@ RemoveAnotherChipMidEdit.play = async ({ canvasElement }) => {
 };
 
 /** Clear every chip and the text at once. */
-export const Clear: StoryFn = () => <QueryBuilder initial={[DEPLOYED, GPU]} />;
+export const Clear: StoryFn = () => <QueryBuilder initial={DEPLOYED_AND_GPU} />;
 Clear.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(
@@ -195,7 +203,8 @@ KeyboardOnly.play = async ({ canvasElement }) => {
   await userEvent.keyboard("{ArrowDown}{Enter}");
   const value = await canvas.findByRole("combobox", { name: "Value for pool" });
   await waitFor(() => expect(value).toHaveFocus());
-  await userEvent.keyboard("{ArrowDown}{Enter}");
+  // The value joins the chip, and Enter again applies it.
+  await userEvent.keyboard("{ArrowDown}{Enter}{Enter}");
   await waitFor(() => expect(entry).toHaveFocus());
   expect(
     canvas.getByRole("group", { name: "pool is default" }),
@@ -203,14 +212,15 @@ KeyboardOnly.play = async ({ canvasElement }) => {
   await userEvent.keyboard("{ArrowLeft}");
   await waitFor(() => expect(findPoolChip()).toHaveFocus());
   await userEvent.keyboard("{Enter}");
-  const field = await canvas.findByRole("combobox", { name: "Field for pool" });
+  const field = await canvas.findByRole("combobox", { name: "Field" });
   await waitFor(() => expect(field).toHaveFocus());
   await userEvent.keyboard("{Tab}{Tab}");
   const edited = await canvas.findByRole("combobox", {
     name: "Value for pool",
   });
   await waitFor(() => expect(edited).toHaveFocus());
-  await userEvent.keyboard("{ArrowDown}{Enter}");
+  // A pick replaces the held value.
+  await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}{Enter}");
   await waitFor(() =>
     expect(
       canvas.getByRole("group", { name: "pool is gpu" }),
@@ -247,13 +257,11 @@ AbandonADraft.play = async ({ canvasElement }) => {
  * Escape cancels an edit: a chip whose field was changed gets its clause
  * back, and focus returns to the part the Entry was on.
  */
-export const CancelAnEdit: StoryFn = () => (
-  <QueryBuilder initial={[DEPLOYED]} />
-);
+export const CancelAnEdit: StoryFn = () => <QueryBuilder initial={DEPLOYED} />;
 CancelAnEdit.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   await userEvent.click(canvas.getByRole("button", { name: "status" }));
-  await canvas.findByRole("combobox", { name: "Field for status" });
+  await canvas.findByRole("combobox", { name: "Field" });
   await userEvent.click(await findOption(canvasElement, /^pool/));
   // The Entry moves to the value, and keeps focus as it moves.
   const value = await canvas.findByRole("combobox", { name: "Value for pool" });
@@ -310,7 +318,8 @@ TabOutOfADraft.play = async ({ canvasElement }) => {
       canvas.getByRole("combobox", { name: "Operator for status" }),
     ).toHaveFocus(),
   );
-  await userEvent.keyboard("is{Tab}");
+  // A typed `:` settles the operator and moves on to the value.
+  await userEvent.keyboard(":");
   const value = await canvas.findByRole("combobox", {
     name: "Value for status",
   });
@@ -325,12 +334,12 @@ TabOutOfADraft.play = async ({ canvasElement }) => {
 };
 
 /**
- * Focus leaving the field commits an edit, with what is typed, and leaves
- * focus where it went.
+ * Focus leaving the field commits an edit, with a value typed exactly in
+ * place of the one it held, and leaves focus where it went.
  */
 export const EndEditOnBlur: StoryFn = () => (
   <div style={{ display: "grid", gap: "var(--dimension-200)" }}>
-    <QueryBuilder initial={[DEPLOYED]} />
+    <QueryBuilder initial={DEPLOYED} />
     <button type="button">Elsewhere</button>
   </div>
 );
@@ -361,7 +370,7 @@ EndEditOnBlur.play = async ({ canvasElement }) => {
  * the page.
  */
 export const LeaveToThePage: StoryFn = () => (
-  <QueryBuilder initial={[DEPLOYED]} />
+  <QueryBuilder initial={DEPLOYED} />
 );
 LeaveToThePage.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
@@ -433,7 +442,31 @@ Empty.play = openSuggestions;
 
 /** The field and its clear control disabled. */
 export const Disabled: StoryFn = () => (
-  <QueryBuilder disabled initial={[DEPLOYED]} />
+  <Component
+    label="Filter machines"
+    value=""
+    onValueChange={() => {}}
+    hiddenLabel={(count) => `+${count} more`}
+    onClear={() => {}}
+    clearLabel="Clear filters and search"
+    disabled
+  >
+    <QueryChips label="Filters">
+      <QueryChip
+        id="clause-1"
+        label="status is deployed"
+        disabled
+        onRemove={() => {}}
+        removeLabel="Remove status is deployed"
+      >
+        <QueryChip.Segment onActivate={() => {}}>status</QueryChip.Segment>
+        <QueryChip.Segment onActivate={() => {}} condition="inclusion">
+          is
+        </QueryChip.Segment>
+        <QueryChip.Segment onActivate={() => {}}>deployed</QueryChip.Segment>
+      </QueryChip>
+    </QueryChips>
+  </Component>
 );
 Disabled.play = async ({ canvasElement }) => {
   // The entry, every chip's parts and both controls are disabled.
@@ -452,17 +485,7 @@ export const HiddenChips: StoryFn = () => (
   <div>
     <QueryBuilder
       inlineSize="24rem"
-      initial={[
-        DEPLOYED,
-        GPU,
-        { id: "clause-3", field: "owner", operator: "is", value: "alice" },
-        {
-          id: "clause-4",
-          field: "status",
-          operator: "is not",
-          value: "broken",
-        },
-      ]}
+      initial="status=deployed&pool=gpu&owner=alice&status__isNone=broken"
     />
     <p>Content after the field, which the focused field overlays.</p>
   </div>
@@ -525,7 +548,7 @@ export const Density: StoryFn = () => (
   <div style={{ display: "grid", gap: "var(--dimension-300)" }}>
     {["comfortable", "dense"].map((density) => (
       <div key={density} className={density}>
-        <QueryBuilder initial={[DEPLOYED]} />
+        <QueryBuilder initial={DEPLOYED} />
       </div>
     ))}
   </div>
