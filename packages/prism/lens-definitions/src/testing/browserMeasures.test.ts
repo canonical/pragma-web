@@ -149,10 +149,10 @@ describe("measureCanvasSvg", () => {
       "M320 568H344V488H392V456H368",
     ];
     const down = ["M96 104H132V140H180", "M112 56H132V120H40"];
-    expect(measureCanvasSvg(serve([...across, ...down].map(bridge))).sharedBridgeLines).toEqual([
-      across.join(" and "),
-      down.join(" and "),
-    ]);
+    expect(
+      measureCanvasSvg(serve([...across, ...down].map(bridge)))
+        .sharedBridgeLines,
+    ).toEqual([across.join(" and "), down.join(" and ")]);
     expect(
       measureCanvasSvg(
         serve(
@@ -178,6 +178,8 @@ describe("measureCanvasSvg", () => {
       // Round three sides of surface, which it neither leaves nor enters.
       bridge("M560 376H536V536H-24V660H152V728H128"),
     ]);
-    expect(measureCanvasSvg(svg).framingBridges).toEqual([`${framing} round ds`]);
+    expect(measureCanvasSvg(svg).framingBridges).toEqual([
+      `${framing} round ds`,
+    ]);
   });
 });

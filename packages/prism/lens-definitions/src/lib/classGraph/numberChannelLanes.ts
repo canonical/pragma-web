@@ -41,7 +41,8 @@ interface RunSpan {
  */
 function meetRun(turn: ChannelPoint, span: RunSpan): readonly [number, number] {
   for (const end of [span.from, span.to]) {
-    if (turn.at === end.at) return turn.settled && end.settled ? [1, 0] : [0, 0];
+    if (turn.at === end.at)
+      return turn.settled && end.settled ? [1, 0] : [0, 0];
   }
   return turn.at > span.from.at && turn.at < span.to.at ? [0, 1] : [0, 0];
 }

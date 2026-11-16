@@ -49,10 +49,20 @@ function readBridgeRoute(d: string): BridgeRoute {
       [x, y] = [value, Number(second)];
       ends.push([x, y]);
     } else if (command === "H") {
-      runs.push({ down: false, line: y, from: Math.min(x, value), to: Math.max(x, value) });
+      runs.push({
+        down: false,
+        line: y,
+        from: Math.min(x, value),
+        to: Math.max(x, value),
+      });
       x = value;
     } else {
-      runs.push({ down: true, line: x, from: Math.min(y, value), to: Math.max(y, value) });
+      runs.push({
+        down: true,
+        line: x,
+        from: Math.min(y, value),
+        to: Math.max(y, value),
+      });
       y = value;
     }
   }
@@ -71,11 +81,19 @@ function overlaps(a1: number, a2: number, b1: number, b2: number): boolean {
  */
 function listSidesPassed(
   route: BridgeRoute,
-  region: { readonly x: number; readonly y: number; readonly w: number; readonly h: number },
+  region: {
+    readonly x: number;
+    readonly y: number;
+    readonly w: number;
+    readonly h: number;
+  },
 ): ReadonlySet<string> {
   const sides = new Set<string>();
   for (const run of route.runs) {
-    if (!run.down && overlaps(run.from, run.to, region.x, region.x + region.w)) {
+    if (
+      !run.down &&
+      overlaps(run.from, run.to, region.x, region.x + region.w)
+    ) {
       if (run.line < region.y) sides.add("top");
       if (run.line > region.y + region.h) sides.add("bottom");
     }

@@ -1052,7 +1052,9 @@ describe("layOutClassGraph", () => {
     expect([aa?.y, bb?.y, cc?.y]).toEqual(
       [aa?.y, bb?.y, cc?.y].toSorted((a = 0, b = 0) => a - b),
     );
-    const right = Math.max(...layout.regions.map((region) => region.x + region.w));
+    const right = Math.max(
+      ...layout.regions.map((region) => region.x + region.w),
+    );
     const boundsOf = (id: string) =>
       measurePathBounds(
         requireDefined(
