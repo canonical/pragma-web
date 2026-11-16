@@ -71,6 +71,19 @@ describe("DataViews.ActionBar", () => {
     ).toBeInTheDocument();
   });
 
+  it.fails("draws the deselect as an icon button", () => {
+    const provider = makeProvider();
+    mount(provider);
+    select(provider, ["m1"]);
+    expect(screen.getByRole("button", { name: "Deselect 1 row" })).toHaveClass(
+      "ds",
+      "button",
+      "tertiary",
+      "icon-button",
+      "deselect",
+    );
+  });
+
   it("clears the selection, and leaves", () => {
     const provider = makeProvider();
     mount(provider);
