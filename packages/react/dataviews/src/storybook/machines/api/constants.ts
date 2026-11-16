@@ -1,8 +1,13 @@
 /**
- * What the mock machine API shares across its modules: its scenarios, the
- * fields either endpoint orders by and computes facets for, the order it
- * lists statuses in, and the one query the GraphQL endpoint answers.
+ * What the mock machine API shares across its modules: its scenarios, its
+ * collection, the fields either endpoint orders by, searches and computes
+ * facets for, the order it lists statuses in, and the one query the GraphQL
+ * endpoint answers.
  */
+
+import { createCollection } from "@canonical/dataviews-core";
+import { machineCollection } from "../fixtures.js";
+import type { ApiRecord } from "./types.js";
 
 /** Every scenario, each served under a path of its own. */
 export const API_SCENARIOS = [
@@ -24,8 +29,17 @@ export const SORTED_FIELDS: readonly string[] = [
 /** The statuses, in the order either endpoint sorts them. */
 export const STATUS_ORDER: readonly string[] = ["running", "failed", "pending"];
 
+/** The machine collection's fields, over records read defensively. */
+export const API_COLLECTION = createCollection({
+  identify: (record: ApiRecord) => record.id,
+  fields: machineCollection.schema.fields,
+});
+
+/** The fields free-text search reads, on either endpoint. */
+export const SEARCHED_FIELDS: readonly string[] = ["name", "owner"];
+
 /** The fields either endpoint computes facets for. */
-export const FACET_FIELDS = ["status", "cores"] as const;
+export const FACET_FIELDS: readonly string[] = ["status", "cores"];
 
 /** The variables the one query the GraphQL endpoint answers declares. */
 export const MACHINES_QUERY_VARIABLES: readonly string[] = [

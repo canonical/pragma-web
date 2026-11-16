@@ -1,9 +1,9 @@
 import {
+  FACET_FIELDS,
   MACHINES_QUERY_VARIABLES,
   SORTED_FIELDS,
   STATUS_ORDER,
 } from "./constants.js";
-import isFacetField from "./isFacetField.js";
 import type { ApiProblem, ApiQuery, ApiTextMatch } from "./types.js";
 
 /**
@@ -77,6 +77,10 @@ const coerceListInput = (value: unknown): readonly unknown[] => {
 /** Whether a value is one of the statuses the endpoint knows. */
 const isStatus = (value: unknown): value is string =>
   typeof value === "string" && STATUS_ORDER.includes(value);
+
+/** Whether a value is one of the fields the endpoint computes facets for. */
+const isFacetField = (value: unknown): value is string =>
+  typeof value === "string" && FACET_FIELDS.includes(value);
 
 /** The first member an input carries that its type does not declare. */
 const findUndeclared = (
@@ -207,9 +211,7 @@ export default function readGraphQLQuery(
     return { reason: `${JSON.stringify(search)} is not text` };
   }
   const faceted = coerceListInput(facets);
-  const unfaceted = faceted.find(
-    (field) => typeof field !== "string" || !isFacetField(field),
-  );
+  const unfaceted = faceted.find((field) => !isFacetField(field));
   if (unfaceted !== undefined) {
     return {
       reason: `this endpoint computes no facet for ${JSON.stringify(unfaceted)}`,
