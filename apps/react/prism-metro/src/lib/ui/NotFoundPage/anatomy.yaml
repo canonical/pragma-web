@@ -1,12 +1,11 @@
 ---
 # NotFoundPage — the page every URL no route matches renders, in the
-# document archetype's canvas: its title (also the document's) and one line
-# of copy. It spans every column of the canvas's page grid; the heading and
-# the line take the typography's own styles. The not-found route renders no
-# strip, so the canvas starts at the viewport's top: the page carries one
-# gutter of external spacing above it, so its title sits one gutter under
-# the viewport's top as a page under a strip sits one gutter under the
-# strip's rule.
+# document archetype's canvas: its title (also the document's), then
+# core's not-found body (one sentence, then each lens's home as a link),
+# one gutter apart as on the docs site. It spans every column of the
+# canvas's page grid; the heading takes the typography's own styles. The
+# not-found route renders it under an empty strip, so its title sits at
+# the canvas's top like any other page's.
 #
 # Every decision is read through a component token declared on the root
 # (`--not-found-page-*`), bound to the symbol named here.
@@ -16,11 +15,13 @@ node:
   uri: metro.component.not_found_page
   styles:
     layout.grid.column: "1 / -1"
-    spacing.external.block.start: grid.gutter
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
   edges:
     - node:
         role: page title
       relation: { cardinality: "1", slotName: title }
     - node:
-        role: page copy
+        uri: prism.component.not_found_body
       relation: { cardinality: "1", slotName: body }

@@ -29,8 +29,9 @@
 #   1px: the overlay's hairline frame.
 #   2px: the tab's underline and its focus ring.
 #   space.200 (16px) between the tab links: the published tabs' inset.
-#   layout.stack 1: the overlay sits over the canvas's in-flow content; no
-#     semantic stacking symbol exists.
+#   layout.stack 2: the overlay sits over the canvas's in-flow content and
+#     one above its sticky bands (the contents bar's layout.stack 1), which
+#     come later in the document; no semantic stacking symbol exists.
 #   layout.offset.top 100%: the overlay starts under the summary (an
 #     unthemable percentage).
 #   The chevron is the catalog's `rendererSwitch.chevron` glyph, hidden
@@ -111,7 +112,7 @@ node:
                 layout.position: absolute
                 layout.offset.top: 100%
                 layout.offset.right: 0
-                layout.stack: 1
+                layout.stack: 2
                 layout.listStyle: none
                 layout.type: flex
                 layout.direction: column

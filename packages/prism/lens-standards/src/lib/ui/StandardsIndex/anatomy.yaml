@@ -1,8 +1,11 @@
 ---
 # StandardsIndex — the bound class's instances, grouped by their own class:
 # an inline row of jump links to the groups, only when there is more than
-# one, then each group, its level-2 heading over its entries in the shared
-# list view, then the explicit "Load more" while the graph has more.
+# one, then each group, its level-2 heading and its count (core's count
+# line, spanning the group's row under the heading) over its entries in the
+# shared list view, then the explicit "Load more" while the graph has more.
+# A group's count is of the entries loaded: no group's total is served, so
+# while pages remain the count's noun says so.
 #
 # Reference: the projection matrix's list entry. Each group's entries are
 # the shared list view (EntityList, rows view, no toolbar) of the
@@ -82,6 +85,11 @@ node:
               styles:
                 layout.grid.column: "1 / -1"
             relation: { cardinality: "1", slotName: group-heading }
+          - node:
+              uri: prism.component.count_line
+              styles:
+                layout.grid.column: "1 / -1"
+            relation: { cardinality: "1", slotName: count }
           - node:
               uri: prism.component.entity_list
               edges:

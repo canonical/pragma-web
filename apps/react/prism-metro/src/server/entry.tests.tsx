@@ -78,7 +78,7 @@ describe("EntryServer", () => {
     expect(html).toContain('class="ds document-layout"');
     expect(html).toContain('data-region="primary-nav"');
     expect(html).toMatch(
-      /<main class="ds canvas canvas"[^>]*><div class="page"><section class="ds not-found-page">/,
+      /<main class="ds canvas canvas"[^>]*><div class="page"><section aria-labelledby="not-found-title" class="ds not-found-page">/,
     );
   });
 

@@ -84,6 +84,7 @@ const pageTwoResponse = {
     ontologyClass: {
       __typename: "OntologyClass",
       uri: CODE_STANDARD_CLASS_URI,
+      instanceCount: 131,
       instances: {
         edges: [
           {
@@ -119,6 +120,11 @@ describe("StandardsPage against a warm store", () => {
           .getAllByRole("heading", { level: 2 })
           .map((heading) => heading.textContent),
       ).toEqual(["CodeStandard"]);
+      // The group's count holds only the standards loaded so far: the
+      // graph has more pages and serves no group's total.
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "8 standards loaded so far",
+      );
       // …so the secondary nav is absent.
       expect(
         screen.queryByRole("navigation", { name: "Categories" }),
@@ -220,6 +226,8 @@ describe("StandardsPage against a warm store", () => {
       expect(
         screen.queryByRole("button", { name: "Load more" }),
       ).not.toBeInTheDocument();
+      // …and the group's count, now the whole group, counts page 2 too.
+      expect(screen.getByRole("status")).toHaveTextContent("10 standards");
     },
     STANDARDS_TEST_TIMEOUT_MS,
   );

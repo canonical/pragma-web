@@ -9,7 +9,11 @@
     --renderer-switch-summary-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
-    --renderer-switch-overlay-stack: 1;
+    /* The open menu overlays the canvas, which comes after the strip in
+     * the document: it stacks one above the canvas's sticky bands (the
+     * sectioned view's contents bar stacks at 1), so no band covers an
+     * option. */
+    --renderer-switch-overlay-stack: 2;
     --renderer-switch-overlay-spacing: var(--space-100);
     --renderer-switch-overlay-background: var(--color-background);
     --renderer-switch-overlay-border-width: 1px;

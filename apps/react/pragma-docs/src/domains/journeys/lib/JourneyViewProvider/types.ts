@@ -2,14 +2,13 @@ import type { ReactNode } from "react";
 import type { JourneyFilterChoice, JourneyView } from "../../types.js";
 
 /**
- * What the lens's consumers share: the view, the graph's filter as the
- * reader chose it, and the ways to change them.
+ * What the lens's consumers share: the view the address names, the graph's
+ * filter as the reader chose it, and the way to change the filter. The
+ * view changes through the strip's links, which rewrite the address.
  */
 export interface JourneyViewValue {
   /** The reading the canvas shows. */
   readonly view: JourneyView;
-  /** Show the other reading. */
-  readonly setView: (next: JourneyView) => void;
   /**
    * The filter the reader chose for the graph, with the job on screen when
    * they chose it, or undefined before any choice: the graph then draws

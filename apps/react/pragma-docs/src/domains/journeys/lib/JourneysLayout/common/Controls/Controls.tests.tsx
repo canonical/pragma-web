@@ -8,7 +8,7 @@ import { JourneyViewProvider } from "../../../JourneyViewProvider/index.js";
 import Controls from "./Controls.js";
 
 describe("Controls", () => {
-  it("switches the view the provider shares, through the address", async () => {
+  it("links each reading by `as`, and a follow makes the graph current", async () => {
     const router = createRouterAt("/journeys");
     render(
       <RouterProvider router={router}>
@@ -17,10 +17,21 @@ describe("Controls", () => {
         </JourneyViewProvider>
       </RouterProvider>,
     );
-    const graph = screen.getByRole("button", { name: "Graph" });
-    expect(graph).toHaveAttribute("aria-pressed", "false");
-    fireEvent.click(graph);
-    await waitFor(() => expect(graph).toHaveAttribute("aria-pressed", "true"));
-    expect(router.getState().location.href).toMatch(/\?as=graph$/);
+    const tabs = screen.getByRole("navigation", { name: "Show as" });
+    const graph = tabs.querySelector('a[href="/journeys?as=graph"]');
+    const table = tabs.querySelector('a[href="/journeys"]');
+    expect(graph).toHaveTextContent("Graph");
+    expect(table).toHaveAttribute("aria-current", "page");
+    fireEvent.click(graph as Element);
+    await waitFor(() =>
+      expect(router.getState().location.href).toMatch(/\?as=graph$/),
+    );
+    await waitFor(() =>
+      expect(
+        screen
+          .getByRole("navigation", { name: "Show as" })
+          .querySelector('a[aria-current="page"]'),
+      ).toHaveTextContent("Graph"),
+    );
   });
 });

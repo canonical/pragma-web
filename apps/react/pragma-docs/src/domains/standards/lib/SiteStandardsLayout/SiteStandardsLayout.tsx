@@ -5,12 +5,13 @@ import { AmbientNamespaceProvider } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { SiteColophon } from "#lib/ui/SiteColophon";
 import { SiteRail } from "#lib/ui/SiteRail";
+import { STANDARDS_BINDING } from "../../constants.js";
 import { AMBIENT_NAMESPACE } from "./constants.js";
 import type { SiteStandardsLayoutProps } from "./types.js";
 
 /**
- * The Standards lens's layout with the site's rail and colophon bound to
- * it. It renders no element of its own: `StandardsLayout` renders the root,
+ * The Standards lens's layout with the site's binding, rail and colophon
+ * bound to it. It renders no element of its own: `StandardsLayout` renders the root,
  * so it takes no native props.
  *
  * Its pages are about the code standards, so it declares `cs` as their
@@ -26,7 +27,11 @@ export default function SiteStandardsLayout({
 }: SiteStandardsLayoutProps): ReactElement {
   return (
     <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
-      <StandardsLayout colophon={<SiteColophon />} rail={<SiteRail />}>
+      <StandardsLayout
+        binding={STANDARDS_BINDING}
+        colophon={<SiteColophon />}
+        rail={<SiteRail />}
+      >
         {children}
       </StandardsLayout>
     </AmbientNamespaceProvider>

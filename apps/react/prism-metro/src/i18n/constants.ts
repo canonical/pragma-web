@@ -156,5 +156,4 @@ export const MESSAGES = {
     other: "{count} stations",
   },
   "notFound.title": "Page not found",
-  "notFound.body": "No page of the metro docs lives at this address.",
 } as const;

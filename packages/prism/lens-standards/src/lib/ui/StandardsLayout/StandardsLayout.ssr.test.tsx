@@ -4,7 +4,10 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
 import createStandardsPage from "../../../../testing/createStandardsPage.js";
-import { LINK_COMPONENT_URI } from "../../../../testing/fixtures.js";
+import {
+  LINK_COMPONENT_URI,
+  STANDARDS_BINDING_FIXTURE,
+} from "../../../../testing/fixtures.js";
 import { StandardsLayout } from "./index.js";
 
 describe("StandardsLayout on the server", () => {
@@ -16,6 +19,7 @@ describe("StandardsLayout on the server", () => {
         undefined,
         fetchFn,
         <StandardsLayout
+          binding={STANDARDS_BINDING_FIXTURE}
           colophon={<footer>Colophon</footer>}
           rail={<nav aria-label="Site rail" />}
         >

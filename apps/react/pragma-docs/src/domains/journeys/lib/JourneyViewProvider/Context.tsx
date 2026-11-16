@@ -12,13 +12,12 @@ import type { JourneyViewValue } from "./types.js";
  * the explorer across to the switch. Context crosses that boundary and is
  * the smallest bridge that does.
  *
- * Its default is the table and no filter with inert setters, so a consumer
+ * Its default is the table and no filter with an inert setter, so a consumer
  * outside any provider degrades to the table and the default filter rather
  * than throwing.
  */
 const JourneyViewContext = createContext<JourneyViewValue>({
   view: DEFAULT_JOURNEY_VIEW,
-  setView: () => {},
   filter: undefined,
   setFilter: () => {},
 });

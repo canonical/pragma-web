@@ -7,7 +7,7 @@ import createSiteTree from "../../../../../../../testing/createSiteTree.js";
 import JourneysWorkspace from "./JourneysWorkspace.js";
 
 describe("JourneysWorkspace SSR", () => {
-  it("server-renders the workspace on the table, with the switch in the strip", () => {
+  it("server-renders the workspace on the table, with the shared switch in the strip", () => {
     const html = renderToString(
       createSiteTree(
         createMockEnvironment(),
@@ -18,7 +18,7 @@ describe("JourneysWorkspace SSR", () => {
       ),
     );
     expect(html).toContain('class="ds workspace-layout');
-    expect(html).toContain('class="ds journey-view-switch"');
+    expect(html).toContain('class="ds renderer-switch"');
     expect(html).toContain("<p>Routed page</p>");
   });
 });
