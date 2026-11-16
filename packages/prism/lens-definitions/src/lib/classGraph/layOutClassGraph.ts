@@ -215,17 +215,19 @@ function chooseCrossPorts(
 
 /**
  * Count the cells of a 4 by 4 grid over the design canvas that hold no part
- * of a box, with the regions placed as given and fitted to the canvas.
+ * of a box, with the regions placed as given and fitted to the canvas:
+ * `boxes` holds each region's boxes, in the order of `sized`.
  */
 function countEmptyCells(
   sized: readonly SizedRegion[],
+  boxes: readonly (readonly Rect[])[],
   places: ReadonlyMap<string, RegionPlace>,
   packing: ShelfPacking,
 ): number {
   const zoom = packing.fit;
-  const boxes = sized.flatMap((region) => {
+  const placed = sized.flatMap((region, index) => {
     const place = requireEntry(places, region.prefix);
-    return [...region.layout.nodes.values()].map((node) => ({
+    return requireAt(boxes, index).map((node) => ({
       x: (node.x + place.x + VIEW_MARGIN) * zoom,
       y: (node.y + place.y + REGION_LABEL_ROW + VIEW_MARGIN) * zoom,
       w: node.w * zoom,
@@ -238,7 +240,7 @@ function countEmptyCells(
     const y = (Math.floor(cell / 4) * DESIGN_CANVAS.h) / 4;
     const w = DESIGN_CANVAS.w / 4;
     const h = DESIGN_CANVAS.h / 4;
-    const covered = boxes.some(
+    const covered = placed.some(
       (box) =>
         box.x < x + w &&
         x < box.x + box.w &&
@@ -311,8 +313,12 @@ function alignShelves(
   // The first choices are searched together; any past the limit keep their
   // first share, as a pick below 3 to the limit reads 0 for them.
   const picks = 3 ** Math.min(choices.length, ALIGNMENT_SEARCH_LIMIT);
+  // Each region's boxes, read once for every pick.
+  const boxes = sized.map((region) => [...region.layout.nodes.values()]);
   let best: { places: Map<string, RegionPlace>; empty: number } | undefined;
-  for (let pick = 0; pick < picks; pick += 1) {
+  // Only a pick that leaves fewer empty cells replaces the best, so once
+  // none is left no later pick can.
+  for (let pick = 0; pick < picks && best?.empty !== 0; pick += 1) {
     const places = new Map<string, RegionPlace>();
     entries.forEach((entry, at) => {
       const shift = roundTo(
@@ -330,7 +336,7 @@ function alignShelves(
         shelfY: entry.shelfY,
       });
     });
-    const empty = countEmptyCells(sized, places, packing);
+    const empty = countEmptyCells(sized, boxes, places, packing);
     if (best === undefined || empty < best.empty) best = { places, empty };
   }
   return requireDefined(best, "region placement").places;
