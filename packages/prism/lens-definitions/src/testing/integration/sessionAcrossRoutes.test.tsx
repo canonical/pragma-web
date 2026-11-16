@@ -8,8 +8,9 @@
  * index. The class's page opens its namespace, which the index draws as
  * one box: a drawing the index's camera does not belong to, so the graph
  * opens as loading the page does, and the index, on the way back, as
- * loading it does. A visit to another lens and back starts from the
- * defaults.
+ * loading it does. The page of a class the index draws at rest keeps the
+ * drawing, so there and back the reader's zoom stays as it was. A visit to
+ * another lens and back starts from the defaults.
  */
 
 import { createEnvironment, HomesProvider } from "@canonical/prism-core";
@@ -31,6 +32,7 @@ import {
   DEFINITIONS_TEST_TIMEOUT_MS,
   HOMES,
 } from "../../../testing/fixtures.js";
+import patchRecords from "../../../testing/patchRecords.js";
 import definitionsExplorerRecordsComponent from "../../../testing/records/definitionsExplorerRecordsComponent.js";
 import { definitionsRoutes } from "../../lib/routes.js";
 import { DefinitionsLayout } from "../../lib/ui/DefinitionsLayout/index.js";
@@ -54,6 +56,20 @@ const elsewhere = route({
   content: () => <p>Another lens</p>,
 });
 
+/**
+ * The capture of ds:Component's page, which also answers for the page of
+ * anatomy:Node, a class the index draws at rest, with ds:Component's
+ * details: the leg that visits it reads the camera, not the inspector.
+ */
+const RECORDS = patchRecords(definitionsExplorerRecordsComponent, {
+  "client:root": {
+    'ontologyClass(uri:"anatomy:Node")': {
+      __ref: 'client:root:ontologyClass(uri:"ds:Component")',
+    },
+    'ontologyProperty(uri:"anatomy:Node")': null,
+  },
+});
+
 /** Mount the lens's two routes and another under a router at `path`. */
 function mountLens(path = "/definitions") {
   const router = createRouter(
@@ -63,7 +79,7 @@ function mountLens(path = "/definitions") {
   const view = render(
     <RelayEnvironmentProvider
       environment={createEnvironment({
-        records: definitionsExplorerRecordsComponent,
+        records: RECORDS,
         fetchFn: createFetchSpy(),
       })}
     >
@@ -99,6 +115,10 @@ const readScreenScale = (container: HTMLElement): number => {
     .map(Number);
   return k * Math.min(VIEWPORT.w / w, VIEWPORT.h / h);
 };
+
+/** The zoom the canvas's controls state, such as "86%". */
+const readZoomLevel = (container: HTMLElement): string | null | undefined =>
+  container.querySelector(".desktop .zoom-level")?.textContent;
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -193,6 +213,33 @@ describe("the reader's choices across the lens's routes", () => {
     });
     expect(screen.getByRole("searchbox")).toHaveValue("st");
     expect(readScreenScale(container)).toBeCloseTo(opened, 10);
+
+    // A class the index draws at rest keeps the drawing, so its page and
+    // the way back resume the reader's camera: the zoom stays as it was.
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    const kept = readScreenScale(container);
+    const keptLevel = readZoomLevel(container);
+    expect(kept).not.toBeCloseTo(opened, 10);
+    expect(keptLevel).toMatch(/^\d+%$/);
+    const fresh = mountLens("/definitions/anatomy%3ANode");
+    const freshScale = readScreenScale(fresh.container);
+    fresh.unmount();
+    expect(freshScale).not.toBeCloseTo(kept, 10);
+    await act(async () => {
+      await router.navigate("definitionsTerm", {
+        params: { term: "anatomy:Node" },
+      });
+    });
+    expect(
+      container.querySelector('.desktop .node[data-id="anatomy:Node"]'),
+    ).not.toBeNull();
+    expect(readScreenScale(container)).toBeCloseTo(kept, 10);
+    expect(readZoomLevel(container)).toBe(keptLevel);
+    await act(async () => {
+      await router.navigate("definitions");
+    });
+    expect(readScreenScale(container)).toBeCloseTo(kept, 10);
+    expect(readZoomLevel(container)).toBe(keptLevel);
 
     // A visit to another lens ends the session: back on the index, the
     // reader starts from the defaults.
