@@ -40,7 +40,11 @@ let graph: RunningServer;
 let server: RunningServer;
 let browser: Browser;
 
-const served: { weights?: ServedWeights; prefixes?: readonly string[] } = {};
+const served: {
+  weights?: ServedWeights;
+  prefixes?: readonly string[];
+  classes?: number;
+} = {};
 const canvases = new Map<string, string>();
 
 /**
@@ -76,6 +80,10 @@ beforeAll(
     const answer = await fetchServedGraph(`${graph.base}/graphql`);
     served.weights = weighServedRelations(answer);
     served.prefixes = answer.ontologies.map((ontology) => ontology.prefix);
+    served.classes = answer.ontologies.reduce(
+      (sum, ontology) => sum + ontology.classes.length,
+      0,
+    );
     for (const path of listViews()) canvases.set(path, await serveCanvas(path));
   },
   GRAPH_READY_MS + DEV_READY_MS + 2 * PAGE_SETTLE_MS,
@@ -195,5 +203,12 @@ describe("the overview's record, on the metro", () => {
         GRAPH_BUDGET.svgElementsMax,
       );
     }
+  });
+
+  // The explorer's query reads every class of every loaded namespace, and
+  // nothing bounds it: a site past the budget's figure is a stated limit.
+  it("fetches no more classes than the budget's figure for fetched nodes", () => {
+    expect(served.classes).toBeGreaterThan(0);
+    expect(served.classes).toBeLessThanOrEqual(GRAPH_BUDGET.fetchedNodesMax);
   });
 });
