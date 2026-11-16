@@ -215,6 +215,11 @@ server, deterministically: two renders of a page give the same SVG.
   fits the canvas with every label at 12px or more on screen (a zoom of
   12/14), otherwise the map's top-left corner at that zoom; a term page
   frames its class instead.
+- **Its task.** The drawing states the task it serves, for tests and
+  audits: `data-task="shape"` with the namespaces it draws for in
+  `data-set` (every drawn namespace at rest, the opened one in an opened
+  view), or `data-task="neighbourhood"` with the selected class in
+  `data-focus` on a term page.
 - **The stated limits.** Three lanes in a channel beside a column: a
   fourth bridge there runs closer than 4px to its neighbour, and from six
   they lie on one line; a gap or a margin keeps nine 4px apart. A namespace with more classes than the budget

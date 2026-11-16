@@ -36,6 +36,22 @@ describe("HierarchyWell SSR", () => {
     expect(renderWell(undefined)).not.toContain("is-faded");
   });
 
+  it("server-renders the task its canvas serves, beside the canvas's other hooks", () => {
+    const sets = layout.regions.map((region) => region.prefix).join(" ");
+    const overview = renderWell(undefined);
+    expect(overview).toMatch(
+      new RegExp(
+        `<g data-task="shape" data-set="${sets}" data-fit-zoom="[^"]+" class="ds class-graph">`,
+      ),
+    );
+    expect(overview).not.toContain("data-focus=");
+    const term = renderWell("ds:Component");
+    expect(term).toMatch(
+      /<g data-task="neighbourhood" data-focus="ds:Component" data-fit-zoom="[^"]+" class="ds class-graph">/,
+    );
+    expect(term).not.toContain("data-set=");
+  });
+
   it("renders the same markup every time", () => {
     expect(renderWell("ds:Component")).toBe(renderWell("ds:Component"));
   });

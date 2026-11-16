@@ -28,6 +28,7 @@ import { ClassGraph } from "../ClassGraph/index.js";
 import buildDrillSearch from "./buildDrillSearch.js";
 import classifyClasses from "./classifyClasses.js";
 import { PhoneGraph } from "./common/PhoneGraph/index.js";
+import describeGraphTask from "./describeGraphTask.js";
 import frameOpeningCamera from "./frameOpeningCamera.js";
 import frameOpeningView from "./frameOpeningView.js";
 import frameRefitWindow from "./frameRefitWindow.js";
@@ -376,6 +377,7 @@ export default function HierarchyWell({
         viewBox={viewBox}
       >
         <ClassGraph
+          {...describeGraphTask(layout, term)}
           active={hovered}
           activeEdge={activeEdge}
           data-fit-zoom={layout.fitZoom.toFixed(4)}
