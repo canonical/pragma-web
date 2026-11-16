@@ -22,7 +22,6 @@ export default function describeGraphTask(
   return {
     "data-task": GRAPH_TASKS.set,
     "data-set":
-      layout.drilled ??
-      layout.regions.map((region) => region.prefix).join(" "),
+      layout.drilled ?? layout.regions.map((region) => region.prefix).join(" "),
   };
 }

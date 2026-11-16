@@ -98,18 +98,18 @@ afterAll(async () => {
 describe("the overview's record, on the metro", () => {
   it("states each canvas's task: the drawn namespaces at rest, the opened one opened, the class in focus on a term page", async () => {
     const hooksOf = (svg: string): string | undefined =>
-      /<g (data-task="[^"]+" data-(?:set|focus)="[^"]+")[^>]* class="ds class-graph"/.exec(
-        svg,
-      )?.at(1);
+      /<g (data-task="[^"]+" data-(?:set|focus)="[^"]+")[^>]* class="ds class-graph"/
+        .exec(svg)
+        ?.at(1);
     const drawn = hooksOf(canvases.get("/definitions") ?? "");
     expect(drawn).toMatch(/^data-task="shape" data-set="/);
     for (const prefix of served.prefixes ?? []) {
-      expect(drawn?.split('data-set="').at(1)?.slice(0, -1).split(" ")).toContain(
-        prefix,
-      );
       expect(
-        hooksOf(canvases.get(`/definitions?expand=${prefix}`) ?? ""),
-      ).toBe(`data-task="shape" data-set="${prefix}"`);
+        drawn?.split('data-set="').at(1)?.slice(0, -1).split(" "),
+      ).toContain(prefix);
+      expect(hooksOf(canvases.get(`/definitions?expand=${prefix}`) ?? "")).toBe(
+        `data-task="shape" data-set="${prefix}"`,
+      );
     }
     expect(hooksOf(await serveCanvas("/definitions/metro%3AStation"))).toBe(
       'data-task="neighbourhood" data-focus="metro:Station"',
