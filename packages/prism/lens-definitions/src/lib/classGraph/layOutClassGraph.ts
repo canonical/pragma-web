@@ -669,14 +669,13 @@ function layOutModel(
   for (const shelfY of new Set(routes.map(({ arch }) => arch?.shelfY))) {
     if (shelfY === undefined) continue;
     const group = routes
-      .filter(
-        ({ arch, bundle }) => arch?.shelfY === shelfY && !across.has(bundle.id),
+      .flatMap(({ arch, bundle, channel }) =>
+        arch?.shelfY === shelfY && !across.has(bundle.id)
+          ? [{ bundle, channel, span: arch.span }]
+          : [],
       )
       .sort((x, y) =>
-        orderBy(
-          (y.arch?.span ?? 0) - (x.arch?.span ?? 0),
-          compareText(x.bundle.id, y.bundle.id),
-        ),
+        orderBy(y.span - x.span, compareText(x.bundle.id, y.bundle.id)),
       );
     group.forEach(({ bundle, channel }, rank) => {
       const lane =

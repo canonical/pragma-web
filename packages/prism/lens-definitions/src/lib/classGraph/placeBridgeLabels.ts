@@ -177,13 +177,14 @@ export default function placeBridgeLabels(
     // bottom, down to the next shelf's top: centred on the bridge, then,
     // failing every other place, anywhere under the pair, nearest the
     // bridge first. A stub that is no region stands for its own box.
-    const [one, two] = [bundle.a, bundle.b].map((end): Rect => {
+    const boundOf = (end: string): Rect => {
       const node = requireEntry(layout.nodes, end);
       return (
         layout.regions.find((region) => region.prefix === node.region) ?? node
       );
-    });
-    if (one === undefined || two === undefined) continue;
+    };
+    const one = boundOf(bundle.a);
+    const two = boundOf(bundle.b);
     const sideBySide =
       one !== two && one.y < two.y + two.h && two.y < one.y + one.h;
     const xs = route.flatMap(({ from, to }) => [from[0], to[0]]);
