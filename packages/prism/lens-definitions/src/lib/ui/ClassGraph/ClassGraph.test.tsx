@@ -430,6 +430,14 @@ describe("ClassGraph", () => {
       const resting = nodeOf(draw(own), "surface");
       expect(resting.getAttribute("data-kind")).toBe("region");
       expect(resting.getAttribute("data-classes")).toBe("31");
+      // A box states no instance figure until one is served for it; a
+      // class states its own.
+      expect(resting.hasAttribute("data-instances")).toBe(false);
+      expect(
+        draw(own)
+          .querySelector('.node[data-kind="concrete"]')
+          ?.getAttribute("data-instances"),
+      ).toMatch(/^\d+$/);
       expect(resting.querySelector(".title.is-prominent")?.textContent).toBe(
         "surface",
       );
@@ -482,6 +490,7 @@ describe("ClassGraph", () => {
       ]);
       for (const stub of stubs) {
         expect(stub.querySelector("a")).toBeNull();
+        expect(stub.hasAttribute("data-instances")).toBe(false);
         expect(stub.getAttribute("aria-label")).toBe(
           `Class ${stub.getAttribute("data-id")}, outside the loaded namespaces, 1 relation`,
         );

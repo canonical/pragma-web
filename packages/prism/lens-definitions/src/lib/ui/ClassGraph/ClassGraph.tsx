@@ -269,7 +269,7 @@ export default function ClassGraph({
         data-h={node.h}
         data-hub={String(node.hub)}
         data-id={term}
-        data-instances={node.instanceCount}
+        data-instances={node.kind === "class" ? node.instanceCount : undefined}
         data-kind={
           node.kind !== "class"
             ? node.kind
