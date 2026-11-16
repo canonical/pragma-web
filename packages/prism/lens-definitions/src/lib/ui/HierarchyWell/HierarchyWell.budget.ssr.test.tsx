@@ -138,6 +138,47 @@ describe("HierarchyWell SSR within the graph budget at rest", () => {
     },
   );
 
+  // A bridge is drawn per pair of drawn ends, whatever number of relations
+  // it bundles: each is named at rest, past the drawing's bounds or under
+  // the pair it joins where its route has no room, in every opened view.
+  it.each([
+    ["the docs records", ontologyGraph],
+    ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH],
+    ["the metro's records", metroGraph],
+  ])(
+    "names every bridge %s draws at rest, at rest and with each namespace opened, within the drawing's bounds",
+    (_, input) => {
+      const t = createTranslator("en", MESSAGES);
+      for (const drill of [
+        undefined,
+        ...new Set(input.classes.map((klass) => klass.prefix)),
+      ]) {
+        const layout = layOutClassGraph(input, {
+          budget: GRAPH_BUDGET,
+          ...(drill === undefined ? {} : { drill }),
+        });
+        const bridges = layout.edges.filter((edge) => edge.bridge === true);
+        const placement = placeBridgeLabels(layout, t);
+        expect(placement.omitted, drill).toEqual([]);
+        expect(placement.placed, drill).toHaveLength(bridges.length);
+        const { viewBox } = layout;
+        for (const { box } of placement.placed) {
+          expect(box.x, drill).toBeGreaterThanOrEqual(viewBox.x);
+          expect(box.y, drill).toBeGreaterThanOrEqual(viewBox.y);
+          expect(box.x + box.w, drill).toBeLessThanOrEqual(
+            viewBox.x + viewBox.w,
+          );
+          expect(box.y + box.h, drill).toBeLessThanOrEqual(
+            viewBox.y + viewBox.h,
+          );
+        }
+        expect(measureCanvasSvg(renderCanvas(input, drill)).bridgeLabels).toBe(
+          bridges.length,
+        );
+      }
+    },
+  );
+
   it("draws the metro's records whole at rest with no box to open, and geo drilled with every other namespace a box that opens it", () => {
     const rest = renderCanvas(metroGraph);
     expect(rest).not.toContain('data-kind="region"');

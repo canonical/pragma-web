@@ -94,17 +94,19 @@ describe("placeBridgeLabels", () => {
     }
   });
 
-  it("labels two of three nested arches at rest and leaves the innermost to the focus", () => {
+  it("labels all three nested arches at rest, the innermost past the others' verticals", () => {
     // In a 48px gap the innermost arch runs between the others' verticals
     // with no stretch of its own wide enough for a label: the outermost
-    // carries its label beside its descent, the middle one under the pair.
+    // carries its label beside its descent, the middle one under the pair,
+    // and the innermost takes a place past them rather than the focus's.
     const layout = layOutClassGraph(CROSSED_TRIO_GRAPH);
     const { bridges, labels, omitted } = placeOn(layout);
     expect(labels.map((label) => label.edge)).toEqual([
       "rel:aa:A0 bb:B2",
       "rel:aa:A1 bb:B1",
+      "rel:aa:A2 bb:B0",
     ]);
-    expect(omitted).toEqual(["rel:aa:A2 bb:B0"]);
+    expect(omitted).toEqual([]);
     for (const label of labels) {
       for (const bridge of bridges) {
         if (bridge.id !== label.edge)
@@ -113,17 +115,12 @@ describe("placeBridgeLabels", () => {
       for (const node of layout.nodes.values()) {
         expect(intersectsRect(label.box, node)).toBe(false);
       }
+      for (const other of labels) {
+        if (other !== label)
+          expect(intersectsRect(label.box, other.box)).toBe(false);
+      }
     }
-    const [first, second] = labels;
-    expect(
-      intersectsRect(
-        requireDefined(first, "a label").box,
-        requireDefined(second, "a label").box,
-      ),
-    ).toBe(false);
-    expect(
-      placeBridgeLabels(layout, t).onFocus.map((label) => label.edge),
-    ).toEqual(["rel:aa:A2 bb:B0"]);
+    expect(placeBridgeLabels(layout, t).onFocus).toEqual([]);
   });
 
   it("labels a bridge too short for its label under the pair it joins, centred on it, clear of boxes, label rows and routes", () => {
@@ -220,19 +217,50 @@ describe("placeBridgeLabels", () => {
     ]);
   });
 
-  it("records a bridge with no clear place, for the focus's labels to name", () => {
+  it("places a label past the drawing's bounds when none fits within them, and the layout's bounds hold it", () => {
     const layout = layOutClassGraph(STACKED_PAIR_GRAPH);
-    expect(
-      placeBridgeLabels({ ...layout, viewBox: { x: 0, y: 0, w: 0, h: 0 } }, t),
-    ).toMatchObject({ placed: [], omitted: ["rel:aa:A bb:B"] });
-  });
-
-  it("gives an omitted bridge the place its label takes on focus, clear of the boxes", () => {
-    const layout = layOutClassGraph(STACKED_PAIR_GRAPH);
-    const { onFocus } = placeBridgeLabels(
+    const { placed, omitted } = placeBridgeLabels(
       { ...layout, viewBox: { x: 0, y: 0, w: 0, h: 0 } },
       t,
     );
+    expect(omitted).toEqual([]);
+    expect(placed.map(({ edge, text }) => [edge, text])).toEqual([
+      ["rel:aa:A bb:B", "reaches"],
+    ]);
+    for (const { box } of placeOn(layout).labels) {
+      expect(box.x).toBeGreaterThanOrEqual(layout.viewBox.x);
+      expect(box.y).toBeGreaterThanOrEqual(layout.viewBox.y);
+      expect(box.x + box.w).toBeLessThanOrEqual(
+        layout.viewBox.x + layout.viewBox.w,
+      );
+      expect(box.y + box.h).toBeLessThanOrEqual(
+        layout.viewBox.y + layout.viewBox.h,
+      );
+    }
+  });
+
+  it("records a bridge with no clear place, for the focus's labels to name, and gives it the place its label takes on focus, clear of the boxes", () => {
+    const layout = layOutClassGraph(STACKED_PAIR_GRAPH);
+    const bridge = requireDefined(
+      layout.edges.find((edge) => edge.bridge === true),
+      "a bridge",
+    );
+    // Another relation's stroke combed over the whole graph, every 8px:
+    // a label crosses it wherever it goes, though no box stands there.
+    const comb = Array.from(
+      { length: 257 },
+      (_, row) => `M-1024 ${row * 8 - 1024}H1024`,
+    ).join("");
+    const combed = {
+      ...layout,
+      edges: [
+        ...layout.edges,
+        { ...bridge, id: "comb", bridge: false, d: comb },
+      ],
+    };
+    const { placed, omitted, onFocus } = placeBridgeLabels(combed, t);
+    expect(placed).toEqual([]);
+    expect(omitted).toEqual(["rel:aa:A bb:B"]);
     expect(onFocus.map(({ edge, text }) => [edge, text])).toEqual([
       ["rel:aa:A bb:B", "reaches"],
     ]);

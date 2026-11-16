@@ -501,10 +501,23 @@ describe("ClassGraph", () => {
   });
 
   describe("a bridge whose label finds no place at rest", () => {
-    // A viewBox with no room leaves every bridge without a place at rest.
+    // Another relation's stroke combed over the whole graph, every 8px,
+    // leaves every bridge without a place at rest, within the drawing or
+    // past it.
+    const first = requireDefined(
+      metro.layout.edges.find((edge) => edge.bridge === true),
+      "a bridge",
+    );
+    const comb = Array.from(
+      { length: 257 },
+      (_, row) => `M-1024 ${row * 8 - 1024}H1024`,
+    ).join("");
     const cramped = {
       ...metro.layout,
-      viewBox: { x: 0, y: 0, w: 0, h: 0 },
+      edges: [
+        ...metro.layout.edges,
+        { ...first, id: "comb", bridge: false, d: comb },
+      ],
     };
     const own = { layout: cramped, terms: metro.terms };
     const bridge = requireDefined(

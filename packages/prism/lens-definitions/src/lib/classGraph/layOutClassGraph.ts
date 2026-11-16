@@ -1,3 +1,4 @@
+import { createTranslator } from "@canonical/i18n-core";
 import {
   BUS_OFFSET,
   buildArrowhead,
@@ -19,6 +20,7 @@ import {
   roundTo,
   uniteRects,
 } from "@canonical/prism-core";
+import { MESSAGES } from "../i18n/constants.js";
 import buildClassGraphModel from "./buildClassGraphModel.js";
 import chooseDrawnScope from "./chooseDrawnScope.js";
 import {
@@ -30,6 +32,7 @@ import {
   CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
   FALLBACK_CHANNEL,
+  MEASURED_LOCALE,
   MIN_FIT,
   REGION_ALIGNMENTS,
   SHELF_ALIGNMENTS,
@@ -47,6 +50,7 @@ import orderBoxedClasses from "./orderBoxedClasses.js";
 import orderRail from "./orderRail.js";
 import orderRegionsByBridges from "./orderRegionsByBridges.js";
 import packShelves from "./packShelves.js";
+import placeBridgeLabels from "./placeBridgeLabels.js";
 import routeNeighbourBridges from "./routeNeighbourBridges.js";
 import type {
   Bundle,
@@ -817,19 +821,34 @@ function layOutModel(
     );
     return [{ x, y: bottom, w, h: BRIDGE_LABEL_BAND }];
   });
-  const bounds = uniteRects([
-    ...regions,
-    ...crossEdges.map((edge) => measurePathBounds(edge.d)),
-    ...bands,
-  ]);
-  const viewBox = {
+  const addMargin = (bounds: Rect): Rect => ({
     x: bounds.x - VIEW_MARGIN,
     y: bounds.y - VIEW_MARGIN,
     w: bounds.w + 2 * VIEW_MARGIN,
     h: bounds.h + 2 * VIEW_MARGIN,
-  };
+  });
+  const drawing = uniteRects([
+    ...regions,
+    ...crossEdges.map((edge) => measurePathBounds(edge.d)),
+    ...bands,
+  ]);
   const orderedNodes = new Map(
     [...nodes.entries()].sort(([a], [b]) => compareText(a, b)),
+  );
+  // A bridge's label with no place within the drawing takes one past it,
+  // and the bounds grow to hold it, so every drawn bridge is named at
+  // rest: measured as the catalog's English sets it, like the boxes.
+  const labelled = placeBridgeLabels(
+    {
+      nodes: orderedNodes,
+      edges: allEdges,
+      regions,
+      viewBox: addMargin(drawing),
+    },
+    createTranslator(MEASURED_LOCALE, MESSAGES),
+  );
+  const viewBox = addMargin(
+    uniteRects([drawing, ...labelled.placed.map((label) => label.box)]),
   );
   const fitZoom = Math.min(
     DESIGN_CANVAS.w / viewBox.w,
@@ -865,7 +884,8 @@ function layOutModel(
  * 14px labels below 12px, which are kept whenever they lift the fit and
  * no arc nests past them), placed on the lattice, then the cross-region
  * relations and subclass joins routed through the gaps, the rail order,
- * the keyboard's moves, the viewBox with its margin, the view the canvas
+ * the keyboard's moves, the viewBox with its margin, grown to hold a
+ * bridge's label with no place within the drawing, the view the canvas
  * opens on (the whole viewBox, or a legible window of it whose edges cut no
  * box when the whole fits only below the legible zoom, which the findings
  * record) and the phone view.

@@ -80,11 +80,15 @@ function touchesRun(box: Rect, { from, to }: Run): boolean {
  * names. A bridge between two regions side by side whose route is too
  * short to carry its label so carries it under the pair: centred on the
  * bridge, in the band below the two regions, from just under them down
- * by the same few px, clear of the same. A bridge with no such place is
- * omitted, and given the place its
- * label takes when a class at one of its ends is the focus, which fades
- * the other lines: the first clear of every box and region label row,
- * else the one nearest its arrowhead. Bridges are placed by edge id and every centre is
+ * by the same few px, clear of the same. A bridge with no such place
+ * within the viewBox takes the first clear place on its route past the
+ * viewBox's edge, else under the pair it joins, centred on it, else
+ * anywhere under the pair, nearest the bridge: the layout grows its
+ * viewBox to hold such a label, so every drawn bridge is named at rest.
+ * Only a bridge with no clear place at all is omitted, and given the place
+ * its label takes when a class at one of its ends is the focus, which
+ * fades the other lines: the first clear of every box and region label
+ * row, else the one nearest its arrowhead. Bridges are placed by edge id and every centre is
  * a whole pixel, so the same layout always gives the same labels.
  *
  * @param layout - The class graph laid out.
@@ -93,7 +97,7 @@ function touchesRun(box: Rect, { from, to }: Run): boolean {
  *   omitted bridges' labels on focus.
  */
 export default function placeBridgeLabels(
-  layout: ClassGraphLayout,
+  layout: Pick<ClassGraphLayout, "nodes" | "edges" | "regions" | "viewBox">,
   t: Translate,
 ): BridgeLabelPlacement {
   const obstacles: readonly Rect[] = [
@@ -169,40 +173,42 @@ export default function placeBridgeLabels(
         },
       ).flat();
     });
-    // Under the pair of regions side by side the bridge joins, centred on
-    // it, in the band below their bottom, down to the next shelf's top.
-    const ends = [bundle.a, bundle.b].map(
-      (end) => requireEntry(layout.nodes, end).region,
-    );
-    const pair = layout.regions.filter((region) =>
-      ends.includes(region.prefix),
-    );
-    const [one, two] = pair;
+    // Under the pair of regions the bridge joins, in the band below their
+    // bottom, down to the next shelf's top: centred on the bridge, then,
+    // failing every other place, anywhere under the pair, nearest the
+    // bridge first. A stub that is no region stands for its own box.
+    const [one, two] = [bundle.a, bundle.b].map((end): Rect => {
+      const node = requireEntry(layout.nodes, end);
+      return (
+        layout.regions.find((region) => region.prefix === node.region) ?? node
+      );
+    });
+    if (one === undefined || two === undefined) continue;
     const sideBySide =
-      one !== undefined &&
-      two !== undefined &&
-      one.y < two.y + two.h &&
-      two.y < one.y + one.h;
+      one !== two && one.y < two.y + two.h && two.y < one.y + one.h;
     const xs = route.flatMap(({ from, to }) => [from[0], to[0]]);
-    const under = sideBySide
-      ? Array.from(
-          {
-            length: Math.floor((SHELF_GAP - h) / BRIDGE_LABEL_STEP) + 1,
-          },
-          (_, step) => ({
-            cx: Math.round((Math.min(...xs) + Math.max(...xs)) / 2),
-            cy:
-              Math.max(one.y + one.h, two.y + two.h) +
-              Math.ceil(h / 2) +
-              step * BRIDGE_LABEL_STEP,
-          }),
-        )
-      : [];
-    const boxes = [...candidates, ...under].map(({ cx, cy }) => ({
+    const centre = Math.round((Math.min(...xs) + Math.max(...xs)) / 2);
+    const left = Math.min(one.x, two.x) + Math.ceil(w / 2);
+    const right = Math.max(one.x + one.w, two.x + two.w) - Math.ceil(w / 2);
+    const shifts = Array.from(
+      { length: Math.floor(Math.max(0, right - left) / BRIDGE_LABEL_STEP) + 1 },
+      (_, step) => left + step * BRIDGE_LABEL_STEP,
+    ).sort((a, b) => Math.abs(a - centre) - Math.abs(b - centre) || a - b);
+    const depths = Array.from(
+      { length: Math.floor((SHELF_GAP - h) / BRIDGE_LABEL_STEP) + 1 },
+      (_, step) =>
+        Math.max(one.y + one.h, two.y + two.h) +
+        Math.ceil(h / 2) +
+        step * BRIDGE_LABEL_STEP,
+    );
+    const under = depths.map((cy) => ({ cx: centre, cy }));
+    const beneath = depths.flatMap((cy) => shifts.map((cx) => ({ cx, cy })));
+    const toBox = ({ cx, cy }: { cx: number; cy: number }) => ({
       cx,
       cy,
       box: { x: cx - Math.ceil(w / 2), y: cy - Math.ceil(h / 2), w, h },
-    }));
+    });
+    const boxes = [...candidates, ...(sideBySide ? under : [])].map(toBox);
     const isInside = (box: Rect): boolean =>
       box.x >= viewBox.x &&
       box.y >= viewBox.y &&
@@ -210,14 +216,19 @@ export default function placeBridgeLabels(
       box.y + box.h <= viewBox.y + viewBox.h;
     const isClear = (box: Rect): boolean =>
       !obstacles.some((obstacle) => intersectsRect(obstacle, box));
-    const chosen = boxes.find(
-      ({ box }) =>
-        isInside(box) &&
-        isClear(box) &&
-        !placed.some((label) => intersectsRect(label.box, box)) &&
-        !others.some((run) => touchesRun(box, run)) &&
-        !strokes.some((run) => touchesRun(box, run)),
-    );
+    const isFree = (box: Rect): boolean =>
+      isClear(box) &&
+      !placed.some((label) => intersectsRect(label.box, box)) &&
+      !others.some((run) => touchesRun(box, run)) &&
+      !strokes.some((run) => touchesRun(box, run));
+    // Within the drawing's bounds first; then on the route or under the
+    // pair past those bounds, which the layout grows to hold the label,
+    // then anywhere under the pair.
+    const chosen =
+      boxes.find(({ box }) => isInside(box) && isFree(box)) ??
+      [...candidates, ...under, ...beneath]
+        .map(toBox)
+        .find(({ box }) => isFree(box));
     if (chosen !== undefined) {
       placed.push({ edge: edge.id, text, ...chosen });
       continue;
