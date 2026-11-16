@@ -32,6 +32,14 @@ const renderControls = (
 };
 
 describe("ExplorerControls", () => {
+  it("explains no chip in a tooltip: no control carries a title", () => {
+    renderControls(createAllNamespacesFilter(["ds", "cs"]));
+    const bar = screen.getByRole("group", { name: "Filter by abstraction" })
+      .parentElement as HTMLElement;
+    expect(within(bar).getAllByRole("button")).toHaveLength(5);
+    expect(bar.querySelectorAll("[title]")).toHaveLength(0);
+  });
+
   it("offers one chip per real axis value — abstraction and ontology", () => {
     renderControls(createAllNamespacesFilter(["ds", "cs"]));
     // The axes are named for what they ARE. No "experimental"/"stable"

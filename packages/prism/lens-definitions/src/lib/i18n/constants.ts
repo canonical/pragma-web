@@ -17,15 +17,10 @@ export const MESSAGES = {
   "explorer.search.placeholder": "Search terms…",
   "controls.abstraction.label": "Filter by abstraction",
   "controls.abstraction.abstract.label": "Abstract",
-  "controls.abstraction.abstract.hint":
-    "Classes that are never instantiated directly",
   "controls.abstraction.concrete.label": "Concrete",
-  "controls.abstraction.concrete.hint": "Classes with instances of their own",
   "controls.ontology.label": "Filter by ontology",
-  "controls.ontology.hint": "Terms from the {label} ontology",
   "controls.instances.label": "Filter by instances",
   "controls.instances.with.label": "With instances",
-  "controls.instances.with.hint": "Dim the classes that have no instances",
   "status.classes": {
     one: "{visible} of {count} class",
     other: "{visible} of {count} classes",

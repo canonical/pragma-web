@@ -1017,6 +1017,18 @@ describe("the overview's record, on the docs site", () => {
     for (const path of listViews()) canvases.set(path, await serveCanvas(path));
   }, PAGE_SETTLE_MS);
 
+  it("explains no chip of the explorer's bar in a tooltip, as served", async () => {
+    const html = await (
+      await fetch(new URL("/definitions", server.base))
+    ).text();
+    // The bar's fieldsets hold no <div>: the first close after its slot
+    // is its own.
+    const start = html.indexOf('data-slot="explorer-controls"');
+    const bar = html.slice(start, html.indexOf("</div>", start));
+    expect(bar.match(/<button/g)?.length).toBeGreaterThan(0);
+    expect(bar).not.toContain(" title=");
+  });
+
   it("packs the overview deterministically: two server renders give the same SVG bytes, at rest and opened", async () => {
     expect(canvases.size).toBe(1 + (served.prefixes?.length ?? 0));
     for (const path of listViews()) {
