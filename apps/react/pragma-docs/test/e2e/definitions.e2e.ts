@@ -564,6 +564,8 @@ describe("at 1440 px", () => {
   it.each([
     `/definitions/${encodeURIComponent("ds:UIBlock")}`,
     "/definitions?expand=surface",
+    "/definitions?expand=ds",
+    "/definitions?expand=anatomy",
   ])(
     "restores %s's opening with Fit, at the legible floor or above, never by a namespace's height",
     async (path) => {
@@ -734,23 +736,28 @@ describe("the drill through the address, at 1440 px", () => {
     },
   );
 
-  it("leads the way back from the address's namespace to the overview at rest", async () => {
-    const seen: { boxes?: string[]; url?: string } = {};
-    const back = await openExplorer(
-      "/definitions?expand=surface",
-      desktop,
-      async (page) => {
-        await page.locator(".ds.graph-canvas svg.viewport a.way-back").click();
-        await page.waitForURL((url) => !url.search.includes("expand"));
-        await page.waitForTimeout(CAMERA_SETTLE_MS);
-        seen.boxes = await listBoxes(page);
-        seen.url = page.url();
-      },
-    );
-    expect(back.errors).toEqual([]);
-    expect(seen.boxes).toEqual(expect.arrayContaining(["surface", "ds"]));
-    expect(new URL(seen.url ?? "").pathname).toBe("/definitions");
-  });
+  it.each(["surface", "ds", "anatomy"])(
+    "leads the way back from %s opened to the overview at rest",
+    async (prefix) => {
+      const seen: { boxes?: string[]; url?: string } = {};
+      const back = await openExplorer(
+        `/definitions?expand=${prefix}`,
+        desktop,
+        async (page) => {
+          await page
+            .locator(".ds.graph-canvas svg.viewport a.way-back")
+            .click();
+          await page.waitForURL((url) => !url.search.includes("expand"));
+          await page.waitForTimeout(CAMERA_SETTLE_MS);
+          seen.boxes = await listBoxes(page);
+          seen.url = page.url();
+        },
+      );
+      expect(back.errors).toEqual([]);
+      expect(seen.boxes).toEqual(expect.arrayContaining(["surface", "ds"]));
+      expect(new URL(seen.url ?? "").pathname).toBe("/definitions");
+    },
+  );
 });
 
 describe("a drill's link against its address", () => {
@@ -1043,9 +1050,17 @@ describe("the overview's record, on the docs site", () => {
     }
   });
 
-  it("keeps every two arches over a shelf off one line, at rest and with each namespace opened", () => {
+  it("draws no two bridges on one line, and none along three sides of a region it joins, at rest and with each namespace opened", () => {
+    expect(listViews()).toEqual(
+      expect.arrayContaining(
+        ["surface", "ds", "anatomy"].map(
+          (prefix) => `/definitions?expand=${prefix}`,
+        ),
+      ),
+    );
     for (const [path, measure] of measureViews()) {
-      expect(measure.sharedArchLines, path).toEqual([]);
+      expect(measure.sharedBridgeLines, path).toEqual([]);
+      expect(measure.framingBridges, path).toEqual([]);
     }
   });
 
