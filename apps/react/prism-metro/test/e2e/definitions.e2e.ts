@@ -100,6 +100,10 @@ describe("the overview's record, on the metro", () => {
     // Three bridges from geo into metro: location, in zone and stops.
     expect(rest.bridges).toBe(served.weights?.bridges);
     expect(rest.bridgeLabels).toBe(rest.bridges);
+    // Every opened view names every bridge it draws at rest too.
+    for (const [path, measure] of measureViews()) {
+      expect(measure.bridgeLabels, path).toBe(measure.bridges);
+    }
     const [desktop] = VIEWPORTS;
     const page = await browser.newPage({
       viewport: { width: desktop.width, height: desktop.height },
