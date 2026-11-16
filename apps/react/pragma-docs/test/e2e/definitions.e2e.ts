@@ -365,7 +365,7 @@ describe.each([...VIEWPORTS, ...SHORT_DESKTOP_VIEWPORTS])(
   "at $name px",
   (viewport) => {
     it.each(DEFINITIONS_PATHS)(
-      "hydrates %s silently, with every graph text legible, every label in its box and no class cut",
+      "hydrates %s silently, with every graph text legible, every label in its box, no class cut at rest and never the selected one",
       async (path) => {
         const { errors, measure } = await openExplorer(path, viewport);
         expect(errors).toEqual([]);
@@ -374,7 +374,14 @@ describe.each([...VIEWPORTS, ...SHORT_DESKTOP_VIEWPORTS])(
         expect(measure.unlabelled).toBe(0);
         expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
         expect(measure.overflowing).toEqual([]);
-        expect(measure.cut).toEqual([]);
+        // A term page centres its class: the window's edge may cut the
+        // classes beside it, never the class itself; the overview cuts none.
+        const term = decodeURIComponent(path.slice("/definitions/".length));
+        expect(
+          path === "/definitions"
+            ? measure.cut
+            : measure.cut.filter((id) => id === term),
+        ).toEqual([]);
         for (const height of measure.railHeadingHeights) {
           expect(height).toBeGreaterThan(MIN_SCREEN_TEXT_PX);
         }
@@ -554,32 +561,40 @@ describe("at 1440 px", () => {
     expect(measure.cut).toEqual([]);
   });
 
-  it("keeps Fit at the overview's floor on a namespace a selection drills into", async () => {
-    const view: { zoom?: string | null } = {};
-    const { errors, measure } = await openExplorer(
-      `/definitions/${encodeURIComponent("ds:UIBlock")}`,
-      desktop,
-      async (page) => {
-        await page.getByRole("button", { name: "Fit", exact: true }).click();
-        await page.waitForTimeout(CAMERA_SETTLE_MS);
-        view.zoom = await page
-          .locator(".ds.graph-canvas .zoom-level")
-          .textContent();
-      },
-    );
-    expect(errors).toEqual([]);
-    // The term page draws ds class by class, which the overview draws as
-    // one box, and the other namespaces as a box each. A drilled view is
-    // not held to the fit: where it fits only below the overview's floor,
-    // Fit stops there, on a window whose edges cut no class, every text
-    // in view at 12px or more.
-    expect(Number.parseInt(view.zoom ?? "", 10)).toBeGreaterThanOrEqual(75);
-    expect(measure.inView).toBeGreaterThan(0);
-    expect(measure.inView).toBeLessThanOrEqual(measure.drawn);
-    expect(measure.textCount).toBeGreaterThan(0);
-    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
-    expect(measure.cut).toEqual([]);
-  });
+  it.each([
+    `/definitions/${encodeURIComponent("ds:UIBlock")}`,
+    "/definitions?expand=surface",
+  ])(
+    "restores %s's opening with Fit, at the legible floor or above, never by a namespace's height",
+    async (path) => {
+      const view: { opened?: string | null; fitted?: string | null } = {};
+      const zoomLevel = ".ds.graph-canvas .zoom-level";
+      const { errors, measure } = await openExplorer(
+        path,
+        desktop,
+        async (page) => {
+          view.opened = await page.locator(zoomLevel).textContent();
+          await page.getByRole("button", { name: "Zoom in" }).click();
+          await page.getByRole("button", { name: "Zoom in" }).click();
+          await page.waitForTimeout(CAMERA_SETTLE_MS);
+          await page.getByRole("button", { name: "Fit", exact: true }).click();
+          await page.waitForTimeout(CAMERA_SETTLE_MS);
+          view.fitted = await page.locator(zoomLevel).textContent();
+        },
+      );
+      expect(errors).toEqual([]);
+      // Fit shows what the page opened on: on the term page its class
+      // framed as on arrival, on the opened view the map's top-left corner
+      // at the legible floor; every text in view at 12px or more.
+      expect(view.fitted).toBe(view.opened);
+      expect(Number.parseInt(view.fitted ?? "", 10)).toBeGreaterThanOrEqual(
+        Math.floor(MIN_FIT * 100),
+      );
+      expect(measure.inView).toBeGreaterThan(0);
+      expect(measure.unlabelled).toBe(0);
+      expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    },
+  );
 
   it("puts the inspector's field ranges on one column line", async () => {
     const { measure } = await openExplorer(
