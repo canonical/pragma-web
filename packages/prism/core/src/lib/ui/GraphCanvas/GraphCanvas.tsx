@@ -44,7 +44,8 @@ function nameLattice(label: string): string {
  * camera fits it, and the Fit control and `0` fit it again, whole, but
  * never into the overview bucket: a box too large for its floor shows the
  * window of it that `legibleWindow` chooses at that floor, or its top-left
- * corner at that floor, so the hub and region labels stay; a `frame`
+ * corner at that floor, so the hub and region labels stay, or, with
+ * `legibleFit`, at the legible zoom, so every label stays; a `frame`
  * request fits its box once per serial; neither a changed `fit` nor a
  * frame zooms a legible view out to an illegible one, showing the window
  * of a box too large for it that `legibleWindow` chooses. When `reveal`
@@ -72,6 +73,7 @@ export default function GraphCanvas({
   fit,
   frame,
   legibleWindow,
+  legibleFit,
   memory,
   reveal,
   hint,
@@ -91,6 +93,7 @@ export default function GraphCanvas({
     fit,
     frame,
     legibleWindow,
+    legibleFit,
     reveal,
     opening,
     memory,

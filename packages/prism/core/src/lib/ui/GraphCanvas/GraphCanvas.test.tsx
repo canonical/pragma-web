@@ -817,6 +817,46 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(-160,-80) scale(1)");
   });
 
+  it("keeps Fit at the legible zoom with `legibleFit`, a box too large shown by its legible window", () => {
+    const large: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
+    const window: GraphBox = { x: 160, y: 80, width: 800, height: 600 };
+    const legibleWindow = vi.fn(() => window);
+    const draw = (fit: GraphBox) => (
+      <GraphCanvas
+        fit={fit}
+        label="Class graph"
+        legibleFit
+        legibleWindow={legibleWindow}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>
+    );
+    const { rerender } = render(draw(large));
+    // Zoomed out into the overview, Fit returns to the legible zoom, not
+    // to the overview's floor, from the window the box's corner gives.
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(legibleWindow).toHaveBeenLastCalledWith(
+      large,
+      VIEW_BOX,
+      1,
+      HUBS_SCALE,
+    );
+    expect(readCamera()).toBe("translate(-160,-80) scale(1)");
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
+    // Without a window, the box's top-left corner at the legible zoom.
+    legibleWindow.mockImplementation((box: GraphBox) => box);
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.8571437142857141)");
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    // A box that fits above the legible zoom is fitted whole.
+    rerender(draw({ x: 0, y: 0, width: 400, height: 300 }));
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(2)");
+  });
+
   it("never frames a region from a legible view into an illegible one", () => {
     render(
       <GraphCanvas

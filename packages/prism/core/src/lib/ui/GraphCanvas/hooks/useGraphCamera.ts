@@ -144,7 +144,8 @@ function prefersReducedMotion(): boolean {
  * 16px hub and region labels still render at 12px) and no further: a box
  * too large for it shows the window of it `legibleWindow` chooses at that
  * floor, or its top-left corner at that floor, the rest a pan away, and
- * the zoom extent's floor follows them down. No fit lands in the overview. When
+ * the zoom extent's floor follows them down; with `legibleFit` they keep
+ * to the legible zoom in the same way. No fit lands in the overview. When
  * `reveal` changes it pans that box into view, without zooming, only if it
  * is not already in view. Every move a control or a prop asks for takes
  * 200ms, and is instant under reduced motion.
@@ -161,6 +162,7 @@ export default function useGraphCamera({
   fit,
   frame,
   legibleWindow,
+  legibleFit = false,
   reveal,
   opening,
   memory,
@@ -177,6 +179,7 @@ export default function useGraphCamera({
     fit,
     frame,
     legibleWindow,
+    legibleFit,
     reveal,
     opening,
     memory,
@@ -187,6 +190,7 @@ export default function useGraphCamera({
     fit,
     frame,
     legibleWindow,
+    legibleFit,
     reveal,
     opening,
     memory,
@@ -248,7 +252,10 @@ export default function useGraphCamera({
         return;
       }
       const target = box ?? latest.current.bounds;
-      const legible = keepLegible && scale * current.current.k >= HUBS_SCALE;
+      // Fit and `0` on a canvas that asks for it keep the legible zoom.
+      const legible =
+        (restore && latest.current.legibleFit) ||
+        (keepLegible && scale * current.current.k >= HUBS_SCALE);
       const floor = legible ? HUBS_SCALE : OVERVIEW_SCALE;
       const least = (floor * LEGIBLE_NUDGE) / scale;
       const fitsLegibly =

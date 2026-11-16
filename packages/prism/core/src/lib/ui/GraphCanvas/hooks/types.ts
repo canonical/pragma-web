@@ -27,6 +27,8 @@ export interface UseGraphCameraProps {
    * of a box too large for the legible zoom.
    */
   readonly legibleWindow: GraphLegibleWindow | undefined;
+  /** Whether Fit and `0` keep to the legible zoom when they fit a box. */
+  readonly legibleFit?: boolean;
   /** The box the camera pans into view when it changes. */
   readonly reveal: GraphBox | undefined;
   /**

@@ -132,6 +132,14 @@ type OwnProps = {
    */
   readonly legibleWindow?: GraphLegibleWindow;
   /**
+   * Whether the Fit control and the `0` key keep to the legible zoom when
+   * they fit `fit`, or the graph's bounds: a box that fits there or above
+   * is fitted whole, and a larger one shows the window of it
+   * `legibleWindow` chooses at the legible zoom, or its top-left corner
+   * there. When omitted, they fit down to the overview's floor.
+   */
+  readonly legibleFit?: boolean;
+  /**
    * Where the canvas keeps its camera as it moves, and resumes it from
    * when it mounts again: a ref its owner keeps beyond the canvas's life.
    * A canvas resumed this way pans `reveal` into view if it is out of view,
