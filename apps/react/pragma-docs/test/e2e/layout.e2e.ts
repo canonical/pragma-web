@@ -56,6 +56,8 @@ import {
   CATALOG_CARD_WIDTHS,
   CATALOG_PATH,
   CATALOG_ROW_SELECTOR,
+  CATALOG_ROW_TITLE_COUNT,
+  CATALOG_ROW_TITLE_WIDTH,
   CATALOG_ROWS_PATH,
   CATALOG_WHOLE_ROW_WIDTHS,
   DEV_READY_MS,
@@ -64,6 +66,7 @@ import {
   MIN_CATALOG_CARD_WIDTH_PX,
   NARROWING_STEP_PX,
   PAGE_SETTLE_MS,
+  ROW_TITLE_FLOOR_CHARACTERS,
   STANDARDS_FACT_WIDTHS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
@@ -880,6 +883,52 @@ describe("a standards index row with several facts", () => {
 });
 
 /**
+ * Read the first rows' titles: each title's shown width, its text's whole
+ * width, the width of `floor` characters in its face (the `ch` of the
+ * floor), and how far its status, if it has one, ends past its row. It
+ * runs in the page.
+ *
+ * @param args - The rows' selector, how many rows, and the floor.
+ * @returns One measure per row.
+ * @throws When a row has no title.
+ */
+function readRowTitles({
+  selector,
+  count,
+  floor,
+}: {
+  readonly selector: string;
+  readonly count: number;
+  readonly floor: number;
+}): readonly {
+  readonly text: string;
+  readonly shown: number;
+  readonly whole: number;
+  readonly floor: number;
+  readonly statusOverflow: number;
+}[] {
+  const context = document.createElement("canvas").getContext("2d");
+  return [...document.querySelectorAll(selector)].slice(0, count).map((row) => {
+    const title = row.querySelector(".title");
+    const status = row.querySelector(".status");
+    if (!title || !context) {
+      throw new Error("a row has no title");
+    }
+    context.font = getComputedStyle(title).font;
+    return {
+      text: title.textContent ?? "",
+      shown: title.clientWidth,
+      whole: title.scrollWidth,
+      floor: context.measureText("0".repeat(floor)).width,
+      statusOverflow: status
+        ? status.getBoundingClientRect().right -
+          row.getBoundingClientRect().right
+        : 0,
+    };
+  });
+}
+
+/**
  * Open the catalog at a viewport width and measure its cards against the
  * canvas, every request off the dev cell's own origins answered empty.
  *
@@ -927,6 +976,37 @@ describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
       for (const section of card.sections) {
         expect(section).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
       }
+    }
+  });
+});
+
+// Below two groups a row's status shortens before its title falls under
+// twelve characters: at one group, where the rail still takes a column, a
+// catalog row's title is whole or keeps the floor, and its status stays
+// inside the row.
+describe("the catalog's rows at one group", () => {
+  it("keeps each title whole or at twelve characters beside its status", async () => {
+    const page = await openPage(CATALOG_ROWS_PATH, {
+      width: CATALOG_ROW_TITLE_WIDTH,
+      height: 844,
+    });
+    try {
+      const titles = await page.evaluate(readRowTitles, {
+        selector: CATALOG_ROW_SELECTOR,
+        count: CATALOG_ROW_TITLE_COUNT,
+        floor: ROW_TITLE_FLOOR_CHARACTERS,
+      });
+      expect(titles).toHaveLength(CATALOG_ROW_TITLE_COUNT);
+      for (const { text, shown, whole, floor, statusOverflow } of titles) {
+        if (whole > shown) {
+          expect(shown, text).toBeGreaterThanOrEqual(
+            floor - WIDTH_TOLERANCE_PX,
+          );
+        }
+        expect(statusOverflow, text).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+      }
+    } finally {
+      await page.close();
     }
   });
 });
