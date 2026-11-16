@@ -59,8 +59,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
-    "@canonical/typescript-config": "0.44.0",
-    "@canonical/webarchitect": "0.44.0",
+    "@canonical/typescript-config": "0.46.0",
+    "@canonical/webarchitect": "0.46.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/jsdom": "^30.0.0",
     "typescript": "^7.0.2",

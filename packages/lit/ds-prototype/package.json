@@ -104,7 +104,7 @@
     "@canonical/ds-types": "^0.47.0",
     "@canonical/styles": "^0.47.0",
     "@canonical/typescript-config-lit": "^0.47.0",
-    "@canonical/webarchitect": "0.44.0",
+    "@canonical/webarchitect": "0.46.0",
     "@chromatic-com/storybook": "^5.0.1",
     "@storybook/web-components-vite": "^10.6.0",
     "@types/node": "^26.0.0",

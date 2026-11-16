@@ -60,7 +60,7 @@
     "@canonical/biome-config": "0.46.0",
     "@canonical/storybook-config": "^0.47.0",
     "@canonical/typescript-config-react": "^0.47.0",
-    "@canonical/webarchitect": "0.44.0",
+    "@canonical/webarchitect": "0.46.0",
     "@storybook/addon-docs": "^10.6.0",
     "@storybook/react-vite": "^10.6.0",
     "@testing-library/react": "^16.3.2",

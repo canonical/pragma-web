@@ -52,11 +52,11 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
-    "@canonical/design-tokens": "0.44.0",
+    "@canonical/design-tokens": "0.46.0",
     "@canonical/storybook-helpers": "^0.47.0",
     "@canonical/typescript-config-react": "^0.47.0",
     "@canonical/vitest-config-react": "^0.47.0",
-    "@canonical/webarchitect": "0.44.0",
+    "@canonical/webarchitect": "0.46.0",
     "@chromatic-com/storybook": "^5.0.1",
     "@storybook/addon-docs": "^10.6.0",
     "@storybook/react-vite": "^10.6.0",
