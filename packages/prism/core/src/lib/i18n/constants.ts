@@ -16,6 +16,9 @@ export const MESSAGES = {
   "graphCanvas.zoomOut": "Zoom out",
   "graphCanvas.zoomOut.glyph": "−",
   "graphCanvas.zoomLevel": "{percent}%",
+  "notFoundBody.sentence":
+    "No page lives at this address. Start again from a lens:",
+  "notFoundBody.homes": "Lenses",
   "rendererSwitch.label": "Show as",
   "rendererSwitch.chevron": "▾",
   "renderer.page": "Page",

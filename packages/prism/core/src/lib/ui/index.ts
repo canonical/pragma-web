@@ -25,3 +25,4 @@ export * from "./SectionedView/index.js";
 export * from "./SourceView/index.js";
 export * from "./ThemeSelector/index.js";
 export * from "./WorkspaceLayout/index.js";
+export * from "./NotFoundBody/index.js";
