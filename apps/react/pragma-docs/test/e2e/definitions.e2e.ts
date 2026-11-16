@@ -915,7 +915,11 @@ describe("a drill's link against its address", () => {
   });
 
   it("lists the opened namespace first at 390, its heading the way back", async () => {
-    const seen: { first?: string; back?: string | null } = {};
+    const seen: {
+      first?: string;
+      back?: string | null;
+      words?: string | null;
+    } = {};
     const { errors } = await openExplorer(
       "/definitions?expand=surface",
       phone,
@@ -925,11 +929,14 @@ describe("a drill's link against its address", () => {
         seen.back = await first
           .locator("a.way-back")
           .getAttribute("aria-label");
+        seen.words = await first.locator("a.way-back").textContent();
       },
     );
     expect(errors).toEqual([]);
     expect(seen.first).toBe("surface");
     expect(seen.back).toMatch(/surface.*31 classes/);
+    // The way back says in visible words where it leads.
+    expect(seen.words).toContain("all namespaces");
   });
 });
 
