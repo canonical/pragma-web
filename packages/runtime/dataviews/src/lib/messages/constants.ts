@@ -1,11 +1,16 @@
 /**
  * The messages domain's constants: the English record DataViews ships with,
- * and the words its messages are built from — each direction, what a
+ * and the words its messages are built from — each direction, each
+ * operator as a chip shows and speaks it, what a
  * saved-view command not done or in flight says, and the note an edit that
  * cannot apply ends with.
  */
 
-import type { SortDirection } from "../query/index.js";
+import type {
+  PredicateOperand,
+  PredicateOperator,
+  SortDirection,
+} from "../query/index.js";
 import type { ViewCommand } from "../views/index.js";
 import choosePlural from "./choosePlural.js";
 import composeClause from "./composeClause.js";
@@ -39,6 +44,50 @@ export const PENDING: Readonly<Record<ViewCommand, string>> = {
 
 /** What the earlier restriction does while an edit cannot apply. */
 export const STILL_APPLIES = "The previous restriction still applies.";
+
+/** Each operator's words, as they read from its operands. */
+type OperatorWords = Readonly<
+  Record<PredicateOperator, (operands: readonly PredicateOperand[]) => string>
+>;
+
+/** Whether a presence operand asks for no value. */
+const isUnset = (operands: readonly PredicateOperand[]): boolean =>
+  operands.at(0) === false;
+
+/**
+ * What a chip shows for each operator: its symbol, or, where it has none,
+ * the same words it is spoken by, so a control's name holds what it
+ * shows. Keyed by operator, so an operator the grammar gains fails to
+ * compile until it is shown.
+ */
+export const OPERATORS_SHOWN: OperatorWords = {
+  isAny: () => ":",
+  is: () => ":",
+  isNone: () => "≠",
+  isNot: () => "≠",
+  contains: () => "contains",
+  notContains: () => "does not contain",
+  startsWith: () => "starts with",
+  endsWith: () => "ends with",
+  gte: () => "≥",
+  lte: () => "≤",
+  isSet: (operands) => (isUnset(operands) ? "has no value" : "has a value"),
+};
+
+/** How each operator is spoken in a clause. Keyed as `OPERATORS_SHOWN`. */
+export const OPERATORS_SPOKEN: OperatorWords = {
+  isAny: (operands) => (operands.length === 1 ? "is" : "is any of"),
+  is: () => "is",
+  isNone: () => "is none of",
+  isNot: () => "is not",
+  contains: () => "contains",
+  notContains: () => "does not contain",
+  startsWith: () => "starts with",
+  endsWith: () => "ends with",
+  gte: () => "at least",
+  lte: () => "at most",
+  isSet: (operands) => (isUnset(operands) ? "has no value" : "has a value"),
+};
 
 /** English's own grouping of numbers, so a large count reads as one. */
 const NUMBERS = new Intl.NumberFormat("en");
@@ -186,6 +235,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
 
   search: "Search",
   submitSearch: "Search",
+
+  operatorShown: (operator, operands) => OPERATORS_SHOWN[operator](operands),
+  operatorSpoken: (operator, operands) => OPERATORS_SPOKEN[operator](operands),
 
   pagination: "Pagination",
   rowsPerPage: "Rows per page",

@@ -3,6 +3,8 @@ import {
   DIRECTIONS,
   DEFAULT_MESSAGES as m,
   NOT_DONE,
+  OPERATORS_SHOWN,
+  OPERATORS_SPOKEN,
   PENDING,
   STILL_APPLIES,
 } from "./constants.js";
@@ -436,5 +438,52 @@ describe("NOT_DONE and PENDING", () => {
 describe("STILL_APPLIES", () => {
   it("says the earlier restriction stands", () => {
     expect(STILL_APPLIES).toBe("The previous restriction still applies.");
+  });
+
+  it("shows each operator as its symbol, or its words where it has none", () => {
+    expect(m.operatorShown("isAny", ["ready"])).toBe(":");
+    expect(m.operatorShown("is", ["web"])).toBe(":");
+    expect(m.operatorShown("isNone", ["ready"])).toBe("≠");
+    expect(m.operatorShown("isNot", ["web"])).toBe("≠");
+    expect(m.operatorShown("contains", ["web"])).toBe("contains");
+    expect(m.operatorShown("notContains", ["web"])).toBe("does not contain");
+    expect(m.operatorShown("startsWith", ["web"])).toBe("starts with");
+    expect(m.operatorShown("endsWith", ["web"])).toBe("ends with");
+    expect(m.operatorShown("gte", [1])).toBe("≥");
+    expect(m.operatorShown("lte", [1])).toBe("≤");
+    expect(m.operatorShown("isSet", [true])).toBe("has a value");
+    expect(m.operatorShown("isSet", [false])).toBe("has no value");
+    expect(Object.keys(OPERATORS_SHOWN)).toEqual(Object.keys(OPERATORS_SPOKEN));
+    // An operator shown in words is shown in the words it is spoken by.
+    for (const [operator, show] of Object.entries(OPERATORS_SHOWN)) {
+      for (const operands of [[true], [false], ["a"]]) {
+        const shown = show(operands);
+        if (/\p{L}/u.test(shown)) {
+          expect(
+            OPERATORS_SPOKEN[operator as keyof typeof OPERATORS_SPOKEN](
+              operands,
+            ),
+          ).toContain(shown);
+        }
+      }
+    }
+  });
+
+  it("speaks each operator by its operands", () => {
+    expect(m.operatorSpoken("isAny", ["ready"])).toBe("is");
+    expect(m.operatorSpoken("isAny", ["ready", "deployed"])).toBe("is any of");
+    expect(m.operatorSpoken("isAny", [])).toBe("is any of");
+    expect(m.operatorSpoken("is", ["web"])).toBe("is");
+    expect(m.operatorSpoken("isNone", ["ready"])).toBe("is none of");
+    expect(m.operatorSpoken("isNot", ["web"])).toBe("is not");
+    expect(m.operatorSpoken("contains", ["web"])).toBe("contains");
+    expect(m.operatorSpoken("notContains", ["web"])).toBe("does not contain");
+    expect(m.operatorSpoken("startsWith", ["web"])).toBe("starts with");
+    expect(m.operatorSpoken("endsWith", ["web"])).toBe("ends with");
+    expect(m.operatorSpoken("gte", [1])).toBe("at least");
+    expect(m.operatorSpoken("lte", [1])).toBe("at most");
+    expect(m.operatorSpoken("isSet", [true])).toBe("has a value");
+    expect(m.operatorSpoken("isSet", [])).toBe("has a value");
+    expect(m.operatorSpoken("isSet", [false])).toBe("has no value");
   });
 });

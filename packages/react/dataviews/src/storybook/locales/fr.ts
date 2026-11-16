@@ -8,6 +8,8 @@
 import type {
   Count,
   DataViewsMessages,
+  PredicateOperand,
+  PredicateOperator,
   SortDirection,
   ViewCommand,
 } from "@canonical/dataviews-core";
@@ -54,6 +56,43 @@ const PENDING: Readonly<Record<ViewCommand, string>> = {
   "save-as": "Enregistrement…",
   rename: "Renommage…",
   remove: "Suppression…",
+};
+
+/** Each operator's French words, as they read from its operands. */
+type OperatorWords = Readonly<
+  Record<PredicateOperator, (operands: readonly PredicateOperand[]) => string>
+>;
+
+/** What a chip shows for each operator: its symbol, or French words. */
+const OPERATORS_SHOWN: OperatorWords = {
+  isAny: () => ":",
+  is: () => ":",
+  isNone: () => "≠",
+  isNot: () => "≠",
+  contains: () => "contient",
+  notContains: () => "ne contient pas",
+  startsWith: () => "commence par",
+  endsWith: () => "finit par",
+  gte: () => "≥",
+  lte: () => "≤",
+  isSet: (operands) =>
+    operands.at(0) === false ? "n’a pas de valeur" : "a une valeur",
+};
+
+/** How each operator is spoken in French. */
+const OPERATORS_SPOKEN: OperatorWords = {
+  isAny: (operands) => (operands.length === 1 ? "est" : "est l’un de"),
+  is: () => "est",
+  isNone: () => "n’est aucun de",
+  isNot: () => "n’est pas",
+  contains: () => "contient",
+  notContains: () => "ne contient pas",
+  startsWith: () => "commence par",
+  endsWith: () => "finit par",
+  gte: () => "au moins",
+  lte: () => "au plus",
+  isSet: (operands) =>
+    operands.at(0) === false ? "n’a pas de valeur" : "a une valeur",
 };
 
 /** A total as French states it: exact, or "au moins". */
@@ -174,6 +213,9 @@ export const FRENCH: DataViewsMessages = {
 
   search: "Rechercher",
   submitSearch: "Rechercher",
+
+  operatorShown: (operator, operands) => OPERATORS_SHOWN[operator](operands),
+  operatorSpoken: (operator, operands) => OPERATORS_SPOKEN[operator](operands),
 
   pagination: "Pagination",
   rowsPerPage: "Lignes par page",

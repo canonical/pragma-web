@@ -7,7 +7,11 @@
  * one contract: a translation writes every member against these shapes.
  */
 
-import type { SortDirection } from "../query/index.js";
+import type {
+  PredicateOperand,
+  PredicateOperator,
+  SortDirection,
+} from "../query/index.js";
 import type { Count } from "../result/index.js";
 import type { ViewCommand } from "../views/index.js";
 
@@ -274,6 +278,24 @@ export type DataViewsMessages = {
   readonly search: string;
   /** The search form's submit control, before scripts run. */
   readonly submitSearch: string;
+
+  // An operator, wherever a clause shows it.
+  /**
+   * An operator as a chip shows it, by its operands: a symbol such as `:`
+   * or `≥`, or words where it has no symbol. Symbols are not translated.
+   */
+  readonly operatorShown: (
+    operator: PredicateOperator,
+    operands: readonly PredicateOperand[],
+  ) => string;
+  /**
+   * An operator as it is spoken in a clause, by its operands: "is" for one
+   * value and "is any of" for several, "at least" for `≥`.
+   */
+  readonly operatorSpoken: (
+    operator: PredicateOperator,
+    operands: readonly PredicateOperand[],
+  ) => string;
 
   // The pagination bar.
   /** The bar's name. */
