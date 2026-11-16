@@ -11,11 +11,10 @@
    * The name and delete dialogs are the platform's modal `dialog`, opened
    * by their commands; only their contents are laid out here.
    *
-   * The select and the name input are the design system's own, themed
-   * through the form layer's channels. The overrides are their width — in a
-   * row of controls each takes its content's — and the name input's border
-   * once the user has given it a name the collection refuses, which the
-   * validity API marks and the form layer's error channel colours.
+   * The select and the name input are the design system's own, sized by
+   * the density scope they sit in. The overrides are their width — in a row
+   * of controls each takes its content's — and the name input's error
+   * channel once the user has given it a name the collection refuses.
    */
   .ds.data-views-saved-views {
     display: flex;
@@ -26,9 +25,6 @@
     font-family: var(--typography-text-primary-font-family);
     font-size: var(--typography-text-primary-font-size);
     font-weight: var(--typography-text-primary-font-weight);
-    --form-input-height: var(--density-line-height-effective);
-    --form-input-padding-block: var(--dimension-050);
-    --form-input-padding-inline: var(--dimension-100);
 
     & :where(p) {
       margin: 0;
