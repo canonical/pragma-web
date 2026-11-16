@@ -4,8 +4,9 @@
 # routed page (the index or a reading page) in the one scrolling canvas,
 # and the site's colophon under it. It renders no element of its own:
 # core's DocumentLayout is the root and takes the layout's native props, so
-# this anatomy binds no style and the folder has no stylesheet. The strip's
-# controls and status stay empty: the lens has no filter and no figure. No
+# this anatomy binds no style and the folder has no stylesheet. On the
+# index the strip's filtering group holds the count alone (the lens has no
+# filter): how many standards the index shows of the class's total. No
 # aside: a standard is one short document with nothing to set beside it.
 node:
   uri: prism.component.standards_layout
@@ -25,6 +26,9 @@ node:
                 - node:
                     uri: prism.subcomponent.standards_view
                   relation: { cardinality: "0..1", slotName: view }
+                - node:
+                    uri: prism.subcomponent.standards_count
+                  relation: { cardinality: "0..1", slotName: count }
             relation: { cardinality: "1", slotName: strip }
           - node:
               role: routed page (the index or a reading page)

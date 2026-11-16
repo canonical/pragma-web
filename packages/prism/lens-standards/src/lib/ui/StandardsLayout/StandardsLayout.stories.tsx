@@ -2,7 +2,11 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withSite } from "../../../../.storybook/decorators/index.js";
-import { LINK_COMPONENT_URI } from "../../../../testing/fixtures.js";
+import { resolveStandards } from "../../../../.storybook/mocks/index.js";
+import {
+  LINK_COMPONENT_URI,
+  STANDARDS_BINDING_FIXTURE,
+} from "../../../../testing/fixtures.js";
 import Component from "./StandardsLayout.js";
 
 const meta: Meta<typeof Component> = {
@@ -10,8 +14,13 @@ const meta: Meta<typeof Component> = {
   component: Component,
   tags: ["autodocs"],
   decorators: [withSite()],
-  parameters: { grid: "intrinsic", layout: "fullscreen" },
+  parameters: {
+    grid: "intrinsic",
+    layout: "fullscreen",
+    relay: { mockResolvers: resolveStandards() },
+  },
   args: {
+    binding: STANDARDS_BINDING_FIXTURE,
     rail: <nav aria-label="Site rail">Rail</nav>,
     children: <p>The routed page</p>,
   },

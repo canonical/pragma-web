@@ -45,6 +45,11 @@
     grid-column: 1 / -1;
   }
 
+  /* A group's count spans the group's row, under the group's heading. */
+  .ds.standards-index .count {
+    grid-column: 1 / -1;
+  }
+
   .ds.standards-index > .more {
     grid-column: 1 / -1;
   }

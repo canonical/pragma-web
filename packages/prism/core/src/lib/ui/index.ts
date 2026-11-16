@@ -18,6 +18,7 @@ export * from "./KeyValueList/index.js";
 export * from "./LensBreadcrumbs/index.js";
 export * from "./MentionChip/index.js";
 export * from "./ModeStrip/index.js";
+export * from "./NotFoundBody/index.js";
 export * from "./Rail/index.js";
 export * from "./RendererSwitch/index.js";
 export * from "./RouterLink/index.js";

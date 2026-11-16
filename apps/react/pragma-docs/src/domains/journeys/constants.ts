@@ -83,6 +83,15 @@ export const ARRIVAL_MESSAGES: ReadonlyMap<string, MessageKey> = new Map<
 export const JOURNEY_VIEWS: readonly JourneyView[] = ["table", "graph"];
 
 /**
+ * The journeys' renderers as data: each reading's name in the address
+ * (`as`) and the catalog key of its label on the strip's shared switch.
+ */
+export const JOURNEY_VIEW_LABELS: Readonly<Record<JourneyView, MessageKey>> = {
+  table: "journeys.view.table",
+  graph: "journeys.view.graph",
+};
+
+/**
  * The reading a page opens on when its address names none: the table, the
  * index of every job.
  */

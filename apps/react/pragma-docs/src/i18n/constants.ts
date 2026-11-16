@@ -142,7 +142,6 @@ export const MESSAGES = {
   "journeys.title": "Journeys",
   "journeys.documentTitle": "{job} — Journeys",
   "journeys.loading": "Loading the demand model…",
-  "journeys.view.label": "Journey view",
   "journeys.view.table": "Table",
   "journeys.view.graph": "Graph",
   "journeys.personaNote":
@@ -221,7 +220,6 @@ export const MESSAGES = {
   "journeys.arrival.viewKept": "view kept",
   "journeys.arrival.noMove": "no move",
   "notFound.title": "Page not found",
-  "notFound.body": "The page you are looking for does not exist.",
   "block.version": "v{version}",
   "block.versionLabel": "Version",
   "block.tier": "Tier",

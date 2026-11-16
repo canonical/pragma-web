@@ -23,6 +23,6 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The switch on the table, the reading a page opens on; a press writes
- * the view to the address. */
+/** The shared switch on the table, the reading a page opens on; each
+ * reading is a link that changes only `as`. */
 export const Default: Story = {};

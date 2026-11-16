@@ -13,6 +13,6 @@ export type UseProviderStateResult = JourneyViewValue;
  * scope. */
 export type UseJourneyViewProps = Record<never, never>;
 
-/** What `useJourneyView` returns: the shared view, the filter and their
- * setters. */
+/** What `useJourneyView` returns: the shared view, the filter and its
+ * setter. */
 export type UseJourneyViewResult = JourneyViewValue;

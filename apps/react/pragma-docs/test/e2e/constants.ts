@@ -83,6 +83,19 @@ export const CATALOG_CARD_WIDTHS = [390, 600, 1440] as const;
 export const CATALOG_WHOLE_ROW_WIDTHS = [390] as const;
 
 /**
+ * The width the catalog's rows are read at for their titles: one group of
+ * the shell, where the rail still takes a column and a row is narrowest
+ * beside its status.
+ */
+export const CATALOG_ROW_TITLE_WIDTH = 448;
+
+/** How many of the catalog's first rows have their titles read. */
+export const CATALOG_ROW_TITLE_COUNT = 6;
+
+/** The fewest characters a cut title keeps beside its row's status. */
+export const ROW_TITLE_FLOOR_CHARACTERS = 12;
+
+/**
  * The narrowest a catalog card may render, in pixels: wide enough for its
  * title and summary, and for a UI block's rendered example under or beside
  * them.

@@ -13,10 +13,10 @@
  * from this file only in its values.
  *
  * It holds eight standards, all instances of `cs:CodeStandard` itself, which
- * makes the index a single group with no jump-link nav, and a `pageInfo`
- * that says the graph has more, which makes "Load more" render. Cursors are
- * `base64(absolute IRI)`, the convention both known providers derive theirs
- * from.
+ * makes the index a single group with no jump-link nav, a `pageInfo` that
+ * says the graph has more, which makes "Load more" render, and the class's
+ * instance count, 131, the strip's total. Cursors are `base64(absolute IRI)`,
+ * the convention both known providers derive theirs from.
  */
 
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
@@ -33,6 +33,7 @@ const standardsIndexRecords = {
     __id: "http://pragma.canonical.com/codestandards#CodeStandard",
     __typename: "OntologyClass",
     uri: "http://pragma.canonical.com/codestandards#CodeStandard",
+    instanceCount: 131,
     "instances(first:100)": {
       __ref:
         "client:http://pragma.canonical.com/codestandards#CodeStandard:instances(first:100)",

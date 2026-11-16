@@ -8,6 +8,7 @@ import journeysExplorerRecordsJob from "../../__fixtures__/journeysExplorerRecor
 import {
   JOURNEYS_TEST_TIMEOUT_MS,
   journeysStrip,
+  viewTab,
 } from "../../__fixtures__/journeysPageHarness.js";
 
 const JOB = "sem://design-system-docs#job.l3";
@@ -34,10 +35,7 @@ describe("JourneysExplorer", () => {
     expect(tablePresent()).toBe(true);
     expect(wellPresent()).toBe(false);
     expect(explorerView()).toBe("table");
-    expect(screen.getByRole("button", { name: "Table" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    expect(viewTab("Table")).toHaveAttribute("aria-current", "page");
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
@@ -45,12 +43,12 @@ describe("JourneysExplorer", () => {
     timeout: JOURNEYS_TEST_TIMEOUT_MS,
   }, async () => {
     render(journeysStrip(undefined, journeysExplorerRecords, createFetchSpy()));
-    // The switch writes the view to the address; the router publishes it.
-    fireEvent.click(screen.getByRole("button", { name: "Graph" }));
+    // The switch's links change the address; the router publishes it.
+    fireEvent.click(viewTab("Graph"));
     await waitFor(() => expect(wellPresent()).toBe(true));
     expect(tablePresent()).toBe(false);
     expect(explorerView()).toBe("graph");
-    fireEvent.click(screen.getByRole("button", { name: "Table" }));
+    fireEvent.click(viewTab("Table"));
     await waitFor(() => expect(tablePresent()).toBe(true));
     expect(wellPresent()).toBe(false);
   });
@@ -79,7 +77,7 @@ describe("JourneysExplorer", () => {
       '.ds.journey-rail .toggle[aria-pressed="true"]',
     );
     expect(pressed).not.toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Graph" }));
+    fireEvent.click(viewTab("Graph"));
     await waitFor(() =>
       expect(
         document.querySelector(".ds.journey-well .journey-hop.is-selected"),

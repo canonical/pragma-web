@@ -393,12 +393,15 @@ site's own catalog, and the factory holds no reader-facing string.
   `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`, `KeyValueList` (key values on the
   page's grid, each key on the main column's first two columns and its
-  value from the third); types `MentionChipProps`,
+  value from the third), `NotFoundBody` (a not-found page's body: one
+  sentence, then each lens's home as a link, read off the route table as
+  the rail reads it); types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `CopyButtonProps`,
   `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
-  `ThemeSelectorProps`, `KeyValueListProps`, `KeyValuePair`.
+  `ThemeSelectorProps`, `KeyValueListProps`, `KeyValuePair`,
+  `NotFoundBodyProps`.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
   lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
   show only the text that renders at 12px or more; types

@@ -29,18 +29,16 @@ describe("useProviderState", () => {
     expect(result.current.view).toBe("graph");
   });
 
-  it("writes the view to the address, and drops it for the table", async () => {
+  it("follows the address when a link changes the view", async () => {
     const { result, router } = renderAt("/journeys");
     act(() => {
-      result.current.setView("graph");
+      router.setSearchParams({ as: "graph" });
     });
     await waitFor(() => expect(result.current.view).toBe("graph"));
-    expect(router.getState().location.href).toBe("/journeys?as=graph");
     act(() => {
-      result.current.setView("table");
+      router.setSearchParams({ as: null });
     });
     await waitFor(() => expect(result.current.view).toBe("table"));
-    expect(router.getState().location.href).toBe("/journeys");
   });
 
   it("starts from no filter and records the reader's choice", () => {
