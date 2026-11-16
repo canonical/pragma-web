@@ -369,6 +369,46 @@ describe("virtualized DataTable", () => {
       expect(listGapHeights(table)).toEqual(["20px", "4910px", "4850px"]);
     });
 
+    it.fails("holds its gaps as the body's padding and a row's margin, not as rows", () => {
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        selectable: true,
+      });
+      act(() => {
+        screen.getByRole("checkbox", { name: "Select m-3" }).focus();
+      });
+      scrollTo(table, 5000);
+      expect(table.querySelector(".ds.data-table-gap")).toBeNull();
+      const body = table.querySelector<HTMLElement>(
+        ".ds.data-table-row-group.body",
+      );
+      expect(body?.style.paddingBlockStart).toBe("20px");
+      expect(body?.style.paddingBlockEnd).toBe("4850px");
+      const margined = Array.from(
+        body?.children ?? [],
+        (row) => (row as HTMLElement).style.marginBlockStart,
+      ).filter((margin) => margin !== "");
+      expect(margined).toEqual(["4910px"]);
+    });
+
+    it("renders only the entering rows' cells while focus splits the range", () => {
+      let renders = 0;
+      const Counted = ({ value }: DisplayFieldCellProps) => {
+        renders += 1;
+        return <>{String(value)}</>;
+      };
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        selectable: true,
+        columns: [{ id: "name", header: "Name", cell: Counted }],
+      });
+      act(() => {
+        screen.getByRole("checkbox", { name: "Select m-3" }).focus();
+      });
+      scrollTo(table, 5000);
+      renders = 0;
+      scrollTo(table, 5100);
+      expect(renders).toBe(10);
+    });
+
     it("follows focus from one row to the next", () => {
       const { table } = renderVirtualizedTable(buildMachines(1000), {
         selectable: true,
