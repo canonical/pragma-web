@@ -4,7 +4,11 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
 import createStandardsPage from "../../../../testing/createStandardsPage.js";
-import { LINK_COMPONENT_URI } from "../../../../testing/fixtures.js";
+import {
+  LINK_COMPONENT_URI,
+  STANDARDS_BINDING_FIXTURE,
+} from "../../../../testing/fixtures.js";
+import standardsIndexRecords from "../../../../testing/records/standardsIndexRecords.js";
 import { StandardsLayout } from "./index.js";
 
 /** The reading page's URL for the exemplar standard. */
@@ -18,6 +22,7 @@ describe("StandardsLayout", () => {
         undefined,
         createFetchSpy(),
         <StandardsLayout
+          binding={STANDARDS_BINDING_FIXTURE}
           colophon={<footer>Colophon</footer>}
           rail={<nav aria-label="Site rail" />}
         >
@@ -37,11 +42,42 @@ describe("StandardsLayout", () => {
         "/standards",
         undefined,
         createFetchSpy(),
-        <StandardsLayout rail={null}>{null}</StandardsLayout>,
+        <StandardsLayout binding={STANDARDS_BINDING_FIXTURE} rail={null}>
+          {null}
+        </StandardsLayout>,
       ),
     );
 
     expect(screen.queryByRole("contentinfo")).toBeNull();
+  });
+
+  it("closes the strip's filtering group with the count on the index only", () => {
+    const index = render(
+      createStandardsPage(
+        "/standards",
+        standardsIndexRecords,
+        createFetchSpy(),
+        <StandardsLayout binding={STANDARDS_BINDING_FIXTURE} rail={null}>
+          {null}
+        </StandardsLayout>,
+      ),
+    );
+    expect(
+      index.container.querySelector('[data-slot="standards-count"]'),
+    ).toHaveTextContent("8 of 131 standards");
+    index.unmount();
+
+    const { container } = render(
+      createStandardsPage(
+        READING_URL,
+        undefined,
+        createFetchSpy(),
+        <StandardsLayout binding={STANDARDS_BINDING_FIXTURE} rail={null}>
+          {null}
+        </StandardsLayout>,
+      ),
+    );
+    expect(container.querySelector('[data-slot="standards-count"]')).toBeNull();
   });
 
   it("names the lens in the strip's trail on the index", () => {
@@ -50,7 +86,9 @@ describe("StandardsLayout", () => {
         "/standards",
         undefined,
         createFetchSpy(),
-        <StandardsLayout rail={null}>{null}</StandardsLayout>,
+        <StandardsLayout binding={STANDARDS_BINDING_FIXTURE} rail={null}>
+          {null}
+        </StandardsLayout>,
       ),
     );
 
@@ -66,7 +104,9 @@ describe("StandardsLayout", () => {
         READING_URL,
         undefined,
         createFetchSpy(),
-        <StandardsLayout rail={null}>{null}</StandardsLayout>,
+        <StandardsLayout binding={STANDARDS_BINDING_FIXTURE} rail={null}>
+          {null}
+        </StandardsLayout>,
       ),
     );
 
@@ -85,7 +125,9 @@ describe("StandardsLayout", () => {
         READING_URL,
         undefined,
         createFetchSpy(),
-        <StandardsLayout rail={null}>{null}</StandardsLayout>,
+        <StandardsLayout binding={STANDARDS_BINDING_FIXTURE} rail={null}>
+          {null}
+        </StandardsLayout>,
       ),
     );
     const tabs = within(screen.getByRole("navigation", { name: "Show as" }));
@@ -104,7 +146,9 @@ describe("StandardsLayout", () => {
         "/standards",
         undefined,
         createFetchSpy(),
-        <StandardsLayout rail={null}>{null}</StandardsLayout>,
+        <StandardsLayout binding={STANDARDS_BINDING_FIXTURE} rail={null}>
+          {null}
+        </StandardsLayout>,
       ),
     );
     expect(container.querySelector('[data-slot="view"]')).toBeEmptyDOMElement();
@@ -117,6 +161,7 @@ describe("StandardsLayout", () => {
         undefined,
         createFetchSpy(),
         <StandardsLayout
+          binding={STANDARDS_BINDING_FIXTURE}
           className="site-layout"
           data-probe="layout"
           id="layout"

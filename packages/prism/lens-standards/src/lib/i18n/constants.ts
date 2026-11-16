@@ -16,6 +16,11 @@ export const MESSAGES = {
   "index.categories.label": "Categories",
   "index.empty": "No standards in the graph.",
   "index.more": "Load more",
+  "index.kind": { one: "standard", other: "standards" },
+  "index.kindLoaded": {
+    one: "standard loaded so far",
+    other: "standards loaded so far",
+  },
   "index.address": "Address",
   "reading.breadcrumb.label": "Breadcrumb",
   "reading.breadcrumb.index": "Standards",

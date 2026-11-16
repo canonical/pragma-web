@@ -52,6 +52,7 @@ const twoGroupRecords = {
     __id: "http://pragma.canonical.com/codestandards#CodeStandard",
     __typename: "OntologyClass",
     uri: "http://pragma.canonical.com/codestandards#CodeStandard",
+    instanceCount: 2,
     "instances(first:100)": {
       __ref:
         "client:http://pragma.canonical.com/codestandards#CodeStandard:instances(first:100)",
@@ -226,6 +227,7 @@ const emptyRecords = {
     __id: "http://pragma.canonical.com/codestandards#CodeStandard",
     __typename: "OntologyClass",
     uri: "http://pragma.canonical.com/codestandards#CodeStandard",
+    instanceCount: 0,
     "instances(first:100)": {
       __ref:
         "client:http://pragma.canonical.com/codestandards#CodeStandard:instances(first:100)",
@@ -302,6 +304,11 @@ describe("StandardsIndex grouping", () => {
           .getAllByRole("heading", { level: 2 })
           .map((heading) => heading.textContent),
       ).toEqual(["CodeStandard", "Style rule"]);
+      // Each group states its count under its heading; no page remains, so
+      // the count is the group's whole size.
+      expect(
+        screen.getAllByRole("status").map((count) => count.textContent),
+      ).toEqual(["1 standard", "1 standard"]);
       // The jump-link nav renders because there is more than one group,
       // and its anchors are derived from the CLASS IRIs, not the headings.
       const nav = screen.getByRole("navigation", { name: "Categories" });

@@ -1,0 +1,15 @@
+---
+# StandardsCount — the strip's count on the standards index, closing its
+# filtering group: how many standards the index shows of how many the
+# bound class holds. It reads the index's own operation and paginated
+# fragment, so the standards a "Load more" adds count too, and the class's
+# instance count as the total. It renders core's count line and binds no
+# style of its own.
+#
+# Token ledger: none.
+node:
+  uri: prism.subcomponent.standards_count
+  edges:
+    - node:
+        uri: prism.component.count_line
+      relation: { cardinality: "1", slotName: default }
