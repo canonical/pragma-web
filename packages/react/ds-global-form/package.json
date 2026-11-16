@@ -58,7 +58,7 @@
     "react-hook-form": "^7.71.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.6",
+    "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
     "@canonical/design-tokens": "0.44.0",
     "@canonical/storybook-addon-form-state": "^0.47.0",

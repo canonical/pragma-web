@@ -64,7 +64,7 @@
     "@storybook/icons": "^2.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.6",
+    "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
     "@canonical/router-core": "^0.47.0",
     "@canonical/router-react": "^0.47.0",
