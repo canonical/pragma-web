@@ -25,8 +25,7 @@
     font-size: var(--typography-text-primary-font-size);
     font-weight: var(--typography-text-primary-font-weight);
     background-color: var(--surface-color-background, var(--color-background));
-    /* The Button reads the page's text colour for its label, not the
-       surface's; its own text channel carries the surface's to it. */
+    /* shim: Button surface text */
     --button-color-text: var(--surface-color-text, var(--color-text));
 
     & > .indicator {
