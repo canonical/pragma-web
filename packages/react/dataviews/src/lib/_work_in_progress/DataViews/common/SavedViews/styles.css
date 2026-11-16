@@ -11,8 +11,8 @@
    * The name and delete dialogs are the platform's modal `dialog`, opened
    * by their commands; only their contents are laid out here.
    *
-   * The select is the design system's own, themed through the form layer's
-   * channels; in a row of controls it takes its content's width. The name
+   * The select is the design system's own, sized by the density scope it
+   * sits in; in a row of controls it takes its content's width. The name
    * form lays itself out.
    */
   .ds.data-views-saved-views {
@@ -24,9 +24,6 @@
     font-family: var(--typography-text-primary-font-family);
     font-size: var(--typography-text-primary-font-size);
     font-weight: var(--typography-text-primary-font-weight);
-    --form-input-height: var(--density-line-height-effective);
-    --form-input-padding-block: var(--dimension-050);
-    --form-input-padding-inline: var(--dimension-100);
 
     & :where(p) {
       margin: 0;
