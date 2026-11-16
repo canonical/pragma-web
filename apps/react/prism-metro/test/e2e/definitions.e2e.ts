@@ -142,6 +142,12 @@ describe("the overview's record, on the metro", () => {
     }
   });
 
+  it("keeps every two arches over a shelf off one line, at rest and with each namespace opened", () => {
+    for (const [path, measure] of measureViews()) {
+      expect(measure.sharedArchLines, path).toEqual([]);
+    }
+  });
+
   it("states each relation's weight by its stroke, 1, 2, 4 or 8 px and dashed exactly at 0, the served count of its heaviest relation", () => {
     const prefixes = served.prefixes ?? [];
     const isClass = (term: string): boolean =>
