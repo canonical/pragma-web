@@ -59,7 +59,8 @@
   "dependencies": {
     "@canonical/ds-assets": "^0.47.0",
     "@canonical/ds-utils": "^0.47.0",
-    "@canonical/styles": "^0.47.0"
+    "@canonical/styles": "^0.47.0",
+    "@floating-ui/dom": "^1.7.6"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
@@ -85,7 +86,8 @@
     "typescript": "~6.0.3",
     "vite": "^8.0.1",
     "vitest": "^5.0.0",
-    "vitest-browser-svelte": "^3.0.0"
+    "vitest-browser-svelte": "^3.0.0",
+    "@canonical/svelte-icons": "^0.1.0"
   },
   "peerDependencies": {
     "svelte": "^5.47.1"
