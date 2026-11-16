@@ -13,6 +13,7 @@ import type {
   SourceRefusal,
 } from "@canonical/dataviews-core";
 import type { ComponentProps } from "react";
+import type { QueryInputOption } from "../../../QueryInput/index.js";
 
 /**
  * The query state the bar reads: the query, the saved view open beside it,
@@ -211,6 +212,22 @@ export type QueryBarDraft =
       /** The search as it applies. */
       readonly text: string;
     };
+
+/** What choosing one of the bar's suggestions writes into its draft. */
+export type QueryBarChoice =
+  | { readonly kind: "field"; readonly field: string }
+  | {
+      readonly kind: "operator";
+      readonly operator: PredicateOperator;
+      /** The operands the operator brings, as presence's do; null keeps the draft's. */
+      readonly operands: readonly PredicateOperand[] | null;
+    }
+  | { readonly kind: "value"; readonly operand: PredicateOperand };
+
+/** One of the bar's suggestions, with what choosing it writes. */
+export type QueryBarOption = QueryInputOption & {
+  readonly choice: QueryBarChoice;
+};
 
 /** The query bar's edit session, the one state the bar keeps of its own. */
 export type QueryBarSession = {
