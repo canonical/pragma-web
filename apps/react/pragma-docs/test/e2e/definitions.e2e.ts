@@ -1054,8 +1054,15 @@ describe("the overview's record, on the docs site", () => {
     expect(weighed).toBeGreaterThan(0);
   });
 
-  it("measures section C at the design canvas: the fit at the legible floor or above, every node and region on the 16px lattice", () => {
+  it("measures section C at the design canvas: the map's fit or the legible floor, never below, every node and region on the 16px lattice", () => {
     for (const [path, measure] of measureViews()) {
+      // The map's fit at the design canvas, as the canvas states it.
+      const fit = Number(
+        /data-fit-zoom="([^"]+)"/.exec(canvases.get(path) ?? "")?.at(1),
+      );
+      const isNear = (zoom: number): boolean =>
+        Math.abs(measure.openingZoom - zoom) <= 1e-3;
+      expect(isNear(MIN_FIT) || isNear(fit), path).toBe(true);
       expect(measure.openingZoom, path).toBeGreaterThanOrEqual(MIN_FIT);
       expect(measure.offLattice, path).toEqual([]);
     }
