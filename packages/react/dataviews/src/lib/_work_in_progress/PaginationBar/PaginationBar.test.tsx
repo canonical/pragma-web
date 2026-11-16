@@ -651,7 +651,7 @@ describe("PaginationBar", () => {
     const next = screen.getByRole("link", { name: "Next page" });
     expect(next).toHaveAttribute("data-router-link");
     expect(next).toHaveAttribute("href", "?page=2&size=2");
-    expect(next).toHaveClass("ds", "button", "tertiary", "next");
+    expect(next).toHaveClass("ds", "page-control", "next");
     fireEvent.click(next);
     // The router's link saw the click; the bar moved nothing itself.
     expect(seen).toEqual(["?page=2&size=2"]);

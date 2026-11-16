@@ -8,10 +8,9 @@
    * `PaginationBar.anatomy.yaml`. Every value below is one it binds; what it
    * could not bind is recorded there, never hardcoded here.
    *
-   * The selects and buttons are the design system's own. The bar themes them
-   * through their channels — the form layer's input tokens and the Button's
-   * padding — and overrides only what a row of them needs: a select's width,
-   * and each icon-only button's square.
+   * The selects and icon buttons are the design system's own. The bar themes
+   * the selects through the form layer's input tokens and overrides only
+   * what a row of them needs: a select's width.
    */
   .ds.data-table-pagination-bar {
     /* The component tokens, each a binding to a design token, set on the
@@ -39,9 +38,6 @@
     );
     --data-table-pagination-bar-divider-block-size: var(--dimension-300);
     --data-table-pagination-bar-divider-color: var(--color-border-muted);
-    --data-table-pagination-bar-control-padding-inline-end: var(
-      --dimension-100
-    );
 
     /* The channel-bound tokens, resolved where the channels are set: the
        leading inset reads the density channel, as the table's cells do; the
@@ -127,18 +123,6 @@
     & > .paging > .navigation {
       display: flex;
       align-items: center;
-    }
-
-    /* Icon-only Buttons collapse without a label. Each is held to a square
-       one row tall, its icon centred and its side padding equal. */
-    & > .paging > .navigation > .ds.button {
-      --button-padding-inline-end: var(
-        --data-table-pagination-bar-control-padding-inline-end
-      );
-      min-block-size: var(--data-table-pagination-bar-control-size);
-      min-inline-size: var(--data-table-pagination-bar-control-size);
-      align-items: center;
-      justify-content: center;
     }
 
     /* Until the design's skip icons ship: a bar with an arrow meeting it,

@@ -33,15 +33,5 @@
       padding-inline: var(--density-padding-inline);
       white-space: nowrap;
     }
-
-    /* An icon-only Button collapses without a label: held to a square one
-       row tall, its icon centred and its side padding equal. */
-    & > .ds.button.deselect {
-      --button-padding-inline-end: var(--dimension-100);
-      min-block-size: var(--density-line-height-effective);
-      min-inline-size: var(--density-line-height-effective);
-      align-items: center;
-      justify-content: center;
-    }
   }
 }

@@ -70,7 +70,7 @@ describe("PageControl", () => {
       expect(link).toHaveAttribute("href", "?page=2");
     });
 
-    it.fails("wears its own root class, not Button's", () => {
+    it("wears its own root class, not Button's", () => {
       renderControl();
       const link = screen.getByRole("link", { name: "Next page" });
       expect(link).toHaveClass("ds", "page-control", "next");
@@ -84,7 +84,7 @@ describe("PageControl", () => {
       expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
     });
 
-    it.fails("is an icon button", () => {
+    it("is an icon button", () => {
       renderControl({ reachable: false });
       expect(screen.getByRole("button", { name: "Next page" })).toHaveClass(
         "icon-button",
