@@ -29,9 +29,7 @@ describe("JourneysLayout", () => {
     expect(layout).not.toBeNull();
     const strip = layout?.querySelector('[data-region="mode-strip"]');
     expect(strip?.textContent).toContain("Journeys");
-    expect(strip?.contains(viewTab("Graph"))).toBe(
-      true,
-    );
+    expect(strip?.contains(viewTab("Graph"))).toBe(true);
   });
 
   it("shares one view between the strip's switch and the explorer in the canvas", {
@@ -42,10 +40,7 @@ describe("JourneysLayout", () => {
     expect(readExplorerView()).toBe("table");
     fireEvent.click(viewTab("Graph"));
     await waitFor(() =>
-      expect(viewTab("Graph")).toHaveAttribute(
-        "aria-current",
-        "page",
-      ),
+      expect(viewTab("Graph")).toHaveAttribute("aria-current", "page"),
     );
     expect(readExplorerView()).toBe("graph");
     expect(fetchFn).not.toHaveBeenCalled();

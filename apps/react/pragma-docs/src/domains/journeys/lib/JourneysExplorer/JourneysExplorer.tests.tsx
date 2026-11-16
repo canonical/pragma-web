@@ -35,10 +35,7 @@ describe("JourneysExplorer", () => {
     expect(tablePresent()).toBe(true);
     expect(wellPresent()).toBe(false);
     expect(explorerView()).toBe("table");
-    expect(viewTab("Table")).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    expect(viewTab("Table")).toHaveAttribute("aria-current", "page");
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
