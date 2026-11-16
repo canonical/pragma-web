@@ -41,13 +41,10 @@
 
     /* The channel-bound tokens, resolved where the channels are set: the
        leading inset reads the density channel, as the table's cells do; the
-       control size is one density line; the colours are the surface the bar
-       sits on, so the rows it covers do not show through. */
+       colours are the surface the bar sits on, so the rows it covers do not
+       show through. */
     --data-table-pagination-bar-padding-inline-start: var(
       --density-padding-inline
-    );
-    --data-table-pagination-bar-control-size: var(
-      --density-line-height-effective
     );
     --data-table-pagination-bar-color-text: var(
       --surface-color-text,
@@ -75,13 +72,6 @@
     background-color: var(--data-table-pagination-bar-color-background);
     border-block-start: var(--data-table-pagination-bar-border-width) solid
       var(--data-table-pagination-bar-border-color);
-
-    /* The design's compact, borderless dropdown, on the select's own tokens. */
-    --form-input-height: var(--data-table-pagination-bar-control-size);
-    --form-input-padding-block: var(--dimension-050);
-    --form-input-padding-inline: var(--dimension-100);
-    --form-input-background: var(--color-foreground-ghost);
-    --form-input-border-color: transparent;
 
     & > .sizing,
     & > .paging {

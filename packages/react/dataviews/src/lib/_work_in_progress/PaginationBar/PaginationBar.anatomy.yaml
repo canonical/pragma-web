@@ -38,16 +38,12 @@
 # The stylesheet binds each path through the bar's own
 # `--data-table-pagination-bar-*` tokens, all declared on the bar.
 #
-# The two selects are the design system's SelectInput, themed through the form
-# layer's own channels on the bar, never restyled:
-#   --form-input-height          density/line-height-effective
-#   --form-input-padding-block   dimension/050
-#   --form-input-padding-inline  dimension/100
-#   --form-input-background      color/foreground/ghost
-#   --form-input-border-color    none: the design draws the dropdown borderless
-# One property is overridden rather than themed: the input chrome fills its
-# container's width, and in a bar it takes its content's. Its caret is the
-# form layer's own, drawn in `color/icon`. The chrome comes from the
+# The bar's root carries the Density modifier `dense`, which the DSL cannot
+# name, so its selects and icon buttons take the dense cell. The two selects
+# are the design system's SelectInput in its own chrome: the design's
+# borderless dropdown has no SelectInput modifier, a gap sent to the design
+# owners. One property is overridden: the input chrome fills its container's
+# width, and in a bar it takes its content's. The chrome comes from the
 # `@canonical/react-ds-global-form` stylesheet, which the page loads.
 #
 # The four page controls are the design system's IconButton, tertiary, where
