@@ -1,5 +1,6 @@
-import { Button } from "@canonical/react-ds-global";
+import { TooltipEngine } from "@canonical/react-ds-global";
 import { type FocusEvent, type ReactElement, useCallback, useRef } from "react";
+import { IconButtonStandIn } from "../../../../common/IconButtonStandIn/index.js";
 import { useDataViewsValue, useMergedRef } from "../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import type { DataViewsActionBarProps } from "./types.js";
@@ -101,16 +102,18 @@ export default function ActionBar({
         indicator
       )}
       {children}
-      <Button
-        type="button"
-        importance="tertiary"
-        icon="close"
-        className="deselect"
-        aria-label={messages.deselectRows(count)}
-        onClick={() => {
-          selection.clear();
-        }}
-      />
+      <TooltipEngine Message={messages.deselectRows(count)}>
+        <IconButtonStandIn
+          type="button"
+          importance="tertiary"
+          icon="close"
+          className="deselect"
+          aria-label={messages.deselectRows(count)}
+          onClick={() => {
+            selection.clear();
+          }}
+        />
+      </TooltipEngine>
     </fieldset>
   );
 }

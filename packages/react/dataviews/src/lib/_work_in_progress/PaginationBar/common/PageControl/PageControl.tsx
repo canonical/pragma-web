@@ -1,13 +1,14 @@
-import { Button, Icon } from "@canonical/react-ds-global";
+import { Icon } from "@canonical/react-ds-global";
 import type { MouseEvent, ReactElement } from "react";
+import { IconButtonStandIn } from "../../../../common/IconButtonStandIn/index.js";
 import type { PageControlProps } from "./types.js";
+import "./styles.css";
 
-const componentCssClassName = "ds button";
+const componentCssClassName = "ds page-control";
 
 /**
  * Whether a click means "go here, in this tab": a plain primary click. A
- * modified click or another button asks the browser for something else —
- * a new tab, a saved link — and keeps the link's own behaviour.
+ * modified click or another button keeps the link's own behaviour.
  */
 const isPlainClick = (event: MouseEvent<HTMLAnchorElement>): boolean =>
   event.button === 0 &&
@@ -17,20 +18,11 @@ const isPlainClick = (event: MouseEvent<HTMLAnchorElement>): boolean =>
   !event.altKey;
 
 /**
- * One way to another page. A reachable page with a destination is a real
- * link, so it works before any script runs and opens in a new tab like any
- * other; rendered through the consumer's router link where one is given —
- * the router then navigates, and the provider hears it through its location
- * port — and through the intrinsic anchor otherwise, where the enhancement
- * intercepts a plain click and moves the window in place. An unreachable
- * page is a disabled button named for where it would go, and a page with
- * no destination — a provider given no location — is a button that only
- * the enhancement can drive, hidden until scripting is enabled.
+ * One way to another page: a link where the page is reachable, an icon
+ * button otherwise.
  *
- * The link is drawn as the design system's Button: the Button renders no
- * link, so its classes and its icon slot are borrowed here by hand, a
- * deviation recorded in the bar's anatomy; a link variant of the Button is
- * asked of the design system, and this borrowing goes when it lands.
+ * A link renders through the consumer's router link where one is given, and
+ * a button with no destination is hidden until scripting is enabled.
  */
 export default function PageControl({
   label,
@@ -43,9 +35,9 @@ export default function PageControl({
 }: PageControlProps): ReactElement {
   if (reachable && destination !== null) {
     const href = `?${destination}`;
-    const linkClassName = [componentCssClassName, "tertiary", className].join(
-      " ",
-    );
+    const linkClassName = [componentCssClassName, className]
+      .filter(Boolean)
+      .join(" ");
     // The icon names the link: the shared link contract carries no
     // attribute for a name, and the name from content reaches every router.
     const content = (
@@ -76,7 +68,7 @@ export default function PageControl({
     );
   }
   return (
-    <Button
+    <IconButtonStandIn
       type="button"
       importance="tertiary"
       icon={icon}

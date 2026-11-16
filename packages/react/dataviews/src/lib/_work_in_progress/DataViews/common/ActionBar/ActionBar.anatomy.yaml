@@ -19,14 +19,13 @@
 #
 # Tokens are `/`-paths over `@canonical/design-tokens` 0.43.0 ids. The
 # indicator's inset reads the `@canonical/styles` density channel
-# (`density/padding-inline`, `--density-padding-inline`), and the deselect's
-# square the density line (`density/line-height-effective`); the DSL cannot
+# (`density/padding-inline`, `--density-padding-inline`); the DSL cannot
 # name a channel, so the path does and this note records it.
 #
-# The deselect button and the actions a caller places are the design system's
-# Button. The Button reads `color/text` for its label rather than the surface
-# text channel, so on this surface the bar sets the Button's own text channel
-# (`--button-color-text`) to `--surface-color-text`. A tertiary Button's ghost
+# The actions a caller places are the design system's Button, and the
+# deselect its IconButton. The Button reads `color/text` for its label rather
+# than the surface text channel, so on this surface the bar sets the
+# Button's own text channel (`--button-color-text`) to `--surface-color-text`. A tertiary Button's ghost
 # fill already reads the surface channel. A destructive action (the design's
 # red Delete) is the Button's `destructive` anticipation, whose ghost fill and
 # text do not read the surface channel: on this surface it paints the light
@@ -34,11 +33,8 @@
 # draws the dark theme's #f53e45 text on the bar itself. Recorded against the
 # Button, not restyled here.
 #
-# The deselect button is icon-only, and an icon-only Button collapses to its
-# icon, because the Button seats its height on a label. The bar holds it to a
-# square of the density line with its icon centred, and sets its trailing
-# padding to `dimension/100` through the Button's own padding channel, as the
-# pagination bar does its buttons. The design draws a 24×24 icon button in a
+# The deselect is the design system's IconButton, tertiary, paired with its
+# Tooltip, which repeats its name. The design draws a 24×24 icon button in a
 # 36×36 frame.
 #
 # Deviations the DSL cannot express, recorded here:
@@ -62,8 +58,8 @@
 #
 # States:
 #   - The indicator's count changes with the selection's size.
-#   - The deselect button's hover, active and focus states are the Button's
-#     own.
+#   - The deselect button's hover, active and focus states are the
+#     IconButton's own.
 #
 # Accessibility (DataViews component coverage):
 #   action bar, actions  "Actions/confirmation/outcome" (2.1.1, 2.4.3, 3.3.4,
@@ -108,13 +104,10 @@ node:
         cardinality: "0..*"
         slotName: default
     - node:
-        uri: global.component.button
+        uri: global.component.icon_button
         props:
           importance: tertiary
           icon: close
-        styles:
-          size.min.width: density/line-height-effective
-          size.min.height: density/line-height-effective
       relation:
         cardinality: "1"
         slotName: deselect

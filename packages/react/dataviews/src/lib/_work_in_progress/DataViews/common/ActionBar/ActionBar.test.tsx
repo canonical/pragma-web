@@ -73,7 +73,7 @@ describe("DataViews.ActionBar", () => {
     ).toBeInTheDocument();
   });
 
-  it.fails("draws the deselect as an icon button", () => {
+  it("draws the deselect as an icon button", () => {
     const provider = makeProvider();
     mount(provider);
     select(provider, ["m1"]);
@@ -105,11 +105,13 @@ describe("DataViews.ActionBar", () => {
       ),
     });
     select(provider, ["m1"]);
-    expect([...getBar().children]).toEqual([
-      within(getBar()).getByRole("status"),
-      screen.getByRole("button", { name: "Export" }),
+    const [indicator, action, deselect] = getBar().children;
+    expect(indicator).toBe(within(getBar()).getByRole("status"));
+    expect(action).toBe(screen.getByRole("button", { name: "Export" }));
+    // The deselect sits in the area its Tooltip wraps around it.
+    expect(deselect).toContainElement(
       screen.getByRole("button", { name: "Deselect 1 row" }),
-    ]);
+    );
   });
 
   it("takes a caller's indicator, or none", () => {
