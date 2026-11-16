@@ -18,12 +18,45 @@ function listTags(svg: string, opening: string): ReadonlyMap<string, string>[] {
   );
 }
 
+/** An arch's top: its route's path data, the line it runs on and its span. */
+interface ArchTop {
+  readonly d: string;
+  readonly y: number;
+  readonly from: number;
+  readonly to: number;
+}
+
+/**
+ * Read an arch from a bridge's route: one that leaves its port across,
+ * rises to a line above both its ports, runs along it and comes down to
+ * the other port; any other route is none.
+ */
+function readArchTop(d: string): ArchTop | undefined {
+  const match =
+    /^M(-?\d+) (-?\d+)H(-?\d+)V(-?\d+)H(-?\d+)V(-?\d+)H(-?\d+)$/.exec(d);
+  if (match === null) return undefined;
+  const [, , portA, exit, top, entry, portB] = match.map(Number);
+  if (
+    portA === undefined ||
+    exit === undefined ||
+    top === undefined ||
+    entry === undefined ||
+    portB === undefined ||
+    top >= portA ||
+    top >= portB
+  ) {
+    return undefined;
+  }
+  return { d, y: top, from: Math.min(exit, entry), to: Math.max(exit, entry) };
+}
+
 /**
  * Measure a canvas's served SVG as the graph checks read it, with no
  * browser: the nodes it draws, by kind and in its fullest graph-wide
  * column; its size in bytes and elements; the zoom at which its viewBox
  * fills the design canvas; the nodes and regions whose corner is off the
- * lattice; and each relation's stroke, weight and kind.
+ * lattice; each relation's stroke, weight and kind; and the arches over
+ * a shelf whose tops run on one line.
  */
 export default function measureCanvasSvg(svg: string): CanvasMeasure {
   const nodes = listTags(svg, '<g class="node');
@@ -65,6 +98,21 @@ export default function measureCanvasSvg(svg: string): CanvasMeasure {
       focus: classes.includes("is-focus"),
     };
   });
+  const arches = listTags(svg, '<path class="relation')
+    .filter((path) =>
+      (path.get("class") ?? "").split(" ").includes("is-bridge"),
+    )
+    .flatMap((path) => readArchTop(path.get("d") ?? "") ?? []);
+  const sharedArchLines = arches.flatMap((arch, index) =>
+    arches
+      .slice(index + 1)
+      .filter(
+        (other) =>
+          other.y === arch.y &&
+          Math.min(arch.to, other.to) > Math.max(arch.from, other.from),
+      )
+      .map((other) => `${arch.d} and ${other.d}`),
+  );
   return {
     nodes: nodes.length,
     kinds,
@@ -77,5 +125,6 @@ export default function measureCanvasSvg(svg: string): CanvasMeasure {
     relations,
     bridges: relations.filter((relation) => relation.bridge).length,
     bridgeLabels: svg.match(/class="edge-label is-bridge"/g)?.length ?? 0,
+    sharedArchLines,
   };
 }

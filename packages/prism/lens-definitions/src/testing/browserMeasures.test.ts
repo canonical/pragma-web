@@ -125,9 +125,38 @@ describe("measureCanvasSvg", () => {
         focus: true,
       },
     ]);
+    expect(measure.sharedArchLines).toEqual([]);
     expect(() => sliceCanvasSvg("<p></p>")).toThrow();
     expect(() =>
       sliceCanvasSvg('<div class="graph-canvas desktop"><svg>'),
     ).toThrow();
+  });
+
+  it("lists two arches over a shelf whose tops run on one line, and no arch whose top has a line of its own", () => {
+    const bridge = (d: string): string =>
+      `<path class="relation is-bridge" d="${d}" stroke-width="1"></path>`;
+    const shared = [
+      "M608 648H584V568H184V656H160",
+      "M784 648H760V568H392V656H368",
+    ];
+    const serve = (paths: readonly string[]): string =>
+      sliceCanvasSvg(
+        `<div class="graph-canvas desktop"><svg viewBox="0 0 1 1">${paths
+          .map(bridge)
+          .join("")}</svg></div>`,
+      );
+    expect(measureCanvasSvg(serve(shared)).sharedArchLines).toEqual([
+      `${shared.join(" and ")}`,
+    ]);
+    expect(
+      measureCanvasSvg(
+        serve([
+          "M608 648H584V564H184V656H160",
+          "M784 648H760V572H392V656H368",
+          // A route down to a lower shelf is no arch.
+          "M560 376H536V568H552V616H528",
+        ]),
+      ).sharedArchLines,
+    ).toEqual([]);
   });
 });

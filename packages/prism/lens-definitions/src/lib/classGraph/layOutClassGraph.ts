@@ -540,6 +540,10 @@ function layOutModel(
     readonly ends: NeighbourBridgeEnds;
     readonly gap: { readonly from: number; readonly to: number } | undefined;
     readonly heads: readonly PathCommand[][];
+    /** The shelf an arch over one shelf runs above, and its span. */
+    readonly arch:
+      | { readonly shelfY: number; readonly span: number }
+      | undefined;
   }[] = [];
   for (const bundle of crossBundles) {
     const a = nodeOf(bundle.a);
@@ -630,6 +634,13 @@ function layOutModel(
       ends: { startX, portA, endX, portB },
       gap,
       heads,
+      arch:
+        step === 0
+          ? {
+              shelfY: originOf(a.region).shelfY,
+              span: Math.abs(exitX - entryX),
+            }
+          : undefined,
     });
   }
   // A pair of neighbours whose bridges all leave and enter by the sides
@@ -651,6 +662,36 @@ function layOutModel(
       across.set(bundle.id, requireAt(paths, index));
     });
   }
+  // The arches over one shelf, whatever pairs they join, each keep a lane
+  // of their own in the gap above it, nested by span: the widest rises
+  // highest, so no two run on one line.
+  const arches = new Map<string, readonly PathCommand[]>();
+  for (const shelfY of new Set(routes.map(({ arch }) => arch?.shelfY))) {
+    if (shelfY === undefined) continue;
+    const group = routes
+      .filter(
+        ({ arch, bundle }) => arch?.shelfY === shelfY && !across.has(bundle.id),
+      )
+      .sort((x, y) =>
+        orderBy(
+          (y.arch?.span ?? 0) - (x.arch?.span ?? 0),
+          compareText(x.bundle.id, y.bundle.id),
+        ),
+      );
+    group.forEach(({ bundle, channel }, rank) => {
+      const lane =
+        shelfY -
+        SHELF_GAP / 2 +
+        offsetLane(rank, group.length, BRIDGE_GAP_ROOM);
+      arches.set(
+        bundle.id,
+        channel.map(
+          (command, index): PathCommand =>
+            index === 2 ? ["V", lane] : command,
+        ),
+      );
+    });
+  }
   const crossEdges: LaidOutEdge[] = routes.map(
     ({ bundle, channel, heads }) => ({
       id: `rel:${bundle.id}`,
@@ -659,7 +700,9 @@ function layOutModel(
       bundle,
       from: bundle.a,
       to: [bundle.b],
-      d: formatPathData(across.get(bundle.id) ?? channel),
+      d: formatPathData(
+        across.get(bundle.id) ?? arches.get(bundle.id) ?? channel,
+      ),
       heads: heads.map((head) => formatPathData(head)),
       region: nodeOf(bundle.a).region,
     }),

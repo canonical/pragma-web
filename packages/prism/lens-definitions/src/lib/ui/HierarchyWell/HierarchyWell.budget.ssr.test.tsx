@@ -8,7 +8,10 @@ import {
 } from "../../../../testing/browser/index.js";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
-import { FOUR_NAMESPACE_GRAPH } from "../../../../testing/fixtures.js";
+import {
+  defineClass,
+  FOUR_NAMESPACE_GRAPH,
+} from "../../../../testing/fixtures.js";
 import metroGraph from "../../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../../testing/records/ontologyGraph.js";
 import chooseAddressDrill from "../../classGraph/chooseAddressDrill.js";
@@ -18,6 +21,25 @@ import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import type { ClassGraphInput } from "../../classGraph/types.js";
 import { MESSAGES } from "../../i18n/index.js";
 import HierarchyWell from "./HierarchyWell.js";
+
+/**
+ * The docs records beside a namespace of 31 classes of their own, five
+ * layers deep and as wide as the docs site's `surface`: opened, it leaves
+ * the other namespaces' boxes and both stubs on one shelf below it.
+ */
+const SITE_LIKE_GRAPH: ClassGraphInput = {
+  classes: [
+    ...ontologyGraph.classes,
+    ...Array.from({ length: 31 }, (_, index) =>
+      defineClass(`surface:C${index}`, `Surface Class ${index}`, {
+        ...(index === 0
+          ? {}
+          : { superclass: `surface:C${Math.floor((index - 1) / 2)}` }),
+      }),
+    ),
+  ],
+  relations: ontologyGraph.relations,
+};
 
 /**
  * The canvas's SVG of the well rendered at rest, or with a namespace
@@ -176,6 +198,32 @@ describe("HierarchyWell SSR within the graph budget at rest", () => {
           bridges.length,
         );
       }
+    },
+  );
+
+  // On the docs site, a namespace of 31 classes of its own opened puts the
+  // three other namespaces' boxes and both stubs on one shelf: two bridges
+  // arch over it, ds to dt:TokenSymbol and anatomy to rdf:List.
+  it.each([
+    ["the docs records", ontologyGraph],
+    ["the docs records beside a wide namespace", SITE_LIKE_GRAPH],
+    ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH],
+    ["the metro's records", metroGraph],
+  ])(
+    "keeps every two arches over a shelf of %s off one line, nested by span, at rest and with each namespace opened",
+    (_, input) => {
+      let arches = 0;
+      for (const drill of [
+        undefined,
+        ...new Set(input.classes.map((klass) => klass.prefix)),
+      ]) {
+        const svg = renderCanvas(input, drill);
+        expect(measureCanvasSvg(svg).sharedArchLines, drill).toEqual([]);
+        arches += [...svg.matchAll(/class="relation[^"]*is-bridge[^>]*>/g)]
+          .map(([tag]) => /\bd="([^"]*)"/.exec(tag)?.at(1) ?? "")
+          .filter((d) => /^M\S+ \S+H\S+V\S+H\S+V\S+H\S+$/.test(d)).length;
+      }
+      if (input === SITE_LIKE_GRAPH) expect(arches).toBeGreaterThanOrEqual(2);
     },
   );
 

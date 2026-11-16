@@ -45,6 +45,12 @@ export interface CanvasMeasure {
   readonly bridges: number;
   /** How many bridge labels the canvas draws at rest. */
   readonly bridgeLabels: number;
+  /**
+   * The pairs of arches over a shelf, each a bridge that rises from both
+   * its ends into the gap above them, whose tops run on one line for a
+   * stretch, each pair as its two routes' path data.
+   */
+  readonly sharedArchLines: readonly string[];
 }
 
 /** A property as the explorer's ontologies serve it. */
