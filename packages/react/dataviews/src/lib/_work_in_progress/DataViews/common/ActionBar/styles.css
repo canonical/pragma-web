@@ -13,6 +13,18 @@
    * below is the bar's own.
    */
   .ds.data-table-action-bar {
+    --data-table-action-bar-color-text: var(
+      --surface-color-text,
+      var(--color-text)
+    );
+    --data-table-action-bar-color-background: var(
+      --surface-color-background,
+      var(--color-background)
+    );
+    --data-table-action-bar-indicator-padding-inline: var(
+      --density-padding-inline
+    );
+
     display: inline-flex;
     /* A fieldset's own frame and floor go: the bar draws none. */
     min-inline-size: 0;
@@ -20,16 +32,16 @@
     border: 0;
     padding: 0;
     align-items: center;
-    color: var(--surface-color-text, var(--color-text));
+    color: var(--data-table-action-bar-color-text);
     font-family: var(--typography-text-primary-font-family);
     font-size: var(--typography-text-primary-font-size);
     font-weight: var(--typography-text-primary-font-weight);
-    background-color: var(--surface-color-background, var(--color-background));
+    background-color: var(--data-table-action-bar-color-background);
     /* shim: Button surface text */
     --button-color-text: var(--surface-color-text, var(--color-text));
 
     & > .indicator {
-      padding-inline: var(--density-padding-inline);
+      padding-inline: var(--data-table-action-bar-indicator-padding-inline);
       white-space: nowrap;
     }
   }

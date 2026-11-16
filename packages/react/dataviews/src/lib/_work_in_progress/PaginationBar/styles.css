@@ -16,12 +16,14 @@
     /* The component tokens, each a binding to a design token, set on the
        bar so no token leaks onto the page: a theme or a host retunes the
        bar by setting them, and the anatomy names what each binds. */
-    --data-table-pagination-bar-gap: var(--dimension-100);
-    --data-table-pagination-bar-gap-control: var(--dimension-050);
+    --data-table-pagination-bar-gap: var(--space-100);
+    --data-table-pagination-bar-gap-control: var(--space-050);
     /* The inset a control keeps from the divider beside it. */
-    --data-table-pagination-bar-inset-inline: var(--dimension-100);
+    --data-table-pagination-bar-inset-inline: var(--space-100);
+    /* shim: design-tokens stroke */
     --data-table-pagination-bar-border-width: var(
-      --dimension-stroke-thickness-medium
+      --stroke-width-border,
+      var(--dimension-stroke-thickness-medium)
     );
     --data-table-pagination-bar-border-color: var(--color-border-muted);
     --data-table-pagination-bar-font-family: var(
@@ -33,10 +35,18 @@
     --data-table-pagination-bar-font-weight: var(
       --typography-text-primary-font-weight
     );
+    /* shim: design-tokens stroke */
     --data-table-pagination-bar-divider-inline-size: var(
-      --dimension-stroke-thickness-medium
+      --stroke-width-border,
+      var(--dimension-stroke-thickness-medium)
     );
-    --data-table-pagination-bar-divider-block-size: var(--dimension-300);
+    /* shim: design-tokens size */
+    --data-table-pagination-bar-divider-block-size: var(
+      --size-divider-block,
+      var(--dimension-300)
+    );
+    /* shim: design-tokens stacking */
+    --data-table-pagination-bar-stacking: var(--stacking-sticky, 1);
     --data-table-pagination-bar-divider-color: var(--color-border-muted);
 
     /* The channel-bound tokens, resolved where the channels are set: the
@@ -58,7 +68,7 @@
     /* Held to the bottom of whatever scrolls it, over the rows beneath. */
     position: sticky;
     inset-block-end: 0;
-    z-index: 1;
+    z-index: var(--data-table-pagination-bar-stacking);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
