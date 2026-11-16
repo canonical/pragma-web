@@ -379,6 +379,21 @@ describe("HierarchyWell", () => {
       expect(cut).toEqual([]);
     });
 
+    it("never fits what the chips leave below the legible floor with Fit", () => {
+      const canvas = { w: 590.67, h: 778 };
+      stubViewport(canvas);
+      const { container, rerender } = render(drawWell({}));
+      rerender(drawWell({ filter: createAllNamespacesFilter(["ds"]) }));
+      for (const _ of [1, 2, 3]) {
+        fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+      }
+      fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+      const { scale } = measureScale(canvas.w, canvas.h);
+      expect(scale * readTransform(container).k).toBeGreaterThanOrEqual(
+        MIN_FIT,
+      );
+    });
+
     it("fits a picked region once per pick, and Fit restores the graph", () => {
       stubViewport();
       const { container, rerender } = render(drawWell({}));

@@ -98,7 +98,8 @@ function readClosest(
  * forgotten. Pointing at a
  * relation shows its label and rings its ends. The filter's chips hide
  * classes, and the camera fits what is left, which the Fit control
- * restores; the search and the instances axis dim. A region a reader picks
+ * restores, never below the legible zoom; the search and the instances
+ * axis dim. A region a reader picks
  * in the inspector is fitted once per pick, on a window of the canvas's
  * aspect whose edges cut no box: an open region as large as it fits, a
  * collapsed one's box among its neighbours. Neither refit zooms a legible
@@ -276,7 +277,9 @@ export default function HierarchyWell({
     }),
     [layout],
   );
-  // Under a filter, Fit fits the classes it leaves; else it restores the
+  // Under a filter, Fit fits the classes it leaves, whole where that is at
+  // the legible floor or above, else at that floor from their box's
+  // top-left corner, in a window that cuts no class; else it restores the
   // opening.
   const fit = useMemo(
     () => measureVisibleBox(layout, hidden, undefined),
@@ -370,6 +373,7 @@ export default function HierarchyWell({
         fit={fit}
         frame={frame}
         label={t("well.label")}
+        legibleFit
         legibleWindow={legibleWindow}
         memory={cameraMemory}
         opening={opening}

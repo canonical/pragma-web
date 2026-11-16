@@ -598,6 +598,30 @@ describe("at 1440 px", () => {
     },
   );
 
+  it("fits what a kind chip leaves on a term page with Fit at the legible floor or above, the classes in view named", async () => {
+    const view: { fitted?: string | null } = {};
+    const { errors, measure } = await openExplorer(
+      `/definitions/${encodeURIComponent("ds:UIBlock")}`,
+      desktop,
+      async (page) => {
+        await page.getByRole("button", { name: "Abstract", exact: true }).click();
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        await page.getByRole("button", { name: "Fit", exact: true }).click();
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        view.fitted = await page
+          .locator(".ds.graph-canvas .zoom-level")
+          .textContent();
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(Number.parseInt(view.fitted ?? "", 10)).toBeGreaterThanOrEqual(
+      Math.floor(MIN_FIT * 100),
+    );
+    expect(measure.inView).toBeGreaterThan(0);
+    expect(measure.unlabelled).toBe(0);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+  });
+
   it("puts the inspector's field ranges on one column line", async () => {
     const { measure } = await openExplorer(
       `/definitions/${encodeURIComponent("ds:Component")}`,
