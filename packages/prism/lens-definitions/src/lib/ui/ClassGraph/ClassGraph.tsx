@@ -5,7 +5,6 @@ import {
   LABEL_HALO,
   LABEL_LINE_PITCH,
   LABEL_SIZE,
-  measureRegionLabelWidth,
   REGION_LABEL_GAP,
   REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
@@ -31,6 +30,7 @@ import type {
   LaidOutNode,
   LaidOutRegion,
 } from "../../classGraph/types.js";
+import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
 import weighStroke from "../../classGraph/weighStroke.js";
 import { useMessages } from "../../i18n/index.js";
 import {
@@ -407,7 +407,7 @@ export default function ClassGraph({
           fill="none"
           height={REGION_LABEL_ROW}
           pointerEvents="all"
-          width={measureRegionLabelWidth(region.prefix, region.members)}
+          width={measureRegionHeading(region.prefix, region.members, true)}
           x={region.x}
           y={region.y}
         />
@@ -457,6 +457,13 @@ export default function ClassGraph({
                   {bucket === "full" ? (
                     <tspan className="count" dx={REGION_LABEL_GAP}>
                       {t("well.region.count", { count: region.members })}
+                    </tspan>
+                  ) : null}
+                  {bucket === "full" &&
+                  buildDrillHref !== undefined &&
+                  layout.drilled === region.prefix ? (
+                    <tspan className="back" dx={REGION_LABEL_GAP}>
+                      {t("well.region.back.words")}
                     </tspan>
                   ) : null}
                 </text>

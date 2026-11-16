@@ -1,7 +1,6 @@
 import {
   intersectsRect,
   LATTICE,
-  measureRegionLabelWidth,
   REGION_LABEL_ROW,
   type Rect,
 } from "@canonical/prism-core";
@@ -12,6 +11,7 @@ import {
   MIN_FIT,
 } from "./constants.js";
 import containsRect from "./containsRect.js";
+import measureRegionHeading from "./measureRegionHeading.js";
 import type { ClassGraphLayout, LegibleWindowOptions } from "./types.js";
 
 /**
@@ -43,7 +43,7 @@ import type { ClassGraphLayout, LegibleWindowOptions } from "./types.js";
  * @returns The window.
  */
 export default function frameLegibleWindow(
-  layout: Pick<ClassGraphLayout, "nodes" | "regions" | "viewBox">,
+  layout: Pick<ClassGraphLayout, "nodes" | "regions" | "viewBox" | "drilled">,
   canvas: { readonly w: number; readonly h: number },
   {
     arrival,
@@ -59,7 +59,11 @@ export default function frameLegibleWindow(
     ...layout.regions.map((region) => ({
       x: region.x,
       y: region.y,
-      w: measureRegionLabelWidth(region.prefix, region.ids.length),
+      w: measureRegionHeading(
+        region.prefix,
+        region.ids.length,
+        region.prefix === layout.drilled,
+      ),
       h: REGION_LABEL_ROW,
     })),
   ];

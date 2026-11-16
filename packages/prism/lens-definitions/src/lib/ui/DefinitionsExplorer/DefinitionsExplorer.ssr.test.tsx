@@ -143,6 +143,14 @@ describe("DefinitionsExplorer SSR", () => {
     expect(
       drilled.match(/<a[^>]*class="[^"]*way-back"[^>]*href="\/definitions"/g),
     ).toHaveLength(2);
+    // Each says in visible words, after the count, where it leads.
+    const backs = [
+      ...drilled.matchAll(/<a[^>]*class="[^"]*way-back"[^>]*>(.*?)<\/a>/g),
+    ].map(([, inner]) => inner?.replace(/<[^>]+>/g, ""));
+    expect(backs).toEqual([
+      "DS20 classes· all namespaces",
+      "DS20 classes· all namespaces",
+    ]);
     // What was opened leads the phone's list, in packing order: its header,
     // with the way back, comes before every box and stub.
     const phone = drilled.slice(drilled.indexOf('class="ds phone-graph'));

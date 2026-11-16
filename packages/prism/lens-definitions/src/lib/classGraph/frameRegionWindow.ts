@@ -1,7 +1,6 @@
 import {
   intersectsRect,
   LATTICE,
-  measureRegionLabelWidth,
   orderBy,
   REGION_LABEL_ROW,
   type Rect,
@@ -13,6 +12,7 @@ import {
   MIN_FIT,
 } from "./constants.js";
 import containsRect from "./containsRect.js";
+import measureRegionHeading from "./measureRegionHeading.js";
 import type { ClassGraphLayout } from "./types.js";
 
 /**
@@ -36,7 +36,7 @@ import type { ClassGraphLayout } from "./types.js";
  *   at that zoom or every window would cut a box.
  */
 export default function frameRegionWindow(
-  layout: Pick<ClassGraphLayout, "nodes" | "regions">,
+  layout: Pick<ClassGraphLayout, "nodes" | "regions" | "drilled">,
   canvas: { readonly w: number; readonly h: number },
   frame: Rect,
   { wide = false, zoom = MIN_FIT }: { wide?: boolean; zoom?: number } = {},
@@ -46,7 +46,11 @@ export default function frameRegionWindow(
     ...layout.regions.map((region) => ({
       x: region.x,
       y: region.y,
-      w: measureRegionLabelWidth(region.prefix, region.ids.length),
+      w: measureRegionHeading(
+        region.prefix,
+        region.ids.length,
+        region.prefix === layout.drilled,
+      ),
       h: REGION_LABEL_ROW,
     })),
   ];

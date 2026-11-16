@@ -205,8 +205,9 @@ server, deterministically: two renders of a page give the same SVG.
 - **An opened view.** A box links to its namespace opened, at the
   address `/definitions?expand=<prefix>` (`/definitions?expand=surface`):
   the namespace drawn class by class and packed first, the others as
-  boxes. Its heading is the way back to the overview at rest, keeping the
-  address's other view keys. A term page of a class inside a box opens
+  boxes. Its heading is the way back to the overview at rest, and says so
+  after its count ("· all namespaces"), keeping the address's other view
+  keys. A term page of a class inside a box opens
   that namespace too. Every view opens by one rule: the whole map where it
   fits the canvas with every label at 12px or more on screen (a zoom of
   12/14), otherwise the map's top-left corner at that zoom; a term page

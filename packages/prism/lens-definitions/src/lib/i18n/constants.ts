@@ -40,6 +40,7 @@ export const MESSAGES = {
     "Namespace {prefix}, drawn as one box: {classes}, {held} inside, {relations} out",
   "well.name.region.open":
     "Namespace {prefix}, drawn as one box: {classes}, {held} inside, {relations} out. Opens the namespace",
+  "well.region.back.words": "· all namespaces",
   "well.region.back":
     "Namespace {prefix}, opened, {classes}: back to the overview of every namespace",
   "well.name":

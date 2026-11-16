@@ -154,6 +154,12 @@ export default function PhoneGraph({
               <tspan className="count" dx={REGION_LABEL_GAP}>
                 {t("well.region.count", { count: header.count })}
               </tspan>
+              {buildDrillHref !== undefined &&
+              layout.drilled === header.prefix ? (
+                <tspan className="back" dx={REGION_LABEL_GAP}>
+                  {t("well.region.back.words")}
+                </tspan>
+              ) : null}
             </text>,
           )}
         </g>

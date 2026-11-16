@@ -9,7 +9,6 @@ import {
   LATTICE,
   layoutLayered,
   measurePathBounds,
-  measureRegionLabelWidth,
   orderBy,
   type PathCommand,
   REGION_LABEL_ROW,
@@ -44,6 +43,7 @@ import frameOpeningWindow from "./frameOpeningWindow.js";
 import gatherDrawnInput from "./gatherDrawnInput.js";
 import layOutPhoneView from "./layOutPhoneView.js";
 import listRegionBridges from "./listRegionBridges.js";
+import measureRegionHeading from "./measureRegionHeading.js";
 import offsetLane from "./offsetLane.js";
 import opensWhole from "./opensWhole.js";
 import orderBoxedClasses from "./orderBoxedClasses.js";
@@ -79,11 +79,15 @@ interface SizedRegion {
   readonly h: number;
 }
 
-/** Size a laid-out region: its content and label row, on the lattice. */
+/**
+ * Size a laid-out region: its content and heading row, the opened
+ * namespace's with the words of its way back, on the lattice.
+ */
 function sizeRegion(
   prefix: string,
   ids: readonly string[],
   layout: GraphLayoutResult<Bundle>,
+  opened: boolean,
 ): SizedRegion {
   return {
     prefix,
@@ -92,7 +96,7 @@ function sizeRegion(
     w: ceilTo(
       Math.max(
         layout.content.x + layout.content.w,
-        measureRegionLabelWidth(prefix, ids.length),
+        measureRegionHeading(prefix, ids.length, opened),
       ),
       LATTICE,
     ),
@@ -132,13 +136,19 @@ function packRegions(
   }[],
   channel: number,
   engine: LayerSettings,
+  lead: string | undefined,
 ): {
   readonly regions: readonly SizedRegion[];
   readonly packing: ShelfPacking;
   readonly crowded: boolean;
 } {
   const regions = order.map(({ prefix, ids }) =>
-    sizeRegion(prefix, ids, layOutLayers(model, ids, channel, engine)),
+    sizeRegion(
+      prefix,
+      ids,
+      layOutLayers(model, ids, channel, engine),
+      prefix === lead,
+    ),
   );
   return {
     regions,
@@ -368,9 +378,15 @@ function layOutModel(
     lead,
   ).map((prefix) => ({ prefix, ids: requireEntry(idsOf, prefix) }));
   let channel = CHANNEL;
-  let packed = packRegions(model, order, channel, engine);
+  let packed = packRegions(model, order, channel, engine, lead);
   if (packed.packing.fit < MIN_FIT) {
-    const retry = packRegions(model, order, FALLBACK_CHANNEL, engine);
+    const retry = packRegions(
+      model,
+      order,
+      FALLBACK_CHANNEL,
+      engine,
+      lead,
+    );
     findings.push(
       `G3: fit ${packed.packing.fit.toFixed(3)} at ${CHANNEL}px channels; ${retry.packing.fit.toFixed(3)} at ${FALLBACK_CHANNEL}px`,
     );
@@ -400,6 +416,7 @@ function layOutModel(
           region.prefix,
           region.ids,
           layOutLayers(model, region.ids, channel, engine, crossPorts),
+          region.prefix === lead,
         )
       : region,
   );
