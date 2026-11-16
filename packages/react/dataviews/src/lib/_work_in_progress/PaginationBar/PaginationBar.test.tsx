@@ -747,6 +747,17 @@ describe("PaginationBar", () => {
     expect(nav).toHaveAttribute("id", "machines-pages");
   });
 
+  it.fails("sets the Dense modifier after its base class", () => {
+    mount(makeProvider().provider, { className: "footer" });
+    const nav = screen.getByRole("navigation", { name: "Pagination" });
+    expect([...nav.classList]).toEqual([
+      "ds",
+      "data-table-pagination-bar",
+      "dense",
+      "footer",
+    ]);
+  });
+
   it("speaks the words it is given, keeping English only where none are given", () => {
     const { provider, source } = makeProvider();
     mount(provider, {
