@@ -203,27 +203,40 @@ describe("HierarchyWell SSR within the graph budget at rest", () => {
 
   // On the docs site, a namespace of 31 classes of its own opened puts the
   // three other namespaces' boxes and both stubs on one shelf: two bridges
-  // arch over it, ds to dt:TokenSymbol and anatomy to rdf:List.
+  // arch over it, ds to dt:TokenSymbol and anatomy to rdf:List. With ds or
+  // anatomy opened, the stubs lie two shelves below it, and the bridges
+  // into them pass a shelf of boxes by a margin.
   it.each([
     ["the docs records", ontologyGraph],
     ["the docs records beside a wide namespace", SITE_LIKE_GRAPH],
     ["the docs site's four namespaces", FOUR_NAMESPACE_GRAPH],
     ["the metro's records", metroGraph],
   ])(
-    "keeps every two arches over a shelf of %s off one line, nested by span, at rest and with each namespace opened",
+    "keeps every two bridges of %s off one line, and none along three sides of a region it joins, at rest and with each namespace opened",
     (_, input) => {
-      let arches = 0;
+      const shapes = { arches: 0, margins: 0 };
       for (const drill of [
         undefined,
         ...new Set(input.classes.map((klass) => klass.prefix)),
       ]) {
         const svg = renderCanvas(input, drill);
-        expect(measureCanvasSvg(svg).sharedArchLines, drill).toEqual([]);
-        arches += [...svg.matchAll(/class="relation[^"]*is-bridge[^>]*>/g)]
-          .map(([tag]) => /\bd="([^"]*)"/.exec(tag)?.at(1) ?? "")
-          .filter((d) => /^M\S+ \S+H\S+V\S+H\S+V\S+H\S+$/.test(d)).length;
+        const measure = measureCanvasSvg(svg);
+        expect(measure.sharedBridgeLines, drill).toEqual([]);
+        expect(measure.framingBridges, drill).toEqual([]);
+        const routes = [
+          ...svg.matchAll(/class="relation[^"]*is-bridge[^>]*>/g),
+        ].map(([tag]) => /\bd="([^"]*)"/.exec(tag)?.at(1) ?? "");
+        shapes.arches += routes.filter((d) =>
+          /^M\S+ \S+H\S+V\S+H\S+V\S+H\S+$/.test(d),
+        ).length;
+        shapes.margins += routes.filter((d) =>
+          /^M\S+ \S+(H\S+V\S+){3}H\S+$/.test(d),
+        ).length;
       }
-      if (input === SITE_LIKE_GRAPH) expect(arches).toBeGreaterThanOrEqual(2);
+      if (input === SITE_LIKE_GRAPH) {
+        expect(shapes.arches).toBeGreaterThanOrEqual(2);
+        expect(shapes.margins).toBeGreaterThanOrEqual(2);
+      }
     },
   );
 

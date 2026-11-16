@@ -18,36 +18,73 @@ function listTags(svg: string, opening: string): ReadonlyMap<string, string>[] {
   );
 }
 
-/** An arch's top: its route's path data, the line it runs on and its span. */
-interface ArchTop {
-  readonly d: string;
-  readonly y: number;
+/**
+ * A straight stretch of a bridge's route: down (along an x) or across
+ * (along a y), the line it keeps and the span it runs along.
+ */
+interface BridgeRun {
+  readonly down: boolean;
+  readonly line: number;
   readonly from: number;
   readonly to: number;
 }
 
-/**
- * Read an arch from a bridge's route: one that leaves its port across,
- * rises to a line above both its ports, runs along it and comes down to
- * the other port; any other route is none.
- */
-function readArchTop(d: string): ArchTop | undefined {
-  const match =
-    /^M(-?\d+) (-?\d+)H(-?\d+)V(-?\d+)H(-?\d+)V(-?\d+)H(-?\d+)$/.exec(d);
-  if (match === null) return undefined;
-  const [, , portA, exit, top, entry, portB] = match.map(Number);
-  if (
-    portA === undefined ||
-    exit === undefined ||
-    top === undefined ||
-    entry === undefined ||
-    portB === undefined ||
-    top >= portA ||
-    top >= portB
-  ) {
-    return undefined;
+/** A bridge's route: its path data, its two ends and its stretches. */
+interface BridgeRoute {
+  readonly d: string;
+  readonly ends: readonly (readonly [number, number])[];
+  readonly runs: readonly BridgeRun[];
+}
+
+/** Read a bridge's route drawn with absolute `M`, `H` and `V` commands. */
+function readBridgeRoute(d: string): BridgeRoute {
+  const runs: BridgeRun[] = [];
+  let [x, y] = [0, 0];
+  const ends: [number, number][] = [];
+  for (const [, command, first = "0", second = "0"] of d.matchAll(
+    /([MHV])(-?\d+)(?: (-?\d+))?/g,
+  )) {
+    const value = Number(first);
+    if (command === "M") {
+      [x, y] = [value, Number(second)];
+      ends.push([x, y]);
+    } else if (command === "H") {
+      runs.push({ down: false, line: y, from: Math.min(x, value), to: Math.max(x, value) });
+      x = value;
+    } else {
+      runs.push({ down: true, line: x, from: Math.min(y, value), to: Math.max(y, value) });
+      y = value;
+    }
   }
-  return { d, y: top, from: Math.min(exit, entry), to: Math.max(exit, entry) };
+  ends.push([x, y]);
+  return { d, ends, runs };
+}
+
+/** Whether two spans overlap by more than a point. */
+function overlaps(a1: number, a2: number, b1: number, b2: number): boolean {
+  return Math.min(a2, b2) > Math.max(a1, b1);
+}
+
+/**
+ * The sides of a region a route runs beyond, along a stretch of that
+ * side: above it, below it, left or right of it.
+ */
+function listSidesPassed(
+  route: BridgeRoute,
+  region: { readonly x: number; readonly y: number; readonly w: number; readonly h: number },
+): ReadonlySet<string> {
+  const sides = new Set<string>();
+  for (const run of route.runs) {
+    if (!run.down && overlaps(run.from, run.to, region.x, region.x + region.w)) {
+      if (run.line < region.y) sides.add("top");
+      if (run.line > region.y + region.h) sides.add("bottom");
+    }
+    if (run.down && overlaps(run.from, run.to, region.y, region.y + region.h)) {
+      if (run.line < region.x) sides.add("left");
+      if (run.line > region.x + region.w) sides.add("right");
+    }
+  }
+  return sides;
 }
 
 /**
@@ -55,8 +92,9 @@ function readArchTop(d: string): ArchTop | undefined {
  * browser: the nodes it draws, by kind and in its fullest graph-wide
  * column; its size in bytes and elements; the zoom at which its viewBox
  * fills the design canvas; the nodes and regions whose corner is off the
- * lattice; each relation's stroke, weight and kind; and the arches over
- * a shelf whose tops run on one line.
+ * lattice; each relation's stroke, weight and kind; the bridges that run
+ * on one line for a stretch; and the bridges that run along three sides
+ * of a region they leave or enter.
  */
 export default function measureCanvasSvg(svg: string): CanvasMeasure {
   const nodes = listTags(svg, '<g class="node');
@@ -98,20 +136,46 @@ export default function measureCanvasSvg(svg: string): CanvasMeasure {
       focus: classes.includes("is-focus"),
     };
   });
-  const arches = listTags(svg, '<path class="relation')
+  const bridges = listTags(svg, '<path class="relation')
     .filter((path) =>
       (path.get("class") ?? "").split(" ").includes("is-bridge"),
     )
-    .flatMap((path) => readArchTop(path.get("d") ?? "") ?? []);
-  const sharedArchLines = arches.flatMap((arch, index) =>
-    arches
+    .map((path) => readBridgeRoute(path.get("d") ?? ""));
+  const sharedBridgeLines = bridges.flatMap((route, index) =>
+    bridges
       .slice(index + 1)
-      .filter(
-        (other) =>
-          other.y === arch.y &&
-          Math.min(arch.to, other.to) > Math.max(arch.from, other.from),
+      .filter((other) =>
+        route.runs.some((run) =>
+          other.runs.some(
+            (otherRun) =>
+              otherRun.down === run.down &&
+              otherRun.line === run.line &&
+              overlaps(run.from, run.to, otherRun.from, otherRun.to),
+          ),
+        ),
       )
-      .map((other) => `${arch.d} and ${other.d}`),
+      .map((other) => `${route.d} and ${other.d}`),
+  );
+  const regions = listTags(svg, '<g class="region').map((region) => ({
+    ns: region.get("data-ns") ?? "",
+    x: Number(region.get("data-x")),
+    y: Number(region.get("data-y")),
+    w: Number(region.get("data-w")),
+    h: Number(region.get("data-h")),
+  }));
+  const framingBridges = bridges.flatMap((route) =>
+    regions
+      .filter(
+        (region) =>
+          route.ends.some(
+            ([x, y]) =>
+              x >= region.x &&
+              x <= region.x + region.w &&
+              y >= region.y &&
+              y <= region.y + region.h,
+          ) && listSidesPassed(route, region).size >= 3,
+      )
+      .map((region) => `${route.d} round ${region.ns}`),
   );
   return {
     nodes: nodes.length,
@@ -125,6 +189,7 @@ export default function measureCanvasSvg(svg: string): CanvasMeasure {
     relations,
     bridges: relations.filter((relation) => relation.bridge).length,
     bridgeLabels: svg.match(/class="edge-label is-bridge"/g)?.length ?? 0,
-    sharedArchLines,
+    sharedBridgeLines,
+    framingBridges,
   };
 }

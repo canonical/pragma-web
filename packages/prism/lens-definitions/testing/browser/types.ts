@@ -46,11 +46,17 @@ export interface CanvasMeasure {
   /** How many bridge labels the canvas draws at rest. */
   readonly bridgeLabels: number;
   /**
-   * The pairs of arches over a shelf, each a bridge that rises from both
-   * its ends into the gap above them, whose tops run on one line for a
-   * stretch, each pair as its two routes' path data.
+   * The pairs of bridges whose routes run on one line for a stretch,
+   * whatever pairs of regions they join, each pair as its two routes' path
+   * data.
    */
-  readonly sharedArchLines: readonly string[];
+  readonly sharedBridgeLines: readonly string[];
+  /**
+   * The bridges whose route runs along three sides of a region it leaves
+   * or enters, reading as the region's frame: each as its path data and
+   * the region's namespace.
+   */
+  readonly framingBridges: readonly string[];
 }
 
 /** A property as the explorer's ontologies serve it. */

@@ -125,38 +125,59 @@ describe("measureCanvasSvg", () => {
         focus: true,
       },
     ]);
-    expect(measure.sharedArchLines).toEqual([]);
+    expect(measure.sharedBridgeLines).toEqual([]);
+    expect(measure.framingBridges).toEqual([]);
     expect(() => sliceCanvasSvg("<p></p>")).toThrow();
     expect(() =>
       sliceCanvasSvg('<div class="graph-canvas desktop"><svg>'),
     ).toThrow();
   });
 
-  it("lists two arches over a shelf whose tops run on one line, and no arch whose top has a line of its own", () => {
-    const bridge = (d: string): string =>
-      `<path class="relation is-bridge" d="${d}" stroke-width="1"></path>`;
-    const shared = [
-      "M608 648H584V568H184V656H160",
-      "M784 648H760V568H392V656H368",
+  const bridge = (d: string): string =>
+    `<path class="relation is-bridge" d="${d}" stroke-width="1"></path>`;
+  const region = (ns: string, x: number, y: number, w: number, h: number) =>
+    `<g class="region" data-ns="${ns}" data-x="${x}" data-y="${y}" data-w="${w}" data-h="${h}"></g>`;
+  const serve = (parts: readonly string[]): string =>
+    sliceCanvasSvg(
+      `<div class="graph-canvas desktop"><svg viewBox="0 0 1 1">${parts.join("")}</svg></div>`,
+    );
+
+  it("lists two bridges whose routes run on one line for a stretch, across or down, and none whose lanes keep apart", () => {
+    // Two pairs' bridges along one gap, then along one channel.
+    const across = [
+      "M368 568H344V488H-24V-24H328V232H256",
+      "M320 568H344V488H392V456H368",
     ];
-    const serve = (paths: readonly string[]): string =>
-      sliceCanvasSvg(
-        `<div class="graph-canvas desktop"><svg viewBox="0 0 1 1">${paths
-          .map(bridge)
-          .join("")}</svg></div>`,
-      );
-    expect(measureCanvasSvg(serve(shared)).sharedArchLines).toEqual([
-      `${shared.join(" and ")}`,
+    const down = ["M96 104H132V140H180", "M112 56H132V120H40"];
+    expect(measureCanvasSvg(serve([...across, ...down].map(bridge))).sharedBridgeLines).toEqual([
+      across.join(" and "),
+      down.join(" and "),
     ]);
     expect(
       measureCanvasSvg(
-        serve([
-          "M608 648H584V564H184V656H160",
-          "M784 648H760V572H392V656H368",
-          // A route down to a lower shelf is no arch.
-          "M560 376H536V568H552V616H528",
-        ]),
-      ).sharedArchLines,
+        serve(
+          [
+            "M368 568H348V492H488V360H328V232H256",
+            "M320 568H340V484H392V456H368",
+            // Two routes that only meet at a point.
+            "M0 0H10V10",
+            "M10 10V20H0",
+          ].map(bridge),
+        ),
+      ).sharedBridgeLines,
     ).toEqual([]);
+  });
+
+  it("lists a bridge that runs along three sides of a region it leaves or enters, and not one that passes a region it does not join", () => {
+    const framing = "M560 376H536V-24H-24V664H152V728H128";
+    const svg = serve([
+      region("ds", 0, 0, 720, 512),
+      region("surface", 0, 560, 160, 80),
+      region("dt", 0, 688, 128, 64),
+      bridge(framing),
+      // Round three sides of surface, which it neither leaves nor enters.
+      bridge("M560 376H536V536H-24V660H152V728H128"),
+    ]);
+    expect(measureCanvasSvg(svg).framingBridges).toEqual([`${framing} round ds`]);
   });
 });
