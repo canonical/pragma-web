@@ -8,6 +8,44 @@
    * from `.dense` on the root.
    */
   .ds.data-table {
+    /* Component tier. Semantic tokens not yet in design-tokens are read
+       through marked shims over today's values. */
+    /* shim: design-tokens stroke, rung 2.5 */
+    --data-table-border-width: var(
+      --stroke-width-border,
+      var(--dimension-stroke-thickness-medium)
+    );
+    /* shim: design-tokens stroke, rung 2.5 */
+    --data-table-focus-width: var(
+      --stroke-width-focus,
+      var(--dimension-stroke-thickness-large)
+    );
+    /* shim: design-tokens stroke, rung 2.5 */
+    --data-table-resize-mark-inline-size: var(
+      --stroke-width-mark,
+      var(--dimension-stroke-thickness-large)
+    );
+    /* shim: design-tokens size, rung 2.5 */
+    --data-table-resize-mark-block-size: var(
+      --size-mark-block,
+      var(--dimension-250)
+    );
+    /* shim: design-tokens size, rung 2.5 */
+    --data-table-control-track: var(--size-control-track, var(--dimension-400));
+    /* shim: design-tokens size, rung 2.5 */
+    --data-table-resize-target: var(
+      --size-target-minimum,
+      var(--dimension-300)
+    );
+    --data-table-gap: var(--space-050);
+    --data-table-overlay-padding-block: var(--space-050);
+    --data-table-status-padding-block: var(--space-300);
+    /* shim: design-tokens stacking, rung 2.5 */
+    --data-table-stacking-sticky: var(--stacking-sticky, 1);
+    /* shim: design-tokens stacking, rung 2.5 */
+    --data-table-stacking-overlay: var(--stacking-overlay, 1);
+    /* Local stacking: the parts' steps order only among themselves. */
+    isolation: isolate;
     display: block;
     /* The columns are authoritative: when their total no longer fits, the
        table scrolls rather than compressing a column past its minimum.
@@ -26,8 +64,7 @@
     /* The surface it sits on, so a table inside a layered surface steps its
        background with it. */
     background-color: var(--surface-color-background, var(--color-background));
-    border: var(--dimension-stroke-thickness-medium) solid
-      var(--color-border-muted);
+    border: var(--data-table-border-width) solid var(--color-border-muted);
   }
 
   /* Bounded: own scroll viewport, capped at 100svh, no browser anchoring. */
@@ -54,9 +91,9 @@
        table that scrolls only horizontally nothing. */
     position: sticky;
     inset-block-start: 0;
-    z-index: 1;
+    z-index: var(--data-table-stacking-sticky);
     background-color: var(--color-background-layer2);
-    border-block-end: var(--dimension-stroke-thickness-medium) solid
+    border-block-end: var(--data-table-border-width) solid
       var(--color-border-muted);
   }
 
@@ -80,7 +117,7 @@
 
   :where(.ds.data-table-body) > .ds.data-table-row {
     &:not(:last-child) {
-      border-block-end: var(--dimension-stroke-thickness-medium) solid
+      border-block-end: var(--data-table-border-width) solid
         var(--color-border-muted);
     }
 
@@ -113,14 +150,14 @@
   .ds.data-table:where(
     :has(> .header > .row > .ds.data-table-select-all-cell)
   ) {
-    --data-table-selection-track: var(--dimension-400);
+    --data-table-selection-track: var(--data-table-control-track);
   }
 
   /* The settings cell is the stylesheet's own track too, after the solved
      ones, in a table whose header holds it. Every row keeps the track, empty
      in the body, so each column's boundary is the same in every row. */
   .ds.data-table:where(:has(> .header > .row > .ds.data-table-settings-cell)) {
-    --data-table-settings-track: var(--dimension-400);
+    --data-table-settings-track: var(--data-table-control-track);
   }
 
   .ds.data-table-body-cell,
@@ -155,7 +192,7 @@
       align-self: stretch;
       /* 24px: the target size WCAG 2.5.8 asks for, on width alone, at every
          density. The hairline stays the mark it shows. */
-      inline-size: var(--dimension-300);
+      inline-size: var(--data-table-resize-target);
       margin-inline-start: auto;
       position: relative;
       cursor: col-resize;
@@ -172,8 +209,8 @@
         position: absolute;
         inset: 0;
         margin: auto;
-        inline-size: var(--dimension-stroke-thickness-large);
-        block-size: var(--dimension-250);
+        inline-size: var(--data-table-resize-mark-inline-size);
+        block-size: var(--data-table-resize-mark-block-size);
         background-color: var(--color-border-muted);
       }
 
@@ -183,9 +220,9 @@
       }
 
       &:focus-visible {
-        outline: var(--dimension-stroke-thickness-large) solid
+        outline: var(--data-table-focus-width) solid
           var(--color-focus-ring, currentColor);
-        outline-offset: calc(-1 * var(--dimension-stroke-thickness-large));
+        outline-offset: calc(-1 * var(--data-table-focus-width));
       }
     }
 
@@ -204,8 +241,8 @@
       pointer-events: none;
       inset-block-start: 100%;
       inset-inline: 0;
-      z-index: 1;
-      padding-block: var(--dimension-050);
+      z-index: var(--data-table-stacking-overlay);
+      padding-block: var(--data-table-overlay-padding-block);
       padding-inline: var(--density-padding-inline);
       font-weight: var(--typography-text-primary-font-weight);
       color: var(--color-text);
@@ -213,8 +250,7 @@
         --surface-color-background,
         var(--color-background)
       );
-      border: var(--dimension-stroke-thickness-medium) solid
-        var(--color-border-muted);
+      border: var(--data-table-border-width) solid var(--color-border-muted);
     }
   }
 
@@ -227,7 +263,7 @@
     align-items: center;
     /* The row's full height, so the resize target at its edge is too. */
     align-self: stretch;
-    gap: var(--dimension-050);
+    gap: var(--data-table-gap);
     font-weight: var(--typography-text-primary-bold-font-weight);
     /* A header cell never clips: its label and sort control clip themselves,
        and the resize handle at its edge must stay reachable however narrow
@@ -253,7 +289,7 @@
       & > .handle-slot {
         display: block;
         flex: none;
-        inline-size: var(--dimension-300);
+        inline-size: var(--data-table-resize-target);
         margin-inline-start: auto;
       }
     }
@@ -280,7 +316,7 @@
       display: flex;
       min-inline-size: 0;
       align-items: center;
-      gap: var(--dimension-050);
+      gap: var(--data-table-gap);
       margin: 0;
       padding: 0;
       color: inherit;
@@ -293,9 +329,9 @@
 
       /* Inset in full: the header cell clips anything drawn outside it. */
       &:focus-visible {
-        outline: var(--dimension-stroke-thickness-large) solid
+        outline: var(--data-table-focus-width) solid
           var(--color-focus-ring, currentColor);
-        outline-offset: calc(-1 * var(--dimension-stroke-thickness-large));
+        outline-offset: calc(-1 * var(--data-table-focus-width));
       }
     }
 
@@ -333,15 +369,14 @@
       margin: 0;
       pointer-events: none;
       font-weight: var(--typography-text-primary-font-weight);
-      padding-block: var(--dimension-050);
+      padding-block: var(--data-table-overlay-padding-block);
       padding-inline: var(--density-padding-inline);
       color: var(--color-text);
       background-color: var(
         --surface-color-background,
         var(--color-background)
       );
-      border: var(--dimension-stroke-thickness-medium) solid
-        var(--color-border-muted);
+      border: var(--data-table-border-width) solid var(--color-border-muted);
     }
 
     /* The column's menu: an icon beside the sort control that neither
@@ -361,9 +396,9 @@
         border: none;
 
         &:focus-visible {
-          outline: var(--dimension-stroke-thickness-large) solid
+          outline: var(--data-table-focus-width) solid
             var(--color-focus-ring, currentColor);
-          outline-offset: calc(-1 * var(--dimension-stroke-thickness-large));
+          outline-offset: calc(-1 * var(--data-table-focus-width));
         }
       }
     }
@@ -377,7 +412,7 @@
       position: absolute;
       inset-block-start: 100%;
       inset-inline: 0;
-      z-index: 1;
+      z-index: var(--data-table-stacking-overlay);
     }
 
     .ds.data-table-header-cell > .sort-reason:where(:empty) {
@@ -433,13 +468,13 @@
     display: block;
 
     &:not(:last-child) {
-      border-block-end: var(--dimension-stroke-thickness-medium) solid
+      border-block-end: var(--data-table-border-width) solid
         var(--color-border-muted);
     }
 
     & > .cell {
       display: block;
-      padding-block: var(--dimension-300);
+      padding-block: var(--data-table-status-padding-block);
       padding-inline: var(--density-padding-inline);
       color: var(--color-text-muted);
       white-space: normal;
