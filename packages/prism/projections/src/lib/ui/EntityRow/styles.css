@@ -45,6 +45,17 @@
     --entity-row-focus-ring-width: 2px;
     --entity-row-focus-ring-offset: -2px;
     --entity-row-focus-ring-color: var(--color-focus-ring);
+    /* Below two groups the title keeps at least twelve characters beside
+     * the status: the status's widest is the row less that floor, the
+     * mark's box and the gutter before the status. */
+    --entity-row-title-floor: 12ch;
+    --entity-row-status-max-width: calc(
+      100% -
+      var(--entity-row-title-floor) -
+      var(--entity-row-mark-size) -
+      var(--entity-row-mark-gap) -
+      var(--entity-row-gap)
+    );
 
     display: flex;
     align-items: center;
@@ -186,11 +197,14 @@
   }
 
   /* The status keeps its width and stands the row's gap from what comes
-   * before it. */
+   * before it. It holds one line, and where it is cut it ends in an
+   * ellipsis. */
   .ds.entity-row .status {
     display: flex;
     flex-shrink: 0;
     margin-inline-start: var(--entity-row-gap);
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   /* A two-line row: the summary is the only slot that leaves the first
@@ -210,10 +224,19 @@
     max-width: max-content;
   }
 
-  /* Below two groups the first line keeps the first fact alone. */
+  /* Below two groups the first line keeps the first fact alone, and the
+   * status shortens before the title falls under its floor: it is a line
+   * of text no wider than the row less the floor, cut by an ellipsis. */
   @container shell (width < 912px) {
     .ds.entity-row .fact.is-later {
       display: none;
+    }
+
+    .ds.entity-row .status {
+      display: block;
+      min-width: 0;
+      max-width: var(--entity-row-status-max-width);
+      overflow-x: clip;
     }
   }
 }
