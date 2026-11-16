@@ -27,7 +27,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/_work_in_progress/common/ScopedDataTable/common/SettingsMenu/SettingsMenu.tsx export:memo-over-function",
   "src/lib/_work_in_progress/common/ScopedDataTable/common/SettingsMenu/common/ItemLabel/ItemLabel.tsx test",
   "src/lib/_work_in_progress/common/ScopedDataTable/common/hooks/useMenuPhase.ts test",
-  "src/lib/_work_in_progress/PaginationBar/common/PageControl/PageControl.tsx test",
   "src/lib/common/SettingsMenuContext/SettingsMenuContext.tsx test",
   "testing/keyboard/DataTable.keyboard.ts export:none",
   "testing/keyboard/DataTable.keyboard.ts test",
