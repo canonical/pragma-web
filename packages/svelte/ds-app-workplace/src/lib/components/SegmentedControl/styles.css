@@ -87,4 +87,11 @@
       opacity: var(--opacity-disabled, 0.5);
     }
   }
+
+  @media (forced-colors: active) {
+    .ds.segmented-control > .list > .item.selected {
+      text-decoration: underline 2px;
+      text-underline-offset: 0.25em;
+    }
+  }
 }
