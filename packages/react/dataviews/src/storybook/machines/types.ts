@@ -38,6 +38,24 @@ export type SpareMachine = {
   readonly tags: readonly string[];
 };
 
+/** One machine as the query bar's stories list it, shaped after MAAS. */
+export type BarMachine = {
+  readonly id: string;
+  readonly hostname: string;
+  readonly status:
+    | "deployed"
+    | "ready"
+    | "commissioning"
+    | "allocated"
+    | "broken";
+  /** Memory in MiB. */
+  readonly memory: number;
+  readonly tags: readonly string[];
+  readonly owner?: string;
+  /** The calendar date it was last deployed. */
+  readonly deployed: string;
+};
+
 /** The collection's field definitions, for typing a provider over it. */
 export type MachineFields = typeof machineCollection.schema.fields;
 

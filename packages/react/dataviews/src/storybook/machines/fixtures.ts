@@ -9,7 +9,8 @@
  */
 
 import { createCollection } from "@canonical/dataviews-core";
-import type { Machine, SpareMachine } from "./types.js";
+import buildBarMachines from "./buildBarMachines.js";
+import type { BarMachine, Machine, SpareMachine } from "./types.js";
 
 /** Twelve machines, every status represented; one story pages them by five. */
 export const machines = [
@@ -203,5 +204,45 @@ export const spareMachineCollection = createCollection({
       options: ["ex-gpu", "ex-nvme"],
       multiple: true,
     },
+  ],
+});
+
+/** The query bar's sixty machines, shaped after MAAS. */
+export const barMachines: readonly BarMachine[] = buildBarMachines();
+
+/**
+ * The query bar's machine collection: a status, memory in MiB typed in MiB
+ * or GiB, a list of tags, whether an owner is set, the host name and the
+ * date it was deployed — one field of each kind.
+ */
+export const barMachineCollection = createCollection({
+  identify: (machine: BarMachine) => machine.id,
+  fields: [
+    {
+      field: "status",
+      kind: "choices",
+      options: ["deployed", "ready", "commissioning", "allocated", "broken"],
+    },
+    {
+      field: "memory",
+      kind: "number",
+      min: 0,
+      units: {
+        base: "MiB",
+        display: [
+          { symbol: "MiB", factor: 1 },
+          { symbol: "GiB", factor: 1024 },
+        ],
+      },
+    },
+    {
+      field: "tags",
+      kind: "choices",
+      options: ["ex-gpu", "ex-nvme", "ex-ssd"],
+      multiple: true,
+    },
+    { field: "owner", kind: "presence" },
+    { field: "hostname", kind: "text" },
+    { field: "deployed", kind: "date" },
   ],
 });

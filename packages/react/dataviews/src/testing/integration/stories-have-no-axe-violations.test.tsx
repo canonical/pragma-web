@@ -16,6 +16,7 @@ import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataCha
 import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
+import * as queryBarStories from "../../lib/_work_in_progress/DataViews/common/QueryBar/QueryBar.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
 import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
@@ -131,6 +132,18 @@ describe("the query controls' played stories have no axe violations", () => {
       await Story.run();
       await expectNoAxeViolations(document.body);
     });
+  }
+
+  // Each as first drawn, then once its play has run.
+  for (const [name, Story] of Object.entries(composeStories(queryBarStories))) {
+    it(`QueryBar ${name}`, async () => {
+      const { container, unmount } = render(<Story />);
+      await expectNoAxeViolations(container);
+      unmount();
+      await Story.run();
+      await expectNoAxeViolations(document.body);
+      // Two sweeps over sixty rows, and a play between them.
+    }, 15_000);
   }
 
   for (const [name, Story] of Object.entries(

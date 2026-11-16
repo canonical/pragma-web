@@ -1,0 +1,37 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./QueryBar.stories";
+
+<Meta of={Stories} name="Usage" />
+
+# DataViews.QueryBar usage
+
+`DataViews.QueryBar` narrows a collection with typed clauses and free text in one field. Each clause is a chip: a field, an operator and its values. It takes no query, no list of fields and no words: the fields come from the collection's schema, the operators from what the source declares, and every word from the root's messages.
+
+```tsx
+<DataViews provider={provider}>
+  <DataViews.QueryBar />
+  <DataTable provider={provider} columns={columns} label="Machines" />
+</DataViews>
+```
+
+<Canvas of={Stories.Default} />
+
+## Building a clause
+
+Type a field's name, or pick it from the suggestions, and the field becomes a chip whose own entry takes the operator, then the value. A choice takes several values: Enter adds the highlighted one, and Enter again applies the chip. Space applies a value picked from the suggestions; in a typed value — a number, a date, text — a space is text, and Enter or Tab applies it. Free text that names no field is the search.
+
+A typed `>` or `<` reads as at least or at most, since bounds are never strict, and the bar says so. A number is typed in any of its field's display units, `64 GiB`, and read in its base unit.
+
+<Canvas of={Stories.BuildAChip} />
+
+## Editing and removing
+
+Press a chip's part, or move onto the chip with Left and Right and press Enter, and that part takes an entry. Tab and Shift+Tab move across the parts, and past either end the chip applies. Escape closes the suggestions first, then leaves the edit as it was. Backspace on the empty entry selects the last chip, and Backspace or Delete removes a selected chip; the clear control clears every chip and the search.
+
+<Canvas of={Stories.SeveralValues} />
+
+## Two clauses on one field
+
+Each chip is one conjunct, so two chips on the same field both hold: a machine tagged both ex-gpu and ex-nvme. One chip holding several values holds either.
+
+<Canvas of={Stories.SameFieldAnd} />
