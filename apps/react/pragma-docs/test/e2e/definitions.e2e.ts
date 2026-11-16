@@ -1034,10 +1034,12 @@ describe("the overview's record, on the docs site", () => {
     }
   });
 
-  it("states each relation's weight by its stroke, 1, 2, 4 or 8 px and dashed exactly at 0, the served count of its heaviest relation", () => {
+  it("states each relation's weight by its stroke, 1, 2, 4 or 8 px and dashed exactly at 0, the served count of its heaviest relation, and none into a stub with no statements counted", () => {
     const prefixes = served.prefixes ?? [];
     const isClass = (term: string): boolean =>
       prefixes.includes(term.split(":").at(0) ?? "") && term.includes(":");
+    const isStub = (term: string): boolean =>
+      term.includes(":") && !isClass(term);
     let weighed = 0;
     for (const [path, measure] of measureViews()) {
       for (const relation of measure.relations) {
@@ -1045,6 +1047,11 @@ describe("the overview's record, on the docs site", () => {
         expect(relation.focus, name).toBe(false);
         expect([1, 2, 4, 8], name).toContain(relation.width);
         expect(relation.dashed, name).toBe(relation.weight === 0);
+        // A relation into a stub claims a weight only where the store
+        // counted statements for it: its 0 measures nothing.
+        if ([relation.from, relation.to].some(isStub)) {
+          expect(relation.weight ?? 1, name).toBeGreaterThan(0);
+        }
         if (!isClass(relation.from) || !isClass(relation.to)) continue;
         const pair = [relation.from, relation.to].sort().join(" ");
         expect(relation.weight, name).toBe(served.weights?.weights.get(pair));
