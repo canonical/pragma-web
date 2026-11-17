@@ -1,5 +1,5 @@
 name: Report a bug
-description: A UI block, stylesheet or package does not look or behave the way Pragma says it should.
+description: Something in Pragma is broken, looks wrong or does not work as expected.
 labels:
   - "Type: bug"
   - "Status: needs triage"
