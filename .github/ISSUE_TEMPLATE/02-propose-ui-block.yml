@@ -17,7 +17,7 @@ body:
     id: name
     attributes:
       label: Name of the UI block
-      description: What would you call it? Use the name people already know it by, if there is one.
+      description: A name lets us check for duplicates and refer to the block in discussion. Use the name people already know it by, if there is one.
       placeholder: Date picker
     validations:
       required: true
@@ -25,6 +25,7 @@ body:
     id: kind
     attributes:
       label: Kind of UI block
+      description: Components, patterns and layouts are specified and reviewed differently.
       options:
         - Component
         - Pattern
@@ -36,7 +37,7 @@ body:
     id: summary
     attributes:
       label: Summary
-      description: One sentence on what it does.
+      description: One sentence on what it does, so triage can understand the proposal at a glance.
       placeholder: Lets users pick a single date or a range from a calendar.
     validations:
       required: true
@@ -44,13 +45,14 @@ body:
     id: problem
     attributes:
       label: Problem it solves
-      description: What can users not do today, or do badly?
+      description: What can users not do today, or do badly? We judge a new block by the problem it solves, not by how it looks.
     validations:
       required: true
   - type: dropdown
     id: tiers
     attributes:
       label: Tiers it serves
+      description: The tier decides where the block lives and who maintains it.
       multiple: true
       options:
         - Global
@@ -64,32 +66,33 @@ body:
     id: other-tier
     attributes:
       label: Other tier
-      description: If you picked "Other", name the tier or product.
+      description: If you picked "Other", name the tier or product, so we know where the block would live.
   - type: textarea
     id: context
     attributes:
       label: Where it will be used
-      description: Products, pages and scenarios.
+      description: Products, pages and scenarios. A block used in several places is worth more than one used once, and real uses shape its design.
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
       label: Alternatives considered
-      description: Existing UI blocks you tried, and why they do not fit.
+      description: Existing UI blocks you tried, and why they do not fit. Often an existing block can be extended instead of adding a new one.
   - type: textarea
     id: states
     attributes:
       label: States and responsive behaviour
-      description: Its states (for example open and closed), and how it scales from small screens up.
+      description: Its states (for example open and closed), and how it scales from small screens up. These drive most of the design and engineering work.
   - type: textarea
     id: visual
     attributes:
       label: Designs or sketches (optional)
-      description: Link a design file or prototype, or drag a sketch or screenshot here.
+      description: Link a design file or prototype, or drag a sketch or screenshot here. A visual makes the proposal faster to understand.
   - type: checkboxes
     id: contribution
     attributes:
       label: Contribution
+      description: Tells us whether the work has an owner or needs one.
       options:
         - label: I'll do this myself.

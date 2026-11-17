@@ -8,6 +8,7 @@ body:
     id: kind
     attributes:
       label: Kind of change
+      description: A new entry needs planning; a fix to an existing one is usually quick.
       options:
         - New entry
         - Fix to an existing entry
@@ -17,27 +18,31 @@ body:
     id: location
     attributes:
       label: Page, story or topic
-      description: Link the existing page or story, or name the topic of a new one.
+      description: Link the existing page or story, or name the topic of a new one, so we know exactly where to look.
     validations:
       required: true
   - type: input
     id: audience
     attributes:
       label: Who it is for
+      description: Designers and engineers need different detail, so the audience decides how the page is written.
       placeholder: Designers adopting Pragma, engineers building an app …
   - type: textarea
     id: problem
     attributes:
       label: What is missing or wrong
+      description: The gap or error you ran into. It tells us what the page has to fix.
     validations:
       required: true
   - type: textarea
     id: suggestion
     attributes:
       label: Suggested content
+      description: Even a rough draft or a list of points saves time when we write the change.
   - type: checkboxes
     id: contribution
     attributes:
       label: Contribution
+      description: Tells us whether the work has an owner or needs one.
       options:
         - label: I'll do this myself.
