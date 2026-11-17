@@ -1,0 +1,51 @@
+name: Propose a new UI block
+description: Pragma is missing a component or pattern your product needs.
+labels:
+  - "Type: UI block"
+  - "Discipline: design"
+  - "Discipline: eng"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check that the component or pattern does not already exist in Pragma, and that it has not already been [proposed](https://github.com/canonical/pragma-web/issues). A UI block in Pragma must serve a range of products, not a single application.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem it solves
+      description: What can users not do today, or do badly?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Where it will be used
+      description: Products, pages and scenarios. Say whether it serves sites, apps or both.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing UI blocks you tried, and why they do not fit.
+  - type: textarea
+    id: states
+    attributes:
+      label: States and responsive behaviour
+      description: Its states (for example open and closed), and how it scales from small screens up.
+  - type: textarea
+    id: visual
+    attributes:
+      label: Figma or sketch
+      description: Link a Figma file or prototype, or drag a sketch here.
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline, if any
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'll do this myself.
