@@ -73,7 +73,7 @@ export const MESSAGES = {
   "fleet.overhangs": "Overhangs",
   "fleet.reversed": "reversed",
   "fleet.notFound": "Nothing in the fleet lives at {address}.",
-  "fleet.facts": "Facts",
+  "fleet.sideView": "Side view",
   "fleet.fact.formations": "Formations",
   "fleet.fact.length": "Length",
   "fleet.fact.capacity": "Capacity",

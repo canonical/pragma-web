@@ -11,7 +11,10 @@ import "./styles.css";
 const componentCssClassName = "ds stock-page";
 
 /**
- * The fleet lens's page of one rolling stock: its title, then its formations, each linked to its page and drawn at one scale with the others, then the car types its units are made of.
+ * The fleet lens's page of one rolling stock, on the sectioned view: its
+ * title, its facts, then its formations, each linked to its page and drawn
+ * at one scale with the others, then the car types its units are made of.
+ * Its root is a subgrid of the canvas's page grid over every column.
  *
  * The page reads its operation inside its own error boundary and Suspense,
  * so neither reaches the router's outlet: a read in flight shows one line,

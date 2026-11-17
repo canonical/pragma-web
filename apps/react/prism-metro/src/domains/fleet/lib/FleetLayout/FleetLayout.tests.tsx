@@ -28,12 +28,15 @@ describe("FleetLayout", () => {
     expect(root?.querySelector(".aside")).toBeNull();
   });
 
-  it("puts a node page's facts in the aside", async () => {
+  it("gives a node's page the canvas's every column, with no aside", async () => {
     const { container } = renderMetroPage(
       `/fleet/${encodeURIComponent(SERIES_90_CURIE)}`,
     );
-    const facts = await screen.findByRole("region", { name: "Facts" });
-    expect(container.querySelector(".aside")).toContainElement(facts);
+    const facts = await screen.findByText("60–120 m");
+    expect(container.querySelector(".ds.canvas > .aside")).toBeNull();
+    expect(container.querySelector(".ds.canvas > .page")).toContainElement(
+      facts,
+    );
     expect(container.querySelector('[data-slot="count"]')).toBeNull();
   });
 
@@ -50,7 +53,7 @@ describe("FleetLayout", () => {
     );
   });
 
-  it("shows no facts off the lens's routes", () => {
+  it("shows no aside off the lens's routes", () => {
     const { container } = render(
       <RouterProvider
         router={createRouter(appRoutes, {

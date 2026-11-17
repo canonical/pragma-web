@@ -2,7 +2,7 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SERIES_90_SIX_CAR_CURIE } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
@@ -15,6 +15,19 @@ afterEach(() => {
 
 /** The page's address in the fleet lens. */
 const url = `/fleet/formations/${encodeURIComponent(SERIES_90_SIX_CAR_CURIE)}`;
+
+/**
+ * Find the sectioned view's facts block once the page's data is in, the
+ * view's own region beside the sections, under no heading of its own.
+ */
+const findFacts = (container: HTMLElement): Promise<HTMLElement> =>
+  waitFor(() => {
+    const facts = container.querySelector<HTMLElement>(
+      ".ds.sectioned-view .facts",
+    );
+    expect(facts).not.toBeNull();
+    return facts as HTMLElement;
+  });
 
 /** Render the page alone, over an environment answering with `response`. */
 const renderWithAnswer = (response: Promise<unknown>) =>
@@ -83,12 +96,29 @@ describe("FormationPage", () => {
     );
   });
 
-  it("lists its facts in the aside", async () => {
-    renderMetroPage(url);
-    const facts = await screen.findByRole("region", { name: "Facts" });
+  it("lists its facts beside its sections, under no heading", async () => {
+    const { container } = renderMetroPage(url);
+    const facts = await findFacts(container);
+    expect(screen.queryByRole("heading", { name: "Facts" })).toBeNull();
     await within(facts).findByText("Units");
     expect(facts).toHaveTextContent("120 m");
     expect(facts).toHaveTextContent("980 passengers");
+  });
+
+  it("indexes its three sections, side view first, beside its facts", async () => {
+    const { container } = renderMetroPage(url);
+    await findFacts(container);
+    const index = container.querySelector(
+      ".ds.sectioned-view > .aside > .contents",
+    ) as HTMLElement;
+    expect(
+      within(index)
+        .getAllByRole("link")
+        .map((link) => link.getAttribute("href")),
+    ).toEqual(["#side-view", "#units", "#platform-fit"]);
+    expect(screen.getByRole("region", { name: "Side view" })).toContainElement(
+      container.querySelector("svg.drawing"),
+    );
   });
 
   it("says nothing of its type lives at an address that names none", async () => {

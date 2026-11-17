@@ -3,11 +3,10 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The page spans the canvas's page columns; its items stack a gutter
-   * apart, and its sections a loose step apart. */
+  /* A subgrid of the canvas's page grid over every column, holding the
+   * sectioned view or the one line a page shows in its place. */
   .ds.formation-page {
     --formation-page-gap: var(--grid-gutter);
-    --formation-page-section-spacing: var(--container-gap-loose);
     /* One baseline pair between the words of an entry. */
     --formation-page-entry-spacing: var(--space-100);
     --formation-page-secondary-color: var(--color-text-muted);
@@ -15,17 +14,30 @@
 
     grid-column: 1 / -1;
     display: grid;
+    grid-template-columns: subgrid;
     gap: var(--formation-page-gap);
     align-self: start;
   }
 
-  .ds.formation-page .section {
-    margin-block-start: var(--formation-page-section-spacing);
+  /* The header spans the view's header columns; the title and the
+   * stock's chip stack a gutter apart. */
+  .ds.formation-page .masthead {
+    grid-column: 1 / -1;
     display: grid;
     gap: var(--formation-page-gap);
   }
 
+  /* A section's content takes the section's every column. */
+  .ds.formation-page .side-view {
+    grid-column: 1 / -1;
+  }
+
+  .ds.formation-page .fit {
+    grid-column: 1 / -1;
+  }
+
   .ds.formation-page .list {
+    grid-column: 1 / -1;
     display: grid;
     gap: var(--formation-page-gap);
     padding-inline-start: 0;
@@ -46,14 +58,17 @@
   }
 
   .ds.formation-page .loading {
+    grid-column: 1 / -1;
     color: var(--formation-page-secondary-color);
   }
 
   .ds.formation-page .not-found {
+    grid-column: 1 / -1;
     color: var(--formation-page-secondary-color);
   }
 
   .ds.formation-page .error {
+    grid-column: 1 / -1;
     color: var(--formation-page-error-color);
   }
 }

@@ -1,4 +1,8 @@
-import { useRenderers } from "@canonical/prism-core";
+import {
+  PAGE_RENDERER_NAMES,
+  SectionedView,
+  useRenderers,
+} from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
@@ -6,6 +10,7 @@ import type { UnitPageQuery } from "#relay/__generated__/UnitPageQuery.graphql.j
 import unitPageQueryNode from "#relay/__generated__/UnitPageQuery.graphql.js";
 import {
   FLEET_RENDERERS,
+  FLEET_SECTIONS,
   REFERENCE_TRAIN_LENGTH,
 } from "../../../../constants.js";
 import { useFleetNode } from "../../../../hooks/index.js";
@@ -14,6 +19,7 @@ import { FormationSideView } from "../../../FormationSideView/index.js";
 import findScaleLength from "../../../findScaleLength.js";
 import orientCars from "../../../orientCars.js";
 import readUnitCars from "../../../readUnitCars.js";
+import renderFleetFacts from "../../../renderFleetFacts.js";
 import type { UnitDetailProps } from "./types.js";
 
 /**
@@ -22,8 +28,11 @@ import type { UnitDetailProps } from "./types.js";
  * length, front first. An address naming no unit says nothing lives
  * there.
  *
- * Under its title the page renders through the active page renderer:
- * these sections for the page, or the node's Turtle source for `as=turtle`.
+ * It is laid on the sectioned view: the title in the header, the facts,
+ * and the side view as the one section. The header and the facts stand
+ * whatever the renderer: under the page renderer the view gets the
+ * section, under any other (Turtle, for `as=turtle`) what that renderer
+ * draws stands in its place.
  *
  * @note Impure: reads the Relay store, the translator and the address.
  */
@@ -53,26 +62,46 @@ export default function UnitDetail({ address }: UnitDetailProps): ReactElement {
       ),
     },
   ]);
+  const isPage = active.name === PAGE_RENDERER_NAMES.page;
   return (
     <>
       <Head title={node._meta.title} />
-      <h1 className="title">{node._meta.title}</h1>
-      {active.render({
-        uri: node.uri,
-        title: node._meta.title,
-        children: (
-          <>
-            <FormationSideView
-              cars={cars}
-              className="side-view"
-              scale={findScaleLength([
-                REFERENCE_TRAIN_LENGTH,
-                cars.reduce((sum, car) => sum + car.length, 0),
-              ])}
-            />
-          </>
-        ),
-      })}
+      <SectionedView
+        facts={renderFleetFacts(node, t)}
+        header={
+          <header className="masthead">
+            <h1 className="title">{node._meta.title}</h1>
+          </header>
+        }
+        sections={
+          isPage
+            ? [
+                {
+                  id: FLEET_SECTIONS.sideView,
+                  title: t("fleet.sideView"),
+                  content: (
+                    <FormationSideView
+                      cars={cars}
+                      className="side-view"
+                      scale={findScaleLength([
+                        REFERENCE_TRAIN_LENGTH,
+                        cars.reduce((sum, car) => sum + car.length, 0),
+                      ])}
+                    />
+                  ),
+                },
+              ]
+            : []
+        }
+      >
+        {isPage
+          ? null
+          : active.render({
+              uri: node.uri,
+              title: node._meta.title,
+              children: null,
+            })}
+      </SectionedView>
     </>
   );
 }
