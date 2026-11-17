@@ -40,33 +40,29 @@ body:
     validations:
       required: true
   - type: textarea
-    id: expected-actual
+    id: expected
     attributes:
-      label: Expected and actual behaviour
-      description: For a design bug, link the Figma frame that shows the expected result.
+      label: Expected behaviour
+      description: What should happen, or what it should look like.
     validations:
       required: true
   - type: textarea
-    id: evidence
+    id: actual
     attributes:
-      label: Screenshots or reproduction
-      description: Drag screenshots here, or link a reproduction (CodeSandbox, StackBlitz, a branch).
+      label: Actual behaviour
+      description: What happens instead.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References (optional)
+      description: Anything that shows the expected or actual result, for example screenshots, a design file, a documentation page, a working example or a reproduction (CodeSandbox, StackBlitz, a branch).
   - type: input
     id: environment
     attributes:
       label: Browser and viewport
       placeholder: Firefox 140, 375×812
-  - type: dropdown
-    id: severity
-    attributes:
-      label: Severity
-      options:
-        - Low (cosmetic, has a workaround)
-        - Medium (degrades a feature)
-        - High (blocks a feature or release)
-        - Critical (breaks production)
-    validations:
-      required: true
   - type: checkboxes
     id: a11y
     attributes:

@@ -1,5 +1,6 @@
 name: Propose a new UI block
 description: Pragma is missing a component or pattern your product needs.
+title: "New UI block: "
 labels:
   - "Type: UI block"
   - "Discipline: design"
@@ -10,6 +11,35 @@ body:
     attributes:
       value: |
         Check that the component or pattern does not already exist in Pragma, and that it has not already been [proposed](https://github.com/canonical/pragma-web/issues). A UI block in Pragma must serve a range of products, not a single application.
+
+        Put the block's name in the issue title too, for example "New UI block: Date picker".
+  - type: input
+    id: name
+    attributes:
+      label: Name of the UI block
+      description: What would you call it? Use the name people already know it by, if there is one.
+      placeholder: Date picker
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of UI block
+      options:
+        - Component
+        - Pattern
+        - Layout
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence on what it does.
+      placeholder: Lets users pick a single date or a range from a calendar.
+    validations:
+      required: true
   - type: textarea
     id: problem
     attributes:
@@ -17,11 +47,29 @@ body:
       description: What can users not do today, or do badly?
     validations:
       required: true
+  - type: dropdown
+    id: tiers
+    attributes:
+      label: Tiers it serves
+      multiple: true
+      options:
+        - Global
+        - Apps
+        - Sites
+        - Stores
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: other-tier
+    attributes:
+      label: Other tier
+      description: If you picked "Other", name the tier or product.
   - type: textarea
     id: context
     attributes:
       label: Where it will be used
-      description: Products, pages and scenarios. Say whether it serves sites, apps or both.
+      description: Products, pages and scenarios.
     validations:
       required: true
   - type: textarea
@@ -37,12 +85,8 @@ body:
   - type: textarea
     id: visual
     attributes:
-      label: Figma or sketch
-      description: Link a Figma file or prototype, or drag a sketch here.
-  - type: input
-    id: deadline
-    attributes:
-      label: Deadline, if any
+      label: Designs or sketches (optional)
+      description: Link a design file or prototype, or drag a sketch or screenshot here.
   - type: checkboxes
     id: contribution
     attributes:
