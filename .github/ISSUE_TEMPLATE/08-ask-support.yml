@@ -17,13 +17,3 @@ body:
       label: Question, or what to review
     validations:
       required: true
-  - type: dropdown
-    id: urgency
-    attributes:
-      label: Urgency
-      options:
-        - Whenever possible
-        - This cycle
-        - Blocking a release
-    validations:
-      required: true

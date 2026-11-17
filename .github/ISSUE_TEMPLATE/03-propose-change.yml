@@ -28,8 +28,8 @@ body:
   - type: textarea
     id: visual
     attributes:
-      label: Figma or screenshots
-      description: Link a Figma file or prototype, or drag screenshots here.
+      label: Designs or screenshots (optional)
+      description: Link a design file or prototype, or drag screenshots here.
   - type: checkboxes
     id: flags
     attributes:
