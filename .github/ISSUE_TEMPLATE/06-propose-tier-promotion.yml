@@ -6,6 +6,24 @@ labels:
   - "Discipline: eng"
   - "Status: needs triage"
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Before you start
+
+        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
+        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
+        - Issues are public. Do not include confidential information.
+        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
+  - type: markdown
+    attributes:
+      value: |
+        ### Is this a tier move?
+
+        Use this form when a block built for one product or tier is needed by others.
+
+        - Nothing similar exists in any tier: [propose a new UI block](https://github.com/canonical/pragma-web/issues/new?template=02-propose-ui-block.yml).
+        - The block must also change to serve the other products: file the move first. Changes needed by one product only can follow as separate proposals ([propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml)).
   - type: input
     id: block
     attributes:
@@ -44,3 +62,9 @@ body:
     id: implementation
     attributes:
       label: Link to the current implementation
+  - type: markdown
+    attributes:
+      value: |
+        ### What happens next
+
+        The Pragma team triages new issues, usually within a week. Triage may add labels, ask questions or move the issue to the correct repository. Updates are posted on this issue.

@@ -10,15 +10,30 @@ body:
   - type: markdown
     attributes:
       value: |
+        ### Before you start
+
+        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
+        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
+        - Issues are public. Do not include confidential information.
+        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
+  - type: markdown
+    attributes:
+      value: |
+        ### Is this a new UI block?
+
+        Use this form when no Pragma component, pattern or layout covers the need. A UI block must serve several products, not a single application.
+
+        - A block exists but lacks a property, variant or behaviour: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+        - The block exists in one product and other products need it: [propose moving it to a higher tier](https://github.com/canonical/pragma-web/issues/new?template=06-propose-tier-promotion.yml).
+        - You need an icon or illustration, not a component: [contribute assets](https://github.com/canonical/pragma-web/issues/new?template=07-contribute-assets.yml).
+
         ### Name the block in the title
 
-        Complete the title above with the name of the block, for example **New UI block: Date picker**. The title is how people find the proposal, spot duplicates and refer to it, so:
+        Complete the title with the name of the block, for example **New UI block: Date picker**.
 
-        - **Name what it is, not the problem it solves.** "Date picker", not "Need a way to pick dates". The problem has its own field below.
-        - **Use the name people already know it by**, from another design system or from your team. If you are not sure, give your best guess; triage may rename it.
-        - **Propose one block per issue**, so each can be discussed and accepted on its own.
-
-        Before filing, check that the block does not already exist in Pragma and has not already been [proposed](https://github.com/canonical/pragma-web/issues). A UI block in Pragma must serve a range of products, not a single application.
+        - Name what it is, not the problem it solves: "Date picker", not "Need a way to pick dates". The problem has its own field.
+        - Use the name the block is commonly known by. If unsure, give your best guess; triage may rename it.
+        - Propose one block per issue.
   - type: dropdown
     id: kind
     attributes:
@@ -80,3 +95,11 @@ body:
       label: Contribution
       options:
         - label: I'd like to contribute this myself.
+  - type: markdown
+    attributes:
+      value: |
+        ### What happens next
+
+        The Pragma team triages new issues, usually within a week. Triage may add labels, ask questions or move the issue to the correct repository. Updates are posted on this issue.
+
+        If you offered to contribute, a maintainer will confirm the approach before you start.
