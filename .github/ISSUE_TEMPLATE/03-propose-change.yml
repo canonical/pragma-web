@@ -38,4 +38,4 @@ body:
       description: Accessibility changes are reviewed separately, and a change with an owner can move faster.
       options:
         - label: This is an accessibility issue.
-        - label: I'll do this myself.
+        - label: I can contribute this work.
