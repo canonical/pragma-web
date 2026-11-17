@@ -10,12 +10,14 @@ body:
     id: block
     attributes:
       label: UI block
+      description: The component or pattern to move, so we know which code and specification are affected.
     validations:
       required: true
   - type: dropdown
     id: current-tier
     attributes:
       label: Current tier
+      description: Where the block lives today, which tells us where it moves from.
       options:
         - Apps
         - Sites
@@ -28,6 +30,7 @@ body:
     id: target-tier
     attributes:
       label: Target tier
+      description: Where it should live. A higher tier means more products depend on it, and a stricter review.
       options:
         - Global
         - Apps
@@ -40,21 +43,22 @@ body:
     id: other-tier
     attributes:
       label: Product or other tier
-      description: If you picked a product tier or "Other" above, name it.
+      description: If you picked a product tier or "Other" above, name it so we can find the block.
       placeholder: apps/lxd
   - type: textarea
     id: consumers
     attributes:
       label: Other products that need it
-      description: Name each product, and link where it would be used.
+      description: Name each product, and link where it would be used. A block moves up only when more than one product needs it.
     validations:
       required: true
   - type: textarea
     id: differences
     attributes:
       label: Differences between products
-      description: Variants, behaviour or styling that differ between the products, and how a shared version would handle them.
+      description: Variants, behaviour or styling that differ between the products, and how a shared version would handle them. These decide how much work the move is.
   - type: input
     id: implementation
     attributes:
       label: Link to the current implementation
+      description: Lets us review the existing code and specification before planning the move.

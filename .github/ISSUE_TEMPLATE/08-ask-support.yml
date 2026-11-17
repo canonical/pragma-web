@@ -8,12 +8,13 @@ body:
     id: project
     attributes:
       label: Project or repository
-      description: Link the project, repository or pull request.
+      description: Link the project, repository or pull request. We answer faster when we can see the code.
     validations:
       required: true
   - type: textarea
     id: request
     attributes:
       label: Question, or what to review
+      description: What you need help with, or which parts to review. A focused question gets a focused answer.
     validations:
       required: true

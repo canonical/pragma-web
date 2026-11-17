@@ -12,6 +12,7 @@ body:
     id: kind
     attributes:
       label: Kind of bug
+      description: Tells us whether a designer or an engineer should look at it first.
       options:
         - Design (looks wrong)
         - Code (behaves wrong)
@@ -19,53 +20,64 @@ body:
     validations:
       required: true
   - type: input
-    id: package
+    id: location
     attributes:
-      label: Package and version
-      placeholder: "@canonical/react-ds-global 0.12.0"
+      label: Where you saw it
+      description: A link to the page, product, Storybook story or design file where the bug appears. It lets anyone see the bug, even without knowing which package it comes from.
+      placeholder: https://…
     validations:
       required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package and version (optional)
+      description: If you know them. Bugs are often fixed in a later release, so the version tells us whether it still happens. Leave it empty if you are not sure; we can find it from where you saw it.
+      placeholder: "@canonical/react-ds-global 0.12.0"
   - type: input
     id: component
     attributes:
       label: Component
+      description: Narrows the search to the code and stories we need to look at.
       placeholder: Button
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to reproduce
-      placeholder: |
-        1. Render …
-        2. Click …
-    validations:
-      required: true
   - type: textarea
     id: expected
     attributes:
       label: Expected behaviour
-      description: What should happen, or what it should look like.
+      description: What should happen, or what it should look like. Without it we cannot tell a bug from intended behaviour.
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
       label: Actual behaviour
-      description: What happens instead.
+      description: What happens instead. Compared with the expected behaviour, it shows us exactly what is wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: We can only fix what we can see happen. Steps let us reproduce the bug and confirm the fix.
+      placeholder: |
+        1. Render …
+        2. Click …
     validations:
       required: true
   - type: textarea
     id: references
     attributes:
       label: References (optional)
-      description: Anything that shows the expected or actual result, for example screenshots, a design file, a documentation page, a working example or a reproduction (CodeSandbox, StackBlitz, a branch).
+      description: Anything that shows the expected or actual result, for example screenshots, a design file, a documentation page, a working example or a reproduction (CodeSandbox, StackBlitz, a branch). A picture or a live example is often faster to understand than a description.
   - type: input
     id: environment
     attributes:
       label: Browser and viewport
+      description: Many bugs only happen in one browser or at one screen size.
       placeholder: Firefox 140, 375×812
   - type: checkboxes
     id: a11y
     attributes:
       label: Accessibility
+      description: Accessibility bugs can stop people from using a product at all, so we review them separately.
       options:
         - label: This bug affects accessibility.
