@@ -45,4 +45,4 @@ body:
       label: Contribution
       description: Tells us whether the work has an owner or needs one.
       options:
-        - label: I'll do this myself.
+        - label: I'd like to contribute this myself.
