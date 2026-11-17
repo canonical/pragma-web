@@ -15,7 +15,7 @@ body:
     id: kind
     attributes:
       label: Kind of change
-      description: Adding a token affects nothing existing; changing one affects every component that uses it.
+      description: Adding a token affects no existing component; changing one affects every component that uses it.
       options:
         - Add a token
         - Change a token
@@ -25,7 +25,7 @@ body:
     id: tokens
     attributes:
       label: Tokens affected
-      description: The exact token names, so we change the right ones.
+      description: The exact token names.
       placeholder: color.text, spacing.inline.small …
     validations:
       required: true
@@ -33,7 +33,7 @@ body:
     id: values
     attributes:
       label: Current and proposed values
-      description: The before and after let us review the change and check contrast and consistency.
+      description: Used to review the change, including contrast and consistency.
       placeholder: "color.border: #d9d9d9 → #cfcfcf"
     validations:
       required: true
@@ -41,18 +41,18 @@ body:
     id: reason
     attributes:
       label: Reason
-      description: Tokens are shared by every product, so a change needs a reason that holds for all of them.
+      description: Tokens are shared by every product, so the reason must apply to all of them.
     validations:
       required: true
   - type: textarea
     id: components
     attributes:
       label: Components affected
-      description: The components you know will change, so we can check them visually before release.
+      description: The components you know will change. Used to plan visual checks before release.
   - type: checkboxes
     id: contribution
     attributes:
       label: Contribution
-      description: Tells us whether the work has an owner or needs one.
+      description: Used to identify whether the work has an owner.
       options:
         - label: I'd like to contribute this myself.

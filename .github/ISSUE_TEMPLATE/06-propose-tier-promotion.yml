@@ -10,14 +10,14 @@ body:
     id: block
     attributes:
       label: UI block
-      description: The component or pattern to move, so we know which code and specification are affected.
+      description: The component or pattern to move.
     validations:
       required: true
   - type: input
     id: current-tier
     attributes:
       label: Current tier
-      description: Where the block lives today, which tells us where it moves from. For example Apps, Sites, Stores, or a product such as apps/lxd.
+      description: Where the block lives today. For example Apps, Sites, Stores, or a product such as apps/lxd.
       placeholder: apps/lxd
     validations:
       required: true
@@ -25,7 +25,7 @@ body:
     id: target-tier
     attributes:
       label: Target tier
-      description: Where it should live. A higher tier means more products depend on it, and a stricter review. For example Global, Apps, Sites or Stores.
+      description: Where it should live. A higher tier has more consumers and a stricter review. For example Global, Apps, Sites or Stores.
       placeholder: Apps
     validations:
       required: true
@@ -33,16 +33,16 @@ body:
     id: consumers
     attributes:
       label: Other products that need it
-      description: Name each product, and link where it would be used. A block moves up only when more than one product needs it.
+      description: Each product that needs it, with a link to where it would be used. A block moves up a tier only when more than one product needs it.
     validations:
       required: true
   - type: textarea
     id: differences
     attributes:
       label: Differences between products
-      description: Variants, behaviour or styling that differ between the products, and how a shared version would handle them. These decide how much work the move is.
+      description: Variants, behaviour or styling that differ between products, and how a shared version would handle them. Used to scope the move.
   - type: input
     id: implementation
     attributes:
       label: Link to the current implementation
-      description: Lets us review the existing code and specification before planning the move.
+      description: Used to review the existing code and specification.

@@ -12,14 +12,14 @@ body:
     id: observation
     attributes:
       label: What you observed
-      description: The behaviour, pattern or problem you noticed. It is the starting point for any decision we take.
+      description: The behaviour, pattern or problem you noticed.
     validations:
       required: true
   - type: input
     id: source
     attributes:
       label: Where it came from
-      description: Lets us judge how representative it is, and who to ask for more detail.
+      description: Used to assess how representative it is, and who to contact for detail.
       placeholder: User research, a support thread, a product team …
     validations:
       required: true
@@ -27,14 +27,14 @@ body:
     id: evidence
     attributes:
       label: Evidence
-      description: Links, screenshots or quotes. Evidence lets others act on the insight without having seen it themselves.
+      description: Links, screenshots or quotes.
   - type: textarea
     id: reach
     attributes:
       label: Who is affected, and how often
-      description: Helps us weigh this insight against other work.
+      description: Used to weigh the insight against other work.
   - type: textarea
     id: direction
     attributes:
       label: Suggested direction (optional)
-      description: An idea of what could be done, if you have one. Not needed to share an insight.
+      description: An idea of what could be done, if you have one.

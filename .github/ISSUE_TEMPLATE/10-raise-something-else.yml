@@ -7,6 +7,6 @@ body:
     id: description
     attributes:
       label: Description
-      description: What you want to raise, and why it matters. Enough context lets triage route it to the right people without coming back to you.
+      description: What you want to raise, and why it matters.
     validations:
       required: true

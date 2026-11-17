@@ -35,7 +35,7 @@ body:
     id: summary
     attributes:
       label: Summary
-      description: One sentence on what it does, so triage can understand the proposal at a glance.
+      description: One sentence describing what the block does.
       placeholder: Lets users pick a single date or a range from a calendar.
     validations:
       required: true
@@ -43,14 +43,14 @@ body:
     id: problem
     attributes:
       label: Problem it solves
-      description: What can users not do today, or do badly? We judge a new block by the problem it solves, not by how it looks.
+      description: What users cannot do today, or do badly. A new block is assessed against the problem it solves.
     validations:
       required: true
   - type: input
     id: tiers
     attributes:
       label: Tiers it serves
-      description: The tier decides where the block lives and who maintains it. Name one or more, for example Global, Apps, Sites, Stores, or a product such as apps/lxd.
+      description: Determines where the block lives and who maintains it. For example Global, Apps, Sites, Stores, or a product such as apps/lxd.
       placeholder: Apps, Sites
     validations:
       required: true
@@ -58,28 +58,28 @@ body:
     id: context
     attributes:
       label: Where it will be used
-      description: Products, pages and scenarios. A block used in several places is worth more than one used once, and real uses shape its design.
+      description: Products, pages and scenarios. Used to assess how widely the block is needed and to inform its design.
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
       label: Alternatives considered
-      description: Existing UI blocks you tried, and why they do not fit. Often an existing block can be extended instead of adding a new one.
+      description: Existing UI blocks you tried, and why they do not fit. Used to check whether an existing block can be extended instead.
   - type: textarea
     id: states
     attributes:
       label: States and responsive behaviour
-      description: Its states (for example open and closed), and how it scales from small screens up. These drive most of the design and engineering work.
+      description: Its states (for example open and closed), and how it adapts from small screens up.
   - type: textarea
     id: visual
     attributes:
       label: Designs or sketches (optional)
-      description: Link a design file or prototype, or drag a sketch or screenshot here. A visual makes the proposal faster to understand.
+      description: A design file, prototype, sketch or screenshot.
   - type: checkboxes
     id: contribution
     attributes:
       label: Contribution
-      description: Tells us whether the work has an owner or needs one.
+      description: Used to identify whether the work has an owner.
       options:
         - label: I'd like to contribute this myself.

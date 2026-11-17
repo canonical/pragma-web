@@ -22,7 +22,7 @@ body:
     id: names
     attributes:
       label: Asset names
-      description: The names people will use to find and import the assets, so we can check they are clear and not already taken.
+      description: The names used to find and import the assets. Used to check for clashes with existing assets.
       placeholder: |
         arrow-up-right
         cloud-sync
@@ -32,21 +32,21 @@ body:
     id: files
     attributes:
       label: SVG files or Figma link
-      description: Drag SVG files here, or link the Figma frame that holds them. We need the source files to add them.
+      description: SVG files, or a link to the Figma frame that holds them. The source files are needed to add the assets.
     validations:
       required: true
   - type: textarea
     id: use
     attributes:
       label: Intended use
-      description: Where the assets will be used. It helps us check they fit the existing set and do not duplicate it.
+      description: Where the assets will be used. Used to check them against the existing set.
     validations:
       required: true
   - type: checkboxes
     id: guidelines
     attributes:
       label: Guidelines
-      description: Assets that follow the guidelines can be added without being redrawn.
+      description: Assets that do not follow the guidelines need to be redrawn before they can be added.
       options:
         - label: These assets follow the asset guidelines.
           required: true

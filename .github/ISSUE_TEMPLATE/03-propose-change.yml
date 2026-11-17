@@ -20,7 +20,7 @@ body:
     id: target
     attributes:
       label: UI block or package
-      description: Tells us which code and which maintainers the change concerns.
+      description: Used to identify the code and maintainers involved.
       placeholder: Accordion, @canonical/router-core …
     validations:
       required: true
@@ -28,26 +28,26 @@ body:
     id: change
     attributes:
       label: What should change
-      description: A new property, variant or behaviour, or a change to an existing one. Being specific lets us estimate the work.
+      description: A new property, variant or behaviour, or a change to an existing one.
     validations:
       required: true
   - type: textarea
     id: use-case
     attributes:
       label: Use case
-      description: The problem this solves, and where. A change must work for every product using the block, so we need to know what it is for.
+      description: The problem this solves, and where. A change must work for every product that uses the block.
     validations:
       required: true
   - type: textarea
     id: visual
     attributes:
       label: Designs or screenshots (optional)
-      description: Link a design file or prototype, or drag screenshots here. A visual makes the change faster to understand.
+      description: A design file, prototype or screenshots.
   - type: checkboxes
     id: flags
     attributes:
       label: About this change
-      description: Accessibility changes are reviewed separately, and a change with an owner can move faster.
+      description: Accessibility issues are reviewed separately. A contribution means the work has an owner.
       options:
         - label: This is an accessibility issue.
         - label: I'd like to contribute this myself.
