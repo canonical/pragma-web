@@ -7,22 +7,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Before you start
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
 
-        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
-        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
-        - Issues are public. Do not include confidential information.
-        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
-  - type: markdown
-    attributes:
-      value: |
-        ### Is this a bug?
+        Use this form when something does not match its design, documentation or tokens.
 
-        It is a bug when something does not match its design, its documentation or the design tokens. This includes a UI block using a token that is missing, renamed or out of date.
-
-        - It works as designed, but should do more or work differently: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
-        - The documentation is wrong, but the component is correct: [propose a documentation change](https://github.com/canonical/pragma-web/issues/new?template=04-propose-docs-change.yml).
-        - You are not sure whether the problem is in Pragma or in your project: [ask for support](https://github.com/canonical/pragma-web/issues/new?template=08-ask-support.yml).
+        - It works as designed but should work differently: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+        - Only the documentation is wrong: [propose a documentation change](https://github.com/canonical/pragma-web/issues/new?template=04-propose-docs-change.yml).
+        - Not sure the problem is in Pragma: [ask for support](https://github.com/canonical/pragma-web/issues/new?template=08-ask-support.yml).
   - type: dropdown
     id: kind
     attributes:
@@ -92,6 +83,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### What happens next
-
-        The Pragma team triages new issues, usually within a week. Triage may add labels, ask questions or move the issue to the correct repository. Updates are posted on this issue.
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue.

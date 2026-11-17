@@ -7,21 +7,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Before you start
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
 
-        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
-        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
-        - Issues are public. Do not include confidential information.
-        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
-  - type: markdown
-    attributes:
-      value: |
-        ### Is this a documentation change?
+        Use this form when documentation is missing, wrong or unclear.
 
-        Use this form when a page, guide or Storybook story is missing, wrong or unclear.
-
-        - The documentation is correct, but the component does not behave as described: [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml).
-        - You have a question the documentation does not answer: [ask for support](https://github.com/canonical/pragma-web/issues/new?template=08-ask-support.yml). If the answer belongs in the documentation, triage opens a documentation change.
+        - The documentation is right but the component is not: [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml).
+        - You have a question: [ask for support](https://github.com/canonical/pragma-web/issues/new?template=08-ask-support.yml).
   - type: dropdown
     id: kind
     attributes:
@@ -64,8 +55,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### What happens next
-
-        The Pragma team triages new issues, usually within a week. Triage may add labels, ask questions or move the issue to the correct repository. Updates are posted on this issue.
-
-        If you offered to contribute, a maintainer will confirm the approach before you start.
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue. If you offered to contribute, wait for a maintainer to confirm the approach.
