@@ -1,0 +1,47 @@
+name: Propose moving a component to a higher tier
+description: A component built for one product is needed by others and should move up a tier.
+labels:
+  - "Type: tier promotion"
+  - "Discipline: design"
+  - "Discipline: eng"
+  - "Status: needs triage"
+body:
+  - type: input
+    id: block
+    attributes:
+      label: UI block
+    validations:
+      required: true
+  - type: input
+    id: current-tier
+    attributes:
+      label: Current tier
+      placeholder: apps/lxd
+    validations:
+      required: true
+  - type: dropdown
+    id: target-tier
+    attributes:
+      label: Target tier
+      options:
+        - Apps
+        - Sites
+        - Global
+    validations:
+      required: true
+  - type: textarea
+    id: consumers
+    attributes:
+      label: Other products that need it
+      description: Name each product, and link where it would be used.
+    validations:
+      required: true
+  - type: textarea
+    id: differences
+    attributes:
+      label: Differences between products
+      description: Variants, behaviour or styling that differ between the products, and how a shared version would handle them.
+  - type: input
+    id: implementation
+    attributes:
+      label: Link to the current implementation

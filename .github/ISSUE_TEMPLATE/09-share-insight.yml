@@ -1,0 +1,36 @@
+name: Share an insight
+description: Share an observation about how Pragma is used, without asking for a specific change.
+labels:
+  - "Type: insight"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An insight is closed once it has been absorbed into a decision, a pattern or a follow-up issue, which are linked from it.
+  - type: textarea
+    id: observation
+    attributes:
+      label: What you observed
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Where it came from
+      placeholder: User research, a support thread, a product team …
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links, screenshots or quotes.
+  - type: textarea
+    id: reach
+    attributes:
+      label: Who is affected, and how often
+  - type: textarea
+    id: direction
+    attributes:
+      label: Suggested direction (optional)

@@ -1,0 +1,29 @@
+name: Ask for support or a review
+description: Get help using Pragma, or ask the team to review how your project uses it.
+labels:
+  - "Type: support"
+  - "Status: needs triage"
+body:
+  - type: input
+    id: project
+    attributes:
+      label: Project or repository
+      description: Link the project, repository or pull request.
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: Question, or what to review
+    validations:
+      required: true
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency
+      options:
+        - Whenever possible
+        - This cycle
+        - Blocking a release
+    validations:
+      required: true

@@ -1,0 +1,11 @@
+name: Raise something else
+description: Anything the other templates do not cover.
+labels:
+  - "Status: needs triage"
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true

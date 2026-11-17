@@ -1,0 +1,48 @@
+name: Contribute assets
+description: Add icons, illustrations or other assets you have made to Pragma.
+labels:
+  - "Type: assets"
+  - "Discipline: design"
+  - "Discipline: eng"
+  - "Contribution: offered"
+  - "Status: needs triage"
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of asset
+      options:
+        - Icon
+        - Illustration
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: names
+    attributes:
+      label: Asset names
+      placeholder: |
+        arrow-up-right
+        cloud-sync
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: SVG files or Figma link
+      description: Drag SVG files here, or link the Figma frame that holds them.
+    validations:
+      required: true
+  - type: textarea
+    id: use
+    attributes:
+      label: Intended use
+    validations:
+      required: true
+  - type: checkboxes
+    id: guidelines
+    attributes:
+      label: Guidelines
+      options:
+        - label: These assets follow the asset guidelines.
+          required: true

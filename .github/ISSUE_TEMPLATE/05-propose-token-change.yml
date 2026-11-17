@@ -1,0 +1,50 @@
+name: Propose a design token change
+description: A colour, spacing, typography or other design token should be added or changed.
+labels:
+  - "Type: tokens"
+  - "Discipline: design"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Design tokens are defined in [canonical/pragma-core](https://github.com/canonical/pragma-core). A token change filed here is moved there once triaged.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of change
+      options:
+        - Add a token
+        - Change a token
+    validations:
+      required: true
+  - type: textarea
+    id: tokens
+    attributes:
+      label: Tokens affected
+      placeholder: color.text, spacing.inline.small …
+    validations:
+      required: true
+  - type: textarea
+    id: values
+    attributes:
+      label: Current and proposed values
+      placeholder: "color.border: #d9d9d9 → #cfcfcf"
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason
+    validations:
+      required: true
+  - type: textarea
+    id: components
+    attributes:
+      label: Components affected
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'll do this myself.

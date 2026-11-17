@@ -1,0 +1,75 @@
+name: Report a bug
+description: Something in a component, stylesheet or package is broken, visually or in code.
+labels:
+  - "Type: bug"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Search the [open issues](https://github.com/canonical/pragma-web/issues) first so the same bug is not tracked twice.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of bug
+      options:
+        - Design (looks wrong)
+        - Code (behaves wrong)
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package and version
+      placeholder: "@canonical/react-ds-global 0.12.0"
+    validations:
+      required: true
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      placeholder: Button
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Render …
+        2. Click …
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: Expected and actual behaviour
+      description: For a design bug, link the Figma frame that shows the expected result.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or reproduction
+      description: Drag screenshots here, or link a reproduction (CodeSandbox, StackBlitz, a branch).
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and viewport
+      placeholder: Firefox 140, 375×812
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Low (cosmetic, has a workaround)
+        - Medium (degrades a feature)
+        - High (blocks a feature or release)
+        - Critical (breaks production)
+    validations:
+      required: true
+  - type: checkboxes
+    id: a11y
+    attributes:
+      label: Accessibility
+      options:
+        - label: This bug affects accessibility.

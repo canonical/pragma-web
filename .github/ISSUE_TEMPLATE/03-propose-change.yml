@@ -1,0 +1,39 @@
+name: Propose a change to a UI block or code
+description: An existing component, pattern or package should gain a property, variant or behaviour, or work differently.
+labels:
+  - "Type: improvement"
+  - "Status: needs triage"
+body:
+  - type: input
+    id: target
+    attributes:
+      label: UI block or package
+      placeholder: Accordion, @canonical/router-core …
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change
+      description: A new property, variant or behaviour, or a change to an existing one.
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: The problem this solves, and where.
+    validations:
+      required: true
+  - type: textarea
+    id: visual
+    attributes:
+      label: Figma or screenshots
+      description: Link a Figma file or prototype, or drag screenshots here.
+  - type: checkboxes
+    id: flags
+    attributes:
+      label: About this change
+      options:
+        - label: This is an accessibility issue.
+        - label: I'll do this myself.

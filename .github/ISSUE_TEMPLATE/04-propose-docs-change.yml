@@ -1,0 +1,43 @@
+name: Propose a documentation change
+description: A guide, reference page or Storybook story is missing, wrong or unclear.
+labels:
+  - "Type: docs"
+  - "Status: needs triage"
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of change
+      options:
+        - New entry
+        - Fix to an existing entry
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Page, story or topic
+      description: Link the existing page or story, or name the topic of a new one.
+    validations:
+      required: true
+  - type: input
+    id: audience
+    attributes:
+      label: Who it is for
+      placeholder: Designers adopting Pragma, engineers building an app …
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is missing or wrong
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested content
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'll do this myself.
