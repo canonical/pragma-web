@@ -1,4 +1,4 @@
-name: Propose moving a component to a higher tier
+name: Propose moving a component to a higher tier (upstream)
 description: A component built for one product is needed by others and should move up a tier.
 labels:
   - "Type: tier promotion"
