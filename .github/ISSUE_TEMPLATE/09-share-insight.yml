@@ -7,21 +7,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Before you start
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
 
-        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
-        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
-        - Issues are public. Do not include confidential information.
-        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
-  - type: markdown
-    attributes:
-      value: |
-        ### Is this an insight?
+        Use this form to share an observation without requesting a specific change.
 
-        Use this form to share an observation, such as research findings, recurring feedback or a pattern across products, without requesting a specific change.
-
-        - You know what should change: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml) or [propose a new UI block](https://github.com/canonical/pragma-web/issues/new?template=02-propose-ui-block.yml).
-        - You need help: [ask for support](https://github.com/canonical/pragma-web/issues/new?template=08-ask-support.yml).
+        - You know what should change: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
   - type: textarea
     id: observation
     attributes:
@@ -52,6 +42,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### What happens next
-
-        The insight is read at triage, usually within a week. It may not receive a direct reply. It is linked from any decision or issue it leads to, and closed once it has been taken into account.
+        **What happens next:** Insights are read at triage and may not get a direct reply. They are closed once taken into account.

@@ -7,21 +7,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### Before you start
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
 
-        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
-        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
-        - Issues are public. Do not include confidential information.
-        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
-  - type: markdown
-    attributes:
-      value: |
-        ### Is this a support request?
-
-        Use this form for help using Pragma, or for a review of how your project uses it.
+        Use this form for help using Pragma, or a review of how your project uses it.
 
         - Something is broken: [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml).
-        - You observed a pattern or problem across projects and do not need help: [share an insight](https://github.com/canonical/pragma-web/issues/new?template=09-share-insight.yml).
   - type: input
     id: project
     attributes:
@@ -37,6 +27,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### What happens next
-
-        A member of the Pragma team replies, usually within a week. If the request blocks a release, say so in your question. Updates are posted on this issue.
+        **What happens next:** A team member usually replies within a week. If this blocks a release, say so. Updates are posted on this issue.
