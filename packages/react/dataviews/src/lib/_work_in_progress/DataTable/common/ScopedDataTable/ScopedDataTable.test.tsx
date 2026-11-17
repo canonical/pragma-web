@@ -94,7 +94,7 @@ describe("ScopedDataTable", () => {
     );
     const table = screen.getByRole("table", { name: "Machines" });
     expect(table).toHaveClass("ds", "data-table", "dense", "inventory");
-    expect(table).toHaveStyle({ maxHeight: "20rem" });
+    expect(table.style.maxHeight).toBe("20rem");
     expect(table).toHaveAttribute("title", "All machines");
     expect(ref.current).toBe(table);
   });

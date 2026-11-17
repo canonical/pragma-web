@@ -76,7 +76,7 @@
     "@types/relay-test-utils": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/coverage-v8": "^5.0.0",
-    "jsdom": "^28.1.0",
+    "jsdom": "^31.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-relay": "^21.0.1",
