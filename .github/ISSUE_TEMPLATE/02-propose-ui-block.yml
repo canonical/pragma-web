@@ -10,17 +10,15 @@ body:
   - type: markdown
     attributes:
       value: |
-        Check that the component or pattern does not already exist in Pragma, and that it has not already been [proposed](https://github.com/canonical/pragma-web/issues). A UI block in Pragma must serve a range of products, not a single application.
+        ### Name the block in the title
 
-        Put the block's name in the issue title too, for example "New UI block: Date picker".
-  - type: input
-    id: name
-    attributes:
-      label: Name of the UI block
-      description: A name lets us check for duplicates and refer to the block in discussion. Use the name people already know it by, if there is one.
-      placeholder: Date picker
-    validations:
-      required: true
+        Complete the title above with the name of the block, for example **New UI block: Date picker**. The title is how people find the proposal, spot duplicates and refer to it, so:
+
+        - **Name what it is, not the problem it solves.** "Date picker", not "Need a way to pick dates". The problem has its own field below.
+        - **Use the name people already know it by**, from another design system or from your team. If you are not sure, give your best guess; triage may rename it.
+        - **Propose one block per issue**, so each can be discussed and accepted on its own.
+
+        Before filing, check that the block does not already exist in Pragma and has not already been [proposed](https://github.com/canonical/pragma-web/issues). A UI block in Pragma must serve a range of products, not a single application.
   - type: dropdown
     id: kind
     attributes:
