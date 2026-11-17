@@ -12,7 +12,6 @@ body:
     id: observation
     attributes:
       label: What you observed
-      description: The behaviour, pattern or problem you noticed.
     validations:
       required: true
   - type: input
@@ -32,9 +31,7 @@ body:
     id: reach
     attributes:
       label: Who is affected, and how often
-      description: Used to weigh the insight against other work.
   - type: textarea
     id: direction
     attributes:
       label: Suggested direction (optional)
-      description: An idea of what could be done, if you have one.

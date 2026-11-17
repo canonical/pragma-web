@@ -11,7 +11,6 @@ body:
     id: kind
     attributes:
       label: Kind of asset
-      description: Each kind of asset has its own guidelines and review.
       options:
         - Icon
         - Illustration
@@ -22,7 +21,6 @@ body:
     id: names
     attributes:
       label: Asset names
-      description: The names used to find and import the assets. Used to check for clashes with existing assets.
       placeholder: |
         arrow-up-right
         cloud-sync
@@ -39,7 +37,7 @@ body:
     id: use
     attributes:
       label: Intended use
-      description: Where the assets will be used. Used to check them against the existing set.
+      description: Used to check the assets against the existing set.
     validations:
       required: true
   - type: checkboxes

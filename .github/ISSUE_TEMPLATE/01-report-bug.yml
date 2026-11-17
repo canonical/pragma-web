@@ -14,7 +14,6 @@ body:
     id: kind
     attributes:
       label: Kind of bug
-      description: Used to route the issue to design or engineering.
       options:
         - Design (looks wrong)
         - Code (behaves wrong)
@@ -39,7 +38,6 @@ body:
     id: component
     attributes:
       label: Component
-      description: Used to locate the code and stories involved.
       placeholder: Button
   - type: textarea
     id: expected
@@ -52,7 +50,6 @@ body:
     id: actual
     attributes:
       label: Actual behaviour
-      description: What happens instead.
     validations:
       required: true
   - type: textarea
@@ -72,12 +69,10 @@ body:
     id: environment
     attributes:
       label: Browser and viewport
-      description: Some bugs occur only in one browser or at one screen size.
       placeholder: Firefox 140, 375×812
   - type: checkboxes
     id: a11y
     attributes:
       label: Accessibility
-      description: Accessibility issues are reviewed separately.
       options:
         - label: This bug affects accessibility.

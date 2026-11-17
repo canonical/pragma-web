@@ -15,7 +15,6 @@ body:
     id: kind
     attributes:
       label: Kind of change
-      description: Adding a token affects no existing component; changing one affects every component that uses it.
       options:
         - Add a token
         - Change a token
@@ -25,7 +24,6 @@ body:
     id: tokens
     attributes:
       label: Tokens affected
-      description: The exact token names.
       placeholder: color.text, spacing.inline.small …
     validations:
       required: true
@@ -53,6 +51,5 @@ body:
     id: contribution
     attributes:
       label: Contribution
-      description: Used to identify whether the work has an owner.
       options:
         - label: I'd like to contribute this myself.

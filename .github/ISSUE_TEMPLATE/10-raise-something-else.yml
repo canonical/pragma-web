@@ -7,6 +7,5 @@ body:
     id: description
     attributes:
       label: Description
-      description: What you want to raise, and why it matters.
     validations:
       required: true

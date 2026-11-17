@@ -20,7 +20,6 @@ body:
     id: target
     attributes:
       label: UI block or package
-      description: Used to identify the code and maintainers involved.
       placeholder: Accordion, @canonical/router-core …
     validations:
       required: true
@@ -47,7 +46,6 @@ body:
     id: flags
     attributes:
       label: About this change
-      description: Accessibility issues are reviewed separately. A contribution means the work has an owner.
       options:
         - label: This is an accessibility issue.
         - label: I'd like to contribute this myself.

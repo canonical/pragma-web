@@ -8,7 +8,6 @@ body:
     id: kind
     attributes:
       label: Kind of change
-      description: A new entry is planned as new work; a fix to an existing entry is handled as maintenance.
       options:
         - New entry
         - Fix to an existing entry
@@ -31,7 +30,6 @@ body:
     id: problem
     attributes:
       label: What is missing or wrong
-      description: The gap or error you found.
     validations:
       required: true
   - type: textarea
@@ -43,6 +41,5 @@ body:
     id: contribution
     attributes:
       label: Contribution
-      description: Used to identify whether the work has an owner.
       options:
         - label: I'd like to contribute this myself.

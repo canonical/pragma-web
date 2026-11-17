@@ -23,7 +23,6 @@ body:
     id: kind
     attributes:
       label: Kind of UI block
-      description: Components, patterns and layouts are specified and reviewed differently.
       options:
         - Component
         - Pattern
@@ -35,7 +34,6 @@ body:
     id: summary
     attributes:
       label: Summary
-      description: One sentence describing what the block does.
       placeholder: Lets users pick a single date or a range from a calendar.
     validations:
       required: true
@@ -70,7 +68,7 @@ body:
     id: states
     attributes:
       label: States and responsive behaviour
-      description: Its states (for example open and closed), and how it adapts from small screens up.
+      description: For example open and closed, and how it adapts from small screens up.
   - type: textarea
     id: visual
     attributes:
@@ -80,6 +78,5 @@ body:
     id: contribution
     attributes:
       label: Contribution
-      description: Used to identify whether the work has an owner.
       options:
         - label: I'd like to contribute this myself.

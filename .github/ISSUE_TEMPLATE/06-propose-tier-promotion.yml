@@ -10,14 +10,13 @@ body:
     id: block
     attributes:
       label: UI block
-      description: The component or pattern to move.
     validations:
       required: true
   - type: input
     id: current-tier
     attributes:
       label: Current tier
-      description: Where the block lives today. For example Apps, Sites, Stores, or a product such as apps/lxd.
+      description: For example Apps, Sites, Stores, or a product such as apps/lxd.
       placeholder: apps/lxd
     validations:
       required: true
@@ -25,7 +24,7 @@ body:
     id: target-tier
     attributes:
       label: Target tier
-      description: Where it should live. A higher tier has more consumers and a stricter review. For example Global, Apps, Sites or Stores.
+      description: A higher tier has more consumers and a stricter review. For example Global, Apps, Sites or Stores.
       placeholder: Apps
     validations:
       required: true
@@ -45,4 +44,3 @@ body:
     id: implementation
     attributes:
       label: Link to the current implementation
-      description: Used to review the existing code and specification.
