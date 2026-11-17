@@ -6,7 +6,7 @@
       ".storybook",
       "*.json",
       "vite.config.ts",
-      "vitest.setup.ts"
+      "vitest.setup.browser.ts"
     ]
   }
 }
