@@ -15,8 +15,9 @@ import type {
   GroupTerm,
   Predicate,
   PredicateOperator,
+  PredicateRef,
   Query,
-  SetOperator,
+  QueryClearPath,
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
@@ -206,13 +207,17 @@ export default function createDataViewsProvider<
     capabilities,
     state: protectChannel(state),
     refusals,
-    setPredicate: (
-      predicate: Predicate,
-      replaces?: SetOperator,
-      history?: HistoryMode,
-    ) => command({ kind: "setPredicate", predicate, replaces }, history),
-    removePredicate: (field: string, operator: PredicateOperator) =>
-      command({ kind: "removePredicate", field, operator }),
+    setPredicate: (predicate: Predicate, nth?: number, history?: HistoryMode) =>
+      command({ kind: "setPredicate", predicate, nth }, history),
+    removePredicate: (
+      field: string,
+      operator: PredicateOperator,
+      nth?: number,
+    ) => command({ kind: "removePredicate", field, operator, nth }),
+    editPredicates: (
+      remove: readonly PredicateRef[],
+      add: readonly Predicate[],
+    ) => command({ kind: "editPredicates", remove, add }),
     refresh: issueRefresh,
     adopt,
     view: protectChannel(openView),
@@ -359,6 +364,8 @@ export default function createDataViewsProvider<
       command({ kind: "navigateWindow", ...window }),
     setSort: (sort: readonly SortTerm[]) => command({ kind: "setSort", sort }),
     setSearch: (search: string) => command({ kind: "setSearch", search }),
+    clear: (paths: readonly [QueryClearPath, ...QueryClearPath[]]) =>
+      command({ kind: "clear", paths }),
     setGroup: (group: readonly GroupTerm[]) =>
       command({ kind: "setGroup", group }),
     setCollapsed: (collapsed: readonly GroupPath[]) =>

@@ -43,7 +43,7 @@ const capabilities = declareCapabilities(machineCollection, {
 
 ## Map a request onto the endpoint
 
-When the endpoint reads the same flat parameters the URL uses, `encodeQuery` writes the request for it — `status=failed&status__isNone=pending&name__startsWith=web&sort=cores__desc&page=2&size=5`. `createPage` builds the page: a count given is exact, a count left out is unknown.
+When the endpoint reads the same flat parameters the URL uses, `encodeQuery` writes the request for it — `status=failed&status__isNone=pending&name__startsWith=web&sort=cores__desc&page=2&size=5`. Further restrictions on one field carry an ordinal, `cores__gte__1=8`, and the endpoint must AND them or refuse the request. `createPage` builds the page: a count given is exact, a count left out is unknown.
 
 ```tsx
 const queryClient = new QueryClient();

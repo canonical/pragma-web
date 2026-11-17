@@ -154,6 +154,7 @@ describe("public surface", () => {
       "showColumn",
       "spellColumnArrangement",
       "spellWireKey",
+      "spellWireValues",
     ]);
     for (const name of Object.keys(bindings)) {
       expect(dataviews).not.toHaveProperty(name);

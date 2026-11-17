@@ -48,6 +48,25 @@ describe("refusalsOf", () => {
     ).toEqual([]);
   });
 
+  it("refuses an address once, however many conjuncts it holds", () => {
+    expect(
+      refusalsOf(
+        permissive,
+        query({
+          filter: [
+            { field: "status", operator: "isNone", operands: ["failed"] },
+            { field: "status", operator: "isNone", operands: ["ready"] },
+            { field: "zone", operator: "isAny", operands: ["north"] },
+            { field: "zone", operator: "isAny", operands: ["south"] },
+          ],
+        }),
+      ).map((refusal) => [refusal.code, refusal.field, refusal.operator]),
+    ).toEqual([
+      ["undeclared-operator", "status", "isNone"],
+      ["undeclared-field", "zone", "isAny"],
+    ]);
+  });
+
   it("freezes the refusals it collects", () => {
     expect(Object.isFrozen(refusalsOf(permissive, query()))).toBe(true);
   });

@@ -126,6 +126,7 @@ describe("createDataViewsProvider", () => {
     const { provider } = machineProvider();
     expect(Object.keys(provider).sort()).toEqual([
       "capabilities",
+      "clear",
       "collection",
       "issues",
       "navigateWindow",
@@ -1333,6 +1334,39 @@ describe("createDataViewsProvider host", () => {
     expect(provider.state.get().slice.filter).toEqual([]);
   });
 
+  it("addresses one conjunct by its place, and edits several in one transition", () => {
+    const { provider, host } = machineProvider();
+    const atLeast = (cores: number): Predicate => ({
+      field: "cpu",
+      operator: "gte",
+      operands: [cores],
+    });
+    host.editPredicates([], [atLeast(8), atLeast(4)]);
+    expect(provider.state.get().slice.filter).toEqual([atLeast(8), atLeast(4)]);
+    // Conjunct 1 in canonical order is the bound at 8.
+    expect(host.removePredicate("cpu", "gte", 1)).toEqual([]);
+    expect(provider.state.get().slice.filter).toEqual([atLeast(4)]);
+    const heard: string[] = [];
+    host.transitions.subscribe(() => {
+      heard.push(String(host.transitions.get()?.cause));
+    });
+    expect(
+      host.editPredicates(
+        [{ field: "cpu", operator: "gte", nth: 0 }],
+        [atLeast(2), STATUS_FAILED],
+      ),
+    ).toEqual([]);
+    expect(provider.state.get().slice.filter).toEqual([
+      atLeast(2),
+      STATUS_FAILED,
+    ]);
+    expect(heard).toEqual(["filter"]);
+    // A conjunct the query does not hold is a stale reading, and throws.
+    expect(() =>
+      host.editPredicates([{ field: "cpu", operator: "gte", nth: 1 }], []),
+    ).toThrow("cpu gte holds no conjunct 1");
+  });
+
   it("moves a set from one operator to another on its field as one transition", () => {
     const recorded = createRecordingLocation({ href: "/machines" });
     const provider = createDataViewsProvider({
@@ -1354,9 +1388,9 @@ describe("createDataViewsProvider host", () => {
     });
     const writesBefore = recorded.writes.length;
     expect(
-      host.setPredicate(
-        { field: "status", operator: "isNone", operands: ["failed"] },
-        "isAny",
+      host.editPredicates(
+        [{ field: "status", operator: "isAny", nth: 0 }],
+        [{ field: "status", operator: "isNone", operands: ["failed"] }],
       ),
     ).toEqual([]);
     expect(provider.state.get().slice.filter).toEqual([

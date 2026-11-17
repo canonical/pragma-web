@@ -3,38 +3,28 @@ import {
   DEFAULT_WINDOW,
   EMPTY_SLICE,
   type GroupTerm,
-  OPERATOR_ARITY,
-  type Predicate,
-  type PredicateOperand,
-  type PredicateOperator,
   type ResultWindow,
   type Slice,
   type SortTerm,
 } from "../query/index.js";
 import type { QueryIssue } from "../result/index.js";
-import {
-  resolveFieldKind,
-  type Schema,
-  type SchemaFieldDefinition,
-  type SchemaPredicateResult,
-} from "../schema/index.js";
 import { refusalsOf, type SourceCapabilities } from "../source/index.js";
 import {
   OPERATOR_DELIMITER,
   QUERY_KEYS,
   RESERVED_QUERY_KEYS,
-  SUFFIXED_OPERATORS,
 } from "./constants.js";
+import readKeyPredicate from "./readKeyPredicate.js";
 import readUndeclaredField from "./readUndeclaredField.js";
 import readWireField from "./readWireField.js";
-import type { DecodedQuery, DecodeQueryConfig } from "./types.js";
+import recordConjunct from "./recordConjunct.js";
+import type {
+  DecodedQuery,
+  DecodeQueryConfig,
+  ReadPredicate,
+} from "./types.js";
 
 const DIGITS = /^\d+$/;
-
-const isOperator = (
-  suffix: string,
-): suffix is (typeof SUFFIXED_OPERATORS)[number] =>
-  SUFFIXED_OPERATORS.some((operator) => operator === suffix);
 
 /** Read a parameter the grammar spells once, reporting any extra values. */
 const singletonOf = (
@@ -97,137 +87,6 @@ const sortTermOf = (value: string): SortTerm | null => {
     return null;
   }
   return { field: value.slice(0, at), direction };
-};
-
-/**
- * One predicate as the parameters spelled it: the keys it was read from, so
- * a refusal of the predicate is reported under each key the link holds.
- */
-type ReadPredicate = {
-  readonly predicate: Predicate;
-  readonly keys: readonly string[];
-};
-
-/**
- * Keep an enforced predicate, or report why the parameter was refused. A set
- * operator read under a second spelling of its address — `status` and
- * `status__isAny` — is one predicate, holding the operands of both and
- * read from both keys.
- */
-const record = (
-  result: SchemaPredicateResult,
-  key: string,
-  filter: ReadPredicate[],
-  issues: QueryIssue[],
-): void => {
-  if (result.status === "valid") {
-    const { predicate } = result;
-    const kept = filter.find(
-      ({ predicate: candidate }) =>
-        candidate.field === predicate.field &&
-        candidate.operator === predicate.operator,
-    );
-    if (kept === undefined) {
-      filter.push({ predicate, keys: [key] });
-      return;
-    }
-    filter.splice(filter.indexOf(kept), 1, {
-      predicate: {
-        ...predicate,
-        operands: [...kept.predicate.operands, ...predicate.operands],
-      },
-      keys: [...kept.keys, key],
-    });
-    return;
-  }
-  issues.push({
-    parameter: key,
-    field: readWireField(key),
-    code: "invalid",
-    reason: result.reason,
-  });
-};
-
-/** Read one field's parameter into a schema-enforced predicate. */
-const readPredicate = (
-  key: string,
-  values: readonly string[],
-  schema: Schema<readonly SchemaFieldDefinition[]>,
-  definition: SchemaFieldDefinition,
-  filter: ReadPredicate[],
-  issues: QueryIssue[],
-): void => {
-  const { field } = definition;
-  const kind = resolveFieldKind(definition.kind);
-  let operator: PredicateOperator = "isAny";
-  if (key.includes(OPERATOR_DELIMITER)) {
-    const suffix = key.slice(field.length + OPERATOR_DELIMITER.length);
-    if (!isOperator(suffix)) {
-      issues.push({
-        parameter: key,
-        field,
-        code: "malformed",
-        reason: `unknown operator "${suffix}"`,
-      });
-      return;
-    }
-    operator = suffix;
-  }
-  if (
-    !kind.operators.includes(operator) ||
-    OPERATOR_ARITY[operator] === "none" ||
-    kind.input.kind === "none"
-  ) {
-    // An operator the kind does not accept is refused for the operator,
-    // before any value is read. The zero-value operator carries no operands
-    // — its presence is the predicate, never a truthiness test on its value
-    // — and a kind that filters without a text input has none to parse: the
-    // schema answers for the operator alone.
-    record(schema.predicateFor(field, operator, []), key, filter, issues);
-    return;
-  }
-  const operands: PredicateOperand[] = [];
-  for (const value of values) {
-    const parsed = schema.validateInput(field, value);
-    if (parsed.status === "valid") {
-      operands.push(...parsed.operands);
-      continue;
-    }
-    // The schema reads a blank input as incomplete, and no blank reaches
-    // it: the decoder dropped them before parsing.
-    /* v8 ignore next 3 -- unreachable: blanks are dropped above */
-    if (parsed.status === "incomplete") {
-      continue;
-    }
-    issues.push({
-      parameter: key,
-      field,
-      code: "invalid",
-      reason: parsed.reason,
-    });
-  }
-  if (operands.length === 0) {
-    return;
-  }
-  const isSet = OPERATOR_ARITY[operator] === "many";
-  if (!isSet && operands.length > 1) {
-    issues.push({
-      parameter: key,
-      field,
-      code: "malformed",
-      reason: `"${key}" takes one value; the extra values were ignored`,
-    });
-  }
-  record(
-    schema.predicateFor(
-      field,
-      operator,
-      isSet ? operands : operands.slice(0, 1),
-    ),
-    key,
-    filter,
-    issues,
-  );
 };
 
 /**
@@ -327,8 +186,9 @@ const addressableWindow = (
  *
  * The schema enforces every owned clause: values are parsed to their field's
  * type, operators are checked against the field's kind, and a clause that
- * fails is left out and reported. With the source's capabilities, a clause
- * it cannot execute is refused the same way. A key spelled `name__operator`
+ * fails is left out and reported. A third segment is the conjunct's
+ * ordinal, `tags__isAny__1`. With the source's capabilities, a clause it
+ * cannot execute is refused the same way. A key spelled `name__operator`
  * with one of the grammar's operators is a filter even when the collection
  * declares no such field, and is refused as `undeclared-field`; any other
  * parameter naming no field of this collection belongs to the host and is
@@ -342,7 +202,7 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
   const { schema, params, capabilities } = config;
 
   const issues: QueryIssue[] = [];
-  const filter: ReadPredicate[] = [];
+  let filter: readonly ReadPredicate[] = [];
   let sort: readonly SortTerm[] = [];
   let search: string | null = null;
   let group: GroupTerm[] = [];
@@ -430,7 +290,20 @@ export default function decodeQuery(config: DecodeQueryConfig): DecodedQuery {
       }
       continue;
     }
-    readPredicate(key, values, schema, definition, filter, issues);
+    const reading = readKeyPredicate(
+      key,
+      params.getAll(key),
+      schema,
+      definition,
+    );
+    issues.push(...reading.issues);
+    if (reading.conjunct !== null) {
+      const recorded = recordConjunct(filter, key, reading.conjunct);
+      filter = recorded.filter;
+      if (recorded.issue !== null) {
+        issues.push(recorded.issue);
+      }
+    }
   }
 
   const read: Slice = {

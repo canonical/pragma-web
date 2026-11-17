@@ -48,6 +48,7 @@ import type {
   FilterHandle,
   FilterHandles,
   FilterInputState,
+  FurtherConjunct,
   GroupCapabilities,
   GroupPath,
   GroupSummary,
@@ -64,6 +65,7 @@ import type {
   Predicate,
   PredicateOperand,
   PredicateOperator,
+  PredicateRef,
   PreferenceResult,
   PresenceField,
   Presentation,
@@ -72,6 +74,7 @@ import type {
   PresentationStore,
   PresentationTarget,
   Query,
+  QueryClearPath,
   QueryIssue,
   QueryIssueCode,
   QueryLocation,
@@ -222,6 +225,7 @@ type EveryPublicType = [
   FilterHandle<unknown>,
   FilterHandles<readonly SchemaFieldDefinition[]>,
   FilterInputState,
+  FurtherConjunct,
   PresenceField,
   GroupCapabilities,
   GroupPath,
@@ -239,6 +243,8 @@ type EveryPublicType = [
   Predicate,
   PredicateOperand,
   PredicateOperator,
+  QueryClearPath,
+  PredicateRef,
   PreferenceResult,
   PresentationPatch,
   PresentationTarget,
@@ -624,6 +630,7 @@ describe("public surface types", () => {
           | "navigateWindow"
           | "setSort"
           | "setSearch"
+          | "clear"
           | "setGroup"
           | "setCollapsed"]
       >
@@ -642,6 +649,7 @@ describe("public surface types", () => {
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("invokeAction");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("setPredicate");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("removePredicate");
+    expectTypeOf<DataViewsProvider>().not.toHaveProperty("editPredicates");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("applicability");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("recordType");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("fields");
@@ -764,6 +772,7 @@ describe("public surface types", () => {
       surface.filter((name) => /^(Relay|Query)/.test(name)).sort(),
     ).toEqual([
       "Query",
+      "QueryClearPath",
       "QueryIssue",
       "QueryIssueCode",
       "QueryLocation",

@@ -19,9 +19,10 @@ import type {
   GroupTerm,
   Predicate,
   PredicateOperator,
+  PredicateRef,
   Query,
+  QueryClearPath,
   QueryCommand,
-  SetOperator,
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
@@ -123,6 +124,13 @@ export type DataViewsProvider<
   ) => readonly SourceRefusal[];
   readonly setSort: (sort: readonly SortTerm[]) => readonly SourceRefusal[];
   readonly setSearch: (search: string) => readonly SourceRefusal[];
+  /**
+   * Empty the named parts of the query, and their refused clauses, in one
+   * transition from page one. A clear that changes nothing commits nothing.
+   */
+  readonly clear: (
+    paths: readonly [QueryClearPath, ...QueryClearPath[]],
+  ) => readonly SourceRefusal[];
   /**
    * Replace the grouping levels. Reserved: refused while no source declares
    * a groupable field.
@@ -352,21 +360,36 @@ export type ProviderHost<
   "collection" | "capabilities" | "state" | "refusals"
 > & {
   /**
-   * Replace the predicate at its address, and the one at the same field
-   * under `replaces` when given, as one transition; the window returns to
-   * page one. Given `history`, the transition enters history that way
-   * rather than as the policy says: a typed value's later edits in one input
-   * session replace the entry its first one entered.
+   * Replace the conjunct at `nth` of the predicate's address, 0 when left
+   * out, or add it where the address holds none, as one transition; the
+   * window returns to page one. Given `history`, the transition enters
+   * history that way rather than as the policy says: a typed value's later
+   * edits in one input session replace the entry its first one entered.
    */
   readonly setPredicate: (
     predicate: Predicate,
-    replaces?: SetOperator,
+    nth?: number,
     history?: HistoryMode,
   ) => readonly SourceRefusal[];
-  /** Remove the predicate at an address; the window returns to page one. */
+  /**
+   * Remove the conjunct at `nth` of an address, 0 when left out; the window
+   * returns to page one. A conjunct already gone is no change.
+   */
   readonly removePredicate: (
     field: string,
     operator: PredicateOperator,
+    nth?: number,
+  ) => readonly SourceRefusal[];
+  /**
+   * Remove the named conjuncts and add others, as one transition: a set
+   * moved to another operator, two bounds merged into one. Each ref names a
+   * conjunct as the query stands before the edit; one naming none, or named
+   * twice, is a stale reading of the query and throws. The window returns to
+   * page one.
+   */
+  readonly editPredicates: (
+    remove: readonly PredicateRef[],
+    add: readonly Predicate[],
   ) => readonly SourceRefusal[];
   /**
    * Request the current query again and name the request. A withheld query

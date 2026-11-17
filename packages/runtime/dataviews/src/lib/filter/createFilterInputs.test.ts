@@ -12,6 +12,7 @@ import {
   createDataViewsProvider,
   readProviderHost,
 } from "../provider/index.js";
+import { canonicalizeSlice } from "../query/index.js";
 import type { EmptyOr } from "../schema/index.js";
 import createFilterInputs from "./createFilterInputs.js";
 
@@ -199,6 +200,139 @@ describe("createFilterInputs", () => {
     expect(inputs.handles.cpu.gte.applied.get()).toEqual({
       kind: "value",
       value: 8,
+    });
+  });
+
+  it("hands each record the first conjunct its address holds", () => {
+    const p = provider();
+    const host = readProviderHost(p);
+    host.adopt(
+      {
+        slice: {
+          filter: [
+            { field: "cpu", operator: "gte", operands: [8] },
+            { field: "cpu", operator: "gte", operands: [4] },
+          ],
+          search: null,
+          sort: [],
+          group: [],
+        },
+        window: p.state.get().window,
+      },
+      "adopt",
+      null,
+    );
+    const inputs = createFilterInputs({ host });
+    expect(inputs.handles.cpu.gte.applied.get()).toEqual({
+      kind: "value",
+      value: 4,
+    });
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4");
+  });
+
+  describe("further conjuncts", () => {
+    const observeAt = (href: string) => {
+      const location = createMemoryLocation({ href });
+      const p = provider(location);
+      const release = p.observe();
+      const host = readProviderHost(p);
+      const inputs = createFilterInputs({ host });
+      const stop = inputs.observe();
+      return {
+        location,
+        p,
+        host,
+        bound: inputs.handles.cpu.gte,
+        stop: () => {
+          stop();
+          release();
+        },
+      };
+    };
+
+    it("publishes the conjuncts a handle does not edit, read-only", () => {
+      const { bound, stop } = observeAt(
+        "/machines?cpu__gte=8&cpu__gte__1=4&page=1&size=50",
+      );
+      expect(bound.applied.get()).toEqual({ kind: "value", value: 4 });
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [8] }]);
+      expect(Object.isFrozen(bound.others)).toBe(true);
+      expect(bound.others).not.toHaveProperty("set");
+      expect(bound.nth.get()).toBe(0);
+      expect(bound.nth).not.toHaveProperty("set");
+      stop();
+    });
+
+    it("keeps the handle on its conjunct when canonical order moves it", () => {
+      const { p, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      // Canonical order reads numbers as text, so 9 now sorts after 8.
+      bound.edit("9");
+      expect(bound.state.get()).toEqual({
+        input: "9",
+        feedback: { status: "applied" },
+      });
+      expect(bound.others.get()).toEqual([{ nth: 0, operands: [8] }]);
+      expect(bound.nth.get()).toBe(1);
+      bound.edit("2");
+      expect(canonicalizeSlice(p.state.get().slice).filter).toEqual([
+        { field: "cpu", operator: "gte", operands: [2] },
+        { field: "cpu", operator: "gte", operands: [8] },
+      ]);
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [8] }]);
+      expect(bound.nth.get()).toBe(0);
+      stop();
+    });
+
+    it("promotes the next conjunct when the handle clears its own", () => {
+      const { p, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      expect(bound.clear()).toEqual([]);
+      expect(p.state.get().slice.filter).toEqual([
+        { field: "cpu", operator: "gte", operands: [8] },
+      ]);
+      expect(bound.state.get().input).toBe("8");
+      expect(bound.others.get()).toEqual([]);
+      stop();
+    });
+
+    it("takes the first conjunct again when the location moves", () => {
+      const { location, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      bound.edit("9");
+      // The handle's conjunct still stands, second; a move of the location
+      // is a fresh reading, and the first conjunct is the handle's again.
+      location.write(
+        new URLSearchParams("cpu__gte=5&cpu__gte__1=9&page=1&size=50"),
+      );
+      expect(bound.state.get()).toEqual({
+        input: "5",
+        feedback: { status: "none" },
+      });
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [9] }]);
+      stop();
+    });
+
+    it("publishes them only when they move", () => {
+      const { p, host, bound, stop } = observeAt(
+        "/machines?cpu__gte=4&cpu__gte__1=8&page=1&size=50",
+      );
+      const seen = vi.fn();
+      bound.others.subscribe(seen);
+      p.setSort([{ field: "cpu", direction: "desc" }]);
+      host.setPredicate({
+        field: "status",
+        operator: "isAny",
+        operands: ["failed"],
+      });
+      expect(seen).not.toHaveBeenCalled();
+      host.setPredicate({ field: "cpu", operator: "gte", operands: [6] }, 1);
+      expect(bound.others.get()).toEqual([{ nth: 1, operands: [6] }]);
+      expect(seen).toHaveBeenCalledTimes(1);
+      stop();
     });
   });
 

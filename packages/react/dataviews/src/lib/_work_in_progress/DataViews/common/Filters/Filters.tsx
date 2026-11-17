@@ -31,6 +31,7 @@ import { NO_RECORDS } from "./common/constants.js";
 import {
   BoundFilter,
   ChoicesFilter,
+  FurtherConjuncts,
   LinkRefusals,
   PresenceFilter,
   TextFilter,
@@ -92,6 +93,26 @@ const leavesWhenCleared = (
   !declares(context, field, operator) ||
   context.isShownOnlyWhileRestricted(field);
 
+/**
+ * The conjuncts at one control's address beyond its own, a read-only row
+ * each, drawn after the control.
+ */
+const renderFurther = (
+  context: FilterContext,
+  field: string,
+  operator: PredicateOperator,
+  label: string,
+): ReactElement => (
+  <FurtherConjuncts
+    handle={findFilterHandle<unknown>(context.filters, field, operator)}
+    field={field}
+    operator={operator}
+    label={label}
+    host={context.host}
+    onLeave={context.focusGroup}
+  />
+);
+
 /** The two bound controls a ranged kind edits through. */
 const renderBounds = (
   context: FilterContext,
@@ -105,29 +126,31 @@ const renderBounds = (
   return (
     <Fragment key={definition.field}>
       {(["gte", "lte"] as const).map((bound) => (
-        <BoundFilter
-          key={bound}
-          handle={findFilterHandle<number | string>(
-            context.filters,
-            definition.field,
-            bound,
-          )}
-          label={name}
-          bound={bound}
-          definition={definition}
-          offered={
-            facet?.kind === "range"
-              ? facet[bound === "gte" ? "min" : "max"]
-              : null
-          }
-          declared={declares(context, definition.field, bound)}
-          leavesWhenCleared={leavesWhenCleared(
-            context,
-            definition.field,
-            bound,
-          )}
-          onLeave={context.focusGroup}
-        />
+        <Fragment key={bound}>
+          <BoundFilter
+            handle={findFilterHandle<number | string>(
+              context.filters,
+              definition.field,
+              bound,
+            )}
+            label={name}
+            bound={bound}
+            definition={definition}
+            offered={
+              facet?.kind === "range"
+                ? facet[bound === "gte" ? "min" : "max"]
+                : null
+            }
+            declared={declares(context, definition.field, bound)}
+            leavesWhenCleared={leavesWhenCleared(
+              context,
+              definition.field,
+              bound,
+            )}
+            onLeave={context.focusGroup}
+          />
+          {renderFurther(context, definition.field, bound, name)}
+        </Fragment>
       ))}
     </Fragment>
   );
@@ -169,36 +192,38 @@ const controls: {
         {(["isAny", "isNone"] as const).map((operator) => {
           const alternative = operator === "isAny" ? "isNone" : "isAny";
           return (
-            <ChoicesFilter
-              key={operator}
-              options={options}
-              serverOwned={definition.options === undefined}
-              counts={counts}
-              handle={findFilterHandle<ReadonlySet<PredicateOperand>>(
-                context.filters,
-                definition.field,
-                operator,
-              )}
-              operator={operator}
-              alternativeDeclared={declares(
-                context,
-                definition.field,
-                alternative,
-              )}
-              alternativeHandle={findFilterHandle<
-                ReadonlySet<PredicateOperand>
-              >(context.filters, definition.field, alternative)}
-              host={context.host}
-              label={name}
-              field={definition.field}
-              declared={declares(context, definition.field, operator)}
-              leavesWhenCleared={leavesWhenCleared(
-                context,
-                definition.field,
-                operator,
-              )}
-              onLeave={context.focusGroup}
-            />
+            <Fragment key={operator}>
+              <ChoicesFilter
+                options={options}
+                serverOwned={definition.options === undefined}
+                counts={counts}
+                handle={findFilterHandle<ReadonlySet<PredicateOperand>>(
+                  context.filters,
+                  definition.field,
+                  operator,
+                )}
+                operator={operator}
+                alternativeDeclared={declares(
+                  context,
+                  definition.field,
+                  alternative,
+                )}
+                alternativeHandle={findFilterHandle<
+                  ReadonlySet<PredicateOperand>
+                >(context.filters, definition.field, alternative)}
+                host={context.host}
+                label={name}
+                field={definition.field}
+                declared={declares(context, definition.field, operator)}
+                leavesWhenCleared={leavesWhenCleared(
+                  context,
+                  definition.field,
+                  operator,
+                )}
+                onLeave={context.focusGroup}
+              />
+              {renderFurther(context, definition.field, operator, name)}
+            </Fragment>
           );
         })}
       </Fragment>
@@ -207,30 +232,32 @@ const controls: {
   presence: (context, definition, name) => {
     const facet = context.answered?.[definition.field];
     return (
-      <PresenceFilter
-        key={definition.field}
-        handle={findFilterHandle<boolean>(
-          context.filters,
-          definition.field,
-          "isSet",
-        )}
-        // A facet that lists no record setting the field counts none.
-        count={
-          facet?.kind === "values"
-            ? (facet.values.find(({ value }) => value === true)?.count ??
-              NO_RECORDS)
-            : null
-        }
-        label={name}
-        field={definition.field}
-        declared={declares(context, definition.field, "isSet")}
-        leavesWhenCleared={leavesWhenCleared(
-          context,
-          definition.field,
-          "isSet",
-        )}
-        onLeave={context.focusGroup}
-      />
+      <Fragment key={definition.field}>
+        <PresenceFilter
+          handle={findFilterHandle<boolean>(
+            context.filters,
+            definition.field,
+            "isSet",
+          )}
+          // A facet that lists no record setting the field counts none.
+          count={
+            facet?.kind === "values"
+              ? (facet.values.find(({ value }) => value === true)?.count ??
+                NO_RECORDS)
+              : null
+          }
+          label={name}
+          field={definition.field}
+          declared={declares(context, definition.field, "isSet")}
+          leavesWhenCleared={leavesWhenCleared(
+            context,
+            definition.field,
+            "isSet",
+          )}
+          onLeave={context.focusGroup}
+        />
+        {renderFurther(context, definition.field, "isSet", name)}
+      </Fragment>
     );
   },
   number: renderBounds,
@@ -238,24 +265,26 @@ const controls: {
   text: (context, definition, name) => (
     <Fragment key={definition.field}>
       {(["contains", "startsWith"] as const).map((operator) => (
-        <TextFilter
-          key={operator}
-          handle={findFilterHandle<string>(
-            context.filters,
-            definition.field,
-            operator,
-          )}
-          operator={operator}
-          label={name}
-          field={definition.field}
-          declared={declares(context, definition.field, operator)}
-          leavesWhenCleared={leavesWhenCleared(
-            context,
-            definition.field,
-            operator,
-          )}
-          onLeave={context.focusGroup}
-        />
+        <Fragment key={operator}>
+          <TextFilter
+            handle={findFilterHandle<string>(
+              context.filters,
+              definition.field,
+              operator,
+            )}
+            operator={operator}
+            label={name}
+            field={definition.field}
+            declared={declares(context, definition.field, operator)}
+            leavesWhenCleared={leavesWhenCleared(
+              context,
+              definition.field,
+              operator,
+            )}
+            onLeave={context.focusGroup}
+          />
+          {renderFurther(context, definition.field, operator, name)}
+        </Fragment>
       ))}
     </Fragment>
   ),

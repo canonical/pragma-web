@@ -175,6 +175,9 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.facetCount(exact(12))).toBe("12");
     expect(m.facetCount(atLeast(1000))).toBe("at least 1,000");
     expect(m.filterContains("Name")).toBe("Name contains");
+    expect(m.filterAlso("Tags is any of", ["ex-gpu", "ex-nvme"])).toBe(
+      "Tags is any of ex-gpu, ex-nvme",
+    );
     expect(m.filterStartsWith("Name")).toBe("Name starts with");
   });
 

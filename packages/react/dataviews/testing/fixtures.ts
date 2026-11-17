@@ -523,6 +523,7 @@ export const MESSAGE_SAMPLES: {
   filterLowest: [[MESSAGE_MARK]],
   filterHighest: [[MESSAGE_MARK]],
   clearFilter: [[MESSAGE_MARK]],
+  filterAlso: [[MESSAGE_MARK, [MESSAGE_MARK, MESSAGE_MARK]]],
   linkRefusals: null,
   clauseRefused: [[MESSAGE_MARK, MESSAGE_MARK]],
   grouping: null,

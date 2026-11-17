@@ -1,4 +1,8 @@
-import { canonicalizeSlice, type Query } from "../query/index.js";
+import {
+  addressPredicate,
+  canonicalizeSlice,
+  type Query,
+} from "../query/index.js";
 import type { SourceRefusal } from "../result/index.js";
 import pluralize from "./pluralize.js";
 import type { SourceCapabilities } from "./types.js";
@@ -27,18 +31,26 @@ export default function refusalsOf(
   capabilities: SourceCapabilities,
   query: Query,
 ): readonly SourceRefusal[] {
-  // Canonicalizing first deduplicates addresses and fixes the order, so
-  // one query always produces the same refusals.
+  // Canonicalizing first fixes the order, so one query always produces the
+  // same refusals.
   const slice = canonicalizeSlice(query.slice);
   const { window } = query;
   const refusals: SourceRefusal[] = [];
 
+  // An address is refused once, however many conjuncts it holds: what the
+  // source cannot execute is the field and operator, not each operand.
+  const refused = new Set<string>();
   for (const predicate of slice.filter) {
+    const address = addressPredicate(predicate.field, predicate.operator);
+    if (refused.has(address)) {
+      continue;
+    }
     // A field declared with no operator is a field not declared.
     const operators = Object.hasOwn(capabilities.filter, predicate.field)
       ? capabilities.filter[predicate.field]
       : undefined;
     if (operators === undefined || operators.length === 0) {
+      refused.add(address);
       refusals.push(
         refusal(
           "filter",
@@ -49,6 +61,7 @@ export default function refusalsOf(
         ),
       );
     } else if (!operators.includes(predicate.operator)) {
+      refused.add(address);
       refusals.push(
         refusal(
           "filter",
