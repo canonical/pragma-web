@@ -46,25 +46,14 @@ body:
       description: What can users not do today, or do badly? We judge a new block by the problem it solves, not by how it looks.
     validations:
       required: true
-  - type: dropdown
+  - type: input
     id: tiers
     attributes:
       label: Tiers it serves
-      description: The tier decides where the block lives and who maintains it.
-      multiple: true
-      options:
-        - Global
-        - Apps
-        - Sites
-        - Stores
-        - Other
+      description: The tier decides where the block lives and who maintains it. Name one or more, for example Global, Apps, Sites, Stores, or a product such as apps/lxd.
+      placeholder: Apps, Sites
     validations:
       required: true
-  - type: input
-    id: other-tier
-    attributes:
-      label: Other tier
-      description: If you picked "Other", name the tier or product, so we know where the block would live.
   - type: textarea
     id: context
     attributes:
