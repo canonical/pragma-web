@@ -8,6 +8,14 @@ body:
     attributes:
       value: |
         **Change or bug?** Use this form when the UI block or package works as designed and you want the design itself to change. If it does not match its design, its documentation or the design tokens, including using a token that is missing or out of date, [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml). If the value of a token itself should change, [propose a token change](https://github.com/canonical/pragma-web/issues/new?template=05-propose-token-change.yml).
+
+        ### Say what changes in the title
+
+        Write the title as **Block: what changes**, for example **Chip: add a removable variant**. A block can have many open changes, so the block's name alone does not tell them apart:
+
+        - **Start with the block or package**, so changes to the same block sort together and are easy to find.
+        - **Then say what should change, not why.** "Accordion: allow several sections open at once", not "Accordion is limiting". The reason has its own field below.
+        - **Propose one change per issue**, so each can be discussed and accepted on its own.
   - type: input
     id: target
     attributes:
