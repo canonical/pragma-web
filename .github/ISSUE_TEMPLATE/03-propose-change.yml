@@ -1,9 +1,13 @@
 name: Propose a change to a UI block or code
-description: An existing component, pattern or package should gain a property, variant or behaviour, or work differently.
+description: A UI block or package works as designed, but should gain a property, variant or behaviour, or work differently.
 labels:
   - "Type: improvement"
   - "Status: needs triage"
 body:
+  - type: markdown
+    attributes:
+      value: |
+        **Change or bug?** Use this form when the UI block or package works as designed and you want the design itself to change. If it does not match its design, its documentation or the design tokens, including using a token that is missing or out of date, [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml). If the value of a token itself should change, [propose a token change](https://github.com/canonical/pragma-web/issues/new?template=05-propose-token-change.yml).
   - type: input
     id: target
     attributes:

@@ -1,5 +1,5 @@
 name: Report a bug
-description: Something in a component, stylesheet or package is broken, visually or in code.
+description: A UI block, stylesheet or package does not look or behave the way Pragma says it should.
 labels:
   - "Type: bug"
   - "Status: needs triage"
@@ -7,6 +7,8 @@ body:
   - type: markdown
     attributes:
       value: |
+        **Bug or change?** It is a bug when something does not match its design, its documentation or the design tokens. That includes a UI block using a token that is missing, renamed or out of date. If it works as designed and you want it to do more, or to work differently, [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml) instead.
+
         Thanks for reporting. Search the [open issues](https://github.com/canonical/pragma-web/issues) first so the same bug is not tracked twice.
   - type: dropdown
     id: kind
@@ -57,12 +59,10 @@ body:
     id: steps
     attributes:
       label: Steps to reproduce
-      description: We can only fix what we can see happen. Steps let us reproduce the bug and confirm the fix.
+      description: We can only fix what we can see happen. Steps let us reproduce the bug and confirm the fix. If the bug is in the code rather than in use (for example a stylesheet referencing a token that does not exist), point at the file or line instead.
       placeholder: |
         1. Render …
         2. Click …
-    validations:
-      required: true
   - type: textarea
     id: references
     attributes:

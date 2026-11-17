@@ -1,5 +1,5 @@
 name: Propose a design token change
-description: A colour, spacing, typography or other design token should be added or changed.
+description: The value of a colour, spacing, typography or other design token should change, or a new token is needed.
 labels:
   - "Type: tokens"
   - "Discipline: design"
@@ -8,6 +8,8 @@ body:
   - type: markdown
     attributes:
       value: |
+        Use this form when the token itself should change. If a UI block uses the wrong token, or one that is missing or out of date, that is a bug in the block: [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml).
+
         Design tokens are defined in [canonical/pragma-core](https://github.com/canonical/pragma-core). A token change filed here is moved there once triaged.
   - type: dropdown
     id: kind
