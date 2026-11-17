@@ -42,10 +42,10 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
-    "@canonical/webarchitect": "0.44.0"
+    "@canonical/webarchitect": "0.46.0"
   },
   "dependencies": {
-    "@canonical/design-tokens": "0.44.0",
+    "@canonical/design-tokens": "0.46.0",
     "@canonical/styles-typography": "^0.47.0"
   },
   "peerDependencies": {
