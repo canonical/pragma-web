@@ -1,29 +1,9 @@
 import { DEFAULT_COOKIE_NAME } from "./constants.js";
+import findLocale from "./findLocale.js";
+import matchLocale from "./matchLocale.js";
 import parseAcceptLanguage from "./parseAcceptLanguage.js";
 import readCookie from "./readCookie.js";
-import type { I18nConfig, Locale } from "./types.js";
-
-/** Raw request inputs negotiation reads from, in priority order. */
-export interface LocaleSources {
-  /** Raw `Cookie` header — an explicit prior choice wins over everything. */
-  cookieHeader?: string | null;
-  /** Raw `Accept-Language` header, consulted when no cookie matches. */
-  acceptLanguage?: string | null;
-}
-
-/**
- * Find the configured locale that matches `value` case-insensitively, returned
- * in its original configured casing — so downstream `catalogs[locale]` and
- * `<html lang>` always use canonical BCP-47 tags (e.g. `"fr-CA"`).
- */
-function findByLower(
-  config: I18nConfig,
-  value: string | undefined,
-): Locale | undefined {
-  if (value === undefined) return undefined;
-  const lower = value.toLowerCase();
-  return config.locales.find((locale) => locale.toLowerCase() === lower);
-}
+import type { I18nConfig, Locale, LocaleSources } from "./types.js";
 
 /**
  * Pick the first supported locale from a prioritized list of requested tags,
@@ -34,10 +14,8 @@ function matchSupported(
   requested: readonly string[],
 ): Locale | undefined {
   for (const tag of requested) {
-    const exact = findByLower(config, tag);
-    if (exact !== undefined) return exact;
-    const base = findByLower(config, tag.split("-")[0]);
-    if (base !== undefined) return base;
+    const match = matchLocale(config, tag);
+    if (match !== undefined) return match;
   }
   return undefined;
 }
@@ -56,7 +34,7 @@ export default function negotiateLocale(
   config: I18nConfig,
   sources: LocaleSources = {},
 ): Locale {
-  const cookie = findByLower(
+  const cookie = findLocale(
     config,
     readCookie(sources.cookieHeader, config.cookieName ?? DEFAULT_COOKIE_NAME),
   );

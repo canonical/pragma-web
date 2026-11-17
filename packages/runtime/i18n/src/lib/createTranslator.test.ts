@@ -1,21 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { translatorCatalog as messages } from "../../testing/fixtures.js";
 import createTranslator from "./createTranslator.js";
-import type { Messages } from "./types.js";
-
-const messages: Messages = {
-  "nav.home": "Home",
-  greeting: "Hello, {name}!",
-  pair: "{a} and {b}",
-  items: { one: "{count} item", other: "{count} items" },
-  arItems: {
-    zero: "لا عناصر",
-    one: "عنصر",
-    two: "عنصران",
-    few: "{count} عناصر",
-    many: "{count} عنصرًا",
-    other: "{count} عنصر",
-  },
-};
 
 describe("createTranslator", () => {
   const t = createTranslator("en", messages);

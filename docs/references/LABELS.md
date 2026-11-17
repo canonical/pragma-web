@@ -35,6 +35,20 @@ Issues have no conventional-commit title, so on an **issue** the same vocabulary
 applied by hand as a triage act. `.github/.jira_sync_config.yaml` maps `feat` to a Jira
 Story.
 
+## Applied by the issue forms
+
+Each form in `.github/ISSUE_TEMPLATE/` applies its labels when the issue is opened.
+A form cannot choose labels from the answers, so labels that depend on an answer (the
+kind of bug, the accessibility and contribution checkboxes) are added at triage.
+
+| Label | Colour | Meaning |
+| --- | --- | --- |
+| `Status: needs triage` | `#cdcdcd` | Nobody has triaged this issue yet. Every form applies it; triage removes it. |
+| `Type: bug` … | `#c5def5` | The kind of request, one per form: `bug`, `UI block`, `improvement`, `docs`, `tokens`, `tier promotion`, `assets`, `support`, `insight`. "Raise something else" applies none. |
+| `Discipline: design` / `eng` | `#f9d0c4` | The discipline that triages the issue. Both when it needs both. |
+| `Area: a11y` | `#d4c5f9` | The issue concerns accessibility. |
+| `Contribution: offered` | `#c2e0c6` | The filer will do the work. Without it, the issue waits for an owner. |
+
 ## Human judgements
 
 | Label | Colour | Meaning |
@@ -63,6 +77,10 @@ Values are lowercase, except acronyms and proper nouns (`QA`, `UX`, `a11y`,
 | amber ramp | priority |
 | purple `#8250df` | migration train |
 | pale teal `#bfdadc` | CI directive |
+| pale blue `#c5def5` | kind of issue request |
+| pale coral `#f9d0c4` | discipline |
+| lavender `#d4c5f9` | area of concern |
+| pale green `#c2e0c6` | contribution offered |
 
 ## What was removed, and why
 

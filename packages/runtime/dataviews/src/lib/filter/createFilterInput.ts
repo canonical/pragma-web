@@ -1,0 +1,203 @@
+import type { HistoryMode } from "../location/index.js";
+import { createChannel, protectChannel } from "../observable/index.js";
+import type { Predicate, PredicateOperand } from "../query/index.js";
+import type { SourceRefusal } from "../result/index.js";
+import { type EmptyOr, resolveFieldKind } from "../schema/index.js";
+import isSamePredicate from "./isSamePredicate.js";
+import type {
+  FilterFeedback,
+  FilterInput,
+  FilterInputConfig,
+  FilterInputState,
+} from "./types.js";
+
+/**
+ * Create the record for one filter address: it owns the text input and its
+ * feedback, applies a valid predicate through the host's predicate
+ * commands, and mirrors the applied value. It never owns the applied
+ * query — the provider does — so the query moving under it arrives
+ * through `setApplied`.
+ *
+ * A valid edit the source refuses applies nothing: the predicate already
+ * in force stays, and the feedback carries the coded refusals.
+ *
+ * @note Impure by design: the record holds the input a person is still
+ * typing and publishes its channels; the host commands it calls move the
+ * provider's query.
+ */
+export default function createFilterInput(
+  config: FilterInputConfig,
+): FilterInput {
+  const { schema, field, operator, host, readConjuncts } = config;
+  const definition = schema.findField(field);
+  if (definition === undefined) {
+    throw new Error(`the schema has no field "${field}" to filter`);
+  }
+  const kind = resolveFieldKind(definition.kind);
+  const isApplied = (a: EmptyOr<unknown>, b: EmptyOr<unknown>): boolean =>
+    a.kind === "empty" || b.kind === "empty"
+      ? a.kind === b.kind
+      : kind.areAppliedEqual(a.value, b.value);
+
+  let input = "";
+  let feedback: FilterFeedback = { status: "none" };
+  let applied: Predicate | null = null;
+  /**
+   * The predicate on its way to the host. The host publishes before
+   * `setPredicate` returns, and the records' sync reads this record's
+   * predicate while it does: reading the one on its way, the sync finds the
+   * record's own edit standing and leaves the input and feedback alone.
+   */
+  let applying: Predicate | null = null;
+  /**
+   * The place of the record's conjunct among those at its address as the
+   * query stands, or 0 — the first, or the one added where there is none —
+   * when it edits none that stands.
+   */
+  const readNth = (): number =>
+    Math.max(
+      0,
+      readConjuncts().findIndex((conjunct) =>
+        isSamePredicate(conjunct, applied),
+      ),
+    );
+  /**
+   * Whether a typed edit has applied since the input session began. The
+   * session's first applied edit enters history as the policy says; every
+   * later one replaces that entry, so typing a bound is one step Back
+   * returns from, not one per keystroke.
+   */
+  let sessionApplied = false;
+  /** End the input session: the next typed edit is a new step. */
+  const endSession = (): void => {
+    sessionApplied = false;
+  };
+  const state = createChannel<FilterInputState>(
+    Object.freeze({ input, feedback }),
+  );
+  const appliedValue = createChannel<EmptyOr<unknown>>(
+    { kind: "empty" },
+    { equals: isApplied },
+  );
+
+  const publish = (): void => {
+    state.set(Object.freeze({ input, feedback }));
+    appliedValue.set(
+      applied === null
+        ? { kind: "empty" }
+        : { kind: "value", value: kind.readApplied(applied) },
+    );
+  };
+
+  /**
+   * Apply one predicate through the host, entering history as `history`
+   * says or, left out, as the policy does; the feedback says how it went.
+   */
+  const apply = (
+    predicate: Predicate,
+    history?: HistoryMode,
+  ): readonly SourceRefusal[] => {
+    applying = predicate;
+    let refusals: readonly SourceRefusal[];
+    try {
+      refusals = host.setPredicate(predicate, readNth(), history);
+    } finally {
+      applying = null;
+    }
+    if (refusals.length > 0) {
+      feedback = {
+        status: "refused",
+        refusals,
+        retainsPredicate: applied !== null,
+      };
+    } else {
+      applied = predicate;
+      feedback = { status: "applied" };
+    }
+    publish();
+    return refusals;
+  };
+
+  return {
+    get predicate(): Predicate | null {
+      return applying ?? applied;
+    },
+    state: protectChannel(state),
+    applied: protectChannel(appliedValue),
+    edit(next: string): void {
+      input = next;
+      const validation = schema.validateInput(field, next);
+      if (validation.status === "valid") {
+        const predicate = {
+          field,
+          operator,
+          operands: [...validation.operands],
+        };
+        // An edit that reads as what is applied moves nothing, so it starts
+        // no session: the next change is still the session's first step.
+        const moves = !isSamePredicate(predicate, applied);
+        const refusals = apply(
+          predicate,
+          sessionApplied ? "replace" : undefined,
+        );
+        sessionApplied ||= moves && refusals.length === 0;
+        return;
+      }
+      feedback =
+        validation.status === "incomplete"
+          ? { status: "incomplete" }
+          : {
+              status: "invalid",
+              reason: validation.reason,
+              retainsPredicate: applied !== null,
+            };
+      publish();
+    },
+    set(operands: readonly PredicateOperand[]): readonly SourceRefusal[] {
+      const built = schema.predicateFor(field, operator, operands);
+      if (built.status !== "valid") {
+        feedback = {
+          status: "invalid",
+          reason: built.reason,
+          retainsPredicate: applied !== null,
+        };
+        publish();
+        return [];
+      }
+      input = "";
+      // A discrete choice is a step of its own, and ends any session.
+      endSession();
+      return apply(built.predicate);
+    },
+    clear(): readonly SourceRefusal[] {
+      endSession();
+      const nth = readNth();
+      // Emptied before the host hears it: the host publishes before it
+      // returns, and a conjunct the removal promotes to this place is
+      // adopted then and must not be emptied after.
+      input = "";
+      feedback = { status: "none" };
+      applied = null;
+      const refusals = host.removePredicate(field, operator, nth);
+      publish();
+      return refusals;
+    },
+    setApplied(next: Predicate | null): void {
+      if (
+        next !== null &&
+        (next.field !== field || next.operator !== operator)
+      ) {
+        throw new Error(
+          `setApplied received a predicate for ${next.field}/${next.operator} on a ${field}/${operator} record`,
+        );
+      }
+      applied = next;
+      input = next === null ? "" : String(next.operands.at(0) ?? "");
+      feedback = { status: "none" };
+      // The query moved under the record: what was being typed has gone.
+      endSession();
+      publish();
+    },
+    endSession,
+  };
+}

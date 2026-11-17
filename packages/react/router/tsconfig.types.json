@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "include": ["src/lib/register.types.test.ts"],
-  "exclude": []
-}

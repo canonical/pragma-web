@@ -1,0 +1,32 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * RendererSwitch styles
+   *
+   * A work-in-progress spike: no design exists for it, so it binds only the
+   * spacing and type tokens the other parts bind. The renderer is drawn
+   * first; the choice, a group of the design system's buttons, follows it at
+   * the inline end, so it sits bottom right in a left-to-right page and
+   * bottom left in a right-to-left one.
+   */
+  .ds.renderer-switch {
+    --renderer-switch-gap: var(--dimension-200);
+    --renderer-switch-choice-gap: var(--dimension-050);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--renderer-switch-gap);
+    color: var(--color-text);
+    font-family: var(--typography-text-primary-font-family);
+    font-size: var(--typography-text-primary-font-size);
+    font-weight: var(--typography-text-primary-font-weight);
+
+    & > .choice {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--renderer-switch-choice-gap);
+    }
+  }
+}

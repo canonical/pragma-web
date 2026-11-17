@@ -723,6 +723,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["action"],
   },
+  "edit-off": {
+    tags: [
+      "pencil",
+      "off",
+      "disable",
+      "read only",
+      "read-only",
+      "view only",
+      "not editable",
+      "no editing",
+    ],
+    categories: ["action"],
+    description:
+      "A pencil struck through: editing is turned off or not allowed.",
+  },
   email: {
     tags: [
       "mail",
@@ -2072,6 +2087,11 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["object"],
   },
+  "status-small": {
+    tags: ["dot", "circle", "indicator", "state", "bullet", "health"],
+    categories: ["status"],
+    description: "A small dot that shows state in the colour of its context.",
+  },
   stop: {
     tags: [
       "square",
@@ -2098,6 +2118,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
       "filled",
     ],
     categories: ["action"],
+  },
+  "storage-bucket": {
+    tags: ["bucket", "pail", "object storage", "s3", "storage"],
+    categories: ["product"],
+    description: "A bucket that holds objects in object storage.",
+  },
+  "storage-pool": {
+    tags: ["pool", "disk", "drive", "cylinder", "storage", "capacity"],
+    categories: ["product"],
+    description: "A pool of storage that volumes and buckets are created in.",
+  },
+  "storage-volume": {
+    tags: ["volume", "disk", "drive", "cylinder", "storage", "block"],
+    categories: ["product"],
+    description: "A storage volume, such as a disk attached to an instance.",
   },
   success: {
     tags: [

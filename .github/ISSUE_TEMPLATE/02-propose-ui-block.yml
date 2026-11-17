@@ -1,0 +1,85 @@
+name: Propose a new UI block
+description: Pragma is missing a component or pattern your product needs.
+title: "New UI block: "
+labels:
+  - "Type: UI block"
+  - "Discipline: design"
+  - "Discipline: eng"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form when no existing component, pattern or layout covers the need.
+
+        - A block exists but lacks something: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+        - It exists in one product and others need it: [propose a tier move](https://github.com/canonical/pragma-web/issues/new?template=06-propose-tier-promotion.yml).
+
+        Title: the block's name, for example **New UI block: Date picker**. One block per issue.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of UI block
+      options:
+        - Component
+        - Pattern
+        - Layout
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: Lets users pick a single date or a range from a calendar.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem it solves
+      description: What users cannot do today, or do badly. A new block is assessed against the problem it solves.
+    validations:
+      required: true
+  - type: input
+    id: tiers
+    attributes:
+      label: Tiers it serves
+      description: Determines where the block lives and who maintains it. For example Global, Apps, Sites, Stores, or a product such as apps/lxd.
+      placeholder: Apps, Sites
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Where it will be used
+      description: Products, pages and scenarios. Used to assess how widely the block is needed and to inform its design.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing UI blocks you tried, and why they do not fit. Used to check whether an existing block can be extended instead.
+  - type: textarea
+    id: states
+    attributes:
+      label: States and responsive behaviour
+      description: For example open and closed, and how it adapts from small screens up.
+  - type: textarea
+    id: visual
+    attributes:
+      label: Designs or sketches (optional)
+      description: A design file, prototype, sketch or screenshot.
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to contribute this myself.
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue. If you offered to contribute, wait for a maintainer to confirm the approach.
