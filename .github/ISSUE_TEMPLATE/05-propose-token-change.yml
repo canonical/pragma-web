@@ -1,5 +1,5 @@
 name: Propose a design token change
-description: A colour, spacing, typography or other design token should be added or changed.
+description: The value of a colour, spacing, typography or other design token should change, or a new token is needed.
 labels:
   - "Type: tokens"
   - "Discipline: design"
@@ -8,7 +8,23 @@ body:
   - type: markdown
     attributes:
       value: |
-        Design tokens are defined in [canonical/pragma-core](https://github.com/canonical/pragma-core). A token change filed here is moved there once triaged.
+        ### Before you start
+
+        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
+        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
+        - Issues are public. Do not include confidential information.
+        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
+  - type: markdown
+    attributes:
+      value: |
+        ### Is this a token change?
+
+        Use this form when a token itself should change: its value, or a new token.
+
+        - A UI block uses the wrong token, or one that is missing or out of date: [report a bug](https://github.com/canonical/pragma-web/issues/new?template=01-report-bug.yml).
+        - A UI block should use a different existing token by design: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+
+        Design tokens are defined in [canonical/pragma-core](https://github.com/canonical/pragma-core). A token change filed here is moved there after triage.
   - type: dropdown
     id: kind
     attributes:
@@ -29,6 +45,7 @@ body:
     id: values
     attributes:
       label: Current and proposed values
+      description: Used to review the change, including contrast and consistency.
       placeholder: "color.border: #d9d9d9 → #cfcfcf"
     validations:
       required: true
@@ -36,15 +53,25 @@ body:
     id: reason
     attributes:
       label: Reason
+      description: Tokens are shared by every product, so the reason must apply to all of them.
     validations:
       required: true
   - type: textarea
     id: components
     attributes:
       label: Components affected
+      description: The components you know will change. Used to plan visual checks before release.
   - type: checkboxes
     id: contribution
     attributes:
       label: Contribution
       options:
-        - label: I'll do this myself.
+        - label: I'd like to contribute this myself.
+  - type: markdown
+    attributes:
+      value: |
+        ### What happens next
+
+        The Pragma team triages new issues, usually within a week. Triage may add labels, ask questions or move the issue to the correct repository. Updates are posted on this issue.
+
+        If you offered to contribute, a maintainer will confirm the approach before you start.

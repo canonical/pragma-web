@@ -1,5 +1,5 @@
 name: Report a bug
-description: Something in a component, stylesheet or package is broken, visually or in code.
+description: Something in Pragma is broken, looks wrong or does not work as expected.
 labels:
   - "Type: bug"
   - "Status: needs triage"
@@ -7,7 +7,22 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting. Search the [open issues](https://github.com/canonical/pragma-web/issues) first so the same bug is not tracked twice.
+        ### Before you start
+
+        - Search the [open issues](https://github.com/canonical/pragma-web/issues) first. If the issue already exists, add your information there.
+        - Components, styles, Storybook, applications and the documentation site are in this repository. The CLI, generators, design tokens and design-system models are in [canonical/pragma-core](https://github.com/canonical/pragma-core/issues/new/choose).
+        - Issues are public. Do not include confidential information.
+        - If no form fits, [raise something else](https://github.com/canonical/pragma-web/issues/new?template=10-raise-something-else.yml).
+  - type: markdown
+    attributes:
+      value: |
+        ### Is this a bug?
+
+        It is a bug when something does not match its design, its documentation or the design tokens. This includes a UI block using a token that is missing, renamed or out of date.
+
+        - It works as designed, but should do more or work differently: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+        - The documentation is wrong, but the component is correct: [propose a documentation change](https://github.com/canonical/pragma-web/issues/new?template=04-propose-docs-change.yml).
+        - You are not sure whether the problem is in Pragma or in your project: [ask for support](https://github.com/canonical/pragma-web/issues/new?template=08-ask-support.yml).
   - type: dropdown
     id: kind
     attributes:
@@ -19,57 +34,64 @@ body:
     validations:
       required: true
   - type: input
-    id: package
+    id: location
     attributes:
-      label: Package and version
-      placeholder: "@canonical/react-ds-global 0.12.0"
+      label: Where you saw it
+      description: A link to the page, product, Storybook story or design file where the bug appears. Used to locate the bug without knowing which package it comes from.
+      placeholder: https://…
     validations:
       required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package and version (optional)
+      description: If known. Used to check whether the bug is already fixed in a later release. Leave empty if unsure.
+      placeholder: "@canonical/react-ds-global 0.12.0"
   - type: input
     id: component
     attributes:
       label: Component
       placeholder: Button
   - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should happen, or what it should look like. Used to distinguish a bug from intended behaviour.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
     id: steps
     attributes:
       label: Steps to reproduce
+      description: Used to reproduce the bug and to verify the fix. If the bug is in the code rather than in use (for example a stylesheet referencing a token that does not exist), point at the file or line instead.
       placeholder: |
         1. Render …
         2. Click …
-    validations:
-      required: true
   - type: textarea
-    id: expected-actual
+    id: references
     attributes:
-      label: Expected and actual behaviour
-      description: For a design bug, link the Figma frame that shows the expected result.
-    validations:
-      required: true
-  - type: textarea
-    id: evidence
-    attributes:
-      label: Screenshots or reproduction
-      description: Drag screenshots here, or link a reproduction (CodeSandbox, StackBlitz, a branch).
+      label: References (optional)
+      description: For example screenshots, a design file, a documentation page, a working example or a reproduction (CodeSandbox, StackBlitz, a branch).
   - type: input
     id: environment
     attributes:
       label: Browser and viewport
       placeholder: Firefox 140, 375×812
-  - type: dropdown
-    id: severity
-    attributes:
-      label: Severity
-      options:
-        - Low (cosmetic, has a workaround)
-        - Medium (degrades a feature)
-        - High (blocks a feature or release)
-        - Critical (breaks production)
-    validations:
-      required: true
   - type: checkboxes
     id: a11y
     attributes:
       label: Accessibility
       options:
         - label: This bug affects accessibility.
+  - type: markdown
+    attributes:
+      value: |
+        ### What happens next
+
+        The Pragma team triages new issues, usually within a week. Triage may add labels, ask questions or move the issue to the correct repository. Updates are posted on this issue.
