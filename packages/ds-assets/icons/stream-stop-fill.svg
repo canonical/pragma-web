@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="stream-stop-fill">
+    <path d="M8 1C9.8563 1 11.6366 1.73734 12.9492 3.0498C14.262 4.36256 15 6.14348 15 8C15 9.85652 14.262 11.6365 12.9492 12.9492C11.6365 14.262 9.85652 15 8 15C6.14348 15 4.36256 14.262 3.0498 12.9492C1.73734 11.6366 1 9.8563 1 8C1 6.14348 1.73705 4.36256 3.0498 3.0498C4.36256 1.73705 6.14348 1 8 1ZM5 5V11H11V5H5Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/>
+  </g>
+</svg>
