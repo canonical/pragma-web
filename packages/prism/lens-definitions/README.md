@@ -212,11 +212,18 @@ server, deterministically: two renders of a page give the same SVG.
   the namespace drawn class by class and packed first, the others as
   boxes. Its heading is the way back to the overview at rest, and says so
   after its count ("· all namespaces"), keeping the address's other view
-  keys. A term page of a class inside a box opens
-  that namespace too. Every view opens by one rule: the whole map where it
+  keys. Every view opens by one rule: the whole map where it
   fits the canvas with every label at 12px or more on screen (a zoom of
   12/14), otherwise the map's top-left corner at that zoom; a term page
   frames its class instead.
+- **A term page.** A class's page draws its neighbourhood one hop deep,
+  whatever namespaces it crosses: the class, its superclass, its
+  subclasses and every class one object property away in either
+  direction, with a stub for a range no loaded ontology holds, banded by
+  namespace and held to the node budget (a class with more neighbours
+  than the budget keeps those joined to it by the most relations). The
+  rail still lists every class in the map's order, and a phone lists the
+  neighbourhood's classes as rows in that order.
 - **Its task.** The drawing states the task it serves, for tests and
   audits: `data-task="shape"` with the namespaces it draws for in
   `data-set` (every drawn namespace at rest, the opened one in an opened
@@ -244,9 +251,7 @@ server, deterministically: two renders of a page give the same SVG.
   each time it draws one more namespace as a box, so thirty namespaces
   take thirty layouts (about 0.7s on a developer's machine).
 
-Not in this package yet: the term page's neighbourhood across namespaces
-(the classes of other namespaces a class relates to, drawn around it);
-the counts as links to the rows they count; the inspector's count line
+Not in this package yet: the counts as links to the rows they count; the inspector's count line
 with nothing selected; and the list of the relations the graph observes
 that no ontology declares.
 
