@@ -11,7 +11,7 @@ describe("every public name is experimental", () => {
     expect(listUnmarked("src/lib/index.ts")).toEqual([]);
   });
 
-  it.fails("tags every name ./bindings exports", () => {
+  it("tags every name ./bindings exports", () => {
     expect(listUnmarked("src/lib/bindings/index.ts")).toEqual([]);
   });
 
