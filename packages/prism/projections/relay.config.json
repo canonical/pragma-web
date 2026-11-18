@@ -4,9 +4,15 @@
   "language": "typescript",
   "eagerEsModules": true,
   "artifactDirectory": "./src/__generated__",
-  "excludes": ["**/node_modules/**", "**/__generated__/**"],
+  "excludes": [
+    "**/node_modules/**",
+    "**/__generated__/**"
+  ],
   "schemaConfig": {
     "nodeInterfaceIdField": "uri",
     "nodeInterfaceIdVariableName": "id"
-  }
+  },
+  "schemaExtensions": [
+    "./schema"
+  ]
 }
