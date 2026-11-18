@@ -13,12 +13,13 @@ const componentCssClassName = "ds count-line";
  * with none. It is a polite live region, so a change the filters make is
  * announced.
  *
- * A count whose noun carries a second clause ("components loaded so far")
- * takes `shortKind`, the noun alone: the line then holds both forms and
- * shows the short one below two groups, where the strip folds, and the
- * full one at two groups and wider; the full sentence is its accessible
- * name at every width. The server renders one HTML for every width: the
- * stylesheet chooses.
+ * A count has a short form, the shown figure and its noun alone ("26
+ * entries" where the full form reads "26 of 26 entries", "100 components"
+ * where it reads "100 components loaded so far"). When it differs from the
+ * full sentence, the line holds both forms and shows the short one below
+ * two groups, where the strip folds, and the full one at two groups and
+ * wider; the full sentence is its accessible name at every width. The
+ * server renders one HTML for every width: the stylesheet chooses.
  *
  * `import { CountLine } from "@canonical/prism-core";`
  *
@@ -33,17 +34,16 @@ export default function CountLine({
   ...props
 }: CountLineProps): ReactElement {
   const t = useMessages();
-  const write = (noun: string): string => {
-    const values = { shown: String(shown), kind: noun };
-    return total.kind === "unknown"
+  const values = { shown: String(shown), kind };
+  const text =
+    total.kind === "unknown"
       ? t("countLine.unknown", values)
       : t(total.kind === "exact" ? "countLine.exact" : "countLine.atLeast", {
           ...values,
           total: String(total.value),
         });
-  };
-  const text = write(kind);
-  const isShortened = shortKind !== undefined && shortKind !== kind;
+  const short = t("countLine.short", { ...values, kind: shortKind ?? kind });
+  const isShortened = short !== text;
   return (
     <output
       {...props}
@@ -54,7 +54,7 @@ export default function CountLine({
       {isShortened ? (
         <>
           <span className="full">{text}</span>
-          <span className="short">{write(shortKind)}</span>
+          <span className="short">{short}</span>
         </>
       ) : (
         text

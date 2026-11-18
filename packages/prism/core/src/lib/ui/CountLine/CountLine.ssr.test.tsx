@@ -15,5 +15,7 @@ describe("CountLine SSR", () => {
     );
     expect(html).toContain("ds count-line");
     expect(html).toContain("4 of 48 stations");
+    // One HTML for every width: both forms, the stylesheet choosing.
+    expect(html).toContain('<span class="short">4 stations</span>');
   });
 });

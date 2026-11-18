@@ -52,19 +52,38 @@ describe("CountLine", () => {
     expect(count.querySelector(".short")?.textContent).toBe("100 components");
   });
 
-  it("keeps one form when the short noun is the noun", () => {
+  it("shortens an exact count to the shown figure and its noun", () => {
     render(
       <CountLine
-        kind="standards"
-        shortKind="standards"
-        shown={100}
-        total={{ kind: "exact", value: 147 }}
+        kind="entries"
+        shown={26}
+        total={{ kind: "exact", value: 26 }}
       />,
     );
+    const count = screen.getByRole("status", { name: "26 of 26 entries" });
+    expect(count.querySelector(".full")?.textContent).toBe("26 of 26 entries");
+    expect(count.querySelector(".short")?.textContent).toBe("26 entries");
+  });
+
+  it("puts the short form's noun in the shown figure's number", () => {
+    render(
+      <CountLine
+        kind="entries"
+        shortKind="entry"
+        shown={1}
+        total={{ kind: "at-least", value: 26 }}
+      />,
+    );
+    const count = screen.getByRole("status", { name: "1 of 26+ entries" });
+    expect(count.querySelector(".short")?.textContent).toBe("1 entry");
+  });
+
+  it("keeps one form when the count is already the figure and its noun", () => {
+    render(<CountLine kind="lines" shown={3} total={{ kind: "unknown" }} />);
     const count = screen.getByRole("status");
     expect(count).not.toHaveAttribute("aria-label");
     expect(count.querySelector(".short")).toBeNull();
-    expect(count).toHaveTextContent("100 of 147 standards");
+    expect(count.textContent).toBe("3 lines");
   });
 
   it("announces a change politely", () => {

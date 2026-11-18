@@ -33,6 +33,7 @@ export const MESSAGES = {
   "countLine.exact": "{shown} of {total} {kind}",
   "countLine.atLeast": "{shown} of {total}+ {kind}",
   "countLine.unknown": "{shown} {kind}",
+  "countLine.short": "{shown} {kind}",
   "copyButton.copy": "Copy",
   "copyButton.copied": "Copied",
   "sourceView.size": "{bytes} bytes",

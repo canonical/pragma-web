@@ -20,10 +20,11 @@ type OwnProps = {
   /** The entries' noun, already in the number the count needs. */
   readonly kind: string;
   /**
-   * The noun alone, without the second clause `kind` carries
-   * ("components" where `kind` reads "components loaded so far"): the
-   * count's short form, shown below two groups. Without it, or equal to
-   * `kind`, the line has one form.
+   * The noun alone, in the number the shown figure needs and without any
+   * second clause `kind` carries ("components" where `kind` reads
+   * "components loaded so far"; "entry" for one shown of 26 entries): the
+   * noun of the count's short form, the shown figure and its noun, shown
+   * below two groups. Without it, `kind` is that noun.
    */
   readonly shortKind?: string;
 };

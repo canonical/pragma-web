@@ -479,9 +479,9 @@ site's own catalog, and the factory holds no reader-facing string.
   `ViewSearch`, `ViewSearchSchema`.
 - Links: `RouterLink`; types `RouterLinkProps`.
 - The strip and the filters: the strip itself (above), `RendererSwitch` (the
-  view group's links), `CountLine` (an index's count; given the noun without its second
-  clause, it shows that short form below two groups and the full one
-  wider, the full sentence its accessible name),
+  view group's links), `CountLine` (an index's count; below two groups it shows its short
+  form, the shown figure and its noun, and the full sentence wider, the
+  full sentence its accessible name at every width),
   `FilterBar`, `FilterPanel`,
   `FilterSheet`, `FilterFold`; types `RendererSwitchProps`, `Count`,
   `CountLineProps`, `FilterBarProps`, `FilterPanelProps`,

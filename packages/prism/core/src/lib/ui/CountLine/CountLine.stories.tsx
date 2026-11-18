@@ -33,7 +33,7 @@ export const Unknown: Story = {
 
 /**
  * A noun with a second clause: the full form at two groups and wider, the
- * short one below.
+ * short one, the figure and its noun, below.
  */
 export const Shortened: Story = {
   args: {
