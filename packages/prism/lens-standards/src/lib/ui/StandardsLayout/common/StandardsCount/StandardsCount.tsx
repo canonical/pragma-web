@@ -21,7 +21,9 @@ const componentCssClassName = "ds standards-count";
  * reads the index's own operation, with the variables the route warms the
  * store with, then the index's paginated fragment, so the standards a
  * "Load more" adds count too. The total is the class's instance count,
- * which the provider counts in full while the connection is paged.
+ * which the provider counts in full while the connection is paged. Below
+ * two groups it shows its short form, the shown figure and its noun ("100
+ * standards"), the full sentence staying its name.
  *
  * It takes the native props of the count line's `<output>` root and
  * spreads them onto it; a consumer `className` merges after its own.
@@ -54,6 +56,7 @@ export default function StandardsCount({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="standards-count"
       kind={t("index.kind", { count: total })}
+      shortKind={t("index.kind", { count: shown })}
       shown={shown}
       total={{ kind: "exact", value: total }}
     />
