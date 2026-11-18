@@ -348,13 +348,13 @@
       "name": "@canonical/lit-ds-prototype",
       "version": "0.47.0",
       "dependencies": {
-        "@canonical/storybook-config": "^0.47.0",
         "lit": "^3.3.2",
       },
       "devDependencies": {
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
         "@canonical/ds-types": "^0.47.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "@canonical/typescript-config-lit": "^0.47.0",
         "@canonical/webarchitect": "0.46.0",
@@ -478,7 +478,6 @@
         "@canonical/ds-utils": "^0.47.0",
         "@canonical/react-ds-global": "^0.47.0",
         "@canonical/react-hooks": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -491,6 +490,7 @@
         "@canonical/router-core": "^0.47.0",
         "@canonical/router-react": "^0.47.0",
         "@canonical/storybook-addon-utils": "^0.47.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -526,7 +526,6 @@
       "version": "0.47.0",
       "dependencies": {
         "@canonical/react-ds-global": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -535,6 +534,7 @@
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
         "@canonical/design-tokens": "0.46.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -562,7 +562,6 @@
       "version": "0.47.0",
       "dependencies": {
         "@canonical/react-ds-global": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -571,6 +570,7 @@
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
         "@canonical/design-tokens": "0.46.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -598,7 +598,6 @@
       "version": "0.47.0",
       "dependencies": {
         "@canonical/ds-utils": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "@js-temporal/polyfill": "^0.5.1",
         "highlight.js": "^11.11.1",
@@ -613,6 +612,7 @@
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
         "@canonical/design-tokens": "0.46.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -641,7 +641,6 @@
       "version": "0.47.0",
       "dependencies": {
         "@canonical/react-ds-global": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -650,6 +649,7 @@
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
         "@canonical/design-tokens": "0.46.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -677,7 +677,6 @@
       "version": "0.47.0",
       "dependencies": {
         "@canonical/react-ds-global": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -686,6 +685,7 @@
         "@biomejs/biome": "2.6.8",
         "@canonical/biome-config": "0.46.0",
         "@canonical/design-tokens": "0.46.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -715,7 +715,6 @@
         "@canonical/ds-assets": "^0.47.0",
         "@canonical/ds-utils": "^0.47.0",
         "@canonical/react-hooks": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -728,6 +727,7 @@
         "@canonical/router-core": "^0.47.0",
         "@canonical/router-react": "^0.47.0",
         "@canonical/storybook-addon-utils": "^0.47.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -756,7 +756,6 @@
       "dependencies": {
         "@canonical/ds-utils": "^0.47.0",
         "@canonical/react-ds-global": "^0.47.0",
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "@canonical/utils": "0.46.0",
         "downshift": "^9.3.2",
@@ -770,6 +769,7 @@
         "@canonical/design-tokens": "0.46.0",
         "@canonical/storybook-addon-form-state": "^0.47.0",
         "@canonical/storybook-addon-msw": "^0.47.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/storybook-helpers": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
@@ -999,7 +999,6 @@
       "name": "@canonical/react-tokens",
       "version": "0.47.0",
       "dependencies": {
-        "@canonical/storybook-config": "^0.47.0",
         "@canonical/styles": "^0.47.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -1009,6 +1008,7 @@
         "@canonical/biome-config": "0.46.0",
         "@canonical/design-tokens": "0.46.0",
         "@canonical/ds-types": "^0.47.0",
+        "@canonical/storybook-config": "^0.47.0",
         "@canonical/typescript-config-react": "^0.47.0",
         "@canonical/vitest-config-react": "^0.47.0",
         "@canonical/webarchitect": "0.46.0",
@@ -3927,8 +3927,6 @@
     "@canonical/biome-config/@biomejs/biome": ["@biomejs/biome@2.6.6", "", { "optionalDependencies": { "@biomejs/cli-android-arm64": "2.6.6", "@biomejs/cli-android-x64": "2.6.6", "@biomejs/cli-darwin-arm64": "2.6.6", "@biomejs/cli-darwin-x64": "2.6.6", "@biomejs/cli-linux-arm64": "2.6.6", "@biomejs/cli-linux-arm64-musl": "2.6.6", "@biomejs/cli-linux-x64": "2.6.6", "@biomejs/cli-linux-x64-musl": "2.6.6", "@biomejs/cli-win32-arm64": "2.6.6", "@biomejs/cli-win32-x64": "2.6.6" }, "bin": { "biome": "bin/biome" } }, "sha512-NCgVJRyrU1+hsW1ILNaRqNAb9fRL4n49bwyef+wjVJQ488/bXbp0BfnNqTTExkiNQT3ugkgYKR1vK8NxsjlNSQ=="],
 
     "@canonical/design-system/tinyglobby": ["tinyglobby@0.2.17", "", { "dependencies": { "fdir": "^6.5.0", "picomatch": "^4.0.4" } }, "sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g=="],
-
-    "@canonical/ke-graphql/graphql": ["graphql@17.1.0", "", {}, "sha512-JKCOa7rSQNrket/JFhuua86hljUO+IIpyUHfKxlKD6FEfbrLX8jc1FDrA0KPKI+s8OspBCF/5npYccAICHXPpQ=="],
 
     "@canonical/svelte-ds-app/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
