@@ -11,6 +11,7 @@
 
 export { DESIGN_CANVAS, MIN_FIT } from "../../src/lib/classGraph/constants.js";
 export { SERVED_GRAPH_QUERY } from "./constants.js";
+export { default as countServedNeighbourhood } from "./countServedNeighbourhood.js";
 export { default as fetchServedGraph } from "./fetchServedGraph.js";
 export { default as measureBridgeLabels } from "./measureBridgeLabels.js";
 export { default as measureCanvasSvg } from "./measureCanvasSvg.js";

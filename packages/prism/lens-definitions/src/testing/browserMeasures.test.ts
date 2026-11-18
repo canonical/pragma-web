@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import countServedNeighbourhood from "../../testing/browser/countServedNeighbourhood.js";
 import measureCanvasSvg from "../../testing/browser/measureCanvasSvg.js";
 import sliceCanvasSvg from "../../testing/browser/sliceCanvasSvg.js";
 import type { ServedGraph } from "../../testing/browser/types.js";
@@ -181,5 +182,59 @@ describe("measureCanvasSvg", () => {
     expect(measureCanvasSvg(svg).framingBridges).toEqual([
       `${framing} round ds`,
     ]);
+  });
+});
+
+describe("countServedNeighbourhood", () => {
+  it("counts a class, its superclass, its subclasses, its relations' other ends and its stubs once each", () => {
+    const graph: ServedGraph = {
+      ontologies: [
+        {
+          prefix: "aa",
+          namespace: "https://aa.example/",
+          classes: [
+            { uri: "https://aa.example/Root", superclass: null },
+            {
+              uri: "https://aa.example/A",
+              superclass: { uri: "https://aa.example/Root" },
+            },
+            {
+              uri: "https://aa.example/Sub",
+              superclass: { uri: "https://aa.example/A" },
+            },
+            { uri: "https://aa.example/Far" },
+          ],
+          properties: [
+            property("https://aa.example/p", "https://aa.example/A", "bb:B"),
+            property("https://aa.example/q", "https://aa.example/A", "bb:B"),
+            property(
+              "https://aa.example/r",
+              "https://aa.example/A",
+              "https://zz.example/Stub",
+            ),
+            property("https://aa.example/s", "https://aa.example/Far", "bb:B"),
+            property(
+              "https://aa.example/t",
+              "https://aa.example/A",
+              "aa:Far",
+              "DATA",
+            ),
+          ],
+        },
+        {
+          prefix: "bb",
+          namespace: "https://bb.example/",
+          classes: [{ uri: "https://bb.example/B" }],
+          properties: [
+            property("https://bb.example/u", "https://bb.example/B", "aa:A"),
+            property("https://bb.example/v", null, "aa:A"),
+          ],
+        },
+      ],
+      classEdges: [],
+    };
+    // A, Root, Sub, bb:B and the stub; not Far, which a datatype
+    // property and a relation of B's reach.
+    expect(countServedNeighbourhood(graph, "https://aa.example/A")).toBe(5);
   });
 });

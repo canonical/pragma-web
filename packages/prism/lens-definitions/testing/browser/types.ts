@@ -73,7 +73,11 @@ export interface ServedGraph {
   readonly ontologies: readonly {
     readonly prefix: string;
     readonly namespace: string;
-    readonly classes: readonly { readonly uri: string }[];
+    readonly classes: readonly {
+      readonly uri: string;
+      /** The class's superclass, when the check asks it. */
+      readonly superclass?: { readonly uri: string } | null;
+    }[];
     readonly properties: readonly ServedProperty[];
   }[];
   readonly classEdges: readonly {
