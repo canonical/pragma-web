@@ -224,3 +224,60 @@ export interface ListFields {
   readonly fields: readonly ListField[];
   readonly display: readonly DisplayField[];
 }
+
+/** One value read for a node's field: its shown text and, for an entity, its IRI. */
+export interface ReadValue {
+  readonly text: string;
+  readonly uri: string | null;
+}
+
+/** A node's value for one list field, as `Node.values` serves it. */
+export interface NodeValue {
+  /** The field's served name. */
+  readonly field: string;
+  /** The field's label, which a table's header reads. */
+  readonly label: string;
+  /** The values' texts joined, or null when the node has none. */
+  readonly text: string | null;
+  /** The IRI of the value when it is exactly one entity, else null. */
+  readonly uri: string | null;
+}
+
+/** One node of a faceted set: its IRI and the values read for each field id. */
+export interface FacetRow {
+  readonly uri: string;
+  readonly values: Readonly<Record<string, readonly ReadValue[]>>;
+}
+
+/** Keeps the nodes holding one of `values` for `field`; `null` stands for no value. */
+export interface FacetFilter {
+  readonly field: string;
+  readonly values: readonly (string | null)[];
+}
+
+/** Orders a set by one field's first value, the nodes without one last. */
+export interface FacetSort {
+  readonly field: string;
+  readonly descending?: boolean | null;
+}
+
+/** One bucket of a facet: a value (null for "none"), its text and its count. */
+export interface FacetValueCount {
+  readonly value: string | null;
+  readonly label: string | null;
+  readonly count: number;
+}
+
+/** A field's buckets, counted with every filter but the field's own. */
+export interface FacetCount {
+  readonly field: string;
+  readonly label: string;
+  readonly values: readonly FacetValueCount[];
+}
+
+/** The filtered, sorted set's IRIs, its size and its facets. */
+export interface FacetedSelection {
+  readonly uris: readonly string[];
+  readonly totalCount: number;
+  readonly facets: readonly FacetCount[];
+}

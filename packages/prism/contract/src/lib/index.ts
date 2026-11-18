@@ -17,6 +17,12 @@ export type {
 export { weighClassEdges } from "./edges/index.js";
 export type {
   DisplayField,
+  FacetCount,
+  FacetedSelection,
+  FacetFilter,
+  FacetRow,
+  FacetSort,
+  FacetValueCount,
   LangLiterals,
   LensClass,
   LensField,
@@ -25,7 +31,9 @@ export type {
   ListField,
   ListFields,
   ListFieldType,
+  NodeValue,
   PropertyRole,
+  ReadValue,
   ResolvedClassLens,
   ResolvedFieldLens,
   ResolvedPropertyLens,
@@ -40,6 +48,9 @@ export {
   deriveListFields,
   HIDDEN_VISIBILITY,
   indexSiteLens,
+  KIND_FACET_FIELD,
+  readNodeValues,
+  selectFacetedInstances,
   selectLiteral,
 } from "./lens/index.js";
 export { listServedExtensions } from "./listServedExtensions.js";
@@ -56,3 +67,9 @@ export type {
   ProviderExtension,
   SatisfiesContractOptions,
 } from "./types.js";
+export type { FacetedInstancesArgs, RunQuery } from "./values/index.js";
+export {
+  LIST_EXTENSION_TYPES_SDL,
+  serveFacetedInstances,
+  serveNodeValues,
+} from "./values/index.js";

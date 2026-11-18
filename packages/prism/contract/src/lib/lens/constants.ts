@@ -2,7 +2,7 @@
  * Domain constants for the site lens.
  */
 
-import type { PropertyRole, TermVisibility } from "./types.js";
+import type { ListField, PropertyRole, TermVisibility } from "./types.js";
 
 /** The {@link LangLiterals} key that holds the untagged literal. */
 export const UNTAGGED = "";
@@ -56,3 +56,23 @@ export const UNLISTED_ROLES: ReadonlySet<PropertyRole> = new Set([
 
 /** The visibility that shows a field first. */
 export const PROMINENT_VISIBILITY: TermVisibility = "PROMINENT";
+
+/** What joins a field's values when a list shows them as one text. */
+export const VALUE_SEPARATOR = ", ";
+
+/**
+ * The facet every faceted list may carry beside its lens's fields: the
+ * node's own class, its values the class IRIs. A list of one class with
+ * subclasses (stations and interchanges) is split by it.
+ */
+export const KIND_FACET_FIELD: ListField = {
+  id: "kind",
+  property: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+  type: "choices",
+  label: "Kind",
+  group: null,
+  role: null,
+  prominent: false,
+  enableSorting: false,
+  facetable: true,
+};
