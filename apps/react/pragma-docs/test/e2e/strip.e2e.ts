@@ -4,8 +4,9 @@
  * The docs' strip in the browser, at each side of the two-group threshold:
  * one 53px band on every page, nothing in it overflowing, no group painted
  * over another, the count shortened only once the trail has given way and
- * no crumb reading as an address, a count with a second clause whole in
- * its short form at 390 and in its full one at 1440, the count ending on
+ * no crumb reading as an address, the count whole in its short form, the
+ * shown figure and its noun, at 390 and in its full one at 1440, the count
+ * ending on
  * the band's last
  * line at 1440 and 1366, the facet bar one band of the strip's height on the
  * Definitions lens, its controls inside the band, and absent below two
@@ -93,6 +94,25 @@ function readStripCount(): {
     shown: count?.innerText.trim() ?? "",
   };
 }
+
+/** A count's short form: the shown figure and its noun, nothing more. */
+const SHORT_FORM_PATTERN = /^(\d+) (\p{L}+)$/u;
+
+/**
+ * Expect the count to show its short form, the shown figure and its noun,
+ * under a full sentence that names it with the same figure and noun.
+ */
+const expectShortForm = (
+  name: string | null,
+  shown: string,
+  path: string,
+): void => {
+  const [, figure, noun] = SHORT_FORM_PATTERN.exec(shown) ?? [];
+  expect(figure, `${path}: "${shown}"`).toBeDefined();
+  expect(name?.startsWith(`${figure} `), path).toBe(true);
+  expect(noun !== undefined && name?.includes(noun), path).toBe(true);
+  expect(shown.length, path).toBeLessThan(name?.length ?? 0);
+};
 
 let server: RunningServer;
 let browser: Browser;
@@ -220,11 +240,11 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
     },
   );
 
-  // A count whose sentence has a second clause shows its short form below
-  // two groups, whole, and its full sentence wider; the full sentence names
-  // it at every width.
+  // A count shows its short form below two groups, the shown figure and its
+  // noun, whole, and its full sentence wider; the full sentence names it at
+  // every width.
   it.runIf(viewport.width === 390 || viewport.width === 1440)(
-    "shows the count whole, its short form at 390 and its full one at 1440",
+    "shows the count whole, its figure and noun at 390 and its sentence at 1440",
     async () => {
       for (const path of COUNTED_PATHS) {
         const page = await open(path);
@@ -234,8 +254,7 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
           expect(strip.countClipped, path).toBe(false);
           expect(name, path).not.toBeNull();
           if (viewport.width === 390) {
-            expect(name?.startsWith(shown), path).toBe(true);
-            expect(shown.length, path).toBeLessThan(name?.length ?? 0);
+            expectShortForm(name, shown, path);
           } else {
             expect(shown, path).toBe(name);
           }
