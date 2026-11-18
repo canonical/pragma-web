@@ -377,6 +377,11 @@ export interface ClassGraphLayout {
    * opening frames its region, not the whole graph.
    */
   readonly drilled?: string;
+  /**
+   * The IRI of the class whose one-hop neighbourhood the layout draws, on a
+   * term page; absent on the overview and an opened view.
+   */
+  readonly focus?: string;
   /** The zoom at which the viewBox fits the design canvas. */
   readonly fitZoom: number;
   /** The channel the packer settled on. */
@@ -451,6 +456,13 @@ export interface ClassGraphLayoutOptions {
    * view is not held to the overview's fit.
    */
   readonly drill?: string;
+  /**
+   * The IRI of the class a term page focuses, within a budget: the view
+   * draws its one-hop neighbourhood (`gatherNeighbourhoodInput`) and not
+   * the overview, and `drill` goes unread. A focus that is no class of the
+   * input draws as though none were given.
+   */
+  readonly focus?: string;
 }
 
 /** A packing of regions into shelves. */

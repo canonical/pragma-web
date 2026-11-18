@@ -34,19 +34,19 @@ describe("DefinitionsExplorer", {
     for (const prefix of ["ds", "cs", "anatomy"]) {
       expect(screen.getByRole("region", { name: prefix })).toBeInTheDocument();
     }
-    // At rest ds is one box; its class's page drills into it: ds's 20
-    // classes, anatomy and cs as a box each, and the two stubs.
+    // At rest ds is one box; its class's page draws the class's one-hop
+    // neighbourhood: 14 classes, no box and no stub.
     expect(
       container.querySelectorAll('.desktop .node[data-kind="region"]'),
-    ).toHaveLength(2);
+    ).toHaveLength(0);
     expect(
       container.querySelectorAll(
         '.desktop .node:not([data-kind="stub"]):not([data-kind="region"])',
       ),
-    ).toHaveLength(20);
+    ).toHaveLength(14);
     expect(
       container.querySelectorAll('.desktop .node[data-kind="stub"]'),
-    ).toHaveLength(2);
+    ).toHaveLength(0);
     const current = screen
       .getAllByRole("link", { current: "page" })
       .map((link) => link.getAttribute("href"));
@@ -104,21 +104,25 @@ describe("DefinitionsExplorer", {
   });
 
   it("draws every class of a fragment whose superclass chain loops", () => {
-    const { container } = render(
-      // ds's own term page, which draws ds class by class.
-      createDefinitionsPage(
-        UIBLOCK_TERM,
+    const countDrawn = (records: typeof definitionsExplorerRecords): number => {
+      const { container, unmount } = render(
+        createDefinitionsPage(UIBLOCK_TERM, records, createFetchSpy()),
+      );
+      const drawn = container.querySelectorAll(
+        '.desktop .node:not([data-kind="stub"])',
+      ).length;
+      unmount();
+      return drawn;
+    };
+    expect(
+      countDrawn(
         patchRecords(definitionsExplorerRecords, {
           "client:root:ontologies:0:classes:1:superclass": {
             uri: "https://ds.canonical.com/ConceptType",
           },
         }),
-        createFetchSpy(),
       ),
-    );
-    expect(
-      container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
-    ).toHaveLength(22);
+    ).toBe(countDrawn(definitionsExplorerRecords));
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
@@ -182,9 +186,9 @@ describe("DefinitionsExplorer", {
       container.querySelector('.phone .row[data-kind="region"]')?.textContent,
     ).toContain("20 classes");
   });
-  it("drills a term page of a class inside a collapsed namespace into it: the class drawn, focused and the tab stop", () => {
-    // Within 20 nodes ds collapses at rest; its class's page draws ds
-    // class by class and the other namespaces as one box each.
+  it("draws a term page of a class inside a collapsed namespace: the class drawn, focused and the tab stop", () => {
+    // Within 20 nodes ds collapses at rest; its class's page draws the
+    // class's neighbourhood, which holds no box.
     const { container } = render(
       <GraphBudgetProvider budget={createGraphBudget({ drawnNodesMax: 20 })}>
         {createDefinitionsPage(
@@ -195,12 +199,9 @@ describe("DefinitionsExplorer", {
       </GraphBudgetProvider>,
     );
     const desktop = container.querySelector(".desktop");
-    expect(
-      [...(desktop?.querySelectorAll('.node[data-kind="region"]') ?? [])].map(
-        (node) => node.getAttribute("data-id"),
-      ),
-    ).toEqual(expect.arrayContaining(["anatomy", "cs"]));
-    expect(desktop?.querySelector('.node[data-id="ds"]')).toBeNull();
+    expect(desktop?.querySelectorAll('.node[data-kind="region"]')).toHaveLength(
+      0,
+    );
     const block = desktop?.querySelector('.node[data-id="ds:UIBlock"]');
     expect(block).not.toBeNull();
     expect(block?.classList.contains("is-faded")).toBe(false);
@@ -212,9 +213,9 @@ describe("DefinitionsExplorer", {
     );
   });
 
-  it("splits a band fuller than the budget's on a term page that drills into its namespace", () => {
-    // Within 20 nodes ds collapses at rest; its class's page draws ds's 20
-    // classes, whose fullest layer the band of 4 splits.
+  it("splits a band fuller than the budget's on a term page's neighbourhood", () => {
+    // Within 20 nodes ds collapses at rest; its class's page draws its 14
+    // neighbours, whose fullest layer the band of 4 splits.
     const countBand = (band: number): number => {
       const { container, unmount } = render(
         <GraphBudgetProvider

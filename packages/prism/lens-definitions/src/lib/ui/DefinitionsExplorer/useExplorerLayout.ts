@@ -2,7 +2,6 @@ import { useGraphBudget } from "@canonical/prism-core";
 import { useMemo } from "react";
 import type { DefinitionsExplorer_ontologies$data } from "../../../__generated__/DefinitionsExplorer_ontologies.graphql.js";
 import chooseAddressDrill from "../../classGraph/chooseAddressDrill.js";
-import chooseSelectionDrill from "../../classGraph/chooseSelectionDrill.js";
 import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import type {
   ClassEdgeInput,
@@ -13,17 +12,19 @@ import buildClassGraphInput from "./buildClassGraphInput.js";
 
 /**
  * Lay the explorer's class graph out within the site's graph budget, the
- * same on the server and in the browser: the overview at rest; the
- * namespace the address's `expand=` names drilled into; or, on a term page
- * of a class the overview draws inside a collapsed namespace's box, that
- * namespace drilled into, so the class is drawn. A term page ignores
- * `expand=`, and a prefix naming no namespace draws the overview at rest.
+ * same on the server and in the browser. The map is the overview at rest,
+ * or the namespace the address's `expand=` names drilled into; a term
+ * page ignores `expand=`, and a prefix naming no namespace draws the
+ * overview at rest. The canvas draws the map, or, on the term page of a
+ * class, that class's one-hop neighbourhood across namespaces; the rail
+ * keeps the map's order.
  *
  * @param ontologies - The explorer's fragment data.
  * @param edges - The class edges the store holds.
  * @param term - The selected term, compact, if any.
  * @param expand - The address's `expand=` parameter, if any.
- * @returns The layout and each class's compact term, by IRI.
+ * @returns The canvas's layout, the rail's, and each class's compact
+ *   term, by IRI.
  * @note Impure: reads the graph budget from its provider.
  */
 export default function useExplorerLayout(
@@ -33,6 +34,7 @@ export default function useExplorerLayout(
   expand?: string,
 ): {
   readonly layout: ClassGraphLayout;
+  readonly rail: ClassGraphLayout;
   readonly terms: ReadonlyMap<string, string>;
 } {
   // The site's budget, from its provider: never the URL nor a setting.
@@ -61,13 +63,18 @@ export default function useExplorerLayout(
     term === undefined
       ? undefined
       : [...terms].find(([, compact]) => compact === term)?.[0];
-  const drill =
-    chooseAddressDrill(input, expand, term) ??
-    chooseSelectionDrill(input, rest, selected);
-  const layout = useMemo(
+  const drill = chooseAddressDrill(input, expand, term);
+  const rail = useMemo(
     () =>
       drill === undefined ? rest : layOutClassGraph(input, { budget, drill }),
     [budget, drill, input, rest],
   );
-  return { layout, terms };
+  const layout = useMemo(
+    () =>
+      selected === undefined
+        ? rail
+        : layOutClassGraph(input, { budget, focus: selected }),
+    [budget, input, rail, selected],
+  );
+  return { layout, rail, terms };
 }

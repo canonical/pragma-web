@@ -105,15 +105,16 @@ const componentCssClassName = "ds definitions-explorer";
 
 /**
  * The Definitions lens's page content: the term rail on the first two
- * columns and the class graph on the rest, both reading one layout of the
- * class graph, so the rail's order is the graph's. It runs the page's one
+ * columns and the class graph on the rest. The rail reads the map's
+ * layout, so its order is the map's, and the graph draws the map or, on a
+ * class's term page, that class's neighbourhood. It runs the page's one
  * operation with the variables the route's warm-up used, so the server's
  * store fulfils it, and lays the graph out once, the same on both sides,
  * within the site's graph budget (see `useExplorerLayout`): the largest
  * namespaces collapse to one box each while the overview would draw more
  * nodes than it allows or would not open whole; the address's `expand=`
- * (core's view parameter) drills into the namespace it names, and a term
- * page of a class inside a box drills into its namespace.
+ * (core's view parameter) drills into the namespace it names, and a
+ * class's term page draws the classes one hop from it, across namespaces.
  *
  * It owns the hover centre the rail and the graph share, the term a
  * reader points at or focuses in either, client-only and empty at first
@@ -145,7 +146,7 @@ export default function DefinitionsExplorer({
     data.ontologies,
   );
   const expand = useSearchParam(VIEW_PARAMS.expand) ?? undefined;
-  const { layout, terms } = useExplorerLayout(
+  const { layout, rail, terms } = useExplorerLayout(
     graphData,
     data.classEdges,
     term,
@@ -175,7 +176,7 @@ export default function DefinitionsExplorer({
         className="explorer-rail"
         filter={filter}
         hoverCentre={hoverCentre}
-        layout={layout}
+        layout={rail}
         onHoverTerm={onHoverTerm}
         onSearchChange={setSearch}
         ontologies={data.ontologies}

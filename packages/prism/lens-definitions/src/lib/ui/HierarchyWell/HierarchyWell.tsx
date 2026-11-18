@@ -235,7 +235,12 @@ export default function HierarchyWell({
   // does: the canvas mounts anew on the new layout, framing the class then
   // selected as its arrival, the camera kept for the other view forgotten
   // before the new canvas reads it.
-  const drillKey = layout.drilled ?? "";
+  // A term page's drawing is its class's own: its camera is kept by that
+  // class, as an opened view's is by its namespace.
+  const drillKey =
+    layout.focus === undefined
+      ? (layout.drilled ?? "")
+      : `focus:${layout.focus}`;
   const [arrival, setArrival] = useState({ drill: drillKey, uri: selected });
   if (arrival.drill !== drillKey)
     setArrival({ drill: drillKey, uri: selected });

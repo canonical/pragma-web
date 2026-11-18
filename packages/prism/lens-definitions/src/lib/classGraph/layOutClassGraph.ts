@@ -40,6 +40,7 @@ import {
 } from "./constants.js";
 import frameOpeningWindow from "./frameOpeningWindow.js";
 import gatherDrawnInput from "./gatherDrawnInput.js";
+import gatherNeighbourhoodInput from "./gatherNeighbourhoodInput.js";
 import layOutPhoneView from "./layOutPhoneView.js";
 import listRegionBridges from "./listRegionBridges.js";
 import measureRegionHeading from "./measureRegionHeading.js";
@@ -945,7 +946,10 @@ function layOutModel(
  *   a namespace, it is packed first and drawn class by class, every other
  *   one as a box after it, whatever the fit. At rest and drilled, a layer of more classes than
  *   the budget's band splits into balanced consecutive columns. Without a
- *   budget, every class given is drawn, a layer as one column.
+ *   budget, every class given is drawn, a layer as one column. Given a
+ *   focus class within a budget, it draws that class's one-hop
+ *   neighbourhood across namespaces (see `gatherNeighbourhoodInput`), the
+ *   focus's namespace packed first, and no drill.
  * @returns The layout. Each class's column is graph-wide: its region's
  *   first column, counted over the regions in packing order, plus its
  *   column in the region.
@@ -954,7 +958,7 @@ export default function layOutClassGraph(
   input: ClassGraphInput | SpecimenGraphInput,
   options: ClassGraphLayoutOptions = {},
 ): ClassGraphLayout {
-  const { sweeps = SWEEPS, budget, drill } = options;
+  const { sweeps = SWEEPS, budget, drill, focus } = options;
   const whole = buildClassGraphModel(input);
   if (budget === undefined) return layOutModel(whole, whole, { sweeps });
   // Wherever a budget holds, at rest and drilled, no column holds more
@@ -967,6 +971,25 @@ export default function layOutClassGraph(
       engine,
       lead,
     );
+  // A term page draws its class's neighbourhood, its namespace packed
+  // first, whatever the fit.
+  if (focus !== undefined && whole.byId.has(focus)) {
+    const near = gatherNeighbourhoodInput(input, whole, focus, budget);
+    const layout = layOutModel(
+      buildClassGraphModel(
+        gatherDrawnInput(near.input, whole, near.scope),
+        whole,
+      ),
+      whole,
+      engine,
+      requireEntry(whole.byId, focus).prefix,
+    );
+    return {
+      ...layout,
+      focus,
+      findings: [...layout.findings, ...near.findings],
+    };
+  }
   // A drilled view is not held to the fit: the reader chose a part, packed
   // first, and it opens by the overview's rule from that part's corner.
   if (drill !== undefined) {
