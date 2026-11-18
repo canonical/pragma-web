@@ -16,7 +16,8 @@
  * canvas and its rail, and whose page's first element spans the whole main
  * column; a catalog whose cards fill their rows and stay inside the
  * canvas, a UI block's example with them, at 390, 600 and 1440px, each
- * card across the canvas's whole row at 390px; a canvas that starts one
+ * card across the canvas's whole row at 390px, and each card's summary
+ * cut at its third line at 1440 and 390px; a canvas that starts one
  * gutter under the strip, or at the viewport's top with no strip, its
  * page then starting one gutter down; bands,
  * the strip's and the colophon's, that run from the rail's border to the
@@ -52,8 +53,10 @@ import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   ADDED_FACTS,
+  CARD_SUMMARY_LINES,
   CATALOG_CARD_SELECTOR,
   CATALOG_CARD_WIDTHS,
+  CATALOG_SUMMARY_WIDTHS,
   CATALOG_PATH,
   CATALOG_ROW_SELECTOR,
   CATALOG_ROW_TITLE_COUNT,
@@ -399,6 +402,35 @@ function measureCatalogCards(selector: string): {
       };
     }),
   };
+}
+
+/**
+ * Read the summary of each of the catalog's cards: its height, its line's
+ * height, whether its text runs past its box and the line count its clamp
+ * names. It runs in the page.
+ *
+ * @param selector - The catalog's cards.
+ * @returns One measure per card that has a summary.
+ */
+function readCardSummaries(selector: string): readonly {
+  readonly text: string;
+  readonly height: number;
+  readonly lineHeight: number;
+  readonly cut: boolean;
+  readonly clamp: string;
+}[] {
+  return [...document.querySelectorAll(`${selector} .summary`)].map(
+    (summary) => {
+      const style = getComputedStyle(summary);
+      return {
+        text: (summary.textContent ?? "").slice(0, 24),
+        height: summary.getBoundingClientRect().height,
+        lineHeight: Number.parseFloat(style.lineHeight),
+        cut: summary.scrollHeight > summary.clientHeight,
+        clamp: style.getPropertyValue("-webkit-line-clamp"),
+      };
+    },
+  );
 }
 
 /**
@@ -976,6 +1008,31 @@ describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
       for (const section of card.sections) {
         expect(section).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
       }
+    }
+  });
+});
+
+// A card's summary ends at its third line, in an ellipsis, so the cards of
+// a row stay close in height and differ by their facts: the catalog's long
+// descriptions are cut, and no summary is taller than three lines.
+describe.each(CATALOG_SUMMARY_WIDTHS)("the catalog's cards at %i px", (width) => {
+  it("cut each summary at its third line", async () => {
+    const page = await openPage(CATALOG_PATH, { width, height: 844 });
+    try {
+      const summaries = await page.evaluate(
+        readCardSummaries,
+        CATALOG_CARD_SELECTOR,
+      );
+      expect(summaries.length).toBeGreaterThan(0);
+      expect(summaries.some(({ cut }) => cut)).toBe(true);
+      for (const { text, height, lineHeight, clamp } of summaries) {
+        expect(clamp, text).toBe(String(CARD_SUMMARY_LINES));
+        expect(height, text).toBeLessThanOrEqual(
+          CARD_SUMMARY_LINES * lineHeight + WIDTH_TOLERANCE_PX,
+        );
+      }
+    } finally {
+      await page.close();
     }
   });
 });

@@ -76,6 +76,16 @@ export const CATALOG_CARD_SELECTOR =
 export const CATALOG_CARD_WIDTHS = [390, 600, 1440] as const;
 
 /**
+ * The widths the catalog cards' summaries are read at: the desktop's,
+ * where a row holds several cards, and a phone's, where each card takes the
+ * whole row.
+ */
+export const CATALOG_SUMMARY_WIDTHS = [1440, 390] as const;
+
+/** The lines a card's summary shows at most, the last ending in an ellipsis. */
+export const CARD_SUMMARY_LINES = 3;
+
+/**
  * The widths below one group of the shell (448px) the catalog is measured
  * at: the canvas holds three columns there, and every card, with an example
  * or without, spans its whole row.
