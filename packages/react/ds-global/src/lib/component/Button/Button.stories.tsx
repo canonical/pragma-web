@@ -3,7 +3,7 @@ import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { Fragment } from "react";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import Component from "./Button.js";
 
@@ -60,6 +60,38 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     children: "Button",
+  },
+};
+
+/** Button text follows its local context, not the page's root font size. */
+export const TextContexts: Story = {
+  render: (args) => (
+    <>
+      <div className="app">
+        <Component {...args}>Save settings</Component>
+      </div>
+      <div className="site">
+        <Component {...args}>Contact sales</Component>
+      </div>
+      <div className="docs">
+        <Component {...args}>Copy example</Component>
+      </div>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    for (const [name, rem] of [
+      ["Save settings", 0.875],
+      ["Contact sales", 1],
+      ["Copy example", 0.875],
+    ] as const) {
+      const button = canvas.getByRole("button", { name });
+      const rootSize = getComputedStyle(
+        button.ownerDocument.documentElement,
+      ).fontSize;
+      await expect(getComputedStyle(button).fontSize).toBe(
+        `${rem * Number.parseFloat(rootSize)}px`,
+      );
+    }
   },
 };
 
