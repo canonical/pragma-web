@@ -164,12 +164,17 @@ export const DisabledMatrix: Story = {
 };
 
 /**
- * Link variant renders as inline text with underline.
+ * The link variant is still an action button. It underlines on hover or
+ * keyboard focus, not at rest.
  */
 export const LinkVariant: Story = {
   args: {
     children: "Learn more",
     variant: "link",
+  },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Learn more" });
+    await expect(getComputedStyle(button).textDecorationLine).toBe("none");
   },
 };
 

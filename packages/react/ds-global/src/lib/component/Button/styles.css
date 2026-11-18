@@ -237,12 +237,13 @@
     border-width: 0;
     padding-inline: 0;
     color: var(--color-text-link, currentColor);
-    text-decoration: underline;
     text-underline-offset: var(--tmp-dimension-underline-offset-link, 0.075em);
 
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled),
+    &:focus-visible {
       background-color: transparent;
       border-color: transparent;
+      text-decoration-line: underline;
       text-decoration-thickness: var(
         --tmp-dimension-decoration-thickness-link,
         1px
