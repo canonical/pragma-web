@@ -6,8 +6,9 @@
  * the same column lines across pages at two groups and wider, no group
  * painted over another, its count shortened only once the trail has given
  * way, no crumb reading as an address, the Definitions count whole in its
- * short form at 390 and in its full one at 1440, the count ending on the
- * band's last
+ * short form, the shown figure and its noun, at 390 and in its full one at
+ * 1440, the stations index's count whole beside the filter button at 448,
+ * the count ending on the band's last
  * line, the facet bar
  * one band of the strip's height only where a lens has facets, its
  * controls inside the band, a panel's count in the strip only below two
@@ -100,6 +101,25 @@ function readStripCount(): {
     shown: count?.innerText.trim() ?? "",
   };
 }
+
+/** A count's short form: the shown figure and its noun, nothing more. */
+const SHORT_FORM_PATTERN = /^(\d+) (\p{L}+)$/u;
+
+/**
+ * Expect the count to show its short form, the shown figure and its noun,
+ * under a full sentence that names it with the same figure and noun.
+ */
+const expectShortForm = (
+  name: string | null,
+  shown: string,
+  path: string,
+): void => {
+  const [, figure, noun] = SHORT_FORM_PATTERN.exec(shown) ?? [];
+  expect(figure, `${path}: "${shown}"`).toBeDefined();
+  expect(name?.startsWith(`${figure} `), path).toBe(true);
+  expect(noun !== undefined && name?.includes(noun), path).toBe(true);
+  expect(shown.length, path).toBeLessThan(name?.length ?? 0);
+};
 
 let server: RunningServer;
 let browser: Browser;
@@ -268,11 +288,11 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
     },
   );
 
-  // A count whose sentence has a second clause shows its short form below
-  // two groups, whole, and its full sentence wider; the full sentence names
-  // it at every width.
+  // A count shows its short form below two groups, the shown figure and its
+  // noun, whole, and its full sentence wider; the full sentence names it at
+  // every width.
   it.runIf(viewport.width === 390 || viewport.width === 1440)(
-    "shows the count whole, its short form at 390 and its full one at 1440",
+    "shows the count whole, its figure and noun at 390 and its sentence at 1440",
     async () => {
       for (const path of [WORKSPACE_PATH]) {
         const page = await open(path);
@@ -282,14 +302,37 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
           expect(strip.countClipped, path).toBe(false);
           expect(name, path).not.toBeNull();
           if (viewport.width === 390) {
-            expect(name?.startsWith(shown), path).toBe(true);
-            expect(shown.length, path).toBeLessThan(name?.length ?? 0);
+            expectShortForm(name, shown, path);
           } else {
             expect(shown, path).toBe(name);
           }
         } finally {
           await page.close();
         }
+      }
+    },
+  );
+
+  // At 448 the stations index's strip carries the filter button beside the
+  // count, which leaves the count about 76px: its short form fits whole.
+  it.runIf(viewport.width === 448)(
+    "shows the stations index's count whole beside the filter button",
+    async () => {
+      const page = await open("/stations");
+      try {
+        const strip = await page.evaluate(measureStrip);
+        const { name, shown } = await page.evaluate(readStripCount);
+        const hasFold = await page.evaluate(
+          () =>
+            document.querySelector('.ds.mode-strip [data-slot="fold"]') !==
+            null,
+        );
+        expect(hasFold).toBe(true);
+        expect(strip.countClipped).toBe(false);
+        expect(name).not.toBeNull();
+        expectShortForm(name, shown, "/stations");
+      } finally {
+        await page.close();
       }
     },
   );
