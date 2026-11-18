@@ -5,7 +5,9 @@
  * band of the same height on every page, its view and filtering groups on
  * the same column lines across pages at two groups and wider, no group
  * painted over another, its count shortened only once the trail has given
- * way, no crumb reading as an address, the count ending on the band's last
+ * way, no crumb reading as an address, the Definitions count whole in its
+ * short form at 390 and in its full one at 1440, the count ending on the
+ * band's last
  * line, the facet bar
  * one band of the strip's height only where a lens has facets, its
  * controls inside the band, a panel's count in the strip only below two
@@ -80,6 +82,25 @@ const COUNTED_PATHS = ["/stations", "/stations?q=cen"] as const;
 const SWITCHED_PATH = "/stations?q=cen";
 
 let graph: RunningServer;
+/**
+ * Read the strip's count: the full sentence that names it, and the text it
+ * shows. It runs in the page.
+ *
+ * @returns The count's name, `null` when it has one form, and its shown text.
+ */
+function readStripCount(): {
+  readonly name: string | null;
+  readonly shown: string;
+} {
+  const count = document.querySelector<HTMLElement>(
+    '.ds.mode-strip [data-slot="count"] [aria-live]',
+  );
+  return {
+    name: count?.getAttribute("aria-label") ?? null,
+    shown: count?.innerText.trim() ?? "",
+  };
+}
+
 let server: RunningServer;
 let browser: Browser;
 
@@ -243,6 +264,32 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
           path,
         ).toBeLessThanOrEqual(EDGE_TOLERANCE_PX);
         expect(strip.searchWidth, path).toBeGreaterThan(0);
+      }
+    },
+  );
+
+  // A count whose sentence has a second clause shows its short form below
+  // two groups, whole, and its full sentence wider; the full sentence names
+  // it at every width.
+  it.runIf(viewport.width === 390 || viewport.width === 1440)(
+    "shows the count whole, its short form at 390 and its full one at 1440",
+    async () => {
+      for (const path of [WORKSPACE_PATH]) {
+        const page = await open(path);
+        try {
+          const strip = await page.evaluate(measureStrip);
+          const { name, shown } = await page.evaluate(readStripCount);
+          expect(strip.countClipped, path).toBe(false);
+          expect(name, path).not.toBeNull();
+          if (viewport.width === 390) {
+            expect(name?.startsWith(shown), path).toBe(true);
+            expect(shown.length, path).toBeLessThan(name?.length ?? 0);
+          } else {
+            expect(shown, path).toBe(name);
+          }
+        } finally {
+          await page.close();
+        }
       }
     },
   );
