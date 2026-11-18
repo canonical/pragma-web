@@ -79,10 +79,11 @@ describe("the schema", () => {
     expect(provider.sdl).toContain("type Station implements Node");
   });
 
-  it("adds three root fields, prose, search and source, to the contract's six", () => {
+  it("adds four root fields, prose, search, source and facetedInstances, to the contract's six", () => {
     const query = provider.schema.getQueryType();
     expect(Object.keys(query?.getFields() ?? {}).sort()).toEqual([
       "classEdges",
+      "facetedInstances",
       "node",
       "ontologies",
       "ontology",
@@ -2642,5 +2643,25 @@ describe("Query.classEdges", () => {
       [`${M}unit`, `${M}UnitPosition`, `${M}Unit`, 1, true],
       [`${M}units`, `${M}Formation`, `${M}UnitPosition`, 1, true],
     ]);
+  });
+});
+
+describe("the list extensions", () => {
+  it("fail a node's values when the schema cannot read them", async () => {
+    const circleLine = "https://metro.example/onto#circle-line";
+    const custom = createExampleProvider({
+      ...exampleDataset,
+      entities: exampleDataset.entities.map((entity) =>
+        entity.uri === circleLine ? { ...entity, code: undefined } : entity,
+      ),
+    } as ExampleDataset);
+    const result = await graphql({
+      schema: custom.schema,
+      rootValue: custom.rootValue,
+      source: `{ node(id: "${circleLine}") { values(fields: ["code"]) { text } } }`,
+    });
+    expect(result.errors?.at(0)?.message).toBe(
+      "Cannot return null for non-nullable field Line.code.",
+    );
   });
 });
