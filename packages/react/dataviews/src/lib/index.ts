@@ -31,8 +31,27 @@ export {
   useDataViews,
   useDataViewsFilter,
 } from "./_work_in_progress/DataViews/index.js";
+export type {
+  FilterButtonCondition,
+  FilterButtonPanelHandle,
+  FilterButtonProps,
+} from "./_work_in_progress/FilterButton/index.js";
+export { FilterButton } from "./_work_in_progress/FilterButton/index.js";
 export type { PaginationBarProps } from "./_work_in_progress/PaginationBar/index.js";
 export { PaginationBar } from "./_work_in_progress/PaginationBar/index.js";
+export type {
+  QueryChipEntryProps,
+  QueryChipProps,
+  QueryChipSegmentProps,
+} from "./_work_in_progress/QueryChip/index.js";
+export { QueryChip } from "./_work_in_progress/QueryChip/index.js";
+export type { QueryChipsProps } from "./_work_in_progress/QueryChips/index.js";
+export { QueryChips } from "./_work_in_progress/QueryChips/index.js";
+export type {
+  QueryInputOption,
+  QueryInputProps,
+} from "./_work_in_progress/QueryInput/index.js";
+export { QueryInput } from "./_work_in_progress/QueryInput/index.js";
 export type {
   DisplayField,
   DisplayFieldCellProps,

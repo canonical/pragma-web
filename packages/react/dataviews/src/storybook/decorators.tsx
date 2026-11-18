@@ -4,6 +4,7 @@
  */
 
 import type { Decorator } from "@storybook/react-vite";
+import { renderToString } from "react-dom/server";
 
 /**
  * Render the story inside the `.app` scope, which the table and its bars
@@ -33,3 +34,21 @@ export const withScrollingFrame =
       <Story />
     </div>
   );
+
+/** Render the story in a right-to-left context. */
+export const withRightToLeft: Decorator = (Story) => (
+  <div dir="rtl">
+    <Story />
+  </div>
+);
+
+/**
+ * Render the markup a server sends for the story, which no script ever runs
+ * over: the story before hydration, or with scripts disabled.
+ */
+export const withServerMarkup: Decorator = (Story) => (
+  <div
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: the story's own server markup, rendered from its own element
+    dangerouslySetInnerHTML={{ __html: renderToString(<Story />) }}
+  />
+);

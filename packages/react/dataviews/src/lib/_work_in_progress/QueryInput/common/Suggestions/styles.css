@@ -1,0 +1,173 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * QueryInput's suggestions
+   * @implements ds:global_dataviews.subcomponent.query_input
+   *
+   * A manual popover in the top layer, at Surface2 above its host.
+   */
+  /* The listbox the focused entry controls, anchored to it, flipping above
+     it when there is no room below. */
+  .ds.query-input-suggestions {
+    /* The reference design's shadow; the system has no elevation token. */
+    --query-input-suggestions-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+    /* Ten option rows. */
+    --query-input-suggestions-max-block-size: 22.5rem;
+
+    flex-direction: column;
+    box-sizing: border-box;
+    min-inline-size: 13.75rem;
+    max-inline-size: 18.75rem;
+    margin: 0;
+    padding: var(--dimension-050);
+    /* Transparent, so forced colours, which drop the shadow, show it. */
+    border: var(--dimension-stroke-thickness-medium) solid transparent;
+    border-radius: var(--dimension-radius-small);
+    background-color: var(--surface-color-background, var(--color-background));
+    color: var(--surface-color-text, var(--color-text));
+    box-shadow: var(--query-input-suggestions-shadow);
+    font-family: var(--typography-text-secondary-font-family);
+    font-size: var(--typography-text-secondary-font-size);
+    line-height: var(--typography-text-secondary-line-height);
+
+    /* Without anchor positioning, script places it under the focused
+       entry; this clears the browser's centred placement. */
+    inset: auto;
+
+    &:popover-open {
+      display: flex;
+    }
+
+    & [role="listbox"] {
+      max-block-size: var(--query-input-suggestions-max-block-size);
+      margin: 0;
+      padding: 0;
+      overflow-block: auto;
+      overflow-y: auto;
+      list-style: none;
+    }
+
+    & .option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--dimension-150);
+      box-sizing: border-box;
+      /* The reference design's 36 px row. No symbol declares 36 px. */
+      min-block-size: 2.25rem;
+      padding-block: var(--dimension-050);
+      padding-inline: var(--dimension-100);
+      border-radius: var(--dimension-radius-small);
+      cursor: pointer;
+
+      /* The keyboard highlight takes the hover fill. The layer2 ghost step
+         stands in until a surface-routed hover channel exists. */
+      /* downshift highlights the option under the pointer, so the keyboard
+         and the pointer share one highlight. */
+      /* The fill alone is too faint to show what Enter, Tab or blur
+         commits, so the highlight also takes the focus ring, inset. */
+      &[aria-selected="true"] {
+        background-color: var(--color-foreground-ghost-layer2-hover);
+        outline: var(--dimension-stroke-thickness-large) solid
+          var(--color-focusRing);
+        outline-offset: calc(-1 * var(--dimension-stroke-thickness-large));
+      }
+
+      &[aria-disabled="true"] {
+        color: var(--color-text-disabled);
+        cursor: not-allowed;
+      }
+
+      &[data-current] {
+        color: var(--color-text);
+        font-weight: var(--typography-weight-bold);
+      }
+
+      /* The divider between consecutive options of different groups. */
+      &[data-group-start] {
+        margin-block-start: calc(
+          2 *
+          var(--dimension-050) +
+          var(--dimension-stroke-thickness-medium)
+        );
+
+        &::before {
+          position: absolute;
+          inset-inline: 0;
+          inset-block-start: calc(
+            -1 *
+            var(--dimension-050) -
+            var(--dimension-stroke-thickness-medium)
+          );
+          /* A border, which forced colours keep. */
+          border-block-start: var(--dimension-stroke-thickness-medium) solid
+            var(--color-border-muted);
+          content: "";
+        }
+      }
+    }
+
+    & .option-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    & .option-hint,
+    & .footer {
+      color: var(--color-text-muted);
+      font-size: var(--typography-text-tertiary-font-size);
+      line-height: var(--typography-text-tertiary-line-height);
+    }
+
+    & .empty {
+      padding-inline-start: var(--dimension-100);
+      color: var(--color-text-muted);
+    }
+
+    & .loading {
+      display: flex;
+      justify-content: center;
+      padding-block: var(--dimension-050);
+    }
+
+    & .footer {
+      margin-block-start: var(--dimension-050);
+      padding-block-start: var(--dimension-050);
+      padding-inline: var(--dimension-100);
+      border-block-start: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+    }
+  }
+
+  @supports (anchor-name: --a) {
+    .ds.query-input-suggestions {
+      inset: auto;
+      margin-block: var(--dimension-050);
+      position-area: block-end span-inline-end;
+      position-try-fallbacks: flip-block, flip-inline;
+    }
+  }
+
+  /* Forced colours replace fills and drop shadows: the highlight takes the
+     system's, unavailable options grey out and the list keeps an edge. */
+  @media (forced-colors: active) {
+    .ds.query-input-suggestions .option[aria-selected="true"],
+    .ds.query-input-suggestions .option[aria-selected="true"] .option-hint {
+      forced-color-adjust: none;
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    .ds.query-input-suggestions
+      .option[aria-disabled="true"]:not([data-current]) {
+      color: GrayText;
+    }
+
+    .ds.query-input-suggestions {
+      border-color: CanvasText;
+    }
+  }
+}
