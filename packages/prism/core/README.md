@@ -163,7 +163,10 @@ Every component folder carries an `anatomy.yaml` in the anatomy DSL, and
 its stylesheet transcribes it. The experimental `@canonical/prism-core/testing`
 subpath holds the checks the prism packages and apps run over their own
 components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
-`assertStylesheets` and `listAnatomyFolders`; and over their projections:
+`assertStylesheets` and `listAnatomyFolders` (a stylesheet binds only the
+keys its anatomy declares, save that a summary slot may cut its text at a
+number of lines with the line-clamp properties, which the DSL has no key
+for); and over their projections:
 `expectSlotOrder` (an identity's slots in the shared order, its required
 slots present) and `expectSwitchCoverage` (a switch over a node's typename
 names one case per type condition of its compiled fragment, and renders

@@ -7,6 +7,8 @@ type OwnProps = {
   readonly label: string;
   /** Where the link leads; without one the box holds no link. */
   readonly href?: string;
+  /** A paragraph about the box, cut after its third line. */
+  readonly summary?: string;
   /** Whether the mark is muted. */
   readonly muted?: boolean;
 };

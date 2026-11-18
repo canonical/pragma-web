@@ -79,6 +79,21 @@ describe("the component checks", () => {
     });
   });
 
+  describe("on a summary cut after its third line", () => {
+    it("admits the line clamp the roster has no key for", () => {
+      const folder = locate(CONFORMING, "Probe");
+      const specification = assertAnatomy(folder);
+      expect(
+        specification.root.edges?.some(
+          ({ relation }) => relation.slotName === "summary",
+        ),
+      ).toBe(true);
+      expect(() =>
+        assertStylesMatchAnatomy(folder, specification),
+      ).not.toThrow();
+    });
+  });
+
   describe("on a component the next generator release scaffolds", () => {
     const folder = locate(CONFORMING, "ScaffoldedProbe");
 
@@ -325,6 +340,13 @@ describe("the component checks", () => {
       expect(() =>
         assertStylesMatchAnatomy(folder, assertAnatomy(folder)),
       ).toThrow(/\.label: a reflow re-values appearance\.border\.color/);
+    });
+
+    it("refuses a line clamp on a slot that is no summary", () => {
+      const folder = locate(DRIFTED, "StyleDrift");
+      expect(() =>
+        assertStylesMatchAnatomy(folder, assertAnatomy(folder)),
+      ).toThrow(/\.label: -webkit-line-clamp binds no style key/);
     });
 
     it("refuses a child chain that leaves the anatomy's path to its slot", () => {

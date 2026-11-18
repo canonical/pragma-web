@@ -9,6 +9,8 @@ import {
 } from "@canonical/anatomy-dsl";
 import {
   CAMEL_LIFTS,
+  LINE_CLAMP_PROPERTIES,
+  LINE_CLAMP_SLOTS,
   LINK_QUALIFIERS,
   MODIFIER_ROLE,
   PROPERTY_KEYS,
@@ -364,7 +366,9 @@ function listChannels(folder: string, prefix: string): string[] {
  * and its terminal literal. Rules under `@container`, and rules that re-flow
  * the root through `:has()` or `:not()`, are reflow: each must style a slot that exists
  * and may only re-value placement, size, spacing, visibility and border
- * width (`REFLOW_KEY_FAMILIES`). Rules under
+ * width (`REFLOW_KEY_FAMILIES`). A summary slot may also cut its text
+ * at a number of lines (`LINE_CLAMP_PROPERTIES`, on `LINE_CLAMP_SLOTS`),
+ * which no key binds. Rules under
  * `@media` (the exempt feature queries) and the `:root` block are left to
  * `assertStylesheets`.
  *
@@ -436,6 +440,12 @@ export default function assertStylesMatchAnatomy(
             continue;
           }
           if (UNKEYED_PROPERTIES.includes(property)) continue;
+          if (
+            LINE_CLAMP_PROPERTIES.includes(property) &&
+            LINE_CLAMP_SLOTS.includes(target.slot)
+          ) {
+            continue;
+          }
           const keys = PROPERTY_KEYS[property];
           if (keys === undefined) {
             problems.push(`${place}: ${property} binds no style key`);

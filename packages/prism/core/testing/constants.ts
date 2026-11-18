@@ -245,6 +245,25 @@ export const UNKEYED_PROPERTIES: readonly string[] = [
 ];
 
 /**
+ * The properties that cut a block of text after a number of lines and end
+ * it in an ellipsis, which the DSL's roster has no key for: the line count
+ * and the box orientation the clamp needs. The box itself is the
+ * `-webkit-box` its slot's `layout.type` binds.
+ */
+export const LINE_CLAMP_PROPERTIES: readonly string[] = [
+  "-webkit-box-orient",
+  "-webkit-line-clamp",
+  "line-clamp",
+];
+
+/**
+ * The slots that may clamp their text at a number of lines: a summary,
+ * which a card or a row cuts so that entities in a set stay one height.
+ * Every other slot binds only what its keys say.
+ */
+export const LINE_CLAMP_SLOTS: readonly string[] = ["summary"];
+
+/**
  * The literals a rule may hold outside a component token, because none is a
  * design decision: filling the containing block, the grid's free space, a
  * circle's half-box radius, and the viewport's height. A zero, with or
