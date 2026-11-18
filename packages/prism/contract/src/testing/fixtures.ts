@@ -1,5 +1,5 @@
 /**
- * Static fixtures for the site lens and class-edge tests.
+ * Static fixtures for the site lens, list-field and class-edge tests.
  *
  * The outline is a small hierarchy with a diamond: `Hub` is both an `Agent`
  * and a `Place`, which declare disagreeing lens facts at the same distance.
@@ -10,7 +10,11 @@ import type {
   ClassEdgeDeclaration,
   ClassEdgeObservation,
 } from "../lib/edges/types.js";
-import type { SiteLens, TBoxOutline } from "../lib/lens/types.js";
+import type {
+  ServedClassField,
+  SiteLens,
+  TBoxOutline,
+} from "../lib/lens/types.js";
 
 /** The fixtures' namespace. */
 export const EX = "http://example.org/";
@@ -141,4 +145,100 @@ export const EDGE_OBSERVATIONS: readonly ClassEdgeObservation[] = [
     objectClass: `${EX}Thing`,
     count: 5,
   },
+];
+
+/** The XML Schema namespace, for the served fields' ranges. */
+const XSD = "http://www.w3.org/2001/XMLSchema#";
+
+/** A served field with no lens, a singular text literal named `name`. */
+const servedField = (
+  name: string,
+  overrides: Partial<ServedClassField> = {},
+): ServedClassField => ({
+  name,
+  property: {
+    uri: `${EX}${name}`,
+    label: null,
+    kind: "DATATYPE",
+    range: `${XSD}string`,
+  },
+  singular: true,
+  group: null,
+  order: null,
+  role: null,
+  visibility: null,
+  ...overrides,
+});
+
+/** The overview group, first among a class's groups. */
+const OVERVIEW = { uri: `${EX}overview`, label: "Overview", order: 1 };
+/** The service group, second. */
+const SERVICE = { uri: `${EX}service`, label: "Service", order: 2 };
+
+/**
+ * A station's served fields, in no particular order: a label, a hidden
+ * field, a number, a flag, a date, an annotation, an entity field and two
+ * unordered fields that only their names order.
+ */
+export const SERVED_STATION_FIELDS: readonly ServedClassField[] = [
+  servedField("servesLine", {
+    property: {
+      uri: `${EX}servesLine`,
+      label: "line",
+      kind: "OBJECT",
+      range: `${EX}Line`,
+    },
+    singular: false,
+    group: SERVICE,
+    order: 1,
+    visibility: "PROMINENT",
+  }),
+  servedField("zone", {
+    property: {
+      uri: `${EX}zone`,
+      label: "zone",
+      kind: "OBJECT",
+      range: `${EX}Zone`,
+    },
+    group: SERVICE,
+    order: 2,
+    role: "CLASSIFICATION",
+  }),
+  servedField("secret", { visibility: "HIDDEN", group: OVERVIEW, order: 9 }),
+  servedField("platformCount", {
+    property: {
+      uri: `${EX}platformCount`,
+      label: "platform count",
+      kind: "DATATYPE",
+      range: `${XSD}integer`,
+    },
+    group: OVERVIEW,
+    order: 2,
+  }),
+  servedField("name", { group: OVERVIEW, order: 1, role: "LABEL" }),
+  servedField("stepFree", {
+    property: {
+      uri: `${EX}stepFree`,
+      label: null,
+      kind: "DATATYPE",
+      range: `${XSD}boolean`,
+    },
+  }),
+  servedField("opened", {
+    property: {
+      uri: `${EX}opened`,
+      label: "opened",
+      kind: "DATATYPE",
+      range: `${XSD}date`,
+    },
+  }),
+  servedField("note", {
+    property: {
+      uri: `${EX}note`,
+      label: "note",
+      kind: "ANNOTATION",
+      range: `${XSD}string`,
+    },
+    group: OVERVIEW,
+  }),
 ];

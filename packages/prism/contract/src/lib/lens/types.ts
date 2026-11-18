@@ -156,3 +156,71 @@ export interface SiteLensIndex {
    */
   readonly unknownIris: readonly string[];
 }
+
+/** How a list reads and filters a field's values. */
+export type ListFieldType = "text" | "number" | "flag" | "date" | "choices";
+
+/** How a property's values are stored: literals, entities or annotations. */
+export type ServedPropertyKind = "DATATYPE" | "OBJECT" | "ANNOTATION";
+
+/**
+ * One field of a class as a provider serves it (`OntologyClass.properties`):
+ * the class-scoped name, the property, its cardinality and its lens.
+ */
+export interface ServedClassField {
+  /** The field's name on this class (`ClassProperty.name`). */
+  readonly name: string;
+  readonly property: {
+    readonly uri: string;
+    readonly label: string | null;
+    readonly kind: ServedPropertyKind;
+    /** The IRI of the property's range. */
+    readonly range: string;
+  };
+  /** Whether the field holds at most one value on this class. */
+  readonly singular: boolean;
+  readonly group: {
+    readonly uri: string;
+    readonly label: string | null;
+    readonly order: number | null;
+  } | null;
+  readonly order: number | null;
+  readonly role: PropertyRole | null;
+  readonly visibility: TermVisibility | null;
+}
+
+/**
+ * One field of a list: what a column, a sort and a facet need to know about
+ * a property of the listed class.
+ */
+export interface ListField {
+  /** The field's served name; the key of its values, sort and facet. */
+  readonly id: string;
+  /** The property's IRI. */
+  readonly property: string;
+  readonly type: ListFieldType;
+  /** The property's label, else its served name. */
+  readonly label: string;
+  /** The IRI of the field's group, or null. */
+  readonly group: string | null;
+  readonly role: PropertyRole | null;
+  /** Whether the lens shows the field prominently on the class. */
+  readonly prominent: boolean;
+  /** Whether a list can sort by the field: one value, not an entity. */
+  readonly enableSorting: boolean;
+  /** Whether a list can filter by the field's values. */
+  readonly facetable: boolean;
+}
+
+/** A field a list shows as a fact, with its header. */
+export interface DisplayField {
+  /** The {@link ListField.id} shown. */
+  readonly field: string;
+  readonly header: string;
+}
+
+/** A class's list fields and the ones it shows, in the lens's order. */
+export interface ListFields {
+  readonly fields: readonly ListField[];
+  readonly display: readonly DisplayField[];
+}

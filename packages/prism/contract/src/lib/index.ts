@@ -1,7 +1,8 @@
 /**
  * The contract check's public surface: the shipped SDL, the predicate, the
  * assertion built on it, and the provider extensions a schema serves; the
- * site lens model and its resolver; and the class-edge weights.
+ * site lens model, its resolver and the list fields it derives; and the
+ * class-edge weights.
  *
  * @module lib
  */
@@ -15,21 +16,28 @@ export type {
 } from "./edges/index.js";
 export { weighClassEdges } from "./edges/index.js";
 export type {
+  DisplayField,
   LangLiterals,
   LensClass,
   LensField,
   LensGroup,
   LensProperty,
+  ListField,
+  ListFields,
+  ListFieldType,
   PropertyRole,
   ResolvedClassLens,
   ResolvedFieldLens,
   ResolvedPropertyLens,
+  ServedClassField,
+  ServedPropertyKind,
   SiteLens,
   SiteLensIndex,
   TBoxOutline,
   TermVisibility,
 } from "./lens/index.js";
 export {
+  deriveListFields,
   HIDDEN_VISIBILITY,
   indexSiteLens,
   selectLiteral,
