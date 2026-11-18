@@ -15,9 +15,10 @@
  * at its edges, a box among its neighbours; at rest Fit brings the whole
  * graph into view, every text at 12px or more, and on a namespace a
  * selection drills into it stops at the overview's floor, on a window that
- * cuts no class; a term page of a class in the largest namespace draws
- * it within the drawn nodes and the band; a pick in the rail keeps the
- * chips, the search and the zoom; the inspector's field rows put their
+ * cuts no class; a term page draws its class's neighbourhood one hop
+ * deep across namespaces, as many nodes as the served graph gives it,
+ * within the drawn nodes and the band; a pick in the rail keeps the
+ * chips and the search, and frames the term it moves to legibly; the inspector's field rows put their
  * ranges on one column line; and, the lens declaring no namespace, every
  * instance chip of a term's page writes its prefix. Where the map does
  * not fit the canvas at the legible floor, it opens at the map's top-left
@@ -28,8 +29,7 @@
  * that page opens by the overview's rule, at the legible floor from the
  * opened namespace's corner. A term page reached from another frames its
  * class as loading its address does, and so does a move between the
- * overview and a term page that opens or closes a namespace; a move that
- * keeps the drawing keeps the reader's zoom.
+ * overview and a term page, which draw apart.
  */
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
@@ -40,6 +40,7 @@ import {
 import {
   type BridgeLabelMeasure,
   type CanvasMeasure,
+  countServedNeighbourhood,
   fetchServedGraph,
   MIN_FIT,
   measureBridgeLabels,
@@ -458,22 +459,29 @@ describe("at 1440 px", () => {
     },
   );
 
-  // A term page of a class in surface drills into it: its 31 classes,
-  // whose fullest layer, 14 classes, is laid as two columns.
-  it("draws a surface term page within the drawn nodes and the band", async () => {
-    const drawn = { nodes: 0, band: 0, selected: false };
+  // ds:UIBlock's page draws the class, its superclass, its subclasses and
+  // every class one relation away in either direction, whatever their
+  // namespace, banded by namespace, with a stub for each range no ontology
+  // loads: as many nodes as the served graph gives that neighbourhood, not
+  // the namespace drilled into.
+  it("draws a term page's one-hop neighbourhood as the served graph counts it, within the budget and the band", async () => {
+    const uiBlock = "ds:UIBlock";
+    const graph = await fetchServedGraph(
+      new URL(new URL(DEFAULT_GRAPHQL_URL).pathname, server.graphBase).href,
+    );
+    const namespace = graph.ontologies.find(
+      (ontology) => ontology.prefix === "ds",
+    )?.namespace;
+    const drawn = { nodes: 0, band: 0, selected: false, regions: 0 };
     const { errors } = await openExplorer(
-      `/definitions/${encodeURIComponent("surface:Actor")}`,
+      `/definitions/${encodeURIComponent(uiBlock)}`,
       desktop,
       async (page) => {
         Object.assign(
           drawn,
-          await page.evaluate(() => {
-            const nodes = [
-              ...document.querySelectorAll(
-                ".ds.graph-canvas svg.viewport g.node",
-              ),
-            ];
+          await page.evaluate((focus) => {
+            const svg = document.querySelector(".ds.graph-canvas svg.viewport");
+            const nodes = [...(svg?.querySelectorAll("g.node") ?? [])];
             const columns = new Map<string, number>();
             for (const node of nodes) {
               const col = node.getAttribute("data-col") ?? "";
@@ -483,25 +491,30 @@ describe("at 1440 px", () => {
               nodes: nodes.length,
               band: Math.max(0, ...columns.values()),
               selected: nodes.some(
-                (node) => node.getAttribute("data-id") === "surface:Actor",
+                (node) => node.getAttribute("data-id") === focus,
               ),
+              regions: svg?.querySelectorAll("g.region").length ?? 0,
             };
-          }),
+          }, uiBlock),
         );
       },
     );
     expect(errors).toEqual([]);
+    expect(namespace).toBeDefined();
     expect(drawn.selected).toBe(true);
-    expect(drawn.nodes).toBeGreaterThan(31);
+    expect(drawn.nodes).toBe(
+      countServedNeighbourhood(graph, `${namespace}UIBlock`),
+    );
+    expect(drawn.regions).toBeGreaterThan(0);
     expect(drawn.nodes).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
     expect(drawn.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
   });
 
-  // cs is drawn class by class at rest, so its term page draws the
-  // overview's own drawing, on which the reader's zoom still holds.
-  it("keeps the chips, the search and the zoom when a rail pick moves to a term the overview draws", async () => {
+  // A term page draws its class's neighbourhood, not the overview: the
+  // pick keeps the reader's chips and search, and the camera frames the
+  // class at the legible floor or above.
+  it("keeps the chips and the search when a rail pick moves to a term, framing it legibly", async () => {
     const view: {
-      before?: string | null;
       pressed?: string | null;
       search?: string;
       after?: string | null;
@@ -519,7 +532,6 @@ describe("at 1440 px", () => {
         await page.getByRole("button", { name: "Zoom in" }).click();
         await page.getByRole("searchbox").fill("st");
         await page.waitForTimeout(CAMERA_SETTLE_MS);
-        view.before = await page.locator(zoomLevel).textContent();
         await page
           .locator('.ds.term-rail a[href="/definitions/cs%3ACodeStandard"]')
           .click();
@@ -537,8 +549,11 @@ describe("at 1440 px", () => {
     expect(view.path).toBe("/definitions/cs%3ACodeStandard");
     expect(view.pressed).toBe("false");
     expect(view.search).toBe("st");
-    expect(view.after).toBe(view.before);
+    expect(Number.parseInt(view.after ?? "", 10)).toBeGreaterThanOrEqual(
+      Math.floor(MIN_FIT * 100),
+    );
     expect(measure.inView).toBeGreaterThan(0);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
   });
 
   it("opens on the whole map at rest: Fit shows every box, every text at 12px or more", async () => {
@@ -896,8 +911,8 @@ describe("a drill's link against its address", () => {
     const loaded = await cameraAfter(actor, "surface", async (page) => {
       framed.loaded = await isFramed(page);
     });
-    // ds:UIBlock's page opens ds and draws surface as one box; the rail
-    // lists surface's classes all the same.
+    // ds:UIBlock's page draws its own neighbourhood; the rail lists
+    // surface's classes all the same.
     const clicked = await cameraAfter(
       `/definitions/${encodeURIComponent("ds:UIBlock")}`,
       "surface",
@@ -914,9 +929,9 @@ describe("a drill's link against its address", () => {
     expectSameCamera(clicked.camera, loaded.camera);
   });
 
-  // The overview draws anatomy and cs class by class, ds and surface each
-  // as one box: a term page of a class in ds or surface opens that
-  // namespace, a drawing the overview's camera does not belong to.
+  // The overview draws ds and surface each as one box; a term page of a
+  // class in either draws its neighbourhood, a drawing the overview's
+  // camera does not belong to.
   it("opens the overview from a term page of a boxed class, by the strip's link, as loading it does", async () => {
     const loaded = await cameraAfter("/definitions", "anatomy");
     const back = await cameraAfter(
