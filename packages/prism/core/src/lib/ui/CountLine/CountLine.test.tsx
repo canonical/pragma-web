@@ -49,7 +49,7 @@ describe("CountLine", () => {
     expect(count.querySelector(".full")).toHaveTextContent(
       "100 components loaded so far",
     );
-    expect(count.querySelector(".short")).toHaveTextContent(/^100 components$/);
+    expect(count.querySelector(".short")?.textContent).toBe("100 components");
   });
 
   it("keeps one form when the short noun is the noun", () => {
