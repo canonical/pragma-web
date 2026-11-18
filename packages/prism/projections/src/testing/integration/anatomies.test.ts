@@ -182,12 +182,6 @@ const PROJECTION_TOKENS = [
   "--color-text-muted",
 ];
 
-/**
- * The one reach into another component the projections make: the peek
- * ends the summary of the card it shows at its third line.
- */
-const PROJECTION_REACHES = [".ds.projection-peek .summary"];
-
 describe("the package's stylesheets", () => {
   it("keep the design's token and grid rules in the generic representations", () => {
     expect(() =>
@@ -206,7 +200,6 @@ describe("the package's stylesheets", () => {
           directory,
           layer: "ds.components.global",
           externalTokens: PROJECTION_TOKENS,
-          reaches: PROJECTION_REACHES,
         }),
       ).not.toThrow();
     });

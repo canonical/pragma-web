@@ -1,17 +1,42 @@
 ---
 # CarTypeDetail — a car type's page once its data is in the store, a
-# subcomponent of CarTypePage: its title, then its side view, the car drawn
-# alone, its cab at the front when it has one. An address naming no car
-# type says nothing lives there.
+# subcomponent of CarTypePage, laid on the sectioned view: its title in
+# the header, its facts, then its side view as its one section, the car
+# drawn alone, its cab at the front when it has one. Under a renderer
+# other than the page (Turtle) the view gets no section and what the
+# renderer draws as its body. An address naming no car type says nothing lives
+# there.
 #
-# It renders no element of its own and binds no styles: its elements land
-# in CarTypePage's grid, which styles each by its slot.
+# It renders no element of its own and binds no styles: the view lays the
+# page out, and the page's stylesheet styles each part by its slot.
 node:
   uri: metro.subcomponent.car_type_detail
   edges:
-    - node: { role: page title }
-      relation: { cardinality: "0..1", slotName: title }
-    - node: { uri: metro.component.formation_side_view }
-      relation: { cardinality: "0..1", slotName: side-view }
+    - node:
+        uri: prism.component.sectioned_view
+        edges:
+          - node:
+              role: masthead, holding the page title
+              edges:
+                - node: { role: page title }
+                  relation: { cardinality: "1", slotName: title }
+            relation: { cardinality: "1", slotName: header }
+          - node:
+              role: facts (the node's facts, when it records any)
+              edges:
+                - node:
+                    uri: prism.component.key_value_list
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "0..1", slotName: facts }
+          - node:
+              role: body (under a renderer other than the page, what it draws)
+            relation: { cardinality: "0..1", slotName: body }
+          - node:
+              role: sections (under the page renderer, in reading order)
+              edges:
+                - node: { uri: metro.component.formation_side_view }
+                  relation: { cardinality: "1", slotName: side-view }
+            relation: { cardinality: "1", slotName: sections }
+      relation: { cardinality: "0..1" }
     - node: { role: not-found line }
       relation: { cardinality: "0..1", slotName: not-found }

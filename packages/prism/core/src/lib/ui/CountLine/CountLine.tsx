@@ -13,6 +13,14 @@ const componentCssClassName = "ds count-line";
  * with none. It is a polite live region, so a change the filters make is
  * announced.
  *
+ * A count has a short form, the shown figure and its noun alone ("26
+ * entries" where the full form reads "26 of 26 entries", "100 components"
+ * where it reads "100 components loaded so far"). When it differs from the
+ * full sentence, the line holds both forms and shows the short one below
+ * two groups, where the strip folds, and the full one at two groups and
+ * wider; the full sentence is its accessible name at every width. The
+ * server renders one HTML for every width: the stylesheet chooses.
+ *
  * `import { CountLine } from "@canonical/prism-core";`
  *
  * @implements prism.component.count_line
@@ -21,6 +29,7 @@ export default function CountLine({
   shown,
   total,
   kind,
+  shortKind,
   className,
   ...props
 }: CountLineProps): ReactElement {
@@ -33,13 +42,23 @@ export default function CountLine({
           ...values,
           total: String(total.value),
         });
+  const short = t("countLine.short", { ...values, kind: shortKind ?? kind });
+  const isShortened = short !== text;
   return (
     <output
       {...props}
+      aria-label={isShortened ? text : undefined}
       aria-live="polite"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      {text}
+      {isShortened ? (
+        <>
+          <span className="full">{text}</span>
+          <span className="short">{short}</span>
+        </>
+      ) : (
+        text
+      )}
     </output>
   );
 }

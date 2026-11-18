@@ -8,6 +8,19 @@
 # narrower than its text: the text is then cut with an ellipsis rather than
 # spilling past it.
 #
+# A count has a short form, the shown figure and its noun alone ("26
+# entries" where the full form reads "26 of 26 entries", "100 components"
+# where it reads "100 components loaded so far"). When it differs from the
+# full sentence, the line holds both, the full form and the short one, and
+# shows one. Below two groups, where the strip folds, the short form; at
+# two groups and wider, the full one. The full sentence is the line's
+# accessible name (aria-label) at every width, and the server renders one
+# HTML for every width: the stylesheet chooses.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)   below two groups: the full form is
+#     not displayed and the short one is, inline.
+#
 # Every decision is read through a component token declared on the root
 # (`--count-line-*`), bound to the symbol named here.
 #
@@ -22,3 +35,13 @@ node:
     typography.variant.numeric: tabular-nums
     typography.whiteSpace: nowrap
     typography.overflow: ellipsis
+  edges:
+    - node:
+        role: full
+      relation: { cardinality: "0..1", slotName: full }
+    - node:
+        role: short
+        styles:
+          # The narrow form's; at two groups and wider it is not displayed.
+          layout.type: none
+      relation: { cardinality: "0..1", slotName: short }

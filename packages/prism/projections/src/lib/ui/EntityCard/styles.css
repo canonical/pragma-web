@@ -30,6 +30,9 @@
     --entity-card-focus-ring-offset: -2px;
     --entity-card-focus-ring-color: var(--color-focus-ring);
     --entity-card-section-spacing: var(--container-gap-default);
+    /* A summary's lines at most, on every card: cards in a row stay close
+     * in height and differ by their facts, and the page is one click away. */
+    --entity-card-summary-lines: 3;
     --entity-card-rule-width: 1px;
     --entity-card-rule-color: var(--color-border-muted);
     --entity-card-term-color: var(--color-text-muted);
@@ -154,10 +157,16 @@
     line-height: var(--entity-card-line-height);
   }
 
+  /* The summary ends at its third line, in an ellipsis. */
   .ds.entity-card > .body > .description > .summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--entity-card-summary-lines);
+    line-clamp: var(--entity-card-summary-lines);
     margin-block-start: var(--entity-card-section-spacing);
     margin-block-end: 0;
     padding-block: 0;
+    overflow: hidden;
     line-height: var(--entity-card-line-height);
   }
 

@@ -12,7 +12,6 @@ export * from "./CarTypeCommand/index.js";
 export * from "./CarTypeGraphNode/index.js";
 export * from "./CarTypePage/index.js";
 export * from "./CarTypeRow/index.js";
-export * from "./FleetFacts/index.js";
 export * from "./FleetIcon/index.js";
 export * from "./FleetIndex/index.js";
 export * from "./FleetLayout/index.js";

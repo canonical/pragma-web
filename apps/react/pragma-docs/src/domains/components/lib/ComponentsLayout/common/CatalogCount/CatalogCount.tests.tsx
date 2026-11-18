@@ -39,6 +39,14 @@ describe("CatalogCount", () => {
     );
   });
 
+  it("names the count by its full sentence beside its short form", () => {
+    renderCount(catalogRecords as unknown as RecordMap);
+    const count = screen.getByRole("status", {
+      name: "7 components loaded so far",
+    });
+    expect(count.querySelector(".short")?.textContent).toBe("7 components");
+  });
+
   it("counts every component once every page is loaded", () => {
     renderCount(completeRecords());
     expect(screen.getByRole("status").textContent).toBe("7 components");

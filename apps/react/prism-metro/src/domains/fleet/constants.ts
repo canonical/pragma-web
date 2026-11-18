@@ -1,6 +1,5 @@
 import type { LensRenderers } from "@canonical/prism-core";
 import { LOCALE, MESSAGES } from "#i18n";
-import type { FleetNodeKind } from "./types.js";
 
 /**
  * The fleet lens in the rail: its label and its place, fifth. Stations,
@@ -11,8 +10,7 @@ export const FLEET_LENS = { label: MESSAGES["lens.fleet"], order: 5 };
 
 /**
  * The fleet lens's route names, each the page of one kind of fleet node,
- * and the index's. The layout reads them to pick the facts of the page in
- * its aside.
+ * and the index's. The layout reads the index's to give it the count.
  */
 export const FLEET_ROUTES = {
   index: "fleet",
@@ -22,25 +20,17 @@ export const FLEET_ROUTES = {
   carType: "fleetCarType",
 } as const;
 
-/** The kind of fleet node each page route shows, by route name. */
-export const KIND_BY_ROUTE: Readonly<Record<string, FleetNodeKind>> = {
-  [FLEET_ROUTES.stock]: "stock",
-  [FLEET_ROUTES.formation]: "formation",
-  [FLEET_ROUTES.unit]: "unit",
-  [FLEET_ROUTES.carType]: "carType",
-};
-
 /**
- * The GraphQL type each kind of page shows. A page's operation answers an
- * address naming a node of another type with that node's type name and none
- * of the page's fields, so a reader checks the type against this first.
+ * The sections of the fleet's pages, by what they hold: each id is its
+ * heading's and its index link's fragment, one per page.
  */
-export const TYPENAME_BY_KIND: Readonly<Record<FleetNodeKind, string>> = {
-  stock: "RollingStock",
-  formation: "Formation",
-  unit: "Unit",
-  carType: "CarType",
-};
+export const FLEET_SECTIONS = {
+  formations: "formations",
+  carTypes: "car-types",
+  sideView: "side-view",
+  units: "units",
+  platformFit: "platform-fit",
+} as const;
 
 /** The class whose instances the fleet index lists, compact. */
 export const FLEET_CLASS_URI = "metro:RollingStock";

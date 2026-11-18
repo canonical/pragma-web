@@ -1,45 +1,48 @@
 ---
-# StockPage — the fleet lens's page of one rolling stock, in the document
-# archetype's canvas, beside its facts in the aside: its title, then
-# its formations drawn at one scale, each captioned by its chip and its
-# length, then the car types its units are made of, as rows. Sections sit
-# a loose step apart, more than the gutter between the items inside them.
-# A stock with no formation says so in one muted line, and has no car
-# types. While the page's data is on its way it says so in one muted line;
-# a failed read says so as an alert; an address naming nothing of its type
-# says that nothing lives there.
-#
-# Token ledger: container.gap.loose between sections, an item's external
-# spacing, never a gap.
+# StockPage — the fleet lens's page of one rolling stock, laid on the
+# sectioned view (SectionedView): its title in the header, its facts in
+# the view's facts block, then its sections: its formations drawn at one
+# scale, each captioned by its chip and its length, then the car types its
+# units are made of, as rows. A stock with no formation says so in one
+# muted line, and has no car types. While the page's data is on its way it
+# says so in one muted line; a failed read says so as an alert; an address
+# naming nothing of its type says that nothing lives there. The root is a
+# subgrid of the canvas's page grid over every column; the header, a
+# section's content and each line take every column they are given.
 node:
   uri: metro.component.stock_page
   styles:
     layout.grid.column: "1 / -1"
     layout.type: grid
+    layout.grid.columns: subgrid
     spacing.gap: grid.gutter
     layout.alignSelf: start
   edges:
     - node:
-        role: page title
-      relation: { cardinality: "0..1", slotName: title }
+        uri: prism.component.sectioned_view
+      relation: { cardinality: "0..1", slotName: default }
     - node:
-        role: section
+        role: masthead, the view's header holding the page title
         styles:
-          spacing.external.block.start: container.gap.loose
+          layout.grid.column: "1 / -1"
           layout.type: grid
           spacing.gap: grid.gutter
-      relation: { cardinality: "0..*", slotName: section }
+      relation: { cardinality: "0..1", slotName: masthead }
     - node:
         uri: metro.component.formation_stack
+        styles:
+          layout.grid.column: "1 / -1"
       relation: { cardinality: "0..1", slotName: formations }
     - node:
         role: no formation runs the stock
         styles:
+          layout.grid.column: "1 / -1"
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: empty }
     - node:
         role: list of rows
         styles:
+          layout.grid.column: "1 / -1"
           spacing.internal.inline.start: 0
           spacing.external.block.start: 0
           spacing.external.block.end: 0
@@ -53,15 +56,18 @@ node:
     - node:
         role: loading line
         styles:
+          layout.grid.column: "1 / -1"
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: loading }
     - node:
         role: not-found line
         styles:
+          layout.grid.column: "1 / -1"
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: not-found }
     - node:
         role: error alert
         styles:
+          layout.grid.column: "1 / -1"
           typography.color: color.text.error
       relation: { cardinality: "0..1", slotName: error }

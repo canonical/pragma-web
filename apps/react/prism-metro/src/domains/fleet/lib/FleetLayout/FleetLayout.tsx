@@ -6,14 +6,12 @@ import {
   ModeStrip,
   makeLensContext,
 } from "@canonical/prism-core";
-import { readUriParam } from "@canonical/prism-lens-entity";
 import { useRouterState } from "@canonical/router-react";
 import type React from "react";
-import { type ReactElement, Suspense } from "react";
+import { Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
-import { FLEET_ROUTES, KIND_BY_ROUTE } from "../../constants.js";
-import { FleetFacts } from "../FleetFacts/index.js";
+import { FLEET_ROUTES } from "../../constants.js";
 import { FleetCount, FleetView } from "./common/index.js";
 import type { FleetLayoutProps } from "./types.js";
 
@@ -26,24 +24,10 @@ const FleetTrail = makeLensContext({
 });
 
 /**
- * Select the facts the aside shows on a route: a node's on a node's page,
- * none on the index.
- */
-function selectFacts(
-  routeName: string,
-  params: Readonly<Record<string, unknown>>,
-): ReactElement | null {
-  const kind = KIND_BY_ROUTE[routeName];
-  return kind === undefined ? null : (
-    <FleetFacts address={readUriParam(params)} kind={kind} />
-  );
-}
-
-/**
  * The fleet lens's layout, on the document archetype: the metro rail, the
  * fleet trail and the page's renderers (the index's table and cards, a
- * node page's page and Turtle) in the mode strip, the routed page in the canvas and, on a
- * node's page, its facts in the aside, the canvas's last three columns.
+ * node page's page and Turtle) in the mode strip and the routed page in
+ * the canvas, with no aside: a node's page lays its facts out itself.
  * On the index, the index's count closes the strip's filtering group; it
  * reads the index's operation from the warm store inside its own error
  * boundary and Suspense, both falling back to nothing, so a cold store
@@ -63,11 +47,6 @@ const FleetLayout = ({
   return (
     <DocumentLayout
       {...props}
-      aside={
-        match?.kind === "route"
-          ? selectFacts(String(match.name), match.params)
-          : null
-      }
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       rail={<MetroRail />}
       strip={

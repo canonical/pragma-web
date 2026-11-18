@@ -19,6 +19,11 @@
     font-variant-caps: small-caps;
   }
 
+  /* A clamp on a slot that is no summary. */
+  .ds.style-drift .label {
+    -webkit-line-clamp: 3;
+  }
+
   .ds.style-drift > .label > .link {
     text-decoration: none;
   }

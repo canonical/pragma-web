@@ -25,6 +25,24 @@ describe("ExplorerStatus", () => {
     expect(screen.getByRole("figure").textContent).not.toContain("abstract");
   });
 
+  it("names the figure by its full sentence beside its short form", () => {
+    render(<ExplorerStatus abstract={5} total={66} visible={66} />);
+    const figure = screen.getByRole("figure", {
+      name: "66 of 66 classes · 5 abstract",
+    });
+    expect(figure.querySelector(".full")?.textContent).toBe(
+      "66 of 66 classes · 5 abstract",
+    );
+    expect(figure.querySelector(".short")?.textContent).toBe("66 classes");
+  });
+
+  it("shortens the count to the shown figure and its noun", () => {
+    render(<ExplorerStatus abstract={0} total={66} visible={1} />);
+    const figure = screen.getByRole("figure", { name: "1 of 66 classes" });
+    expect(figure.querySelector(".full")?.textContent).toBe("1 of 66 classes");
+    expect(figure.querySelector(".short")?.textContent).toBe("1 class");
+  });
+
   it("survives the degenerate empty graph without dividing by zero", () => {
     render(<ExplorerStatus abstract={0} total={0} visible={0} />);
     expect(screen.getByRole("figure").textContent).toContain("0 of 0 classes");

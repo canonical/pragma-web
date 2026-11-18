@@ -1,10 +1,9 @@
 ---
 # FleetLayout — the fleet lens's layout: the document archetype with the
 # metro rail, the fleet trail, the page's renderers and, on the index, the
-# index's count closing the filtering group in the mode strip, the routed
-# page in the
-# canvas, and the page's facts in the aside, the canvas's last three
-# columns, so the page fills the columns up to it. The mode strip bleeds
+# index's count closing the filtering group in the mode strip, and the
+# routed page in the canvas, with no aside: a node's page lays its facts
+# out on the sectioned view itself. The mode strip bleeds
 # to the rail's border on its own, so this anatomy binds no styles and the
 # folder has no stylesheet.
 node:
@@ -32,6 +31,3 @@ node:
     - node:
         role: routed page
       relation: { cardinality: "1", slotName: page }
-    - node:
-        uri: metro.component.fleet_facts
-      relation: { cardinality: "0..1", slotName: aside }

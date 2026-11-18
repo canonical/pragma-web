@@ -10,7 +10,7 @@ type OwnProps = {
 /**
  * Props accepted by `FleetLayout`: the routed page, then the native props of
  * the `<div>` root `DocumentLayout` renders for it. The layout supplies the
- * rail, the strip and the aside itself.
+ * rail and the strip itself; a node's page lays out its own facts.
  */
 export type FleetLayoutProps = OwnProps &
   Omit<ComponentProps<"div">, keyof OwnProps>;

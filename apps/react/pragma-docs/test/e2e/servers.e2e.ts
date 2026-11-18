@@ -383,37 +383,79 @@ describe("server matrix (2×3) serves correctly", () => {
             // 5d. Silent-rot closures. The graph's classes and edges could
             //     rot to zero or partial while every literal above still
             //     matched. Graph counts are never pinned, since the live
-            //     graph grows; instead the graph draws exactly one class
-            //     per class the rail lists, so the class count must equal
-            //     the rail's class-link count, both derived from THIS
-            //     response (drift-proof, catches a partial graph). Floors
-            //     catch the both-surfaces-rot-to-zero case the equality
-            //     alone would wave through (0 === 0), and subclass buses
-            //     stay strictly below classes — each joins a superclass to
-            //     its subclasses, and every non-empty ontology has a root.
+            //     graph grows; instead every class the rail lists is in
+            //     the well, drawn as its own node or held by a namespace's
+            //     box (which states its classes in `data-classes`), so
+            //     the drawn classes plus the boxed ones must equal the
+            //     rail's class-link count, and every drawn class must have
+            //     its rail link, all derived from THIS response
+            //     (drift-proof, catches a partial graph). External stubs
+            //     are no class of a loaded namespace and the rail lists
+            //     none. Floors catch the both-surfaces-rot-to-zero case
+            //     the equality alone would wave through (0 === 0), and
+            //     subclass buses stay strictly below the drawn nodes —
+            //     each joins a superclass to its subclasses, and every
+            //     drawn ontology has a root.
             const wellNodeCount = (
               definitionsTermHtml.match(/<g class="node[ "]/g) ?? []
             ).length;
             const wellEdgeCount = (
               definitionsTermHtml.match(/<path class="subclass[ "]/g) ?? []
             ).length;
-            const railClassLinkCount =
-              // The headings carry a match count ("Classes 17 of 17"),
-              // so the opening tag is matched loosely up to its close.
-              (
-                definitionsTermHtml.match(
-                  /<h3 class="subheading">Classes[\s\S]*?<h3 class="subheading">Properties/g,
-                ) ?? []
+            // The headings carry a match count ("Classes 17 of 17"), so
+            // the opening tag is matched loosely up to its close.
+            const railClassSections =
+              definitionsTermHtml.match(
+                /<h3 class="subheading">Classes[\s\S]*?<h3 class="subheading">Properties/g,
+              ) ?? [];
+            const railClassTerms = railClassSections.flatMap((section) =>
+              [...section.matchAll(/href="\/definitions\/([^"]+)"/g)].map(
+                ([, encoded]) => decodeURIComponent(encoded ?? ""),
+              ),
+            );
+            const wellNodeTags =
+              definitionsTermHtml.match(/<g class="node[ "][^>]*>/g) ?? [];
+            const readAttribute = (tag: string, name: string): string =>
+              tag.match(new RegExp(` ${name}="([^"]*)"`))?.[1] ?? "";
+            const drawnClassTerms = wellNodeTags
+              .filter((tag) =>
+                ["abstract", "concrete"].includes(
+                  readAttribute(tag, "data-kind"),
+                ),
               )
-                .map(
-                  (section) =>
-                    (section.match(/href="\/definitions\//g) ?? []).length,
-                )
-                .reduce((sum, count) => sum + count, 0);
-            expect(wellNodeCount).toBe(railClassLinkCount);
+              .map((tag) => readAttribute(tag, "data-id"));
+            const boxedClassCount = wellNodeTags
+              .filter((tag) => readAttribute(tag, "data-kind") === "region")
+              .map((tag) => Number(readAttribute(tag, "data-classes")))
+              .reduce((sum, count) => sum + count, 0);
+            expect(new Set(railClassTerms).size).toBe(railClassTerms.length);
+            expect(
+              drawnClassTerms.filter((term) => !railClassTerms.includes(term)),
+            ).toEqual([]);
+            expect(drawnClassTerms.length + boxedClassCount).toBe(
+              railClassTerms.length,
+            );
+            expect(railClassTerms.length).toBeGreaterThan(20);
+            expect(drawnClassTerms.length).toBeGreaterThan(0);
             expect(wellNodeCount).toBeGreaterThan(20);
-            expect(wellEdgeCount).toBeGreaterThan(3);
+            expect(wellEdgeCount).toBeGreaterThan(0);
             expect(wellEdgeCount).toBeLessThan(wellNodeCount);
+            //     A box draws no subclass edge inside it, so the buses
+            //     are few; each one joins nodes the well draws.
+            const wellNodeTerms = new Set(
+              wellNodeTags.map((tag) => readAttribute(tag, "data-id")),
+            );
+            const subclassEnds = (
+              definitionsTermHtml.match(/<path class="subclass[ "][^>]*>/g) ??
+              []
+            ).flatMap((tag) => [
+              readAttribute(tag, "data-from"),
+              ...readAttribute(tag, "data-to").split(" "),
+            ]);
+            expect(subclassEnds.length).toBeGreaterThan(wellEdgeCount);
+            expect(
+              subclassEnds.filter((term) => !wellNodeTerms.has(term)),
+            ).toEqual([]);
             //     The relations, the object properties between drawn
             //     classes, are in the server markup too.
             expect(definitionsTermHtml).toMatch(/<path class="relation[ "]/);
@@ -458,13 +500,18 @@ describe("server matrix (2×3) serves correctly", () => {
             // Two abstraction chips, one per ontology (three live) and the
             // instances chip.
             expect(chipCount).toBeGreaterThanOrEqual(6);
-            // The figure's counts agree with the graph it drew, so the
+            // The figure's counts agree with the classes the rail lists,
+            // which the graph draws or boxes (asserted above), so the
             // figure can never flatter the graph. Both sides derive from
             // THIS response, with no pinned graph counts: the abstract
-            // tally is read off the graph's own abstract classes.
+            // tally is read off the rail's own abstract marks, as a box
+            // states no abstraction for the classes it holds.
+            // The caption holds the full sentence and its short form; the
+            // full one is read here.
             const statusCaption =
-              /<figcaption class="caption">([\s\S]*?)<\/figcaption>/
-                .exec(definitionsTermHtml)?.[1]
+              /<figcaption class="caption"><span class="full">([\s\S]*?)<\/span>/
+                .exec(definitionsTermHtml)
+                ?.at(1)
                 ?.replaceAll("<!-- -->", "");
             const abstractNodeCount = (
               definitionsTermHtml.match(
@@ -472,10 +519,17 @@ describe("server matrix (2×3) serves correctly", () => {
               ) ?? []
             ).length;
             expect(abstractNodeCount).toBeGreaterThan(0);
+            const railAbstractCount = railClassSections
+              .map(
+                (section) =>
+                  (section.match(/class="mark is-abstract"/g) ?? []).length,
+              )
+              .reduce((sum, count) => sum + count, 0);
+            expect(railAbstractCount).toBeGreaterThanOrEqual(abstractNodeCount);
             // Unfiltered server render: visible === total, and the
-            // abstract clause matches the classes the graph drew.
+            // abstract clause matches the classes the rail lists.
             expect(statusCaption).toBe(
-              `${wellNodeCount} of ${wellNodeCount} classes · ${abstractNodeCount} abstract`,
+              `${railClassTerms.length} of ${railClassTerms.length} classes · ${railAbstractCount} abstract`,
             );
 
             //   THE CANVAS carries its controls: the zoom level and Fit.

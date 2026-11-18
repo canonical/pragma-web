@@ -18,6 +18,19 @@ afterEach(() => {
 /** The page's address in the fleet lens. */
 const url = `/fleet/${encodeURIComponent(SERIES_90_CURIE)}`;
 
+/**
+ * Find the sectioned view's facts block once the page's data is in, the
+ * view's own region beside the sections, under no heading of its own.
+ */
+const findFacts = (container: HTMLElement): Promise<HTMLElement> =>
+  waitFor(() => {
+    const facts = container.querySelector<HTMLElement>(
+      ".ds.sectioned-view .facts",
+    );
+    expect(facts).not.toBeNull();
+    return facts as HTMLElement;
+  });
+
 /** Render the page alone, over an environment answering with `response`. */
 const renderWithAnswer = (response: Promise<unknown>) =>
   renderWithSite(
@@ -62,17 +75,20 @@ describe("StockPage", () => {
     ).toHaveAttribute("href", "/fleet/car-types/metro%3Acar-90-trailer");
   });
 
-  it("lists its facts in the aside: formations and the ranges", async () => {
-    renderMetroPage(url);
-    const facts = await screen.findByRole("region", { name: "Facts" });
+  it("lists its facts beside its sections: formations and the ranges", async () => {
+    const { container } = renderMetroPage(url);
+    const facts = await findFacts(container);
+    expect(screen.queryByRole("heading", { name: "Facts" })).toBeNull();
     await within(facts).findByText("Formations");
     expect(facts).toHaveTextContent("60–120 m");
     expect(facts).toHaveTextContent("490–980 passengers");
   });
 
   it("reads one formation's measures as single values", async () => {
-    renderMetroPage(`/fleet/${encodeURIComponent("metro:series-70")}`);
-    const facts = await screen.findByRole("region", { name: "Facts" });
+    const { container } = renderMetroPage(
+      `/fleet/${encodeURIComponent("metro:series-70")}`,
+    );
+    const facts = await findFacts(container);
     await within(facts).findByText("Formations");
     expect(facts).toHaveTextContent("107.2 m");
     expect(facts).not.toHaveTextContent(" to ");

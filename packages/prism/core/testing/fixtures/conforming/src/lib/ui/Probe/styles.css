@@ -13,6 +13,7 @@
     --probe-label-font-weight: var(--typography-text-primary-bold-font-weight);
     --probe-mark-opacity: 1;
     --probe-muted-mark-opacity: 0.4;
+    --probe-summary-lines: 3;
 
     display: grid;
     gap: var(--probe-gap);
@@ -41,6 +42,15 @@
 
   .ds.probe > .body > .link[href]:hover {
     text-decoration: underline;
+  }
+
+  /* The summary ends at its third line, in an ellipsis. */
+  .ds.probe .summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--probe-summary-lines);
+    line-clamp: var(--probe-summary-lines);
+    overflow: hidden;
   }
 
   .ds.probe .mark {

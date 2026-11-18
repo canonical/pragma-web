@@ -1,35 +1,51 @@
 ---
-# UnitPage — the fleet lens's page of one unit, in the document archetype's
-# canvas, beside its facts in the aside: its title, then its side view, the
-# unit drawn as a train of its own. While the page's data is on its way it
-# says so in one muted line; a failed read says so as an alert; an address
-# naming nothing of its type says that nothing lives there.
+# UnitPage — the fleet lens's page of one unit, laid on the
+# sectioned view (SectionedView): its title in the header, its facts in
+# the view's facts block, then its side view as its one section, the unit
+# drawn as a train of its own. While the page's data is on
+# its way it says so in one muted line; a failed read says so as an alert;
+# an address naming nothing of its type says that nothing lives there. The
+# root is a subgrid of the canvas's page grid over every column; the
+# header, the side view and each line take every column they are given.
 node:
   uri: metro.component.unit_page
   styles:
     layout.grid.column: "1 / -1"
     layout.type: grid
+    layout.grid.columns: subgrid
     spacing.gap: grid.gutter
     layout.alignSelf: start
   edges:
     - node:
-        role: page title
-      relation: { cardinality: "0..1", slotName: title }
+        uri: prism.component.sectioned_view
+      relation: { cardinality: "0..1", slotName: default }
+    - node:
+        role: masthead, the view's header holding the page title
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.type: grid
+          spacing.gap: grid.gutter
+      relation: { cardinality: "0..1", slotName: masthead }
     - node:
         uri: metro.component.formation_side_view
-      relation: { cardinality: "0..*", slotName: side-view }
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: side-view }
     - node:
         role: loading line
         styles:
+          layout.grid.column: "1 / -1"
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: loading }
     - node:
         role: not-found line
         styles:
+          layout.grid.column: "1 / -1"
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: not-found }
     - node:
         role: error alert
         styles:
+          layout.grid.column: "1 / -1"
           typography.color: color.text.error
       relation: { cardinality: "0..1", slotName: error }

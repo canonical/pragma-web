@@ -14,6 +14,7 @@ export default function Probe({
   className,
   label,
   href,
+  summary,
   muted = false,
   ...props
 }: ProbeProps): ReactElement {
@@ -30,6 +31,7 @@ export default function Probe({
           </a>
         )}
       </span>
+      {summary === undefined ? null : <p className="summary">{summary}</p>}
       <span
         className={["mark", muted ? "is-muted" : ""].filter(Boolean).join(" ")}
       />

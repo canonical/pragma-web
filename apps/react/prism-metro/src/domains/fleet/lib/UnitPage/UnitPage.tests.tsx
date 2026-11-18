@@ -2,7 +2,7 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SERIES_90_UNIT_CURIE } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
@@ -15,6 +15,19 @@ afterEach(() => {
 
 /** The page's address in the fleet lens. */
 const url = `/fleet/units/${encodeURIComponent(SERIES_90_UNIT_CURIE)}`;
+
+/**
+ * Find the sectioned view's facts block once the page's data is in, the
+ * view's own region beside the sections, under no heading of its own.
+ */
+const findFacts = (container: HTMLElement): Promise<HTMLElement> =>
+  waitFor(() => {
+    const facts = container.querySelector<HTMLElement>(
+      ".ds.sectioned-view .facts",
+    );
+    expect(facts).not.toBeNull();
+    return facts as HTMLElement;
+  });
 
 /** Render the page alone, over an environment answering with `response`. */
 const renderWithAnswer = (response: Promise<unknown>) =>
@@ -38,11 +51,30 @@ describe("UnitPage", () => {
     expect(container.querySelectorAll("article path.car")).toHaveLength(3);
   });
 
-  it("lists its facts in the aside", async () => {
-    renderMetroPage(url);
-    const facts = await screen.findByRole("region", { name: "Facts" });
+  it("lists its facts beside its sections, under no heading", async () => {
+    const { container } = renderMetroPage(url);
+    const facts = await findFacts(container);
+    expect(screen.queryByRole("heading", { name: "Facts" })).toBeNull();
     await within(facts).findByText("Cars");
     expect(facts).toHaveTextContent("60 m");
+  });
+
+  it("shows its side view as its one section, with no index", async () => {
+    const { container } = renderMetroPage(url);
+    const section = await screen.findByRole("region", { name: "Side view" });
+    expect(section.querySelectorAll("path.car")).toHaveLength(3);
+    expect(container.querySelector(".ds.sectioned-view .contents")).toBeNull();
+  });
+
+  it("draws its Turtle source in place of its sections at as=turtle", async () => {
+    const { container } = renderMetroPage(`${url}?as=turtle`);
+    const source = await screen.findByRole("figure");
+    await waitFor(() => expect(source).toHaveTextContent("@prefix"));
+    expect(source).toHaveTextContent("Series 90 unit");
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Side view" }),
+    ).not.toBeInTheDocument();
+    expect(await findFacts(container)).not.toContainElement(source);
   });
 
   it("says nothing of its type lives at an address that names none", async () => {

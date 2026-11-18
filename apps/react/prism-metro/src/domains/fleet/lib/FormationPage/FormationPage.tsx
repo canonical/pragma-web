@@ -11,7 +11,11 @@ import "./styles.css";
 const componentCssClassName = "ds formation-page";
 
 /**
- * The fleet lens's page of one formation: its title, then its stock, its side view with a tick at each line's shortest platform, its units in order, then its fit at the platforms of every line it runs on.
+ * The fleet lens's page of one formation, on the sectioned view: its title
+ * and its stock, its facts, then its side view with a tick at each line's
+ * shortest platform, its units in order, then its fit at the platforms of
+ * every line it runs on. Its root is a subgrid of the canvas's page grid
+ * over every column.
  *
  * The page reads its operation inside its own error boundary and Suspense,
  * so neither reaches the router's outlet: a read in flight shows one line,

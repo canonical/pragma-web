@@ -23,7 +23,8 @@ const componentCssClassName = "ds catalog-count";
  * the figure cannot disagree with the tiers in the canvas. The connection
  * carries no total: while pages remain, the count says it holds only the
  * components loaded so far; once none remain, the loaded count is the
- * catalog's size.
+ * catalog's size. While pages remain, its short form, shown below two
+ * groups, drops that clause ("100 components").
  *
  * It takes the native props of the count line's `<output>` root and
  * spreads them onto it; a consumer `className` merges after its own.
@@ -54,6 +55,7 @@ export default function CatalogCount({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="catalog-count"
       kind={t(hasNext ? "catalog.kindLoaded" : "catalog.kind", { count })}
+      shortKind={t("catalog.kind", { count })}
       shown={count}
       total={{ kind: "unknown" }}
     />

@@ -58,12 +58,6 @@ const EXTERNAL_TOKENS = [
 const DOCUMENT_TOKENS = ["--grid-col-min"];
 
 /**
- * The one reach into another component the app's components make: the
- * peek ends the summary of the card it shows at its third line.
- */
-const REACHES = [".ds.docs-peek .summary"];
-
-/**
  * The context providers among the app's components. A provider follows its
  * own file structure (cs:react.component.structure.context): its main file
  * is `Provider.tsx`, beside `Context.tsx` and its hook, with no stylesheet
@@ -146,7 +140,6 @@ describe("the app's components", () => {
           layer: "ds.components.global",
           externalTokens: EXTERNAL_TOKENS,
           documentTokens: DOCUMENT_TOKENS,
-          reaches: REACHES,
         }),
       ).not.toThrow();
     },

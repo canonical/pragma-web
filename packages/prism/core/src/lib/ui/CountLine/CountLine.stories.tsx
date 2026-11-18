@@ -30,3 +30,16 @@ export const AtLeast: Story = {
 export const Unknown: Story = {
   args: { shown: 3, total: { kind: "unknown" }, kind: "lines" },
 };
+
+/**
+ * A noun with a second clause: the full form at two groups and wider, the
+ * short one, the figure and its noun, below.
+ */
+export const Shortened: Story = {
+  args: {
+    shown: 100,
+    total: { kind: "unknown" },
+    kind: "components loaded so far",
+    shortKind: "components",
+  },
+};

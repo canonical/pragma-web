@@ -3,8 +3,8 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The page spans the canvas's page columns; its items stack a gutter
-   * apart. */
+  /* A subgrid of the canvas's page grid over every column, holding the
+   * sectioned view or the one line a page shows in its place. */
   .ds.unit-page {
     --unit-page-gap: var(--grid-gutter);
     --unit-page-secondary-color: var(--color-text-muted);
@@ -12,19 +12,35 @@
 
     grid-column: 1 / -1;
     display: grid;
+    grid-template-columns: subgrid;
     gap: var(--unit-page-gap);
     align-self: start;
   }
 
+  /* The header spans the view's header columns. */
+  .ds.unit-page .masthead {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: var(--unit-page-gap);
+  }
+
+  /* The side view takes its section's every column. */
+  .ds.unit-page .side-view {
+    grid-column: 1 / -1;
+  }
+
   .ds.unit-page .loading {
+    grid-column: 1 / -1;
     color: var(--unit-page-secondary-color);
   }
 
   .ds.unit-page .not-found {
+    grid-column: 1 / -1;
     color: var(--unit-page-secondary-color);
   }
 
   .ds.unit-page .error {
+    grid-column: 1 / -1;
     color: var(--unit-page-error-color);
   }
 }

@@ -14,6 +14,8 @@ const componentCssClassName = "ds entity-status";
  * count line. It counts with the same matcher the index filters by, over
  * the same operation and the same search text, so the figure and the canvas
  * cannot disagree; the count line announces the change as the reader types.
+ * Below two groups it shows its short form, the shown figure and its noun
+ * ("26 entries"), the full sentence staying its name.
  *
  * It takes the native props of the count line's `<output>` root and
  * spreads them onto it; a consumer `className` merges after its own.
@@ -37,6 +39,7 @@ export default function EntityStatus({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="entity-status"
       kind={t("status.kind", { count })}
+      shortKind={t("status.kind", { count: visible })}
       shown={visible}
       total={{ kind: "exact", value: count }}
     />

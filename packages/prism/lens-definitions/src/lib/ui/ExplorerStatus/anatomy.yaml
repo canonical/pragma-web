@@ -8,6 +8,17 @@
 # Why not a published component: the published meters carry no caption of
 # counts; this one is a figure with a decorative bar.
 #
+# The caption holds two forms, the full sentence ("66 of 66 classes · 5
+# abstract") and its short form, the shown figure and its noun ("66
+# classes"), and shows one: below two groups, where the strip folds, the
+# short form; at two groups and wider, the full one. The full sentence
+# names the figure (aria-label) at every width; the server renders one
+# HTML for every width, and the stylesheet chooses.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)   below two groups: the full form is
+#     not displayed and the short one is, inline.
+#
 # The fill's width is the inline channel `--explorer-status-share`, the
 # one computed value no stylesheet can hold.
 #
@@ -62,4 +73,15 @@ node:
           layout.overflow.inline: clip
           typography.variant.numeric: tabular-nums
           typography.overflow: ellipsis
+        edges:
+          - node:
+              role: full
+            relation: { cardinality: "1", slotName: full }
+          - node:
+              role: short
+              styles:
+                # The narrow form's; at two groups and wider it is not
+                # displayed.
+                layout.type: none
+            relation: { cardinality: "1", slotName: short }
       relation: { cardinality: "1", slotName: caption }

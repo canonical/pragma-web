@@ -11,7 +11,9 @@ import "./styles.css";
 const componentCssClassName = "ds car-type-page";
 
 /**
- * The fleet lens's page of one car type: its title, then its side view, the car drawn alone.
+ * The fleet lens's page of one car type, on the sectioned view: its title,
+ * its facts, then its side view, the car drawn alone. Its root is a
+ * subgrid of the canvas's page grid over every column.
  *
  * The page reads its operation inside its own error boundary and Suspense,
  * so neither reaches the router's outlet: a read in flight shows one line,

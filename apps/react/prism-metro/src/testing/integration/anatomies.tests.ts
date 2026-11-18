@@ -57,12 +57,6 @@ const EXTERNAL_TOKENS = [
  */
 const DOCUMENT_TOKENS = ["--grid-col-min"];
 
-/**
- * The one reach into another component the app's components make: the
- * peek ends the summary of the card it shows at its third line.
- */
-const REACHES = [".ds.metro-peek .summary"];
-
 const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
 
 /**
@@ -178,7 +172,6 @@ describe("the app's components", () => {
           layer: "ds.components.global",
           externalTokens: EXTERNAL_TOKENS,
           documentTokens: DOCUMENT_TOKENS,
-          reaches: REACHES,
         }),
       ).not.toThrow();
     },

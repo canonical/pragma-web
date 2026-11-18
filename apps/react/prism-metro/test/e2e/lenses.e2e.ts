@@ -217,7 +217,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     );
     expect(status).toBe(200);
     expect(html).toMatch(/<h1[^>]*>Series 90 six-car<\/h1>/);
-    expect(html).toContain('class="ds platform-fit"');
+    expect(html).toMatch(/class="ds platform-fit[ "]/);
     expect(html).toMatch(/class="ds entity-chip ds rolling-stock-chip"/);
     expect(html).toContain('class="mark"');
   });

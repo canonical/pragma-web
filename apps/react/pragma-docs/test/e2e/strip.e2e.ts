@@ -4,7 +4,10 @@
  * The docs' strip in the browser, at each side of the two-group threshold:
  * one 53px band on every page, nothing in it overflowing, no group painted
  * over another, the count shortened only once the trail has given way and
- * no crumb reading as an address, the count ending on the band's last
+ * no crumb reading as an address, the count whole in its short form, the
+ * shown figure and its noun, at 390 and in its full one at 1440, the count
+ * ending on
+ * the band's last
  * line at 1440 and 1366, the facet bar one band of the strip's height on the
  * Definitions lens, its controls inside the band, and absent below two
  * groups, the folded renderer menu's
@@ -72,6 +75,44 @@ const SECTIONED_PATH = `/components/${encodeURIComponent("ds:global.component.bu
 
 /** The widths the open menu is checked over the contents bar at. */
 const MENU_OVER_BAR_WIDTHS: readonly number[] = [820, 390];
+
+/**
+ * Read the strip's count: the full sentence that names it, and the text it
+ * shows. It runs in the page.
+ *
+ * @returns The count's name, `null` when it has one form, and its shown text.
+ */
+function readStripCount(): {
+  readonly name: string | null;
+  readonly shown: string;
+} {
+  const count = document.querySelector<HTMLElement>(
+    '.ds.mode-strip [data-slot="count"] [aria-live]',
+  );
+  return {
+    name: count?.getAttribute("aria-label") ?? null,
+    shown: count?.innerText.trim() ?? "",
+  };
+}
+
+/** A count's short form: the shown figure and its noun, nothing more. */
+const SHORT_FORM_PATTERN = /^(\d+) (\p{L}+)$/u;
+
+/**
+ * Expect the count to show its short form, the shown figure and its noun,
+ * under a full sentence that names it with the same figure and noun.
+ */
+const expectShortForm = (
+  name: string | null,
+  shown: string,
+  path: string,
+): void => {
+  const [, figure, noun] = SHORT_FORM_PATTERN.exec(shown) ?? [];
+  expect(figure, `${path}: "${shown}"`).toBeDefined();
+  expect(name?.startsWith(`${figure} `), path).toBe(true);
+  expect(noun !== undefined && name?.includes(noun), path).toBe(true);
+  expect(shown.length, path).toBeLessThan(name?.length ?? 0);
+};
 
 let server: RunningServer;
 let browser: Browser;
@@ -195,6 +236,31 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
         }
       } finally {
         await page.close();
+      }
+    },
+  );
+
+  // A count shows its short form below two groups, the shown figure and its
+  // noun, whole, and its full sentence wider; the full sentence names it at
+  // every width.
+  it.runIf(viewport.width === 390 || viewport.width === 1440)(
+    "shows the count whole, its figure and noun at 390 and its sentence at 1440",
+    async () => {
+      for (const path of COUNTED_PATHS) {
+        const page = await open(path);
+        try {
+          const strip = await page.evaluate(measureStrip);
+          const { name, shown } = await page.evaluate(readStripCount);
+          expect(strip.countClipped, path).toBe(false);
+          expect(name, path).not.toBeNull();
+          if (viewport.width === 390) {
+            expectShortForm(name, shown, path);
+          } else {
+            expect(shown, path).toBe(name);
+          }
+        } finally {
+          await page.close();
+        }
       }
     },
   );

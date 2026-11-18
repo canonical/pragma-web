@@ -34,6 +34,58 @@ describe("CountLine", () => {
     expect(screen.getByRole("status")).toHaveTextContent("3 lines");
   });
 
+  it("holds a short form beside the full one, the full sentence its name", () => {
+    render(
+      <CountLine
+        kind="components loaded so far"
+        shortKind="components"
+        shown={100}
+        total={{ kind: "unknown" }}
+      />,
+    );
+    const count = screen.getByRole("status", {
+      name: "100 components loaded so far",
+    });
+    expect(count.querySelector(".full")).toHaveTextContent(
+      "100 components loaded so far",
+    );
+    expect(count.querySelector(".short")?.textContent).toBe("100 components");
+  });
+
+  it("shortens an exact count to the shown figure and its noun", () => {
+    render(
+      <CountLine
+        kind="entries"
+        shown={26}
+        total={{ kind: "exact", value: 26 }}
+      />,
+    );
+    const count = screen.getByRole("status", { name: "26 of 26 entries" });
+    expect(count.querySelector(".full")?.textContent).toBe("26 of 26 entries");
+    expect(count.querySelector(".short")?.textContent).toBe("26 entries");
+  });
+
+  it("puts the short form's noun in the shown figure's number", () => {
+    render(
+      <CountLine
+        kind="entries"
+        shortKind="entry"
+        shown={1}
+        total={{ kind: "at-least", value: 26 }}
+      />,
+    );
+    const count = screen.getByRole("status", { name: "1 of 26+ entries" });
+    expect(count.querySelector(".short")?.textContent).toBe("1 entry");
+  });
+
+  it("keeps one form when the count is already the figure and its noun", () => {
+    render(<CountLine kind="lines" shown={3} total={{ kind: "unknown" }} />);
+    const count = screen.getByRole("status");
+    expect(count).not.toHaveAttribute("aria-label");
+    expect(count.querySelector(".short")).toBeNull();
+    expect(count.textContent).toBe("3 lines");
+  });
+
   it("announces a change politely", () => {
     render(<CountLine kind="lines" shown={3} total={{ kind: "unknown" }} />);
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");

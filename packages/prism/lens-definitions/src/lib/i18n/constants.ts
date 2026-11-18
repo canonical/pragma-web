@@ -25,6 +25,10 @@ export const MESSAGES = {
     one: "{visible} of {count} class",
     other: "{visible} of {count} classes",
   },
+  "status.classes.short": {
+    one: "{visible} class",
+    other: "{visible} classes",
+  },
   "status.classes.abstract": {
     one: "{visible} of {count} class · {abstract} abstract",
     other: "{visible} of {count} classes · {abstract} abstract",

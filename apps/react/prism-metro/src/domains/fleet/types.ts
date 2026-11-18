@@ -98,9 +98,6 @@ export interface LineFit {
   readonly overhangs: readonly Overhang[];
 }
 
-/** The kinds of fleet node that have a page of their own. */
-export type FleetNodeKind = "stock" | "formation" | "unit" | "carType";
-
 /** One fact of a fleet node: its term and its value, as a reader reads them. */
 export interface FleetFact {
   readonly term: string;

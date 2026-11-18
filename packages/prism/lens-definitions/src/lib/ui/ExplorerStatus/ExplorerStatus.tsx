@@ -24,6 +24,12 @@ const componentCssClassName = "ds explorer-status";
  * when chips move the count, which is the whole point of putting it in the
  * strip rather than in the canvas.
  *
+ * The caption holds two forms: the full sentence and its short form, the
+ * shown figure and its noun ("66 classes"). Below two groups, where the
+ * strip folds, the short form shows; at two groups and wider, the full
+ * one. The full sentence names the figure at every width, and the server
+ * renders one HTML for every width: the stylesheet chooses.
+ *
  * `import { ExplorerStatus } from "../ExplorerStatus/index.js";`
  *
  * @implements prism.component.explorer_status
@@ -39,10 +45,16 @@ export default function ExplorerStatus({
   const t = useMessages();
   // Guard the degenerate graph so the bar never computes NaN.
   const share = total === 0 ? 0 : Math.round((visible / total) * 100);
+  const short = t("status.classes.short", { visible, count: visible });
+  const full =
+    abstract > 0
+      ? t("status.classes.abstract", { visible, count: total, abstract })
+      : t("status.classes", { visible, count: total });
 
   return (
     <figure
       {...props}
+      aria-label={full}
       aria-live="polite"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-status"
@@ -58,9 +70,8 @@ export default function ExplorerStatus({
         <span className="fill" />
       </div>
       <figcaption className="caption">
-        {abstract > 0
-          ? t("status.classes.abstract", { visible, count: total, abstract })
-          : t("status.classes", { visible, count: total })}
+        <span className="full">{full}</span>
+        <span className="short">{short}</span>
       </figcaption>
     </figure>
   );

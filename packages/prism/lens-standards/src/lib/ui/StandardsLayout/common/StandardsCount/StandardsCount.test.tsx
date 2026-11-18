@@ -36,7 +36,9 @@ const renderCount = (
 describe("StandardsCount", () => {
   it("states the loaded standards of the class's instance count", () => {
     renderCount();
-    expect(screen.getByRole("status")).toHaveTextContent("8 of 131 standards");
+    const count = screen.getByRole("status", { name: "8 of 131 standards" });
+    // Below two groups the strip shows the shown figure and its noun.
+    expect(count.querySelector(".short")?.textContent).toBe("8 standards");
   });
 
   it("states none of none, not a crash, when the binding names no class", () => {
