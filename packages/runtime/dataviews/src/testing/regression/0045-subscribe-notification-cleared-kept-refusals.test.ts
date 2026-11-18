@@ -30,7 +30,7 @@ const collection = createCollection({
 });
 
 /** A location whose subscription calls the listener at once. */
-const notifyingOnSubscribe = (href: string): QueryLocation => {
+const createNotifyingLocation = (href: string): QueryLocation => {
   const memory = createMemoryLocation({ href });
   return {
     ...memory,
@@ -50,7 +50,7 @@ describe("regression 0045 — a subscribe notification cleared kept refusals", (
         capabilities: declare({ filter: { status: ["isAny"] } }),
         answer: answerWith([]),
       }).source,
-      location: notifyingOnSubscribe("/machines"),
+      location: createNotifyingLocation("/machines"),
       snapshot: { query: "status=failed&owner__isSet=1", presentation: {} },
     });
     const release = provider.observe();

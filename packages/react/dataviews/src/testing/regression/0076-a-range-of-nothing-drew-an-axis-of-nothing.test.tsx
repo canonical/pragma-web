@@ -19,7 +19,7 @@ const unusable: readonly (readonly [number, number])[] = [
   [Number.NEGATIVE_INFINITY, 8],
 ];
 
-describe("a range whose ends are not finite", () => {
+describe("regression 0076 — a range of nothing drew an axis of nothing", () => {
   it("says no matching record holds a value, and draws no axis", () => {
     for (const [min, max] of unusable) {
       const { provider, source } = createFacetedManual();

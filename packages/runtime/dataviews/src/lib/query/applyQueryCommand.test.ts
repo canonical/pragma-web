@@ -3,7 +3,7 @@ import applyQueryCommand from "./applyQueryCommand.js";
 import { DEFAULT_WINDOW } from "./constants.js";
 import type { Predicate, ResultWindow, Slice } from "./types.js";
 
-const slice = (overrides: Partial<Slice> = {}): Slice => ({
+const buildSlice = (overrides: Partial<Slice> = {}): Slice => ({
   filter: [],
   search: null,
   sort: [],
@@ -11,21 +11,21 @@ const slice = (overrides: Partial<Slice> = {}): Slice => ({
   ...overrides,
 });
 
-const window = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
+const buildWindow = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
   ...DEFAULT_WINDOW,
   ...overrides,
 });
 
 describe("applyQueryCommand", () => {
   it("replaces only the addressed predicate and preserves other clauses", () => {
-    const base = slice({
+    const base = buildSlice({
       filter: [
         { field: "status", operator: "isAny", operands: ["failed"] },
         { field: "zone", operator: "isAny", operands: ["north"] },
       ],
       sort: [{ field: "name", direction: "asc" }],
     });
-    const result = applyQueryCommand(base, window(), {
+    const result = applyQueryCommand(base, buildWindow(), {
       kind: "setPredicate",
       predicate: {
         field: "status",
@@ -45,7 +45,7 @@ describe("applyQueryCommand", () => {
   });
 
   it("appends a predicate for an unaddressed field", () => {
-    const result = applyQueryCommand(slice(), window(), {
+    const result = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "setPredicate",
       predicate: { field: "status", operator: "isAny", operands: ["failed"] },
     });
@@ -61,7 +61,7 @@ describe("applyQueryCommand", () => {
       { field: "updated", operator: "lte", operands: ["2026-12-31"] },
       { field: "owner", operator: "isSet", operands: [] },
     ] as const) {
-      const result = applyQueryCommand(slice(), window(), {
+      const result = applyQueryCommand(buildSlice(), buildWindow(), {
         kind: "setPredicate",
         predicate,
       });
@@ -71,8 +71,8 @@ describe("applyQueryCommand", () => {
 
   it("resets the page and clears the cursor on a slice change", () => {
     const result = applyQueryCommand(
-      slice(),
-      window({ page: 4, cursor: "page-four" }),
+      buildSlice(),
+      buildWindow({ page: 4, cursor: "page-four" }),
       {
         kind: "setPredicate",
         predicate: { field: "status", operator: "isAny", operands: ["failed"] },
@@ -89,10 +89,14 @@ describe("applyQueryCommand", () => {
   it("clears a cursor a slice change left addressing nothing", () => {
     // Already on page one, so the token alone is what moves: a token minted
     // for one result set does not address a start in another.
-    const result = applyQueryCommand(slice(), window({ cursor: "minted" }), {
-      kind: "setSearch",
-      search: "yak",
-    });
+    const result = applyQueryCommand(
+      buildSlice(),
+      buildWindow({ cursor: "minted" }),
+      {
+        kind: "setSearch",
+        search: "yak",
+      },
+    );
     if (result.status !== "accepted") {
       throw new Error("expected acceptance");
     }
@@ -103,8 +107,8 @@ describe("applyQueryCommand", () => {
   it("keeps the collapsed groups across a slice change", () => {
     // A collapsed group is still that group after a filter.
     const result = applyQueryCommand(
-      slice({ group: [{ field: "status" }] }),
-      window({ collapsed: [["failed"]] }),
+      buildSlice({ group: [{ field: "status" }] }),
+      buildWindow({ collapsed: [["failed"]] }),
       { kind: "setSearch", search: "yak" },
     );
     if (result.status !== "accepted") {
@@ -117,13 +121,13 @@ describe("applyQueryCommand", () => {
   });
 
   it("removes exactly the addressed predicate and resets the window", () => {
-    const base = slice({
+    const base = buildSlice({
       filter: [
         { field: "status", operator: "isAny", operands: ["failed"] },
         { field: "status", operator: "isSet", operands: [] },
       ],
     });
-    const result = applyQueryCommand(base, window({ page: 3 }), {
+    const result = applyQueryCommand(base, buildWindow({ page: 3 }), {
       kind: "removePredicate",
       field: "status",
       operator: "isAny",
@@ -138,10 +142,10 @@ describe("applyQueryCommand", () => {
   });
 
   it("reports no change when removing an absent predicate", () => {
-    const base = slice({
+    const base = buildSlice({
       filter: [{ field: "zone", operator: "isAny", operands: ["north"] }],
     });
-    const result = applyQueryCommand(base, window({ page: 2 }), {
+    const result = applyQueryCommand(base, buildWindow({ page: 2 }), {
       kind: "removePredicate",
       field: "status",
       operator: "isAny",
@@ -156,8 +160,8 @@ describe("applyQueryCommand", () => {
 
   it("treats an empty search replacement as clearing the search", () => {
     const result = applyQueryCommand(
-      slice({ search: "yak" }),
-      window({ page: 2 }),
+      buildSlice({ search: "yak" }),
+      buildWindow({ page: 2 }),
       { kind: "setSearch", search: "" },
     );
     if (result.status !== "accepted") {
@@ -169,8 +173,8 @@ describe("applyQueryCommand", () => {
   });
 
   it("replaces the complete sort and resets the window", () => {
-    const base = slice({ sort: [{ field: "name", direction: "asc" }] });
-    const result = applyQueryCommand(base, window({ page: 2 }), {
+    const base = buildSlice({ sort: [{ field: "name", direction: "asc" }] });
+    const result = applyQueryCommand(base, buildWindow({ page: 2 }), {
       kind: "setSort",
       sort: [
         { field: "updated", direction: "desc" },
@@ -188,8 +192,8 @@ describe("applyQueryCommand", () => {
   });
 
   it("stores a sort field spelled twice as its first term", () => {
-    const base = slice({ sort: [{ field: "name", direction: "asc" }] });
-    const result = applyQueryCommand(base, window(), {
+    const base = buildSlice({ sort: [{ field: "name", direction: "asc" }] });
+    const result = applyQueryCommand(base, buildWindow(), {
       kind: "setSort",
       sort: [
         { field: "name", direction: "asc" },
@@ -207,8 +211,8 @@ describe("applyQueryCommand", () => {
   });
 
   it("clears the sort through an empty replacement", () => {
-    const base = slice({ sort: [{ field: "name", direction: "asc" }] });
-    const result = applyQueryCommand(base, window(), {
+    const base = buildSlice({ sort: [{ field: "name", direction: "asc" }] });
+    const result = applyQueryCommand(base, buildWindow(), {
       kind: "setSort",
       sort: [],
     });
@@ -220,7 +224,7 @@ describe("applyQueryCommand", () => {
   });
 
   it("sets ordered grouping levels and clears them again", () => {
-    const grouped = applyQueryCommand(slice(), window({ page: 2 }), {
+    const grouped = applyQueryCommand(buildSlice(), buildWindow({ page: 2 }), {
       kind: "setGroup",
       group: [{ field: "zone" }, { field: "status" }],
     });
@@ -233,7 +237,7 @@ describe("applyQueryCommand", () => {
     ]);
     expect(grouped.window.page).toBe(1);
 
-    const cleared = applyQueryCommand(grouped.slice, window(), {
+    const cleared = applyQueryCommand(grouped.slice, buildWindow(), {
       kind: "setGroup",
       group: [],
     });
@@ -246,19 +250,21 @@ describe("applyQueryCommand", () => {
 
   it("rebuilds the grouping levels rather than keeping the caller's", () => {
     const levels = [{ field: "zone" }];
-    const result = applyQueryCommand(slice(), window(), {
+    const result = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "setGroup",
       group: levels,
     });
     if (result.status !== "accepted") {
       throw new Error("expected acceptance");
     }
-    expect(result.slice.group[0]).not.toBe(levels[0]);
+    expect(result.slice.group.at(0)).not.toBe(levels.at(0));
   });
 
   it("keeps a reordering of the same grouping fields as a change", () => {
-    const base = slice({ group: [{ field: "zone" }, { field: "status" }] });
-    const result = applyQueryCommand(base, window(), {
+    const base = buildSlice({
+      group: [{ field: "zone" }, { field: "status" }],
+    });
+    const result = applyQueryCommand(base, buildWindow(), {
       kind: "setGroup",
       group: [{ field: "status" }, { field: "zone" }],
     });
@@ -272,8 +278,8 @@ describe("applyQueryCommand", () => {
     // Grouping decides what a collapsed path names, so a new grouping leaves
     // no path that still means what it meant.
     const result = applyQueryCommand(
-      slice({ group: [{ field: "status" }] }),
-      window({ collapsed: [["failed"]] }),
+      buildSlice({ group: [{ field: "status" }] }),
+      buildWindow({ collapsed: [["failed"]] }),
       { kind: "setGroup", group: [{ field: "zone" }] },
     );
     if (result.status !== "accepted") {
@@ -284,7 +290,7 @@ describe("applyQueryCommand", () => {
   });
 
   it("rejects a grouping level naming no field", () => {
-    const result = applyQueryCommand(slice(), window(), {
+    const result = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "setGroup",
       group: [{ field: "zone" }, { field: "" }],
     });
@@ -295,10 +301,10 @@ describe("applyQueryCommand", () => {
   });
 
   it("collapses groups from the first page, leaving the query alone", () => {
-    const base = slice({ group: [{ field: "status" }] });
+    const base = buildSlice({ group: [{ field: "status" }] });
     const result = applyQueryCommand(
       base,
-      window({ page: 3, cursor: "page-three" }),
+      buildWindow({ page: 3, cursor: "page-three" }),
       { kind: "setCollapsed", collapsed: [["failed"], ["ready"]] },
     );
     if (result.status !== "accepted") {
@@ -315,19 +321,22 @@ describe("applyQueryCommand", () => {
 
   it("copies the collapsed paths it is given", () => {
     const paths = [["failed"]];
-    const result = applyQueryCommand(slice(), window(), {
+    const result = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "setCollapsed",
       collapsed: paths,
     });
     if (result.status !== "accepted") {
       throw new Error("expected acceptance");
     }
-    expect(result.window.collapsed[0]).not.toBe(paths[0]);
+    expect(result.window.collapsed.at(0)).not.toBe(paths.at(0));
   });
 
   it("changes nothing when the collapse is restated", () => {
-    const base = window({ page: 3, collapsed: [["failed"], ["eu", "west"]] });
-    const result = applyQueryCommand(slice(), base, {
+    const base = buildWindow({
+      page: 3,
+      collapsed: [["failed"], ["eu", "west"]],
+    });
+    const result = applyQueryCommand(buildSlice(), base, {
       kind: "setCollapsed",
       collapsed: [["failed"], ["eu", "west"]],
     });
@@ -339,17 +348,21 @@ describe("applyQueryCommand", () => {
   });
 
   it("tells collapses apart by count, by depth and by key", () => {
-    const collapsing = (collapsed: readonly (readonly string[])[]) =>
-      applyQueryCommand(slice(), window({ collapsed: [["eu", "west"]] }), {
-        kind: "setCollapsed",
-        collapsed,
-      });
+    const applyCollapsed = (collapsed: readonly (readonly string[])[]) =>
+      applyQueryCommand(
+        buildSlice(),
+        buildWindow({ collapsed: [["eu", "west"]] }),
+        {
+          kind: "setCollapsed",
+          collapsed,
+        },
+      );
     for (const collapsed of [
       [["eu", "west"], ["failed"]],
       [["eu"]],
       [["eu", "east"]],
     ]) {
-      const result = collapsing(collapsed);
+      const result = applyCollapsed(collapsed);
       if (result.status !== "accepted") {
         throw new Error("expected acceptance");
       }
@@ -358,8 +371,8 @@ describe("applyQueryCommand", () => {
   });
 
   it("navigates the window without touching the query", () => {
-    const base = slice({ search: "yak" });
-    const result = applyQueryCommand(base, window(), {
+    const base = buildSlice({ search: "yak" });
+    const result = applyQueryCommand(base, buildWindow(), {
       kind: "navigateWindow",
       page: 2,
       size: 25,
@@ -379,18 +392,26 @@ describe("applyQueryCommand", () => {
   });
 
   it("takes the current value for a window member it is not given", () => {
-    const result = applyQueryCommand(slice(), window({ page: 4, size: 25 }), {
-      kind: "navigateWindow",
-      page: 5,
-    });
+    const result = applyQueryCommand(
+      buildSlice(),
+      buildWindow({ page: 4, size: 25 }),
+      {
+        kind: "navigateWindow",
+        page: 5,
+      },
+    );
     if (result.status !== "accepted") {
       throw new Error("expected acceptance");
     }
     expect(result.window.size).toBe(25);
-    const resized = applyQueryCommand(slice(), window({ page: 4, size: 25 }), {
-      kind: "navigateWindow",
-      size: 10,
-    });
+    const resized = applyQueryCommand(
+      buildSlice(),
+      buildWindow({ page: 4, size: 25 }),
+      {
+        kind: "navigateWindow",
+        size: 10,
+      },
+    );
     if (resized.status !== "accepted") {
       throw new Error("expected acceptance");
     }
@@ -398,11 +419,15 @@ describe("applyQueryCommand", () => {
   });
 
   it("reports no change when navigating to the current window", () => {
-    const result = applyQueryCommand(slice(), window({ page: 2, size: 25 }), {
-      kind: "navigateWindow",
-      page: 2,
-      size: 25,
-    });
+    const result = applyQueryCommand(
+      buildSlice(),
+      buildWindow({ page: 2, size: 25 }),
+      {
+        kind: "navigateWindow",
+        page: 2,
+        size: 25,
+      },
+    );
     if (result.status !== "accepted") {
       throw new Error("expected acceptance");
     }
@@ -410,7 +435,7 @@ describe("applyQueryCommand", () => {
   });
 
   it("reaches a page by the token the source handed back", () => {
-    const result = applyQueryCommand(slice(), window({ page: 1 }), {
+    const result = applyQueryCommand(buildSlice(), buildWindow({ page: 1 }), {
       kind: "navigateWindow",
       page: 2,
       cursor: "after-page-one",
@@ -424,8 +449,8 @@ describe("applyQueryCommand", () => {
 
   it("keeps the token when neither the page nor the size moves", () => {
     const result = applyQueryCommand(
-      slice(),
-      window({ page: 2, cursor: "page-two" }),
+      buildSlice(),
+      buildWindow({ page: 2, cursor: "page-two" }),
       { kind: "navigateWindow", page: 2 },
     );
     if (result.status !== "accepted") {
@@ -439,8 +464,8 @@ describe("applyQueryCommand", () => {
     // A token addresses one page start, so moving without supplying one
     // leaves no token behind to describe the page that was left.
     const paged = applyQueryCommand(
-      slice(),
-      window({ page: 2, cursor: "page-two" }),
+      buildSlice(),
+      buildWindow({ page: 2, cursor: "page-two" }),
       { kind: "navigateWindow", page: 3 },
     );
     if (paged.status !== "accepted") {
@@ -449,8 +474,8 @@ describe("applyQueryCommand", () => {
     expect(paged.window.cursor).toBeNull();
 
     const resized = applyQueryCommand(
-      slice(),
-      window({ page: 2, cursor: "page-two" }),
+      buildSlice(),
+      buildWindow({ page: 2, cursor: "page-two" }),
       { kind: "navigateWindow", size: 10 },
     );
     if (resized.status !== "accepted") {
@@ -461,8 +486,8 @@ describe("applyQueryCommand", () => {
 
   it("drops a token on the spot when asked for null", () => {
     const result = applyQueryCommand(
-      slice(),
-      window({ page: 2, cursor: "page-two" }),
+      buildSlice(),
+      buildWindow({ page: 2, cursor: "page-two" }),
       { kind: "navigateWindow", cursor: null },
     );
     if (result.status !== "accepted") {
@@ -474,7 +499,7 @@ describe("applyQueryCommand", () => {
   });
 
   it("rejects an empty cursor rather than reading it as no cursor", () => {
-    const result = applyQueryCommand(slice(), window(), {
+    const result = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "navigateWindow",
       cursor: "",
     });
@@ -488,8 +513,8 @@ describe("applyQueryCommand", () => {
 
   it("leaves the collapsed groups alone while navigating", () => {
     const result = applyQueryCommand(
-      slice(),
-      window({ collapsed: [["failed"]] }),
+      buildSlice(),
+      buildWindow({ collapsed: [["failed"]] }),
       { kind: "navigateWindow", page: 2 },
     );
     if (result.status !== "accepted") {
@@ -499,7 +524,7 @@ describe("applyQueryCommand", () => {
   });
 
   it("treats a semantically unchanged edit as no change at all", () => {
-    const base = slice({
+    const base = buildSlice({
       filter: [
         {
           field: "status",
@@ -509,7 +534,7 @@ describe("applyQueryCommand", () => {
       ],
       sort: [{ field: "name", direction: "asc" }],
     });
-    const result = applyQueryCommand(base, window({ page: 2 }), {
+    const result = applyQueryCommand(base, buildWindow({ page: 2 }), {
       kind: "setPredicate",
       predicate: {
         field: "status",
@@ -526,7 +551,7 @@ describe("applyQueryCommand", () => {
   });
 
   it("rejects a predicate with an empty field", () => {
-    const result = applyQueryCommand(slice(), window(), {
+    const result = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "setPredicate",
       predicate: { field: "", operator: "isAny", operands: ["failed"] },
     });
@@ -544,7 +569,7 @@ describe("applyQueryCommand", () => {
       { kind: "navigateWindow", size: 2.5 },
       { kind: "navigateWindow", size: Number.POSITIVE_INFINITY },
     ] as const) {
-      const result = applyQueryCommand(slice(), window(), command);
+      const result = applyQueryCommand(buildSlice(), buildWindow(), command);
       expect(result.status).toBe("rejected");
     }
   });
@@ -597,19 +622,19 @@ describe("applyQueryCommand", () => {
       },
     ] as const;
     for (const command of cases) {
-      const result = applyQueryCommand(slice(), window(), command);
+      const result = applyQueryCommand(buildSlice(), buildWindow(), command);
       expect(result.status).toBe("rejected");
     }
   });
 
   it("rejects predicate fields containing NUL characters on creation only", () => {
-    const result = applyQueryCommand(slice(), window(), {
+    const result = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "setPredicate",
       predicate: { field: "a\u0000b", operator: "isAny", operands: ["x"] },
     });
     expect(result.status).toBe("rejected");
     // Removal may address out-of-grammar predicates to clean them up.
-    const removal = applyQueryCommand(slice(), window(), {
+    const removal = applyQueryCommand(buildSlice(), buildWindow(), {
       kind: "removePredicate",
       field: "a\u0000b",
       operator: "isAny",
@@ -622,7 +647,7 @@ describe("applyQueryCommand", () => {
       kind: "setPredicate",
       predicate: { field: "status", operator: "like", operands: ["x"] },
     } as unknown as { kind: "setPredicate"; predicate: Predicate };
-    const result = applyQueryCommand(slice(), window(), forged);
+    const result = applyQueryCommand(buildSlice(), buildWindow(), forged);
     if (result.status !== "rejected") {
       throw new Error("expected rejection");
     }
@@ -630,8 +655,8 @@ describe("applyQueryCommand", () => {
   });
 
   it("keeps state unchanged on rejection", () => {
-    const base = slice({ search: "yak" });
-    const result = applyQueryCommand(base, window({ page: 2 }), {
+    const base = buildSlice({ search: "yak" });
+    const result = applyQueryCommand(base, buildWindow({ page: 2 }), {
       kind: "navigateWindow",
       page: 0,
     });
@@ -644,13 +669,13 @@ describe("applyQueryCommand", () => {
   });
 
   it("moves a set to the other operator on its field in one transition", () => {
-    const standing = slice({
+    const standing = buildSlice({
       filter: [
         { field: "status", operator: "isAny", operands: ["failed"] },
         { field: "cpu", operator: "gte", operands: [4] },
       ],
     });
-    const result = applyQueryCommand(standing, window(), {
+    const result = applyQueryCommand(standing, buildWindow(), {
       kind: "editPredicates",
       remove: [{ field: "status", operator: "isAny", nth: 0 }],
       add: [{ field: "status", operator: "isNone", operands: ["failed"] }],
@@ -663,12 +688,14 @@ describe("applyQueryCommand", () => {
   });
 
   describe("one conjunct among several at an address", () => {
-    const gte = (cores: number): Predicate => ({
+    const buildGte = (cores: number): Predicate => ({
       field: "cpu",
       operator: "gte",
       operands: [cores],
     });
-    const bounded = slice({ filter: [gte(8), gte(4), gte(16)] });
+    const bounded = buildSlice({
+      filter: [buildGte(8), buildGte(4), buildGte(16)],
+    });
 
     const accept = (result: ReturnType<typeof applyQueryCommand>) => {
       if (result.status !== "accepted") {
@@ -680,40 +707,44 @@ describe("applyQueryCommand", () => {
     // Canonical order compares operands by their text: 16, then 4, then 8.
     it("replaces the conjunct at nth, counted in canonical order", () => {
       const result = accept(
-        applyQueryCommand(bounded, window(), {
+        applyQueryCommand(bounded, buildWindow(), {
           kind: "setPredicate",
-          predicate: gte(2),
+          predicate: buildGte(2),
           nth: 1,
         }),
       );
-      expect(result.slice.filter).toEqual([gte(8), gte(16), gte(2)]);
+      expect(result.slice.filter).toEqual([
+        buildGte(8),
+        buildGte(16),
+        buildGte(2),
+      ]);
     });
 
     it("replaces conjunct 0 when no place is given", () => {
       expect(
         accept(
-          applyQueryCommand(bounded, window(), {
+          applyQueryCommand(bounded, buildWindow(), {
             kind: "setPredicate",
-            predicate: gte(2),
+            predicate: buildGte(2),
           }),
         ).slice.filter,
-      ).toEqual([gte(8), gte(4), gte(2)]);
+      ).toEqual([buildGte(8), buildGte(4), buildGte(2)]);
     });
 
     it("rejects a place past the conjuncts present, or no whole number", () => {
       for (const nth of [3, -1, 1.5, Number.NaN]) {
-        const result = applyQueryCommand(bounded, window(), {
+        const result = applyQueryCommand(bounded, buildWindow(), {
           kind: "setPredicate",
-          predicate: gte(2),
+          predicate: buildGte(2),
           nth,
         });
         expect(result.status).toBe("rejected");
         expect(result.slice).toBe(bounded);
       }
       expect(
-        applyQueryCommand(slice(), window(), {
+        applyQueryCommand(buildSlice(), buildWindow(), {
           kind: "setPredicate",
-          predicate: gte(2),
+          predicate: buildGte(2),
           nth: 1,
         }),
       ).toMatchObject({
@@ -725,17 +756,17 @@ describe("applyQueryCommand", () => {
     it("removes the conjunct at nth alone, and nothing for one already gone", () => {
       expect(
         accept(
-          applyQueryCommand(bounded, window(), {
+          applyQueryCommand(bounded, buildWindow(), {
             kind: "removePredicate",
             field: "cpu",
             operator: "gte",
             nth: 2,
           }),
         ).slice.filter,
-      ).toEqual([gte(4), gte(16)]);
+      ).toEqual([buildGte(4), buildGte(16)]);
       expect(
         accept(
-          applyQueryCommand(bounded, window({ page: 2 }), {
+          applyQueryCommand(bounded, buildWindow({ page: 2 }), {
             kind: "removePredicate",
             field: "cpu",
             operator: "gte",
@@ -744,7 +775,7 @@ describe("applyQueryCommand", () => {
         ),
       ).toMatchObject({ sliceChanged: false, windowChanged: false });
       expect(
-        applyQueryCommand(bounded, window(), {
+        applyQueryCommand(bounded, buildWindow(), {
           kind: "removePredicate",
           field: "cpu",
           operator: "gte",
@@ -756,18 +787,22 @@ describe("applyQueryCommand", () => {
     it("removes every copy of a conjunct the slice spells twice", () => {
       expect(
         accept(
-          applyQueryCommand(slice({ filter: [gte(4), gte(4)] }), window(), {
-            kind: "removePredicate",
-            field: "cpu",
-            operator: "gte",
-          }),
+          applyQueryCommand(
+            buildSlice({ filter: [buildGte(4), buildGte(4)] }),
+            buildWindow(),
+            {
+              kind: "removePredicate",
+              field: "cpu",
+              operator: "gte",
+            },
+          ),
         ).slice.filter,
       ).toEqual([]);
     });
 
     it("edits by refs read before the edit, in one transition", () => {
       const result = accept(
-        applyQueryCommand(bounded, window({ page: 3 }), {
+        applyQueryCommand(bounded, buildWindow({ page: 3 }), {
           kind: "editPredicates",
           remove: [
             { field: "cpu", operator: "gte", nth: 0 },
@@ -777,7 +812,7 @@ describe("applyQueryCommand", () => {
         }),
       );
       expect(result.slice.filter).toEqual([
-        gte(8),
+        buildGte(8),
         { field: "cpu", operator: "lte", operands: [32] },
       ]);
       expect(result.window.page).toBe(1);
@@ -786,7 +821,7 @@ describe("applyQueryCommand", () => {
     it("accepts an empty edit as no change", () => {
       expect(
         accept(
-          applyQueryCommand(bounded, window(), {
+          applyQueryCommand(bounded, buildWindow(), {
             kind: "editPredicates",
             remove: [],
             add: [],
@@ -796,7 +831,7 @@ describe("applyQueryCommand", () => {
     });
 
     it("rejects an edit naming a conjunct twice, or one the slice lacks", () => {
-      const twice = applyQueryCommand(bounded, window(), {
+      const twice = applyQueryCommand(bounded, buildWindow(), {
         kind: "editPredicates",
         remove: [
           { field: "cpu", operator: "gte", nth: 1 },
@@ -809,7 +844,7 @@ describe("applyQueryCommand", () => {
         reason: "conjunct 1 of cpu gte is named twice",
       });
       expect(
-        applyQueryCommand(bounded, window(), {
+        applyQueryCommand(bounded, buildWindow(), {
           kind: "editPredicates",
           remove: [{ field: "cpu", operator: "lte", nth: 0 }],
           add: [],
@@ -819,7 +854,7 @@ describe("applyQueryCommand", () => {
         reason: "cpu lte holds no conjunct 0",
       });
       expect(
-        applyQueryCommand(bounded, window(), {
+        applyQueryCommand(bounded, buildWindow(), {
           kind: "editPredicates",
           remove: [{ field: "cpu", operator: "gte", nth: 0.5 }],
           add: [],
@@ -829,7 +864,7 @@ describe("applyQueryCommand", () => {
 
     it("rejects an edit adding a conjunct outside the grammar", () => {
       expect(
-        applyQueryCommand(bounded, window(), {
+        applyQueryCommand(bounded, buildWindow(), {
           kind: "editPredicates",
           remove: [],
           add: [{ field: "cpu", operator: "gte", operands: [] }],
@@ -842,7 +877,7 @@ describe("applyQueryCommand", () => {
   });
 
   describe("clearing parts of the query", () => {
-    const busy = slice({
+    const busy = buildSlice({
       filter: [
         { field: "tags", operator: "isAny", operands: ["ex-gpu"] },
         { field: "tags", operator: "isAny", operands: ["ex-nvme"] },
@@ -850,7 +885,11 @@ describe("applyQueryCommand", () => {
       search: "alder",
       sort: [{ field: "name", direction: "asc" }],
     });
-    const deep = window({ page: 3, cursor: "ex-token", collapsed: [["a"]] });
+    const deep = buildWindow({
+      page: 3,
+      cursor: "ex-token",
+      collapsed: [["a"]],
+    });
 
     it("empties the filter, the search, or both, and keeps the rest", () => {
       expect(
@@ -895,13 +934,13 @@ describe("applyQueryCommand", () => {
 
     it("changes nothing when the parts are already empty", () => {
       expect(
-        applyQueryCommand(slice(), deep, {
+        applyQueryCommand(buildSlice(), deep, {
           kind: "clear",
           paths: ["filter", "search"],
         }),
       ).toEqual({
         status: "accepted",
-        slice: slice(),
+        slice: buildSlice(),
         window: deep,
         sliceChanged: false,
         windowChanged: false,

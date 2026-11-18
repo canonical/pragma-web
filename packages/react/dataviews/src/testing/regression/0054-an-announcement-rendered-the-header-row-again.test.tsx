@@ -7,37 +7,33 @@
  * The announcer holds what it says, and saying something renders its region
  * alone.
  *
- * Header cells are counted by wrapping the module that renders them: React
- * offers no per-component render count to read otherwise, as regression
- * 0014 found.
+ * Header cells are counted by a pass-through counter: a spy that runs the
+ * real cell on every render. React offers no per-component render count to
+ * read otherwise, as regression 0014 found.
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
+import HeaderCell from "../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
-const renders = vi.hoisted(() => ({ count: 0 }));
-
 vi.mock(
-  "../../lib/_work_in_progress/DataTable/common/HeaderCell/HeaderCell.js",
+  "../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../lib/_work_in_progress/DataTable/common/HeaderCell/HeaderCell.js")
+        typeof import("../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js")
       >();
-    const CountedHeaderCell = (props: Parameters<typeof actual.default>[0]) => {
-      renders.count += 1;
-      return createElement(actual.default, props);
-    };
-    return { default: CountedHeaderCell };
+    return { default: vi.fn(actual.default) };
   },
 );
+
+const renders = vi.mocked(HeaderCell);
 
 beforeEach(() => {
   fakeAnnouncerClock();
@@ -63,9 +59,10 @@ describe("regression 0054 — an announcement rendered the header row again", ()
     const item = screen.getByRole("menuitem", {
       name: "Name is always shown",
     });
-    renders.count = 0;
+    expect(renders).toHaveBeenCalled();
+    renders.mockClear();
     fireEvent.click(item);
     expect(await readAnnouncements()).toEqual(["Name is always shown"]);
-    expect(renders.count).toBe(0);
+    expect(renders).not.toHaveBeenCalled();
   });
 });

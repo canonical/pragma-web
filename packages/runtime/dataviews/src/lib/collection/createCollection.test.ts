@@ -5,12 +5,12 @@ type Container = { readonly id: string; readonly type: "container" };
 type VirtualMachine = { readonly id: string; readonly type: "virtual-machine" };
 type Instance = Container | VirtualMachine;
 
-const byId = (instance: Instance): string => instance.id;
+const readInstanceId = (instance: Instance): string => instance.id;
 
 describe("createCollection", () => {
   it("declares the schema, the identity and no types by default", () => {
     const collection = createCollection({
-      identify: byId,
+      identify: readInstanceId,
       fields: [{ field: "id", kind: "text" }],
     });
     expect(collection.schema.fieldNames).toEqual(["id"]);
@@ -21,7 +21,7 @@ describe("createCollection", () => {
 
   it("publishes the discriminator and its names in declaration order", () => {
     const { types } = createCollection({
-      identify: byId,
+      identify: readInstanceId,
       discriminator: "type",
       fields: [
         {
@@ -45,7 +45,7 @@ describe("createCollection", () => {
   it("refuses a discriminator the schema does not describe", () => {
     expect(() =>
       createCollection({
-        identify: byId,
+        identify: readInstanceId,
         fields: [{ field: "type", kind: "choices", options: ["container"] }],
         discriminator: "kind" as "type",
       }),
@@ -94,7 +94,7 @@ describe("createCollection", () => {
   it("refuses a field scoped to a type the discriminator does not offer", () => {
     expect(() =>
       createCollection({
-        identify: byId,
+        identify: readInstanceId,
         discriminator: "type",
         fields: [
           { field: "type", kind: "choices", options: ["container"] },

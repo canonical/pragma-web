@@ -13,7 +13,7 @@ import buildMachine from "../../../testing/buildMachine.js";
 import createFacetedManual from "../../../testing/createFacetedManual.js";
 import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
-describe("a number field answered with a facet of values", () => {
+describe("regression 0072 — a values facet read as a range of nothing", () => {
   it("is refused rather than drawn as no value at all", () => {
     // React reports the thrown render to the console before rethrowing it.
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});

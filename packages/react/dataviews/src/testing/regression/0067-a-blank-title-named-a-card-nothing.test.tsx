@@ -17,7 +17,7 @@ const fields: readonly DisplayField[] = [
   { id: "status", header: "Status" },
 ];
 
-describe("a card whose title holds no text", () => {
+describe("regression 0067 — a blank title named a card nothing", () => {
   it("is named by its identity, and so is its checkbox", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", ""), buildMachine("m-2", "beta")],

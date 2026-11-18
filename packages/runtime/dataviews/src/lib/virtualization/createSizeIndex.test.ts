@@ -86,11 +86,11 @@ describe("createSizeIndex", () => {
     }
     const offsets = sumOffsets(sizes);
     for (let position = 0; position <= sizes.length; position += 1) {
-      expect(index.readOffset(position)).toBe(offsets[position]);
+      expect(index.readOffset(position)).toBe(offsets.at(position));
     }
     for (let position = 0; position < sizes.length; position += 1) {
-      const from = offsets[position] ?? Number.NaN;
-      const to = offsets[position + 1] ?? Number.NaN;
+      const from = offsets.at(position) ?? Number.NaN;
+      const to = offsets.at(position + 1) ?? Number.NaN;
       expect(index.findPosition(from)).toBe(position);
       expect(index.findPosition(to - 0.5)).toBe(position);
     }

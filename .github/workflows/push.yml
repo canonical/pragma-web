@@ -61,3 +61,6 @@ jobs:
 
       - name: Test
         run: bun run test
+
+      - name: Test coverage
+        run: bun run test:coverage --scope @canonical/dataviews-core --scope @canonical/dataviews-react

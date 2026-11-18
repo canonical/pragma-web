@@ -21,7 +21,7 @@ const cards: RendererChoice = {
   content: <p>the cards</p>,
 };
 
-describe("a renderer withdrawn while it was chosen", () => {
+describe("regression 0066 — a withdrawn renderer came back chosen", () => {
   it("is not chosen again when it comes back", () => {
     const { rerender } = render(
       <RendererSwitch label="Show machines as" renderers={[table, cards]} />,

@@ -22,16 +22,11 @@ export const MOCK_API_ORIGIN = "http://localhost";
  * longer found, so a row leaves with the fix.
  */
 export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
-  "src/lib/_work_in_progress/DataTable/common/BodyCell/BodyCell.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataTable/common/HeaderMenu/HeaderMenu.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataTable/common/SettingsMenu/LabelsContext.ts test",
-  "src/lib/_work_in_progress/DataTable/common/SettingsMenu/SettingsMenu.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataTable/common/SettingsMenu/common/ItemLabel/ItemLabel.tsx test",
-  "src/lib/_work_in_progress/DataTable/common/TableBody/TableBody.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataTable/common/TableBody/TableBody.tsx test",
-  "src/lib/_work_in_progress/DataTable/common/hooks/useMenuPhase.ts test",
-  "src/lib/_work_in_progress/DataTable/common/utils/spellDestinationKey.ts test",
-  "src/lib/_work_in_progress/DataTable/constants.ts test",
+  "src/lib/_work_in_progress/common/ScopedDataTable/common/HeaderMenu/HeaderMenu.tsx export:memo-over-function",
+  "src/lib/_work_in_progress/common/ScopedDataTable/common/SettingsMenu/LabelsContext.ts test",
+  "src/lib/_work_in_progress/common/ScopedDataTable/common/SettingsMenu/SettingsMenu.tsx export:memo-over-function",
+  "src/lib/_work_in_progress/common/ScopedDataTable/common/SettingsMenu/common/ItemLabel/ItemLabel.tsx test",
+  "src/lib/_work_in_progress/common/ScopedDataTable/common/hooks/useMenuPhase.ts test",
   "src/lib/_work_in_progress/PaginationBar/common/PageControl/PageControl.tsx test",
   "src/lib/common/SettingsMenuContext/SettingsMenuContext.tsx test",
   "testing/keyboard/DataTable.keyboard.ts export:none",

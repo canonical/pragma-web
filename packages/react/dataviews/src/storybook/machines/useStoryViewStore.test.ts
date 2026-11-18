@@ -4,7 +4,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import useStoryViewStore from "./useStoryViewStore.js";
 
 /** A factory refusing every open, as a browser refusing storage does. */
-const refusing = (): IndexedDBFactory & { readonly names: string[] } => {
+const createRefusingFactory = (): IndexedDBFactory & {
+  readonly names: string[];
+} => {
   const names: string[] = [];
   return {
     names,
@@ -32,7 +34,7 @@ afterEach(() => {
 
 describe("useStoryViewStore", () => {
   it("opens a store of the story's own, and another tab over the same database", async () => {
-    const factory = refusing();
+    const factory = createRefusingFactory();
     const hook = renderHook(() => useStoryViewStore({ indexedDB: factory }));
     const { store, openAnotherTab } = hook.result.current;
     expect(openAnotherTab()).not.toBe(store);
@@ -42,14 +44,14 @@ describe("useStoryViewStore", () => {
       .list()
       .catch(() => {});
     expect(factory.names).toHaveLength(2);
-    expect(factory.names[0]).toMatch(/^dataviews-story-views-/);
-    expect(factory.names[1]).toBe(factory.names[0]);
+    expect(factory.names.at(0)).toMatch(/^dataviews-story-views-/);
+    expect(factory.names.at(1)).toBe(factory.names.at(0));
   });
 
   it("seeds the store once, leaving refused storage to the control, and deletes it on unmount", async () => {
     const deleteDatabase = vi.fn();
     vi.stubGlobal("indexedDB", { deleteDatabase });
-    const factory = refusing();
+    const factory = createRefusingFactory();
     const hook = renderHook(() =>
       useStoryViewStore({
         indexedDB: factory,
@@ -67,6 +69,6 @@ describe("useStoryViewStore", () => {
       expect(factory.names).toHaveLength(1);
     });
     hook.unmount();
-    expect(deleteDatabase).toHaveBeenCalledWith(factory.names[0]);
+    expect(deleteDatabase).toHaveBeenCalledWith(factory.names.at(0));
   });
 });

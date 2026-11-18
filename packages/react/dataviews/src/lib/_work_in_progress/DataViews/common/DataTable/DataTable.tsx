@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { ScopedDataTable } from "../../../DataTable/index.js";
+import { ScopedDataTable } from "../../../common/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import type { DataViewsDataTableProps } from "./types.js";
 
@@ -17,7 +17,7 @@ import type { DataViewsDataTableProps } from "./types.js";
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
- * @implements ds:apps.pattern.data_table
+ * @implements ds:apps.pattern.datatable
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

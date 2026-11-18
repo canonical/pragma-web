@@ -75,7 +75,7 @@ class FakeResizeObserver {
  * source answers the table's first request at once, so the rows are there
  * after the table's effect observes the provider.
  */
-const largeTable = (selectable = false) => {
+const renderLargeTable = (selectable = false) => {
   const { provider } = createMachineProvider({ rows });
   const view = render(
     <DataTable
@@ -107,10 +107,8 @@ const countElements = (root: Element): number =>
   1 + root.querySelectorAll("*").length;
 
 /** The body rows mounted right now. */
-const mountedRows = (table: HTMLElement): HTMLElement[] => [
-  ...table.querySelectorAll<HTMLElement>(
-    '.ds.data-table-row-group.body > [role="row"]',
-  ),
+const listMountedRows = (table: HTMLElement): HTMLElement[] => [
+  ...table.querySelectorAll<HTMLElement>(".ds.data-table-body > tr"),
 ];
 
 beforeEach(() => {
@@ -119,7 +117,7 @@ beforeEach(() => {
   vi.stubGlobal("ResizeObserver", FakeResizeObserver);
   vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
     function (this: HTMLElement) {
-      return this.getAttribute("role") === "table" ? 640 : 0;
+      return this.tagName === "TABLE" ? 640 : 0;
     },
   );
 });
@@ -135,23 +133,26 @@ describe("virtualized DataTable, bounded work", () => {
   it.each([0, 1, 2, 3])(
     "mounts a bounded range of a 10,000-row window at every scroll position, quarter %i",
     (quarter) => {
-      const { table } = largeTable();
+      const { table } = renderLargeTable();
       // What the range may hold, as first drawn: one row's elements, and
       // the frame around the rows — the header, the body and its gaps.
-      const [firstRow] = mountedRows(table);
+      const [firstRow] = listMountedRows(table);
       if (firstRow === undefined) {
         throw new Error("the window mounts no row");
       }
       const perRow = countElements(firstRow);
       const frame =
         table.querySelectorAll("*").length -
-        mountedRows(table).reduce((sum, row) => sum + countElements(row), 0);
+        listMountedRows(table).reduce(
+          (sum, row) => sum + countElements(row),
+          0,
+        );
       // Away from the top a second gap stands before the rows.
       const elementsAtMost = frame + 1 + mountedAtMost * perRow;
       const span = (rows.length * rowHeight) / 4;
       for (let top = quarter * span; top < (quarter + 1) * span; top += 3_200) {
         scrollTo(table, top);
-        const mounted = mountedRows(table);
+        const mounted = listMountedRows(table);
         expect(mounted.length).toBeLessThanOrEqual(mountedAtMost);
         expect(mounted.length).toBeGreaterThanOrEqual(inView);
         // The row at the viewport's top is among them, at its position.
@@ -172,7 +173,7 @@ describe("virtualized DataTable, bounded work", () => {
   );
 
   it("renders only the rows entering the range as it scrolls", () => {
-    const { table } = largeTable();
+    const { table } = renderLargeTable();
     scrollTo(table, 16_000);
     for (let step = 1; step <= 20; step += 1) {
       cellRenders = 0;
@@ -182,7 +183,7 @@ describe("virtualized DataTable, bounded work", () => {
   });
 
   it("renders no cell for a scroll inside the range, a selection or a resize", () => {
-    const { provider, table } = largeTable(true);
+    const { provider, table } = renderLargeTable(true);
     scrollTo(table, 16_000);
     cellRenders = 0;
     scrollTo(table, 16_005);
@@ -198,11 +199,11 @@ describe("virtualized DataTable, bounded work", () => {
   });
 
   it("keeps its gaps equal to the rows they stand for, however tall each is", () => {
-    const { table } = largeTable();
-    const measured = mountedRows(table).map(
+    const { table } = renderLargeTable();
+    const measured = listMountedRows(table).map(
       (row, position) => [row, position % 2 === 0 ? 32 : 64] as const,
     );
-    const firstMeasured = elementAt(measured, 0)[0];
+    const [firstMeasured] = elementAt(measured, 0);
     const observer = FakeResizeObserver.live.find((candidate) =>
       candidate.observed.has(firstMeasured),
     );
@@ -214,16 +215,16 @@ describe("virtualized DataTable, bounded work", () => {
     });
     scrollTo(table, 160_000);
     const before = elementAt(
-      [...table.querySelectorAll<HTMLElement>(".ds.data-table-gap")],
+      [...table.querySelectorAll<HTMLElement>(".ds.data-table-body")],
       0,
     );
     const first = Number(
-      elementAt(mountedRows(table), 0).getAttribute("aria-rowindex"),
+      elementAt(listMountedRows(table), 0).getAttribute("aria-rowindex"),
     );
     // Every row before the first mounted one: the measured ones at their
     // measured heights, the rest at the estimate.
     const grown = measured.reduce((total, [, height]) => total + height, 0);
-    expect(before.style.blockSize).toBe(
+    expect(before.style.paddingBlockStart).toBe(
       `${grown + (first - 2 - measured.length) * rowHeight}px`,
     );
   });

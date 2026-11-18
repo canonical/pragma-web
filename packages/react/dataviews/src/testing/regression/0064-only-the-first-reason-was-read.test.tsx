@@ -72,7 +72,7 @@ describe("regression 0064 — only the first reason was read", () => {
     expect(
       screen
         .getByRole("button", { name: "Name" })
-        .closest("[role='columnheader']")
+        .closest("th")
         ?.querySelector(".sort-reason")?.textContent,
     ).toBe(SAID);
   });

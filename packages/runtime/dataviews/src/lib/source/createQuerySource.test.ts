@@ -71,7 +71,7 @@ const readDelivery = (
   deliver: ReturnType<typeof createDeliverySpy>,
   index: number,
 ): SourceDelivery => {
-  const call = deliver.mock.calls[index];
+  const call = deliver.mock.calls.at(index);
   if (call === undefined) {
     throw new Error(`expected a delivery at index ${index}`);
   }

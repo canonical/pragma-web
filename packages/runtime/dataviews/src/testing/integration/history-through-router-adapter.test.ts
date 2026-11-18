@@ -23,7 +23,7 @@ const machines = createCollection({
   fields: [{ field: "cpu", kind: "number" }],
 });
 
-const harness = () => {
+const createHarness = () => {
   const adapter = createMemoryAdapter();
   adapter.navigate("/machines?tab=overview");
   /** Every navigation the adapter was asked for, with whether it replaced. */
@@ -48,12 +48,12 @@ const harness = () => {
   return { adapter, navigations, provider };
 };
 
-const searchOf = (adapter: ReturnType<typeof createMemoryAdapter>): string =>
+const readSearch = (adapter: ReturnType<typeof createMemoryAdapter>): string =>
   new URL(String(adapter.getLocation()), "http://localhost/").search;
 
 describe("history through the router adapter", () => {
   it("replaces for a search, pushes for a sort and a page, keeping the host's parameter", () => {
-    const { adapter, navigations, provider } = harness();
+    const { navigations, provider } = createHarness();
     const release = provider.observe();
     navigations.length = 0;
     provider.setSearch("ya");
@@ -70,7 +70,7 @@ describe("history through the router adapter", () => {
   });
 
   it("adopts Back and Forward through the adapter and writes nothing back", () => {
-    const { adapter, navigations, provider } = harness();
+    const { adapter, navigations, provider } = createHarness();
     const release = provider.observe();
     provider.setSearch("yak");
     provider.setSort([{ field: "cpu", direction: "desc" }]);
@@ -79,7 +79,7 @@ describe("history through the router adapter", () => {
 
     // Back: the entry before the page move, with the sort still in force.
     adapter.back();
-    expect(searchOf(adapter)).toBe(
+    expect(readSearch(adapter)).toBe(
       "?tab=overview&q=yak&sort=cpu__desc&page=1&size=50",
     );
     expect(provider.state.get().window.page).toBe(1);
@@ -91,7 +91,7 @@ describe("history through the router adapter", () => {
     // own, so this is the entry the reader arrived on, with the search
     // replaced into it.
     adapter.back();
-    expect(searchOf(adapter)).toBe("?tab=overview&q=yak&page=1&size=50");
+    expect(readSearch(adapter)).toBe("?tab=overview&q=yak&page=1&size=50");
     expect(provider.state.get().slice.sort).toEqual([]);
     expect(provider.state.get().slice.search).toBe("yak");
 

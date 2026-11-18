@@ -20,7 +20,7 @@ import declareMachineOrdering from "../../../../testing/declareMachineOrdering.j
 import deliverRows from "../../../../testing/deliverRows.js";
 import { machines } from "../../../../testing/machines.js";
 import DataTable from "./DataTable.js";
-import type { DataTableColumn } from "./types.js";
+import type { DataTableColumn } from "./index.js";
 
 const columns: readonly DataTableColumn[] = [
   {
@@ -67,12 +67,31 @@ describe("DataTable SSR", () => {
     expect(readPresentation).not.toHaveBeenCalled();
     expect(heard).not.toHaveBeenCalled();
     expect(html).toContain('class="ds data-table dense"');
-    expect(html).toContain('role="table"');
+    expect(html).toContain('<table class="ds data-table dense"');
     expect(html).toContain('aria-label="Machines"');
     // A resize handle's keys work only once scripts run, so none is sent.
     expect(html).not.toContain('role="separator"');
     expect(html).toContain('aria-label="Select all displayed rows"');
     expect(html).toContain("alpha");
+  });
+
+  it("draws the selection column disabled and unselected until scripts run", () => {
+    const { provider } = createMachineProvider();
+    const host = readProviderHost(provider);
+    host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
+    const html = renderToString(
+      <DataTable
+        provider={provider}
+        label="Machines"
+        selectable
+        getRowLabel={(row) => row.name}
+        columns={columns}
+      />,
+    );
+    expect(html).not.toContain("aria-selected");
+    expect(
+      html.match(/<input[^>]*type="checkbox"[^>]*disabled=""/g),
+    ).toHaveLength(2);
   });
 
   it("observes nothing on the server: the provider stays idle and the source is never asked", () => {

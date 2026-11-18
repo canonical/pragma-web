@@ -70,6 +70,9 @@ jobs:
       - name: Test
         run: bunx nx affected -t test --base=origin/${{ github.event.pull_request.base.ref }} --head=HEAD
 
+      - name: Test coverage
+        run: bun run test:coverage --scope @canonical/dataviews-core --scope @canonical/dataviews-react
+
     # The implementation graph data (data/*.ttl) is committed and must match
     # what the collector generates from the @implements annotations in-tree.
   implementation-data:

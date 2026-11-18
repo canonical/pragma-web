@@ -4,7 +4,7 @@ import createVirtualRange from "./createVirtualRange.js";
 import type { MountedRange, MountedRun } from "./types.js";
 
 /** The one run a range holds, which these cases mount exactly one of. */
-const onlyRun = (range: MountedRange): MountedRun => {
+const readOnlyRun = (range: MountedRange): MountedRun => {
   const [run, ...rest] = range.runs;
   if (run === undefined || rest.length > 0) {
     throw new Error(`expected one run, got ${range.runs.length}`);
@@ -13,22 +13,22 @@ const onlyRun = (range: MountedRange): MountedRun => {
 };
 
 /** Row identities `r-0` to `r-<count - 1>`. */
-const rowIds = (count: number, from = 0): string[] =>
+const listRowIds = (count: number, from = 0): string[] =>
   Array.from({ length: count }, (_, position) => `r-${from + position}`);
 
-const records = (ids: readonly string[]) =>
+const listRecords = (ids: readonly string[]) =>
   listDisplayEntries({ rowIds: ids, status: null });
 
 /** A range over a hundred 10px rows; a status row is estimated at 30px. */
-const hundredRows = () => {
+const createHundredRows = () => {
   const range = createVirtualRange({ estimates: { record: 10, status: 30 } });
-  const entries = records(rowIds(100));
+  const entries = listRecords(listRowIds(100));
   range.setEntries(entries);
   return { range, entries };
 };
 
 /** The runs as [start, end, before] triples, and the space after them. */
-const shape = (range: ReturnType<typeof hundredRows>["range"]) => ({
+const readShape = (range: ReturnType<typeof createHundredRows>["range"]) => ({
   runs: range.get().runs.map((run) => [run.start, run.end, run.before]),
   after: range.get().after,
 });
@@ -51,17 +51,17 @@ describe("createVirtualRange", () => {
   });
 
   it("mounts the entries in view and a few past each edge", () => {
-    const { range } = hundredRows();
+    const { range } = createHundredRows();
     // Nothing in view yet: the overscan alone.
-    expect(shape(range)).toEqual({ runs: [[0, 5, 0]], after: 950 });
+    expect(readShape(range)).toEqual({ runs: [[0, 5, 0]], after: 950 });
     range.setViewport(0, 45);
-    expect(shape(range)).toEqual({ runs: [[0, 9, 0]], after: 910 });
+    expect(readShape(range)).toEqual({ runs: [[0, 9, 0]], after: 910 });
     range.setViewport(500, 45);
-    expect(shape(range)).toEqual({ runs: [[46, 59, 460]], after: 410 });
+    expect(readShape(range)).toEqual({ runs: [[46, 59, 460]], after: 410 });
   });
 
   it("publishes a scroll only when it changes what is mounted", () => {
-    const { range } = hundredRows();
+    const { range } = createHundredRows();
     range.setViewport(500, 45);
     const listener = vi.fn();
     const unsubscribe = range.subscribe(listener);
@@ -75,16 +75,16 @@ describe("createVirtualRange", () => {
   });
 
   it("takes new entries silently, since whoever sets them renders them", () => {
-    const { range } = hundredRows();
+    const { range } = createHundredRows();
     const listener = vi.fn();
     range.subscribe(listener);
-    range.setEntries(records(rowIds(3)));
+    range.setEntries(listRecords(listRowIds(3)));
     expect(listener).not.toHaveBeenCalled();
-    expect(shape(range)).toEqual({ runs: [[0, 3, 0]], after: 0 });
+    expect(readShape(range)).toEqual({ runs: [[0, 3, 0]], after: 0 });
   });
 
   it("ignores the entries it already has", () => {
-    const { range, entries } = hundredRows();
+    const { range, entries } = createHundredRows();
     range.setViewport(500, 45);
     const before = range.get();
     expect(range.setEntries(entries)).toBe(0);
@@ -93,15 +93,15 @@ describe("createVirtualRange", () => {
 
   describe("measurement", () => {
     it("scrolls by what an entry above the anchor grew", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       expect(range.measure([["record:r-47", 25]])).toBe(15);
       // The anchor kept its place, so the same entries stay mounted.
-      expect(shape(range)).toEqual({ runs: [[46, 59, 460]], after: 410 });
+      expect(readShape(range)).toEqual({ runs: [[46, 59, 460]], after: 410 });
     });
 
     it("moves nothing on screen for an entry below the anchor", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       const listener = vi.fn();
       range.subscribe(listener);
@@ -112,12 +112,12 @@ describe("createVirtualRange", () => {
         ]),
       ).toBe(0);
       // The mounted r-55 grew inside its run; only r-70 is space after it.
-      expect(shape(range)).toEqual({ runs: [[46, 59, 460]], after: 420 });
+      expect(readShape(range)).toEqual({ runs: [[46, 59, 460]], after: 420 });
       expect(listener).toHaveBeenCalledTimes(1);
     });
 
     it("does nothing for a size it already has or an entry it lacks", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       const listener = vi.fn();
       range.subscribe(listener);
@@ -127,42 +127,46 @@ describe("createVirtualRange", () => {
     });
 
     it("keeps no anchor at the very top", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(0, 45);
       expect(range.measure([["record:r-2", 30]])).toBe(0);
-      expect(shape(range)).toEqual({ runs: [[0, 7, 0]], after: 930 });
+      expect(readShape(range)).toEqual({ runs: [[0, 7, 0]], after: 930 });
     });
 
     it("keeps the measurements of entries that stay", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.measure([["record:r-99", 30]]);
-      range.setEntries(records([...rowIds(100), "r-100"]));
+      range.setEntries(listRecords([...listRowIds(100), "r-100"]));
       expect(range.get().after).toBe(1010 + 20 - 50);
     });
 
     it("drops the measurements of entries that leave", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.measure([["record:r-60", 30]]);
-      range.setEntries(records(rowIds(100).filter((id) => id !== "r-60")));
-      range.setEntries(records(rowIds(100)));
+      range.setEntries(
+        listRecords(listRowIds(100).filter((id) => id !== "r-60")),
+      );
+      range.setEntries(listRecords(listRowIds(100)));
       // Back at its estimate: a kept 30px would leave 970 after the run.
       expect(range.get().after).toBe(950);
     });
 
     it("keeps a measurement with its entry when the entry moves", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.measure([["record:r-60", 30]]);
-      range.setEntries(records([...rowIds(5, 1000), ...rowIds(100)]));
+      range.setEntries(
+        listRecords([...listRowIds(5, 1000), ...listRowIds(100)]),
+      );
       range.setViewport(700, 45);
       // r-60 now sits at position 65, still 30px: keyed by position, the
       // 30px would have stayed at 60 and moved the run's start to 660.
-      expect(shape(range).runs).toEqual([[64, 77, 640]]);
+      expect(readShape(range).runs).toEqual([[64, 77, 640]]);
     });
   });
 
   describe("invalidation", () => {
     it("keeps mounted entries' measurements, which are measured again", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       range.measure([["record:r-55", 20]]);
       expect(range.invalidate("all")).toBe(0);
@@ -172,7 +176,7 @@ describe("createVirtualRange", () => {
     });
 
     it("forgets unmounted ones and keeps the anchor in place", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       range.measure([["record:r-47", 25]]);
       range.setViewport(815, 45);
@@ -183,7 +187,7 @@ describe("createVirtualRange", () => {
     });
 
     it("forgets only the entries named", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.measure([
         ["record:r-80", 20],
         ["record:r-90", 30],
@@ -197,7 +201,7 @@ describe("createVirtualRange", () => {
     });
 
     it("changes nothing for a measurement equal to the estimate", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.measure([["record:r-90", 10]]);
       const listener = vi.fn();
       range.subscribe(listener);
@@ -208,47 +212,53 @@ describe("createVirtualRange", () => {
 
   describe("new entries", () => {
     it("keeps the anchor in place when a status row appears above it", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       const stale = listDisplayEntries({
-        rowIds: rowIds(100),
+        rowIds: listRowIds(100),
         status: { status: "stale", reason: "offline" },
       });
       expect(range.setEntries(stale)).toBe(30);
       // Entry 51 is r-50: the same rows stay mounted under the status row.
-      expect(shape(range)).toEqual({ runs: [[47, 60, 490]], after: 410 });
+      expect(readShape(range)).toEqual({ runs: [[47, 60, 490]], after: 410 });
     });
 
     it("follows the anchor to wherever it moved", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(505, 45);
-      expect(range.setEntries(records(["new", ...rowIds(100)]))).toBe(10);
+      expect(range.setEntries(listRecords(["new", ...listRowIds(100)]))).toBe(
+        10,
+      );
       // Reversed, r-50 lands at position 49: 20px earlier than it just was.
-      expect(range.setEntries(records(rowIds(100).reverse()))).toBe(-20);
+      expect(range.setEntries(listRecords(listRowIds(100).reverse()))).toBe(
+        -20,
+      );
     });
 
     it("stays put when the anchor left", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
-      const without = rowIds(100).filter((id) => id !== "r-50");
-      expect(range.setEntries(records(without))).toBe(0);
+      const without = listRowIds(100).filter((id) => id !== "r-50");
+      expect(range.setEntries(listRecords(without))).toBe(0);
       // The entry now at the viewport's start is the new anchor.
       expect(range.measure([["record:r-49", 20]])).toBe(10);
     });
 
     it("shows entries added at the very top rather than scrolling past them", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(0, 45);
-      expect(range.setEntries(records(["new", ...rowIds(100)]))).toBe(0);
+      expect(range.setEntries(listRecords(["new", ...listRowIds(100)]))).toBe(
+        0,
+      );
     });
   });
 
   describe("retention", () => {
     it("keeps an entry above the viewport mounted, with its neighbours", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       range.retain("record:r-10");
-      expect(shape(range)).toEqual({
+      expect(readShape(range)).toEqual({
         runs: [
           [9, 12, 90],
           [46, 59, 340],
@@ -258,10 +268,10 @@ describe("createVirtualRange", () => {
     });
 
     it("keeps an entry below the viewport mounted", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       range.retain("record:r-90");
-      expect(shape(range)).toEqual({
+      expect(readShape(range)).toEqual({
         runs: [
           [46, 59, 460],
           [89, 92, 300],
@@ -271,7 +281,7 @@ describe("createVirtualRange", () => {
     });
 
     it("joins the runs when the kept entry touches the viewport's", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       for (const [id, run] of [
         ["record:r-58", [46, 60, 460]],
@@ -279,15 +289,15 @@ describe("createVirtualRange", () => {
         ["record:r-44", [43, 59, 430]],
       ] as const) {
         range.retain(id);
-        expect(shape(range).runs).toEqual([run]);
+        expect(readShape(range).runs).toEqual([run]);
       }
     });
 
     it("keeps the first and last entries, with the one neighbour each has", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       range.retain("record:r-0");
-      expect(shape(range)).toEqual({
+      expect(readShape(range)).toEqual({
         runs: [
           [0, 2, 0],
           [46, 59, 440],
@@ -295,7 +305,7 @@ describe("createVirtualRange", () => {
         after: 410,
       });
       range.retain("record:r-99");
-      expect(shape(range)).toEqual({
+      expect(readShape(range)).toEqual({
         runs: [
           [46, 59, 460],
           [98, 100, 390],
@@ -305,39 +315,41 @@ describe("createVirtualRange", () => {
     });
 
     it("lets go when asked, or when the entry is not displayed", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       range.retain("record:r-10");
       range.retain(null);
-      expect(shape(range).runs).toEqual([[46, 59, 460]]);
+      expect(readShape(range).runs).toEqual([[46, 59, 460]]);
       range.retain("record:gone");
-      expect(shape(range).runs).toEqual([[46, 59, 460]]);
+      expect(readShape(range).runs).toEqual([[46, 59, 460]]);
     });
 
     it("lets go of an entry that leaves", () => {
-      const { range } = hundredRows();
+      const { range } = createHundredRows();
       range.setViewport(500, 45);
       range.retain("record:r-10");
       // One row fewer above the anchor: the viewport follows it up by one.
-      range.setEntries(records(rowIds(100).filter((id) => id !== "r-10")));
-      expect(shape(range).runs).toEqual([[45, 58, 450]]);
+      range.setEntries(
+        listRecords(listRowIds(100).filter((id) => id !== "r-10")),
+      );
+      expect(readShape(range).runs).toEqual([[45, 58, 450]]);
       // Back again, r-10 is not retained any more.
-      range.setEntries(records(rowIds(100)));
-      expect(shape(range).runs).toEqual([[46, 59, 460]]);
+      range.setEntries(listRecords(listRowIds(100)));
+      expect(readShape(range).runs).toEqual([[46, 59, 460]]);
     });
   });
 
   it("accounts for every measured fraction, and leaves nothing after the last entry", () => {
-    const { range } = hundredRows();
+    const { range } = createHundredRows();
     for (let round = 0; round < 50; round += 1) {
-      const sizes = rowIds(100).map(
+      const sizes = listRowIds(100).map(
         (id, position) =>
           [`record:${id}`, 10 + ((position * 7 + round) % 13) * 0.2] as const,
       );
       range.measure(sizes);
       const whole = sizes.reduce((total, [, size]) => total + size, 0);
       range.setViewport(whole / 2, 100);
-      const run = onlyRun(range.get());
+      const run = readOnlyRun(range.get());
       const mounted = sizes
         .slice(run.start, run.end)
         .reduce((total, [, size]) => total + size, 0);
@@ -353,9 +365,9 @@ describe("createVirtualRange", () => {
       const range = createVirtualRange({
         estimates: { record: 32, status: 64 },
       });
-      range.setEntries(records(rowIds(count)));
+      range.setEntries(listRecords(listRowIds(count)));
       range.setViewport((count / 2) * 32, 640);
-      const run = onlyRun(range.get());
+      const run = readOnlyRun(range.get());
       expect(run.end - run.start).toBe(20 + 1 + 8);
       expect(run.before + (run.end - run.start) * 32 + range.get().after).toBe(
         count * 32,

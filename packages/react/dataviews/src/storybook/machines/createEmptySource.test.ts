@@ -16,7 +16,7 @@ const request: SourceRequest = {
 };
 
 /** Every delivery one execution makes, in order. */
-const deliveries = (
+const listDeliveries = (
   source: Source<Machine>,
 ): readonly SourceDelivery<Machine>[] => {
   const delivered: SourceDelivery<Machine>[] = [];
@@ -28,7 +28,7 @@ const deliveries = (
 
 describe("createEmptySource", () => {
   it("answers no machine", () => {
-    const [delivery] = deliveries(createEmptySource());
+    const [delivery] = listDeliveries(createEmptySource());
     expect(delivery).toMatchObject({ status: "succeeded", page: { rows: [] } });
   });
 });

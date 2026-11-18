@@ -27,7 +27,7 @@ import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { virtualizeRows } from "../../virtualization/index.js";
 import Component from "./DataTable.js";
-import type { DataTableColumn, DataTableProps } from "./types.js";
+import type { DataTableColumn, DataTableProps } from "./index.js";
 
 const meta = {
   title: "_work_in_progress/DataViews/Renderers/DataTable",
@@ -213,6 +213,14 @@ const sortableColumnsCode = `const columns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];`;
 
+const oneTermColumnsCode = `const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host", sortable: true },
+  { id: "status", header: "Status", sortable: true, resizable: true },
+  { id: "region", header: "Region" },
+  { id: "cores", header: "Cores", sortable: true },
+  { id: "owner", header: "Owner" },
+];`;
+
 const sizedColumnsCode = `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 } },
   { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
@@ -365,10 +373,12 @@ export const SortedDescending: Story = {
 export const SortLimitedToOneTerm: Story = {
   parameters: showConsumerCode({
     parts: tableParts,
-    declarations: sortableColumnsCode,
+    declarations: oneTermColumnsCode,
     render: tableCode,
   }),
-  render: renderMachines(sortableColumns, { source: createOneTermSource }),
+  render: renderMachines(markResizable(sortableColumns, ["status"]), {
+    source: createOneTermSource,
+  }),
 };
 
 /**
@@ -1198,7 +1208,7 @@ ${columns}`,
 
 /** The logical positions of the rows mounted right now. */
 const listMountedPositions = (table: HTMLElement): number[] =>
-  [...table.querySelectorAll('[role="row"]')].map((row) =>
+  [...table.querySelectorAll("tr")].map((row) =>
     Number(row.getAttribute("aria-rowindex")),
   );
 
@@ -1232,10 +1242,7 @@ export const Virtualized: Story = {
     await expect(listMountedPositions(table).length).toBeLessThan(40);
     table.scrollTop = table.scrollHeight;
     const last = await canvas.findByText("node-09999.example.com");
-    await expect(last.closest('[role="row"]')).toHaveAttribute(
-      "aria-rowindex",
-      "10001",
-    );
+    await expect(last.closest("tr")).toHaveAttribute("aria-rowindex", "10001");
     await expect(listMountedPositions(table).length).toBeLessThan(40);
   },
 };
@@ -1291,9 +1298,9 @@ const columns: readonly DataTableColumn[] = [
         1000,
       ),
     );
-    const header = table.querySelector(".ds.data-table-row-group.header");
+    const header = table.querySelector(".ds.data-table > .header");
     const listRows = () => [
-      ...table.querySelectorAll(".ds.data-table-row-group.body > [role=row]"),
+      ...table.querySelectorAll(".ds.data-table-body > tr"),
     ];
     const waitFrames = async (): Promise<void> => {
       for (let frame = 0; frame < 2; frame += 1) {
@@ -1355,9 +1362,6 @@ export const VirtualizedKeepsFocus: Story = {
     );
     await expect(checkbox).toBeInTheDocument();
     await expect(checkbox).toHaveFocus();
-    await expect(checkbox.closest('[role="row"]')).toHaveAttribute(
-      "aria-rowindex",
-      "2",
-    );
+    await expect(checkbox.closest("tr")).toHaveAttribute("aria-rowindex", "2");
   },
 };

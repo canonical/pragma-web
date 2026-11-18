@@ -17,7 +17,7 @@ import type { ResolvedRule } from "../../../testing/types.js";
 const sheet = readFileSync(
   path.join(
     path.dirname(fileURLToPath(import.meta.url)),
-    "../../lib/_work_in_progress/DataTable/styles.css",
+    "../../lib/_work_in_progress/common/ScopedDataTable/styles.css",
   ),
   "utf8",
 ).replace(/\/\*[\s\S]*?\*\//g, "");
@@ -89,7 +89,11 @@ describe("regression 0123 — the resize strip was narrower than a target", () =
     );
     expect(strip).not.toEqual([]);
     expect(strip.map(({ declarations }) => declarations).join(";")).toMatch(
-      /inline-size:\s*var\(--dimension-300\);/,
+      /inline-size:\s*var\(--data-table-resize-target\);/,
+    );
+    // The target token is 24px: the 300 step, under its size shim.
+    expect(sheet).toMatch(
+      /--data-table-resize-target:\s*var\(\s*--size-target-minimum,\s*var\(--dimension-300\)\s*\);/,
     );
   });
 });
