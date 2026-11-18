@@ -65,7 +65,9 @@ the link.
 - **`EntityCard`**: the card, built on the published `Card`: the mark, the
   foreign prefix and the title, the address, the kind, the summary, the
   facts and the status, over its static Specimen, which depicts the
-  entity where it has a depiction.
+  entity where it has a depiction. The summary ends at its third line, in
+  an ellipsis, on every card, on an index and in a peek alike, so the
+  cards of a row differ by their facts.
 - **`EntityCommand`**: the command-palette result, a two-line row: the
   mark, the foreign prefix and the title over the address, the kind and
   the status at the end.

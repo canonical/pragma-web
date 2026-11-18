@@ -43,6 +43,12 @@
 # The title's link reads as the title: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the title clips.
 #
+# The summary ends at its third line, in an ellipsis, on every card, on
+# an index and in the peek alike (`--entity-card-summary-lines`, 3): cards
+# in a row stay close in height and differ by their facts, and the page is
+# one click away. The clamp is the line-clamp properties on a
+# `-webkit-box`, which the style check admits on a summary slot alone.
+#
 # Reflow, bound in styles.css:
 #   @container shell (width < 448px)   below one group: the card spans
 #     every column of the grid that holds it (`--entity-card-narrow-column`,
@@ -89,6 +95,7 @@
 #   --entity-card-mark-size: space.200 (16px)
 #   --entity-card-identity-gap: space.050 (4px)   mark and prefix to the title
 #   --entity-card-mono-font-family: ui-monospace, monospace   literal: no mono token
+#   --entity-card-summary-lines: 3   a summary's lines at most: a count, not a length
 #   prefix and address: color.text.muted; status above: container.gap.default
 node:
   uri: prism.component.entity_card
@@ -198,6 +205,11 @@ node:
                 - node:
                     role: summary
                     styles:
+                      # Cut at its third line, in an ellipsis, on every
+                      # card (the line-clamp properties, which the DSL has
+                      # no key for, on the -webkit-box).
+                      layout.type: -webkit-box
+                      layout.overflow: hidden
                       spacing.external.block.start: container.gap.default
                       spacing.external.block.end: 0
                       spacing.internal.block.start: 0
