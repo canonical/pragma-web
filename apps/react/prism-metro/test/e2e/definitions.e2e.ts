@@ -9,8 +9,10 @@
  * relation's stroke states its weight, the served count of its heaviest
  * relation, in four widths, dashed exactly where the count is 0; the
  * served SVG fits the design canvas at the legible floor or above, its
- * nodes and regions on the 16px lattice; and the overview at rest and with
- * each namespace opened draws within the graph budget.
+ * nodes and regions on the 16px lattice; the overview at rest and with
+ * each namespace opened draws within the graph budget; and a class's term
+ * page draws its neighbourhood one hop deep across namespaces, as many
+ * nodes as the served graph gives it.
  */
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
@@ -20,10 +22,12 @@ import {
 import {
   type BridgeLabelMeasure,
   type CanvasMeasure,
+  countServedNeighbourhood,
   fetchServedGraph,
   MIN_FIT,
   measureBridgeLabels,
   measureCanvasSvg,
+  type ServedGraph,
   type ServedWeights,
   sliceCanvasSvg,
   weighServedRelations,
@@ -41,6 +45,7 @@ let server: RunningServer;
 let browser: Browser;
 
 const served: {
+  graph?: ServedGraph;
   weights?: ServedWeights;
   prefixes?: readonly string[];
   classes?: number;
@@ -78,6 +83,7 @@ beforeAll(
     });
     browser = await launchBrowser();
     const answer = await fetchServedGraph(`${graph.base}/graphql`);
+    served.graph = answer;
     served.weights = weighServedRelations(answer);
     served.prefixes = answer.ontologies.map((ontology) => ontology.prefix);
     served.classes = answer.ontologies.reduce(
@@ -236,6 +242,28 @@ describe("the overview's record, on the metro", () => {
         GRAPH_BUDGET.svgElementsMax,
       );
     }
+  });
+
+  // metro:Station's page draws the class, its superclass, its subclasses
+  // and every class one relation away in either direction, whatever their
+  // namespace, banded by namespace.
+  it("draws a term page's one-hop neighbourhood across namespaces, as the served graph counts it, within the budget", async () => {
+    const { graph: answer } = served;
+    if (answer === undefined) throw new Error("No served graph was read.");
+    const svg = await serveCanvas("/definitions/metro%3AStation");
+    const measure = measureCanvasSvg(svg);
+    const namespace = answer.ontologies.find(
+      (ontology) => ontology.prefix === "metro",
+    )?.namespace;
+    expect(namespace).toBeDefined();
+    expect(svg).toContain('data-id="metro:Station"');
+    expect(measure.nodes).toBe(
+      countServedNeighbourhood(answer, `${namespace}Station`),
+    );
+    expect(measure.nodes).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
+    expect(measure.largestColumn).toBeLessThanOrEqual(
+      GRAPH_BUDGET.bandMembersMax,
+    );
   });
 
   // The explorer's query reads every class of every loaded namespace, and
