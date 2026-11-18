@@ -33,16 +33,14 @@ describe("ExplorerStatus", () => {
     expect(figure.querySelector(".full")?.textContent).toBe(
       "66 of 66 classes · 5 abstract",
     );
-    expect(figure.querySelector(".short")?.textContent).toBe(
-      "66 of 66 classes",
-    );
+    expect(figure.querySelector(".short")?.textContent).toBe("66 classes");
   });
 
-  it("keeps one form when nothing abstract is showing", () => {
-    render(<ExplorerStatus abstract={0} total={66} visible={60} />);
-    const figure = screen.getByRole("figure");
-    expect(figure).not.toHaveAttribute("aria-label");
-    expect(figure.querySelector(".short")).toBeNull();
+  it("shortens the count to the shown figure and its noun", () => {
+    render(<ExplorerStatus abstract={0} total={66} visible={1} />);
+    const figure = screen.getByRole("figure", { name: "1 of 66 classes" });
+    expect(figure.querySelector(".full")?.textContent).toBe("1 of 66 classes");
+    expect(figure.querySelector(".short")?.textContent).toBe("1 class");
   });
 
   it("survives the degenerate empty graph without dividing by zero", () => {

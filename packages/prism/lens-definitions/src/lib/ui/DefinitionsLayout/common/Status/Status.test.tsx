@@ -36,7 +36,7 @@ describe("Status", () => {
     // 35 live classes across the three ontologies, 4 of them abstract: the
     // full sentence, and the short form the folded strip shows.
     expect(readForm("full")).toBe("35 of 35 classes · 4 abstract");
-    expect(readForm("short")).toBe("35 of 35 classes");
+    expect(readForm("short")).toBe("35 classes");
     expect(fetchFn).not.toHaveBeenCalled();
   });
 

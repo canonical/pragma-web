@@ -24,12 +24,11 @@ const componentCssClassName = "ds explorer-status";
  * when chips move the count, which is the whole point of putting it in the
  * strip rather than in the canvas.
  *
- * With abstract classes showing, the caption holds two forms: the full
- * sentence and its short form, the figure and the noun without the
- * abstract clause ("66 of 66 classes"). Below two groups, where the strip
- * folds, the short form shows; at two groups and wider, the full one. The
- * full sentence names the figure at every width, and the server renders
- * one HTML for every width: the stylesheet chooses.
+ * The caption holds two forms: the full sentence and its short form, the
+ * shown figure and its noun ("66 classes"). Below two groups, where the
+ * strip folds, the short form shows; at two groups and wider, the full
+ * one. The full sentence names the figure at every width, and the server
+ * renders one HTML for every width: the stylesheet chooses.
  *
  * `import { ExplorerStatus } from "../ExplorerStatus/index.js";`
  *
@@ -46,11 +45,11 @@ export default function ExplorerStatus({
   const t = useMessages();
   // Guard the degenerate graph so the bar never computes NaN.
   const share = total === 0 ? 0 : Math.round((visible / total) * 100);
-  const short = t("status.classes", { visible, count: total });
+  const short = t("status.classes.short", { visible, count: visible });
   const full =
     abstract > 0
       ? t("status.classes.abstract", { visible, count: total, abstract })
-      : short;
+      : t("status.classes", { visible, count: total });
   const isShortened = full !== short;
 
   return (
