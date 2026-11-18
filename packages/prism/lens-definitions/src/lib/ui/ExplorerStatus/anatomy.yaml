@@ -76,12 +76,12 @@ node:
         edges:
           - node:
               role: full
-            relation: { cardinality: "0..1", slotName: full }
+            relation: { cardinality: "1", slotName: full }
           - node:
               role: short
               styles:
                 # The narrow form's; at two groups and wider it is not
                 # displayed.
                 layout.type: none
-            relation: { cardinality: "0..1", slotName: short }
+            relation: { cardinality: "1", slotName: short }
       relation: { cardinality: "1", slotName: caption }

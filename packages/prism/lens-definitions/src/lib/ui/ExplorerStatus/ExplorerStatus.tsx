@@ -50,12 +50,11 @@ export default function ExplorerStatus({
     abstract > 0
       ? t("status.classes.abstract", { visible, count: total, abstract })
       : t("status.classes", { visible, count: total });
-  const isShortened = full !== short;
 
   return (
     <figure
       {...props}
-      aria-label={isShortened ? full : undefined}
+      aria-label={full}
       aria-live="polite"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-status"
@@ -71,14 +70,8 @@ export default function ExplorerStatus({
         <span className="fill" />
       </div>
       <figcaption className="caption">
-        {isShortened ? (
-          <>
-            <span className="full">{full}</span>
-            <span className="short">{short}</span>
-          </>
-        ) : (
-          full
-        )}
+        <span className="full">{full}</span>
+        <span className="short">{short}</span>
       </figcaption>
     </figure>
   );
