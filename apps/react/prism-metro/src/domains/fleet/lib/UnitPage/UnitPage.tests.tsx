@@ -66,6 +66,17 @@ describe("UnitPage", () => {
     expect(container.querySelector(".ds.sectioned-view .contents")).toBeNull();
   });
 
+  it("draws its Turtle source in place of its sections at as=turtle", async () => {
+    const { container } = renderMetroPage(`${url}?as=turtle`);
+    const source = await screen.findByRole("figure");
+    await waitFor(() => expect(source).toHaveTextContent("@prefix"));
+    expect(source).toHaveTextContent("Series 90 unit");
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Side view" }),
+    ).not.toBeInTheDocument();
+    expect(await findFacts(container)).not.toContainElement(source);
+  });
+
   it("says nothing of its type lives at an address that names none", async () => {
     renderMetroPage(`/fleet/units/${encodeURIComponent("metro:northgate")}`);
     expect(await screen.findByRole("status")).toHaveTextContent(
