@@ -1,0 +1,18 @@
+/* @canonical/styles — Surfaces SHIM (temporary)
+ *
+ * The generated surfaces declare `--surface-color-text` only on `.contrasted`,
+ * so a same-polarity surface nested inside one inherits the inverted text.
+ * This resets the channel, so readers fall back to `--color-text`. Remove it
+ * once the design tokens emit the text channel on every surface.
+ *
+ * Imported before the generated file: on an element that is both `.surface`
+ * and `.contrasted`, the later `.contrasted` rule wins.
+ */
+
+@layer ds.surfaces {
+  /* shim: design-tokens surfaces */
+  .surface,
+  .modal {
+    --surface-color-text: initial;
+  }
+}
