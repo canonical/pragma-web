@@ -6,6 +6,8 @@
 
 @import "@canonical/design-tokens/dist/sets.primitive.css";
 @import "@canonical/design-tokens/dist/modifiers.theme.css";
+/* shim: design-tokens surfaces; must precede the generated file. */
+@import "@canonical/styles/modifiers.surfaces.shim.css";
 @import "@canonical/design-tokens/dist/modifiers.surfaces.css";
 @import "@canonical/design-tokens/dist/modifiers.typography.css";
 @import "@canonical/design-tokens/dist/modifiers.criticality.css";
