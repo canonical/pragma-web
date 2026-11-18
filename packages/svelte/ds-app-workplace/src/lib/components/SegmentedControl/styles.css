@@ -45,10 +45,7 @@
 
   .ds.segmented-control > .list > .item {
     appearance: none;
-    display: inline-flex;
     min-width: 0;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
     padding: var(--segmented-control-padding-block)
       var(--segmented-control-padding-inline);
@@ -56,6 +53,7 @@
     color: var(--segmented-control-color-text);
     font: inherit;
     line-height: var(--size-line-height-text, 24px);
+    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     background-color: var(--segmented-control-color-background);
@@ -84,7 +82,6 @@
     &:disabled {
       cursor: not-allowed;
       color: var(--color-text-disabled, currentColor);
-      opacity: var(--opacity-disabled, 0.5);
     }
   }
 
