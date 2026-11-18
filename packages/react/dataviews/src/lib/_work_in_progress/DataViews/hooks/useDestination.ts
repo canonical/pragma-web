@@ -11,6 +11,9 @@ import type { UseDestinationProps, UseDestinationResult } from "./types.js";
  * leaves the destination as it was re-renders nothing. Null without a location:
  * there is nowhere for a destination to lead. `destinationOf` is compared by
  * identity, so a caller keeps one at module scope.
+ *
+ * @note Impure: subscribes to the provider's state, its open view and its
+ * location while mounted.
  */
 export default function useDestination({
   provider,

@@ -10,6 +10,8 @@ const selectSearch = (state: DataViewsState): string =>
  * The applied search text, and nothing else of the state: the subscription
  * is the provider's state channel, but the value is the search alone, so
  * a result arriving or a page turning re-renders no search box.
+ *
+ * @note Impure: subscribes to the provider's state while mounted.
  */
 export default function useAppliedSearch({
   provider,

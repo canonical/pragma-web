@@ -28,6 +28,8 @@ const countRestrictedFields = (
  * holds, and nothing else of the state: held at one identity while it reads
  * the same, so a result arriving, a page turning or an edit to a bound that
  * stands re-renders nothing that places controls by it.
+ *
+ * @note Impure: subscribes to the provider's state while mounted.
  */
 export default function useRestrictedFields({
   provider,

@@ -15,6 +15,8 @@ import type { DataViewsDataCardsProps } from "./types.js";
  * Not exported from the package root, nor placed on `DataViews`: a
  * work-in-progress spike, imported from its own module until it is admitted.
  *
+ * @implements ds:global.group.cards
+ *
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */

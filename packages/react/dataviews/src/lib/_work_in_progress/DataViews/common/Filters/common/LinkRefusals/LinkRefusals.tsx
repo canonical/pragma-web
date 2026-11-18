@@ -69,8 +69,6 @@ const spellClearDestination = (
  * left. The list is named by its label, a place: "Not applied from the
  * link".
  *
- * `import { DataViews } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.subcomponent.data_views_filters-link_refusals
  */
 export default function LinkRefusals({

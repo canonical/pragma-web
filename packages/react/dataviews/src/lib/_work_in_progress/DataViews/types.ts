@@ -61,6 +61,7 @@ export type DataViewsProps<
  * is the one they were handed.
  */
 export type ContextOptions = {
+  /** The root's provider, at the widest shape the context can hold. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
   /** Every message the root's parts render or announce, resolved over English. */
   readonly messages: DataViewsMessages;

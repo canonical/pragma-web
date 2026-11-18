@@ -31,6 +31,8 @@ type AppliedAt<
  * the field and operator are checked against its schema at compile time,
  * and the applied value is typed by the field's kind.
  *
+ * @note Impure: subscribes to the filter's handle while mounted.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

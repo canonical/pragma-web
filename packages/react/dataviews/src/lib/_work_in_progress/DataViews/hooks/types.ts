@@ -37,6 +37,7 @@ export type UseDataViewsRootResult = ContextOptions;
 
 /** What the applied-search hook takes: the provider whose search it reads. */
 export type UseAppliedSearchProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
 };
 
@@ -45,6 +46,7 @@ export type UseAppliedSearchResult = string;
 
 /** What the applied-sort hook takes: the provider whose ordering it reads. */
 export type UseAppliedSortProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
 };
 
@@ -56,6 +58,7 @@ export type UseAppliedSortResult = readonly SortTerm[];
 
 /** What the restricted-fields hook takes: the provider whose query it reads. */
 export type UseRestrictedFieldsProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
 };
 
@@ -94,6 +97,7 @@ export type UseMoreFiltersPinResult = {
 
 /** What the destination hook takes: the provider, and the query a state leads to. */
 export type UseDestinationProps = {
+  /** The provider whose applied state the hook reads. */
   readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
   /** The destination's query, from the applied state; held by identity. */
   readonly destinationOf: (state: DataViewsState<object>) => Query;
