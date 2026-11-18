@@ -1,5 +1,19 @@
 @layer ds.components.apps-workplace {
   :root {
+    --segmented-control-color-border: var(
+      --color-border-muted,
+      rgb(0 0 0 / 10%)
+    );
+    --segmented-control-border-width: 1.5px;
+    --segmented-control-padding-block: var(
+      --tmp-dimension-segmented-control-padding-block,
+      4.5px
+    );
+    --segmented-control-padding-inline: var(--dimension-200, 16px);
+  }
+
+  .ds.segmented-control {
+    /* Surface-dependent colors live here, not on :root, so they follow the surface. */
     --segmented-control-color-background: var(
       --surface-color-background,
       var(--color-background, #fff)
@@ -13,26 +27,14 @@
       )
     );
     --segmented-control-color-background-hover: var(
-      --color-foreground-ghost-hover,
+      --hover--color-foreground-ghost,
       var(--segmented-control-color-background-selected)
-    );
-    --segmented-control-color-border: var(
-      --color-border-muted,
-      rgb(0 0 0 / 10%)
     );
     --segmented-control-color-text: var(
       --surface-color-text,
       var(--color-text)
     );
-    --segmented-control-border-width: 1.5px;
-    --segmented-control-padding-block: var(
-      --tmp-dimension-segmented-control-padding-block,
-      4.5px
-    );
-    --segmented-control-padding-inline: var(--dimension-200, 16px);
-  }
 
-  .ds.segmented-control {
     display: inline-flex;
     max-width: 100%;
     padding-bottom: var(--baseline-kick-segmented-control-bottom, 0);
