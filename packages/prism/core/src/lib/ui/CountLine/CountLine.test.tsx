@@ -34,6 +34,39 @@ describe("CountLine", () => {
     expect(screen.getByRole("status")).toHaveTextContent("3 lines");
   });
 
+  it("holds a short form beside the full one, the full sentence its name", () => {
+    render(
+      <CountLine
+        kind="components loaded so far"
+        shortKind="components"
+        shown={100}
+        total={{ kind: "unknown" }}
+      />,
+    );
+    const count = screen.getByRole("status", {
+      name: "100 components loaded so far",
+    });
+    expect(count.querySelector(".full")).toHaveTextContent(
+      "100 components loaded so far",
+    );
+    expect(count.querySelector(".short")).toHaveTextContent(/^100 components$/);
+  });
+
+  it("keeps one form when the short noun is the noun", () => {
+    render(
+      <CountLine
+        kind="standards"
+        shortKind="standards"
+        shown={100}
+        total={{ kind: "exact", value: 147 }}
+      />,
+    );
+    const count = screen.getByRole("status");
+    expect(count).not.toHaveAttribute("aria-label");
+    expect(count.querySelector(".short")).toBeNull();
+    expect(count).toHaveTextContent("100 of 147 standards");
+  });
+
   it("announces a change politely", () => {
     render(<CountLine kind="lines" shown={3} total={{ kind: "unknown" }} />);
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");

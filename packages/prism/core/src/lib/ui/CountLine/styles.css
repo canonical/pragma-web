@@ -17,4 +17,22 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+
+  /* The short form is the narrow strip's; at two groups and wider the
+   * full form shows. */
+  .ds.count-line > .short {
+    display: none;
+  }
+
+  /* Below two groups, where the strip folds, the short form shows in the
+   * full one's place; the full sentence stays the line's name. */
+  @container shell (width < 912px) {
+    .ds.count-line > .full {
+      display: none;
+    }
+
+    .ds.count-line > .short {
+      display: inline;
+    }
+  }
 }

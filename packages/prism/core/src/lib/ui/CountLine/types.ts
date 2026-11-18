@@ -19,6 +19,13 @@ type OwnProps = {
   readonly total: Count;
   /** The entries' noun, already in the number the count needs. */
   readonly kind: string;
+  /**
+   * The noun alone, without the second clause `kind` carries
+   * ("components" where `kind` reads "components loaded so far"): the
+   * count's short form, shown below two groups. Without it, or equal to
+   * `kind`, the line has one form.
+   */
+  readonly shortKind?: string;
 };
 
 /**
