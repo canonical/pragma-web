@@ -11,9 +11,7 @@
  * loaded route paints before its CSS arrives. Linking this file means no
  * route can ever render unstyled.
  *
- * A hand-written list, not a generated one, and `index.css.test.ts` fails if
- * it ever disagrees with the stylesheets on disk. Add a component, add its
- * line, alphabetically.
+ * A hand-written list. Add a component, add its line, alphabetically.
  */
 
 @import url("./_work_in_progress/DataCards/styles.css");
