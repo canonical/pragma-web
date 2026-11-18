@@ -56,12 +56,12 @@ import {
   CARD_SUMMARY_LINES,
   CATALOG_CARD_SELECTOR,
   CATALOG_CARD_WIDTHS,
-  CATALOG_SUMMARY_WIDTHS,
   CATALOG_PATH,
   CATALOG_ROW_SELECTOR,
   CATALOG_ROW_TITLE_COUNT,
   CATALOG_ROW_TITLE_WIDTH,
   CATALOG_ROWS_PATH,
+  CATALOG_SUMMARY_WIDTHS,
   CATALOG_WHOLE_ROW_WIDTHS,
   DEV_READY_MS,
   DOCUMENT_PATHS,
@@ -1015,27 +1015,30 @@ describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
 // A card's summary ends at its third line, in an ellipsis, so the cards of
 // a row stay close in height and differ by their facts: the catalog's long
 // descriptions are cut, and no summary is taller than three lines.
-describe.each(CATALOG_SUMMARY_WIDTHS)("the catalog's cards at %i px", (width) => {
-  it("cut each summary at its third line", async () => {
-    const page = await openPage(CATALOG_PATH, { width, height: 844 });
-    try {
-      const summaries = await page.evaluate(
-        readCardSummaries,
-        CATALOG_CARD_SELECTOR,
-      );
-      expect(summaries.length).toBeGreaterThan(0);
-      expect(summaries.some(({ cut }) => cut)).toBe(true);
-      for (const { text, height, lineHeight, clamp } of summaries) {
-        expect(clamp, text).toBe(String(CARD_SUMMARY_LINES));
-        expect(height, text).toBeLessThanOrEqual(
-          CARD_SUMMARY_LINES * lineHeight + WIDTH_TOLERANCE_PX,
+describe.each(CATALOG_SUMMARY_WIDTHS)(
+  "the catalog's cards at %i px",
+  (width) => {
+    it("cut each summary at its third line", async () => {
+      const page = await openPage(CATALOG_PATH, { width, height: 844 });
+      try {
+        const summaries = await page.evaluate(
+          readCardSummaries,
+          CATALOG_CARD_SELECTOR,
         );
+        expect(summaries.length).toBeGreaterThan(0);
+        expect(summaries.some(({ cut }) => cut)).toBe(true);
+        for (const { text, height, lineHeight, clamp } of summaries) {
+          expect(clamp, text).toBe(String(CARD_SUMMARY_LINES));
+          expect(height, text).toBeLessThanOrEqual(
+            CARD_SUMMARY_LINES * lineHeight + WIDTH_TOLERANCE_PX,
+          );
+        }
+      } finally {
+        await page.close();
       }
-    } finally {
-      await page.close();
-    }
-  });
-});
+    });
+  },
+);
 
 // Below two groups a row's status shortens before its title falls under
 // twelve characters: at one group, where the rail still takes a column, a
