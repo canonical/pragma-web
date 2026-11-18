@@ -1,17 +1,27 @@
 /**
  * The messages domain's constants: the English record DataViews ships with,
- * and the words its messages are built from — each direction, what a
+ * and the words its messages are built from — each direction, each
+ * operator as a chip shows and speaks it, what a
  * saved-view command not done or in flight says, and the note an edit that
  * cannot apply ends with.
  */
 
-import type { SortDirection } from "../query/index.js";
+import type {
+  PredicateOperand,
+  PredicateOperator,
+  SortDirection,
+} from "../query/index.js";
+import type { Count } from "../result/index.js";
 import type { ViewCommand } from "../views/index.js";
 import choosePlural from "./choosePlural.js";
 import composeClause from "./composeClause.js";
 import composeSentence from "./composeSentence.js";
 import spellOrdinal from "./spellOrdinal.js";
-import type { DataViewsMessages } from "./types.js";
+import type {
+  DataViewsMessages,
+  FacetCountWords,
+  RecordNoun,
+} from "./types.js";
 
 /** The word each direction reads as in English. */
 export const DIRECTIONS: Readonly<Record<SortDirection, string>> = {
@@ -40,11 +50,78 @@ export const PENDING: Readonly<Record<ViewCommand, string>> = {
 /** What the earlier restriction does while an edit cannot apply. */
 export const STILL_APPLIES = "The previous restriction still applies.";
 
+/** Each operator's words, as they read from its operands. */
+type OperatorWords = Readonly<
+  Record<PredicateOperator, (operands: readonly PredicateOperand[]) => string>
+>;
+
+/** Whether a presence operand asks for no value. */
+const isUnset = (operands: readonly PredicateOperand[]): boolean =>
+  operands.at(0) === false;
+
+/**
+ * What a chip shows for each operator: its symbol, or, where it has none,
+ * the same words it is spoken by, so a control's name holds what it
+ * shows. Keyed by operator, so an operator the grammar gains fails to
+ * compile until it is shown.
+ */
+export const OPERATORS_SHOWN: OperatorWords = {
+  isAny: () => ":",
+  is: () => ":",
+  isNone: () => "≠",
+  isNot: () => "≠",
+  contains: () => "contains",
+  notContains: () => "does not contain",
+  startsWith: () => "starts with",
+  endsWith: () => "ends with",
+  gte: () => "≥",
+  lte: () => "≤",
+  isSet: (operands) => (isUnset(operands) ? "has no value" : "has a value"),
+};
+
+/** How each operator is spoken in a clause. Keyed as `OPERATORS_SHOWN`. */
+export const OPERATORS_SPOKEN: OperatorWords = {
+  isAny: (operands) => (operands.length === 1 ? "is" : "is any of"),
+  is: () => "is",
+  isNone: () => "is none of",
+  isNot: () => "is not",
+  contains: () => "contains",
+  notContains: () => "does not contain",
+  startsWith: () => "starts with",
+  endsWith: () => "ends with",
+  gte: () => "at least",
+  lte: () => "at most",
+  isSet: (operands) => (isUnset(operands) ? "has no value" : "has a value"),
+};
+
 /** English's own grouping of numbers, so a large count reads as one. */
 const NUMBERS = new Intl.NumberFormat("en");
 
 /** A count as English writes it: grouped, never bare digits past a thousand. */
 const formatCount = (value: number): string => NUMBERS.format(value);
+
+/**
+ * A count of records as English words it: "12 machines", "at least 1,000
+ * machines", or "At least" where it starts a sentence.
+ */
+const formatRecords = (
+  count: FacetCountWords,
+  noun: RecordNoun,
+  bound = "at least",
+): string => {
+  const records = `${formatCount(count.value)} ${noun.counted?.(count.value) ?? choosePlural(count.value, noun.singular, noun.plural)}`;
+  return count.kind === "exact" ? records : `${bound} ${records}`;
+};
+
+/** An outcome's sentence, then the result count where one is known. */
+const composeOutcome = (
+  sentence: string,
+  count: Count,
+  noun: RecordNoun,
+): string =>
+  count.kind === "unknown"
+    ? sentence
+    : `${sentence} ${formatRecords(count, noun, "At least")}.`;
 
 /** One term as the ordering messages word it: "Name, descending". */
 const formatSortTerm = (name: string, direction: SortDirection): string =>
@@ -186,6 +263,46 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
 
   search: "Search",
   submitSearch: "Search",
+
+  operatorShown: (operator, operands) => OPERATORS_SHOWN[operator](operands),
+  operatorSpoken: (operator, operands) => OPERATORS_SPOKEN[operator](operands),
+
+  queryBar: (noun) => `Filter ${noun.plural}`,
+  queryBarDescription:
+    "Left and Right to move between filters, Enter to edit, Backspace or Delete to remove",
+  queryBarPlaceholder: "Search or filter",
+  appliedFilters: "Applied filters",
+  clearFiltersAndSearch: "Clear filters and search",
+  queryCleared: (count, noun) =>
+    composeOutcome("Cleared the filters and the search.", count, noun),
+  queryClause: (label, operator, values) =>
+    values.length === 0
+      ? `${label} ${operator}`
+      : `${label} ${operator} ${values.join(", ")}`,
+  searchClause: (text) => `Search for ${text}`,
+  removeClause: (clause) => `Remove ${clause}`,
+  hiddenChips: (count) => `+${formatCount(count)} more`,
+  loadingSuggestions: "Loading suggestions",
+  noSuggestions: "No matches",
+  clauseField: "Field",
+  clauseOperator: (label) => `Operator for ${label}`,
+  clauseValue: (label) => `Value for ${label}`,
+  recordCount: (count, noun) => formatRecords(count, noun),
+  clauseAdded: (clause, count, noun) =>
+    composeOutcome(`Added ${clause}.`, count, noun),
+  clauseChanged: (clause, count, noun) =>
+    composeOutcome(`Changed to ${clause}.`, count, noun),
+  clauseRemoved: (clause, count, noun) =>
+    composeOutcome(`Removed ${clause}.`, count, noun),
+  readAsAtLeast: "Read as at least",
+  readAsAtMost: "Read as at most",
+  valuePicked: (clause) => `${clause}. Enter again to apply it.`,
+  multipleValuesHint: "Enter adds a value; Enter again applies them",
+  dateFormat: "Date, format YYYY-MM-DD",
+  numberFormat: (units) =>
+    units.length === 0 ? "Number" : `Number, in ${units.join(" or ")}`,
+  clauseInvalid: (reason) => `Invalid: ${composeClause(reason)}`,
+  decimalSeparator: ".",
 
   pagination: "Pagination",
   rowsPerPage: "Rows per page",

@@ -142,6 +142,7 @@ describe("public surface", () => {
       "hideColumn",
       "isDataViewsProvider",
       "isNarrowingIssue",
+      "listConjuncts",
       "listDisplayEntries",
       "listOfferedOperators",
       "moveColumn",

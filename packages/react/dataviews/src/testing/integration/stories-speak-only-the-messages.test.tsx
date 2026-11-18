@@ -35,6 +35,7 @@ import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.s
 import * as actionsStories from "../../lib/_work_in_progress/DataViews/common/Actions/Actions.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as paginationStories from "../../lib/_work_in_progress/DataViews/common/Pagination/Pagination.stories.js";
+import * as queryBarStories from "../../lib/_work_in_progress/DataViews/common/QueryBar/QueryBar.stories.js";
 import * as savedViewsStories from "../../lib/_work_in_progress/DataViews/common/SavedViews/SavedViews.stories.js";
 import * as searchStories from "../../lib/_work_in_progress/DataViews/common/Search/Search.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
@@ -83,6 +84,7 @@ const parts = {
   Actions: composeStories(actionsStories),
   Filters: composeStories(filtersStories),
   Pagination: composeStories(paginationStories),
+  QueryBar: composeStories(queryBarStories),
   SavedViews: composeStories(savedViewsStories),
   Search: composeStories(searchStories),
   Settings: composeStories(settingsStories),
@@ -105,6 +107,8 @@ const AUTHORED: Readonly<Record<string, readonly string[]>> = {
   Actions: ["Delete", "machines selected"],
   // The root's own story places a child that counts the page's rows.
   DataViews: ["machines on this page"],
+  // The bar's stories place a control of their own beside it.
+  QueryBar: ["Show only machines tagged ex-ssd"],
   // The cards' stories place a switch of their own, named the same way, and
   // one story's own cell writes a sentence saying the record's "from".
   // The tutorial's list names its own sort controls.

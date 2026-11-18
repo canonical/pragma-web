@@ -10,6 +10,7 @@ import {
   DataTable,
   Filters,
   Pagination,
+  QueryBar,
   SavedViews,
   Search,
   Settings,
@@ -66,6 +67,8 @@ DataViews.DataTable = DataTable;
 DataViews.Filters = Filters;
 /** The connected window-navigation part of the composition. */
 DataViews.Pagination = Pagination;
+/** The connected query bar: typed clauses and free text in one field. */
+DataViews.QueryBar = QueryBar;
 /** The connected saved-view control, over the store the provider was given. */
 DataViews.SavedViews = SavedViews;
 /** The connected search part, over the applied search. */

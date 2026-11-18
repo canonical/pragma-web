@@ -3,6 +3,8 @@ import {
   DIRECTIONS,
   DEFAULT_MESSAGES as m,
   NOT_DONE,
+  OPERATORS_SHOWN,
+  OPERATORS_SPOKEN,
   PENDING,
   STILL_APPLIES,
 } from "./constants.js";
@@ -436,5 +438,106 @@ describe("NOT_DONE and PENDING", () => {
 describe("STILL_APPLIES", () => {
   it("says the earlier restriction stands", () => {
     expect(STILL_APPLIES).toBe("The previous restriction still applies.");
+  });
+
+  it("shows each operator as its symbol, or its words where it has none", () => {
+    expect(m.operatorShown("isAny", ["ready"])).toBe(":");
+    expect(m.operatorShown("is", ["web"])).toBe(":");
+    expect(m.operatorShown("isNone", ["ready"])).toBe("≠");
+    expect(m.operatorShown("isNot", ["web"])).toBe("≠");
+    expect(m.operatorShown("contains", ["web"])).toBe("contains");
+    expect(m.operatorShown("notContains", ["web"])).toBe("does not contain");
+    expect(m.operatorShown("startsWith", ["web"])).toBe("starts with");
+    expect(m.operatorShown("endsWith", ["web"])).toBe("ends with");
+    expect(m.operatorShown("gte", [1])).toBe("≥");
+    expect(m.operatorShown("lte", [1])).toBe("≤");
+    expect(m.operatorShown("isSet", [true])).toBe("has a value");
+    expect(m.operatorShown("isSet", [false])).toBe("has no value");
+    expect(Object.keys(OPERATORS_SHOWN)).toEqual(Object.keys(OPERATORS_SPOKEN));
+    // An operator shown in words is shown in the words it is spoken by.
+    for (const [operator, show] of Object.entries(OPERATORS_SHOWN)) {
+      for (const operands of [[true], [false], ["a"]]) {
+        const shown = show(operands);
+        if (/\p{L}/u.test(shown)) {
+          expect(
+            OPERATORS_SPOKEN[operator as keyof typeof OPERATORS_SPOKEN](
+              operands,
+            ),
+          ).toContain(shown);
+        }
+      }
+    }
+  });
+
+  it("speaks each operator by its operands", () => {
+    expect(m.operatorSpoken("isAny", ["ready"])).toBe("is");
+    expect(m.operatorSpoken("isAny", ["ready", "deployed"])).toBe("is any of");
+    expect(m.operatorSpoken("isAny", [])).toBe("is any of");
+    expect(m.operatorSpoken("is", ["web"])).toBe("is");
+    expect(m.operatorSpoken("isNone", ["ready"])).toBe("is none of");
+    expect(m.operatorSpoken("isNot", ["web"])).toBe("is not");
+    expect(m.operatorSpoken("contains", ["web"])).toBe("contains");
+    expect(m.operatorSpoken("notContains", ["web"])).toBe("does not contain");
+    expect(m.operatorSpoken("startsWith", ["web"])).toBe("starts with");
+    expect(m.operatorSpoken("endsWith", ["web"])).toBe("ends with");
+    expect(m.operatorSpoken("gte", [1])).toBe("at least");
+    expect(m.operatorSpoken("lte", [1])).toBe("at most");
+    expect(m.operatorSpoken("isSet", [true])).toBe("has a value");
+    expect(m.operatorSpoken("isSet", [])).toBe("has a value");
+    expect(m.operatorSpoken("isSet", [false])).toBe("has no value");
+  });
+
+  it("words the query bar, its clauses and what its commits did", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(m.queryBar(noun)).toBe("Filter machines");
+    expect(m.queryBarDescription).toBe(
+      "Left and Right to move between filters, Enter to edit, Backspace or Delete to remove",
+    );
+    expect(m.queryBarPlaceholder).toBe("Search or filter");
+    expect(m.appliedFilters).toBe("Applied filters");
+    expect(m.clearFiltersAndSearch).toBe("Clear filters and search");
+    expect(m.queryCleared(exact(60), noun)).toBe(
+      "Cleared the filters and the search. 60 machines.",
+    );
+    // A noun with a form of its own after a count takes it.
+    expect(
+      m.recordCount(exact(3), { ...noun, counted: (n) => `machine×${n}` }),
+    ).toBe("3 machine×3");
+    expect(m.queryClause("status", "is any of", ["ready", "deployed"])).toBe(
+      "status is any of ready, deployed",
+    );
+    expect(m.queryClause("owner", "has a value", [])).toBe("owner has a value");
+    expect(m.searchClause("ex web")).toBe("Search for ex web");
+    expect(m.removeClause("status is ready")).toBe("Remove status is ready");
+    expect(m.hiddenChips(3)).toBe("+3 more");
+    expect(m.loadingSuggestions).toBe("Loading suggestions");
+    expect(m.noSuggestions).toBe("No matches");
+    expect(m.clauseField).toBe("Field");
+    expect(m.clauseOperator("status")).toBe("Operator for status");
+    expect(m.clauseValue("status")).toBe("Value for status");
+    expect(m.recordCount(exact(1), noun)).toBe("1 machine");
+    expect(m.recordCount(atLeast(1000), noun)).toBe("at least 1,000 machines");
+    expect(m.clauseAdded("status is ready", exact(12), noun)).toBe(
+      "Added status is ready. 12 machines.",
+    );
+    expect(m.clauseChanged("status is ready", unknown, noun)).toBe(
+      "Changed to status is ready.",
+    );
+    expect(m.clauseRemoved("status is ready", atLeast(2), noun)).toBe(
+      "Removed status is ready. At least 2 machines.",
+    );
+    expect(m.readAsAtLeast).toBe("Read as at least");
+    expect(m.readAsAtMost).toBe("Read as at most");
+    expect(m.valuePicked("status is any of ready, deployed")).toBe(
+      "status is any of ready, deployed. Enter again to apply it.",
+    );
+    expect(m.multipleValuesHint).toBe(
+      "Enter adds a value; Enter again applies them",
+    );
+    expect(m.dateFormat).toBe("Date, format YYYY-MM-DD");
+    expect(m.numberFormat([])).toBe("Number");
+    expect(m.numberFormat(["MiB", "GiB"])).toBe("Number, in MiB or GiB");
+    expect(m.clauseInvalid("not a number.")).toBe("Invalid: not a number");
+    expect(m.decimalSeparator).toBe(".");
   });
 });

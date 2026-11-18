@@ -7,7 +7,11 @@
  * one contract: a translation writes every member against these shapes.
  */
 
-import type { SortDirection } from "../query/index.js";
+import type {
+  PredicateOperand,
+  PredicateOperator,
+  SortDirection,
+} from "../query/index.js";
 import type { Count } from "../result/index.js";
 import type { ViewCommand } from "../views/index.js";
 
@@ -31,6 +35,27 @@ export type SortTermWords = {
  * name may change or move before the first release.
  */
 export type FacetCountWords = Exclude<Count, { readonly kind: "unknown" }>;
+
+/**
+ * What a collection's records are called, in the singular and the plural,
+ * as a message counting them words them: "machine", "machines".
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type RecordNoun = {
+  /** One record: "machine". */
+  readonly singular: string;
+  /** Records in general, and a count other than one: "machines". */
+  readonly plural: string;
+  /**
+   * The noun after a count, where a language takes more forms than the
+   * singular and the plural; left out, the count chooses between those two.
+   */
+  readonly counted?: (count: number) => string;
+  /** The noun's grammatical gender, where the words around it agree with it. */
+  readonly gender?: string;
+};
 
 /**
  * Every user-facing string DataViews renders or announces. It ships in
@@ -274,6 +299,103 @@ export type DataViewsMessages = {
   readonly search: string;
   /** The search form's submit control, before scripts run. */
   readonly submitSearch: string;
+
+  // An operator, wherever a clause shows it.
+  /**
+   * An operator as a chip shows it, by its operands: a symbol such as `:`
+   * or `≥`, or words where it has no symbol. Symbols are not translated.
+   */
+  readonly operatorShown: (
+    operator: PredicateOperator,
+    operands: readonly PredicateOperand[],
+  ) => string;
+  /**
+   * An operator as it is spoken in a clause, by its operands: "is" for one
+   * value and "is any of" for several, "at least" for `≥`.
+   */
+  readonly operatorSpoken: (
+    operator: PredicateOperator,
+    operands: readonly PredicateOperand[],
+  ) => string;
+
+  // The query bar.
+  /** The query bar's name, by what its collection's records are called. */
+  readonly queryBar: (noun: RecordNoun) => string;
+  /** The keys the query bar handles, as its toolbar's description. */
+  readonly queryBarDescription: string;
+  /** Shown in the query bar while nothing is typed and no clause applies. */
+  readonly queryBarPlaceholder: string;
+  /** The list of the clauses that apply. */
+  readonly appliedFilters: string;
+  /** The query bar's control clearing every clause and the search. */
+  readonly clearFiltersAndSearch: string;
+  /** Every clause and the search cleared, with the result count after it. */
+  readonly queryCleared: (count: Count, noun: RecordNoun) => string;
+  /**
+   * One clause as it is spoken: its field's label, its operator as spoken,
+   * and the values it holds, none for presence.
+   */
+  readonly queryClause: (
+    label: string,
+    operator: string,
+    values: readonly string[],
+  ) => string;
+  /** The search as a clause, by its text. */
+  readonly searchClause: (text: string) => string;
+  /** A clause's remove control, by the clause as spoken. */
+  readonly removeClause: (clause: string) => string;
+  /** How many clauses the unfocused field hides. */
+  readonly hiddenChips: (count: number) => string;
+  /** The suggestions while they load. */
+  readonly loadingSuggestions: string;
+  /** The suggestions when none matches what is typed. */
+  readonly noSuggestions: string;
+  /** The field part of a clause being built, while it is typed. */
+  readonly clauseField: string;
+  /** The operator part of a clause, by its field's label. */
+  readonly clauseOperator: (label: string) => string;
+  /** The value part of a clause, by its field's label. */
+  readonly clauseValue: (label: string) => string;
+  /** How many matching records hold a value, beside it as a hint. */
+  readonly recordCount: (count: FacetCountWords, noun: RecordNoun) => string;
+  /** A clause added, with the result count after it. */
+  readonly clauseAdded: (
+    clause: string,
+    count: Count,
+    noun: RecordNoun,
+  ) => string;
+  /** A clause changed, with the result count after it. */
+  readonly clauseChanged: (
+    clause: string,
+    count: Count,
+    noun: RecordNoun,
+  ) => string;
+  /** A clause removed, with the result count after it. */
+  readonly clauseRemoved: (
+    clause: string,
+    count: Count,
+    noun: RecordNoun,
+  ) => string;
+  /** A typed `>` read as the bound it stops short of. */
+  readonly readAsAtLeast: string;
+  /** A typed `<` read as the bound it stops short of. */
+  readonly readAsAtMost: string;
+  /** A value picked among several, by the clause as it now reads. */
+  readonly valuePicked: (clause: string) => string;
+  /** The hint while a clause takes several values. */
+  readonly multipleValuesHint: string;
+  /** A date value's format, in words. */
+  readonly dateFormat: string;
+  /** A number value's format, by the units it may be typed in. */
+  readonly numberFormat: (units: readonly string[]) => string;
+  /** A typed value that cannot be read, and why. */
+  readonly clauseInvalid: (reason: string) => string;
+  /**
+   * The decimal separator a reader types and reads numbers with in the
+   * query bar's entries, beside `.`, which always reads: `,` in French.
+   * Never a grouping separator.
+   */
+  readonly decimalSeparator: string;
 
   // The pagination bar.
   /** The bar's name. */

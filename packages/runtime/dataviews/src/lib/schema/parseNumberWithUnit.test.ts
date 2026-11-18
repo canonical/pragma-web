@@ -87,4 +87,25 @@ describe("parseNumberWithUnit", () => {
     expect(read("16 ", undefined)).toEqual({ kind: "not-a-number" });
     expect(read("-", undefined)).toEqual({ kind: "not-a-number" });
   });
+
+  it("reads the reader's decimal separator as the point, beside the point itself", () => {
+    expect(parseNumberWithUnit("16,5 GiB", memory, ",")).toEqual({
+      kind: "value",
+      value: 16_896,
+    });
+    expect(parseNumberWithUnit("16.5 GiB", memory, ",")).toEqual({
+      kind: "value",
+      value: 16_896,
+    });
+    expect(parseNumberWithUnit("16,", memory, ",")).toEqual({
+      kind: "incomplete",
+    });
+    // A grouping separator is never read, under either point.
+    expect(parseNumberWithUnit("1,024", undefined)).toEqual({
+      kind: "not-a-number",
+    });
+    expect(parseNumberWithUnit("1 024,5", memory, ",")).toEqual({
+      kind: "not-a-number",
+    });
+  });
 });
