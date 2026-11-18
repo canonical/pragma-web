@@ -15,7 +15,7 @@
     ...rest
   }: SegmentedControlProps = $props();
 
-  let root = $state<HTMLDivElement>();
+  let rootRef = $state<HTMLDivElement>();
 
   const enabledIndexes = $derived(
     items.flatMap((item, index) => (item.disabled ? [] : [index])),
@@ -32,7 +32,7 @@
   }
 
   function focusItem(index: number): void {
-    root
+    rootRef
       ?.querySelector<HTMLButtonElement>(`[data-item-index="${index}"]`)
       ?.focus();
   }
@@ -47,39 +47,38 @@
     if (changed) onValueChange?.(item.value, item);
   }
 
-  function handleKeydown(event: KeyboardEvent, index: number): void {
-    if (
-      event.key !== "ArrowLeft" &&
-      event.key !== "ArrowRight" &&
-      event.key !== "Home" &&
-      event.key !== "End"
-    ) {
-      return;
-    }
-
-    event.preventDefault();
-    if (enabledIndexes.length === 0) return;
-
-    if (event.key === "Home") {
-      selectItem(enabledIndexes[0], true);
-      return;
-    }
-    if (event.key === "End") {
-      selectItem(enabledIndexes.at(-1) ?? enabledIndexes[0], true);
-      return;
-    }
+  function getTargetIndex(key: string, index: number): number | undefined {
+    if (key === "Home") return enabledIndexes[0];
+    if (key === "End") return enabledIndexes.at(-1);
+    if (key !== "ArrowLeft" && key !== "ArrowRight") return undefined;
 
     const currentPosition = enabledIndexes.indexOf(index);
-    const direction = event.key === "ArrowLeft" ? -1 : 1;
+    const isRtl = rootRef
+      ? getComputedStyle(rootRef).direction === "rtl"
+      : false;
+    const direction = key === "ArrowLeft" ? -1 : 1;
     const nextPosition =
-      (currentPosition + direction + enabledIndexes.length) %
+      (currentPosition +
+        (isRtl ? -direction : direction) +
+        enabledIndexes.length) %
       enabledIndexes.length;
-    selectItem(enabledIndexes[nextPosition], true);
+    return enabledIndexes[nextPosition];
+  }
+
+  function handleKeydown(event: KeyboardEvent, index: number): void {
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+      return;
+
+    const targetIndex = getTargetIndex(event.key, index);
+    if (targetIndex === undefined) return;
+
+    event.preventDefault();
+    selectItem(targetIndex, true);
   }
 </script>
 
 <div
-  bind:this={root}
+  bind:this={rootRef}
   {id}
   class={[componentCssClassName, className]}
   {...rest}

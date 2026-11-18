@@ -88,6 +88,57 @@ describe("SegmentedControl component", () => {
     expect(onValueChange).toHaveBeenNthCalledWith(2, "direct", items[0]);
   });
 
+  it.each(["altKey", "ctrlKey", "metaKey", "shiftKey"] as const)(
+    "leaves navigation keys with $0 to the browser",
+    async (modifier) => {
+      const onValueChange = vi.fn();
+      const page = await render(Component, { ...baseProps, onValueChange });
+      const direct = page.getByRole("tab", { name: "My direct reports" });
+      direct.element().focus();
+
+      for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
+        const event = new KeyboardEvent("keydown", {
+          key,
+          [modifier]: true,
+          bubbles: true,
+          cancelable: true,
+        });
+        direct.element().dispatchEvent(event);
+
+        expect(event.defaultPrevented).toBe(false);
+      }
+
+      await expect.element(direct).toHaveFocus();
+      await expect.element(direct).toHaveAttribute("aria-selected", "true");
+      expect(onValueChange).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["ArrowLeft", "ArrowRight"] as const)(
+    "moves in the visual direction with %s in RTL, wraps, and skips disabled items",
+    async (key) => {
+      const page = await render(Component, {
+        ...baseProps,
+        dir: "rtl",
+        items: [...items, { label: "All reports", value: "all" }],
+      });
+      const direct = page.getByRole("tab", { name: "My direct reports" });
+      direct.element().focus();
+      const targets =
+        key === "ArrowLeft"
+          ? ["My span of control", "All reports", "My direct reports"]
+          : ["All reports", "My span of control", "My direct reports"];
+
+      for (const name of targets) {
+        await userEvent.keyboard(`{${key}}`);
+
+        const target = page.getByRole("tab", { name });
+        await expect.element(target).toHaveFocus();
+        await expect.element(target).toHaveAttribute("aria-selected", "true");
+      }
+    },
+  );
+
   it("moves to the first and last enabled items with Home and End", async () => {
     const page = await render(Component, { ...baseProps });
     const direct = page.getByRole("tab", { name: "My direct reports" });
