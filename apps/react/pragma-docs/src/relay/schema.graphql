@@ -125,11 +125,21 @@ type Job implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 interface Node {
   uri: ID!
   _meta: EntityMeta!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type SubstrateConnection {
@@ -308,6 +318,11 @@ type Coordinate implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type ActorConnection {
@@ -414,6 +429,11 @@ type Actor implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -490,6 +510,11 @@ type Role implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -569,6 +594,11 @@ type Fluency implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -653,6 +683,11 @@ type Persona implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -729,6 +764,11 @@ type Substrate implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -825,6 +865,11 @@ type Capability implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type AuthorityFamilyConnection {
@@ -911,6 +956,11 @@ type AuthorityFamily implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -987,6 +1037,11 @@ type Rendering implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1063,6 +1118,11 @@ type Direction implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1139,6 +1199,11 @@ type Anchoring implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1253,6 +1318,11 @@ type LensSurface implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type RenderingConnection {
@@ -1404,6 +1474,11 @@ type View implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1505,6 +1580,11 @@ type Detail implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1606,6 +1686,11 @@ type Peek implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1707,6 +1792,11 @@ type Mechanism implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1808,6 +1898,11 @@ type ComposerSurface implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -1909,6 +2004,11 @@ type Editor implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2020,6 +2120,11 @@ type Port implements Node & Surface {
   The pairings this surface participates in (inverse of pairsSurface) — materialized by the closure so surfaces connect outward without walking reification by hand.
   """
   pairedIns(first: Int, after: String, last: Int, before: String): PairingConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2101,6 +2206,11 @@ type Preservation implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2177,6 +2287,11 @@ type PairingRole implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2267,6 +2382,11 @@ type Pairing implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type PreservationConnection {
@@ -2353,6 +2473,11 @@ type Region implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2442,6 +2567,11 @@ type Slot implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2531,6 +2661,11 @@ type Bet implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2607,6 +2742,11 @@ type Law implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2706,6 +2846,11 @@ type Exemplar implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2782,6 +2927,11 @@ type Verdict implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2858,6 +3008,11 @@ type Validity implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2923,6 +3078,11 @@ type ConceptType implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -2965,6 +3125,11 @@ type Concept implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type ConceptTypeConnection {
@@ -3041,6 +3206,11 @@ type TagCategory implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -3083,6 +3253,11 @@ type Tag implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type TagCategoryConnection {
@@ -3137,6 +3312,11 @@ type ImplementationLibrary implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type TierConnection {
@@ -3203,6 +3383,11 @@ type ImplementationObject implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -3230,6 +3415,11 @@ type Tier implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """A configurable property of a UI Block"""
@@ -3298,6 +3488,11 @@ type ModifierFamily implements Node & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type ModifierConnection {
@@ -3338,6 +3533,11 @@ type Modifier implements Node & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -3430,6 +3630,11 @@ type Group implements Node & UIBlock & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type TagConnection {
@@ -3550,6 +3755,11 @@ type Subcomponent implements Node & UIBlock & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type ComponentConnection {
@@ -3664,6 +3874,11 @@ type Layout implements Node & UIBlock & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """A reusable solution to a recurring user problem in a specific context"""
@@ -3754,6 +3969,11 @@ type Pattern implements Node & UIBlock & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -3849,6 +4069,11 @@ type Component implements Node & UIBlock & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type SubcomponentConnection {
@@ -3881,6 +4106,11 @@ type Example implements Node {
 
   """A general description of the code standard or example"""
   description: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -3900,6 +4130,11 @@ type Category implements Node {
   A short identifier for the category or standard, used for domain annotation.
   """
   slug: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """A coding standard or best practice guideline for software development"""
@@ -3931,6 +4166,11 @@ type CodeStandard implements Node {
   DEPRECATED (2.1.0): use rdfs:label. An optional human-readable display title for a code standard. This is not an identifier and must not duplicate the canonical role of the subject IRI.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type ExampleConnection {
@@ -4022,6 +4262,11 @@ type StyleKey implements Node {
       anatomy:consumes, or it carries a primitive styleValue.
   """
   valueKind: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """One alternative within a Switch."""
@@ -4055,6 +4300,11 @@ type SwitchCase implements Node {
 
   """Platform-agnostic style property identifier."""
   styleKey: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """Polymorphic position admitting several alternatives."""
@@ -4091,6 +4341,11 @@ type Switch implements Node {
 
   """What determines which case applies."""
   discriminator: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type SwitchCaseConnection {
@@ -4147,6 +4402,11 @@ type Prop implements Node {
 
   """Platform-agnostic style property identifier."""
   styleKey: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -4192,6 +4452,11 @@ type Projection implements Node {
 
   """Platform-agnostic style property identifier."""
   styleKey: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """A single style declaration binding a property key to a value."""
@@ -4259,6 +4524,11 @@ type Style implements Node {
 
   """Platform-agnostic style property identifier."""
   styleKey: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """Metadata qualifying a parent-child relationship."""
@@ -4295,6 +4565,11 @@ type Relation implements Node {
 
   """Instance count constraint on the child."""
   cardinality: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """Reified parent-child relationship in the anatomy tree."""
@@ -4334,6 +4609,11 @@ type Edge implements Node {
 
   """Platform-agnostic style property identifier."""
   styleKey: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """Structural element without design system identity."""
@@ -4373,6 +4653,11 @@ type AnonymousNode implements Node & AnatomyNode {
 
   """Connects a node to a child relationship."""
   edges(first: Int, after: String, last: Int, before: String): EdgeConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type StyleConnection {
@@ -4437,6 +4722,11 @@ type NamedNode implements Node & AnatomyNode {
 
   """Connects a node to a child relationship."""
   edges(first: Int, after: String, last: Int, before: String): EdgeConnection!
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 type PropConnection {
@@ -4480,6 +4770,11 @@ type Specification implements Node {
 
   """Platform-agnostic style property identifier."""
   styleKey: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -4581,6 +4876,11 @@ interface Surface implements Node {
   The mandatory comment on an invalid item: what happened, decided where, and what to use instead.
   """
   validityNote: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -4673,6 +4973,11 @@ interface UIBlock implements Node & UIElement & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """Base class for all visual and interactive design system elements"""
@@ -4698,6 +5003,11 @@ interface UIElement implements Node & Entity {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -4725,6 +5035,11 @@ interface Entity implements Node {
   A human-readable text for the entity. The primary identifier, used for referencing and display purposes.
   """
   name: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """Position in the anatomy tree."""
@@ -4761,6 +5076,11 @@ interface AnatomyNode implements Node {
 
   """Platform-agnostic style property identifier."""
   styleKey: String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -4832,6 +5152,11 @@ type OntologyClass implements Node {
   prism:pluralLabel in `lang` (exact tag, else untagged); never inherited; null when undeclared.
   """
   pluralLabel(lang: String = "en"): String
+
+  """
+  The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order.
+  """
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -5065,6 +5390,11 @@ type Query {
   Every edge between classes, sorted by property, subject class and object class.
   """
   classEdges: [ClassEdge!]!
+
+  """
+  The instances of the class `classUri` names that `filters` keep, in `sort`'s order (the IRIs' without one), with their number and the facets of the class's list fields and of its kind.
+  """
+  facetedInstances(classUri: ID!, filters: [FieldFilter!], sort: FieldSort, first: Int, after: String): FacetedConnection!
 }
 
 type Ontology {
@@ -5419,4 +5749,55 @@ type PropertyGroup {
   sh:order: the group's position among a class's groups, ascending; null when undeclared.
   """
   order: Float
+}
+
+"""A node's value for one list field."""
+type NodeValue {
+  """The field's served name."""
+  field: ID!
+
+  """The field's label."""
+  label: String!
+
+  """The values' texts joined, or null when the node has none."""
+  text: String
+
+  """The IRI of the value when it is exactly one entity."""
+  uri: ID
+}
+
+"""
+Keeps the nodes holding one of `values` for `field`; a null value stands for none.
+"""
+input FieldFilter {
+  field: String!
+  values: [ID]
+}
+
+"""Orders a set by one field, the nodes without a value last."""
+input FieldSort {
+  field: String!
+  descending: Boolean
+}
+
+"""One bucket of a facet; a null value is the nodes with none."""
+type FacetValue {
+  value: ID
+  label: String
+  count: Int!
+}
+
+"""A field's buckets, counted with every filter but the field's own."""
+type Facet {
+  field: String!
+  label: String!
+  values: [FacetValue!]!
+}
+
+"""A page of a faceted set, the set's size and its facets."""
+type FacetedConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+  facets: [Facet!]!
 }
