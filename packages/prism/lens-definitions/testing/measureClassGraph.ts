@@ -114,14 +114,22 @@ export function countEmptyCells(layout: ClassGraphLayout): number {
   return empty;
 }
 
-/** The nodes of one region's column, top first. */
+/**
+ * The nodes of one region's column, top first, by the column's place in
+ * its region: a node's column is graph-wide, so the region's first column
+ * is the count of the columns of the regions packed before it.
+ */
 function listColumn(
   layout: ClassGraphLayout,
   region: string,
   column: number,
 ): LaidOutNode[] {
+  const regions = layout.regions.map((candidate) => candidate.prefix);
+  const first = layout.regions
+    .slice(0, regions.indexOf(region))
+    .reduce((sum, candidate) => sum + candidate.columns, 0);
   return [...layout.nodes.values()]
-    .filter((node) => node.region === region && node.col === column)
+    .filter((node) => node.region === region && node.col === first + column)
     .sort((a, b) => a.y - b.y);
 }
 

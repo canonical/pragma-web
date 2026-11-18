@@ -10,7 +10,10 @@ import type { FilterPlacement } from "./types.js";
 /**
  * The search parameters a view keeps its state in, by role: the renderer
  * (`as`; `view` is left to saved views), the search text, the open sheet,
- * the graph's kind, its selection and its expanded relation.
+ * the graph's kind, its selection and what it has expanded. What `expand`
+ * holds is the graph's to define: a relation, for a graph of an entity's
+ * neighbourhood; a namespace's prefix, for the Definitions overview, which
+ * draws that namespace opened and the others as one box each.
  */
 export const VIEW_PARAMS = {
   renderer: "as",

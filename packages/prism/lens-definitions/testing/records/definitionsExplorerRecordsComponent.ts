@@ -12,11 +12,13 @@
  * a Relay environment whose network answers from
  * `createPragmaProvider()` in process, over the installed ref packages,
  * serialise its store with `getStore().getSource().toJSON()`, and keep only
- * the records of the `ds`, `cs` and `anatomy` namespaces: the capture
+ * the records of the `ds`, `cs` and `anatomy` namespaces (their class
+ * edges are `classEdges.ts`, spread in): the capture
  * predates the demand model's `surface` and `design-system-docs` packages.
  */
 
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
+import { CLASS_EDGE_RECORDS, CLASS_EDGES_ROOT_FIELD } from "./classEdges.js";
 
 const definitionsExplorerRecordsComponent = {
   "client:__type:Component": {
@@ -27,6 +29,7 @@ const definitionsExplorerRecordsComponent = {
   "client:root": {
     __id: "client:root",
     __typename: "__Root",
+    classEdges: CLASS_EDGES_ROOT_FIELD,
     ontologies: {
       __refs: [
         "client:root:ontologies:0",
@@ -7442,6 +7445,7 @@ const definitionsExplorerRecordsComponent = {
     uri: "https://ds.canonical.com/Entity",
     label: "Entity",
   },
+  ...CLASS_EDGE_RECORDS,
 } as unknown as RecordMap;
 
 export default definitionsExplorerRecordsComponent;

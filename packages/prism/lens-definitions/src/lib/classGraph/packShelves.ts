@@ -64,13 +64,16 @@ export default function packShelves(
       [{ h: -SHELF_GAP, start: 0 }],
     ];
     for (let shelves = 1; shelves <= count; shelves += 1) {
+      const previous = requireAt(stacks, shelves - 1);
       const row: (ShelfStack | undefined)[] = [undefined];
       for (let end = 1; end <= count; end += 1) {
         let least: ShelfStack | undefined;
-        for (let start = end - 1; start >= 0; start -= 1) {
+        // The first `start` regions fill `shelves - 1` shelves only when
+        // there are at least as many of them.
+        for (let start = end - 1; start >= shelves - 1; start -= 1) {
           const run = runOf(start, end - 1);
           if (run.w > bound) break;
-          const before = requireAt(stacks, shelves - 1).at(start);
+          const before = previous.at(start);
           if (before === undefined) continue;
           const h = before.h + SHELF_GAP + run.h;
           if (least === undefined || h < least.h) least = { h, start };

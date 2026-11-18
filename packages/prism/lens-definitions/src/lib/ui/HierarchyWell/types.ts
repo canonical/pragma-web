@@ -4,6 +4,7 @@ import type { GraphCameraMemory } from "@canonical/prism-core";
 import type { ComponentProps, RefObject } from "react";
 import type { ClassGraphLayout } from "../../classGraph/types.js";
 import type { LensFilter, RegionRequest } from "../../types.js";
+import type { GRAPH_TASKS } from "./constants.js";
 
 type OwnProps = {
   /** The class graph laid out. */
@@ -39,3 +40,18 @@ type OwnProps = {
  */
 export type HierarchyWellProps = OwnProps &
   Omit<ComponentProps<"div">, keyof OwnProps>;
+
+/** The topology task a Definitions canvas serves, as `data-task` states it. */
+export type GraphTask = (typeof GRAPH_TASKS)[keyof typeof GRAPH_TASKS];
+
+/**
+ * What a Definitions canvas states of its task: the task, and the class in
+ * focus on a term page or the set of namespaces drawn elsewhere.
+ */
+export interface GraphTaskHooks {
+  readonly "data-task": GraphTask;
+  /** The compact term of the class in focus, on a term page. */
+  readonly "data-focus"?: string;
+  /** The prefixes of the namespaces the view draws for, space-separated. */
+  readonly "data-set"?: string;
+}

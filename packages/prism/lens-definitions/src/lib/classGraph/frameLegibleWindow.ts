@@ -1,30 +1,18 @@
 import {
   intersectsRect,
   LATTICE,
-  measureRegionLabelWidth,
   REGION_LABEL_ROW,
   type Rect,
 } from "@canonical/prism-core";
 import {
   CLEAN_EDGE_ZOOM,
+  FIT_TOLERANCE,
   LEGIBLE_MARGIN,
   MIN_FIT,
-  VIEW_MARGIN,
 } from "./constants.js";
+import containsRect from "./containsRect.js";
+import measureRegionHeading from "./measureRegionHeading.js";
 import type { ClassGraphLayout, LegibleWindowOptions } from "./types.js";
-
-/** How far a rectangle may overrun another and still count as inside it. */
-const TOLERANCE = 1e-6;
-
-/** Whether `inner` lies inside `outer`, edges included. */
-function containsRect(outer: Rect, inner: Rect): boolean {
-  return (
-    inner.x >= outer.x - TOLERANCE &&
-    inner.y >= outer.y - TOLERANCE &&
-    inner.x + inner.w <= outer.x + outer.w + TOLERANCE &&
-    inner.y + inner.h <= outer.y + outer.h + TOLERANCE
-  );
-}
 
 /**
  * Frame the window of the class graph a canvas of a given size opens on,
@@ -41,11 +29,10 @@ function containsRect(outer: Rect, inner: Rect): boolean {
  *
  * The box it frames is the whole viewBox, or the one `within` names, such as
  * the classes a filter leaves or a region a reader picked, and runs from
- * its top-left corner, or, for a class selected on arrival, from the
- * corner in the gaps before the boxes that gives the widest such window
- * holding the class, the one that centres it best among equals, so a term
- * page opens on its term. When no zoom frames it so, the window is the
- * legible one, from the top-left corner or centred on the class.
+ * its top-left corner; when no zoom frames it so, the window is the
+ * legible one from that corner. For a class selected on arrival, the
+ * window is the legible one centred on the class, clamped to the box, so a
+ * term page opens on its term with the map around it.
  *
  * @param layout - The class graph's boxes, regions and viewBox; only the
  *   boxes drawn, when a filter hides some.
@@ -56,7 +43,7 @@ function containsRect(outer: Rect, inner: Rect): boolean {
  * @returns The window.
  */
 export default function frameLegibleWindow(
-  layout: Pick<ClassGraphLayout, "nodes" | "regions" | "viewBox">,
+  layout: Pick<ClassGraphLayout, "nodes" | "regions" | "viewBox" | "drilled">,
   canvas: { readonly w: number; readonly h: number },
   {
     arrival,
@@ -72,7 +59,11 @@ export default function frameLegibleWindow(
     ...layout.regions.map((region) => ({
       x: region.x,
       y: region.y,
-      w: measureRegionLabelWidth(region.prefix, region.ids.length),
+      w: measureRegionHeading(
+        region.prefix,
+        region.ids.length,
+        region.prefix === layout.drilled,
+      ),
       h: REGION_LABEL_ROW,
     })),
   ];
@@ -82,8 +73,7 @@ export default function frameLegibleWindow(
     h: canvas.h / (zoom * LEGIBLE_MARGIN),
   };
   const isFramed = (window: Rect): boolean =>
-    obstacles.some((box) => containsRect(window, box)) &&
-    (arrival === undefined || containsRect(window, arrival));
+    obstacles.some((box) => containsRect(window, box));
   // A box the bottom edge crosses shows that more lies below, as long as
   // it lies within the window's width; every other box in view lies wholly
   // in the window, so no corner cuts a box on two sides.
@@ -92,9 +82,9 @@ export default function frameLegibleWindow(
       (box) =>
         !intersectsRect(window, box) ||
         containsRect(window, box) ||
-        (box.x >= window.x - TOLERANCE &&
-          box.x + box.w <= window.x + window.w + TOLERANCE &&
-          box.y >= window.y - TOLERANCE &&
+        (box.x >= window.x - FIT_TOLERANCE &&
+          box.x + box.w <= window.x + window.w + FIT_TOLERANCE &&
+          box.y >= window.y - FIT_TOLERANCE &&
           box.y + box.h > window.y + window.h),
     );
   const isClean = (window: Rect): boolean =>
@@ -145,52 +135,9 @@ export default function frameLegibleWindow(
       }
     );
   }
-  // Around an arrival, every corner in a gap a view margin before a box,
-  // or the graph's own, from which a legible window could hold the class
-  // is tried; the widest window wins, then the one that centres the class
-  // best.
-  const corners = (
-    starts: readonly number[],
-    from: number,
-    near: number,
-    far: number,
-    span: number,
-  ): number[] =>
-    [...new Set([from, ...starts.map((start) => start - VIEW_MARGIN)])].filter(
-      (start) => start >= from && start <= near && start + span >= far,
-    );
-  const xs = corners(
-    obstacles.map((box) => box.x),
-    frame.x,
-    arrival.x,
-    arrival.x + arrival.w,
-    least.w,
-  );
-  const ys = corners(
-    obstacles.map((box) => box.y),
-    frame.y,
-    arrival.y,
-    arrival.y + arrival.h,
-    least.h,
-  );
-  const offCentre = (window: Rect): number =>
-    Math.abs(window.x + window.w / 2 - (arrival.x + arrival.w / 2)) +
-    Math.abs(window.y + window.h / 2 - (arrival.y + arrival.h / 2));
-  let best: Rect | undefined;
-  for (const x of xs) {
-    for (const y of ys) {
-      const found = searchFrom(x, y);
-      if (
-        found !== undefined &&
-        (best === undefined ||
-          found.w > best.w + TOLERANCE ||
-          (found.w > best.w - TOLERANCE && offCentre(found) < offCentre(best)))
-      ) {
-        best = found;
-      }
-    }
-  }
-  if (best !== undefined) return best;
+  // Around an arrival: the legible window centred on the class, clamped
+  // to the frame, so the window is not left bare where the map goes on; on
+  // an axis the frame is narrower than the window, centred on the frame.
   const centre = (
     from: number,
     size: number,
@@ -198,7 +145,12 @@ export default function frameLegibleWindow(
     start: number,
     room: number,
   ): number =>
-    Math.min(Math.max(from + size / 2 - span / 2, start), start + room - span);
+    span >= room
+      ? start + (room - span) / 2
+      : Math.min(
+          Math.max(from + size / 2 - span / 2, start),
+          start + room - span,
+        );
   return {
     x: centre(arrival.x, arrival.w, least.w, frame.x, frame.w),
     y: centre(arrival.y, arrival.h, least.h, frame.y, frame.h),

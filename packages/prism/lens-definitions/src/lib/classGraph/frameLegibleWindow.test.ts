@@ -9,7 +9,8 @@ import {
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../testing/createClassGraphSetup.js";
 import { CROSS_REGION_GRAPH } from "../../../testing/fixtures.js";
-import { MIN_FIT } from "./constants.js";
+import { FIT_TOLERANCE, MIN_FIT } from "./constants.js";
+import containsRect from "./containsRect.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
 import layOutClassGraph from "./layOutClassGraph.js";
 
@@ -52,14 +53,10 @@ const findSideCuts = (window: Rect): Rect[] =>
       window.x < box.x + box.w &&
       box.y < bottom &&
       window.y < box.y + box.h;
-    const inside =
-      box.x >= window.x - 1e-6 &&
-      box.x + box.w <= right + 1e-6 &&
-      box.y >= window.y - 1e-6 &&
-      box.y + box.h <= bottom + 1e-6;
+    const inside = containsRect(window, box);
     const openBelow =
       box.y >= window.y &&
-      box.x + box.w <= right + 1e-6 &&
+      box.x + box.w <= right + FIT_TOLERANCE &&
       box.y + box.h > bottom;
     return inView && !inside && !openBelow;
   });
@@ -86,7 +83,7 @@ describe("frameLegibleWindow", () => {
   );
 
   it.each(CANVASES)(
-    "opens a $w by $h canvas around the class selected on arrival, cutting none on its sides",
+    "opens a $w by $h canvas around the class selected on arrival, holding it whole at the legible floor or above",
     (canvas) => {
       const arrival = requireEntry(
         layout.nodes,
@@ -98,23 +95,42 @@ describe("frameLegibleWindow", () => {
       expect(window.x + window.w).toBeGreaterThanOrEqual(arrival.x + arrival.w);
       expect(window.y).toBeLessThanOrEqual(arrival.y);
       expect(window.y + window.h).toBeGreaterThanOrEqual(arrival.y + arrival.h);
-      expect(findSideCuts(window)).toEqual([]);
     },
   );
 
-  it("opens around a class from a corner in the gaps, the widest window that holds it", () => {
-    const canvas = { w: 590.67, h: 778 };
-    const arrival = requireEntry(
-      layout.nodes,
-      requireEntry(uris, "ds:UIBlock"),
-    );
-    const window = frameLegibleWindow(layout, canvas, { arrival });
-    // A view margin before the second column's boxes, which start at 144.
-    expect(window).toMatchObject({ x: 128, y: 16 });
-    expect(zoomOf(canvas, window)).toBeCloseTo(MIN_FIT, 5);
+  it("opens around a class centred in the legible window, clamped to the map", () => {
+    const frame = layout.viewBox;
+    for (const canvas of CANVASES) {
+      for (const term of ["ds:UIBlock", "cs:CodeStandard", "anatomy:Node"]) {
+        const arrival = requireEntry(layout.nodes, requireEntry(uris, term));
+        const window = frameLegibleWindow(layout, canvas, { arrival });
+        const name = `${term} ${canvas.w}`;
+        expect(zoomOf(canvas, window), name).toBeCloseTo(MIN_FIT, 5);
+        expect(containsRect(window, arrival), name).toBe(true);
+        // On each axis: centred on the class, unless that would show past
+        // the map's edge, where the window keeps to the map.
+        for (const [at, size, span, start, room] of [
+          [arrival.x, arrival.w, window.w, frame.x, frame.w],
+          [arrival.y, arrival.h, window.h, frame.y, frame.h],
+        ] as const) {
+          const from = at === arrival.x ? window.x : window.y;
+          if (span >= room) {
+            expect(from + span / 2, name).toBeCloseTo(start + room / 2, 6);
+            continue;
+          }
+          expect(from, name).toBeGreaterThanOrEqual(start - 1e-6);
+          expect(from + span, name).toBeLessThanOrEqual(start + room + 1e-6);
+          const centred = Math.abs(from + span / 2 - (at + size / 2)) < 1e-6;
+          const clamped =
+            Math.abs(from - start) < 1e-6 ||
+            Math.abs(from + span - (start + room)) < 1e-6;
+          expect(centred || clamped, name).toBe(true);
+        }
+      }
+    }
   });
 
-  it("falls back to the legible window centred on a class no clean window holds", () => {
+  it("centres the legible window on a class on a canvas too small for any clean window", () => {
     const canvas = { w: 40, h: 40 };
     const arrival = requireEntry(
       layout.nodes,

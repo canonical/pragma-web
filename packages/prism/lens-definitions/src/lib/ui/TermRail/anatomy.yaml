@@ -94,6 +94,7 @@ node:
                 layout.type: flex
                 layout.align: baseline
                 layout.justify: space-between
+                layout.wrap: wrap
                 spacing.external.block.start: container.gap.default
                 spacing.external.block.end: container.gap.tight
                 typography.size: typography.text.secondary.fontSize
@@ -106,6 +107,14 @@ node:
                     styles:
                       typography.variant.numeric: tabular-nums
                   relation: { cardinality: "1", slotName: count }
+                # Under the classes' subheading of a namespace the graph
+                # draws as one box, on a line of its own; the rail still
+                # lists every class.
+                - node:
+                    role: boxed
+                    styles:
+                      layout.flex.basis: 100%
+                  relation: { cardinality: "0..1", slotName: boxed }
             relation: { cardinality: "2", slotName: subheading }
           - node:
               role: list

@@ -10,23 +10,12 @@ import "./styles.css";
 
 const componentCssClassName = "ds explorer-controls";
 
-/** The catalog keys of what each abstraction chip says, and what it means.
- * The copy names the axis for what it IS — a fact about the class — never
- * dressing it up as maturity, which this ontology does not record. */
-const ABSTRACTION_COPY: {
-  readonly [K in Abstraction]: {
-    readonly label: MessageKey;
-    readonly hint: MessageKey;
-  };
-} = {
-  abstract: {
-    label: "controls.abstraction.abstract.label",
-    hint: "controls.abstraction.abstract.hint",
-  },
-  concrete: {
-    label: "controls.abstraction.concrete.label",
-    hint: "controls.abstraction.concrete.hint",
-  },
+/** The catalog key of what each abstraction chip says. The copy names the
+ * axis for what it IS — a fact about the class — never dressing it up as
+ * maturity, which this ontology does not record. */
+const ABSTRACTION_LABELS: { readonly [K in Abstraction]: MessageKey } = {
+  abstract: "controls.abstraction.abstract.label",
+  concrete: "controls.abstraction.concrete.label",
 };
 
 /**
@@ -42,7 +31,10 @@ const ABSTRACTION_COPY: {
  * filter here would be a label over data that does not exist.
  *
  * Each chip is a real toggle button carrying `aria-pressed`, so its state
- * is available to assistive tech and not merely to the eye. An abstraction
+ * is available to assistive tech and not merely to the eye. No chip
+ * carries a tooltip: what each means is on the page, in the legend's rows
+ * for the abstraction chips and in the canvas's namespace headings for the
+ * ontology chips, and the instances chip's name says what it does. An abstraction
  * or ontology chip dims the rail and hides in the graph; the instances chip
  * dims both. None navigates, because a way of looking is not a place to
  * link to.
@@ -89,10 +81,9 @@ export default function ExplorerControls({
                   ),
                 });
               }}
-              title={t(ABSTRACTION_COPY[value].hint)}
               type="button"
             >
-              {t(ABSTRACTION_COPY[value].label)}
+              {t(ABSTRACTION_LABELS[value])}
             </button>
           );
         })}
@@ -114,7 +105,6 @@ export default function ExplorerControls({
                   namespaces: toggleIn(filter.namespaces, prefixes, prefix),
                 });
               }}
-              title={t("controls.ontology.hint", { label })}
               type="button"
             >
               {label}
@@ -132,7 +122,6 @@ export default function ExplorerControls({
           onClick={() => {
             onFilterChange({ ...filter, withInstances: !filter.withInstances });
           }}
-          title={t("controls.instances.with.hint")}
           type="button"
         >
           {t("controls.instances.with.label")}

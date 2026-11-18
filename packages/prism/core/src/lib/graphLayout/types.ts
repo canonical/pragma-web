@@ -118,6 +118,11 @@ export interface RegionLayout<TBundle extends LayeredBundle = LayeredBundle> {
   readonly crowdedArcs: number;
   /** A class's column. */
   readonly columnOf: (id: string) => number;
+  /**
+   * A class's layer: its column before a full layer split, so the classes
+   * of layer 0 are the region's roots however many columns they take.
+   */
+  readonly layerOf: (id: string) => number;
   /** A class's superclass hops to its root. */
   readonly depthOf: (id: string) => number;
   /** A relation-placed class's predecessors, back edges removed. */
@@ -193,6 +198,11 @@ export interface LayeredOptions {
    * by `<bundle> <node>`; an end not named meets its box at the middle.
    */
   readonly crossPorts?: ReadonlyMap<string, CrossPort>;
+  /**
+   * The most nodes one column holds: a layer of more splits into balanced
+   * consecutive columns, in its order. Unset, a layer is one column.
+   */
+  readonly bandMembersMax?: number;
 }
 
 /** One relation drawn in a bundle, as the labels name it. */

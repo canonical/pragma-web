@@ -14,11 +14,54 @@
 # count in 14px muted) over a hairline rule in the line colour: no hull, no
 # fill, no tint. Subclass buses are 1px in the muted ink, each with one
 # hollow head at its superclass (a fill in the floor's colour under a
-# stroke). Relations are 1px in the edge colour with a filled head at each
-# range; a focus's relations draw in the accent at 2px (the width is an
-# attribute). A selection's lineage draws in the ink at 2px. Edge labels
-# are 14px, muted, or in the accent for the focus, on a 3px halo of the
-# floor's colour.
+# stroke). Relations are in the edge colour with a filled head at each
+# range; a focus's relations draw in the accent at 2px at least (the width
+# is an attribute). A selection's lineage draws in the ink at 2px. Edge
+# labels are 14px, muted, or in the accent for the focus, on a 3px halo of
+# the floor's colour.
+#
+# Weights: an edge's stroke is its weight by decade (1px for 1 to 9, 2px
+# for 10 to 99, 4px for 100 to 999, 8px from 1,000), and 1px dashed (4 4)
+# where it is 0, never hidden. A zero edge keeps the edge colour, its head
+# with it, and says what it is by its dash alone: the muted rule colour
+# sits about 1.2 to 1 on the floor, and a line that carries meaning needs
+# 3 to 1; a focus draws it in the accent like any other. A bridge (a
+# relation whose ends lie in two regions) draws in the strong line
+# (`color.border.highlighted`), its head with it, and its label at rest in
+# 16px ink on the floor's halo, on the longest clear horizontal run of its
+# route (a shelf gap or a channel); a focus's own label for it replaces
+# it, and a focus that fades it fades its label. A relation's count
+# is the one the store serves for its declared edge between the two
+# classes it is drawn between; an edge bundling several relations weighs
+# its heaviest, never their sum (an inverse pair held both ways would
+# count each link twice). The weight is the edge's `data-weight`. A 4px
+# or 8px line ends inside its head: the head grows to 12px or 20px (from
+# the 8px head) about its tip, and the line stops its own width short of
+# the tip, where the head is as wide as it is.
+#
+# Within its budget the overview at rest draws what fits: while the
+# classes, the collapsed regions and the stubs exceed the drawn nodes, or
+# the overview would not open whole at the legible zoom, the largest
+# namespace collapses to one box (`data-kind="region"`) in its own region:
+# its prefix at a hub's 16px, named wherever a hub is named, over what it
+# holds (its classes, `data-classes`, and the relations with both ends
+# inside it) at 14px, drawn only at full; a hub's height, at least 128px
+# wide, inert. A relation with an end inside it is drawn from the box. A
+# relation to a class no loaded namespace holds reaches an external stub
+# (`data-kind="stub"`): a class box named by its compact term at 14px,
+# drawn at full as a class's name is, in a region of its prefix, inert,
+# its frame cut into dashes (4 4) by the floor's colour, and the relation
+# to it is a bridge. A term page of a class inside a box draws its
+# namespace class by class and every other one as a box.
+#
+# The drill: on the explorer's index, with links, a collapsed region's box
+# is a link (`target`) to the same page with core's `expand=<prefix>`,
+# named for assistive technology by its namespace, what it holds and that
+# it opens (no `img` role once it is a link), and a tab stop of its own;
+# hovered or focused, it is the focus: ringed, its bridges named. A stub
+# takes the focus by hover. Drilled, the drilled region's label row is the
+# way back (`way-back`): a link to the same page without `expand=`,
+# underlined. A term page ignores `expand=` and draws neither link.
 #
 # States are modifier classes and never move anything: faded (16% for
 # classes, 6% for edges), dimmed by the search (40%), hidden by the filter.
@@ -40,11 +83,14 @@
 #   light-dark(var(--color-border), oklch(54.86% 0 0)): the relation edge
 #     colour, about 4:1 on the floor in both themes; no dark semantic token
 #     sits between 0.45 and 0.64.
-#   1rem: the region prefix; the docs context has no 16px text size.
+#   1rem: the region prefix and a bridge's label; the docs context has no
+#     16px text size.
 #   0.16, 0.06, 0.4: the faded class, the faded edge, the dimmed class.
 #   In constants.ts and the layout's constants (attributes, not CSS): the
-#   1px and 2px strokes, the ring's 2px offset, the 6px halo stroke, the
-#   8px hover target.
+#   weight strokes 1, 2, 4 and 8px with their decades 10, 100 and 1,000,
+#   the zero dash 4 4 (a quarter of the 16px lattice), the heavy heads'
+#   12px and 20px, the 1px and 2px strokes, the ring's 2px offset, the 6px
+#   halo stroke, the 8px hover target.
 #
 # Roster namespaces (accepted and tracked): the semantic typography
 # symbols typography.text.secondary.fontSize and
@@ -128,6 +174,10 @@ node:
                 motion.property: opacity
                 motion.duration: motion.duration.fast
           - node:
+              role: bridge relation (.is-bridge)
+              styles:
+                typography.color: color.border.highlighted
+          - node:
               role: focus relation (.is-focus)
               styles:
                 typography.color: color.text.branded
@@ -147,6 +197,10 @@ node:
               role: filled head
               styles:
                 typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+          - node:
+              role: bridge filled head (.is-bridge)
+              styles:
+                typography.color: color.border.highlighted
           - node:
               role: focus filled head (.is-focus)
               styles:
@@ -178,6 +232,24 @@ node:
                     uri: prism.component.entity_graph_node
                   relation: { cardinality: "1" }
           - node:
+              role: external stub (data-kind=stub)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+                - node:
+                    role: stub frame
+                    styles:
+                      typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                      interaction.pointerEvents: none
+                  relation: { cardinality: "1", slotName: stub-frame }
+          - node:
+              role: collapsed region (data-kind=region)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+          - node:
               role: faded node (.is-faded)
               styles:
                 appearance.opacity: 0.16
@@ -196,6 +268,12 @@ node:
           interaction.cursor: pointer
           appearance.outline.style@focus: none
       relation: { cardinality: "0..*", slotName: target }
+    - node:
+        role: way back
+        styles:
+          interaction.cursor: pointer
+          typography.decoration: underline
+      relation: { cardinality: "0..1", slotName: way-back }
     - switch:
         on: internal
         cases:
@@ -208,12 +286,19 @@ node:
               styles:
                 typography.color: color.text.branded
       relation: { cardinality: "0..*", slotName: ring }
-    - node:
-        role: label halo
-        styles:
-          typography.size: typography.text.secondary.fontSize
-          typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
-          interaction.pointerEvents: none
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: label halo
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                interaction.pointerEvents: none
+          - node:
+              role: bridge label halo (.is-bridge)
+              styles:
+                typography.size: 1rem
       relation: { cardinality: "0..*", slotName: label-halo }
     - switch:
         on: internal
@@ -224,6 +309,11 @@ node:
                 typography.size: typography.text.secondary.fontSize
                 typography.color: color.text.muted
                 interaction.pointerEvents: none
+          - node:
+              role: bridge edge label (.is-bridge)
+              styles:
+                typography.size: 1rem
+                typography.color: color.text
           - node:
               role: focus edge label (.is-focus)
               styles:

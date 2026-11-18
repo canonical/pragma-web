@@ -30,13 +30,18 @@ import {
 } from "../../../testing/measureClassGraph.js";
 import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
-import { DESIGN_CANVAS, MIN_FIT } from "../../lib/classGraph/constants.js";
+import {
+  DESIGN_CANVAS,
+  LEGIBLE_MARGIN,
+  MIN_FIT,
+} from "../../lib/classGraph/constants.js";
+import containsRect from "../../lib/classGraph/containsRect.js";
 import layOutClassGraph from "../../lib/classGraph/layOutClassGraph.js";
 
 const layout = layOutClassGraph(ontologyGraph);
 
 describe("the class graph of the real ontology", () => {
-  it("fits the 1440 well only below the legible zoom, says so, and opens on a legible window", () => {
+  it("fits the 1440 well only below the legible zoom, says so, and opens at its top-left corner at the legible floor", () => {
     const fit = measureFit(layout);
     expect(fit.zoom).toBeLessThan(MIN_FIT);
     expect(fit.zoom).toBeCloseTo(0.7151, 4);
@@ -50,13 +55,14 @@ describe("the class graph of the real ontology", () => {
     // The 32px channels would lift the fit a little but nest three arcs
     // past them, so the 48px channels stay.
     expect(layout.channel).toBe(48);
-    // The widest legible window that cuts no box on two sides ends half a
-    // lattice step past the ds region's second column, and its bottom edge
-    // falls half a step above Tag Category, in the gap before it: one
-    // ending past the third column would cut Anonymous Node in its corner.
-    expect(layout.view).toMatchObject({ x: -16, y: -16, h: 488 });
-    expect(layout.view.w).toBeCloseTo(
-      (488 * DESIGN_CANVAS.w) / DESIGN_CANVAS.h,
+    // The map opens at its top-left corner at the legible floor, the
+    // widest window a reader can still read: the first shelf's boxes are
+    // whole where they fit, and a box the window's edge crosses is cut.
+    const floor = DESIGN_CANVAS.w / (MIN_FIT * LEGIBLE_MARGIN);
+    expect(layout.view).toMatchObject({ x: -16, y: -16 });
+    expect(layout.view.w).toBeCloseTo(floor, 10);
+    expect(layout.view.h).toBeCloseTo(
+      (floor * DESIGN_CANVAS.h) / DESIGN_CANVAS.w,
       10,
     );
     const zoom = Math.min(
@@ -64,18 +70,45 @@ describe("the class graph of the real ontology", () => {
       DESIGN_CANVAS.h / layout.view.h,
     );
     expect(zoom).toBeGreaterThanOrEqual(MIN_FIT);
-    expect(zoom).toBeCloseTo(1.5943, 4);
+    expect(zoom).toBeCloseTo(0.8571, 4);
+    const top = Math.min(...layout.regions.map((region) => region.y));
+    expect(layout.regions.find((region) => region.y === top)?.prefix).toBe(
+      "ds",
+    );
+    // The first shelf: the topmost region and every region starting above
+    // its bottom, grown as they join.
+    const shelfBottom = [...layout.regions]
+      .sort((a, b) => a.y - b.y)
+      .reduce(
+        (bottom, region) =>
+          region.y < bottom ? Math.max(bottom, region.y + region.h) : bottom,
+        top + 1,
+      );
     const right = layout.view.x + layout.view.w;
     const bottom = layout.view.y + layout.view.h;
-    const inView = [...layout.nodes.values()].filter(
-      (node) => node.x < right && node.y < bottom,
+    const shelf = [...layout.nodes.values()].filter(
+      (node) => node.y < shelfBottom,
     );
+    const inView = shelf.filter((node) => node.x < right && node.y < bottom);
+    const whole = inView.filter((node) => containsRect(layout.view, node));
+    // Every box of the first shelf is in view; the window's right edge
+    // cuts two of ds's, which run past it, and nothing else.
+    expect(inView).toHaveLength(shelf.length);
+    expect(shelf).toHaveLength(20);
+    expect(
+      inView
+        .filter((node) => !whole.includes(node))
+        .map((node) => [node.uri.split("/").at(-1), node.x < right])
+        .sort(),
+    ).toEqual([
+      ["Component", true],
+      ["Subcomponent", true],
+    ]);
     expect(
       inView.filter(
-        (node) => node.x + node.w > right || node.y + node.h > bottom,
+        (node) => !whole.includes(node) && node.x + node.w <= right,
       ),
     ).toEqual([]);
-    expect(inView).toHaveLength(10);
   });
 
   it("covers the canvas densely, with no holes", () => {
@@ -121,7 +154,9 @@ describe("the class graph of the real ontology", () => {
 
   it("crosses fewer edges than the label-sorted order, and no subclass edges", () => {
     const crossings = countCrossings(layout);
-    const baseline = countCrossings(layOutClassGraph(ontologyGraph, 0));
+    const baseline = countCrossings(
+      layOutClassGraph(ontologyGraph, { sweeps: 0 }),
+    );
     expect(crossings.total).toBe(14);
     expect(baseline.total).toBe(42);
     expect(crossings.total).toBeLessThanOrEqual(baseline.total);
@@ -221,14 +256,22 @@ describe("the class graph of the metro ontology", () => {
       edgesThroughBoxes: [],
       textOverlaps: 0,
     });
-    expect(countCrossings(metro).total).toBe(6);
-    expect(countCrossings(layOutClassGraph(metroGraph, 0)).total).toBe(7);
+    // The third bridge the provider serves, "stops" from Zone to Stop,
+    // makes four of the ten: on its way into the metro it crosses the
+    // relations from Formation to Line, Rolling stock and Unit position,
+    // and the "location" bridge once; without it the count is 6, as
+    // before the bridges ran in lanes. The label-sorted order: 12, 7
+    // without it.
+    expect(countCrossings(metro).total).toBe(10);
+    expect(
+      countCrossings(layOutClassGraph(metroGraph, { sweeps: 0 })).total,
+    ).toBe(12);
     expect(followsRailOrder(metro)).toBe(true);
   });
 
   it("routes a relation between its shelves through the gap between them", () => {
     const crossing = metro.edges.filter((edge) => edge.bundle?.cross === true);
-    expect(crossing).toHaveLength(2);
+    expect(crossing).toHaveLength(3);
     for (const edge of crossing) {
       expect(measurePathBounds(edge.d).x).toBeGreaterThanOrEqual(0);
     }

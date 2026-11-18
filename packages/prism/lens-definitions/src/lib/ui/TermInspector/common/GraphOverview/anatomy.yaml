@@ -1,7 +1,13 @@
 ---
 # GraphOverview — the inspector with no selection: the legend, each row a
 # tiny graph drawn by the graph's own layout and drawing over what it
-# means, scaled down to the inspector's width where it is wider; a row per namespace with its figures, each a button that fits the
+# means, scaled down to the inspector's width where it is wider, then the
+# relation's strokes (its weight in the canvas's four steps, each beside
+# the statements it stands for, in muted 14px, the bounds read from the
+# canvas's steps; a relation with no statements yet, dashed), each step a
+# relation's line and head alone, in the class graph's own classes, its
+# width, dash and heads from the canvas's own code, on the same floor; a
+# row per namespace with its figures, each a button that fits the
 # graph's camera to that region; and how to move about the graph. A
 # subgrid of the inspector's columns, its rows spanning them all; its
 # sections and their labels are the inspector's.
@@ -60,7 +66,41 @@ node:
                       - node:
                           uri: prism.component.class_graph
                         relation: { cardinality: "1" }
-                  relation: { cardinality: "1", slotName: specimen }
+                  relation: { cardinality: "0..1", slotName: specimen }
+                - node:
+                    role: strokes
+                    styles:
+                      layout.type: flex
+                      layout.direction: column
+                      spacing.gap: space.050
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      spacing.internal.inline.start: 0
+                      layout.listStyle: none
+                    edges:
+                      - node:
+                          role: stroke
+                          styles:
+                            layout.type: flex
+                            layout.align: center
+                            spacing.gap: space.100
+                          edges:
+                            - node:
+                                role: stroke specimen
+                                edges:
+                                  - node:
+                                      uri: prism.component.class_graph
+                                    relation: { cardinality: "1" }
+                              relation: { cardinality: "1", slotName: specimen }
+                            - node:
+                                role: step
+                                styles:
+                                  typography.size: typography.text.secondary.fontSize
+                                  typography.color: color.text.muted
+                                  typography.variant.numeric: tabular-nums
+                              relation: { cardinality: "0..1", slotName: step }
+                        relation: { cardinality: "1..*", slotName: stroke }
+                  relation: { cardinality: "0..1", slotName: strokes }
                 - node:
                     role: meaning
                     styles:

@@ -1,10 +1,10 @@
 import {
   type GraphBox,
-  measureRegionLabelWidth,
   REGION_LABEL_ROW,
   uniteRects,
 } from "@canonical/prism-core";
 import { VIEW_MARGIN } from "../../classGraph/constants.js";
+import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
 import type { ClassGraphLayout } from "../../classGraph/types.js";
 
 /**
@@ -32,7 +32,11 @@ export default function measureVisibleBox(
     .map((region) => ({
       x: region.x,
       y: region.y,
-      w: measureRegionLabelWidth(region.prefix, region.ids.length),
+      w: measureRegionHeading(
+        region.prefix,
+        region.ids.length,
+        region.prefix === layout.drilled,
+      ),
       h: REGION_LABEL_ROW,
     }));
   const rects =

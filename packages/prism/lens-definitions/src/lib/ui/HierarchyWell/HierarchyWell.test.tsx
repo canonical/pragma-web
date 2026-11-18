@@ -5,14 +5,24 @@
  * lifting the fade.
  */
 
-import { requireEntry } from "@canonical/prism-core";
+import {
+  createGraphBudget,
+  GRAPH_BUDGET,
+  requireDefined,
+  requireEntry,
+} from "@canonical/prism-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
-import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
+import {
+  CROSS_REGION_GRAPH,
+  FOUR_NAMESPACE_GRAPH,
+} from "../../../../testing/fixtures.js";
+import ontologyGraph from "../../../../testing/records/ontologyGraph.js";
 import { MIN_FIT } from "../../classGraph/constants.js";
+import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import frameOpeningView from "./frameOpeningView.js";
 import HierarchyWell from "./HierarchyWell.js";
 import type { HierarchyWellProps } from "./types.js";
@@ -369,6 +379,21 @@ describe("HierarchyWell", () => {
       expect(cut).toEqual([]);
     });
 
+    it("never fits what the chips leave below the legible floor with Fit", () => {
+      const canvas = { w: 590.67, h: 778 };
+      stubViewport(canvas);
+      const { container, rerender } = render(drawWell({}));
+      rerender(drawWell({ filter: createAllNamespacesFilter(["ds"]) }));
+      for (const _ of [1, 2, 3]) {
+        fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+      }
+      fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+      const { scale } = measureScale(canvas.w, canvas.h);
+      expect(scale * readTransform(container).k).toBeGreaterThanOrEqual(
+        MIN_FIT,
+      );
+    });
+
     it("fits a picked region once per pick, and Fit restores the graph", () => {
       stubViewport();
       const { container, rerender } = render(drawWell({}));
@@ -383,6 +408,51 @@ describe("HierarchyWell", () => {
       rerender(drawWell({ region: { prefix: "cs", serial: 2 } }));
       expect(readCamera(container)).toBe(region);
     });
+
+    it.each([
+      ["an opened view", "surface", undefined],
+      ["a term page", "ds", "ds"],
+    ] as const)(
+      "restores %s's opening with Fit, at the legible floor or above, never by a namespace's height",
+      (_, drill, termPrefix) => {
+        const four = createClassGraphSetup(FOUR_NAMESPACE_GRAPH);
+        const drilled = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+          budget: GRAPH_BUDGET,
+          drill,
+        });
+        const uri = FOUR_NAMESPACE_GRAPH.classes.find(
+          (entry) => entry.prefix === termPrefix,
+        )?.uri;
+        stubViewport({ w: 1000, h: 700 });
+        const { container } = render(
+          createRouterHarness(
+            <HierarchyWell
+              filter={createAllNamespacesFilter(
+                drilled.regions.map((region) => region.prefix),
+              )}
+              hoverCentre={undefined}
+              layout={drilled}
+              onHoverTerm={() => {}}
+              term={
+                uri === undefined ? undefined : requireEntry(four.terms, uri)
+              }
+              terms={four.terms}
+            />,
+          ),
+        );
+        const opened = readCamera(container);
+        const percent = screen.getByRole("status").textContent;
+        expect(Number.parseInt(percent ?? "", 10)).toBeGreaterThanOrEqual(
+          Math.floor(MIN_FIT * 100),
+        );
+        fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+        fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+        expect(readCamera(container)).not.toBe(opened);
+        fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+        expect(readCamera(container)).toBe(opened);
+        expect(screen.getByRole("status").textContent).toBe(percent);
+      },
+    );
 
     it("leaves the camera alone for a region the graph does not draw", () => {
       stubViewport();
@@ -451,6 +521,7 @@ describe("HierarchyWell", () => {
         label,
         domain: "ex:Family",
         range: "ex:Member",
+        count: 1,
       })),
     });
     const { container } = render(
@@ -468,5 +539,477 @@ describe("HierarchyWell", () => {
     expect(container.querySelector(".desktop .edge-label")?.textContent).toBe(
       "3 relations",
     );
+  });
+});
+
+describe("over a layout whose rail opens on a box", () => {
+  // Within two nodes the larger namespace, aa, collapses to a box that
+  // the rail lists before zz's one class.
+  const klass = (prefix: string, local: string) => ({
+    uri: `https://${prefix}.example/${local}`,
+    label: local,
+    prefix,
+    abstract: false,
+    superclass: null,
+    instanceCount: 0,
+    fields: 0,
+  });
+  const input = {
+    classes: [
+      klass("aa", "A1"),
+      klass("aa", "A2"),
+      klass("aa", "A3"),
+      klass("zz", "Z1"),
+    ],
+    relations: [],
+  };
+  const boxed = layOutClassGraph(input, {
+    budget: createGraphBudget({ drawnNodesMax: 2 }),
+  });
+  const boxedTerms = new Map(
+    input.classes.map((entry) => [
+      entry.uri,
+      `${entry.prefix}:${entry.uri.split("/").at(-1)}`,
+    ]),
+  );
+  const drawBoxed = (term: string | undefined, hoverCentre?: string) =>
+    createRouterHarness(
+      <HierarchyWell
+        filter={createAllNamespacesFilter(["aa", "zz"])}
+        hoverCentre={hoverCentre}
+        layout={boxed}
+        onHoverTerm={vi.fn()}
+        term={term}
+        terms={boxedTerms}
+      />,
+    );
+
+  it("puts the tab stop on the first class drawn", () => {
+    expect(boxed.rail.at(0)).toBe("region:aa");
+    const { container } = render(drawBoxed(undefined));
+    const stops = container.querySelectorAll('.desktop a[tabindex="0"]');
+    expect(stops).toHaveLength(1);
+    expect(stops[0]?.closest(".node")?.getAttribute("data-id")).toBe("zz:Z1");
+  });
+
+  it("lights the box of a hovered or focused class the canvas does not draw", () => {
+    // The rail's row of aa:A3, under the pointer or the keyboard, makes
+    // aa's box the focus: the box stays lit and what is outside its
+    // neighbourhood fades.
+    const { container } = render(drawBoxed(undefined, "aa:A3"));
+    const box = container.querySelector('.desktop .node[data-kind="region"]');
+    expect(box?.classList.contains("is-faded")).toBe(false);
+    expect(
+      [...container.querySelectorAll(".desktop .node.is-faded")].map((node) =>
+        node.getAttribute("data-id"),
+      ),
+    ).toEqual(["zz:Z1"]);
+    expect(container.querySelectorAll('.desktop a[tabindex="0"]')).toHaveLength(
+      1,
+    );
+  });
+
+  it("fades nothing for a selected class the canvas does not draw", () => {
+    const { container } = render(drawBoxed("aa:A2"));
+    expect(container.querySelectorAll(".desktop .node.is-faded")).toHaveLength(
+      0,
+    );
+  });
+
+  it("makes a box a link to its namespace drilled, a tab stop of its own off the tree's moves", () => {
+    const onHoverTerm = vi.fn();
+    const { container } = render(
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={boxed}
+          onHoverTerm={onHoverTerm}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+      ),
+    );
+    const box = container.querySelector('.desktop .node[data-kind="region"]');
+    expect(box?.getAttribute("role")).toBeNull();
+    const link = box?.querySelector("a") as HTMLElement;
+    expect(link.getAttribute("href")).toBe("/definitions?expand=aa");
+    expect(link.getAttribute("aria-label")).toBe(
+      "Namespace aa, drawn as one box: 3 classes, 0 relations, 0 relations drawn from it. Opens the namespace",
+    );
+    // Reached by Tab: no tabindex keeps it out of the order.
+    expect(link.hasAttribute("tabindex")).toBe(false);
+    fireEvent.focus(link);
+    expect(onHoverTerm).toHaveBeenLastCalledWith("aa");
+    const before = document.activeElement;
+    fireEvent.keyDown(link, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(before);
+    // The phone view's row of the box links the same way.
+    expect(
+      container
+        .querySelector('.phone .row[data-kind="region"] a')
+        ?.getAttribute("href"),
+    ).toBe("/definitions?expand=aa");
+  });
+
+  it("opens a drill the address changes anew, forgetting the camera kept for the other view", () => {
+    const drilled = layOutClassGraph(input, {
+      budget: createGraphBudget({ drawnNodesMax: 2 }),
+      drill: "aa",
+    });
+    const kept = { camera: { k: 2, x: 30, y: 40 }, moved: true };
+    const memory = { current: kept as typeof kept | undefined };
+    const draw = (shown: typeof boxed, remembers = true) =>
+      createRouterHarness(
+        <HierarchyWell
+          cameraMemory={remembers ? memory : undefined}
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={shown}
+          onHoverTerm={vi.fn()}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+      );
+    const { container, rerender } = render(draw(boxed));
+    const canvas = container.querySelector(".desktop");
+    // A render on the same view keeps the canvas and the camera.
+    rerender(draw(boxed));
+    expect(container.querySelector(".desktop")).toBe(canvas);
+    expect(memory.current).toBe(kept);
+    // The drill moves: a new canvas opens on it, as a load would.
+    rerender(draw(drilled));
+    expect(container.querySelector(".desktop")).not.toBe(canvas);
+    expect(memory.current).toBeUndefined();
+    // With no memory to forget, the canvas still opens anew.
+    const opened = container.querySelector(".desktop");
+    rerender(draw(boxed, false));
+    expect(container.querySelector(".desktop")).not.toBe(opened);
+  });
+
+  it("clears the kept camera before the new canvas resumes it, in a layout effect", () => {
+    // The canvas measures, so its passive effect reads the memory on mount:
+    // a clear in the well's own passive effect would come after it, and the
+    // new canvas would resume the old view's camera.
+    vi.stubGlobal(
+      "matchMedia",
+      (query: string) =>
+        ({ matches: true, media: query }) as unknown as MediaQueryList,
+    );
+    vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
+      width: 800,
+      height: 600,
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 600,
+      toJSON: () => ({}),
+    });
+    try {
+      const drilled = layOutClassGraph(input, {
+        budget: createGraphBudget({ drawnNodesMax: 2 }),
+        drill: "aa",
+      });
+      const draw = (shown: typeof boxed, memory?: { current: unknown }) =>
+        createRouterHarness(
+          <HierarchyWell
+            cameraMemory={memory as HierarchyWellProps["cameraMemory"]}
+            filter={createAllNamespacesFilter(["aa", "zz"])}
+            hoverCentre={undefined}
+            layout={shown}
+            onHoverTerm={vi.fn()}
+            term={undefined}
+            terms={boxedTerms}
+          />,
+        );
+      const camera = (container: HTMLElement) =>
+        container.querySelector(".desktop .camera")?.getAttribute("transform");
+      const fresh = render(draw(drilled));
+      const opens = camera(fresh.container);
+      fresh.unmount();
+      const memory = {
+        current: { camera: { k: 3, x: 70, y: 90 }, moved: true } as unknown,
+      };
+      const { container, rerender } = render(draw(boxed, memory));
+      memory.current = { camera: { k: 3, x: 70, y: 90 }, moved: true };
+      rerender(draw(drilled, memory));
+      expect(camera(container)).toBe(opens);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("frames the class selected when a term page's drill moves, as loading its address does", () => {
+    const four = createClassGraphSetup(FOUR_NAMESPACE_GRAPH);
+    const firstOf = (prefix: string): string =>
+      requireDefined(
+        FOUR_NAMESPACE_GRAPH.classes.find((entry) => entry.prefix === prefix),
+        prefix,
+      ).uri;
+    const from = firstOf("ds");
+    const to = firstOf("surface");
+    const drillInto = (prefix: string) =>
+      layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+        budget: GRAPH_BUDGET,
+        drill: prefix,
+      });
+    const [ds, surface] = [drillInto("ds"), drillInto("surface")];
+    // The class first selected is in a box once the drill moves.
+    expect(surface.nodes.get(from)).toBeUndefined();
+    const draw = (shown: typeof ds, uri: string) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["surface", "ds", "anatomy", "cs"])}
+          hoverCentre={undefined}
+          layout={shown}
+          onHoverTerm={vi.fn()}
+          term={requireEntry(four.terms, uri)}
+          terms={four.terms}
+        />,
+      );
+    const viewBoxOf = (container: HTMLElement) =>
+      container.querySelector(".desktop svg.viewport")?.getAttribute("viewBox");
+    const loaded = render(draw(surface, to));
+    const expected = viewBoxOf(loaded.container);
+    loaded.unmount();
+    const opened = frameOpeningView(surface, surface.nodes.get(to));
+    expect(expected).toBe(
+      `${opened.x} ${opened.y} ${opened.width} ${opened.height}`,
+    );
+    const { container, rerender } = render(draw(ds, from));
+    rerender(draw(surface, to));
+    expect(viewBoxOf(container)).toBe(expected);
+  });
+
+  it("keeps the arrival's frame when the selection moves within the same drill, so the camera follows", () => {
+    const four = createClassGraphSetup(FOUR_NAMESPACE_GRAPH);
+    const ds = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+      budget: GRAPH_BUDGET,
+      drill: "ds",
+    });
+    const inDs = FOUR_NAMESPACE_GRAPH.classes
+      .filter((entry) => entry.prefix === "ds")
+      .map((entry) => entry.uri);
+    const framed = (uri: string) => {
+      const box = frameOpeningView(ds, ds.nodes.get(uri));
+      return `${box.x} ${box.y} ${box.width} ${box.height}`;
+    };
+    // Each class, loaded, opens centred on itself: the first ds class and
+    // the next whose own frame differs.
+    const first = requireDefined(inDs.at(0), "a ds class");
+    const last = requireDefined(
+      inDs.find((uri) => framed(uri) !== framed(first)),
+      "a ds class framed apart from the first",
+    );
+    const draw = (uri: string) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["surface", "ds", "anatomy", "cs"])}
+          hoverCentre={undefined}
+          layout={ds}
+          onHoverTerm={vi.fn()}
+          term={requireEntry(four.terms, uri)}
+          terms={four.terms}
+        />,
+      );
+    const { container, rerender } = render(draw(first));
+    const canvas = container.querySelector(".desktop");
+    rerender(draw(last));
+    expect(container.querySelector(".desktop")).toBe(canvas);
+    expect(
+      container.querySelector(".desktop svg.viewport")?.getAttribute("viewBox"),
+    ).toBe(framed(first));
+  });
+
+  it("forgets a camera kept on another drill when the router mounts the well anew", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      (query: string) =>
+        ({ matches: true, media: query }) as unknown as MediaQueryList,
+    );
+    vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
+      width: 800,
+      height: 600,
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 600,
+      toJSON: () => ({}),
+    });
+    try {
+      const drilled = layOutClassGraph(input, {
+        budget: createGraphBudget({ drawnNodesMax: 2 }),
+        drill: "aa",
+      });
+      const draw = (shown: typeof boxed, memory?: { current: unknown }) =>
+        createRouterHarness(
+          <HierarchyWell
+            cameraMemory={memory as HierarchyWellProps["cameraMemory"]}
+            filter={createAllNamespacesFilter(["aa", "zz"])}
+            hoverCentre={undefined}
+            layout={shown}
+            onHoverTerm={vi.fn()}
+            term={undefined}
+            terms={boxedTerms}
+          />,
+        );
+      const camera = (container: HTMLElement) =>
+        container.querySelector(".desktop .camera")?.getAttribute("transform");
+      const zoomed = { camera: { k: 3, x: 70, y: 90 }, moved: true };
+      const fresh = render(draw(boxed));
+      const opens = camera(fresh.container);
+      fresh.unmount();
+      // A camera kept on the opened namespace's page is not resumed on the
+      // overview the router mounts next: it opens as a load does.
+      const memory = { current: undefined as unknown };
+      render(draw(drilled, memory)).unmount();
+      memory.current = zoomed;
+      const back = render(draw(boxed, memory));
+      expect(camera(back.container)).toBe(opens);
+      back.unmount();
+      // One kept on the same drawing is resumed.
+      memory.current = zoomed;
+      const again = render(draw(boxed, memory));
+      expect(camera(again.container)).not.toBe(opens);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("links every box when every namespace is a box and the rail holds no class", () => {
+    const allBoxed = layOutClassGraph(input, {
+      budget: createGraphBudget({ drawnNodesMax: 1 }),
+    });
+    expect(
+      allBoxed.rail.every((uri) => allBoxed.nodes.get(uri)?.kind !== "class"),
+    ).toBe(true);
+    const { container } = render(
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={allBoxed}
+          onHoverTerm={vi.fn()}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+      ),
+    );
+    for (const view of [".desktop", ".phone"]) {
+      const boxes = [
+        ...container.querySelectorAll(`${view} [data-kind="region"]`),
+      ];
+      expect(boxes, view).toHaveLength(2);
+      expect(
+        boxes.map((box) => box.querySelector("a")?.getAttribute("href")),
+        view,
+      ).toEqual(["/definitions?expand=aa", "/definitions?expand=zz"]);
+    }
+    expect(
+      container.querySelector('.desktop [data-kind="region"][role="img"]'),
+    ).toBeNull();
+  });
+
+  it("keeps the page's other view keys on a box's link and on the way back", () => {
+    const drilled = layOutClassGraph(input, {
+      budget: createGraphBudget({ drawnNodesMax: 2 }),
+      drill: "aa",
+    });
+    const draw = (shown: typeof boxed, url: string) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={shown}
+          onHoverTerm={vi.fn()}
+          term={undefined}
+          terms={boxedTerms}
+        />,
+        url,
+      );
+    const rest = render(
+      draw(boxed, "/definitions?q=x&tag=a&sheet=filter&tag=b"),
+    );
+    const href = rest.container
+      .querySelector('.desktop [data-kind="region"] a')
+      ?.getAttribute("href");
+    // A repeated key is kept whole, each value in order.
+    expect(new URL(href ?? "", "https://site.example").search).toBe(
+      "?q=x&tag=a&tag=b&sheet=filter&expand=aa",
+    );
+    rest.unmount();
+    const opened = render(
+      draw(drilled, "/definitions?expand=aa&q=x&tag=a&tag=b"),
+    );
+    const backs = [...opened.container.querySelectorAll("a.way-back")].map(
+      (link) => link.getAttribute("href"),
+    );
+    expect(backs).toEqual([
+      "/definitions?q=x&tag=a&tag=b",
+      "/definitions?q=x&tag=a&tag=b",
+    ]);
+  });
+
+  it("draws a box on a term page as an image, with no link", () => {
+    const { container } = render(drawBoxed("zz:Z1"));
+    const box = container.querySelector('.desktop .node[data-kind="region"]');
+    expect(box?.getAttribute("role")).toBe("img");
+    expect(box?.querySelector("a")).toBeNull();
+    expect(container.querySelector('a[href*="expand="]')).toBeNull();
+  });
+
+  it("makes a hovered box or stub the focus, ringed, with its bridges named", () => {
+    const docs = layOutClassGraph(ontologyGraph, { budget: GRAPH_BUDGET });
+    const docsTerms = new Map(
+      ontologyGraph.classes.map((entry) => [
+        entry.uri,
+        `${entry.prefix}:${entry.uri.split("/").at(-1)}`,
+      ]),
+    );
+    const bridged = (centre: string) => {
+      const { container } = render(
+        createRouterHarness(
+          <HierarchyWell
+            filter={createAllNamespacesFilter(["ds", "cs", "anatomy"])}
+            hoverCentre={centre}
+            layout={docs}
+            onHoverTerm={vi.fn()}
+            term={undefined}
+            terms={docsTerms}
+          />,
+        ),
+      );
+      return container;
+    };
+    for (const node of docs.nodes.values()) {
+      if (node.kind === "class") continue;
+      const container = bridged(requireDefined(node.term, "a box's term"));
+      const drawn = container.querySelector(
+        `.desktop .node[data-id="${node.term}"]`,
+      );
+      expect(drawn?.querySelector(".ring"), node.uri).not.toBeNull();
+      expect(drawn?.classList.contains("is-faded")).toBe(false);
+      // Every bridge at the focus is named: none is left without a label.
+      const bridges = docs.edges.filter(
+        (edge) =>
+          edge.bridge === true &&
+          (edge.from === node.uri || edge.to.includes(node.uri)),
+      );
+      expect(bridges.length, node.uri).toBeGreaterThan(0);
+      for (const edge of bridges) {
+        expect(
+          container.querySelector(
+            `.desktop [data-layer="labels"] [data-edge="${edge.id}"] .edge-label`,
+          ),
+          edge.id,
+        ).not.toBeNull();
+      }
+    }
   });
 });

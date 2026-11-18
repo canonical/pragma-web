@@ -133,9 +133,12 @@ describe("TermRail", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(itemOf(rail, "UI Block")).not.toHaveClass("is-dimmed");
     expect(itemOf(rail, "Code Standard")).toHaveClass("is-dimmed");
     expect(itemOf(rail, "hasSubcomponent")).toHaveClass("is-dimmed");
-    expect(
-      within(ds).getByRole("heading", { name: /^Classes/ }).textContent,
-    ).toMatch(/^Classes1 of 20$/);
+    // ds is one box at rest: the rail still counts its classes.
+    const heading = within(ds).getByRole("heading", { name: /^Classes/ });
+    expect(heading.querySelector(".count")?.textContent).toBe("1 of 20");
+    expect(heading.querySelector(".boxed")?.textContent).toBe(
+      "drawn as one box",
+    );
   });
 
   it("dims the classes a chip or the instances axis leaves out", () => {

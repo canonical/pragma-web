@@ -75,6 +75,11 @@ interface StackItem {
  * @param crossPorts - The side and ideal offset of each end of a relation to
  *   another region, by `<bundle> <class>`; an end not named leaves its
  *   domain's right side or enters its range's left side, at the middle.
+ * @param bandMembersMax - The most classes one column holds: a layer of
+ *   more splits into that many columns' worth of balanced consecutive
+ *   columns, in pre-order, and a subclass a split moved past the column
+ *   after its superclass's is reached through a waypoint slot in each
+ *   column between. Unset, a layer is one column however full.
  * @returns The region's layout.
  */
 export default function layOutRegion<TBundle extends LayeredBundle>(
@@ -83,6 +88,7 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
   channel: number,
   sweeps: number,
   crossPorts: ReadonlyMap<string, CrossPort> = new Map(),
+  bandMembersMax?: number,
 ): RegionLayout<TBundle> {
   const { byId } = model;
   const findings: string[] = [];
@@ -144,21 +150,19 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
         .map((relation) => relation.domain),
     ),
   ];
-  const columnMemo = new Map<string, number>();
-  const columnOf = (id: string): number => {
-    const known = columnMemo.get(id);
+  const layerMemo = new Map<string, number>();
+  const layerOf = (id: string): number => {
+    const known = layerMemo.get(id);
     if (known !== undefined) return known;
     const predecessors = predecessorsOf(id);
-    const column = inTree(id)
+    const layer = inTree(id)
       ? depthOf(id)
       : predecessors.length > 0
-        ? 1 + Math.max(...predecessors.map(columnOf))
+        ? 1 + Math.max(...predecessors.map(layerOf))
         : 0;
-    columnMemo.set(id, column);
-    return column;
+    layerMemo.set(id, layer);
+    return layer;
   };
-  const lastColumn = Math.max(...ids.map(columnOf));
-  const columnRange = Array.from({ length: lastColumn + 1 }, (_, c) => c);
 
   // (b) Order: the forest's pre-order, siblings by label.
   const preorder: string[] = [];
@@ -171,6 +175,31 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
     .sort(byLabel)) {
     visit(root);
   }
+  // A layer of more members than a column holds splits into balanced
+  // consecutive columns, in pre-order; every later layer moves right.
+  const layers: string[][] = Array.from(
+    { length: Math.max(...ids.map(layerOf)) + 1 },
+    () => [],
+  );
+  for (const id of preorder) requireAt(layers, layerOf(id)).push(id);
+  const columnByNode = new Map<string, number>();
+  let columnCount = 0;
+  for (const members of layers) {
+    const parts =
+      bandMembersMax === undefined
+        ? 1
+        : Math.max(1, Math.ceil(members.length / bandMembersMax));
+    members.forEach((id, index) => {
+      columnByNode.set(
+        id,
+        columnCount + Math.floor((index * parts) / members.length),
+      );
+    });
+    columnCount += parts;
+  }
+  const columnOf = (id: string): number => requireEntry(columnByNode, id);
+  const lastColumn = columnCount - 1;
+  const columnRange = Array.from({ length: lastColumn + 1 }, (_, c) => c);
   const columns: StackItem[][] = columnRange.map(() => []);
   const items = new Map<string, StackItem>();
   for (const id of preorder) {
@@ -215,6 +244,28 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
     chain.push(high);
     chains.set(bundle.id, chain);
   }
+  // A subclass past the column after its superclass's: one waypoint slot
+  // per column between, shared by the superclass's farther subclasses.
+  const passOf = (parent: string, column: number): string =>
+    `sub:${parent}@${column}`;
+  const passes = new Map<string, number>();
+  for (const id of ids) {
+    const farthest = Math.max(columnOf(id), ...childrenOf(id).map(columnOf));
+    if (farthest <= columnOf(id) + 1) continue;
+    passes.set(id, farthest);
+    for (let c = columnOf(id) + 1; c < farthest; c += 1) {
+      const waypoint: StackItem = {
+        kind: "waypoint",
+        id: passOf(id, c),
+        h: WAYPOINT_SLOT,
+        top: 0,
+        group: "",
+        label: "",
+      };
+      items.set(waypoint.id, waypoint);
+      requireAt(columns, c).push(waypoint);
+    }
+  }
   const columnOfItem = (id: string): number =>
     requireEntry(items, id).kind === "node"
       ? columnOf(id)
@@ -228,7 +279,19 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
   };
   for (const id of ids) {
     const parent = parentOf(id);
-    if (parent !== undefined) link(id, parent);
+    if (parent === undefined) continue;
+    link(
+      id,
+      columnOf(id) > columnOf(parent) + 1
+        ? passOf(parent, columnOf(id) - 1)
+        : parent,
+    );
+  }
+  for (const [parent, farthest] of passes) {
+    link(parent, passOf(parent, columnOf(parent) + 1));
+    for (let c = columnOf(parent) + 2; c < farthest; c += 1) {
+      link(passOf(parent, c - 1), passOf(parent, c));
+    }
   }
   for (const chain of chains.values()) {
     for (let index = 1; index < chain.length; index += 1) {
@@ -426,12 +489,14 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
     }
     // A column with no sibling group holds only relation-placed classes and
     // waypoints, each linked to the column on its left: its predecessor's
-    // chain arrives from there. It centres on those neighbours.
+    // chain arrives from there. It centres on those neighbours. A root a
+    // full first layer moved on has none and does not pull.
     if (deltas.length === 0 && column > 0) {
       stack.forEach((item, index) => {
         const near = requireEntry(neighbours, item.id).filter(
           (id) => columnOfItem(id) === column - 1,
         );
+        if (near.length === 0) return;
         const ownCentre =
           requireAt(offsets, index) +
           item.top +
@@ -588,10 +653,38 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
     const portX = parent.x + parent.w;
     const portY = parent.y + parent.h / 2;
     const busX = rightOf(parent.col) + BUS_OFFSET;
-    const middles = subclasses.map(
-      (child) => nodeOf(child).y + nodeOf(child).h / 2,
-    );
+    // What the bus reaches in a column: its subclasses' middles, and the
+    // slot it passes on through towards farther ones.
+    const farthest = passes.get(id) ?? parent.col + 1;
+    const reachedIn = (column: number): number[] => [
+      ...subclasses
+        .filter((child) => columnOf(child) === column)
+        .map((child) => nodeOf(child).y + nodeOf(child).h / 2),
+      ...(column < farthest ? [centreOf(passOf(id, column))] : []),
+    ];
+    const middles = reachedIn(parent.col + 1);
     const entry = requireAt(columnX, parent.col + 1);
+    // Past each slot the bus runs on in the next channel, half its offset
+    // in, clear of the buses of that column's own classes.
+    const passing = Array.from(
+      { length: farthest - parent.col - 1 },
+      (_, index): PathCommand[] => {
+        const column = parent.col + 1 + index;
+        const slotY = centreOf(passOf(id, column));
+        const passX = rightOf(column) + BUS_OFFSET / 2;
+        const reached = reachedIn(column + 1);
+        return [
+          ["M", requireAt(columnX, column), slotY],
+          ["H", passX],
+          ["M", passX, Math.min(slotY, ...reached)],
+          ["V", Math.max(slotY, ...reached)],
+          ...reached.flatMap((middle): PathCommand[] => [
+            ["M", passX, middle],
+            ["H", requireAt(columnX, column + 1)],
+          ]),
+        ];
+      },
+    ).flat();
     edges.push({
       id: `sub:${id}`,
       kind: "subclass",
@@ -606,6 +699,7 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
           ["M", busX, middle],
           ["H", entry],
         ]),
+        ...passing,
       ],
       heads: [buildArrowhead(portX, portY, false)],
       busX,
@@ -826,6 +920,7 @@ export default function layOutRegion<TBundle extends LayeredBundle>(
     findings,
     crowdedArcs,
     columnOf,
+    layerOf,
     depthOf,
     predecessorsOf,
   };

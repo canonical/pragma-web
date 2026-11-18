@@ -9,19 +9,45 @@
  * through no class; every class's label fits its box in the font the page
  * ships; the term rail's ontology headings are laid out; and, on a phone,
  * the inspector's drawer trigger covers nothing of the explorer, its search
- * field least of all. A filter chip's refit and a namespace's keep every
- * class in view labelled and cut none; Fit brings the graph into view
- * whole, or a window of it from its top-left corner at the overview's
- * floor where the whole fits only below it, keeping the hub and region
- * labels and cutting no class; a pick in
- * the rail keeps the chips, the search and the zoom; the inspector's
- * field rows put their ranges on one column line; and, the lens declaring
- * no namespace, every instance chip of a term's page writes its prefix.
+ * field least of all. A filter chip's refit keeps every class in view
+ * labelled and cuts none; a namespace a reader picks, drawn class by class
+ * or as one box, is fitted on a window that holds it whole and cuts no box
+ * at its edges, a box among its neighbours; at rest Fit brings the whole
+ * graph into view, every text at 12px or more, and on a namespace a
+ * selection drills into it stops at the overview's floor, on a window that
+ * cuts no class; a term page of a class in the largest namespace draws
+ * it within the drawn nodes and the band; a pick in the rail keeps the
+ * chips, the search and the zoom; the inspector's field rows put their
+ * ranges on one column line; and, the lens declaring no namespace, every
+ * instance chip of a term's page writes its prefix. Where the map does
+ * not fit the canvas at the legible floor, it opens at the map's top-left
+ * corner at that floor: the first shelf's boxes whole where they fit, a
+ * box the window's edge crosses cut there.
+ * A namespace's box is a link, by pointer and by keyboard, to the page
+ * drilled into it (`expand=`), whose heading leads back to the overview;
+ * that page opens by the overview's rule, at the legible floor from the
+ * opened namespace's corner. A term page reached from another frames its
+ * class as loading its address does, and so does a move between the
+ * overview and a term page that opens or closes a namespace; a move that
+ * keeps the drawing keeps the reader's zoom.
  */
+import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
   launchBrowser,
+  STRIP_VIEWPORTS,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
+import {
+  type BridgeLabelMeasure,
+  type CanvasMeasure,
+  fetchServedGraph,
+  MIN_FIT,
+  measureBridgeLabels,
+  measureCanvasSvg,
+  type ServedWeights,
+  sliceCanvasSvg,
+  weighServedRelations,
+} from "@canonical/prism-lens-definitions/testing/browser";
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DEFAULT_GRAPHQL_URL } from "../../src/relay/graphqlEndpoint.js";
@@ -39,6 +65,13 @@ import {
 import { type RunningServer, startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
+
+/**
+ * How far from the canvas's top-left corner an opened namespace's heading
+ * may start, in screen px: the view's 16px margin at the legible floor,
+ * with a lattice step to spare.
+ */
+const CORNER_ROOM_PX = 32;
 
 let server: RunningServer;
 let browser: Browser;
@@ -209,6 +242,59 @@ function measureExplorer({
   };
 }
 
+/** A box of the overview's first shelf, and how the viewport shows it. */
+interface ShelfBox {
+  readonly id: string;
+  /** Whether it lies wholly in the viewport. */
+  readonly whole: boolean;
+  /** Whether any part of it lies in the viewport. */
+  readonly met: boolean;
+}
+
+/**
+ * Measure the overview's first shelf in the page: the boxes whose tops lie
+ * above the bottom of the topmost region, grown by every region that
+ * starts above it, from the left, each whole in the canvas's viewport,
+ * partly in it, or out of it, to within the tolerance of sub-pixel
+ * rounding.
+ */
+function measureFirstShelf(tolerance: number): ShelfBox[] {
+  const svg = document.querySelector(".ds.graph-canvas .viewport");
+  const viewport = svg?.getBoundingClientRect();
+  if (svg === null || viewport === undefined) return [];
+  const read = (element: Element, name: string): number =>
+    Number(element.getAttribute(`data-${name}`));
+  const regions = [...svg.querySelectorAll("g.region")]
+    .map((region) => ({ y: read(region, "y"), h: read(region, "h") }))
+    .sort((a, b) => a.y - b.y);
+  let bottom = Number.NEGATIVE_INFINITY;
+  for (const region of regions) {
+    if (bottom !== Number.NEGATIVE_INFINITY && region.y >= bottom) break;
+    bottom = Math.max(bottom, region.y + region.h);
+  }
+  return [...svg.querySelectorAll(".node:not(.is-hidden)")]
+    .filter((node) => read(node, "y") < bottom)
+    .sort((a, b) => read(a, "x") - read(b, "x"))
+    .map((node) => {
+      const box = (
+        node.querySelector(".surface") ?? node
+      ).getBoundingClientRect();
+      return {
+        id: node.getAttribute("data-id") ?? "",
+        whole:
+          box.left >= viewport.left - tolerance &&
+          box.right <= viewport.right + tolerance &&
+          box.top >= viewport.top - tolerance &&
+          box.bottom <= viewport.bottom + tolerance,
+        met:
+          box.left < viewport.right - tolerance &&
+          box.right > viewport.left + tolerance &&
+          box.top < viewport.bottom - tolerance &&
+          box.bottom > viewport.top + tolerance,
+      };
+    });
+}
+
 /**
  * Open `path` at a viewport, collecting every console error and uncaught
  * exception, and measure the explorer once its fonts have loaded.
@@ -279,7 +365,7 @@ describe.each([...VIEWPORTS, ...SHORT_DESKTOP_VIEWPORTS])(
   "at $name px",
   (viewport) => {
     it.each(DEFINITIONS_PATHS)(
-      "hydrates %s silently, with every graph text legible, every label in its box and no class cut",
+      "hydrates %s silently, with every graph text legible, every label in its box, no class cut at rest and never the selected one",
       async (path) => {
         const { errors, measure } = await openExplorer(path, viewport);
         expect(errors).toEqual([]);
@@ -288,7 +374,14 @@ describe.each([...VIEWPORTS, ...SHORT_DESKTOP_VIEWPORTS])(
         expect(measure.unlabelled).toBe(0);
         expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
         expect(measure.overflowing).toEqual([]);
-        expect(measure.cut).toEqual([]);
+        // A term page centres its class: the window's edge may cut the
+        // classes beside it, never the class itself; the overview cuts none.
+        const term = decodeURIComponent(path.slice("/definitions/".length));
+        expect(
+          path === "/definitions"
+            ? measure.cut
+            : measure.cut.filter((id) => id === term),
+        ).toEqual([]);
         for (const height of measure.railHeadingHeights) {
           expect(height).toBeGreaterThan(MIN_SCREEN_TEXT_PX);
         }
@@ -343,20 +436,70 @@ describe("at 1440 px", () => {
     expect(measure.cut).toEqual([]);
   });
 
-  it("fits a namespace a reader picks legibly, cutting no class", async () => {
-    const { errors, measure } = await openExplorer(
-      "/definitions",
+  // anatomy and cs are drawn class by class at rest, ds and surface each
+  // as one box.
+  it.each(["anatomy", "cs", "ds", "surface"])(
+    "fits %s when a reader picks it, legibly and cutting no box at the window's edge",
+    async (prefix) => {
+      const { errors, measure } = await openExplorer(
+        "/definitions",
+        desktop,
+        (page) =>
+          page
+            .getByRole("button", { name: `Fit the graph to ${prefix}` })
+            .click(),
+      );
+      expect(errors).toEqual([]);
+      // A box's window holds its neighbours too, never the box alone.
+      expect(measure.inView).toBeGreaterThan(1);
+      expect(measure.unlabelled).toBe(0);
+      expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+      expect(measure.cut).toEqual([]);
+    },
+  );
+
+  // A term page of a class in surface drills into it: its 31 classes,
+  // whose fullest layer, 14 classes, is laid as two columns.
+  it("draws a surface term page within the drawn nodes and the band", async () => {
+    const drawn = { nodes: 0, band: 0, selected: false };
+    const { errors } = await openExplorer(
+      `/definitions/${encodeURIComponent("surface:Actor")}`,
       desktop,
-      (page) =>
-        page.getByRole("button", { name: "Fit the graph to ds" }).click(),
+      async (page) => {
+        Object.assign(
+          drawn,
+          await page.evaluate(() => {
+            const nodes = [
+              ...document.querySelectorAll(
+                ".ds.graph-canvas svg.viewport g.node",
+              ),
+            ];
+            const columns = new Map<string, number>();
+            for (const node of nodes) {
+              const col = node.getAttribute("data-col") ?? "";
+              columns.set(col, (columns.get(col) ?? 0) + 1);
+            }
+            return {
+              nodes: nodes.length,
+              band: Math.max(0, ...columns.values()),
+              selected: nodes.some(
+                (node) => node.getAttribute("data-id") === "surface:Actor",
+              ),
+            };
+          }),
+        );
+      },
     );
     expect(errors).toEqual([]);
-    expect(measure.inView).toBeGreaterThan(0);
-    expect(measure.unlabelled).toBe(0);
-    expect(measure.cut).toEqual([]);
+    expect(drawn.selected).toBe(true);
+    expect(drawn.nodes).toBeGreaterThan(31);
+    expect(drawn.nodes).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
+    expect(drawn.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
   });
 
-  it("keeps the chips, the search and the zoom when a rail pick moves to a term", async () => {
+  // cs is drawn class by class at rest, so its term page draws the
+  // overview's own drawing, on which the reader's zoom still holds.
+  it("keeps the chips, the search and the zoom when a rail pick moves to a term the overview draws", async () => {
     const view: {
       before?: string | null;
       pressed?: string | null;
@@ -378,10 +521,9 @@ describe("at 1440 px", () => {
         await page.waitForTimeout(CAMERA_SETTLE_MS);
         view.before = await page.locator(zoomLevel).textContent();
         await page
-          .locator(".ds.term-rail")
-          .getByRole("link", { name: "Concept", exact: true })
+          .locator('.ds.term-rail a[href="/definitions/cs%3ACodeStandard"]')
           .click();
-        await page.waitForURL(/\/definitions\/ds%3AConcept$/);
+        await page.waitForURL(/\/definitions\/cs%3ACodeStandard$/);
         await page.waitForTimeout(CAMERA_SETTLE_MS);
         view.path = new URL(page.url()).pathname;
         view.pressed = await page
@@ -392,38 +534,94 @@ describe("at 1440 px", () => {
       },
     );
     expect(errors).toEqual([]);
-    expect(view.path).toBe("/definitions/ds%3AConcept");
+    expect(view.path).toBe("/definitions/cs%3ACodeStandard");
     expect(view.pressed).toBe("false");
     expect(view.search).toBe("st");
     expect(view.after).toBe(view.before);
     expect(measure.inView).toBeGreaterThan(0);
   });
 
-  it("never fits into the overview: Fit keeps the hub and region labels", async () => {
-    const view: { zoom?: string | null } = {};
+  it("opens on the whole map at rest: Fit shows every box, every text at 12px or more", async () => {
     const { errors, measure } = await openExplorer(
       "/definitions",
       desktop,
       async (page) => {
         await page.getByRole("button", { name: "Fit", exact: true }).click();
         await page.waitForTimeout(CAMERA_SETTLE_MS);
-        view.zoom = await page
+      },
+    );
+    expect(errors).toEqual([]);
+    // The overview collapses its largest namespaces until it fits the
+    // canvas at the legible zoom, so Fit frames the whole graph: every
+    // box drawn is in view, none cut, every visible text at 12px or more.
+    expect(measure.drawn).toBeGreaterThan(0);
+    expect(measure.inView).toBe(measure.drawn);
+    expect(measure.textCount).toBeGreaterThan(0);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    expect(measure.cut).toEqual([]);
+  });
+
+  it.each([
+    `/definitions/${encodeURIComponent("ds:UIBlock")}`,
+    "/definitions?expand=surface",
+    "/definitions?expand=ds",
+    "/definitions?expand=anatomy",
+  ])(
+    "restores %s's opening with Fit, at the legible floor or above, never by a namespace's height",
+    async (path) => {
+      const view: { opened?: string | null; fitted?: string | null } = {};
+      const zoomLevel = ".ds.graph-canvas .zoom-level";
+      const { errors, measure } = await openExplorer(
+        path,
+        desktop,
+        async (page) => {
+          view.opened = await page.locator(zoomLevel).textContent();
+          await page.getByRole("button", { name: "Zoom in" }).click();
+          await page.getByRole("button", { name: "Zoom in" }).click();
+          await page.waitForTimeout(CAMERA_SETTLE_MS);
+          await page.getByRole("button", { name: "Fit", exact: true }).click();
+          await page.waitForTimeout(CAMERA_SETTLE_MS);
+          view.fitted = await page.locator(zoomLevel).textContent();
+        },
+      );
+      expect(errors).toEqual([]);
+      // Fit shows what the page opened on: on the term page its class
+      // framed as on arrival, on the opened view the map's top-left corner
+      // at the legible floor; every text in view at 12px or more.
+      expect(view.fitted).toBe(view.opened);
+      expect(Number.parseInt(view.fitted ?? "", 10)).toBeGreaterThanOrEqual(
+        Math.floor(MIN_FIT * 100),
+      );
+      expect(measure.inView).toBeGreaterThan(0);
+      expect(measure.unlabelled).toBe(0);
+      expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    },
+  );
+
+  it("fits what a kind chip leaves on a term page with Fit at the legible floor or above, the classes in view named", async () => {
+    const view: { fitted?: string | null } = {};
+    const { errors, measure } = await openExplorer(
+      `/definitions/${encodeURIComponent("ds:UIBlock")}`,
+      desktop,
+      async (page) => {
+        await page
+          .getByRole("button", { name: "Abstract", exact: true })
+          .click();
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        await page.getByRole("button", { name: "Fit", exact: true }).click();
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        view.fitted = await page
           .locator(".ds.graph-canvas .zoom-level")
           .textContent();
       },
     );
     expect(errors).toEqual([]);
-    // At 1440 the docsite's graph fits whole only below the overview zoom,
-    // so Fit stops at its floor, on a window from the graph's top-left
-    // corner whose edges fall between classes, the rest a pan away: every
-    // class in view drawn, the hubs and the regions labelled, none cut on
-    // the left, top or right.
-    expect(Number.parseInt(view.zoom ?? "", 10)).toBeGreaterThanOrEqual(75);
+    expect(Number.parseInt(view.fitted ?? "", 10)).toBeGreaterThanOrEqual(
+      Math.floor(MIN_FIT * 100),
+    );
     expect(measure.inView).toBeGreaterThan(0);
-    expect(measure.inView).toBeLessThanOrEqual(measure.drawn);
-    expect(measure.textCount).toBeGreaterThan(0);
+    expect(measure.unlabelled).toBe(0);
     expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
-    expect(measure.cut).toEqual([]);
   });
 
   it("puts the inspector's field ranges on one column line", async () => {
@@ -436,5 +634,554 @@ describe("at 1440 px", () => {
     for (const left of measure.rangeLefts) {
       expect(Math.abs(left - first)).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
     }
+  });
+});
+
+describe("the drill through the address, at 1440 px", () => {
+  const [desktop] = VIEWPORTS;
+
+  /** The namespaces the canvas draws as one box, by prefix. */
+  const listBoxes = (page: Page): Promise<string[]> =>
+    page.evaluate(() =>
+      [
+        ...document.querySelectorAll(
+          '.ds.graph-canvas svg.viewport g.node[data-kind="region"]',
+        ),
+      ].map((node) => node.getAttribute("data-id") ?? ""),
+    );
+
+  it("opens a box's namespace from its link, and Back returns to the overview", async () => {
+    const seen: { drilled?: string[]; back?: string[]; url?: string } = {};
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        await page
+          .locator(
+            '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
+          )
+          .click();
+        await page.waitForURL(/[?&]expand=surface/);
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        seen.drilled = await listBoxes(page);
+        await page.goBack();
+        await page.waitForURL((url) => !url.search.includes("expand"));
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        seen.back = await listBoxes(page);
+        seen.url = page.url();
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.drilled).not.toContain("surface");
+    expect(seen.drilled).toContain("ds");
+    expect(seen.back).toEqual(expect.arrayContaining(["surface", "ds"]));
+    expect(new URL(seen.url ?? "").pathname).toBe("/definitions");
+  });
+
+  it("reaches a box by Tab from the graph's tab stop, and Enter follows it", async () => {
+    const seen: { focused?: string; url?: string } = {};
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        // The boxes follow or precede the classes in the drawing's order.
+        for (const key of ["Tab", "Shift+Tab"]) {
+          await page
+            .locator('.ds.graph-canvas svg.viewport a.target[tabindex="0"]')
+            .focus();
+          for (let press = 0; press < 6; press += 1) {
+            await page.keyboard.press(key);
+            seen.focused ??= await page.evaluate(
+              () =>
+                document.activeElement
+                  ?.closest('g.node[data-kind="region"]')
+                  ?.getAttribute("data-id") ?? undefined,
+            );
+            if (seen.focused !== undefined) break;
+          }
+          if (seen.focused !== undefined) break;
+        }
+        if (seen.focused === undefined) {
+          throw new Error(
+            `no box took the focus; it is on ${await page.evaluate(() => document.activeElement?.outerHTML.slice(0, 160))}`,
+          );
+        }
+        await page.keyboard.press("Enter");
+        await page.waitForURL(/[?&]expand=/);
+        seen.url = page.url();
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.focused).toBeDefined();
+    expect(new URL(seen.url ?? "").searchParams.get("expand")).toBe(
+      seen.focused,
+    );
+  });
+
+  it.each(["1440", "912"])(
+    "opens the address's namespace at %s px by the overview's rule: the legible floor, its heading at the window's top-left corner",
+    async (width) => {
+      const viewport = [...VIEWPORTS, ...STRIP_VIEWPORTS].find(
+        (candidate) => candidate.name === width,
+      );
+      if (viewport === undefined) throw new Error(`no ${width} viewport`);
+      const seen: { zoom?: string | null; corner?: readonly number[] } = {};
+      const { errors, measure } = await openExplorer(
+        "/definitions?expand=surface",
+        viewport,
+        async (page) => {
+          seen.zoom = await page
+            .locator(".ds.graph-canvas .zoom-level")
+            .textContent();
+          seen.corner = await page.evaluate(() => {
+            const frame = document
+              .querySelector(".ds.graph-canvas svg.viewport")
+              ?.getBoundingClientRect();
+            const heading = document
+              .querySelector(".ds.graph-canvas svg.viewport a.way-back")
+              ?.getBoundingClientRect();
+            return frame === undefined || heading === undefined
+              ? []
+              : [heading.left - frame.left, heading.top - frame.top];
+          });
+        },
+      );
+      expect(errors).toEqual([]);
+      // The map does not fit the canvas at the legible floor: it opens
+      // there, from the map's top-left corner, which is the opened
+      // namespace's own, never zoomed to the namespace's height.
+      expect(seen.zoom).toBe("86%");
+      const [left = Number.NaN, top = Number.NaN] = seen.corner ?? [];
+      for (const offset of [left, top]) {
+        expect(offset).toBeGreaterThanOrEqual(0);
+        expect(offset).toBeLessThanOrEqual(CORNER_ROOM_PX);
+      }
+      expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+      expect(measure.unlabelled).toBe(0);
+      expect(measure.inView).toBeGreaterThan(1);
+    },
+  );
+
+  it.each(["surface", "ds", "anatomy"])(
+    "leads the way back from %s opened to the overview at rest",
+    async (prefix) => {
+      const seen: { boxes?: string[]; url?: string } = {};
+      const back = await openExplorer(
+        `/definitions?expand=${prefix}`,
+        desktop,
+        async (page) => {
+          await page
+            .locator(".ds.graph-canvas svg.viewport a.way-back")
+            .click();
+          await page.waitForURL((url) => !url.search.includes("expand"));
+          await page.waitForTimeout(CAMERA_SETTLE_MS);
+          seen.boxes = await listBoxes(page);
+          seen.url = page.url();
+        },
+      );
+      expect(back.errors).toEqual([]);
+      expect(seen.boxes).toEqual(expect.arrayContaining(["surface", "ds"]));
+      expect(new URL(seen.url ?? "").pathname).toBe("/definitions");
+    },
+  );
+});
+
+describe("a drill's link against its address", () => {
+  const [desktop, phone] = VIEWPORTS;
+
+  /**
+   * Where the canvas shows a region's top rule on screen, its left end and
+   * its length: the camera's window and zoom, read where a reader sees
+   * them.
+   */
+  const readCamera = (page: Page, prefix: string): Promise<readonly number[]> =>
+    page.evaluate((ns) => {
+      const rule = document.querySelector(
+        `.ds.graph-canvas svg.viewport g.region[data-ns="${ns}"] rect.rule`,
+      );
+      if (rule === null) return [];
+      const box = rule.getBoundingClientRect();
+      return [box.x, box.y, box.width];
+    }, prefix);
+
+  /** Load a path, act, then read the camera on a region. */
+  const cameraAfter = async (
+    path: string,
+    prefix: string,
+    act?: (page: Page) => Promise<void>,
+  ): Promise<{ errors: readonly string[]; camera: readonly number[] }> => {
+    const seen: { camera: readonly number[] } = { camera: [] };
+    const { errors } = await openExplorer(path, desktop, async (page) => {
+      await act?.(page);
+      // The pointer leaves the canvas, so no hover rings a node.
+      await page.mouse.move(0, 0);
+      await page.waitForTimeout(CAMERA_SETTLE_MS);
+      seen.camera = await readCamera(page, prefix);
+    });
+    return { errors, camera: seen.camera };
+  };
+
+  /** Each figure within a pixel of the loaded address's. */
+  const expectSameCamera = (
+    seen: readonly number[],
+    loaded: readonly number[],
+  ): void => {
+    expect(seen).toHaveLength(loaded.length);
+    expect(loaded.length).toBeGreaterThan(0);
+    loaded.forEach((value, at) => {
+      expect(
+        Math.abs((seen.at(at) ?? Number.NaN) - value),
+        `[${seen.join(", ")}] against [${loaded.join(", ")}]`,
+      ).toBeLessThanOrEqual(1);
+    });
+  };
+
+  it("lands a box's click on the window and zoom that loading its address opens", async () => {
+    const loaded = await cameraAfter("/definitions?expand=surface", "surface");
+    const clicked = await cameraAfter(
+      "/definitions",
+      "surface",
+      async (page) => {
+        await page
+          .locator(
+            '.ds.graph-canvas svg.viewport g.node[data-kind="region"][data-id="surface"] a',
+          )
+          .click();
+        await page.waitForURL(/[?&]expand=surface/);
+      },
+    );
+    expect(loaded.errors).toEqual([]);
+    expect(clicked.errors).toEqual([]);
+    expectSameCamera(clicked.camera, loaded.camera);
+  });
+
+  it("lands the way back on the overview at rest that loading it opens", async () => {
+    const loaded = await cameraAfter("/definitions", "anatomy");
+    const back = await cameraAfter(
+      "/definitions?expand=surface",
+      "anatomy",
+      async (page) => {
+        await page.locator(".ds.graph-canvas svg.viewport a.way-back").click();
+        await page.waitForURL((url) => !url.search.includes("expand"));
+      },
+    );
+    expect(back.errors).toEqual([]);
+    expectSameCamera(back.camera, loaded.camera);
+  });
+
+  it("frames a class of a collapsed namespace reached from another term page as loading its address does", async () => {
+    const actor = `/definitions/${encodeURIComponent("surface:Actor")}`;
+    /** Whether the class's box lies wholly in the canvas's viewport. */
+    const isFramed = (page: Page): Promise<boolean> =>
+      page.evaluate(() => {
+        const frame = document
+          .querySelector(".ds.graph-canvas svg.viewport")
+          ?.getBoundingClientRect();
+        const node = document
+          .querySelector(
+            '.ds.graph-canvas svg.viewport g.node[data-id="surface:Actor"] .surface',
+          )
+          ?.getBoundingClientRect();
+        return (
+          frame !== undefined &&
+          node !== undefined &&
+          node.width > 0 &&
+          node.left >= frame.left &&
+          node.right <= frame.right &&
+          node.top >= frame.top &&
+          node.bottom <= frame.bottom
+        );
+      });
+    const framed: { loaded?: boolean; clicked?: boolean } = {};
+    const loaded = await cameraAfter(actor, "surface", async (page) => {
+      framed.loaded = await isFramed(page);
+    });
+    // ds:UIBlock's page opens ds and draws surface as one box; the rail
+    // lists surface's classes all the same.
+    const clicked = await cameraAfter(
+      `/definitions/${encodeURIComponent("ds:UIBlock")}`,
+      "surface",
+      async (page) => {
+        await page.locator(`.ds.term-rail a[href="${actor}"]`).click();
+        await page.waitForURL((url) => url.pathname === actor);
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        framed.clicked = await isFramed(page);
+      },
+    );
+    expect(loaded.errors).toEqual([]);
+    expect(clicked.errors).toEqual([]);
+    expect(framed).toEqual({ loaded: true, clicked: true });
+    expectSameCamera(clicked.camera, loaded.camera);
+  });
+
+  // The overview draws anatomy and cs class by class, ds and surface each
+  // as one box: a term page of a class in ds or surface opens that
+  // namespace, a drawing the overview's camera does not belong to.
+  it("opens the overview from a term page of a boxed class, by the strip's link, as loading it does", async () => {
+    const loaded = await cameraAfter("/definitions", "anatomy");
+    const back = await cameraAfter(
+      `/definitions/${encodeURIComponent("surface:Actor")}`,
+      "anatomy",
+      async (page) => {
+        await page.locator('.strip a[href="/definitions"]').first().click();
+        await page.waitForURL((url) => url.pathname === "/definitions");
+      },
+    );
+    expect(loaded.errors).toEqual([]);
+    expect(back.errors).toEqual([]);
+    expectSameCamera(back.camera, loaded.camera);
+  });
+
+  it("opens a term page of a boxed class from the zoomed overview as loading its address does", async () => {
+    const uiBlock = `/definitions/${encodeURIComponent("ds:UIBlock")}`;
+    const loaded = await cameraAfter(uiBlock, "ds");
+    const picked = await cameraAfter("/definitions", "ds", async (page) => {
+      await page.getByRole("button", { name: "Zoom in" }).click();
+      await page.getByRole("button", { name: "Zoom in" }).click();
+      await page.waitForTimeout(CAMERA_SETTLE_MS);
+      await page.locator(`.ds.term-rail a[href="${uiBlock}"]`).click();
+      await page.waitForURL((url) => url.pathname === uiBlock);
+    });
+    expect(loaded.errors).toEqual([]);
+    expect(picked.errors).toEqual([]);
+    expectSameCamera(picked.camera, loaded.camera);
+  });
+
+  it("lists the opened namespace first at 390, its heading the way back", async () => {
+    const seen: {
+      first?: string;
+      back?: string | null;
+      words?: string | null;
+    } = {};
+    const { errors } = await openExplorer(
+      "/definitions?expand=surface",
+      phone,
+      async (page) => {
+        const first = page.locator("svg.ds.phone-graph g[data-ns]").first();
+        seen.first = (await first.getAttribute("data-ns")) ?? undefined;
+        seen.back = await first
+          .locator("a.way-back")
+          .getAttribute("aria-label");
+        seen.words = await first.locator("a.way-back").textContent();
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.first).toBe("surface");
+    expect(seen.back).toMatch(/surface.*31 classes/);
+    // The way back says in visible words where it leads.
+    expect(seen.words).toContain("all namespaces");
+  });
+});
+
+describe("at 912 px, on a canvas narrower than the drawing", () => {
+  const tablet = STRIP_VIEWPORTS.find((viewport) => viewport.name === "912");
+
+  it("opens at the map's top-left corner at the legible floor, both boxes and every class whole", async () => {
+    if (tablet === undefined) throw new Error("no 912 viewport");
+    const view: { shelf?: ShelfBox[] } = {};
+    const { errors, measure } = await openExplorer(
+      "/definitions",
+      tablet,
+      async (page) => {
+        view.shelf = await page.evaluate(measureFirstShelf, WIDTH_TOLERANCE_PX);
+      },
+    );
+    expect(errors).toEqual([]);
+    // The widest window a reader can still read: surface and ds, each
+    // drawn as one box, are whole in it; the dt stub after them may be cut
+    // by its right edge, the sign that the map goes on, and no class is.
+    expect(
+      view.shelf
+        ?.filter(({ id }) => id === "surface" || id === "ds")
+        .map(({ id, whole }) => [id, whole]),
+    ).toEqual([
+      ["surface", true],
+      ["ds", true],
+    ]);
+    expect(measure.cut.filter((id) => id !== "dt:TokenSymbol")).toEqual([]);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    expect(measure.unlabelled).toBe(0);
+  });
+});
+
+describe("the overview's record, on the docs site", () => {
+  const [desktop] = VIEWPORTS;
+  const served: {
+    weights?: ServedWeights;
+    prefixes?: readonly string[];
+    classes?: number;
+  } = {};
+  const canvases = new Map<string, string>();
+
+  /** The canvas's SVG the server renders for `path`, fetched afresh. */
+  const serveCanvas = async (path: string): Promise<string> =>
+    sliceCanvasSvg(await (await fetch(new URL(path, server.base))).text());
+
+  /** The overview at rest, then with each namespace opened. */
+  const listViews = (): readonly string[] => [
+    "/definitions",
+    ...(served.prefixes ?? []).map((prefix) => `/definitions?expand=${prefix}`),
+  ];
+
+  /** Each view's canvas, as first served, measured. */
+  const measureViews = (): [string, CanvasMeasure][] =>
+    listViews().map((path) => [
+      path,
+      measureCanvasSvg(canvases.get(path) ?? ""),
+    ]);
+
+  beforeAll(async () => {
+    const graph = await fetchServedGraph(
+      new URL(new URL(DEFAULT_GRAPHQL_URL).pathname, server.graphBase).href,
+    );
+    served.weights = weighServedRelations(graph);
+    served.prefixes = graph.ontologies.map((ontology) => ontology.prefix);
+    served.classes = graph.ontologies.reduce(
+      (sum, ontology) => sum + ontology.classes.length,
+      0,
+    );
+    for (const path of listViews()) canvases.set(path, await serveCanvas(path));
+  }, PAGE_SETTLE_MS);
+
+  it("states each canvas's task: the drawn namespaces at rest, the opened one opened, the class in focus on a term page", async () => {
+    const hooksOf = (svg: string): string | undefined =>
+      /<g (data-task="[^"]+" data-(?:set|focus)="[^"]+")[^>]* class="ds class-graph"/
+        .exec(svg)
+        ?.at(1);
+    const drawn = hooksOf(canvases.get("/definitions") ?? "");
+    expect(drawn).toMatch(/^data-task="shape" data-set="/);
+    for (const prefix of served.prefixes ?? []) {
+      expect(
+        drawn?.split('data-set="').at(1)?.slice(0, -1).split(" "),
+      ).toContain(prefix);
+      expect(hooksOf(canvases.get(`/definitions?expand=${prefix}`) ?? "")).toBe(
+        `data-task="shape" data-set="${prefix}"`,
+      );
+    }
+    expect(hooksOf(await serveCanvas("/definitions/ds%3AUIBlock"))).toBe(
+      'data-task="neighbourhood" data-focus="ds:UIBlock"',
+    );
+  });
+
+  it("explains no chip of the explorer's bar in a tooltip, as served", async () => {
+    const html = await (
+      await fetch(new URL("/definitions", server.base))
+    ).text();
+    // The bar's fieldsets hold no <div>: the first close after its slot
+    // is its own.
+    const start = html.indexOf('data-slot="explorer-controls"');
+    const bar = html.slice(start, html.indexOf("</div>", start));
+    expect(bar.match(/<button/g)?.length).toBeGreaterThan(0);
+    expect(bar).not.toContain(" title=");
+  });
+
+  it("packs the overview deterministically: two server renders give the same SVG bytes, at rest and opened", async () => {
+    expect(canvases.size).toBe(1 + (served.prefixes?.length ?? 0));
+    for (const path of listViews()) {
+      expect(await serveCanvas(path), path).toBe(canvases.get(path));
+    }
+  });
+
+  it("labels every drawn bridge at rest, as many as the site's data serves, legibly at the opening zoom", async () => {
+    const rest = measureCanvasSvg(canvases.get("/definitions") ?? "");
+    // Two bridges, each to a stub: anatomy to rdf:List, ds to dt:TokenSymbol.
+    expect(rest.bridges).toBe(served.weights?.bridges);
+    expect(rest.bridgeLabels).toBe(rest.bridges);
+    // Every opened view names every bridge it draws at rest too.
+    for (const [path, measure] of measureViews()) {
+      expect(measure.bridgeLabels, path).toBe(measure.bridges);
+    }
+    const seen: { labels?: readonly BridgeLabelMeasure[] } = {};
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        seen.labels = await page.evaluate(measureBridgeLabels);
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.labels).toHaveLength(rest.bridges);
+    for (const label of seen.labels ?? []) {
+      expect(label.px, label.text).toBeGreaterThanOrEqual(
+        GRAPH_BUDGET.labelPxMin,
+      );
+    }
+  });
+
+  it("draws no two bridges on one line, and none along three sides of a region it joins, at rest and with each namespace opened", () => {
+    expect(listViews()).toEqual(
+      expect.arrayContaining(
+        ["surface", "ds", "anatomy"].map(
+          (prefix) => `/definitions?expand=${prefix}`,
+        ),
+      ),
+    );
+    for (const [path, measure] of measureViews()) {
+      expect(measure.sharedBridgeLines, path).toEqual([]);
+      expect(measure.framingBridges, path).toEqual([]);
+    }
+  });
+
+  it("states each relation's weight by its stroke, 1, 2, 4 or 8 px and dashed exactly at 0, the served count of its heaviest relation, and none into a stub with no statements counted", () => {
+    const prefixes = served.prefixes ?? [];
+    const isClass = (term: string): boolean =>
+      prefixes.includes(term.split(":").at(0) ?? "") && term.includes(":");
+    const isStub = (term: string): boolean =>
+      term.includes(":") && !isClass(term);
+    let weighed = 0;
+    for (const [path, measure] of measureViews()) {
+      for (const relation of measure.relations) {
+        const name = `${path}: ${relation.from} to ${relation.to}`;
+        expect(relation.focus, name).toBe(false);
+        expect([1, 2, 4, 8], name).toContain(relation.width);
+        expect(relation.dashed, name).toBe(relation.weight === 0);
+        // A relation into a stub claims a weight only where the store
+        // counted statements for it: its 0 measures nothing.
+        if ([relation.from, relation.to].some(isStub)) {
+          expect(relation.weight ?? 1, name).toBeGreaterThan(0);
+        }
+        if (!isClass(relation.from) || !isClass(relation.to)) continue;
+        const pair = [relation.from, relation.to].sort().join(" ");
+        expect(relation.weight, name).toBe(served.weights?.weights.get(pair));
+        weighed += 1;
+      }
+    }
+    expect(weighed).toBeGreaterThan(0);
+  });
+
+  it("measures section C at the design canvas: the map's fit or the legible floor, never below, every node and region on the 16px lattice", () => {
+    for (const [path, measure] of measureViews()) {
+      // The map's fit at the design canvas, as the canvas states it.
+      const fit = Number(
+        /data-fit-zoom="([^"]+)"/.exec(canvases.get(path) ?? "")?.at(1),
+      );
+      const isNear = (zoom: number): boolean =>
+        Math.abs(measure.openingZoom - zoom) <= 1e-3;
+      expect(isNear(MIN_FIT) || isNear(fit), path).toBe(true);
+      expect(measure.openingZoom, path).toBeGreaterThanOrEqual(MIN_FIT);
+      expect(measure.offLattice, path).toEqual([]);
+    }
+  });
+
+  it("draws within the budget at rest and with each namespace opened: nodes, the largest column, bytes and elements", () => {
+    for (const [path, measure] of measureViews()) {
+      expect(measure.nodes, path).toBeLessThanOrEqual(
+        GRAPH_BUDGET.drawnNodesMax,
+      );
+      expect(measure.largestColumn, path).toBeLessThanOrEqual(
+        GRAPH_BUDGET.bandMembersMax,
+      );
+      expect(measure.bytes, path).toBeLessThanOrEqual(GRAPH_BUDGET.svgBytesMax);
+      expect(measure.elements, path).toBeLessThanOrEqual(
+        GRAPH_BUDGET.svgElementsMax,
+      );
+    }
+  });
+
+  // The explorer's query reads every class of every loaded namespace, and
+  // nothing bounds it: a site past the budget's figure is a stated limit.
+  it("fetches no more classes than the budget's figure for fetched nodes", () => {
+    expect(served.classes).toBeGreaterThan(0);
+    expect(served.classes).toBeLessThanOrEqual(GRAPH_BUDGET.fetchedNodesMax);
   });
 });

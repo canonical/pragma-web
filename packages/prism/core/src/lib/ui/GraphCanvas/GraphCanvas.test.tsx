@@ -14,7 +14,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HUBS_SCALE, OVERVIEW_SCALE } from "./constants.js";
 import GraphCanvas from "./GraphCanvas.js";
 import useGraphZoomBucket from "./hooks/useGraphZoomBucket.js";
-import type { GraphBox, GraphCameraMemory, GraphOpening } from "./types.js";
+import type {
+  GraphBox,
+  GraphCameraMemory,
+  GraphLegibleWindow,
+  GraphOpening,
+} from "./types.js";
 
 const VIEW_BOX: GraphBox = { x: 0, y: 0, width: 800, height: 600 };
 
@@ -433,6 +438,43 @@ describe("GraphCanvas", () => {
     expect(opening).toHaveBeenCalledOnce();
   });
 
+  it("restores where `opening` asks with Fit and 0 when no fit box is given, and fits the fit box when one is", () => {
+    const resize = stubResizeObserver();
+    stubViewportSize(400, 300);
+    const opening = vi.fn<GraphOpening>(() => ({ k: 1.5, x: -40, y: -30 }));
+    const draw = (fit?: GraphBox) => (
+      <GraphCanvas
+        data-testid="canvas"
+        label="Class graph"
+        opening={opening}
+        viewBox={VIEW_BOX}
+        {...(fit === undefined ? {} : { fit })}
+      >
+        <BucketProbe />
+      </GraphCanvas>
+    );
+    const { rerender } = render(draw());
+    act(() => resize());
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(readCamera()).not.toBe("translate(-40,-30) scale(1.5)");
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(-40,-30) scale(1.5)");
+    expect(opening).toHaveBeenLastCalledWith(VIEW_BOX, 0.5);
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.keyDown(screen.getByTestId("canvas"), { key: "0" });
+    expect(readCamera()).toBe("translate(-40,-30) scale(1.5)");
+    // An opening that asks for nothing is the server's paint, the identity.
+    opening.mockReturnValueOnce(undefined);
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    // With a fit box, Fit fits it: the viewBox, shown at 50% on this
+    // viewport, from its top-left corner at the overview's floor.
+    rerender(draw(VIEW_BOX));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toMatch(/^translate\(0,0\) scale\(1\.5\d*\)$/);
+  });
+
   it("opens a 390px canvas at the legible zoom on its first region", () => {
     // The map fits a phone's canvas at 40%, below the legible zoom; it
     // opens on its top-left corner at 12/14, every label at 12px or more,
@@ -778,6 +820,46 @@ describe("GraphCanvas", () => {
       OVERVIEW_SCALE,
     );
     expect(readCamera()).toBe("translate(-160,-80) scale(1)");
+  });
+
+  it("keeps Fit at the legible zoom with `legibleFit`, a box too large shown by its legible window", () => {
+    const large: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
+    const window: GraphBox = { x: 160, y: 80, width: 800, height: 600 };
+    const legibleWindow = vi.fn<GraphLegibleWindow>(() => window);
+    const draw = (fit: GraphBox) => (
+      <GraphCanvas
+        fit={fit}
+        label="Class graph"
+        legibleFit
+        legibleWindow={legibleWindow}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>
+    );
+    const { rerender } = render(draw(large));
+    // Zoomed out into the overview, Fit returns to the legible zoom, not
+    // to the overview's floor, from the window the box's corner gives.
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(legibleWindow).toHaveBeenLastCalledWith(
+      large,
+      VIEW_BOX,
+      1,
+      HUBS_SCALE,
+    );
+    expect(readCamera()).toBe("translate(-160,-80) scale(1)");
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
+    // Without a window, the box's top-left corner at the legible zoom.
+    legibleWindow.mockImplementation((box: GraphBox) => box);
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.8571437142857141)");
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    // A box that fits above the legible zoom is fitted whole.
+    rerender(draw({ x: 0, y: 0, width: 400, height: 300 }));
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(2)");
   });
 
   it("never frames a region from a legible view into an illegible one", () => {

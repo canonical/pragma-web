@@ -8,23 +8,31 @@ import {
   placeEdgeLabels,
   requireEntry,
 } from "@canonical/prism-core";
+import { useRouter, useSearchParams } from "@canonical/router-react";
 import {
   type KeyboardEvent,
   type ReactElement,
   type SyntheticEvent,
   useCallback,
+  useEffect,
+  useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
+import { REGION_NODE_SCHEME } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import type { NodeNavigation } from "../../classGraph/types.js";
 import { useMessages } from "../../i18n/index.js";
 import { ClassGraph } from "../ClassGraph/index.js";
+import buildDrillSearch from "./buildDrillSearch.js";
 import classifyClasses from "./classifyClasses.js";
 import { PhoneGraph } from "./common/PhoneGraph/index.js";
+import describeGraphTask from "./describeGraphTask.js";
 import frameOpeningCamera from "./frameOpeningCamera.js";
 import frameOpeningView from "./frameOpeningView.js";
 import frameRefitWindow from "./frameRefitWindow.js";
+import frameRegionRequest from "./frameRegionRequest.js";
 import measureVisibleBox from "./measureVisibleBox.js";
 import type { HierarchyWellProps } from "./types.js";
 import "./styles.css";
@@ -39,6 +47,15 @@ const NAVIGATION_KEYS: Readonly<Record<string, keyof NodeNavigation>> = {
   ArrowRight: "right",
   Home: "home",
 };
+
+/**
+ * The drill each camera memory was last kept for (`""` for none), beside
+ * the memory, which a well does not own: the lens's provider keeps it
+ * across the wells the router mounts, and a well reads it to forget a
+ * camera kept on another drawing. Weakly keyed, so a memory's provider
+ * takes its entry with it.
+ */
+const KEPT_DRILLS = new WeakMap<object, string>();
 
 /**
  * Read the attribute of the nearest element that carries it, from the
@@ -72,11 +89,20 @@ function readClosest(
  * pans the selected class into view in place of the opening. Pointing at
  * a class or focusing it, in the graph or the rail, makes it the focus:
  * everything outside its neighbourhood fades and its relations show their
- * labels. Pointing at a
+ * labels; a class a collapsed namespace's box stands for makes its box
+ * the focus, and so does pointing at or focusing a box or a stub, which
+ * then names its bridges. On the explorer's index a box is a link to the
+ * page drilled into its namespace, a tab stop of its own, and the drilled
+ * namespace's label is the way back. A drill the address changes opens
+ * as a load of that address does, the reader's camera on the other view
+ * forgotten. Pointing at a
  * relation shows its label and rings its ends. The filter's chips hide
  * classes, and the camera fits what is left, which the Fit control
- * restores; the search and the instances axis dim. A region a reader picks
- * in the inspector is fitted once per pick. Neither refit zooms a legible
+ * restores, never below the legible zoom; the search and the instances
+ * axis dim. A region a reader picks
+ * in the inspector is fitted once per pick, on a window of the canvas's
+ * aspect whose edges cut no box: an open region as large as it fits, a
+ * collapsed one's box among its neighbours. Neither refit zooms a legible
  * view out to an illegible one: what is too large for the legible zoom
  * shows from its top-left corner, in a window whose edges cut no class.
  *
@@ -91,8 +117,10 @@ function readClosest(
  * `import { HierarchyWell } from "../HierarchyWell/index.js";`
  *
  * @implements prism.component.hierarchy_well
- * @note Impure: holds the pointer's edge and the keyboard's state, and moves
- *   keyboard focus between the classes' links.
+ * @note Impure: holds the pointer's edge and the keyboard's state, moves
+ *   keyboard focus between the classes' links, measures the canvas
+ *   when a region is picked, and clears the camera memory when the drill
+ *   changes.
  */
 export default function HierarchyWell({
   layout,
@@ -114,8 +142,57 @@ export default function HierarchyWell({
     () => new Map([...terms].map(([uri, compact]) => [compact, uri])),
     [terms],
   );
-  const selected = term === undefined ? undefined : uris.get(term);
-  const hovered = hoverCentre === undefined ? undefined : uris.get(hoverCentre);
+  // The canvas centres only on a class it draws: the rail lists the
+  // classes a collapsed namespace's box stands for too.
+  const drawnOf = (compact: string | undefined): string | undefined => {
+    const uri = compact === undefined ? undefined : uris.get(compact);
+    return uri !== undefined && layout.nodes.has(uri) ? uri : undefined;
+  };
+  // A class a box stands for points at its box.
+  const boxOf = (compact: string | undefined): string | undefined => {
+    const uri = compact === undefined ? undefined : uris.get(compact);
+    const region = layout.regions.find((candidate) =>
+      candidate.boxed.some((klass) => klass.uri === uri),
+    );
+    return region === undefined
+      ? undefined
+      : `${REGION_NODE_SCHEME}${region.prefix}`;
+  };
+  // A box or a stub the reader points at or focuses is the focus itself.
+  const boxes = useMemo(
+    () =>
+      new Map(
+        [...layout.nodes.values()].flatMap((node) =>
+          node.kind === "class" || node.term === undefined
+            ? []
+            : [[node.term, node.uri] as const],
+        ),
+      ),
+    [layout],
+  );
+  const selected = drawnOf(term);
+  // The explorer's index links a box to its drill and the drill back,
+  // keeping the page's other view keys; a term page keeps its selection's
+  // drill and links neither.
+  const router = useRouter();
+  const search = useSearchParams();
+  const buildDrillHref = useCallback(
+    (prefix: string | undefined): string =>
+      router.buildPath("definitions", {
+        search: buildDrillSearch(search, prefix),
+      }),
+    [router, search],
+  );
+  const drillHref = term === undefined ? buildDrillHref : undefined;
+  const hovered =
+    drawnOf(hoverCentre) ??
+    boxOf(hoverCentre) ??
+    (hoverCentre === undefined ? undefined : boxes.get(hoverCentre));
+  // The graph's one tab stop: the selected class, else the first class in
+  // the rail's order, never a box that holds no link.
+  const tabStop =
+    selected ??
+    layout.rail.find((uri) => layout.nodes.get(uri)?.kind === "class");
   const focus = escaped ? undefined : (hovered ?? selected);
   const { hidden, dimmed } = useMemo(
     () => classifyClasses(layout, terms, filter),
@@ -150,21 +227,47 @@ export default function HierarchyWell({
   }, [activeEdge, focus, hidden, layout, t]);
   // The server paints the whole graph, or a legible window of it around
   // the class selected on arrival, for the design canvas; the client opens
-  // on the window its own canvas calls for. Fit fits the whole, or shows a
-  // window of it at the overview's floor whose edges cut no class, never
-  // below.
-  const [arrival] = useState(selected);
+  // on the window its own canvas calls for, and Fit restores it: never
+  // below the legible floor, never by a namespace's height.
+  //
+  // A drill the address changes, by a box, the way back, a term page
+  // reached from another or the history, opens as a load of that address
+  // does: the canvas mounts anew on the new layout, framing the class then
+  // selected as its arrival, the camera kept for the other view forgotten
+  // before the new canvas reads it.
+  const drillKey = layout.drilled ?? "";
+  const [arrival, setArrival] = useState({ drill: drillKey, uri: selected });
+  if (arrival.drill !== drillKey)
+    setArrival({ drill: drillKey, uri: selected });
   const arrivalNode =
-    arrival === undefined ? undefined : layout.nodes.get(arrival);
+    arrival.uri === undefined ? undefined : layout.nodes.get(arrival.uri);
   const viewBox = useMemo(
     () => frameOpeningView(layout, arrivalNode),
     [arrivalNode, layout],
   );
+  // The opening, which the Fit control and `0` restore too: the selected
+  // class framed as on arrival, or the map by the overview's rule.
+  const selectedNode =
+    selected === undefined ? undefined : layout.nodes.get(selected);
   const opening = useCallback(
     (visible: GraphBox, scale: number): GraphTransform =>
-      frameOpeningCamera(layout, arrivalNode, visible, scale),
-    [arrivalNode, layout],
+      frameOpeningCamera(layout, selectedNode, visible, scale),
+    [selectedNode, layout],
   );
+  // The memory outlives the well, which the router mounts anew on each of
+  // the lens's routes, so the drill the camera was kept for is kept beside
+  // it: a well that draws another drill, on this mount or the next, forgets
+  // that camera. The order is load-bearing: the new canvas reads the memory
+  // in a passive effect, and a child's passive effects run before its
+  // parent's, so only a layout effect clears it first.
+  useLayoutEffect(() => {
+    if (cameraMemory === undefined) return;
+    const kept = KEPT_DRILLS.get(cameraMemory);
+    KEPT_DRILLS.set(cameraMemory, drillKey);
+    if (kept !== undefined && kept !== drillKey) {
+      cameraMemory.current = undefined;
+    }
+  }, [cameraMemory, drillKey]);
   const bounds = useMemo(
     () => ({
       x: layout.viewBox.x,
@@ -174,22 +277,36 @@ export default function HierarchyWell({
     }),
     [layout],
   );
+  // Under a filter, Fit fits the classes it leaves, whole where that is at
+  // the legible floor or above, else at that floor from their box's
+  // top-left corner, in a window that cuts no class; else it restores the
+  // opening.
   const fit = useMemo(
-    () => measureVisibleBox(layout, hidden, undefined) ?? bounds,
-    [bounds, hidden, layout],
+    () => measureVisibleBox(layout, hidden, undefined),
+    [hidden, layout],
   );
   const legibleWindow = useCallback(
     (box: GraphBox, visible: GraphBox, scale: number, zoom: number): GraphBox =>
       frameRefitWindow(layout, hidden, box, visible, scale, zoom),
     [hidden, layout],
   );
-  const frame = useMemo(() => {
-    if (region === undefined) return undefined;
-    const box = measureVisibleBox(layout, hidden, region.prefix);
-    return box === undefined ? undefined : { box, serial: region.serial };
+  // A region a reader picks is framed once the canvas's size is known: in
+  // its aspect, so the camera shows exactly that window and no edge of it
+  // cuts a box; a box too large for that, or a canvas not yet measured,
+  // is fitted as it is.
+  const root = useRef<HTMLDivElement>(null);
+  const [frame, setFrame] = useState<
+    { readonly box: GraphBox; readonly serial: number } | undefined
+  >(undefined);
+  useEffect(() => {
+    if (region === undefined) return;
+    const box = frameRegionRequest(layout, hidden, region.prefix, root.current);
+    if (box === undefined) return;
+    setFrame({
+      box,
+      serial: region.serial,
+    });
   }, [hidden, layout, region]);
-  const selectedNode =
-    selected === undefined ? undefined : layout.nodes.get(selected);
   const reveal =
     selectedNode === undefined
       ? undefined
@@ -209,12 +326,14 @@ export default function HierarchyWell({
     onKeyDown?.(event);
     const id = readClosest(event.target, "data-id");
     if (id === undefined) return;
-    const uri = requireEntry(uris, id);
     if (event.key === "Escape") {
       if (escaped && event.target instanceof SVGElement) event.target.blur();
       setEscaped(true);
       return;
     }
+    // A box's link is a tab stop of its own, off the tree's moves.
+    const uri = uris.get(id);
+    if (uri === undefined) return;
     const move = NAVIGATION_KEYS[event.key];
     const next =
       move === undefined ? null : requireEntry(layout.nodes, uri).nav[move];
@@ -234,6 +353,7 @@ export default function HierarchyWell({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-canvas"
+      ref={root}
       onBlur={() => {
         onHoverTerm(undefined);
         setEscaped(false);
@@ -249,9 +369,11 @@ export default function HierarchyWell({
       <GraphCanvas
         bounds={bounds}
         className="desktop"
+        key={drillKey}
         fit={fit}
         frame={frame}
         label={t("well.label")}
+        legibleFit
         legibleWindow={legibleWindow}
         memory={cameraMemory}
         opening={opening}
@@ -259,22 +381,25 @@ export default function HierarchyWell({
         viewBox={viewBox}
       >
         <ClassGraph
+          {...describeGraphTask(layout, term)}
           active={hovered}
           activeEdge={activeEdge}
           data-fit-zoom={layout.fitZoom.toFixed(4)}
           dimmed={dimmed}
+          buildDrillHref={drillHref}
           focus={focus}
           hidden={hidden}
           labels={labels}
           layout={layout}
           selected={selected}
-          tabStop={selected ?? layout.rail.at(0)}
+          tabStop={tabStop}
           terms={terms}
         />
       </GraphCanvas>
       <PhoneGraph
         className="phone"
         dimmed={dimmed}
+        buildDrillHref={drillHref}
         hidden={hidden}
         layout={layout}
         selected={selected}

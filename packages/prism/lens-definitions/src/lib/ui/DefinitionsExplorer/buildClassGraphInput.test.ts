@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DefinitionsExplorer_ontologies$data } from "../../../__generated__/DefinitionsExplorer_ontologies.graphql.js";
+import type { ClassEdgeInput } from "../../classGraph/types.js";
 import buildClassGraphInput from "./buildClassGraphInput.js";
 
 /** One ontology as the explorer's fragment selects it. */
@@ -46,9 +47,38 @@ const ONTOLOGIES = [
   },
 ] as unknown as DefinitionsExplorer_ontologies$data;
 
+/**
+ * The edges the graph serves for the ontology: the declared edge between
+ * `taggedBy`'s domain and range, a declared edge between other classes,
+ * and an observed pair nothing declares.
+ */
+const EDGES: readonly ClassEdgeInput[] = [
+  {
+    property: "https://ds.canonical.com/taggedBy",
+    subjectClass: "https://ds.canonical.com/Tag",
+    objectClass: "https://ds.canonical.com/Tag",
+    count: 40,
+    declared: true,
+  },
+  {
+    property: "https://ds.canonical.com/taggedBy",
+    subjectClass: "https://ds.canonical.com/Entity",
+    objectClass: "https://ds.canonical.com/Tag",
+    count: 2,
+    declared: true,
+  },
+  {
+    property: "https://ds.canonical.com/taggedBy",
+    subjectClass: "https://ds.canonical.com/View",
+    objectClass: "https://ds.canonical.com/Tag",
+    count: 7,
+    declared: false,
+  },
+];
+
 describe("buildClassGraphInput", () => {
   it("names a class by its compact term when it has no label, and counts its fields", () => {
-    expect(buildClassGraphInput(ONTOLOGIES).classes).toEqual([
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES).classes).toEqual([
       {
         uri: "https://ds.canonical.com/Tag",
         label: "ds:Tag",
@@ -62,19 +92,84 @@ describe("buildClassGraphInput", () => {
   });
 
   it("keeps the object properties as relations, an unstated domain as none and a compact range expanded", () => {
-    expect(buildClassGraphInput(ONTOLOGIES).relations).toEqual([
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES).relations).toEqual([
       {
         uri: "https://ds.canonical.com/category",
         label: "ds:category",
         domain: null,
         range: "https://ds.canonical.com/TagCategory",
+        count: 0,
       },
       {
         uri: "https://ds.canonical.com/taggedBy",
         label: "taggedBy",
         domain: "https://ds.canonical.com/Tag",
         range: "https://ds.canonical.com/Tag",
+        count: 40,
       },
     ]);
+  });
+
+  it("weighs a relation by the declared edge between its domain and range, 0 when none is served", () => {
+    expect(
+      buildClassGraphInput(ONTOLOGIES, []).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([0, 0]);
+    expect(
+      buildClassGraphInput(ONTOLOGIES, EDGES).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([0, 40]);
+    expect(
+      buildClassGraphInput(ONTOLOGIES, EDGES.slice(1)).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([0, 0]);
+  });
+
+  it("counts no relation into a class of a namespace that is not loaded unless the graph counts its statements", () => {
+    const [ontology] = ONTOLOGIES;
+    const symbol = {
+      uri: "https://ds.canonical.com/consumesSymbol",
+      label: "consumesSymbol",
+      kind: "OBJECT",
+      domain: { uri: "https://ds.canonical.com/Tag" },
+      range: "https://dt.canonical.com/TokenSymbol",
+    };
+    const outward = [
+      { ...ontology, properties: [symbol] },
+    ] as unknown as DefinitionsExplorer_ontologies$data;
+    const served = (count: number): ClassEdgeInput[] => [
+      {
+        property: symbol.uri,
+        subjectClass: symbol.domain.uri,
+        objectClass: symbol.range,
+        count,
+        declared: true,
+      },
+    ];
+    expect(
+      buildClassGraphInput(outward, served(0)).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([null]);
+    expect(
+      buildClassGraphInput(outward, served(12)).relations.map(
+        (relation) => relation.count,
+      ),
+    ).toEqual([12]);
+  });
+
+  it("states each namespace's relations as its object properties, the figure its box states", () => {
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES).namespaceRelations).toEqual(
+      new Map([["ds", 2]]),
+    );
+  });
+
+  it("builds the same input whatever order the edges come in", () => {
+    expect(buildClassGraphInput(ONTOLOGIES, EDGES.toReversed())).toEqual(
+      buildClassGraphInput(ONTOLOGIES, EDGES),
+    );
   });
 });

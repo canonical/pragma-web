@@ -17,15 +17,10 @@ export const MESSAGES = {
   "explorer.search.placeholder": "Search terms…",
   "controls.abstraction.label": "Filter by abstraction",
   "controls.abstraction.abstract.label": "Abstract",
-  "controls.abstraction.abstract.hint":
-    "Classes that are never instantiated directly",
   "controls.abstraction.concrete.label": "Concrete",
-  "controls.abstraction.concrete.hint": "Classes with instances of their own",
   "controls.ontology.label": "Filter by ontology",
-  "controls.ontology.hint": "Terms from the {label} ontology",
   "controls.instances.label": "Filter by instances",
   "controls.instances.with.label": "With instances",
-  "controls.instances.with.hint": "Dim the classes that have no instances",
   "status.classes": {
     one: "{visible} of {count} class",
     other: "{visible} of {count} classes",
@@ -35,6 +30,14 @@ export const MESSAGES = {
     other: "{visible} of {count} classes · {abstract} abstract",
   },
   "well.label": "Class graph",
+  "well.name.stub": "Class {term}, outside the loaded namespaces, {relations}",
+  "well.name.region":
+    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it",
+  "well.name.region.open":
+    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it. Opens the namespace",
+  "well.region.back.words": "· all namespaces",
+  "well.region.back":
+    "Namespace {prefix}, opened, {classes}: back to the overview of every namespace",
   "well.name":
     "Class {label}, in {namespace}, {subclasses} subclasses, {relations} relations, {instances} instances, {fields} fields",
   "well.name.abstract":
@@ -43,13 +46,18 @@ export const MESSAGES = {
     one: "{count} class",
     other: "{count} classes",
   },
-  "well.relations.count": "{count} relations",
+  "well.relations.count": {
+    one: "{count} relation",
+    other: "{count} relations",
+  },
+  "well.region.holds": "{classes}, {relations}",
   "well.phone.label": "Class graph, in rail order",
   "rail.label": "Ontology terms",
   "rail.classes": "Classes",
   "rail.properties": "Properties",
   "rail.count": "{matches} of {total}",
   "rail.abstract": "abstract",
+  "rail.region": "drawn as one box",
   "kind.object": "object",
   "kind.datatype": "datatype",
   "kind.annotation": "annotation",
@@ -72,6 +80,17 @@ export const MESSAGES = {
   "legend.bundle":
     "Every relation between two classes as one path, a head at each range",
   "legend.loop": "Relations from a class to itself, as one loop",
+  "legend.bridge":
+    "A bridge: relations between two namespaces, in the strong line and named at rest",
+  "legend.weight":
+    "A relation's line is heavier the more statements the graph holds for it",
+  "legend.weight.range": "{from} to {to} statements",
+  "legend.weight.from": "{from} and more statements",
+  "legend.zero": "A relation with no statements yet: dashed",
+  "legend.region":
+    "A namespace drawn as one box, with its classes and relations: select it to open",
+  "legend.stub":
+    "A class of a namespace that is not loaded, in a dashed frame: its relations are not counted, so their line is plain",
   "legend.specimen.concrete": "Concrete class",
   "legend.specimen.abstract": "Abstract class",
   "legend.specimen.hub": "Hub",
@@ -86,6 +105,8 @@ export const MESSAGES = {
   "legend.specimen.of": "toA",
   "legend.specimen.standard": "Class C",
   "legend.specimen.extends": "toItself",
+  "legend.specimen.namespace": "ns",
+  "legend.specimen.external": "other:Class",
   "inspector.unknown":
     "No term at {term}. The rail lists every term the ontologies carry.",
   "inspector.tag.class": "class",

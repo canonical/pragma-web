@@ -14,6 +14,13 @@ type OwnProps = {
   readonly dimmed: ReadonlySet<string>;
   /** The selected class's IRI, whose row is ringed; none when omitted. */
   readonly selected?: string;
+  /**
+   * The address of the explorer drilled into a namespace (`expand=<prefix>`),
+   * or at rest for none. Given, each collapsed namespace's row links to its
+   * drill and the drilled namespace's header back to the overview at rest:
+   * on the explorer's index, never on a term page.
+   */
+  readonly buildDrillHref?: (prefix: string | undefined) => string;
 };
 
 /**

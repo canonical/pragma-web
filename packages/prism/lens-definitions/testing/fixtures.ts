@@ -9,6 +9,7 @@ import type {
   ClassGraphInput,
   GraphClassInput,
 } from "../src/lib/classGraph/types.js";
+import ontologyGraph from "./records/ontologyGraph.js";
 
 /** The class exemplar `records/definitionsExplorerRecords` serves. */
 export const UIBLOCK_TERM = "ds:UIBlock";
@@ -92,29 +93,63 @@ export const CROSS_REGION_GRAPH: ClassGraphInput = {
       label: "hasPart",
       domain: "ex:Whole",
       range: "ex:Part",
+      count: 1010,
     },
-    { uri: "ex:partOf", label: "partOf", domain: "ex:Part", range: "ex:Whole" },
-    { uri: "ex:about", label: "about", domain: "ex:Note", range: "ex:Remark" },
+    {
+      uri: "ex:partOf",
+      label: "partOf",
+      domain: "ex:Part",
+      range: "ex:Whole",
+      count: 0,
+    },
+    {
+      uri: "ex:about",
+      label: "about",
+      domain: "ex:Note",
+      range: "ex:Remark",
+      count: 12,
+    },
     {
       uri: "ex:refines",
       label: "refines",
       domain: "ex:Remark",
       range: "ex:Long",
+      count: 150,
     },
-    { uri: "ex:cites", label: "cites", domain: "ex:Long", range: "ex:Note" },
+    {
+      uri: "ex:cites",
+      label: "cites",
+      domain: "ex:Long",
+      range: "ex:Note",
+      count: 3,
+    },
     {
       uri: "ex:seeAlso",
       label: "seeAlso",
       domain: "ex:Note",
       range: "ex:Note",
+      count: 0,
     },
-    { uri: "ex:links", label: "links", domain: "zz:Leaf", range: "ex:Whole" },
-    { uri: "ex:loose", label: "loose", domain: null, range: "ex:Part" },
+    {
+      uri: "ex:links",
+      label: "links",
+      domain: "zz:Leaf",
+      range: "ex:Whole",
+      count: 9,
+    },
+    {
+      uri: "ex:loose",
+      label: "loose",
+      domain: null,
+      range: "ex:Part",
+      count: 1,
+    },
     {
       uri: "ex:outside",
       label: "outside",
       domain: "ex:Part",
       range: "xsd:string",
+      count: 1,
     },
   ],
 };
@@ -136,23 +171,55 @@ export const TANGLED_GRAPH: ClassGraphInput = {
   ],
   relations: [
     ...CROSS_REGION_GRAPH.relations,
-    { uri: "ex:holds", label: "holds", domain: "ex:Whole", range: "ex:Piece" },
-    { uri: "ex:near", label: "near", domain: "ex:Piece", range: "ex:Part" },
-    { uri: "ex:echoes", label: "echoes", domain: "ex:Long", range: "ex:Echo" },
+    {
+      uri: "ex:holds",
+      label: "holds",
+      domain: "ex:Whole",
+      range: "ex:Piece",
+      count: 1,
+    },
+    {
+      uri: "ex:near",
+      label: "near",
+      domain: "ex:Piece",
+      range: "ex:Part",
+      count: 1,
+    },
+    {
+      uri: "ex:echoes",
+      label: "echoes",
+      domain: "ex:Long",
+      range: "ex:Echo",
+      count: 1,
+    },
     {
       uri: "ex:answers",
       label: "answers",
       domain: "ex:Remark",
       range: "ex:Echo",
+      count: 1,
     },
     {
       uri: "ex:mentions",
       label: "mentions",
       domain: "ex:Note",
       range: "yy:Solo",
+      count: 1,
     },
-    { uri: "ex:points", label: "points", domain: "yy:Solo", range: "ex:Long" },
-    { uri: "ex:pairs", label: "pairs", domain: "zz:Leaf", range: "yy:Other" },
+    {
+      uri: "ex:points",
+      label: "points",
+      domain: "yy:Solo",
+      range: "ex:Long",
+      count: 1,
+    },
+    {
+      uri: "ex:pairs",
+      label: "pairs",
+      domain: "zz:Leaf",
+      range: "yy:Other",
+      count: 1,
+    },
   ],
 };
 
@@ -170,6 +237,7 @@ export const WIDE_GRAPH: ClassGraphInput = {
     label: `next${index}`,
     domain: `ex:C${index}`,
     range: `ex:C${index + 1}`,
+    count: index,
   })),
 };
 
@@ -186,6 +254,7 @@ export const NARROWING_GRAPH: ClassGraphInput = {
     label: `follows${index}`,
     domain: `ex:N${index}`,
     range: `ex:N${index + 1}`,
+    count: index,
   })),
 };
 
@@ -211,8 +280,69 @@ export const SHELF_PAIR_GRAPH: ClassGraphInput = {
     ...["B0", "B1", "B2"].map((label) => defineClass(`bb:${label}`, label)),
   ],
   relations: [
-    { uri: "aa:reaches", label: "reaches", domain: "aa:A0", range: "bb:B0" },
+    {
+      uri: "aa:reaches",
+      label: "reaches",
+      domain: "aa:A0",
+      range: "bb:B0",
+      count: 1,
+    },
   ],
+};
+
+/**
+ * The two regions of `SHELF_PAIR_GRAPH` side by side, joined by two
+ * bridges whose ports cross: the first leaves by the top box for the
+ * bottom one, the second, with no statements, by the bottom box for the
+ * top one.
+ */
+export const CROSSED_PAIR_GRAPH: ClassGraphInput = {
+  classes: SHELF_PAIR_GRAPH.classes,
+  relations: [
+    {
+      uri: "aa:down",
+      label: "down",
+      domain: "aa:A0",
+      range: "bb:B2",
+      count: 1,
+    },
+    { uri: "aa:up", label: "up", domain: "aa:A2", range: "bb:B0", count: 0 },
+  ],
+};
+
+/**
+ * The two regions of `SHELF_PAIR_GRAPH` side by side, joined by three
+ * bridges whose ports cross: the top box to the bottom one and back,
+ * and the middle box to the middle one.
+ */
+export const CROSSED_TRIO_GRAPH: ClassGraphInput = {
+  classes: SHELF_PAIR_GRAPH.classes,
+  relations: [
+    ["0", "2"],
+    ["2", "0"],
+    ["1", "1"],
+  ].map(([from, to]) => ({
+    uri: `aa:from${from}`,
+    label: `from ${from}`,
+    domain: `aa:A${from}`,
+    range: `bb:B${to}`,
+    count: 1,
+  })),
+};
+
+/**
+ * The two regions of `SHELF_PAIR_GRAPH` side by side, joined by three
+ * bridges, box to box across, the middle one with no statements.
+ */
+export const NEIGHBOUR_TRIO_GRAPH: ClassGraphInput = {
+  classes: SHELF_PAIR_GRAPH.classes,
+  relations: ["0", "1", "2"].map((index) => ({
+    uri: `aa:to${index}`,
+    label: `to ${index}`,
+    domain: `aa:A${index}`,
+    range: `bb:B${index}`,
+    count: index === "1" ? 0 : 1,
+  })),
 };
 
 /**
@@ -222,6 +352,118 @@ export const SHELF_PAIR_GRAPH: ClassGraphInput = {
 export const STACKED_PAIR_GRAPH: ClassGraphInput = {
   classes: [defineClass("aa:A", "A"), defineClass("bb:B", "B")],
   relations: [
-    { uri: "aa:reaches", label: "reaches", domain: "aa:A", range: "bb:B" },
+    {
+      uri: "aa:reaches",
+      label: "reaches",
+      domain: "aa:A",
+      range: "bb:B",
+      count: 1,
+    },
   ],
+};
+
+/**
+ * Three regions of three classes each, two of them in a subclass chain,
+ * and three bridges: two between the same two regions, one of those with
+ * no statements and the other bundling two relations of one name, and one
+ * on to the third region.
+ */
+export const BRIDGE_TRIO_GRAPH: ClassGraphInput = {
+  classes: ["aa", "bb", "cc"].flatMap((prefix) =>
+    ["0", "1", "2"].map((label) =>
+      defineClass(`${prefix}:${label}`, `${prefix} ${label}`, {
+        ...(label === "2" ? { superclass: `${prefix}:1` } : {}),
+      }),
+    ),
+  ),
+  relations: [
+    {
+      uri: "aa:holds",
+      label: "holds",
+      domain: "aa:0",
+      range: "bb:0",
+      count: 3,
+    },
+    {
+      uri: "bb:holds",
+      label: "holds",
+      domain: "bb:0",
+      range: "aa:0",
+      count: 1,
+    },
+    {
+      uri: "aa:lacks",
+      label: "lacks",
+      domain: "aa:1",
+      range: "bb:2",
+      count: 0,
+    },
+    {
+      uri: "bb:feeds",
+      label: "feeds",
+      domain: "bb:1",
+      range: "cc:0",
+      count: 12,
+    },
+    {
+      uri: "cc:loops",
+      label: "loops",
+      domain: "cc:0",
+      range: "cc:1",
+      count: 2,
+    },
+  ],
+};
+
+/**
+ * A generated namespace of `size` classes, `<prefix>:C0` to
+ * `<prefix>:C<size - 1>`, in one tree: each class below the first a
+ * subclass of the one a quarter of its number down.
+ */
+export function defineRegion(
+  prefix: string,
+  size: number,
+): readonly GraphClassInput[] {
+  return Array.from({ length: size }, (_, index) =>
+    defineClass(`${prefix}:C${index}`, `${prefix} ${index}`, {
+      ...(index === 0
+        ? {}
+        : { superclass: `${prefix}:C${Math.floor((index - 1) / 4)}` }),
+      instanceCount: index,
+    }),
+  );
+}
+
+/**
+ * The docs site's four namespaces: the captured design-system, code
+ * standards and anatomy classes (35, whose relations reach the stubs
+ * `rdf:List` and `dt:TokenSymbol`), and a generated `surface` namespace
+ * of 31 classes in the captures' stead, whose relations reach a `ds`
+ * class and a third external class.
+ */
+export const FOUR_NAMESPACE_GRAPH: ClassGraphInput = {
+  classes: [...ontologyGraph.classes, ...defineRegion("surface", 31)],
+  relations: [
+    ...ontologyGraph.relations,
+    {
+      uri: "surface:shows",
+      label: "shows",
+      domain: "surface:C0",
+      range: "https://ds.canonical.com/UIBlock",
+      count: 4,
+    },
+    {
+      uri: "surface:lists",
+      label: "lists",
+      domain: "surface:C1",
+      range: "https://example.org/vocab/Shelf",
+      count: null,
+    },
+  ],
+};
+
+/** One generated namespace of 60 classes: more than a budget draws. */
+export const SIXTY_CLASS_GRAPH: ClassGraphInput = {
+  classes: defineRegion("big", 60),
+  relations: [],
 };

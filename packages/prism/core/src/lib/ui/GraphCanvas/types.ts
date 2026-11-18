@@ -112,7 +112,9 @@ type OwnProps = {
    * one, and never into the overview: a box too large for the overview's
    * floor shows the window of it `legibleWindow` chooses at that floor, or
    * its top-left corner at that floor. The visible part of the graph under
-   * a filter; the graph's whole bounds when omitted.
+   * a filter. When omitted, the Fit control and the `0` key restore the
+   * view `opening` asks for, where one is given, and otherwise fit the
+   * graph's whole bounds.
    */
   readonly fit?: GraphBox;
   /**
@@ -129,6 +131,14 @@ type OwnProps = {
    * a box is shown from its top-left corner at that floor.
    */
   readonly legibleWindow?: GraphLegibleWindow;
+  /**
+   * Whether the Fit control and the `0` key keep to the legible zoom when
+   * they fit `fit`, or the graph's bounds: a box that fits there or above
+   * is fitted whole, and a larger one shows the window of it
+   * `legibleWindow` chooses at the legible zoom, or its top-left corner
+   * there. When omitted, they fit down to the overview's floor.
+   */
+  readonly legibleFit?: boolean;
   /**
    * Where the canvas keeps its camera as it moves, and resumes it from
    * when it mounts again: a ref its owner keeps beyond the canvas's life.

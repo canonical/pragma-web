@@ -8,16 +8,30 @@ import {
   REGION_LABEL_GAP,
   REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
+  RouterLink,
   requireDefined,
   requireEntry,
   useGraphZoomBucket,
 } from "@canonical/prism-core";
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
-import type { ReactElement, ReactNode } from "react";
+import { type ReactElement, type ReactNode, useMemo } from "react";
+import {
+  BRIDGE_LABEL_SIZE,
+  ZERO_STROKE_DASH,
+} from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
+import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
+import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
+import nameRegionBox from "../../classGraph/nameRegionBox.js";
+import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
-import type { LaidOutEdge, LaidOutNode } from "../../classGraph/types.js";
+import type {
+  LaidOutEdge,
+  LaidOutNode,
+  LaidOutRegion,
+} from "../../classGraph/types.js";
+import weighStroke from "../../classGraph/weighStroke.js";
 import { useMessages } from "../../i18n/index.js";
 import {
   EDGE_HIT_WIDTH,
@@ -27,6 +41,7 @@ import {
   RING_OFFSET,
   RING_RADIUS,
   RING_STROKE,
+  STUB_FRAME_RADIUS,
 } from "./constants.js";
 import type { ClassGraphProps } from "./types.js";
 import "./styles.css";
@@ -42,14 +57,20 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * The class graph drawn in native SVG, in the layers it paints in: the
  * namespace regions (a label row over a hairline rule), the subclass buses
  * with one hollow arrowhead at each superclass, the relations with their
- * filled arrowheads at each range, the classes as `EntityGraphNode`s, and
- * the focus's edge labels on a halo. Every coordinate comes from the
+ * filled arrowheads at each range, each stroked by its weight (1, 2, 4 or
+ * 8px by the decade of the statements it covers, a heavy line ending
+ * inside a head grown to its width; 1px dashed, in the same colour, where
+ * none does; a legend's specimen, which no store counts, at the lightest solid
+ * stroke with no weight attribute), a bridge (a relation between two
+ * regions) in the strong line with its label at a region prefix's size at
+ * rest, the classes as `EntityGraphNode`s, and the focus's edge labels on
+ * a halo. Every coordinate comes from the
  * layout, and every geometric fact and encoding is readable from its data
  * attributes, so a script measures the drawing with no browser.
  *
  * The reader's state never moves anything: a focus fades every class and
- * edge outside its neighbourhood and draws its relations in the accent at
- * 2px; a selection draws its lineage at 2px and rings its class in the
+ * edge outside its neighbourhood and draws its relations in the accent, at
+ * 2px at least; a selection draws its lineage at 2px and rings its class in the
  * accent; a hovered or keyboard-focused class is ringed in the focus
  * colour; the filter hides classes and the edges that lose an end; the
  * search dims. The text follows the zoom bucket of the canvas it is drawn
@@ -58,6 +79,11 @@ function joinClasses(...names: readonly (string | false)[]): string {
  * With a tab stop each class is a router link to its term view, one tab
  * stop in all, named for assistive technology by its kind, namespace and
  * counts; without one the classes are inert boxes, as a legend draws them.
+ * With drill links too, on the explorer's index, a collapsed namespace's
+ * box is a link to the same page drilled into it (core's `expand=`), a
+ * tab stop of its own named by what it holds and that it opens, and the
+ * drilled namespace's label row is the way back, a link to the page
+ * without `expand=`.
  *
  * `import { ClassGraph } from "../ClassGraph/index.js";`
  *
@@ -76,6 +102,7 @@ export default function ClassGraph({
   dimmed = new Set(),
   labels = { placed: [], omitted: [] },
   tabStop,
+  buildDrillHref,
   className,
   ...props
 }: ClassGraphProps): ReactElement {
@@ -92,7 +119,10 @@ export default function ClassGraph({
     selected === undefined || focus !== selected
       ? []
       : traceChainToRoot(layout, selected);
-  const termOf = (uri: string): string => requireEntry(terms, uri);
+  // A stub or a collapsed region carries its own term; a class's is the
+  // explorer's.
+  const termOf = (uri: string): string =>
+    layout.nodes.get(uri)?.term ?? requireEntry(terms, uri);
   const isHidden = (edge: LaidOutEdge): boolean =>
     hidden.has(edge.from) || edge.to.every((id) => hidden.has(id));
   const isFaded = (edge: LaidOutEdge): boolean =>
@@ -103,35 +133,46 @@ export default function ClassGraph({
     neighbourhood.edges.has(edge.id);
 
   const drawEdge = (edge: LaidOutEdge): ReactNode => {
-    const relation = edge.kind === "relation";
+    const bundle =
+      edge.kind === "relation"
+        ? requireDefined(edge.bundle, "bundle for a relation edge")
+        : undefined;
+    const relation = bundle !== undefined;
     const role = relation ? "relation" : "subclass";
+    const bridge = edge.bridge === true && "is-bridge";
     const state = isHidden(edge)
       ? "is-hidden"
       : isFocus(edge)
         ? "is-focus"
         : isFaded(edge) && "is-faded";
+    // A legend's specimen is counted by no store: the lightest solid
+    // stroke, with no weight to claim.
+    const { d, heads, width, dash } = fitRelationStroke(
+      edge.d,
+      edge.heads,
+      bundle?.weight === undefined ? undefined : weighStroke(bundle.weight),
+    );
     return (
       <g data-edge={edge.id} key={edge.id}>
         <path
-          className={joinClasses(role, state)}
-          d={edge.d}
-          data-count={
-            relation
-              ? requireDefined(edge.bundle, "bundle for a relation edge")
-                  .relations.length
-              : edge.to.length
-          }
+          className={joinClasses(role, bridge, state)}
+          d={d}
+          data-count={bundle?.relations.length ?? edge.to.length}
           data-from={termOf(edge.from)}
           data-kind={edge.kind}
           data-to={edge.to.map(termOf).join(" ")}
+          data-weight={bundle?.weight}
           fill="none"
           stroke="currentColor"
-          strokeWidth={state === "is-focus" ? FOCUS_STROKE : EDGE_STROKE}
+          strokeDasharray={dash}
+          strokeWidth={
+            state === "is-focus" ? Math.max(width, FOCUS_STROKE) : width
+          }
         />
-        {edge.heads.map((head) =>
+        {heads.map((head) =>
           relation ? (
             <path
-              className={joinClasses("filled-head", state)}
+              className={joinClasses("filled-head", bridge, state)}
               d={head}
               fill="currentColor"
               key={head}
@@ -173,38 +214,88 @@ export default function ClassGraph({
       : isFadedNode
         ? "is-faded"
         : dimmed.has(node.uri) && "is-dimmed";
-    const showText = bucket === "full" || (bucket === "hubs" && node.hub);
+    // Every text follows the zoom buckets, so none is drawn under 12px on
+    // screen: a collapsed region's 16px name is drawn wherever a hub's is,
+    // and what it holds, at 14px, only at full; a stub's 14px name at full,
+    // as a class's.
+    const region = node.kind === "region";
+    const showText =
+      bucket === "full" || (bucket === "hubs" && (node.hub || region));
     const box = (
       <EntityGraphNode
         count={bucket === "full" ? (node.count ?? undefined) : undefined}
         height={node.h}
         hollow={node.abstract}
-        prominent={node.hub}
+        kind={
+          region && bucket === "full"
+            ? t("well.region.holds", {
+                classes: t("well.region.count", { count: node.members }),
+                relations: t("well.relations.count", { count: node.held }),
+              })
+            : undefined
+        }
+        prominent={node.hub || region}
         showText={showText}
         title={node.label}
         width={node.w}
       />
     );
     const ring = ringed.has(node.uri) || node.uri === selected;
+    // A box opens its namespace wherever the page drills, whatever else
+    // the graph links, every namespace boxed included; a stub, and a box
+    // elsewhere, hold no link.
+    const opens = region && buildDrillHref !== undefined;
+    const regionName = region ? nameRegionBox(layout, node, t) : undefined;
     return (
       <g
         className={joinClasses("node", state)}
+        // An inert stub or box is an image the group names; a link names
+        // itself.
+        aria-label={
+          node.kind === "stub"
+            ? t("well.name.stub", {
+                term,
+                relations: t("well.relations.count", {
+                  count: node.relationCount,
+                }),
+              })
+            : regionName !== undefined && !opens
+              ? t("well.name.region", regionName)
+              : undefined
+        }
+        data-classes={node.kind === "region" ? node.members : undefined}
         data-col={node.col}
         data-degree={node.degree}
         data-h={node.h}
         data-hub={String(node.hub)}
         data-id={term}
-        data-instances={node.instanceCount}
-        data-kind={node.abstract ? "abstract" : "concrete"}
+        data-instances={node.kind === "class" ? node.instanceCount : undefined}
+        data-kind={
+          node.kind !== "class"
+            ? node.kind
+            : node.abstract
+              ? "abstract"
+              : "concrete"
+        }
         data-lifecycle="none"
         data-ns={node.region}
         data-w={node.w}
         data-x={node.x}
         data-y={node.y}
         key={node.uri}
+        role={node.kind === "class" || opens ? undefined : "img"}
         transform={`translate(${node.x},${node.y})`}
       >
-        {tabStop === undefined ? (
+        {opens && regionName !== undefined ? (
+          // Not the current page: the drill is another view of it.
+          <RouterLink
+            aria-label={t("well.name.region.open", regionName)}
+            className="target"
+            href={buildDrillHref(node.region)}
+          >
+            {box}
+          </RouterLink>
+        ) : tabStop === undefined || node.kind !== "class" ? (
           box
         ) : (
           <Link
@@ -224,6 +315,21 @@ export default function ClassGraph({
             {box}
           </Link>
         )}
+        {node.kind === "stub" ? (
+          // The floor's colour cuts the box's frame into dashes.
+          <rect
+            className="stub-frame"
+            fill="none"
+            height={node.h - EDGE_STROKE}
+            rx={STUB_FRAME_RADIUS}
+            stroke="currentColor"
+            strokeDasharray={ZERO_STROKE_DASH}
+            strokeWidth={EDGE_STROKE}
+            width={node.w - EDGE_STROKE}
+            x={EDGE_STROKE / 2}
+            y={EDGE_STROKE / 2}
+          />
+        ) : null}
         {ring ? (
           <rect
             className={joinClasses(
@@ -244,11 +350,72 @@ export default function ClassGraph({
     );
   };
 
+  // A bridge's label is drawn at rest, unless the focus fades it or the
+  // focus's own labels, drawn only at full zoom, name it. A bridge whose
+  // label finds no place at rest is named whenever a class at one of its
+  // ends is the focus, at every zoom that draws labels, unless the focus's
+  // own labels name it.
+  const bridgeLabels = useMemo(() => placeBridgeLabels(layout, t), [layout, t]);
+  const focusLabelled = new Set(
+    bucket === "full" ? labels.placed.map((label) => label.edge) : [],
+  );
+  const edgeOf = (id: string): LaidOutEdge =>
+    requireDefined(
+      layout.edges.find((candidate) => candidate.id === id),
+      "a bridge's edge",
+    );
+  const restingLabels = bridgeLabels.placed.filter((label) => {
+    const edge = edgeOf(label.edge);
+    return !focusLabelled.has(label.edge) && !isHidden(edge) && !isFaded(edge);
+  });
+  const focusedLabels = bridgeLabels.onFocus.filter((label) => {
+    const edge = edgeOf(label.edge);
+    return (
+      focus !== undefined &&
+      [edge.from, ...edge.to].includes(focus) &&
+      !focusLabelled.has(label.edge) &&
+      !isHidden(edge)
+    );
+  });
+  const bridgeBaseline = findCentredBaseline(
+    BRIDGE_LABEL_SIZE + 2 * LABEL_HALO,
+    BRIDGE_LABEL_SIZE,
+  );
   const regionBaseline = findCentredBaseline(
     REGION_LABEL_ROW,
     REGION_LABEL_SIZE,
   );
   const labelBaseline = findCentredBaseline(LABEL_LINE_PITCH, LABEL_SIZE);
+  // The drilled namespace's label row is the way back to the overview at
+  // rest, wherever its boxes would open. Its whole row takes the pointer,
+  // not only the glyphs, and stays at every zoom: zoomed out past the
+  // labels, the row is still the link, with no text.
+  const wrapWayBack = (
+    region: LaidOutRegion,
+    label: ReactElement | null,
+  ): ReactElement | null =>
+    buildDrillHref !== undefined && layout.drilled === region.prefix ? (
+      <RouterLink
+        aria-label={t("well.region.back", {
+          prefix: region.prefix,
+          classes: t("well.region.count", { count: region.members }),
+        })}
+        className="way-back"
+        href={buildDrillHref(undefined)}
+      >
+        <rect
+          fill="none"
+          height={REGION_LABEL_ROW}
+          pointerEvents="all"
+          width={measureRegionHeading(region.prefix, region.members, true)}
+          x={region.x}
+          y={region.y}
+        />
+        {label}
+      </RouterLink>
+    ) : (
+      label
+    );
   return (
     <g
       {...props}
@@ -258,7 +425,7 @@ export default function ClassGraph({
         {layout.regions.map((region) => (
           <g
             className="region"
-            data-classes={region.ids.length}
+            data-classes={region.members}
             data-columns={region.columns}
             data-h={region.h}
             data-ns={region.prefix}
@@ -275,20 +442,32 @@ export default function ClassGraph({
               x={region.x}
               y={region.y}
             />
-            {bucket === "overview" ? null : (
-              <text
-                className="region-label"
-                fill="currentColor"
-                x={region.x}
-                y={region.y + regionBaseline}
-              >
-                <tspan className="prefix">{region.prefix.toUpperCase()}</tspan>
-                {bucket === "full" ? (
-                  <tspan className="count" dx={REGION_LABEL_GAP}>
-                    {t("well.region.count", { count: region.ids.length })}
+            {wrapWayBack(
+              region,
+              bucket === "overview" ? null : (
+                <text
+                  className="region-label"
+                  fill="currentColor"
+                  x={region.x}
+                  y={region.y + regionBaseline}
+                >
+                  <tspan className="prefix">
+                    {region.prefix.toUpperCase()}
                   </tspan>
-                ) : null}
-              </text>
+                  {bucket === "full" ? (
+                    <tspan className="count" dx={REGION_LABEL_GAP}>
+                      {t("well.region.count", { count: region.members })}
+                    </tspan>
+                  ) : null}
+                  {bucket === "full" &&
+                  buildDrillHref !== undefined &&
+                  layout.drilled === region.prefix ? (
+                    <tspan className="back" dx={REGION_LABEL_GAP}>
+                      {t("well.region.back.words")}
+                    </tspan>
+                  ) : null}
+                </text>
+              ),
             )}
           </g>
         ))}
@@ -315,6 +494,35 @@ export default function ClassGraph({
         {layout.rail.map((uri) => drawNode(requireEntry(layout.nodes, uri)))}
       </g>
       <g className="label-layer" data-layer="labels">
+        {bucket === "overview"
+          ? null
+          : [...restingLabels, ...focusedLabels].map((label) => (
+              <g data-edge={label.edge} key={label.edge}>
+                {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
+                <text
+                  aria-hidden="true"
+                  className="label-halo is-bridge"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  strokeWidth={LABEL_HALO_STROKE}
+                  textAnchor="middle"
+                  x={label.cx}
+                  y={label.box.y + bridgeBaseline}
+                >
+                  {label.text}
+                </text>
+                <text
+                  className="edge-label is-bridge"
+                  fill="currentColor"
+                  textAnchor="middle"
+                  x={label.cx}
+                  y={label.box.y + bridgeBaseline}
+                >
+                  {label.text}
+                </text>
+              </g>
+            ))}
         {bucket === "full"
           ? labels.placed.map((label) => {
               const lines = label.lines.map((line, index) => (

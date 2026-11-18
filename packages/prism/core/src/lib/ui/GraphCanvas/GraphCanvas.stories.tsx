@@ -6,7 +6,10 @@ import {
   GraphBudgetProvider,
   useGraphBudget,
 } from "../../graphBudget/index.js";
-import type { LayeredBundle, RegionLayout } from "../../graphLayout/index.js";
+import type {
+  GraphLayoutResult,
+  LayeredBundle,
+} from "../../graphLayout/index.js";
 import { formatPathData, layoutLayered } from "../../graphLayout/index.js";
 import Component from "./GraphCanvas.js";
 
@@ -53,7 +56,7 @@ const drawing = (
 );
 
 /** Four nodes and one relation, as the layered engine reads them. */
-const layered: RegionLayout = (() => {
+const layered: GraphLayoutResult = (() => {
   const box = { w: 96, h: 32, hub: false, loop: false, loopExtent: 0 };
   const bundle: LayeredBundle = {
     id: "b c",

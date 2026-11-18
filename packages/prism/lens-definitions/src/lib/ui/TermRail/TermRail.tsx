@@ -142,17 +142,34 @@ export default function TermRail({
       </p>
       {data.map((ontology) => {
         const namespaces = [ontology];
+        // The rail lists every class, whatever the graph draws: a
+        // namespace the graph collapses to one box is listed in its own
+        // tree's order, under a heading that says so.
+        const boxed = layout.regions.find(
+          (region) => region.prefix === ontology.prefix && region.collapsed,
+        )?.boxed;
+        const order =
+          boxed === undefined
+            ? undefined
+            : new Map(
+                boxed.map(({ uri, depth }, index) => [uri, { index, depth }]),
+              );
+        const placeOf = (uri: string): { index: number; depth: number } => {
+          if (order !== undefined) return requireEntry(order, uri);
+          return {
+            index: requireEntry(railIndex, uri),
+            depth: requireEntry(layout.nodes, uri).depth,
+          };
+        };
         const classes = [...ontology.classes]
-          .sort(
-            (a, b) =>
-              requireEntry(railIndex, a.uri) - requireEntry(railIndex, b.uri),
-          )
-          .map((term) => {
+          .map((term) => ({ term, place: placeOf(term.uri) }))
+          .sort((a, b) => a.place.index - b.place.index)
+          .map(({ term, place }) => {
             const prefixed = compactUri(term.uri, namespaces);
             return {
               term,
               prefixed,
-              depth: requireEntry(layout.nodes, term.uri).depth,
+              depth: place.depth,
               dimmed:
                 !matchesDimming(
                   filter,
@@ -189,9 +206,12 @@ export default function TermRail({
               <span className="count">
                 {t("rail.count", {
                   matches: classMatches,
-                  total: classes.length,
+                  total: ontology.classes.length,
                 })}
               </span>
+              {boxed === undefined ? null : (
+                <span className="boxed">{t("rail.region")}</span>
+              )}
             </h3>
             <ul className="list">
               {classes.map(({ term, prefixed, depth, dimmed }) => (

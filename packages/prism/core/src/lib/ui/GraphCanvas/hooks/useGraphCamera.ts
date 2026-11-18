@@ -137,12 +137,15 @@ function prefersReducedMotion(): boolean {
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
  * illegible one: a box too large for the legible zoom shows the window of
- * it `legibleWindow` chooses, or its top-left corner at that zoom. Fit and
- * `0` fit the fit box whole down to the overview's floor (12/16, where the
+ * it `legibleWindow` chooses, or its top-left corner at that zoom. With an
+ * `opening` and no `fit`, Fit and `0` move the camera to where `opening`
+ * asks for the viewport as it is, the page's opening view. Otherwise Fit
+ * and `0` fit the fit box whole down to the overview's floor (12/16, where the
  * 16px hub and region labels still render at 12px) and no further: a box
  * too large for it shows the window of it `legibleWindow` chooses at that
  * floor, or its top-left corner at that floor, the rest a pan away, and
- * the zoom extent's floor follows them down. No fit lands in the overview. When
+ * the zoom extent's floor follows them down; with `legibleFit` they keep
+ * to the legible zoom in the same way. No fit lands in the overview. When
  * `reveal` changes it pans that box into view, without zooming, only if it
  * is not already in view. Every move a control or a prop asks for takes
  * 200ms, and is instant under reduced motion.
@@ -159,6 +162,7 @@ export default function useGraphCamera({
   fit,
   frame,
   legibleWindow,
+  legibleFit = false,
   reveal,
   opening,
   memory,
@@ -175,6 +179,7 @@ export default function useGraphCamera({
     fit,
     frame,
     legibleWindow,
+    legibleFit,
     reveal,
     opening,
     memory,
@@ -185,6 +190,7 @@ export default function useGraphCamera({
     fit,
     frame,
     legibleWindow,
+    legibleFit,
     reveal,
     opening,
     memory,
@@ -228,14 +234,28 @@ export default function useGraphCamera({
   // legible when the camera is legible now. A box too large for the floor
   // shows the window of it `legibleWindow` chooses at that floor, or its
   // top-left corner at that floor without one, the rest a pan away.
+  // Fit and `0` restore the opening instead where there is one and no fit
+  // box, so the control shows what the page opened on.
   const fitBox = useCallback(
-    (box: GraphBox | undefined, keepLegible: boolean): void => {
+    (
+      box: GraphBox | undefined,
+      keepLegible: boolean,
+      restore = false,
+    ): void => {
       const svg = viewport.current;
       /* v8 ignore next -- only a mounted canvas fits, and its viewport ref is attached */
       if (svg === null) return;
       const { scale, visible } = measureViewport(svg, latest.current.viewBox);
+      const { opening } = latest.current;
+      if (restore && box === undefined && opening !== undefined) {
+        moveTo(opening(visible, scale) ?? zoomIdentity);
+        return;
+      }
       const target = box ?? latest.current.bounds;
-      const legible = keepLegible && scale * current.current.k >= HUBS_SCALE;
+      // Fit and `0` on a canvas that asks for it keep the legible zoom.
+      const legible =
+        (restore && latest.current.legibleFit) ||
+        (keepLegible && scale * current.current.k >= HUBS_SCALE);
       const floor = legible ? HUBS_SCALE : OVERVIEW_SCALE;
       const least = (floor * LEGIBLE_NUDGE) / scale;
       const fitsLegibly =
@@ -493,7 +513,10 @@ export default function useGraphCamera({
   return {
     bucket,
     percent,
-    fitView: useCallback(() => fitBox(latest.current.fit, false), [fitBox]),
+    fitView: useCallback(
+      () => fitBox(latest.current.fit, false, true),
+      [fitBox],
+    ),
     zoomIn: useCallback(() => zoomBy(ZOOM_STEP), [zoomBy]),
     zoomOut: useCallback(() => zoomBy(1 / ZOOM_STEP), [zoomBy]),
   };

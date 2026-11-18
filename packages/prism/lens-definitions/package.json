@@ -4,14 +4,16 @@
   "version": "0.44.1",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testing/browser": "./testing/browser/index.ts"
   },
   "files": [
     "src",
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
     "!src/**/*.stories.tsx",
-    "!src/testing"
+    "!src/testing",
+    "testing/browser"
   ],
   "author": {
     "email": "webteam@canonical.com",

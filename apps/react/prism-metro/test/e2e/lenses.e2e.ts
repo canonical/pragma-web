@@ -148,6 +148,26 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(Object.keys(records).length).toBeGreaterThan(0);
   });
 
+  it("draws nothing collapsed at rest, and geo drilled through expand with the metro's namespace a box that opens it", async () => {
+    // The legend draws a namespace's box as its specimen; the graph none.
+    const listBoxes = (page: string): string[] =>
+      [...page.matchAll(/data-kind="region"[^>]*data-ns="([^"]*)"/g)]
+        .map(([, prefix]) => String(prefix))
+        .filter((prefix) => prefix !== "legend");
+    const rest = await fetchPage(script, "/definitions");
+    expect(listBoxes(rest.html)).toEqual([]);
+    expect(rest.html).not.toContain("expand=");
+    const { status, html } = await fetchPage(script, "/definitions?expand=geo");
+    expect(status).toBe(200);
+    expect(html).toMatch(/<g class="node[^"]*"[^>]*data-kind="region"/);
+    expect(html).toMatch(/<g class="node[^"]*"[^>]*data-ns="geo"[^>]*>/);
+    expect(html).toContain('href="/definitions?expand=metro"');
+    expect(html).toMatch(/class="[^"]*way-back"[^>]*href="\/definitions"/);
+    // An unknown prefix draws the overview at rest.
+    const unknown = await fetchPage(script, "/definitions?expand=nowhere");
+    expect(listBoxes(unknown.html)).toEqual([]);
+  });
+
   it("lands an instance chip of the term inspector on the network lens", async () => {
     const { status, html } = await fetchPage(
       script,

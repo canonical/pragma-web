@@ -1,3 +1,4 @@
+import { createTranslator } from "@canonical/i18n-core";
 import {
   ceilTo,
   compareText,
@@ -9,6 +10,8 @@ import {
   requireAt,
   requireEntry,
 } from "@canonical/prism-core";
+import { MESSAGES } from "../i18n/constants.js";
+import type { Translate } from "../i18n/index.js";
 import {
   BOX_HEIGHT,
   BOX_INSET,
@@ -20,17 +23,20 @@ import {
   HUB_LOOP_EXTENT,
   HUB_MIN_DEGREE,
   LOOP_EXTENT,
+  MEASURED_LOCALE,
+  REGION_BOX_MIN_WIDTH,
   WRAPPED_HEIGHT,
 } from "./constants.js";
 import type {
+  AnyRelationInput,
   Bundle,
   ClassGraphInput,
   ClassGraphModel,
   ClassModel,
   DrawnRelation,
   GraphClassInput,
-  GraphRelationInput,
   RegionJoin,
+  SpecimenGraphInput,
 } from "./types.js";
 
 /** A class's box and label, before the layout places it. */
@@ -44,9 +50,41 @@ type BoxGeometry = Pick<
  * abstract) flush left at an 8px inset, then the instance count, when there
  * is one, before the right inset; the width rounded up to the lattice and
  * kept between 96 and 208px. A label too long for the widest box wraps to
- * two lines, the second ellipsised.
+ * two lines, the second ellipsised. A collapsed region's box is a hub's
+ * height, for its prefix at a hub's size over the classes and relations
+ * it holds, and at least 128px wide.
  */
-function sizeBox(klass: GraphClassInput, hub: boolean): BoxGeometry {
+function sizeBox(
+  klass: GraphClassInput,
+  hub: boolean,
+  measured: Translate,
+): BoxGeometry {
+  if (klass.kind === "region") {
+    // Its prefix at a hub's 16px over what it holds at 14px, both within
+    // the insets: the line measured as the catalog's English sets it.
+    const box = sizeBox({ ...klass, kind: "class" }, true, measured);
+    const holds = measureTextWidth(
+      measured("well.region.holds", {
+        classes: measured("well.region.count", {
+          count: klass.members ?? 1,
+        }),
+        relations: measured("well.relations.count", {
+          count: klass.held ?? 0,
+        }),
+      }),
+      "regular",
+      LABEL_SIZE,
+    );
+    return {
+      ...box,
+      w: Math.max(
+        REGION_BOX_MIN_WIDTH,
+        box.w,
+        ceilTo(2 * BOX_INSET + holds, LATTICE),
+      ),
+      h: Math.max(HUB_HEIGHT, box.h),
+    };
+  }
   const size = hub ? HUB_LABEL_SIZE : LABEL_SIZE;
   const face: FontFace = klass.abstract ? "boldItalic" : "bold";
   const count =
@@ -94,7 +132,7 @@ function sizeBox(klass: GraphClassInput, hub: boolean): BoxGeometry {
 /**
  * Bundle the drawn relations by unordered pair: one bundle per pair, its
  * relations by label, its arrowheads at the ends that are some relation's
- * range.
+ * range, its weight its heaviest counted relation's count.
  */
 function bundleRelations(
   relations: readonly DrawnRelation[],
@@ -131,8 +169,24 @@ function bundleRelations(
           a !== b &&
           sorted.some((relation) => relation.domain === a) &&
           sorted.some((relation) => relation.domain === b),
+        weight: weighBundle(sorted),
       };
     });
+}
+
+/**
+ * Weigh a bundle by its heaviest counted relation's count.
+ *
+ * @param relations - The bundle's relations: all of the data, or all a
+ *   legend's specimens.
+ * @returns The largest count, or `undefined` for specimens and for a
+ *   bundle none of whose relations is counted.
+ */
+function weighBundle(relations: readonly DrawnRelation[]): number | undefined {
+  const counts = relations.flatMap((relation) =>
+    "count" in relation && relation.count !== null ? [relation.count] : [],
+  );
+  return counts.length === 0 ? undefined : Math.max(...counts);
 }
 
 /**
@@ -181,13 +235,23 @@ function breakSuperclassCycles(
  * superclass cycle broken, the subclass hierarchy split into in-region parents and cross-region joins,
  * the drawn relations (both ends drawn) bundled by pair, the hubs (four or
  * more incident edges after bundling, at most six, the subclass roots
- * always) and the regions, largest first.
+ * always) and the regions, largest first, with the relations that reach
+ * an IRI no class of the input holds.
  *
+ * @param input - The data's classes and counted relations, or a legend
+ *   specimen's.
+ * @param whole - The whole graph's model, when the input is what a view
+ *   draws of it: each class it holds keeps its degree and hub there, so a
+ *   class whose relations run into a box stays the hub it is.
  * @returns The model the layout places.
  */
 export default function buildClassGraphModel(
-  input: ClassGraphInput,
+  input: ClassGraphInput | SpecimenGraphInput,
+  whole?: ClassGraphModel,
 ): ClassGraphModel {
+  const relations: readonly AnyRelationInput[] = input.relations;
+  // The catalog a box's text is measured in, the same in every locale.
+  const measured = createTranslator(MEASURED_LOCALE, MESSAGES);
   const classes = breakSuperclassCycles(
     [...input.classes].sort((a, b) => compareText(a.uri, b.uri)),
   );
@@ -211,13 +275,22 @@ export default function buildClassGraphModel(
     }
   }
 
-  const isDrawn = (relation: GraphRelationInput): relation is DrawnRelation =>
+  const isDrawn = (relation: AnyRelationInput): relation is DrawnRelation =>
     relation.domain !== null &&
     relation.range !== null &&
     inputs.has(relation.domain) &&
     inputs.has(relation.range);
-  const drawnRelations = input.relations
+  const drawnRelations = relations
     .filter(isDrawn)
+    .sort((a, b) => compareText(a.uri, b.uri));
+  const external = relations
+    .filter(
+      (relation): relation is DrawnRelation =>
+        relation.domain !== null &&
+        relation.range !== null &&
+        inputs.has(relation.domain) &&
+        !inputs.has(relation.range),
+    )
     .sort((a, b) => compareText(a.uri, b.uri));
   const bundles = bundleRelations(drawnRelations, prefixOf);
 
@@ -269,9 +342,12 @@ export default function buildClassGraphModel(
     if (!hubs.includes(root)) hubs = [...hubs.slice(0, HUB_CAP - 1), root];
   }
 
+  // A class of the whole graph keeps the whole graph's degree and hub,
+  // whatever the drawing collapses into a box.
+  const wholeOf = (uri: string): ClassModel | undefined => whole?.byId.get(uri);
   const byId = new Map<string, ClassModel>(
     classes.map((klass) => {
-      const hub = hubs.includes(klass.uri);
+      const hub = wholeOf(klass.uri)?.hub ?? hubs.includes(klass.uri);
       const loop = bundles.some(
         (bundle) => bundle.self && bundle.a === klass.uri,
       );
@@ -279,12 +355,15 @@ export default function buildClassGraphModel(
         klass.uri,
         {
           ...klass,
-          ...sizeBox(klass, hub),
+          kind: klass.kind ?? "class",
+          members: klass.members ?? 1,
+          held: klass.held ?? 0,
+          ...sizeBox(klass, hub, measured),
           hub,
-          degree: requireEntry(degree, klass.uri),
+          degree: wholeOf(klass.uri)?.degree ?? requireEntry(degree, klass.uri),
           loop,
           loopExtent: loop ? (hub ? HUB_LOOP_EXTENT : LOOP_EXTENT) : 0,
-          relationCount: input.relations.filter(
+          relationCount: relations.filter(
             (relation) =>
               relation.domain === klass.uri || relation.range === klass.uri,
           ).length,
@@ -314,5 +393,6 @@ export default function buildClassGraphModel(
     joins,
     regionOrder,
     drawnRelations,
+    external,
   };
 }

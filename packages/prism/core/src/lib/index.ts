@@ -30,7 +30,6 @@ export {
   useGraphBudget,
 } from "./graphBudget/index.js";
 export type {
-  CrossPort,
   FontFace,
   GraphLayout,
   GraphLayoutEdge,
@@ -38,16 +37,13 @@ export type {
   GraphLayoutOptions,
   GraphLayoutResult,
   LabelledBundle,
-  LabelledLayout,
   LabelPlacement,
   LayeredBundle,
   LayeredEdges,
-  LayeredModel,
   LayeredNodes,
   PathCommand,
   Point,
   Rect,
-  RegionLayout,
 } from "./graphLayout/index.js";
 export {
   ARC_BASE,
@@ -68,7 +64,6 @@ export {
   LABEL_LINE_PITCH,
   LABEL_SIZE,
   LATTICE,
-  layOutRegion,
   layoutLayered,
   measurePathBounds,
   measureRegionLabelWidth,

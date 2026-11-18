@@ -1,7 +1,7 @@
 import {
   compareText,
+  type GraphLayoutResult,
   orderBy,
-  type RegionLayout,
   requireAt,
   requireEntry,
 } from "@canonical/prism-core";
@@ -20,11 +20,13 @@ import type { ClassGraphModel } from "./types.js";
  */
 export default function orderRail(
   model: ClassGraphModel,
-  region: RegionLayout,
+  region: GraphLayoutResult,
 ): string[] {
-  const firstColumn = requireAt(region.columns, 0).filter((id) =>
-    region.nodes.has(id),
-  );
+  // The first layer's classes, top to bottom and column by column: a
+  // full first layer takes several columns.
+  const firstColumn = region.columns
+    .flat()
+    .filter((id) => region.nodes.has(id) && region.layerOf(id) === 0);
   const rootOf = (id: string): string => {
     const parent = model.parent.get(id);
     return parent === undefined ? id : rootOf(parent);
@@ -36,7 +38,7 @@ export default function orderRail(
     const root = rootOf(id);
     if (
       firstColumn.includes(root) &&
-      (model.parent.has(id) || region.columnOf(id) === 0)
+      (model.parent.has(id) || region.layerOf(id) === 0)
     ) {
       return firstColumn.indexOf(root);
     }
@@ -48,8 +50,9 @@ export default function orderRail(
     firstColumn.map((id, index) => [id, [index, 0, 0, 0]]),
   );
   region.columns.forEach((stack, column) => {
-    if (column === 0) return;
-    const classes = stack.filter((id) => region.nodes.has(id));
+    const classes = stack.filter(
+      (id) => region.nodes.has(id) && region.layerOf(id) > 0,
+    );
     let lastTree = -1;
     let previous = -1;
     classes.forEach((id, position) => {

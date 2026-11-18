@@ -5,18 +5,22 @@ import {
   LATTICE,
   REGION_LABEL_GAP,
   REGION_LABEL_SIZE,
+  RouterLink,
   requireEntry,
 } from "@canonical/prism-core";
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type { ReactElement } from "react";
-import { PHONE } from "../../../../classGraph/constants.js";
+import { PHONE, ZERO_STROKE_DASH } from "../../../../classGraph/constants.js";
+import nameRegionBox from "../../../../classGraph/nameRegionBox.js";
 import type { LaidOutEdge } from "../../../../classGraph/types.js";
 import { useMessages } from "../../../../i18n/index.js";
 import {
+  EDGE_STROKE,
   RING_OFFSET,
   RING_RADIUS,
   RING_STROKE,
+  STUB_FRAME_RADIUS,
 } from "../../../ClassGraph/constants.js";
 import type { PhoneGraphProps } from "./types.js";
 import "./styles.css";
@@ -46,6 +50,7 @@ export default function PhoneGraph({
   hidden,
   dimmed,
   selected,
+  buildDrillHref,
   className,
   ...props
 }: PhoneGraphProps): ReactElement {
@@ -65,6 +70,37 @@ export default function PhoneGraph({
     );
   const isEdgeHidden = (edge: LaidOutEdge): boolean =>
     hidden.has(edge.from) || edge.to.every((id) => hidden.has(id));
+  // The drilled namespace's header is the way back to the overview at rest.
+  // Its whole row takes the pointer, not only the glyphs.
+  const wrapWayBack = (
+    header: {
+      readonly prefix: string;
+      readonly y: number;
+      readonly count: number;
+    },
+    label: ReactElement,
+  ): ReactElement =>
+    buildDrillHref !== undefined && layout.drilled === header.prefix ? (
+      <RouterLink
+        aria-label={t("well.region.back", {
+          prefix: header.prefix,
+          classes: t("well.region.count", { count: header.count }),
+        })}
+        className="way-back"
+        href={buildDrillHref(undefined)}
+      >
+        <rect
+          fill="none"
+          height={PHONE.header}
+          pointerEvents="all"
+          width={phone.width}
+          y={header.y}
+        />
+        {label}
+      </RouterLink>
+    ) : (
+      label
+    );
   return (
     // biome-ignore lint/a11y/useSemanticElements: an SVG drawing has no native grouping element; `group` names the drawing and keeps its links reachable.
     <svg
@@ -107,16 +143,25 @@ export default function PhoneGraph({
             width={phone.width}
             y={header.y}
           />
-          <text
-            className="header"
-            fill="currentColor"
-            y={header.y + headerBaseline}
-          >
-            <tspan className="prefix">{header.prefix.toUpperCase()}</tspan>
-            <tspan className="count" dx={REGION_LABEL_GAP}>
-              {t("well.region.count", { count: header.count })}
-            </tspan>
-          </text>
+          {wrapWayBack(
+            header,
+            <text
+              className="header"
+              fill="currentColor"
+              y={header.y + headerBaseline}
+            >
+              <tspan className="prefix">{header.prefix.toUpperCase()}</tspan>
+              <tspan className="count" dx={REGION_LABEL_GAP}>
+                {t("well.region.count", { count: header.count })}
+              </tspan>
+              {buildDrillHref !== undefined &&
+              layout.drilled === header.prefix ? (
+                <tspan className="back" dx={REGION_LABEL_GAP}>
+                  {t("well.region.back.words")}
+                </tspan>
+              ) : null}
+            </text>,
+          )}
         </g>
       ))}
       {phone.guides.map((guide) => (
@@ -144,8 +189,23 @@ export default function PhoneGraph({
       {layout.rail.map((uri) => {
         const row = requireEntry(phone.rows, uri);
         const node = requireEntry(layout.nodes, uri);
-        const term = requireEntry(terms, uri);
+        // A stub or a collapsed region carries its own term; a stub is no
+        // link, nor a box on a term page.
+        const term = node.term ?? requireEntry(terms, uri);
         const isSelected = uri === selected;
+        const box = (
+          <EntityGraphNode
+            count={
+              node.kind === "region"
+                ? t("well.region.count", { count: node.members })
+                : (node.count ?? undefined)
+            }
+            height={row.h}
+            hollow={node.abstract}
+            title={node.label}
+            width={row.w}
+          />
+        );
         return (
           <g
             className={[
@@ -156,18 +216,43 @@ export default function PhoneGraph({
               .filter(Boolean)
               .join(" ")}
             data-id={term}
+            data-kind={node.kind}
             key={uri}
             transform={`translate(${row.x},${row.y})`}
           >
-            <Link className="target" params={{ term }} to="definitionsTerm">
-              <EntityGraphNode
-                count={node.count ?? undefined}
-                height={row.h}
-                hollow={node.abstract}
-                title={node.label}
-                width={row.w}
+            {node.kind === "class" ? (
+              <Link className="target" params={{ term }} to="definitionsTerm">
+                {box}
+              </Link>
+            ) : node.kind === "region" && buildDrillHref !== undefined ? (
+              <RouterLink
+                aria-label={t(
+                  "well.name.region.open",
+                  nameRegionBox(layout, node, t),
+                )}
+                className="target"
+                href={buildDrillHref(node.region)}
+              >
+                {box}
+              </RouterLink>
+            ) : (
+              box
+            )}
+            {node.kind === "stub" ? (
+              // The floor's colour cuts the box's frame into dashes.
+              <rect
+                className="stub-frame"
+                fill="none"
+                height={row.h - EDGE_STROKE}
+                rx={STUB_FRAME_RADIUS}
+                stroke="currentColor"
+                strokeDasharray={ZERO_STROKE_DASH}
+                strokeWidth={EDGE_STROKE}
+                width={row.w - EDGE_STROKE}
+                x={EDGE_STROKE / 2}
+                y={EDGE_STROKE / 2}
               />
-            </Link>
+            ) : null}
             {isSelected ? (
               <rect
                 className="ring is-selected"

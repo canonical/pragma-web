@@ -7,10 +7,15 @@
 
 import {
   BUS_OFFSET,
+  COLLISION_MARGIN,
+  ceilTo,
   GRAPH_LABEL_PX_MIN,
+  LABEL_HALO,
   LABEL_SIZE,
   LATTICE,
+  REGION_LABEL_SIZE,
 } from "@canonical/prism-core";
+import type { StrokeWidth } from "./types.js";
 
 /** A class box's height, in px. */
 export const BOX_HEIGHT = 32;
@@ -101,6 +106,12 @@ export const LEGIBLE_MARGIN = 1 + 1e-6;
  */
 export const CLEAN_EDGE_ZOOM = 1.2;
 
+/**
+ * The camera's greatest zoom, as the graph canvas clamps it: a region's
+ * window is never so small that the camera would show more than it.
+ */
+export const FRAME_ZOOM_MAX = 2.4;
+
 /** A self-loop's extent above and right of its box, in px. */
 export const LOOP_EXTENT = 16;
 
@@ -138,3 +149,137 @@ export const PHONE = {
   outPort: 24,
   loop: 16,
 } as const;
+
+/**
+ * The instance counts at which a relation's stroke steps up, heaviest
+ * first: a decade per step, so the width tells the order of magnitude of
+ * the statements it covers. A count below the last step is drawn at 1px.
+ */
+export const STROKE_STEPS: readonly {
+  readonly from: number;
+  readonly width: StrokeWidth;
+}[] = [
+  { from: 1000, width: 8 },
+  { from: 100, width: 4 },
+  { from: 10, width: 2 },
+];
+
+/** The stroke of a relation below the first step, in px. */
+export const STROKE_MIN_WIDTH: StrokeWidth = 1;
+
+/**
+ * The arrowhead a heavy relation ends in, by its stroke width: its length
+ * and width, in px, grown from the 8px head so the head stays wider than
+ * its line (half again as wide at 4px, two and a half times at 8px). The
+ * line stops its own width short of the tip, where the head is as wide
+ * as the line, so it ends inside the head instead of overrunning its
+ * point. Lighter strokes keep the 8px head and run to the tip.
+ */
+export const HEAVY_HEAD_SIZES: Readonly<Partial<Record<StrokeWidth, number>>> =
+  { 4: 12, 8: 20 };
+
+/** The dash pattern of a relation no statement instantiates, in px. */
+export const ZERO_STROKE_DASH = "4 4";
+
+/**
+ * The type size of a bridge's label, in px: a region prefix's, so it
+ * stays legible from the zoom at which the prefixes are drawn.
+ */
+export const BRIDGE_LABEL_SIZE = REGION_LABEL_SIZE;
+
+/** How many relations a bridge's label names before it counts them. */
+export const BRIDGE_LABEL_NAMES = 2;
+
+/** What a bridge's label joins the names of its relations with. */
+export const BRIDGE_LABEL_SEPARATOR = " · ";
+
+/**
+ * How far apart the lanes of the bridges that run along one channel, gap
+ * or margin run, in px, where it has room: each bridge keeps a stretch of
+ * route of its own, so no line is drawn over another.
+ */
+export const BRIDGE_LANE = 8;
+
+/**
+ * How much of a gap between regions or shelves, or of a margin, the lanes
+ * of the bridges that run along it may spread over, in px: the gap less a
+ * lane's clearance from the boxes on either side.
+ */
+export const BRIDGE_GAP_ROOM = SHELF_GAP - 2 * BRIDGE_LANE;
+
+/**
+ * How much of a channel between two columns the lanes of the bridges that
+ * run along it may spread over, in px: the room either side of the channel's
+ * middle, short of the subclass bus before it and of the next column's
+ * boxes after it, in the narrower of the two channels the packer uses.
+ */
+export const BRIDGE_CHANNEL_ROOM =
+  2 * (CROSS_CHANNEL_OFFSET - BUS_OFFSET - BRIDGE_LANE / 2);
+
+/**
+ * How many bridges a channel may hold for its lanes to be ordered by
+ * trying every order (720 at six); a fuller channel keeps its runs in the
+ * order they start along it.
+ */
+export const LANE_ORDER_SEARCH_LIMIT = 6;
+
+/**
+ * How far below a pair of neighbours joined straight across their gap the
+ * graph reaches, in px, on the lattice: with the view margin, room for a
+ * bridge's label, its halo and its clearance from the boxes, under the
+ * pair when the route is too short to carry it.
+ */
+export const BRIDGE_LABEL_BAND = ceilTo(
+  BRIDGE_LABEL_SIZE + 2 * LABEL_HALO + COLLISION_MARGIN - VIEW_MARGIN,
+  LATTICE,
+);
+
+/**
+ * How far a bridge's label slides along its route between the places it
+ * tries, in px, from the route's arrowhead back.
+ */
+export const BRIDGE_LABEL_STEP = 4;
+
+/**
+ * The narrowest a collapsed region's box is drawn, in px: its prefix over
+ * its class count, which needs more room than a class's one line.
+ */
+export const REGION_BOX_MIN_WIDTH = 128;
+
+/**
+ * What a collapsed region's box is keyed by, before its prefix: no IRI a
+ * provider serves starts so.
+ */
+export const REGION_NODE_SCHEME = "region:";
+
+/**
+ * The prefixes of the well-known vocabularies a relation may reach without
+ * their ontology being loaded, by namespace: the W3C's, FOAF, SKOS and
+ * Dublin Core. The store serves the lens no namespace inventory beyond
+ * the loaded ontologies, and these vocabularies' IRIs carry no readable
+ * prefix.
+ */
+export const STUB_PREFIXES: ReadonlyMap<string, string> = new Map([
+  ["http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf"],
+  ["http://www.w3.org/2000/01/rdf-schema#", "rdfs"],
+  ["http://www.w3.org/2001/XMLSchema#", "xsd"],
+  ["http://www.w3.org/2002/07/owl#", "owl"],
+  ["http://www.w3.org/2004/02/skos/core#", "skos"],
+  ["http://xmlns.com/foaf/0.1/", "foaf"],
+  ["http://purl.org/dc/terms/", "dcterms"],
+  ["http://purl.org/dc/elements/1.1/", "dc"],
+]);
+
+/**
+ * How far a rectangle may overrun another, in px, and still count as
+ * inside it: a window's edges are fractional where it is framed at the
+ * legible zoom.
+ */
+export const FIT_TOLERANCE = 1e-6;
+
+/**
+ * The locale of the catalog in which the layout measures a box's text:
+ * the layout is the same in every locale, so the server and the client
+ * lay out the same graph.
+ */
+export const MEASURED_LOCALE = "en";

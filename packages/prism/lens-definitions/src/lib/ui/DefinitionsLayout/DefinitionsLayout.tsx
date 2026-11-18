@@ -34,8 +34,10 @@ import type { DefinitionsLayoutProps } from "./types.js";
  * search and one region request. The router mounts the layout again
  * whenever the matched route changes, so the provider keeps those choices,
  * and where the graph's camera stood, in the router's session: a move from
- * the lens index to a term or back keeps the chips, the search, the zoom
- * and the pan, and the graph only pans the selected class into view. The
+ * the lens index to a term or back keeps the chips, the search and, while
+ * the graph draws the same namespaces opened, the zoom and the pan, the
+ * graph only panning the selected class into view; a move that opens or
+ * closes a namespace opens the graph as loading its address does. The
  * strip's tenants and the inspector read the explorer's own operation from
  * the warm store (`useExplorerQuery`), each inside its own `SocketGuard`,
  * so a cold store empties their sockets and nothing else.
