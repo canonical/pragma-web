@@ -154,7 +154,8 @@ const collapsedEquals = (
 /**
  * Apply one addressed query command as a coherent transition: a changed
  * query resets the window to its first page, window-only commands leave the
- * query untouched, and a semantically unchanged edit changes nothing.
+ * query untouched, and a semantically unchanged edit changes nothing: a
+ * conjunct added where the slice already holds it among them.
  * Commands that violate the bounded grammar (empty fields, wrong arities,
  * non-finite numbers, non-positive or fractional window values, an empty
  * cursor token) are rejected with the input state unchanged, and so is one
@@ -279,6 +280,8 @@ const commandRejection = (
         ? null
         : `${field} ${operator} holds no conjunct ${nth}`;
     }
+    case "addPredicate":
+      return predicateRejection(command.predicate);
     case "removePredicate":
       // Removal may address out-of-grammar predicates (for example one
       // installed by an unvalidated adopt): it cleans up by exact address
@@ -317,6 +320,10 @@ const applyToSlice = (slice: Slice, command: SliceCommand): Slice => {
   switch (command.kind) {
     case "setPredicate":
       return setPredicate(slice, command.predicate, command.nth ?? 0);
+    case "addPredicate":
+      // A conjunct the slice already holds collapses in the canonical form,
+      // so the slice compares equal and nothing is committed.
+      return { ...slice, filter: [...slice.filter, command.predicate] };
     case "removePredicate": {
       const removed = listConjuncts(slice, command.field, command.operator).at(
         command.nth ?? 0,

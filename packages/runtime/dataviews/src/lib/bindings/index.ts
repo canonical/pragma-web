@@ -6,16 +6,17 @@
  * pagination facts a bar offers — each projected from the published state —
  * the filter records a root builds, the check a binding tells a provider
  * by, the provider's internal host, the query transition a command makes
- * with the command and its result, the list comparison, the comparison of
- * one field's facet, the operators a control may offer on a field, the
- * ordering in force and the next one a header's
+ * with the command and its result, the canonical slice a conjunct's place
+ * is counted in, the list comparison, the comparison of one field's facet,
+ * the operators a control may offer on a field, the fold two texts compare
+ * equal under, the ordering in force and the next one a header's
  * activation, or its menu's choice, leads to, the wire key a form control
  * is named by, the parameters a query's members are spelled under, which
- * of a followed link's refused clauses narrow the result
- * and so offer a Clear, the parameters a link carries an arrangement in,
- * and the words a root speaks — the application's messages over the
- * English record. React uses it now; a Svelte binding would use the same
- * names rather than solve its own geometry or word its own English.
+ * of a followed link's refused clauses narrow the result and so offer a
+ * Clear, the parameters a link carries an arrangement in, and the words a
+ * root speaks — the application's messages over the English record. React
+ * uses it now; a Svelte binding would use the same names rather than solve
+ * its own geometry or word its own English.
  */
 
 export type {
@@ -79,6 +80,7 @@ export type { QueryCommand, QueryCommandResult } from "../query/index.js";
 export {
   applyQueryCommand,
   areListsEqual,
+  canonicalizeSlice,
   cycleSortTerm,
   placeSortTerm,
 } from "../query/index.js";
@@ -92,6 +94,7 @@ export type {
 export { createRowScopes } from "../rows/index.js";
 export type { EffectiveOrdering } from "../source/index.js";
 export {
+  foldText,
   listOfferedOperators,
   resolveEffectiveOrdering,
 } from "../source/index.js";
