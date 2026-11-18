@@ -126,6 +126,11 @@
       --button-padding-inline-start: var(--dimension-100);
     }
 
+    /* Outlined destructive actions use the intent colour for the label too. */
+    &:where(.secondary.destructive) {
+      --modifier-color-text: var(--color-text-destructive);
+    }
+
     /* State fallbacks resolve to the default (primary) surface states when no
        importance modifier supplies `--modifier-surface-*`. */
     &:hover:not(:disabled) {

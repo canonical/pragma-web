@@ -175,14 +175,32 @@ export const LinkVariant: Story = {
 
 /**
  * The full matrix with a leading icon in every cell — so the icon colour can be
- * checked against each importance × anticipation combination (the icon should
- * follow the label colour: contrast on a filled primary, the modifier colour on
- * ghost secondary/tertiary). The `icon` prop takes a design-system icon name;
+ * checked against each importance × anticipation combination. For destructive
+ * actions, both the icon and the label use the on-fill contrast colour on
+ * primary and the intent colour on secondary and tertiary. The `icon` prop
+ * takes a design-system icon name;
  * the sprite is served from the `@canonical/ds-assets` staticDir at `/icons`.
  */
 export const IconMatrix: Story = {
   render: (args) => <MatrixGrid {...args} />,
   args: { children: "Button", icon: "edit" },
+  play: async ({ canvasElement }) => {
+    const primary = canvasElement.querySelector("button.primary.destructive");
+    const secondary = canvasElement.querySelector(
+      "button.secondary.destructive",
+    );
+    const tertiary = canvasElement.querySelector("button.tertiary.destructive");
+    if (!primary || !secondary || !tertiary) {
+      throw new Error("Expected all three destructive Button importances");
+    }
+
+    await expect(getComputedStyle(secondary).color).toBe(
+      getComputedStyle(tertiary).color,
+    );
+    await expect(getComputedStyle(primary).color).not.toBe(
+      getComputedStyle(secondary).color,
+    );
+  },
 };
 
 /**
