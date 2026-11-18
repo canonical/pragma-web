@@ -1,0 +1,51 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* A stand-in for DropdownButton's sheet: the chevron and the panel's
+     surface, removed when DropdownButton lands. */
+  .ds.dropdown-button .chevron {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-inline-start: var(--dropdown-button-chevron-gap);
+  }
+
+  /* Through Button's variable, as DropdownButton does, so a link variant
+     keeps its own padding of 0. */
+  .ds.dropdown-button {
+    --dropdown-button-chevron-gap: var(--dimension-100);
+    --dropdown-button-padding-inline-end: var(--dimension-100);
+  }
+
+  .ds.button.dropdown-button {
+    --button-padding-inline-end: var(--dropdown-button-padding-inline-end);
+  }
+
+  .ds.dropdown-button-panel {
+    min-inline-size: 12rem;
+    max-inline-size: 20rem;
+    max-block-size: calc(100dvh - 2 * var(--dimension-200));
+    overflow-y: auto;
+    padding: var(--dimension-200);
+    /* As DropdownPanel's: FilterButton gives the panel its forced-colours
+       edge. */
+    border: none;
+    background-color: var(--surface-color-background, var(--color-background));
+    color: var(--surface-color-text, var(--color-text));
+    /* ContextualMenu's shadow: the system has no elevation token. */
+    box-shadow:
+      0 1px 1px 0 rgba(0, 0, 0, 0.15),
+      0 2px 2px -1px rgba(0, 0, 0, 0.15),
+      0 0 3px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  /* Tethered under the trigger where the browser has anchor positioning; a
+     panel composed directly keeps the browser's centred placement. */
+  @supports (anchor-name: --a) {
+    .ds.dropdown-button-panel.anchored {
+      inset: auto;
+      margin: var(--dimension-050) 0;
+      position-area: block-end span-inline-end;
+      position-try-fallbacks: flip-block, flip-inline;
+    }
+  }
+}
