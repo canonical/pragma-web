@@ -25,9 +25,12 @@ describe("EntityStatus", () => {
         children: <EntityStatus binding={STATIONS_BINDING} className="site" />,
       }),
     );
-    const status = screen.getByRole("status");
-    expect(status).toHaveTextContent(
-      `${STATION_COUNT} of ${STATION_COUNT} entries`,
+    const status = screen.getByRole("status", {
+      name: `${STATION_COUNT} of ${STATION_COUNT} entries`,
+    });
+    // Below two groups the strip shows the shown figure and its noun.
+    expect(status.querySelector(".short")?.textContent).toBe(
+      `${STATION_COUNT} entries`,
     );
     expect(status).toHaveAttribute("aria-live", "polite");
     expect(status.className).toBe("ds count-line ds entity-status site");
@@ -45,9 +48,10 @@ describe("EntityStatus", () => {
         children: <EntityStatus binding={STATIONS_BINDING} />,
       }),
     );
-    expect(screen.getByRole("status")).toHaveTextContent(
-      `0 of ${STATION_COUNT} entries`,
-    );
+    const status = screen.getByRole("status", {
+      name: `0 of ${STATION_COUNT} entries`,
+    });
+    expect(status.querySelector(".short")?.textContent).toBe("0 entries");
   });
 
   it("suspends over a cold store, reading the index's own operation", () => {
