@@ -95,13 +95,13 @@
     "test:vitest": "vitest run"
   },
   "dependencies": {
-    "@canonical/storybook-config": "^0.47.0",
     "lit": "^3.3.2"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
     "@canonical/biome-config": "0.46.0",
     "@canonical/ds-types": "^0.47.0",
+    "@canonical/storybook-config": "^0.47.0",
     "@canonical/styles": "^0.47.0",
     "@canonical/typescript-config-lit": "^0.47.0",
     "@canonical/webarchitect": "0.46.0",
