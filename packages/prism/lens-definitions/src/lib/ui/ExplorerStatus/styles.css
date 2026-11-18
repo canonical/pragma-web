@@ -50,4 +50,22 @@
     font-variant-numeric: tabular-nums;
     text-overflow: ellipsis;
   }
+
+  /* The short form is the narrow strip's; at two groups and wider the
+   * full form shows. */
+  .ds.explorer-status > .caption > .short {
+    display: none;
+  }
+
+  /* Below two groups, where the strip folds, the short form shows in the
+   * full one's place; the full sentence stays the figure's name. */
+  @container shell (width < 912px) {
+    .ds.explorer-status > .caption > .full {
+      display: none;
+    }
+
+    .ds.explorer-status > .caption > .short {
+      display: inline;
+    }
+  }
 }

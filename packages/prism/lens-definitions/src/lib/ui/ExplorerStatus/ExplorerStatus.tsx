@@ -24,6 +24,13 @@ const componentCssClassName = "ds explorer-status";
  * when chips move the count, which is the whole point of putting it in the
  * strip rather than in the canvas.
  *
+ * With abstract classes showing, the caption holds two forms: the full
+ * sentence and its short form, the figure and the noun without the
+ * abstract clause ("66 of 66 classes"). Below two groups, where the strip
+ * folds, the short form shows; at two groups and wider, the full one. The
+ * full sentence names the figure at every width, and the server renders
+ * one HTML for every width: the stylesheet chooses.
+ *
  * `import { ExplorerStatus } from "../ExplorerStatus/index.js";`
  *
  * @implements prism.component.explorer_status
@@ -39,10 +46,17 @@ export default function ExplorerStatus({
   const t = useMessages();
   // Guard the degenerate graph so the bar never computes NaN.
   const share = total === 0 ? 0 : Math.round((visible / total) * 100);
+  const short = t("status.classes", { visible, count: total });
+  const full =
+    abstract > 0
+      ? t("status.classes.abstract", { visible, count: total, abstract })
+      : short;
+  const isShortened = full !== short;
 
   return (
     <figure
       {...props}
+      aria-label={isShortened ? full : undefined}
       aria-live="polite"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-status"
@@ -58,9 +72,14 @@ export default function ExplorerStatus({
         <span className="fill" />
       </div>
       <figcaption className="caption">
-        {abstract > 0
-          ? t("status.classes.abstract", { visible, count: total, abstract })
-          : t("status.classes", { visible, count: total })}
+        {isShortened ? (
+          <>
+            <span className="full">{full}</span>
+            <span className="short">{short}</span>
+          </>
+        ) : (
+          full
+        )}
       </figcaption>
     </figure>
   );

@@ -27,12 +27,16 @@ describe("Status", () => {
 
     expect(html).toContain('data-slot="explorer-status"');
     // React separates adjacent text nodes with `<!-- -->` markers in SSR
-    // output, so the caption is asserted on its stripped text.
-    const caption = /<figcaption class="caption">([\s\S]*?)<\/figcaption>/
-      .exec(html)?.[1]
-      ?.replaceAll("<!-- -->", "");
-    // 35 live classes across the three ontologies, 4 of them abstract.
-    expect(caption).toBe("35 of 35 classes · 4 abstract");
+    // output, so each form is asserted on its stripped text.
+    const readForm = (form: string): string | undefined =>
+      new RegExp(`<span class="${form}">([\\s\\S]*?)</span>`)
+        .exec(html)
+        ?.at(1)
+        ?.replaceAll("<!-- -->", "");
+    // 35 live classes across the three ontologies, 4 of them abstract: the
+    // full sentence, and the short form the folded strip shows.
+    expect(readForm("full")).toBe("35 of 35 classes · 4 abstract");
+    expect(readForm("short")).toBe("35 of 35 classes");
     expect(fetchFn).not.toHaveBeenCalled();
   });
 

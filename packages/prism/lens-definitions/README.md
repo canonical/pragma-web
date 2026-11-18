@@ -125,7 +125,9 @@ mode strip (the breadcrumb trail and the status figure), the facet bar
 under it (the filter chips), the explorer in the canvas and the term
 inspector in the inspector region, a drawer below three groups of columns.
 Below two groups the bar folds into the strip's "Filter · n" link, which
-opens the filter sheet through the address (`?sheet=filter`). The router mounts the layout
+opens the filter sheet through the address (`?sheet=filter`), and the
+status figure shows its short form, the classes without the abstract
+clause ("66 of 66 classes"), the full sentence staying its name. The router mounts the layout
 again on each of the lens's routes, so the lens keeps the reader's chips
 and search for the router's life while the reader stays in the lens, and
 the zoom and pan while the graph keeps its drawing: a pick in the rail of
