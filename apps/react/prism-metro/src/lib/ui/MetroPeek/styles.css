@@ -10,9 +10,6 @@
    * starts on the title's edge. */
   .ds.metro-peek {
     --metro-peek-card-border-width: 0;
-    /* The card's summary, three of its 24px lines at most in the peek: the
-     * page is one click away. */
-    --metro-peek-summary-max-height: calc(3 * var(--space-300));
     --metro-peek-address-padding-block-start: var(--space-100);
     --metro-peek-address-padding-block-end: var(
       --card-content-padding-block-end
@@ -28,12 +25,6 @@
 
   .ds.metro-peek > .card {
     border-width: var(--metro-peek-card-border-width);
-  }
-
-  /* The summary ends at its third line; the cut falls between two lines. */
-  .ds.metro-peek .summary {
-    max-height: var(--metro-peek-summary-max-height);
-    overflow: hidden;
   }
 
   /* The address line is pinned to the foot of the frame, which scrolls a

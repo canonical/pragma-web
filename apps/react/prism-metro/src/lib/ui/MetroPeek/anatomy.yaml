@@ -12,9 +12,8 @@
 # its own inside it and its insets are the peek's only ones: a specimen
 # meets the frame, and the address line takes the card's inline and
 # block-end insets (the published Card's content tokens), so the CURIE
-# starts on the title's edge. In the peek the card's summary ends at its
-# third line (three 24px lines; the cut falls between two lines, since the
-# anatomy has no line-clamp key); the page is one click away.
+# starts on the title's edge. The card's summary ends at its third line,
+# in an ellipsis, as on every card: the card cuts it, not the peek.
 #
 # The frame scrolls a card taller than its room; the address line is
 # pinned to its foot (position sticky, block-end 0, on the frame's
@@ -39,7 +38,6 @@
 #
 # Token ledger (every decision; a literal only where no symbol exists):
 #   --metro-peek-card-border-width: 0      the frame encloses the card
-#   --metro-peek-summary-max-height: calc(3 * space.300)   three 24px lines
 #   --metro-peek-address-padding-block-start: space.100 (8px) above the line
 #   --metro-peek-address-padding-block-end: card.content.padding.block.end
 #   --metro-peek-address-padding-inline: card.content.padding.inline
@@ -59,13 +57,6 @@ node:
           on: Node
         styles:
           appearance.border.width: 0
-        edges:
-          - node:
-              role: summary
-              styles:
-                size.max.height: "calc(3 * var(--space-300))"
-                layout.overflow: hidden
-            relation: { cardinality: "0..1", slotName: summary }
       relation:
         cardinality: "1"
         slotName: card
