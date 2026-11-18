@@ -74,6 +74,8 @@ interface Node {
   uri: ID!
   "Self-describing TBox access for this entity."
   _meta: EntityMeta!
+  "The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order."
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -174,6 +176,8 @@ type OntologyClass implements Node {
   prism:pluralLabel in `lang` (exact tag, else untagged); never inherited; null when undeclared.
   """
   pluralLabel(lang: String = "en"): String
+  "The class's values for the list fields named, or for the fields its metaclass's lens displays."
+  values(fields: [ID!]): [NodeValue!]!
 }
 
 """
@@ -354,6 +358,14 @@ type Query {
   search(text: String!, first: Int, after: String): NodeConnection!
   "The statements whose subject is `uri` (an absolute IRI), as Turtle with the provider's prefixes, or null when the graph holds none."
   source(uri: ID!): String
+  "The instances of the class `classUri` names that `filters` keep, in `sort`'s order (the IRIs' without one), with their number and the facets of the class's list fields and of its kind."
+  facetedInstances(
+    classUri: ID!
+    filters: [FieldFilter!]
+    sort: FieldSort
+    first: Int
+    after: String
+  ): FacetedConnection!
 }
 
 # =============================================================================
@@ -367,8 +379,8 @@ type Query {
 # contract's superset rule is for (contract.graphql:39-42). `buildSchema` over
 # the contract alone cannot serve instance data.
 #
-# THREE ROOT FIELDS ARE ADDED: `prose`, `search` and `source`, at the end of
-# this file. Every entity type below is reachable through the contract's own
+# FOUR ROOT FIELDS ARE ADDED: `prose`, `search`, `source` and
+# `facetedInstances`, at the end of this file, and every node gains `values`. Every entity type below is reachable through the contract's own
 # root fields — `node(id:)` and `OntologyClass.instances` — and adding a root
 # field for them would have been easier and would have proved less: the point
 # is that the contract's five roots suffice for the graph. Prose, search and
@@ -399,6 +411,7 @@ line may be run by more than one rolling stock.
 type Line implements Node {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   servedBy: [Stop!]!
   code: String!
@@ -430,6 +443,7 @@ compare directly. It is null for a station no route calls at.
 interface Stop implements Node {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   platformCount: Int
   platformLength: Int
@@ -448,6 +462,7 @@ it so `_meta.title`'s fallback chain has something to fall back from.
 type Station implements Node & Stop {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   platformCount: Int
   platformLength: Int
@@ -469,6 +484,7 @@ inverse of `Stop.inZone`, so it holds a mix of both types as
 type Zone implements Node {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   stops: [Stop!]!
 }
@@ -481,6 +497,7 @@ TBox and shows up through `superclasses` / `subclasses` / `inherited`.
 type Interchange implements Node & Stop {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   platformCount: Int
   platformLength: Int
@@ -518,6 +535,55 @@ type Prose {
   availableLanguages: [String!]!
   "Entities the prose links to across its languages, in order of first mention; destinations node(id:) does not resolve are dropped."
   references: NodeConnection!
+}
+
+# `values` is the one field every node gains: a table reads its cells from it
+# whatever the node's type. A provider cannot add a field to `Node` without
+# adding it to each implementation, the contract's `OntologyClass` included.
+"A node's value for one list field."
+type NodeValue {
+  "The field's served name."
+  field: ID!
+  "The field's label."
+  label: String!
+  "The values' texts joined, or null when the node has none."
+  text: String
+  "The IRI of the value when it is exactly one entity."
+  uri: ID
+}
+
+"Keeps the nodes holding one of `values` for `field`; a null value stands for none."
+input FieldFilter {
+  field: String!
+  values: [ID]
+}
+
+"Orders a set by one field, the nodes without a value last."
+input FieldSort {
+  field: String!
+  descending: Boolean
+}
+
+"One bucket of a facet; a null value is the nodes with none."
+type FacetValue {
+  value: ID
+  label: String
+  count: Int!
+}
+
+"A field's buckets, counted with every filter but the field's own."
+type Facet {
+  field: String!
+  label: String!
+  values: [FacetValue!]!
+}
+
+"A page of a faceted set, the set's size and its facets."
+type FacetedConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+  facets: [Facet!]!
 }
 
 """
@@ -593,6 +659,7 @@ shortest first.
 type RollingStock implements Node {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   formations: [Formation!]!
 }
@@ -616,6 +683,7 @@ they add up without gaps; capacity is passengers seated plus standing.
 type Formation implements Node {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   stock: RollingStock!
   units: [UnitPosition!]!
@@ -640,6 +708,7 @@ standing.
 type Unit implements Node {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   cars: [CarPosition!]!
   length: Int!
@@ -660,6 +729,7 @@ passengers seated plus standing.
 type CarType implements Node {
   uri: ID!
   _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
   name: String
   code: String!
   hasCab: Boolean!
