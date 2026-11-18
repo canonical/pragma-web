@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import * as decorators from "../../../storybook/decorators.js";
+import renderOnSurfaces from "../../../storybook/renderOnSurfaces.js";
 import Component from "./Tile.js";
 
 const meta = {
@@ -10,9 +10,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Default tile with a header and content.
- */
+/** A tile with a header and content. */
 export const Default: Story = {
   args: {
     children: [
@@ -26,9 +24,7 @@ export const Default: Story = {
   },
 };
 
-/**
- * A tile with content only (the header is optional).
- */
+/** A tile with content only. */
 export const ContentOnly: Story = {
   args: {
     children: (
@@ -42,19 +38,12 @@ export const ContentOnly: Story = {
   },
 };
 
-/**
- * The Tile always provides a surface, so its background steps as it is nested
- * inside successive `.surface` contexts (surface 1 -> 2 -> 3) — it stands out
- * from whatever it sits on, unlike the Card which blends in.
- */
+/** The tile steps above each surface level. */
 export const OnSurfaces: Story = {
   parameters: { grid: "responsive" },
-  // `render` builds its own tiles; args are unused but the type requires them.
   args: { children: <Component.Content>—</Component.Content> },
   render: () =>
-    // The tile provides its own surface, so its background steps a level above
-    // whatever band it sits on — it stands out rather than blending in.
-    decorators.surfaces((level) => (
+    renderOnSurfaces((level) => (
       <Component>
         <Component.Header>
           <h4>On surface level {level + 1}</h4>
