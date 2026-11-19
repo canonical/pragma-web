@@ -22,6 +22,7 @@ import "./styles.css";
 const declareNodeFragment = (): unknown => graphql`
   fragment LineCard_node on Line {
     __typename
+    code
     colour
     _meta {
       title
@@ -84,6 +85,7 @@ export default function LineCard({
   const first = calls.at(0)?.stop._meta.title;
   const last = calls.at(-1)?.stop._meta.title;
   const facts = [
+    { property: "code", label: t("line.code"), value: data.code },
     {
       property: "servedBy",
       label: t("line.stops"),

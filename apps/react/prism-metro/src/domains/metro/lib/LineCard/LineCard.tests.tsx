@@ -118,6 +118,7 @@ describe("LineCard", () => {
         fact.querySelector(".detail")?.textContent,
       ]),
     ).toEqual([
+      ["code", "N"],
       ["servedBy", "5"],
       ["routes", "Northgate to Marsh End"],
     ]);
@@ -140,7 +141,7 @@ describe("LineCard", () => {
       [...container.querySelectorAll(".fact")].map((fact) =>
         fact.getAttribute("data-property"),
       ),
-    ).toEqual(["servedBy"]);
+    ).toEqual(["code", "servedBy"]);
     expect(container.querySelector(".status")?.textContent).toBe("loop");
     expect(container.querySelector(".summary")).toBeNull();
   });
@@ -153,7 +154,7 @@ describe("LineCard", () => {
       [...container.querySelectorAll(".fact")].map((fact) =>
         fact.getAttribute("data-property"),
       ),
-    ).toEqual(["servedBy"]);
+    ).toEqual(["code", "servedBy"]);
     expect(container.querySelector(".status")).toBeNull();
   });
 

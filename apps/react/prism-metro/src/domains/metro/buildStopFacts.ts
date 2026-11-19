@@ -4,8 +4,8 @@ import type { StopFacts } from "./types.js";
 
 /**
  * Build the facts a stop's card lists, in their order, each naming the
- * graph property it reads: its platforms, its fare zone, and the lines it
- * serves joined into one value. A value the graph does not assert leaves
+ * graph property it reads: its platforms, its fare zone, the lines it
+ * serves joined into one value, and its place. A value the graph does not assert leaves
  * its fact out.
  *
  * @param stop - What the card read of the stop.
@@ -19,6 +19,7 @@ export default function buildStopFacts(
   const platforms = stop.platformCount ?? undefined;
   const zone = stop.inZone?._meta.title;
   const lines = stop.servesLine.map((line) => line._meta.title);
+  const location = stop.location ?? undefined;
   return [
     ...(platforms === undefined
       ? []
@@ -39,6 +40,18 @@ export default function buildStopFacts(
             property: "servesLine",
             label: t("station.lines"),
             value: lines.join(t("station.lines.separator")),
+          },
+        ]),
+    ...(location === undefined
+      ? []
+      : [
+          {
+            property: "location",
+            label: t("station.location"),
+            value: t("station.location.value", {
+              latitude: location.latitude,
+              longitude: location.longitude,
+            }),
           },
         ]),
   ];

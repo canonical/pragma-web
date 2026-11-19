@@ -24,6 +24,10 @@ import "./styles.css";
 const declareNodeFragment = (): unknown => graphql`
   fragment StationCard_node on Station {
     __typename
+    location {
+      latitude
+      longitude
+    }
     platformCount
     _meta {
       title
