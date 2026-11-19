@@ -157,6 +157,15 @@ specificity war between them — a point returned to below. A paragraph placed n
 to a control will sit on _a_ grid line, but not necessarily the control's target
 line — controls and prose answer to different seating rules by design.
 
+One sanctioned exception: bare prose _inside_ a control that seats its own text
+— an `<h6>` in an accordion header, say. The control marks its seat element with
+`.control-seat`, and the shared layer exempts bare prose inside it from the
+engine's box (nudges and trimming, in every engine), handing it the seat line
+instead. The hand-over is safe because the seat is the engine's own nudge
+formula re-aimed at the density target — composing the two would seat the text
+twice. Outside a density scope the exemption is inert and the engine seats
+prose as always.
+
 ## The intrinsic control seat
 
 A boxed control (the button, the single-line input chrome) does **not** set a
@@ -164,7 +173,7 @@ height. Its height _emerges_: the text's own line box is the control interior,
 and border + padding + line-height add up to exactly the density cell.
 
 The shared styles layer (`@canonical/styles`, `modifiers.density.css`) exports
-two pieces:
+the two seat pieces below, plus the `.control-seat` exemption above:
 
 ```css
 /* The control's interior line box: the cell minus one baseline of headroom
