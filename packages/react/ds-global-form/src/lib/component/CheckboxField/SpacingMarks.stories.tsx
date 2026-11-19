@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Field, Form } from "../../index.js";
+import { assertRootTextSeats } from "../../spacingRootTextSeatProof.js";
 import "../../../index.css";
 import "./SpacingMarks.css";
 
@@ -16,6 +17,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 type Metrics = {
+  rootTextSeat: { occupied: number; expected: number; pass: boolean } | null;
   markInline: number;
   markBlock: number;
   paintTileInline: number | null;
@@ -175,7 +177,9 @@ const Measured = ({
         : null;
       const text = nativeCaret
         ? owner
-        : owner.querySelector<HTMLElement>(labelSelector);
+        : owner.matches(labelSelector)
+          ? owner
+          : owner.querySelector<HTMLElement>(labelSelector);
       if (!text) return;
       const guideRect = owner.getBoundingClientRect();
       const ownerStyle = getComputedStyle(owner);
@@ -207,7 +211,29 @@ const Measured = ({
             : labelRect.left - (slotRect?.right ?? 0);
       const localRect = root.current?.getBoundingClientRect();
       if (!localRect) return;
+      const occupied = guideRect.height + number(ownerStyle.marginBlockEnd);
+      const tier = owner.closest(".site, .docs, .app")?.matches(".site")
+        ? "site"
+        : "app";
+      const scale =
+        number(getComputedStyle(document.documentElement).fontSize) / 16;
+      const expected = (tier === "site" ? 40 : 32) * scale;
+      const rootTextSeat = owner.matches(
+        ".spacing-text-seat, [data-marks-root-text]",
+      )
+        ? {
+            occupied,
+            expected,
+            pass:
+              Math.abs(occupied - expected) < 0.05 &&
+              Math.abs(
+                number(ownerStyle.fontSize) -
+                  (tier === "site" ? 16 : 14) * scale,
+              ) < 0.05,
+          }
+        : null;
       const next: Metrics = {
+        rootTextSeat,
         markInline: nativeCaret ? caretSize : (markRect?.width ?? 0),
         markBlock: nativeCaret ? caretSize / 2 : (markRect?.height ?? 0),
         paintTileInline: nativeCaret ? caretSize / 2 : null,
@@ -317,7 +343,17 @@ const Measured = ({
   return (
     <figure className="marks-sample">
       <figcaption>{label}</figcaption>
-      <div className="marks-measure" ref={root}>
+      <div
+        className="marks-measure"
+        ref={root}
+        data-root-text-seat-proof={
+          metrics?.rootTextSeat
+            ? metrics.rootTextSeat.pass
+              ? "pass"
+              : "fail"
+            : undefined
+        }
+      >
         {children}
         {metrics ? (
           <>
@@ -456,6 +492,15 @@ const Tier = ({
         reference
       >
         <Button icon="edit">Apply</Button>
+      </Measured>
+      <Measured
+        label="Body · root-size text"
+        ownerSelector="p[data-marks-root-text]"
+        labelSelector="p"
+      >
+        <p className="ds p" data-marks-root-text>
+          Body
+        </p>
       </Measured>
       <Measured
         label="Button icon override"
@@ -652,6 +697,7 @@ const Tier = ({
 );
 
 export const SiteDocsApp: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 15),
   render: () => (
     <main className="spacing-marks">
       <h1>04 Marks</h1>
@@ -662,6 +708,11 @@ export const SiteDocsApp: Story = {
       <p className="marks-fixture-note">
         Navigation peers show one shipped row; this fixture hides the rail
         header and skip link. The footer action keeps its region padding.
+        One-line Body and the text-seat owners beside checkbox, radio and switch
+        marks occupy 32px in Docs/App (previously 24px), with Site unchanged at
+        40px. Inner option/toggle labels remain unseated; the surrounding row
+        owns the single text seat. Mark sizes and mark-to-label gaps are
+        unchanged.
       </p>
       <Tier tier="site" title="Site" />
       <Tier tier="docs" title="Docs" />

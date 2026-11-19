@@ -254,20 +254,50 @@
   display: block;
 }
 
-/* Additional role and wrapping diagnostics retain layout without adding a second
-   visible specimen of each heading to the compact comparison. */
-.bucket-text-diagnostics {
-  position: absolute;
-  inset-inline-start: -10000px;
-  inline-size: 32rem;
-  visibility: hidden;
-  pointer-events: none;
+/* The comparison reconstructs the old text geometry locally. Controls and
+   product values are identical in the two phases; shipped CSS has no switch. */
+.bucket-text-phase[data-text-seat-phase="before"]
+  :is([data-root-seat-role], .bucket-rich-choice-fixture .p) {
+  --start-nudge: var(--_text-unseated-nudge);
+  --grid-compensation: var(--_text-unseated-compensation);
 }
 
-.bucket-text-diagnostics > * {
+.bucket-text-phase[data-text-seat-phase="before"] .ds.spacing-text-seat {
+  padding-block-start: var(--ds-text-baseline-nudge);
+  margin-block-end: var(--ds-text-grid-compensation);
+}
+
+/* All remaining roles stay in normal flow so their first baselines, wraps and
+   field geometry can be inspected beside the printed measurement results. */
+.bucket-text-diagnostics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-block: 1rem;
+}
+
+.bucket-text-diagnostics > figure {
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.bucket-text-diagnostics figcaption {
+  font-size: 0.75rem;
+}
+
+.bucket-text-diagnostics [data-root-seat-role] {
   display: flow-root;
 }
 
 .bucket-wrapped-text {
   inline-size: 8rem;
+}
+
+.bucket-field-fixture .form {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.bucket-rich-choice-fixture > .form-rich-choices {
+  grid-template-columns: 1fr;
 }

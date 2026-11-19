@@ -30,6 +30,9 @@
 
       /* Label is the visible card surface */
       & > label {
+        /* Card chrome owns both edges. Keep its paragraph closure unseated,
+           including when the Vanilla boundary restores that closing margin. */
+        --_text-seat-inset: 0px;
         display: flex;
         flex-direction: column;
         flex: 1;

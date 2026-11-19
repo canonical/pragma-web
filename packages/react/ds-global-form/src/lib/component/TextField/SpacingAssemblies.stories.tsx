@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Field, Form } from "../../index.js";
+import { assertRootTextSeats } from "../../spacingRootTextSeatProof.js";
 import "../../../index.css";
 import "./SpacingGaps.css";
 
@@ -298,6 +299,7 @@ function Sample({
   );
 }
 export const Assemblies: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 126),
   render: () => (
     <main className="spacing-gaps">
       <h1>05 Gaps · owned form assemblies</h1>
@@ -338,6 +340,7 @@ export const Assemblies: Story = {
   ),
 };
 export const DisabledAndNaturalChoices: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 9),
   render: () => (
     <main className="spacing-gaps">
       <h1>05 Gaps · disabled and naturally wrapped Choices</h1>

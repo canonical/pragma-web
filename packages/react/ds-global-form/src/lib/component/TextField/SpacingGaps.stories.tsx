@@ -4,6 +4,7 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Field, Form } from "../../index.js";
+import { assertRootTextSeats } from "../../spacingRootTextSeatProof.js";
 import "../../../index.css";
 import "./SpacingGaps.css";
 
@@ -471,6 +472,7 @@ const Tier = ({ title, className }: { title: string; className: string }) => (
 );
 
 export const SiteDocsApp: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 27),
   render: () => (
     <main className="spacing-gaps">
       <h1>05 Gaps</h1>

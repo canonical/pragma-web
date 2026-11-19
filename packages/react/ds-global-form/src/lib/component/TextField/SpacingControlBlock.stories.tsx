@@ -7,6 +7,8 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { expect, waitFor } from "storybook/test";
+import { Form } from "../../pattern/Form/index.js";
 import { ColorInput } from "../../subcomponent/ColorInput/index.js";
 import { ComboboxInput } from "../../subcomponent/ComboboxInput/index.js";
 import { DateInput } from "../../subcomponent/DateInput/index.js";
@@ -17,6 +19,8 @@ import { PhoneInput } from "../../subcomponent/PhoneInput/index.js";
 import { SelectInput } from "../../subcomponent/SelectInput/index.js";
 import { TextInput } from "../../subcomponent/TextInput/index.js";
 import { TimeInput } from "../../subcomponent/TimeInput/index.js";
+import { RichChoices } from "../RichChoicesField/RichChoices.js";
+import { TextField } from "./index.js";
 import "./SpacingControlBlock.css";
 
 const meta = {
@@ -29,6 +33,7 @@ type Story = StoryObj<typeof meta>;
 
 type Metrics = {
   fontSize: number;
+  fontWeight: number;
   lineHeight: number;
   inset: number;
   nudge: number;
@@ -96,6 +101,8 @@ const readBrowserBaseline = (
     const before = owner.getBoundingClientRect();
     const marker = document.createElement("span");
     marker.className = "bucket-baseline-marker";
+    // A leading marker reads the first baseline even when the text wraps;
+    // single-line control specimens retain the same zero-size marker position.
     baselineOwner.prepend(marker);
     const markerTop = marker.getBoundingClientRect().top;
     const after = owner.getBoundingClientRect();
@@ -206,6 +213,7 @@ const readMetrics = (
 
   return {
     fontSize,
+    fontWeight: number(baselineStyle.fontWeight),
     lineHeight,
     inset,
     nudge,
@@ -326,6 +334,8 @@ const Measured = ({
       const referenceOwner = flow
         ? null
         : local
+            // Each Before/Adopted row has its own Button. A tier-wide lookup
+            // would compare later rows against a Button at another block start.
             ?.closest(".bucket-samples")
             ?.querySelector<HTMLElement>("[data-bucket-reference] .button");
       const naturalVisibleOwner = naturalVisibleSelector
@@ -493,6 +503,42 @@ const MenuItemFixture = ({ tier }: { tier: string }) => {
 };
 
 type TierName = "site" | "docs" | "app";
+// Fixed size/line/weight expectations keep a changed type mapping from silently
+// redefining which roles the proof considers root-size.
+const typeScale = {
+  site: {
+    body: [16, 24, 400],
+    h1: [42, 48, 500],
+    h2: [42, 48, 300],
+    h3: [24, 32, 500],
+    h4: [24, 32, 300],
+    h5: [16, 24, 600],
+    h6: [16, 24, 400],
+  },
+  docs: {
+    body: [14, 20, 400],
+    h1: [32, 40, 500],
+    h2: [32, 40, 300],
+    h3: [24, 32, 500],
+    h4: [24, 32, 300],
+    h5: [18, 24, 600],
+    h6: [18, 24, 400],
+  },
+  app: {
+    body: [14, 20, 400],
+    h1: [24, 32, 500],
+    h2: [24, 32, 300],
+    h3: [18, 24, 600],
+    h4: [18, 24, 400],
+    h5: [14, 20, 600],
+    h6: [14, 20, 600],
+  },
+} as const;
+const seatedRoles: Record<TierName, readonly string[]> = {
+  site: ["body", "h5", "h6", "helper", "wrapped", "cell-body"],
+  docs: ["body", "helper", "wrapped", "cell-body"],
+  app: ["body", "h5", "h6", "helper", "wrapped", "cell-body"],
+};
 const textSeatRoles = [
   "body",
   "h1",
@@ -510,10 +556,31 @@ type TextSeatResult = {
   before: number;
   adopted: number;
   baselineDelta: number;
+  beforeBaseline: number | null;
+  adoptedBaseline: number | null;
   buttonDelta: number | null;
 };
+type FieldSeatResult = {
+  labelToInputTop: number;
+  labelToInputBaseline: number;
+  labelBaselineOffset: number;
+  inputBaselineOffset: number;
+  labelOccupied: number;
+  inputOccupied: number;
+};
+type RichChoiceResult = {
+  painted: number;
+  occupied: number;
+  marginEnd: number;
+};
 
-const TextSeatSamples = () => (
+const TextSeatSamples = ({
+  tier,
+  phase,
+}: {
+  tier: TierName;
+  phase: string;
+}) => (
   <>
     <div className="bucket-samples">
       <Measured
@@ -527,38 +594,81 @@ const TextSeatSamples = () => (
       <Measured label="Body" ownerSelector="p">
         <p data-root-seat-role="body">Body text</p>
       </Measured>
-      <Measured label="Heading 5 · App 14px" ownerSelector="h5">
+      <Measured
+        label={`Heading 5 · ${typeScale[tier].h5[0]}px`}
+        ownerSelector="h5"
+      >
         <h5 data-root-seat-role="h5">Heading five</h5>
       </Measured>
       <Measured
-        label="Heading 4 · App 18px"
+        label={`Heading 4 · ${typeScale[tier].h4[0]}px`}
         ownerSelector="h4"
         usesControlInset={false}
       >
         <h4 data-root-seat-role="h4">Heading four</h4>
       </Measured>
     </div>
-    <div className="bucket-text-diagnostics" aria-hidden="true">
-      <h1 data-root-seat-role="h1">Heading one</h1>
-      <h2 data-root-seat-role="h2">Heading two</h2>
-      <h3 data-root-seat-role="h3">Heading three</h3>
-      <h6 data-root-seat-role="h6">Heading six</h6>
-      <div className="ds spacing-text-seat" data-root-seat-role="helper">
-        Shared body seat
-      </div>
-      <p className="bucket-wrapped-text" data-root-seat-role="wrapped">
-        Wrapped body text keeps its first baseline and every subsequent line on
-        the grid.
-      </p>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <p data-root-seat-role="cell-body">Cell body text</p>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div className="bucket-text-diagnostics">
+      <figure>
+        <figcaption>Heading 1 · {typeScale[tier].h1[0]}px</figcaption>
+        <h1 data-root-seat-role="h1">Heading one</h1>
+      </figure>
+      <figure>
+        <figcaption>Heading 2 · {typeScale[tier].h2[0]}px</figcaption>
+        <h2 data-root-seat-role="h2">Heading two</h2>
+      </figure>
+      <figure>
+        <figcaption>Heading 3 · {typeScale[tier].h3[0]}px</figcaption>
+        <h3 data-root-seat-role="h3">Heading three</h3>
+      </figure>
+      <figure>
+        <figcaption>Heading 6 · {typeScale[tier].h6[0]}px</figcaption>
+        <h6 data-root-seat-role="h6">Heading six</h6>
+      </figure>
+      <figure>
+        <figcaption>Shared body seat</figcaption>
+        <div className="ds spacing-text-seat" data-root-seat-role="helper">
+          Shared body seat
+        </div>
+      </figure>
+      <figure>
+        <figcaption>Wrapped body · first baseline</figcaption>
+        <p className="bucket-wrapped-text" data-root-seat-role="wrapped">
+          Wrapped body text keeps its first baseline and every subsequent line
+          on the grid.
+        </p>
+      </figure>
+      <figure>
+        <figcaption>Body in a density-providing cell</figcaption>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <p data-root-seat-role="cell-body">Cell body text</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </figure>
+      <figure className="bucket-field-fixture">
+        <figcaption>Stacked field · label to input</figcaption>
+        <Form onSubmit={() => undefined}>
+          <TextField
+            name={`${tier}-${phase}-text-seat`}
+            label="Field label"
+            defaultValue="Text input"
+          />
+        </Form>
+      </figure>
+      <figure className="bucket-rich-choice-fixture">
+        <figcaption>Rich choice · chrome retains its own seat</figcaption>
+        <RichChoices
+          name={`${tier}-${phase}-rich-seat`}
+          options={[{ value: "one", label: "Rich choice" }]}
+          value="one"
+          onChange={() => undefined}
+        />
+      </figure>
     </div>
   </>
 );
@@ -569,6 +679,8 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
     checks: number;
     errors: string[];
     rows: TextSeatResult[];
+    fields: { before: FieldSeatResult; adopted: FieldSeatResult } | null;
+    richChoices: { before: RichChoiceResult; adopted: RichChoiceResult } | null;
   } | null>(null);
 
   useEffect(() => {
@@ -598,20 +710,34 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
       const button = adopted.querySelector<HTMLElement>(".button");
       if (!button) return;
       const style = getComputedStyle(button);
-      const inset = resolveLength(
-        button,
-        "var(--ds-spacing-control-inset)",
-        style,
-      );
-      const rootSize = resolveLength(
-        button,
-        "var(--ds-typography-body-font-size)",
-        style,
-      );
-      const unit = resolveLength(button, "var(--ds-spacing-baseline)", style);
       const rootScale =
         number(getComputedStyle(document.documentElement).fontSize) / 16;
+      const inset = (tier === "site" ? 0 : 4) * rootScale;
+      const unit = (tier === "site" ? 8 : 4) * rootScale;
       const expectedOneLine = (tier === "site" ? 40 : 32) * rootScale;
+      equal(
+        resolveLength(button, "var(--ds-spacing-control-inset)", style),
+        inset,
+        "tier control inset",
+      );
+      equal(
+        resolveLength(button, "var(--ds-spacing-baseline)", style),
+        unit,
+        "tier baseline unit",
+      );
+      equal(
+        button.getBoundingClientRect().height + number(style.marginBlockEnd),
+        expectedOneLine,
+        "reference Button occupied seat",
+      );
+      const buttonLabel = button.querySelector<HTMLElement>(".label");
+      const buttonBaseline = buttonLabel
+        ? readBrowserBaseline(
+            button,
+            buttonLabel,
+            button.getBoundingClientRect(),
+          )
+        : null;
       for (const role of textSeatRoles) {
         const owner = adopted.querySelector<HTMLElement>(
           `[data-root-seat-role="${role}"]`,
@@ -641,7 +767,31 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
           true,
           null,
         );
-        const eligible = Math.abs(metrics.fontSize - rootSize) < 0.01;
+        const expectedType =
+          role === "helper" || role === "wrapped" || role === "cell-body"
+            ? typeScale[tier].body
+            : typeScale[tier][role];
+        for (const [phase, measured] of [
+          ["Before", oldMetrics],
+          ["Adopted", metrics],
+        ] as const) {
+          equal(
+            measured.fontSize,
+            expectedType[0] * rootScale,
+            `${role} ${phase} font size`,
+          );
+          equal(
+            measured.lineHeight,
+            expectedType[1] * rootScale,
+            `${role} ${phase} line height`,
+          );
+          equal(
+            measured.fontWeight,
+            expectedType[2],
+            `${role} ${phase} font weight`,
+          );
+        }
+        const eligible = seatedRoles[tier].includes(role);
         const addedInset = eligible ? inset : 0;
         equal(
           metrics.paddingStart - oldMetrics.paddingStart,
@@ -667,6 +817,13 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
           (metrics.baseline ?? Number.NaN) -
           (oldMetrics.baseline ?? Number.NaN);
         equal(baselineDelta, addedInset, `${role} first baseline change`);
+        if (eligible) {
+          equal(
+            (metrics.baseline ?? Number.NaN) - (buttonBaseline ?? Number.NaN),
+            0,
+            `${role} first baseline offset vs Button`,
+          );
+        }
         if (["body", "helper", "cell-body"].includes(role)) {
           equal(metrics.occupied, expectedOneLine, `${role} occupied seat`);
         }
@@ -688,12 +845,133 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
           before: oldMetrics.occupied,
           adopted: metrics.occupied,
           baselineDelta,
+          beforeBaseline: oldMetrics.baseline,
+          adoptedBaseline: metrics.baseline,
           buttonDelta: ["body", "h4", "h5"].includes(role)
             ? metrics.baselineDifference
             : null,
         });
       }
-      setResult({ checks, errors, rows });
+      const fieldMetrics = (phase: HTMLElement): FieldSeatResult | null => {
+        const field = phase.querySelector<HTMLElement>(
+          ".bucket-field-fixture .field",
+        );
+        const label = field?.querySelector<HTMLElement>(
+          ":scope > .field-label",
+        );
+        const input = field?.querySelector<HTMLElement>(".input.text");
+        const leaf = input?.querySelector<HTMLElement>("input");
+        if (!label || !input || !leaf) return null;
+        const labelRect = label.getBoundingClientRect();
+        const inputRect = input.getBoundingClientRect();
+        const labelBaseline = readBrowserBaseline(label, label, labelRect);
+        const inputBaseline = readBrowserBaseline(input, leaf, inputRect);
+        return {
+          labelToInputTop: inputRect.top - labelRect.top,
+          labelToInputBaseline:
+            inputRect.top +
+            (inputBaseline ?? Number.NaN) -
+            labelRect.top -
+            (labelBaseline ?? Number.NaN),
+          labelBaselineOffset: labelBaseline ?? Number.NaN,
+          inputBaselineOffset: inputBaseline ?? Number.NaN,
+          labelOccupied:
+            labelRect.height + number(getComputedStyle(label).marginBlockEnd),
+          inputOccupied:
+            inputRect.height + number(getComputedStyle(input).marginBlockEnd),
+        };
+      };
+      const beforeField = fieldMetrics(before);
+      const adoptedField = fieldMetrics(adopted);
+      const fields =
+        beforeField && adoptedField
+          ? { before: beforeField, adopted: adoptedField }
+          : null;
+      check(fields != null, "stacked field: missing label/input specimen");
+      if (fields) {
+        equal(
+          fields.before.labelToInputTop,
+          (tier === "site" ? 48 : 28) * rootScale,
+          "Before field label to input top",
+        );
+        equal(
+          fields.adopted.labelToInputTop,
+          (tier === "site" ? 48 : 36) * rootScale,
+          "Adopted field label to input top",
+        );
+        // Flow adds the inset twice, while the label's own first baseline also
+        // moves by one inset. Preserve the browser's native-input baseline
+        // offset instead of assuming it equals a plain text element's offset.
+        equal(
+          fields.adopted.labelToInputBaseline -
+            fields.before.labelToInputBaseline,
+          inset,
+          "field baseline separation change",
+        );
+        equal(
+          fields.adopted.labelBaselineOffset -
+            fields.before.labelBaselineOffset,
+          inset,
+          "field label first baseline change",
+        );
+        equal(
+          fields.adopted.inputBaselineOffset,
+          fields.before.inputBaselineOffset,
+          "native input baseline offset unchanged",
+        );
+        equal(
+          fields.adopted.labelOccupied,
+          expectedOneLine,
+          "Adopted field label occupied seat",
+        );
+        equal(
+          fields.adopted.inputOccupied,
+          fields.before.inputOccupied,
+          "field input remains unchanged",
+        );
+      }
+      const richChoiceMetrics = (
+        phase: HTMLElement,
+      ): RichChoiceResult | null => {
+        const card = phase.querySelector<HTMLElement>(
+          ".bucket-rich-choice-fixture .option > label",
+        );
+        if (!card) return null;
+        const painted = card.getBoundingClientRect().height;
+        const marginEnd = number(getComputedStyle(card).marginBlockEnd);
+        return { painted, occupied: painted + marginEnd, marginEnd };
+      };
+      const beforeChoice = richChoiceMetrics(before);
+      const adoptedChoice = richChoiceMetrics(adopted);
+      const richChoices =
+        beforeChoice && adoptedChoice
+          ? { before: beforeChoice, adopted: adoptedChoice }
+          : null;
+      check(richChoices != null, "rich choice: missing card specimen");
+      if (richChoices) {
+        equal(
+          richChoices.adopted.painted,
+          richChoices.before.painted,
+          "rich choice painted size unchanged",
+        );
+        equal(
+          richChoices.adopted.marginEnd,
+          richChoices.before.marginEnd,
+          "rich choice unseated closure unchanged",
+        );
+        equal(
+          richChoices.adopted.occupied,
+          richChoices.before.occupied,
+          "rich choice occupied size unchanged",
+        );
+        if (tier !== "site")
+          equal(
+            richChoices.adopted.occupied,
+            40 * rootScale,
+            "rich choice occupied seat",
+          );
+      }
+      setResult({ checks, errors, rows, fields, richChoices });
     };
     const schedule = () => {
       cancelAnimationFrame(frame);
@@ -727,16 +1005,11 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
           key={phase}
           className="bucket-text-phase"
           data-text-seat-phase={phase}
-          style={
-            phase === "before"
-              ? ({ "--_text-seat-control-inset": "0px" } as React.CSSProperties)
-              : undefined
-          }
         >
           <h4 className="bucket-text-phase-heading">
             {phase === "before" ? "Before" : "Adopted"}
           </h4>
-          <TextSeatSamples />
+          <TextSeatSamples tier={tier} phase={phase} />
         </div>
       ))}
       <output
@@ -753,15 +1026,34 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
             {result.errors.length
               ? result.errors.join("; ")
               : `${result.checks} checks passed.`}
-            {result.rows
-              .filter(({ role }) => ["body", "h5", "h4"].includes(role))
-              .map((row) => (
-                <span key={row.role}>
-                  {row.role}: {show(row.before)} → {show(row.adopted)} occupied;
-                  adopted baseline Δ vs Button{" "}
-                  {show(row.buttonDelta ?? Number.NaN)}.
-                </span>
-              ))}
+            {result.rows.map((row) => (
+              <span key={row.role}>
+                {row.role}: {show(row.before)} → {show(row.adopted)} occupied;
+                first baseline offset {show(row.beforeBaseline ?? Number.NaN)} →{" "}
+                {show(row.adoptedBaseline ?? Number.NaN)}
+                {row.buttonDelta != null
+                  ? `; adopted Δ vs Button ${show(row.buttonDelta)}`
+                  : ""}
+                .
+              </span>
+            ))}
+            {result.fields && (
+              <span>
+                Field label → input top:{" "}
+                {show(result.fields.before.labelToInputTop)} →{" "}
+                {show(result.fields.adopted.labelToInputTop)}; baseline
+                separation: {show(result.fields.before.labelToInputBaseline)} →{" "}
+                {show(result.fields.adopted.labelToInputBaseline)}.
+              </span>
+            )}
+            {result.richChoices && (
+              <span>
+                Rich choice occupied: {show(result.richChoices.before.occupied)}{" "}
+                → {show(result.richChoices.adopted.occupied)}; painted:{" "}
+                {show(result.richChoices.before.painted)} →{" "}
+                {show(result.richChoices.adopted.painted)}.
+              </span>
+            )}
           </>
         ) : (
           "Awaiting fonts and text-seat measurements."
@@ -963,4 +1255,21 @@ export const SiteDocsApp: Story = {
       <Tier tier="app" title="App" />
     </main>
   ),
+  play: async ({ canvasElement }) => {
+    await waitFor(
+      () => {
+        const proofs = canvasElement.querySelectorAll<HTMLElement>(
+          "[data-root-text-seat-result]",
+        );
+        expect(proofs).toHaveLength(3);
+        for (const proof of proofs) {
+          expect(
+            proof.dataset.rootTextSeatResult,
+            proof.textContent ?? "Root text seat measurements are pending",
+          ).toBe("pass");
+        }
+      },
+      { timeout: 10000 },
+    );
+  },
 };
