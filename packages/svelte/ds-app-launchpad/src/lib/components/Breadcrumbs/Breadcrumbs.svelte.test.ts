@@ -150,21 +150,16 @@ describe("Breadcrumbs component", () => {
       });
 
       // Mock narrow container
-      pageContext.viewport(100, 800);
+      await pageContext.viewport(100, 800);
 
-      await expectAreCollapsed(page);
+      await expectAreCollapsed(page, collapseProps.segments.length);
 
       // Make sure the collapsed segments are not accessible and all links are in the document
       expect(page.getByRole("link").elements()).toHaveLength(
         collapseProps.segments.length,
       );
-      // Make sure that all of the segments are collapsed
-      expect(
-        collapsedLocator(page).getByRole("listitem").elements(),
-      ).toHaveLength(collapseProps.segments.length);
-
       // Expand the container
-      pageContext.viewport(1000, 800);
+      await pageContext.viewport(1000, 800);
 
       // Check that no segments are collapsed again
       await expectNoCollapsed(page);
@@ -181,13 +176,13 @@ describe("Breadcrumbs component", () => {
       });
 
       // Mock narrow container
-      pageContext.viewport(100, 800);
+      await pageContext.viewport(100, 800);
 
       // Check that maxNumCollapsed segments are collapsed
-      await expectAreCollapsed(page);
-      expect(
-        collapsedLocator(page).getByRole("listitem").elements(),
-      ).toHaveLength(collapseProps.segments.length - minNumExpanded);
+      await expectAreCollapsed(
+        page,
+        collapseProps.segments.length - minNumExpanded,
+      );
     });
 
     describe("edge cases", () => {
@@ -197,7 +192,7 @@ describe("Breadcrumbs component", () => {
           minNumExpanded: 1000,
         });
 
-        pageContext.viewport(100, 800);
+        await pageContext.viewport(100, 800);
 
         await expectNoCollapsed(page);
         expect(page.getByRole("link").elements()).toHaveLength(
@@ -211,12 +206,9 @@ describe("Breadcrumbs component", () => {
           minNumExpanded: -1,
         });
 
-        pageContext.viewport(100, 800);
+        await pageContext.viewport(100, 800);
 
-        await expectAreCollapsed(page);
-        expect(
-          collapsedLocator(page).getByRole("listitem").elements(),
-        ).toHaveLength(collapseProps.segments.length);
+        await expectAreCollapsed(page, collapseProps.segments.length);
       });
     });
   });
@@ -250,9 +242,9 @@ describe("Breadcrumbs component", () => {
           minNumExpanded: 1,
         });
 
-        pageContext.viewport(100, 800);
+        await pageContext.viewport(100, 800);
 
-        await expectAreCollapsed(page);
+        await expectAreCollapsed(page, segments.length - 1);
         expect(
           page.getByRole("list").getByRole("listitem").elements(),
         ).toHaveLength(segments.length);
@@ -286,9 +278,9 @@ describe("Breadcrumbs component", () => {
           minNumExpanded: 2,
         });
 
-        pageContext.viewport(100, 800);
+        await pageContext.viewport(100, 800);
 
-        await expectAreCollapsed(page);
+        await expectAreCollapsed(page, baseProps.segments.length - 2);
 
         const firstLink = page.getByRole("link", { name: "Home" });
         await expect.element(firstLink).toBeInTheDocument();
@@ -371,9 +363,14 @@ function collapsedLocator(page: RenderResult<typeof Component>): Locator {
   return page.getByTestId("collapsed-segments");
 }
 
-// Utility functions to await for Svelte to settle the collapsed state
-async function expectAreCollapsed(page: RenderResult<typeof Component>) {
-  await expect.element(collapsedLocator(page)).toBeInTheDocument();
+// Resize measurements can update the collapsed list over multiple frames.
+async function expectAreCollapsed(
+  page: RenderResult<typeof Component>,
+  count: number,
+) {
+  await expect
+    .poll(() => collapsedLocator(page).getByRole("listitem").elements())
+    .toHaveLength(count);
 }
 
 async function expectNoCollapsed(page: RenderResult<typeof Component>) {
