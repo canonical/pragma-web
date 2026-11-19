@@ -120,7 +120,9 @@ function resolveTokens(
 /**
  * Describe what is wrong with a rule's gaps, if anything: a rule that lays
  * out a grid or a subgrid sets its gap, and from the grid's gutter alone,
- * and no gap anywhere reads the shim's container gaps.
+ * on one axis at least, the other the gutter or none (`row-gap: 0`, rows
+ * that stand one under the next), and no gap anywhere reads the shim's
+ * container gaps.
  */
 function describeGapProblems(
   rule: StyleRule,
@@ -141,12 +143,19 @@ function describeGapProblems(
     if (listReads(resolved).some((read) => CONTAINER_GAP.test(read))) {
       return [`"${selector}" sets ${property} from a container gap`];
     }
-    if (isGrid && resolved !== gutter) {
+    const axes = resolved
+      .split(/\s+(?![^(]*\))/)
+      .map((axis) => resolveTokens(axis, tokens));
+    if (isGrid && !axes.every((axis) => axis === gutter || axis === "0")) {
       return [`"${selector}" sets its grid's ${property} from ${resolved}`];
     }
     return [];
   });
-  const hasGap = gaps.some(({ property }) => property === "gap");
+  const hasGap = gaps.some(({ value }) =>
+    value
+      .split(/\s+(?![^(]*\))/)
+      .some((axis) => resolveTokens(axis, tokens) === gutter),
+  );
   return isGrid && !hasGap
     ? [...problems, `"${selector}" lays out a grid and sets no gap`]
     : problems;
