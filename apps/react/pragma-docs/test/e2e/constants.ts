@@ -137,9 +137,12 @@ export const STANDARDS_FACT_WIDTHS = [
 /** The catalog's rows view, an index that opts its rows into two lines. */
 export const CATALOG_ROWS_PATH = "/components";
 
-/** The catalog's rows. */
+/**
+ * The catalog's rows: the table of facts' body rows, or the scented rows
+ * where a tier's list is mixed.
+ */
 export const CATALOG_ROW_SELECTOR =
-  ".ds.components-catalog-page .ds.entity-row";
+  ".ds.components-catalog-page :is(.ds.entity-table > .body > .row, .ds.entity-row)";
 
 /**
  * The facts a standards index row is given in the browser, after its
