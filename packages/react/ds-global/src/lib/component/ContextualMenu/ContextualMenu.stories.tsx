@@ -31,20 +31,12 @@ const stage: Decorator = (Story) => (
 
 /**
  * Every story renders its menu open — a story is first a picture of the
- * pattern, and a preview has nothing else to click. The open is deferred one
- * effect after mount rather than `useState(true)`: it must land like a click,
- * once the trigger and the portalled menu both exist — opened on the very
- * first render, the fitment positioning runs before either ref is attached
- * and the menu lands unpositioned. Real state rather than a static
- * `open: true` keeps the story interactive: Escape, an outside click, or
- * choosing an item closes the menu, and the trigger reopens it. Open
- * previews stack safely because each docs preview is its own iframe.
+ * pattern, and a preview has nothing else to click. State keeps the story
+ * interactive: Escape, an outside click, or choosing an item closes the menu,
+ * and the trigger reopens it. Each docs preview has its own iframe.
  */
 const openByDefault: Decorator = (Story, context) => {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    setOpen(true);
-  }, []);
+  const [open, setOpen] = useState(true);
   // Args passed here REPLACE the story's args, so the story's own args must be
   // spread back in — without them the trigger and the items vanish.
   return <Story args={{ ...context.args, open, onOpenChange: setOpen }} />;
@@ -69,8 +61,8 @@ const meta = {
     },
   },
   argTypes: {
-    // The `openByDefault` decorator drives the open state, so panel controls
-    // for it would only ever be overridden by it.
+    // The `openByDefault` decorator drives the open state, so controls for it
+    // would only ever be overridden by it.
     open: { control: false },
     onOpenChange: { control: false },
   },
@@ -201,6 +193,91 @@ export const CustomItems_NotCoreApi: Story = {
           </span>
         ),
       },
+    ],
+  },
+};
+
+const StatusDialog = ({ close }: { close: () => void }) => {
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<string[]>(["Running"]);
+  const options = ["Running", "Stopped", "Error"].filter((status) =>
+    status.toLowerCase().includes(search.toLowerCase()),
+  );
+  return (
+    <div style={{ display: "grid", gap: "0.5rem" }}>
+      <input
+        type="search"
+        aria-label="Search statuses"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+      />
+      <fieldset>
+        <legend>Status</legend>
+        {options.map((status) => (
+          <label key={status} style={{ display: "block" }}>
+            <input
+              type="checkbox"
+              checked={selected.includes(status)}
+              onChange={() =>
+                setSelected((current) =>
+                  current.includes(status)
+                    ? current.filter((value) => value !== status)
+                    : [...current, status],
+                )
+              }
+            />
+            {status}
+          </label>
+        ))}
+      </fieldset>
+      <button type="button" onClick={close}>
+        Apply
+      </button>
+    </div>
+  );
+};
+
+/**
+ * An aggregate Filters menu launches a separate non-modal dialog anchored to
+ * each category item. Their chevrons signal the attached surface, while the
+ * search and checkboxes remain outside role=menu.
+ * Escape first closes the dialog and returns to Status; a second closes Filters.
+ */
+export const MenuItemDialog: Story = {
+  args: {
+    children: "Filters",
+    triggerProps: { icon: "filter", importance: "secondary" },
+    items: [
+      {
+        key: "status",
+        label: "Status",
+        dialog: {
+          label: "Filter by status",
+          render: ({ close }) => <StatusDialog close={close} />,
+        },
+      },
+      {
+        key: "date",
+        label: "Date",
+        dialog: {
+          label: "Filter by date",
+          render: ({ close }) => (
+            <div style={{ display: "grid", gap: "0.5rem" }}>
+              <label>
+                From <input type="date" />
+              </label>
+              <label>
+                To <input type="date" />
+              </label>
+              <button type="button" onClick={close}>
+                Apply
+              </button>
+            </div>
+          ),
+        },
+      },
+      { type: "separator", key: "before-refresh" },
+      { key: "refresh", label: "Refresh" },
     ],
   },
 };

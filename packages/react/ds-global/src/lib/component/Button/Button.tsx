@@ -68,10 +68,10 @@ const Button = ({
         .filter(Boolean)
         .join(" ")}
       style={style}
+      {...props}
       // A loading button is busy and must not be re-triggered mid-action.
       aria-busy={loading || undefined}
       disabled={disabled || loading}
-      {...props}
     >
       {/* The icon and label stay in the DOM while loading so the button keeps
           its width; CSS hides them (visibility:hidden) and the Spinner is
