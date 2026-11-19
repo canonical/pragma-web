@@ -13,43 +13,41 @@ import buildClassGraphInput from "./buildClassGraphInput.js";
 
 /** A page's graph input and the maps laid out over it, by drill. */
 interface LaidOutMaps {
+  /** The input and the budget, written out: what the maps are laid out of. */
+  readonly key: string;
   readonly budget: GraphBudget;
   readonly input: ClassGraphInput;
   readonly maps: Map<string, ClassGraphLayout>;
 }
 
 /**
- * The maps laid out, by the operation's ontologies and class edges: the
- * canvas and the inspector read one operation from one store, so a page
- * lays its map out once for both. Weakly held: it goes with the store's
- * data.
+ * The last maps laid out. The canvas and the inspector each read the
+ * page's one operation, as equal data but not the same objects, so the
+ * maps are kept by what they are laid out of: the page lays its map out
+ * once for both, and the memory holds one page's maps at most.
  */
-const LAID_OUT = new WeakMap<
-  DefinitionsExplorer_ontologies$data,
-  WeakMap<readonly ClassEdgeInput[], LaidOutMaps>
->();
+const LAST_LAID_OUT: { current?: LaidOutMaps } = {};
 
 /**
- * Read the input and maps laid out over an operation's data within a
- * budget, starting them when none are kept for it.
+ * Read the maps laid out over an input within a budget: the last ones
+ * when they were laid out of the same, else fresh ones, kept as the last.
  *
- * @note Impure: reads and writes the module's `LAID_OUT`.
+ * @note Impure: reads and writes `LAST_LAID_OUT`.
  */
 function readLaidOutMaps(
-  ontologies: DefinitionsExplorer_ontologies$data,
-  edges: readonly ClassEdgeInput[],
+  input: ClassGraphInput,
   budget: GraphBudget,
 ): LaidOutMaps {
-  const byEdges = LAID_OUT.get(ontologies) ?? new WeakMap();
-  LAID_OUT.set(ontologies, byEdges);
-  const kept = byEdges.get(edges);
-  if (kept !== undefined && kept.budget === budget) return kept;
+  const key = JSON.stringify([input, budget]);
+  const last = LAST_LAID_OUT.current;
+  if (last?.key === key) return last;
   const fresh = {
+    key,
     budget,
-    input: buildClassGraphInput(ontologies, edges),
+    input,
     maps: new Map<string, ClassGraphLayout>(),
   };
-  byEdges.set(edges, fresh);
+  LAST_LAID_OUT.current = fresh;
   return fresh;
 }
 
@@ -105,7 +103,7 @@ export default function useExplorerLayout(
   // The site's budget, from its provider: never the URL nor a setting.
   const budget = useGraphBudget();
   const laidOut = useMemo(
-    () => readLaidOutMaps(ontologies, edges, budget),
+    () => readLaidOutMaps(buildClassGraphInput(ontologies, edges), budget),
     [ontologies, edges, budget],
   );
   const { input } = laidOut;
