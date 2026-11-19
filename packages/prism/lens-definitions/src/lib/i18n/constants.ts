@@ -165,6 +165,10 @@ export const MESSAGES = {
   "inspector.fields.inherited": "Inherited from {class}",
   "inspector.relations": "Relations ({count})",
   "inspector.relations.none": "No relations.",
+  "inspector.relations.count": {
+    one: "{count} statement of {property}: open the property",
+    other: "{count} statements of {property}: open the property",
+  },
   "inspector.relations.outgoing": "Outgoing",
   "inspector.relations.incoming": "Incoming",
   "inspector.relations.inherited": "Inherited from {class}",

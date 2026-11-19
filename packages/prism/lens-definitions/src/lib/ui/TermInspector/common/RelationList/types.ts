@@ -15,6 +15,8 @@ export interface RelationEntry {
   readonly predicate: LinkedTerm;
   /** The class at the other end, or `null` when the domain is unstated. */
   readonly other: LinkedTerm | null;
+  /** The statements the graph serves on its edge, when it serves one. */
+  readonly count?: number;
 }
 
 type OwnProps = {

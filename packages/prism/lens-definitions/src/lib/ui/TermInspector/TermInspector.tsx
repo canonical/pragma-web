@@ -199,6 +199,7 @@ export default function TermInspector({
     body = (
       <ClassView
         className="view"
+        classEdges={classEdges}
         data={classData}
         namespaces={namespaces}
         ontologies={ontologyData}

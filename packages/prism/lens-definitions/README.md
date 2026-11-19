@@ -256,7 +256,11 @@ server, deterministically: two renders of a page give the same SVG.
   `data-set` (every drawn namespace at rest, the opened one in an opened
   view), or `data-task="neighbourhood"` with the selected class in
   `data-focus` on a term page.
-- **The stated limits.** Three lanes in a channel beside a column: a
+- **The stated limits.** The canvas names only the labels it can seat:
+  on a term page a relation whose label finds no seat is drawn unnamed.
+  The term page's inspector lists every relation of the class with the
+  statements served on its edge, the heaviest first, its count a link to
+  the property, so each one drawn is named there. Three lanes in a channel beside a column: a
   fourth bridge there runs closer than 4px to its neighbour, and from six
   they lie on one line; a gap or a margin keeps nine 4px apart. A
   namespace with more classes than the budget leaves room for is drawn
