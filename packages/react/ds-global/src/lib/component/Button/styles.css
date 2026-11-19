@@ -126,11 +126,6 @@
       --button-padding-inline-start: var(--dimension-100);
     }
 
-    /* Outlined destructive actions use the intent colour for the label too. */
-    &:where(.secondary.destructive) {
-      --modifier-color-text: var(--color-text-destructive);
-    }
-
     /* State fallbacks resolve to the default (primary) surface states when no
        importance modifier supplies `--modifier-surface-*`. */
     &:hover:not(:disabled) {
@@ -194,6 +189,10 @@
     color: var(--modifier-color-icon, var(--modifier-color-text, currentColor));
   }
 
+  .ds.button:where(.secondary.destructive:not(.link, :disabled)) > .icon {
+    color: var(--color-icon);
+  }
+
   .ds.button:disabled > .icon {
     color: var(--modifier-color-icon-disabled, var(--color-icon-disabled));
   }
@@ -237,13 +236,12 @@
     border-width: 0;
     padding-inline: 0;
     color: var(--color-text-link, currentColor);
+    text-decoration: underline;
     text-underline-offset: var(--tmp-dimension-underline-offset-link, 0.075em);
 
-    &:hover:not(:disabled),
-    &:focus-visible {
+    &:hover:not(:disabled) {
       background-color: transparent;
       border-color: transparent;
-      text-decoration-line: underline;
       text-decoration-thickness: var(
         --tmp-dimension-decoration-thickness-link,
         1px

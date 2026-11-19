@@ -164,46 +164,43 @@ export const DisabledMatrix: Story = {
 };
 
 /**
- * The link variant is still an action button. It underlines on hover or
- * keyboard focus, not at rest.
+ * Link variant renders as inline text with underline.
  */
 export const LinkVariant: Story = {
   args: {
     children: "Learn more",
     variant: "link",
   },
-  play: async ({ canvas }) => {
-    const button = canvas.getByRole("button", { name: "Learn more" });
-    await expect(getComputedStyle(button).textDecorationLine).toBe("none");
-  },
 };
 
 /**
  * The full matrix with a leading icon in every cell — so the icon colour can be
- * checked against each importance × anticipation combination. For destructive
- * actions, both the icon and the label use the on-fill contrast colour on
- * primary and the intent colour on secondary and tertiary. The `icon` prop
- * takes a design-system icon name;
+ * checked against each importance × anticipation combination. Outlined
+ * destructive buttons keep a neutral label and icon; the border signals intent.
+ * The `icon` prop takes a design-system icon name;
  * the sprite is served from the `@canonical/ds-assets` staticDir at `/icons`.
  */
 export const IconMatrix: Story = {
   render: (args) => <MatrixGrid {...args} />,
   args: { children: "Button", icon: "edit" },
   play: async ({ canvasElement }) => {
-    const primary = canvasElement.querySelector("button.primary.destructive");
-    const secondary = canvasElement.querySelector(
-      "button.secondary.destructive",
+    const neutral = canvasElement.querySelector(
+      "button.secondary:not(.destructive) > .icon",
     );
-    const tertiary = canvasElement.querySelector("button.tertiary.destructive");
-    if (!primary || !secondary || !tertiary) {
-      throw new Error("Expected all three destructive Button importances");
+    const destructive = canvasElement.querySelector(
+      "button.secondary.destructive > .icon",
+    );
+    if (!neutral?.parentElement || !destructive?.parentElement) {
+      throw new Error(
+        "Expected neutral and destructive outlined buttons with icons",
+      );
     }
 
-    await expect(getComputedStyle(secondary).color).toBe(
-      getComputedStyle(tertiary).color,
+    await expect(getComputedStyle(destructive).color).toBe(
+      getComputedStyle(neutral).color,
     );
-    await expect(getComputedStyle(primary).color).not.toBe(
-      getComputedStyle(secondary).color,
+    await expect(getComputedStyle(destructive.parentElement).color).toBe(
+      getComputedStyle(neutral.parentElement).color,
     );
   },
 };
