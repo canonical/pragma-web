@@ -431,6 +431,8 @@ export default function ClassGraph({
         })}
         className="weight-link"
         data-count={numeral.count}
+        data-weight-of={edge}
+        key={edge}
         params={{ term: termOf(numeral.property) }}
         tabIndex={-1}
         to="definitionsTerm"
@@ -604,7 +606,6 @@ export default function ClassGraph({
               >
                 {label.text}
               </text>
-              {drawNumeral(label.edge)}
             </g>
           );
         })}
@@ -650,10 +651,13 @@ export default function ClassGraph({
               >
                 {lines}
               </text>
-              {drawNumeral(label.edge)}
             </g>
           );
         })}
+        {/* The numerals sit outside their labels' groups: the pointer on
+         * one raises no edge, whose labels would be seated anew and move
+         * the numeral from under it before the click lands. */}
+        {[...drawnBridges, ...drawnFocus].map(({ edge }) => drawNumeral(edge))}
       </g>
     </g>
   );

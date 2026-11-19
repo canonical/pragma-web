@@ -727,20 +727,19 @@ describe("ClassGraph", () => {
   });
 
   describe("a count's numeral", () => {
-    it("links each counted label's numeral to its property, out of the tab order", () => {
+    it("links each counted label's numeral to its property, out of the tab order and of its label's group", () => {
       const container = draw({ layout: metro.layout, terms: metro.terms });
       const links = [...container.querySelectorAll("a.weight-link")];
       expect(links.length).toBeGreaterThan(0);
       for (const link of links) {
         const edge = requireDefined(
           metro.layout.edges.find(
-            (candidate) =>
-              candidate.id ===
-              link.closest("[data-edge]")?.getAttribute("data-edge"),
+            (candidate) => candidate.id === link.getAttribute("data-weight-of"),
           ),
           "the numeral's edge",
         );
         const weight = requireDefined(edge.bundle?.weight, "a weight");
+        expect(link.closest("[data-edge]")).toBeNull();
         expect(link.getAttribute("tabindex")).toBe("-1");
         expect(link.getAttribute("data-count")).toBe(String(weight));
         expect(link.querySelector("text.weight-label")?.textContent).toBe(
