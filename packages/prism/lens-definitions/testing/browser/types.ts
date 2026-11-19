@@ -111,3 +111,21 @@ export interface BridgeLabelMeasure {
   /** The label's on-screen size, in px. */
   readonly px: number;
 }
+
+/** A count's numeral as the canvas shows it on screen. */
+export interface WeightLinkMeasure {
+  /** The count it states. */
+  readonly count: number;
+  /** The address it links to: its property's term page. */
+  readonly href: string;
+  /** Its `tabindex`: "-1", out of the tab order. */
+  readonly tabIndex: string;
+  /** Its box's centre on screen, in CSS px. */
+  readonly centre: { readonly x: number; readonly y: number };
+  /** Whether its box lies wholly inside the canvas's frame on screen. */
+  readonly inFrame: boolean;
+  /** Whether any point of its box falls on a drawn line's stroke. */
+  readonly onLine: boolean;
+  /** Whether any point of its box falls on an arrowhead. */
+  readonly onHead: boolean;
+}

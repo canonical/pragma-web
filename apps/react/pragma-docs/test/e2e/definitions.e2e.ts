@@ -45,8 +45,10 @@ import {
   MIN_FIT,
   measureBridgeLabels,
   measureCanvasSvg,
+  measureWeightLinks,
   type ServedWeights,
   sliceCanvasSvg,
+  type WeightLinkMeasure,
   weighServedRelations,
 } from "@canonical/prism-lens-definitions/testing/browser";
 import type { Browser, Page } from "playwright";
@@ -508,6 +510,76 @@ describe("at 1440 px", () => {
     expect(drawn.regions).toBeGreaterThan(0);
     expect(drawn.nodes).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
     expect(drawn.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
+  });
+
+  // A counted relation's figure on ds:UIBlock's page is a link to its
+  // property's page, out of the tab order: a reader's pointer, pressed at
+  // the numeral's centre (not a scripted click on the element), opens it,
+  // and that page lists the class edge with the same count.
+  it("opens a count's property from its numeral by a real pointer click, whose page lists the class edge with that count", async () => {
+    const uiBlock = `/definitions/${encodeURIComponent("ds:UIBlock")}`;
+    const seen: {
+      numerals: readonly WeightLinkMeasure[];
+      path: string;
+      counts: readonly string[];
+    } = { numerals: [], path: "", counts: [] };
+    const { errors } = await openExplorer(uiBlock, desktop, async (page) => {
+      seen.numerals = await page.evaluate(measureWeightLinks);
+      const numeral = seen.numerals.at(0);
+      if (numeral === undefined) return;
+      await page.mouse.click(numeral.centre.x, numeral.centre.y);
+      await page.waitForURL((url) => url.pathname === numeral.href, {
+        timeout: PAGE_SETTLE_MS,
+      });
+      seen.path = new URL(page.url()).pathname;
+      const rows = page.locator(".ds.term-inspector .edges .row");
+      await rows.first().waitFor({ timeout: PAGE_SETTLE_MS });
+      seen.counts = await rows.evaluateAll((items) =>
+        items.map(
+          (item) => item.querySelector(".cell.is-figure")?.textContent ?? "",
+        ),
+      );
+    });
+    expect(errors).toEqual([]);
+    const [numeral] = seen.numerals;
+    expect(numeral).toBeDefined();
+    for (const each of seen.numerals) {
+      expect(each.count, each.href).toBeGreaterThan(0);
+      expect(each.tabIndex, each.href).toBe("-1");
+      expect(each.inFrame, each.href).toBe(true);
+      expect(each.onHead, each.href).toBe(false);
+    }
+    expect(seen.path).toBe(numeral?.href);
+    expect(seen.path).not.toBe(uiBlock);
+    expect(seen.counts).toContain(String(numeral?.count));
+  });
+
+  // At rest the inspector opens on the graph's count line; each figure
+  // links to the namespace rows that add up to it.
+  it("follows a figure of the inspector's count line to the namespace rows", async () => {
+    const seen = { links: 0, hash: "", rowsInView: false };
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        const links = page.locator(
+          ".ds.graph-overview .count-line .count-link",
+        );
+        seen.links = await links.count();
+        await links.first().click();
+        seen.hash = new URL(page.url()).hash;
+        seen.rowsInView = await page
+          .locator("#graph-overview-namespaces")
+          .evaluate((section) => {
+            const box = section.getBoundingClientRect();
+            return box.top < window.innerHeight && box.bottom > 0;
+          });
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.links).toBe(4);
+    expect(seen.hash).toBe("#graph-overview-namespaces");
+    expect(seen.rowsInView).toBe(true);
   });
 
   // A term page draws its class's neighbourhood, not the overview: the

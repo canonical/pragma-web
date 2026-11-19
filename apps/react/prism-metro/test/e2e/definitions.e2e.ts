@@ -27,9 +27,11 @@ import {
   MIN_FIT,
   measureBridgeLabels,
   measureCanvasSvg,
+  measureWeightLinks,
   type ServedGraph,
   type ServedWeights,
   sliceCanvasSvg,
+  type WeightLinkMeasure,
   weighServedRelations,
 } from "@canonical/prism-lens-definitions/testing/browser";
 import type { Browser } from "playwright";
@@ -268,6 +270,56 @@ describe("the overview's record, on the metro", () => {
 
   // The explorer's query reads every class of every loaded namespace, and
   // nothing bounds it: a site past the budget's figure is a stated limit.
+  // A counted relation's figure is drawn beside its label, clear of every
+  // line and arrowhead and wholly inside the canvas's frame: on geo opened,
+  // where a numeral once sat on its arrowhead, and on metro:Station's
+  // page, where one was cut at the frame's edge.
+  it.each(["/definitions?expand=geo", "/definitions/metro%3AStation"])(
+    "draws each count's numeral on %s clear of the lines and the arrowheads, inside the frame",
+    async (path) => {
+      const [desktop] = VIEWPORTS;
+      const page = await browser.newPage({
+        viewport: { width: desktop.width, height: desktop.height },
+      });
+      const errors: string[] = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      let numerals: readonly WeightLinkMeasure[] = [];
+      try {
+        const origins = [
+          new URL(server.base).origin,
+          new URL(graph.base).origin,
+        ];
+        await page.route("**/*", (route) =>
+          origins.includes(new URL(route.request().url()).origin)
+            ? route.continue()
+            : route.fulfill({ status: 204, body: "" }),
+        );
+        await page.routeWebSocket(
+          () => true,
+          () => {
+            // Left unconnected, the dev server's live-reload socket stays silent.
+          },
+        );
+        await page.goto(new URL(path, server.base).href, {
+          waitUntil: "networkidle",
+          timeout: PAGE_SETTLE_MS,
+        });
+        await page.evaluate(() => document.fonts.ready.then(() => undefined));
+        numerals = await page.evaluate(measureWeightLinks);
+      } finally {
+        await page.close();
+      }
+      expect(errors).toEqual([]);
+      expect(numerals.length).toBeGreaterThan(0);
+      for (const numeral of numerals) {
+        expect(numeral.count, numeral.href).toBeGreaterThan(0);
+        expect(numeral.inFrame, numeral.href).toBe(true);
+        expect(numeral.onLine, numeral.href).toBe(false);
+        expect(numeral.onHead, numeral.href).toBe(false);
+      }
+    },
+  );
+
   it("fetches no more classes than the budget's figure for fetched nodes", () => {
     expect(served.classes).toBeGreaterThan(0);
     expect(served.classes).toBeLessThanOrEqual(GRAPH_BUDGET.fetchedNodesMax);

@@ -15,6 +15,7 @@ export { default as countServedNeighbourhood } from "./countServedNeighbourhood.
 export { default as fetchServedGraph } from "./fetchServedGraph.js";
 export { default as measureBridgeLabels } from "./measureBridgeLabels.js";
 export { default as measureCanvasSvg } from "./measureCanvasSvg.js";
+export { default as measureWeightLinks } from "./measureWeightLinks.js";
 export { default as sliceCanvasSvg } from "./sliceCanvasSvg.js";
 export type {
   BridgeLabelMeasure,
@@ -23,5 +24,6 @@ export type {
   ServedGraph,
   ServedProperty,
   ServedWeights,
+  WeightLinkMeasure,
 } from "./types.js";
 export { default as weighServedRelations } from "./weighServedRelations.js";
