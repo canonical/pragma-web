@@ -33,6 +33,37 @@ const box = (element: Element): Box => {
 };
 const numeric = (value: string) => Number.parseFloat(value) || 0;
 
+const rootTextSeats = (host: HTMLElement) => {
+  const scale =
+    numeric(getComputedStyle(document.documentElement).fontSize) / 16;
+  return [...host.querySelectorAll<HTMLElement>("p.p")].map((text) => {
+    const site = text.closest(".site, .docs, .app")?.matches(".site") ?? true;
+    const css = getComputedStyle(text);
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    const lines = new Set(
+      [...range.getClientRects()]
+        .filter((rect) => rect.height > 0)
+        .map((rect) => Math.round(rect.top * 64)),
+    ).size;
+    const occupied =
+      text.getBoundingClientRect().height + numeric(css.marginBlockEnd);
+    const expected =
+      ((site ? 40 : 32) + (lines - 1) * (site ? 24 : 20)) * scale;
+    return {
+      text: text.textContent,
+      lines,
+      occupied,
+      expected,
+      fontSize: css.fontSize,
+      pass:
+        lines > 0 &&
+        Math.abs(occupied - expected) < 0.05 &&
+        Math.abs(numeric(css.fontSize) - (site ? 16 : 14) * scale) < 0.05,
+    };
+  });
+};
+
 // A zero-size inline marker reads the browser's first actual line baseline.
 // Prepending it also reads the first line of naturally wrapped public prose.
 const baseline = (element: HTMLElement): number | null => {
@@ -100,11 +131,17 @@ const Measured = ({
           ".form, .field, .payload, .range-control, .form-choices, .option, .card, .card-header, .card-content, .card-footer, .modal-footer, [data-gap-owner]",
         ),
       );
+      const textSeats = rootTextSeats(host);
+      if (textSeats.length)
+        host.dataset.rootTextSeatProof = textSeats.every((seat) => seat.pass)
+          ? "pass"
+          : "fail";
       setMetrics({
         caption,
         measuredOwner: first.className,
         box: firstBox,
         firstBaseline,
+        rootTextSeats: textSeats,
         tierBaseline: getComputedStyle(first).getPropertyValue(
           "--ds-spacing-baseline",
         ),
@@ -441,7 +478,9 @@ export const SiteDocsApp: Story = {
         Container-owned block gaps. Red: block start / occupied end. Blue: first
         browser baseline. Help leads text/select controls and follows toggle
         controls, as shipped. Card uses the adopted frame and section group.
-        Inline items use the selected gap.
+        Inline items use the selected gap. One-line Body occupies 40px in Site
+        and 32px in Docs/App (previously 24px); wrapped lines add 24/20px. Item,
+        group and section gaps are unchanged.
       </p>
       <Tier title="Site" className="site" />
       <Tier title="Docs" className="docs" />

@@ -230,3 +230,44 @@
 .bucket-metrics {
   display: none;
 }
+
+.bucket-text-comparison {
+  position: relative;
+  margin-block-end: 1.5rem;
+}
+
+.bucket-text-phase {
+  margin-block: 1rem;
+}
+
+.bucket-text-phase-heading {
+  margin-block-end: 0.5rem;
+}
+
+.bucket-text-summary {
+  display: block;
+  margin-block: 1rem;
+  font-family: monospace;
+}
+
+.bucket-text-summary > span {
+  display: block;
+}
+
+/* Additional role and wrapping diagnostics retain layout without adding a second
+   visible specimen of each heading to the compact comparison. */
+.bucket-text-diagnostics {
+  position: absolute;
+  inset-inline-start: -10000px;
+  inline-size: 32rem;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.bucket-text-diagnostics > * {
+  display: flow-root;
+}
+
+.bucket-wrapped-text {
+  inline-size: 8rem;
+}

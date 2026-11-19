@@ -9,8 +9,8 @@
  * 2×3 matrix and the value table.
  *
  * THIS file is the FORM APPLICATION layer for controls that have not moved to
- * the semantic spacing seats. Single-line inputs opt out below; labels and the
- * multiline textarea keep the established density model.
+ * the semantic spacing seats. Single-line inputs and shared-seat field labels
+ * opt out below; unmigrated owners keep the established density model.
  *
  * Migrated controls compute their local cap nudge from spacing-seat.css and do
  * not subscribe to `.dense` or `.comfortable` geometry here.
@@ -135,8 +135,8 @@
    * centring (e.g. the Button's `align-items: center`). */
   /* Description/Error carrying .p retain the body engine's line-height, cap nudge
    * and compensation margin; density seating applies only to control-like owners. */
-  /* Font family and size remain shared. Migrated Toggle/Choices body owners
-     supply their own complete semantic seats; other labels keep density seating. */
+  /* Font family and size remain shared. Shared-seat labels and option owners
+     opt out below; standalone unmigrated labels retain density seating. */
   :is(.comfortable, .dense, .app, .site, .docs)
     :is(
       .ds.field-label,

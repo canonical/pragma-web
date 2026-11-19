@@ -68,11 +68,13 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
         .join(" ")}
     >
       <Label
-        className={
-          className?.split(/\s+/).includes("field-choices")
-            ? "spacing-text-seat field-choice-heading"
-            : undefined
-        }
+        className={[
+          "spacing-text-seat",
+          className?.split(/\s+/).includes("field-choices") &&
+            "field-choice-heading",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         name={name}
         isOptional={isOptional}
         requiredIndicator={requiredIndicator}

@@ -39,7 +39,7 @@
         /* Block padding: chrome padding + baseline nudges, minus border */
         padding-block-start: calc(
           var(--form-input-padding-block) +
-          var(--start-nudge, 0px) -
+          var(--_text-unseated-nudge, var(--start-nudge, 0px)) -
           var(--form-input-border-width)
         );
         padding-block-end: calc(

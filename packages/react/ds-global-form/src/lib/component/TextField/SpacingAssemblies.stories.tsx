@@ -113,6 +113,8 @@ function Sample({
         (baselineRaw.endsWith("rem")
           ? parseFloat(getComputedStyle(document.documentElement).fontSize)
           : 1);
+      const rootScale =
+        parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
       const owners = [
         ...field.querySelectorAll<HTMLElement>(
           ".field-toggle-control,.form-choices,.option,.field-label,.field-description,.field-error",
@@ -136,6 +138,15 @@ function Sample({
           height: rect.height,
           marginEnd: css.marginBlockEnd,
           occupiedHeight: rect.height + parseFloat(css.marginBlockEnd || "0"),
+          expectedTextSeat: node.matches(".spacing-text-seat,p.p")
+            ? ((tier === "site" ? 40 : 32) +
+                Math.max(0, lines.length - 1) * (tier === "site" ? 24 : 20)) *
+              rootScale
+            : null,
+          textSeatCanStretch:
+            node.matches(".option") &&
+            (node.parentElement?.matches(".form-choices:not(.stacked)") ??
+              false),
           padding: css.paddingBlock,
           rowGap: css.rowGap,
           columnGap: css.columnGap,
@@ -170,6 +181,28 @@ function Sample({
               : null,
         };
       });
+      const textSeats = owners.filter(
+        (owner) => owner.expectedTextSeat !== null,
+      );
+      if (textSeats.length)
+        host.dataset.rootTextSeatProof = textSeats.every(
+          (owner) =>
+            owner.expectedTextSeat !== null &&
+            (owner.textSeatCanStretch
+              ? owner.occupiedHeight + 0.05 >= owner.expectedTextSeat &&
+                Math.abs(
+                  owner.occupiedHeight -
+                    Math.round(owner.occupiedHeight / bU) * bU,
+                ) < 0.05
+              : Math.abs(owner.occupiedHeight - owner.expectedTextSeat) <
+                0.05) &&
+            Math.abs(
+              parseFloat(owner.fontSize) -
+                (tier === "site" ? 16 : 14) * rootScale,
+            ) < 0.05,
+        )
+          ? "pass"
+          : "fail";
       const nextLabel = following.querySelector<HTMLElement>(".field-label");
       const nextBaseline = nextLabel ? firstBaseline(nextLabel) : null;
       const followingOffset = following.getBoundingClientRect().top - origin;
@@ -273,8 +306,10 @@ export const Assemblies: Story = {
         labels, optional headings, help and errors expose actual line advances
         and following flow. Native public density classes are compared without
         enrolling a new provider. Toggle marks center the full control label;
-        Choices marks center its first line. Normal following-field labels
-        retain their existing density policy.
+        Choices marks center its first line. Normal following-field labels use
+        the shared text seat. One-line Body and labels occupy 40px in Site and
+        32px in Docs/App (previously 24px); wrapping adds 24/20px per line.
+        Public density classes do not change text seats or the selected gaps.
       </p>
       {["site", "docs", "app"].map((tier) =>
         ["normal", "comfortable", "dense"].map((mode) => (
@@ -309,7 +344,8 @@ export const DisabledAndNaturalChoices: Story = {
       <p className="gaps-note">
         Public disabled radio and multiple Choices retain their native disabled
         behavior. The enabled multiple specimen wraps ordinary text naturally;
-        its mark uses the first body line.
+        its mark uses the first body line. Docs/App text adds 4px to each metric
+        edge, so one line occupies 32px; Site is unchanged at 40px.
       </p>
       {["site", "docs", "app"].map((tier) => (
         <section key={tier} className={`${tier} gaps-tier`}>

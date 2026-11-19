@@ -42,6 +42,7 @@ type Metrics = {
   naturalVisible: number | null;
   setClosure: number | null;
   baseline: number | null;
+  baselineDifference: number | null;
   capModelBaseline: number | null;
   occupiedEnd: number;
   guideLeft: number;
@@ -95,7 +96,7 @@ const readBrowserBaseline = (
     const before = owner.getBoundingClientRect();
     const marker = document.createElement("span");
     marker.className = "bucket-baseline-marker";
-    baselineOwner.append(marker);
+    baselineOwner.prepend(marker);
     const markerTop = marker.getBoundingClientRect().top;
     const after = owner.getBoundingClientRect();
     marker.remove();
@@ -113,9 +114,9 @@ const readBrowserBaseline = (
   const rig = document.createElement("span");
   rig.className = "bucket-baseline-rig";
   const clone = baselineOwner.cloneNode(true) as HTMLElement;
-  clone
-    .querySelectorAll("[id]")
-    .forEach((element) => element.removeAttribute("id"));
+  clone.querySelectorAll("[id]").forEach((element) => {
+    element.removeAttribute("id");
+  });
   clone.removeAttribute("id");
   for (const property of baselineStyle) {
     clone.style.setProperty(property, baselineStyle.getPropertyValue(property));
@@ -190,6 +191,12 @@ const readMetrics = (
   const baseline = hasTextBaseline
     ? readBrowserBaseline(owner, baselineOwner, guideRect)
     : null;
+  const referenceLabel = referenceOwner?.querySelector<HTMLElement>(".label");
+  const referenceRect = referenceOwner?.getBoundingClientRect();
+  const referenceBaseline =
+    referenceOwner && referenceLabel && referenceRect
+      ? readBrowserBaseline(referenceOwner, referenceLabel, referenceRect)
+      : null;
   const borderValues = [
     style.borderBlockStartWidth,
     style.borderInlineEndWidth,
@@ -216,6 +223,10 @@ const readMetrics = (
       : null,
     setClosure: naturalVisibleOwner ? ownerRect.height + ownerMarginEnd : null,
     baseline,
+    baselineDifference:
+      baseline != null && referenceBaseline != null && referenceRect
+        ? guideRect.top + baseline - referenceRect.top - referenceBaseline
+        : null,
     capModelBaseline: hasTextBaseline
       ? ownerRect.top - guideRect.top + paddingStart + naturalBaseline
       : null,
@@ -264,6 +275,9 @@ const MetricsOutput = ({ metrics }: { metrics: Metrics | null }) => (
         {metrics.baseline == null
           ? "no text baseline"
           : `browser baseline offset ${show(metrics.baseline)}`}
+        {metrics.baselineDifference == null
+          ? null
+          : `; Δ vs Plain Button ${show(metrics.baselineDifference)}`}
       </>
     ) : (
       "awaiting fonts and styles"
@@ -312,7 +326,7 @@ const Measured = ({
       const referenceOwner = flow
         ? null
         : local
-            ?.closest(".bucket-tier")
+            ?.closest(".bucket-samples")
             ?.querySelector<HTMLElement>("[data-bucket-reference] .button");
       const naturalVisibleOwner = naturalVisibleSelector
         ? (owner?.querySelector(naturalVisibleSelector) as HTMLElement | null)
@@ -387,6 +401,7 @@ const Measured = ({
     hasTextBaseline,
     naturalVisibleSelector,
     ownerSelector,
+    reference,
     seatSelector,
     usesControlInset,
   ]);
@@ -477,13 +492,286 @@ const MenuItemFixture = ({ tier }: { tier: string }) => {
   );
 };
 
-const Tier = ({
-  tier,
-  title,
-}: {
-  tier: "site" | "docs" | "app";
-  title: string;
-}) => (
+type TierName = "site" | "docs" | "app";
+const textSeatRoles = [
+  "body",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "helper",
+  "wrapped",
+  "cell-body",
+] as const;
+type TextSeatResult = {
+  role: string;
+  before: number;
+  adopted: number;
+  baselineDelta: number;
+  buttonDelta: number | null;
+};
+
+const TextSeatSamples = () => (
+  <>
+    <div className="bucket-samples">
+      <Measured
+        label="Plain Button"
+        ownerSelector=".button"
+        baselineSelector=".label"
+        reference
+      >
+        <Button>Button</Button>
+      </Measured>
+      <Measured label="Body" ownerSelector="p">
+        <p data-root-seat-role="body">Body text</p>
+      </Measured>
+      <Measured label="Heading 5 · App 14px" ownerSelector="h5">
+        <h5 data-root-seat-role="h5">Heading five</h5>
+      </Measured>
+      <Measured
+        label="Heading 4 · App 18px"
+        ownerSelector="h4"
+        usesControlInset={false}
+      >
+        <h4 data-root-seat-role="h4">Heading four</h4>
+      </Measured>
+    </div>
+    <div className="bucket-text-diagnostics" aria-hidden="true">
+      <h1 data-root-seat-role="h1">Heading one</h1>
+      <h2 data-root-seat-role="h2">Heading two</h2>
+      <h3 data-root-seat-role="h3">Heading three</h3>
+      <h6 data-root-seat-role="h6">Heading six</h6>
+      <div className="ds spacing-text-seat" data-root-seat-role="helper">
+        Shared body seat
+      </div>
+      <p className="bucket-wrapped-text" data-root-seat-role="wrapped">
+        Wrapped body text keeps its first baseline and every subsequent line on
+        the grid.
+      </p>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <p data-root-seat-role="cell-body">Cell body text</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </>
+);
+
+const RootTextComparison = ({ tier }: { tier: TierName }) => {
+  const root = useRef<HTMLDivElement>(null);
+  const [result, setResult] = useState<{
+    checks: number;
+    errors: string[];
+    rows: TextSeatResult[];
+  } | null>(null);
+
+  useEffect(() => {
+    const local = root.current;
+    if (!local) return;
+    let frame = 0;
+    const measure = () => {
+      const before = local.querySelector<HTMLElement>(
+        '[data-text-seat-phase="before"]',
+      );
+      const adopted = local.querySelector<HTMLElement>(
+        '[data-text-seat-phase="adopted"]',
+      );
+      if (!before || !adopted) return;
+      let checks = 0;
+      const errors: string[] = [];
+      const rows: TextSeatResult[] = [];
+      const check = (valid: boolean, label: string) => {
+        checks += 1;
+        if (!valid) errors.push(label);
+      };
+      const equal = (actual: number, expected: number, label: string) =>
+        check(
+          Math.abs(actual - expected) < 0.05,
+          `${label}: ${show(actual)} ≠ ${show(expected)}`,
+        );
+      const button = adopted.querySelector<HTMLElement>(".button");
+      if (!button) return;
+      const style = getComputedStyle(button);
+      const inset = resolveLength(
+        button,
+        "var(--ds-spacing-control-inset)",
+        style,
+      );
+      const rootSize = resolveLength(
+        button,
+        "var(--ds-typography-body-font-size)",
+        style,
+      );
+      const unit = resolveLength(button, "var(--ds-spacing-baseline)", style);
+      const rootScale =
+        number(getComputedStyle(document.documentElement).fontSize) / 16;
+      const expectedOneLine = (tier === "site" ? 40 : 32) * rootScale;
+      for (const role of textSeatRoles) {
+        const owner = adopted.querySelector<HTMLElement>(
+          `[data-root-seat-role="${role}"]`,
+        );
+        const oldOwner = before.querySelector<HTMLElement>(
+          `[data-root-seat-role="${role}"]`,
+        );
+        if (!owner || !oldOwner) {
+          check(false, `${role}: missing Before/Adopted peer`);
+          continue;
+        }
+        const oldMetrics = readMetrics(
+          oldOwner,
+          oldOwner,
+          oldOwner,
+          false,
+          null,
+          true,
+          null,
+        );
+        const metrics = readMetrics(
+          owner,
+          owner,
+          owner,
+          true,
+          button,
+          true,
+          null,
+        );
+        const eligible = Math.abs(metrics.fontSize - rootSize) < 0.01;
+        const addedInset = eligible ? inset : 0;
+        equal(
+          metrics.paddingStart - oldMetrics.paddingStart,
+          addedInset,
+          `${role} start inset`,
+        );
+        equal(
+          metrics.marginEnd - oldMetrics.marginEnd,
+          addedInset,
+          `${role} end inset`,
+        );
+        equal(
+          metrics.occupied - oldMetrics.occupied,
+          2 * addedInset,
+          `${role} occupied change`,
+        );
+        equal(
+          metrics.occupied / unit,
+          Math.round(metrics.occupied / unit),
+          `${role} grid closure`,
+        );
+        const baselineDelta =
+          (metrics.baseline ?? Number.NaN) -
+          (oldMetrics.baseline ?? Number.NaN);
+        equal(baselineDelta, addedInset, `${role} first baseline change`);
+        if (["body", "helper", "cell-body"].includes(role)) {
+          equal(metrics.occupied, expectedOneLine, `${role} occupied seat`);
+        }
+        if (role === "body" || (eligible && ["h4", "h5"].includes(role))) {
+          equal(
+            metrics.baselineDifference ?? Number.NaN,
+            0,
+            `${role} Button baseline`,
+          );
+        }
+        if (role === "wrapped") {
+          check(
+            metrics.occupied > expectedOneLine,
+            "wrapped: expected multiple lines",
+          );
+        }
+        rows.push({
+          role,
+          before: oldMetrics.occupied,
+          adopted: metrics.occupied,
+          baselineDelta,
+          buttonDelta: ["body", "h4", "h5"].includes(role)
+            ? metrics.baselineDifference
+            : null,
+        });
+      }
+      setResult({ checks, errors, rows });
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(local);
+    void document.fonts.ready.then(schedule);
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", schedule);
+    };
+  }, [tier]);
+
+  return (
+    <div
+      className="bucket-text-comparison"
+      ref={root}
+      data-root-text-seat={tier}
+    >
+      <h3>Root-size text · Before / Adopted</h3>
+      <p>
+        Body and root-size headings gain the tier-default inset on both metric
+        edges. Larger headings keep their previous occupied size. Text in cells
+        keeps the same default seat.
+      </p>
+      {(["before", "adopted"] as const).map((phase) => (
+        <div
+          key={phase}
+          className="bucket-text-phase"
+          data-text-seat-phase={phase}
+          style={
+            phase === "before"
+              ? ({ "--_text-seat-control-inset": "0px" } as React.CSSProperties)
+              : undefined
+          }
+        >
+          <h4 className="bucket-text-phase-heading">
+            {phase === "before" ? "Before" : "Adopted"}
+          </h4>
+          <TextSeatSamples />
+        </div>
+      ))}
+      <output
+        className="bucket-text-summary"
+        data-root-text-seat-result={
+          result ? (result.errors.length ? "error" : "pass") : "pending"
+        }
+        data-root-text-seat-metrics={
+          result ? JSON.stringify(result) : undefined
+        }
+      >
+        {result ? (
+          <>
+            {result.errors.length
+              ? result.errors.join("; ")
+              : `${result.checks} checks passed.`}
+            {result.rows
+              .filter(({ role }) => ["body", "h5", "h4"].includes(role))
+              .map((row) => (
+                <span key={row.role}>
+                  {row.role}: {show(row.before)} → {show(row.adopted)} occupied;
+                  adopted baseline Δ vs Button{" "}
+                  {show(row.buttonDelta ?? Number.NaN)}.
+                </span>
+              ))}
+          </>
+        ) : (
+          "Awaiting fonts and text-seat measurements."
+        )}
+      </output>
+    </div>
+  );
+};
+
+const Tier = ({ tier, title }: { tier: TierName; title: string }) => (
   <section className={`bucket-tier ${tier}`} data-tier={tier}>
     <header>
       <h2>{title}</h2>
@@ -491,13 +779,9 @@ const Tier = ({
         Grid unit: <span className="tier-unit" />
       </p>
     </header>
+    <RootTextComparison tier={tier} />
     <div className="bucket-body-flow">
-      <Measured
-        label="Body flow"
-        ownerSelector="p.ds"
-        usesControlInset={false}
-        flow
-      >
+      <Measured label="Body flow" ownerSelector="p.ds" flow>
         <p className="ds">Body paragraph</p>
         <span className="bucket-following-flow-marker" aria-hidden="true" />
       </Measured>
@@ -511,11 +795,7 @@ const Tier = ({
       >
         <Button>Button</Button>
       </Measured>
-      <Measured
-        label="Body paragraph"
-        ownerSelector="p.ds"
-        usesControlInset={false}
-      >
+      <Measured label="Body paragraph" ownerSelector="p.ds">
         <p className="ds">Body text</p>
       </Measured>
       <Measured
