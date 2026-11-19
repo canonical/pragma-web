@@ -22,7 +22,9 @@
     --entity-table-selected-background: var(--color-background-layer2);
     --entity-table-sort-font-weight: var(--typography-text-primary-font-weight);
     --entity-table-title-color: var(--color-text);
-    --entity-table-title-font-weight: var(--typography-text-primary-font-weight);
+    --entity-table-title-font-weight: var(
+      --typography-text-primary-font-weight
+    );
     --entity-table-sorted-color: var(--color-text);
 
     display: grid;
