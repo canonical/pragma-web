@@ -41,3 +41,12 @@ export const CARDINALITY_MESSAGES: Readonly<Record<Cardinality, MessageKey>> = {
   many: "cardinality.many",
   any: "cardinality.any",
 };
+
+/** How many of the lens's facets the bar holds when the lens sets none. */
+export const DEFAULT_BAR_FACETS = 3;
+
+/** The address's word for a facet's "none" bucket (`?servesLine=none`). */
+export const FACET_NONE = "none";
+
+/** Between a facet's applied values in the address. */
+export const FACET_VALUE_SEPARATOR = ",";
