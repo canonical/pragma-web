@@ -126,7 +126,7 @@ describe("SavedViews stylesheet", () => {
   it("renders the structure the stylesheet's combinators assume", async () => {
     const containers = await rendered();
     for (const selector of [
-      `${root} > .picker > .ds.input.select`,
+      `${root} > .picker > .ds.select-input`,
       `${root} > .picker > .modified`,
       `${root} > .commands`,
       `${root} > .ds.data-views-saved-views-name-form > .ds.input.text`,
