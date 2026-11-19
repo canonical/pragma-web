@@ -189,7 +189,16 @@ server, deterministically: two renders of a page give the same SVG.
   holds for it (`Query.classEdges`): 1px below 10, 2px from 10, 4px from
   100 and 8px from 1000; a relation with no statements yet is dashed. A
   line that bundles several relations between two classes weighs the
-  heaviest of them.
+  heaviest of them. At full zoom a counted line's figure is drawn beside
+  its label, clear of every line, head and heading and inside the
+  drawing, as a link to its property's page; it takes the pointer and
+  stays out of the tab order, where the inspector's rows carry the same
+  links. A line with no statements draws no figure.
+- **The inspector at rest.** With nothing selected the inspector opens on
+  a count line: the graph's classes, namespaces, instances and
+  relations, each a link to the namespace rows below that add up to it
+  (`#graph-overview-namespaces`). It then lists, a row each, the edges
+  between classes the instances state that no property declares.
 - **Stubs.** A class the relations reach that no loaded ontology holds is
   a dashed stub, named by its well-known prefix (`rdf:List`), else by its
   host and last segment, never two alike. A store counts a statement
@@ -249,11 +258,12 @@ server, deterministically: two renders of a page give the same SVG.
   past the box sized for the English words. The layout's cost grows with
   the number of namespaces: the overview lays the whole graph out again
   each time it draws one more namespace as a box, so thirty namespaces
-  take thirty layouts (about 0.7s on a developer's machine).
-
-Not in this package yet: the counts as links to the rows they count; the inspector's count line
-with nothing selected; and the list of the relations the graph observes
-that no ontology declares.
+  take thirty layouts (about 0.7s on a developer's machine). A
+  property's page lists its edges between classes, a row each, with the
+  statements counted for each: the classes are links, the counts are
+  figures, as no page lists a property's statements between two
+  classes. The count line's figures link to the namespace rows, not to
+  a list of what they count.
 
 ## Styling
 
