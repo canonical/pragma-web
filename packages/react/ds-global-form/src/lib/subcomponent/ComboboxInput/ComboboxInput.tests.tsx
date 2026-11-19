@@ -21,7 +21,7 @@ const fruits: Option[] = [
  */
 const chipLabels = (container: HTMLElement): string[] =>
   Array.from(container.querySelectorAll(".selected-items .chip")).map((chip) =>
-    (chip.textContent ?? "").replace("×", "").trim(),
+    (chip.textContent ?? "").trim(),
   );
 
 describe("ComboboxInput (presentational)", () => {

@@ -108,10 +108,10 @@ describe("PaginationBar stylesheet", () => {
     // part through its parent, and a part that moves loses its rule.
     const container = loaded();
     for (const selector of [
-      `${bar} > .leading > .page-size > .ds.input.select`,
+      `${bar} > .leading > .page-size > .ds.select-input`,
       `${bar} > .leading > .divider`,
       `${bar} > .leading > .summary`,
-      `${bar} > .trailing > .page > .ds.input.select`,
+      `${bar} > .trailing > .page > .ds.select-input`,
       `${bar} > .trailing > .page > .total`,
       `${bar} > .trailing > .divider`,
       `${bar} > .trailing > .navigation > .ds.button`,
@@ -238,7 +238,7 @@ describe("PaginationBar stylesheet", () => {
     // The one property overridden rather than themed.
     expect(
       rule(
-        "& > .leading > .page-size > .ds.input.select, & > .trailing > .page > .ds.input.select",
+        "& > .leading > .page-size > .ds.select-input, & > .trailing > .page > .ds.select-input",
       ),
     ).toMatch(/inline-size: auto;/);
   });

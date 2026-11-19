@@ -65,8 +65,7 @@
       }
 
       & > .remove-icon {
-        font-size: 0.75em;
-        line-height: 1;
+        --icon-size: 0.75em;
       }
     }
   }

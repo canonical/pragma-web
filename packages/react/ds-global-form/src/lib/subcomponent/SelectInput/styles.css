@@ -1,56 +1,31 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* Chevron indicator, painted with CSS gradients so it takes the theme colour.
-   * A `background-image` SVG cannot be recoloured by CSS (no inheritance into
-   * the image document), which left the caret black on dark themes — the same
-   * reason the checkbox/accordion glyphs are masks. A <select> is a replaced
-   * element with no ::before/::after to mask, so the chevron is drawn instead:
-   * two diagonally-striped gradient squares butted together form a down-chevron
-   * STROKE (transparent → colour → transparent along each diagonal), coloured by
-   * --color-icon like every other control glyph. */
+  /* A <select> is a replaced element: no ::before/::after, no children, so
+   * the chevron-down icon overlays it in a grid instead. */
+  .ds.select-input {
+    display: inline-grid;
+    align-items: center;
+    grid-template-areas: "select";
+
+    & > * {
+      grid-area: select;
+    }
+
+    & > .chevron {
+      justify-self: end;
+      pointer-events: none;
+      margin-inline-end: var(--form-input-padding-inline);
+      color: var(--color-icon, currentColor);
+    }
+  }
+
   .ds.input.select {
     appearance: none;
-    --select-caret-color: var(--color-icon, currentColor);
-    --select-caret-half: 0.4em; /* each square; the chevron is two halves wide */
-    /* left half: rising stroke ╱ */
-    background-image:
-      linear-gradient(
-        45deg,
-        transparent 42%,
-        var(--select-caret-color) 42%,
-        var(--select-caret-color) 58%,
-        transparent 58%
-      ),
-      /* right half: falling stroke ╲ */
-      linear-gradient(
-        135deg,
-        transparent 42%,
-        var(--select-caret-color) 42%,
-        var(--select-caret-color) 58%,
-        transparent 58%
-      );
-    background-repeat: no-repeat;
-    background-position:
-      right calc(var(--form-input-padding-inline) + var(--select-caret-half))
-      center,
-      right var(--form-input-padding-inline) center;
-    background-size: var(--select-caret-half) var(--select-caret-half);
     /* This element IS the text-bearing leaf, so it carries the inline padding
      * (`.ds.input.chrome` provides only the block padding). The end side leaves
-     * room for the chevron. */
+     * room for the chevron overlay. */
     padding-inline-start: var(--form-input-padding-inline);
     padding-inline-end: calc(var(--form-input-padding-inline) * 2 + 1em);
-
-    /* The padding above is logical, so in right-to-left text the room for
-       the chevron opens on the left; `background-position` has no logical
-       keywords, so the chevron moves there explicitly. Mirrored, the two
-       gradient squares swap halves: the 45deg square is the outer one. */
-    &:dir(rtl) {
-      background-position:
-        left var(--form-input-padding-inline) center,
-        left calc(var(--form-input-padding-inline) + var(--select-caret-half))
-        center;
-    }
   }
 }

@@ -207,7 +207,7 @@ dense's 16px line to 16.8px would knock every row off the grid.
 | Field label / description / error | bare text | `round(nearest, h × 2/3)` | 0 | The remaining `line-height: 1` crush seat |
 | Button | the button element | `round(nearest, h × 2/3)` | constant `--button-border-width`, colour-toggled | Intrinsic: no height; box closes to the cell |
 | Input (single-line, composite) | chrome wrapper + inner leaf | `round(nearest, h × 2/3)` | chrome border, folded into the shared `--seat-before` | Line floored at `1.2em` (the UA `<input>` floor); no drift knob |
-| Select | the element | `round(nearest, h × 2/3)` | own border | Single-element intrinsic seat; gradient-drawn caret takes the theme colour |
+| Select | the element | `round(nearest, h × 2/3)` | own border | Single-element intrinsic seat; the ds-assets chevron-down icon overlays via a grid wrapper and fills `currentColor` |
 | Textarea | the element | first row on target | own border | Same seat, N rows: `--control-seat-line` is a whole multiple, so the invariant comes free |
 
 The through-line: **one seat — the interior line box plus its complement — with

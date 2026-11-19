@@ -42,7 +42,7 @@
     }
 
     /* The input chrome fills its container; in a row it takes its content. */
-    & > .picker > .ds.input.select,
+    & > .picker > .ds.select-input,
     & > .ds.data-views-saved-views-name-form > .ds.input.text {
       inline-size: auto;
     }

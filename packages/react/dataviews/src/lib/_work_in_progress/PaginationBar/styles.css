@@ -128,8 +128,8 @@
     }
 
     /* The input chrome fills its container; in a bar it takes its content. */
-    & > .leading > .page-size > .ds.input.select,
-    & > .trailing > .page > .ds.input.select {
+    & > .leading > .page-size > .ds.select-input,
+    & > .trailing > .page > .ds.select-input {
       inline-size: auto;
     }
 

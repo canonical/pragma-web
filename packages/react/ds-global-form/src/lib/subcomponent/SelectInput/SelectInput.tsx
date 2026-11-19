@@ -1,8 +1,10 @@
+import { Icon } from "@canonical/react-ds-global";
 import { forwardRef, type ReactElement } from "react";
 import type { SelectInputProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds input select chrome";
+const wrapperCssClassName = "ds select-input";
 
 /**
  * Presentational select input — pure markup, no react-hook-form.
@@ -21,24 +23,31 @@ export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
     ref,
   ): ReactElement {
     return (
-      <select
-        id={id}
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
-        style={style}
-        ref={ref}
-        {...nativeProps}
-      >
-        {options.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            disabled={option.disabled}
-            lang={option.lang}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <div className={wrapperCssClassName}>
+        <select
+          id={id}
+          className={[componentCssClassName, className]
+            .filter(Boolean)
+            .join(" ")}
+          style={style}
+          ref={ref}
+          {...nativeProps}
+        >
+          {options.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+              lang={option.lang}
+            >
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {!nativeProps.multiple && (
+          <Icon icon="chevron-down" className="chevron" />
+        )}
+      </div>
     );
   },
 );
