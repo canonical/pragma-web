@@ -444,6 +444,12 @@ const Tier = ({
       <h2>{title}</h2>
       <span>Text input reference</span>
     </header>
+    <p>
+      Field labels occupy{" "}
+      {tier === "site" ? "40px, unchanged" : "32px, previously 24px"} at a 16px
+      root. Their added block spacing leaves these inline inset measurements
+      unchanged; guides follow each control's actual position.
+    </p>
     <div className="field-samples">
       <Measured
         label="Text input"
