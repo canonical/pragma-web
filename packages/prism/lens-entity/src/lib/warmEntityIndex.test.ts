@@ -2,7 +2,7 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import type { FetchFunction } from "relay-runtime";
+import { type FetchFunction, Observable } from "relay-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import { STATIONS_BINDING } from "../../testing/fixtures.js";
@@ -86,6 +86,19 @@ describe("warmEntityIndex", () => {
       warmEntityIndex(STATIONS_BINDING, { servesLine: "none" }),
     ).resolves.toBeUndefined();
     expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+
+  it("fetches no index when the facet scope answers nothing", async () => {
+    const fetchFn = vi.fn<FetchFunction>(() =>
+      Observable.create((sink) => sink.complete()),
+    );
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+
+    await expect(
+      warmEntityIndex(STATIONS_BINDING, { servesLine: "none" }),
+    ).resolves.toBeUndefined();
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+    expect(fetchFn.mock.lastCall?.[0].name).toBe("EntityFacetScopeQuery");
   });
 
   it("fetches nothing filtered when no environment is published", async () => {

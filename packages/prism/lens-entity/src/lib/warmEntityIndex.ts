@@ -18,7 +18,8 @@ import selectFacetParams from "./selectFacetParams.js";
  * parameter prefetches the index's one operation. A filtered address takes
  * two steps, as the entity page does: the facet scope (the class's facets
  * and the graph's prefixes), then the index with the filters the scope
- * reads off the address, both through the environment read once.
+ * reads off the address, both through the environment read once. A scope
+ * that answers nothing warms nothing more: the filters cannot be read.
  *
  * @param binding - The binding whose class the index lists.
  * @param search - The matched search, carrying the facet parameters.
@@ -48,9 +49,9 @@ export default function warmEntityIndex(
   )
     .toPromise()
     .then((scope) => {
-      /* v8 ignore next -- the observable yields the response before it completes */
+      if (scope === undefined) return undefined;
       const facets = new Set(
-        scope?.facetedInstances.facets.map(({ field }) => field) ?? [],
+        scope.facetedInstances.facets.map(({ field }) => field),
       );
       return fetchQuery<EntityIndexQuery>(
         environment,
@@ -60,8 +61,7 @@ export default function warmEntityIndex(
           readFacetParams(
             search,
             names.filter((name) => facets.has(name)),
-            /* v8 ignore next -- the observable yields the response before it completes */
-            scope?.ontologies ?? [],
+            scope.ontologies,
           ),
         ),
         STORE_OR_NETWORK,

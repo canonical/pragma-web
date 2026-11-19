@@ -12,7 +12,6 @@ const entitySearch: ViewSearchSchema = {
     validate: (value) => {
       const search = value as Readonly<Record<string, unknown>>;
       const read = viewSearch["~standard"].validate(value);
-      /* v8 ignore next -- core's view search validates synchronously and never fails */
       if (read instanceof Promise || read.issues !== undefined) return read;
       return {
         value: {
