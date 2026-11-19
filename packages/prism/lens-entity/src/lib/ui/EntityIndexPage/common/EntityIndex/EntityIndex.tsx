@@ -6,7 +6,7 @@ import {
   useRenderers,
   VIEW_PARAMS,
 } from "@canonical/prism-core";
-import { CardProjection, RowProjection } from "@canonical/prism-projections";
+import { NodeList } from "@canonical/prism-projections";
 import { Button } from "@canonical/react-ds-global";
 import { useSearchParam } from "@canonical/router-react";
 import type { ReactElement } from "react";
@@ -43,8 +43,9 @@ import "./styles.css";
  * from `ontologyClass(uri:)`, the class supplied by the site's binding. The `@connection` key and
  * `@refetchable` generate `EntityIndexPaginationQuery` for "Load more".
  *
- * `title` and `curie` ride beside the row and card spreads because the
- * search filters on them, and fragment data is masked from this component.
+ * `title` and `curie` ride beside the list's spread because the search
+ * filters on them; the list's spread carries each node's `values`, so the
+ * table's cells come in the same request, and fragment data is masked from this component.
  * `instanceCount` is the denominator the strip's status states.
  */
 const declareEntityIndexOperations = (): unknown => [
@@ -74,8 +75,7 @@ const declareEntityIndexOperations = (): unknown => [
                 title
                 curie
               }
-              ...RowProjection_node
-              ...CardProjection_node
+              ...NodeList_node
             }
           }
         }
@@ -122,12 +122,16 @@ export default function EntityIndex({
   binding,
   renderers,
   filters = DEFAULT_FILTER_PLACEMENT,
+  lines,
+  tableOmits,
   className,
   ...props
 }: EntityIndexProps): ReactElement {
   const t = useMessages();
   const { active } = useRenderers("list", renderers?.list);
   const text = useSearchParam(VIEW_PARAMS.query) ?? "";
+  const sort = useSearchParam(VIEW_PARAMS.sort) ?? undefined;
+  const selected = useSearchParam(VIEW_PARAMS.select) ?? undefined;
   const query = useLazyLoadQuery<EntityIndexQuery>(
     entityIndexQueryNode,
     buildEntityIndexVariables(binding),
@@ -160,16 +164,15 @@ export default function EntityIndex({
         </div>
       ) : null}
       <div className="list">
-        {active.render({
-          empty: edges.length === 0 ? t("index.empty") : t("index.noMatch"),
-          children: visible.map(({ node }) =>
-            active.name === "cards" ? (
-              <CardProjection key={node.uri} node={node} />
-            ) : (
-              <RowProjection key={node.uri} node={node} />
-            ),
-          ),
-        })}
+        <NodeList
+          empty={edges.length === 0 ? t("index.empty") : t("index.noMatch")}
+          lines={lines}
+          nodes={visible.map(({ node }) => node)}
+          omits={tableOmits}
+          renderer={active.name === "cards" ? "cards" : "table"}
+          selected={selected}
+          sort={sort}
+        />
       </div>
       {hasNext ? (
         <p className="more">

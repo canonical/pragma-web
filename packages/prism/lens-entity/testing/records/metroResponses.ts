@@ -22,8 +22,14 @@ export default [
     response: {
       data: {
         ontologies: [
-          { prefix: "metro", namespace: "https://metro.example/onto#" },
-          { prefix: "geo", namespace: "https://geo.example/onto#" },
+          {
+            prefix: "metro",
+            namespace: "https://metro.example/onto#",
+          },
+          {
+            prefix: "geo",
+            namespace: "https://geo.example/onto#",
+          },
           {
             prefix: "rdfs",
             namespace: "http://www.w3.org/2000/01/rdf-schema#",
@@ -34,12 +40,24 @@ export default [
   },
   {
     operation: "EntityIndexQuery",
-    variables: { classUri: "metro:Nowhere", count: 100, cursor: null },
-    response: { data: { ontologyClass: null } },
+    variables: {
+      classUri: "metro:Nowhere",
+      count: 100,
+      cursor: null,
+    },
+    response: {
+      data: {
+        ontologyClass: null,
+      },
+    },
   },
   {
     operation: "EntityIndexQuery",
-    variables: { classUri: "metro:Station", count: 100, cursor: null },
+    variables: {
+      classUri: "metro:Station",
+      count: 100,
+      cursor: null,
+    },
     response: {
       data: {
         ontologyClass: {
@@ -56,7 +74,18 @@ export default [
                     curie: "metro:",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -73,7 +102,18 @@ export default [
                     curie: "metro:central-exchange",
                     type: {
                       uri: "https://metro.example/onto#Interchange",
-                      _meta: { title: "Interchange" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Interchange",
+                      },
                     },
                     definition: "The busiest transfer point on the network.",
                   },
@@ -91,7 +131,15 @@ export default [
                     curie: "metro:eastcliff",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -108,7 +156,15 @@ export default [
                     curie: "metro:foundry-row",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -125,7 +181,15 @@ export default [
                     curie: "metro:ghost",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -142,7 +206,15 @@ export default [
                     curie: "metro:greenhithe",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -159,7 +231,15 @@ export default [
                     curie: "metro:harbourside",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -176,7 +256,15 @@ export default [
                     curie: "metro:kilnwood",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -193,7 +281,15 @@ export default [
                     curie: "metro:marsh-end",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -210,7 +306,15 @@ export default [
                     curie: "metro:northgate",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: "The northern terminus.",
                   },
@@ -227,7 +331,15 @@ export default [
                     curie: "metro:quarry-hill",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -244,7 +356,18 @@ export default [
                     curie: "metro:riverside-junction",
                     type: {
                       uri: "https://metro.example/onto#Interchange",
-                      _meta: { title: "Interchange" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Interchange",
+                      },
                     },
                     definition: null,
                   },
@@ -262,7 +385,15 @@ export default [
                     curie: "metro:saltford",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -279,7 +410,18 @@ export default [
                     curie: "metro:tannery-lane",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Interchange" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Interchange",
+                      },
                     },
                     definition: null,
                   },
@@ -296,7 +438,15 @@ export default [
                     curie: "metro:verge-park",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -313,7 +463,15 @@ export default [
                     curie: "metro:willowbank",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -333,7 +491,11 @@ export default [
   },
   {
     operation: "EntityIndexQuery",
-    variables: { classUri: "metro:Station", count: 5, cursor: null },
+    variables: {
+      classUri: "metro:Station",
+      count: 5,
+      cursor: null,
+    },
     response: {
       data: {
         ontologyClass: {
@@ -350,7 +512,18 @@ export default [
                     curie: "metro:",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -367,7 +540,18 @@ export default [
                     curie: "metro:central-exchange",
                     type: {
                       uri: "https://metro.example/onto#Interchange",
-                      _meta: { title: "Interchange" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Interchange",
+                      },
                     },
                     definition: "The busiest transfer point on the network.",
                   },
@@ -385,7 +569,15 @@ export default [
                     curie: "metro:eastcliff",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -402,7 +594,18 @@ export default [
                     curie: "metro:foundry-row",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -419,7 +622,18 @@ export default [
                     curie: "metro:ghost",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -460,7 +674,15 @@ export default [
                     curie: "metro:greenhithe",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -477,7 +699,15 @@ export default [
                     curie: "metro:harbourside",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -494,7 +724,15 @@ export default [
                     curie: "metro:kilnwood",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -511,7 +749,15 @@ export default [
                     curie: "metro:marsh-end",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -528,7 +774,15 @@ export default [
                     curie: "metro:northgate",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: "The northern terminus.",
                   },
@@ -545,7 +799,15 @@ export default [
                     curie: "metro:quarry-hill",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -562,7 +824,18 @@ export default [
                     curie: "metro:riverside-junction",
                     type: {
                       uri: "https://metro.example/onto#Interchange",
-                      _meta: { title: "Interchange" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Interchange",
+                      },
                     },
                     definition: null,
                   },
@@ -580,7 +853,15 @@ export default [
                     curie: "metro:saltford",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -597,7 +878,18 @@ export default [
                     curie: "metro:tannery-lane",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Interchange" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Station",
+                        },
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Interchange",
+                      },
                     },
                     definition: null,
                   },
@@ -614,7 +906,15 @@ export default [
                     curie: "metro:verge-park",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -631,7 +931,15 @@ export default [
                     curie: "metro:willowbank",
                     type: {
                       uri: "https://metro.example/onto#Station",
-                      _meta: { title: "Station" },
+                      visibility: "PROMINENT",
+                      superclasses: [
+                        {
+                          uri: "https://metro.example/onto#Stop",
+                        },
+                      ],
+                      _meta: {
+                        title: "Station",
+                      },
                     },
                     definition: null,
                   },
@@ -657,7 +965,9 @@ export default [
     },
     response: {
       data: {
-        ontologyClass: { uri: "https://geo.example/onto#Zone" },
+        ontologyClass: {
+          uri: "https://geo.example/onto#Zone",
+        },
         node: {
           __typename: "Zone",
           uri: "https://geo.example/onto#coastal-zone",
@@ -671,7 +981,9 @@ export default [
               _meta: {
                 curie: "geo:Zone",
                 title: "Fare zone",
-                type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
+                type: {
+                  uri: "http://www.w3.org/2000/01/rdf-schema#Class",
+                },
               },
             },
             fields: [
@@ -712,13 +1024,19 @@ export default [
             title: "Northgate",
             type: {
               uri: "https://metro.example/onto#Station",
-              superclasses: [{ uri: "https://metro.example/onto#Stop" }],
+              superclasses: [
+                {
+                  uri: "https://metro.example/onto#Stop",
+                },
+              ],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 curie: "metro:Station",
                 title: "Station",
-                type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
+                type: {
+                  uri: "http://www.w3.org/2000/01/rdf-schema#Class",
+                },
               },
             },
             fields: [
@@ -806,7 +1124,9 @@ export default [
     },
     response: {
       data: {
-        ontologyClass: { uri: "https://metro.example/onto#Station" },
+        ontologyClass: {
+          uri: "https://metro.example/onto#Station",
+        },
         node: {
           __typename: "Interchange",
           uri: "https://metro.example/onto#central-exchange",
@@ -815,15 +1135,21 @@ export default [
             type: {
               uri: "https://metro.example/onto#Interchange",
               superclasses: [
-                { uri: "https://metro.example/onto#Station" },
-                { uri: "https://metro.example/onto#Stop" },
+                {
+                  uri: "https://metro.example/onto#Station",
+                },
+                {
+                  uri: "https://metro.example/onto#Stop",
+                },
               ],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 curie: "metro:Interchange",
                 title: "Interchange",
-                type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
+                type: {
+                  uri: "http://www.w3.org/2000/01/rdf-schema#Class",
+                },
               },
             },
             fields: [
@@ -922,7 +1248,9 @@ export default [
     },
     response: {
       data: {
-        ontologyClass: { uri: "https://metro.example/onto#Station" },
+        ontologyClass: {
+          uri: "https://metro.example/onto#Station",
+        },
         node: {
           __typename: "Line",
           uri: "https://metro.example/onto#circle-line",
@@ -936,7 +1264,9 @@ export default [
               _meta: {
                 curie: "metro:Line",
                 title: "Line",
-                type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
+                type: {
+                  uri: "http://www.w3.org/2000/01/rdf-schema#Class",
+                },
               },
             },
             fields: [
@@ -980,7 +1310,9 @@ export default [
     },
     response: {
       data: {
-        ontologyClass: { uri: "https://metro.example/onto#Station" },
+        ontologyClass: {
+          uri: "https://metro.example/onto#Station",
+        },
         node: {
           __typename: "Station",
           uri: "https://metro.example/onto#harbourside",
@@ -988,13 +1320,19 @@ export default [
             title: "Harbourside",
             type: {
               uri: "https://metro.example/onto#Station",
-              superclasses: [{ uri: "https://metro.example/onto#Stop" }],
+              superclasses: [
+                {
+                  uri: "https://metro.example/onto#Stop",
+                },
+              ],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 curie: "metro:Station",
                 title: "Station",
-                type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
+                type: {
+                  uri: "http://www.w3.org/2000/01/rdf-schema#Class",
+                },
               },
             },
             fields: [
@@ -1082,7 +1420,9 @@ export default [
     },
     response: {
       data: {
-        ontologyClass: { uri: "https://metro.example/onto#Station" },
+        ontologyClass: {
+          uri: "https://metro.example/onto#Station",
+        },
         node: {
           __typename: "Station",
           uri: "https://metro.example/onto#northgate",
@@ -1090,13 +1430,19 @@ export default [
             title: "Northgate",
             type: {
               uri: "https://metro.example/onto#Station",
-              superclasses: [{ uri: "https://metro.example/onto#Stop" }],
+              superclasses: [
+                {
+                  uri: "https://metro.example/onto#Stop",
+                },
+              ],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 curie: "metro:Station",
                 title: "Station",
-                type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
+                type: {
+                  uri: "http://www.w3.org/2000/01/rdf-schema#Class",
+                },
               },
             },
             fields: [
@@ -1184,7 +1530,9 @@ export default [
     },
     response: {
       data: {
-        ontologyClass: { uri: "https://metro.example/onto#Station" },
+        ontologyClass: {
+          uri: "https://metro.example/onto#Station",
+        },
         node: null,
       },
     },

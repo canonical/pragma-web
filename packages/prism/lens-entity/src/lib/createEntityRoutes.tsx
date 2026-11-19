@@ -55,14 +55,24 @@ export default function createEntityRoutes<const TId extends string>(
   lens: EntityLensOptions,
 ): EntityRoutes<TId> {
   const { id } = defineBinding(binding);
-  const { label, order, icon = EntityIcon, renderers, filters } = lens;
+  const {
+    label,
+    order,
+    icon = EntityIcon,
+    renderers,
+    filters,
+    lines,
+    tableOmits,
+  } = lens;
 
   const EntityIndexContent = (): ReactElement => (
     <EntityIndexPage
       binding={binding}
       filters={filters}
       label={label}
+      lines={lines}
       renderers={renderers}
+      tableOmits={tableOmits}
     />
   );
   const EntityPageContent = ({

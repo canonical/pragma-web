@@ -3,6 +3,7 @@ import type {
   LensRenderers,
   ViewSearchSchema,
 } from "@canonical/prism-core";
+import type { ListLines } from "@canonical/prism-projections";
 import type { DataRouteDefinition } from "@canonical/router-core";
 import type { ComponentType, ReactElement } from "react";
 
@@ -32,6 +33,10 @@ export interface EntityLensOptions {
   readonly renderers?: LensRenderers;
   /** Where the index places its filters; the bar when omitted. */
   readonly filters?: FilterPlacement;
+  /** How many lines a row of the index takes; one when omitted. */
+  readonly lines?: ListLines;
+  /** The value fields the index's table leaves out, by served name. */
+  readonly tableOmits?: readonly string[];
 }
 
 /**
