@@ -92,9 +92,9 @@ const readBrowserBaseline = (
   const rig = document.createElement("span");
   rig.className = "action-baseline-rig";
   const clone = baselineOwner.cloneNode(true) as HTMLElement;
-  clone
-    .querySelectorAll("[id]")
-    .forEach((element) => element.removeAttribute("id"));
+  clone.querySelectorAll("[id]").forEach((element) => {
+    element.removeAttribute("id");
+  });
   clone.removeAttribute("id");
   for (const property of style) {
     clone.style.setProperty(property, style.getPropertyValue(property));

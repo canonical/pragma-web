@@ -175,6 +175,12 @@
     line-height: var(--typography-text-primary-line-height);
     letter-spacing: var(--typography-text-primary-letter-spacing);
 
+    /* The header owns the text's block inset and divider closure. Embedded
+       prose and headings retain their cap nudge without a second text inset. */
+    & :is(p, .p, h1, h2, h3, h4, h5, h6) {
+      --_text-seat-inset: 0px;
+    }
+
     /* Normalise every heading element except <h6> down to the inherited body
        tier. <h6> keeps the base h6 tier from @canonical/styles-typography
        (correct heading-6 tokens, including the baseline-snapped line-height) — no
