@@ -2,7 +2,11 @@
 
 import type { ReactElement } from "react";
 import { useMessages } from "../../i18n/index.js";
+import buildViewHref from "../../renderers/buildViewHref.js";
+import { FILTER_SHEET, VIEW_PARAMS } from "../../renderers/constants.js";
+import useViewLocation from "../../renderers/hooks/useViewLocation.js";
 import isRenderedNode from "../isRenderedNode.js";
+import { RouterLink } from "../RouterLink/index.js";
 import type { FilterBarProps } from "./types.js";
 import "./styles.css";
 
@@ -10,24 +14,34 @@ const componentCssClassName = "ds filter-bar";
 
 /**
  * The facet bar: the second band under the strip, for a lens that places
- * its facets in a bar. Its controls start under the strip's Search and
- * run on one line to the last column, the applied chips after the facets;
- * below three groups they start on the first column line, so they stay on
- * one line. The controls are one labelled fieldset; the band around them
- * stays a plain subgrid. It touches the strip above it. Below two groups it is not displayed, and
- * the sheet holds its content.
+ * its facets in a bar. Its controls start under the strip's Search at
+ * every width and run on one line to the last column: the facets, the
+ * applied chips, then "More filters", a link to the current address with
+ * the sheet open (`sheet=filter`). From three groups up "More filters"
+ * shows only when the bar is `folded`; below three groups the facets and
+ * the chips are not displayed and the bar holds "More filters" alone. The
+ * controls are one labelled fieldset; the band around them stays a plain
+ * subgrid. It touches the strip above it. Below two groups it is not
+ * displayed, and the sheet holds its content.
  *
  * `import { FilterBar } from "@canonical/prism-core";`
  *
  * @implements prism.component.filter_bar
+ * @note Impure: reads the address and the translator in scope.
  */
 export default function FilterBar({
   facets,
   chips,
+  folded = false,
   className,
   ...props
 }: FilterBarProps): ReactElement {
   const t = useMessages();
+  const { pathname, search } = useViewLocation();
+  const moreHref = buildViewHref(pathname, {
+    ...search,
+    [VIEW_PARAMS.sheet]: FILTER_SHEET,
+  });
   return (
     <div
       {...props}
@@ -43,6 +57,13 @@ export default function FilterBar({
             {chips}
           </div>
         ) : null}
+        <RouterLink
+          className={folded ? "more is-needed" : "more"}
+          data-slot="more"
+          href={moreHref}
+        >
+          {t("filterBar.more")}
+        </RouterLink>
       </fieldset>
     </div>
   );

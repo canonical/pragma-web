@@ -1,16 +1,21 @@
 ---
 # FilterBar — the second band under the strip, present only when a lens
 # has facets for the current set: the facet controls from column 5 (under
-# Search), then the applied chips, filling the band to the last line. The
+# Search), then the applied chips, then "More filters", a link opening
+# the sheet, filling the band to the last line. The
 # same height rule as the strip (the density line plus one component
 # padding above and below, content-box, 53px) and the same bleed at its
 # inline start, so its hairline meets the rail's border; its end is the
 # last column line. It bleeds upward across the layout's row gap (a
 # negative block margin of one gutter), so the two bands touch and the
 # layout keeps one gap variable on both axes. It is one line at every
-# width: its controls never wrap. Below three groups the columns from 5
-# (about 330px at 1366, 216px at 912) are narrower than a lens's facet
-# buttons, so the controls start on the first column line instead. Below two groups the bar is not
+# width: its controls never wrap and always start at column 5. From three
+# groups up "More filters" shows only when the bar is folded (the lens has
+# facets the bar does not hold: the link's .is-needed). Below three groups the
+# columns from 5 (about 330px at 1366, 216px at 912) are narrower than a
+# lens's first group, so the facets and the chips are not displayed and
+# the bar holds "More filters" alone; nothing hidden takes focus and the
+# server HTML is one for every width. Below two groups the bar is not
 # displayed: its content is the sheet's.
 #
 # Every decision is read through a component token declared on the root
@@ -23,8 +28,9 @@
 #   space.100 (8px) between the controls.
 #
 # Reflow, bound in styles.css:
-#   @container shell (width < 1376px)  below three groups: the controls
-#     run from the first column line to the last.
+#   .more.is-needed  "More filters" shows at every width.
+#   @container shell (width < 1376px)  below three groups: the facets and
+#     the chips are not displayed; "More filters" shows alone.
 #   @container shell (width < 912px)  below two groups: not displayed.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
@@ -75,4 +81,19 @@ node:
           - node:
               role: chips slot
             relation: { cardinality: "0..1", slotName: chips }
+          - node:
+              role: more filters (a link opening the sheet; shown when
+                folded, and alone below three groups)
+              styles:
+                layout.type: none
+                typography.color: color.text.link
+                typography.decoration: none
+                typography.decoration@hover: underline
+                typography.whiteSpace: nowrap
+            relation: { cardinality: "1", slotName: more }
+          - node:
+              role: more filters, needed (.is-needed)
+              styles:
+                layout.type: inline
+            relation: { cardinality: "0..1", slotName: more }
       relation: { cardinality: "1", slotName: controls }
