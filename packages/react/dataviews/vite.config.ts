@@ -62,6 +62,17 @@ const testConfig = reactTestConfig({
   setupFiles: ["./vitest.setup.ts"],
 });
 
+/**
+ * The axe sweeps this package runs append whole SSR-rendered markup to the
+ * document and check it against every WCAG A/AA rule, which a contended CI
+ * runner can take past Vitest's 5000ms default. A timeout there leaves the
+ * axe-core singleton run in flight, so the next test in the file fails
+ * "Axe is already running" — one slow runner reads as two broken tests
+ * across two files. 20s holds the whole suite at CI-parallelism and keeps
+ * the ceiling a real regression catch, not a coin flip.
+ */
+const TEST_TIMEOUT_MS = 20_000;
+
 const [client, ...others] = testConfig.projects ?? [];
 
 export default defineConfig({
@@ -74,6 +85,7 @@ export default defineConfig({
   },
   test: {
     ...testConfig,
+    testTimeout: TEST_TIMEOUT_MS,
     projects: [
       typeof client === "object" && "test" in client
         ? {
@@ -84,10 +96,18 @@ export default defineConfig({
                 ...(client.test?.include ?? []),
                 "testing/**/*.test.{ts,tsx}",
               ],
+              testTimeout: TEST_TIMEOUT_MS,
             },
           }
         : client,
-      ...others,
+      ...others.map((project) =>
+        project && typeof project === "object" && "test" in project
+          ? {
+              ...project,
+              test: { ...project.test, testTimeout: TEST_TIMEOUT_MS },
+            }
+          : project,
+      ),
     ].filter((project) => project !== undefined),
   },
 });
