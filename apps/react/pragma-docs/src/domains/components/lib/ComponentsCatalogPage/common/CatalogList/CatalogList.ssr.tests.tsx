@@ -14,7 +14,8 @@ describe("CatalogList SSR", () => {
       '<nav aria-labelledby="catalog-tiers-partial" class="tiers"><p class="partial" id="catalog-tiers-partial">Tiers of the components loaded so far</p>',
     );
     expect(html).toContain('id="catalog-tier-global"');
-    expect(html).toContain('class="ds entity-list"');
+    expect(html).toMatch(/class="[^"]*\bnode-list\b[^"]*"/);
+    expect(html).toContain('class="ds entity-table');
     expect(html).toContain('<p class="more">');
   });
 });

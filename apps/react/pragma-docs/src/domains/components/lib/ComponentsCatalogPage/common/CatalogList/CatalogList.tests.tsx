@@ -134,17 +134,61 @@ describe("CatalogList", () => {
   );
 
   it(
-    "lists its rows in two lines, each block's summary under its title",
+    "lists each tier as a table of the lens's facts, two lines a row",
     () => {
       const { container } = render(
         catalogPage(catalogRecords, createFetchSpy(), createCatalogRouter()),
       );
-      const rows = [...container.querySelectorAll(".ds.ui-block-row")];
-      const summaries = rows.flatMap((row) => [
-        ...row.querySelectorAll(":scope > .summary"),
+      const tables = [...container.querySelectorAll(".ds.entity-table")];
+      expect(tables).toHaveLength(3);
+      const rows = tables.flatMap((table) => [
+        ...table.querySelectorAll(":scope > .body > .row"),
       ]);
-      expect(rows.length).toBeGreaterThan(0);
-      expect(summaries.length).toBeGreaterThan(0);
+      expect(rows).toHaveLength(7);
+      for (const row of rows) {
+        expect(row).toHaveClass("is-two-line");
+        expect(
+          row.querySelectorAll(".value[data-property]").length,
+        ).toBeGreaterThan(0);
+      }
+    },
+    HARNESS_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "highlights the component the address selects, in the table and the cards",
+    () => {
+      const tableView = render(
+        catalogPage(
+          catalogRecords,
+          createFetchSpy(),
+          createCatalogRouter(
+            "/components?select=ds%3Aglobal.component.button",
+          ),
+        ),
+      );
+      const selected = [
+        ...tableView.container.querySelectorAll('[aria-selected="true"]'),
+      ];
+      expect(selected).toHaveLength(1);
+      expect(selected.at(0)?.textContent).toContain("Button");
+      expect(tableView.container.querySelector("input")).toBeNull();
+      tableView.unmount();
+      const cardsView = render(
+        catalogPage(
+          catalogRecords,
+          createFetchSpy(),
+          createCatalogRouter(
+            "/components?as=cards&select=ds%3Aglobal.component.button",
+          ),
+        ),
+      );
+      const current = [
+        ...cardsView.container.querySelectorAll('[aria-current="true"]'),
+      ];
+      expect(current).toHaveLength(1);
+      expect(current.at(0)).toHaveClass("entity-card");
+      expect(current.at(0)?.textContent).toContain("Button");
     },
     HARNESS_TEST_TIMEOUT_MS,
   );

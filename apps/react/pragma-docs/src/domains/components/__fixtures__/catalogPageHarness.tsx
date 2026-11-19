@@ -23,6 +23,7 @@ import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
+import { SITE_SWITCHES } from "#lib/ui";
 import { SiteRenderers } from "#lib/ui/SiteRenderers";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
@@ -63,7 +64,10 @@ export const catalogPage = (
     >
       <RouterProvider router={router}>
         <HomesProvider homes={homes}>
-          <ProjectionLinkProvider LinkComponent={RouterLink}>
+          <ProjectionLinkProvider
+            LinkComponent={RouterLink}
+            site={SITE_SWITCHES}
+          >
             <SiteRenderers>
               <ComponentsCatalogPage />
             </SiteRenderers>

@@ -19,7 +19,9 @@ describe("ComponentsCatalogPage", () => {
       expect(
         screen.getByRole("heading", { level: 1, name: "Components" }),
       ).toHaveClass("heading");
-      expect(container.querySelectorAll(".ds.entity-row").length).toBe(7);
+      expect(
+        container.querySelectorAll(".ds.entity-table > .body > .row").length,
+      ).toBe(7);
       expect(container.querySelector(".ds.entity-card")).toBeNull();
       expect(fetchFn).not.toHaveBeenCalled();
     },
@@ -37,7 +39,7 @@ describe("ComponentsCatalogPage", () => {
         ),
       );
       expect(container.querySelectorAll(".ds.entity-card").length).toBe(7);
-      expect(container.querySelector(".ds.entity-row")).toBeNull();
+      expect(container.querySelector(".ds.entity-table")).toBeNull();
     },
     HARNESS_TEST_TIMEOUT_MS,
   );
