@@ -130,6 +130,21 @@ describe("FacetControls", () => {
       );
     });
 
+    it("names an applied value no bucket holds by its IRI", () => {
+      const { container } = renderAt(
+        "/stations",
+        <FacetControls
+          applied={[{ field: "inZone", values: ["https://other.example/z"] }]}
+          facets={FACETS}
+          namespaces={NAMESPACES}
+          placement="bar"
+        />,
+      );
+      expect(container.querySelector(".is-applied")).toHaveTextContent(
+        "Zone: https://other.example/z",
+      );
+    });
+
     it("links each value with its count, written as a curie, none as none", () => {
       renderAt(
         "/stations?q=cen",
