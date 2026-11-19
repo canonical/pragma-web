@@ -82,15 +82,17 @@ function findPointAt(runs: readonly Run[], share: number): Point {
 }
 
 /**
- * The property an edge's count is of: its heaviest relation's, the one
- * whose statements are the bundle's weight; none when the edge counts no
- * statement (a zero edge, dashed, or a legend's specimen).
+ * The property an edge's count is of: its one relation's; none when the
+ * edge counts no statement (a zero edge, dashed, or a legend's specimen)
+ * or bundles more than one relation, whose label names them all while
+ * the weight counts only the heaviest (the inspector's rows carry each).
  */
 function findCountedRelation(
   edge: LaidOutEdge,
 ): { property: string; count: number } | undefined {
   const weight = edge.bundle?.weight;
   if (weight === undefined || weight <= 0) return undefined;
+  if (edge.bundle?.relations.length !== 1) return undefined;
   const relation = requireDefined(
     edge.bundle?.relations.find(
       (candidate) => "count" in candidate && candidate.count === weight,
@@ -111,8 +113,8 @@ function findCountedRelation(
  * holds the unit, the label stays where it was placed and its numeral
  * takes the first clear place right of, left of, above or below it, or
  * none: the inspector's rows still carry the count. A numeral is drawn
- * only for an edge whose weight is above 0, and links to the property
- * whose statements it counts. Labels are seated by edge id and every
+ * only for an edge of one relation whose weight is above 0, and links to
+ * the property whose statements it counts. Labels are seated by edge id and every
  * coordinate is a whole pixel, so the same layout gives the same places.
  *
  * @param layout - The class graph laid out.

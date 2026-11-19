@@ -808,7 +808,26 @@ describe("ClassGraph", () => {
     });
 
     it("draws no numeral on a zero edge, and none below full zoom", () => {
-      const container = draw({ layout: metro.layout, terms: metro.terms });
+      const counted = requireDefined(
+        draw({ layout: metro.layout, terms: metro.terms })
+          .querySelector("a.weight-link")
+          ?.getAttribute("data-weight-of"),
+        "a counted edge",
+      );
+      const zero = {
+        ...metro.layout,
+        edges: metro.layout.edges.map((edge) =>
+          edge.id === counted && edge.bundle !== undefined
+            ? { ...edge, bundle: { ...edge.bundle, weight: 0 } }
+            : edge,
+        ),
+      };
+      const container = draw({ layout: zero, terms: metro.terms });
+      expect(
+        container.querySelector(
+          `a.weight-link[data-weight-of="${CSS.escape(counted)}"]`,
+        ),
+      ).toBeNull();
       for (const link of container.querySelectorAll("a.weight-link")) {
         expect(Number(link.getAttribute("data-count"))).toBeGreaterThan(0);
       }

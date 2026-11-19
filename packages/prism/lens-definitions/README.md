@@ -201,7 +201,9 @@ server, deterministically: two renders of a page give the same SVG.
   its label, clear of every line, head and heading and inside the
   drawing, as a link to its property's page; it takes the pointer and
   stays out of the tab order, where the inspector's rows carry the same
-  links. A line with no statements draws no figure.
+  links. A line with no statements draws no figure, nor does a line
+  whose label names more than one relation: its weight counts only the
+  heaviest, and the inspector's rows carry each relation's count.
 - **The inspector at rest.** With nothing selected the inspector opens on
   a count line: the graph's classes, namespaces, instances and
   relations, each a link to the namespace rows below that add up to it

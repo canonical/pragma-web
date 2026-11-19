@@ -117,7 +117,11 @@ describe("placeWeightLabels", () => {
         layout.edges.find((candidate) => candidate.id === edge)?.bundle,
         "a bundle",
       );
-      if (bundle.weight === undefined || bundle.weight === 0) {
+      if (
+        bundle.weight === undefined ||
+        bundle.weight === 0 ||
+        bundle.relations.length !== 1
+      ) {
         expect(numeral).toBeUndefined();
         continue;
       }
@@ -132,13 +136,58 @@ describe("placeWeightLabels", () => {
     expect(placeWeightLabels(layout, labels)).toEqual(placed);
   });
 
-  it("draws no numeral on a zero edge", () => {
-    const zero = layout.edges.find((edge) => edge.bundle?.weight === 0);
-    if (zero === undefined) return;
-    const [entry] = placeWeightLabels(layout, [
-      { edge: zero.id, box: { x: 0, y: 0, w: 1, h: 1 } },
-    ]);
-    expect(entry?.numeral).toBeUndefined();
+  describe("on an edge it cannot count by one relation", () => {
+    const counted = requireDefined(
+      placed.find((entry) => entry.numeral !== undefined),
+      "a counted label",
+    );
+    const label = requireDefined(
+      labels.find((candidate) => candidate.edge === counted.edge),
+      "the counted label",
+    );
+    const edge = requireDefined(
+      layout.edges.find((candidate) => candidate.id === counted.edge),
+      "the counted edge",
+    );
+    const bundle = requireDefined(edge.bundle, "the counted edge's bundle");
+    const relation = requireDefined(
+      bundle.relations.at(0),
+      "its one relation",
+    );
+    /** The counted label alone, its edge's bundle changed. */
+    const seatWith = (changed: Partial<typeof bundle>) => {
+      const [entry] = placeWeightLabels(
+        {
+          ...layout,
+          edges: layout.edges.map((candidate) =>
+            candidate.id === edge.id
+              ? { ...candidate, bundle: { ...bundle, ...changed } }
+              : candidate,
+          ),
+        },
+        [label],
+      );
+      return requireDefined(entry, "the label's seat");
+    };
+
+    it("counts the same label's one relation", () => {
+      expect(seatWith({}).numeral?.count).toBe(bundle.weight);
+    });
+
+    it("draws no numeral on a zero edge", () => {
+      expect(seatWith({ weight: 0 }).numeral).toBeUndefined();
+    });
+
+    it("draws no numeral on an edge no store counts", () => {
+      expect(seatWith({ weight: undefined }).numeral).toBeUndefined();
+    });
+
+    it("draws no numeral on a label that names more than one relation", () => {
+      const other = { ...relation, uri: `${relation.uri}Other` };
+      expect(
+        seatWith({ relations: [relation, other] }).numeral,
+      ).toBeUndefined();
+    });
   });
 
   it("seats a label on a line of no length at a point it can draw", () => {
