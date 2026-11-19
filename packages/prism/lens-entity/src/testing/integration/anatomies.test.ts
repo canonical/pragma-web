@@ -20,6 +20,7 @@ const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
 /** The semantic tokens the components' tokens bind beyond the shim. */
 const EXTERNAL_TOKENS = [
   "--color-background",
+  "--color-border",
   "--color-border-muted",
   "--color-focus-ring",
   "--color-text",

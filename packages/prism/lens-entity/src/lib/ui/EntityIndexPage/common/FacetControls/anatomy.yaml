@@ -43,6 +43,18 @@ node:
                 layout.listStyle: none
                 interaction.cursor: pointer
                 typography.whiteSpace: nowrap
+                spacing.gap: space.050
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border
+              edges:
+                - node:
+                    role: caret (the button's opening mark)
+                    styles:
+                      layout.flex.shrink: 0
+                  relation: { cardinality: "1", slotName: caret }
             relation: { cardinality: "1", slotName: button }
           - node:
               role: applied button (.is-applied)
@@ -74,11 +86,30 @@ node:
                 - node:
                     role: bucket (a value's item)
                     edges:
-                      - node:
-                          role: value (a link that toggles it)
-                          styles:
-                            typography.decoration: none
-                            typography.decoration@hover: underline
+                      - switch:
+                          on: matches
+                          cases:
+                            - node:
+                                role: value (a link that toggles it)
+                                styles:
+                                  layout.type: flex
+                                  layout.justify: space-between
+                                  spacing.gap: space.100
+                                  typography.color: inherit
+                                  typography.decoration: none
+                                  typography.decoration@hover: underline
+                                  typography.whiteSpace: nowrap
+                                  typography.weight@selected: typography.text.primary.bold.fontWeight
+                                edges:
+                                  - node:
+                                      role: count
+                                      styles:
+                                        typography.color: color.text.muted
+                                    relation: { cardinality: "1", slotName: count }
+                            - node:
+                                role: empty value (.is-empty)
+                                styles:
+                                  typography.color: color.text.muted
                         relation: { cardinality: "1", slotName: value }
                   relation: { cardinality: "0..*", slotName: bucket }
             relation: { cardinality: "1", slotName: values }

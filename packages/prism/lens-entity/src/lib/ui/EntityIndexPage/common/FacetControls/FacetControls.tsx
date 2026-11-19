@@ -6,6 +6,7 @@ import {
   RouterLink,
   useViewLocation,
 } from "@canonical/prism-core";
+import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { DEFAULT_BAR_FACETS } from "../../../../constants.js";
 import { useMessages } from "../../../../i18n/index.js";
@@ -78,7 +79,7 @@ export default function FacetControls({
             <li className="bucket" key={bucket.value ?? ""}>
               <RouterLink
                 aria-current={on ? "true" : undefined}
-                className="value"
+                className={bucket.count === 0 ? "value is-empty" : "value"}
                 href={hrefWith(
                   facet.field,
                   on
@@ -158,6 +159,7 @@ export default function FacetControls({
               }
             >
               {readButton(facet)}
+              <Icon aria-hidden="true" className="caret" icon="chevron-down" />
             </summary>
             {renderValues(facet, "values")}
           </details>
