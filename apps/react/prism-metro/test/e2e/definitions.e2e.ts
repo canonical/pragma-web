@@ -9,23 +9,33 @@
  * relation's stroke states its weight, the served count of its heaviest
  * relation, in four widths, dashed exactly where the count is 0; the
  * served SVG fits the design canvas at the legible floor or above, its
- * nodes and regions on the 16px lattice; and the overview at rest and with
- * each namespace opened draws within the graph budget.
+ * nodes and regions on the 16px lattice; the overview at rest and with
+ * each namespace opened draws within the graph budget; and a class's term
+ * page draws its neighbourhood one hop deep across namespaces, as many
+ * nodes as the served graph gives it.
  */
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
   launchBrowser,
+  STRIP_VIEWPORTS,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
 import {
   type BridgeLabelMeasure,
   type CanvasMeasure,
+  countServedBridges,
+  countServedNeighbourhood,
   fetchServedGraph,
   MIN_FIT,
   measureBridgeLabels,
   measureCanvasSvg,
+  measureOpenedShelf,
+  measureWeightLinks,
+  type OpenedShelfMeasure,
+  type ServedGraph,
   type ServedWeights,
   sliceCanvasSvg,
+  type WeightLinkMeasure,
   weighServedRelations,
 } from "@canonical/prism-lens-definitions/testing/browser";
 import type { Browser } from "playwright";
@@ -36,11 +46,15 @@ import type { RunningServer } from "./types.js";
 
 const CWD = process.cwd();
 
+/** The sub-pixel rounding a box's edge may stand past the canvas's, in px. */
+const WIDTH_TOLERANCE_PX = 0.5;
+
 let graph: RunningServer;
 let server: RunningServer;
 let browser: Browser;
 
 const served: {
+  graph?: ServedGraph;
   weights?: ServedWeights;
   prefixes?: readonly string[];
   classes?: number;
@@ -61,6 +75,48 @@ const listViews = (): readonly string[] => [
   ...(served.prefixes ?? []).map((prefix) => `/definitions?expand=${prefix}`),
 ];
 
+/**
+ * Open `path` at a viewport and measure its shelves and label rows once
+ * its fonts have loaded, collecting every uncaught exception.
+ *
+ * @note Impure: opens a browser tab, which it closes.
+ */
+const measureShelfAt = async (
+  path: string,
+  viewport: { readonly width: number; readonly height: number },
+): Promise<{ errors: string[]; shelf: OpenedShelfMeasure }> => {
+  const page = await browser.newPage({
+    viewport: { width: viewport.width, height: viewport.height },
+  });
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  try {
+    const origins = [new URL(server.base).origin, new URL(graph.base).origin];
+    await page.route("**/*", (route) =>
+      origins.includes(new URL(route.request().url()).origin)
+        ? route.continue()
+        : route.fulfill({ status: 204, body: "" }),
+    );
+    await page.routeWebSocket(
+      () => true,
+      () => {
+        // Left unconnected, the dev server's live-reload socket stays silent.
+      },
+    );
+    await page.goto(new URL(path, server.base).href, {
+      waitUntil: "networkidle",
+      timeout: PAGE_SETTLE_MS,
+    });
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    return {
+      errors,
+      shelf: await page.evaluate(measureOpenedShelf, WIDTH_TOLERANCE_PX),
+    };
+  } finally {
+    await page.close();
+  }
+};
+
 /** Each view's canvas, as first served, measured. */
 const measureViews = (): [string, CanvasMeasure][] =>
   listViews().map((path) => [path, measureCanvasSvg(canvases.get(path) ?? "")]);
@@ -78,6 +134,7 @@ beforeAll(
     });
     browser = await launchBrowser();
     const answer = await fetchServedGraph(`${graph.base}/graphql`);
+    served.graph = answer;
     served.weights = weighServedRelations(answer);
     served.prefixes = answer.ontologies.map((ontology) => ontology.prefix);
     served.classes = answer.ontologies.reduce(
@@ -238,8 +295,281 @@ describe("the overview's record, on the metro", () => {
     }
   });
 
+  // metro:Station's page draws the class, its superclass, its subclasses
+  // and every class one relation away in either direction, whatever their
+  // namespace, banded by namespace.
+  it("draws a term page's one-hop neighbourhood across namespaces, as the served graph counts it, within the budget", async () => {
+    const { graph: answer } = served;
+    if (answer === undefined) throw new Error("No served graph was read.");
+    const svg = await serveCanvas("/definitions/metro%3AStation");
+    const measure = measureCanvasSvg(svg);
+    const namespace = answer.ontologies.find(
+      (ontology) => ontology.prefix === "metro",
+    )?.namespace;
+    expect(namespace).toBeDefined();
+    expect(svg).toContain('data-id="metro:Station"');
+    expect(measure.nodes).toBe(
+      countServedNeighbourhood(answer, `${namespace}Station`),
+    );
+    expect(measure.nodes).toBeLessThanOrEqual(GRAPH_BUDGET.drawnNodesMax);
+    expect(measure.largestColumn).toBeLessThanOrEqual(
+      GRAPH_BUDGET.bandMembersMax,
+    );
+  });
+
   // The explorer's query reads every class of every loaded namespace, and
   // nothing bounds it: a site past the budget's figure is a stated limit.
+  // A counted relation's figure is drawn beside its label, clear of every
+  // line and arrowhead and wholly inside the canvas's frame: on geo opened,
+  // where a numeral once sat on its arrowhead, and on metro:Station's
+  // page, where one was cut at the frame's edge.
+  it.each(["/definitions?expand=geo", "/definitions/metro%3AStation"])(
+    "draws each count's numeral on %s clear of the lines and the arrowheads, inside the frame",
+    async (path) => {
+      const [desktop] = VIEWPORTS;
+      const page = await browser.newPage({
+        viewport: { width: desktop.width, height: desktop.height },
+      });
+      const errors: string[] = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      let numerals: readonly WeightLinkMeasure[] = [];
+      try {
+        const origins = [
+          new URL(server.base).origin,
+          new URL(graph.base).origin,
+        ];
+        await page.route("**/*", (route) =>
+          origins.includes(new URL(route.request().url()).origin)
+            ? route.continue()
+            : route.fulfill({ status: 204, body: "" }),
+        );
+        await page.routeWebSocket(
+          () => true,
+          () => {
+            // Left unconnected, the dev server's live-reload socket stays silent.
+          },
+        );
+        await page.goto(new URL(path, server.base).href, {
+          waitUntil: "networkidle",
+          timeout: PAGE_SETTLE_MS,
+        });
+        await page.evaluate(() => document.fonts.ready.then(() => undefined));
+        numerals = await page.evaluate(measureWeightLinks);
+      } finally {
+        await page.close();
+      }
+      expect(errors).toEqual([]);
+      expect(numerals.length).toBeGreaterThan(0);
+      for (const numeral of numerals) {
+        expect(numeral.count, numeral.href).toBeGreaterThan(0);
+        expect(numeral.inFrame, numeral.href).toBe(true);
+        expect(numeral.onLine, numeral.href).toBe(false);
+        expect(numeral.onHead, numeral.href).toBe(false);
+      }
+    },
+  );
+
+  // A counted relation's figure on metro:Station's page is a link to its
+  // property's page: a reader's pointer, pressed at the numeral's centre
+  // (not a scripted click on the element), opens it, and that page lists
+  // the class edge with the same count.
+  it("opens a count's property from its numeral by a real pointer click, whose page lists the class edge with that count", async () => {
+    const station = "/definitions/metro%3AStation";
+    const [desktop] = VIEWPORTS;
+    const page = await browser.newPage({
+      viewport: { width: desktop.width, height: desktop.height },
+    });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    let numerals: readonly WeightLinkMeasure[] = [];
+    let path = "";
+    let counts: readonly string[] = [];
+    try {
+      const origins = [new URL(server.base).origin, new URL(graph.base).origin];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.routeWebSocket(
+        () => true,
+        () => {
+          // Left unconnected, the dev server's live-reload socket stays silent.
+        },
+      );
+      await page.goto(new URL(station, server.base).href, {
+        waitUntil: "networkidle",
+        timeout: PAGE_SETTLE_MS,
+      });
+      await page.evaluate(() => document.fonts.ready.then(() => undefined));
+      numerals = await page.evaluate(measureWeightLinks);
+      const numeral = numerals.at(0);
+      if (numeral !== undefined) {
+        await page.mouse.click(numeral.centre.x, numeral.centre.y);
+        await page.waitForURL((url) => url.pathname === numeral.href, {
+          timeout: PAGE_SETTLE_MS,
+        });
+        path = new URL(page.url()).pathname;
+        const rows = page.locator(".ds.term-inspector .edges .row");
+        await rows.first().waitFor({ timeout: PAGE_SETTLE_MS });
+        counts = await rows.evaluateAll((items) =>
+          items.map(
+            (item) => item.querySelector(".cell.is-figure")?.textContent ?? "",
+          ),
+        );
+      }
+    } finally {
+      await page.close();
+    }
+    expect(errors).toEqual([]);
+    const [numeral] = numerals;
+    expect(numeral).toBeDefined();
+    expect(numeral?.tabIndex).toBe("-1");
+    expect(path).toBe(numeral?.href);
+    expect(path).not.toBe(station);
+    expect(counts).toContain(String(numeral?.count));
+  });
+
+  it("crosses no box with a bridge it does not join, and states each namespace's instances on its box, at rest and with each namespace opened", () => {
+    const instances = new Map(
+      (served.graph?.ontologies ?? []).map((ontology) => [
+        ontology.prefix,
+        ontology.classes.reduce(
+          (sum, klass) => sum + (klass.instanceCount ?? 0),
+          0,
+        ),
+      ]),
+    );
+    let boxes = 0;
+    for (const [path, measure] of measureViews()) {
+      expect(measure.crossingBridges, path).toEqual([]);
+      for (const box of measure.boxes) {
+        boxes += 1;
+        expect(box.instances, `${path} ${box.id}`).toBe(instances.get(box.id));
+      }
+    }
+    expect(boxes).toBeGreaterThan(0);
+  });
+
+  it("names metro's bridge to geo on its label row at rest, with the relations served", async () => {
+    const [desktop] = VIEWPORTS;
+    const { errors, shelf } = await measureShelfAt("/definitions", desktop);
+    expect(errors).toEqual([]);
+    const answer = served.graph;
+    if (answer === undefined) throw new Error("no served graph");
+    expect(shelf.names).toEqual([
+      {
+        ns: "metro",
+        to: "geo",
+        relations: countServedBridges(answer).get("geo metro"),
+      },
+    ]);
+    expect(shelf.namesInWayBack).toBe(false);
+  });
+
+  it.each(
+    STRIP_VIEWPORTS.filter(
+      ({ name }) => name === "1440" || name === "912",
+    ).flatMap((viewport) =>
+      ["geo", "metro"].map(
+        (prefix) => [prefix, viewport.name, viewport] as const,
+      ),
+    ),
+  )(
+    "wraps the shelf under %s opened within the canvas at %s px",
+    async (prefix, _width, viewport) => {
+      const { errors, shelf } = await measureShelfAt(
+        `/definitions?expand=${prefix}`,
+        viewport,
+      );
+      expect(errors).toEqual([]);
+      expect(shelf.boxes.length).toBeGreaterThan(0);
+      expect(shelf.boxes.filter(({ across }) => !across)).toEqual([]);
+      expect(shelf.namesInWayBack).toBe(false);
+    },
+  );
+
+  // A boxed namespace's inspector row opens it, by a link; the opened
+  // namespace's row keeps its fit button and opens nothing.
+  it("opens a boxed namespace from its inspector row by a real click, its row then fitting it only", async () => {
+    const [desktop] = VIEWPORTS;
+    const page = await browser.newPage({
+      viewport: { width: desktop.width, height: desktop.height },
+    });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    const readRows = (): Promise<{
+      opens: string[];
+      boxes: string[];
+      fits: number;
+    }> =>
+      page.evaluate(() => ({
+        opens: [
+          ...document.querySelectorAll(
+            ".ds.graph-overview .namespace-row .open",
+          ),
+        ].map(
+          (link) =>
+            new URL(
+              link.getAttribute("href") ?? "",
+              document.baseURI,
+            ).searchParams.get("expand") ?? "",
+        ),
+        boxes: [
+          ...document.querySelectorAll(
+            '.ds.graph-canvas svg.viewport g.node[data-kind="region"]',
+          ),
+        ].map((node) => node.getAttribute("data-id") ?? ""),
+        fits: document.querySelectorAll(
+          ".ds.graph-overview .namespace-row .namespace",
+        ).length,
+      }));
+    let before: Awaited<ReturnType<typeof readRows>> | undefined;
+    let after: Awaited<ReturnType<typeof readRows>> | undefined;
+    let opened: string | null = null;
+    let target = "";
+    try {
+      const origins = [new URL(server.base).origin, new URL(graph.base).origin];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.routeWebSocket(
+        () => true,
+        () => {
+          // Left unconnected, the dev server's live-reload socket stays silent.
+        },
+      );
+      await page.goto(new URL("/definitions?expand=geo", server.base).href, {
+        waitUntil: "networkidle",
+        timeout: PAGE_SETTLE_MS,
+      });
+      before = await readRows();
+      target = before.opens.at(0) ?? "";
+      await page
+        .locator(".ds.graph-overview .namespace-row .open", {
+          hasText: `Open ${target}`,
+        })
+        .click();
+      await page.waitForURL(new RegExp(`[?&]expand=${target}`));
+      await page.waitForLoadState("networkidle");
+      opened = new URL(page.url()).searchParams.get("expand");
+      after = await readRows();
+    } finally {
+      await page.close();
+    }
+    expect(errors).toEqual([]);
+    expect(before?.opens).not.toContain("geo");
+    expect(before?.opens.toSorted()).toEqual(before?.boxes.toSorted());
+    expect(target).not.toBe("");
+    expect(opened).toBe(target);
+    expect(after?.opens).not.toContain(target);
+    expect(after?.opens).toContain("geo");
+    // Every row keeps its fit button, the opened namespace's included.
+    expect(after?.fits).toBe(served.prefixes?.length);
+  });
+
   it("fetches no more classes than the budget's figure for fetched nodes", () => {
     expect(served.classes).toBeGreaterThan(0);
     expect(served.classes).toBeLessThanOrEqual(GRAPH_BUDGET.fetchedNodesMax);

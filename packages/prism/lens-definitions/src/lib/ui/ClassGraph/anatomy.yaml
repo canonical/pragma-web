@@ -45,7 +45,8 @@
 # namespace collapses to one box (`data-kind="region"`) in its own region:
 # its prefix at a hub's 16px, named wherever a hub is named, over what it
 # holds (its classes, `data-classes`, and the relations with both ends
-# inside it) at 14px, drawn only at full; a hub's height, at least 128px
+# inside it) at 14px, drawn only at full, its instances beside its prefix
+# as a class's count (`data-instances`); a hub's height, at least 128px
 # wide, inert. A relation with an end inside it is drawn from the box. A
 # relation to a class no loaded namespace holds reaches an external stub
 # (`data-kind="stub"`): a class box named by its compact term at 14px,
@@ -116,6 +117,23 @@ node:
           typography.size: typography.text.secondary.fontSize
           typography.color: color.text.muted
       relation: { cardinality: "0..*", slotName: count }
+    - node:
+        # The way back's words after the opened namespace's count, at the
+        # 14px the layout measures them in.
+        role: back
+        styles:
+          typography.size: typography.text.secondary.fontSize
+      relation: { cardinality: "0..1", slotName: back }
+    - node:
+        # A region's bridges, named after its heading and outside the way
+        # back: "· 3 relations to geo", the heaviest first, as many as the
+        # region's width holds; the rest keep their labels on the canvas.
+        # Drawn only at full, as the count is.
+        role: region bridges
+        styles:
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: region-bridges }
     - switch:
         on: internal
         cases:
@@ -319,3 +337,32 @@ node:
               styles:
                 typography.color: color.text.branded
       relation: { cardinality: "0..*", slotName: edge-label }
+    - node:
+        # A count's numeral, seated with its edge's label clear of every
+        # line, off the arrowheads, inside the viewBox: an
+        # <a class="weight-link" tabindex="-1"> to the property's term
+        # page, out of the tab order (the inspector's rows carry the
+        # keyboard route); a real pointer click opens it. Drawn only at
+        # full zoom and for a count above 0, on a halo as an edge label.
+        role: weight link
+        styles:
+          typography.color: color.text.link
+          interaction.pointerEvents: all
+          interaction.cursor: pointer
+        edges:
+          - node:
+              role: weight halo
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                interaction.pointerEvents: none
+            relation: { cardinality: "1", slotName: weight-halo }
+          - node:
+              role: weight label
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.variant.numeric: tabular-nums
+                typography.decoration: underline
+                interaction.pointerEvents: none
+            relation: { cardinality: "1", slotName: weight-label }
+      relation: { cardinality: "0..*", slotName: weight-link }

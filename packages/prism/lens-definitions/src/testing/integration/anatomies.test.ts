@@ -32,6 +32,7 @@ const EXTERNAL_TOKENS = [
   "--color-focus-ring",
   "--color-text",
   "--color-text-branded",
+  "--color-text-link",
   "--color-text-muted",
   "--motion-duration-fast",
   "--typography-text-primary-bold-font-weight",

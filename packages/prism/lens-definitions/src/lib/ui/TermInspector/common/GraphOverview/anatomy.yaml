@@ -8,7 +8,9 @@
 # relation's line and head alone, in the class graph's own classes, its
 # width, dash and heads from the canvas's own code, on the same floor; a
 # row per namespace with its figures, each a button that fits the
-# graph's camera to that region; and how to move about the graph. A
+# graph's camera to that region, and under a namespace the graph draws as
+# one box a link that opens it (`?expand=<prefix>`, "Open <prefix>"); and
+# how to move about the graph. A
 # subgrid of the inspector's columns, its rows spanning them all; its
 # sections and their labels are the inspector's.
 # Reference: the graph heuristics' empty inspector (G29).
@@ -36,6 +38,25 @@ node:
     layout.grid.column: "1 / -1"
     spacing.gap: grid.gutter
   edges:
+    - node:
+        role: count-line
+        # The graph's classes, namespaces, instances and relations, each a
+        # link to the namespace rows (#graph-overview-namespaces), whose
+        # figures add up to it; first child at rest.
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: space.100
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.weight: typography.text.primary.bold.fontWeight
+          typography.variant.numeric: tabular-nums
+        edges:
+          - node:
+              role: count-link
+            relation: { cardinality: "4", slotName: count }
+      relation: { cardinality: "1", slotName: count-line }
     - node:
         role: legend
         styles:
@@ -121,45 +142,70 @@ node:
           layout.listStyle: none
         edges:
           - node:
-              role: namespace
+              role: namespace-row
+              # A namespace's row: its fit button, then, for a boxed
+              # namespace, the link that opens it.
               styles:
                 layout.type: flex
-                layout.wrap: wrap
-                layout.align: baseline
-                layout.justify: space-between
-                spacing.gap: space.100
-                size.inline: 100%
-                spacing.internal.block.start: container.gap.tight
-                spacing.internal.block.end: container.gap.tight
-                spacing.internal.inline.start: container.gap.tight
-                spacing.internal.inline.end: container.gap.tight
-                appearance.background: color.background
-                appearance.background@hover: color.background.layer2
-                appearance.border.width: 1px
-                appearance.border.style: solid
-                appearance.border.color: color.border.muted
-                typography.font: inherit
-                typography.color: color.text
-                typography.align: start
-                interaction.cursor: pointer
-                appearance.outline.width@focus: 2px
-                appearance.outline.style@focus: solid
-                appearance.outline.color@focus: color.focusRing
+                layout.direction: column
+                layout.align: start
+                spacing.gap: space.050
               edges:
                 - node:
-                    role: abbreviation
+                    role: namespace
                     styles:
-                      typography.weight: typography.text.primary.bold.fontWeight
-                  relation: { cardinality: "1", slotName: abbreviation }
+                      layout.type: flex
+                      layout.wrap: wrap
+                      layout.align: baseline
+                      layout.justify: space-between
+                      spacing.gap: space.100
+                      size.inline: 100%
+                      spacing.internal.block.start: container.gap.tight
+                      spacing.internal.block.end: container.gap.tight
+                      spacing.internal.inline.start: container.gap.tight
+                      spacing.internal.inline.end: container.gap.tight
+                      appearance.background: color.background
+                      appearance.background@hover: color.background.layer2
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.color: color.border.muted
+                      typography.font: inherit
+                      typography.color: color.text
+                      typography.align: start
+                      interaction.cursor: pointer
+                      appearance.outline.width@focus: 2px
+                      appearance.outline.style@focus: solid
+                      appearance.outline.color@focus: color.focusRing
+                    edges:
+                      - node:
+                          role: abbreviation
+                          styles:
+                            typography.weight: typography.text.primary.bold.fontWeight
+                        relation: { cardinality: "1", slotName: abbreviation }
+                      - node:
+                          role: figures
+                          styles:
+                            typography.size: typography.text.secondary.fontSize
+                            typography.color: color.text.muted
+                            typography.variant.numeric: tabular-nums
+                        relation: { cardinality: "1", slotName: figures }
+                  relation: { cardinality: "1", slotName: namespace }
                 - node:
-                    role: figures
+                    role: open
+                    # "Open <prefix>": the explorer opened on the boxed
+                    # namespace, the page's other view keys kept.
                     styles:
                       typography.size: typography.text.secondary.fontSize
-                      typography.color: color.text.muted
-                      typography.variant.numeric: tabular-nums
-                  relation: { cardinality: "1", slotName: figures }
-            relation: { cardinality: "1..*", slotName: namespace }
+                  relation: { cardinality: "0..1", slotName: open }
+            relation: { cardinality: "1..*", slotName: namespace-row }
       relation: { cardinality: "1", slotName: namespaces }
+    - node:
+        role: undeclared
+        # The class edges the instances state that no property declares,
+        # in the inspector's edge table (its `edges` slot): from, property,
+        # to as term links; the statements as a figure flush to the end. A
+        # sentence when none.
+      relation: { cardinality: "1", slotName: undeclared }
     - node:
         role: gestures
         styles:

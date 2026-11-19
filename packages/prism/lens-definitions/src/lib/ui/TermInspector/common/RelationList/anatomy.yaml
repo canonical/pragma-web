@@ -1,7 +1,8 @@
 ---
 # RelationList — a class's relations one way in the inspector: one row
 # each, the property's link, an arrow for the direction, the class at the
-# other end. A subgrid of the inspector's three columns, and each row a
+# other end, and the statements served on its edge, flush to the row's end
+# (a link to the property where there are any). A subgrid of the inspector's three columns, and each row a
 # subgrid of it: the property on the first column, the arrow and the class
 # at the other end on the other two, so the rows line up with the field
 # rows; a cell wraps inside its column. Its gap is the grid's gutter.
@@ -64,5 +65,11 @@ node:
                     styles:
                       typography.wrap: anywhere
                   relation: { cardinality: "1", slotName: other }
+                - node:
+                    role: count
+                    styles:
+                      spacing.external.inline.start: auto
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "0..1", slotName: count }
             relation: { cardinality: "1", slotName: end }
       relation: { cardinality: "1..*", slotName: row }

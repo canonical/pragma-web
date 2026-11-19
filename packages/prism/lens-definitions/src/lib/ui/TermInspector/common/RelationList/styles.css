@@ -48,4 +48,10 @@
   .ds.relation-list .other {
     overflow-wrap: anywhere;
   }
+
+  /* The statements counted, flush to the row's end. */
+  .ds.relation-list .count {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+  }
 }

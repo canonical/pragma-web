@@ -22,9 +22,12 @@ import {
 } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
+import listRegionBridges from "../../classGraph/listRegionBridges.js";
 import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
 import nameRegionBox from "../../classGraph/nameRegionBox.js";
+import nameRegionBridges from "../../classGraph/nameRegionBridges.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
+import placeWeightLabels from "../../classGraph/placeWeightLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type {
   LaidOutEdge,
@@ -70,7 +73,8 @@ function joinClasses(...names: readonly (string | false)[]): string {
  *
  * The reader's state never moves anything: a focus fades every class and
  * edge outside its neighbourhood and draws its relations in the accent, at
- * 2px at least; a selection draws its lineage at 2px and rings its class in the
+ * 2px at least on the whole map and at their weight's own width on a term
+ * page's layout, where every relation is the focus's; a selection draws its lineage at 2px and rings its class in the
  * accent; a hovered or keyboard-focused class is ringed in the focus
  * colour; the filter hides classes and the edges that lose an end; the
  * search dims. The text follows the zoom bucket of the canvas it is drawn
@@ -166,7 +170,9 @@ export default function ClassGraph({
           stroke="currentColor"
           strokeDasharray={dash}
           strokeWidth={
-            state === "is-focus" ? Math.max(width, FOCUS_STROKE) : width
+            state === "is-focus" && layout.focus === undefined
+              ? Math.max(width, FOCUS_STROKE)
+              : width
           }
         />
         {heads.map((head) =>
@@ -269,7 +275,7 @@ export default function ClassGraph({
         data-h={node.h}
         data-hub={String(node.hub)}
         data-id={term}
-        data-instances={node.kind === "class" ? node.instanceCount : undefined}
+        data-instances={node.kind === "stub" ? undefined : node.instanceCount}
         data-kind={
           node.kind !== "class"
             ? node.kind
@@ -385,7 +391,137 @@ export default function ClassGraph({
     REGION_LABEL_ROW,
     REGION_LABEL_SIZE,
   );
+
   const labelBaseline = findCentredBaseline(LABEL_LINE_PITCH, LABEL_SIZE);
+  const numeralBaseline = findCentredBaseline(
+    LABEL_SIZE + 2 * LABEL_HALO,
+    LABEL_SIZE,
+  );
+  // Every label drawn, seated with its count's numeral clear of the
+  // lines; a numeral only at full zoom, where text of its size is drawn.
+  const drawnBridges =
+    bucket === "overview" ? [] : [...restingLabels, ...focusedLabels];
+  const drawnFocus = bucket === "full" ? labels.placed : [];
+  const drawnKey = [...drawnBridges, ...drawnFocus]
+    .map(({ edge, box }) => `${edge} ${box.x} ${box.y} ${box.w} ${box.h}`)
+    .join(";");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the labels drawn, which are new arrays on each render.
+  const seats = useMemo(
+    () =>
+      new Map(
+        placeWeightLabels(
+          layout,
+          [...drawnBridges, ...drawnFocus].map(({ edge, box }) => ({
+            edge,
+            box,
+          })),
+        ).map((seat) => [seat.edge, seat]),
+      ),
+    [layout, drawnKey],
+  );
+  const seatOf = (edge: string) => requireEntry(seats, edge);
+  const drawNumeral = (edge: string): ReactNode => {
+    const { numeral } = seatOf(edge);
+    if (numeral === undefined || bucket !== "full") return null;
+    const property = requireDefined(
+      edgeOf(edge).bundle?.relations.find(
+        (relation) => relation.uri === numeral.property,
+      ),
+      "the relation a numeral counts",
+    );
+    return (
+      <Link
+        aria-label={t("well.weight.link", {
+          count: numeral.count,
+          property: property.label,
+        })}
+        className="weight-link"
+        data-count={numeral.count}
+        data-weight-of={edge}
+        key={edge}
+        params={{ term: termOf(numeral.property) }}
+        tabIndex={-1}
+        to="definitionsTerm"
+      >
+        <rect
+          fill="none"
+          height={numeral.box.h}
+          pointerEvents="all"
+          width={numeral.box.w}
+          x={numeral.box.x}
+          y={numeral.box.y}
+        />
+        {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the numeral, so assistive technology reads it once. */}
+        <text
+          aria-hidden="true"
+          className="weight-halo"
+          fill="none"
+          stroke="currentColor"
+          strokeLinejoin="round"
+          strokeWidth={LABEL_HALO_STROKE}
+          textAnchor="middle"
+          x={numeral.cx}
+          y={numeral.box.y + numeralBaseline}
+        >
+          {numeral.count}
+        </text>
+        <text
+          className="weight-label"
+          fill="currentColor"
+          textAnchor="middle"
+          x={numeral.cx}
+          y={numeral.box.y + numeralBaseline}
+        >
+          {numeral.count}
+        </text>
+      </Link>
+    );
+  };
+  const bridges = useMemo(() => listRegionBridges(layout.model), [layout]);
+  // A region's label row names its bridges after its heading, outside the
+  // way back, as many as its width holds, or says it has none (never on a
+  // term page, whose layout holds only the class's neighbours); drawn only
+  // at full, as its count.
+  const drawBridgeNames = (region: LaidOutRegion): ReactElement | null => {
+    const opened =
+      buildDrillHref !== undefined && layout.drilled === region.prefix;
+    if (bucket !== "full") return null;
+    const { named, none } = nameRegionBridges(
+      region,
+      bridges,
+      opened,
+      layout.focus !== undefined,
+    );
+    return named.length === 0 && !none ? null : (
+      <text
+        className="region-bridges"
+        fill="currentColor"
+        x={
+          region.x + measureRegionHeading(region.prefix, region.members, opened)
+        }
+        y={region.y + regionBaseline}
+      >
+        {none ? (
+          <tspan data-none="" dx={REGION_LABEL_GAP}>
+            {t("well.region.bridges.none")}
+          </tspan>
+        ) : null}
+        {named.map(({ prefix, relations }) => (
+          <tspan
+            data-ns={prefix}
+            data-relations={relations}
+            dx={REGION_LABEL_GAP}
+            key={prefix}
+          >
+            {t("well.region.bridge", {
+              prefix,
+              relations: t("well.relations.count", { count: relations }),
+            })}
+          </tspan>
+        ))}
+      </text>
+    );
+  };
   // The drilled namespace's label row is the way back to the overview at
   // rest, wherever its boxes would open. Its whole row takes the pointer,
   // not only the glyphs, and stays at every zoom: zoomed out past the
@@ -469,6 +605,7 @@ export default function ClassGraph({
                 </text>
               ),
             )}
+            {drawBridgeNames(region)}
           </g>
         ))}
       </g>
@@ -494,81 +631,85 @@ export default function ClassGraph({
         {layout.rail.map((uri) => drawNode(requireEntry(layout.nodes, uri)))}
       </g>
       <g className="label-layer" data-layer="labels">
-        {bucket === "overview"
-          ? null
-          : [...restingLabels, ...focusedLabels].map((label) => (
-              <g data-edge={label.edge} key={label.edge}>
-                {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
-                <text
-                  aria-hidden="true"
-                  className="label-halo is-bridge"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinejoin="round"
-                  strokeWidth={LABEL_HALO_STROKE}
-                  textAnchor="middle"
-                  x={label.cx}
-                  y={label.box.y + bridgeBaseline}
-                >
-                  {label.text}
-                </text>
-                <text
-                  className="edge-label is-bridge"
-                  fill="currentColor"
-                  textAnchor="middle"
-                  x={label.cx}
-                  y={label.box.y + bridgeBaseline}
-                >
-                  {label.text}
-                </text>
-              </g>
-            ))}
-        {bucket === "full"
-          ? labels.placed.map((label) => {
-              const lines = label.lines.map((line, index) => (
-                <tspan
-                  key={line}
-                  x={label.cx}
-                  y={
-                    label.box.y +
-                    LABEL_HALO +
-                    labelBaseline +
-                    index * LABEL_LINE_PITCH
-                  }
-                >
-                  {line}
-                </tspan>
-              ));
-              const isFocusLabel =
-                focus !== undefined && label.edge !== activeEdge;
-              return (
-                <g data-edge={label.edge} key={label.edge}>
-                  {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
-                  <text
-                    aria-hidden="true"
-                    className="label-halo"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinejoin="round"
-                    strokeWidth={LABEL_HALO_STROKE}
-                    textAnchor="middle"
-                  >
-                    {lines}
-                  </text>
-                  <text
-                    className={joinClasses(
-                      "edge-label",
-                      isFocusLabel && "is-focus",
-                    )}
-                    fill="currentColor"
-                    textAnchor="middle"
-                  >
-                    {lines}
-                  </text>
-                </g>
-              );
-            })
-          : null}
+        {drawnBridges.map((label) => {
+          const { dx, dy } = seatOf(label.edge);
+          return (
+            <g data-edge={label.edge} key={label.edge}>
+              {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
+              <text
+                aria-hidden="true"
+                className="label-halo is-bridge"
+                fill="none"
+                stroke="currentColor"
+                strokeLinejoin="round"
+                strokeWidth={LABEL_HALO_STROKE}
+                textAnchor="middle"
+                x={label.cx + dx}
+                y={label.box.y + dy + bridgeBaseline}
+              >
+                {label.text}
+              </text>
+              <text
+                className="edge-label is-bridge"
+                fill="currentColor"
+                textAnchor="middle"
+                x={label.cx + dx}
+                y={label.box.y + dy + bridgeBaseline}
+              >
+                {label.text}
+              </text>
+            </g>
+          );
+        })}
+        {drawnFocus.map((label) => {
+          const { dx, dy } = seatOf(label.edge);
+          const lines = label.lines.map((line, index) => (
+            <tspan
+              key={line}
+              x={label.cx + dx}
+              y={
+                label.box.y +
+                dy +
+                LABEL_HALO +
+                labelBaseline +
+                index * LABEL_LINE_PITCH
+              }
+            >
+              {line}
+            </tspan>
+          ));
+          const isFocusLabel = focus !== undefined && label.edge !== activeEdge;
+          return (
+            <g data-edge={label.edge} key={label.edge}>
+              {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
+              <text
+                aria-hidden="true"
+                className="label-halo"
+                fill="none"
+                stroke="currentColor"
+                strokeLinejoin="round"
+                strokeWidth={LABEL_HALO_STROKE}
+                textAnchor="middle"
+              >
+                {lines}
+              </text>
+              <text
+                className={joinClasses(
+                  "edge-label",
+                  isFocusLabel && "is-focus",
+                )}
+                fill="currentColor"
+                textAnchor="middle"
+              >
+                {lines}
+              </text>
+            </g>
+          );
+        })}
+        {/* The numerals sit outside their labels' groups: the pointer on
+         * one raises no edge, whose labels would be seated anew and move
+         * the numeral from under it before the click lands. */}
+        {[...drawnBridges, ...drawnFocus].map(({ edge }) => drawNumeral(edge))}
       </g>
     </g>
   );

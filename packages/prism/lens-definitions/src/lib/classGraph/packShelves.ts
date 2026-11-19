@@ -13,7 +13,9 @@ interface ShelfStack {
 /**
  * Pack regions, largest first, into shelves 48px apart in both directions,
  * keeping the shelf break of their order that fits the design canvas at
- * the largest zoom (on a tie, fewer shelves).
+ * the largest zoom (on a tie, fewer shelves). With a `maxWidth`, a shelf
+ * of several regions is never wider than it: the shelves wrap, and only a
+ * region wider on its own takes a shelf alone.
  *
  * Every packing's width is one run's width, so each run's width is tried
  * as a bound: under a bound, the least stacked height on each number of
@@ -22,12 +24,15 @@ interface ShelfStack {
  * would double with each.
  *
  * @param sizes - Each region's width and height, in their packing order.
+ * @param options - The widest a shelf of several regions may be, in px.
  * @returns The best packing.
  * @throws When there is no region to pack.
  */
 export default function packShelves(
   sizes: readonly { readonly w: number; readonly h: number }[],
+  options: { readonly maxWidth?: number } = {},
 ): ShelfPacking {
+  const maxWidth = options.maxWidth ?? Number.POSITIVE_INFINITY;
   if (sizes.length === 0)
     throw new Error("the class graph has no region to pack");
   const count = sizes.length;
@@ -72,7 +77,7 @@ export default function packShelves(
         // there are at least as many of them.
         for (let start = end - 1; start >= shelves - 1; start -= 1) {
           const run = runOf(start, end - 1);
-          if (run.w > bound) break;
+          if (run.w > bound || (start < end - 1 && run.w > maxWidth)) break;
           const before = previous.at(start);
           if (before === undefined) continue;
           const h = before.h + SHELF_GAP + run.h;

@@ -112,6 +112,24 @@ export const CLEAN_EDGE_ZOOM = 1.2;
  */
 export const FRAME_ZOOM_MAX = 2.4;
 
+/**
+ * The narrowest canvas the graph is drawn on, in px: the well's width
+ * where the shell's container query still draws the graph, below which it
+ * becomes the phone's rows.
+ */
+export const NARROWEST_CANVAS_W = 448;
+
+/**
+ * The widest an opened view's shelf of several regions is packed, in px,
+ * on the lattice: the legible window of the narrowest canvas, less the
+ * view's margins, so a view that opens on its top-left corner shows every
+ * row of boxes whole on every canvas the graph is drawn on (480; 656 on
+ * the design canvas).
+ */
+export const SHELF_MAX_WIDTH =
+  Math.floor((NARROWEST_CANVAS_W / MIN_FIT - 2 * VIEW_MARGIN) / LATTICE) *
+  LATTICE;
+
 /** A self-loop's extent above and right of its box, in px. */
 export const LOOP_EXTENT = 16;
 
@@ -208,6 +226,13 @@ export const BRIDGE_LANE = 8;
 export const BRIDGE_GAP_ROOM = SHELF_GAP - 2 * BRIDGE_LANE;
 
 /**
+ * The closest the lanes down a gap between two regions keep, in px: a gap
+ * a bridge runs down past a shelf holds one more lane only while they keep
+ * this far apart.
+ */
+export const BRIDGE_LANE_MIN = BRIDGE_LANE / 2;
+
+/**
  * How much of a channel between two columns the lanes of the bridges that
  * run along it may spread over, in px: the room either side of the channel's
  * middle, short of the subclass bus before it and of the next column's
@@ -283,3 +308,16 @@ export const FIT_TOLERANCE = 1e-6;
  * lay out the same graph.
  */
 export const MEASURED_LOCALE = "en";
+
+/**
+ * The gap, in px, between an edge's label and its count's numeral, and
+ * between either and the line they are seated beside.
+ */
+export const WEIGHT_LABEL_GAP = 4;
+
+/**
+ * The shares of an edge's length, from its start, at which its label and
+ * numeral are tried beside it when they do not clear the lines where the
+ * label was placed: the middle first, then out towards either end.
+ */
+export const WEIGHT_LABEL_AT: readonly number[] = [0.5, 0.35, 0.65, 0.2, 0.8];

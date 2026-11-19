@@ -57,6 +57,16 @@ export interface CanvasMeasure {
    * the region's namespace.
    */
   readonly framingBridges: readonly string[];
+  /**
+   * The bridges whose route crosses a box it does not join, each as its
+   * path data and the box's term.
+   */
+  readonly crossingBridges: readonly string[];
+  /** The namespaces drawn as one box: each box's term and its instances. */
+  readonly boxes: readonly {
+    readonly id: string;
+    readonly instances: number;
+  }[];
 }
 
 /** A property as the explorer's ontologies serve it. */
@@ -73,7 +83,13 @@ export interface ServedGraph {
   readonly ontologies: readonly {
     readonly prefix: string;
     readonly namespace: string;
-    readonly classes: readonly { readonly uri: string }[];
+    readonly classes: readonly {
+      readonly uri: string;
+      /** How many instances the class has, when the check asks it. */
+      readonly instanceCount?: number;
+      /** The class's superclass, when the check asks it. */
+      readonly superclass?: { readonly uri: string } | null;
+    }[];
     readonly properties: readonly ServedProperty[];
   }[];
   readonly classEdges: readonly {
@@ -106,4 +122,41 @@ export interface BridgeLabelMeasure {
   readonly text: string;
   /** The label's on-screen size, in px. */
   readonly px: number;
+}
+
+/** A count's numeral as the canvas shows it on screen. */
+export interface WeightLinkMeasure {
+  /** The count it states. */
+  readonly count: number;
+  /** The address it links to: its property's term page. */
+  readonly href: string;
+  /** Its `tabindex`: "-1", out of the tab order. */
+  readonly tabIndex: string;
+  /** Its box's centre on screen, in CSS px. */
+  readonly centre: { readonly x: number; readonly y: number };
+  /** Whether its box lies wholly inside the canvas's frame on screen. */
+  readonly inFrame: boolean;
+  /** Whether any point of its box falls on a drawn line's stroke. */
+  readonly onLine: boolean;
+  /** Whether any point of its box falls on an arrowhead. */
+  readonly onHead: boolean;
+}
+
+/** An opened view's shelves and label rows, measured in a browser. */
+export interface OpenedShelfMeasure {
+  /**
+   * Each namespace drawn as one box: its term and whether it lies across
+   * the canvas's whole width.
+   */
+  readonly boxes: readonly { readonly id: string; readonly across: boolean }[];
+  /** Each bridge a label row names: its region, the other end, its count. */
+  readonly names: readonly {
+    readonly ns: string;
+    readonly to: string;
+    readonly relations: number;
+  }[];
+  /** Each region whose label row says it has no bridge. */
+  readonly none: readonly string[];
+  /** Whether a bridge's name sits inside the way back's link. */
+  readonly namesInWayBack: boolean;
 }

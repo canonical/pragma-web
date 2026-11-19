@@ -116,6 +116,13 @@ function sectionOf(panel: HTMLElement, name: string | RegExp): HTMLElement {
   return section;
 }
 
+/** A property view's key-value rows, apart from its class edges. */
+function requireDetails(panel: HTMLElement): HTMLElement {
+  const details = panel.querySelector<HTMLElement>(".details");
+  if (details === null) throw new Error("the property's details");
+  return details;
+}
+
 describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
   it("shows a class in the explorer's section model, with no fetch", () => {
     const fetchFn = createFetchSpy();
@@ -249,7 +256,9 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
         .getAllByRole("term")
         .map((key) => key.textContent),
     ).toEqual(["Kind", "Functional", "Range", "Domain", "Inverse"]);
-    expect(within(panel).getByText("ds:Subcomponent")).toBeInTheDocument();
+    expect(
+      within(requireDetails(panel)).getByText("ds:Subcomponent"),
+    ).toBeInTheDocument();
     expect(
       within(panel).getByRole("link", { name: "Component" }),
     ).toHaveAttribute("href", "/definitions/ds%3AComponent");

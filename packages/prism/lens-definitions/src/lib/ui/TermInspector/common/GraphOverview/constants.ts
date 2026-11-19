@@ -194,3 +194,10 @@ export const STROKE_SPECIMEN_LENGTH = 48;
  */
 export const STROKE_SPECIMEN_REACH =
   Math.max(...Object.values(HEAVY_HEAD_SIZES)) / 2;
+
+/**
+ * The id of the overview's namespace rows, where the count line's
+ * figures lead: one inspector on a page, so a fixed id, the same on the
+ * server and in the browser.
+ */
+export const NAMESPACES_ID = "graph-overview-namespaces";

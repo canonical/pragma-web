@@ -177,4 +177,42 @@
     grid-column: 1 / -1;
     margin-block: 0;
   }
+
+  /* A list of class edges, the overview's undeclared ones or a
+   * property's: a table row each, its figures flush to the end. */
+  .ds.term-inspector .edges {
+    grid-column: 1 / -1;
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--term-inspector-small-font-size);
+  }
+
+  .ds.term-inspector .cell {
+    padding-block: var(--term-inspector-tag-gap);
+    padding-inline-end: var(--term-inspector-link-gap);
+    border-bottom-width: var(--term-inspector-rule-width);
+    border-bottom-style: solid;
+    border-bottom-color: var(--term-inspector-rule-color);
+    text-align: start;
+    vertical-align: baseline;
+    overflow-wrap: anywhere;
+  }
+
+  /* A column's heading and a figure break only between words. A term
+   * breaks first right after its prefix's colon, and inside its local
+   * name only where its column, shared by four in the inspector's width,
+   * cannot hold it whole: the table never runs past the inspector. */
+  .ds.term-inspector .cell.is-heading {
+    font-weight: var(--term-inspector-caps-weight);
+    color: var(--term-inspector-muted-color);
+    overflow-wrap: normal;
+  }
+
+  .ds.term-inspector .cell.is-figure {
+    padding-inline-start: var(--term-inspector-link-gap);
+    padding-inline-end: 0;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: normal;
+  }
 }

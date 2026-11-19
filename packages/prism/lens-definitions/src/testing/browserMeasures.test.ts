@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import countServedBridges from "../../testing/browser/countServedBridges.js";
+import countServedNeighbourhood from "../../testing/browser/countServedNeighbourhood.js";
 import measureCanvasSvg from "../../testing/browser/measureCanvasSvg.js";
 import sliceCanvasSvg from "../../testing/browser/sliceCanvasSvg.js";
 import type { ServedGraph } from "../../testing/browser/types.js";
@@ -181,5 +183,84 @@ describe("measureCanvasSvg", () => {
     expect(measureCanvasSvg(svg).framingBridges).toEqual([
       `${framing} round ds`,
     ]);
+  });
+
+  it("lists a bridge that crosses a box it does not join, not one that ends in its own, and reads each box's instances", () => {
+    const node = (id: string, kind: string, x: number, y: number) =>
+      `<g class="node" data-id="${id}" data-instances="4" data-kind="${kind}" data-x="${x}" data-y="${y}" data-w="96" data-h="48"></g>`;
+    const across = "M0 24H400";
+    const svg = serve([
+      node("aa:A", "concrete", 0, 0),
+      node("zz", "region", 320, 0),
+      node("yy", "region", 160, 0),
+      `<path class="relation is-bridge" d="${across}" data-from="aa:A" data-to="zz" stroke-width="1"></path>`,
+      `<path class="relation is-bridge" d="M48 48V96H368V48" data-from="aa:A" data-to="zz" stroke-width="1"></path>`,
+    ]);
+    const measure = measureCanvasSvg(svg);
+    expect(measure.crossingBridges).toEqual([`${across} across yy`]);
+    expect(measure.boxes).toEqual([
+      { id: "zz", instances: 4 },
+      { id: "yy", instances: 4 },
+    ]);
+  });
+});
+
+describe("countServedBridges", () => {
+  it("counts the object properties between two loaded namespaces, whichever way they run", () => {
+    expect(countServedBridges(GRAPH)).toEqual(new Map([["aa zz", 1]]));
+  });
+});
+
+describe("countServedNeighbourhood", () => {
+  it("counts a class, its superclass, its subclasses, its relations' other ends and its stubs once each", () => {
+    const graph: ServedGraph = {
+      ontologies: [
+        {
+          prefix: "aa",
+          namespace: "https://aa.example/",
+          classes: [
+            { uri: "https://aa.example/Root", superclass: null },
+            {
+              uri: "https://aa.example/A",
+              superclass: { uri: "https://aa.example/Root" },
+            },
+            {
+              uri: "https://aa.example/Sub",
+              superclass: { uri: "https://aa.example/A" },
+            },
+            { uri: "https://aa.example/Far" },
+          ],
+          properties: [
+            property("https://aa.example/p", "https://aa.example/A", "bb:B"),
+            property("https://aa.example/q", "https://aa.example/A", "bb:B"),
+            property(
+              "https://aa.example/r",
+              "https://aa.example/A",
+              "https://zz.example/Stub",
+            ),
+            property("https://aa.example/s", "https://aa.example/Far", "bb:B"),
+            property(
+              "https://aa.example/t",
+              "https://aa.example/A",
+              "aa:Far",
+              "DATA",
+            ),
+          ],
+        },
+        {
+          prefix: "bb",
+          namespace: "https://bb.example/",
+          classes: [{ uri: "https://bb.example/B" }],
+          properties: [
+            property("https://bb.example/u", "https://bb.example/B", "aa:A"),
+            property("https://bb.example/v", null, "aa:A"),
+          ],
+        },
+      ],
+      classEdges: [],
+    };
+    // A, Root, Sub, bb:B and the stub; not Far, which a datatype
+    // property and a relation of B's reach.
+    expect(countServedNeighbourhood(graph, "https://aa.example/A")).toBe(5);
   });
 });

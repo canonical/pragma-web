@@ -5,12 +5,14 @@ import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
 import createStripHarness from "../../../../../../testing/createStripHarness.js";
 import { DEFINITIONS_TEST_TIMEOUT_MS } from "../../../../../../testing/fixtures.js";
+import classEdges from "../../../../../../testing/records/classEdges.js";
 import definitionsExplorerRecords from "../../../../../../testing/records/definitionsExplorerRecords.js";
 import metroGraph from "../../../../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../../../../testing/records/ontologyGraph.js";
 import useCapturedExplorer from "../../../../../../testing/useCapturedExplorer.js";
 import type { TermInspector_ontologies$key } from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
 import termInspectorOntologiesFragmentNode from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
+import listUndeclaredEdges from "../../../../classGraph/listUndeclaredEdges.js";
 import weighStroke from "../../../../classGraph/weighStroke.js";
 import { MESSAGES } from "../../../../i18n/index.js";
 import { useLensFilter } from "../../../LensFilterProvider/index.js";
@@ -18,7 +20,13 @@ import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 import GraphOverview from "./GraphOverview.js";
 
 /** The overview over the store, beside a readout of the asked region. */
-function Overview(): ReactElement {
+function Overview({
+  edges = classEdges,
+  boxed,
+}: {
+  readonly edges?: typeof classEdges;
+  readonly boxed?: readonly string[];
+}): ReactElement {
   const { data } = useCapturedExplorer();
   const ontologies = useFragment<TermInspector_ontologies$key>(
     termInspectorOntologiesFragmentNode,
@@ -31,7 +39,9 @@ function Overview(): ReactElement {
         {region === undefined ? "all" : `${region.prefix} #${region.serial}`}
       </output>
       <GraphOverview
+        boxed={boxed}
         className="custom-class"
+        classEdges={edges}
         data-testid="overview"
         ontologies={ontologies}
       />
@@ -39,14 +49,21 @@ function Overview(): ReactElement {
   );
 }
 
-/** Mount the overview over the captured store. */
-function renderOverview(): HTMLElement {
+/**
+ * Mount the overview over the captured store, with its class edges and
+ * the namespaces drawn as boxes, at an address of the explorer.
+ */
+function renderOverview(
+  edges?: typeof classEdges,
+  boxed?: readonly string[],
+  url = "/definitions",
+): HTMLElement {
   render(
     createStripHarness(
-      "/definitions",
+      url,
       definitionsExplorerRecords,
       createFetchSpy(),
-      <Overview />,
+      <Overview boxed={boxed} edges={edges} />,
     ),
   );
   return screen.getByTestId("overview");
@@ -212,10 +229,97 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     );
   });
 
+  it("links a boxed namespace's row to the explorer opened on it, keeping the page's view keys, and keeps every row's fit button", () => {
+    const overview = renderOverview(
+      undefined,
+      ["cs"],
+      "/definitions?sheet=filter",
+    );
+    const open = within(overview).getByRole("link", { name: "Open cs" });
+    const href = new URL(open.getAttribute("href") ?? "", "http://site");
+    expect(href.pathname).toBe("/definitions");
+    expect(href.searchParams.get("expand")).toBe("cs");
+    expect(href.searchParams.get("sheet")).toBe("filter");
+    // Only the boxed namespace opens; every row still fits the camera.
+    expect(
+      within(overview).queryAllByRole("link", { name: /^Open / }),
+    ).toHaveLength(1);
+    expect(within(overview).getAllByRole("button")).toHaveLength(3);
+    expect(
+      open
+        .closest(".namespace-row")
+        ?.querySelector(".namespace")
+        ?.getAttribute("aria-label"),
+    ).toBe("Fit the graph to cs");
+  });
+
+  it("opens no namespace from its row when the graph draws none as a box", () => {
+    const overview = renderOverview();
+    expect(within(overview).queryAllByRole("link", { name: /^Open / })).toEqual(
+      [],
+    );
+  });
+
   it("says how to move about the graph", () => {
     const overview = renderOverview();
     expect(
       within(overview).getByRole("heading", { name: "Gestures" }),
     ).toBeInTheDocument();
+  });
+
+  it("opens on a count line whose figures link to the namespace rows that add up to them", () => {
+    const root = renderOverview();
+    const line = root.firstElementChild;
+    expect(line?.className).toBe("count-line");
+    const links = [...(line?.querySelectorAll("a.count-link") ?? [])];
+    expect(links).toHaveLength(4);
+    for (const link of links) {
+      expect(link.getAttribute("href")).toBe("#graph-overview-namespaces");
+    }
+    const rows = root.querySelectorAll("#graph-overview-namespaces .namespace");
+    expect(links.at(1)?.textContent).toBe(`${rows.length} namespaces`);
+    const sum = (index: number): number =>
+      [...rows].reduce(
+        (total, row) =>
+          total +
+          Number(
+            row
+              .querySelector(".figures")
+              ?.textContent?.split(" · ")
+              .at(index)
+              ?.split(" ")
+              .at(0),
+          ),
+        0,
+      );
+    expect(links.at(0)?.textContent).toBe(`${sum(0)} classes`);
+    expect(links.at(2)?.textContent).toBe(`${sum(1)} instances`);
+    expect(links.at(3)?.textContent).toBe(`${sum(2)} relations`);
+  });
+
+  it("lists each undeclared observed edge as a row, with its count", () => {
+    const root = renderOverview();
+    const undeclared = listUndeclaredEdges(classEdges);
+    expect(undeclared.length).toBeGreaterThan(0);
+    const rows = root.querySelectorAll(".undeclared tbody tr");
+    expect(rows).toHaveLength(undeclared.length);
+    for (const [index, row] of [...rows].entries()) {
+      expect(row.querySelectorAll("td a")).toHaveLength(3);
+      expect(row.querySelector("td.is-figure")?.textContent).toBe(
+        String(undeclared.at(index)?.count),
+      );
+    }
+  });
+
+  it("says so when every observed edge is declared", () => {
+    const declared = classEdges.filter((edge) => edge.declared);
+    expect(declared.length).toBeGreaterThan(0);
+    expect(listUndeclaredEdges(declared)).toEqual([]);
+    const root = renderOverview(declared);
+    const section = root.querySelector(".undeclared");
+    expect(section?.querySelector(".edges")).toBeNull();
+    expect(section?.querySelector(".prose")?.textContent).toBe(
+      String(MESSAGES["inspector.overview.undeclared.none"]),
+    );
   });
 });

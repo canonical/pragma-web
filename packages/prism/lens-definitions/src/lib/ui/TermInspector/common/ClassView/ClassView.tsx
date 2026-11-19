@@ -12,6 +12,7 @@ import { RelationList } from "../RelationList/index.js";
 import type { RelationEntry } from "../RelationList/types.js";
 import { TermLink } from "../TermLink/index.js";
 import type { ClassViewProps } from "./types.js";
+import weighRelationEntries from "./weighRelationEntries.js";
 
 const componentCssClassName = "ds class-view";
 
@@ -44,8 +45,9 @@ function groupByDeclaringClass(entries: readonly ClassPropertyEntry[]): {
  * tags (class, and abstract when it is), the name and the address, then
  * its lineage, its definition, its subclasses, its fields (datatype
  * properties, its own first, then each inherited group under the class it
- * comes from), its relations (outgoing, incoming, then inherited) and its
- * instances. Every reference is a term link.
+ * comes from), its relations (outgoing, incoming, then inherited, each
+ * group the heaviest first, with the statements served on its edge) and
+ * its instances. Every reference is a term link.
  *
  * `import { ClassView } from "../ClassView/index.js";`
  *
@@ -57,6 +59,7 @@ export default function ClassView({
   term,
   ontologies,
   namespaces,
+  classEdges = [],
   className,
   ...props
 }: ClassViewProps): ReactElement {
@@ -207,7 +210,12 @@ export default function ClassView({
             <RelationList
               direction="outgoing"
               namespaces={namespaces}
-              relations={outgoing}
+              relations={weighRelationEntries(
+                outgoing,
+                classEdges,
+                data.uri,
+                "outgoing",
+              )}
             />
           </div>
         )}
@@ -217,7 +225,12 @@ export default function ClassView({
             <RelationList
               direction="incoming"
               namespaces={namespaces}
-              relations={incoming}
+              relations={weighRelationEntries(
+                incoming,
+                classEdges,
+                data.uri,
+                "incoming",
+              )}
             />
           </div>
         )}
@@ -240,7 +253,12 @@ export default function ClassView({
             <RelationList
               direction="outgoing"
               namespaces={namespaces}
-              relations={group.entries.map(toOutgoing)}
+              relations={weighRelationEntries(
+                group.entries.map(toOutgoing),
+                classEdges,
+                group.uri,
+                "outgoing",
+              )}
             />
           </div>
         ))}
