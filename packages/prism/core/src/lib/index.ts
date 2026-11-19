@@ -119,7 +119,9 @@ export type {
 } from "./renderers/index.js";
 export {
   buildRendererSearch,
+  buildViewHref,
   DEFAULT_FILTER_PLACEMENT,
+  DESCENDING_SORT_PREFIX,
   FILTER_PLACEMENTS,
   FILTER_SHEET,
   PAGE_RENDERER_NAMES,
@@ -130,6 +132,7 @@ export {
   resolveRenderers,
   usePageRenderers,
   useRenderers,
+  useViewLocation,
   VIEW_PARAMS,
   viewSearch,
   warmPageRenderer,

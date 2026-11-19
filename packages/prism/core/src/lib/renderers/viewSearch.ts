@@ -8,7 +8,7 @@ const readText = (value: unknown): string | undefined =>
 /**
  * The search schema every route with a strip declares, in the Standard
  * Schema shape the router validates search parameters with: it reads the
- * view's six parameters as text, each absent when the address has none,
+ * view's seven parameters as text, each absent when the address has none,
  * and never fails. Declaring it names the parameters in a site's route
  * table, so a view can read and write them under the site's register.
  */
@@ -25,6 +25,7 @@ const viewSearch: ViewSearchSchema = {
         graph: readText(search[VIEW_PARAMS.graph]),
         select: readText(search[VIEW_PARAMS.select]),
         expand: readText(search[VIEW_PARAMS.expand]),
+        sort: readText(search[VIEW_PARAMS.sort]),
       };
       return {
         value: Object.fromEntries(

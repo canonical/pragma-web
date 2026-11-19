@@ -463,12 +463,15 @@ site's own catalog, and the factory holds no reader-facing string.
   `ShortcutAllocation`.
 - Router: `createStaticRouter`.
 - Renderers: `RenderersProvider`, `useRenderers`, `resolveRenderers`,
-  `readRenderer`, `buildRendererSearch`, `viewSearch` (the search schema
+  `readRenderer`, `buildRendererSearch`, `buildViewHref` (the current
+  page's href with other view parameters), `useViewLocation` (the address's
+  path and parameters), `viewSearch` (the search schema
   every route with a strip declares), `VIEW_PARAMS` (the address's view grammar: the renderer, the search
   text, the open sheet and the graph's kind, selection and expansion; the
   expansion is what the graph defines: a relation on an entity's
-  neighbourhood, a namespace's prefix on the Definitions overview),
-  `FILTER_SHEET`, `FILTER_PLACEMENTS`,
+  neighbourhood, a namespace's prefix on the Definitions overview; and the
+  list's sort), `DESCENDING_SORT_PREFIX` (the minus before a field that sorts
+  it descending), `FILTER_SHEET`, `FILTER_PLACEMENTS`,
   `DEFAULT_FILTER_PLACEMENT`, `RENDERER_KINDS`, `PAGE_RENDERER_NAMES`,
   `RENDERER_LABEL_KEYS`, `usePageRenderers` (core's page renderers, Page
   and Turtle), `warmPageRenderer` (a route's warm calls it so the server
