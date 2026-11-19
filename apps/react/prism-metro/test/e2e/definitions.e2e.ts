@@ -407,10 +407,13 @@ describe("the overview's record, on the metro", () => {
   });
 
   it.each(
-    STRIP_VIEWPORTS.filter(({ name }) => name === "1440" || name === "912")
-      .flatMap((viewport) =>
-        ["geo", "metro"].map((prefix) => [prefix, viewport.name, viewport] as const),
+    STRIP_VIEWPORTS.filter(
+      ({ name }) => name === "1440" || name === "912",
+    ).flatMap((viewport) =>
+      ["geo", "metro"].map(
+        (prefix) => [prefix, viewport.name, viewport] as const,
       ),
+    ),
   )(
     "wraps the shelf under %s opened within the canvas at %s px",
     async (prefix, _width, viewport) => {
