@@ -1,17 +1,18 @@
 ---
 # StockList — the fleet index's list, a subcomponent of FleetIndex: every
-# rolling stock in the shared list view of nodes, with the count line, the
-# view toggle and the empty line it carries. As cards, each stock's card
-# draws its formations at one scale in its specimen; as rows, each row counts
-# them. The view is the address's `as` parameter, rows when it names none.
+# rolling stock through the shared list of nodes. As a table, the default,
+# each stock is a row of the facts its lens displays, sortable by their
+# headers; as cards, each stock's card draws its formations at one scale in
+# its specimen through the site's card arm. The renderer, the sort and the
+# selected stock are the address's `as`, `sort` and `select` parameters.
 #
-# It renders no element of its own and binds no styles: EntityList is the
+# It renders no element of its own and binds no styles: NodeList is the
 # root, and each stock renders through the site's card and row switches.
 node:
   uri: metro.subcomponent.stock_list
   edges:
     - node:
-        uri: prism.component.entity_list
+        uri: prism.component.node_list
         edges:
           - node:
               uri: metro.component.metro_card_projection

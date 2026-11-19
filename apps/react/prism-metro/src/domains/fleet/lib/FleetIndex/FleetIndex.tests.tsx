@@ -62,21 +62,47 @@ describe("FleetIndex", () => {
     ).toHaveAttribute("href", "/fleet/metro%3Aseries-90");
   });
 
-  it("lists the rolling stock as rows in the table, by default", async () => {
+  it("lists the rolling stock as a table of its lens's facts, by default", async () => {
     const { container } = renderMetroPage("/fleet");
     await waitFor(() => {
       expect(
-        container.querySelectorAll(".ds.entity-list .rolling-stock-row"),
+        container.querySelectorAll(".ds.entity-list .entity-table tr.row"),
       ).toHaveLength(ROLLING_STOCK_COUNT);
     });
+    expect(
+      container.querySelectorAll(".entity-table th.column a.sort").length,
+    ).toBeGreaterThan(0);
     expect(container.querySelector(".rolling-stock-card")).toBeNull();
+  });
+
+  it("highlights the selected stock and keeps it across the renderers", async () => {
+    const table = renderMetroPage("/fleet?select=metro%3Aseries-90");
+    await waitFor(() => {
+      expect(
+        table.container.querySelectorAll('tr.row[aria-selected="true"]'),
+      ).toHaveLength(1);
+    });
+    const switchLink = table.container.querySelector(
+      '.ds.renderer-switch a[href*="as=cards"]',
+    );
+    expect(switchLink?.getAttribute("href")).toContain("select=");
+    table.unmount();
+    const cards = renderMetroPage("/fleet?as=cards&select=metro%3Aseries-90");
+    await waitFor(() => {
+      expect(
+        cards.container.querySelectorAll(
+          '.rolling-stock-card[aria-current="true"]',
+        ),
+      ).toHaveLength(1);
+    });
+    expect(cards.container.querySelector('input[type="checkbox"]')).toBeNull();
   });
 
   it("closes the strip with a count of the rolling stocks it lists", async () => {
     const { container } = renderMetroPage("/fleet");
     const rows = await waitFor(() => {
       const found = container.querySelectorAll(
-        ".ds.entity-list .rolling-stock-row",
+        ".ds.entity-list .entity-table tr.row",
       );
       expect(found).toHaveLength(ROLLING_STOCK_COUNT);
       return found;
