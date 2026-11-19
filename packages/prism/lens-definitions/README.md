@@ -186,7 +186,11 @@ server, deterministically: two renders of a page give the same SVG.
   nearer margin only where none has. Every
   bridge keeps a lane of its own in each channel, gap and margin it runs
   along, whatever namespaces it joins, so no two share a line. A label
-  with no room of its own is named when either end is in focus.
+  with no room of its own is named when either end is in focus. A
+  region's label row names its bridges after its class count, the
+  heaviest first ("· 3 relations to geo"), as many as the region's width
+  holds; it is never widened for them, and the opened namespace's names
+  sit after its way back, outside the link.
 - **Weights.** A relation's line states how many statements the graph
   holds for it (`Query.classEdges`): 1px below 10, 2px from 10, 4px from
   100 and 8px from 1000; a relation with no statements yet is dashed. A

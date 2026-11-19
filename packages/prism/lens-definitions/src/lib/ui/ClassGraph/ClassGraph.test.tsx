@@ -234,6 +234,50 @@ describe("ClassGraph", () => {
     },
   );
 
+  it.each(["full", "hubs"] as const)(
+    "names a region's bridges after its heading, outside the way back, at the %s zoom by its count's rule",
+    (bucket) => {
+      zoom.bucket = bucket;
+      const container = draw({
+        layout: layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+          budget: GRAPH_BUDGET,
+          drill: "surface",
+        }),
+        terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
+        buildDrillHref: (prefix) =>
+          prefix === undefined
+            ? "/definitions"
+            : `/definitions?expand=${prefix}`,
+      });
+      const names = container.querySelector(
+        '.region[data-ns="surface"] > text.region-bridges',
+      );
+      expect(container.querySelector(".way-back .region-bridges")).toBeNull();
+      if (bucket === "hubs") {
+        expect(names).toBeNull();
+        return;
+      }
+      expect(
+        [...(names?.querySelectorAll("tspan") ?? [])].map((name) => [
+          name.getAttribute("data-ns"),
+          name.getAttribute("data-relations"),
+          name.textContent,
+        ]),
+      ).toEqual([
+        ["ds", "1", "· 1 relation to ds"],
+        ["vocab", "1", "· 1 relation to vocab"],
+      ]);
+    },
+  );
+
+  it("names metro's three relations to geo on its label row", () => {
+    const container = draw({ layout: metro.layout, terms: metro.terms });
+    expect(
+      container.querySelector('.region[data-ns="metro"] .region-bridges')
+        ?.textContent,
+    ).toBe("· 3 relations to geo");
+  });
+
   it("makes each class a link with one tab stop, named for assistive technology", () => {
     const container = draw({ tabStop: uri("ds:Component") });
     const links = container.querySelectorAll("a.target");

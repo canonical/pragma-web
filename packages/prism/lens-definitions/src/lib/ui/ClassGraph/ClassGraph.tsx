@@ -22,8 +22,10 @@ import {
 } from "../../classGraph/constants.js";
 import findNeighbourhood from "../../classGraph/findNeighbourhood.js";
 import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
+import listRegionBridges from "../../classGraph/listRegionBridges.js";
 import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
 import nameRegionBox from "../../classGraph/nameRegionBox.js";
+import nameRegionBridges from "../../classGraph/nameRegionBridges.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
 import placeWeightLabels from "../../classGraph/placeWeightLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
@@ -472,6 +474,39 @@ export default function ClassGraph({
       </Link>
     );
   };
+  const bridges = useMemo(() => listRegionBridges(layout.model), [layout]);
+  // A region's label row names its bridges after its heading, outside the
+  // way back, as many as its width holds; drawn only at full, as its count.
+  const drawBridgeNames = (region: LaidOutRegion): ReactElement | null => {
+    const opened =
+      buildDrillHref !== undefined && layout.drilled === region.prefix;
+    const named =
+      bucket === "full" ? nameRegionBridges(region, bridges, opened) : [];
+    return named.length === 0 ? null : (
+      <text
+        className="region-bridges"
+        fill="currentColor"
+        x={
+          region.x + measureRegionHeading(region.prefix, region.members, opened)
+        }
+        y={region.y + regionBaseline}
+      >
+        {named.map(({ prefix, relations }) => (
+          <tspan
+            data-ns={prefix}
+            data-relations={relations}
+            dx={REGION_LABEL_GAP}
+            key={prefix}
+          >
+            {t("well.region.bridge", {
+              prefix,
+              relations: t("well.relations.count", { count: relations }),
+            })}
+          </tspan>
+        ))}
+      </text>
+    );
+  };
   // The drilled namespace's label row is the way back to the overview at
   // rest, wherever its boxes would open. Its whole row takes the pointer,
   // not only the glyphs, and stays at every zoom: zoomed out past the
@@ -555,6 +590,7 @@ export default function ClassGraph({
                 </text>
               ),
             )}
+            {drawBridgeNames(region)}
           </g>
         ))}
       </g>

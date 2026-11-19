@@ -427,6 +427,17 @@ export interface Bridge {
   readonly relations: number;
 }
 
+/**
+ * A bridge as a region's label row names it: the region across it and how
+ * many relations cross between the two.
+ */
+export interface RegionBridgeName {
+  /** The prefix of the region at the bridge's other end. */
+  readonly prefix: string;
+  /** How many relations cross between the two. */
+  readonly relations: number;
+}
+
 /** What the layered engine is given for every region of one layout. */
 export interface LayerSettings {
   /** How many barycentre sweeps order the columns. */

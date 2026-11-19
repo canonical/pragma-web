@@ -40,6 +40,7 @@
     /* The fade; zero under reduced motion. */
     --class-graph-fade-duration: var(--motion-duration-fast);
     --class-graph-weight-link-color: var(--color-text-link);
+    --class-graph-region-bridges-color: var(--color-text-muted);
   }
 
   .ds.class-graph .rule {
@@ -55,6 +56,12 @@
   .ds.class-graph .count {
     font-size: var(--class-graph-label-font-size);
     color: var(--class-graph-muted-color);
+  }
+
+  /* A region's bridges, named after its heading as its count is set. */
+  .ds.class-graph .region-bridges {
+    font-size: var(--class-graph-label-font-size);
+    color: var(--class-graph-region-bridges-color);
   }
 
   .ds.class-graph .subclass {

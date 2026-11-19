@@ -117,6 +117,16 @@ node:
           typography.size: typography.text.secondary.fontSize
           typography.color: color.text.muted
       relation: { cardinality: "0..*", slotName: count }
+    - node:
+        # A region's bridges, named after its heading and outside the way
+        # back: "· 3 relations to geo", the heaviest first, as many as the
+        # region's width holds; the rest keep their labels on the canvas.
+        # Drawn only at full, as the count is.
+        role: region bridges
+        styles:
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: region-bridges }
     - switch:
         on: internal
         cases:
