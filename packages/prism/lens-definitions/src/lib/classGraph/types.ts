@@ -438,6 +438,14 @@ export interface RegionBridgeName {
   readonly relations: number;
 }
 
+/** What a region's label row says of its bridges. */
+export interface RegionBridgeNames {
+  /** The bridges named, the heaviest first, as many as fit. */
+  readonly named: readonly RegionBridgeName[];
+  /** Whether the row says the region has no bridge: only where it has none and the words fit. */
+  readonly none: boolean;
+}
+
 /** What the layered engine is given for every region of one layout. */
 export interface LayerSettings {
   /** How many barycentre sweeps order the columns. */

@@ -9,7 +9,12 @@ import {
 import { MESSAGES } from "../i18n/constants.js";
 import { MEASURED_LOCALE } from "./constants.js";
 import measureRegionHeading from "./measureRegionHeading.js";
-import type { Bridge, LaidOutRegion, RegionBridgeName } from "./types.js";
+import type {
+  Bridge,
+  LaidOutRegion,
+  RegionBridgeName,
+  RegionBridgeNames,
+} from "./types.js";
 
 /** The catalog a name is measured in, the same in every locale. */
 const measured = createTranslator(MEASURED_LOCALE, MESSAGES);
@@ -17,19 +22,21 @@ const measured = createTranslator(MEASURED_LOCALE, MESSAGES);
 /**
  * Name a region's bridges on its label row, after its heading: the
  * heaviest first (then by the other region's prefix), as many as fit in
- * the region's width, each a gap after the last. The region is never
- * widened for them: a bridge left unnamed keeps its label on the canvas.
+ * the region's width, each a gap after the last; a region with no bridge
+ * says so instead, where that fits. The region is never widened for them:
+ * a bridge left unnamed keeps its label on the canvas.
  *
  * @param region - The region whose label row names them.
  * @param bridges - Every bridge of the layout.
  * @param opened - Whether its heading carries the way back.
- * @returns The bridges named, in the row's order.
+ * @returns The bridges named, in the row's order, and whether the row says
+ *   the region has none.
  */
 export default function nameRegionBridges(
   region: LaidOutRegion,
   bridges: readonly Bridge[],
   opened: boolean,
-): readonly RegionBridgeName[] {
+): RegionBridgeNames {
   const ends = bridges
     .filter(({ a, b }) => a === region.prefix || b === region.prefix)
     .map(({ a, b, relations }) => ({
@@ -39,8 +46,16 @@ export default function nameRegionBridges(
     .sort((x, y) =>
       orderBy(y.relations - x.relations, compareText(x.prefix, y.prefix)),
     );
-  const named: RegionBridgeName[] = [];
   let end = measureRegionHeading(region.prefix, region.members, opened);
+  if (ends.length === 0) {
+    const width = measureTextWidth(
+      measured("well.region.bridges.none"),
+      "regular",
+      LABEL_SIZE,
+    );
+    return { named: [], none: end + REGION_LABEL_GAP + width <= region.w };
+  }
+  const named: RegionBridgeName[] = [];
   for (const bridge of ends) {
     const width = measureTextWidth(
       measured("well.region.bridge", {
@@ -56,5 +71,5 @@ export default function nameRegionBridges(
     if (end > region.w) break;
     named.push(bridge);
   }
-  return named;
+  return { named, none: false };
 }

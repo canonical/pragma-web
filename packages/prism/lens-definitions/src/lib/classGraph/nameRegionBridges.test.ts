@@ -43,28 +43,55 @@ const measureName = (prefix: string, relations: number): number =>
 
 describe("nameRegionBridges", () => {
   it("names a region's own bridges, the heaviest first, then by prefix", () => {
-    expect(nameRegionBridges(regionOf(4000), BRIDGES, false)).toEqual([
-      { prefix: "cs", relations: 5 },
-      { prefix: "anatomy", relations: 2 },
-      { prefix: "surface", relations: 2 },
-    ]);
+    expect(nameRegionBridges(regionOf(4000), BRIDGES, false)).toEqual({
+      named: [
+        { prefix: "cs", relations: 5 },
+        { prefix: "anatomy", relations: 2 },
+        { prefix: "surface", relations: 2 },
+      ],
+      none: false,
+    });
   });
 
   it("names only as many as fit in the region's width, after its heading", () => {
     const heading = measureRegionHeading("ds", 3, true);
-    expect(nameRegionBridges(regionOf(heading), BRIDGES, true)).toEqual([]);
+    expect(nameRegionBridges(regionOf(heading), BRIDGES, true)).toEqual({
+      named: [],
+      none: false,
+    });
     const one = heading + measureName("cs", 5);
-    expect(nameRegionBridges(regionOf(one), BRIDGES, true)).toEqual([
+    expect(nameRegionBridges(regionOf(one), BRIDGES, true).named).toEqual([
       { prefix: "cs", relations: 5 },
     ]);
-    expect(nameRegionBridges(regionOf(one - 1), BRIDGES, true)).toEqual([]);
+    expect(nameRegionBridges(regionOf(one - 1), BRIDGES, true).named).toEqual(
+      [],
+    );
+  });
+
+  it("says a region with no bridge has none, where the words fit", () => {
+    const heading = measureRegionHeading("ds", 3, false);
+    const words =
+      REGION_LABEL_GAP +
+      measureTextWidth(
+        "· no relations to other namespaces",
+        "regular",
+        LABEL_SIZE,
+      );
+    expect(nameRegionBridges(regionOf(heading + words), [], false)).toEqual({
+      named: [],
+      none: true,
+    });
+    expect(nameRegionBridges(regionOf(heading + words - 1), [], false)).toEqual(
+      { named: [], none: false },
+    );
   });
 
   it("names metro's bridge to geo with its three relations", () => {
     const layout = layOutClassGraph(metroGraph, { budget: GRAPH_BUDGET });
     const metro = layout.regions.find(({ prefix }) => prefix === "metro");
     expect(
-      metro && nameRegionBridges(metro, listRegionBridges(layout.model), false),
+      metro &&
+        nameRegionBridges(metro, listRegionBridges(layout.model), false).named,
     ).toEqual([{ prefix: "geo", relations: 3 }]);
   });
 
@@ -79,10 +106,23 @@ describe("nameRegionBridges", () => {
       const bridges = listRegionBridges(layout.model);
       for (const region of layout.regions) {
         const opened = layout.drilled === region.prefix;
-        const named = nameRegionBridges(region, bridges, opened);
+        const { named, none } = nameRegionBridges(region, bridges, opened);
+        const heading = measureRegionHeading(
+          region.prefix,
+          region.members,
+          opened,
+        );
         const end = named.reduce(
           (sum, { prefix, relations }) => sum + measureName(prefix, relations),
-          measureRegionHeading(region.prefix, region.members, opened),
+          none
+            ? heading +
+                REGION_LABEL_GAP +
+                measureTextWidth(
+                  "· no relations to other namespaces",
+                  "regular",
+                  LABEL_SIZE,
+                )
+            : heading,
         );
         expect(end, region.prefix).toBeLessThanOrEqual(region.w);
       }

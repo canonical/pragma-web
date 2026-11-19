@@ -479,13 +479,14 @@ export default function ClassGraph({
   };
   const bridges = useMemo(() => listRegionBridges(layout.model), [layout]);
   // A region's label row names its bridges after its heading, outside the
-  // way back, as many as its width holds; drawn only at full, as its count.
+  // way back, as many as its width holds, or says it has none; drawn only
+  // at full, as its count.
   const drawBridgeNames = (region: LaidOutRegion): ReactElement | null => {
     const opened =
       buildDrillHref !== undefined && layout.drilled === region.prefix;
-    const named =
-      bucket === "full" ? nameRegionBridges(region, bridges, opened) : [];
-    return named.length === 0 ? null : (
+    if (bucket !== "full") return null;
+    const { named, none } = nameRegionBridges(region, bridges, opened);
+    return named.length === 0 && !none ? null : (
       <text
         className="region-bridges"
         fill="currentColor"
@@ -494,6 +495,11 @@ export default function ClassGraph({
         }
         y={region.y + regionBaseline}
       >
+        {none ? (
+          <tspan data-none="" dx={REGION_LABEL_GAP}>
+            {t("well.region.bridges.none")}
+          </tspan>
+        ) : null}
         {named.map(({ prefix, relations }) => (
           <tspan
             data-ns={prefix}

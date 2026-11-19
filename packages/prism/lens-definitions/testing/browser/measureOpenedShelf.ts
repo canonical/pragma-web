@@ -33,11 +33,13 @@ export default function measureOpenedShelf(
     },
   );
   const names = [...svg.querySelectorAll("g.region")].flatMap((region) =>
-    [...region.querySelectorAll(".region-bridges tspan")].map((name) => ({
-      ns: region.getAttribute("data-ns") ?? "",
-      to: name.getAttribute("data-ns") ?? "",
-      relations: Number(name.getAttribute("data-relations")),
-    })),
+    [...region.querySelectorAll(".region-bridges tspan[data-ns]")].map(
+      (name) => ({
+        ns: region.getAttribute("data-ns") ?? "",
+        to: name.getAttribute("data-ns") ?? "",
+        relations: Number(name.getAttribute("data-relations")),
+      }),
+    ),
   );
   return {
     boxes,

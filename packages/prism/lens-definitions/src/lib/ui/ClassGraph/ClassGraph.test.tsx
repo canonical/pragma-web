@@ -270,6 +270,20 @@ describe("ClassGraph", () => {
     },
   );
 
+  it("says on its label row that a region with no bridge has none", () => {
+    const container = draw({
+      layout: layOutClassGraph(FOUR_NAMESPACE_GRAPH, { budget: GRAPH_BUDGET }),
+      terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
+    });
+    const names = container.querySelector(
+      '.region[data-ns="cs"] > text.region-bridges',
+    );
+    expect(names?.querySelectorAll("tspan[data-ns]")).toHaveLength(0);
+    expect(names?.querySelector("tspan[data-none]")?.textContent).toBe(
+      "· no relations to other namespaces",
+    );
+  });
+
   it("names metro's three relations to geo on its label row", () => {
     const container = draw({ layout: metro.layout, terms: metro.terms });
     expect(
