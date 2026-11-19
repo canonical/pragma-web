@@ -832,7 +832,7 @@ describe("ClassGraph", () => {
       const counted = requireDefined(
         draw({ layout: metro.layout, terms: metro.terms })
           .querySelector("a.weight-link")
-          ?.getAttribute("data-weight-of"),
+          ?.getAttribute("data-weight-of") ?? undefined,
         "a counted edge",
       );
       const zero = {
