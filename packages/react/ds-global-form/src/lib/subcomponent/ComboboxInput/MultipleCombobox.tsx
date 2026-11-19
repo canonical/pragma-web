@@ -1,3 +1,4 @@
+import { Icon } from "@canonical/react-ds-global";
 import { useCombobox, useMultipleSelection } from "downshift";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -148,7 +149,7 @@ const MultipleCombobox = ({
             className="chip"
           >
             {convertItemToString(selectedItem)}
-            <span className="remove-icon">×</span>
+            <Icon icon="close" className="remove-icon" />
           </button>
         ))}
       </div>
