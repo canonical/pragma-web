@@ -11,20 +11,19 @@ import {
   type FurtherConjunct,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createFakeChannel from "../../../../../../../../testing/createFakeChannel.js";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
 import expectNoAxeViolations from "../../../../../../../../testing/expectNoAxeViolations.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
+import type { IdentifiedRecord } from "../../../../../../../../testing/types.js";
 import DataViews from "../../../../Provider.js";
 import Filters from "../../Filters.js";
 import FurtherConjuncts from "./FurtherConjuncts.js";
 
-type Row = { readonly id: string };
-
 const collection = createCollection({
-  identify: (row: Row) => row.id,
+  identify: (row: IdentifiedRecord) => row.id,
   fields: [
     {
       field: "tags",
@@ -45,7 +44,7 @@ const capabilities = declareCapabilities(collection, {
 const follow = (href: string) =>
   createDataViewsProvider({
     collection,
-    source: createManualSource<Row>({ capabilities }).source,
+    source: createManualSource<IdentifiedRecord>({ capabilities }).source,
     location: createMemoryLocation({ href }),
   });
 
@@ -60,8 +59,8 @@ const mount = (href: string) => {
   return { provider, view, release };
 };
 
-/** A handle whose further conjuncts are the ones given. */
-const standing = (others: readonly FurtherConjunct[]) => ({
+/** Build a handle whose further conjuncts are the ones given. */
+const buildHandle = (others: readonly FurtherConjunct[]) => ({
   others: createFakeChannel(others),
 });
 
@@ -118,14 +117,14 @@ describe("FurtherConjuncts", () => {
   it("reads each row as the control above it reads", () => {
     const provider = follow("/machines");
     const host = readProviderHost(provider);
-    const rows = (
+    const readRowText = (
       operator: "isNone" | "lte" | "contains" | "startsWith" | "isSet",
       operands: readonly (string | number)[],
     ) => {
       const { container, unmount } = render(
         <DataViews provider={provider}>
           <FurtherConjuncts
-            handle={standing([{ nth: 1, operands }])}
+            handle={buildHandle([{ nth: 1, operands }])}
             field="cpu"
             operator={operator}
             label="Cores"
@@ -138,20 +137,20 @@ describe("FurtherConjuncts", () => {
       unmount();
       return text;
     };
-    expect(rows("isNone", ["ex-gpu"])).toBe("Cores is none of ex-gpu");
-    expect(rows("lte", [8])).toBe("Cores to 8");
-    expect(rows("contains", ["ex"])).toBe("Cores contains ex");
-    expect(rows("startsWith", ["ex"])).toBe("Cores starts with ex");
+    expect(readRowText("isNone", ["ex-gpu"])).toBe("Cores is none of ex-gpu");
+    expect(readRowText("lte", [8])).toBe("Cores to 8");
+    expect(readRowText("contains", ["ex"])).toBe("Cores contains ex");
+    expect(readRowText("startsWith", ["ex"])).toBe("Cores starts with ex");
     // Presence holds no value: its row reads as the field, its value the
     // marker a link spells it with.
-    expect(rows("isSet", [])).toBe("Cores 1");
+    expect(readRowText("isSet", [])).toBe("Cores 1");
   });
   it("passes native props to its list, keeping its own class first", () => {
     const provider = follow("/machines");
     const { container } = render(
       <DataViews provider={provider}>
         <FurtherConjuncts
-          handle={standing([{ nth: 1, operands: [8] }])}
+          handle={buildHandle([{ nth: 1, operands: [8] }])}
           field="cpu"
           operator="gte"
           label="Cores"

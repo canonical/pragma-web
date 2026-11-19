@@ -13,20 +13,19 @@ import {
   EMPTY_SLICE,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
-import createManualSource from "../../../../../../../../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../../../testing/fixtures.js";
+import type { IdentifiedRecord } from "../../../../../../../../../../testing/types.js";
 import DataViews from "../../../../../../Provider.js";
 import Filters from "../../../../Filters.js";
 import FurtherConjunct from "./FurtherConjunct.js";
 
-type Row = { readonly id: string };
-
 const collection = createCollection({
-  identify: (row: Row) => row.id,
+  identify: (row: IdentifiedRecord) => row.id,
   fields: [
     {
       field: "tags",
@@ -48,11 +47,12 @@ const LINK = "/machines?tags=ex-gpu&tags__isAny__1=ex-nvme&cpu__gte=4";
 const follow = (href: string) =>
   createDataViewsProvider({
     collection,
-    source: createManualSource<Row>({ capabilities }).source,
+    source: createManualSource<IdentifiedRecord>({ capabilities }).source,
     location: createMemoryLocation({ href }),
   });
 
-const tree = (provider: ReturnType<typeof follow>) => (
+/** Build the filters over a provider, in a root. */
+const buildTree = (provider: ReturnType<typeof follow>) => (
   <DataViews provider={provider}>
     <Filters labels={{ tags: "Tags", cpu: "Cores" }} />
   </DataViews>
@@ -61,7 +61,7 @@ const tree = (provider: ReturnType<typeof follow>) => (
 describe("FurtherConjunct", () => {
   it("clears its conjunct alone, and hands focus to the filters' group", () => {
     const provider = follow(LINK);
-    render(tree(provider));
+    render(buildTree(provider));
     const release = provider.observe();
     fireEvent.click(
       screen.getByRole("button", { name: "Clear Tags is any of ex-nvme" }),
@@ -76,7 +76,7 @@ describe("FurtherConjunct", () => {
   });
 
   it("leads its Clear to the query without it before scripts run, and carries it in a submission", () => {
-    const html = renderToString(tree(follow(LINK)));
+    const html = renderToString(buildTree(follow(LINK)));
     expect(html).toContain(
       'href="?cpu__gte=4&amp;tags=ex-gpu&amp;page=1&amp;size=50"',
     );
@@ -89,7 +89,7 @@ describe("FurtherConjunct", () => {
   it("keeps every conjunct through a submission of the server's form", () => {
     const container = document.createElement("div");
     container.innerHTML = renderToString(
-      tree(follow(`${LINK}&tags__isAny__2=ex-ssd&cpu__gte__1=8`)),
+      buildTree(follow(`${LINK}&tags__isAny__2=ex-ssd&cpu__gte__1=8`)),
     );
     const form = container.querySelector("form");
     if (form === null) {
@@ -118,7 +118,7 @@ describe("FurtherConjunct", () => {
   it("offers no link where there is no location to lead to", () => {
     const provider = createDataViewsProvider({
       collection,
-      source: createManualSource<Row>({ capabilities }).source,
+      source: createManualSource<IdentifiedRecord>({ capabilities }).source,
     });
     readProviderHost(provider).adopt(
       {
@@ -134,7 +134,7 @@ describe("FurtherConjunct", () => {
       "adopt",
       null,
     );
-    const html = renderToString(tree(provider));
+    const html = renderToString(buildTree(provider));
     expect(html).toContain("Cores from 8");
     expect(html).not.toContain("Clear Cores from 8");
     // Still carried through a submission.
@@ -144,7 +144,7 @@ describe("FurtherConjunct", () => {
   it("hands a focused Clear link's focus to its button once scripts take over", async () => {
     const provider = follow(LINK);
     const container = document.createElement("div");
-    container.innerHTML = renderToString(tree(provider));
+    container.innerHTML = renderToString(buildTree(provider));
     document.body.append(container);
     onTestFinished(() => {
       container.remove();
@@ -155,7 +155,7 @@ describe("FurtherConjunct", () => {
     link?.focus();
     expect(link).toHaveFocus();
     await act(async () => {
-      const root = hydrateRoot(container, tree(provider));
+      const root = hydrateRoot(container, buildTree(provider));
       onTestFinished(() => {
         act(() => {
           root.unmount();

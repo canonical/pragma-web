@@ -21,7 +21,7 @@ The store's scope — its database, the collection and an opaque partition such 
 
 ## Saving, saving as, renaming
 
-**Save** writes the live query into the open view, and **Revert** applies the view's query again. **Save as…** saves the live query, and the arrangement in force, under a new name, and opens the new view. **Rename…** renames the open view. A name that is empty, or already another view's, is refused beside the input before anything is written.
+**Save** writes the live query into the open view, and **Revert** applies the view's query again. **Save as…** saves the live query, and the arrangement in force, under a new name, and opens the new view. **Rename…** renames the open view. Each asks for the name in a modal dialog, which its command opens natively and Cancel or Escape closes, returning the focus to the command. A name that is empty, only spaces, or already another view's is refused beside the input before anything is written.
 
 Every outcome is said in a polite status. A save that did not happen never reads as saved: a failure names its reason, and the store is never replaced by one in memory.
 
@@ -35,7 +35,7 @@ Every edit names the revision of the view it was made against. When another tab 
 
 ## Deleting
 
-**Delete…** asks first, naming the view, with the focus on Cancel. The view goes; the query it applied stays, so the rows on screen do not change.
+**Delete…** asks first in a modal dialog, naming the view, with the focus on Cancel. The view goes; the query it applied stays, so the rows on screen do not change.
 
 <Canvas of={Stories.DeletingAView} sourceState="none" />
 

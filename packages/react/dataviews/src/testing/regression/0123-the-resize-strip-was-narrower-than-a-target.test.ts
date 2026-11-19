@@ -12,6 +12,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import type { ResolvedRule } from "../../../testing/types.js";
 
 const sheet = readFileSync(
   path.join(
@@ -20,12 +21,6 @@ const sheet = readFileSync(
   ),
   "utf8",
 ).replace(/\/\*[\s\S]*?\*\//g, "");
-
-/** One rule of the sheet: the selectors it resolves to, and its declarations. */
-type ResolvedRule = {
-  readonly selectors: readonly string[];
-  readonly declarations: string;
-};
 
 /** The selectors a nested selector list resolves to under its parents'. */
 const resolveSelectors = (

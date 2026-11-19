@@ -23,6 +23,6 @@ describe("renderInRoot", () => {
     act(() => {
       provider.setSearch("alpha");
     });
-    expect(source.latest().request.slice.search).toBe("alpha");
+    expect(source.readLatest().request.slice.search).toBe("alpha");
   });
 });

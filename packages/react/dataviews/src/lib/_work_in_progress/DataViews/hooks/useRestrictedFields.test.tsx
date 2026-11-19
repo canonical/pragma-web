@@ -3,11 +3,12 @@
  * held at one reference while that reads the same, so a result landing or
  * an edit to a bound that stands re-renders nothing placed by it.
  */
+
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../testing/buildPage.js";
 import renderInRoot from "../../../../../testing/renderInRoot.js";
 import useRestrictedFields from "./useRestrictedFields.js";
 
@@ -46,7 +47,7 @@ describe("useRestrictedFields", () => {
     const tally = hook.result.current;
     const renders = readRenders();
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "a")]),
       });

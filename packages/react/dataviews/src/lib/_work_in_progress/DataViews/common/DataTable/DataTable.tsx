@@ -17,6 +17,8 @@ import type { DataViewsDataTableProps } from "./types.js";
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
+ * @implements ds:apps.pattern.data_table
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

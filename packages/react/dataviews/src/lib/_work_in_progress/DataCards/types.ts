@@ -37,7 +37,7 @@ type OwnProps<
    * title field, or its identity when that field holds no text. The latest
    * one is always called, and its identity alone never re-renders a card.
    */
-  readonly rowLabel?: (row: TRow, rowId: string) => string;
+  readonly getRowLabel?: (row: TRow, rowId: string) => string;
   /**
    * Replaces the default text of a status: no cards to render, or cards that
    * no longer answer the current query. The status is the core's, decided

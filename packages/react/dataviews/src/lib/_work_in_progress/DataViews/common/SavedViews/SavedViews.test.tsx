@@ -4,6 +4,7 @@
  * can be brought about on cue: a conflict, a rejection, an unreadable
  * record.
  */
+
 import {
   createArraySource,
   createCollection,
@@ -15,6 +16,10 @@ import {
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import {
+  buildStoredView,
+  createStandInPresentationStore,
+} from "@canonical/dataviews-core/testing";
+import {
   act,
   fireEvent,
   render,
@@ -24,14 +29,10 @@ import {
 } from "@testing-library/react";
 import { StrictMode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildStoredView from "../../../../../../testing/buildStoredView.js";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
-import { createStandInPresentationStore } from "../../../../../../testing/createStandInStores.js";
+import type { IdentifiedRecord as Row } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import SavedViews from "./SavedViews.js";
-
-/** One record of the collection; no case reads a row. */
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,
@@ -333,10 +334,8 @@ describe("DataViews.SavedViews", () => {
     expect(queryStatus()).toHaveTextContent("");
     expect(getSelect().options).toHaveLength(2);
 
-    // A blank name passes the native check and is refused by the
+    // A name submitted past the native check is refused by the
     // collection, which the input reports as its own validity.
-    fireEvent.change(name, { target: { value: "   " } });
-    expect(name).toBeValid();
     fireEvent.submit(form);
     await waitFor(() => {
       expect(name).toHaveAccessibleDescription("A view needs a name.");
@@ -368,12 +367,12 @@ describe("DataViews.SavedViews", () => {
       expect(getButton("Save as…")).toHaveFocus();
     });
     expect(screen.queryByRole("form")).toBeNull();
-    expect(getSelect().selectedOptions[0]).toHaveTextContent(
+    expect(getSelect().selectedOptions.item(0)).toHaveTextContent(
       "Running machines",
     );
   });
 
-  it("cancels a panel with Escape, returning the focus to its command", async () => {
+  it("cancels a dialog with Escape, returning the focus to its command", async () => {
     await mountListed(createMemoryViewStore([failed]).store);
     await choose(failed);
     fireEvent.click(getButton("Save as…"));
@@ -403,6 +402,49 @@ describe("DataViews.SavedViews", () => {
     });
   });
 
+  it("opens each dialog natively from its command", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    await choose(failed);
+    for (const name of ["Save as…", "Rename…", "Delete…"]) {
+      const command = getButton(name);
+      expect(command).toHaveAttribute("command", "show-modal");
+      const dialog = document.getElementById(
+        command.getAttribute("commandfor") ?? "",
+      );
+      expect(dialog).toBeInstanceOf(HTMLDialogElement);
+      fireEvent.click(command);
+      expect(dialog).toHaveAttribute("open");
+      fireEvent.keyDown(document.activeElement ?? document.body, {
+        key: "Escape",
+      });
+      expect(dialog).not.toHaveAttribute("open");
+    }
+  });
+
+  it("refuses a blank name natively, never asking the collection", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    fireEvent.click(getButton("Save as…"));
+    const form = screen.getByRole("form", { name: "Save as a new view" });
+    const name = within(form).getByRole("textbox", { name: "Name" });
+    fireEvent.change(name, { target: { value: "   " } });
+    expect(name).toBeInvalid();
+    fireEvent.click(within(form).getByRole("button", { name: "Save view" }));
+    expect(queryStatus()).toHaveTextContent("");
+    expect(getSelect().options).toHaveLength(2);
+  });
+
+  it("asks before deleting in a dialog named by its question", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    await choose(failed);
+    fireEvent.click(getButton("Delete…"));
+    const confirm = screen.getByRole("dialog", {
+      name: 'Delete "Failed"? This cannot be undone.',
+    });
+    expect(
+      within(confirm).getByRole("button", { name: "Cancel" }),
+    ).toHaveFocus();
+  });
+
   it("renames the open view", async () => {
     await mountListed(createMemoryViewStore([failed, running]).store);
     await choose(failed);
@@ -422,7 +464,7 @@ describe("DataViews.SavedViews", () => {
     await waitFor(() => {
       expect(queryStatus()).toHaveTextContent('Renamed to "Failures".');
     });
-    expect(getSelect().selectedOptions[0]).toHaveTextContent("Failures");
+    expect(getSelect().selectedOptions.item(0)).toHaveTextContent("Failures");
     await waitFor(() => {
       expect(getButton("Rename…")).toHaveFocus();
     });
@@ -434,7 +476,7 @@ describe("DataViews.SavedViews", () => {
     );
     await choose(failed);
     fireEvent.click(getButton("Delete…"));
-    const confirm = screen.getByRole("group", {
+    const confirm = screen.getByRole("dialog", {
       name: 'Delete "Failed"? This cannot be undone.',
     });
     expect(
@@ -502,14 +544,16 @@ describe("DataViews.SavedViews", () => {
       expect(getButton("Discard changes")).toBeEnabled();
     });
     fireEvent.click(getButton("Discard changes"));
-    expect(provider.state.get().slice.filter[0]?.operands).toEqual(["running"]);
+    expect(provider.state.get().slice.filter.at(0)?.operands).toEqual([
+      "running",
+    ]);
     expect(screen.queryByText("Modified")).toBeNull();
     expect(queryStatus()).toHaveTextContent("");
     expect(getButton("Save")).toBeDisabled();
     expect(getButton("Revert")).toBeDisabled();
   });
 
-  it("keeps the rename form open through a conflict, for a second try", async () => {
+  it("keeps the rename dialog open through a conflict, for a second try", async () => {
     const memory = createMemoryViewStore([failed]);
     await mountListed(memory.store);
     await choose(failed);
@@ -531,7 +575,7 @@ describe("DataViews.SavedViews", () => {
     });
   });
 
-  it("closes a panel whose view was deleted elsewhere, and keeps the focus", async () => {
+  it("closes a dialog whose view was deleted elsewhere, and keeps the focus", async () => {
     const memory = createMemoryViewStore([failed]);
     await mountListed(memory.store);
     await choose(failed);
@@ -544,7 +588,7 @@ describe("DataViews.SavedViews", () => {
       expect(screen.queryByRole("form")).toBeNull();
     });
     expect(getSelect()).toHaveFocus();
-    // Opening a view later does not bring the old panel back.
+    // Opening a view later does not bring the old dialog back.
     await act(() =>
       memory.store.create({
         id: running.id,
@@ -703,5 +747,24 @@ describe("DataViews.SavedViews", () => {
     unmount();
     // StrictMode's rehearsal released once already; the kept mount now too.
     expect(unsubscribe).toHaveBeenCalledTimes(2);
+  });
+
+  it("pre-fills Rename with the name a save conflict brings back", async () => {
+    const memory = createMemoryViewStore([failed]);
+    const { provider } = await mountListed(memory.store);
+    await choose(failed);
+    memory.elsewhere(failed.id, { name: "Theirs", query: "status=running" });
+    setStatus(provider, ["failed", "running"]);
+    fireEvent.click(getButton("Save"));
+    await waitFor(() => {
+      expect(queryStatus()).toHaveTextContent(
+        'Not saved: "Theirs" was changed elsewhere.',
+      );
+    });
+    fireEvent.click(getButton("Rename…"));
+    const dialog = screen.getByRole("dialog", { name: 'Rename "Theirs"' });
+    expect(within(dialog).getByRole("textbox", { name: "Name" })).toHaveValue(
+      "Theirs",
+    );
   });
 });

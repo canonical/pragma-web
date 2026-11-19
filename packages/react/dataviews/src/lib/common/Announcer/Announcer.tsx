@@ -47,9 +47,15 @@ type Waiting = {
  * It holds what it says itself, so speaking renders the region and nothing of
  * the root. Unmounting drops what is waiting and what is shown.
  *
+ * @implements ds:apps.subcomponent.data_views-announcer
+ *
  * @note Impure: schedules timers to speak and to clear, released on unmount.
  */
-function Announcer({ ref }: AnnouncerProps): ReactElement {
+const Announcer = ({
+  ref,
+  className,
+  ...rest
+}: AnnouncerProps): ReactElement => {
   const [said, setSaid] = useState<readonly Announcement[]>([]);
   // What has been said since the wait began, not yet spoken.
   const waiting = useRef<Waiting[]>([]);
@@ -118,7 +124,8 @@ function Announcer({ ref }: AnnouncerProps): ReactElement {
 
   return (
     <div
-      className={componentCssClassName}
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-live="polite"
       aria-relevant="additions"
     >
@@ -136,6 +143,6 @@ function Announcer({ ref }: AnnouncerProps): ReactElement {
       ))}
     </div>
   );
-}
+};
 
 export default memo(Announcer);

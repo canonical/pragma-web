@@ -15,6 +15,12 @@ import countExactly from "../../../testing/countExactly.js";
 import declare from "../../../testing/declare.js";
 import declareSort from "../../../testing/declareSort.js";
 import readId from "../../../testing/readId.js";
+import type {
+  RelayFetch as Fetch,
+  RelayMachine as Machine,
+  RelayMachinesData as MachinesData,
+  RelayMachinesOperation as MachinesOperation,
+} from "../../../testing/relayTypes.js";
 import { createCollection } from "../collection/index.js";
 import {
   createDataViewsProvider,
@@ -51,33 +57,7 @@ import type {
  * Relay's own `Environment` satisfies.
  */
 
-type Machine = {
-  readonly id: string;
-  readonly name: string;
-  readonly status: string;
-};
-
-/** The data `MachinesQuery` selects, as the Relay compiler types it. */
-type MachinesData = {
-  readonly machines: {
-    readonly totalCount: number | null;
-    readonly pageInfo: {
-      readonly endCursor: string | null;
-      readonly hasNextPage: boolean | null;
-    };
-    readonly edges: ReadonlyArray<{
-      readonly node: Machine | null;
-    } | null> | null;
-  } | null;
-};
-
-/** The compiled query type `MachinesQuery`, as the Relay compiler emits it. */
-type MachinesOperation = {
-  readonly response: MachinesData;
-  readonly variables: Variables;
-};
-
-const scalar = (name: string) => ({
+const buildScalar = (name: string) => ({
   alias: null,
   args: null,
   kind: "ScalarField",
@@ -85,7 +65,7 @@ const scalar = (name: string) => ({
   storageKey: null,
 });
 
-const linked = (
+const buildLinked = (
   name: string,
   concreteType: string,
   selections: readonly unknown[],
@@ -107,23 +87,23 @@ const argumentDefinitions = ["first", "after", "status"].map((name) => ({
   name,
 }));
 
-const machinesField = linked(
+const machinesField = buildLinked(
   "machines",
   "MachineConnection",
   [
-    scalar("totalCount"),
-    linked("pageInfo", "PageInfo", [
-      scalar("endCursor"),
-      scalar("hasNextPage"),
+    buildScalar("totalCount"),
+    buildLinked("pageInfo", "PageInfo", [
+      buildScalar("endCursor"),
+      buildScalar("hasNextPage"),
     ]),
-    linked(
+    buildLinked(
       "edges",
       "MachineEdge",
       [
-        linked("node", "Machine", [
-          scalar("id"),
-          scalar("name"),
-          scalar("status"),
+        buildLinked("node", "Machine", [
+          buildScalar("id"),
+          buildScalar("name"),
+          buildScalar("status"),
         ]),
       ],
       { plural: true },
@@ -211,7 +191,7 @@ const withSelections = (
   }) as unknown as ConcreteRequest;
 
 /** A normalization field holding other selections. */
-const field = (
+const buildField = (
   name: string,
   plural: boolean,
   selections: readonly unknown[],
@@ -226,7 +206,7 @@ const machines: readonly Machine[] = [
 ];
 
 /** The server's answer to one page's variables: a forward connection. */
-const pageFor = (variables: Variables): GraphQLResponse => {
+const answerPage = (variables: Variables): GraphQLResponse => {
   const statuses = variables["status"] as readonly string[] | null;
   const matching = machines.filter(
     (machine) => statuses === null || statuses.includes(machine.status),
@@ -253,24 +233,15 @@ const pageFor = (variables: Variables): GraphQLResponse => {
   };
 };
 
-type Fetch = {
-  readonly variables: Variables;
-  /** Answer the fetch, by default with the server's page. */
-  readonly respond: (response?: GraphQLResponse) => void;
-  readonly fail: (error: Error) => void;
-  /** True when the fetch was abandoned before it was answered. */
-  cancelled: boolean;
-};
-
 /** A real Relay environment over a network the test answers by hand. */
-const relay = () => {
+const createRelay = () => {
   const fetches: Fetch[] = [];
   const network = Network.create((_request, variables) =>
     Observable.create<GraphQLResponse>((sink) => {
       let answered = false;
       const fetch: Fetch = {
         variables,
-        respond(response = pageFor(variables)) {
+        respond(response = answerPage(variables)) {
           answered = true;
           sink.next(response);
           sink.complete();
@@ -310,24 +281,24 @@ const connectionCapabilities: SourceCapabilities = declare({
 });
 
 /** What an ungrouped connection counts: the matched rows are the visible ones. */
-const countsOf = (matched: Count): SourceCounts => ({
+const buildCounts = (matched: Count): SourceCounts => ({
   pageable: matched,
   matched,
 });
 
-const statusOf = (slice: Slice): readonly string[] | null => {
+const readStatuses = (slice: Slice): readonly string[] | null => {
   const predicate = slice.filter.find(({ field }) => field === "status");
   return predicate === undefined ? null : predicate.operands.map(String);
 };
 
-const operation = (page: RelayPageRequest) =>
+const buildOperation = (page: RelayPageRequest) =>
   createOperationDescriptor(MachinesQuery, {
     first: page.first,
     after: page.after,
-    status: statusOf(page.slice),
+    status: readStatuses(page.slice),
   });
 
-const source = (
+const createSource = (
   environment: RelayEnvironment,
   overrides: {
     readonly capabilities?: SourceCapabilities;
@@ -337,8 +308,8 @@ const source = (
   createRelaySource<MachinesOperation>({
     capabilities: overrides.capabilities ?? connectionCapabilities,
     environment,
-    operation,
-    connection: (data: MachinesData) => data.machines,
+    buildOperation,
+    readConnection: (data: MachinesData) => data.machines,
     ...(overrides.isForbidden === undefined
       ? {}
       : { isForbidden: overrides.isForbidden }),
@@ -347,16 +318,18 @@ const source = (
 const emptySlice: Slice = { filter: [], search: null, sort: [], group: [] };
 
 /** A window over the two-row pages these tests read. */
-const paged = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
+const buildPaged = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
   ...DEFAULT_WINDOW,
   size: 2,
   ...overrides,
 });
 
-const request = (overrides: Partial<SourceRequest> = {}): SourceRequest => ({
+const buildRequest = (
+  overrides: Partial<SourceRequest> = {},
+): SourceRequest => ({
   requestId: "i1:r1",
   slice: emptySlice,
-  window: paged(),
+  window: buildPaged(),
   facets: [],
   ...overrides,
 });
@@ -366,14 +339,18 @@ const readRefusals = (
   adapter: Source,
   overrides: Partial<Query> = {},
 ): readonly SourceRefusal[] => {
-  const { refusals } = adapter;
-  if (refusals === undefined) {
+  const { listRefusals } = adapter;
+  if (listRefusals === undefined) {
     throw new Error("expected a source declaring which pages it cannot reach");
   }
-  return refusals({ slice: emptySlice, window: paged(), ...overrides });
+  return listRefusals({
+    slice: emptySlice,
+    window: buildPaged(),
+    ...overrides,
+  });
 };
 
-const unreachable = (page: number): SourceRefusal => ({
+const buildUnreachable = (page: number): SourceRefusal => ({
   part: "window",
   code: "unreachable-page",
   field: null,
@@ -381,20 +358,23 @@ const unreachable = (page: number): SourceRefusal => ({
   reason: `a forward connection reaches page ${page} only from page ${page - 1}`,
 });
 
-const delivery = () => vi.fn<(delivered: SourceDelivery) => void>();
+const createDeliverySpy = () => vi.fn<(delivered: SourceDelivery) => void>();
 
-const idsOf = (delivered: SourceDelivery) =>
+const listIds = (delivered: SourceDelivery) =>
   delivered.status === "succeeded"
     ? delivered.page.rows.map((row) => (row as Machine).id)
     : delivered;
 
 /** The latest delivery, or a failure rather than a skipped assertion. */
-const lastOf = (deliver: ReturnType<typeof delivery>): SourceDelivery => {
+const readLast = (
+  deliver: ReturnType<typeof createDeliverySpy>,
+): SourceDelivery => {
   const call = deliver.mock.calls.at(-1);
   if (call === undefined) {
     throw new Error("expected a delivery");
   }
-  return call[0];
+  const [delivered] = call;
+  return delivered;
 };
 
 const machinesCollection = createCollection({
@@ -417,17 +397,17 @@ const buildSnapshotAt = (window: ResultWindow) => ({
  * the first observer issues the first request, so `fetchAt(0)` is the
  * observation's own fetch.
  */
-const bound = (
+const createBound = (
   environment: RelayEnvironment,
-  window: ResultWindow = paged(),
+  window: ResultWindow = buildPaged(),
 ) => {
   const provider = createDataViewsProvider({
     collection: machinesCollection,
-    source: source(environment),
+    source: createSource(environment),
     snapshot: buildSnapshotAt(window),
   });
   const release = provider.observe();
-  const shown = () => {
+  const readShown = () => {
     const state = provider.state.get();
     return {
       ids: (state.result.rows ?? []).map((row) => (row as Machine).id),
@@ -437,11 +417,16 @@ const bound = (
       problem: state.result.problem,
     };
   };
-  return { provider, host: readProviderHost(provider), release, shown };
+  return {
+    provider,
+    host: readProviderHost(provider),
+    release,
+    shown: readShown,
+  };
 };
 
 /** An environment whose retentions, subscriptions and fetches are counted. */
-const counted = (environment: RelayEnvironment) => {
+const countReleases = (environment: RelayEnvironment) => {
   const released = { retentions: 0, subscriptions: 0, fetches: 0 };
   const wrapped: RelayEnvironment = {
     retain(operation) {
@@ -481,1026 +466,1112 @@ const counted = (environment: RelayEnvironment) => {
   return { released, wrapped };
 };
 
-describe("createRelaySource over relay-runtime", () => {
-  it("delivers the first page as rows, counts, more and cursors together", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    expect(fetchAt(0).variables).toEqual({
-      first: 2,
-      after: null,
-      status: null,
-    });
-    expect(deliver).not.toHaveBeenCalled();
-
-    fetchAt(0).respond();
-    expect(deliver).toHaveBeenCalledTimes(1);
-    expect(lastOf(deliver)).toEqual({
-      status: "succeeded",
-      page: {
-        rows: [machines[0], machines[1]],
-        groups: null,
-        counts: countsOf(countExactly(5)),
-        facets: {},
-        more: true,
-        cursors: { next: "c:m2", previous: null },
-      },
-    });
-  });
-
-  it("hands the operation builder the query, the page size and the cursor", () => {
-    const { environment } = relay();
-    const build = vi.fn(operation);
-    const filtered: Slice = {
-      ...emptySlice,
-      filter: [{ field: "status", operator: "isAny", operands: ["failed"] }],
-    };
-    createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      operation: build,
-      connection: (data: MachinesData) => data.machines,
-    }).execute(request({ slice: filtered }), delivery());
-    expect(build).toHaveBeenCalledWith({
-      slice: filtered,
-      first: 2,
-      after: null,
-      facets: [],
-    });
-  });
-
-  it("pages forward from each page's end cursor", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-
-    const deliver = delivery();
-    adapter.execute(request({ window: paged({ page: 2 }) }), deliver);
-    expect(fetchAt(1).variables["after"]).toBe("c:m2");
-    fetchAt(1).respond();
-    expect(idsOf(lastOf(deliver))).toEqual(["m3", "m4"]);
-
-    adapter.execute(request({ window: paged({ page: 3 }) }), deliver);
-    expect(fetchAt(2).variables["after"]).toBe("c:m4");
-    fetchAt(2).respond();
-    expect(idsOf(lastOf(deliver))).toEqual(["m5"]);
-    // The last page ends in a cursor, and no page follows it.
-    expect(lastOf(deliver)).toMatchObject({
-      page: { more: false, cursors: { next: null, previous: null } },
-    });
-  });
-
-  it("refuses a page no token and no remembered cursor reaches", () => {
-    const { environment, fetches } = relay();
-    expect(
-      readRefusals(source(environment), { window: paged({ page: 3 }) }),
-    ).toEqual([unreachable(3)]);
-    expect(fetches).toHaveLength(0);
-  });
-
-  it("refuses nothing for the first page or a page its trail reaches", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    expect(readRefusals(adapter)).toEqual([]);
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    expect(readRefusals(adapter, { window: paged({ page: 2 }) })).toEqual([]);
-  });
-
-  it("prefers the window's own token over a remembered cursor", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    // The trail remembers "c:m2" for page two; the window names another, and
-    // a token reaches a page no trail ever did.
-    const carried = paged({ page: 2, cursor: "c:m1" });
-    expect(readRefusals(adapter, { window: carried })).toEqual([]);
-    expect(
-      readRefusals(adapter, { window: paged({ page: 9, cursor: "c:m4" }) }),
-    ).toEqual([]);
-    adapter.execute(request({ window: carried }), delivery());
-    expect(fetchAt(1).variables["after"]).toBe("c:m1");
-  });
-
-  it("guards execute against a page nothing reaches", () => {
-    const { environment, fetches } = relay();
-    expect(() =>
-      source(environment).execute(
-        request({ window: paged({ page: 3 }) }),
-        delivery(),
-      ),
-    ).toThrow("a forward connection reaches page 3 only from page 2");
-    expect(fetches).toHaveLength(0);
-  });
-
-  it("keeps cursors per page size, since a size change moves every boundary", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    expect(
-      readRefusals(adapter, { window: paged({ page: 2, size: 3 }) }),
-    ).toEqual([unreachable(2)]);
-  });
-
-  it("shares cursors between respellings of the same query", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    const spelled: Slice = {
-      ...emptySlice,
-      filter: [
-        { field: "status", operator: "isAny", operands: ["ready", "failed"] },
-      ],
-    };
-    const respelled: Slice = {
-      ...emptySlice,
-      filter: [
-        { field: "status", operator: "isAny", operands: ["failed", "ready"] },
-      ],
-    };
-    adapter.execute(request({ slice: spelled }), delivery());
-    fetchAt(0).respond();
-    adapter.execute(
-      request({ slice: respelled, window: paged({ page: 2 }) }),
-      delivery(),
-    );
-    expect(fetchAt(1).variables["after"]).toBe("c:m2");
-  });
-
-  it("keeps each query's cursors apart from another's", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    const failed: Slice = {
-      ...emptySlice,
-      filter: [{ field: "status", operator: "isAny", operands: ["failed"] }],
-    };
-    expect(
-      readRefusals(adapter, { slice: failed, window: paged({ page: 2 }) }),
-    ).toEqual([unreachable(2)]);
-  });
-
-  it("remembers the cursors of the most recently used queries only", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    const firstPage = (size: number) => {
-      adapter.execute(request({ window: paged({ size }) }), delivery());
-    };
-    // Two queries with cursors, the second one older only by use.
-    firstPage(2);
-    fetchAt(0).respond();
-    firstPage(3);
-    fetchAt(1).respond();
-    for (let size = 4; size < 34; size += 1) {
-      firstPage(size);
-    }
-    // Paging on the oldest makes it the most recently used…
-    adapter.execute(request({ window: paged({ page: 2 }) }), delivery());
-    // …so one more query pushes out the one used least recently instead.
-    firstPage(34);
-    adapter.execute(request({ window: paged({ page: 2 }) }), delivery());
-    expect(fetchAt(34).variables["after"]).toBe("c:m2");
-    expect(
-      readRefusals(adapter, { window: paged({ page: 2, size: 3 }) }),
-    ).toEqual([unreachable(2)]);
-  });
-
-  it("never lets a refused page push another query's cursors out", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    // Thirty-one other queries leave the first one the oldest remembered.
-    for (let size = 3; size < 34; size += 1) {
-      adapter.execute(request({ window: paged({ size }) }), delivery());
-    }
-    const unreached = paged({ page: 2, size: 99 });
-    expect(readRefusals(adapter, { window: unreached })).toEqual([
-      unreachable(2),
-    ]);
-    expect(() =>
-      adapter.execute(request({ window: unreached }), delivery()),
-    ).toThrow("reaches page 2 only from page 1");
-    adapter.execute(request({ window: paged({ page: 2 }) }), delivery());
-    expect(fetchAt(32).variables["after"]).toBe("c:m2");
-  });
-
-  it("counts a null total as unknown, and an absent next page as unknown", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond({
-      data: {
-        machines: {
-          totalCount: null,
-          pageInfo: { endCursor: "c:m2", hasNextPage: null },
-          edges: [{ node: machines[0] }, { node: machines[1] }],
-        },
-      },
-    });
-    expect(lastOf(deliver)).toMatchObject({
-      status: "succeeded",
-      page: {
-        counts: countsOf(UNKNOWN_COUNT),
-        more: null,
-        cursors: { next: "c:m2", previous: null },
-      },
-    });
-  });
-
-  it("delivers an empty last page with no cursor to go on from", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    const failed: Slice = {
-      ...emptySlice,
-      filter: [{ field: "status", operator: "isAny", operands: ["missing"] }],
-    };
-    const deliver = delivery();
-    adapter.execute(request({ slice: failed }), deliver);
-    fetchAt(0).respond();
-    expect(lastOf(deliver)).toEqual({
-      status: "succeeded",
-      page: {
-        rows: [],
-        groups: null,
-        counts: countsOf(countExactly(0)),
-        facets: {},
-        more: false,
-        cursors: { next: null, previous: null },
-      },
-    });
-    expect(
-      readRefusals(adapter, { slice: failed, window: paged({ page: 2 }) }),
-    ).toEqual([unreachable(2)]);
-  });
-
-  it("delivers a page already in the store at once, and still fetches it", () => {
-    const { environment, fetches, fetchAt } = relay();
-    const adapter = source(environment);
-    const release = adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    release();
-
-    const deliver = delivery();
-    adapter.execute(request(), deliver);
-    expect(idsOf(lastOf(deliver))).toEqual(["m1", "m2"]);
-    expect(fetches).toHaveLength(2);
-
-    // The fetch confirms what the store held: nothing new is delivered.
-    fetchAt(1).respond();
-    expect(deliver).toHaveBeenCalledTimes(1);
-  });
-
-  it("delivers what a fetch changed about a page already in the store", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    const release = adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    release();
-
-    const deliver = delivery();
-    adapter.execute(request(), deliver);
-    fetchAt(1).respond({
-      data: {
-        machines: {
-          totalCount: 5,
-          pageInfo: { endCursor: "c:m2", hasNextPage: true },
-          edges: [
-            { node: { ...machines[0], name: "alpha-renamed" } },
-            { node: machines[1] },
-          ],
-        },
-      },
-    });
-    expect(deliver).toHaveBeenCalledTimes(2);
-    expect(lastOf(deliver)).toMatchObject({
-      page: { rows: [{ id: "m1", name: "alpha-renamed" }, machines[1]] },
-    });
-  });
-
-  it("delivers a local update to a displayed record as an external change", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond();
-
-    commitLocalUpdate(environment, (store) => {
-      store.get("m1")?.setValue("alpha-renamed", "name");
-    });
-    expect(deliver).toHaveBeenCalledTimes(2);
-    expect(lastOf(deliver)).toMatchObject({
-      status: "succeeded",
-      page: { rows: [{ id: "m1", name: "alpha-renamed" }, machines[1]] },
-    });
-
-    // An update to a record this page does not show changes nothing.
-    commitLocalUpdate(environment, (store) => {
-      store.get("m5")?.setValue("epsilon-renamed", "name");
-    });
-    expect(deliver).toHaveBeenCalledTimes(2);
-  });
-
-  it("delivers a failed fetch as a failure carrying its cause", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    const error = new Error("502 from the graph");
-    fetchAt(0).fail(error);
-    expect(deliver.mock.calls).toEqual([
-      [
-        {
-          status: "failed",
-          failure: {
-            reason: "502 from the graph",
-            cause: error,
-            transient: null,
-          },
-        },
-      ],
-    ]);
-  });
-
-  it("delivers a fetch the application reads as forbidden as forbidden", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    const denied = new Error("403 from the graph");
-    source(environment, {
-      isForbidden: (error) => error === denied,
-    }).execute(request(), deliver);
-    fetchAt(0).fail(denied);
-    expect(deliver.mock.calls).toEqual([
-      [{ status: "forbidden", cause: denied }],
-    ]);
-  });
-
-  it("delivers nothing from the store once the fetch is forbidden", () => {
-    const { environment, fetchAt } = relay();
-    const denied = new Error("403 from the graph");
-    const adapter = source(environment, {
-      isForbidden: (error) => error === denied,
-    });
-    const release = adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    release();
-
-    // The page is in the store, so it is delivered at once; the fetch then
-    // says the reader may not see it.
-    const deliver = delivery();
-    adapter.execute(request(), deliver);
-    fetchAt(1).fail(denied);
-    expect(lastOf(deliver)).toEqual({ status: "forbidden", cause: denied });
-    const delivered = deliver.mock.calls.length;
-    commitLocalUpdate(environment, (store) => {
-      store.get("m1")?.setValue("alpha-renamed", "name");
-    });
-    expect(deliver).toHaveBeenCalledTimes(delivered);
-  });
-
-  it("delivers nothing from the store to a later execution of a forbidden page until its fetch completes", () => {
-    const { environment, fetchAt } = relay();
-    const denied = new Error("403 from the graph");
-    const adapter = source(environment, {
-      isForbidden: (error) => error === denied,
-    });
-    const first = adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    first();
-    const second = adapter.execute(request(), delivery());
-    fetchAt(1).fail(denied);
-    second();
-
-    // A refresh, or a return to the query: the refused page is still in the
-    // store, and is not delivered while the fetch runs.
-    const deliver = delivery();
-    adapter.execute(request(), deliver);
-    expect(deliver).not.toHaveBeenCalled();
-    commitLocalUpdate(environment, (store) => {
-      store.get("m1")?.setValue("alpha-renamed", "name");
-    });
-    expect(deliver).not.toHaveBeenCalled();
-    // Answered again as forbidden, the page stays withdrawn.
-    fetchAt(2).fail(denied);
-    expect(deliver.mock.calls).toEqual([
-      [{ status: "forbidden", cause: denied }],
-    ]);
-  });
-
-  it("delivers a forbidden page again once a fetch of it completes", () => {
-    const { environment, fetchAt } = relay();
-    const denied = new Error("403 from the graph");
-    const adapter = source(environment, {
-      isForbidden: (error) => error === denied,
-    });
-    adapter.execute(request(), delivery());
-    fetchAt(0).fail(denied);
-    const deliver = delivery();
-    adapter.execute(request(), deliver);
-    fetchAt(1).respond();
-    expect(lastOf(deliver)).toMatchObject({ status: "succeeded" });
-    // Access granted, the next execution reads the store at once again.
-    const next = delivery();
-    adapter.execute(request(), next);
-    expect(lastOf(next)).toMatchObject({ status: "succeeded" });
-  });
-
-  it("keeps a forbidden mark to its own page", () => {
-    const { environment, fetchAt } = relay();
-    const denied = new Error("403 from the graph");
-    const adapter = source(environment, {
-      isForbidden: (error) => error === denied,
-    });
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    adapter.execute(request({ window: paged({ page: 2 }) }), delivery());
-    fetchAt(1).fail(denied);
-    const deliver = delivery();
-    adapter.execute(request(), deliver);
-    expect(lastOf(deliver)).toMatchObject({ status: "succeeded" });
-  });
-
-  it("delivers a failure where the forbidden check answers no or throws", () => {
-    for (const isForbidden of [
-      () => false,
-      () => {
-        throw new Error("the check broke");
-      },
-    ]) {
-      const { environment, fetchAt } = relay();
-      const deliver = delivery();
-      source(environment, { isForbidden }).execute(request(), deliver);
-      fetchAt(0).fail(new Error("403"));
-      expect(lastOf(deliver)).toMatchObject({
-        status: "failed",
-        failure: { reason: "403" },
+describe("createRelaySource", () => {
+  describe("createRelaySource over relay-runtime", () => {
+    it("delivers the first page as rows, counts, more and cursors together", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      expect(fetchAt(0).variables).toEqual({
+        first: 2,
+        after: null,
+        status: null,
       });
-    }
-  });
+      expect(deliver).not.toHaveBeenCalled();
 
-  it("fails a page whose response left selected data missing", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    const warn = vi.spyOn(console, "error").mockImplementation(() => {});
-    fetchAt(0).respond({
-      data: {
-        machines: {
-          totalCount: 5,
-          pageInfo: { endCursor: "c:m2", hasNextPage: true },
-          // The second record lacks a field the query selects.
-          edges: [
-            { node: machines[0] },
-            { node: { id: "m2", status: "failed" } },
-          ],
+      fetchAt(0).respond();
+      expect(deliver).toHaveBeenCalledTimes(1);
+      expect(readLast(deliver)).toEqual({
+        status: "succeeded",
+        page: {
+          rows: [machines.at(0), machines.at(1)],
+          groups: null,
+          counts: buildCounts(countExactly(5)),
+          facets: {},
+          more: true,
+          cursors: { next: "c:m2", previous: null },
         },
-      },
+      });
     });
-    warn.mockRestore();
-    expect(deliver.mock.calls).toEqual([
-      [
-        {
-          status: "failed",
-          failure: {
-            reason: "the store is missing data this page selects",
-            cause: null,
-            transient: null,
-          },
-        },
-      ],
-    ]);
-  });
 
-  it("fails once while the store stays incomplete, and recovers when it is whole", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond();
+    it("hands the operation builder the query, the page size and the cursor", () => {
+      const { environment } = createRelay();
+      const build = vi.fn(buildOperation);
+      const filtered: Slice = {
+        ...emptySlice,
+        filter: [{ field: "status", operator: "isAny", operands: ["failed"] }],
+      };
+      createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        buildOperation: build,
+        readConnection: (data: MachinesData) => data.machines,
+      }).execute(buildRequest({ slice: filtered }), createDeliverySpy());
+      expect(build).toHaveBeenCalledWith({
+        slice: filtered,
+        first: 2,
+        after: null,
+        facets: [],
+      });
+    });
 
-    commitLocalUpdate(environment, (store) => {
-      store.get("m1")?.setValue(undefined, "name");
-    });
-    commitLocalUpdate(environment, (store) => {
-      store.get("m2")?.setValue(undefined, "name");
-    });
-    expect(deliver.mock.calls.slice(1)).toEqual([
-      [
-        {
-          status: "failed",
-          failure: {
-            reason: "the store is missing data this page selects",
-            cause: null,
-            transient: null,
-          },
-        },
-      ],
-    ]);
+    it("pages forward from each page's end cursor", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
 
-    commitLocalUpdate(environment, (store) => {
-      store.get("m1")?.setValue("alpha", "name");
-      store.get("m2")?.setValue("beta", "name");
-    });
-    expect(idsOf(lastOf(deliver))).toEqual(["m1", "m2"]);
-  });
+      const deliver = createDeliverySpy();
+      adapter.execute(
+        buildRequest({ window: buildPaged({ page: 2 }) }),
+        deliver,
+      );
+      expect(fetchAt(1).variables["after"]).toBe("c:m2");
+      fetchAt(1).respond();
+      expect(listIds(readLast(deliver))).toEqual(["m3", "m4"]);
 
-  it("fails a page with a missing record rather than delivering it shorter", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond({
-      data: {
-        machines: {
-          totalCount: 5,
-          pageInfo: { endCursor: "c:m2", hasNextPage: true },
-          edges: [{ node: machines[0] }, { node: null }],
-        },
-      },
+      adapter.execute(
+        buildRequest({ window: buildPaged({ page: 3 }) }),
+        deliver,
+      );
+      expect(fetchAt(2).variables["after"]).toBe("c:m4");
+      fetchAt(2).respond();
+      expect(listIds(readLast(deliver))).toEqual(["m5"]);
+      // The last page ends in a cursor, and no page follows it.
+      expect(readLast(deliver)).toMatchObject({
+        page: { more: false, cursors: { next: null, previous: null } },
+      });
     });
-    expect(lastOf(deliver)).toMatchObject({
-      status: "failed",
-      failure: { reason: "the connection carries an edge without a record" },
-    });
-  });
 
-  it("fails a page when a displayed record is deleted from the store", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond();
-    commitLocalUpdate(environment, (store) => {
-      store.delete("m2");
+    it("refuses a page no token and no remembered cursor reaches", () => {
+      const { environment, fetches } = createRelay();
+      expect(
+        readRefusals(createSource(environment), {
+          window: buildPaged({ page: 3 }),
+        }),
+      ).toEqual([buildUnreachable(3)]);
+      expect(fetches).toHaveLength(0);
     });
-    expect(lastOf(deliver)).toMatchObject({
-      status: "failed",
-      failure: { reason: "the connection carries an edge without a record" },
-    });
-  });
 
-  it("fails a response that carries no connection", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond({ data: { machines: null } });
-    expect(lastOf(deliver)).toEqual({
-      status: "failed",
-      failure: {
-        reason: "the response carries no connection",
-        cause: null,
-        transient: null,
-      },
+    it("refuses nothing for the first page or a page its trail reaches", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      expect(readRefusals(adapter)).toEqual([]);
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      expect(
+        readRefusals(adapter, { window: buildPaged({ page: 2 }) }),
+      ).toEqual([]);
     });
-  });
 
-  it("fails a page with a missing edge rather than delivering it shorter", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond({
-      data: {
-        machines: {
-          totalCount: 5,
-          pageInfo: { endCursor: "c:m2", hasNextPage: true },
-          edges: [{ node: machines[0] }, null],
-        },
-      },
+    it("prefers the window's own token over a remembered cursor", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      // The trail remembers "c:m2" for page two; the window names another, and
+      // a token reaches a page no trail ever did.
+      const carried = buildPaged({ page: 2, cursor: "c:m1" });
+      expect(readRefusals(adapter, { window: carried })).toEqual([]);
+      expect(
+        readRefusals(adapter, {
+          window: buildPaged({ page: 9, cursor: "c:m4" }),
+        }),
+      ).toEqual([]);
+      adapter.execute(buildRequest({ window: carried }), createDeliverySpy());
+      expect(fetchAt(1).variables["after"]).toBe("c:m1");
     });
-    expect(lastOf(deliver)).toMatchObject({
-      status: "failed",
-      failure: { reason: "the connection carries an edge without a record" },
+
+    it("guards execute against a page nothing reaches", () => {
+      const { environment, fetches } = createRelay();
+      expect(() =>
+        createSource(environment).execute(
+          buildRequest({ window: buildPaged({ page: 3 }) }),
+          createDeliverySpy(),
+        ),
+      ).toThrow("a forward connection reaches page 3 only from page 2");
+      expect(fetches).toHaveLength(0);
     });
-  });
 
-  it("fails a connection that carries no edges", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    source(environment).execute(request(), deliver);
-    fetchAt(0).respond({
-      data: {
-        machines: {
-          totalCount: 5,
-          pageInfo: { endCursor: null, hasNextPage: false },
-          edges: null,
-        },
-      },
+    it("keeps cursors per page size, since a size change moves every boundary", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      expect(
+        readRefusals(adapter, { window: buildPaged({ page: 2, size: 3 }) }),
+      ).toEqual([buildUnreachable(2)]);
     });
-    expect(lastOf(deliver)).toMatchObject({
-      status: "failed",
-      failure: { reason: "the connection carries no edges" },
-    });
-  });
 
-  it("cancels a fetch still in flight on release", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    const release = source(environment).execute(request(), deliver);
-    release();
-    expect(fetchAt(0).cancelled).toBe(true);
-    fetchAt(0).respond();
-    expect(deliver).not.toHaveBeenCalled();
-  });
-
-  it("stops following the store on release", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    const release = source(environment).execute(request(), deliver);
-    fetchAt(0).respond();
-    expect(deliver).toHaveBeenCalledTimes(1);
-    release();
-    commitLocalUpdate(environment, (store) => {
-      store.get("m1")?.setValue("renamed", "name");
-    });
-    expect(deliver).toHaveBeenCalledTimes(1);
-  });
-
-  it("releases the retention, the store subscription and the fetch together", () => {
-    const { environment, fetchAt } = relay();
-    const { released, wrapped } = counted(environment);
-    const release = source(wrapped).execute(request(), delivery());
-    fetchAt(0).respond();
-    expect(released).toEqual({ retentions: 0, subscriptions: 0, fetches: 0 });
-    release();
-    expect(released).toEqual({ retentions: 1, subscriptions: 1, fetches: 1 });
-  });
-
-  it.each([
-    [
-      "on the query itself",
-      withSelections(
-        [...MachinesQuery.operation.selections, connectionHandle],
-        connectionMetadata,
-      ),
-    ],
-    [
-      "through an unmasked fragment spread",
-      withSelections([...MachinesQuery.operation.selections, connectionHandle]),
-    ],
-    [
-      "under a parent field",
-      withSelections(
-        [
-          field("viewer", false, [
-            ...MachinesQuery.operation.selections,
-            connectionHandle,
-          ]),
+    it("shares cursors between respellings of the same query", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      const spelled: Slice = {
+        ...emptySlice,
+        filter: [
+          { field: "status", operator: "isAny", operands: ["ready", "failed"] },
         ],
-        connectionMetadata,
-      ),
-    ],
-  ])("refuses a query paging through @connection %s", (_, merging) => {
-    const { environment, fetches } = relay();
-    const adapter = createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      operation: (page) =>
-        createOperationDescriptor(merging, {
-          first: page.first,
-          after: page.after,
-          status: null,
+      };
+      const respelled: Slice = {
+        ...emptySlice,
+        filter: [
+          { field: "status", operator: "isAny", operands: ["failed", "ready"] },
+        ],
+      };
+      adapter.execute(buildRequest({ slice: spelled }), createDeliverySpy());
+      fetchAt(0).respond();
+      adapter.execute(
+        buildRequest({ slice: respelled, window: buildPaged({ page: 2 }) }),
+        createDeliverySpy(),
+      );
+      expect(fetchAt(1).variables["after"]).toBe("c:m2");
+    });
+
+    it("keeps each query's cursors apart from another's", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      const failed: Slice = {
+        ...emptySlice,
+        filter: [{ field: "status", operator: "isAny", operands: ["failed"] }],
+      };
+      expect(
+        readRefusals(adapter, {
+          slice: failed,
+          window: buildPaged({ page: 2 }),
         }),
-      connection: (data: MachinesData) => data.machines,
+      ).toEqual([buildUnreachable(2)]);
     });
-    expect(() => adapter.execute(request(), delivery())).toThrow(
-      "a query paging through @connection merges its pages",
-    );
-    expect(fetches).toHaveLength(0);
-  });
 
-  it("never refuses a query carrying a handle that is not a connection", () => {
-    // Relay writes a handle for other directives too — an appended edge, a
-    // deleted record, a client field. Only `@connection` merges pages, so
-    // only `@connection` is refused.
-    const { environment, fetches } = relay();
-    const otherHandle = withSelections([
-      ...MachinesQuery.operation.selections,
-      { ...connectionHandle, handle: "deleteRecord", key: "" },
-    ]);
-    createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      operation: (page) =>
-        createOperationDescriptor(otherHandle, {
-          first: page.first,
-          after: page.after,
-          status: null,
+    it("remembers the cursors of the most recently used queries only", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      const requestFirstPage = (size: number) => {
+        adapter.execute(
+          buildRequest({ window: buildPaged({ size }) }),
+          createDeliverySpy(),
+        );
+      };
+      // Two queries with cursors, the second one older only by use.
+      requestFirstPage(2);
+      fetchAt(0).respond();
+      requestFirstPage(3);
+      fetchAt(1).respond();
+      for (let size = 4; size < 34; size += 1) {
+        requestFirstPage(size);
+      }
+      // Paging on the oldest makes it the most recently used…
+      adapter.execute(
+        buildRequest({ window: buildPaged({ page: 2 }) }),
+        createDeliverySpy(),
+      );
+      // …so one more query pushes out the one used least recently instead.
+      requestFirstPage(34);
+      adapter.execute(
+        buildRequest({ window: buildPaged({ page: 2 }) }),
+        createDeliverySpy(),
+      );
+      expect(fetchAt(34).variables["after"]).toBe("c:m2");
+      expect(
+        readRefusals(adapter, { window: buildPaged({ page: 2, size: 3 }) }),
+      ).toEqual([buildUnreachable(2)]);
+    });
+
+    it("never lets a refused page push another query's cursors out", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      // Thirty-one other queries leave the first one the oldest remembered.
+      for (let size = 3; size < 34; size += 1) {
+        adapter.execute(
+          buildRequest({ window: buildPaged({ size }) }),
+          createDeliverySpy(),
+        );
+      }
+      const unreached = buildPaged({ page: 2, size: 99 });
+      expect(readRefusals(adapter, { window: unreached })).toEqual([
+        buildUnreachable(2),
+      ]);
+      expect(() =>
+        adapter.execute(
+          buildRequest({ window: unreached }),
+          createDeliverySpy(),
+        ),
+      ).toThrow("reaches page 2 only from page 1");
+      adapter.execute(
+        buildRequest({ window: buildPaged({ page: 2 }) }),
+        createDeliverySpy(),
+      );
+      expect(fetchAt(32).variables["after"]).toBe("c:m2");
+    });
+
+    it("counts a null total as unknown, and an absent next page as unknown", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond({
+        data: {
+          machines: {
+            totalCount: null,
+            pageInfo: { endCursor: "c:m2", hasNextPage: null },
+            edges: [{ node: machines.at(0) }, { node: machines.at(1) }],
+          },
+        },
+      });
+      expect(readLast(deliver)).toMatchObject({
+        status: "succeeded",
+        page: {
+          counts: buildCounts(UNKNOWN_COUNT),
+          more: null,
+          cursors: { next: "c:m2", previous: null },
+        },
+      });
+    });
+
+    it("delivers an empty last page with no cursor to go on from", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      const failed: Slice = {
+        ...emptySlice,
+        filter: [{ field: "status", operator: "isAny", operands: ["missing"] }],
+      };
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest({ slice: failed }), deliver);
+      fetchAt(0).respond();
+      expect(readLast(deliver)).toEqual({
+        status: "succeeded",
+        page: {
+          rows: [],
+          groups: null,
+          counts: buildCounts(countExactly(0)),
+          facets: {},
+          more: false,
+          cursors: { next: null, previous: null },
+        },
+      });
+      expect(
+        readRefusals(adapter, {
+          slice: failed,
+          window: buildPaged({ page: 2 }),
         }),
-      connection: (data: MachinesData) => data.machines,
-    }).execute(request(), delivery());
-    expect(fetches).toHaveLength(1);
-  });
-
-  it("never refuses a query for a row's own @connection list", () => {
-    const { environment, fetches } = relay();
-    const rowsWithLists = withSelections([
-      field("machines", false, [
-        field("edges", true, [field("node", false, [connectionHandle])]),
-      ]),
-    ]);
-    createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      operation: (page) =>
-        createOperationDescriptor(rowsWithLists, {
-          first: page.first,
-          after: page.after,
-          status: null,
-        }),
-      connection: (data: MachinesData) => data.machines,
-    }).execute(request(), delivery());
-    expect(fetches).toHaveLength(1);
-  });
-
-  it("never lets a refused @connection query push another query's cursors out", () => {
-    const { environment, fetchAt } = relay();
-    const merging = withSelections(
-      [...MachinesQuery.operation.selections, connectionHandle],
-      connectionMetadata,
-    );
-    const adapter = createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      // One page size stands for a query paging through @connection.
-      operation: (page) =>
-        createOperationDescriptor(page.first === 99 ? merging : MachinesQuery, {
-          first: page.first,
-          after: page.after,
-          status: null,
-        }),
-      connection: (data: MachinesData) => data.machines,
+      ).toEqual([buildUnreachable(2)]);
     });
-    adapter.execute(request(), delivery());
-    fetchAt(0).respond();
-    for (let size = 3; size < 34; size += 1) {
-      adapter.execute(request({ window: paged({ size }) }), delivery());
-    }
-    expect(() =>
-      adapter.execute(request({ window: paged({ size: 99 }) }), delivery()),
-    ).toThrow("merges its pages");
-    adapter.execute(request({ window: paged({ page: 2 }) }), delivery());
-    expect(fetchAt(32).variables["after"]).toBe("c:m2");
-  });
 
-  it("forgets the next page once its page no longer ends in a cursor", () => {
-    const { environment, fetchAt } = relay();
-    const adapter = source(environment);
-    const deliver = delivery();
-    adapter.execute(request(), deliver);
-    fetchAt(0).respond();
-    commitLocalUpdate(environment, (store) => {
-      store
-        .getRoot()
-        .getLinkedRecord("machines", { after: null, first: 2, status: null })
-        ?.getLinkedRecord("pageInfo")
-        ?.setValue(null, "endCursor");
-    });
-    expect(lastOf(deliver)).toMatchObject({
-      page: { more: true, cursors: { next: null, previous: null } },
-    });
-    expect(readRefusals(adapter, { window: paged({ page: 2 }) })).toEqual([
-      unreachable(2),
-    ]);
-  });
+    it("delivers a page already in the store at once, and still fetches it", () => {
+      const { environment, fetches, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      const release = adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      release();
 
-  it("fails a page whose connection selector throws", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    const thrown = new Error("the query has no machines field");
-    createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      operation,
-      connection: () => {
-        throw thrown;
-      },
-    }).execute(request(), deliver);
-    fetchAt(0).respond();
-    expect(lastOf(deliver)).toEqual({
-      status: "failed",
-      failure: {
-        reason: "the query has no machines field",
-        cause: thrown,
-        transient: null,
-      },
-    });
-  });
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest(), deliver);
+      expect(listIds(readLast(deliver))).toEqual(["m1", "m2"]);
+      expect(fetches).toHaveLength(2);
 
-  it("fails a page whose selector throws on a store change, never the writer", () => {
-    const { environment, fetchAt } = relay();
-    const deliver = delivery();
-    let reads = 0;
-    createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      operation,
-      connection: (data: MachinesData) => {
-        reads += 1;
-        if (reads > 1) {
-          throw new Error("the renamed field is not a machine");
-        }
-        return data.machines;
-      },
-    }).execute(request(), deliver);
-    fetchAt(0).respond();
-    expect(lastOf(deliver)).toMatchObject({ status: "succeeded" });
-    expect(() =>
+      // The fetch confirms what the store held: nothing new is delivered.
+      fetchAt(1).respond();
+      expect(deliver).toHaveBeenCalledTimes(1);
+    });
+
+    it("delivers what a fetch changed about a page already in the store", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      const release = adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      release();
+
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest(), deliver);
+      fetchAt(1).respond({
+        data: {
+          machines: {
+            totalCount: 5,
+            pageInfo: { endCursor: "c:m2", hasNextPage: true },
+            edges: [
+              { node: { ...machines.at(0), name: "alpha-renamed" } },
+              { node: machines.at(1) },
+            ],
+          },
+        },
+      });
+      expect(deliver).toHaveBeenCalledTimes(2);
+      expect(readLast(deliver)).toMatchObject({
+        page: { rows: [{ id: "m1", name: "alpha-renamed" }, machines.at(1)] },
+      });
+    });
+
+    it("delivers a local update to a displayed record as an external change", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond();
+
       commitLocalUpdate(environment, (store) => {
         store.get("m1")?.setValue("alpha-renamed", "name");
-      }),
-    ).not.toThrow();
-    expect(lastOf(deliver)).toMatchObject({
-      status: "failed",
-      failure: { reason: "the renamed field is not a machine" },
+      });
+      expect(deliver).toHaveBeenCalledTimes(2);
+      expect(readLast(deliver)).toMatchObject({
+        status: "succeeded",
+        page: { rows: [{ id: "m1", name: "alpha-renamed" }, machines.at(1)] },
+      });
+
+      // An update to a record this page does not show changes nothing.
+      commitLocalUpdate(environment, (store) => {
+        store.get("m5")?.setValue("epsilon-renamed", "name");
+      });
+      expect(deliver).toHaveBeenCalledTimes(2);
+    });
+
+    it("delivers a failed fetch as a failure carrying its cause", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      const error = new Error("502 from the graph");
+      fetchAt(0).fail(error);
+      expect(deliver.mock.calls).toEqual([
+        [
+          {
+            status: "failed",
+            failure: {
+              reason: "502 from the graph",
+              cause: error,
+              transient: null,
+            },
+          },
+        ],
+      ]);
+    });
+
+    it("delivers a fetch the application reads as forbidden as forbidden", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      const denied = new Error("403 from the graph");
+      createSource(environment, {
+        isForbidden: (error) => error === denied,
+      }).execute(buildRequest(), deliver);
+      fetchAt(0).fail(denied);
+      expect(deliver.mock.calls).toEqual([
+        [{ status: "forbidden", cause: denied }],
+      ]);
+    });
+
+    it("delivers nothing from the store once the fetch is forbidden", () => {
+      const { environment, fetchAt } = createRelay();
+      const denied = new Error("403 from the graph");
+      const adapter = createSource(environment, {
+        isForbidden: (error) => error === denied,
+      });
+      const release = adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      release();
+
+      // The page is in the store, so it is delivered at once; the fetch then
+      // says the reader may not see it.
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest(), deliver);
+      fetchAt(1).fail(denied);
+      expect(readLast(deliver)).toEqual({ status: "forbidden", cause: denied });
+      const delivered = deliver.mock.calls.length;
+      commitLocalUpdate(environment, (store) => {
+        store.get("m1")?.setValue("alpha-renamed", "name");
+      });
+      expect(deliver).toHaveBeenCalledTimes(delivered);
+    });
+
+    it("delivers nothing from the store to a later execution of a forbidden page until its fetch completes", () => {
+      const { environment, fetchAt } = createRelay();
+      const denied = new Error("403 from the graph");
+      const adapter = createSource(environment, {
+        isForbidden: (error) => error === denied,
+      });
+      const first = adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      first();
+      const second = adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(1).fail(denied);
+      second();
+
+      // A refresh, or a return to the query: the refused page is still in the
+      // store, and is not delivered while the fetch runs.
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest(), deliver);
+      expect(deliver).not.toHaveBeenCalled();
+      commitLocalUpdate(environment, (store) => {
+        store.get("m1")?.setValue("alpha-renamed", "name");
+      });
+      expect(deliver).not.toHaveBeenCalled();
+      // Answered again as forbidden, the page stays withdrawn.
+      fetchAt(2).fail(denied);
+      expect(deliver.mock.calls).toEqual([
+        [{ status: "forbidden", cause: denied }],
+      ]);
+    });
+
+    it("delivers a forbidden page again once a fetch of it completes", () => {
+      const { environment, fetchAt } = createRelay();
+      const denied = new Error("403 from the graph");
+      const adapter = createSource(environment, {
+        isForbidden: (error) => error === denied,
+      });
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).fail(denied);
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest(), deliver);
+      fetchAt(1).respond();
+      expect(readLast(deliver)).toMatchObject({ status: "succeeded" });
+      // Access granted, the next execution reads the store at once again.
+      const next = createDeliverySpy();
+      adapter.execute(buildRequest(), next);
+      expect(readLast(next)).toMatchObject({ status: "succeeded" });
+    });
+
+    it("keeps a forbidden mark to its own page", () => {
+      const { environment, fetchAt } = createRelay();
+      const denied = new Error("403 from the graph");
+      const adapter = createSource(environment, {
+        isForbidden: (error) => error === denied,
+      });
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      adapter.execute(
+        buildRequest({ window: buildPaged({ page: 2 }) }),
+        createDeliverySpy(),
+      );
+      fetchAt(1).fail(denied);
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest(), deliver);
+      expect(readLast(deliver)).toMatchObject({ status: "succeeded" });
+    });
+
+    it("delivers a failure where the forbidden check answers no or throws", () => {
+      for (const isForbidden of [
+        () => false,
+        () => {
+          throw new Error("the check broke");
+        },
+      ]) {
+        const { environment, fetchAt } = createRelay();
+        const deliver = createDeliverySpy();
+        createSource(environment, { isForbidden }).execute(
+          buildRequest(),
+          deliver,
+        );
+        fetchAt(0).fail(new Error("403"));
+        expect(readLast(deliver)).toMatchObject({
+          status: "failed",
+          failure: { reason: "403" },
+        });
+      }
+    });
+
+    it("fails a page whose response left selected data missing", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      const warn = vi.spyOn(console, "error").mockImplementation(() => {});
+      fetchAt(0).respond({
+        data: {
+          machines: {
+            totalCount: 5,
+            pageInfo: { endCursor: "c:m2", hasNextPage: true },
+            // The second record lacks a field the query selects.
+            edges: [
+              { node: machines.at(0) },
+              { node: { id: "m2", status: "failed" } },
+            ],
+          },
+        },
+      });
+      warn.mockRestore();
+      expect(deliver.mock.calls).toEqual([
+        [
+          {
+            status: "failed",
+            failure: {
+              reason: "the store is missing data this page selects",
+              cause: null,
+              transient: null,
+            },
+          },
+        ],
+      ]);
+    });
+
+    it("fails once while the store stays incomplete, and recovers when it is whole", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond();
+
+      commitLocalUpdate(environment, (store) => {
+        store.get("m1")?.setValue(undefined, "name");
+      });
+      commitLocalUpdate(environment, (store) => {
+        store.get("m2")?.setValue(undefined, "name");
+      });
+      expect(deliver.mock.calls.slice(1)).toEqual([
+        [
+          {
+            status: "failed",
+            failure: {
+              reason: "the store is missing data this page selects",
+              cause: null,
+              transient: null,
+            },
+          },
+        ],
+      ]);
+
+      commitLocalUpdate(environment, (store) => {
+        store.get("m1")?.setValue("alpha", "name");
+        store.get("m2")?.setValue("beta", "name");
+      });
+      expect(listIds(readLast(deliver))).toEqual(["m1", "m2"]);
+    });
+
+    it("fails a page with a missing record rather than delivering it shorter", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond({
+        data: {
+          machines: {
+            totalCount: 5,
+            pageInfo: { endCursor: "c:m2", hasNextPage: true },
+            edges: [{ node: machines.at(0) }, { node: null }],
+          },
+        },
+      });
+      expect(readLast(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "the connection carries an edge without a record" },
+      });
+    });
+
+    it("fails a page when a displayed record is deleted from the store", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond();
+      commitLocalUpdate(environment, (store) => {
+        store.delete("m2");
+      });
+      expect(readLast(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "the connection carries an edge without a record" },
+      });
+    });
+
+    it("fails a response that carries no connection", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond({ data: { machines: null } });
+      expect(readLast(deliver)).toEqual({
+        status: "failed",
+        failure: {
+          reason: "the response carries no connection",
+          cause: null,
+          transient: null,
+        },
+      });
+    });
+
+    it("fails a page with a missing edge rather than delivering it shorter", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond({
+        data: {
+          machines: {
+            totalCount: 5,
+            pageInfo: { endCursor: "c:m2", hasNextPage: true },
+            edges: [{ node: machines.at(0) }, null],
+          },
+        },
+      });
+      expect(readLast(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "the connection carries an edge without a record" },
+      });
+    });
+
+    it("fails a connection that carries no edges", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond({
+        data: {
+          machines: {
+            totalCount: 5,
+            pageInfo: { endCursor: null, hasNextPage: false },
+            edges: null,
+          },
+        },
+      });
+      expect(readLast(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "the connection carries no edges" },
+      });
+    });
+
+    it("fails a connection that carries no page info", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      createSource(environment).execute(buildRequest(), deliver);
+      fetchAt(0).respond({
+        data: { machines: { totalCount: 5, pageInfo: null, edges: [] } },
+      });
+      expect(readLast(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "the connection carries no page info" },
+      });
+    });
+
+    it("cancels a fetch still in flight on release", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      const release = createSource(environment).execute(
+        buildRequest(),
+        deliver,
+      );
+      release();
+      expect(fetchAt(0).cancelled).toBe(true);
+      fetchAt(0).respond();
+      expect(deliver).not.toHaveBeenCalled();
+    });
+
+    it("stops following the store on release", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      const release = createSource(environment).execute(
+        buildRequest(),
+        deliver,
+      );
+      fetchAt(0).respond();
+      expect(deliver).toHaveBeenCalledTimes(1);
+      release();
+      commitLocalUpdate(environment, (store) => {
+        store.get("m1")?.setValue("renamed", "name");
+      });
+      expect(deliver).toHaveBeenCalledTimes(1);
+    });
+
+    it("releases the retention, the store subscription and the fetch together", () => {
+      const { environment, fetchAt } = createRelay();
+      const { released, wrapped } = countReleases(environment);
+      const release = createSource(wrapped).execute(
+        buildRequest(),
+        createDeliverySpy(),
+      );
+      fetchAt(0).respond();
+      expect(released).toEqual({ retentions: 0, subscriptions: 0, fetches: 0 });
+      release();
+      expect(released).toEqual({ retentions: 1, subscriptions: 1, fetches: 1 });
+    });
+
+    it.each([
+      [
+        "on the query itself",
+        withSelections(
+          [...MachinesQuery.operation.selections, connectionHandle],
+          connectionMetadata,
+        ),
+      ],
+      [
+        "through an unmasked fragment spread",
+        withSelections([
+          ...MachinesQuery.operation.selections,
+          connectionHandle,
+        ]),
+      ],
+      [
+        "under a parent field",
+        withSelections(
+          [
+            buildField("viewer", false, [
+              ...MachinesQuery.operation.selections,
+              connectionHandle,
+            ]),
+          ],
+          connectionMetadata,
+        ),
+      ],
+    ])("refuses a query paging through @connection %s", (_, merging) => {
+      const { environment, fetches } = createRelay();
+      const adapter = createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        buildOperation: (page) =>
+          createOperationDescriptor(merging, {
+            first: page.first,
+            after: page.after,
+            status: null,
+          }),
+        readConnection: (data: MachinesData) => data.machines,
+      });
+      expect(() =>
+        adapter.execute(buildRequest(), createDeliverySpy()),
+      ).toThrow("a query paging through @connection merges its pages");
+      expect(fetches).toHaveLength(0);
+    });
+
+    it("never refuses a query carrying a handle that is not a connection", () => {
+      // Relay writes a handle for other directives too — an appended edge, a
+      // deleted record, a client field. Only `@connection` merges pages, so
+      // only `@connection` is refused.
+      const { environment, fetches } = createRelay();
+      const otherHandle = withSelections([
+        ...MachinesQuery.operation.selections,
+        { ...connectionHandle, handle: "deleteRecord", key: "" },
+      ]);
+      createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        buildOperation: (page) =>
+          createOperationDescriptor(otherHandle, {
+            first: page.first,
+            after: page.after,
+            status: null,
+          }),
+        readConnection: (data: MachinesData) => data.machines,
+      }).execute(buildRequest(), createDeliverySpy());
+      expect(fetches).toHaveLength(1);
+    });
+
+    it("never refuses a query for a row's own @connection list", () => {
+      const { environment, fetches } = createRelay();
+      const rowsWithLists = withSelections([
+        buildField("machines", false, [
+          buildField("edges", true, [
+            buildField("node", false, [connectionHandle]),
+          ]),
+        ]),
+      ]);
+      createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        buildOperation: (page) =>
+          createOperationDescriptor(rowsWithLists, {
+            first: page.first,
+            after: page.after,
+            status: null,
+          }),
+        readConnection: (data: MachinesData) => data.machines,
+      }).execute(buildRequest(), createDeliverySpy());
+      expect(fetches).toHaveLength(1);
+    });
+
+    it("never lets a refused @connection query push another query's cursors out", () => {
+      const { environment, fetchAt } = createRelay();
+      const merging = withSelections(
+        [...MachinesQuery.operation.selections, connectionHandle],
+        connectionMetadata,
+      );
+      const adapter = createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        // One page size stands for a query paging through @connection.
+        buildOperation: (page) =>
+          createOperationDescriptor(
+            page.first === 99 ? merging : MachinesQuery,
+            {
+              first: page.first,
+              after: page.after,
+              status: null,
+            },
+          ),
+        readConnection: (data: MachinesData) => data.machines,
+      });
+      adapter.execute(buildRequest(), createDeliverySpy());
+      fetchAt(0).respond();
+      for (let size = 3; size < 34; size += 1) {
+        adapter.execute(
+          buildRequest({ window: buildPaged({ size }) }),
+          createDeliverySpy(),
+        );
+      }
+      expect(() =>
+        adapter.execute(
+          buildRequest({ window: buildPaged({ size: 99 }) }),
+          createDeliverySpy(),
+        ),
+      ).toThrow("merges its pages");
+      adapter.execute(
+        buildRequest({ window: buildPaged({ page: 2 }) }),
+        createDeliverySpy(),
+      );
+      expect(fetchAt(32).variables["after"]).toBe("c:m2");
+    });
+
+    it("forgets the next page once its page no longer ends in a cursor", () => {
+      const { environment, fetchAt } = createRelay();
+      const adapter = createSource(environment);
+      const deliver = createDeliverySpy();
+      adapter.execute(buildRequest(), deliver);
+      fetchAt(0).respond();
+      commitLocalUpdate(environment, (store) => {
+        store
+          .getRoot()
+          .getLinkedRecord("machines", { after: null, first: 2, status: null })
+          ?.getLinkedRecord("pageInfo")
+          ?.setValue(null, "endCursor");
+      });
+      expect(readLast(deliver)).toMatchObject({
+        page: { more: true, cursors: { next: null, previous: null } },
+      });
+      expect(
+        readRefusals(adapter, { window: buildPaged({ page: 2 }) }),
+      ).toEqual([buildUnreachable(2)]);
+    });
+
+    it("fails a page whose connection selector throws", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      const thrown = new Error("the query has no machines field");
+      createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        buildOperation,
+        readConnection: () => {
+          throw thrown;
+        },
+      }).execute(buildRequest(), deliver);
+      fetchAt(0).respond();
+      expect(readLast(deliver)).toEqual({
+        status: "failed",
+        failure: {
+          reason: "the query has no machines field",
+          cause: thrown,
+          transient: null,
+        },
+      });
+    });
+
+    it("fails a page whose selector throws on a store change, never the writer", () => {
+      const { environment, fetchAt } = createRelay();
+      const deliver = createDeliverySpy();
+      let reads = 0;
+      createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        buildOperation,
+        readConnection: (data: MachinesData) => {
+          reads += 1;
+          if (reads > 1) {
+            throw new Error("the renamed field is not a machine");
+          }
+          return data.machines;
+        },
+      }).execute(buildRequest(), deliver);
+      fetchAt(0).respond();
+      expect(readLast(deliver)).toMatchObject({ status: "succeeded" });
+      expect(() =>
+        commitLocalUpdate(environment, (store) => {
+          store.get("m1")?.setValue("alpha-renamed", "name");
+        }),
+      ).not.toThrow();
+      expect(readLast(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "the renamed field is not a machine" },
+      });
+    });
+
+    it("releases what it acquired when the fetch cannot start", () => {
+      const { environment } = createRelay();
+      const { released, wrapped } = countReleases(environment);
+      const offline: RelayEnvironment = {
+        ...wrapped,
+        execute() {
+          throw new Error("offline");
+        },
+      };
+      expect(() =>
+        createSource(offline).execute(buildRequest(), createDeliverySpy()),
+      ).toThrow("offline");
+      expect(released).toEqual({ retentions: 1, subscriptions: 1, fetches: 0 });
+    });
+
+    it("freezes the declaration it was handed", () => {
+      const { environment } = createRelay();
+      const fields = ["name"];
+      const capabilities = declare({ sort: declareSort(fields) });
+      const adapter = createSource(environment, { capabilities });
+      fields.push("zone");
+      expect(Object.isFrozen(adapter.capabilities)).toBe(true);
+      expect(adapter.capabilities.sort.fields).toEqual(["name"]);
+    });
+
+    it("carries the application's row operations", () => {
+      const { environment } = createRelay();
+      const runAction: SourceActionRunner = vi.fn().mockResolvedValue([]);
+      const adapter = createRelaySource<MachinesOperation>({
+        capabilities: connectionCapabilities,
+        environment,
+        buildOperation,
+        readConnection: (data: MachinesData) => data.machines,
+        runAction,
+      });
+      expect(adapter.runAction).toBe(runAction);
+      const plain = createSource(environment);
+      expect("runAction" in plain).toBe(false);
     });
   });
 
-  it("releases what it acquired when the fetch cannot start", () => {
-    const { environment } = relay();
-    const { released, wrapped } = counted(environment);
-    const offline: RelayEnvironment = {
-      ...wrapped,
-      execute() {
-        throw new Error("offline");
-      },
-    };
-    expect(() => source(offline).execute(request(), delivery())).toThrow(
-      "offline",
-    );
-    expect(released).toEqual({ retentions: 1, subscriptions: 1, fetches: 0 });
-  });
-
-  it("freezes the declaration it was handed", () => {
-    const { environment } = relay();
-    const fields = ["name"];
-    const capabilities = declare({ sort: declareSort(fields) });
-    const adapter = source(environment, { capabilities });
-    fields.push("zone");
-    expect(Object.isFrozen(adapter.capabilities)).toBe(true);
-    expect(adapter.capabilities.sort.fields).toEqual(["name"]);
-  });
-
-  it("carries the application's row operations", () => {
-    const { environment } = relay();
-    const runAction: SourceActionRunner = vi.fn().mockResolvedValue([]);
-    const adapter = createRelaySource<MachinesOperation>({
-      capabilities: connectionCapabilities,
-      environment,
-      operation,
-      connection: (data: MachinesData) => data.machines,
-      runAction,
-    });
-    expect(adapter.runAction).toBe(runAction);
-    const plain = source(environment);
-    expect("runAction" in plain).toBe(false);
-  });
-});
-
-describe("createRelaySource bound to a collection", () => {
-  it("fetches nothing until the provider is observed, and its first page then", () => {
-    const { environment, fetches } = relay();
-    const provider = createDataViewsProvider({
-      collection: machinesCollection,
-      source: source(environment),
-      snapshot: buildSnapshotAt(paged()),
-    });
-    expect(fetches).toHaveLength(0);
-    expect(provider.state.get().result.status).toBe("idle");
-    const release = provider.observe();
-    expect(fetches).toHaveLength(1);
-    expect(provider.state.get().result.status).toBe("pending");
-    release();
-  });
-
-  it("publishes pages under the collection's request identities", () => {
-    const { environment, fetchAt } = relay();
-    const { provider, shown, release } = bound(environment);
-    fetchAt(0).respond();
-    expect(shown()).toMatchObject({
-      ids: ["m1", "m2"],
-      status: "ready",
-      counts: countsOf(countExactly(5)),
-      matches: true,
+  describe("createRelaySource bound to a collection", () => {
+    it("fetches nothing until the provider is observed, and its first page then", () => {
+      const { environment, fetches } = createRelay();
+      const provider = createDataViewsProvider({
+        collection: machinesCollection,
+        source: createSource(environment),
+        snapshot: buildSnapshotAt(buildPaged()),
+      });
+      expect(fetches).toHaveLength(0);
+      expect(provider.state.get().result.status).toBe("idle");
+      const release = provider.observe();
+      expect(fetches).toHaveLength(1);
+      expect(provider.state.get().result.status).toBe("pending");
+      release();
     });
 
-    provider.navigateWindow({ page: 2 });
-    expect(shown().status).toBe("pending");
-    fetchAt(1).respond();
-    expect(shown()).toMatchObject({ ids: ["m3", "m4"], status: "ready" });
-    release();
-  });
+    it("publishes pages under the collection's request identities", () => {
+      const { environment, fetchAt } = createRelay();
+      const { provider, shown, release } = createBound(environment);
+      fetchAt(0).respond();
+      expect(shown()).toMatchObject({
+        ids: ["m1", "m2"],
+        status: "ready",
+        counts: buildCounts(countExactly(5)),
+        matches: true,
+      });
 
-  it("never lets an abandoned filter replace a newer one", () => {
-    const { environment, fetchAt } = relay();
-    const { host, shown, release } = bound(environment);
-    // The observation's own fetch is the first one abandoned.
-    host.setPredicate({
-      field: "status",
-      operator: "isAny",
-      operands: ["failed"],
-    });
-    host.setPredicate({
-      field: "status",
-      operator: "isAny",
-      operands: ["ready"],
-    });
-    expect(fetchAt(0).cancelled).toBe(true);
-    expect(fetchAt(1).cancelled).toBe(true);
-
-    fetchAt(2).respond();
-    expect(shown()).toMatchObject({ ids: ["m1", "m3"], status: "ready" });
-    // The abandoned fetch answering late reaches nothing.
-    fetchAt(1).respond();
-    expect(shown()).toMatchObject({
-      ids: ["m1", "m3"],
-      status: "ready",
-      counts: countsOf(countExactly(3)),
-      matches: true,
-    });
-    release();
-  });
-
-  it("follows a local update into the collection without refetching", () => {
-    const { environment, fetches, fetchAt } = relay();
-    const { provider, shown, release } = bound(environment);
-    fetchAt(0).respond();
-    const before = provider.state.get().result.provenance;
-
-    commitLocalUpdate(environment, (store) => {
-      store.get("m2")?.setValue("failed", "status");
-      store.get("m2")?.setValue("beta-renamed", "name");
-    });
-    const rows = provider.state.get().result.rows as readonly Machine[];
-    expect(rows[1]).toEqual({
-      id: "m2",
-      name: "beta-renamed",
-      status: "failed",
-    });
-    expect(provider.state.get().result.provenance).not.toEqual(before);
-    expect(shown().matches).toBe(true);
-    expect(fetches).toHaveLength(1);
-    release();
-  });
-
-  it("reports a page reached without its cursor as a refusal", () => {
-    const { environment, fetches } = relay();
-    const { provider, release } = bound(environment, paged({ page: 3 }));
-    expect(provider.state.get().result).toMatchObject({
-      status: "failed",
-      rows: null,
-      problem: { status: "refused", refusals: [unreachable(3)] },
-    });
-    // A refused request costs no round trip.
-    expect(fetches).toHaveLength(0);
-    release();
-  });
-
-  it("keeps the rows and reports the failure when a refetch fails", () => {
-    const { environment, fetchAt } = relay();
-    const { provider, shown, release } = bound(environment);
-    fetchAt(0).respond();
-    provider.refresh();
-    fetchAt(1).fail(new Error("timeout"));
-    expect(shown()).toMatchObject({
-      ids: ["m1", "m2"],
-      status: "refresh-failed",
-      matches: true,
-      problem: { status: "failed", failure: { reason: "timeout" } },
-    });
-    release();
-  });
-
-  it("releases everything when the provider resets, and requests the new generation's first page", () => {
-    const { environment, fetches, fetchAt } = relay();
-    const { released, wrapped } = counted(environment);
-    const { provider, release } = bound(wrapped);
-    provider.reset();
-    expect(released).toEqual({ retentions: 1, subscriptions: 1, fetches: 1 });
-    expect(fetchAt(0).cancelled).toBe(true);
-    // Still observed, the provider asks for the new generation's first page.
-    expect(fetches).toHaveLength(2);
-    expect(provider.state.get().result.status).toBe("pending");
-    release();
-    expect(released).toEqual({ retentions: 2, subscriptions: 2, fetches: 2 });
-  });
-
-  it("releases everything when the observation ends, answered or not", () => {
-    const { environment, fetchAt } = relay();
-    const detaching = counted(environment);
-    const pending = bound(detaching.wrapped);
-    pending.release();
-    expect(detaching.released).toEqual({
-      retentions: 1,
-      subscriptions: 1,
-      fetches: 1,
+      provider.navigateWindow({ page: 2 });
+      expect(shown().status).toBe("pending");
+      fetchAt(1).respond();
+      expect(shown()).toMatchObject({ ids: ["m3", "m4"], status: "ready" });
+      release();
     });
 
-    const ending = counted(environment);
-    const answered = bound(ending.wrapped);
-    fetchAt(1).respond();
-    answered.release();
-    expect(ending.released).toEqual({
-      retentions: 1,
-      subscriptions: 1,
-      fetches: 1,
+    it("never lets an abandoned filter replace a newer one", () => {
+      const { environment, fetchAt } = createRelay();
+      const { host, shown, release } = createBound(environment);
+      // The observation's own fetch is the first one abandoned.
+      host.setPredicate({
+        field: "status",
+        operator: "isAny",
+        operands: ["failed"],
+      });
+      host.setPredicate({
+        field: "status",
+        operator: "isAny",
+        operands: ["ready"],
+      });
+      expect(fetchAt(0).cancelled).toBe(true);
+      expect(fetchAt(1).cancelled).toBe(true);
+
+      fetchAt(2).respond();
+      expect(shown()).toMatchObject({ ids: ["m1", "m3"], status: "ready" });
+      // The abandoned fetch answering late reaches nothing.
+      fetchAt(1).respond();
+      expect(shown()).toMatchObject({
+        ids: ["m1", "m3"],
+        status: "ready",
+        counts: buildCounts(countExactly(3)),
+        matches: true,
+      });
+      release();
+    });
+
+    it("follows a local update into the collection without refetching", () => {
+      const { environment, fetches, fetchAt } = createRelay();
+      const { provider, shown, release } = createBound(environment);
+      fetchAt(0).respond();
+      const before = provider.state.get().result.provenance;
+
+      commitLocalUpdate(environment, (store) => {
+        store.get("m2")?.setValue("failed", "status");
+        store.get("m2")?.setValue("beta-renamed", "name");
+      });
+      const rows = provider.state.get().result.rows as readonly Machine[];
+      expect(rows.at(1)).toEqual({
+        id: "m2",
+        name: "beta-renamed",
+        status: "failed",
+      });
+      expect(provider.state.get().result.provenance).not.toEqual(before);
+      expect(shown().matches).toBe(true);
+      expect(fetches).toHaveLength(1);
+      release();
+    });
+
+    it("reports a page reached without its cursor as a refusal", () => {
+      const { environment, fetches } = createRelay();
+      const { provider, release } = createBound(
+        environment,
+        buildPaged({ page: 3 }),
+      );
+      expect(provider.state.get().result).toMatchObject({
+        status: "failed",
+        rows: null,
+        problem: { status: "refused", refusals: [buildUnreachable(3)] },
+      });
+      // A refused request costs no round trip.
+      expect(fetches).toHaveLength(0);
+      release();
+    });
+
+    it("keeps the rows and reports the failure when a refetch fails", () => {
+      const { environment, fetchAt } = createRelay();
+      const { provider, shown, release } = createBound(environment);
+      fetchAt(0).respond();
+      provider.refresh();
+      fetchAt(1).fail(new Error("timeout"));
+      expect(shown()).toMatchObject({
+        ids: ["m1", "m2"],
+        status: "refresh-failed",
+        matches: true,
+        problem: { status: "failed", failure: { reason: "timeout" } },
+      });
+      release();
+    });
+
+    it("releases everything when the provider resets, and requests the new generation's first page", () => {
+      const { environment, fetches, fetchAt } = createRelay();
+      const { released, wrapped } = countReleases(environment);
+      const { provider, release } = createBound(wrapped);
+      provider.reset();
+      expect(released).toEqual({ retentions: 1, subscriptions: 1, fetches: 1 });
+      expect(fetchAt(0).cancelled).toBe(true);
+      // Still observed, the provider asks for the new generation's first page.
+      expect(fetches).toHaveLength(2);
+      expect(provider.state.get().result.status).toBe("pending");
+      release();
+      expect(released).toEqual({ retentions: 2, subscriptions: 2, fetches: 2 });
+    });
+
+    it("releases everything when the observation ends, answered or not", () => {
+      const { environment, fetchAt } = createRelay();
+      const detaching = countReleases(environment);
+      const pending = createBound(detaching.wrapped);
+      pending.release();
+      expect(detaching.released).toEqual({
+        retentions: 1,
+        subscriptions: 1,
+        fetches: 1,
+      });
+
+      const ending = countReleases(environment);
+      const answered = createBound(ending.wrapped);
+      fetchAt(1).respond();
+      answered.release();
+      expect(ending.released).toEqual({
+        retentions: 1,
+        subscriptions: 1,
+        fetches: 1,
+      });
     });
   });
 });

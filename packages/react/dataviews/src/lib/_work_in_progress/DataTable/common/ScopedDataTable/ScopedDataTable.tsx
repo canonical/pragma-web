@@ -5,6 +5,7 @@ import type {
 } from "@canonical/dataviews-core";
 import {
   areDisplayStatusesEqual,
+  assertInvariant,
   type ColumnToSize,
   createColumnLayout,
   createGridInteraction,
@@ -71,7 +72,7 @@ const componentCssClassName = "ds data-table dense";
 const NO_SORTABLE_FIELDS: readonly string[] = Object.freeze([]);
 
 /** A record answers to its own identity until the caller names it better. */
-const defaultRowLabel = (_row: object, rowId: string): string => rowId;
+const labelRowById = (_row: object, rowId: string): string => rowId;
 
 /**
  * The body a virtualization descriptor carries, given what a virtualized body
@@ -94,9 +95,10 @@ const renderVirtualizedBody = (
  * however many tables it places. Its private cells and menus read the words
  * from the context it installs over them.
  *
- * `import { DataTable } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.pattern.data_table
+ *
+ * @note Impure: observes the provider and the grid interaction while
+ * mounted.
  */
 export default function ScopedDataTable<
   TFields extends readonly SchemaFieldDefinition[],
@@ -106,7 +108,7 @@ export default function ScopedDataTable<
   columns,
   label,
   selectable = false,
-  rowLabel = defaultRowLabel,
+  getRowLabel = labelRowById,
   renderStatus,
   virtualization,
   settings,
@@ -257,7 +259,7 @@ export default function ScopedDataTable<
   // Held behind one identity apiece: the README's own examples pass these
   // as lambdas, and a new function per render would re-render every row
   // and every cell of the body for nothing.
-  const nameRow = useStableCallback(rowLabel);
+  const nameRow = useStableCallback(getRowLabel);
   // The messages' words for a status, unless the caller renders its own.
   const describe = useCallback(
     (shown: DisplayStatus) => describeStatus(shown, messages),
@@ -288,7 +290,7 @@ export default function ScopedDataTable<
           channels={scopes.readRow(entry.rowId)}
           columns={rendered}
           selectable={selectable}
-          rowLabel={nameRow}
+          getRowLabel={nameRow}
         />
       ),
     [renderer, provider, scopes, rendered, selectable, nameRow],
@@ -366,7 +368,10 @@ export default function ScopedDataTable<
                   }
                   bounds={readSizingBounds(layout.readDeclared(column.id))}
                   // Solved for every rendered column, in the same order.
-                  width={geometry.widths[position] as number}
+                  width={assertInvariant(
+                    geometry.widths.at(position),
+                    "a solved width for every rendered column",
+                  )}
                   labelId={`${baseId}-${column.id}`}
                   announce={announce}
                 />

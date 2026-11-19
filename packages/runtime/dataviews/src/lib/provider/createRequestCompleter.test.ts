@@ -16,21 +16,21 @@ import type { RecordTyping } from "./types.js";
 const alpha = { id: "a", name: "Alpha" };
 const rows = [alpha, { id: "b", name: "Beta" }];
 
-const succeeded = (page: readonly RowRecord[]): Completion => ({
+const buildSucceeded = (page: readonly RowRecord[]): Completion => ({
   status: "succeeded",
   page: buildPage(page),
 });
 
 /** A typing that rejects every model with the given reason, or none. */
-const typing = (rejection: string | null): RecordTyping => ({
-  rejectionOf: () => rejection,
-  applicability: () => "applies",
-  recordType: () => null,
+const createTyping = (rejection: string | null): RecordTyping => ({
+  readRejection: () => rejection,
+  readApplicability: () => "applies",
+  readRecordType: () => null,
   remember: vi.fn(),
   forget: vi.fn(),
 });
 
-const setup = (recordTyping: RecordTyping | null = null) => {
+const setUp = (recordTyping: RecordTyping | null = null) => {
   const coordinator = createQueryCoordinator();
   const model = createChannel<RowModel>(EMPTY_ROW_MODEL);
   const publish = vi.fn();
@@ -47,23 +47,23 @@ const setup = (recordTyping: RecordTyping | null = null) => {
 
 describe("createRequestCompleter", () => {
   it("displays the rows of the pending request's success", () => {
-    const { coordinator, model, publish, complete, requestId } = setup();
-    expect(complete(requestId, succeeded(rows))).toBe(true);
+    const { coordinator, model, publish, complete, requestId } = setUp();
+    expect(complete(requestId, buildSucceeded(rows))).toBe(true);
     expect(model.get().ids).toEqual(["a", "b"]);
     expect(coordinator.state.result.status).toBe("ready");
     expect(publish).toHaveBeenCalledTimes(1);
   });
 
   it("builds nothing and publishes nothing for any other request", () => {
-    const { model, publish, complete } = setup();
-    expect(complete("elsewhere", succeeded(rows))).toBe(false);
+    const { model, publish, complete } = setUp();
+    expect(complete("elsewhere", buildSucceeded(rows))).toBe(false);
     expect(model.get()).toBe(EMPTY_ROW_MODEL);
     expect(publish).not.toHaveBeenCalled();
   });
 
   it("fails the request on rows with an ambiguous identity, keeping the rows shown", () => {
-    const { coordinator, model, complete, requestId } = setup();
-    complete(requestId, succeeded([alpha, alpha]));
+    const { coordinator, model, complete, requestId } = setUp();
+    complete(requestId, buildSucceeded([alpha, alpha]));
     expect(model.get()).toBe(EMPTY_ROW_MODEL);
     expect(coordinator.state.result.problem).toMatchObject({
       status: "failed",
@@ -72,9 +72,9 @@ describe("createRequestCompleter", () => {
   });
 
   it("fails the request on rows the record typing rejects", () => {
-    const rejecting = typing("row b has no type");
-    const { coordinator, model, complete, requestId } = setup(rejecting);
-    complete(requestId, succeeded(rows));
+    const rejecting = createTyping("row b has no type");
+    const { coordinator, model, complete, requestId } = setUp(rejecting);
+    complete(requestId, buildSucceeded(rows));
     expect(model.get()).toBe(EMPTY_ROW_MODEL);
     expect(coordinator.state.result.problem).toEqual({
       status: "failed",
@@ -84,16 +84,16 @@ describe("createRequestCompleter", () => {
   });
 
   it("remembers the outgoing model's types before replacing it", () => {
-    const accepting = typing(null);
-    const { model, complete, requestId } = setup(accepting);
-    complete(requestId, succeeded(rows));
+    const accepting = createTyping(null);
+    const { model, complete, requestId } = setUp(accepting);
+    complete(requestId, buildSucceeded(rows));
     expect(accepting.remember).toHaveBeenCalledWith(EMPTY_ROW_MODEL);
     expect(model.get().ids).toEqual(["a", "b"]);
   });
 
   it("keeps a model handed back whole, without reading its records again", () => {
-    const accepting = typing(null);
-    const { coordinator, model, complete } = setup(accepting);
+    const accepting = createTyping(null);
+    const { coordinator, model, complete } = setUp(accepting);
     const built = createRowModel({ rows, identify: readId });
     if (built.status !== "built") {
       throw new Error("the fixture rows build a model");
@@ -101,14 +101,14 @@ describe("createRequestCompleter", () => {
     const shown = built.model;
     model.set(shown);
     const requestId = coordinator.refresh();
-    complete(requestId, succeeded(rows));
+    complete(requestId, buildSucceeded(rows));
     expect(model.get()).toBe(shown);
     expect(accepting.remember).not.toHaveBeenCalled();
   });
 
   it("keeps the rows shown when the request fails", () => {
-    const { coordinator, model, complete, requestId } = setup();
-    complete(requestId, succeeded(rows));
+    const { coordinator, model, complete, requestId } = setUp();
+    complete(requestId, buildSucceeded(rows));
     const shown = model.get();
     const retry = coordinator.refresh();
     complete(retry, {

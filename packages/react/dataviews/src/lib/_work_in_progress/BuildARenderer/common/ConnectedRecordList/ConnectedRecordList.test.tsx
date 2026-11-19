@@ -24,7 +24,7 @@ describe("ConnectedRecordList", () => {
           columns={[{ id: "name", header: "Name" }]}
           label="Machine table"
           selectable
-          rowLabel={(row) => String(row["name"])}
+          getRowLabel={(row) => String(row["name"])}
         />
       </DataViews>,
     );

@@ -4,6 +4,7 @@
  * invalid input that keeps the restriction already in force. Each case is
  * mutation-tested against that contract.
  */
+
 import {
   createArraySource,
   createCollection,
@@ -21,6 +22,10 @@ import {
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import {
+  createManualSource,
+  createRecordingLocation,
+} from "@canonical/dataviews-core/testing";
+import {
   act,
   fireEvent,
   isInaccessible,
@@ -31,17 +36,19 @@ import {
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
-import createManualSource from "../../../../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
+import answerFacetValues from "../../../../../../testing/answerFacetValues.js";
 import elementAt from "../../../../../../testing/elementAt.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
 import toggleDisclosure from "../../../../../../testing/toggleDisclosure.js";
+import type {
+  FacetedRecord,
+  PlacedRecord,
+  RegionRecord,
+  IdentifiedRecord as Row,
+} from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import Filters from "./Filters.js";
-
-/** One record of the collection; the controls never read a row. */
-type Row = { readonly id: string };
 
 /** A collection with a field of every kind, so every control is exercised. */
 const collection = createCollection({
@@ -255,10 +262,10 @@ describe("DataViews.Filters", () => {
     // range — the check a declaration cannot express.
     const source = createManualSource<Row>({
       capabilities: everything,
-      refusals: (query) =>
+      listRefusals: (query) =>
         query.slice.filter.some(
           (predicate) =>
-            predicate.field === "cpu" && Number(predicate.operands[0]) > 32,
+            predicate.field === "cpu" && Number(predicate.operands.at(0)) > 32,
         )
           ? [
               {
@@ -628,7 +635,7 @@ describe("DataViews.Filters", () => {
         collection,
         source: createManualSource<Row>({
           capabilities: withText,
-          refusals: ({ slice }) =>
+          listRefusals: ({ slice }) =>
             slice.filter.some(({ operator }) => operator === "contains")
               ? [
                   {
@@ -755,7 +762,7 @@ describe("DataViews.Filters", () => {
         collection,
         source: createManualSource<Row>({
           capabilities: withText,
-          refusals: ({ slice }) =>
+          listRefusals: ({ slice }) =>
             slice.filter.some(({ operator }) => operator === "contains")
               ? [
                   {
@@ -795,15 +802,8 @@ describe("DataViews.Filters", () => {
   });
 
   describe("facets and set operators", () => {
-    /** A machine carrying the fields its facets are computed from. */
-    type Machine = Row & {
-      readonly status: string;
-      readonly cpu: number;
-      readonly name: string;
-    };
-
     /** Three machines, answered by a source computing every facet. */
-    const records: readonly Machine[] = [
+    const records: readonly FacetedRecord[] = [
       { id: "a", status: "failed", cpu: 4, name: "web-01" },
       { id: "b", status: "failed", cpu: 16, name: "web-02" },
       { id: "c", status: "ready", cpu: 8, name: "api" },
@@ -867,32 +867,17 @@ describe("DataViews.Filters", () => {
         facets: ["status"],
       });
       mount(provider);
-      /** Answer the latest request with a count of failed machines. */
-      const answerWith = (count: number): void => {
-        act(() => {
-          manual.latest().deliver({
-            status: "succeeded",
-            page: createPage({
-              rows: [],
-              facets: {
-                status: {
-                  kind: "values",
-                  values: [
-                    { value: "failed", count: { kind: "exact", value: count } },
-                  ],
-                },
-              },
-            }),
-          });
-        });
-      };
-      answerWith(2);
+      answerFacetValues(manual, "status", [
+        { value: "failed", count: { kind: "exact", value: 2 } },
+      ]);
       const failed = screen.getByRole("checkbox", { name: "failed" });
       expect(failed).toHaveAccessibleDescription("2");
       // Another query is pending: the counts it answers are not yet known.
       fireEvent.click(screen.getByRole("checkbox", { name: "ready" }));
       expect(failed).not.toHaveAttribute("aria-describedby");
-      answerWith(1);
+      answerFacetValues(manual, "status", [
+        { value: "failed", count: { kind: "exact", value: 1 } },
+      ]);
       expect(failed).toHaveAccessibleDescription("1");
     });
 
@@ -956,14 +941,13 @@ describe("DataViews.Filters", () => {
     });
 
     it("lists a choice's options from the facet where they are the server's, keeping one the set holds", () => {
-      type Placed = { readonly id: string; readonly region?: string };
       const places = createCollection({
-        identify: (row: Placed) => row.id,
+        identify: (row: PlacedRecord) => row.id,
         fields: [{ field: "region", kind: "choices" }],
       });
       const provider = createDataViewsProvider({
         collection: places,
-        source: createArraySource<Placed>({
+        source: createArraySource<PlacedRecord>({
           rows: [
             { id: "a", region: "eu" },
             { id: "b", region: "us" },
@@ -1006,15 +990,14 @@ describe("DataViews.Filters", () => {
     });
 
     it("lists each field's server-owned options from its own facet", () => {
-      type Zoned = { readonly id: string };
       const zoned = createCollection({
-        identify: (row: Zoned) => row.id,
+        identify: (row: Row) => row.id,
         fields: [
           { field: "region", kind: "choices" },
           { field: "zone", kind: "choices" },
         ],
       });
-      const answering = createManualSource<Zoned>({
+      const answering = createManualSource<Row>({
         capabilities: declareCapabilities(zoned, {
           filter: { region: true, zone: true },
           facets: ["region", "zone"],
@@ -1050,12 +1033,11 @@ describe("DataViews.Filters", () => {
     });
 
     it("keeps the server's options listed, without counts, once a request fails", () => {
-      type Placed = { readonly id: string };
       const places = createCollection({
-        identify: (row: Placed) => row.id,
+        identify: (row: Row) => row.id,
         fields: [{ field: "region", kind: "choices" }],
       });
-      const manual = createManualSource<Placed>({
+      const manual = createManualSource<Row>({
         capabilities: declareCapabilities(places, {
           filter: { region: true },
           facets: ["region"],
@@ -1073,7 +1055,7 @@ describe("DataViews.Filters", () => {
         </DataViews>,
       );
       act(() => {
-        manual.latest().deliver({
+        manual.readLatest().deliver({
           status: "succeeded",
           page: createPage({
             rows: [],
@@ -1091,7 +1073,7 @@ describe("DataViews.Filters", () => {
       });
       fireEvent.click(screen.getByRole("checkbox", { name: "eu" }));
       act(() => {
-        manual.latest().deliver({
+        manual.readLatest().deliver({
           status: "failed",
           failure: { reason: "offline", cause: null, transient: null },
         });
@@ -1103,12 +1085,11 @@ describe("DataViews.Filters", () => {
     });
 
     it("lists each of the server's options once, and no value that is no option", () => {
-      type Placed = { readonly id: string };
       const places = createCollection({
-        identify: (row: Placed) => row.id,
+        identify: (row: Row) => row.id,
         fields: [{ field: "region", kind: "choices" }],
       });
-      const listing: Source<Placed> = {
+      const listing: Source<Row> = {
         capabilities: declareCapabilities(places, {
           filter: { region: true },
           facets: ["region"],
@@ -1151,16 +1132,15 @@ describe("DataViews.Filters", () => {
     });
 
     it("offers no control for a choice whose options are the server's while nothing lists them", () => {
-      type Placed = { readonly id: string };
       const places = createCollection({
-        identify: (row: Placed) => row.id,
+        identify: (row: Row) => row.id,
         fields: [{ field: "region", kind: "choices" }],
       });
       render(
         <DataViews
           provider={createDataViewsProvider({
             collection: places,
-            source: createManualSource<Placed>({
+            source: createManualSource<Row>({
               capabilities: declareCapabilities(places, {
                 filter: { region: true },
                 facets: ["region"],
@@ -1273,9 +1253,8 @@ describe("DataViews.Filters", () => {
     });
 
     it("lists hundreds of the server's options once each, in first-seen order", () => {
-      type Placed = { readonly id: string };
       const places = createCollection({
-        identify: (row: Placed) => row.id,
+        identify: (row: Row) => row.id,
         fields: [{ field: "region", kind: "choices" }],
       });
       // Two hundred options, each listed twice: as the facet spelled it,
@@ -1284,7 +1263,7 @@ describe("DataViews.Filters", () => {
         value: at % 2 === 0 ? `r${at}` : at,
         count: { kind: "exact" as const, value: 1 },
       }));
-      const listing: Source<Placed> = {
+      const listing: Source<Row> = {
         capabilities: declareCapabilities(places, {
           filter: { region: true },
           facets: ["region"],
@@ -1600,9 +1579,8 @@ describe("DataViews.Filters", () => {
     });
 
     it("discloses the server's options under More filters once a facet lists them", () => {
-      type Placed = { readonly id: string; readonly region: string };
       const places = createCollection({
-        identify: (row: Placed) => row.id,
+        identify: (row: RegionRecord) => row.id,
         fields: [
           { field: "status", kind: "choices", options: ["failed", "ready"] },
           { field: "region", kind: "choices" },
@@ -1612,7 +1590,7 @@ describe("DataViews.Filters", () => {
         <DataViews
           provider={createDataViewsProvider({
             collection: places,
-            source: createArraySource<Placed>({
+            source: createArraySource<RegionRecord>({
               rows: [
                 { id: "a", region: "eu" },
                 { id: "b", region: "us" },

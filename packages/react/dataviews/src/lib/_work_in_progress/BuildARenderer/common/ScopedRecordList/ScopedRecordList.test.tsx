@@ -1,8 +1,8 @@
 import type { Query, SourceRefusal } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { MachineProvider } from "../../../../../../testing/types.js";
 import ScopedRecordList from "./ScopedRecordList.js";
@@ -38,13 +38,14 @@ const renderList = (
   return { provider, view, stop };
 };
 
-const region = () => within(screen.getByRole("region", { name: "Machines" }));
+const getRegion = () =>
+  within(screen.getByRole("region", { name: "Machines" }));
 
 describe("ScopedRecordList", () => {
   it("lists the scope's rows, and says nothing while they speak for themselves", () => {
     renderList();
     expect(
-      region()
+      getRegion()
         .getAllByRole("listitem")
         .map((item) => item.textContent),
     ).toEqual(["alpha", "beta"]);
@@ -60,7 +61,7 @@ describe("ScopedRecordList", () => {
       "aria-busy",
       "true",
     );
-    expect(region().queryAllByRole("listitem")).toHaveLength(0);
+    expect(getRegion().queryAllByRole("listitem")).toHaveLength(0);
     expect(screen.getByRole("region", { name: "Machines" })).toHaveTextContent(
       "Chargement…",
     );
@@ -68,7 +69,9 @@ describe("ScopedRecordList", () => {
 
   it("draws a checkbox per record when selectable", () => {
     const { provider } = renderList({ selectable: true });
-    fireEvent.click(region().getByRole("checkbox", { name: "Select alpha" }));
+    fireEvent.click(
+      getRegion().getByRole("checkbox", { name: "Select alpha" }),
+    );
     expect([...provider.selection.state.get().ids]).toEqual(["m-1"]);
   });
 
@@ -99,7 +102,7 @@ describe("ScopedRecordList", () => {
     let refusing = true;
     const { provider } = createMachineProvider({
       rows,
-      refusals: (query: Query) =>
+      listRefusals: (query: Query) =>
         refusing && query.slice.sort.length > 0 ? [rebuilding] : [],
     });
     renderList({ sortBy: { field: "name", label: "Sort by name" } }, provider);
@@ -118,13 +121,15 @@ describe("ScopedRecordList", () => {
     const { provider, source } = createMachineProvider();
     renderList({}, provider);
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+      source
+        .readLatest()
+        .deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: { reason: "offline", cause: null, transient: null },
       });
@@ -132,6 +137,6 @@ describe("ScopedRecordList", () => {
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows could not be refreshed: offline",
     );
-    expect(region().getAllByRole("listitem")).toHaveLength(2);
+    expect(getRegion().getAllByRole("listitem")).toHaveLength(2);
   });
 });

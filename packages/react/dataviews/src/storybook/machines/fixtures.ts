@@ -10,8 +10,8 @@
 import { createCollection } from "@canonical/dataviews-core";
 import type { Machine } from "./types.js";
 
-/** Twelve machines, every status represented; one story pages them by five. */
-export const machines = [
+/** Twelve story machines, every status represented; one story pages them by five. */
+export const storyMachines = [
   {
     id: "m-01",
     name: "alder.example.com",

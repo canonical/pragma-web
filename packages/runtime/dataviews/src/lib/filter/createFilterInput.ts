@@ -154,7 +154,7 @@ export default function createFilterInput(
       publish();
     },
     set(operands: readonly PredicateOperand[]): readonly SourceRefusal[] {
-      const built = schema.predicateFor(field, operator, operands);
+      const built = schema.buildPredicate(field, operator, operands);
       if (built.status !== "valid") {
         feedback = {
           status: "invalid",

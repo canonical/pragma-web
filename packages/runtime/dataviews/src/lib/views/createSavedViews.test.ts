@@ -5,7 +5,7 @@ import buildStoredView from "../../../testing/buildStoredView.js";
 import createDeferred from "../../../testing/createDeferred.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import { createStandInViewStore } from "../../../testing/createStandInStores.js";
+import createStandInViewStore from "../../../testing/createStandInViewStore.js";
 import declare from "../../../testing/declare.js";
 import flushPresentation from "../../../testing/flushPresentation.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
@@ -239,13 +239,13 @@ describe("createSavedViews", () => {
       views: [view],
       unreadable: [],
     }));
-    let changed = (): void => {};
+    let notifyChange = (): void => {};
     const views = readViews(
       createProviderOver(
         createStandInViewStore({
           list,
           subscribe: (listener) => {
-            changed = listener;
+            notifyChange = listener;
             return () => {};
           },
         }),
@@ -253,21 +253,21 @@ describe("createSavedViews", () => {
     );
     await waitForListing(views);
     const before = views.state.get().views;
-    changed();
+    notifyChange();
     await settleCalls(list);
     expect(views.state.get().views).toBe(before);
   });
 
   it("hears the store while any observer remains, and stops with the last", async () => {
     const unsubscribe = vi.fn();
-    let heard = (): void => {};
+    let notifyHeard = (): void => {};
     const list = vi.fn(async () => ({ views: [], unreadable: [] }));
     const views = readViews(
       createProviderOver(
         createStandInViewStore({
           list,
           subscribe: (listener) => {
-            heard = listener;
+            notifyHeard = listener;
             return unsubscribe;
           },
         }),
@@ -276,7 +276,7 @@ describe("createSavedViews", () => {
     const first = views.observe();
     const second = views.observe();
     expect(list).toHaveBeenCalledTimes(1);
-    heard();
+    notifyHeard();
     expect(list).toHaveBeenCalledTimes(2);
     first();
     first();
@@ -455,7 +455,7 @@ describe("createSavedViews", () => {
       });
       provider.navigateWindow({ page: 4 });
       views.revert();
-      expect(provider.state.get().slice.filter[0]?.operands).toEqual([
+      expect(provider.state.get().slice.filter.at(0)?.operands).toEqual([
         "failed",
       ]);
       expect(provider.state.get().window.page).toBe(1);
@@ -1097,7 +1097,9 @@ describe("createSavedViews", () => {
       });
       const retried = await views.saveAs("Failed");
       expect(retried.status).toBe("saved");
-      expect(create.mock.calls[1]?.[0].id).toBe(create.mock.calls[0]?.[0].id);
+      const [first, second] = create.mock.calls.map(([draft]) => draft.id);
+      expect(first).toBeDefined();
+      expect(second).toBe(first);
       expect((await real.list()).views).toHaveLength(1);
     });
 
@@ -1116,8 +1118,8 @@ describe("createSavedViews", () => {
       provider.presentation.arrange({ width: 120 });
       await views.saveAs("Failures");
       const ids = create.mock.calls.map(([draft]) => draft.id);
-      expect(ids[0]).toMatch(/^[0-9a-f]{32}$/);
-      expect(ids[2]).toBe(ids[1]);
+      expect(ids.at(0)).toMatch(/^[0-9a-f]{32}$/);
+      expect(ids.at(2)).toBe(ids.at(1));
       expect(new Set(ids).size).toBe(4);
     });
 
@@ -1340,17 +1342,17 @@ describe("createSavedViews", () => {
         .mockReturnValueOnce(stale.promise)
         .mockResolvedValue({ views: [created], unreadable: [] });
       // A store tells this tab of its own writes, as the contract has it.
-      let changed = (): void => {};
+      let notifyChange = (): void => {};
       const views = readViews(
         createProviderOver(
           createStandInViewStore({
             list,
             subscribe: (listener) => {
-              changed = listener;
+              notifyChange = listener;
               return () => {};
             },
             create: async () => {
-              changed();
+              notifyChange();
               return { status: "saved", view: created };
             },
           }),

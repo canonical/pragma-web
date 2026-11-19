@@ -14,6 +14,9 @@ import type {
  * Preview coalescing to animation frames is the renderer's concern — the
  * machine clamps and publishes per preview call.
  *
+ * @note Impure: holds the sizing a resize started from, writes the
+ * column layout, and subscribes to it while observed.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
@@ -31,7 +34,7 @@ export default function createGridInteraction(
   };
 
   const clamp = (columnId: string, width: number): number => {
-    const sizing = layout.effective(columnId);
+    const sizing = layout.readEffective(columnId);
     let next = Math.max(0, width);
     if (sizing.kind === "flex") {
       next = Math.max(sizing.minPx, next);
@@ -45,10 +48,10 @@ export default function createGridInteraction(
   // A conflicting same-column update invalidates the live preview; an
   // unrelated column's update does not. Our own commit ends the interaction
   // before writing, so any change observed while resizing is external.
-  const onLayoutChange = (): void => {
+  const handleLayoutChange = (): void => {
     const state = channel.get();
     if (state.status === "resizing" && resizingBaseline !== null) {
-      const current = layout.effective(state.columnId);
+      const current = layout.readEffective(state.columnId);
       if (!areSizingsEqual(current, resizingBaseline)) {
         resizingBaseline = null;
         publish({ status: "idle" });
@@ -59,7 +62,7 @@ export default function createGridInteraction(
   return {
     state: protectChannel(channel),
     startResize(columnId: string, originX: number, startWidth: number): void {
-      resizingBaseline = layout.effective(columnId);
+      resizingBaseline = layout.readEffective(columnId);
       publish({
         status: "resizing",
         columnId,
@@ -105,7 +108,7 @@ export default function createGridInteraction(
       publish({ status: "idle" });
     },
     observe(): () => void {
-      return layout.state.subscribe(onLayoutChange);
+      return layout.state.subscribe(handleLayoutChange);
     },
   };
 }

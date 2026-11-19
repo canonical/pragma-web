@@ -5,27 +5,106 @@
  * link to the same place before they do.
  */
 import {
+  type Count,
   createCollection,
   createDataViewsProvider,
   createMemoryLocation,
   declareCapabilities,
   type PredicateOperand,
+  type QueryLocation,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { createManualSource } from "@canonical/dataviews-core/testing";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
+import createMachineProvider from "../../../../../../../../testing/createMachineProvider.js";
+import {
+  MACHINE_DECLARATION,
+  machines,
+} from "../../../../../../../../testing/machines.js";
+import type { IdentifiedRecord } from "../../../../../../../../testing/types.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
 import { findFilterHandle } from "../../../utils/index.js";
 import ChoicesFilter from "./ChoicesFilter.js";
 import type { ChoicesFilterProps } from "./types.js";
 
-type Row = { readonly id: string };
+/** A source declaring status under both set operators. */
+const BOTH_DECLARED = declareCapabilities(machines, {
+  ...MACHINE_DECLARATION,
+  filter: { ...MACHINE_DECLARATION.filter, status: ["isAny", "isNone"] },
+});
 
-const collection = createCollection({
-  identify: (row: Row) => row.id,
+/** The filter at the root's own status handles. */
+const StatusFilter = ({
+  operator = "isAny" as "isAny" | "isNone",
+  options = ["failed", "running"] as readonly (string | number)[],
+  serverOwned = false,
+  counts = null as ReadonlyMap<string, Count> | null,
+  alternativeDeclared = false,
+  declared = true,
+  leavesWhenCleared = false,
+  onLeave = () => {},
+}) => {
+  const { provider, filters } = useDataViewsRoot("ChoicesFilter test");
+  const alternative = operator === "isAny" ? "isNone" : "isAny";
+  return (
+    <ChoicesFilter
+      options={options}
+      serverOwned={serverOwned}
+      counts={counts}
+      handle={findFilterHandle(filters, "status", operator)}
+      operator={operator}
+      alternativeDeclared={alternativeDeclared}
+      alternativeHandle={findFilterHandle(filters, "status", alternative)}
+      host={readProviderHost(provider)}
+      label="Status"
+      field="status"
+      declared={declared}
+      leavesWhenCleared={leavesWhenCleared}
+      onLeave={onLeave}
+    />
+  );
+};
+
+/** A provider over the machines, declaring both set operators on status. */
+const buildProvider = (location?: QueryLocation) =>
+  createMachineProvider({
+    rows: [],
+    capabilities: BOTH_DECLARED,
+    ...(location === undefined ? {} : { location }),
+  }).provider;
+
+/** The filter mounted in a root over the provider. */
+const mountFilter = (
+  provider: ReturnType<typeof buildProvider>,
+  props: Parameters<typeof StatusFilter>[0] = {},
+) =>
+  render(
+    <DataViews provider={provider}>
+      <StatusFilter {...props} />
+    </DataViews>,
+  );
+
+/** Stand a status predicate under the operator. */
+const standStatus = (
+  provider: ReturnType<typeof buildProvider>,
+  operator: "isAny" | "isNone",
+  operands: readonly string[],
+): void => {
+  act(() => {
+    readProviderHost(provider).setPredicate({
+      field: "status",
+      operator,
+      operands: [...operands],
+    });
+  });
+};
+
+/** A collection whose closed set, tags, holds conjuncts that sort apart. */
+const tags = createCollection({
+  identify: (row: IdentifiedRecord) => row.id,
   fields: [
     {
       field: "tags",
@@ -36,21 +115,20 @@ const collection = createCollection({
   ],
 });
 
-const makeProvider = (href: string) =>
+/** A provider over the tags collection at a link. */
+const buildTagsProvider = (href: string) =>
   createDataViewsProvider({
-    collection,
-    source: createManualSource<Row>({
-      capabilities: declareCapabilities(collection, {
+    collection: tags,
+    source: createManualSource<IdentifiedRecord>({
+      capabilities: declareCapabilities(tags, {
         filter: { tags: true, cpu: true },
       }),
     }).source,
     location: createMemoryLocation({ href }),
   });
 
-type Provider = ReturnType<typeof makeProvider>;
-
 /** The any-of filter on `tags`, beside its none-of alternative. */
-const Harness = ({
+const TagsFilter = ({
   onLeave,
   options = ["ex-gpu", "ex-nvme"],
   ...native
@@ -85,14 +163,15 @@ const Harness = ({
   );
 };
 
-const mount = (
-  provider: Provider,
+/** The tags filter mounted in a root over the provider. */
+const mountTagsFilter = (
+  provider: ReturnType<typeof buildTagsProvider>,
   onLeave = () => {},
   options?: ChoicesFilterProps["options"],
 ) =>
   render(
     <DataViews provider={provider}>
-      <Harness
+      <TagsFilter
         onLeave={onLeave}
         {...(options === undefined ? {} : { options })}
       />
@@ -100,29 +179,208 @@ const mount = (
   );
 
 describe("ChoicesFilter", () => {
-  it("names each checkbox as the wire spells the set, and edits the set", () => {
-    const provider = makeProvider("/machines");
-    mount(provider);
-    const gpu = screen.getByRole("checkbox", { name: "ex-gpu" });
-    expect(gpu).toHaveAttribute("name", "tags");
-    expect(gpu).toHaveAttribute("value", "ex-gpu");
-    fireEvent.click(gpu);
+  it("draws a checkbox per option under a legend naming the set", () => {
+    mountFilter(buildProvider());
+    const group = screen.getByRole("group", { name: "Status is any of" });
+    expect(group).toHaveClass("ds", "data-views-filters-choices");
+    const failed = screen.getByRole("checkbox", { name: "failed" });
+    expect(failed).toHaveAttribute("name", "status");
+    expect(failed).toHaveAttribute("value", "failed");
+    expect(failed).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "running" })).toBeEnabled();
+  });
+
+  it("names a none-of set's checkboxes as the wire spells it", () => {
+    mountFilter(buildProvider(), { operator: "isNone" });
+    expect(
+      screen.getByRole("group", { name: "Status is none of" }),
+    ).toBeVisible();
+    expect(screen.getByRole("checkbox", { name: "failed" })).toHaveAttribute(
+      "name",
+      "status__isNone",
+    );
+  });
+
+  it("adds to the set as an option is checked, and clears it with the last", () => {
+    const provider = buildProvider();
+    const onLeave = vi.fn();
+    mountFilter(provider, { onLeave });
+    fireEvent.click(screen.getByRole("checkbox", { name: "failed" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "running" }));
     expect(provider.state.get().slice.filter).toEqual([
-      { field: "tags", operator: "isAny", operands: ["ex-gpu"] },
+      { field: "status", operator: "isAny", operands: ["failed", "running"] },
     ]);
-    fireEvent.click(gpu);
+    fireEvent.click(screen.getByRole("checkbox", { name: "failed" }));
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "status", operator: "isAny", operands: ["running"] },
+    ]);
+    fireEvent.click(screen.getByRole("checkbox", { name: "running" }));
     expect(provider.state.get().slice.filter).toEqual([]);
+    expect(onLeave).not.toHaveBeenCalled();
+  });
+
+  it("leaves with the last option cleared when it leaves once cleared", () => {
+    const provider = buildProvider();
+    const onLeave = vi.fn();
+    mountFilter(provider, { leavesWhenCleared: true, onLeave });
+    fireEvent.click(screen.getByRole("checkbox", { name: "failed" }));
+    expect(onLeave).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("checkbox", { name: "failed" }));
+    expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("draws nothing for a none-of set not offered while nothing stands", () => {
+    mountFilter(buildProvider(), {
+      operator: "isNone",
+      alternativeDeclared: true,
+    });
+    expect(screen.queryByRole("group")).toBeNull();
+  });
+
+  it("offers an undeclared set only while it stands, for removal alone", () => {
+    const provider = buildProvider();
+    const onLeave = vi.fn();
+    mountFilter(provider, { declared: false, onLeave });
+    expect(screen.queryByRole("group")).toBeNull();
+    standStatus(provider, "isAny", ["failed"]);
+    expect(screen.getByRole("checkbox", { name: "failed" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "running" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("checkbox", { name: "failed" }));
+    expect(provider.state.get().slice.filter).toEqual([]);
+    expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves with a none-of set offered only while it stood", () => {
+    const provider = buildProvider();
+    const onLeave = vi.fn();
+    mountFilter(provider, {
+      operator: "isNone",
+      alternativeDeclared: true,
+      onLeave,
+    });
+    standStatus(provider, "isNone", ["failed"]);
+    fireEvent.click(screen.getByRole("checkbox", { name: "failed" }));
+    expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("draws nothing without options", () => {
+    mountFilter(buildProvider(), { options: [] });
+    expect(screen.queryByRole("group")).toBeNull();
+  });
+
+  it("lists a server's options with those the set holds, the held ones leaving with it", () => {
+    const provider = buildProvider();
+    const onLeave = vi.fn();
+    mountFilter(provider, { serverOwned: true, options: ["running"], onLeave });
+    standStatus(provider, "isAny", ["failed", "running"]);
+    expect(
+      screen.getAllByRole("checkbox").map((box) => box.getAttribute("value")),
+    ).toEqual(["running", "failed"]);
+    fireEvent.click(screen.getByRole("checkbox", { name: "running" }));
+    expect(onLeave).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("checkbox", { name: "failed" }));
+    expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("describes each option by its count, a missing one counting none", () => {
+    mountFilter(buildProvider(), {
+      counts: new Map([["failed", { kind: "exact", value: 1200 }]]),
+    });
+    expect(
+      screen.getByRole("checkbox", { name: "failed" }),
+    ).toHaveAccessibleDescription("1,200");
+    expect(
+      screen.getByRole("checkbox", { name: "running" }),
+    ).toHaveAccessibleDescription("0");
+  });
+
+  it("says no count while none answers", () => {
+    mountFilter(buildProvider());
+    expect(
+      screen.getByRole("checkbox", { name: "failed" }),
+    ).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("moves a standing set to the other operator, and leaves with it", () => {
+    const provider = buildProvider();
+    const onLeave = vi.fn();
+    mountFilter(provider, { alternativeDeclared: true, onLeave });
+    expect(screen.queryByRole("button")).toBeNull();
+    standStatus(provider, "isAny", ["failed"]);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Match none of these instead" }),
+    );
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "status", operator: "isNone", operands: ["failed"] },
+    ]);
+    expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers a none-of set the move to any-of", () => {
+    const provider = buildProvider();
+    mountFilter(provider, { operator: "isNone", alternativeDeclared: true });
+    standStatus(provider, "isNone", ["failed"]);
+    expect(
+      screen.getByRole("button", { name: "Match any of these instead" }),
+    ).toBeVisible();
+  });
+
+  it("offers no move without the other operator declared", () => {
+    const provider = buildProvider();
+    mountFilter(provider);
+    standStatus(provider, "isAny", ["failed"]);
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("offers no move onto a set that stands", () => {
+    const provider = buildProvider();
+    mountFilter(provider, { alternativeDeclared: true });
+    standStatus(provider, "isAny", ["failed"]);
+    standStatus(provider, "isNone", ["running"]);
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("draws the move as a link before scripts take over", () => {
+    const provider = buildProvider(
+      createMemoryLocation({ href: "/machines?status=failed" }),
+    );
+    const html = renderToString(
+      <DataViews provider={provider}>
+        <StatusFilter alternativeDeclared />
+      </DataViews>,
+    );
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    const link = container.querySelector("a.switch");
+    expect(link?.textContent).toBe("Match none of these instead");
+    expect(
+      new URLSearchParams(link?.getAttribute("href") ?? "").get(
+        "status__isNone",
+      ),
+    ).toBe("failed");
+  });
+
+  it("draws no link without a location to lead to", () => {
+    const provider = buildProvider();
+    standStatus(provider, "isAny", ["failed"]);
+    const html = renderToString(
+      <DataViews provider={provider}>
+        <StatusFilter alternativeDeclared />
+      </DataViews>,
+    );
+    expect(html).toContain("failed");
+    expect(html).not.toContain("<a");
   });
 
   it("moves a standing set to none-of in one edit, and leaves with it", () => {
-    const provider = makeProvider("/machines?tags=ex-gpu&cpu__gte=4");
+    const provider = buildTagsProvider("/machines?tags=ex-gpu&cpu__gte=4");
     const host = readProviderHost(provider);
     const heard: string[] = [];
     host.transitions.subscribe(() => {
       heard.push(String(host.transitions.get()?.cause));
     });
     const onLeave = vi.fn();
-    mount(provider, onLeave);
+    mountTagsFilter(provider, onLeave);
     fireEvent.click(
       screen.getByRole("button", { name: "Match none of these instead" }),
     );
@@ -135,10 +393,10 @@ describe("ChoicesFilter", () => {
   });
 
   it("moves the set it shows, whichever conjunct at its address that is", () => {
-    const provider = makeProvider(
+    const provider = buildTagsProvider(
       "/machines?tags=ex-gpu&tags__isAny__1=ex-nvme",
     );
-    mount(provider, () => {}, ["ex-gpu", "ex-nvme", "ex-ssd"]);
+    mountTagsFilter(provider, () => {}, ["ex-gpu", "ex-nvme", "ex-ssd"]);
     // The control's set becomes ex-ssd, which sorts after ex-nvme's.
     fireEvent.click(screen.getByRole("checkbox", { name: "ex-ssd" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "ex-gpu" }));
@@ -153,8 +411,10 @@ describe("ChoicesFilter", () => {
 
   it("links to where the move leads before any script runs", () => {
     const html = renderToString(
-      <DataViews provider={makeProvider("/machines?tags=ex-gpu&cpu__gte=4")}>
-        <Harness onLeave={() => {}} />
+      <DataViews
+        provider={buildTagsProvider("/machines?tags=ex-gpu&cpu__gte=4")}
+      >
+        <TagsFilter onLeave={() => {}} />
       </DataViews>,
     );
     const href = /<a class="switch" href="([^"]*)">/
@@ -163,10 +423,11 @@ describe("ChoicesFilter", () => {
       ?.replaceAll("&amp;", "&");
     expect(href).toBe("?cpu__gte=4&tags__isNone=ex-gpu&page=1&size=50");
   });
+
   it("passes native props to its group, keeping its own class first", () => {
     render(
-      <DataViews provider={makeProvider("/machines")}>
-        <Harness onLeave={() => {}} className="extra" id="tags-filter" />
+      <DataViews provider={buildTagsProvider("/machines")}>
+        <TagsFilter onLeave={() => {}} className="extra" id="tags-filter" />
       </DataViews>,
     );
     const group = screen.getByRole("group", { name: "Tags is any of" });

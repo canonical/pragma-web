@@ -17,8 +17,6 @@ const componentCssClassName = "ds data-views-filters-presence";
  * records set the field, from the facet, describing the checkbox while a
  * facet answers the applied query.
  *
- * `import { DataViews } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.subcomponent.data_views_filters-presence_filter
  */
 export default function PresenceFilter({

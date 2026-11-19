@@ -1,15 +1,20 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
 import { SERVER_BACKED_FACETS } from "../../../storybook/machines/constants.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
 import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataChart as ConnectedChart } from "../DataViews/common/DataChart/index.js";
 import { DataViews } from "../DataViews/index.js";
@@ -56,13 +61,14 @@ const connectedImports = `import { machineCollection, machines } from "./machine
 // A work-in-progress prototype: not yet exported from the package root.
 import { DataChart } from "./DataViews/DataChart.js";`;
 
-/** The chart over a provider bound to the story's own source. */
+/** The chart over a provider bound to the story's own source, in its words. */
 function MachineChart({
   type,
   field,
   label,
   options,
-}: {
+  ...words
+}: StoryWords & {
   readonly type: DataChartType;
   readonly field: string;
   readonly label: string;
@@ -73,7 +79,13 @@ function MachineChart({
     ...options,
   });
   return (
-    <Component provider={provider} type={type} field={field} label={label} />
+    <Component
+      {...words}
+      provider={provider}
+      type={type}
+      field={field}
+      label={label}
+    />
   );
 }
 
@@ -83,10 +95,15 @@ function MachineChart({
  * are in the table that follows the drawing.
  */
 export const StatusCounts: Story = {
-  render: ({ type, field, label }) => (
-    <MachineChart type={type} field={field} label={label} />
+  render: ({ type, field, label, messages }) => (
+    <MachineChart
+      type={type}
+      field={field}
+      label={label}
+      {...pickStoryWords({ messages })}
+    />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     // A prototype: nothing of it is exported from the package root to name.
     parts: [],
     imports: prototypeImports,
@@ -109,10 +126,15 @@ export const StatusCounts: Story = {
  */
 export const CoresRange: Story = {
   args: { type: "range", field: "cores", label: "Cores" },
-  render: ({ type, field, label }) => (
-    <MachineChart type={type} field={field} label={label} />
+  render: ({ type, field, label, messages }) => (
+    <MachineChart
+      type={type}
+      field={field}
+      label={label}
+      {...pickStoryWords({ messages })}
+    />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [],
     imports: prototypeImports,
     facets: ["cores"],
@@ -127,27 +149,23 @@ export const CoresRange: Story = {
   },
 };
 
-/** The counts beside the filters, a table and its pagination, over one root. */
+/** The counts beside the filters, a table and its pagination, inside the story's root. */
 function CountsBesideFiltersMachines({
   label,
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({
-    query: "page=1&size=5",
-    facets: ["status", "cores"],
-  });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Filters />
       <ConnectedChart type="bar" field="status" label={label} />
       <DataViews.DataTable
         columns={columns}
         label="Machines"
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -158,8 +176,11 @@ function CountsBesideFiltersMachines({
  * screen.
  */
 export const CountsBesideFilters: Story = {
+  decorators: [
+    withMachineRoot({ query: "page=1&size=5", facets: ["status", "cores"] }),
+  ],
   render: ({ label }) => <CountsBesideFiltersMachines label={label} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     imports: connectedImports,
     query: "page=1&size=5",
@@ -198,18 +219,17 @@ export const CountsBesideFilters: Story = {
   },
 };
 
-/** The range beside the filters, over one root. */
+/** The range beside the filters, inside the story's root. */
 function RangeBesideFiltersMachines({
   label,
 }: {
   readonly label: string;
 }): ReactElement {
-  const provider = useMachineProvider({ facets: ["status", "cores"] });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Filters />
       <ConnectedChart type="range" field="cores" label={label} />
-    </DataViews>
+    </>
   );
 }
 
@@ -220,8 +240,9 @@ function RangeBesideFiltersMachines({
  */
 export const RangeBesideFilters: Story = {
   args: { type: "range", field: "cores", label: "Cores" },
+  decorators: [withMachineRoot({ facets: ["status", "cores"] })],
   render: ({ label }) => <RangeBesideFiltersMachines label={label} />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews"],
     imports: connectedImports,
     facets: ["status", "cores"],
@@ -245,12 +266,13 @@ export const RangeBesideFilters: Story = {
 
 /** Loading: the source has not answered, so the chart says so and draws nothing. */
 export const Loading: Story = {
-  render: ({ type, field, label }) => (
+  render: ({ type, field, label, messages }) => (
     <MachineChart
       type={type}
       field={field}
       label={label}
       options={{ source: createPendingSource }}
+      {...pickStoryWords({ messages })}
     />
   ),
   play: async ({ canvas }) => {
@@ -258,29 +280,16 @@ export const Loading: Story = {
   },
 };
 
-/** The chart over the REST endpoint, which computes its facets. */
-function RestBackedMachines({
-  type,
-  field,
-  label,
-  query,
-}: {
-  readonly type: DataChartType;
-  readonly field: string;
-  readonly label: string;
-  readonly query?: string;
-}): ReactElement {
-  const provider = useMachineProvider({
+/**
+ * Render the story inside a root over the REST endpoint, which computes its
+ * facets, starting on `query` when one is given.
+ */
+const withRestBackedRoot = (query?: string): Decorator =>
+  withMachineRoot({
     source: () => createRestMachineSource("live"),
     ...(query === undefined ? {} : { query }),
     facets: SERVER_BACKED_FACETS,
   });
-  return (
-    <DataViews provider={provider}>
-      <ConnectedChart type={type} field={field} label={label} />
-    </DataViews>
-  );
-}
 
 /**
  * Counts over REST: the same chart over a REST endpoint reached through
@@ -288,13 +297,9 @@ function RestBackedMachines({
  * matches, and the chart draws what it answers.
  */
 export const CountsRestBacked: Story = {
+  decorators: [withRestBackedRoot("page=1&size=5")],
   render: ({ label }) => (
-    <RestBackedMachines
-      type="bar"
-      field="status"
-      label={label}
-      query="page=1&size=5"
-    />
+    <ConnectedChart type="bar" field="status" label={label} />
   ),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole(
@@ -316,8 +321,9 @@ export const CountsRestBacked: Story = {
  */
 export const RangeRestBacked: Story = {
   args: { type: "range", field: "cores", label: "Cores" },
+  decorators: [withRestBackedRoot()],
   render: ({ label }) => (
-    <RestBackedMachines type="range" field="cores" label={label} />
+    <ConnectedChart type="range" field="cores" label={label} />
   ),
   play: async ({ canvas }) => {
     await expect(

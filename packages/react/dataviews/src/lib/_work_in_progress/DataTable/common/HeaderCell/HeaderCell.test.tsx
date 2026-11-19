@@ -11,6 +11,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import type { HeaderCellCaseProps as CaseProps } from "../../../../../../testing/types.js";
 import HeaderCell from "./HeaderCell.js";
 import type { HeaderCellProps } from "./types.js";
 
@@ -27,9 +28,6 @@ const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
   // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, as the table's is
   <div role="row">{children}</div>
 );
-
-/** What a case sets; the rest is a plain, unsorted column. */
-type CaseProps = Partial<HeaderCellProps>;
 
 const mount = (props: CaseProps = {}) => {
   const layout = createColumnLayout({
@@ -70,14 +68,14 @@ const mount = (props: CaseProps = {}) => {
   return { ...view, ...callbacks };
 };
 
-const header = (): HTMLElement =>
+const getHeader = (): HTMLElement =>
   screen.getByRole("columnheader", { name: "Name" });
 
 describe("HeaderCell", () => {
   describe("its control", () => {
     it("is a plain label on a column that does not sort", () => {
       mount();
-      expect(header()).toBeInTheDocument();
+      expect(getHeader()).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Name" })).toBeNull();
       expect(screen.queryByRole("link")).toBeNull();
     });
@@ -96,7 +94,7 @@ describe("HeaderCell", () => {
     it("is a plain label before scripts where there is nowhere to lead", () => {
       mount({ sortable: true, hydrated: false });
       expect(screen.queryByRole("link")).toBeNull();
-      expect(header()).toBeInTheDocument();
+      expect(getHeader()).toBeInTheDocument();
     });
 
     it("sorts by the column alone on a click, and as a further term with Shift", () => {
@@ -140,11 +138,11 @@ describe("HeaderCell", () => {
         primary: true,
         precedence: { direction: "desc", position: 2, count: 3 },
       });
-      expect(header()).toHaveAttribute("aria-sort", "descending");
+      expect(getHeader()).toHaveAttribute("aria-sort", "descending");
       expect(
         screen.getByRole("button", { name: "Name" }),
       ).toHaveAccessibleDescription("descending, 2nd of 3");
-      expect(header()).toHaveTextContent("2");
+      expect(getHeader()).toHaveTextContent("2");
     });
 
     it("leaves the claim to the ordering's first column", () => {
@@ -152,7 +150,7 @@ describe("HeaderCell", () => {
         sortable: true,
         precedence: { direction: "asc", position: 1, count: 1 },
       });
-      expect(header()).not.toHaveAttribute("aria-sort");
+      expect(getHeader()).not.toHaveAttribute("aria-sort");
       expect(
         screen.getByRole("button", { name: "Name" }),
       ).toHaveAccessibleDescription("ascending");
@@ -160,7 +158,7 @@ describe("HeaderCell", () => {
 
     it("describes a header with no control of its own itself", () => {
       mount({ precedence: { direction: "asc", position: 1, count: 1 } });
-      expect(header()).toHaveAccessibleDescription("ascending");
+      expect(getHeader()).toHaveAccessibleDescription("ascending");
     });
   });
 
@@ -180,7 +178,7 @@ describe("HeaderCell", () => {
         sortable: true,
         reason: "This source cannot sort by name.",
       });
-      expect(header()).toHaveTextContent("This source cannot sort by name.");
+      expect(getHeader()).toHaveTextContent("This source cannot sort by name.");
       fireEvent.blur(screen.getByRole("button", { name: "Name" }), {
         relatedTarget: screen.getByRole("button", { name: /Column options/ }),
       });
@@ -234,7 +232,7 @@ describe("HeaderCell", () => {
 
   it("takes the native props of its root, merging the class name", () => {
     mount({ className: "pinned", title: "Machine name" });
-    expect(header()).toHaveClass("ds", "data-table-header-cell", "pinned");
-    expect(header()).toHaveAttribute("title", "Machine name");
+    expect(getHeader()).toHaveClass("ds", "data-table-header-cell", "pinned");
+    expect(getHeader()).toHaveAttribute("title", "Machine name");
   });
 });

@@ -32,7 +32,9 @@ export default function readKeyPredicate(
   definition: SchemaFieldDefinition,
 ): KeyReading {
   const { field } = definition;
-  const filled = [...values.keys()].filter((at) => values[at] !== "");
+  const filled = [...values.entries()]
+    .filter(([, value]) => value !== "")
+    .map(([at]) => at);
   if (filled.length === 0) {
     return { issues: [], conjunct: null };
   }
@@ -93,7 +95,7 @@ export default function readKeyPredicate(
     // — its presence is the predicate, never a truthiness test on its value
     // — and a kind that filters without a text input has none to parse: the
     // schema answers for the operator alone.
-    return settle(schema.predicateFor(field, operator, []), filled);
+    return settle(schema.buildPredicate(field, operator, []), filled);
   }
   const operands: PredicateOperand[] = [];
   const read: number[] = [];
@@ -128,7 +130,7 @@ export default function readKeyPredicate(
     });
   }
   return settle(
-    schema.predicateFor(
+    schema.buildPredicate(
       field,
       operator,
       isSet ? operands : operands.slice(0, 1),

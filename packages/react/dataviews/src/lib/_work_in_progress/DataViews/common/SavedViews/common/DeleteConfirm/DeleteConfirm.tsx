@@ -5,8 +5,11 @@ import type { DeleteConfirmProps } from "./types.js";
 const componentCssClassName = "ds data-views-saved-views-confirm";
 
 /**
- * The question deleting a view asks first, naming the view. The focus starts
- * on Cancel, so a stray Enter deletes nothing. Escape cancels.
+ * The dialog deleting a view opens first, asking the question that names
+ * the view. Cancel comes first, so the focus starts on it and a stray Enter
+ * deletes nothing. Cancel and Escape close the dialog.
+ *
+ * @implements ds:apps.subcomponent.data_views-saved_views-delete_confirm
  */
 export default function DeleteConfirm({
   question,
@@ -14,25 +17,27 @@ export default function DeleteConfirm({
   cancel,
   pending,
   onSubmit,
-  onCancel,
+  id,
+  className,
+  ...props
 }: DeleteConfirmProps): ReactElement {
-  const messageId = useId();
+  const baseId = useId();
+  const dialogId = id ?? baseId;
+  const messageId = `${baseId}-message`;
   return (
-    // biome-ignore lint/a11y/useSemanticElements: a fieldset groups form controls under a legend; this groups a question with its answers
-    <div
-      role="group"
+    <dialog
+      {...props}
+      id={dialogId}
       aria-labelledby={messageId}
-      className={componentCssClassName}
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          onCancel();
-        }
-      }}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <p id={messageId} className="message">
         {question}
       </p>
+      {/* The safe answer comes first, so the dialog's focus starts on it. */}
+      <Button type="button" commandfor={dialogId} command="close">
+        {cancel}
+      </Button>
       <Button
         type="button"
         anticipation="destructive"
@@ -41,10 +46,6 @@ export default function DeleteConfirm({
       >
         {submit}
       </Button>
-      {/* The safe answer takes focus, so Enter cancels and Escape is not the only way out. */}
-      <Button autoFocus type="button" onClick={onCancel}>
-        {cancel}
-      </Button>
-    </div>
+    </dialog>
   );
 }

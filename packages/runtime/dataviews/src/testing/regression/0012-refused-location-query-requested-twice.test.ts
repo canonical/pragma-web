@@ -27,7 +27,7 @@ describe("regression 0012 — a refused location query is refused once", () => {
       source: createManualSource({
         capabilities: declare({}),
         // The source reaches page one only, as a cursor-less endpoint might.
-        refusals: (query) =>
+        listRefusals: (query) =>
           query.window.page > 1
             ? [
                 {

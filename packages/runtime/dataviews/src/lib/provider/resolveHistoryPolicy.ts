@@ -16,17 +16,17 @@ import type {
 export default function resolveHistoryPolicy(
   policy: HistoryPolicy | undefined,
 ): TransitionHistory {
-  const modeOf = (transition: QueryTransition): HistoryMode =>
+  const readMode = (transition: QueryTransition): HistoryMode =>
     typeof policy === "string"
       ? policy
       : (policy?.[transition] ?? DEFAULT_HISTORY[transition]);
   return Object.freeze({
-    filter: modeOf("filter"),
-    search: modeOf("search"),
-    sort: modeOf("sort"),
-    group: modeOf("group"),
-    window: modeOf("window"),
-    view: modeOf("view"),
+    filter: readMode("filter"),
+    search: readMode("search"),
+    sort: readMode("sort"),
+    group: readMode("group"),
+    window: readMode("window"),
+    view: readMode("view"),
     ...FIXED_HISTORY,
   });
 }

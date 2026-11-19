@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createStandInPresentationStore } from "../../../testing/createStandInStores.js";
+import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
 import {
   createPresentation,
   type JsonValue,
@@ -34,12 +34,12 @@ describe("createColumnLayout", () => {
 
   it("declares sizing per column and rejects empty or duplicate ids", () => {
     const { layout } = createLayoutOver();
-    expect(layout.effective("name")).toEqual({
+    expect(layout.readEffective("name")).toEqual({
       kind: "flex",
       weight: 2,
       minPx: 120,
     });
-    expect(layout.effective("status")).toEqual({ kind: "fixed", px: 120 });
+    expect(layout.readEffective("status")).toEqual({ kind: "fixed", px: 120 });
     const presentation = createPresentation();
     expect(() =>
       createColumnLayout({
@@ -57,7 +57,7 @@ describe("createColumnLayout", () => {
       }),
     ).toThrow("duplicate");
     // The prototype chain is not a member.
-    expect(() => layout.effective("toString")).toThrow("unknown column id");
+    expect(() => layout.readEffective("toString")).toThrow("unknown column id");
     expect(() => layout.readDeclared("toString")).toThrow("unknown column id");
     expect(layout.readDeclared("status")).toEqual({ kind: "fixed", px: 120 });
   });
@@ -69,13 +69,13 @@ describe("createColumnLayout", () => {
       [spellWidthKey("zone")]: 900,
       [spellWidthKey("status")]: 40,
     });
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 340 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 340 });
     // A flexible column is held to its declared maximum, a fixed one goes
     // anywhere from zero.
-    expect(layout.effective("zone")).toEqual({ kind: "fixed", px: 300 });
-    expect(layout.effective("status")).toEqual({ kind: "fixed", px: 40 });
+    expect(layout.readEffective("zone")).toEqual({ kind: "fixed", px: 300 });
+    expect(layout.readEffective("status")).toEqual({ kind: "fixed", px: 40 });
     presentation.arrange({ [spellWidthKey("name")]: 10 });
-    expect(layout.effective("name")).toEqual({ kind: "fixed", px: 120 });
+    expect(layout.readEffective("name")).toEqual({ kind: "fixed", px: 120 });
   });
 
   it("keeps the declared sizing where the presentation holds no usable width", () => {
@@ -88,7 +88,7 @@ describe("createColumnLayout", () => {
     });
     expect(layout.state.get().overrides).toEqual({});
     for (const column of buildColumns()) {
-      expect(layout.effective(column.id)).toEqual(column.sizing);
+      expect(layout.readEffective(column.id)).toEqual(column.sizing);
     }
   });
 
@@ -99,7 +99,7 @@ describe("createColumnLayout", () => {
     expect(presentation.state.get().presentation).toEqual({
       [spellWidthKey("name")]: 340,
     });
-    expect(other.effective("name")).toEqual({ kind: "fixed", px: 340 });
+    expect(other.readEffective("name")).toEqual({ kind: "fixed", px: 340 });
     expect(other.state.get()).toBe(other.state.get());
   });
 
@@ -169,7 +169,7 @@ describe("createColumnLayout", () => {
       id: "sneaky",
       sizing: { kind: "fixed", px: 1 },
     });
-    expect(() => layout.effective("sneaky")).toThrow("unknown column id");
+    expect(() => layout.readEffective("sneaky")).toThrow("unknown column id");
     // A width stored for the column pushed later is nobody's: the layout
     // derives over the ids it copied, so it neither throws nor applies it.
     presentation.arrange({ [spellWidthKey("sneaky")]: 200 });
@@ -199,7 +199,7 @@ describe("createColumnLayout", () => {
       );
       const { presentation, layout } = createLayoutOver();
       presentation.arrange(arrangement);
-      expect(layout.effective("status")).toEqual({
+      expect(layout.readEffective("status")).toEqual({
         kind: "fixed",
         px: resolved?.width ?? 120,
       });

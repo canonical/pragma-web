@@ -18,12 +18,11 @@ import {
   EMPTY_SLICE,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
+import type { IdentifiedRecord as Placed } from "../../../testing/types.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
-
-type Placed = { readonly id: string };
 
 const places = createCollection({
   identify: (row: Placed) => row.id,

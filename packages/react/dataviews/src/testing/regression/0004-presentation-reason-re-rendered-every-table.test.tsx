@@ -8,15 +8,15 @@
  * re-rendered the saved-views control, which reads only the reason.
  */
 
+import {
+  createStandInPresentationStore,
+  createStandInViewStore,
+} from "@canonical/dataviews-core/testing";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Profiler } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
-import {
-  createStandInPresentationStore,
-  createStandInViewStore,
-} from "../../../testing/createStandInStores.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

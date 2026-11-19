@@ -1,5 +1,5 @@
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { describe, expect, it } from "vitest";
-import buildPage from "./buildPage.js";
 import deliverRows from "./deliverRows.js";
 
 describe("deliverRows", () => {

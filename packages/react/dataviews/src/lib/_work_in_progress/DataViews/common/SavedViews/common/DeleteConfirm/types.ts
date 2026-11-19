@@ -1,9 +1,6 @@
-/**
- * Exempt from the native-prop extension convention: an internal renderer of
- * the saved-views control, never rendered by a caller, whose root the control
- * places.
- */
-export type DeleteConfirmProps = {
+import type { ComponentProps } from "react";
+
+type OwnProps = {
   /** The question deleting asks first, naming the view. */
   readonly question: string;
   /** The submitting button's text. */
@@ -12,6 +9,17 @@ export type DeleteConfirmProps = {
   readonly cancel: string;
   /** Whether a command is in flight; deleting waits for it. */
   readonly pending: boolean;
+  /** Delete the view the question names. */
   readonly onSubmit: () => void;
-  readonly onCancel: () => void;
 };
+
+/**
+ * Props of the delete dialog. The root is a `dialog`, so it extends native
+ * dialog props; `children` is excluded, since the dialog renders its own
+ * answers, and so is `aria-labelledby`, which the question gives.
+ */
+export type DeleteConfirmProps = OwnProps &
+  Omit<
+    ComponentProps<"dialog">,
+    keyof OwnProps | "children" | "aria-labelledby"
+  >;

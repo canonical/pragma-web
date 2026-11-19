@@ -8,7 +8,7 @@ import {
 import type { SettledRow } from "./types.js";
 
 /** Counts where only `pageable` — the one a bar pages over — is claimed. */
-const countingPageable = (pageable: Count): SourceCounts => ({
+const buildPageableCounts = (pageable: Count): SourceCounts => ({
   pageable,
   matched: UNKNOWN_COUNT,
 });
@@ -31,7 +31,7 @@ export default function buildSettledPage({
   return {
     rows: Array.from({ length: rows }, (_unused, at) => ({ id: `m${at}` })),
     groups: null,
-    counts: countingPageable(pageable),
+    counts: buildPageableCounts(pageable),
     facets: {},
     more,
     cursors,

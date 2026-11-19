@@ -76,4 +76,16 @@ describe("SelectAllOnPage", () => {
     expect(readCheckbox().checked).toBe(false);
     expect(readCheckbox().indeterminate).toBe(true);
   });
+
+  it("passes native props to its root", () => {
+    const { provider } = createMachineProvider();
+    const { container } = render(
+      <SelectAllOnPage
+        selection={provider.selection}
+        ids={createFakeChannel<readonly string[]>([])}
+        id="probe"
+      />,
+    );
+    expect(container.firstElementChild).toHaveAttribute("id", "probe");
+  });
 });

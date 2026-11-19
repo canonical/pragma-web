@@ -1,6 +1,11 @@
 import type { SavedView } from "../src/lib/views/index.js";
 
-/** One stored view, as a store would list it, with the given fields changed. */
+/**
+ * One stored view, as a store would list it, with the given fields changed.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export default function buildStoredView(
   overrides: Partial<SavedView> = {},
 ): SavedView {

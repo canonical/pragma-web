@@ -71,9 +71,9 @@ export function Machines() {
         columns={columns}
         label="Machines"
         selectable
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
-      <DataViews.Actions />
+      <DataViews.ActionBar />
       <DataViews.Pagination sizes={[5, 10, 25]} />
     </DataViews>
   );

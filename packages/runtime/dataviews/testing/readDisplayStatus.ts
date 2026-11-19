@@ -1,6 +1,11 @@
 import type { DisplayStatus } from "../src/lib/display/index.js";
 
-/** One display status of each kind, with a reason where the kind carries one. */
+/**
+ * One display status of each kind, with a reason where the kind carries one.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export default function readDisplayStatus(
   status: DisplayStatus["status"],
 ): DisplayStatus {

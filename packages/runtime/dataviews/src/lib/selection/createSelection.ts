@@ -1,7 +1,10 @@
 import { createChannel, protectChannel } from "../observable/index.js";
 import type { Selection, SelectionState } from "./types.js";
 
-const setsEqual = (a: ReadonlySet<string>, b: ReadonlySet<string>): boolean => {
+const areSetsEqual = (
+  a: ReadonlySet<string>,
+  b: ReadonlySet<string>,
+): boolean => {
   if (a.size !== b.size) {
     return false;
   }
@@ -17,6 +20,8 @@ const setsEqual = (a: ReadonlySet<string>, b: ReadonlySet<string>): boolean => {
  * Create one selection record: explicit record identities with a valid
  * empty state. The record owns only the identity set; row data, counts and
  * operations stay with their own owners.
+ *
+ * @note Impure: holds the selected identities and publishes each change.
  */
 export default function createSelection(
   initial: readonly string[] = [],
@@ -27,7 +32,7 @@ export default function createSelection(
 
   const publish = (ids: Set<string>): void => {
     const current = channel.get();
-    if (setsEqual(current.ids, ids)) {
+    if (areSetsEqual(current.ids, ids)) {
       return;
     }
     channel.set(Object.freeze({ ids, revision: current.revision + 1 }));

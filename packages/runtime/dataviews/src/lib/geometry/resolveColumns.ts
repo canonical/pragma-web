@@ -6,7 +6,7 @@ type Slot = { readonly id: string; width: number };
 /** A flexible column paired with the slot the water-fill grows. */
 type FlexEntry = { readonly slot: Slot; readonly sizing: FlexSizing };
 
-const sizingRejection = (column: ColumnToSize): string | null => {
+const findSizingRejection = (column: ColumnToSize): string | null => {
   const { sizing } = column;
   if (sizing.kind === "fixed") {
     if (!Number.isFinite(sizing.px) || sizing.px < 0) {
@@ -44,7 +44,7 @@ export default function resolveColumns(
   availableWidth: number,
 ): readonly ResolvedColumn[] {
   for (const column of columns) {
-    const rejection = sizingRejection(column);
+    const rejection = findSizingRejection(column);
     if (rejection !== null) {
       throw new Error(rejection);
     }
@@ -73,7 +73,7 @@ export default function resolveColumns(
 
   if (fixedTotal + minTotal >= availableWidth) {
     // Overflow: the reservations are the declared widths already.
-    return toVector(slots);
+    return listResolvedColumns(slots);
   }
 
   let remaining = availableWidth - fixedTotal - minTotal;
@@ -112,8 +112,9 @@ export default function resolveColumns(
     active = stillActive;
   }
 
-  return toVector(slots);
+  return listResolvedColumns(slots);
 }
 
-const toVector = (slots: readonly Slot[]): readonly ResolvedColumn[] =>
-  slots.map(({ id, width }) => ({ id, width }));
+const listResolvedColumns = (
+  slots: readonly Slot[],
+): readonly ResolvedColumn[] => slots.map(({ id, width }) => ({ id, width }));

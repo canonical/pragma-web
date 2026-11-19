@@ -11,11 +11,7 @@ import {
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
-import {
-  type DisplayField,
-  MessagesContext,
-  StatusItem,
-} from "../../common/index.js";
+import { MessagesContext, StatusItem } from "../../common/index.js";
 import {
   useDataViewsValue,
   useMessages,
@@ -71,6 +67,8 @@ const areNamesEqual = (a: readonly string[], b: readonly string[]): boolean =>
  *
  * @implements ds:global.group.cards
  *
+ * @note Impure: observes the provider, and its rows' scopes, while mounted.
+ *
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
@@ -83,7 +81,7 @@ export default function DataCards<
   title,
   label,
   selectable = false,
-  rowLabel,
+  getRowLabel,
   renderStatus,
   messages,
   className,
@@ -130,7 +128,7 @@ export default function DataCards<
   // until the caller names records, so a card names itself by its title.
   const nameRecord = useStableCallback(
     (row: TRow, rowId: string): string | null =>
-      rowLabel === undefined ? null : rowLabel(row, rowId),
+      getRowLabel === undefined ? null : getRowLabel(row, rowId),
   );
   // The words' own text for a status, unless the caller renders its own.
   const describe = useCallback(

@@ -6,7 +6,7 @@ import {
 } from "@canonical/dataviews-core";
 import { describe, expect, it } from "vitest";
 import createMachineSource from "./createMachineSource.js";
-import { machines } from "./fixtures.js";
+import { storyMachines } from "./fixtures.js";
 import type { Machine } from "./types.js";
 
 const request: SourceRequest = {
@@ -17,7 +17,7 @@ const request: SourceRequest = {
 };
 
 /** Every delivery one execution makes, in order. */
-const deliveries = (
+const listDeliveries = (
   source: Source<Machine>,
 ): readonly SourceDelivery<Machine>[] => {
   const delivered: SourceDelivery<Machine>[] = [];
@@ -29,7 +29,7 @@ const deliveries = (
 
 describe("createMachineSource", () => {
   it("answers every machine, counted", () => {
-    const [delivery] = deliveries(createMachineSource());
+    const [delivery] = listDeliveries(createMachineSource());
     expect(delivery).toMatchObject({
       status: "succeeded",
       page: { counts: { matched: { kind: "exact", value: 12 } } },
@@ -38,13 +38,13 @@ describe("createMachineSource", () => {
 
   it("answers a caller's own rows, in the order it documents", () => {
     const source = createMachineSource({
-      rows: machines.slice(0, 2),
+      rows: storyMachines.slice(0, 2),
       defaultSort: [{ field: "name", direction: "desc" }],
     });
     expect(source.capabilities.sort.default).toEqual([
       { field: "name", direction: "desc" },
     ]);
-    const [delivery] = deliveries(source);
+    const [delivery] = listDeliveries(source);
     expect(
       delivery?.status === "succeeded" ? delivery.page.rows : [],
     ).toHaveLength(2);

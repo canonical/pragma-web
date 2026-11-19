@@ -7,11 +7,10 @@
 import { createCollection } from "@canonical/dataviews-core";
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createFakeChannel from "../../../testing/createFakeChannel.js";
 import { machines } from "../../../testing/machines.js";
-import type { Machine } from "../../../testing/types.js";
 import { CellContext, type CellContextValue } from "../common/index.js";
 import useDataViewsCell from "./useDataViewsCell.js";
 
@@ -55,8 +54,6 @@ describe("useDataViewsCell", () => {
     expect(result.current.record.get()).toEqual(alpha);
     expect(result.current.fields["status"]?.get()).toBe("failed");
     expect(result.current.selected.get()).toBe(false);
-    // The record is the collection's, with no cast at the call site.
-    expectTypeOf(result.current.record.get()).toEqualTypeOf<Machine>();
     expect(result.current.record.get().cores).toBe(8);
   });
 

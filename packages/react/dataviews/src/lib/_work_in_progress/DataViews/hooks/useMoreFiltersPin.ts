@@ -27,6 +27,8 @@ import type {
  * was heard, in the commit where the filters hydrate.
  *
  * @note Impure: reads the disclosure's open state from the document.
+ *
+ * @note Impure: reads the disclosure's open state in a layout effect.
  */
 export default function useMoreFiltersPin({
   marks,

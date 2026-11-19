@@ -1,3 +1,4 @@
+import { assertInvariant } from "../assertion/index.js";
 import type { DisplayEntry } from "../display/index.js";
 import { areListsEqual } from "../query/index.js";
 import createSizeIndex from "./createSizeIndex.js";
@@ -17,7 +18,7 @@ const emptyRange: MountedRange = Object.freeze({
   after: 0,
 });
 
-const sameRange = (a: MountedRange, b: MountedRange): boolean =>
+const isSameRange = (a: MountedRange, b: MountedRange): boolean =>
   a.after === b.after &&
   areListsEqual(
     a.runs,
@@ -31,13 +32,16 @@ const sameRange = (a: MountedRange, b: MountedRange): boolean =>
 /**
  * Create one table's virtual range.
  *
- * It is pure arithmetic over entry sizes: estimates until entries are
+ * It is arithmetic over entry sizes: estimates until entries are
  * measured, then their measurements. It reads no DOM and schedules
  * nothing, so every framework binding shares it; the binding reports the
  * viewport and the measurements, and scrolls by the corrections returned.
  *
  * A scroll costs O(log n) and publishes only when the mounted entries or
  * the space around them change.
+ *
+ * @note Impure: holds the entries, their measured sizes, the viewport and
+ * its anchor, and notifies subscribers when the mounted range moves.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -66,12 +70,12 @@ export default function createVirtualRange(
   // No anchor at the very top: new entries there are shown, not scrolled
   // past, as the browser's own scroll anchoring leaves them.
   const anchorAt = (offset: number): void => {
-    const position = sizes.at(offset);
-    const entry = entries[position];
+    const position = sizes.findPosition(offset);
+    const entry = entries.at(position);
     anchor =
       entry === undefined || offset <= 0
         ? null
-        : { id: entry.id, within: offset - sizes.offset(position) };
+        : { id: entry.id, within: offset - sizes.readOffset(position) };
   };
 
   // Move the viewport by however far the sizes or entries before its
@@ -81,7 +85,7 @@ export default function createVirtualRange(
     const moved =
       anchor === null || position === undefined
         ? 0
-        : sizes.offset(position) + anchor.within - start;
+        : sizes.readOffset(position) + anchor.within - start;
     start += moved;
     return moved;
   };
@@ -91,23 +95,23 @@ export default function createVirtualRange(
     if (count === 0) {
       return emptyRange;
     }
-    const main: [number, number] = [
-      Math.max(0, sizes.at(start) - overscan),
-      Math.min(count, sizes.at(start + size) + 1 + overscan),
-    ];
+    const mainStart = Math.max(0, sizes.findPosition(start) - overscan);
+    const mainEnd = Math.min(
+      count,
+      sizes.findPosition(start + size) + 1 + overscan,
+    );
+    const main: [number, number] = [mainStart, mainEnd];
     const spans: [number, number][] = [main];
     const kept = retained === null ? undefined : positions.get(retained);
     if (kept !== undefined) {
-      const span: [number, number] = [
-        Math.max(0, kept - 1),
-        Math.min(count, kept + 2),
-      ];
-      if (span[1] < main[0]) {
-        spans.unshift(span);
-      } else if (span[0] > main[1]) {
-        spans.push(span);
+      const keptStart = Math.max(0, kept - 1);
+      const keptEnd = Math.min(count, kept + 2);
+      if (keptEnd < mainStart) {
+        spans.unshift([keptStart, keptEnd]);
+      } else if (keptStart > mainEnd) {
+        spans.push([keptStart, keptEnd]);
       } else {
-        spans[0] = [Math.min(span[0], main[0]), Math.max(span[1], main[1])];
+        spans[0] = [Math.min(keptStart, mainStart), Math.max(keptEnd, mainEnd)];
       }
     }
     let reached = 0;
@@ -117,20 +121,20 @@ export default function createVirtualRange(
         Object.freeze({
           start: first,
           end,
-          before: sizes.offset(first) - sizes.offset(reached),
+          before: sizes.readOffset(first) - sizes.readOffset(reached),
         }),
       );
       reached = end;
     }
     return Object.freeze({
       runs: Object.freeze(runs),
-      after: sizes.offset(count) - sizes.offset(reached),
+      after: sizes.readOffset(count) - sizes.readOffset(reached),
     });
   };
 
   const publish = (notify: boolean): void => {
     const next = compute();
-    if (sameRange(current, next)) {
+    if (isSameRange(current, next)) {
       return;
     }
     current = next;
@@ -148,7 +152,7 @@ export default function createVirtualRange(
     return moved;
   };
 
-  const mounted = (position: number): boolean =>
+  const isMounted = (position: number): boolean =>
     current.runs.some((run) => run.start <= position && position < run.end);
 
   return {
@@ -197,7 +201,7 @@ export default function createVirtualRange(
           continue;
         }
         measured.set(id, measuredSize);
-        if (sizes.size(position) !== measuredSize) {
+        if (sizes.readSize(position) !== measuredSize) {
           sizes.set(position, measuredSize);
           changed = true;
         }
@@ -208,14 +212,20 @@ export default function createVirtualRange(
       let changed = false;
       for (const id of ids === "all" ? [...measured.keys()] : ids) {
         const position = positions.get(id);
-        if (position === undefined || mounted(position) || !measured.has(id)) {
+        if (
+          position === undefined ||
+          isMounted(position) ||
+          !measured.has(id)
+        ) {
           continue;
         }
         measured.delete(id);
-        // In range: the positions were built from these entries.
-        const entry = entries[position] as DisplayEntry;
+        const entry = assertInvariant(
+          entries.at(position),
+          "positions are built from the entries they index",
+        );
         const estimate = config.estimates[entry.kind];
-        if (sizes.size(position) !== estimate) {
+        if (sizes.readSize(position) !== estimate) {
           sizes.set(position, estimate);
           changed = true;
         }

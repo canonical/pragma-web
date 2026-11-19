@@ -2,7 +2,10 @@ import type { Source, SourceRefusal } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
 import createMachineSource from "../../../storybook/machines/createMachineSource.js";
@@ -10,6 +13,8 @@ import createPendingSource from "../../../storybook/machines/createPendingSource
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import type { Machine } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataViews } from "../DataViews/index.js";
 import { ConnectedRecordList, PlainList, StatusList } from "./common/index.js";
@@ -40,7 +45,7 @@ const createRebuildingSource = (): Source<Machine> => {
   };
   return {
     ...createMachineSource(),
-    refusals: (query) => (query.slice.sort.length > 0 ? [refusal] : []),
+    listRefusals: (query) => (query.slice.sort.length > 0 ? [refusal] : []),
   };
 };
 
@@ -59,35 +64,48 @@ export const APlainList: Story = {
 function StatusMachines({
   source,
   query = "page=1&size=5",
-}: {
+  ...words
+}: StoryWords & {
   readonly source: () => Source<Machine>;
   readonly query?: string;
 }): ReactElement {
   const provider = useMachineProvider({ source, query });
   return (
-    <StatusList provider={provider} label="Machines" nameRecord={nameMachine} />
+    <StatusList
+      {...words}
+      provider={provider}
+      label="Machines"
+      nameRecord={nameMachine}
+    />
   );
 }
 
 /** Step 2: the source has not answered yet, so the list says it is loading. */
 export const StatusLoading: Story = {
-  render: () => <StatusMachines source={createPendingSource} />,
+  render: (args) => (
+    <StatusMachines {...pickStoryWords(args)} source={createPendingSource} />
+  ),
 };
 
 /** Step 2: the source failed, and its reason stands in place of the rows. */
 export const StatusFailed: Story = {
-  render: () => <StatusMachines source={createFailingSource} />,
+  render: (args) => (
+    <StatusMachines {...pickStoryWords(args)} source={createFailingSource} />
+  ),
 };
 
 /** Step 2: the collection holds nothing yet. */
 export const StatusNoData: Story = {
-  render: () => <StatusMachines source={createEmptySource} />,
+  render: (args) => (
+    <StatusMachines {...pickStoryWords(args)} source={createEmptySource} />
+  ),
 };
 
 /** Step 2: the search matches no machine. */
 export const StatusNoMatch: Story = {
-  render: () => (
+  render: (args) => (
     <StatusMachines
+      {...pickStoryWords(args)}
       source={createMachineSource}
       query="q=nothing-matches&page=1&size=5"
     />
@@ -96,12 +114,14 @@ export const StatusNoMatch: Story = {
 
 function SelectableMachines({
   source = createMachineSource,
-}: {
+  ...words
+}: StoryWords & {
   readonly source?: () => Source<Machine>;
 }): ReactElement {
   const provider = useMachineProvider({ source, query: "page=1&size=5" });
   return (
     <Component
+      {...words}
       provider={provider}
       label="Machines"
       nameRecord={nameMachine}
@@ -113,7 +133,7 @@ function SelectableMachines({
 
 /** Step 3: a checkbox per record, and a sort the source can run. */
 export const SelectionAndSort: Story = {
-  render: () => <SelectableMachines />,
+  render: (args) => <SelectableMachines {...pickStoryWords(args)} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
@@ -127,7 +147,12 @@ export const SelectionAndSort: Story = {
 
 /** Step 3: the source refuses the sort, and the list says why. */
 export const SortRefused: Story = {
-  render: () => <SelectableMachines source={createRebuildingSource} />,
+  render: (args) => (
+    <SelectableMachines
+      {...pickStoryWords(args)}
+      source={createRebuildingSource}
+    />
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(
@@ -146,12 +171,13 @@ const columns: readonly DataTableColumn[] = [
   { id: "status", header: "Status" },
 ];
 
-function ConnectedMachines(): ReactElement {
-  const provider = useMachineProvider({ query: "page=1&size=5" });
+// The twin takes its words itself, as the standalone list does.
+function ConnectedMachines(words: StoryWords): ReactElement {
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Search label="Search machines" />
       <ConnectedRecordList
+        {...words}
         collection={machineCollection}
         label="Machines"
         nameRecord={nameMachine}
@@ -161,10 +187,10 @@ function ConnectedMachines(): ReactElement {
         columns={columns}
         label="Machine table"
         selectable
-        rowLabel={(row) => String(row["name"])}
+        getRowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -174,7 +200,8 @@ function ConnectedMachines(): ReactElement {
  * selected in the other.
  */
 export const ConnectedTwin: Story = {
-  render: () => <ConnectedMachines />,
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
+  render: (args) => <ConnectedMachines {...pickStoryWords(args)} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const list = within(canvas.getByRole("region", { name: "Machines" }));

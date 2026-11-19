@@ -31,7 +31,13 @@
       padding-block: var(--data-chart-status-padding-block);
     }
 
-    & > .chart {
+    /* A drawing's root lays out nothing: its drawing and its table sit in
+       the figure's column, spaced as the caption and the status are. */
+    & > .drawing {
+      display: contents;
+    }
+
+    & > .drawing > .chart {
       inline-size: 100%;
       block-size: auto;
     }
@@ -59,12 +65,12 @@
       fill: var(--color-text-muted);
     }
 
-    & > .data {
+    & > .drawing > .data {
       border-collapse: collapse;
       text-align: start;
     }
 
-    & > .data :is(th, td) {
+    & > .drawing > .data :is(th, td) {
       padding-block: var(--data-chart-cell-padding-block);
       padding-inline-end: var(--data-chart-cell-padding-inline-end);
       text-align: start;

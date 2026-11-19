@@ -16,9 +16,8 @@ import {
 } from "@canonical/dataviews-core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import type { TaggedRecord as Tagged } from "../../../testing/types.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
-
-type Tagged = { readonly id: string; readonly tag: unknown };
 
 const tagged = createCollection({
   identify: (row: Tagged) => row.id,

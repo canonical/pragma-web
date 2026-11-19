@@ -1,5 +1,5 @@
 import type { Completion } from "@canonical/dataviews-core";
-import buildPage from "./buildPage.js";
+import { buildPage } from "@canonical/dataviews-core/testing";
 
 /** A delivered page of rows, counted exactly and grouped by nothing. */
 export default function deliverRows<TRow extends object>(

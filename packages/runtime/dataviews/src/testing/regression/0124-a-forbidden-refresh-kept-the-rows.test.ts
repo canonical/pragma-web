@@ -69,11 +69,11 @@ const observeRelay = () => {
       pagination: { kind: "cursor", backward: false, durable: false },
     }),
     environment,
-    operation: () => ({
+    buildOperation: () => ({
       fragment: null,
       request: { node: { operation: { selections: [] } } },
     }),
-    connection: (data) => data.machines,
+    readConnection: (data) => data.machines,
     isForbidden: (error) => error === denied,
   });
   const provider = createDataViewsProvider({ collection: machines, source });

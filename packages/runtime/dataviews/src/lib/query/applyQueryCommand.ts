@@ -24,7 +24,7 @@ type SliceCommand = Exclude<
 >;
 
 /** Validate one predicate against the bounded grammar. */
-const predicateRejection = (predicate: Predicate): string | null => {
+const findPredicateRejection = (predicate: Predicate): string | null => {
   if (predicate.field === "") {
     return "predicate field must not be empty";
   }
@@ -49,7 +49,7 @@ const predicateRejection = (predicate: Predicate): string | null => {
  * start, so a token minted for one page never addresses another. Collapse
  * survives, because a collapsed group is still that group after a filter.
  */
-const firstPage = (window: ResultWindow): ResultWindow => ({
+const moveToFirstPage = (window: ResultWindow): ResultWindow => ({
   ...window,
   page: 1,
   cursor: null,
@@ -78,8 +78,8 @@ const rejectNth = (nth: number | undefined): string | null =>
     ? null
     : `a conjunct's place must be a whole number from 0, not ${nth}`;
 
-/** The slice's filter less every copy of one conjunct. */
-const withoutConjunct = (
+/** Drop every copy of one conjunct from a filter. */
+const dropConjunct = (
   filter: readonly Predicate[],
   conjunct: Predicate,
 ): readonly Predicate[] =>
@@ -138,14 +138,14 @@ const setPredicate = (
   const kept =
     replaced === undefined
       ? slice.filter
-      : withoutConjunct(slice.filter, replaced);
+      : dropConjunct(slice.filter, replaced);
   return {
     ...slice,
     filter: [...kept, predicate],
   };
 };
 
-const collapsedEquals = (
+const areCollapsedPathsEqual = (
   a: readonly GroupPath[],
   b: readonly GroupPath[],
 ): boolean =>
@@ -180,7 +180,7 @@ export default function applyQueryCommand(
       cursor: command.cursor ?? null,
     });
     if (rejection !== null) {
-      return rejected(slice, window, rejection);
+      return buildRejection(slice, window, rejection);
     }
     // A token addresses one page start, so moving without supplying one
     // leaves no token behind to describe the page that was left.
@@ -203,7 +203,7 @@ export default function applyQueryCommand(
   }
 
   if (command.kind === "setCollapsed") {
-    if (collapsedEquals(window.collapsed, command.collapsed)) {
+    if (areCollapsedPathsEqual(window.collapsed, command.collapsed)) {
       return {
         status: "accepted",
         slice,
@@ -218,7 +218,7 @@ export default function applyQueryCommand(
       status: "accepted",
       slice,
       window: {
-        ...firstPage(window),
+        ...moveToFirstPage(window),
         collapsed: command.collapsed.map((path) => [...path]),
       },
       sliceChanged: false,
@@ -226,9 +226,9 @@ export default function applyQueryCommand(
     };
   }
 
-  const rejection = commandRejection(slice, command);
+  const rejection = findCommandRejection(slice, command);
   if (rejection !== null) {
-    return rejected(slice, window, rejection);
+    return buildRejection(slice, window, rejection);
   }
 
   const nextSlice = applyToSlice(slice, command);
@@ -246,8 +246,8 @@ export default function applyQueryCommand(
   // path that still means what it meant.
   const nextWindow =
     command.kind === "setGroup"
-      ? { ...firstPage(window), collapsed: [] }
-      : firstPage(window);
+      ? { ...moveToFirstPage(window), collapsed: [] }
+      : moveToFirstPage(window);
   return {
     status: "accepted",
     slice: nextSlice,
@@ -260,14 +260,15 @@ export default function applyQueryCommand(
   };
 }
 
-const commandRejection = (
+const findCommandRejection = (
   slice: Slice,
   command: SliceCommand,
 ): string | null => {
   switch (command.kind) {
     case "setPredicate": {
       const nth = command.nth ?? 0;
-      const rejection = rejectNth(nth) ?? predicateRejection(command.predicate);
+      const rejection =
+        rejectNth(nth) ?? findPredicateRejection(command.predicate);
       if (rejection !== null) {
         return rejection;
       }
@@ -291,7 +292,7 @@ const commandRejection = (
         return rejection;
       }
       for (const predicate of command.add) {
-        const rejection = predicateRejection(predicate);
+        const rejection = findPredicateRejection(predicate);
         if (rejection !== null) {
           return rejection;
         }
@@ -323,17 +324,14 @@ const applyToSlice = (slice: Slice, command: SliceCommand): Slice => {
       );
       return removed === undefined
         ? slice
-        : { ...slice, filter: withoutConjunct(slice.filter, removed) };
+        : { ...slice, filter: dropConjunct(slice.filter, removed) };
     }
     case "editPredicates": {
       // Resolved before anything moves.
       const removed = resolveRefs(slice, command.remove);
       return {
         ...slice,
-        filter: [
-          ...removed.reduce(withoutConjunct, slice.filter),
-          ...command.add,
-        ],
+        filter: [...removed.reduce(dropConjunct, slice.filter), ...command.add],
       };
     }
     case "setSearch":
@@ -359,7 +357,7 @@ const applyToSlice = (slice: Slice, command: SliceCommand): Slice => {
   }
 };
 
-const rejected = (
+const buildRejection = (
   slice: Slice,
   window: ResultWindow,
   reason: string,

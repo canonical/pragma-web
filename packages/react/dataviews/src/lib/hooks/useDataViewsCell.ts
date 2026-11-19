@@ -1,12 +1,11 @@
 import type {
-  Collection,
   ReadonlyChannel,
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import { useContext, useMemo } from "react";
 import { CellContext } from "../common/index.js";
-import type { UseDataViewsCellResult } from "./types.js";
+import type { UseDataViewsCellProps, UseDataViewsCellResult } from "./types.js";
 
 /**
  * Read the current cell's scope, installed by the table renderer.
@@ -23,7 +22,9 @@ import type { UseDataViewsCellResult } from "./types.js";
 export default function useDataViewsCell<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->(collection: Collection<TFields, TRow>): UseDataViewsCellResult<TRow> {
+>(
+  ...[collection]: UseDataViewsCellProps<TFields, TRow>
+): UseDataViewsCellResult<TRow> {
   const cell = useContext(CellContext);
   if (cell === null) {
     throw new Error(

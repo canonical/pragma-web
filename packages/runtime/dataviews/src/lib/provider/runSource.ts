@@ -42,7 +42,7 @@ const findPortRejection = <TRow extends object>(
   }
   if (
     capabilities.pagination.kind === "cursor" &&
-    source.refusals === undefined
+    source.listRefusals === undefined
   ) {
     // Only the source knows which pages its tokens reach, so a cursor
     // source that refuses nothing would be asked for pages it cannot serve.
@@ -262,7 +262,7 @@ export default function runSource<
     }
     // Requests issued by another listener during the republish were
     // invisible above; converge on whatever the host now wants.
-    onHostChange();
+    handleHostChange();
   };
 
   /**
@@ -270,7 +270,7 @@ export default function runSource<
    * one check both an execution and a read within the call make first.
    */
   const refuseUnsupported = (query: Query, requestId: string): boolean => {
-    const refusals = host.refusals(query);
+    const refusals = host.listRefusals(query);
     if (refusals.length === 0) {
       return false;
     }
@@ -312,7 +312,7 @@ export default function runSource<
     }
   };
 
-  function onHostChange(): void {
+  function handleHostChange(): void {
     if (driving || unsubscribe === null) {
       return;
     }
@@ -356,8 +356,8 @@ export default function runSource<
       if (unsubscribe !== null) {
         throw new Error("this source is already running against its host");
       }
-      unsubscribe = host.state.subscribe(onHostChange);
-      onHostChange();
+      unsubscribe = host.state.subscribe(handleHostChange);
+      handleHostChange();
       return detach;
     },
     completePending(): void {

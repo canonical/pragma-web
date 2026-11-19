@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../../../storybook/decorators/index.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./SortPanel.js";
@@ -45,18 +47,13 @@ const sortByThree = (provider: MachineProvider): void => {
   ]);
 };
 
-/** The panel beside the table it orders, over one root. */
-function SortedCollection({
-  prepare,
-}: {
-  readonly prepare?: (provider: MachineProvider) => void;
-}): ReactElement {
-  const provider = useMachineProvider({ prepare });
+/** The panel beside the table it orders, inside the story's root. */
+function SortedCollection(): ReactElement {
   return (
-    <DataViews provider={provider}>
+    <>
       <Component />
       <DataViews.DataTable columns={columns} label="Machines" />
-    </DataViews>
+    </>
   );
 }
 
@@ -69,7 +66,7 @@ function SortedCollection({
  * key, and it is deliberately rough: its design comes later.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.setSort([
@@ -82,7 +79,8 @@ export const Default: Story = {
   <DataViews.DataTable columns={columns} label="Machines" />
 </DataViews>`,
   }),
-  render: () => <SortedCollection prepare={sortByThree} />,
+  decorators: [withMachineRoot({ prepare: sortByThree })],
+  render: () => <SortedCollection />,
   play: async ({ canvas }) => {
     const panel = canvas.getByRole("region", { name: "Sort" });
     const hostTerm = within(panel)
@@ -113,11 +111,12 @@ export const Default: Story = {
  * rather than showing an empty list.
  */
 export const NothingStated: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews"],
     render: `<DataViews provider={provider}>
   <DataViews.SortPanel />
 </DataViews>`,
   }),
+  decorators: [withMachineRoot()],
   render: () => <SortedCollection />,
 };

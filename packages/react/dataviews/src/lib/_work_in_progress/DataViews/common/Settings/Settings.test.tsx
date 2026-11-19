@@ -9,6 +9,7 @@ import {
   createMemoryLocation,
   type QueryLocation,
 } from "@canonical/dataviews-core";
+import { createRecordingLocation } from "@canonical/dataviews-core/testing";
 import {
   act,
   fireEvent,
@@ -24,7 +25,6 @@ import { describe, expect, it, onTestFinished, vi } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
-import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
 import declareMachineOrdering from "../../../../../../testing/declareMachineOrdering.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import fakeAnnouncerClock from "../../../../../../testing/fakeAnnouncerClock.js";

@@ -1,13 +1,8 @@
 import type { DataViewsMessages, Selection } from "@canonical/dataviews-core";
 import type { RowChannels } from "@canonical/dataviews-core/bindings";
+import type { ComponentProps } from "react";
 
-/**
- * Props of one record's list item.
- *
- * Exempt from the native-prop extension convention: a tutorial example kept
- * to the props it teaches.
- */
-export type RecordItemProps<TRow extends object> = {
+type OwnProps<TRow extends object> = {
   /** The row's channels, from the list's row scopes. */
   readonly channels: RowChannels<TRow>;
   /** The collection's selection, which the checkbox toggles. */
@@ -19,3 +14,10 @@ export type RecordItemProps<TRow extends object> = {
   /** The words the checkbox is named in. */
   readonly messages: DataViewsMessages;
 };
+
+/**
+ * Props of one record's list item. Its root is an `li`, so it extends native
+ * li props, less `children`, the record it lists.
+ */
+export type RecordItemProps<TRow extends object> = OwnProps<TRow> &
+  Omit<ComponentProps<"li">, keyof OwnProps<TRow> | "children">;

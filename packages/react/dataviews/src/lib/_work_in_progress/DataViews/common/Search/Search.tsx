@@ -18,7 +18,7 @@ const OWN_KEYS: readonly string[] = [QUERY_KEYS.search];
  * the input submits itself, from the first page, as a search command would
  * leave it.
  */
-const destinationOf = ({ slice, window }: DataViewsState<object>): Query => ({
+const readDestination = ({ slice, window }: DataViewsState<object>): Query => ({
   slice: { ...slice, search: null },
   window: { ...window, page: 1, cursor: null },
 });
@@ -90,7 +90,7 @@ export default function Search({
       />
       <HiddenQueryFields
         provider={provider}
-        destinationOf={destinationOf}
+        readDestination={readDestination}
         omit={OWN_KEYS}
       />
       <Button type="submit" importance="secondary" className="submit">

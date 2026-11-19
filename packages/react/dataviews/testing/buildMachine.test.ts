@@ -8,6 +8,9 @@ describe("buildMachine", () => {
       name: "alpha",
       status: "running",
       cores: 4,
+      region: "eu-west-1",
+      owner: "ex:ana",
+      note: "",
     });
     expect(buildMachine("m-2", "beta", "failed", 8)).toMatchObject({
       status: "failed",

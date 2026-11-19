@@ -14,23 +14,29 @@ import {
   useSyncExternalStore,
 } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import { withAppScope } from "../../../../../storybook/decorators/index.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import useStoryViewStore from "../../../../../storybook/machines/useStoryViewStore.js";
+import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../../../storybook/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./SavedViews.js";
+import type { DataViewsSavedViewsProps } from "./types.js";
+
+/** The part's props, and the words the story's root speaks. */
+type StoryArgs = DataViewsSavedViewsProps & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/SavedViews",
   component: Component,
   decorators: [withAppScope],
-} satisfies Meta<typeof Component>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof Component>;
+type Story = StoryObj<StoryArgs>;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", resizable: true, hideable: false },
@@ -61,7 +67,7 @@ const failedMachines: ViewDraft = {
 };
 
 /** The store's scope as every story's consumer code declares it. */
-const parameters = consumerCode({
+const parameters = showConsumerCode({
   parts: ["DataTable", "DataViews", "type DataTableColumn"],
   declarations: columnsCode,
   query: "page=1&size=5",
@@ -69,16 +75,20 @@ const parameters = consumerCode({
   render: composition,
 });
 
-/** The root, its saved-views control and the parts the views act on. */
+/**
+ * The root, its saved-views control and the parts the views act on,
+ * speaking `messages` when given.
+ */
 function Collection({
   provider,
   children,
-}: {
+  ...words
+}: StoryWords & {
   readonly provider: MachineProvider;
   readonly children?: ReactNode | undefined;
 }): ReactElement {
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <Component />
       <DataViews.Filters
         labels={{
@@ -90,7 +100,12 @@ function Collection({
         }}
       />
       {children}
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...words}
+      />
       <DataViews.Pagination sizes={[5, 10, 25]} />
     </DataViews>
   );
@@ -100,7 +115,8 @@ function Collection({
 function SavedMachines({
   seed,
   indexedDB,
-}: {
+  ...words
+}: StoryWords & {
   readonly seed?: readonly ViewDraft[] | undefined;
   readonly indexedDB?: IndexedDBFactory | undefined;
 }): ReactElement {
@@ -110,7 +126,7 @@ function SavedMachines({
     views: store,
     presentation: store,
   });
-  return <Collection provider={provider} />;
+  return <Collection provider={provider} {...words} />;
 }
 
 type Canvas = ReturnType<typeof within>;
@@ -146,7 +162,9 @@ const open = async (canvas: Canvas, name: string): Promise<void> => {
  */
 export const SavedViews: Story = {
   parameters,
-  render: () => <SavedMachines seed={[failedMachines]} />,
+  render: (args) => (
+    <SavedMachines {...pickStoryWords(args)} seed={[failedMachines]} />
+  ),
   play: async ({ canvas }) => {
     await open(canvas, "Failed machines");
     await waitFor(() =>
@@ -165,7 +183,9 @@ export const SavedViews: Story = {
  */
 export const SaveAsANewView: Story = {
   parameters,
-  render: () => <SavedMachines seed={[failedMachines]} />,
+  render: (args) => (
+    <SavedMachines {...pickStoryWords(args)} seed={[failedMachines]} />
+  ),
   play: async ({ canvas }) => {
     await userEvent.click(canvas.getByRole("checkbox", { name: "running" }));
     await waitFor(() =>
@@ -223,7 +243,7 @@ function AnotherTab({
  */
 export const AConflictBetweenTabs: Story = {
   parameters,
-  render: function Render() {
+  render: function Render(args) {
     const { store, openAnotherTab } = useStoryViewStore({
       seed: [failedMachines],
     });
@@ -233,7 +253,7 @@ export const AConflictBetweenTabs: Story = {
       presentation: store,
     });
     return (
-      <Collection provider={provider}>
+      <Collection provider={provider} {...pickStoryWords(args)}>
         <AnotherTab openAnotherTab={openAnotherTab} />
       </Collection>
     );
@@ -267,13 +287,15 @@ export const AConflictBetweenTabs: Story = {
  */
 export const DeletingAView: Story = {
   parameters,
-  render: () => <SavedMachines seed={[failedMachines]} />,
+  render: (args) => (
+    <SavedMachines {...pickStoryWords(args)} seed={[failedMachines]} />
+  ),
   play: async ({ canvas }) => {
     await open(canvas, "Failed machines");
     await userEvent.click(
       getViews(canvas).getByRole("button", { name: "Delete…" }),
     );
-    const confirm = getViews(canvas).getByRole("group", {
+    const confirm = getViews(canvas).getByRole("dialog", {
       name: 'Delete "Failed machines"? This cannot be undone.',
     });
     await expect(
@@ -301,7 +323,9 @@ const wideHosts: ViewDraft = {
  */
 export const AViewsArrangement: Story = {
   parameters,
-  render: () => <SavedMachines seed={[wideHosts]} />,
+  render: (args) => (
+    <SavedMachines {...pickStoryWords(args)} seed={[wideHosts]} />
+  ),
   play: async ({ canvas }) => {
     await open(canvas, "Wide hosts");
     await waitFor(() =>
@@ -317,7 +341,7 @@ export const AViewsArrangement: Story = {
     const headers = canvas.getAllByRole("columnheader");
     await expect(headers).toHaveLength(3);
     for (const [index, header] of ["Owner", "Host", "Status"].entries()) {
-      await expect(headers[index]).toHaveAccessibleName(header);
+      await expect(headers.at(index)).toHaveAccessibleName(header);
     }
   },
 };
@@ -339,7 +363,9 @@ const refusedStorage: IndexedDBFactory = {
  */
 export const StorageUnavailable: Story = {
   parameters,
-  render: () => <SavedMachines indexedDB={refusedStorage} />,
+  render: (args) => (
+    <SavedMachines {...pickStoryWords(args)} indexedDB={refusedStorage} />
+  ),
   play: async ({ canvas }) => {
     await getViews(canvas).findByText(
       "Saved views are unavailable: view storage is unavailable: the browser refused storage for this site.",
@@ -375,7 +401,7 @@ function QueryInTheLocation({
  * in the link; the view itself stays in this browser.
  */
 export const WithTheQueryInTheUrl: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
@@ -389,7 +415,7 @@ import { platform } from "./router.js";`,
     store: true,
     render: composition,
   }),
-  render: function Render() {
+  render: function Render(args) {
     // A memory location stands in for the browser's here, so the story
     // never rewrites the page's own address.
     const [location] = useState(() =>
@@ -403,7 +429,7 @@ import { platform } from "./router.js";`,
       location,
     });
     return (
-      <Collection provider={provider}>
+      <Collection provider={provider} {...pickStoryWords(args)}>
         <QueryInTheLocation location={location} />
       </Collection>
     );

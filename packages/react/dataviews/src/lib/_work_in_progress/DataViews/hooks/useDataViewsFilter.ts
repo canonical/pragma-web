@@ -31,6 +31,8 @@ type AppliedAt<
  * the field and operator are checked against its schema at compile time,
  * and the applied value is typed by the field's kind.
  *
+ * @note Impure: subscribes to the filter's handle while mounted.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
@@ -45,7 +47,7 @@ export default function useDataViewsFilter<
   operator: TOperator,
 ): UseDataViewsFilterResult<AppliedAt<TFields, TField, TOperator>> {
   const root = useContext(Context);
-  if (root === null) {
+  if (root === undefined) {
     throw new Error("useDataViewsFilter must be used inside a DataViews root");
   }
   if (root.provider.collection !== collection) {

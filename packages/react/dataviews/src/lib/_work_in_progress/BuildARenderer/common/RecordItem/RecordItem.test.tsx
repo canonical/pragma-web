@@ -75,4 +75,21 @@ describe("RecordItem", () => {
     expect(checkbox).not.toBeChecked();
     detach();
   });
+
+  it("passes native props to its list item", () => {
+    const { provider, channels } = readChannels();
+    render(
+      <ul>
+        <RecordItem
+          channels={channels}
+          selection={provider.selection}
+          nameRecord={(record) => record.name}
+          selectable={false}
+          messages={english}
+          id="probe"
+        />
+      </ul>,
+    );
+    expect(screen.getByRole("listitem")).toHaveAttribute("id", "probe");
+  });
 });

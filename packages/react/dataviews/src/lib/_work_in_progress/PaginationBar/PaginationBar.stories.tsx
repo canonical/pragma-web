@@ -5,11 +5,11 @@ import { expect, userEvent, waitFor } from "storybook/test";
 import {
   withAppScope,
   withScrollingFrame,
-} from "../../../storybook/decorators.js";
+} from "../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../storybook/getHiddenButton.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import createUncountedSource from "../../../storybook/machines/createUncountedSource.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type {
   Machine,
   MachineFields,
@@ -17,6 +17,7 @@ import type {
   MachineProviderConfig,
 } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import { DataTable, type DataTableColumn } from "../DataTable/index.js";
 import Component from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
@@ -55,7 +56,10 @@ const pageCode = `<>
   <PaginationBar provider={provider} sizes={[5, 10, 25]} />
 </>`;
 
-/** The machines five to a page, the table and its bar over one provider. */
+/**
+ * The machines five to a page, the table and its bar over one provider,
+ * both speaking the story's messages.
+ */
 function MachinesPage({
   options,
   ...args
@@ -68,7 +72,12 @@ function MachinesPage({
   });
   return (
     <>
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...pickStoryWords(args)}
+      />
       <Component {...args} provider={provider} />
     </>
   );
@@ -95,7 +104,7 @@ const expectAvailable = async (
   const names = ["First page", "Previous page", "Next page", "Last page"];
   for (const [at, name] of names.entries()) {
     const button = canvas.getByRole("button", { name });
-    await (available[at]
+    await (available.at(at)
       ? expect(button).toBeEnabled()
       : expect(button).toBeDisabled());
   }
@@ -107,7 +116,7 @@ const expectAvailable = async (
  * that total makes, and there is nothing before the first page to go to.
  */
 export const FirstPage: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,
     query: "page=1&size=5",
@@ -127,7 +136,7 @@ export const FirstPage: Story = {
 
 /** A middle page: every destination is open. */
 export const MiddlePage: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,
     query: "page=1&size=5",
@@ -150,7 +159,7 @@ export const MiddlePage: Story = {
  * beyond the last page, so Next and Last are unavailable.
  */
 export const LastPage: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,
     query: "page=1&size=5",
@@ -178,7 +187,7 @@ export const LastPage: Story = {
  * browser's here, so the story never rewrites this page's own address.
  */
 export const RealDestinations: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
@@ -227,7 +236,7 @@ import { platform } from "./router.js";`,
  * is full, which is the only evidence there may be another.
  */
 export const WithoutACount: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     imports: `import { machineCollection, machinesApi } from "./machines.js";`,
     declarations: `${columnsCode}
@@ -254,7 +263,7 @@ export const WithoutACount: Story = {
  * count and no total it does not have, and offers no page it cannot reach.
  */
 export const Loading: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: `${columnsCode}
 
@@ -284,7 +293,7 @@ export const Loading: Story = {
  * passing beneath it.
  */
 export const StickyInAScrollingFrame: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
     declarations: columnsCode,
     render: `<div style={{ maxHeight: "16rem", overflow: "auto" }}>

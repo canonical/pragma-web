@@ -3,21 +3,23 @@
  * root's own filter records and the sessions they type in, and the words
  * its parts speak.
  */
+
 import {
   createCollection,
   createDataViewsProvider,
   declareCapabilities,
   type QueryLocation,
 } from "@canonical/dataviews-core";
+import {
+  createManualSource,
+  createRecordingLocation,
+} from "@canonical/dataviews-core/testing";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
+import type { IdentifiedRecord as Row } from "../../../../../testing/types.js";
 import { findFilterHandle } from "../common/utils/index.js";
 import useProviderState from "./useProviderState.js";
-
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,
@@ -55,7 +57,7 @@ describe("useProviderState", () => {
     const hook = renderHook(() => useProviderState({ provider }));
     expect(source.calls).toHaveLength(1);
     hook.unmount();
-    expect(source.latest().releases).toBe(1);
+    expect(source.readLatest().releases).toBe(1);
   });
 
   it("speaks the words it is handed, over English", () => {
@@ -66,7 +68,7 @@ describe("useProviderState", () => {
         messages: { statusNoData: "Nothing here yet." },
       }),
     );
-    const { messages } = hook.result.current.value;
+    const { messages } = hook.result.current;
     expect(messages.statusNoData).toBe("Nothing here yet.");
     expect(messages.statusPending).toBeTypeOf("string");
   });
@@ -74,9 +76,9 @@ describe("useProviderState", () => {
   it("holds one value while nothing it carries changes", () => {
     const { provider } = makeFixture();
     const hook = renderHook(() => useProviderState({ provider }));
-    const first = hook.result.current.value;
+    const first = hook.result.current;
     hook.rerender();
-    expect(hook.result.current.value).toBe(first);
+    expect(hook.result.current).toBe(first);
     expect(first.provider).toBe(provider);
   });
 
@@ -84,7 +86,7 @@ describe("useProviderState", () => {
     const recorded = createRecordingLocation({ href: "/machines" });
     const { provider } = makeFixture(recorded.location);
     const hook = renderHook(() => useProviderState({ provider }));
-    const { filters, endSessions } = hook.result.current.value;
+    const { filters, endSessions } = hook.result.current;
     const from = findFilterHandle<number>(filters, "cpu", "gte");
     const before = recorded.writes.length;
     act(() => {

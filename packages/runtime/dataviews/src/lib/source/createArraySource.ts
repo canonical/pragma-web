@@ -25,6 +25,9 @@ const createExactCount = (value: number) => ({ kind: "exact" as const, value });
  * executed here, so a grouped query is refused rather than answered with
  * ungrouped rows.
  *
+ * @note Impure: holds its rows and the requests delivered from them, and
+ * keeps the last slice it executed, so paging it does not run it again.
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
@@ -94,7 +97,7 @@ export default function createArraySource<TRow extends object = RowRecord>(
       search: slice.search,
     });
 
-  const deliveryFor = (request: SourceRequest): SourceDelivery<TRow> => {
+  const buildDelivery = (request: SourceRequest): SourceDelivery<TRow> => {
     if (executed === null || executed.slice !== request.slice) {
       executed = {
         slice: request.slice,
@@ -153,13 +156,13 @@ export default function createArraySource<TRow extends object = RowRecord>(
   return {
     capabilities,
     // Complete local input always holds the answer.
-    readDelivery: deliveryFor,
+    readDelivery: buildDelivery,
     execute(
       request: SourceRequest,
       deliver: (delivery: SourceDelivery<TRow>) => void,
     ): () => void {
       const run = (): void => {
-        deliver(deliveryFor(request));
+        deliver(buildDelivery(request));
       };
       live.add(run);
       run();

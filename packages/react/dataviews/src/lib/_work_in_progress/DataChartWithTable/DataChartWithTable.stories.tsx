@@ -2,12 +2,17 @@ import type { SchemaFieldDefinition } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../storybook/decorators.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../storybook/decorators/index.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
 import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
 import type { DataChartProps } from "../DataChart/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataChartWithTable as ConnectedChartWithTable } from "../DataViews/common/DataChartWithTable/index.js";
@@ -61,11 +66,15 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
   { id: "cores", header: "Cores" },
 ];`;
 
-/** The chart and its table over a provider bound to the story's own source. */
+/**
+ * The chart and its table over a provider bound to the story's own source,
+ * in its words.
+ */
 function MachineChartWithTable({
   chart,
   options,
-}: {
+  ...words
+}: StoryWords & {
   readonly chart: ChartProps;
   readonly options?: MachineProviderConfig | undefined;
 }): ReactElement {
@@ -75,12 +84,13 @@ function MachineChartWithTable({
   });
   return (
     <Component
+      {...words}
       provider={provider}
       chartProps={chart}
       tableProps={{
         columns,
         label: "Machines",
-        rowLabel: (row) => String(row["name"]),
+        getRowLabel: (row) => String(row["name"]),
       }}
     />
   );
@@ -92,8 +102,10 @@ function MachineChartWithTable({
  * provider, so choosing asks the source for nothing.
  */
 export const Default: Story = {
-  render: () => <MachineChartWithTable chart={statusCounts} />,
-  parameters: consumerCode({
+  render: (args) => (
+    <MachineChartWithTable {...pickStoryWords(args)} chart={statusCounts} />
+  ),
+  parameters: showConsumerCode({
     parts: ["type DataTableColumn"],
     imports: prototypeImports,
     facets: ["status", "cores"],
@@ -129,12 +141,13 @@ export const Default: Story = {
 
 /** A number field's range in place of the counts, with the same table. */
 export const RangeOrTable: Story = {
-  render: () => (
+  render: (args) => (
     <MachineChartWithTable
+      {...pickStoryWords(args)}
       chart={{ type: "range", field: "cores", label: "Machines by cores" }}
     />
   ),
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["type DataTableColumn"],
     imports: prototypeImports,
     facets: ["status", "cores"],
@@ -156,23 +169,19 @@ export const RangeOrTable: Story = {
 
 /** The connected chart with its table, beside the filters and the pagination. */
 function BesideFiltersMachines(): ReactElement {
-  const provider = useMachineProvider({
-    query: "page=1&size=5",
-    facets: ["status", "cores"],
-  });
   return (
-    <DataViews provider={provider}>
+    <>
       <DataViews.Filters />
       <ConnectedChartWithTable
         chartProps={statusCounts}
         tableProps={{
           columns,
           label: "Machines",
-          rowLabel: (row) => String(row["name"]),
+          getRowLabel: (row) => String(row["name"]),
         }}
       />
       <DataViews.Pagination sizes={[5, 10]} />
-    </DataViews>
+    </>
   );
 }
 
@@ -182,8 +191,14 @@ function BesideFiltersMachines(): ReactElement {
  * lifts its own field's filter.
  */
 export const BesideFilters: Story = {
+  decorators: [
+    withMachineRoot({
+      query: "page=1&size=5",
+      facets: ["status", "cores"],
+    }),
+  ],
   render: () => <BesideFiltersMachines />,
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress prototype: not yet exported from the package root.
@@ -231,8 +246,9 @@ import { DataChartWithTable } from "./DataViews/DataChartWithTable.js";`,
 
 /** Loading: the source has not answered, so the chart shows the status. */
 export const Loading: Story = {
-  render: () => (
+  render: (args) => (
     <MachineChartWithTable
+      {...pickStoryWords(args)}
       chart={statusCounts}
       options={{ source: createPendingSource }}
     />

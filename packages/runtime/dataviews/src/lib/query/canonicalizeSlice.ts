@@ -5,7 +5,7 @@ import rankOperand from "./rankOperand.js";
 import type { GroupTerm, Predicate, PredicateOperand, Slice } from "./types.js";
 
 /** Canonicalize one predicate: a set operator's operands become an ordered set. */
-const canonicalPredicate = (predicate: Predicate): Predicate => {
+const canonicalizePredicate = (predicate: Predicate): Predicate => {
   if (OPERATOR_ARITY[predicate.operator] !== "many") {
     return {
       field: predicate.field,
@@ -43,7 +43,7 @@ const canonicalPredicate = (predicate: Predicate): Predicate => {
  * name may change or move before the first release.
  */
 export default function canonicalizeSlice(slice: Slice): Slice {
-  const sorted = slice.filter.map(canonicalPredicate).sort(compareConjuncts);
+  const sorted = slice.filter.map(canonicalizePredicate).sort(compareConjuncts);
   const filter: Predicate[] = [];
   for (const predicate of sorted) {
     const last = filter.at(-1);

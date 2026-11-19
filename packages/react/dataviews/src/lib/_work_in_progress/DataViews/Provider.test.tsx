@@ -4,11 +4,11 @@
  * through, so two roots over one provider share the query and never a
  * half-typed input.
  */
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, type ReactNode, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../testing/buildMachine.js";
-import buildPage from "../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import { machines } from "../../../../testing/machines.js";
 import type { MachineProvider } from "../../../../testing/types.js";
@@ -25,7 +25,7 @@ const Root = ({
 }) => <DataViews provider={provider}>{children}</DataViews>;
 
 /** The executions the source still holds. */
-const live = (source: ReturnType<typeof createMachineProvider>["source"]) =>
+const listLive = (source: ReturnType<typeof createMachineProvider>["source"]) =>
   source.calls.filter((call) => call.releases === 0);
 
 /** A control over the `cores` lower bound, as a child of one root. */
@@ -107,15 +107,15 @@ describe("DataViews root", () => {
       </StrictMode>,
     );
     // The rehearsal observed and released; the kept mount observes again.
-    expect(live(source)).toHaveLength(1);
+    expect(listLive(source)).toHaveLength(1);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "alpha")]),
       });
     });
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
-    expect(live(source)).toHaveLength(1);
+    expect(listLive(source)).toHaveLength(1);
   });
 
   it("releases the first provider and observes the next when the prop changes", () => {
@@ -126,24 +126,24 @@ describe("DataViews root", () => {
         <DataViews.DataTable columns={columns} label="Machines" />
       </Root>,
     );
-    expect(live(first.source)).toHaveLength(1);
+    expect(listLive(first.source)).toHaveLength(1);
     rerender(
       <Root provider={second.provider}>
         <DataViews.DataTable columns={columns} label="Machines" />
       </Root>,
     );
-    expect(live(first.source)).toHaveLength(0);
-    expect(live(second.source)).toHaveLength(1);
+    expect(listLive(first.source)).toHaveLength(0);
+    expect(listLive(second.source)).toHaveLength(1);
     // The parts now read the new provider.
     act(() => {
-      second.source.latest().deliver({
+      second.source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m1", "alpha")]),
       });
     });
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
     unmount();
-    expect(live(second.source)).toHaveLength(0);
+    expect(listLive(second.source)).toHaveLength(0);
   });
 
   it("keeps the source live after a StrictMode mount over a source that answered at once", () => {
@@ -161,9 +161,9 @@ describe("DataViews root", () => {
       </StrictMode>,
     );
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
-    expect(live(source)).toHaveLength(1);
+    expect(listLive(source)).toHaveLength(1);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m2", "beta")]),
       });

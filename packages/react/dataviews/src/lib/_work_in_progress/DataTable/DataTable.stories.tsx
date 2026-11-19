@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope, withFrame } from "../../../storybook/decorators.js";
+import {
+  withAppScope,
+  withFrame,
+} from "../../../storybook/decorators/index.js";
 import buildMachines from "../../../storybook/machines/buildMachines.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
 import createForbiddingSource from "../../../storybook/machines/createForbiddingSource.js";
@@ -12,6 +14,7 @@ import createOneTermSource from "../../../storybook/machines/createOneTermSource
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import readHostName from "../../../storybook/machines/readHostName.js";
+import showConsumerCode from "../../../storybook/machines/showConsumerCode.js";
 import type {
   Machine,
   MachineFields,
@@ -38,7 +41,7 @@ const meta = {
   argTypes: {
     provider: { control: false },
     columns: { control: false },
-    rowLabel: { control: false },
+    getRowLabel: { control: false },
     renderStatus: { control: false },
     virtualization: { control: false },
   },
@@ -50,7 +53,7 @@ type Story = StoryObj<typeof Component>;
 /** The table's own props, less the ones a story's collection supplies. */
 type StoryTableProps = Omit<
   DataTableProps<MachineFields, Machine>,
-  "provider" | "columns" | "rowLabel"
+  "provider" | "columns" | "getRowLabel"
 >;
 
 /** The table over a provider bound to the story's own source. */
@@ -68,7 +71,7 @@ function MachinesTable({
       {...args}
       provider={provider}
       columns={columns}
-      rowLabel={readHostName}
+      getRowLabel={readHostName}
     />
   );
 }
@@ -82,7 +85,7 @@ const renderMachines =
   (args) => <MachinesTable {...args} columns={columns} options={options} />;
 
 /** A heading that states its column's sizing rule under its name. */
-const ruled = (name: string, rule: string): ReactNode => (
+const renderRuledHeader = (name: string, rule: string): ReactNode => (
   <>
     {name}
     <br />
@@ -104,49 +107,49 @@ const plainColumns: readonly DataTableColumn[] = [
 // order by, and every sortable column below is built through this helper,
 // whose type holds it to that: a column offering a sort its source cannot
 // execute is a dead control, and no story demonstrates one.
-const sortableColumn = (
+const declareSortableColumn = (
   id: SortableField,
   header: string,
 ): DataTableColumn => ({ id, header, sortable: true });
 
 const sortableColumns: readonly DataTableColumn[] = [
-  sortableColumn("name", "Host"),
-  sortableColumn("status", "Status"),
+  declareSortableColumn("name", "Host"),
+  declareSortableColumn("status", "Status"),
   { id: "region", header: "Region" },
-  sortableColumn("cores", "Cores"),
+  declareSortableColumn("cores", "Cores"),
   { id: "owner", header: "Owner" },
 ];
 
 const sizedColumns: readonly DataTableColumn[] = [
   {
     id: "name",
-    header: ruled("Host", "flex ×2 · min 160"),
+    header: renderRuledHeader("Host", "flex ×2 · min 160"),
     sizing: { kind: "flex", weight: 2, minPx: 160 },
   },
   {
     id: "status",
-    header: ruled("Status", "fixed 112"),
+    header: renderRuledHeader("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
     id: "region",
-    header: ruled("Region", "flex ×1 · 96–144"),
+    header: renderRuledHeader("Region", "flex ×1 · 96–144"),
     sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 },
   },
   {
     id: "cores",
-    header: ruled("Cores", "fixed 80"),
+    header: renderRuledHeader("Cores", "fixed 80"),
     sizing: { kind: "fixed", px: 80 },
   },
   {
     id: "owner",
-    header: ruled("Owner", "flex ×1 · min 96"),
+    header: renderRuledHeader("Owner", "flex ×1 · min 96"),
     sizing: { kind: "flex", weight: 1, minPx: 96 },
   },
 ];
 
 /** Mark the named columns resizable, leaving the rest as they are. */
-const resizing = (
+const markResizable = (
   columns: readonly DataTableColumn[],
   ids: readonly string[],
 ): readonly DataTableColumn[] =>
@@ -184,11 +187,11 @@ const selectableTableCode = `<DataTable
   columns={columns}
   label="Machines"
   selectable
-  rowLabel={(row) => row.name}
+  getRowLabel={(row) => row.name}
 />`;
 
 /** The table inside a frame of the given width. */
-const framedTableCode = (
+const spellFramedTableCode = (
   width: string,
 ): string => `<div style={{ maxWidth: "${width}" }}>
   ${tableCode}
@@ -229,7 +232,7 @@ const press = async (
 };
 
 /** An element's rendered width, in whole pixels. */
-const widthOf = (element: HTMLElement): number =>
+const measureWidth = (element: HTMLElement): number =>
   Math.round(element.getBoundingClientRect().width);
 
 /**
@@ -239,7 +242,7 @@ const widthOf = (element: HTMLElement): number =>
  * takes the ghost fill under the pointer.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     render: tableCode,
@@ -260,7 +263,7 @@ export const Default: Story = {
  * nothing to activate.
  */
 export const Sortable: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     render: tableCode,
@@ -275,7 +278,7 @@ export const Sortable: Story = {
  * machines of one status keep the source's order among themselves.
  */
 export const SortedAscending: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     prepare: `provider.setSort([{ field: "status", direction: "asc" }]);`,
@@ -301,7 +304,7 @@ export const SortedAscending: Story = {
         canvas
           .getAllByRole("row")
           .slice(1)
-          .map((row) => within(row).getAllByRole("cell")[0]?.textContent),
+          .map((row) => within(row).getAllByRole("cell").at(0)?.textContent),
       ).toEqual(
         [
           "alder",
@@ -328,7 +331,7 @@ export const SortedAscending: Story = {
  * at ascending.
  */
 export const SortedDescending: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     prepare: `provider.setSort([{ field: "cores", direction: "desc" }]);`,
@@ -345,7 +348,7 @@ export const SortedDescending: Story = {
       canvas.getByRole("columnheader", { name: "Cores" }).querySelector("use"),
     ).toHaveAttribute("href", expect.stringMatching(/#chevron-down$/));
     await waitFor(() =>
-      expect(canvas.getAllByRole("cell")[0]).toHaveTextContent(
+      expect(canvas.getAllByRole("cell").at(0)).toHaveTextContent(
         "ironwood.example.com",
       ),
     );
@@ -360,7 +363,7 @@ export const SortedDescending: Story = {
  * Shift still sorts by that column alone.
  */
 export const SortLimitedToOneTerm: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     render: tableCode,
@@ -388,7 +391,7 @@ const sortByStatusThenCores = (provider: MachineProvider): void => {
  * one heading ever claims it.
  */
 export const SortedByTwoTerms: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sortableColumnsCode,
     prepare: `provider.setSort([
@@ -421,7 +424,7 @@ export const SortedByTwoTerms: Story = {
  * own; clearing it returns to this.
  */
 export const DefaultOrdering: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [...tableParts, "createArraySource"],
     declarations: `const source = createArraySource({
   rows: machines,
@@ -459,7 +462,7 @@ ${sortableColumnsCode}`,
  * two cannot disagree. A selected row takes the information tint.
  */
 export const Selectable: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     render: selectableTableCode,
@@ -471,7 +474,9 @@ export const Selectable: Story = {
     // The select-all header leads the row: the stylesheet's track, from the
     // design's 32px dimension token.
     const [selection, ...columns] = canvas.getAllByRole("columnheader");
-    await expect(selection === undefined ? null : widthOf(selection)).toBe(32);
+    await expect(selection === undefined ? null : measureWidth(selection)).toBe(
+      32,
+    );
     // The data columns share exactly what that track leaves.
     const shared = columns.reduce(
       (total, column) => total + column.getBoundingClientRect().width,
@@ -494,7 +499,7 @@ export const Selectable: Story = {
  * alone. It never reaches a row the reader cannot see.
  */
 export const SelectAllActsOnDisplayedRows: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     query: "page=1&size=5",
@@ -528,10 +533,10 @@ export const SelectAllActsOnDisplayedRows: Story = {
  * column is ever squeezed below its minimum to make room.
  */
 export const FixedAndFlexibleColumns: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
-    render: framedTableCode("48rem"),
+    render: spellFramedTableCode("48rem"),
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(sizedColumns),
@@ -545,17 +550,17 @@ export const FixedAndFlexibleColumns: Story = {
  * column when scrolled.
  */
 export const HorizontalScroll: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: sizedColumnsCode,
-    render: framedTableCode("24rem"),
+    render: spellFramedTableCode("24rem"),
   }),
   decorators: [withFrame("24rem")],
   render: renderMachines(sizedColumns),
 };
 
 /** The code a resizable table's stories show. */
-const resizableCode = consumerCode({
+const resizableCode = showConsumerCode({
   parts: tableParts,
   declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
@@ -585,7 +590,9 @@ const resizableCode = consumerCode({
 export const Resizable: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  render: renderMachines(
+    markResizable(sizedColumns, ["name", "region", "owner"]),
+  ),
   play: async ({ canvas }) => {
     const controls = await canvas.findAllByRole("separator");
     await expect(controls).toHaveLength(2);
@@ -601,7 +608,7 @@ export const Resizable: Story = {
  * control appears exactly where a column may be resized, and nowhere else.
  */
 export const MixedResizableColumns: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", resizable: true },
@@ -613,7 +620,7 @@ export const MixedResizableColumns: Story = {
     render: tableCode,
   }),
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(plainColumns, ["name", "region"])),
+  render: renderMachines(markResizable(plainColumns, ["name", "region"])),
 };
 
 /**
@@ -627,7 +634,9 @@ export const MixedResizableColumns: Story = {
 export const ResizeWithoutDragging: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  render: renderMachines(
+    markResizable(sizedColumns, ["name", "region", "owner"]),
+  ),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const before = Number(host.getAttribute("aria-valuenow"));
@@ -664,7 +673,9 @@ export const PlacingAColumnsEdge: Story = {
   name: "Placing a column's edge",
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  render: renderMachines(
+    markResizable(sizedColumns, ["name", "region", "owner"]),
+  ),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const edge = host.getBoundingClientRect();
@@ -691,24 +702,24 @@ export const PlacingAColumnsEdge: Story = {
 const boundedColumns: readonly DataTableColumn[] = [
   {
     id: "name",
-    header: ruled("Host", "resizable · 120–320"),
+    header: renderRuledHeader("Host", "resizable · 120–320"),
     sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 },
     resizable: true,
   },
   {
     id: "region",
-    header: ruled("Region", "resizable · 96–160"),
+    header: renderRuledHeader("Region", "resizable · 96–160"),
     sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 160 },
     resizable: true,
   },
   {
     id: "status",
-    header: ruled("Status", "fixed 112"),
+    header: renderRuledHeader("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
     id: "owner",
-    header: ruled("Owner", "takes the rest"),
+    header: renderRuledHeader("Owner", "takes the rest"),
     sizing: { kind: "flex", weight: 1, minPx: 96 },
   },
 ];
@@ -723,7 +734,7 @@ const boundedColumns: readonly DataTableColumn[] = [
  * width is left.
  */
 export const ResizeWithinBounds: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 } },
@@ -758,7 +769,7 @@ export const ResizeWithinBounds: Story = {
  * scrolls.
  */
 export const ResizePastTheContainer: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
@@ -767,10 +778,10 @@ export const ResizePastTheContainer: Story = {
   { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
   { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
 ];`,
-    render: framedTableCode("36rem"),
+    render: spellFramedTableCode("36rem"),
   }),
   decorators: [withFrame("36rem")],
-  render: renderMachines(resizing(sizedColumns, ["name", "region"])),
+  render: renderMachines(markResizable(sizedColumns, ["name", "region"])),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole("table");
     const host = await canvas.findByRole("separator", { name: /^Host/ });
@@ -786,7 +797,7 @@ export const ResizePastTheContainer: Story = {
       start + table.clientWidth + 0.5,
     );
     await expect(
-      widthOf(canvas.getByRole("columnheader", { name: /^Owner/ })),
+      measureWidth(canvas.getByRole("columnheader", { name: /^Owner/ })),
     ).toBe(96);
   },
 };
@@ -794,18 +805,18 @@ export const ResizePastTheContainer: Story = {
 const fixedColumns: readonly DataTableColumn[] = [
   {
     id: "name",
-    header: ruled("Host", "resizable · fixed 200"),
+    header: renderRuledHeader("Host", "resizable · fixed 200"),
     sizing: { kind: "fixed", px: 200 },
     resizable: true,
   },
   {
     id: "status",
-    header: ruled("Status", "fixed 112"),
+    header: renderRuledHeader("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
     id: "owner",
-    header: ruled("Owner", "fixed 120"),
+    header: renderRuledHeader("Owner", "fixed 120"),
     sizing: { kind: "fixed", px: 120 },
   },
 ];
@@ -818,21 +829,23 @@ const fixedColumns: readonly DataTableColumn[] = [
  * take it, up to its own maximum.
  */
 export const SpaceAfterFixedColumns: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", resizable: true, sizing: { kind: "fixed", px: 200 } },
   { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
   { id: "owner", header: "Owner", sizing: { kind: "fixed", px: 120 } },
 ];`,
-    render: framedTableCode("48rem"),
+    render: spellFramedTableCode("48rem"),
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(fixedColumns),
   play: async ({ canvas }) => {
     await expect(
       Math.round(
-        widthOf(await canvas.findByRole("columnheader", { name: /^Owner/ })),
+        measureWidth(
+          await canvas.findByRole("columnheader", { name: /^Owner/ }),
+        ),
       ),
     ).toBe(120);
   },
@@ -871,7 +884,7 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
  * caller authoring any other header, row or cell.
  */
 export const CustomCellRenderer: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "type DisplayFieldCellProps", "type DataTableColumn"],
     declarations: `const statusDisplay: Record<string, { label: string; tone: string }> = {
   running: { label: "Running", tone: "var(--color-icon-success)" },
@@ -946,7 +959,7 @@ const scopedColumns: readonly DataTableColumn[] = [
  * cells, and every other row, stay as they are.
  */
 export const CellReadingItsScope: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: [
       "DataTable",
       "type DisplayFieldCellProps",
@@ -992,7 +1005,7 @@ const columns: readonly DataTableColumn[] = [
  * know yet.
  */
 export const Loading: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1016,7 +1029,7 @@ export const Loading: Story = {
  * nothing.
  */
 export const Failed: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1044,7 +1057,7 @@ export const Failed: Story = {
  * malfunctioned. A change of filter or search asks again.
  */
 export const NoAccess: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1069,7 +1082,7 @@ export const NoAccess: Story = {
  * matched nothing — there is nothing here to find.
  */
 export const EmptyCollection: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `${plainColumnsCode}
 
@@ -1091,7 +1104,7 @@ export const EmptyCollection: Story = {
  * collection is empty.
  */
 export const NoMatch: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: plainColumnsCode,
     prepare: `provider.setSearch("quartz");`,
@@ -1112,14 +1125,14 @@ export const NoMatch: Story = {
  * technology reads and what a copy selects.
  */
 export const LongValues: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "fixed", px: 176 } },
   { id: "status", header: "Status", sizing: { kind: "fixed", px: 96 } },
   { id: "note", header: "Note", sizing: { kind: "flex", weight: 1, minPx: 160 } },
 ];`,
-    render: framedTableCode("40rem"),
+    render: spellFramedTableCode("40rem"),
   }),
   decorators: [withFrame("40rem")],
   render: renderMachines([
@@ -1158,11 +1171,11 @@ const renderVirtualized =
  * A virtualized story's consumer code: the table, virtualized, in a capped
  * frame, over a provider whose window holds every one of ten thousand machines.
  */
-const virtualizedConsumer = (
+const showVirtualizedCode = (
   columns: string,
   parts: readonly string[] = tableParts,
 ): NonNullable<Story["parameters"]> =>
-  consumerCode({
+  showConsumerCode({
     parts,
     imports: `import { virtualizeRows } from "@canonical/dataviews-react/virtualization";
 import { machineCollection, machines } from "./machines.js";`,
@@ -1177,14 +1190,14 @@ ${columns}`,
   columns={columns}
   label="Machines"
   selectable
-  rowLabel={(row) => row.name}
+  getRowLabel={(row) => row.name}
   virtualization={virtualization}
   style={{ maxBlockSize: "24rem" }}
 />`,
   });
 
 /** The logical positions of the rows mounted right now. */
-const mountedPositions = (table: HTMLElement): number[] =>
+const listMountedPositions = (table: HTMLElement): number[] =>
   [...table.querySelectorAll('[role="row"]')].map((row) =>
     Number(row.getAttribute("aria-rowindex")),
   );
@@ -1202,7 +1215,7 @@ const mountedPositions = (table: HTMLElement): number[] =>
  * window, mounted or not.
  */
 export const Virtualized: Story = {
-  parameters: virtualizedConsumer(`const columns: readonly DataTableColumn[] = [
+  parameters: showVirtualizedCode(`const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sortable: true },
   { id: "status", header: "Status", sortable: true },
   { id: "region", header: "Region" },
@@ -1216,14 +1229,14 @@ export const Virtualized: Story = {
     await waitFor(() =>
       expect(table).toHaveAttribute("aria-rowcount", "10001"),
     );
-    await expect(mountedPositions(table).length).toBeLessThan(40);
+    await expect(listMountedPositions(table).length).toBeLessThan(40);
     table.scrollTop = table.scrollHeight;
     const last = await canvas.findByText("node-09999.example.com");
     await expect(last.closest('[role="row"]')).toHaveAttribute(
       "aria-rowindex",
       "10001",
     );
-    await expect(mountedPositions(table).length).toBeLessThan(40);
+    await expect(listMountedPositions(table).length).toBeLessThan(40);
   },
 };
 
@@ -1240,7 +1253,7 @@ function WrappingNote({ value }: DisplayFieldCellProps): ReactElement {
  * its estimate, the view stays on the rows being read rather than jumping.
  */
 export const VirtualizedVariableHeights: Story = {
-  parameters: virtualizedConsumer(
+  parameters: showVirtualizedCode(
     `function WrappingNote({ value }: DisplayFieldCellProps) {
   return <span style={{ whiteSpace: "normal" }}>{String(value)}</span>;
 }
@@ -1274,34 +1287,34 @@ const columns: readonly DataTableColumn[] = [
     await canvas.findByText("node-00000.example.com");
     table.scrollTop = table.scrollHeight / 2;
     await waitFor(() =>
-      expect(Math.min(...mountedPositions(table).slice(1))).toBeGreaterThan(
+      expect(Math.min(...listMountedPositions(table).slice(1))).toBeGreaterThan(
         1000,
       ),
     );
     const header = table.querySelector(".ds.data-table-row-group.header");
-    const rows = () => [
+    const listRows = () => [
       ...table.querySelectorAll(".ds.data-table-row-group.body > [role=row]"),
     ];
-    const frames = async (): Promise<void> => {
+    const waitFrames = async (): Promise<void> => {
       for (let frame = 0; frame < 2; frame += 1) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
       }
     };
-    await frames();
+    await waitFrames();
     const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
-    const first = rows().find(
+    const first = listRows().find(
       (row) => row.getBoundingClientRect().bottom > headerBottom,
     );
     const top = first?.getBoundingClientRect().top;
     await expect(top).toBeDefined();
     // Settled, and measured: the row being read holds still.
-    await frames();
+    await waitFrames();
     await expect(first?.getBoundingClientRect().top).toBe(top);
     // The mounted rows cover the viewport, with no blank band at either end.
-    const mounted = rows();
-    await expect(mounted[0]?.getBoundingClientRect().top).toBeLessThanOrEqual(
-      headerBottom,
-    );
+    const mounted = listRows();
+    await expect(
+      mounted.at(0)?.getBoundingClientRect().top,
+    ).toBeLessThanOrEqual(headerBottom);
     await expect(
       mounted.at(-1)?.getBoundingClientRect().bottom,
     ).toBeGreaterThanOrEqual(table.getBoundingClientRect().bottom - 1);
@@ -1321,7 +1334,7 @@ const columns: readonly DataTableColumn[] = [
  * the row is let go.
  */
 export const VirtualizedKeepsFocus: Story = {
-  parameters: virtualizedConsumer(`const columns: readonly DataTableColumn[] = [
+  parameters: showVirtualizedCode(`const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
   { id: "status", header: "Status" },
   { id: "region", header: "Region" },
@@ -1338,7 +1351,7 @@ export const VirtualizedKeepsFocus: Story = {
     const table = canvas.getByRole("table");
     table.scrollTop = table.scrollHeight / 2;
     await waitFor(() =>
-      expect(Math.max(...mountedPositions(table))).toBeGreaterThan(4000),
+      expect(Math.max(...listMountedPositions(table))).toBeGreaterThan(4000),
     );
     await expect(checkbox).toBeInTheDocument();
     await expect(checkbox).toHaveFocus();

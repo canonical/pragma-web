@@ -19,6 +19,10 @@
       "types": "./dist/types/lib/indexeddb/index.d.ts",
       "import": "./dist/esm/lib/indexeddb/index.js"
     },
+    "./testing": {
+      "types": "./dist/types/testing/index.d.ts",
+      "import": "./dist/esm/testing/index.js"
+    },
     "./virtualization": {
       "types": "./dist/types/lib/virtualization/index.d.ts",
       "import": "./dist/esm/lib/virtualization/index.js"
@@ -43,8 +47,12 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && bun run build:testing",
+    "build:testing": "tsc -p tsconfig.build.testing.json && cp -R dist/testing-build/esm/testing dist/esm/ && cp -R dist/testing-build/types/testing dist/types/ && rm -rf dist/testing-build && perl -pi -e 's#\\.\\./src/lib/#../lib/#g' dist/esm/testing/*.js dist/types/testing/*.d.ts",
     "build:all": "bun run build",
     "check": "bun run check:biome && bun run check:ts && bun run check:webarchitect",
     "check:webarchitect": "webarchitect library",
