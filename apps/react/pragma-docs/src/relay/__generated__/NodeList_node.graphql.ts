@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e310a730a04c20f60b1b50d61fdec06a>>
+ * @generated SignedSource<<8a28c6f9a679b5ab23db8c8d399cab15>>
  * @lightSyntaxTransform
  */
 
@@ -11,12 +11,24 @@ import { ReaderFragment } from 'relay-runtime';
 export type TermVisibility = "HIDDEN" | "NORMAL" | "PROMINENT" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type NodeList_node$data = ReadonlyArray<{
+  readonly __typename: string;
   readonly _meta: {
+    readonly curie: string;
+    readonly title: string;
     readonly type: {
+      readonly superclasses: ReadonlyArray<{
+        readonly uri: string;
+      }>;
+      readonly uri: string;
       readonly visibility: TermVisibility | null | undefined;
     };
   };
   readonly uri: string;
+  readonly values: ReadonlyArray<{
+    readonly field: string;
+    readonly label: string;
+    readonly text: string | null | undefined;
+  }>;
   readonly " $fragmentSpreads": FragmentRefs<"CardProjection_node" | "RowProjection_node">;
   readonly " $fragmentType": "NodeList_node";
 }>;
@@ -25,7 +37,15 @@ export type NodeList_node$key = ReadonlyArray<{
   readonly " $fragmentSpreads": FragmentRefs<"NodeList_node">;
 }>;
 
-const node: ReaderFragment = {
+const node: ReaderFragment = (function(){
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "uri",
+  "storageKey": null
+};
+return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": {
@@ -37,9 +57,10 @@ const node: ReaderFragment = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "uri",
+      "name": "__typename",
       "storageKey": null
     },
+    (v0/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -51,19 +72,78 @@ const node: ReaderFragment = {
         {
           "alias": null,
           "args": null,
+          "kind": "ScalarField",
+          "name": "title",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "curie",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
           "concreteType": "OntologyClass",
           "kind": "LinkedField",
           "name": "type",
           "plural": false,
           "selections": [
+            (v0/*:: as any*/),
             {
               "alias": null,
               "args": null,
               "kind": "ScalarField",
               "name": "visibility",
               "storageKey": null
+            },
+            {
+              "alias": null,
+              "args": null,
+              "concreteType": "OntologyClass",
+              "kind": "LinkedField",
+              "name": "superclasses",
+              "plural": true,
+              "selections": [
+                (v0/*:: as any*/)
+              ],
+              "storageKey": null
             }
           ],
+          "storageKey": null
+        }
+      ],
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": "NodeValue",
+      "kind": "LinkedField",
+      "name": "values",
+      "plural": true,
+      "selections": [
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "field",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "label",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "text",
           "storageKey": null
         }
       ],
@@ -83,7 +163,8 @@ const node: ReaderFragment = {
   "type": "Node",
   "abstractKey": "__isNode"
 };
+})();
 
-(node as any).hash = "2e236db1df21f1ca29d22a0fbbda9755";
+(node as any).hash = "0ef74dd5ec3372a29ffc814acc600342";
 
 export default node;
