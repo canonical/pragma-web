@@ -16,11 +16,7 @@
     --button-color-background-disabled: var(
       --color-foreground-primary-disabled
     );
-    /* Neutral text is the normal text colour. The filled default reads as
-       contrast on the fill because `.primary` (the default importance, applied by
-       the component) overrides text/icon to the on-fill contrast tokens; ghost
-       importances keep this normal colour, so they stay visible. */
-    --button-color-text: var(--color-text);
+    /* No --button-color-text here, so ancestor overrides win. */
     --button-color-border: var(--color-border-highlighted, var(--color-border));
 
     /* Inline padding (Figma):
@@ -78,7 +74,12 @@
     gap: var(--button-gap);
     cursor: pointer;
 
-    color: var(--modifier-color-text, var(--button-color-text));
+    /* Surface text (inverted on .contrasted), else page text; `.primary`
+       overrides it with the on-fill contrast colour. */
+    color: var(
+      --modifier-color-text,
+      var(--button-color-text, var(--surface-color-text, var(--color-text)))
+    );
     background-color: var(--modifier-surface, var(--button-color-background));
     /* The outline flag (0/1) toggles the border's COLOUR, not its width: the
        border is ALWAYS present at the nominal width (transparent when hidden), so
@@ -205,7 +206,10 @@
      working, not unavailable — so it keeps the enabled surface, text and border
      colours, overriding the :disabled greying above. */
   .ds.button.loading {
-    color: var(--modifier-color-text, var(--button-color-text));
+    color: var(
+      --modifier-color-text,
+      var(--button-color-text, var(--surface-color-text, var(--color-text)))
+    );
     background-color: var(--modifier-surface, var(--button-color-background));
     border-color: var(--modifier-color-border, var(--button-color-border));
 

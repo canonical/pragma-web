@@ -91,6 +91,8 @@
  * carries a `layer()` keyword: that would nest the file's layer inside another. */
 @import url("@canonical/design-tokens/dist/sets.primitive.css");
 @import url("@canonical/design-tokens/dist/modifiers.theme.css");
+/* shim: design-tokens surfaces; must precede the generated file. */
+@import url("./modifiers.surfaces.shim.css");
 @import url("@canonical/design-tokens/dist/modifiers.surfaces.css");
 @import url("@canonical/design-tokens/dist/modifiers.anticipation.css");
 @import url("@canonical/design-tokens/dist/modifiers.criticality.css");

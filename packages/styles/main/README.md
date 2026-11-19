@@ -201,6 +201,7 @@ on, and the two are chosen by different people for different reasons.
 | `grid.css` `:root` defaults | `ds.components.global` | no — tokens the presets read, kept with them rather than moved to `ds.tokens` |
 | `modifiers.density.css` | `ds.modifiers` | no |
 | `modifiers.states.shim.css`, `modifiers.importance.shim.css`, `modifiers.criticality.shim.css` | `ds.modifiers` | no |
+| `modifiers.surfaces.shim.css` | `ds.surfaces` | no |
 | `controls.hover.shim.css` | `ds.surfaces` and `ds.states` | no |
 | `@canonical/styles-typography` | `ds.tokens` for its naming shims, `ds.typography` for its element rules and engine, `ds.modifiers` for the typographic scale it imports | its element rules, yes; its tokens, no |
 | `@canonical/design-tokens` distribution files | `ds.tokens`, `ds.modifiers`, `ds.surfaces`, `ds.states` — each file opens its own, except `modifiers.importance.css`, which is empty and opens none | no |

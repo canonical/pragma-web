@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import * as decorators from "../../../storybook/decorators.js";
+import renderOnSurfaces from "../../../storybook/renderOnSurfaces.js";
 import Component from "./Accordion.js";
 
 const meta: Meta<typeof Component> = {
@@ -50,11 +50,7 @@ export const SingleItem: Story = {
   ),
 };
 
-/**
- * The `heading` prop takes a node, so the consumer owns the heading semantics.
- * Only two type tokens are used: plain text (and any heading element) renders
- * at the text-primary body tier, while an `<h6>` renders at the heading-6 tier.
- */
+/** Headings passed as plain text or as an `<h6>`. */
 export const Heading: Story = {
   render: () => (
     <Component>
@@ -71,18 +67,11 @@ export const Heading: Story = {
   ),
 };
 
-/**
- * The accordion adapts to nested `.surface` contexts: its header background
- * uses the ghost surface channel, which steps to layer 2 and layer 3 as the
- * component is nested inside successive `.surface` containers.
- */
+/** The accordion on each surface level. */
 export const OnSurfaces: Story = {
   parameters: { grid: "responsive" },
   render: () =>
-    // The accordion's header background uses the ghost surface channel, which
-    // steps with each nested surface band. The bands are subgrids, so the
-    // accordion (grid-column: 1 / -1) aligns to the page grid.
-    decorators.surfaces((level) => (
+    renderOnSurfaces((level) => (
       <Component>
         <Component.Item heading={`On surface level ${level + 1}`} expanded>
           <p className="p">
