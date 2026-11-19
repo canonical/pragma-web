@@ -267,6 +267,14 @@
   margin-block-end: var(--ds-text-grid-compensation);
 }
 
+/* The old field relationship preceded the seated label: retain its original
+   item gap only in Before, alongside the original text correction terms. */
+.bucket-text-phase[data-text-seat-phase="before"]
+  .bucket-field-fixture
+  .ds.field {
+  row-gap: var(--form-field-label-gap);
+}
+
 /* All remaining roles stay in normal flow so their first baselines, wraps and
    field geometry can be inspected beside the printed measurement results. */
 .bucket-text-diagnostics {

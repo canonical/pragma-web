@@ -11,12 +11,37 @@
     row-gap: var(--form-field-label-gap);
     align-items: baseline;
 
+    /* A seated label already supplies the trailing control inset. Absorb it
+       into the following item gap while keeping both label metric edges. */
+    &:has(> .payload):has(> .ds.field-label.spacing-text-seat) {
+      row-gap: max(
+        0px,
+        calc(
+          var(--form-field-label-gap) -
+          var(--_text-seat-inset, var(--ds-spacing-control-inset, 0px))
+        )
+      );
+    }
+
     /* Retain the public leading-description carrier for consumer overrides. */
     &:has(> .payload > .ds.field-description:first-child) {
       row-gap: var(
         --form-field-label-description-gap,
         var(--form-field-label-gap)
       );
+
+      &:has(> .ds.field-label.spacing-text-seat) {
+        row-gap: max(
+          0px,
+          calc(
+            var(
+              --form-field-label-description-gap,
+              var(--form-field-label-gap)
+            ) -
+            var(--_text-seat-inset, var(--ds-spacing-control-inset, 0px))
+          )
+        );
+      }
     }
 
     & > .ds.field-label {

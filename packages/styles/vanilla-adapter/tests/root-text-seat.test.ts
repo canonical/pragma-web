@@ -4,10 +4,12 @@ import navItemCss from "../../../react/ds-app/src/lib/SideNavigation/common/Item
 import navCss from "../../../react/ds-app/src/lib/SideNavigation/styles.css?inline";
 import accordionItemCss from "../../../react/ds-global/src/lib/component/Accordion/common/Item/styles.css?inline";
 import accordionCss from "../../../react/ds-global/src/lib/component/Accordion/styles.css?inline";
+import wrapperCss from "../../../react/ds-global-form/src/lib/common/Wrapper/styles.css?inline";
 import toggleCss from "../../../react/ds-global-form/src/lib/common/Wrapper/ToggleWrapper.css?inline";
 import choicesCss from "../../../react/ds-global-form/src/lib/component/ChoicesField/styles.css?inline";
 import richChoicesCss from "../../../react/ds-global-form/src/lib/component/RichChoicesField/styles.css?inline";
 import checkboxCss from "../../../react/ds-global-form/src/lib/subcomponent/CheckboxInput/styles.css?inline";
+import labelCss from "../../../react/ds-global-form/src/lib/subcomponent/Field/Label/styles.css?inline";
 import {
   computed,
   emulate,
@@ -293,6 +295,330 @@ describe("root-size text seating", () => {
             oldShell.getBoundingClientRect().height,
           `${tier} ${tag} header closure`,
         ).toBeCloseTo(0, 2);
+      }
+    },
+  );
+
+  it.each(["none", "active"] as const)(
+    "inherits one chrome opt-out through nested text helpers in forced colors %s",
+    async (forcedColors) => {
+      await emulate({ forcedColors });
+      for (const css of [PRAGMA_CSS, MIXED_PRAGMA_CSS]) {
+        for (const rootSize of [16, 20]) {
+          const scale = rootSize / 16;
+          const doc = await render({
+            root: "site",
+            styles: [
+              css,
+              spacingSeatCss,
+              accordionCss,
+              accordionItemCss,
+              richChoicesCss,
+              labelCss,
+              beforeCss,
+              fixtureCss,
+              `html {font-size:${rootSize}px} .nested-shell {display:flow-root}`,
+            ],
+            body: tiers
+              .map(
+                (tier) =>
+                  `<section class="ds ${tier}">${["before", "adopted"]
+                    .map(
+                      (phase) => `
+              <div class="${phase}">
+                <div id="${tier}-${phase}-isolated-shell" class="nested-shell" style="--_text-seat-inset:0px">
+                  ${text(`${tier}-${phase}-isolated-helper`, "span", 'class="ds field-label spacing-text-seat text-test"')}
+                  ${text(`${tier}-${phase}-isolated-prose`, "p", 'class="p text-test"')}
+                </div>
+                <div class="ds accordion"><details class="ds accordion-item">
+                  <summary id="${tier}-${phase}-nested-header-shell" class="header"><span class="chevron"></span><span class="heading">
+                    ${text(`${tier}-${phase}-header-helper`, "span", 'class="ds field-label spacing-text-seat text-test"')}
+                  </span></summary><div class="content editorial"></div>
+                </details></div>
+                <fieldset class="ds form-rich-choices"><div class="ds option"><input type="radio" id="${tier}-${phase}-nested-input"/>
+                  <label id="${tier}-${phase}-nested-card-shell" class="p" for="${tier}-${phase}-nested-input">
+                    ${text(`${tier}-${phase}-card-helper`, "span", 'class="ds field-label spacing-text-seat text-test"')}
+                  </label>
+                </div></fieldset>
+              </div>`,
+                    )
+                    .join("")}</section>`,
+              )
+              .join(""),
+          });
+          for (const tier of tiers) {
+            for (const role of [
+              "isolated-helper",
+              "isolated-prose",
+              "header-helper",
+              "card-helper",
+            ]) {
+              const result = changed(doc, tier, role, 0);
+              expect(
+                result.before.occupied,
+                `${tier} ${role} original closure`,
+              ).toBeCloseTo((tier === "site" ? 40 : 24) * scale, 2);
+              expect(
+                result.adopted.occupied,
+                `${tier} ${role} unseated closure`,
+              ).toBeCloseTo((tier === "site" ? 40 : 24) * scale, 2);
+            }
+            for (const shell of [
+              "isolated-shell",
+              "nested-header-shell",
+              "nested-card-shell",
+            ]) {
+              const oldShell = doc.getElementById(`${tier}-before-${shell}`);
+              const newShell = doc.getElementById(`${tier}-adopted-${shell}`);
+              if (!oldShell || !newShell) throw new Error(`missing ${shell}`);
+              const oldOccupied =
+                oldShell.getBoundingClientRect().height +
+                number(computed(doc, oldShell).marginBlockEnd);
+              const newOccupied =
+                newShell.getBoundingClientRect().height +
+                number(computed(doc, newShell).marginBlockEnd);
+              expect(
+                newOccupied,
+                `${tier} ${shell} has no second seat or closure`,
+              ).toBeCloseTo(oldOccupied, 2);
+            }
+          }
+        }
+      }
+    },
+  );
+
+  it.each([16, 20])(
+    "absorbs the label's end inset into the stacked field gap at %spx rem",
+    async (rootSize) => {
+      const scale = rootSize / 16;
+      for (const css of [PRAGMA_CSS, MIXED_PRAGMA_CSS]) {
+        const doc = await render({
+          root: "site",
+          styles: [
+            css,
+            wrapperCss,
+            labelCss,
+            beforeCss,
+            fixtureCss,
+            `html {font-size:${rootSize}px} .before .ds.field {row-gap:var(--form-field-label-gap)}`,
+          ],
+          body: tiers
+            .map(
+              (tier) =>
+                `<section class="ds ${tier}">${["before", "adopted"]
+                  .map(
+                    (phase) => `
+            <form class="${phase} ds form"><div id="${tier}-${phase}-stacked-field" class="ds field" style="grid-template-columns:1fr">
+              <label id="${tier}-${phase}-stacked-label" class="ds field-label spacing-text-seat text-test" for="${tier}-${phase}-stacked-input">Label<i></i></label>
+              <div class="payload"><div id="${tier}-${phase}-stacked-control" class="ds input text chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within"><input id="${tier}-${phase}-stacked-input" value="Value"/></div></div>
+            </div></form>`,
+                  )
+                  .join("")}</section>`,
+            )
+            .join(""),
+        });
+        for (const tier of tiers) {
+          const inset = (tier === "site" ? 0 : 4) * scale;
+          const label = changed(doc, tier, "stacked-label", inset);
+          expect(label.before.occupied, `${tier} old label seat`).toBeCloseTo(
+            (tier === "site" ? 40 : 24) * scale,
+            2,
+          );
+          expect(
+            label.adopted.occupied,
+            `${tier} adopted label seat`,
+          ).toBeCloseTo((tier === "site" ? 40 : 32) * scale, 2);
+          const readings = ["before", "adopted"].map((phase) => {
+            const field = doc.getElementById(`${tier}-${phase}-stacked-field`);
+            const owner = doc.getElementById(`${tier}-${phase}-stacked-label`);
+            const control = doc.getElementById(
+              `${tier}-${phase}-stacked-control`,
+            );
+            if (!field || !owner || !control)
+              throw new Error("missing actual stacked field owner");
+            const ownerTop = owner.getBoundingClientRect().top;
+            const ownerMetrics = metrics(doc, `${tier}-${phase}-stacked-label`);
+            return {
+              gap: number(computed(doc, field).rowGap),
+              controlTop: control.getBoundingClientRect().top - ownerTop,
+              baselineToControl:
+                control.getBoundingClientRect().top -
+                ownerTop -
+                ownerMetrics.baseline,
+            };
+          });
+          expect(readings[0].gap, `${tier} original item gap`).toBeCloseTo(
+            (tier === "site" ? 8 : 4) * scale,
+            2,
+          );
+          expect(readings[1].gap, `${tier} absorbed item gap`).toBeCloseTo(
+            (tier === "site" ? 8 : 0) * scale,
+            2,
+          );
+          expect(
+            readings[0].controlTop,
+            `${tier} original label to control`,
+          ).toBeCloseTo((tier === "site" ? 48 : 28) * scale, 2);
+          expect(
+            readings[1].controlTop,
+            `${tier} adopted label to control`,
+          ).toBeCloseTo((tier === "site" ? 48 : 32) * scale, 2);
+          expect(
+            readings[1].baselineToControl,
+            `${tier} label baseline to control is preserved`,
+          ).toBeCloseTo(readings[0].baselineToControl, 2);
+        }
+      }
+    },
+  );
+
+  it.each([
+    "custom",
+    "leading-description",
+    "chrome-opt-out",
+    "toggle",
+    "side-by-side",
+  ] as const)(
+    "retains the public and composition gap contract for %s fields",
+    async (variant) => {
+      const doc = await render({
+        root: "site",
+        styles: [
+          PRAGMA_CSS,
+          wrapperCss,
+          labelCss,
+          toggleCss,
+          checkboxCss,
+          beforeCss,
+          fixtureCss,
+          `.before .ds.field {row-gap:var(--form-field-label-gap)}
+           .before .ds.field:has(> .payload > .ds.field-description:first-child) {row-gap:var(--form-field-label-description-gap,var(--form-field-label-gap))}`,
+        ],
+        body: tiers
+          .map(
+            (tier) =>
+              `<section class="${tier}">${["before", "adopted"]
+                .map((phase) => {
+                  const prefix = `${tier}-${phase}`;
+                  const heading = text(
+                    `${prefix}-gap-label`,
+                    "label",
+                    'class="ds field-label spacing-text-seat text-test"',
+                  );
+                  const control = `<div id="${prefix}-gap-control" class="ds input text chrome spacing-control-seat"><input value="Value"/></div>`;
+                  const description = `<p id="${prefix}-gap-description" class="ds field-description p text-test">Description<i></i></p>`;
+                  const style =
+                    variant === "custom" || variant === "side-by-side"
+                      ? "--form-field-label-gap:12px"
+                      : variant === "leading-description"
+                        ? "--form-field-label-description-gap:12px"
+                        : variant === "chrome-opt-out"
+                          ? "--_text-seat-inset:0px"
+                          : "";
+                  const content =
+                    variant === "toggle"
+                      ? `${heading}<div id="${prefix}-gap-control" class="ds field-toggle-control spacing-text-seat"><input class="ds form-checkbox" type="checkbox"/><label class="ds field-label field-toggle-inline-label">Toggle</label></div>${description}`
+                      : `${heading}<div id="${prefix}-gap-payload" class="payload">${variant === "leading-description" ? description : ""}${control}</div>`;
+                  const columns =
+                    variant === "side-by-side"
+                      ? "grid-template-columns:1fr 1fr;--form-label-columns:1;--form-payload-columns:2"
+                      : "grid-template-columns:1fr";
+                  return `<form class="${phase} ds form"><div id="${prefix}-gap-field" class="ds field${variant === "toggle" ? " field-toggle" : ""}" style="${columns};${style}">${content}</div></form>`;
+                })
+                .join("")}</section>`,
+          )
+          .join(""),
+      });
+      for (const tier of tiers) {
+        const itemGap = tier === "site" ? 8 : 4;
+        const inset = tier === "site" ? 0 : 4;
+        const baselineToPayload: number[] = [];
+        for (const phase of ["before", "adopted"]) {
+          const prefix = `${tier}-${phase}`;
+          const field = doc.getElementById(`${prefix}-gap-field`);
+          const label = doc.getElementById(`${prefix}-gap-label`);
+          const control = doc.getElementById(`${prefix}-gap-control`);
+          if (!field || !label || !control)
+            throw new Error("missing actual field composition");
+          const publicGap =
+            variant === "custom" ||
+            variant === "leading-description" ||
+            variant === "side-by-side"
+              ? 12
+              : itemGap;
+          const absorbs = variant !== "toggle" && variant !== "chrome-opt-out";
+          const expectedGap =
+            phase === "adopted" && absorbs ? publicGap - inset : publicGap;
+          expect(
+            number(computed(doc, field).rowGap),
+            `${tier} ${phase} ${variant} row gap`,
+          ).toBeCloseTo(expectedGap, 2);
+          if (variant === "toggle") {
+            const description = doc.getElementById(`${prefix}-gap-description`);
+            if (!description)
+              throw new Error("missing actual toggle description");
+            for (const [previous, next] of [
+              [label, control],
+              [control, description],
+            ]) {
+              expect(
+                next.getBoundingClientRect().top -
+                  previous.getBoundingClientRect().bottom -
+                  number(computed(doc, previous).marginBlockEnd),
+                `${tier} ${phase} toggle relationship gap`,
+              ).toBeCloseTo(itemGap, 2);
+            }
+          } else {
+            const payload = doc.getElementById(`${prefix}-gap-payload`);
+            if (!payload) throw new Error("missing actual field payload");
+            expect(
+              number(computed(doc, payload).rowGap),
+              `${tier} payload internal gap remains independent`,
+            ).toBeCloseTo(itemGap, 2);
+            if (variant === "chrome-opt-out") {
+              expect(
+                metrics(doc, `${prefix}-gap-label`).occupied,
+                `${tier} chrome-owned label remains unseated`,
+              ).toBeCloseTo(tier === "site" ? 40 : 24, 2);
+              expect(
+                control.getBoundingClientRect().top -
+                  label.getBoundingClientRect().top,
+                `${tier} opted-out field keeps original relationship`,
+              ).toBeCloseTo(tier === "site" ? 48 : 28, 2);
+            } else if (variant === "side-by-side") {
+              const before = {
+                label: label.getBoundingClientRect().top,
+                control: control.getBoundingClientRect().top,
+                height: field.getBoundingClientRect().height,
+              };
+              field.style.rowGap = "99px";
+              expect(
+                label.getBoundingClientRect().top,
+                `${tier} same-row label ignores row gap`,
+              ).toBeCloseTo(before.label, 2);
+              expect(
+                control.getBoundingClientRect().top,
+                `${tier} same-row control ignores row gap`,
+              ).toBeCloseTo(before.control, 2);
+              expect(
+                field.getBoundingClientRect().height,
+                `${tier} same-row field height ignores row gap`,
+              ).toBeCloseTo(before.height, 2);
+            } else {
+              baselineToPayload.push(
+                payload.getBoundingClientRect().top -
+                  label.getBoundingClientRect().top -
+                  metrics(doc, `${prefix}-gap-label`).baseline,
+              );
+            }
+          }
+        }
+        if (baselineToPayload.length)
+          expect(
+            baselineToPayload[1],
+            `${tier} ${variant} preserves label-baseline relationship`,
+          ).toBeCloseTo(baselineToPayload[0], 2);
       }
     },
   );

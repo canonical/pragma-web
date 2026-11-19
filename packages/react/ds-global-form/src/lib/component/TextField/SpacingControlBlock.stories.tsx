@@ -561,7 +561,9 @@ type TextSeatResult = {
   buttonDelta: number | null;
 };
 type FieldSeatResult = {
+  layoutGap: number;
   labelToInputTop: number;
+  labelBaselineToInputTop: number;
   labelToInputBaseline: number;
   labelBaselineOffset: number;
   inputBaselineOffset: number;
@@ -861,13 +863,16 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
         );
         const input = field?.querySelector<HTMLElement>(".input.text");
         const leaf = input?.querySelector<HTMLElement>("input");
-        if (!label || !input || !leaf) return null;
+        if (!field || !label || !input || !leaf) return null;
         const labelRect = label.getBoundingClientRect();
         const inputRect = input.getBoundingClientRect();
         const labelBaseline = readBrowserBaseline(label, label, labelRect);
         const inputBaseline = readBrowserBaseline(input, leaf, inputRect);
         return {
+          layoutGap: number(getComputedStyle(field).rowGap),
           labelToInputTop: inputRect.top - labelRect.top,
+          labelBaselineToInputTop:
+            inputRect.top - labelRect.top - (labelBaseline ?? Number.NaN),
           labelToInputBaseline:
             inputRect.top +
             (inputBaseline ?? Number.NaN) -
@@ -896,17 +901,32 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
         );
         equal(
           fields.adopted.labelToInputTop,
-          (tier === "site" ? 48 : 36) * rootScale,
+          (tier === "site" ? 48 : 32) * rootScale,
           "Adopted field label to input top",
         );
-        // Flow adds the inset twice, while the label's own first baseline also
-        // moves by one inset. Preserve the browser's native-input baseline
-        // offset instead of assuming it equals a plain text element's offset.
+        equal(
+          fields.before.layoutGap,
+          (tier === "site" ? 8 : 4) * rootScale,
+          "Before field layout gap",
+        );
+        equal(
+          fields.adopted.layoutGap,
+          (tier === "site" ? 8 : 0) * rootScale,
+          "Adopted field layout gap",
+        );
+        // The wrapper absorbs the label's end inset in its layout gap. The
+        // label keeps its full seat while its text-to-input distances stay
+        // unchanged, including the browser's native-input baseline offset.
+        equal(
+          fields.adopted.labelBaselineToInputTop,
+          fields.before.labelBaselineToInputTop,
+          "label baseline to input top unchanged",
+        );
         equal(
           fields.adopted.labelToInputBaseline -
             fields.before.labelToInputBaseline,
-          inset,
-          "field baseline separation change",
+          0,
+          "field baseline separation unchanged",
         );
         equal(
           fields.adopted.labelBaselineOffset -
@@ -998,7 +1018,8 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
       <p>
         Body and root-size headings gain the tier-default inset on both metric
         edges. Larger headings keep their previous occupied size. Text in cells
-        keeps the same default seat.
+        keeps the same default seat. Stacked fields absorb the label's trailing
+        inset in their layout gap, preserving the label-text-to-input distance.
       </p>
       {(["before", "adopted"] as const).map((phase) => (
         <div
@@ -1041,7 +1062,11 @@ const RootTextComparison = ({ tier }: { tier: TierName }) => {
               <span>
                 Field label → input top:{" "}
                 {show(result.fields.before.labelToInputTop)} →{" "}
-                {show(result.fields.adopted.labelToInputTop)}; baseline
+                {show(result.fields.adopted.labelToInputTop)}; layout gap:{" "}
+                {show(result.fields.before.layoutGap)} →{" "}
+                {show(result.fields.adopted.layoutGap)}; label baseline → input
+                top: {show(result.fields.before.labelBaselineToInputTop)} →{" "}
+                {show(result.fields.adopted.labelBaselineToInputTop)}; baseline
                 separation: {show(result.fields.before.labelToInputBaseline)} →{" "}
                 {show(result.fields.adopted.labelToInputBaseline)}.
               </span>
