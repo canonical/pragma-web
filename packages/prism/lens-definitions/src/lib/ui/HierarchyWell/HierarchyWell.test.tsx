@@ -687,6 +687,51 @@ describe("over a layout whose rail opens on a box", () => {
     expect(container.querySelector(".desktop")).not.toBe(opened);
   });
 
+  it("opens a term page anew, keyed by its class, from the overview and from another term page", () => {
+    const [a1, , , z1] = input.classes.map((entry) => entry.uri);
+    const focusOn = (uri: string | undefined) =>
+      layOutClassGraph(input, {
+        budget: createGraphBudget({ drawnNodesMax: 2 }),
+        focus: uri,
+      });
+    const kept = { camera: { k: 2, x: 30, y: 40 }, moved: true };
+    const memory = { current: kept as typeof kept | undefined };
+    const draw = (shown: typeof boxed, term: string | undefined) =>
+      createRouterHarness(
+        <HierarchyWell
+          cameraMemory={memory}
+          filter={createAllNamespacesFilter(["aa", "zz"])}
+          hoverCentre={undefined}
+          layout={shown}
+          onHoverTerm={vi.fn()}
+          term={term}
+          terms={boxedTerms}
+        />,
+      );
+    const { container, rerender } = render(draw(boxed, undefined));
+    const overview = container.querySelector(".desktop");
+    // From the overview to a term page: a new canvas framing its class,
+    // the overview's camera forgotten.
+    const onA1 = focusOn(a1);
+    rerender(draw(onA1, a1));
+    const first = container.querySelector(".desktop");
+    expect(first).not.toBe(overview);
+    expect(memory.current).toBeUndefined();
+    expect(first?.querySelector(`.node[data-id="aa:A1"]`)).not.toBeNull();
+    // A render of the same term page keeps its canvas and its camera.
+    memory.current = kept;
+    rerender(draw(onA1, a1));
+    expect(container.querySelector(".desktop")).toBe(first);
+    expect(memory.current).toBe(kept);
+    // From one term page to another: a new canvas framing the other class.
+    rerender(draw(focusOn(z1), z1));
+    const second = container.querySelector(".desktop");
+    expect(second).not.toBe(first);
+    expect(memory.current).toBeUndefined();
+    expect(second?.querySelector(`.node[data-id="zz:Z1"]`)).not.toBeNull();
+    expect(second?.querySelector(`.node[data-id="aa:A1"]`)).toBeNull();
+  });
+
   it("clears the kept camera before the new canvas resumes it, in a layout effect", () => {
     // The canvas measures, so its passive effect reads the memory on mount:
     // a clear in the well's own passive effect would come after it, and the
