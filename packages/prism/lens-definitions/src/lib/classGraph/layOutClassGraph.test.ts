@@ -638,7 +638,7 @@ describe("layOutClassGraph", () => {
       });
     });
 
-    it("draws a drilled namespace of more classes than the budget leaves room for whole, over the node budget: a limit of this layout", () => {
+    it("draws an opened namespace of more classes than the node budget whole, over the budget, folding no deeper subtree into its root: a stated limit of this layout", () => {
       const layout = layOutClassGraph(
         {
           ...SIXTY_CLASS_GRAPH,
@@ -652,6 +652,15 @@ describe("layOutClassGraph", () => {
       expect(measure.nodes).toBe(61);
       expect(measure.nodes).toBeGreaterThan(GRAPH_BUDGET.drawnNodesMax);
       expect(measure.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
+      // Each of its classes is a class of its own: none stands for a
+      // folded subtree.
+      const big = [...layout.nodes.values()].filter(
+        (node) => node.prefix === "big",
+      );
+      expect(big).toHaveLength(SIXTY_CLASS_GRAPH.classes.length);
+      expect(
+        big.every((node) => node.kind === "class" && node.members === 1),
+      ).toBe(true);
       expect(requireEntry(layout.nodes, "region:aa").kind).toBe("region");
     });
 
