@@ -68,6 +68,18 @@ describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
     expect(hrefs).not.toContain("/network/stations/metro%3A");
   });
 
+  it("draws no column for a station's coordinates", async () => {
+    renderLensPage("/stations", graph.url);
+    await findIndexRows();
+    const columns = Array.from(
+      document.querySelectorAll(".entity-table th.column"),
+      (column) => column.getAttribute("data-property"),
+    );
+    expect(columns.length).toBeGreaterThan(0);
+    expect(columns).not.toContain("location");
+    expect(columns).not.toContain("diagramPosition");
+  });
+
   it("shows a station's page with the fields its class declares", async () => {
     renderLensPage("/stations/metro%3Anorthgate", graph.url);
     expect(

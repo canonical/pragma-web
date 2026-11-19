@@ -10,13 +10,14 @@ export const METRO_LIST_RENDERERS = { list: ["table", "cards"] } as const;
 /**
  * The stations lens in the rail: its label and its place, first. The
  * Definitions lens keeps its own place, third. Its table leaves out the
- * station's place on the diagram, a coordinate pair no reader compares.
+ * station's place on the diagram and on the ground, coordinate pairs no
+ * reader compares in a column.
  */
 export const STATIONS_LENS = {
   label: MESSAGES["lens.stations"],
   order: 1,
   renderers: METRO_LIST_RENDERERS,
-  tableOmits: ["diagramPosition"],
+  tableOmits: ["diagramPosition", "location"],
 } as const satisfies EntityLensOptions;
 
 /**
