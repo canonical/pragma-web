@@ -173,27 +173,32 @@ describe("constants", () => {
       expect(m.filterFrom("Cores")).toBe("Cores from");
       expect(m.filterTo("Cores")).toBe("Cores to");
       expect(m.filterLowest("2")).toBe("Lowest: 2");
+      // Each operator's control reads by the field's label and the words
+      // the operator is spoken by.
+      expect(
+        m.operatorPhrase({ operator: "isAny", operands: [], label: "Status" }),
+      ).toBe("Status is any of");
+      expect(
+        m.operatorPhrase({ operator: "isNot", operands: [], label: "Name" }),
+      ).toBe("Name is not");
+      expect(
+        m.operatorPhrase({
+          operator: "isSet",
+          operands: [false],
+          label: "Owner",
+        }),
+      ).toBe("Owner has no value");
       expect(m.filterHighest("64")).toBe("Highest: 64");
       expect(m.clearFilter("Cores from")).toBe("Clear Cores from");
-      expect(m.filterIsAnyOf("Status")).toBe("Status is any of");
-      expect(m.filterIsNoneOf("Status")).toBe("Status is none of");
       expect(m.matchAnyInstead).toBe("Match any of these instead");
       expect(m.matchNoneInstead).toBe("Match none of these instead");
       expect(m.facetCount(buildExact(12))).toBe("12");
       expect(m.facetCount(buildAtLeast(1000))).toBe("at least 1,000");
-      expect(m.filterContains("Name")).toBe("Name contains");
       expect(m.filterAlso("Tags is any of", ["ex-gpu", "ex-nvme"])).toBe(
         "Tags is any of ex-gpu, ex-nvme",
       );
-      expect(m.filterStartsWith("Name")).toBe("Name starts with");
-      expect(m.filterIs("Name")).toBe("Name is");
-      expect(m.filterIsNot("Name")).toBe("Name is not");
-      expect(m.filterNotContains("Name")).toBe("Name does not contain");
-      expect(m.filterEndsWith("Name")).toBe("Name ends with");
       expect(m.filterMatch("Name")).toBe("How Name matches");
       expect(m.filterInUnit("Memory from", "MiB")).toBe("Memory from (MiB)");
-      expect(m.filterHasValue("Owner")).toBe("Owner has a value");
-      expect(m.filterHasNoValue("Owner")).toBe("Owner has no value");
       expect([m.presenceAny, m.presenceSet, m.presenceUnset]).toEqual([
         "Any",
         "Has a value",
@@ -480,21 +485,49 @@ describe("constants", () => {
   });
 
   it("speaks each operator by its operands", () => {
-    expect(m.operatorSpoken("isAny", ["ready"])).toBe("is");
-    expect(m.operatorSpoken("isAny", ["ready", "deployed"])).toBe("is any of");
-    expect(m.operatorSpoken("isAny", [])).toBe("is any of");
-    expect(m.operatorSpoken("is", ["web"])).toBe("is");
-    expect(m.operatorSpoken("isNone", ["ready"])).toBe("is none of");
-    expect(m.operatorSpoken("isNot", ["web"])).toBe("is not");
-    expect(m.operatorSpoken("contains", ["web"])).toBe("contains");
-    expect(m.operatorSpoken("notContains", ["web"])).toBe("does not contain");
-    expect(m.operatorSpoken("startsWith", ["web"])).toBe("starts with");
-    expect(m.operatorSpoken("endsWith", ["web"])).toBe("ends with");
-    expect(m.operatorSpoken("gte", [1])).toBe("at least");
-    expect(m.operatorSpoken("lte", [1])).toBe("at most");
-    expect(m.operatorSpoken("isSet", [true])).toBe("has a value");
-    expect(m.operatorSpoken("isSet", [])).toBe("has a value");
-    expect(m.operatorSpoken("isSet", [false])).toBe("has no value");
+    expect(m.operatorPhrase({ operator: "isAny", operands: ["ready"] })).toBe(
+      "is",
+    );
+    expect(
+      m.operatorPhrase({ operator: "isAny", operands: ["ready", "deployed"] }),
+    ).toBe("is any of");
+    expect(m.operatorPhrase({ operator: "isAny", operands: [] })).toBe(
+      "is any of",
+    );
+    expect(m.operatorPhrase({ operator: "is", operands: ["web"] })).toBe("is");
+    expect(m.operatorPhrase({ operator: "isNone", operands: ["ready"] })).toBe(
+      "is none of",
+    );
+    expect(m.operatorPhrase({ operator: "isNot", operands: ["web"] })).toBe(
+      "is not",
+    );
+    expect(m.operatorPhrase({ operator: "contains", operands: ["web"] })).toBe(
+      "contains",
+    );
+    expect(
+      m.operatorPhrase({ operator: "notContains", operands: ["web"] }),
+    ).toBe("does not contain");
+    expect(
+      m.operatorPhrase({ operator: "startsWith", operands: ["web"] }),
+    ).toBe("starts with");
+    expect(m.operatorPhrase({ operator: "endsWith", operands: ["web"] })).toBe(
+      "ends with",
+    );
+    expect(m.operatorPhrase({ operator: "gte", operands: [1] })).toBe(
+      "at least",
+    );
+    expect(m.operatorPhrase({ operator: "lte", operands: [1] })).toBe(
+      "at most",
+    );
+    expect(m.operatorPhrase({ operator: "isSet", operands: [true] })).toBe(
+      "has a value",
+    );
+    expect(m.operatorPhrase({ operator: "isSet", operands: [] })).toBe(
+      "has a value",
+    );
+    expect(m.operatorPhrase({ operator: "isSet", operands: [false] })).toBe(
+      "has no value",
+    );
   });
 
   it("words the query bar, its clauses and what its commits did", () => {
@@ -513,10 +546,15 @@ describe("constants", () => {
     expect(
       m.recordCount(buildExact(3), { ...noun, counted: (n) => `machine×${n}` }),
     ).toBe("3 machine×3");
-    expect(m.queryClause("status", "is any of", ["ready", "deployed"])).toBe(
-      "status is any of ready, deployed",
+    expect(
+      m.queryClause({
+        phrase: "status is any of",
+        values: ["ready", "deployed"],
+      }),
+    ).toBe("status is any of ready, deployed");
+    expect(m.queryClause({ phrase: "owner has a value", values: [] })).toBe(
+      "owner has a value",
     );
-    expect(m.queryClause("owner", "has a value", [])).toBe("owner has a value");
     expect(m.searchClause("ex web")).toBe("Search for ex web");
     expect(m.removeClause("status is ready")).toBe("Remove status is ready");
     expect(m.hiddenChips(3)).toBe("+3 more");

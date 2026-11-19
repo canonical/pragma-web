@@ -60,26 +60,10 @@ const isUnset = (operands: readonly PredicateOperand[]): boolean =>
   operands.at(0) === false;
 
 /**
- * What a chip shows for each operator: its symbol, or, where it has none,
- * the same words it is spoken by, so a control's name holds what it
- * shows. Keyed by operator, so an operator the grammar gains fails to
- * compile until it is shown.
+ * How each operator is worded, from its operands: the one table of
+ * English operator words. Keyed by operator, so an operator the grammar
+ * gains fails to compile until it is worded.
  */
-export const OPERATORS_SHOWN: OperatorWords = {
-  isAny: () => ":",
-  is: () => ":",
-  isNone: () => "≠",
-  isNot: () => "≠",
-  contains: () => "contains",
-  notContains: () => "does not contain",
-  startsWith: () => "starts with",
-  endsWith: () => "ends with",
-  gte: () => "≥",
-  lte: () => "≤",
-  isSet: (operands) => (isUnset(operands) ? "has no value" : "has a value"),
-};
-
-/** How each operator is spoken in a clause. Keyed as `OPERATORS_SHOWN`. */
 export const OPERATORS_SPOKEN: OperatorWords = {
   isAny: (operands) => (operands.length === 1 ? "is" : "is any of"),
   is: () => "is",
@@ -92,6 +76,24 @@ export const OPERATORS_SPOKEN: OperatorWords = {
   gte: () => "at least",
   lte: () => "at most",
   isSet: (operands) => (isUnset(operands) ? "has no value" : "has a value"),
+};
+
+/**
+ * What a chip shows for each operator: its symbol, or, where it has none,
+ * the words it is spoken by, so a control's name holds what it shows.
+ */
+export const OPERATORS_SHOWN: OperatorWords = {
+  isAny: () => ":",
+  is: () => ":",
+  isNone: () => "≠",
+  isNot: () => "≠",
+  contains: OPERATORS_SPOKEN.contains,
+  notContains: OPERATORS_SPOKEN.notContains,
+  startsWith: OPERATORS_SPOKEN.startsWith,
+  endsWith: OPERATORS_SPOKEN.endsWith,
+  gte: () => "≥",
+  lte: () => "≤",
+  isSet: OPERATORS_SPOKEN.isSet,
 };
 
 /** English's own grouping of numbers, so a large count reads as one. */
@@ -226,26 +228,16 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   linkRefusals: "Not applied from the link",
   clauseRefused: (name, reason) => `${name}: ${composeClause(reason)}.`,
   grouping: "Grouping",
-  filterIsAnyOf: (label) => `${label} is any of`,
-  filterIsNoneOf: (label) => `${label} is none of`,
   matchAnyInstead: "Match any of these instead",
   matchNoneInstead: "Match none of these instead",
   facetCount: (count) =>
     count.kind === "exact"
       ? formatCount(count.value)
       : `at least ${formatCount(count.value)}`,
-  filterContains: (label) => `${label} contains`,
   filterMatch: (label) => `How ${label} matches`,
   presenceAny: "Any",
   presenceSet: "Has a value",
   presenceUnset: "Has no value",
-  filterHasValue: (label) => `${label} has a value`,
-  filterHasNoValue: (label) => `${label} has no value`,
-  filterStartsWith: (label) => `${label} starts with`,
-  filterEndsWith: (label) => `${label} ends with`,
-  filterNotContains: (label) => `${label} does not contain`,
-  filterIsNot: (label) => `${label} is not`,
-  filterIs: (label) => `${label} is`,
   filterIncomplete: (retained) =>
     retained
       ? `Enter a value to change this restriction. ${STILL_APPLIES}`
@@ -265,7 +257,10 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   submitSearch: "Search",
 
   operatorShown: (operator, operands) => OPERATORS_SHOWN[operator](operands),
-  operatorSpoken: (operator, operands) => OPERATORS_SPOKEN[operator](operands),
+  operatorPhrase: ({ operator, operands, label }) => {
+    const words = OPERATORS_SPOKEN[operator](operands);
+    return label === undefined ? words : `${label} ${words}`;
+  },
 
   queryBar: (noun) => `Filter ${noun.plural}`,
   queryBarDescription:
@@ -275,10 +270,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   clearFiltersAndSearch: "Clear filters and search",
   queryCleared: (count, noun) =>
     composeOutcome("Cleared the filters and the search.", count, noun),
-  queryClause: (label, operator, values) =>
-    values.length === 0
-      ? `${label} ${operator}`
-      : `${label} ${operator} ${values.join(", ")}`,
+  queryClause: ({ phrase, values }) =>
+    values.length === 0 ? phrase : `${phrase} ${values.join(", ")}`,
   searchClause: (text) => `Search for ${text}`,
   removeClause: (clause) => `Remove ${clause}`,
   hiddenChips: (count) => `+${formatCount(count)} more`,

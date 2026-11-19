@@ -20,7 +20,7 @@ describe("spellOperator", () => {
     expect(
       spellOperator("isSet", [false], {
         operatorShown: (operator, operands) => `${operator}:${operands}`,
-        operatorSpoken: () => "spoken",
+        operatorPhrase: ({ label }) => `spoken${label ?? ""}`,
       }),
     ).toEqual({ shown: "isSet:false", spoken: "spoken" });
   });

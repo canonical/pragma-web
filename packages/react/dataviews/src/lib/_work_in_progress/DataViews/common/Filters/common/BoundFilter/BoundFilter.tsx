@@ -3,8 +3,7 @@ import { spellWireKey } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useId, useRef } from "react";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
-import { PHRASE_MESSAGES } from "../constants.js";
-import { describeFilterFeedback } from "../utils/index.js";
+import { describeFilterFeedback, phraseOperator } from "../utils/index.js";
 import type { BoundFilterProps } from "./types.js";
 import "./styles.css";
 
@@ -68,7 +67,7 @@ export default function BoundFilter({
       .filter((id) => id !== null)
       .join(" ") || undefined;
   const units = definition.kind === "number" ? definition.units : undefined;
-  const phrase = messages[PHRASE_MESSAGES[bound]](label);
+  const phrase = phraseOperator(messages, bound, label);
   // A number with units is read in its base unit, which the name says.
   const name =
     units === undefined ? phrase : messages.filterInUnit(phrase, units.base);

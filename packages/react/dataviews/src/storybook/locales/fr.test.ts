@@ -91,22 +91,24 @@ describe("fr", () => {
       "Cœurs à partir de 4, 8",
     );
     expect(fr.clauseRefused("Statut", "inconnu.")).toBe("Statut : inconnu.");
-    expect(fr.filterIsAnyOf("Statut")).toBe("Statut est l’une des valeurs");
-    expect(fr.filterIsNoneOf("Statut")).toBe("Statut n’est aucune des valeurs");
-    expect(fr.filterContains("Nom")).toBe("Nom contient");
-    expect(fr.filterStartsWith("Nom")).toBe("Nom commence par");
-    expect(fr.filterEndsWith("Nom")).toBe("Nom finit par");
-    expect(fr.filterNotContains("Nom")).toBe("Nom ne contient pas");
-    expect(fr.filterIsNot("Nom")).toBe("Nom n’est pas");
-    expect(fr.filterIs("Nom")).toBe("Nom est");
+    const phrase = (
+      operator: Parameters<typeof fr.operatorPhrase>[0]["operator"],
+      operands: readonly (string | boolean)[] = [],
+    ) => fr.operatorPhrase({ operator, operands, label: "Nom" });
+    expect(phrase("isAny")).toBe("Nom est l’une des valeurs");
+    expect(phrase("isNone")).toBe("Nom n’est aucune des valeurs");
+    expect(phrase("contains")).toBe("Nom contient");
+    expect(phrase("startsWith")).toBe("Nom commence par");
+    expect(phrase("endsWith")).toBe("Nom finit par");
+    expect(phrase("notContains")).toBe("Nom ne contient pas");
+    expect(phrase("isNot")).toBe("Nom n’est pas");
+    expect(phrase("is")).toBe("Nom est");
     expect(fr.filterMatch("Nom")).toBe("Comment Nom correspond");
     expect(fr.filterInUnit("Mémoire à partir de", "Mio")).toBe(
       "Mémoire à partir de (Mio)",
     );
-    expect(fr.filterHasValue("Propriétaire")).toBe("Propriétaire a une valeur");
-    expect(fr.filterHasNoValue("Propriétaire")).toBe(
-      "Propriétaire n’a pas de valeur",
-    );
+    expect(phrase("isSet", [true])).toBe("Nom a une valeur");
+    expect(phrase("isSet", [false])).toBe("Nom n’a pas de valeur");
   });
 
   it("states a count exactly or at least", () => {

@@ -28,14 +28,18 @@ export default function speakClause(
   const label = labels.readFieldLabel(draft.field);
   if (draft.operator === null) return label;
   const definition = schema.findField(draft.field);
-  return messages.queryClause(
-    label,
-    messages.operatorSpoken(draft.operator, draft.operands),
+  return messages.queryClause({
+    phrase: messages.operatorPhrase({
+      operator: draft.operator,
+      operands: draft.operands,
+      label,
+    }),
     // Presence speaks its value in its operator.
-    draft.operator === "isSet"
-      ? []
-      : draft.operands.map((operand) =>
-          spellOperand(definition, operand, messages.decimalSeparator),
-        ),
-  );
+    values:
+      draft.operator === "isSet"
+        ? []
+        : draft.operands.map((operand) =>
+            spellOperand(definition, operand, messages.decimalSeparator),
+          ),
+  });
 }

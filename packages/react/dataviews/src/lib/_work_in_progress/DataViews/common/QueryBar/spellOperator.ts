@@ -18,10 +18,10 @@ import type {
 export default function spellOperator(
   operator: PredicateOperator,
   operands: readonly PredicateOperand[],
-  messages: Pick<DataViewsMessages, "operatorShown" | "operatorSpoken">,
+  messages: Pick<DataViewsMessages, "operatorShown" | "operatorPhrase">,
 ): { readonly shown: string; readonly spoken: string } {
   return {
     shown: messages.operatorShown(operator, operands),
-    spoken: messages.operatorSpoken(operator, operands),
+    spoken: messages.operatorPhrase({ operator, operands }),
   };
 }

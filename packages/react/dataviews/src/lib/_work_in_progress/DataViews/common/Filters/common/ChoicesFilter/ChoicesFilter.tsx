@@ -15,7 +15,8 @@ import {
 } from "../../../../../../hooks/index.js";
 import { spellCount } from "../../../../../../utils/index.js";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
-import { NO_RECORDS, PHRASE_MESSAGES } from "../constants.js";
+import { NO_RECORDS } from "../constants.js";
+import { phraseOperator } from "../utils/index.js";
 import type { ChoicesFilterProps } from "./types.js";
 
 const componentCssClassName = "ds data-views-filters-choices";
@@ -157,7 +158,7 @@ export default function ChoicesFilter({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <legend className="legend">
-        {messages[PHRASE_MESSAGES[operator]](label)}
+        {phraseOperator(messages, operator, label)}
       </legend>
       {listed.map((option, place) => {
         const countId = `${baseId}-count-${place}`;

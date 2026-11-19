@@ -6,8 +6,7 @@ import {
   useIsHydrated,
 } from "../../../../../../hooks/index.js";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
-import { PHRASE_MESSAGES } from "../constants.js";
-import { describeFilterFeedback } from "../utils/index.js";
+import { describeFilterFeedback, phraseOperator } from "../utils/index.js";
 import type { TextFilterOperator, TextFilterProps } from "./types.js";
 import "./styles.css";
 
@@ -85,7 +84,7 @@ export default function TextFilter({
   const declared = offered.includes(operator);
   const feedbackId = `${inputId}-feedback`;
   const message = describeFilterFeedback(field.feedback, retained, messages);
-  const name = messages[PHRASE_MESSAGES[operator]](label);
+  const name = phraseOperator(messages, operator, label);
   /** Match by another operator: standing text moves to it as one step. */
   const choose = (next: TextFilterOperator): void => {
     setChosen(next);
@@ -124,7 +123,7 @@ export default function TextFilter({
               value={candidate}
               disabled={candidate !== operator && taken.includes(candidate)}
             >
-              {messages[PHRASE_MESSAGES[candidate]](label)}
+              {phraseOperator(messages, candidate, label)}
             </option>
           ))}
         </select>

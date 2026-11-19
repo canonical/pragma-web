@@ -65,27 +65,20 @@ type OperatorWords = Readonly<
   Record<PredicateOperator, (operands: readonly PredicateOperand[]) => string>
 >;
 
-/** What a chip shows for each operator: its symbol, or French words. */
-const OPERATORS_SHOWN: OperatorWords = {
-  isAny: () => ":",
-  is: () => ":",
-  isNone: () => "≠",
-  isNot: () => "≠",
-  contains: () => "contient",
-  notContains: () => "ne contient pas",
-  startsWith: () => "commence par",
-  endsWith: () => "finit par",
-  gte: () => "≥",
-  lte: () => "≤",
-  isSet: (operands) =>
-    operands.at(0) === false ? "n’a pas de valeur" : "a une valeur",
-};
-
-/** How each operator is spoken in French. */
+/**
+ * How each operator is worded in French, from its operands: a set's
+ * operator without values names the values it takes.
+ */
 const OPERATORS_SPOKEN: OperatorWords = {
-  isAny: (operands) => (operands.length === 1 ? "est" : "est l’un de"),
+  isAny: (operands) =>
+    operands.length === 0
+      ? "est l’une des valeurs"
+      : operands.length === 1
+        ? "est"
+        : "est l’un de",
   is: () => "est",
-  isNone: () => "n’est aucun de",
+  isNone: (operands) =>
+    operands.length === 0 ? "n’est aucune des valeurs" : "n’est aucun de",
   isNot: () => "n’est pas",
   contains: () => "contient",
   notContains: () => "ne contient pas",
@@ -95,6 +88,17 @@ const OPERATORS_SPOKEN: OperatorWords = {
   lte: () => "au plus",
   isSet: (operands) =>
     operands.at(0) === false ? "n’a pas de valeur" : "a une valeur",
+};
+
+/** What a chip shows for each operator: its symbol, or its French words. */
+const OPERATORS_SHOWN: OperatorWords = {
+  ...OPERATORS_SPOKEN,
+  isAny: () => ":",
+  is: () => ":",
+  isNone: () => "≠",
+  isNot: () => "≠",
+  gte: () => "≥",
+  lte: () => "≤",
 };
 
 /** A total as French states it: exact, or "au moins". */
@@ -197,23 +201,13 @@ const fr: DataViewsMessages = {
   linkRefusals: "Non appliqué depuis le lien",
   clauseRefused: (name, reason) => `${name} : ${trimClause(reason)}.`,
   grouping: "Regroupement",
-  filterIsAnyOf: (label) => `${label} est l’une des valeurs`,
-  filterIsNoneOf: (label) => `${label} n’est aucune des valeurs`,
   matchAnyInstead: "Correspondre plutôt à l’une d’elles",
   matchNoneInstead: "Correspondre plutôt à aucune d’elles",
   facetCount: spellTotal,
-  filterContains: (label) => `${label} contient`,
   filterMatch: (label) => `Comment ${label} correspond`,
   presenceAny: "Tous",
   presenceSet: "A une valeur",
   presenceUnset: "N’a pas de valeur",
-  filterHasValue: (label) => `${label} a une valeur`,
-  filterHasNoValue: (label) => `${label} n’a pas de valeur`,
-  filterStartsWith: (label) => `${label} commence par`,
-  filterEndsWith: (label) => `${label} finit par`,
-  filterNotContains: (label) => `${label} ne contient pas`,
-  filterIsNot: (label) => `${label} n’est pas`,
-  filterIs: (label) => `${label} est`,
   filterIncomplete: (retained) =>
     retained
       ? "Saisissez une valeur pour modifier cette restriction. La restriction précédente s’applique toujours."
@@ -229,7 +223,10 @@ const fr: DataViewsMessages = {
   submitSearch: "Rechercher",
 
   operatorShown: (operator, operands) => OPERATORS_SHOWN[operator](operands),
-  operatorSpoken: (operator, operands) => OPERATORS_SPOKEN[operator](operands),
+  operatorPhrase: ({ operator, operands, label }) => {
+    const words = OPERATORS_SPOKEN[operator](operands);
+    return label === undefined ? words : `${label} ${words}`;
+  },
 
   queryBar: (noun) => `Filtrer les ${noun.plural}`,
   queryBarDescription:
@@ -239,10 +236,8 @@ const fr: DataViewsMessages = {
   clearFiltersAndSearch: "Effacer les filtres et la recherche",
   queryCleared: (counted, noun) =>
     outcome("Filtres et recherche effacés.", counted, noun),
-  queryClause: (label, operator, values) =>
-    values.length === 0
-      ? `${label} ${operator}`
-      : `${label} ${operator} ${values.join(", ")}`,
+  queryClause: ({ phrase, values }) =>
+    values.length === 0 ? phrase : `${phrase} ${values.join(", ")}`,
   searchClause: (text) => `Recherche de ${text}`,
   removeClause: (spoken) => `Retirer ${spoken}`,
   hiddenChips: (hidden) => `+${count(hidden)} de plus`,
