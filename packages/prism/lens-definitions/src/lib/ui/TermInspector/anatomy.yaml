@@ -210,6 +210,7 @@ node:
                                 role: figure (.is-figure)
                                 styles:
                                   spacing.internal.inline.end: 0
+                                  spacing.internal.inline.start: space.100
                                   typography.wrap: normal
                                   typography.align: end
                                   typography.variant.numeric: tabular-nums
