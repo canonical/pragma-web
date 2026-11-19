@@ -25,12 +25,42 @@ const isPinOrContent = (property: string): boolean =>
 describe.each(VANILLA_VERSIONS)(
   "vanilla-territory-untouched (Vanilla %s)",
   (version) => {
-    it("is not changed by adapter.css", async () => {
-      const withAdapter = await render(mixedPage(version));
+    // Under app, adapter.css gives Vanilla's default-size text the context's
+    // text size (text-size.test.ts). These cases leave those rules out, so that
+    // they see the boundary alone; the site case keeps them, because under site
+    // they change nothing.
+    const TEXT_SIZE_APART = { textSize: false } as const;
+
+    it("is not changed by adapter.css, text size apart", async () => {
+      const withAdapter = await render(mixedPage(version, TEXT_SIZE_APART));
       const without = await render(mixedPage(version, { adapter: "none" }));
       const failures = idsIn(VANILLA_BLOCK).flatMap((id) =>
         differences(`#${id}`, computed(withAdapter, id), computed(without, id)),
       );
+      expect(failures).toEqual([]);
+    });
+
+    it("is not changed by adapter.css at all under site", async () => {
+      const root = "site comfortable light";
+      const withAdapter = await render(mixedPage(version, { root }));
+      const without = await render(
+        mixedPage(version, { root, adapter: "none" }),
+      );
+      const failures = [
+        ...differences(
+          "body",
+          computed(withAdapter, withAdapter.body),
+          computed(without, without.body),
+          isLayoutOutput,
+        ),
+        ...idsIn(VANILLA_BLOCK).flatMap((id) =>
+          differences(
+            `#${id}`,
+            computed(withAdapter, id),
+            computed(without, id),
+          ),
+        ),
+      ];
       expect(failures).toEqual([]);
     });
 
@@ -51,9 +81,9 @@ describe.each(VANILLA_VERSIONS)(
     });
 
     it.for([1280, 1700])(
-      "equals the Vanilla-only page for every longhand at %ipx, html and body included",
+      "equals the Vanilla-only page for every longhand at %ipx, html and body included, text size apart",
       async (width) => {
-        const mixed = await render(mixedPage(version), width);
+        const mixed = await render(mixedPage(version, TEXT_SIZE_APART), width);
         const vanilla = await render(vanillaPage(version), width);
         const failures = [
           ...differences(

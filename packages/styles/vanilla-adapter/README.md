@@ -9,7 +9,7 @@ The package ships three stylesheets and depends only on `@canonical/styles`. Non
 | File | What it does |
 | --- | --- |
 | `layers.css` | Declares the cascade layer order that both frameworks share. |
-| `adapter.css` | Keeps Vanilla out of pragma's components, carries Vanilla's light or dark mode into them, and loads what a mixed page needs from pragma. |
+| `adapter.css` | Keeps Vanilla out of pragma's components, carries Vanilla's light or dark mode into them, sets Vanilla's text at pragma's text size, and loads what a mixed page needs from pragma. |
 | `elements.css` | Pragma's element styles, confined to pragma's components rather than applied to the whole page. |
 
 The reasoning behind the design is in pragma's cascade explanation, `docs/explanations/STYLES_CASCADE.md`.
@@ -93,7 +93,7 @@ The first import brings `@canonical/styles/tokens.css`, `@canonical/styles/layou
 
 Use `app comfortable light` instead of `site comfortable light` in an application. One context class, one density class, and `light`. Nothing marks the page as mixed, because nothing needs to.
 
-Link order does not decide which framework wins, since the layers do that. What matters is that the order statement is the first rule the browser sees, which step 3 arranged.
+Link order does not decide which framework wins, since the layers do that. What matters is that the order statement is the first rule the browser sees, which step 3 arranged. Keep `styles.css` before `pragma.css` all the same: [text size](#text-size-in-an-application) is the one thing that relies on it.
 
 That is the whole setup. Writing pragma components into a page that Vanilla still owns is a separate matter, and [Territories](#territories) and [Rules](#rules) below cover it: where a `ds` root may go, what may not go inside one, and how light and dark reach a component.
 
@@ -143,6 +143,28 @@ The alternative, letting each framework name its own family, downloads the same 
 Five things tell you the page is set up correctly. The order statement is the first rule in your built CSS, before anything that mentions a `ds` layer. Every rule sits in a declared layer. The only `!important` declarations outside your own Vanilla stylesheet are the four this package writes, which answer Vanilla's own. The root carries its classes. And no Vanilla class appears under any `.ds`. Then run your own visual checks: if the first of the five is wrong, the page will look like unstyled markup rather than subtly off.
 
 If something looks wrong, [Troubleshooting](#troubleshooting) starts from the symptom.
+
+## Text size in an application
+
+Pragma sets its text size from the context class on the root: 14px under `app` and `docs`, 16px under `site`. Vanilla sets all of its running text at the root size, 16px. On a site the two agree. In an application they do not, and a Vanilla form or table renders visibly larger than the pragma components beside it, with Vanilla checkbox labels at 16px under a pragma heading at 14px.
+
+`adapter.css` closes that gap, with nothing to configure. It imports this package's `text-size.css` into the `vanilla` layer, and that file restates Vanilla's own default-size text rules, selector for selector, with pragma's token `--typography-text-primary-font-size`, so Vanilla's text follows the context class the page already carries. Under `site` the token is Vanilla's own `1rem` and nothing changes.
+
+The restated rules go into `vanilla` rather than a layer of their own because each has the specificity of the Vanilla rule it restates and wins only by coming later. Any Vanilla rule that is more specific still wins, so `.p-text--small`, an `.is-small` button and a paragraph carrying `.p-heading--5` keep their sizes. A layer above `vanilla` would override those too. Pragma's islands are not reached, because `boundary` reverts the whole `vanilla` layer inside them.
+
+This relies on two of the installation steps: Vanilla in `@layer vanilla` (step 2), and Vanilla's stylesheet linked before pragma's entry (step 5).
+
+The root size is not touched, so every `rem` on the page keeps its value: Vanilla's spacing, its grid and pragma's own tokens. Only text changes. Above 1681 pixels Vanilla scales the root to 18px, and the token scales with it, to 15.75px.
+
+What it changes, and what it leaves:
+
+- **Running text, form controls and buttons.** Body text, paragraphs, labels, list items and table cells, text inputs, selects and text areas, buttons, tabs and pagination links, notification titles and details, and definition lists all move to the token's size. Vanilla's values set in `em`, such as a paragraph's `max-width: 40em` and the small-caps letter spacing, follow the text in proportion.
+- **Headings stay.** Vanilla's `h5`, `h6`, `.p-heading--5` and `.p-heading--6` are also `1rem`, but pragma's heading sizes are a separate token per context, and `docs` sets them larger than text. Size them yourself if you need them to match.
+- **Vanilla's smaller text does not get smaller.** `.p-text--small`, `.p-form-help-text` and the like are already `0.875rem`, so under `app` they are now the same size as the text around them, and the hierarchy between the two is lost. If it matters on your page, set them in your own overrides.
+- **@canonical/react-components is covered.** Its `MultiSelect`, `CustomSelect` and `PrefixedInput` compile their own copies of Vanilla's input rules, and the file restates those too, one class more specific so that they win wherever your bundler puts the components' CSS. That CSS still has to be inside the `vanilla` layer, like the rest of your Vanilla-era CSS: no layered rule beats CSS outside every layer. [An application built with a bundler](#an-application-built-with-a-bundler) shows how.
+- **Other CSS that hardcodes `1rem` is not.** Your own stylesheet, or another library's, keeps its size. Restate those selectors in your overrides with the same token.
+
+This is the one part of the package that changes Vanilla's territory, and only under `app` and `docs`. Everything it does is in `tests/text-size.test.ts`, including a check against Vanilla's compiled build that no default-size text rule has been missed.
 
 ## Territories
 
@@ -259,7 +281,28 @@ Write `<html class="site comfortable light">` in the template, and link `styles.
 
 Write `<html class="app comfortable light">`.
 
-Bundlers emit CSS in the order their module graph reaches it, not in the order your entry lists things, so make sure the design system's CSS is reached before any component package's. A component module imported earlier can otherwise drag its package's stylesheet ahead of the order statement.
+Bundlers emit CSS in the order their module graph reaches it, not in the order your entry lists things, so make sure the design system's CSS is reached before any component package's. A component module imported earlier can otherwise drag its package's stylesheet ahead of the order statement. A production build that splits CSS into chunks can do the same, and [Troubleshooting](#order-late) has the fix.
+
+CSS that a component imports from JavaScript, such as @canonical/react-components' stylesheets, never passes through your entry, so no `@import … layer(vanilla)` can wrap it, and outside every layer it beats the adapter. Wrap it as the bundler reads it instead. With PostCSS, which Vite and webpack both run:
+
+```js
+// postcss.config.js
+const vanillaEra = /\/@canonical\/react-components\/dist\/.*\.s?css(\?|$)/;
+
+export default {
+  plugins: [
+    {
+      postcssPlugin: "vanilla-layer",
+      Once(root, { AtRule }) {
+        if (!vanillaEra.test(root.source?.input.file ?? "")) return;
+        const layer = new AtRule({ name: "layer", params: "vanilla" });
+        layer.append(root.nodes);
+        root.append(layer);
+      },
+    },
+  ],
+};
+```
 
 ### A page with no build step
 
@@ -285,7 +328,8 @@ Each line names the fixture that checks it, in `tests/`. The one that compares t
 - A pragma element inside a Vanilla page computes the same styles as it would on a pragma-only page, for every property pragma declares or leaves to the browser. (`tests/territory.test.ts`)
 - Vanilla does not style the `.ds` root itself. (`tests/territory.test.ts` for placement inside Vanilla containers, `tests/vanilla-territory.test.ts` for the full-longhand comparison)
 - A pragma root inside a Vanilla dark section computes `color-scheme: dark`, and its token-driven colours match pragma's dark page. Inside a light or paper section it computes light. (`tests/theme.test.ts`, covering the four theme cases and `.is-paper`)
-- Installing this package does not change Vanilla's territory, with one exception named below: every element outside `.ds`, including `html` and `body`, matches the Vanilla-only page. (`tests/vanilla-territory.test.ts`, at 1280 and 1700 pixels)
+- Installing this package does not change Vanilla's territory, with one exception named below: every element outside `.ds`, including `html` and `body`, matches the Vanilla-only page. Under `site` that holds outright; under `app` and `docs` it holds apart from text size, which the next line describes. (`tests/vanilla-territory.test.ts`, at 1280 and 1700 pixels)
+- Under `app`, every Vanilla element at the default size takes the token's size and nothing else changes on it, except values Vanilla sets in `em`, which scale in proportion. Headings and Vanilla's smaller text keep their sizes, a site's page does not change at all, and neither does a pragma island. Every default-size text rule in Vanilla's compiled build is restated, apart from a named list with its reasons, and so is every default-size rule @canonical/react-components compiles, wherever its CSS is linked. (`tests/text-size.test.ts`, on Vanilla 4.56 and 4.61, at 1280 and 1700 pixels)
 - Where `adapter.css` sits inside your pragma entry does not matter. Where `layers.css` sits does. (`tests/order.test.ts`, and the negative case in `tests/boundary.test.ts`)
 - After removal, the page renders as a pragma page and every root follows pragma's own `light` and `dark` classes. (`tests/theme.test.ts`)
 
@@ -366,6 +410,13 @@ Vanilla lays out its containers' direct children with `> *` rules, and the bound
 ### Everything Vanilla went missing across the whole page
 
 `<html>` carries `ds`, which makes the whole document a pragma island, and the boundary then reverts every Vanilla rule in it. Remove it: the document is never an island while Vanilla is in the page (rule 4).
+
+<a id="order-late"></a>
+### Pragma components render as bare markup in the production build, but not in development
+
+The order statement is no longer the first rule the browser reads. A production build splits CSS by chunk and links the chunks in its own order, so a chunk carrying a component package's stylesheet, or one of pragma's entries, can arrive ahead of the file that holds the statement, and the boundary then reverts pragma ("What this package does not fix" has the detail). A development server may inject the same sheets in another order, which is why it looks right there. Check the built HTML and the first stylesheet it links.
+
+If you cannot make the bundler put the statement first, put it in the HTML: copy `src/layers.css` into a `<style>` element in `<head>`, before every stylesheet link. Leave the import in your CSS as well. The same statement read a second time changes nothing. Refresh the copy when you upgrade this package.
 
 <a id="islands-plain"></a>
 ### Pragma components render in the browser's font, with no baseline and no typography
