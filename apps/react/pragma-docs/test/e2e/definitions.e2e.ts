@@ -1055,7 +1055,14 @@ describe("a drill's link against its address", () => {
       async (page) => {
         await page.locator(`.ds.term-rail a[href="${actor}"]`).click();
         await page.waitForURL((url) => url.pathname === actor);
-        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        // The address changes before its drawing replaces ds:UIBlock's, and
+        // the canvas opens its camera at once on the drawing's first
+        // measure: the class's box drawn on screen is the camera settled.
+        await page
+          .locator(
+            '.ds.graph-canvas svg.viewport g.node[data-id="surface:Actor"] .surface',
+          )
+          .waitFor({ state: "visible" });
         framed.clicked = await isFramed(page);
       },
     );
