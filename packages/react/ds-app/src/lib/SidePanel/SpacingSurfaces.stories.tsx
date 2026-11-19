@@ -16,6 +16,7 @@ import {
   useState,
 } from "react";
 import { SideNavigation } from "../SideNavigation/index.js";
+import { assertRootTextSeats } from "../spacingRootTextSeatProof.js";
 import { SidePanel } from "./index.js";
 import type { SidePanelHandle } from "./types.js";
 import "./SpacingSurfaces.css";
@@ -918,7 +919,10 @@ function Page() {
     </main>
   );
 }
-export const Surfaces: Story = { render: () => <Page /> };
+export const Surfaces: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 12),
+  render: () => <Page />,
+};
 
 // Isolated frozen Before: exact former defaults on the same public renderer.
 function ShippedPair({ tier }: { tier: Tier }) {

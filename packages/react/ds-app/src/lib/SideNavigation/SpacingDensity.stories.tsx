@@ -13,6 +13,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { assertRootTextSeats } from "../spacingRootTextSeatProof.js";
 import { navigationDensityPolicy } from "./common/densityPolicy.js";
 import { SideNavigation } from "./index.js";
 import type { LinkComponentProps } from "./types.js";
@@ -703,6 +704,7 @@ function Fit({
 }
 
 export const HostProposal: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 3),
   render: () => (
     <main className="density08">
       <h1>08 Density · enrolled navigation host</h1>
@@ -714,6 +716,7 @@ export const HostProposal: Story = {
 };
 
 export const PublicDensityClasses: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 9),
   render: () => (
     <main className="density08">
       <h1>08 Density · public class boundaries</h1>
@@ -920,6 +923,7 @@ function NativeVariants({
 }
 
 export const NativeRows: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 6),
   render: () => (
     <main className="density08">
       <h1>08 Density · native row variants</h1>

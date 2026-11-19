@@ -1,6 +1,7 @@
 import { Accordion } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
+import { assertRootTextSeats } from "../spacingRootTextSeatProof.js";
 import { SideNavigation } from "./index.js";
 import "./SpacingKeylines.css";
 
@@ -110,7 +111,31 @@ function Row({
             name: record.name ?? "",
           })),
       );
+      const body = host.querySelector<HTMLElement>("p[data-keyline-content]");
+      const bodyStyle = body ? getComputedStyle(body) : null;
+      const scale =
+        parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
+      const expected = (tier === "site" ? 40 : 32) * scale;
+      const occupied =
+        body && bodyStyle
+          ? body.getBoundingClientRect().height +
+            parseFloat(bodyStyle.marginBlockEnd)
+          : null;
+      const rootTextSeat = {
+        occupied,
+        expected,
+        pass:
+          occupied !== null &&
+          bodyStyle !== null &&
+          Math.abs(occupied - expected) < 0.05 &&
+          Math.abs(
+            parseFloat(bodyStyle.fontSize) -
+              (tier === "site" ? 16 : 14) * scale,
+          ) < 0.05,
+      };
+      host.dataset.rootTextSeatProof = rootTextSeat.pass ? "pass" : "fail";
       setMetrics({
+        rootTextSeat,
         tier,
         density,
         currentContext: context.key,
@@ -328,13 +353,18 @@ function Row({
         contain the actual default label seat; intrinsic paint includes its
         closure without a target height. Context menu sizing retains its
         existing global portal fallback. Clipped labels and viewport popups keep
-        hidden measurements and have no row-guide markers.
+        hidden measurements and have no row-guide markers. The open disclosure's
+        root-size prose occupies 32px in Docs/App (previously 24px), and an
+        unchanged 40px in Site. Its inline keyline stays aligned with the
+        header; navigation control seats and mark gaps keep their existing
+        geometry.
       </p>
     </section>
   );
 }
 
 export const Keylines: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 6),
   render: () => (
     <main className="keylines07">
       <h1>07 Keylines</h1>
@@ -347,6 +377,7 @@ export const Keylines: Story = {
   ),
 };
 export const Scrollable: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 6),
   render: () => (
     <main className="keylines07">
       <h1>07 Keylines · native scroll proof</h1>
@@ -365,6 +396,7 @@ export const Scrollable: Story = {
 };
 
 export const PublicDensityClasses: Story = {
+  play: async ({ canvasElement }) => assertRootTextSeats(canvasElement, 9),
   render: () => (
     <main className="keylines07">
       <h1>07 Keylines · public density class boundaries</h1>
