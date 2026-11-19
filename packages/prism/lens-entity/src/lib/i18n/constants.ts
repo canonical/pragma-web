@@ -19,6 +19,12 @@ export const MESSAGES = {
   "index.more": "Load more",
   "controls.search.label": "Filter entries",
   "controls.search.placeholder": "Search entries…",
+  "facets.none": "None",
+  "facets.one": "{facet}: {value}",
+  "facets.several": "{facet} · {count}",
+  "facets.chip": "{facet}: {value}",
+  "facets.chipName": "Remove the filter {facet}: {value}",
+  "facets.chips": "Applied filters",
   "status.kind": {
     one: "entry",
     other: "entries",

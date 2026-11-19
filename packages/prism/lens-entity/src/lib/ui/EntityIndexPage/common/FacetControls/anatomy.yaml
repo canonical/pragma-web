@@ -1,0 +1,81 @@
+---
+# FacetControls — a lens's facets as controls in the bar, the panel or the
+# sheet. In the bar it holds the lens's first facets in its order, up to
+# the count the lens sets (three by default): a disclosure per facet whose
+# summary is the facet's button, an applied facet's button bold with its
+# value or the number applied (.button.is-applied), its values an overlay
+# list of links, each with its count (the "none" bucket last). The facets
+# left are the sheet's; the facet bar's "More filters" opens it. In the
+# panel and the sheet every facet stacks with its values and counts, then
+# a chip per applied value, a link that lifts it. Nothing is clipped and
+# nothing hidden takes focus; one server HTML serves every width.
+#
+# Every decision is read through a component token declared on the root
+# (`--facet-controls-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   --facet-controls-overlay-stack: 2  above the list, as the renderer
+#     switch's overlay.
+#   --facet-controls-overlay-border-width: 1px  the overlay's hairline.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.100,
+# density.line.height.
+node:
+  uri: prism.subcomponent.facet_controls
+  styles:
+    layout.type: flex
+    layout.align: center
+    layout.wrap: nowrap
+    size.min.width: 0
+    spacing.gap: space.100
+  edges:
+    - node:
+        role: facet (a disclosure, bar only)
+        styles:
+          layout.position: relative
+        edges:
+          - node:
+              role: button (the summary)
+              styles:
+                layout.type: flex
+                layout.align: center
+                size.min.block: density.line.height
+                layout.listStyle: none
+                interaction.cursor: pointer
+                typography.whiteSpace: nowrap
+            relation: { cardinality: "1", slotName: button }
+          - node:
+              role: applied button (.is-applied)
+              styles:
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "0..1", slotName: button }
+          - node:
+              role: values (an overlay list)
+              styles:
+                layout.position: absolute
+                layout.offset.top: 100%
+                layout.offset.left: 0
+                layout.stack: 2
+                layout.listStyle: none
+                layout.type: flex
+                layout.direction: column
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.block.start: space.100
+                spacing.internal.block.end: space.100
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+                spacing.gap: space.100
+                appearance.background: color.background
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border.muted
+            relation: { cardinality: "1", slotName: values }
+      relation: { cardinality: "0..*", slotName: facet }
+    - node:
+        role: stack (panel and sheet only)
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: grid.gutter
+      relation: { cardinality: "0..1", slotName: stack }

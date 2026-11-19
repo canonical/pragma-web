@@ -26,6 +26,7 @@ const EXTERNAL_TOKENS = [
   "--color-text-muted",
   "--typography-text-secondary-font-size",
   "--typography-text-secondary-line-height",
+  "--typography-text-primary-bold-font-weight",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
@@ -52,6 +53,7 @@ describe("the lens's components", () => {
   it("have their subcomponents found in their parents' common folders", () => {
     expect(subcomponentFolders.map((folder) => basename(folder))).toEqual([
       "EntityIndex",
+      "FacetControls",
       "EntitySearch",
       "EntityStatus",
       "EntityView",
