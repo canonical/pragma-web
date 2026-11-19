@@ -166,7 +166,9 @@ another lens and back starts afresh.
   on the inspector region's three columns: a key or a field's name on the
   first, its value on the rest, row after row.
   With no term it explains the graph with a legend drawn by the graph's own
-  code, a row per namespace that fits the camera to it, and the gestures.
+  code, a row per namespace that fits the camera to it, and the gestures;
+  the row of a namespace drawn as one box also links to it opened ("Open
+  surface").
 
 ## The overview
 
@@ -223,12 +225,17 @@ server, deterministically: two renders of a page give the same SVG.
   A layer of more than twelve classes is laid as balanced consecutive
   columns.
 - **An opened view.** A box links to its namespace opened, at the
-  address `/definitions?expand=<prefix>` (`/definitions?expand=surface`):
-  the namespace drawn class by class and packed first, the others as
+  address `/definitions?expand=<prefix>` (`/definitions?expand=surface`),
+  and so does the box's row in the inspector at rest, a link "Open
+  <prefix>" under the row's fit button, keeping the address's other view
+  keys; the opened namespace's row keeps its fit button and opens
+  nothing; a namespace's chip in the facet bar stays a filter. The view
+  draws the namespace class by class and packed first, the others as
   boxes, their shelves wrapped within the legible window of the
   narrowest canvas the graph is drawn on (480px; 656px on the design
   canvas). A box states its namespace's instances beside its prefix, as
-  a class states its own. Its heading is the way back to the overview at rest, and says so
+  a class states its own. The opened namespace's heading is the way
+  back to the overview at rest, and says so
   after its count ("· all namespaces"), keeping the address's other view
   keys. Every view opens by one rule: the whole map where it
   fits the canvas with every label at 12px or more on screen (a zoom of
@@ -249,8 +256,10 @@ server, deterministically: two renders of a page give the same SVG.
   `data-focus` on a term page.
 - **The stated limits.** Three lanes in a channel beside a column: a
   fourth bridge there runs closer than 4px to its neighbour, and from six
-  they lie on one line; a gap or a margin keeps nine 4px apart. A namespace with more classes than the budget
-  leaves room for is drawn whole, over the budget, when it is opened.
+  they lie on one line; a gap or a margin keeps nine 4px apart. A
+  namespace with more classes than the budget leaves room for is drawn
+  whole, over the budget, when it is opened: no deeper subtree folds into
+  its root, so such a namespace would open past the budget.
   More namespaces than the budget has nodes are all drawn as boxes, over
   the budget. The explorer reads every class of every loaded namespace,
   however many: nothing bounds what it fetches, so a graph of more
@@ -272,7 +281,10 @@ server, deterministically: two renders of a page give the same SVG.
   statements counted for each: the classes are links, the counts are
   figures, as no page lists a property's statements between two
   classes. The count line's figures link to the namespace rows, not to
-  a list of what they count.
+  a list of what they count. A region's label row names its bridges with
+  their counts as plain text, not as links. The canvas's numerals are
+  out of the tab order, so a keyboard reaches a count's property only
+  through the inspector's rows.
 
 ## Styling
 
