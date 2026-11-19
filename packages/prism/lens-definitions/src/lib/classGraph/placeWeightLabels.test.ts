@@ -150,10 +150,7 @@ describe("placeWeightLabels", () => {
       "the counted edge",
     );
     const bundle = requireDefined(edge.bundle, "the counted edge's bundle");
-    const relation = requireDefined(
-      bundle.relations.at(0),
-      "its one relation",
-    );
+    const relation = requireDefined(bundle.relations.at(0), "its one relation");
     /** The counted label alone, its edge's bundle changed. */
     const seatWith = (changed: Partial<typeof bundle>) => {
       const [entry] = placeWeightLabels(
