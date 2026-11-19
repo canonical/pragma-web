@@ -10,7 +10,6 @@
     --entity-list-muted-color: var(--color-text-muted);
     /* The matrix's 24px line, which the rows and cards share. */
     --entity-list-line-height: var(--space-300);
-    --entity-list-current-background: var(--color-background-layer2);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -24,12 +23,6 @@
     list-style: none;
     margin-block: 0;
     padding-inline-start: 0;
-  }
-
-  /* The selected entity, a row or a card, takes the raised background the
-   * table of facts gives its selected row. */
-  .ds.entity-list [aria-current="true"] {
-    background: var(--entity-list-current-background);
   }
 
   /* The empty line sets no baseline nudge and takes the list's 24px line
