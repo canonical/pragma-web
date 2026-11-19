@@ -283,3 +283,16 @@ export const FIT_TOLERANCE = 1e-6;
  * lay out the same graph.
  */
 export const MEASURED_LOCALE = "en";
+
+/**
+ * The gap, in px, between an edge's label and its count's numeral, and
+ * between either and the line they are seated beside.
+ */
+export const WEIGHT_LABEL_GAP = 4;
+
+/**
+ * The shares of an edge's length, from its start, at which its label and
+ * numeral are tried beside it when they do not clear the lines where the
+ * label was placed: the middle first, then out towards either end.
+ */
+export const WEIGHT_LABEL_AT: readonly number[] = [0.5, 0.35, 0.65, 0.2, 0.8];

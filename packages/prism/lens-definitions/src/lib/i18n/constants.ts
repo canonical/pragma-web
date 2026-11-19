@@ -50,6 +50,10 @@ export const MESSAGES = {
     one: "{count} class",
     other: "{count} classes",
   },
+  "well.weight.link": {
+    one: "{count} statement of {property}: open the property",
+    other: "{count} statements of {property}: open the property",
+  },
   "well.relations.count": {
     one: "{count} relation",
     other: "{count} relations",
@@ -74,6 +78,32 @@ export const MESSAGES = {
   "inspector.overview.namespace":
     "{classes} classes · {instances} instances · {relations} relations",
   "inspector.overview.fit": "Fit the graph to {prefix}",
+  "inspector.overview.count.classes": {
+    one: "{count} class",
+    other: "{count} classes",
+  },
+  "inspector.overview.count.namespaces": {
+    one: "{count} namespace",
+    other: "{count} namespaces",
+  },
+  "inspector.overview.count.instances": {
+    one: "{count} instance",
+    other: "{count} instances",
+  },
+  "inspector.overview.count.relations": {
+    one: "{count} relation",
+    other: "{count} relations",
+  },
+  "inspector.overview.undeclared": "Observed, not declared",
+  "inspector.overview.undeclared.none":
+    "Every relation the instances state is declared.",
+  "inspector.edges.subject": "From",
+  "inspector.edges.property": "Property",
+  "inspector.edges.object": "To",
+  "inspector.edges.count": "Statements",
+  "inspector.edges.declared": "Declared",
+  "inspector.property.edges": "Between classes",
+  "inspector.property.edges.none": "No statements between classes yet.",
   "legend.concrete": "A concrete class with its instance count",
   "legend.abstract":
     "An abstract class: a hollow box and an italic label, never a count",

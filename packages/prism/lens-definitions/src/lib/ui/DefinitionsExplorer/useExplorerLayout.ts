@@ -23,8 +23,8 @@ import buildClassGraphInput from "./buildClassGraphInput.js";
  * @param edges - The class edges the store holds.
  * @param term - The selected term, compact, if any.
  * @param expand - The address's `expand=` parameter, if any.
- * @returns The canvas's layout, the rail's, and each class's compact
- *   term, by IRI.
+ * @returns The canvas's layout, the rail's, and each class's and
+ *   property's compact term, by IRI.
  * @note Impure: reads the graph budget from its provider.
  */
 export default function useExplorerLayout(
@@ -47,7 +47,7 @@ export default function useExplorerLayout(
     () => layOutClassGraph(input, { budget }),
     [input, budget],
   );
-  const terms = useMemo(
+  const classTerms = useMemo(
     () =>
       new Map(
         ontologies.flatMap((ontology) =>
@@ -59,10 +59,24 @@ export default function useExplorerLayout(
       ),
     [ontologies],
   );
+  // A count's numeral links to its property's term page.
+  const terms = useMemo(
+    () =>
+      new Map([
+        ...classTerms,
+        ...ontologies.flatMap((ontology) =>
+          ontology.properties.map(
+            (property) =>
+              [property.uri, compactUri(property.uri, [ontology])] as const,
+          ),
+        ),
+      ]),
+    [classTerms, ontologies],
+  );
   const selected =
     term === undefined
       ? undefined
-      : [...terms].find(([, compact]) => compact === term)?.[0];
+      : [...classTerms].find(([, compact]) => compact === term)?.[0];
   const drill = chooseAddressDrill(input, expand, term);
   const rail = useMemo(
     () =>

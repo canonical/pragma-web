@@ -725,4 +725,46 @@ describe("ClassGraph", () => {
     expect(root?.getAttribute("class")).toBe("ds class-graph custom-class");
     expect(root?.getAttribute("aria-label")).toBe("Classes");
   });
+
+  describe("a count's numeral", () => {
+    it("links each counted label's numeral to its property, out of the tab order", () => {
+      const container = draw({ layout: metro.layout, terms: metro.terms });
+      const links = [...container.querySelectorAll("a.weight-link")];
+      expect(links.length).toBeGreaterThan(0);
+      for (const link of links) {
+        const edge = requireDefined(
+          metro.layout.edges.find(
+            (candidate) =>
+              candidate.id === link.closest("[data-edge]")?.getAttribute("data-edge"),
+          ),
+          "the numeral's edge",
+        );
+        const weight = requireDefined(edge.bundle?.weight, "a weight");
+        expect(link.getAttribute("tabindex")).toBe("-1");
+        expect(link.getAttribute("data-count")).toBe(String(weight));
+        expect(link.querySelector("text.weight-label")?.textContent).toBe(
+          String(weight),
+        );
+        const property = requireDefined(
+          edge.bundle?.relations.find((relation) =>
+            decodeURIComponent(link.getAttribute("href") ?? "").endsWith(
+              metro.terms.get(relation.uri) ?? "?",
+            ),
+          ),
+          "the property the numeral links",
+        );
+        expect("count" in property && property.count).toBe(weight);
+      }
+    });
+
+    it("draws no numeral on a zero edge, and none below full zoom", () => {
+      const container = draw({ layout: metro.layout, terms: metro.terms });
+      for (const link of container.querySelectorAll("a.weight-link")) {
+        expect(Number(link.getAttribute("data-count"))).toBeGreaterThan(0);
+      }
+      zoom.bucket = "hubs";
+      const hubs = draw({ layout: metro.layout, terms: metro.terms });
+      expect(hubs.querySelectorAll("a.weight-link")).toHaveLength(0);
+    });
+  });
 });

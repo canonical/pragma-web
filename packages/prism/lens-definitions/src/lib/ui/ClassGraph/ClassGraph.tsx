@@ -25,6 +25,7 @@ import fitRelationStroke from "../../classGraph/fitRelationStroke.js";
 import measureRegionHeading from "../../classGraph/measureRegionHeading.js";
 import nameRegionBox from "../../classGraph/nameRegionBox.js";
 import placeBridgeLabels from "../../classGraph/placeBridgeLabels.js";
+import placeWeightLabels from "../../classGraph/placeWeightLabels.js";
 import traceChainToRoot from "../../classGraph/traceChainToRoot.js";
 import type {
   LaidOutEdge,
@@ -386,6 +387,87 @@ export default function ClassGraph({
     REGION_LABEL_SIZE,
   );
   const labelBaseline = findCentredBaseline(LABEL_LINE_PITCH, LABEL_SIZE);
+  const numeralBaseline = findCentredBaseline(
+    LABEL_SIZE + 2 * LABEL_HALO,
+    LABEL_SIZE,
+  );
+  // Every label drawn, seated with its count's numeral clear of the
+  // lines; a numeral only at full zoom, where text of its size is drawn.
+  const drawnBridges =
+    bucket === "overview" ? [] : [...restingLabels, ...focusedLabels];
+  const drawnFocus = bucket === "full" ? labels.placed : [];
+  const drawnKey = [...drawnBridges, ...drawnFocus]
+    .map(({ edge, box }) => `${edge} ${box.x} ${box.y} ${box.w} ${box.h}`)
+    .join(";");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the labels drawn, which are new arrays on each render.
+  const seats = useMemo(
+    () =>
+      new Map(
+        placeWeightLabels(
+          layout,
+          [...drawnBridges, ...drawnFocus].map(({ edge, box }) => ({
+            edge,
+            box,
+          })),
+        ).map((seat) => [seat.edge, seat]),
+      ),
+    [layout, drawnKey],
+  );
+  const seatOf = (edge: string) => requireEntry(seats, edge);
+  const drawNumeral = (edge: string): ReactNode => {
+    const { numeral } = seatOf(edge);
+    if (numeral === undefined || bucket !== "full") return null;
+    const property = requireDefined(
+      edgeOf(edge).bundle?.relations.find(
+        (relation) => relation.uri === numeral.property,
+      ),
+      "the relation a numeral counts",
+    );
+    return (
+      <Link
+        aria-label={t("well.weight.link", {
+          count: numeral.count,
+          property: property.label,
+        })}
+        className="weight-link"
+        data-count={numeral.count}
+        params={{ term: termOf(numeral.property) }}
+        tabIndex={-1}
+        to="definitionsTerm"
+      >
+        <rect
+          fill="none"
+          height={numeral.box.h}
+          pointerEvents="all"
+          width={numeral.box.w}
+          x={numeral.box.x}
+          y={numeral.box.y}
+        />
+        <text
+          aria-hidden="true"
+          className="weight-halo"
+          fill="none"
+          stroke="currentColor"
+          strokeLinejoin="round"
+          strokeWidth={LABEL_HALO_STROKE}
+          textAnchor="middle"
+          x={numeral.cx}
+          y={numeral.box.y + numeralBaseline}
+        >
+          {numeral.count}
+        </text>
+        <text
+          className="weight-label"
+          fill="currentColor"
+          textAnchor="middle"
+          x={numeral.cx}
+          y={numeral.box.y + numeralBaseline}
+        >
+          {numeral.count}
+        </text>
+      </Link>
+    );
+  };
   // The drilled namespace's label row is the way back to the overview at
   // rest, wherever its boxes would open. Its whole row takes the pointer,
   // not only the glyphs, and stays at every zoom: zoomed out past the
@@ -494,9 +576,9 @@ export default function ClassGraph({
         {layout.rail.map((uri) => drawNode(requireEntry(layout.nodes, uri)))}
       </g>
       <g className="label-layer" data-layer="labels">
-        {bucket === "overview"
-          ? null
-          : [...restingLabels, ...focusedLabels].map((label) => (
+        {drawnBridges.map((label) => {
+          const { dx, dy } = seatOf(label.edge);
+          return (
               <g data-edge={label.edge} key={label.edge}>
                 {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
                 <text
@@ -507,8 +589,8 @@ export default function ClassGraph({
                   strokeLinejoin="round"
                   strokeWidth={LABEL_HALO_STROKE}
                   textAnchor="middle"
-                  x={label.cx}
-                  y={label.box.y + bridgeBaseline}
+                  x={label.cx + dx}
+                  y={label.box.y + dy + bridgeBaseline}
                 >
                   {label.text}
                 </text>
@@ -516,21 +598,24 @@ export default function ClassGraph({
                   className="edge-label is-bridge"
                   fill="currentColor"
                   textAnchor="middle"
-                  x={label.cx}
-                  y={label.box.y + bridgeBaseline}
+                  x={label.cx + dx}
+                  y={label.box.y + dy + bridgeBaseline}
                 >
                   {label.text}
                 </text>
+                {drawNumeral(label.edge)}
               </g>
-            ))}
-        {bucket === "full"
-          ? labels.placed.map((label) => {
+          );
+        })}
+        {drawnFocus.map((label) => {
+              const { dx, dy } = seatOf(label.edge);
               const lines = label.lines.map((line, index) => (
                 <tspan
                   key={line}
-                  x={label.cx}
+                  x={label.cx + dx}
                   y={
                     label.box.y +
+                    dy +
                     LABEL_HALO +
                     labelBaseline +
                     index * LABEL_LINE_PITCH
@@ -565,10 +650,10 @@ export default function ClassGraph({
                   >
                     {lines}
                   </text>
+                  {drawNumeral(label.edge)}
                 </g>
               );
-            })
-          : null}
+            })}
       </g>
     </g>
   );

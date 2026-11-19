@@ -39,6 +39,8 @@
     --class-graph-dimmed-opacity: 0.4;
     /* The fade; zero under reduced motion. */
     --class-graph-fade-duration: var(--motion-duration-fast);
+    --class-graph-weight-link-color: var(--color-text-link);
+    --class-graph-weight-link-hover: var(--color-text-link-hover);
   }
 
   .ds.class-graph .rule {
@@ -209,5 +211,30 @@
 
   .ds.class-graph .edge-label.is-focus {
     color: var(--class-graph-accent-color);
+  }
+
+  /* A count's numeral links to its property: it takes the pointer, out of
+   * the tab order (the inspector's rows carry the keyboard route). */
+  .ds.class-graph .weight-link {
+    color: var(--class-graph-weight-link-color);
+    cursor: pointer;
+    pointer-events: all;
+  }
+
+  .ds.class-graph .weight-link:hover {
+    color: var(--class-graph-weight-link-hover);
+  }
+
+  .ds.class-graph .weight-halo {
+    font-size: var(--class-graph-label-font-size);
+    color: var(--class-graph-floor-color);
+    pointer-events: none;
+  }
+
+  .ds.class-graph .weight-label {
+    font-size: var(--class-graph-label-font-size);
+    font-variant-numeric: tabular-nums;
+    text-decoration: underline;
+    pointer-events: none;
   }
 }

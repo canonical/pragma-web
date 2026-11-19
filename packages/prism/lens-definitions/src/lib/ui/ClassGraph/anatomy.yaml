@@ -290,6 +290,26 @@ node:
         on: internal
         cases:
           - node:
+              # A count's numeral, seated with its edge's label clear of
+              # every line, off the arrowheads, inside the viewBox: an
+              # <a class="weight-link" tabindex="-1"> to the property's
+              # term page, out of the tab order (the inspector's rows carry
+              # the keyboard route); a real pointer click opens it. Drawn
+              # only at full zoom and for a count above 0.
+              role: weight-link
+              styles:
+                typography.color: color.text.link
+                interaction.pointerEvents: all
+                interaction.cursor: pointer
+              edges:
+                - node:
+                    role: weight-label
+                    styles:
+                      typography.size: typography.text.secondary.fontSize
+                      typography.variant.numeric: tabular-nums
+                      typography.decoration: underline
+                  relation: { cardinality: "1", slotName: numeral }
+          - node:
               role: label halo
               styles:
                 typography.size: typography.text.secondary.fontSize

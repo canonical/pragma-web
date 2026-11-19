@@ -559,3 +559,36 @@ export interface NeighbourBridgeEnds {
   readonly endX: number;
   readonly portB: number;
 }
+
+/** An edge's label as drawn: its edge id and its box with its halo. */
+export interface DrawnEdgeLabel {
+  readonly edge: string;
+  readonly box: Rect;
+}
+
+/** A relation's count, drawn as a numeral that links to its property. */
+export interface WeightNumeral {
+  /** The full IRI of the property whose statements the count is. */
+  readonly property: string;
+  /** The statements the edge covers: its bundle's weight, above 0. */
+  readonly count: number;
+  /** The numeral's box with its halo. */
+  readonly box: Rect;
+  /** The numeral's centre. */
+  readonly cx: number;
+  readonly cy: number;
+}
+
+/**
+ * An edge's label seated with its count: how far the label moves from
+ * where it was placed, and its numeral, when the edge counts statements
+ * and a clear place holds it.
+ */
+export interface PlacedWeightLabel {
+  /** The edge id. */
+  readonly edge: string;
+  /** The label's shift from its placed box, in whole pixels. */
+  readonly dx: number;
+  readonly dy: number;
+  readonly numeral: WeightNumeral | undefined;
+}
