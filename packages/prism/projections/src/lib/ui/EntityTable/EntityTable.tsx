@@ -12,7 +12,7 @@ const componentCssClassName = "ds entity-table";
  * The table of facts of a single-type index: a header row whose value
  * headers are sort links, then a row per entity, its title cell first and
  * a value cell per column, each carrying its field's id as
- * `data-property`. The selected row is highlighted and marked current.
+ * `data-property`. The selected row is highlighted and marked selected.
  *
  * It is a subgrid of the grid that holds it: the title spans two columns
  * and each value one, and a row is clipped at its own height, so the
@@ -39,13 +39,11 @@ export default function EntityTable({
   return (
     <table
       {...props}
-      className={[componentCssClassName, `is-${lines}-line`, className]
-        .filter(Boolean)
-        .join(" ")}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <thead>
+      <thead className="head">
         <tr className="header">
-          <th className="title" scope="col">
+          <th className="heading" scope="col">
             {t("table.title")}
           </th>
           {columns.map(({ field, header, href, sorted }) => (
@@ -63,13 +61,11 @@ export default function EntityTable({
           ))}
         </tr>
       </thead>
-      <tbody>
+      <tbody className="body">
         {rows.map(({ key, title, cells }) => (
           <tr
-            aria-current={key === selected ? "true" : undefined}
-            className={["row", key === selected ? "is-selected" : null]
-              .filter(Boolean)
-              .join(" ")}
+            aria-selected={key === selected ? "true" : undefined}
+            className={lines === "two" ? "row is-two-line" : "row"}
             key={key}
           >
             <th className="title" scope="row">

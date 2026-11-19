@@ -7,6 +7,7 @@
 import type { HomeNode, HomeResolver, Homes } from "@canonical/prism-core";
 import { type Router, route } from "@canonical/router-core";
 import type { MockResolver } from "relay-test-utils";
+import type { EntityTableProps } from "../src/lib/ui/EntityTable/types.js";
 import type { ClassPayload, NodePayload } from "./types.js";
 
 /** A site's route table with one entity page, addressed by the entity. */
@@ -158,3 +159,34 @@ export const PROSE_REFERENCES = {
 
 /** A link that names no reference. */
 export const UNREFERENCED_HREF = "https://example.com/elsewhere";
+
+/** A stations table of two rows: a header per value field, one sorted. */
+export const ENTITY_TABLE_PROPS: EntityTableProps = {
+  columns: [
+    { field: "servesLine", header: "Line", href: "/x?sort=servesLine" },
+    {
+      field: "inZone",
+      header: "Zone",
+      href: "/x?sort=-inZone",
+      sorted: "ascending",
+    },
+  ],
+  rows: [
+    {
+      key: "a",
+      title: "Bank",
+      cells: [
+        { field: "servesLine", text: "Central Line" },
+        { field: "inZone", text: "Zone 1" },
+      ],
+    },
+    {
+      key: "b",
+      title: "Angel",
+      cells: [
+        { field: "servesLine", text: "Northern Line" },
+        { field: "inZone", text: null },
+      ],
+    },
+  ],
+};

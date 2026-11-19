@@ -2,66 +2,116 @@
 # EntityTable — the table of facts of a single-type index: a header row of
 # sort links, one per value field the index's nodes carry, then one row per
 # entity, its title cell first and a value cell per column. A row is 32px
-# (one line) or 56px (two lines), as the index declares. Cells carry
-# `data-property` with the field's id from `Node.values`, in the header's
-# order; headers read the first row's value labels.
+# (one line) or 56px (two lines, `.is-two-line`), as the index declares.
+# Cells carry `data-property` with the field's id from `Node.values`, in the
+# header's order; headers read the first row's value labels. The selected
+# row (`aria-selected="true"`, the address's `select=`) takes the raised
+# background.
 #
 # The root is a subgrid over every column of the grid that holds it; the
-# header row and each row are subgrids of it, the title cell spanning two
-# columns and each value cell one. A row is clipped at its own height, so
-# the value cells that find no column on its line leave whole, the last
-# first. Below two groups the header row is hidden and a row keeps the
-# title and the facts that fit: the scented row's two facts at 390.
-# Rows stack with no gap between them, the gutter between their columns.
+# head, the body, the header row and each row are subgrids of it, the
+# title cell spanning two columns and each value cell one. The grid's
+# gutter stands between the rows and between their columns, as in every
+# subgrid of the package; a hairline closes each row. A row is clipped at
+# its own height, so the value cells that find no column on its line leave
+# whole, the last first. Below two groups the header row is hidden and a
+# row keeps the title and the facts that fit: the scented row's facts.
 #
 # Token ledger (no symbol to bind):
 #   space.400 (32px) for a one-line row's block size: the matrix's row.
-#   space.300 x 2 + space.100 (56px) for a two-line row's block size: two
+#   2 x space.300 + space.100 (56px) for a two-line row's block size: two
 #   24px lines between 4px insets, as W3's two-line row.
+#   1px for the hairline under each row, as the key-value list's rule.
 #
-# Roster namespaces: grid.gutter, space.0, space.100, space.300,
-# space.400 (row heights).
+# Roster namespaces: grid.gutter, space.100, space.300, space.400.
 node:
   uri: prism.component.entity_table
   styles:
     layout.type: grid
     layout.grid.columns: subgrid
     layout.grid.column: "1 / -1"
-    spacing.gap.block: space.0
-    spacing.gap.inline: grid.gutter
+    spacing.gap: grid.gutter
   edges:
     - node:
-        role: header row
+        role: head
         styles:
           layout.type: grid
           layout.grid.columns: subgrid
           layout.grid.column: "1 / -1"
-          size.blockSize: space.400
-          typography.color: color.text.muted
+          spacing.gap: grid.gutter
         edges:
           - node:
-              role: sort link
+              role: header row
               styles:
-                typography.weight: typography.weight.regular
-            relation: { cardinality: "1..*", slotName: columns }
-      relation: { cardinality: "1", slotName: header }
+                layout.type: grid
+                layout.grid.columns: subgrid
+                layout.grid.column: "1 / -1"
+                spacing.gap: grid.gutter
+                layout.align: center
+                size.block: space.400
+                layout.overflow: hidden
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.bottom.color: color.border.muted
+                typography.color: color.text.muted
+              edges:
+                - node:
+                    role: title heading
+                    styles:
+                      layout.grid.column: "span 2"
+                  relation: { cardinality: "1", slotName: heading }
+                - node:
+                    role: column heading
+                    attributes: { data-property: "{field}" }
+                    edges:
+                      - node:
+                          role: sort link
+                          styles:
+                            typography.weight: typography.text.primary.fontWeight
+                        relation: { cardinality: "1", slotName: sort }
+                  relation: { cardinality: "1..*", slotName: column }
+            relation: { cardinality: "1", slotName: header }
+      relation: { cardinality: "1", slotName: head }
     - node:
-        role: row
+        role: body
         styles:
           layout.type: grid
           layout.grid.columns: subgrid
           layout.grid.column: "1 / -1"
-          size.blockSize: space.400
+          spacing.gap: grid.gutter
         edges:
-          - node:
-              role: title cell
-              styles:
-                layout.grid.column: "span 2"
-                typography.overflow: ellipsis
-            relation: { cardinality: "1", slotName: title }
-          - node:
-              role: value cell
-              styles:
-                typography.overflow: ellipsis
-            relation: { cardinality: "0..*", slotName: cells }
-      relation: { cardinality: "0..*", slotName: rows }
+          - switch:
+              on: lines
+              cases:
+                - node:
+                    role: row
+                    styles:
+                      layout.type: grid
+                      layout.grid.columns: subgrid
+                      layout.grid.column: "1 / -1"
+                      spacing.gap: grid.gutter
+                      layout.align: center
+                      size.block: space.400
+                      layout.grid.autoRows: space.400
+                      layout.overflow: hidden
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.bottom.color: color.border.muted
+                      appearance.background@selected: color.background.layer2
+                    edges:
+                      - node:
+                          role: title cell
+                          styles:
+                            layout.grid.column: "span 2"
+                        relation: { cardinality: "1", slotName: title }
+                      - node:
+                          role: value cell
+                          attributes: { data-property: "{field}" }
+                        relation: { cardinality: "0..*", slotName: value }
+                - node:
+                    role: two-line row (.is-two-line)
+                    styles:
+                      size.block: "calc(2 * var(--space-300) + var(--space-100))"
+                      layout.grid.autoRows: "calc(2 * var(--space-300) + var(--space-100))"
+            relation: { cardinality: "0..*", slotName: row }
+      relation: { cardinality: "1", slotName: body }

@@ -3,11 +3,10 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* A subgrid over every column of the grid that holds it: the header row
-   * and each row span all of them, stacked with no gap between. */
+  /* A subgrid over every column of the grid that holds it: the head and the
+   * body span all of them, the grid's gutter between their rows. */
   .ds.entity-table {
     --entity-table-gap: var(--grid-gutter);
-    --entity-table-row-gap: var(--space-0);
     /* The matrix's 32px row, and the two-line row's 56px: two 24px lines
      * between 4px insets. */
     --entity-table-row-size: var(--space-400);
@@ -16,25 +15,24 @@
       var(--space-300) +
       var(--space-100)
     );
-    --entity-table-muted-color: var(--color-text-muted);
+    --entity-table-rule-width: 1px;
     --entity-table-rule-color: var(--color-border-muted);
+    --entity-table-muted-color: var(--color-text-muted);
     --entity-table-selected-background: var(--color-background-layer2);
+    --entity-table-sort-font-weight: var(--typography-text-primary-font-weight);
 
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-    row-gap: var(--entity-table-row-gap);
-    column-gap: var(--entity-table-gap);
+    gap: var(--entity-table-gap);
   }
 
-  /* The header and the body are no boxes: their rows sit on the grid. */
-  .ds.entity-table > thead,
-  .ds.entity-table > tbody {
-    display: contents;
-  }
-
-  .ds.entity-table.is-two-line {
-    --entity-table-row-size: var(--entity-table-two-line-row-size);
+  .ds.entity-table .head,
+  .ds.entity-table .body {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    gap: var(--entity-table-gap);
   }
 
   /* The header row and each row: subgrids clipped at the row's height, so
@@ -43,40 +41,40 @@
   .ds.entity-table .row {
     display: grid;
     grid-template-columns: subgrid;
-    grid-auto-rows: var(--entity-table-row-size);
     grid-column: 1 / -1;
+    gap: var(--entity-table-gap);
     align-items: center;
     block-size: var(--entity-table-row-size);
     overflow: hidden;
-    border-block-end: 1px solid var(--entity-table-rule-color);
+    border-bottom-width: var(--entity-table-rule-width);
+    border-bottom-style: solid;
+    border-bottom-color: var(--entity-table-rule-color);
   }
 
   .ds.entity-table .header {
     color: var(--entity-table-muted-color);
   }
 
-  .ds.entity-table .header .sort {
-    font-weight: var(--typography-weight-regular);
+  .ds.entity-table .row {
+    grid-auto-rows: var(--entity-table-row-size);
   }
 
-  .ds.entity-table .row.is-selected {
+  .ds.entity-table .row[aria-selected="true"] {
     background: var(--entity-table-selected-background);
   }
 
+  .ds.entity-table .row.is-two-line {
+    block-size: var(--entity-table-two-line-row-size);
+    grid-auto-rows: var(--entity-table-two-line-row-size);
+  }
+
+  .ds.entity-table .heading,
   .ds.entity-table .title {
     grid-column: span 2;
   }
 
-  .ds.entity-table .title,
-  .ds.entity-table .column,
-  .ds.entity-table .value {
-    padding: 0;
-    text-align: start;
-    font-weight: inherit;
-    min-inline-size: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  .ds.entity-table .sort {
+    font-weight: var(--entity-table-sort-font-weight);
   }
 
   /* Below two groups the rows read as scented rows: no header row, the

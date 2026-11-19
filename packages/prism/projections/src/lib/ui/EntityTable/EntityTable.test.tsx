@@ -3,39 +3,12 @@ import { RouterProvider } from "@canonical/router-react";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import { THING_ROUTES } from "../../../../testing/fixtures.js";
+import {
+  ENTITY_TABLE_PROPS,
+  THING_ROUTES,
+} from "../../../../testing/fixtures.js";
 import EntityTable from "./EntityTable.js";
 import type { EntityTableProps } from "./types.js";
-
-const PROPS: EntityTableProps = {
-  columns: [
-    { field: "servesLine", header: "Line", href: "/x?sort=servesLine" },
-    {
-      field: "inZone",
-      header: "Zone",
-      href: "/x?sort=-inZone",
-      sorted: "ascending",
-    },
-  ],
-  rows: [
-    {
-      key: "a",
-      title: "Bank",
-      cells: [
-        { field: "servesLine", text: "Central Line" },
-        { field: "inZone", text: "Zone 1" },
-      ],
-    },
-    {
-      key: "b",
-      title: "Angel",
-      cells: [
-        { field: "servesLine", text: "Northern Line" },
-        { field: "inZone", text: null },
-      ],
-    },
-  ],
-};
 
 /** The table under a router, which its sort links need. */
 const renderTable = (props: Partial<EntityTableProps> = {}) =>
@@ -46,7 +19,7 @@ const renderTable = (props: Partial<EntityTableProps> = {}) =>
           adapter: createMemoryAdapter("/"),
         })}
       >
-        <EntityTable {...PROPS} {...props} />
+        <EntityTable {...ENTITY_TABLE_PROPS} {...props} />
       </RouterProvider>
     ) as ReactElement,
   );
@@ -88,18 +61,15 @@ describe("EntityTable", () => {
   it("highlights the selected row only", () => {
     renderTable({ selected: "b" });
     const [, first, second] = screen.getAllByRole("row");
-    expect(second).toHaveAttribute("aria-current", "true");
-    expect(second).toHaveClass("is-selected");
-    expect(first).not.toHaveAttribute("aria-current");
+    expect(second).toHaveAttribute("aria-selected", "true");
+    expect(first).not.toHaveAttribute("aria-selected");
   });
 
   it("takes one line a row unless told two", () => {
     const { container, unmount } = renderTable();
-    expect(container.querySelector(".entity-table")).toHaveClass("is-one-line");
+    expect(container.querySelectorAll(".row.is-two-line")).toHaveLength(0);
     unmount();
     const two = renderTable({ lines: "two" });
-    expect(two.container.querySelector(".entity-table")).toHaveClass(
-      "is-two-line",
-    );
+    expect(two.container.querySelectorAll(".row.is-two-line")).toHaveLength(2);
   });
 });
