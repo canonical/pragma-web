@@ -74,7 +74,9 @@ const componentCssClassName = "ds node-list";
  * values but those `omits` names, each header a link that sorts the list
  * by it, and each row the node's title and its values in the columns'
  * order. A mixed list, or one whose nodes carry no values, keeps the rows.
- * The `sort` orders the nodes by a value's text in every renderer.
+ * The `sort` orders the nodes by a value's text in every renderer, and
+ * the `selected` node, by address or curie, is highlighted in every
+ * renderer: the table's row is marked selected, a row or a card current.
  *
  * It keeps no renderer of its own: the lens reads it from the page's
  * address and passes its name as `renderer`. The empty line is the lens's
@@ -110,6 +112,9 @@ export default function NodeList({
   const listClassName = [componentCssClassName, className]
     .filter(Boolean)
     .join(" ");
+  const selectedUri = data.find(
+    ({ uri, _meta }) => uri === selected || _meta.curie === selected,
+  )?.uri;
   const fields = (data.at(0)?.values ?? []).filter(
     ({ field }) => !omits.includes(field),
   );
@@ -156,11 +161,7 @@ export default function NodeList({
         lines={lines}
         renderer={renderer}
         rows={rows}
-        selected={
-          data.find(
-            ({ uri, _meta }) => uri === selected || _meta.curie === selected,
-          )?.uri
-        }
+        selected={selectedUri}
       />
     );
   }
@@ -168,9 +169,18 @@ export default function NodeList({
     <EntityList {...props} className={listClassName} renderer={renderer}>
       {data.map((node) =>
         renderer === "cards" ? (
-          <CardProjection key={node.uri} node={node} />
+          <CardProjection
+            aria-current={node.uri === selectedUri ? "true" : undefined}
+            key={node.uri}
+            node={node}
+          />
         ) : (
-          <RowProjection key={node.uri} node={node} />
+          <RowProjection
+            aria-current={node.uri === selectedUri ? "true" : undefined}
+            key={node.uri}
+            lines={lines}
+            node={node}
+          />
         ),
       )}
     </EntityList>

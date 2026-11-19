@@ -42,6 +42,15 @@ node:
                 spacing.external.block.start: 0
                 spacing.external.block.end: 0
                 spacing.internal.inline.start: 0
+              edges:
+                # The selected entity's row or card (`aria-current="true"`,
+                # the address's `select=`): the raised background, as the
+                # table of facts marks its selected row.
+                - node:
+                    role: current item
+                    styles:
+                      appearance.background@selected: color.background.layer2
+                  relation: { cardinality: "0..1", slotName: children }
       relation: { cardinality: "0..1", slotName: items }
     - node:
         role: empty line

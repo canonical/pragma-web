@@ -131,6 +131,44 @@ describe("NodeList", () => {
     expect(container.querySelector(".ds.ontology-class-card")).not.toBeNull();
   });
 
+  it("marks the selected node's row current by its address or curie", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList nodes={nodes} selected="https://ds.canonical.com/Layout" />
+    ));
+    const current = container.querySelectorAll('ol > [aria-current="true"]');
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveClass("ontology-class-row");
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull();
+  });
+
+  it("keeps the selected node current in the cards", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList
+        nodes={nodes}
+        renderer="cards"
+        selected="https://ds.canonical.com/IconButton"
+      />
+    ));
+    const current = container.querySelectorAll('[aria-current="true"]');
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveClass("node-card");
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull();
+  });
+
+  it("marks no node current when the selection names none listed", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList nodes={nodes} selected="https://ds.canonical.com/Nowhere" />
+    ));
+    expect(container.querySelector('[aria-current="true"]')).toBeNull();
+  });
+
+  it("hands its row height to each row", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList lines="two" nodes={nodes} />
+    ));
+    expect(container.querySelectorAll("ol > li > .summary")).toHaveLength(2);
+  });
+
   it("shows the empty line when every node is hidden", () => {
     renderWithNodes(
       (nodes) => <NodeList empty="No instances." nodes={nodes} />,
