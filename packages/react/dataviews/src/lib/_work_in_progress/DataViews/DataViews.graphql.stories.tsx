@@ -50,7 +50,7 @@ const capabilities = declareCapabilities(machineCollection, {
   filter: {
     status: ["isAny", "isNone"],
     cores: ["gte", "lte"],
-    name: ["contains", "startsWith"],
+    name: ["is", "isNot", "contains", "notContains", "startsWith", "endsWith"],
     region: ["contains"],
     owner: ["contains", "startsWith"],
   },
@@ -81,8 +81,12 @@ const source = createRelaySource({
             : [...filters.status.isNone],
         coresGte: filters.cores?.gte ?? null,
         coresLte: filters.cores?.lte ?? null,
+        nameIs: filters.name?.is ?? null,
+        nameIsNot: filters.name?.isNot ?? null,
         nameContains: filters.name?.contains ?? null,
+        nameNotContains: filters.name?.notContains ?? null,
         nameStartsWith: filters.name?.startsWith ?? null,
+        nameEndsWith: filters.name?.endsWith ?? null,
         regionContains: filters.region?.contains ?? null,
         ownerContains: filters.owner?.contains ?? null,
         ownerStartsWith: filters.owner?.startsWith ?? null,
@@ -301,8 +305,8 @@ export const CountsAndNoneOf: Story = {
 
 /**
  * Text an owner starts with: this endpoint looks through the owner, so its
- * input is offered, while the region has text it contains and none it starts
- * with. `EX:I` keeps the machine owned by `ex:ivy`.
+ * input offers starts with beside contains, while the region has text it
+ * contains and nothing else. `EX:I` keeps the machine owned by `ex:ivy`.
  */
 export const StartsWithApplied: Story = {
   parameters: code,
@@ -310,12 +314,15 @@ export const StartsWithApplied: Story = {
     <ServerBackedMachines source={() => createGraphQLMachineSource("live")} />
   ),
   play: async ({ canvas }) => {
-    const owner = await canvas.findByRole("textbox", {
-      name: "Owner starts with",
-    });
+    await userEvent.selectOptions(
+      await canvas.findByRole("combobox", { name: "How Owner matches" }),
+      "startsWith",
+    );
+    const owner = canvas.getByRole("textbox", { name: "Owner starts with" });
     await expect(owner).toHaveAttribute("name", "owner__startsWith");
+    // The region declares one operator, so it offers no choice.
     await expect(
-      canvas.queryByRole("textbox", { name: "Region starts with" }),
+      canvas.queryByRole("combobox", { name: "How Region matches" }),
     ).toBeNull();
     await userEvent.type(owner, "EX:I");
     await waitFor(() =>

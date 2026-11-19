@@ -1,30 +1,11 @@
-import type {
-  DataViewsMessages,
-  PredicateOperator,
-} from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { useDataViewsValue } from "../../../../../../hooks/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
+import { PHRASE_MESSAGES } from "../constants.js";
 import { FurtherConjunct } from "./common/index.js";
 import type { FurtherConjunctsProps } from "./types.js";
 
 const componentCssClassName = "ds data-views-filters-further-conjuncts";
-
-/**
- * The message each operator's control reads by, by the field's label, or
- * null for presence, whose control reads as the label alone.
- */
-const PHRASE_MESSAGES = {
-  isAny: "filterIsAnyOf",
-  isNone: "filterIsNoneOf",
-  gte: "filterFrom",
-  lte: "filterTo",
-  contains: "filterContains",
-  startsWith: "filterStartsWith",
-  isSet: null,
-} as const satisfies Readonly<
-  Record<PredicateOperator, keyof DataViewsMessages | null>
->;
 
 /**
  * The conjuncts at a filter's address beyond the one its control edits, a
@@ -37,6 +18,7 @@ export default function FurtherConjuncts({
   field,
   operator,
   label,
+  unit,
   host,
   onLeave,
   className,
@@ -48,7 +30,9 @@ export default function FurtherConjuncts({
     return null;
   }
   const key = PHRASE_MESSAGES[operator];
-  const phrase = key === null ? label : messages[key](label);
+  const named = key === null ? label : messages[key](label);
+  const phrase =
+    unit === undefined ? named : messages.filterInUnit(named, unit);
   return (
     <ul
       {...rest}

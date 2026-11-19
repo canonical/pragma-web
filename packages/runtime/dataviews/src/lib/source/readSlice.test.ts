@@ -23,7 +23,7 @@ describe("readSlice", () => {
         { field: "cpu", operator: "lte", operands: [16] },
         { field: "status", operator: "isAny", operands: ["ready", "failed"] },
         { field: "cpu", operator: "gte", operands: [4] },
-        { field: "owner", operator: "isSet", operands: [] },
+        { field: "owner", operator: "isSet", operands: [true] },
         { field: "updated", operator: "gte", operands: ["2026-01-01"] },
         { field: "name", operator: "contains", operands: ["web"] },
         { field: "name", operator: "startsWith", operands: ["api"] },
@@ -82,7 +82,15 @@ describe("readSlice", () => {
     >();
     expectTypeOf(reading.filters.owner).toEqualTypeOf<boolean | undefined>();
     expectTypeOf(reading.filters.name).toEqualTypeOf<
-      { readonly contains?: string; readonly startsWith?: string } | undefined
+      | {
+          readonly is?: string;
+          readonly isNot?: string;
+          readonly contains?: string;
+          readonly notContains?: string;
+          readonly startsWith?: string;
+          readonly endsWith?: string;
+        }
+      | undefined
     >();
   });
 });

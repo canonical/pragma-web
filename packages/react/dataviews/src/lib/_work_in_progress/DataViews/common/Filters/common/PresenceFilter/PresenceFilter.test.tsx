@@ -1,7 +1,7 @@
 /**
- * One presence filter, mounted on its own under a root: the checkbox the
- * wire spells, the count beside it, and the control leaving with the last
- * restriction it removes.
+ * One presence filter, mounted on its own under a root: the three radios
+ * the wire spells, the count beside one, and the control leaving with the
+ * last restriction it removes.
  */
 import {
   type Count,
@@ -10,7 +10,10 @@ import {
   DEFAULT_WINDOW,
   declareCapabilities,
 } from "@canonical/dataviews-core";
-import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import {
+  readProviderHost,
+  spellWireValues,
+} from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import createManualSource from "../../../../../../../../testing/createManualSource.js";
@@ -50,8 +53,7 @@ type HarnessProps = Partial<
 const Harness = ({
   count = null,
   declared = true,
-  leavesWhenCleared = false,
-  onLeave = () => {},
+  onHold = () => {},
   ...rest
 }: HarnessProps) => {
   const { filters } = useDataViewsRoot("PresenceFilter test");
@@ -63,8 +65,7 @@ const Harness = ({
       field="owner"
       count={count}
       declared={declared}
-      leavesWhenCleared={leavesWhenCleared}
-      onLeave={onLeave}
+      onHold={onHold}
     />
   );
 };
@@ -76,12 +77,12 @@ const mount = (provider: Provider, props: HarnessProps = {}) =>
     </DataViews>,
   );
 
-const setOwner = (provider: Provider): void => {
+const setOwner = (provider: Provider, set = true): void => {
   act(() => {
     readProviderHost(provider).adopt(
       {
         slice: {
-          filter: [{ field: "owner", operator: "isSet", operands: [] }],
+          filter: [{ field: "owner", operator: "isSet", operands: [set] }],
           search: null,
           sort: [],
           group: [],
@@ -94,69 +95,132 @@ const setOwner = (provider: Provider): void => {
   });
 };
 
+/** One of the group's radios, by its name. */
+const findRadio = (name: string): HTMLElement =>
+  screen.getByRole("radio", { name });
+
 describe("PresenceFilter", () => {
-  it("applies the presence predicate when checked, and removes it when unchecked", () => {
+  it("is a group of three choices named by the field, Any chosen", () => {
+    mount(makeProvider());
+    const group = screen.getByRole("group", { name: "Owned" });
+    expect(group.tagName).toBe("FIELDSET");
+    expect(
+      screen.getAllByRole("radio").map((radio) => radio.getAttribute("value")),
+    ).toEqual(["", "true", "false"]);
+    expect(findRadio("Any")).toBeChecked();
+  });
+
+  it("applies either restriction, and removes it with Any", () => {
     const provider = makeProvider();
     mount(provider);
-    const owned = screen.getByRole("checkbox", { name: "Owned" });
-    expect(owned).not.toBeChecked();
-    fireEvent.click(owned);
+    fireEvent.click(findRadio("Has a value"));
     expect(provider.state.get().slice.filter).toEqual([
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [true] },
     ]);
-    expect(owned).toBeChecked();
-    fireEvent.click(owned);
+    expect(findRadio("Has a value")).toBeChecked();
+    fireEvent.click(findRadio("Has no value"));
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [false] },
+    ]);
+    expect(findRadio("Has no value")).toBeChecked();
+    fireEvent.click(findRadio("Any"));
     expect(provider.state.get().slice.filter).toEqual([]);
+    expect(findRadio("Any")).toBeChecked();
   });
 
-  it("names the checkbox as the wire spells presence, with the encoder's marker", () => {
+  it("names each radio as the wire spells presence, with the encoder's value", () => {
+    // The values the encoder writes for each operand, and none for Any.
     mount(makeProvider());
-    const owned = screen.getByRole("checkbox", { name: "Owned" });
-    expect(owned).toHaveAttribute("name", "owner__isSet");
-    expect(owned).toHaveAttribute("value", "1");
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio).toHaveAttribute("name", "owner__isSet");
+    }
+    expect(
+      screen.getAllByRole("radio").map((radio) => radio.getAttribute("value")),
+    ).toEqual([
+      "",
+      ...spellWireValues({
+        field: "owner",
+        operator: "isSet",
+        operands: [true],
+      }),
+      ...spellWireValues({
+        field: "owner",
+        operator: "isSet",
+        operands: [false],
+      }),
+    ]);
   });
 
-  it("describes the checkbox by how many matching records set the field", () => {
+  it("describes Has a value by how many matching records hold one", () => {
     const count: Count = { kind: "at-least", value: 1200 };
     mount(makeProvider(), { count });
-    expect(
-      screen.getByRole("checkbox", { name: "Owned" }),
-    ).toHaveAccessibleDescription("at least 1,200");
+    expect(findRadio("Has a value")).toHaveAccessibleDescription(
+      "at least 1,200",
+    );
+    expect(findRadio("Has no value")).not.toHaveAttribute("aria-describedby");
   });
 
   it("says no count while none answers, or the source cannot count", () => {
     const { rerender } = mount(makeProvider());
-    const owned = screen.getByRole("checkbox", { name: "Owned" });
-    expect(owned).not.toHaveAttribute("aria-describedby");
+    expect(findRadio("Has a value")).not.toHaveAttribute("aria-describedby");
     rerender(
       <DataViews provider={makeProvider()}>
         <Harness count={{ kind: "unknown" }} />
       </DataViews>,
     );
-    expect(screen.getByRole("checkbox", { name: "Owned" })).not.toHaveAttribute(
-      "aria-describedby",
-    );
+    expect(findRadio("Has a value")).not.toHaveAttribute("aria-describedby");
   });
 
-  it("offers an undeclared field only while it stands, then leaves with it", () => {
+  it("offers an undeclared field only while it stands, for removal only", () => {
     const provider = makeProvider();
-    const onLeave = vi.fn();
-    mount(provider, { declared: false, leavesWhenCleared: true, onLeave });
-    expect(screen.queryByRole("checkbox")).toBeNull();
-    setOwner(provider);
-    fireEvent.click(screen.getByRole("checkbox", { name: "Owned" }));
+    mount(provider, { declared: false });
+    expect(screen.queryByRole("radio")).toBeNull();
+    setOwner(provider, false);
+    // Only for removal: the other restriction was never offered.
+    expect(findRadio("Has a value")).toBeDisabled();
+    expect(findRadio("Has no value")).toBeEnabled();
+    fireEvent.click(findRadio("Any"));
     expect(provider.state.get().slice.filter).toEqual([]);
-    expect(onLeave).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole("checkbox")).toBeNull();
+    // Nothing held focus inside it, so it leaves with the restriction.
+    expect(screen.queryByRole("radio")).toBeNull();
+  });
+
+  it("stays while focus is inside it once Any removes an undeclared field, and leaves after", () => {
+    const provider = makeProvider();
+    const onHold = vi.fn();
+    mount(provider, { declared: false, onHold });
+    setOwner(provider, false);
+    const unset = findRadio("Has no value");
+    act(() => {
+      unset.focus();
+    });
+    expect(onHold).toHaveBeenLastCalledWith(true);
+    // An arrow key moving to Any chooses it, as the browser does.
+    act(() => {
+      findRadio("Any").focus();
+    });
+    fireEvent.click(findRadio("Any"));
+    expect(provider.state.get().slice.filter).toEqual([]);
+    expect(findRadio("Any")).toHaveFocus();
+    expect(findRadio("Any")).toBeChecked();
+    expect(onHold).not.toHaveBeenCalledWith(false);
+    act(() => {
+      findRadio("Any").blur();
+    });
+    expect(onHold).toHaveBeenLastCalledWith(false);
+    expect(screen.queryByRole("radio")).toBeNull();
   });
 
   it("keeps focus where it is when the control stays after a clear", () => {
     const provider = makeProvider();
-    const onLeave = vi.fn();
-    mount(provider, { onLeave });
+    mount(provider);
     setOwner(provider);
-    fireEvent.click(screen.getByRole("checkbox", { name: "Owned" }));
-    expect(onLeave).not.toHaveBeenCalled();
+    act(() => {
+      findRadio("Any").focus();
+    });
+    fireEvent.click(findRadio("Any"));
+    expect(screen.getByRole("group", { name: "Owned" })).toBeInTheDocument();
+    expect(findRadio("Any")).toHaveFocus();
   });
 
   it("takes the native props of its root, merging the class name", () => {
@@ -165,6 +229,7 @@ describe("PresenceFilter", () => {
       title: "Machines with an owner",
     });
     const root = container.firstElementChild;
+    expect(root?.tagName).toBe("FIELDSET");
     expect(root).toHaveClass("ds", "data-views-filters-presence", "extra");
     expect(root).toHaveAttribute("title", "Machines with an owner");
   });

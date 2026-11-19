@@ -56,7 +56,7 @@ const capabilities = declareCapabilities(machineCollection, {
   filter: {
     status: ["isAny", "isNone"],
     cores: ["gte", "lte"],
-    name: ["contains", "startsWith"],
+    name: ["is", "isNot", "contains", "notContains", "startsWith", "endsWith"],
     region: ["contains", "startsWith"],
   },
   search: ["name", "owner"],
@@ -373,8 +373,9 @@ export const CountsAndNoneOf: Story = {
 
 /**
  * Text a host name starts with: `B` keeps `birch.example.com` alone, where
- * text it contains would keep every host holding a `b`. Before any script
- * runs the input is a GET form control named `name__startsWith`.
+ * text it contains would keep every host holding a `b`. Chosen beside the
+ * input, the operator renames it: a GET form control named
+ * `name__startsWith`.
  */
 export const StartsWithApplied: Story = {
   parameters: code,
@@ -386,6 +387,10 @@ export const StartsWithApplied: Story = {
       expect(readPaginationSummary(canvas)).toHaveTextContent(
         "Showing 1–5 out of 12 rows",
       ),
+    );
+    await userEvent.selectOptions(
+      canvas.getByRole("combobox", { name: "How Host matches" }),
+      "startsWith",
     );
     const host = canvas.getByRole("textbox", { name: "Host starts with" });
     await expect(host).toHaveAttribute("name", "name__startsWith");

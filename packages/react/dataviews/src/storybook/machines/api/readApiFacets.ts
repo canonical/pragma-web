@@ -1,7 +1,12 @@
 import type { Facet } from "@canonical/dataviews-core";
 import { STATUS_ORDER } from "./constants.js";
 import selectRecords from "./selectRecords.js";
-import type { ApiQuery, ApiRecord, ApiTextMatch, FacetValue } from "./types.js";
+import type {
+  ApiHeldTextOperator,
+  ApiQuery,
+  ApiRecord,
+  FacetValue,
+} from "./types.js";
 
 /** One status counted so far. */
 type Tally = { readonly value: string | number; count: number };
@@ -45,7 +50,7 @@ export default function readApiFacets(
   query: ApiQuery,
   matched: readonly ApiRecord[],
   matchText: (
-    operator: ApiTextMatch["operator"],
+    operator: ApiHeldTextOperator,
     text: string,
   ) => (value: string) => boolean,
 ): Readonly<Record<string, Facet>> {
@@ -113,11 +118,13 @@ export default function readApiFacets(
         facets[field] = { kind: "range", min, max };
         break;
       }
+      /* v8 ignore start -- unreachable: every facet field has a case */
       default: {
         // A facet field the endpoint lists but reads no facet for.
         const unread: never = field;
         throw new Error(`no facet reader for ${JSON.stringify(unread)}`);
       }
+      /* v8 ignore stop */
     }
   }
   return facets;

@@ -6,6 +6,7 @@ export { default as createRelaySource } from "./createRelaySource.js";
 export { default as declareCapabilities } from "./declareCapabilities.js";
 export { default as describeError } from "./describeError.js";
 export { default as executeSlice } from "./executeSlice.js";
+export { default as listOfferedOperators } from "./listOfferedOperators.js";
 export { default as pluralize } from "./pluralize.js";
 export { default as readFacets } from "./readFacets.js";
 export { default as readSlice } from "./readSlice.js";

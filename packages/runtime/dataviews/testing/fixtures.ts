@@ -331,13 +331,25 @@ export const LINKS_VALID_TODAY: readonly LinkReading[] = [
   {
     params: "owner__isSet=1",
     slice: {
-      filter: [{ field: "owner", operator: "isSet", operands: [] }],
+      filter: [{ field: "owner", operator: "isSet", operands: [true] }],
       search: null,
       sort: [],
       group: [],
     },
     issues: [],
-    encoded: "owner__isSet=1&page=1&size=50",
+    // Read as it always was, and written back as presence is now spelled.
+    encoded: "owner__isSet=true&page=1&size=50",
+  },
+  {
+    params: "owner__isSet=false",
+    slice: {
+      filter: [{ field: "owner", operator: "isSet", operands: [false] }],
+      search: null,
+      sort: [],
+      group: [],
+    },
+    issues: [],
+    encoded: "owner__isSet=false&page=1&size=50",
   },
   {
     params: "owner__isSet=",

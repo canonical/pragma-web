@@ -11,6 +11,7 @@ import type {
   FilterFeedback,
   FilterHandles,
   PredicateOperand,
+  PredicateOperator,
   Query,
   RowRecord,
   SchemaFieldDefinition,
@@ -72,6 +73,21 @@ export type UseRestrictedFieldsProps = {
  * the same.
  */
 export type UseRestrictedFieldsResult = ReadonlyMap<string, number>;
+
+/** What the standing-operators hook reads: the provider whose query it reads. */
+export type UseStandingOperatorsProps = {
+  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
+};
+
+/**
+ * What the standing-operators hook returns: the operators the applied query
+ * holds a conjunct under on each field it restricts, each once, in the
+ * query's order, at one identity while that reads the same.
+ */
+export type UseStandingOperatorsResult = ReadonlyMap<
+  string,
+  readonly PredicateOperator[]
+>;
 
 /**
  * What the More filters pin takes: the marks a pin is placed under, and the

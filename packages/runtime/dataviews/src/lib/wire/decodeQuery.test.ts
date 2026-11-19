@@ -98,6 +98,77 @@ describe("decodeQuery", () => {
     ]);
   });
 
+  it.each(["is", "isNot", "notContains", "endsWith"] as const)(
+    "reads and writes back the text a text field's %s operator takes",
+    (operator) => {
+      const decoded = decode(`name__${operator}=Web`);
+      expect(decoded.slice.filter).toEqual([
+        { field: "name", operator, operands: ["Web"] },
+      ]);
+      expect(
+        encodeQuery({
+          schema: machines(),
+          slice: decoded.slice,
+          window: null,
+        }).toString(),
+      ).toBe(`name__${operator}=Web`);
+    },
+  );
+
+  it("reads a bound typed in a display unit in base units, as a form submits it", () => {
+    const schema = createSchema([
+      {
+        field: "memory",
+        kind: "number",
+        units: {
+          base: "MiB",
+          display: [
+            { symbol: "MiB", factor: 1 },
+            { symbol: "GiB", factor: 1024 },
+          ],
+        },
+      },
+    ]);
+    const decoded = decodeQuery({
+      schema,
+      params: new URLSearchParams("memory__gte=16+GiB"),
+    });
+    expect(decoded.slice.filter).toEqual([
+      { field: "memory", operator: "gte", operands: [16_384] },
+    ]);
+    expect(
+      encodeQuery({ schema, slice: decoded.slice, window: null }).toString(),
+    ).toBe("memory__gte=16384");
+    // A trailing space ends a whole value on the wire.
+    expect(
+      decodeQuery({ schema, params: new URLSearchParams("memory__gte=16+") })
+        .slice.filter,
+    ).toEqual([{ field: "memory", operator: "gte", operands: [16] }]);
+    // Text still on its way to a value restricts nothing, and is refused.
+    expect(
+      decodeQuery({ schema, params: new URLSearchParams("memory__gte=16+G") })
+        .issues,
+    ).toEqual([
+      {
+        parameter: "memory__gte",
+        field: "memory",
+        code: "invalid",
+        reason: '"16 G" is not a whole value',
+      },
+    ]);
+  });
+
+  it("reads text equality only under its own key", () => {
+    expect(decode("name=web").issues).toEqual([
+      {
+        parameter: "name",
+        field: "name",
+        code: "invalid",
+        reason: 'text field "name" does not accept the isAny operator',
+      },
+    ]);
+  });
+
   it("reads the text a text field starts with, literally and once", () => {
     const decoded = decode(`name__startsWith=${encodeURIComponent(" 50%_")}`);
     expect(decoded.slice.filter).toEqual([
@@ -139,10 +210,46 @@ describe("decodeQuery", () => {
     ]);
   });
 
-  it("applies the zero-value operator on its presence, not its value", () => {
-    expect(decode("owner__isSet=0").slice.filter).toEqual([
-      { field: "owner", operator: "isSet", operands: [] },
+  it("reads presence as true or false, and 1 as true", () => {
+    expect(decode("owner__isSet=true").slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [true] },
     ]);
+    expect(decode("owner__isSet=false").slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [false] },
+    ]);
+    expect(decode("owner__isSet=1").slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [true] },
+    ]);
+  });
+
+  it("reads an empty presence value as no clause", () => {
+    expect(decode("owner__isSet=")).toMatchObject({
+      slice: { filter: [] },
+      issues: [],
+    });
+  });
+
+  it("refuses a presence value that is neither true nor false", () => {
+    expect(decode("owner__isSet=0")).toMatchObject({
+      slice: { filter: [] },
+      issues: [
+        {
+          parameter: "owner__isSet",
+          field: "owner",
+          code: "malformed",
+          reason: '"0" is neither true nor false',
+        },
+      ],
+    });
+  });
+
+  it("keeps the first of two presence values, reporting the other", () => {
+    expect(decode("owner__isSet=false&owner__isSet=true")).toMatchObject({
+      slice: {
+        filter: [{ field: "owner", operator: "isSet", operands: [false] }],
+      },
+      issues: [{ parameter: "owner__isSet", code: "malformed" }],
+    });
   });
 
   it("reads search and an ordered sort", () => {

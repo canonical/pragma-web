@@ -1,5 +1,21 @@
 import compareRecords from "./compareRecords.js";
-import type { ApiQuery, ApiRecord, ApiTextMatch } from "./types.js";
+import type {
+  ApiHeldTextOperator,
+  ApiQuery,
+  ApiRecord,
+  ApiTextMatch,
+} from "./types.js";
+
+/** The operator each negation holds exactly where it does not. */
+const NEGATED: Readonly<
+  Record<
+    Exclude<ApiTextMatch["operator"], ApiHeldTextOperator>,
+    ApiHeldTextOperator
+  >
+> = {
+  isNot: "is",
+  notContains: "contains",
+};
 
 /** The fields free-text search reads, on either endpoint. */
 const SEARCHED_FIELDS: readonly string[] = ["name", "owner"];
@@ -15,24 +31,36 @@ const SEARCHED_FIELDS: readonly string[] = ["name", "owner"];
  * Whether a value holds text is the endpoint's own call, so each endpoint
  * executes `contains` and `startsWith` its own way over the same records and
  * the same query: `matchText` prepares one operand once per query — folds
- * it, escapes it — and answers whether each string value holds it.
+ * it, escapes it — and answers whether each string value holds it. Each
+ * negation is the complement of its operator, decided here once for both.
  */
 export default function selectRecords(
   records: readonly ApiRecord[],
   query: ApiQuery,
   matchText: (
-    operator: ApiTextMatch["operator"],
+    operator: ApiHeldTextOperator,
     text: string,
   ) => (value: string) => boolean,
 ): readonly ApiRecord[] {
   /** A prepared operand, reading only string values. */
-  const prepare = (operator: ApiTextMatch["operator"], text: string) => {
+  const prepare = (operator: ApiHeldTextOperator, text: string) => {
     const holds = matchText(operator, text);
     return (value: unknown): boolean =>
       typeof value === "string" && holds(value);
   };
+  /**
+   * A prepared operand for any text operator: a negation holds exactly where
+   * its operator does not, so a record without text matches it.
+   */
+  const prepareAny = (operator: ApiTextMatch["operator"], text: string) => {
+    if (operator === "isNot" || operator === "notContains") {
+      const held = prepare(NEGATED[operator], text);
+      return (value: unknown): boolean => !held(value);
+    }
+    return prepare(operator, text);
+  };
   const texts = query.text.map(
-    ({ field, operator, text }) => [field, prepare(operator, text)] as const,
+    ({ field, operator, text }) => [field, prepareAny(operator, text)] as const,
   );
   const searched =
     query.search === null ? null : prepare("contains", query.search);

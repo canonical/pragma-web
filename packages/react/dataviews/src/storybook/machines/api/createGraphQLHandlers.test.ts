@@ -152,6 +152,19 @@ describe("createGraphQLHandlers", () => {
     });
   });
 
+  it("matches the text a name equals or ends with", async () => {
+    const equal = await requestGraphQL("live", {
+      first: 12,
+      where: { nameIs: "BIRCH.example.com" },
+    });
+    expect(readIds(equal.body)).toEqual(["m-02"]);
+    const ending = await requestGraphQL("live", {
+      first: 12,
+      where: { nameEndsWith: "RCH.EXAMPLE.COM" },
+    });
+    expect(readIds(ending.body)).toEqual(["m-02", "m-12"]);
+  });
+
   it("looks for text a value starts with in each member it declares", async () => {
     const { body } = await requestGraphQL("live", {
       first: 12,

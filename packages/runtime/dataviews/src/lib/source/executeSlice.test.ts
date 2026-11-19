@@ -126,7 +126,7 @@ describe("executeSlice", () => {
         executeSlice(
           rows,
           slice({
-            filter: [{ field: "owner", operator: "isSet", operands: [] }],
+            filter: [{ field: "owner", operator: "isSet", operands: [true] }],
           }),
           buildExecuteConfig(),
         ),
@@ -623,7 +623,7 @@ describe("executeSlice", () => {
       executeSlice(
         rows,
         slice({
-          filter: [{ field: "toString", operator: "isSet", operands: [] }],
+          filter: [{ field: "toString", operator: "isSet", operands: [true] }],
         }),
         buildExecuteConfig(),
       ),

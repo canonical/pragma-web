@@ -9,10 +9,10 @@ import readRestQuery from "./readRestQuery.js";
 import selectRecords from "./selectRecords.js";
 import spellLikePattern from "./spellLikePattern.js";
 import type {
+  ApiHeldTextOperator,
   ApiProblem,
   ApiRecord,
   ApiScenario,
-  ApiTextMatch,
   MockApiConfig,
 } from "./types.js";
 
@@ -30,7 +30,7 @@ type RestPage = {
  * escaped into a `LIKE` pattern and compiled once per query, and both sides
  * folded, as `lower(value) LIKE lower(pattern) ESCAPE '\'` compares them.
  */
-const matchText = (operator: ApiTextMatch["operator"], text: string) => {
+const matchText = (operator: ApiHeldTextOperator, text: string) => {
   const matches = compileLikePattern(
     foldStoredText(spellLikePattern(operator, text)),
   );

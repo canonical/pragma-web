@@ -14,7 +14,7 @@ const testConfig = reactTestConfig({
   ssr: true,
   // Unmeasured: stories, decorators, the hidden-button reader, the French
   // record, the import speller, the consumer-code and summary helpers, the
-  // GraphQL query, the mock API's untested readers and matchers, and the
+  // GraphQL query, the mock API's untested helpers, and the
   // untested testing/ helpers.
   coverage: {
     include: ["src/**/*.{ts,tsx}", "testing/**/*.{ts,tsx}"],
@@ -28,10 +28,6 @@ const testConfig = reactTestConfig({
       "src/storybook/machines/api/constants.ts",
       "src/storybook/machines/api/foldStoredText.ts",
       "src/storybook/machines/api/isFacetField.ts",
-      "src/storybook/machines/api/readApiFacets.ts",
-      "src/storybook/machines/api/readGraphQLQuery.ts",
-      "src/storybook/machines/api/readRestQuery.ts",
-      "src/storybook/machines/api/selectRecords.ts",
       "src/storybook/machines/consumerCode.ts",
       "src/storybook/machines/readPaginationSummary.ts",
       "src/storybook/machines/sources/MachinesQuery.ts",

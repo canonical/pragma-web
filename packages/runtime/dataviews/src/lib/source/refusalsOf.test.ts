@@ -95,7 +95,7 @@ describe("refusalsOf", () => {
       refusalsOf(
         permissive,
         query({
-          filter: [{ field: "status", operator: "isSet", operands: [] }],
+          filter: [{ field: "status", operator: "isSet", operands: [true] }],
         }),
       ),
     ).toEqual([

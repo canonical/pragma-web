@@ -24,8 +24,12 @@ describe("resolveFieldKind", () => {
     expect(resolveFieldKind("presence").operators).toEqual(["isSet"]);
     expect(resolveFieldKind("date").operators).toEqual(["gte", "lte"]);
     expect(resolveFieldKind("text").operators).toEqual([
+      "is",
+      "isNot",
       "contains",
+      "notContains",
       "startsWith",
+      "endsWith",
     ]);
   });
 
@@ -70,6 +74,12 @@ describe("resolveFieldKind", () => {
     expect(
       presence.rules.rejectOperands(presence.definition, [true]),
     ).toBeNull();
+    expect(
+      presence.rules.rejectOperands(presence.definition, [false]),
+    ).toBeNull();
+    expect(presence.rules.rejectOperands(presence.definition, ["yes"])).toBe(
+      '"yes" is neither true nor false',
+    );
     const text = rulesOf("text");
     expect(text.rules.rejectOperands(text.definition, ["web"])).toBeNull();
     expect(text.rules.rejectOperands(text.definition, [""])).toBe(
@@ -108,6 +118,13 @@ describe("resolveFieldKind", () => {
         operands: [],
       }),
     ).toBe(true);
+    expect(
+      resolveFieldKind("presence").readApplied({
+        field: "owner",
+        operator: "isSet",
+        operands: [false],
+      }),
+    ).toBe(false);
   });
 
   it("compares a row value to a range bound through the kind", () => {

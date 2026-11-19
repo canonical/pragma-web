@@ -1327,7 +1327,11 @@ describe("createDataViewsProvider host", () => {
     expect(host.setPredicate(STATUS_FAILED)).toEqual([]);
     expect(provider.state.get().slice.filter).toEqual([STATUS_FAILED]);
     expect(
-      host.setPredicate({ field: "owner", operator: "isSet", operands: [] }),
+      host.setPredicate({
+        field: "owner",
+        operator: "isSet",
+        operands: [true],
+      }),
     ).toEqual([expect.objectContaining({ code: "undeclared-field" })]);
     expect(provider.state.get().slice.filter).toEqual([STATUS_FAILED]);
     expect(host.removePredicate("status", "isAny")).toEqual([]);

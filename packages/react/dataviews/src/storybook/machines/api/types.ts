@@ -4,7 +4,7 @@
  * path, and the answers each endpoint sends.
  */
 
-import type { Facet } from "@canonical/dataviews-core";
+import type { Facet, FieldKindOperators } from "@canonical/dataviews-core";
 import type { API_SCENARIOS, FACET_FIELDS } from "./constants.js";
 
 /** One value a values facet lists, with how many matching records hold it. */
@@ -37,16 +37,25 @@ export type MockApiConfig = {
 /** A field either endpoint computes a facet for. */
 export type ApiFacetField = (typeof FACET_FIELDS)[number];
 
-/** What one text field's value must contain or start with. */
+/** What one text field's value must match, by one of the text operators. */
 export type ApiTextMatch = {
   readonly field: string;
-  readonly operator: "contains" | "startsWith";
+  readonly operator: FieldKindOperators["text"];
   readonly text: string;
 };
 
+/**
+ * A text operator an endpoint matches a value against itself; the two
+ * negations hold exactly where `is` and `contains` do not.
+ */
+export type ApiHeldTextOperator = Exclude<
+  ApiTextMatch["operator"],
+  "isNot" | "notContains"
+>;
+
 /** The query one request asks, as the endpoint reads it. */
 export type ApiQuery = {
-  /** The text each text field's value must contain or start with. */
+  /** What each text field's value must match. */
   readonly text: readonly ApiTextMatch[];
   /**
    * The statuses a record must have one of, and those it must have none of;

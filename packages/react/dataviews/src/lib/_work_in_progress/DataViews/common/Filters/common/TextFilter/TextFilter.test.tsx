@@ -1,13 +1,14 @@
 /**
  * One text filter, mounted on its own under a root: the input the wire
- * spells, the clear control and where focus goes after it, and typing as
- * one history step.
+ * spells, the choice of how it matches, the clear control and where focus
+ * goes after it, and typing as one history step.
  */
 import {
   createCollection,
   createDataViewsProvider,
   DEFAULT_WINDOW,
   declareCapabilities,
+  type Predicate,
   type QueryLocation,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
@@ -20,7 +21,7 @@ import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
 import { findFilterHandle } from "../../../utils/index.js";
 import TextFilter from "./TextFilter.js";
-import type { TextFilterProps } from "./types.js";
+import type { TextFilterOperator, TextFilterProps } from "./types.js";
 
 type Row = { readonly id: string };
 
@@ -34,7 +35,7 @@ const makeProvider = (location?: QueryLocation) =>
     collection,
     source: createManualSource<Row>({
       capabilities: declareCapabilities(collection, {
-        filter: { name: true },
+        filter: { name: ["is", "contains", "endsWith"] },
         counts: COUNTED_EXACTLY,
       }),
     }).source,
@@ -43,30 +44,39 @@ const makeProvider = (location?: QueryLocation) =>
 
 type Provider = ReturnType<typeof makeProvider>;
 
-/** What a case sets; the handle, label and field are the harness's. */
+/** What a case sets; the handles, label, field and host are the harness's. */
 type HarnessProps = Partial<
-  Omit<TextFilterProps, "handle" | "label" | "field">
+  Omit<TextFilterProps, "findHandle" | "label" | "field" | "host">
 >;
 
-/** The filter at the root's own handle for the name. */
+/** The filter over the root's own handles for the name. */
 const Harness = ({
-  operator = "contains",
-  declared = true,
+  standing = null,
+  offered = ["is", "contains", "endsWith"],
+  taken = [],
   leavesWhenCleared = false,
   onLeave = () => {},
+  onMoved = () => {},
+  takeMoved = () => false,
   ...rest
 }: HarnessProps) => {
-  const { filters } = useDataViewsRoot("TextFilter test");
+  const { filters, provider } = useDataViewsRoot("TextFilter test");
   return (
     <TextFilter
       {...rest}
-      handle={findFilterHandle<string>(filters, "name", operator)}
-      operator={operator}
+      standing={standing}
+      offered={offered}
+      taken={taken}
+      findHandle={(operator) =>
+        findFilterHandle<string>(filters, "name", operator)
+      }
       label="name"
       field="name"
-      declared={declared}
+      host={readProviderHost(provider)}
       leavesWhenCleared={leavesWhenCleared}
       onLeave={onLeave}
+      onMoved={onMoved}
+      takeMoved={takeMoved}
     />
   );
 };
@@ -78,16 +88,11 @@ const mount = (provider: Provider, props: HarnessProps = {}) =>
     </DataViews>,
   );
 
-const adoptContains = (provider: Provider): void => {
+const adopt = (provider: Provider, filter: readonly Predicate[]): void => {
   act(() => {
     readProviderHost(provider).adopt(
       {
-        slice: {
-          filter: [{ field: "name", operator: "contains", operands: ["web"] }],
-          search: null,
-          sort: [],
-          group: [],
-        },
+        slice: { filter, search: null, sort: [], group: [] },
         window: DEFAULT_WINDOW,
       },
       "adopt",
@@ -96,31 +101,121 @@ const adoptContains = (provider: Provider): void => {
   });
 };
 
+const nameOf = (operator: TextFilterOperator, text: string): Predicate => ({
+  field: "name",
+  operator,
+  operands: [text],
+});
+
 describe("TextFilter", () => {
-  it("is a text input named as the wire spells its operator", () => {
-    mount(makeProvider(), { operator: "startsWith" });
+  it("starts on contains, its input named as the wire spells it", () => {
+    mount(makeProvider());
     expect(
-      screen.getByRole("textbox", { name: "name starts with" }),
-    ).toHaveAttribute("name", "name__startsWith");
+      screen.getByRole("textbox", { name: "name contains" }),
+    ).toHaveAttribute("name", "name__contains");
+  });
+
+  it("starts on the first declared operator where contains is not one", () => {
+    mount(makeProvider(), { offered: ["is", "endsWith"] });
+    expect(screen.getByRole("textbox", { name: "name is" })).toHaveAttribute(
+      "name",
+      "name__is",
+    );
+  });
+
+  it("offers no choice where one operator is declared", () => {
+    mount(makeProvider(), { offered: ["endsWith"] });
+    expect(
+      screen.getByRole("textbox", { name: "name ends with" }),
+    ).toBeVisible();
+    expect(screen.queryByRole("combobox")).toBeNull();
+  });
+
+  it("chooses how the text matches among the declared operators", () => {
+    const provider = makeProvider();
+    mount(provider);
+    const select = screen.getByRole("combobox", { name: "How name matches" });
+    expect(
+      [...(select as HTMLSelectElement).options].map(({ text }) => text),
+    ).toEqual(["name is", "name contains", "name ends with"]);
+    fireEvent.change(select, { target: { value: "endsWith" } });
+    expect(
+      screen.getByRole("textbox", { name: "name ends with" }),
+    ).toHaveAttribute("name", "name__endsWith");
+    expect(provider.state.get().slice.filter).toEqual([]);
+  });
+
+  it("matches typed text by the operator last chosen", () => {
+    const provider = makeProvider();
+    mount(provider);
+    const select = screen.getByRole("combobox", { name: "How name matches" });
+    fireEvent.change(select, { target: { value: "endsWith" } });
+    fireEvent.change(select, { target: { value: "is" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "name is" }), {
+      target: { value: "web" },
+    });
+    expect(provider.state.get().slice.filter).toEqual([nameOf("is", "web")]);
+  });
+
+  it("moves standing text to the operator chosen, as one step", () => {
+    const recorded = createRecordingLocation({ href: "/m?name__is=web" });
+    const provider = makeProvider(recorded.location);
+    const { rerender } = mount(provider, {
+      standing: "is",
+      taken: ["endsWith"],
+    });
+    adopt(provider, [nameOf("is", "web"), nameOf("endsWith", "01")]);
+    const select = screen.getByRole("combobox", { name: "How name matches" });
+    const endsWith = [...(select as HTMLSelectElement).options].find(
+      ({ value }) => value === "endsWith",
+    );
+    // Another control edits it, so this one cannot take it.
+    expect(endsWith).toHaveProperty("disabled", true);
+    const before = recorded.writes.length;
+    fireEvent.change(select, { target: { value: "contains" } });
+    expect(provider.state.get().slice.filter).toEqual([
+      nameOf("endsWith", "01"),
+      nameOf("contains", "web"),
+    ]);
+    expect(recorded.writes.length - before).toBe(1);
+    rerender(
+      <DataViews provider={provider}>
+        <Harness standing="contains" taken={["endsWith"]} />
+      </DataViews>,
+    );
+    expect(screen.getByRole("textbox", { name: "name contains" })).toHaveValue(
+      "web",
+    );
+  });
+
+  it("says where standing text moves, and takes focus when text moved to it", () => {
+    const provider = makeProvider();
+    const onMoved = vi.fn();
+    mount(provider, { standing: "is", onMoved, takeMoved: () => true });
+    adopt(provider, [nameOf("is", "web")]);
+    const select = screen.getByRole("combobox", { name: "How name matches" });
+    expect(select).toHaveFocus();
+    fireEvent.change(select, { target: { value: "endsWith" } });
+    expect(onMoved).toHaveBeenCalledWith("endsWith");
   });
 
   it("applies each edit, and keeps the text while the input is emptied", () => {
     const provider = makeProvider();
     mount(provider);
-    const contains = screen.getByRole("textbox", { name: "name contains" });
-    fireEvent.change(contains, { target: { value: "web" } });
+    const input = screen.getByRole("textbox", { name: "name contains" });
+    fireEvent.change(input, { target: { value: "web" } });
     expect(provider.state.get().slice.filter).toEqual([
-      { field: "name", operator: "contains", operands: ["web"] },
+      nameOf("contains", "web"),
     ]);
-    fireEvent.change(contains, { target: { value: "" } });
+    fireEvent.change(input, { target: { value: "" } });
     expect(provider.state.get().slice.filter).toHaveLength(1);
-    expect(contains).toHaveAccessibleDescription(/Enter a value/);
+    expect(input).toHaveAccessibleDescription(/Enter a value/);
   });
 
   it("clears the text, returning focus to the input that stays", () => {
     const provider = makeProvider();
-    mount(provider);
-    adoptContains(provider);
+    mount(provider, { standing: "contains" });
+    adopt(provider, [nameOf("contains", "web")]);
     fireEvent.click(
       screen.getByRole("button", { name: "Clear name contains" }),
     );
@@ -133,17 +228,23 @@ describe("TextFilter", () => {
   it("offers undeclared text for removal only, then leaves with it", () => {
     const provider = makeProvider();
     const onLeave = vi.fn();
-    mount(provider, { declared: false, leavesWhenCleared: true, onLeave });
-    expect(screen.queryByRole("textbox")).toBeNull();
-    adoptContains(provider);
+    mount(provider, { standing: "isNot", leavesWhenCleared: true, onLeave });
+    adopt(provider, [nameOf("isNot", "web")]);
     expect(
-      screen.getByRole("textbox", { name: "name contains" }),
+      screen.getByRole("textbox", { name: "name is not" }),
     ).toHaveAttribute("readonly");
-    fireEvent.click(
-      screen.getByRole("button", { name: "Clear name contains" }),
-    );
+    expect(screen.queryByRole("combobox")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Clear name is not" }));
     expect(onLeave).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole("textbox")).toBeNull();
+    expect(provider.state.get().slice.filter).toEqual([]);
+  });
+
+  it("refuses to render with no operator to edit", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => mount(makeProvider(), { offered: [] })).toThrow(
+      'text field "name" has no operator to edit',
+    );
+    vi.restoreAllMocks();
   });
 
   it("takes the native props of its root, merging the class name", () => {
@@ -159,12 +260,12 @@ describe("TextFilter", () => {
   it("types text as one history step, until the input is left", () => {
     const recorded = createRecordingLocation({ href: "/machines" });
     mount(makeProvider(recorded.location));
-    const contains = screen.getByRole("textbox", { name: "name contains" });
+    const input = screen.getByRole("textbox", { name: "name contains" });
     const before = recorded.writes.length;
-    fireEvent.change(contains, { target: { value: "w" } });
-    fireEvent.change(contains, { target: { value: "web" } });
-    fireEvent.blur(contains);
-    fireEvent.change(contains, { target: { value: "web-1" } });
+    fireEvent.change(input, { target: { value: "w" } });
+    fireEvent.change(input, { target: { value: "web" } });
+    fireEvent.blur(input);
+    fireEvent.change(input, { target: { value: "web-1" } });
     expect(recorded.writes.slice(before).map(([, mode]) => mode)).toEqual([
       "push",
       "replace",

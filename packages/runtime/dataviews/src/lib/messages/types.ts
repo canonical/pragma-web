@@ -200,6 +200,8 @@ export type DataViewsMessages = {
   readonly filterFrom: (label: string) => string;
   /** A number or date field's upper bound, by the field's label. */
   readonly filterTo: (label: string) => string;
+  /** A number bound's name with the base unit its value is read in. */
+  readonly filterInUnit: (name: string, symbol: string) => string;
   /** The least value a matching record holds, beside the lower bound. */
   readonly filterLowest: (value: string) => string;
   /** The greatest value a matching record holds, beside the upper bound. */
@@ -230,8 +232,28 @@ export type DataViewsMessages = {
   readonly facetCount: (count: FacetCountWords) => string;
   /** A text field's contains input, by the field's label. */
   readonly filterContains: (label: string) => string;
+  /** The control choosing how a text field's input matches, by its label. */
+  readonly filterMatch: (label: string) => string;
+  /** A presence field's choice restricting nothing. */
+  readonly presenceAny: string;
+  /** A presence field's choice of records that hold a value. */
+  readonly presenceSet: string;
+  /** A presence field's choice of records that hold none. */
+  readonly presenceUnset: string;
+  /** A presence restriction to records that hold a value, by the label. */
+  readonly filterHasValue: (label: string) => string;
+  /** A presence restriction to records that hold none, by the label. */
+  readonly filterHasNoValue: (label: string) => string;
   /** A text field's starts-with input, by the field's label. */
   readonly filterStartsWith: (label: string) => string;
+  /** A text field's ends-with input, by the field's label. */
+  readonly filterEndsWith: (label: string) => string;
+  /** A text field's does-not-contain input, by the field's label. */
+  readonly filterNotContains: (label: string) => string;
+  /** A text field's not-equal input, by the field's label. */
+  readonly filterIsNot: (label: string) => string;
+  /** A text field's equals input, by the field's label. */
+  readonly filterIs: (label: string) => string;
   /**
    * An emptied input, which removes nothing; `retained` is whether any
    * restriction stands on the field at all.

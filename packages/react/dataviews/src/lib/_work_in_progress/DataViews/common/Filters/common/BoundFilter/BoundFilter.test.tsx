@@ -29,6 +29,17 @@ const collection = createCollection({
   fields: [
     { field: "cpu", kind: "number", min: 0, max: 64 },
     { field: "updated", kind: "date" },
+    {
+      field: "memory",
+      kind: "number",
+      units: {
+        base: "MiB",
+        display: [
+          { symbol: "MiB", factor: 1 },
+          { symbol: "GiB", factor: 1024 },
+        ],
+      },
+    },
   ],
 });
 
@@ -37,7 +48,7 @@ const makeProvider = (location?: QueryLocation) =>
     collection,
     source: createManualSource<Row>({
       capabilities: declareCapabilities(collection, {
-        filter: { cpu: true, updated: true },
+        filter: { cpu: true, updated: true, memory: true },
         counts: COUNTED_EXACTLY,
       }),
     }).source,
@@ -49,7 +60,7 @@ type Provider = ReturnType<typeof makeProvider>;
 /** What a case sets; the handle, label and definition follow the field. */
 type HarnessProps = Partial<
   Omit<BoundFilterProps, "handle" | "label" | "definition">
-> & { readonly field?: "cpu" | "updated" };
+> & { readonly field?: "cpu" | "updated" | "memory" };
 
 /** The bound at the root's own handle for the field. */
 const Harness = ({
@@ -107,6 +118,38 @@ const adoptLowerBound = (provider: Provider): void => {
 };
 
 describe("BoundFilter", () => {
+  it("names a number with units by its base unit, and reads a display unit typed", () => {
+    const provider = makeProvider();
+    mount(provider, { field: "memory" });
+    const input = screen.getByRole("textbox", { name: "memory from (MiB)" });
+    // A full keyboard, so a display unit can be typed after the digits.
+    expect(input).not.toHaveAttribute("inputmode");
+    expect(input).toHaveAttribute("name", "memory__gte");
+    fireEvent.change(input, { target: { value: "16 GiB" } });
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "memory", operator: "gte", operands: [16_384] },
+    ]);
+    expect(input).toHaveValue("16 GiB");
+    fireEvent.change(input, { target: { value: "16 GX" } });
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveAccessibleDescription(
+      /"GX" is not a unit; use MiB or GiB/,
+    );
+  });
+
+  it("never calls a value with units wrong while it is typed key by key", () => {
+    const provider = makeProvider();
+    mount(provider, { field: "memory" });
+    const input = screen.getByRole("textbox", { name: "memory from (MiB)" });
+    for (const typed of ["1", "16", "16 ", "16 G", "16 Gi", "16 GiB"]) {
+      fireEvent.change(input, { target: { value: typed } });
+      expect(input).toHaveAttribute("aria-invalid", "false");
+    }
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "memory", operator: "gte", operands: [16_384] },
+    ]);
+  });
+
   it("is a native number input carrying the schema's bounds, named as the wire spells it", () => {
     mount(makeProvider());
     const from = screen.getByRole("spinbutton", { name: "cpu from" });

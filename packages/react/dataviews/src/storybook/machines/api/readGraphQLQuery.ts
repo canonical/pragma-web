@@ -7,14 +7,18 @@ import isFacetField from "./isFacetField.js";
 import type { ApiProblem, ApiQuery, ApiTextMatch } from "./types.js";
 
 /**
- * The `where` members holding text a text field must contain or start with,
- * each with the field and how it matches.
+ * The `where` members holding text a text field must match, each with the
+ * field and the operator it matches by.
  */
 const TEXT_MEMBERS: Readonly<
   Record<string, Pick<ApiTextMatch, "field" | "operator">>
 > = {
+  nameIs: { field: "name", operator: "is" },
+  nameIsNot: { field: "name", operator: "isNot" },
   nameContains: { field: "name", operator: "contains" },
+  nameNotContains: { field: "name", operator: "notContains" },
   nameStartsWith: { field: "name", operator: "startsWith" },
+  nameEndsWith: { field: "name", operator: "endsWith" },
   regionContains: { field: "region", operator: "contains" },
   ownerContains: { field: "owner", operator: "contains" },
   ownerStartsWith: { field: "owner", operator: "startsWith" },

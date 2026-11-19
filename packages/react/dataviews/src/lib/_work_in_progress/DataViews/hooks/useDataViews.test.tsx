@@ -53,8 +53,12 @@ describe("useDataViews", () => {
     expect(result.current.runAction).toBe(provider.runAction);
     // One handle per field and legal operator.
     expect(Object.keys(result.current.filters.name)).toEqual([
+      "is",
+      "isNot",
       "contains",
+      "notContains",
       "startsWith",
+      "endsWith",
     ]);
     expect(Object.keys(result.current.filters.status)).toEqual([
       "isAny",

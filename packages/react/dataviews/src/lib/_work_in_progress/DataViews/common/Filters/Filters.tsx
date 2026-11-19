@@ -9,21 +9,24 @@ import type {
 } from "@canonical/dataviews-core";
 import {
   isNarrowingIssue,
+  listOfferedOperators,
   type ProviderHost,
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
-import { Fragment, type ReactElement, useMemo, useRef } from "react";
+import { Fragment, type ReactElement, useMemo, useRef, useState } from "react";
 import {
   type UseFacetsResult,
   useDataViewsValue,
   useFacets,
 } from "../../../../hooks/index.js";
 import { interceptSubmit } from "../../../../utils/index.js";
+import type { UseStandingOperatorsResult } from "../../hooks/index.js";
 import {
   useDataViewsRoot,
   useMoreFiltersPin,
   useRestrictedFields,
+  useStandingOperators,
 } from "../../hooks/index.js";
 import { HiddenQueryFields } from "../HiddenQueryFields/index.js";
 import { findFilterHandle } from "../utils/index.js";
@@ -35,6 +38,7 @@ import {
   LinkRefusals,
   PresenceFilter,
   TextFilter,
+  type TextFilterOperator,
 } from "./common/index.js";
 import { listFacetOptions } from "./common/utils/index.js";
 import type { DataViewsFiltersProps } from "./types.js";
@@ -67,8 +71,19 @@ type FilterContext = {
   readonly answered: UseFacetsResult["answered"];
   /** The server's options for a field, as the latest facet lists them. */
   readonly listServerOptions: (field: string) => readonly string[];
+  /** The operators the applied query holds a conjunct under, by field. */
+  readonly standing: UseStandingOperatorsResult;
   /** Whether a field's control moves elsewhere once its last restriction is cleared. */
   readonly isShownOnlyWhileRestricted: (field: string) => boolean;
+  /**
+   * Keep a field's control where it stands while focus is inside it, or let
+   * it go: a control holding focus never moves or leaves under it.
+   */
+  readonly holdField: (field: string, holding: boolean) => void;
+  /** Note that a field's text is moving to an operator, for focus to follow. */
+  readonly markMoved: (field: string, operator: PredicateOperator) => void;
+  /** Whether a field's text just moved to an operator, once. */
+  readonly takeMoved: (field: string, operator: PredicateOperator) => boolean;
   /** Move focus to the filters' group, where a leaving control hands it. */
   readonly focusGroup: () => void;
 };
@@ -76,10 +91,12 @@ type FilterContext = {
 /** Whether the source executes one operator over one field. */
 const declares = (
   context: FilterContext,
-  field: string,
+  definition: SchemaFieldDefinition,
   operator: PredicateOperator,
 ): boolean =>
-  context.host.capabilities.filter[field]?.includes(operator) === true;
+  listOfferedOperators(definition, context.host.capabilities).includes(
+    operator,
+  );
 
 /**
  * Whether a control leaves once the restriction it clears was the field's
@@ -87,11 +104,11 @@ const declares = (
  */
 const leavesWhenCleared = (
   context: FilterContext,
-  field: string,
+  definition: SchemaFieldDefinition,
   operator: PredicateOperator,
 ): boolean =>
-  !declares(context, field, operator) ||
-  context.isShownOnlyWhileRestricted(field);
+  !declares(context, definition, operator) ||
+  context.isShownOnlyWhileRestricted(definition.field);
 
 /**
  * The conjuncts at one control's address beyond its own, a read-only row
@@ -102,12 +119,14 @@ const renderFurther = (
   field: string,
   operator: PredicateOperator,
   label: string,
+  unit?: string,
 ): ReactElement => (
   <FurtherConjuncts
     handle={findFilterHandle<unknown>(context.filters, field, operator)}
     field={field}
     operator={operator}
     label={label}
+    unit={unit}
     host={context.host}
     onLeave={context.focusGroup}
   />
@@ -141,15 +160,17 @@ const renderBounds = (
                 ? facet[bound === "gte" ? "min" : "max"]
                 : null
             }
-            declared={declares(context, definition.field, bound)}
-            leavesWhenCleared={leavesWhenCleared(
-              context,
-              definition.field,
-              bound,
-            )}
+            declared={declares(context, definition, bound)}
+            leavesWhenCleared={leavesWhenCleared(context, definition, bound)}
             onLeave={context.focusGroup}
           />
-          {renderFurther(context, definition.field, bound, name)}
+          {renderFurther(
+            context,
+            definition.field,
+            bound,
+            name,
+            definition.kind === "number" ? definition.units?.base : undefined,
+          )}
         </Fragment>
       ))}
     </Fragment>
@@ -203,21 +224,17 @@ const controls: {
                   operator,
                 )}
                 operator={operator}
-                alternativeDeclared={declares(
-                  context,
-                  definition.field,
-                  alternative,
-                )}
+                alternativeDeclared={declares(context, definition, alternative)}
                 alternativeHandle={findFilterHandle<
                   ReadonlySet<PredicateOperand>
                 >(context.filters, definition.field, alternative)}
                 host={context.host}
                 label={name}
                 field={definition.field}
-                declared={declares(context, definition.field, operator)}
+                declared={declares(context, definition, operator)}
                 leavesWhenCleared={leavesWhenCleared(
                   context,
-                  definition.field,
+                  definition,
                   operator,
                 )}
                 onLeave={context.focusGroup}
@@ -248,13 +265,10 @@ const controls: {
           }
           label={name}
           field={definition.field}
-          declared={declares(context, definition.field, "isSet")}
-          leavesWhenCleared={leavesWhenCleared(
-            context,
-            definition.field,
-            "isSet",
-          )}
-          onLeave={context.focusGroup}
+          declared={declares(context, definition, "isSet")}
+          onHold={(holding) => {
+            context.holdField(definition.field, holding);
+          }}
         />
         {renderFurther(context, definition.field, "isSet", name)}
       </Fragment>
@@ -262,32 +276,56 @@ const controls: {
   },
   number: renderBounds,
   date: renderBounds,
-  text: (context, definition, name) => (
-    <Fragment key={definition.field}>
-      {(["contains", "startsWith"] as const).map((operator) => (
-        <Fragment key={operator}>
-          <TextFilter
-            handle={findFilterHandle<string>(
-              context.filters,
-              definition.field,
-              operator,
-            )}
-            operator={operator}
-            label={name}
-            field={definition.field}
-            declared={declares(context, definition.field, operator)}
-            leavesWhenCleared={leavesWhenCleared(
-              context,
-              definition.field,
-              operator,
-            )}
-            onLeave={context.focusGroup}
-          />
-          {renderFurther(context, definition.field, operator, name)}
-        </Fragment>
-      ))}
-    </Fragment>
-  ),
+  text: (context, definition, name) => {
+    const { field } = definition;
+    const offered = listOfferedOperators(definition, context.host.capabilities);
+    const held = context.standing.get(field) ?? [];
+    // One control per operator a conjunct stands under, in the kind's order,
+    // or one offering the declared operators while none stands. The kind
+    // is text, so its operators are text operators.
+    const standing = context.host.collection.schema
+      .listOperators(field)
+      .filter((operator) => held.includes(operator)) as TextFilterOperator[];
+    const rows: readonly (TextFilterOperator | null)[] =
+      standing.length > 0 ? standing : offered.length > 0 ? [null] : [];
+    return (
+      <Fragment key={field}>
+        {rows.map((operator, place) => (
+          // Keyed by place, so the control a reader types into keeps its
+          // input as the text comes to stand.
+          // biome-ignore lint/suspicious/noArrayIndexKey: the place is the control's identity
+          <Fragment key={place}>
+            <TextFilter
+              standing={operator}
+              offered={offered}
+              taken={standing.filter((other) => other !== operator)}
+              findHandle={(chosen) =>
+                findFilterHandle<string>(context.filters, field, chosen)
+              }
+              label={name}
+              field={field}
+              host={context.host}
+              // Cleared, the text leaves with its control, or another takes
+              // its place: only the last, with operators left to offer, stays.
+              leavesWhenCleared={
+                standing.length > 1 ||
+                offered.length === 0 ||
+                context.isShownOnlyWhileRestricted(field)
+              }
+              onLeave={context.focusGroup}
+              onMoved={(moved) => {
+                context.markMoved(field, moved);
+              }}
+              takeMoved={(moved) => context.takeMoved(field, moved)}
+            />
+            {operator === null
+              ? null
+              : renderFurther(context, field, operator, name)}
+          </Fragment>
+        ))}
+      </Fragment>
+    );
+  },
 };
 
 /** One field's control, through the row its kind selects. */
@@ -333,12 +371,16 @@ const renderControl = (
  *
  * At baseline the controls are a GET form: each is named as the wire
  * grammar spells its clause, a number bound is a native number input with
- * the schema's bounds, the text a field must contain or start with is a
- * native text input, a set standing any-of or none-of moves to the other by
- * a real link, hidden controls carry the rest of the query, and the submit
- * control leads to the destination the provider would have written. Once
- * scripting is enabled every edit applies as it is made, the clear controls
- * appear, and a submission is intercepted. A typed value — text, a number
+ * the schema's bounds, or, where the field declares units, a text input
+ * named with its base unit that reads a value typed in any display unit,
+ * the text a field must match is a native text input
+ * for each operator text stands under, or one while none does, a set
+ * standing any-of or none-of moves to the other by a real link, hidden
+ * controls carry the rest of the query, and the submit control leads to the
+ * destination the provider would have written. Once scripting is enabled
+ * every edit applies as it is made, the clear controls appear, a select
+ * beside a text input chooses how it matches among the operators the source
+ * declares, and a submission is intercepted. A typed value — text, a number
  * or a date — edits in one input session: its first change enters history
  * and the rest replace it, until the reader leaves the input or submits the
  * form.
@@ -370,6 +412,7 @@ export default function Filters({
     useDataViewsRoot("Filters");
   const facets = useFacets({ provider });
   const restricted = useRestrictedFields({ provider });
+  const standing = useStandingOperators({ provider });
   const issues = useDataViewsValue(provider.issues);
   // The controls submit every filter themselves, and the refused clauses
   // the query is withheld for are left out: submitting the form removes
@@ -379,6 +422,14 @@ export default function Filters({
     [issues],
   );
   const groupRef = useRef<HTMLFieldSetElement>(null);
+  // The field whose control holds focus, kept where it stands meanwhile.
+  const [held, setHeld] = useState<string | null>(null);
+  // The address text last moved to, so the control it lands in takes the
+  // focus of the choice that moved it.
+  const moved = useRef<{
+    readonly field: string;
+    readonly operator: PredicateOperator;
+  } | null>(null);
   const { schema } = provider.collection;
   const marked = primary ?? [];
   // Each mark read once: a field the collection lacks is refused, and the
@@ -395,7 +446,7 @@ export default function Filters({
   const marks = marked.join("\u0000");
   /** Whether a field's control shows by default as things stand now. */
   const isShown = (field: string): boolean =>
-    marked.includes(field) || restricted.has(field);
+    marked.includes(field) || restricted.has(field) || held === field;
   const { pinned, detailsRef, handleSummaryClick, handleToggle } =
     useMoreFiltersPin({
       marks,
@@ -422,12 +473,29 @@ export default function Filters({
     filters,
     host: readProviderHost(provider),
     answered: facets.answered,
+    standing,
     listServerOptions,
     isShownOnlyWhileRestricted: (field) =>
       hasPrimary &&
       pinned === null &&
       !marked.includes(field) &&
       restricted.get(field) === 1,
+    // A control lets focus go before the next takes it, so one holds at a
+    // time.
+    holdField: (field, holding) => {
+      setHeld(holding ? field : null);
+    },
+    markMoved: (field, operator) => {
+      moved.current = { field, operator };
+    },
+    takeMoved: (field, operator) => {
+      const taken =
+        moved.current?.field === field && moved.current.operator === operator;
+      if (taken) {
+        moved.current = null;
+      }
+      return taken;
+    },
     focusGroup: () => {
       groupRef.current?.focus();
     },

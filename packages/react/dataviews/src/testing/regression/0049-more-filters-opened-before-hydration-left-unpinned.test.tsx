@@ -78,10 +78,14 @@ describe("regression 0049 — More filters opened before hydration left unpinned
     });
     // The open state a reader chose is not reported as a mismatch.
     expect(errors.mock.calls).toEqual([]);
-    const owner = within(container).getByRole("checkbox", { name: "owner" });
+    const owner = within(container).getByRole("radio", {
+      name: "Has a value",
+    });
     owner.focus();
     fireEvent.click(owner);
-    const checked = within(container).getByRole("checkbox", { name: "owner" });
+    const checked = within(container).getByRole("radio", {
+      name: "Has a value",
+    });
     expect(checked).toBeChecked();
     expect(container.querySelector("details")).toContainElement(checked);
     expect(checked).toHaveFocus();

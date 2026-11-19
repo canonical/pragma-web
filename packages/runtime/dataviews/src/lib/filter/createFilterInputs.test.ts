@@ -59,7 +59,14 @@ describe("createFilterInputs", () => {
       "updated",
     ]);
     expect(Object.keys(handles.cpu).sort()).toEqual(["gte", "lte"]);
-    expect(Object.keys(handles.name)).toEqual(["contains", "startsWith"]);
+    expect(Object.keys(handles.name)).toEqual([
+      "is",
+      "isNot",
+      "contains",
+      "notContains",
+      "startsWith",
+      "endsWith",
+    ]);
     expect(Object.keys(handles.status)).toEqual(["isAny", "isNone"]);
     expectTypeOf(handles.name.contains.applied).toEqualTypeOf<
       ReadonlyChannel<EmptyOr<string>>
@@ -405,7 +412,7 @@ describe("createFilterInputs", () => {
   it("clears a predicate on the query and answers with no refusal", () => {
     const p = provider();
     const inputs = createFilterInputs({ host: readProviderHost(p) });
-    inputs.handles.owner.isSet.set([]);
+    inputs.handles.owner.isSet.set([true]);
     expect(p.state.get().slice.filter).toHaveLength(1);
     expect(inputs.handles.owner.isSet.clear()).toEqual([]);
     expect(p.state.get().slice.filter).toEqual([]);

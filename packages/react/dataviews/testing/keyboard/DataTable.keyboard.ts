@@ -160,7 +160,9 @@ type Controls = {
 
 /**
  * Number every control a keyboard should reach inside the story: in the tab
- * order, enabled, rendered, and not hidden from assistive technology.
+ * order, enabled, rendered, and not hidden from assistive technology. A
+ * radio group is one stop, its checked radio or else its first, and arrow
+ * keys move within it: the group's other radios are not Tab stops.
  *
  * @note Impure: marks each control in the page with its number.
  */
@@ -170,11 +172,26 @@ const markControls = (page: Page): Promise<Controls> =>
     const candidates = root?.querySelectorAll<HTMLElement>(
       "a[href], button, input, select, textarea, [tabindex]",
     );
+    /** Whether a radio is its group's one Tab stop. */
+    const isRadioStop = (radio: HTMLInputElement): boolean => {
+      const group = [
+        ...(radio.form ?? document).querySelectorAll<HTMLInputElement>(
+          `input[type="radio"][name="${CSS.escape(radio.name)}"]`,
+        ),
+      ].filter((member) => !member.disabled);
+      return (group.find((member) => member.checked) ?? group.at(0)) === radio;
+    };
     const controls = [...(candidates ?? [])].filter(
       (element) =>
         element.tabIndex >= 0 &&
         !element.matches(":disabled") &&
         !(element instanceof HTMLInputElement && element.type === "hidden") &&
+        !(
+          element instanceof HTMLInputElement &&
+          element.type === "radio" &&
+          element.name !== "" &&
+          !isRadioStop(element)
+        ) &&
         element.checkVisibility({ visibilityProperty: true }) &&
         element.closest("[inert], [aria-hidden='true']") === null,
     );
@@ -959,7 +976,7 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(page.getByRole("group", { name: "Filters" })).toBeFocused();
   });
 
-  test("REST API Answered: text typed into a starts-with filter narrows the table, and Enter on its clear restores it", async ({
+  test("REST API Answered: arrow keys choose starts with, text typed narrows the table, and Enter on its clear restores it", async ({
     page,
   }) => {
     await openStory(page, findStory(REST_API, "Answered").id);
@@ -967,8 +984,16 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
       .getByRole("navigation", { name: "Pagination" })
       .getByRole("status");
     await expect(summary).toHaveText("Showing 1–3 out of 3 rows");
+    // The select beside the input chooses how it matches: from contains,
+    // two steps down is starts with.
+    const how = page.getByRole("combobox", { name: "How Host matches" });
+    await tabTo(page, how);
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+    await expect(how).toHaveValue("startsWith");
     const host = page.getByRole("textbox", { name: "Host starts with" });
-    await tabTo(page, host);
+    await page.keyboard.press("Tab");
+    await expect(host).toBeFocused();
     await page.keyboard.type("b");
     await expect(summary).toHaveText("Showing row 1 out of 1");
     await expect(host).toBeFocused();

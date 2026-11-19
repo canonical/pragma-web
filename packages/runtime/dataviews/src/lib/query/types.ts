@@ -16,8 +16,12 @@ export type PredicateOperator =
   | "gte"
   | "lte"
   | "isSet"
+  | "is"
+  | "isNot"
   | "contains"
-  | "startsWith";
+  | "notContains"
+  | "startsWith"
+  | "endsWith";
 
 /**
  * A semantic operand value. Field metadata owns coercion; core never guesses.
@@ -30,10 +34,10 @@ export type PredicateOperand = string | number | boolean | null;
 /**
  * One filter clause — a conjunct of the slice's filter — addressed by its
  * field and operator; an address may hold several, and each restricts the
- * result. `isAny` and
- * `isNone` operands are a non-empty set; `gte`, `lte`, `contains` and
- * `startsWith` carry exactly one operand; `isSet` carries none. Numbers must
- * be finite.
+ * result. `isAny` and `isNone` operands are a non-empty set; `isSet` carries
+ * one boolean, `true` for a field that holds a value and `false` for one
+ * that holds none; every other operator carries exactly one operand.
+ * Numbers must be finite.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

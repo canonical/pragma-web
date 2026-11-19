@@ -140,6 +140,7 @@ describe("public surface", () => {
       "isDataViewsProvider",
       "isNarrowingIssue",
       "listDisplayEntries",
+      "listOfferedOperators",
       "moveColumn",
       "placeSortTerm",
       "readProviderHost",

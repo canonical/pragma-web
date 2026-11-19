@@ -2,8 +2,9 @@
  * Every filter operator means one thing wherever it is executed: each case
  * of the one fixture table, run through each executor that claims the
  * operator — the local array source, the REST endpoint matching text with an
- * escaped `LIKE` pattern, and the GraphQL endpoint matching it with a
- * substring or prefix test.
+ * escaped `LIKE` pattern, and the GraphQL endpoint matching it with a plain
+ * string test. A negation's cases hold exactly where its operator's do not,
+ * so a record without text matches it everywhere.
  */
 
 import {
@@ -49,7 +50,7 @@ const EVERY_RECORD = OPERATOR_RECORDS.length;
 
 /** The field a case's operator looks at. */
 const readCaseField = ({ operator }: OperatorCase): "name" | "status" =>
-  operator === "contains" || operator === "startsWith" ? "name" : "status";
+  operator === "isAny" || operator === "isNone" ? "status" : "name";
 
 /** Run one case through the local array source. */
 const findInArraySource = (tested: OperatorCase): unknown => {
@@ -86,8 +87,12 @@ const findInArraySource = (tested: OperatorCase): unknown => {
 
 /** The REST parameter a case is spelled as, as the wire grammar spells it. */
 const REST_KEYS = {
+  is: "name__is",
+  isNot: "name__isNot",
   contains: "name__contains",
+  notContains: "name__notContains",
   startsWith: "name__startsWith",
+  endsWith: "name__endsWith",
   isAny: "status",
   isNone: "status__isNone",
 } as const satisfies Readonly<Record<OperatorCase["operator"], string>>;
@@ -107,8 +112,12 @@ const findOverRest = async (tested: OperatorCase): Promise<unknown> => {
 
 /** The `where` member a case is sent in, as the GraphQL endpoint names it. */
 const GRAPHQL_MEMBERS = {
+  is: "nameIs",
+  isNot: "nameIsNot",
   contains: "nameContains",
+  notContains: "nameNotContains",
   startsWith: "nameStartsWith",
+  endsWith: "nameEndsWith",
   isAny: "status",
   isNone: "statusIsNone",
 } as const satisfies Readonly<Record<OperatorCase["operator"], string>>;

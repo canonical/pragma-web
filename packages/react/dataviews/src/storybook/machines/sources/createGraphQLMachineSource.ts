@@ -21,9 +21,9 @@ import MachinesQuery from "./MachinesQuery.js";
 
 /**
  * What the GraphQL endpoint executes, and so all the parts may offer: the
- * statuses a machine is any or none of, bounds on cores, text the name, the
- * region and the owner contain, text the name and the owner — but not the
- * region — start with, search over the name and the owner, one ordered term,
+ * statuses a machine is any or none of, bounds on cores, every text operator
+ * on the name, text the region and the owner contain, text the owner — but
+ * not the region — starts with, search over the name and the owner, one ordered term,
  * forward pages by cursor with no counts at all, and the facets of the status
  * and the cores.
  */
@@ -31,7 +31,7 @@ const GRAPHQL_CAPABILITIES = declareCapabilities(machineCollection, {
   filter: {
     status: ["isAny", "isNone"],
     cores: ["gte", "lte"],
-    name: ["contains", "startsWith"],
+    name: ["is", "isNot", "contains", "notContains", "startsWith", "endsWith"],
     region: ["contains"],
     owner: ["contains", "startsWith"],
   },
@@ -51,8 +51,12 @@ type MachineWhere = {
   readonly statusIsNone?: readonly string[] | null | undefined;
   readonly coresGte?: number | null | undefined;
   readonly coresLte?: number | null | undefined;
+  readonly nameIs?: string | null | undefined;
+  readonly nameIsNot?: string | null | undefined;
   readonly nameContains?: string | null | undefined;
+  readonly nameNotContains?: string | null | undefined;
   readonly nameStartsWith?: string | null | undefined;
+  readonly nameEndsWith?: string | null | undefined;
   readonly regionContains?: string | null | undefined;
   readonly ownerContains?: string | null | undefined;
   readonly ownerStartsWith?: string | null | undefined;
@@ -115,8 +119,12 @@ const readVariables = ({
           : [...filters.status.isNone],
       coresGte: filters.cores?.gte ?? null,
       coresLte: filters.cores?.lte ?? null,
+      nameIs: filters.name?.is ?? null,
+      nameIsNot: filters.name?.isNot ?? null,
       nameContains: filters.name?.contains ?? null,
+      nameNotContains: filters.name?.notContains ?? null,
       nameStartsWith: filters.name?.startsWith ?? null,
+      nameEndsWith: filters.name?.endsWith ?? null,
       regionContains: filters.region?.contains ?? null,
       ownerContains: filters.owner?.contains ?? null,
       ownerStartsWith: filters.owner?.startsWith ?? null,

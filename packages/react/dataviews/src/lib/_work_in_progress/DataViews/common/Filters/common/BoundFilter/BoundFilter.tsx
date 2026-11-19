@@ -3,19 +3,12 @@ import { spellWireKey } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useId, useRef } from "react";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
+import { PHRASE_MESSAGES } from "../constants.js";
 import { describeFilterFeedback } from "../utils/index.js";
 import type { BoundFilterProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-filters-bound";
-
-/** The message naming each bound, by the field's label. */
-const BOUND_MESSAGES = {
-  gte: "filterFrom",
-  lte: "filterTo",
-} as const satisfies Readonly<
-  Record<BoundFilterProps["bound"], keyof DataViewsMessages>
->;
 
 /** The message offering the value a facet holds for each bound, beside it. */
 const RANGE_MESSAGES = {
@@ -34,8 +27,9 @@ const RANGE_MESSAGES = {
  * filters' group when it leaves with the bound — undeclared, or shown only
  * because it is restricted. A number is a native number input carrying the
  * schema's bounds, so the browser validates it before any script runs and the
- * same bounds the schema enforces are the ones it announces; a date is a
- * native date input. The control is named as the wire spells the clause, so a
+ * same bounds the schema enforces are the ones it announces; one with units
+ * is a text input named with its base unit, which reads a value typed in any
+ * of its display units; a date is a native date input. The control is named as the wire spells the clause, so a
  * GET submission is the same destination the edit writes. Where the source's
  * facet answers the applied query, a hint beside the input offers the least
  * value a matching record holds for the lower bound ("Lowest") and the
@@ -75,18 +69,27 @@ export default function BoundFilter({
     [hint === null ? null : hintId, message === null ? null : feedbackId]
       .filter((id) => id !== null)
       .join(" ") || undefined;
-  const name = messages[BOUND_MESSAGES[bound]](label);
+  const units = definition.kind === "number" ? definition.units : undefined;
+  const phrase = messages[PHRASE_MESSAGES[bound]](label);
+  // A number with units is read in its base unit, which the name says.
+  const name =
+    units === undefined ? phrase : messages.filterInUnit(phrase, units.base);
   // The schema's bounds, natively: an out-of-range value is refused by the
-  // browser at baseline and by the schema once scripted.
+  // browser at baseline and by the schema once scripted. A number with units
+  // is text, so a display unit can be typed after it — `16 GiB` — and the
+  // schema reads it, at baseline once submitted.
   const native =
-    definition.kind === "number"
-      ? {
-          type: "number",
-          min: definition.min,
-          max: definition.max,
-          step: "any",
-        }
-      : { type: "date" };
+    definition.kind === "date"
+      ? { type: "date" }
+      : units === undefined
+        ? {
+            type: "number",
+            min: definition.min,
+            max: definition.max,
+            step: "any",
+          }
+        : // Plain text, so a touch keyboard offers the unit's letters too.
+          { type: "text" };
   return (
     <div
       {...rest}

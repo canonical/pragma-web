@@ -1,6 +1,7 @@
 import type { Predicate, PredicateOperand } from "../query/index.js";
 import compareByCodeUnit from "./compareByCodeUnit.js";
 import isCalendarDate from "./isCalendarDate.js";
+import parseNumberWithUnit from "./parseNumberWithUnit.js";
 import readInstant from "./readInstant.js";
 import type {
   ChoicesField,
@@ -9,6 +10,7 @@ import type {
   FieldKindRules,
   KindOrder,
   NumberField,
+  NumberUnits,
   OrderKey,
   PresenceField,
   SchemaFieldDefinition,
@@ -149,6 +151,39 @@ const CHOICES: FieldKindRules<ChoicesField> = {
   },
 };
 
+/**
+ * Why a number field's units are malformed, or null when they are not: the
+ * base unit must be a display unit of factor 1, each factor finite and
+ * positive and greater than the one before, and each symbol non-empty,
+ * without spaces and distinct from the others, case aside, as it is typed.
+ */
+const rejectUnits = (field: string, units: NumberUnits): string | null => {
+  const symbols = units.display.map(({ symbol }) => symbol.toLowerCase());
+  if (
+    !units.display.some(
+      ({ symbol, factor }) => symbol === units.base && factor === 1,
+    )
+  ) {
+    return `number field "${field}" does not display its base unit "${units.base}" with a factor of 1`;
+  }
+  // A symbol is read after the digits, so it cannot start as a number does.
+  if (symbols.some((symbol) => !/^[^\s\d.+-]\S*$/.test(symbol))) {
+    return `number field "${field}" has a unit symbol that is empty, holds a space or starts as a number does`;
+  }
+  if (new Set(symbols).size !== symbols.length) {
+    return `number field "${field}" has two unit symbols that are the same, case aside`;
+  }
+  // Each factor above the one before, the first above zero.
+  let previous = 0;
+  for (const { factor } of units.display) {
+    if (!Number.isFinite(factor) || factor <= previous) {
+      return `number field "${field}" has unit factors that are not positive and ascending`;
+    }
+    previous = factor;
+  }
+  return null;
+};
+
 const NUMBER_ORDER: KindOrder = {
   readKey: (value) => (isFiniteNumber(value) ? createKey(value) : null),
   compareText: compareByCodeUnit,
@@ -156,7 +191,7 @@ const NUMBER_ORDER: KindOrder = {
 
 const NUMBER: FieldKindRules<NumberField> = {
   operators: ["gte", "lte"],
-  rejectDefinition: ({ field, min, max }) => {
+  rejectDefinition: ({ field, min, max, units }) => {
     if (
       (min !== undefined && !Number.isFinite(min)) ||
       (max !== undefined && !Number.isFinite(max))
@@ -166,14 +201,26 @@ const NUMBER: FieldKindRules<NumberField> = {
     if (min !== undefined && max !== undefined && min > max) {
       return `number field "${field}" has an inverted range`;
     }
-    return null;
+    return units === undefined ? null : rejectUnits(field, units);
   },
   input: {
     kind: "text",
-    parse: (_definition, input) =>
-      /^-?\d+(\.\d+)?$/.test(input)
-        ? { status: "valid", operand: Number(input) }
-        : { status: "invalid", reason: "not a number" },
+    parse: (definition, input) => {
+      const read = parseNumberWithUnit(input, definition.units);
+      switch (read.kind) {
+        case "value":
+          return { status: "valid", operand: read.value };
+        case "incomplete":
+          return { status: "incomplete" };
+        case "unknown-unit":
+          return {
+            status: "invalid",
+            reason: `"${read.symbol}" is not a unit; use ${read.accepted.join(" or ")}`,
+          };
+        case "not-a-number":
+          return { status: "invalid", reason: "not a number" };
+      }
+    },
   },
   rejectOperands: (definition, operands) => {
     for (const operand of operands) {
@@ -199,7 +246,7 @@ const NUMBER: FieldKindRules<NumberField> = {
  * A presence field orders in two ranks: unset, then set. Its domain is
  * presence — the one thing it filters on — so anything but an absent or
  * null value is set, `false` included, and ordering and `isSet` agree about
- * which rows are set. `false` and `true` share the set rank, so the next
+ * which rows are set and which are not. `false` and `true` share the set rank, so the next
  * term or the tiebreak orders them. No value is empty to this kind; a row
  * the field does not apply to is placed by the ordering, not by the kind.
  */
@@ -216,10 +263,19 @@ const PRESENCE: FieldKindRules<PresenceField> = {
     kind: "none",
     reason: "presence fields edit through direct commands",
   },
-  // Neither carries an operand to check; operand arity is the operator's
-  // concern, and the grammar checks it.
-  rejectOperands: () => null,
-  readApplied: () => true,
+  // `true` asks for a value, `false` for none; operand arity is the
+  // operator's concern, and the grammar checks it.
+  rejectOperands: (_definition, operands) => {
+    for (const operand of operands) {
+      if (typeof operand !== "boolean") {
+        return `${describeOperand(operand)} is neither true nor false`;
+      }
+    }
+    return null;
+  },
+  // A presence predicate without its operand asks for a value, as a link
+  // spelled before presence took a boolean does.
+  readApplied: (predicate) => predicate.operands.at(0) !== false,
   areAppliedEqual: isSameValue,
   // Presence has no range: it orders in two ranks, and a set `false` and a
   // set `true` tie, so no bound compares with either.
@@ -259,7 +315,14 @@ const DATE: FieldKindRules<DateField> = {
 };
 
 const TEXT: FieldKindRules<TextField> = {
-  operators: ["contains", "startsWith"],
+  operators: [
+    "is",
+    "isNot",
+    "contains",
+    "notContains",
+    "startsWith",
+    "endsWith",
+  ],
   rejectDefinition: () => null,
   input: {
     kind: "text",

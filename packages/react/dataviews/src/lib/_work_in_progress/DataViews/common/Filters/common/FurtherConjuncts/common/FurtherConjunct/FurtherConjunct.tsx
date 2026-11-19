@@ -37,7 +37,14 @@ export default function FurtherConjunct({
   const hydrated = useIsHydrated();
   const { link, button } = useHydrationFocusHandoff({ hydrated });
   const values = spellWireValues({ field, operator, operands });
-  const name = messages.filterAlso(phrase, values);
+  // Presence reads as a phrase of its own, never as the value a link
+  // spells it with: the phrase is the field's label.
+  const name =
+    operator === "isSet"
+      ? operands.at(0) === false
+        ? messages.filterHasNoValue(phrase)
+        : messages.filterHasValue(phrase)
+      : messages.filterAlso(phrase, values);
   /**
    * Where the Clear leads without scripts: the query the core's own removal
    * makes of the applied one, so the link and the button arrive at the

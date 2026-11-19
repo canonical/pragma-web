@@ -7,22 +7,31 @@ import readApiFacets from "./readApiFacets.js";
 import readGraphQLQuery from "./readGraphQLQuery.js";
 import selectRecords from "./selectRecords.js";
 import type {
+  ApiHeldTextOperator,
   ApiScenario,
-  ApiTextMatch,
   MachinesData,
   MockApiConfig,
 } from "./types.js";
 
+/** How a resolver tests one folded value against one folded operand. */
+const TEXT_TESTS: Readonly<
+  Record<ApiHeldTextOperator, (folded: string, needle: string) => boolean>
+> = {
+  is: (folded, needle) => folded === needle,
+  contains: (folded, needle) => folded.includes(needle),
+  startsWith: (folded, needle) => folded.startsWith(needle),
+  endsWith: (folded, needle) => folded.endsWith(needle),
+};
+
 /**
  * Whether a value holds text, as a resolver in JavaScript answers it: the
- * operand folded once per query, each value folded, then a plain substring
- * or prefix test, with no pattern to escape.
+ * operand folded once per query, each value folded, then a plain equality,
+ * substring, prefix or suffix test, with no pattern to escape.
  */
-const matchText = (operator: ApiTextMatch["operator"], text: string) => {
+const matchText = (operator: ApiHeldTextOperator, text: string) => {
   const needle = foldStoredText(text);
-  return operator === "contains"
-    ? (value: string): boolean => foldStoredText(value).includes(needle)
-    : (value: string): boolean => foldStoredText(value).startsWith(needle);
+  const holds = TEXT_TESTS[operator];
+  return (value: string): boolean => holds(foldStoredText(value), needle);
 };
 
 /** A cursor the endpoint hands back for the page starting after `offset`. */

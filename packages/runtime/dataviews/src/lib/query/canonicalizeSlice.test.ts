@@ -172,7 +172,7 @@ describe("canonicalizeSlice", () => {
         filter: [
           { field: "zone", operator: "isAny", operands: ["north"] },
           { field: "status", operator: "isAny", operands: ["failed"] },
-          { field: "status", operator: "isSet", operands: [] },
+          { field: "status", operator: "isSet", operands: [true] },
         ],
       }),
     );
@@ -250,15 +250,15 @@ describe("canonicalizeSlice", () => {
     expect(reordered).toEqual(result);
   });
 
-  it("keeps bound and zero-value operand shapes, ordered by address", () => {
+  it("keeps bound and presence operand shapes, ordered by address", () => {
     const input = slice({
       filter: [
         { field: "updated", operator: "gte", operands: ["2026-01-01"] },
-        { field: "owner", operator: "isSet", operands: [] },
+        { field: "owner", operator: "isSet", operands: [true] },
       ],
     });
     expect(canonicalizeSlice(input).filter).toEqual([
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [true] },
       { field: "updated", operator: "gte", operands: ["2026-01-01"] },
     ]);
   });

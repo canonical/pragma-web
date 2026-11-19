@@ -5,9 +5,9 @@
    * TextFilter styles
    *
    * The input is native, themed by the page. What this sheet settles is the
-   * clear control: the enhancement's, so it appears only once scripting is
+   * clear control, the enhancement's, so it appears only once scripting is
    * enabled — at baseline the text is removed by emptying the input and
-   * submitting.
+   * submitting — and the select's target size.
    */
   .ds.data-views-filters-text {
     & > .clear {
@@ -18,6 +18,11 @@
       & > .clear {
         display: inline-flex;
       }
+    }
+
+    /* The select of how the text matches is a target one row tall. */
+    & > .operator {
+      min-block-size: var(--density-line-height-effective);
     }
   }
 }

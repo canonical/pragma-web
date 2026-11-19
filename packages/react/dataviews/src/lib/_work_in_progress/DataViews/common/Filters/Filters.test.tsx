@@ -123,8 +123,10 @@ describe("DataViews.Filters", () => {
 
   it("offers one control per field and legal operator, and no others", () => {
     mount(makeProvider());
-    // Three options and the presence field; two bounds on each of two fields.
-    expect(screen.getAllByRole("checkbox")).toHaveLength(4);
+    // Three options, the presence field's three choices, and two bounds on
+    // each of two fields.
+    expect(screen.getAllByRole("checkbox")).toHaveLength(3);
+    expect(screen.getAllByRole("radio")).toHaveLength(3);
     expect(screen.getAllByRole("spinbutton")).toHaveLength(2);
     expect(screen.queryByLabelText("owner from")).toBeNull();
     expect(screen.getByRole("group", { name: "Filters" })).toBeInTheDocument();
@@ -147,7 +149,7 @@ describe("DataViews.Filters", () => {
       "type",
       "date",
     );
-    expect(screen.getByRole("checkbox", { name: "owner" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "owner" })).toBeInTheDocument();
     // A choices field has one operator, so it gets no bounds.
     expect(screen.queryByLabelText("status from")).toBeNull();
     // The source declares nothing over the text field, so it gets no control.
@@ -203,18 +205,22 @@ describe("DataViews.Filters", () => {
     expect(provider.state.get().slice.filter).toEqual([]);
   });
 
-  it("applies and removes a presence predicate", () => {
+  it("applies a presence predicate either way, and removes it", () => {
     const provider = makeProvider();
     mount(provider);
-    const owner = screen.getByRole("checkbox", { name: "owner" });
-    fireEvent.click(owner);
+    const owner = within(screen.getByRole("group", { name: "owner" }));
+    fireEvent.click(owner.getByRole("radio", { name: "Has no value" }));
     expect(provider.state.get().slice.filter).toEqual([
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [false] },
     ]);
-    expect(owner).toBeChecked();
-    fireEvent.click(owner);
+    fireEvent.click(owner.getByRole("radio", { name: "Has a value" }));
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "owner", operator: "isSet", operands: [true] },
+    ]);
+    expect(owner.getByRole("radio", { name: "Has a value" })).toBeChecked();
+    fireEvent.click(owner.getByRole("radio", { name: "Any" }));
     expect(provider.state.get().slice.filter).toEqual([]);
-    expect(owner).not.toBeChecked();
+    expect(owner.getByRole("radio", { name: "Any" })).toBeChecked();
   });
 
   it("applies a bound and offers to clear it only once it applies", () => {
@@ -374,13 +380,13 @@ describe("DataViews.Filters", () => {
       "value",
       "failed",
     );
-    expect(screen.getByRole("checkbox", { name: "owner" })).toHaveAttribute(
+    expect(screen.getByRole("radio", { name: "Has a value" })).toHaveAttribute(
       "name",
       "owner__isSet",
     );
-    expect(screen.getByRole("checkbox", { name: "owner" })).toHaveAttribute(
+    expect(screen.getByRole("radio", { name: "Has a value" })).toHaveAttribute(
       "value",
-      "1",
+      "true",
     );
     expect(screen.getByLabelText("cpu from")).toHaveAttribute(
       "name",
@@ -496,7 +502,7 @@ describe("DataViews.Filters", () => {
     expect(screen.getByLabelText("cpu from")).toBeInTheDocument();
     expect(screen.queryByLabelText("cpu to")).toBeNull();
     expect(screen.queryByLabelText("updated from")).toBeNull();
-    expect(screen.queryByRole("checkbox", { name: "owner" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "owner" })).toBeNull();
   });
 
   it("keeps an undeclared restriction that stands clearable, then withdraws it", () => {
@@ -506,13 +512,14 @@ describe("DataViews.Filters", () => {
     adopt(provider, [
       { field: "status", operator: "isAny", operands: ["failed"] },
       { field: "cpu", operator: "lte", operands: [8] },
-      { field: "owner", operator: "isSet", operands: [] },
+      { field: "owner", operator: "isSet", operands: [true] },
     ]);
     // Nothing else removes it, so each stays offered while it stands — for
     // removal only: nothing can be added the source never declared.
     expect(screen.getByRole("checkbox", { name: "cancelled" })).toBeDisabled();
     expect(screen.getByRole("checkbox", { name: "failed" })).toBeEnabled();
-    expect(screen.getByRole("checkbox", { name: "owner" })).toBeEnabled();
+    expect(screen.getByRole("radio", { name: "Any" })).toBeEnabled();
+    expect(screen.getByRole("radio", { name: "Has no value" })).toBeDisabled();
     expect(screen.getByLabelText("cpu to")).toHaveAttribute("readonly");
     expect(
       screen.getByRole("button", { name: "Clear cpu to" }),
@@ -520,6 +527,7 @@ describe("DataViews.Filters", () => {
     // The query moving on withdraws what no longer stands.
     adopt(provider, [{ field: "cpu", operator: "lte", operands: [8] }]);
     expect(screen.queryByRole("checkbox")).toBeNull();
+    expect(screen.queryByRole("radio")).toBeNull();
     expect(screen.getByLabelText("cpu to")).toHaveValue(8);
     // The last undeclared restriction is removed through its own control.
     fireEvent.click(screen.getByRole("button", { name: "Clear cpu to" }));
@@ -1425,15 +1433,77 @@ describe("DataViews.Filters", () => {
       ).toBeNull();
     });
 
-    it("offers a text input for the text a field starts with", () => {
+    it("offers one text input, matching by the operator chosen beside it", () => {
       const provider = makeProvider(withText);
       mount(provider);
+      const select = screen.getByRole("combobox", {
+        name: "How name matches",
+      });
+      // The operators the source declares, in the kind's order.
+      expect(
+        [...(select as HTMLSelectElement).options].map(({ value }) => value),
+      ).toEqual([
+        "is",
+        "isNot",
+        "contains",
+        "notContains",
+        "startsWith",
+        "endsWith",
+      ]);
+      fireEvent.change(select, { target: { value: "startsWith" } });
       const input = screen.getByRole("textbox", { name: "name starts with" });
       expect(input).toHaveAttribute("name", "name__startsWith");
       fireEvent.change(input, { target: { value: "we" } });
       expect(provider.state.get().slice.filter).toEqual([
         { field: "name", operator: "startsWith", operands: ["we"] },
       ]);
+    });
+
+    it("keeps focus on the choice that moved text, wherever its control lands", () => {
+      const provider = makeProvider(withText);
+      mount(provider);
+      adopt(provider, [
+        { field: "name", operator: "contains", operands: ["web"] },
+        { field: "name", operator: "endsWith", operands: ["01"] },
+      ]);
+      const [, ending] = screen.getAllByRole("combobox", {
+        name: "How name matches",
+      });
+      if (ending === undefined) {
+        throw new Error("expected a select beside each standing text");
+      }
+      expect(ending).toHaveValue("endsWith");
+      ending.focus();
+      // Moved to is, the text's control now comes first.
+      fireEvent.change(ending, { target: { value: "is" } });
+      const focused = document.activeElement;
+      expect(focused).toHaveAccessibleName("How name matches");
+      expect(focused).toHaveValue("is");
+      expect(
+        screen.getAllByRole("combobox", { name: "How name matches" }).at(0),
+      ).toBe(focused);
+    });
+
+    it("draws one text control per operator standing, the field's own only", () => {
+      const provider = makeProvider(withText);
+      const { container } = mount(provider);
+      adopt(provider, [
+        { field: "name", operator: "endsWith", operands: ["01"] },
+        { field: "name", operator: "contains", operands: ["web"] },
+      ]);
+      expect(
+        [...container.querySelectorAll(".data-views-filters-text input")].map(
+          (input) => input.getAttribute("name"),
+        ),
+      ).toEqual(["name__contains", "name__endsWith"]);
+      // Clearing one of two hands focus to the group: the other takes its place.
+      fireEvent.click(
+        screen.getByRole("button", { name: "Clear name contains" }),
+      );
+      expect(container.querySelector("fieldset")).toHaveFocus();
+      expect(
+        screen.getByRole("textbox", { name: "name ends with" }),
+      ).toHaveValue("01");
     });
   });
 
@@ -1447,6 +1517,36 @@ describe("DataViews.Filters", () => {
       return details;
     };
 
+    it("keeps a presence control shown for its restriction in place while focus is inside it", () => {
+      const provider = makeProvider();
+      const { container } = mount(provider, { primary: ["status"] });
+      adopt(provider, [
+        { field: "owner", operator: "isSet", operands: [true] },
+      ]);
+      const details = findDisclosure(container);
+      const owner = screen.getByRole("group", { name: "owner" });
+      expect(details).not.toContainElement(owner);
+      const any = within(owner).getByRole("radio", { name: "Any" });
+      act(() => {
+        within(owner).getByRole("radio", { name: "Has a value" }).focus();
+        any.focus();
+      });
+      // An arrow key reaching Any chooses it, as the browser does.
+      fireEvent.click(any);
+      expect(provider.state.get().slice.filter).toEqual([]);
+      expect(any).toHaveFocus();
+      expect(details).not.toContainElement(
+        screen.getByRole("group", { name: "owner" }),
+      );
+      act(() => {
+        any.blur();
+      });
+      // Focus gone, the control takes the place its field now has.
+      expect(details).toContainElement(
+        screen.getByRole("group", { name: "owner", hidden: true }),
+      );
+    });
+
     it("draws no More filters when every field left over is one the source cannot filter", () => {
       // The source declares every field but the text one, marked or not.
       const { container } = mount(makeProvider(), {
@@ -1459,7 +1559,7 @@ describe("DataViews.Filters", () => {
       const { container } = mount(makeProvider(), { primary: [] });
       expect(container.querySelector("details")).toBeNull();
       expect(screen.getByLabelText("cpu from")).toBeVisible();
-      expect(screen.getByRole("checkbox", { name: "owner" })).toBeVisible();
+      expect(screen.getByRole("group", { name: "owner" })).toBeVisible();
     });
 
     it("shows the primary fields' controls, in the order marked, and the others under More filters", async () => {
@@ -1469,15 +1569,15 @@ describe("DataViews.Filters", () => {
       const details = findDisclosure(container);
       expect(details.open).toBe(false);
       expect(screen.getByText("More filters").tagName).toBe("SUMMARY");
-      const owner = screen.getByRole("checkbox", { name: "owner" });
+      const owner = screen.getByRole("group", { name: "owner" });
       const failed = screen.getByRole("checkbox", { name: "failed" });
       expect(owner).toBeVisible();
       expect(failed).toBeVisible();
       // Marked owner first, then status.
-      const checkboxes = screen.getAllByRole("checkbox");
-      expect(checkboxes.indexOf(owner)).toBeLessThan(
-        checkboxes.indexOf(failed),
-      );
+      expect(
+        owner.compareDocumentPosition(failed) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
       const cpu = screen.getByLabelText("cpu from");
       expect(details).toContainElement(cpu);
       expect(cpu).not.toBeVisible();
@@ -1564,8 +1664,10 @@ describe("DataViews.Filters", () => {
       fireEvent.click(screen.getByRole("button", { name: "Clear cpu from" }));
       expect(group).toHaveFocus();
 
-      adopt(provider, [{ field: "owner", operator: "isSet", operands: [] }]);
-      fireEvent.click(screen.getByRole("checkbox", { name: "owner" }));
+      adopt(provider, [
+        { field: "owner", operator: "isSet", operands: [true] },
+      ]);
+      fireEvent.click(screen.getByRole("radio", { name: "Any" }));
       expect(provider.state.get().slice.filter).toEqual([]);
       expect(group).toHaveFocus();
 
