@@ -1241,6 +1241,74 @@ describe("layOutClassGraph", () => {
     });
   });
 
+  describe("a term page's focus", () => {
+    const STATION = "https://metro.example/onto#Station";
+    const focused = layOutClassGraph(metroGraph, {
+      budget: GRAPH_BUDGET,
+      focus: STATION,
+    });
+    const classes = new Map(
+      metroGraph.classes.map((klass) => [klass.uri, klass]),
+    );
+
+    it("names its class and draws that class's one-hop neighbourhood", () => {
+      const station = requireEntry(classes, STATION);
+      const near = new Set([
+        STATION,
+        ...(station.superclass === null ? [] : [station.superclass]),
+        ...metroGraph.classes
+          .filter((klass) => klass.superclass === STATION)
+          .map((klass) => klass.uri),
+        ...metroGraph.relations.flatMap(({ domain, range }) =>
+          domain === STATION && range !== null
+            ? [range]
+            : range === STATION && domain !== null
+              ? [domain]
+              : [],
+        ),
+      ]);
+      expect(focused.focus).toBe(STATION);
+      const drawn = [...focused.nodes.keys()].filter((id) => classes.has(id));
+      expect(new Set(drawn)).toEqual(
+        new Set([...near].filter((id) => classes.has(id))),
+      );
+      expect(drawn.length).toBeLessThan(metroGraph.classes.length);
+    });
+
+    it("draws as though none were given when it names no class", () => {
+      const unknown = layOutClassGraph(metroGraph, {
+        budget: GRAPH_BUDGET,
+        focus: "https://metro.example/onto#Nowhere",
+      });
+      expect(unknown.focus).toBeUndefined();
+      expect(unknown).toEqual(
+        layOutClassGraph(metroGraph, { budget: GRAPH_BUDGET }),
+      );
+    });
+
+    it("leaves a drill unread", () => {
+      const other = requireDefined(
+        metroGraph.classes.find(
+          (klass) => klass.prefix !== requireEntry(classes, STATION).prefix,
+        ),
+        "a class of another namespace",
+      ).prefix;
+      const both = layOutClassGraph(metroGraph, {
+        budget: GRAPH_BUDGET,
+        focus: STATION,
+        drill: other,
+      });
+      expect(both.drilled).toBeUndefined();
+      expect(both).toEqual(focused);
+    });
+
+    it("packs its class's namespace first", () => {
+      expect(requireAt(focused.regions, 0).prefix).toBe(
+        requireEntry(classes, STATION).prefix,
+      );
+    });
+  });
+
   describe("an opened view", () => {
     // Each straight stretch of a path drawn with absolute M, H and V.
     const listStretches = (d: string) => {
