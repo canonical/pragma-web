@@ -39,6 +39,26 @@ describe("Choices (presentational)", () => {
     expect(container.querySelector("fieldset")).toHaveClass("stacked");
   });
 
+  it("renders a divider between consecutive options when withDividers in stacked layout", () => {
+    render(
+      <Choices name="color" options={options} layout="stacked" withDividers />,
+    );
+    expect(screen.getAllByRole("separator")).toHaveLength(2);
+  });
+
+  it("renders no dividers without withDividers", () => {
+    render(<Choices name="color" options={options} layout="stacked" />);
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+  });
+
+  it("renders no dividers outside the stacked layout", () => {
+    const { container } = render(
+      <Choices name="color" options={options} withDividers />,
+    );
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+    expect(container.querySelector(".ds.choices-divider")).toBeNull();
+  });
+
   it("reflects the selected value (single)", () => {
     render(<Choices name="color" options={options} value="blue" />);
     const radios = screen.getAllByRole("radio");

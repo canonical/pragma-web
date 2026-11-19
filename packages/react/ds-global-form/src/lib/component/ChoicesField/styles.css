@@ -16,6 +16,16 @@
     &.stacked {
       flex-direction: column;
       flex-wrap: nowrap;
+
+      /* Hairline between consecutive options (withDividers, stacked only). */
+      & > .ds.choices-divider {
+        flex-basis: 100%;
+        width: 100%;
+        margin: 0;
+        border: none;
+        border-top: var(--dimension-stroke-thickness-medium) solid
+          var(--color-border-muted);
+      }
     }
 
     /* Columns: a grid of equal-width columns. Each option fills its cell, so the

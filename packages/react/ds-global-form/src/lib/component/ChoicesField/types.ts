@@ -27,6 +27,12 @@ type AdditionalChoicesProps = OptionsProps & {
    */
   columns?: number;
 
+  /**
+   * Whether to draw a hairline divider between consecutive options.
+   * Stacked layout only; ignored in the other layouts.
+   */
+  withDividers?: boolean;
+
   /** Selected value (string for radios, string[] for checkboxes) */
   value?: string | string[];
 
