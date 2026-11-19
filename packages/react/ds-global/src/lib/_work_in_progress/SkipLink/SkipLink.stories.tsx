@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import * as decorators from "storybook/decorators.js";
 import { expect } from "storybook/test";
+import { withMainAfter, withRtl } from "../../../storybook/decorators/index.js";
 import Component from "./SkipLink.js";
 
 const MainContents = () => (
@@ -39,7 +39,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {},
   decorators: [
-    decorators.beforeMain({
+    withMainAfter({
       children: MainContents(),
     }),
   ],
@@ -50,7 +50,7 @@ export const CustomMainElement: Story = {
     mainId: "my-main-element",
   },
   decorators: [
-    decorators.beforeMain({ id: "my-main-element", children: MainContents() }),
+    withMainAfter({ id: "my-main-element", children: MainContents() }),
   ],
   parameters: {
     docs: {
@@ -67,7 +67,7 @@ export const CustomText: Story = {
     children: "Custom skip text",
   },
   decorators: [
-    decorators.beforeMain({
+    withMainAfter({
       children: MainContents(),
     }),
   ],
@@ -87,7 +87,7 @@ export const Focused: Story = {
     children: "Skip to main content",
   },
   decorators: [
-    decorators.beforeMain({
+    withMainAfter({
       children: MainContents(),
     }),
   ],
@@ -112,10 +112,10 @@ export const Focused: Story = {
 export const FocusedRtl: Story = {
   ...Focused,
   decorators: [
-    decorators.beforeMain({
+    withMainAfter({
       children: MainContents(),
     }),
-    decorators.rtl(),
+    withRtl(),
   ],
   tags: ["!dev", "!autodocs"],
   name: "Focused (RTL)",
