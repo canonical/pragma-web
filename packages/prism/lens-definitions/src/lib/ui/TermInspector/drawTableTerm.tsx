@@ -3,8 +3,8 @@ import type { StubName } from "../../classGraph/types.js";
 
 /**
  * Draw an edge table's term in its short form, `prefix:Local`, with a
- * break allowed right after the colon and nowhere inside a word: a narrow
- * column wraps the local name under its prefix whole. A term with no
+ * break allowed right after the colon: a narrow column wraps the local
+ * name under its prefix there first. A term with no
  * prefix is drawn as it is named.
  *
  * @param name - The term's name, as `nameTableTerms` gives it.

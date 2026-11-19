@@ -199,8 +199,8 @@ node:
                                   appearance.border.bottom.color: color.border.muted
                                   typography.align: start
                                   layout.verticalAlign: baseline
-                                  # A term breaks only between words or right after its prefix's colon.
-                                  typography.wrap: normal
+                                  # A term breaks first right after its prefix's colon, inside its local name only where the column cannot hold it whole.
+                                  typography.wrap: anywhere
                             - node:
                                 role: column heading (.is-heading)
                                 styles:

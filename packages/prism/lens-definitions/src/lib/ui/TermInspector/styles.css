@@ -195,11 +195,13 @@
     border-bottom-color: var(--term-inspector-rule-color);
     text-align: start;
     vertical-align: baseline;
-    overflow-wrap: normal;
+    overflow-wrap: anywhere;
   }
 
-  /* A column's heading and a figure break only between words; a term
-   * breaks only between words or right after its prefix's colon. */
+  /* A column's heading and a figure break only between words. A term
+   * breaks first right after its prefix's colon, and inside its local
+   * name only where its column, shared by four in the inspector's width,
+   * cannot hold it whole: the table never runs past the inspector. */
   .ds.term-inspector .cell.is-heading {
     font-weight: var(--term-inspector-caps-weight);
     color: var(--term-inspector-muted-color);
