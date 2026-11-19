@@ -84,6 +84,32 @@ describe("RelationList", () => {
     expect(second?.querySelector(".count a")).toBeNull();
   });
 
+  it("names an unlabelled property's count link by its short term", () => {
+    render(
+      createRouterHarness(
+        <RelationList
+          direction="outgoing"
+          namespaces={NAMESPACES}
+          relations={[
+            {
+              predicate: {
+                uri: "https://ds.canonical.com/viaTag",
+                label: null,
+              },
+              other: null,
+              count: 3,
+            },
+          ]}
+        />,
+      ),
+    );
+    expect(
+      screen.getByRole("link", {
+        name: "3 statements of ds:viaTag: open the property",
+      }),
+    ).toHaveAttribute("href", "/definitions/ds%3AviaTag");
+  });
+
   it("points the arrow back for incoming relations", () => {
     render(
       createRouterHarness(
