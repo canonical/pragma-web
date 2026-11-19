@@ -153,7 +153,7 @@ describe("DefinitionsExplorer", {
     const name =
       box?.getAttribute("aria-label") ??
       box?.querySelector("a")?.getAttribute("aria-label");
-    expect(name).toContain("20 classes, 21 relations,");
+    expect(name).toMatch(/20 classes, \d+ instances, 21 relations,/);
     expect(
       container.querySelectorAll('.desktop .node:not([data-kind="stub"])'),
     ).toHaveLength(16);

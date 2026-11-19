@@ -632,7 +632,9 @@ function layOutModel(
       const passed = [...placed.entries()]
         .filter(([prefix]) => {
           const shelf = shelfIndexOf(prefix);
-          return shelf > Math.min(shelfA, shelfB) && shelf < Math.max(shelfA, shelfB);
+          return (
+            shelf > Math.min(shelfA, shelfB) && shelf < Math.max(shelfA, shelfB)
+          );
         })
         .map(([prefix, place]) => ({
           left: place.x,

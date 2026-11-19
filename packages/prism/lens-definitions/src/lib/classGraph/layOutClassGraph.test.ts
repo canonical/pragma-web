@@ -1239,7 +1239,10 @@ describe("layOutClassGraph", () => {
       let x = 0;
       let y = 0;
       for (const [, command, values] of d.matchAll(/([MHV])([^MHV]*)/g)) {
-        const numbers = (values ?? "").trim().split(/[\s,]+/).map(Number);
+        const numbers = (values ?? "")
+          .trim()
+          .split(/[\s,]+/)
+          .map(Number);
         if (command === "M") [x = 0, y = 0] = numbers;
         if (command === "H") {
           const to = numbers.at(-1) ?? x;

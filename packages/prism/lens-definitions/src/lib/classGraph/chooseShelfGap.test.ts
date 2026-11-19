@@ -21,7 +21,9 @@ describe("chooseShelfGap", () => {
   });
 
   it("passes a gap with no room left for its lane for the next nearest", () => {
-    expect(chooseShelfGap(SHELF, 380, 420, MARGINS, new Map([[392, 9]])).base).toBe(184);
+    expect(
+      chooseShelfGap(SHELF, 380, 420, MARGINS, new Map([[392, 9]])).base,
+    ).toBe(184);
   });
 
   it("goes round the nearer margin where no shelf passed leaves a gap", () => {
