@@ -3,7 +3,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 @prefix ds: <https://ds.canonical.com/>.
 
-ds:implementation.library.svelte-ds-global ds:hasImplementation ds:implementation.svelte-ds-global.global.component.announcement, ds:implementation.svelte-ds-global.global.component.breadcrumbs, ds:implementation.svelte-ds-global.global.component.button, ds:implementation.svelte-ds-global.global.pattern.modal, ds:implementation.svelte-ds-global.global.pattern.skip_link, ds:implementation.svelte-ds-global.global.subcomponent.breadcrumbs-item, ds:implementation.svelte-ds-global.global.subcomponent.modal-content, ds:implementation.svelte-ds-global.global.subcomponent.modal-footer, ds:implementation.svelte-ds-global.global.subcomponent.modal-header.
+ds:implementation.library.svelte-ds-global ds:hasImplementation ds:implementation.svelte-ds-global.global.component.announcement, ds:implementation.svelte-ds-global.global.component.breadcrumbs, ds:implementation.svelte-ds-global.global.component.button, ds:implementation.svelte-ds-global.global.component.tooltip, ds:implementation.svelte-ds-global.global.component.tooltip_wrapper, ds:implementation.svelte-ds-global.global.pattern.modal, ds:implementation.svelte-ds-global.global.pattern.skip_link, ds:implementation.svelte-ds-global.global.subcomponent.breadcrumbs-item, ds:implementation.svelte-ds-global.global.subcomponent.modal-content, ds:implementation.svelte-ds-global.global.subcomponent.modal-footer, ds:implementation.svelte-ds-global.global.subcomponent.modal-header.
 ds:implementation.svelte-ds-global.global.component.announcement a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.announcement;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Announcement/Announcement.svelte";
@@ -19,6 +19,16 @@ ds:implementation.svelte-ds-global.global.component.button a ds:ImplementationOb
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Button/Button.svelte";
     ds:importStatement "import { Button } from \"@canonical/svelte-ds-global\";";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Button/Button.svelte".
+ds:implementation.svelte-ds-global.global.component.tooltip a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.tooltip;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Tooltip/Tooltip.svelte";
+    ds:importStatement "import { Tooltip } from \"@canonical/svelte-ds-global\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Tooltip/Tooltip.svelte".
+ds:implementation.svelte-ds-global.global.component.tooltip_wrapper a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.tooltip_wrapper;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Tooltip/TooltipEngine.svelte";
+    ds:importStatement "import { TooltipEngine } from \"@canonical/svelte-ds-global\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.47.0/packages/svelte/ds-global/src/lib/component/Tooltip/TooltipEngine.svelte".
 ds:implementation.svelte-ds-global.global.pattern.modal a ds:ImplementationObject;
     ds:implementsBlock ds:global.pattern.modal;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/Modal.svelte";
