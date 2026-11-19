@@ -624,6 +624,27 @@ describe("ClassGraph", () => {
     });
   });
 
+  it("draws a term page's relations by colour alone, at their weight's own width", () => {
+    const station = requireEntry(metro.uris, "metro:Station");
+    const container = draw({
+      focus: station,
+      layout: layOutClassGraph(metroGraph, {
+        budget: GRAPH_BUDGET,
+        focus: station,
+      }),
+      terms: metro.terms,
+    });
+    const accented = [...container.querySelectorAll("path.relation.is-focus")];
+    expect(accented.length).toBeGreaterThan(0);
+    for (const path of accented) {
+      const { width } = weighStroke(Number(path.getAttribute("data-weight")));
+      expect(path.getAttribute("stroke-width")).toBe(String(width));
+    }
+    expect(
+      accented.some((path) => path.getAttribute("stroke-width") === "1"),
+    ).toBe(true);
+  });
+
   it("keeps a focused relation with no statements dashed, at the focus's 2px", () => {
     const container = draw({ focus: uri("cs:Example") });
     const zero = container.querySelector(

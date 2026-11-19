@@ -73,7 +73,8 @@ function joinClasses(...names: readonly (string | false)[]): string {
  *
  * The reader's state never moves anything: a focus fades every class and
  * edge outside its neighbourhood and draws its relations in the accent, at
- * 2px at least; a selection draws its lineage at 2px and rings its class in the
+ * 2px at least on the whole map and at their weight's own width on a term
+ * page's layout, where every relation is the focus's; a selection draws its lineage at 2px and rings its class in the
  * accent; a hovered or keyboard-focused class is ringed in the focus
  * colour; the filter hides classes and the edges that lose an end; the
  * search dims. The text follows the zoom bucket of the canvas it is drawn
@@ -169,7 +170,9 @@ export default function ClassGraph({
           stroke="currentColor"
           strokeDasharray={dash}
           strokeWidth={
-            state === "is-focus" ? Math.max(width, FOCUS_STROKE) : width
+            state === "is-focus" && layout.focus === undefined
+              ? Math.max(width, FOCUS_STROKE)
+              : width
           }
         />
         {heads.map((head) =>
