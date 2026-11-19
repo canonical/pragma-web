@@ -140,6 +140,25 @@ describe("placeWeightLabels", () => {
     ]);
     expect(entry?.numeral).toBeUndefined();
   });
+
+  it("seats a label on a line of no length at a point it can draw", () => {
+    const label = requireDefined(labels.at(0), "a drawn label");
+    const point = "M 40 40 L 40 40";
+    const still = {
+      ...layout,
+      edges: layout.edges.map((edge) =>
+        edge.id === label.edge ? { ...edge, d: point } : edge,
+      ),
+    };
+    const [entry] = placeWeightLabels(still, [label]);
+    const seat = requireDefined(entry, "the label's seat");
+    expect(Number.isFinite(seat.dx)).toBe(true);
+    expect(Number.isFinite(seat.dy)).toBe(true);
+    if (seat.numeral !== undefined) {
+      expect(Number.isFinite(seat.numeral.box.x)).toBe(true);
+      expect(Number.isFinite(seat.numeral.box.y)).toBe(true);
+    }
+  });
 });
 
 describe("listUndeclaredEdges", () => {
