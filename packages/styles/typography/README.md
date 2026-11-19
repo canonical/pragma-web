@@ -180,15 +180,15 @@ Three engines implement the same grid-snap pattern with different trade-offs. Im
 
 Uses the browser-native `cap` CSS unit to resolve font metrics at render time. No JavaScript extraction step, no per-font variables. Changing `font-family` on an element automatically updates the `1cap` value the engine uses.
 
-The baseline position formula is `(line-height + 1cap) / 2` — the browser resolves `1cap` from the font's OpenType tables natively.
+The baseline position formula is `(line-height + 1cap) / 2` — the browser resolves `1cap` from the font's OpenType tables natively. With the shared spacing roles loaded, text matching the product root's font size adds the default control inset to its start padding and end compensation. Docs/App body text occupies 32px per one-line seat, including App h5/h6; larger headings retain their existing geometry. Wrapped lines add the body line height. Text never reads the density member.
 
-| Browser | `mod()` | `cap` unit | This engine's floor |
-|---------|----------|------------|---------------------|
-| Chrome  | 125+     | 118+       | **125+**            |
-| Safari  | 15.4+    | 17.2+      | **17.2+**           |
-| Firefox | 118+     | 97+        | **118+**            |
+| Browser | `round()` | `cap` unit | This engine's floor |
+|---------|-----------|------------|---------------------|
+| Chrome  | 125+      | 118+       | **125+**            |
+| Safari  | 15.4+     | 17.2+      | **17.2+**           |
+| Firefox | 118+      | 97+        | **118+**            |
 
-`mod()` binds Chrome and Firefox, the `cap` unit binds Safari.
+`round()` binds Chrome and Firefox, the `cap` unit binds Safari.
 
 ### baseline-metrics.css — Extracted metrics
 
