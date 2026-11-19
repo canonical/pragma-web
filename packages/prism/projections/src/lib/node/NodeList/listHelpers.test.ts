@@ -91,6 +91,20 @@ describe("orderByValue", () => {
     ).toEqual(["a", "c", "b"]);
   });
 
+  it("keeps tied nodes in their order", () => {
+    const tied = [
+      zoned("a", "Zone 1"),
+      zoned("b", "Zone 1"),
+      zoned("c", null),
+      zoned("d", null),
+    ];
+    expect(
+      orderByValue(tied, { field: "inZone", descending: true }).map(
+        ({ name }) => name,
+      ),
+    ).toEqual(["a", "b", "c", "d"]);
+  });
+
   it("reads a node without values as showing nothing", () => {
     expect(
       orderByValue([{ values: null }, zoned("a", "Zone 1")], {

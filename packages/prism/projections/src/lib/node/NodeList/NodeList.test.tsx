@@ -261,6 +261,33 @@ describe("NodeList's table of facts", () => {
     ).toHaveAttribute("href", "/?sort=-code");
   });
 
+  it("marks a descending sort on its header", () => {
+    const { container } = renderTable({ sort: "-code" });
+    expect(
+      Array.from(
+        container.querySelectorAll("th.title"),
+        (title) => title.textContent,
+      ),
+    ).toEqual(["Northgate", "Central"]);
+    expect(
+      container.querySelector('th.column[data-property="code"]'),
+    ).toHaveAttribute("aria-sort", "descending");
+  });
+
+  it("leaves a cell empty where its node shows no value", () => {
+    const { container } = renderTable({ selected: "metro:Nowhere" }, [
+      VALUED_NODES[0],
+      { ...createValuedNode("Bank", "BK"), values: [] },
+      { ...createValuedNode("Monument", "MO"), values: null },
+    ]);
+    const cells = Array.from(
+      container.querySelectorAll("tbody > tr.row:last-child td.value"),
+      (cell) => cell.textContent,
+    );
+    expect(cells).toEqual(["", ""]);
+    expect(container.querySelector('tr[aria-selected="true"]')).toBeNull();
+  });
+
   it("selects the row the address names, by its uri or its curie", () => {
     const byCurie = renderTable({ selected: "metro:Central" });
     expect(
