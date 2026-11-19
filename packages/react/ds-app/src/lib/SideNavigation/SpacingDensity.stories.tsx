@@ -13,7 +13,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { assertRootTextSeats } from "../spacingRootTextSeatProof.js";
+import { assertRootTextSeats } from "../../storybook/spacingRootTextSeatProof.js";
 import { navigationDensityPolicy } from "./common/densityPolicy.js";
 import { SideNavigation } from "./index.js";
 import type { LinkComponentProps } from "./types.js";

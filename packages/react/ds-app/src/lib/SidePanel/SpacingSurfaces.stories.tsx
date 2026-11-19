@@ -15,8 +15,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { assertRootTextSeats } from "../../storybook/spacingRootTextSeatProof.js";
 import { SideNavigation } from "../SideNavigation/index.js";
-import { assertRootTextSeats } from "../spacingRootTextSeatProof.js";
 import { SidePanel } from "./index.js";
 import type { SidePanelHandle } from "./types.js";
 import "./SpacingSurfaces.css";

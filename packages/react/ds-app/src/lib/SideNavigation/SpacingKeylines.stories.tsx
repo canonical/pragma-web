@@ -1,7 +1,7 @@
 import { Accordion } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
-import { assertRootTextSeats } from "../spacingRootTextSeatProof.js";
+import { assertRootTextSeats } from "../../storybook/spacingRootTextSeatProof.js";
 import { SideNavigation } from "./index.js";
 import "./SpacingKeylines.css";
 
