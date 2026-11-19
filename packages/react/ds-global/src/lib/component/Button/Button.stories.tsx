@@ -3,7 +3,7 @@ import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { Fragment } from "react";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import Component from "./Button.js";
 
@@ -60,6 +60,38 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     children: "Button",
+  },
+};
+
+/** Button text follows its local context, not the page's root font size. */
+export const TextContexts: Story = {
+  render: (args) => (
+    <>
+      <div className="app">
+        <Component {...args}>Save settings</Component>
+      </div>
+      <div className="site">
+        <Component {...args}>Contact sales</Component>
+      </div>
+      <div className="docs">
+        <Component {...args}>Copy example</Component>
+      </div>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    for (const [name, rem] of [
+      ["Save settings", 0.875],
+      ["Contact sales", 1],
+      ["Copy example", 0.875],
+    ] as const) {
+      const button = canvas.getByRole("button", { name });
+      const rootSize = getComputedStyle(
+        button.ownerDocument.documentElement,
+      ).fontSize;
+      await expect(getComputedStyle(button).fontSize).toBe(
+        `${rem * Number.parseFloat(rootSize)}px`,
+      );
+    }
   },
 };
 
@@ -143,14 +175,34 @@ export const LinkVariant: Story = {
 
 /**
  * The full matrix with a leading icon in every cell — so the icon colour can be
- * checked against each importance × anticipation combination (the icon should
- * follow the label colour: contrast on a filled primary, the modifier colour on
- * ghost secondary/tertiary). The `icon` prop takes a design-system icon name;
+ * checked against each importance × anticipation combination. Outlined
+ * destructive buttons keep a neutral label and icon; the border signals intent.
+ * The `icon` prop takes a design-system icon name;
  * the sprite is served from the `@canonical/ds-assets` staticDir at `/icons`.
  */
 export const IconMatrix: Story = {
   render: (args) => <MatrixGrid {...args} />,
   args: { children: "Button", icon: "edit" },
+  play: async ({ canvasElement }) => {
+    const neutral = canvasElement.querySelector(
+      "button.secondary:not(.destructive) > .icon",
+    );
+    const destructive = canvasElement.querySelector(
+      "button.secondary.destructive > .icon",
+    );
+    if (!neutral?.parentElement || !destructive?.parentElement) {
+      throw new Error(
+        "Expected neutral and destructive outlined buttons with icons",
+      );
+    }
+
+    await expect(getComputedStyle(destructive).color).toBe(
+      getComputedStyle(neutral).color,
+    );
+    await expect(getComputedStyle(destructive.parentElement).color).toBe(
+      getComputedStyle(neutral.parentElement).color,
+    );
+  },
 };
 
 /**
