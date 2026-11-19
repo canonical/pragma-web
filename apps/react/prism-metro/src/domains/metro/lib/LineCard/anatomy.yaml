@@ -60,6 +60,12 @@ node:
               role: facts
               edges:
                 - node:
+                    role: code
+                    projection:
+                      field: code
+                  relation:
+                    cardinality: "1"
+                - node:
                     role: servedBy
                     projection:
                       field: uri

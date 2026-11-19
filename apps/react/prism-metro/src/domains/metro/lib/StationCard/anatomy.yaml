@@ -78,6 +78,23 @@ node:
                     cardinality: "0..*"
                     projection:
                       field: servesLine
+                - node:
+                    role: location
+                    # Where the station stands: its latitude and longitude.
+                    projection:
+                      field: latitude
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: location
+                - node:
+                    role: location longitude
+                    projection:
+                      field: longitude
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: location
             relation:
               cardinality: "0..1"
               slotName: facts

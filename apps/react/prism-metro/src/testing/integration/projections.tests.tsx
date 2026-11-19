@@ -78,11 +78,13 @@ describe("the stations lens's cards", {
       ["platformCount", "Platforms", "4"],
       ["inZone", "Zone", ZONE_TITLE],
       ["servesLine", "Lines", "North Line"],
+      ["location", "Location", "51.5412, -0.1435"],
     ]);
     expect(readFacts(findCard(container, CENTRAL_EXCHANGE_TITLE))).toEqual([
       ["platformCount", "Platforms", "8"],
       ["inZone", "Zone", ZONE_TITLE],
       ["servesLine", "Lines", "North Line, Circle Line, Coastal Line"],
+      ["location", "Location", "51.5074, -0.1278"],
       ["transferMinutes", "Transfer", "4 minutes"],
     ]);
   });
