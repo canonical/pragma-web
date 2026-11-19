@@ -79,5 +79,9 @@ export const CLOSE_ICON_ID = "close";
  */
 export const ROWS_PATHS = ["/stations", "/fleet"] as const;
 
-/** An index's rows, in the canvas. */
-export const INDEX_ROW_SELECTOR = "main.ds.canvas .ds.entity-row";
+/**
+ * An index's rows, in the canvas: the table of facts' body rows on a
+ * single-type index, the scented rows on a mixed one.
+ */
+export const INDEX_ROW_SELECTOR =
+  "main.ds.canvas :is(.ds.entity-table > .body > .row, .ds.entity-row)";
