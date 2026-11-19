@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { assertRootTextSeats } from "../../../storybook/spacingRootTextSeatProof.js";
 import { Field, Form } from "../../index.js";
-import { assertRootTextSeats } from "../../spacingRootTextSeatProof.js";
 import "../../../index.css";
 import "./SpacingGaps.css";
 

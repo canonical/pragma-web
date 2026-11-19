@@ -3,8 +3,8 @@ import { Accordion, Button, Icon } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { assertRootTextSeats } from "../../../storybook/spacingRootTextSeatProof.js";
 import { Field, Form } from "../../index.js";
-import { assertRootTextSeats } from "../../spacingRootTextSeatProof.js";
 import "../../../index.css";
 import "./SpacingMarks.css";
 
