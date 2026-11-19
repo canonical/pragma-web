@@ -88,25 +88,28 @@ describe("the stations lens's cards", {
   });
 });
 
-describe("the lines lens's rows", {
+describe("the lines lens's table", {
   timeout: LENS_PAGE_TEST_TIMEOUT_MS,
 }, () => {
-  it("row every line as a line, each counting its stops", async () => {
+  it("tables every line, each naming its stops under its header", async () => {
     const { container } = renderLensPage("/lines", graph.url);
     await waitFor(() => {
-      expect(container.querySelectorAll("li.line-row")).toHaveLength(
-        LINE_COUNT,
-      );
+      expect(
+        container.querySelectorAll(".entity-table > tbody > tr"),
+      ).toHaveLength(LINE_COUNT);
     }, WAIT);
     expect(container.querySelector(".node-row")).toBeNull();
-    const circle = [...container.querySelectorAll("li.line-row")].find(
-      (row) => row.querySelector(".title")?.textContent === CIRCLE_LINE_TITLE,
-    );
+    const circle = [
+      ...container.querySelectorAll(".entity-table > tbody > tr"),
+    ].find((row) => row.querySelector("th")?.textContent === CIRCLE_LINE_TITLE);
     expect(
-      circle?.querySelector('.fact[data-property="servedBy"] .detail')
-        ?.textContent,
-    ).toBe("6");
-    expect(circle?.querySelector(".status")?.textContent).toBe("loop");
+      circle
+        ?.querySelector('td.value[data-property="servedBy"]')
+        ?.textContent?.split(", "),
+    ).toHaveLength(6);
+    expect(
+      container.querySelector('th.column[data-property="servedBy"] a.sort'),
+    ).toHaveAttribute("href", "/lines?sort=servedBy");
   });
 });
 

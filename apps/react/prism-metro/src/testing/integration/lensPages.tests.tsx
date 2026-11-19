@@ -32,15 +32,19 @@ afterAll(() => graph.close());
 /** How long each query and wait below gives the page to answer. */
 const WAIT = { timeout: LENS_PAGE_WAIT_MS };
 
-/** The rows of the entity index's list view once its query has answered. */
+/** The body rows of the entity index's table once its query has answered. */
 const findIndexRows = async (): Promise<HTMLElement[]> => {
   const canvas = await screen.findByRole("main", {}, WAIT);
   await waitFor(() => {
     expect(
-      canvas.querySelector(".entity-index .entity-list .items"),
+      canvas.querySelector(".entity-index .entity-table > tbody"),
     ).not.toBeNull();
   }, WAIT);
-  return within(canvas).getAllByRole("listitem");
+  return Array.from(
+    canvas.querySelectorAll<HTMLElement>(
+      ".entity-index .entity-table > tbody > tr",
+    ),
+  );
 };
 
 describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {

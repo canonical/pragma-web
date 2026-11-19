@@ -2,10 +2,22 @@ import type { EntityLensOptions } from "@canonical/prism-lens-entity";
 import { MESSAGES } from "#i18n";
 
 /**
- * The stations lens in the rail: its label and its place, first. The
- * Definitions lens keeps its own place, third.
+ * The list renderers the stations and lines indexes offer: the table first,
+ * and the cards their entries' card arms draw.
  */
-export const STATIONS_LENS = { label: MESSAGES["lens.stations"], order: 1 };
+export const METRO_LIST_RENDERERS = { list: ["table", "cards"] } as const;
+
+/**
+ * The stations lens in the rail: its label and its place, first. The
+ * Definitions lens keeps its own place, third. Its table leaves out the
+ * station's place on the diagram, a coordinate pair no reader compares.
+ */
+export const STATIONS_LENS = {
+  label: MESSAGES["lens.stations"],
+  order: 1,
+  renderers: METRO_LIST_RENDERERS,
+  tableOmits: ["diagramPosition"],
+} as const satisfies EntityLensOptions;
 
 /**
  * The lines lens in the rail: its label and its place, second. Its index
@@ -16,4 +28,5 @@ export const LINES_LENS = {
   label: MESSAGES["lens.lines"],
   order: 2,
   filters: "panel",
+  renderers: METRO_LIST_RENDERERS,
 } as const satisfies EntityLensOptions;
