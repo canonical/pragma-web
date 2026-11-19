@@ -45,6 +45,8 @@
     --entity-row-focus-ring-width: 2px;
     --entity-row-focus-ring-offset: -2px;
     --entity-row-focus-ring-color: var(--color-focus-ring);
+    /* The selected entity's row, as the table marks its selected row. */
+    --entity-row-selected-background: var(--color-background-layer2);
     /* Below two groups the title keeps at least twelve characters beside
      * the status: the status's widest is the row less that floor, the
      * mark's box and the gutter before the status. */
@@ -66,6 +68,12 @@
     list-style: none;
     font-size: var(--entity-row-font-size);
     line-height: var(--entity-row-line-height);
+  }
+
+  /* The selected entity (the address's select=) takes the raised
+   * background the table of facts gives its selected row. */
+  .ds.entity-row[aria-current="true"] {
+    background: var(--entity-row-selected-background);
   }
 
   /* The identity's basis is its content and it never wraps: it shrinks

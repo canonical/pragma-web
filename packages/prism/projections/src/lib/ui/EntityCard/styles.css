@@ -42,9 +42,17 @@
     --entity-card-address-color: var(--color-text-muted);
     /* No typography token names a monospace face. */
     --entity-card-mono-font-family: ui-monospace, monospace;
+    /* The selected entity's card, as the table marks its selected row. */
+    --entity-card-selected-background: var(--color-background-layer2);
 
     font-size: var(--entity-card-font-size);
     line-height: var(--entity-card-line-height);
+  }
+
+  /* The selected entity (the address's select=) takes the raised
+   * background the table of facts gives its selected row. */
+  .ds.entity-card[aria-current="true"] {
+    background: var(--entity-card-selected-background);
   }
 
   /* The card has no image and no header: the body takes their tracks with
