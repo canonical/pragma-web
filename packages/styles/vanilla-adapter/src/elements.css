@@ -702,10 +702,7 @@
       /* Equality is evaluated on this text owner, so larger roles and nested
          product roots never inherit another element's eligibility. Density
          changes only the private control channel, not this tier-default inset. */
-      --_text-default-inset: var(
-        --_text-seat-control-inset,
-        var(--ds-spacing-control-inset, 0px)
-      );
+      --_text-default-inset: var(--ds-spacing-control-inset, 0px);
       /* Any nonzero font-size difference rounds up to at least the inset;
          exact equality leaves the whole inset. The step stays nonzero even
          for a product whose control inset is zero. */
@@ -716,14 +713,8 @@
           round(
             up,
             max(
-              calc(
-                var(--font-size) -
-                var(--ds-typography-body-font-size, var(--font-size))
-              ),
-              calc(
-                var(--ds-typography-body-font-size, var(--font-size)) -
-                var(--font-size)
-              )
+              calc(1em - var(--ds-typography-body-font-size, 1em)),
+              calc(var(--ds-typography-body-font-size, 1em) - 1em)
             ),
             max(var(--_text-default-inset), 1px)
           )
