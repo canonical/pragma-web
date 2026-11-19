@@ -57,6 +57,10 @@
 @import url("./component/Chip/styles.css");
 @import url("./component/ContextualMenu/common/Item/styles.css");
 @import url("./component/ContextualMenu/styles.css");
+@import url("./component/DropdownButton/common/Menu/styles.css");
+@import url("./component/DropdownButton/common/MenuItem/styles.css");
+@import url("./component/DropdownButton/common/Panel/styles.css");
+@import url("./component/DropdownButton/styles.css");
 @import url("./component/Icon/styles.css");
 @import url("./component/InlineCode/styles.css");
 @import url("./component/KeyboardKey/styles.css");
