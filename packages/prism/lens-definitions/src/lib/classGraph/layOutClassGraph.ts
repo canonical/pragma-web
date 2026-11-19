@@ -21,6 +21,7 @@ import {
 import { MESSAGES } from "../i18n/constants.js";
 import buildClassGraphModel from "./buildClassGraphModel.js";
 import chooseDrawnScope from "./chooseDrawnScope.js";
+import chooseShelfGap from "./chooseShelfGap.js";
 import {
   ALIGNMENT_SEARCH_LIMIT,
   BRIDGE_CHANNEL_ROOM,
@@ -35,6 +36,7 @@ import {
   REGION_ALIGNMENTS,
   SHELF_ALIGNMENTS,
   SHELF_GAP,
+  SHELF_MAX_WIDTH,
   SWEEPS,
   VIEW_MARGIN,
 } from "./constants.js";
@@ -127,6 +129,16 @@ function layOutLayers(
 }
 
 /**
+ * How wide an opened view's shelves of several regions may run: the
+ * opened namespace leads a view that opens on its top-left corner, so the
+ * shelves under it wrap within the narrowest canvas's legible window. The
+ * overview at rest keeps the packing that fits the design canvas best.
+ */
+function wrapOf(lead: string | undefined): { readonly maxWidth?: number } {
+  return lead === undefined ? {} : { maxWidth: SHELF_MAX_WIDTH };
+}
+
+/**
  * Lay every region out at a channel, in the order given, and pack them
  * into shelves, saying whether any arc nests past the channel.
  */
@@ -154,7 +166,7 @@ function packRegions(
   );
   return {
     regions,
-    packing: packShelves(regions),
+    packing: packShelves(regions, wrapOf(lead)),
     crowded: regions.some((region) => region.layout.crowdedArcs > 0),
   };
 }
@@ -260,11 +272,13 @@ function countEmptyCells(
  * shelf's middle, top or bottom: every combination of the first
  * `ALIGNMENT_SEARCH_LIMIT` choices (the shelves', then the regions') is
  * tried, in those orders, the rest keeping their first share, and the
- * first that leaves the fewest empty cells on the canvas is kept.
+ * first that leaves the fewest empty cells on the canvas is kept. With a
+ * `maxWidth`, a shelf moves only as far as keeps its right edge within it.
  */
 function alignShelves(
   sized: readonly SizedRegion[],
   packing: ShelfPacking,
+  { maxWidth = Number.POSITIVE_INFINITY }: { readonly maxWidth?: number },
 ): Map<string, RegionPlace> {
   const entries: {
     readonly index: number;
@@ -289,7 +303,8 @@ function alignShelves(
       });
       x += region.w + SHELF_GAP;
     }
-    slack.push(packing.w - (x - SHELF_GAP));
+    const width = x - SHELF_GAP;
+    slack.push(Math.min(packing.w, Math.max(maxWidth, width)) - width);
     shelfY += height + SHELF_GAP;
   });
   // Every open alignment is one choice of three shares; a pick numbers one
@@ -410,7 +425,7 @@ function layOutModel(
   const crossPorts = chooseCrossPorts(
     model,
     packedRegions,
-    alignShelves(packedRegions, packed.packing),
+    alignShelves(packedRegions, packed.packing, wrapOf(lead)),
   );
   const sized = packedRegions.map((region) =>
     [...crossPorts.keys()].some((key) => region.layout.ports.has(key))
@@ -422,12 +437,12 @@ function layOutModel(
         )
       : region,
   );
-  const packing = packShelves(sized);
+  const packing = packShelves(sized, wrapOf(lead));
 
   // Place the regions: shelves 48px apart, each region shorter than its
   // shelf aligned to its top, middle or bottom, whichever leaves the
   // fewest empty cells on the canvas.
-  const placed = alignShelves(sized, packing);
+  const placed = alignShelves(sized, packing, wrapOf(lead));
   const sizedByPrefix = new Map(sized.map((region) => [region.prefix, region]));
   const regionOf = (prefix: string): SizedRegion =>
     requireEntry(sizedByPrefix, prefix);
@@ -503,7 +518,7 @@ function layOutModel(
     requireAt(shelfTops, shelf) - SHELF_GAP / 2;
   // The packing's two margins: left of its first region, right of its
   // widest shelf.
-  const margins = [
+  const margins: readonly [number, number] = [
     -SHELF_GAP / 2,
     Math.max(
       ...[...placed.entries()].map(
@@ -585,6 +600,8 @@ function layOutModel(
     readonly gap: { readonly from: number; readonly to: number } | undefined;
     readonly heads: readonly PathCommand[][];
   }[] = [];
+  // How many bridges run down each gap past a shelf, by its middle.
+  const taken = new Map<number, number>();
   for (const bundle of crossBundles) {
     const a = nodeOf(bundle.a);
     const b = nodeOf(bundle.b);
@@ -602,26 +619,33 @@ function layOutModel(
     });
     // One shelf: over it, through the gap above. Adjacent shelves: through
     // the gap that joins them. Shelves further apart: out by the gap on
-    // the other end's side of the first shelf, down or up the nearer
-    // margin, in by the gap on this end's side of the last.
+    // the other end's side of the first shelf, down or up the nearest gap
+    // between the regions of the shelves passed that has room for its
+    // lane (else the nearer margin), in by the gap on this end's side of
+    // the last.
     const shelfA = shelfIndexOf(a.region);
     const shelfB = shelfIndexOf(b.region);
     const step = shelfB - shelfA;
     const down = step > 0;
-    const margin = margins.reduce((nearer, candidate) =>
-      Math.abs(exit.base - candidate) + Math.abs(candidate - entry.base) <
-      Math.abs(exit.base - nearer) + Math.abs(nearer - entry.base)
-        ? candidate
-        : nearer,
-    );
-    const between: LaneChannel[] =
-      Math.abs(step) <= 1
-        ? [gapAt(gapAbove(Math.max(shelfA, shelfB)))]
-        : [
-            gapAt(gapAbove(down ? shelfA + 1 : shelfA)),
-            gapAt(margin),
-            gapAt(gapAbove(down ? shelfB : shelfB + 1)),
-          ];
+    let between: LaneChannel[] = [gapAt(gapAbove(Math.max(shelfA, shelfB)))];
+    if (Math.abs(step) > 1) {
+      const passed = [...placed.entries()]
+        .filter(([prefix]) => {
+          const shelf = shelfIndexOf(prefix);
+          return shelf > Math.min(shelfA, shelfB) && shelf < Math.max(shelfA, shelfB);
+        })
+        .map(([prefix, place]) => ({
+          left: place.x,
+          right: place.x + regionOf(prefix).w,
+        }));
+      const way = chooseShelfGap(passed, exit.base, entry.base, margins, taken);
+      taken.set(way.base, (taken.get(way.base) ?? 0) + 1);
+      between = [
+        gapAt(gapAbove(down ? shelfA + 1 : shelfA)),
+        way,
+        gapAt(gapAbove(down ? shelfB : shelfB + 1)),
+      ];
+    }
     const heads: PathCommand[][] = [];
     if (bundle.heads.has(bundle.a))
       heads.push(buildArrowhead(startX, portA, sideA === "left"));

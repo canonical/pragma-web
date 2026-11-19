@@ -45,7 +45,8 @@
 # namespace collapses to one box (`data-kind="region"`) in its own region:
 # its prefix at a hub's 16px, named wherever a hub is named, over what it
 # holds (its classes, `data-classes`, and the relations with both ends
-# inside it) at 14px, drawn only at full; a hub's height, at least 128px
+# inside it) at 14px, drawn only at full, its instances beside its prefix
+# as a class's count (`data-instances`); a hub's height, at least 128px
 # wide, inert. A relation with an end inside it is drawn from the box. A
 # relation to a class no loaded namespace holds reaches an external stub
 # (`data-kind="stub"`): a class box named by its compact term at 14px,

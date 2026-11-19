@@ -635,7 +635,7 @@ describe("over a layout whose rail opens on a box", () => {
     const link = box?.querySelector("a") as HTMLElement;
     expect(link.getAttribute("href")).toBe("/definitions?expand=aa");
     expect(link.getAttribute("aria-label")).toBe(
-      "Namespace aa, drawn as one box: 3 classes, 0 relations, 0 relations drawn from it. Opens the namespace",
+      "Namespace aa, drawn as one box: 3 classes, 0 instances, 0 relations, 0 relations drawn from it. Opens the namespace",
     );
     // Reached by Tab: no tabindex keeps it out of the order.
     expect(link.hasAttribute("tabindex")).toBe(false);

@@ -181,7 +181,9 @@ server, deterministically: two renders of a page give the same SVG.
   holds. Bridges are drawn in the strong line and named at rest by their
   property, near their head. A bridge runs through the channels beside
   columns and the gaps between regions and shelves; past a shelf it goes
-  out by the gap facing the other end and round the nearer margin. Every
+  out by the gap facing the other end and down the nearest gap between
+  two regions of the shelves passed that has room for its lane, round the
+  nearer margin only where none has. Every
   bridge keeps a lane of its own in each channel, gap and margin it runs
   along, whatever namespaces it joins, so no two share a line. A label
   with no room of its own is named when either end is in focus.
@@ -219,7 +221,10 @@ server, deterministically: two renders of a page give the same SVG.
 - **An opened view.** A box links to its namespace opened, at the
   address `/definitions?expand=<prefix>` (`/definitions?expand=surface`):
   the namespace drawn class by class and packed first, the others as
-  boxes. Its heading is the way back to the overview at rest, and says so
+  boxes, their shelves wrapped within the legible window of the
+  narrowest canvas the graph is drawn on (480px; 656px on the design
+  canvas). A box states its namespace's instances beside its prefix, as
+  a class states its own. Its heading is the way back to the overview at rest, and says so
   after its count ("· all namespaces"), keeping the address's other view
   keys. Every view opens by one rule: the whole map where it
   fits the canvas with every label at 12px or more on screen (a zoom of

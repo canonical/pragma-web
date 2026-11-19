@@ -72,13 +72,14 @@ export default function gatherDrawnInput<
     term: string,
     kind: "stub" | "region",
     members: number,
+    instanceCount = 0,
   ): GraphClassInput => ({
     uri,
     label: term,
     prefix,
     abstract: false,
     superclass: null,
-    instanceCount: 0,
+    instanceCount,
     fields: 0,
     kind,
     members,
@@ -96,6 +97,9 @@ export default function gatherDrawnInput<
           prefix,
           "region",
           requireEntry(sizes, prefix),
+          input.classes
+            .filter((klass) => klass.prefix === prefix)
+            .reduce((sum, klass) => sum + klass.instanceCount, 0),
         ),
       ),
       ...scope.stubs.map((iri) => {

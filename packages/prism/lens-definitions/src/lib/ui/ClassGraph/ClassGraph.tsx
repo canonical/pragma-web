@@ -270,7 +270,7 @@ export default function ClassGraph({
         data-h={node.h}
         data-hub={String(node.hub)}
         data-id={term}
-        data-instances={node.kind === "class" ? node.instanceCount : undefined}
+        data-instances={node.kind === "stub" ? undefined : node.instanceCount}
         data-kind={
           node.kind !== "class"
             ? node.kind
@@ -386,6 +386,7 @@ export default function ClassGraph({
     REGION_LABEL_ROW,
     REGION_LABEL_SIZE,
   );
+
   const labelBaseline = findCentredBaseline(LABEL_LINE_PITCH, LABEL_SIZE);
   const numeralBaseline = findCentredBaseline(
     LABEL_SIZE + 2 * LABEL_HALO,

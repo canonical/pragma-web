@@ -430,9 +430,15 @@ describe("ClassGraph", () => {
       const resting = nodeOf(draw(own), "surface");
       expect(resting.getAttribute("data-kind")).toBe("region");
       expect(resting.getAttribute("data-classes")).toBe("31");
-      // A box states no instance figure until one is served for it; a
-      // class states its own.
-      expect(resting.hasAttribute("data-instances")).toBe(false);
+      // A box states its namespace's instances, the sum of its classes'
+      // figures, as a class states its own.
+      expect(resting.getAttribute("data-instances")).toBe(
+        String(
+          FOUR_NAMESPACE_GRAPH.classes
+            .filter((klass) => klass.prefix === "surface")
+            .reduce((sum, klass) => sum + klass.instanceCount, 0),
+        ),
+      );
       expect(
         draw(own)
           .querySelector('.node[data-kind="concrete"]')
@@ -446,7 +452,7 @@ describe("ClassGraph", () => {
       expect(resting.getAttribute("role")).toBe("img");
       // What leaves the box is the edges drawn from it.
       expect(resting.getAttribute("aria-label")).toBe(
-        "Namespace surface, drawn as one box: 31 classes, 0 relations, 2 relations drawn from it",
+        `Namespace surface, drawn as one box: 31 classes, ${resting.getAttribute("data-instances")} instances, 0 relations, 2 relations drawn from it`,
       );
       zoom.bucket = "full";
       const container = draw(own);

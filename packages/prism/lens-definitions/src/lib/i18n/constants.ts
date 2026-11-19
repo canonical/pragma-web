@@ -36,9 +36,9 @@ export const MESSAGES = {
   "well.label": "Class graph",
   "well.name.stub": "Class {term}, outside the loaded namespaces, {relations}",
   "well.name.region":
-    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it",
+    "Namespace {prefix}, drawn as one box: {classes}, {instances}, {held}, {relations} drawn from it",
   "well.name.region.open":
-    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it. Opens the namespace",
+    "Namespace {prefix}, drawn as one box: {classes}, {instances}, {held}, {relations} drawn from it. Opens the namespace",
   "well.region.back.words": "· all namespaces",
   "well.region.back":
     "Namespace {prefix}, opened, {classes}: back to the overview of every namespace",
@@ -59,6 +59,10 @@ export const MESSAGES = {
     other: "{count} relations",
   },
   "well.region.holds": "{classes}, {relations}",
+  "well.instances.count": {
+    one: "{count} instance",
+    other: "{count} instances",
+  },
   "well.phone.label": "Class graph, in rail order",
   "rail.label": "Ontology terms",
   "rail.classes": "Classes",
