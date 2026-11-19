@@ -25,6 +25,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+function readRootTextSeat(host: HTMLElement, tier: string) {
+  const text = host.querySelector<HTMLElement>("[data-root-text-reference]");
+  if (!text) return null;
+  const css = getComputedStyle(text);
+  const scale =
+    parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
+  const occupied =
+    text.getBoundingClientRect().height + parseFloat(css.marginBlockEnd);
+  const expected = (tier === "site" ? 40 : 32) * scale;
+  const pass =
+    Math.abs(occupied - expected) < 0.05 &&
+    Math.abs(parseFloat(css.fontSize) - (tier === "site" ? 16 : 14) * scale) <
+      0.05;
+  host.dataset.rootTextSeatProof = pass ? "pass" : "fail";
+  return { occupied, expected, fontSize: css.fontSize, pass };
+}
+
 // Isolated frozen component Before: the real link/DOM is retained, but the
 // newly added internal label helper is absent as it was before this migration.
 function beforeLabel(children: ReactNode): ReactNode {
@@ -355,6 +372,7 @@ function Fit({
       setMetrics({
         tier,
         publicDensityClass: density,
+        rootTextSeat: readRootTextSeat(host, tier),
         viewport: window.innerWidth,
         policy: navigationDensityPolicy,
         enrollment:
@@ -661,6 +679,7 @@ function Fit({
             </div>
           </div>
         </div>
+        <p data-root-text-reference>Body</p>
         <output hidden data-density-fit={tier}>
           {JSON.stringify(metrics)}
         </output>
@@ -675,7 +694,9 @@ function Fit({
         density again after a real root reset. Intrinsic painted rows contain
         closure and touch the next row; no target height is authored. Other
         controls, interactive Chips and portals outside the trailing slot keep
-        their default seat.
+        their default seat. The Body reference occupies 32px in Docs/App
+        (previously 24px), and an unchanged 40px in Site, across every public
+        density class; plain text always reads the product-default inset.
       </p>
     </section>
   );
@@ -727,6 +748,7 @@ function NativeVariants({
       const nav = host.querySelector<HTMLElement>(".side-navigation");
       setMetrics({
         tier,
+        rootTextSeat: readRootTextSeat(host, tier),
         expanded: nav?.dataset.expanded,
         railWidth: nav?.getBoundingClientRect().width,
         rows: [
@@ -879,6 +901,7 @@ function NativeVariants({
             ],
           }}
         />
+        <p data-root-text-reference>Body</p>
         <output
           hidden
           data-density-native={`${tier}-${expanded}`}

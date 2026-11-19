@@ -28,6 +28,39 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 const tiers = ["site", "docs", "app"] as const;
 type Tier = (typeof tiers)[number];
+
+function rootTextSeats(host: HTMLElement) {
+  const scale =
+    parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
+  return [...host.querySelectorAll<HTMLElement>("p.p")]
+    .filter((text) => text.getBoundingClientRect().height > 0)
+    .map((text) => {
+      const site = text.closest(".site, .docs, .app")?.matches(".site") ?? true;
+      const css = getComputedStyle(text);
+      const range = document.createRange();
+      range.selectNodeContents(text);
+      const lines = new Set(
+        [...range.getClientRects()]
+          .filter((rect) => rect.height > 0)
+          .map((rect) => Math.round(rect.top * 64)),
+      ).size;
+      const occupied =
+        text.getBoundingClientRect().height + parseFloat(css.marginBlockEnd);
+      const expected =
+        ((site ? 40 : 32) + (lines - 1) * (site ? 24 : 20)) * scale;
+      return {
+        text: text.textContent,
+        lines,
+        occupied,
+        expected,
+        fontSize: css.fontSize,
+        pass:
+          lines > 0 &&
+          Math.abs(occupied - expected) < 0.05 &&
+          Math.abs(parseFloat(css.fontSize) - (site ? 16 : 14) * scale) < 0.05,
+      };
+    });
+}
 const image = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="64"><rect width="320" height="64" fill="#777"/><path d="M0 32H320" stroke="#fff"/></svg>')}`;
 
 function Reference({
@@ -321,7 +354,12 @@ function Measure({
         ];
       });
       setTicks(peerSeats);
-      setMetrics({ label, owners, cards, peerSeats });
+      const textSeats = rootTextSeats(host);
+      if (textSeats.length)
+        host.dataset.rootTextSeatProof = textSeats.every((seat) => seat.pass)
+          ? "pass"
+          : "fail";
+      setMetrics({ label, owners, cards, peerSeats, rootTextSeats: textSeats });
       onSummary?.(label, { viewport: window.innerWidth, cards });
     };
     void document.fonts.ready.then(measure);
@@ -682,7 +720,10 @@ function Page() {
         Global grid margins and horizontal gutters, standard surfaces and Card
         construction and expanded navigation gutters are adopted. The compact
         rail retains its current 52px width; the widened contrast is rejected.
-        Density enrollment remains a proposal.
+        Density enrollment remains a proposal. One-line Body now occupies 32px
+        in Docs/App (previously 24px), with Site unchanged at 40px. Both surface
+        variants use the current text seat; surface insets and gaps are
+        unchanged.
       </p>
       <h2>Global responsive layout · adopted</h2>
       <p className="surfaces-caption">
