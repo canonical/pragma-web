@@ -1,0 +1,67 @@
+---
+# EntityTable — the table of facts of a single-type index: a header row of
+# sort links, one per value field the index's nodes carry, then one row per
+# entity, its title cell first and a value cell per column. A row is 32px
+# (one line) or 56px (two lines), as the index declares. Cells carry
+# `data-property` with the field's id from `Node.values`, in the header's
+# order; headers read the first row's value labels.
+#
+# The root is a subgrid over every column of the grid that holds it; the
+# header row and each row are subgrids of it, the title cell spanning two
+# columns and each value cell one. A row is clipped at its own height, so
+# the value cells that find no column on its line leave whole, the last
+# first. Below two groups the header row is hidden and a row keeps the
+# title and the facts that fit: the scented row's two facts at 390.
+# Rows stack with no gap between them, the gutter between their columns.
+#
+# Token ledger (no symbol to bind):
+#   space.400 (32px) for a one-line row's block size: the matrix's row.
+#   space.300 x 2 + space.100 (56px) for a two-line row's block size: two
+#   24px lines between 4px insets, as W3's two-line row.
+#
+# Roster namespaces: grid.gutter, space.0, space.100, space.300,
+# space.400 (row heights).
+node:
+  uri: prism.component.entity_table
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap.block: space.0
+    spacing.gap.inline: grid.gutter
+  edges:
+    - node:
+        role: header row
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          size.blockSize: space.400
+          typography.color: color.text.muted
+        edges:
+          - node:
+              role: sort link
+              styles:
+                typography.weight: typography.weight.regular
+            relation: { cardinality: "1..*", slotName: columns }
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: row
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          size.blockSize: space.400
+        edges:
+          - node:
+              role: title cell
+              styles:
+                layout.grid.column: "span 2"
+                typography.overflow: ellipsis
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: value cell
+              styles:
+                typography.overflow: ellipsis
+            relation: { cardinality: "0..*", slotName: cells }
+      relation: { cardinality: "0..*", slotName: rows }
