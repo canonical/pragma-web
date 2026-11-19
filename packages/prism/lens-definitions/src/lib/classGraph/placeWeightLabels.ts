@@ -58,24 +58,27 @@ function boundPath(d: string): Rect {
   return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
 }
 
-/** The point at a share of a run of stretches' length, from its start. */
+/**
+ * The point at a share of a run of stretches' length, from its start: on
+ * the stretch where that length ends, or on the last one.
+ */
 function findPointAt(runs: readonly Run[], share: number): Point {
   const lengths = runs.map(({ from, to }) =>
     Math.hypot(to[0] - from[0], to[1] - from[1]),
   );
   let rest = share * lengths.reduce((sum, length) => sum + length, 0);
-  for (const [index, run] of runs.entries()) {
-    const length = requireAt(lengths, index);
-    if (rest <= length || index === runs.length - 1) {
-      const part = length === 0 ? 0 : Math.min(1, rest / length);
-      return [
-        run.from[0] + (run.to[0] - run.from[0]) * part,
-        run.from[1] + (run.to[1] - run.from[1]) * part,
-      ];
-    }
-    rest -= length;
+  let index = 0;
+  while (index < runs.length - 1 && rest > requireAt(lengths, index)) {
+    rest -= requireAt(lengths, index);
+    index += 1;
   }
-  return requireAt(runs, 0).from;
+  const run = requireAt(runs, index);
+  const length = requireAt(lengths, index);
+  const part = length === 0 ? 0 : Math.min(1, rest / length);
+  return [
+    run.from[0] + (run.to[0] - run.from[0]) * part,
+    run.from[1] + (run.to[1] - run.from[1]) * part,
+  ];
 }
 
 /**
