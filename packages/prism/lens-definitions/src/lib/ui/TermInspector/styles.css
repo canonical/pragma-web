@@ -198,14 +198,18 @@
     overflow-wrap: anywhere;
   }
 
+  /* A column's heading and a figure break only between words: the
+   * terms' columns give up their width first. */
   .ds.term-inspector .cell.is-heading {
     font-weight: var(--term-inspector-caps-weight);
     color: var(--term-inspector-muted-color);
+    overflow-wrap: normal;
   }
 
   .ds.term-inspector .cell.is-figure {
     padding-inline-end: 0;
     text-align: end;
     font-variant-numeric: tabular-nums;
+    overflow-wrap: normal;
   }
 }

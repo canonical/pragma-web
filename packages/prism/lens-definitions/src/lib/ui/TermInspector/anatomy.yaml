@@ -205,10 +205,12 @@ node:
                                 styles:
                                   typography.weight: typography.text.secondary.fontWeight
                                   typography.color: color.text.muted
+                                  typography.wrap: normal
                             - node:
                                 role: figure (.is-figure)
                                 styles:
                                   spacing.internal.inline.end: 0
+                                  typography.wrap: normal
                                   typography.align: end
                                   typography.variant.numeric: tabular-nums
                         relation: { cardinality: "1..*", slotName: cell }
