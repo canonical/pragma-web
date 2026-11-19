@@ -1157,16 +1157,29 @@ describe.each(["1440", "912"])("an opened view at %s px", (width) => {
         },
       );
       expect(errors).toEqual([]);
-      const { boxes = [], names = [], namesInWayBack } = seen.shelf ?? {};
+      const {
+        boxes = [],
+        names = [],
+        none = [],
+        namesInWayBack,
+      } = seen.shelf ?? {};
       expect(boxes.length).toBeGreaterThan(1);
       expect(boxes.filter(({ across }) => !across)).toEqual([]);
       expect(namesInWayBack).toBe(false);
       // The opened namespace's label row names its bridges, outside the way
-      // back: ds's reach its two stubs, surface's reach ds.
-      expect(
-        names.filter(({ ns }) => ns === prefix).length,
-        `${prefix}'s label row`,
-      ).toBeGreaterThan(0);
+      // back (ds's reach its two stubs), or, for a namespace the served
+      // graph relates to no other (surface: `composes` states no domain),
+      // says it has none.
+      const named = names.filter(({ ns }) => ns === prefix);
+      const served = [...bridges.keys()].filter((pair) =>
+        pair.split(" ").includes(prefix),
+      );
+      if (named.length === 0) {
+        expect(served, `${prefix}'s served bridges`).toEqual([]);
+        expect(none, `${prefix}'s label row`).toContain(prefix);
+      } else {
+        expect(none, `${prefix}'s label row`).not.toContain(prefix);
+      }
       // A bridge into a stub counts relations no loaded namespace serves
       // between two prefixes; its order is read below all the same.
       for (const name of names.filter(({ to }) => loaded.has(to))) {

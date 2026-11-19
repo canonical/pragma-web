@@ -155,6 +155,8 @@ export interface OpenedShelfMeasure {
     readonly to: string;
     readonly relations: number;
   }[];
+  /** Each region whose label row says it has no bridge. */
+  readonly none: readonly string[];
   /** Whether a bridge's name sits inside the way back's link. */
   readonly namesInWayBack: boolean;
 }
