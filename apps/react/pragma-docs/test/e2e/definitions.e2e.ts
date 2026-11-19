@@ -1068,6 +1068,7 @@ describe.each(["1440", "912"])("an opened view at %s px", (width) => {
     (candidate) => candidate.name === width,
   );
   const bridges = new Map<string, number>();
+  const loaded = new Set<string>();
 
   beforeAll(async () => {
     const graph = await fetchServedGraph(
@@ -1076,6 +1077,7 @@ describe.each(["1440", "912"])("an opened view at %s px", (width) => {
     for (const [pair, count] of countServedBridges(graph)) {
       bridges.set(pair, count);
     }
+    for (const ontology of graph.ontologies) loaded.add(ontology.prefix);
   }, PAGE_SETTLE_MS);
 
   it.each(["surface", "ds"])(
@@ -1098,7 +1100,9 @@ describe.each(["1440", "912"])("an opened view at %s px", (width) => {
       expect(boxes.length).toBeGreaterThan(1);
       expect(boxes.filter(({ across }) => !across)).toEqual([]);
       expect(namesInWayBack).toBe(false);
-      for (const name of names) {
+      // A bridge into a stub counts relations no loaded namespace serves
+      // between two prefixes; its order is read below all the same.
+      for (const name of names.filter(({ to }) => loaded.has(to))) {
         expect(name.relations, `${name.ns} to ${name.to}`).toBe(
           bridges.get([name.ns, name.to].sort().join(" ")),
         );
