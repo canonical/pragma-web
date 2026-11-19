@@ -25,7 +25,10 @@ interface FieldFilter {
 
 interface FacetedInstances {
   readonly totalCount: number;
-  readonly edges: readonly { readonly node: { readonly uri: string } }[];
+  readonly edges: readonly {
+    readonly cursor: string;
+    readonly node: { readonly uri: string };
+  }[];
   readonly facets: readonly {
     readonly field: string;
     readonly values: readonly {
@@ -35,10 +38,10 @@ interface FacetedInstances {
   }[];
 }
 
-const FACETED_QUERY = `query Faceted($classUri: ID!, $filters: [FieldFilter!], $sort: FieldSort, $first: Int) {
-  facetedInstances(classUri: $classUri, filters: $filters, sort: $sort, first: $first) {
+const FACETED_QUERY = `query Faceted($classUri: ID!, $filters: [FieldFilter!], $sort: FieldSort, $first: Int, $after: String) {
+  facetedInstances(classUri: $classUri, filters: $filters, sort: $sort, first: $first, after: $after) {
     totalCount
-    edges { node { uri } }
+    edges { cursor node { uri } }
     facets { field values { value count } }
   }
 }`;
@@ -130,6 +133,17 @@ describe("Query.facetedInstances", () => {
     expect(sorted.totalCount).toBe(26);
     expect(sorted.edges).toHaveLength(3);
     expect(countValues(sorted, "servesLine")).not.toEqual([]);
+  });
+
+  it("pages on after a cursor", async () => {
+    const readUris = (selection: FacetedInstances) =>
+      selection.edges.map((edge) => edge.node.uri);
+    const head = await facet(STATION, [], { first: 6 });
+    const page = await facet(STATION, [], {
+      first: 3,
+      after: head.edges.at(2)?.cursor,
+    });
+    expect(readUris(page)).toEqual(readUris(head).slice(3));
   });
 
   it("refuses a sort the list cannot make", async () => {
