@@ -1,0 +1,96 @@
+@layer ds.components.apps-workplace {
+  :root {
+    --segmented-control-color-border: var(
+      --color-border-muted,
+      rgb(0 0 0 / 10%)
+    );
+    --segmented-control-border-width: 1.5px;
+    --segmented-control-padding-block: var(
+      --tmp-dimension-segmented-control-padding-block,
+      4.5px
+    );
+    --segmented-control-padding-inline: var(--dimension-200, 16px);
+  }
+
+  .ds.segmented-control {
+    /* Surface-dependent colors live here, not on :root, so they follow the surface. */
+    --segmented-control-color-background: var(
+      --surface-color-background,
+      var(--color-background, #fff)
+    );
+    --segmented-control-color-background-selected: var(
+      --color-background-active,
+      color-mix(
+        in srgb,
+        var(--surface-color-text, var(--color-text, #000)) 8%,
+        var(--surface-color-background, var(--color-background, #fff))
+      )
+    );
+    --segmented-control-color-background-hover: var(
+      --hover--color-foreground-ghost,
+      var(--segmented-control-color-background-selected)
+    );
+    --segmented-control-color-text: var(
+      --surface-color-text,
+      var(--color-text)
+    );
+
+    display: inline-flex;
+    max-width: 100%;
+    padding-bottom: var(--baseline-kick-segmented-control-bottom, 0);
+  }
+
+  .ds.segmented-control > .list {
+    display: flex;
+    max-width: 100%;
+  }
+
+  .ds.segmented-control > .list > .item {
+    appearance: none;
+    min-width: 0;
+    overflow: hidden;
+    padding: var(--segmented-control-padding-block)
+      var(--segmented-control-padding-inline);
+    cursor: pointer;
+    color: var(--segmented-control-color-text);
+    font: inherit;
+    line-height: var(--size-line-height-text, 24px);
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background-color: var(--segmented-control-color-background);
+    border: 0;
+    border-inline-end: var(--segmented-control-border-width) solid
+      var(--segmented-control-color-border);
+    border-radius: 0;
+    transition: background-color var(--motion-duration-fast, 100ms)
+      var(--motion-easing-standard, ease-out);
+
+    &:hover:not(:disabled, .selected) {
+      background-color: var(--segmented-control-color-background-hover);
+    }
+
+    &:focus-visible {
+      z-index: 1;
+      outline: var(--focus-outline-width, 2px) solid
+        var(--color-focus-ring, currentColor);
+      outline-offset: var(--focus-outline-offset, -2px);
+    }
+
+    &.selected {
+      background-color: var(--segmented-control-color-background-selected);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      color: var(--color-text-disabled, currentColor);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .ds.segmented-control > .list > .item.selected {
+      text-decoration: underline 2px;
+      text-underline-offset: 0.25em;
+    }
+  }
+}
