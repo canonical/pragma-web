@@ -118,6 +118,13 @@ node:
           typography.color: color.text.muted
       relation: { cardinality: "0..*", slotName: count }
     - node:
+        # The way back's words after the opened namespace's count, at the
+        # 14px the layout measures them in.
+        role: back
+        styles:
+          typography.size: typography.text.secondary.fontSize
+      relation: { cardinality: "0..1", slotName: back }
+    - node:
         # A region's bridges, named after its heading and outside the way
         # back: "· 3 relations to geo", the heaviest first, as many as the
         # region's width holds; the rest keep their labels on the canvas.

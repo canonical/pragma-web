@@ -58,6 +58,11 @@
     color: var(--class-graph-muted-color);
   }
 
+  /* The way back's words, set at the size the layout measures them. */
+  .ds.class-graph .back {
+    font-size: var(--class-graph-label-font-size);
+  }
+
   /* A region's bridges, named after its heading as its count is set. */
   .ds.class-graph .region-bridges {
     font-size: var(--class-graph-label-font-size);
