@@ -369,6 +369,67 @@ describe("the overview's record, on the metro", () => {
     },
   );
 
+  // A counted relation's figure on metro:Station's page is a link to its
+  // property's page: a reader's pointer, pressed at the numeral's centre
+  // (not a scripted click on the element), opens it, and that page lists
+  // the class edge with the same count.
+  it("opens a count's property from its numeral by a real pointer click, whose page lists the class edge with that count", async () => {
+    const station = "/definitions/metro%3AStation";
+    const [desktop] = VIEWPORTS;
+    const page = await browser.newPage({
+      viewport: { width: desktop.width, height: desktop.height },
+    });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    let numerals: readonly WeightLinkMeasure[] = [];
+    let path = "";
+    let counts: readonly string[] = [];
+    try {
+      const origins = [new URL(server.base).origin, new URL(graph.base).origin];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.routeWebSocket(
+        () => true,
+        () => {
+          // Left unconnected, the dev server's live-reload socket stays silent.
+        },
+      );
+      await page.goto(new URL(station, server.base).href, {
+        waitUntil: "networkidle",
+        timeout: PAGE_SETTLE_MS,
+      });
+      await page.evaluate(() => document.fonts.ready.then(() => undefined));
+      numerals = await page.evaluate(measureWeightLinks);
+      const numeral = numerals.at(0);
+      if (numeral !== undefined) {
+        await page.mouse.click(numeral.centre.x, numeral.centre.y);
+        await page.waitForURL((url) => url.pathname === numeral.href, {
+          timeout: PAGE_SETTLE_MS,
+        });
+        path = new URL(page.url()).pathname;
+        const rows = page.locator(".ds.term-inspector .edges .row");
+        await rows.first().waitFor({ timeout: PAGE_SETTLE_MS });
+        counts = await rows.evaluateAll((items) =>
+          items.map(
+            (item) => item.querySelector(".cell.is-figure")?.textContent ?? "",
+          ),
+        );
+      }
+    } finally {
+      await page.close();
+    }
+    expect(errors).toEqual([]);
+    const [numeral] = numerals;
+    expect(numeral).toBeDefined();
+    expect(numeral?.tabIndex).toBe("-1");
+    expect(path).toBe(numeral?.href);
+    expect(path).not.toBe(station);
+    expect(counts).toContain(String(numeral?.count));
+  });
+
   it("crosses no box with a bridge it does not join, and states each namespace's instances on its box, at rest and with each namespace opened", () => {
     const instances = new Map(
       (served.graph?.ontologies ?? []).map((ontology) => [
