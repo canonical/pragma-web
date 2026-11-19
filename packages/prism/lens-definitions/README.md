@@ -258,6 +258,8 @@ server, deterministically: two renders of a page give the same SVG.
   `data-focus` on a term page.
 - **The stated limits.** The canvas names only the labels it can seat:
   on a term page a relation whose label finds no seat is drawn unnamed.
+  A label the canvas seats may lie on a line of its own bundle; the
+  inspector names it too.
   The term page's inspector lists every relation of the class with the
   statements served on its edge, the heaviest first, its count a link to
   the property, so each one drawn is named there. Three lanes in a channel beside a column: a
