@@ -40,8 +40,16 @@
     display: flow-root;
     font-size: var(--ds-typography-body-font-size);
     line-height: var(--ds-typography-body-line-height);
-    margin-block: 0 var(--ds-text-grid-compensation);
-    padding-block: var(--ds-text-baseline-nudge) 0;
+    margin-block: 0
+      calc(
+        var(--_text-seat-control-inset, var(--ds-spacing-control-inset)) +
+        var(--ds-text-grid-compensation)
+      );
+    padding-block: calc(
+        var(--_text-seat-control-inset, var(--ds-spacing-control-inset)) +
+        var(--ds-text-baseline-nudge)
+      )
+      0;
   }
 
   /* A set of abutting control rows closes once, from its actual intrinsic block
