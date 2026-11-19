@@ -70,10 +70,10 @@ const componentCssClassName = "ds node-list";
  * hidden.
  *
  * In the `table` renderer, a list whose nodes share one type up to their
- * superclasses is a table of facts: its columns are the first node's
- * values but those `omits` names, each header a link that sorts the list
- * by it, and each row the node's title and its values in the columns'
- * order. A mixed list, or one whose nodes carry no values, keeps the rows.
+ * superclasses is a table of facts: its columns are the values of the
+ * answer's first node, before any sort, but those `omits` names, each
+ * header a link that sorts the list by it, and each row the node's title
+ * and its values in the columns' order. A mixed list, or one whose nodes carry no values, keeps the rows.
  * The `sort` orders the nodes by a value's text in every renderer, and
  * the `selected` node, by address or curie, is highlighted in every
  * renderer: the table's row is marked selected, a row or a card current.
@@ -103,19 +103,17 @@ export default function NodeList({
 }: NodeListProps): ReactElement {
   const { pathname, search } = useViewLocation();
   const order = readListSort(sort);
-  const data = orderByValue(
-    useFragment(nodeFragment, nodes).filter(
-      ({ _meta }) => _meta.type.visibility !== HIDDEN_VISIBILITY,
-    ),
-    order,
+  const shown = useFragment(nodeFragment, nodes).filter(
+    ({ _meta }) => _meta.type.visibility !== HIDDEN_VISIBILITY,
   );
+  const data = orderByValue(shown, order);
   const listClassName = [componentCssClassName, className]
     .filter(Boolean)
     .join(" ");
   const selectedUri = data.find(
     ({ uri, _meta }) => uri === selected || _meta.curie === selected,
   )?.uri;
-  const fields = (data.at(0)?.values ?? []).filter(
+  const fields = (shown.at(0)?.values ?? []).filter(
     ({ field }) => !omits.includes(field),
   );
   if (

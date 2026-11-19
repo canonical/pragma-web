@@ -299,6 +299,30 @@ describe("NodeList's table of facts", () => {
     ).toHaveAttribute("href", "/?sort=-code");
   });
 
+  it("takes its columns from the answer's first node, whatever the sort", () => {
+    const { container } = renderTable({ sort: "platforms" }, [
+      createValuedNode("Northgate", "NG"),
+      {
+        ...createValuedNode("Central", "CE", INTERCHANGE_TYPE),
+        values: [
+          { field: "code", label: "Code", text: "CE" },
+          { field: "platforms", label: "Platforms", text: "4" },
+        ],
+      },
+    ]);
+    expect(
+      Array.from(
+        container.querySelectorAll("th.title"),
+        (title) => title.textContent,
+      ),
+    ).toEqual(["Central", "Northgate"]);
+    expect(
+      Array.from(container.querySelectorAll("th.column"), (column) =>
+        column.getAttribute("data-property"),
+      ),
+    ).toEqual(["code", "inZone"]);
+  });
+
   it("marks a descending sort on its header", () => {
     const { container } = renderTable({ sort: "-code" });
     expect(
