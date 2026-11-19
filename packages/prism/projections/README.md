@@ -90,7 +90,9 @@ the link.
 - **`EntityList`**: the shared list view of an index: its children as
   rows in an ordered list (the `table` renderer, the default) or as cards
   in the published `Cards` group, two columns each (the `cards` renderer),
-  or one line when it has none. It has no toolbar: the lens's strip
+  or one line when it has none. Given `columns` and `rows`, the `table`
+  renderer draws `EntityTable`: a header row of sort links and one
+  `data-property` cell per column. It has no toolbar: the lens's strip
   switches the renderer and counts the entries.
 
 ## Installation
@@ -355,6 +357,9 @@ its type's arm. It keeps no renderer of its own: the lens reads it from
 the page's address (`as=`) and passes its name with the empty line. A node
 whose type the graph's type lens hides (`_meta.type.visibility` is
 `HIDDEN`) is a value, never an entity, so the list skips it.
+In the `table` renderer, a list whose nodes share one type up to their
+superclasses draws a table of facts from each node's `values` (less the
+`omits`), headers sorting by `sort=`; a mixed list keeps the rows.
 
 ```tsx
 <NodeList
@@ -419,12 +424,16 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `OntologyPropertyCommandProps`, `OntologyPropertyGraphNodeProps`.
 - Representations: `EntityChip`, `EntityRow`, `EntityCard` (its
   depiction is its static Specimen), `EntityCommand`,
-  `EntityGraphNode`, `EntityList`, `PEEK_OPEN_DELAY_MS` and
+  `EntityGraphNode`, `EntityList`, `EntityTable` (a single-type list's
+  table of facts), `LIST_LINES` (the lines a row may take),
+  `PEEK_OPEN_DELAY_MS` and
   `PEEK_CLOSE_DELAY_MS` (how long a chip's peek waits to open and to
   close); types `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
   `EntityFact` (one fact a card or a row states),
   `SpecimenKind`, `EntityCommandProps`, `EntityGraphNodeProps`,
-  `EntityListProps`, `EntityListRenderer`.
+  `EntityListProps`, `EntityListRenderer`, `EntityTableProps`,
+  `EntityTableRow`, `EntityTableCell`, `ListColumn` (a table column and
+  its sort link), `ListLines`.
 - Marks and swatches: `SwatchMark` (the 16px mark of an entity whose
   colour is its own data, such as a line), `TokenMark` (a design token's
   16px mark, its light and dark values side by side) and `TokenSwatch`
