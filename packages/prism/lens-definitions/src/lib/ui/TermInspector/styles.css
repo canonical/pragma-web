@@ -195,11 +195,11 @@
     border-bottom-color: var(--term-inspector-rule-color);
     text-align: start;
     vertical-align: baseline;
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
   }
 
-  /* A column's heading and a figure break only between words: the
-   * terms' columns give up their width first. */
+  /* A column's heading and a figure break only between words; a term
+   * breaks only between words or right after its prefix's colon. */
   .ds.term-inspector .cell.is-heading {
     font-weight: var(--term-inspector-caps-weight);
     color: var(--term-inspector-muted-color);
