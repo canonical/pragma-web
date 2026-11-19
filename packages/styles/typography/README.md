@@ -1,6 +1,6 @@
 # @canonical/styles-typography
 
-Baseline grid alignment for the Canonical Design System. This package provides three interchangeable CSS engines that snap text baselines to a configurable grid, plus the typography tokens and the element rules that bridge `@canonical/design-tokens` to the engine's variable contract.
+Baseline grid alignment for the Canonical Design System. This package provides three CSS engines that snap text baselines to a configurable grid, plus the typography tokens and the element rules that bridge `@canonical/design-tokens` to the engine's variable contract. The default cap engine also aligns root-size text with the product's default controls; the metrics and trim engines retain their separate text geometry.
 
 ## Quick Start
 
@@ -51,7 +51,7 @@ Not for what it includes, and never for what it leaves out.
 | --- | --- |
 | `tokens.css` | **the values.** The names that map the design tokens' typographic scale onto what the engines and the element rules read. It declares custom properties and styles nothing. |
 | `elements.css` | **what bare elements get.** `body`, `h1`–`h6`, `p`, `.p`, `.code`, `.editorial`. |
-| `baseline-cap.css`, `baseline-metrics.css`, `baseline-trim.css` | **the engines.** The arithmetic that puts a line on the grid. Interchangeable, one loaded at a time. |
+| `baseline-cap.css`, `baseline-metrics.css`, `baseline-trim.css` | **the engines.** The arithmetic that puts a line on the grid. Select one; only the cap engine adds the product-default inset to root-size text. |
 | `index.css` | **the whole**, and nothing else. It composes the tokens, the element rules and the default engine, in that order. |
 
 Each of the five is an entry point, and the name in the manifest is the name of the concept.
@@ -157,12 +157,16 @@ The baseline engines solve this by computing where the first baseline falls with
  +----------------------------------------------+
 ```
 
-The `mod()` CSS function does the heavy lifting:
+The default cap engine rounds the natural baseline up to the next grid line, then quantizes the difference to the browser's 1/64px layout unit:
 
 ```css
---top-nudge: calc(
-  var(--baseline-height) -
-  mod(var(--baseline-position), var(--baseline-height))
+--_text-unseated-nudge: round(
+  nearest,
+  calc(
+    round(up, var(--baseline-position), var(--text-baseline-unit)) -
+    var(--baseline-position)
+  ),
+  0.015625px
 );
 ```
 
@@ -180,7 +184,9 @@ Three engines implement the same grid-snap pattern with different trade-offs. Im
 
 Uses the browser-native `cap` CSS unit to resolve font metrics at render time. No JavaScript extraction step, no per-font variables. Changing `font-family` on an element automatically updates the `1cap` value the engine uses.
 
-The baseline position formula is `(line-height + 1cap) / 2` — the browser resolves `1cap` from the font's OpenType tables natively. With the shared spacing roles loaded, text matching the product root's font size adds the default control inset to its start padding and end compensation. Docs/App body text occupies 32px per one-line seat, including App h5/h6; larger headings retain their existing geometry. Wrapped lines add the body line height. Text never reads the density member.
+The baseline position formula is `(line-height + 1cap) / 2` — the browser resolves `1cap` from the font's OpenType tables natively. With the shared spacing roles loaded, text matching the product root's font size adds the default control inset to its start padding and end compensation. The comparison uses the owner's rendered size (`1em`), including direct `font-size` overrides, rather than its `--font-size` input. Equality is exact: any nonzero size difference excludes the added inset, including differences smaller than 1/64px. Equivalent `px` and `rem` values compare equally after resolution.
+
+Docs/App body text occupies 32px per one-line seat, including App h5/h6; larger headings retain their existing geometry. Wrapped lines add the body line height. Text never reads the density member. A shell that already owns the text's block padding and closure, such as a RichChoices card, keeps both text edges unseated. Before comparisons reconstruct the old padding and compensation in story CSS; shipped styles expose no comparison switch.
 
 | Browser | `round()` | `cap` unit | This engine's floor |
 |---------|-----------|------------|---------------------|
@@ -350,12 +356,12 @@ The baseline grid is rendered as a red 1px line overlay so alignment errors are 
 
 ## Browser Support
 
-All engines require `mod()` for the grid-snap calculation:
+The cap engine uses `round()` for grid alignment; the metrics and trim engines use `mod()`:
 
 | Feature | Used by | Chrome | Safari | Firefox |
 |---------|---------|--------|--------|---------|
-| `mod()` | all three engines | 125 | 15.4 | 118 |
-| `round()` | the line-height fallback in `elements.css` | 125 | 15.4 | 118 |
+| `mod()` | the metrics and trim engines | 125 | 15.4 | 118 |
+| `round()` | the cap engine and line-height fallback in `elements.css` | 125 | 15.4 | 118 |
 | `cap` unit | the cap and text-trim engines | 118 | 17.2 | 97 |
 | `text-box-trim` | the text-trim engine only | 133 | 18.2 | 154 |
 
@@ -363,7 +369,7 @@ Read the table by engine, not row by row — an engine's floor is the highest nu
 
 | Engine | Chrome | Safari | Firefox | What binds |
 |--------|--------|--------|---------|------------|
-| `baseline-cap.css` | 125 | 17.2 | 118 | `mod()`, and the `cap` unit in Safari |
+| `baseline-cap.css` | 125 | 17.2 | 118 | `round()`, and the `cap` unit in Safari |
 | `baseline-metrics.css` | 125 | 15.4 | 118 | `mod()` throughout |
 | `baseline-trim.css` | 133 | 18.2 | 154 | `text-box-trim` throughout |
 
@@ -371,4 +377,4 @@ One caveat on that table, and it is a real one.
 
 **Below `text-box-trim`, the text-trim engine does not hold the grid.** The trim is skipped, the element gets its half-leading back, and the nudge that survives — `mod(calc(-1 * 1cap), unit)` — was computed for a trimmed box and never reads the line height, so it cannot compensate. Measured in Chromium with a 16px serif on a 24px line: with the trim applied the first baseline sits at 12px on a 4px grid, 16px on an 8px grid and 12px on a 12px grid, every one a whole number of units; with the trim ignored it moves 6.516px in each case, which is 1.63, 0.81 and 0.54 units. The element's outer height stays a whole number of units, so blocks still stack on the grid, but the text inside them does not sit on it. A browser below the floor should use the cap engine, whose nudge is computed from the untrimmed line box.
 
-`mod()` is the hard floor. Below it no engine computes a nudge at all and text falls back to its natural leading.
+`round()` or `mod()` supplies each engine's numeric floor. Below the relevant function's support, that engine computes no nudge and text falls back to its natural leading.
