@@ -26,8 +26,9 @@ describe("ComboboxInput (SSR)", () => {
         value={["apple", "banana"]}
       />,
     );
-    expect(html).toContain("Apple<span");
-    expect(html).toContain("Banana<span");
+    // Each chip is its label followed by the decorative remove icon.
+    expect(html).toContain("Apple<svg");
+    expect(html).toContain("Banana<svg");
     expect(html).toContain('type="hidden" name="fruit" value="apple"');
     expect(html).toContain('type="hidden" name="fruit" value="banana"');
   });
