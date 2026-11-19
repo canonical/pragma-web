@@ -10,7 +10,8 @@ type InspectorProbeProps = { readonly term: string | undefined } & Omit<
 
 /**
  * The inspector over the store at `term`, handed the lookups and the
- * ontologies as the workspace's inspector socket hands them.
+ * ontologies as the workspace's inspector socket hands them; class edges
+ * passed to the probe stand in for the store's.
  *
  * @note Impure: reads the Relay store.
  */
@@ -21,8 +22,8 @@ export default function InspectorProbe({
   const { data } = useCapturedExplorer(term);
   return (
     <TermInspector
-      {...props}
       classEdges={data.classEdges}
+      {...props}
       classRef={data.ontologyClass}
       namespaces={data.ontologies.map(({ prefix, namespace }) => ({
         prefix,

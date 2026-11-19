@@ -20,7 +20,11 @@ import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 import GraphOverview from "./GraphOverview.js";
 
 /** The overview over the store, beside a readout of the asked region. */
-function Overview(): ReactElement {
+function Overview({
+  edges = classEdges,
+}: {
+  readonly edges?: typeof classEdges;
+}): ReactElement {
   const { data } = useCapturedExplorer();
   const ontologies = useFragment<TermInspector_ontologies$key>(
     termInspectorOntologiesFragmentNode,
@@ -34,7 +38,7 @@ function Overview(): ReactElement {
       </output>
       <GraphOverview
         className="custom-class"
-        classEdges={classEdges}
+        classEdges={edges}
         data-testid="overview"
         ontologies={ontologies}
       />
@@ -42,14 +46,14 @@ function Overview(): ReactElement {
   );
 }
 
-/** Mount the overview over the captured store. */
-function renderOverview(): HTMLElement {
+/** Mount the overview over the captured store, with its class edges. */
+function renderOverview(edges?: typeof classEdges): HTMLElement {
   render(
     createStripHarness(
       "/definitions",
       definitionsExplorerRecords,
       createFetchSpy(),
-      <Overview />,
+      <Overview edges={edges} />,
     ),
   );
   return screen.getByTestId("overview");
@@ -264,5 +268,17 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
         String(undeclared.at(index)?.count),
       );
     }
+  });
+
+  it("says so when every observed edge is declared", () => {
+    const declared = classEdges.filter((edge) => edge.declared);
+    expect(declared.length).toBeGreaterThan(0);
+    expect(listUndeclaredEdges(declared)).toEqual([]);
+    const root = renderOverview(declared);
+    const section = root.querySelector(".undeclared");
+    expect(section?.querySelector(".edges")).toBeNull();
+    expect(section?.querySelector(".prose")?.textContent).toBe(
+      String(MESSAGES["inspector.overview.undeclared.none"]),
+    );
   });
 });
