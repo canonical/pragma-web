@@ -188,6 +188,16 @@ The baseline position formula is `(line-height + 1cap) / 2` — the browser reso
 
 Docs/App body text occupies 32px per one-line seat, including App h5/h6; larger headings retain their existing geometry. Wrapped lines add the body line height. Text never reads the density member. A shell that already owns the text's block padding and closure, such as a RichChoices card, keeps both text edges unseated. Before comparisons reconstruct the old padding and compensation in story CSS; shipped styles expose no comparison switch.
 
+#### Private opt-out for chrome-owned text
+
+Set `--_text-seat-inset: 0px` on a shell whose own padding already provides the control inset. This inherited private input is read by both the cap engine and `@canonical/styles`'s `.spacing-text-seat` helper, so it covers headings, prose, field labels, toggle rows and options inside that shell. Without an override, both use the product's default control inset and apply it only at the root font size. Their computed result is `--_text-seat-applied-inset`.
+
+The consumers are the Accordion header and the RichChoices card label. Keep the override on the actual shell so it does not reach neighboring content. Boxed controls retain their own control layout; this input governs text only. It is an internal implementation contract, not a design token or a public modifier.
+
+Stacked fields keep a seated label's complete start padding and end compensation. Their following item gap absorbs the inset: `max(0px, item gap - control inset)`. This makes the Docs/App label-to-payload layout gap zero while Site keeps its 8px gap. The label's baseline-to-input distance is preserved, and a label beside its input retains the same baseline alignment. A shell's private text opt-out also prevents this gap absorption when its label is unseated.
+
+This field rule targets the standard Wrapper label, which uses the product's root type size. Its layout gap follows the field structure and resolved inset; directly overriding a label's font size does not change that gap calculation. The text helper still uses the actual font size to decide its own padding and compensation.
+
 | Browser | `round()` | `cap` unit | This engine's floor |
 |---------|-----------|------------|---------------------|
 | Chrome  | 125+      | 118+       | **125+**            |

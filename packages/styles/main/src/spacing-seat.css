@@ -13,17 +13,20 @@
     /* Compare the font this owner renders, including direct font-size rules.
        Exact equality selects the whole default inset; any difference keeps
        the original text geometry. The rounding step is nonzero at zero inset. */
-    --_ds-text-seat-inset: max(
+    --_text-seat-applied-inset: max(
       0px,
       calc(
-        var(--ds-spacing-control-inset, 0px) -
+        var(--_text-seat-inset, var(--ds-spacing-control-inset, 0px)) -
         round(
           up,
           max(
             calc(1em - var(--ds-typography-body-font-size, 1em)),
             calc(var(--ds-typography-body-font-size, 1em) - 1em)
           ),
-          max(var(--ds-spacing-control-inset, 0px), 1px)
+          max(
+            var(--_text-seat-inset, var(--ds-spacing-control-inset, 0px)),
+            1px
+          )
         )
       )
     );
@@ -58,9 +61,9 @@
     font-size: var(--ds-typography-body-font-size);
     line-height: var(--ds-typography-body-line-height);
     margin-block: 0
-      calc(var(--_ds-text-seat-inset) + var(--ds-text-grid-compensation));
+      calc(var(--_text-seat-applied-inset) + var(--ds-text-grid-compensation));
     padding-block: calc(
-        var(--_ds-text-seat-inset) +
+        var(--_text-seat-applied-inset) +
         var(--ds-text-baseline-nudge)
       )
       0;

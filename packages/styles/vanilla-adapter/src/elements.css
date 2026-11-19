@@ -702,11 +702,14 @@
       /* Equality is evaluated on this text owner, so larger roles and nested
          product roots never inherit another element's eligibility. Density
          changes only the private control channel, not this tier-default inset. */
-      --_text-default-inset: var(--ds-spacing-control-inset, 0px);
+      --_text-default-inset: var(
+        --_text-seat-inset,
+        var(--ds-spacing-control-inset, 0px)
+      );
       /* Any nonzero font-size difference rounds up to at least the inset;
          exact equality leaves the whole inset. The step stays nonzero even
          for a product whose control inset is zero. */
-      --_text-seat-inset: max(
+      --_text-seat-applied-inset: max(
         0px,
         calc(
           var(--_text-default-inset) -
@@ -722,7 +725,7 @@
       );
       --start-nudge: calc(
         var(--_text-unseated-nudge) +
-        var(--_text-seat-inset)
+        var(--_text-seat-applied-inset)
       );
       /* Every mapped line-height is a whole tier baseline: Site uses
          24/32/40/48px on 8px; Docs and App use 20/24/32/40/48px on 4px.
@@ -742,7 +745,7 @@
       );
       --grid-compensation: calc(
         var(--_text-unseated-compensation) +
-        var(--_text-seat-inset)
+        var(--_text-seat-applied-inset)
       );
     }
 

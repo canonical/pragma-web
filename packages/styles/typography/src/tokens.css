@@ -33,8 +33,9 @@
 @import url("@canonical/design-tokens/dist/modifiers.typography.css");
 
 @layer ds.modifiers {
-  /* Site's lower heading pair shares the body size and differs by weight.
-     A product class on the document root retains its own heading mapping. */
+  /* Temporary bridge for the published design-tokens Site h6 weight. Remove
+     once the upstream token is regular. A product class on the document root
+     retains its own heading mapping. */
   :root:not(.app, .docs, .os),
   .global,
   .site {
