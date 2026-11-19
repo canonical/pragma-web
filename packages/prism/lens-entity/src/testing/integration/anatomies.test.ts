@@ -54,6 +54,7 @@ describe("the lens's components", () => {
     expect(subcomponentFolders.map((folder) => basename(folder))).toEqual([
       "EntityIndex",
       "FacetControls",
+      "EntityFacets",
       "EntitySearch",
       "EntityStatus",
       "EntityView",

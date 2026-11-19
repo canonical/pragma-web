@@ -23,6 +23,7 @@ import {
 import { useMessages } from "../../../../i18n/index.js";
 import matchesEntityText from "../../../../matchesEntityText.js";
 import {
+  EntityFacets,
   EntitySearch,
   EntityStatus,
   SocketGuard,
@@ -158,8 +159,8 @@ const componentCssClassName = "ds entity-index";
  * links each to its home.
  *
  * A lens that places its filters in a panel gets the panel on the
- * canvas's first two columns, holding the count and the search, with the
- * list beside it.
+ * canvas's first two columns, holding the count, the search and every
+ * facet with its counts and the applied chips, with the list beside it.
  *
  * A class the graph does not know (`ontologyClass` is null) and a class with
  * no instances both render the list's empty line; a search that hides every
@@ -214,6 +215,11 @@ export default function EntityIndex({
             count={
               <SocketGuard>
                 <EntityStatus binding={binding} />
+              </SocketGuard>
+            }
+            facets={
+              <SocketGuard>
+                <EntityFacets binding={binding} placement="panel" />
               </SocketGuard>
             }
             search={<EntitySearch />}

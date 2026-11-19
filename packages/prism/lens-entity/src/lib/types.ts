@@ -33,6 +33,11 @@ export interface EntityLensOptions {
   readonly renderers?: LensRenderers;
   /** Where the index places its filters; the bar when omitted. */
   readonly filters?: FilterPlacement;
+  /**
+   * How many facets the index's facet bar holds, in the lens's order; the
+   * rest fold under "More filters". Three when omitted.
+   */
+  readonly barFacets?: number;
   /** How many lines a row of the index takes; one when omitted. */
   readonly lines?: ListLines;
   /** The value fields the index's table leaves out, by served name. */

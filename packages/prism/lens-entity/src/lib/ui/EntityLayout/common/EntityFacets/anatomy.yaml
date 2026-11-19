@@ -1,0 +1,17 @@
+---
+# EntityFacets — the index's facets, read from its own operation: in the
+# bar, core's facet bar holding the facet controls, folded when the lens
+# has facets the bar does not hold; in the panel and the sheet, the facet
+# controls alone. A class with no facets renders nothing. It binds no
+# style of its own.
+#
+# Token ledger: none.
+node:
+  uri: prism.subcomponent.entity_facets
+  edges:
+    - node:
+        uri: prism.component.filter_bar
+      relation: { cardinality: "0..1", slotName: default }
+    - node:
+        uri: prism.subcomponent.facet_controls
+      relation: { cardinality: "0..1", slotName: default }

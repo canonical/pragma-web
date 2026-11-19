@@ -22,6 +22,8 @@ type OwnProps = WrapperComponentProps<ReactNode> & {
   readonly renderers?: LensRenderers;
   /** Where the lens places its index's filters; the bar when omitted. */
   readonly filters?: FilterPlacement;
+  /** How many facets the facet bar holds; three when omitted. */
+  readonly barFacets?: number;
 };
 
 /**
