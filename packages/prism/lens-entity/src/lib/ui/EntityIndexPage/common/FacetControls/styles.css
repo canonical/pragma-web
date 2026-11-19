@@ -60,10 +60,37 @@
     border-color: var(--facet-controls-overlay-border-color);
   }
 
+  /* A value reads as a link only under the pointer. */
+  .ds.facet-controls > .facet > .values > .bucket > .value {
+    text-decoration: none;
+  }
+
+  .ds.facet-controls > .facet > .values > .bucket > .value:hover {
+    text-decoration: underline;
+  }
+
   /* Every facet, its values and the chips, one gutter apart. */
   .ds.facet-controls > .stack {
     display: flex;
     flex-direction: column;
     gap: var(--facet-controls-gap);
+  }
+
+  /* A stacked facet: its label at text size over its values. */
+  .ds.facet-controls > .stack > .facet > .heading {
+    font-size: inherit;
+    font-weight: var(--facet-controls-applied-font-weight);
+    margin-block: 0;
+  }
+
+  /* Its values, a plain list, one under the other. */
+  .ds.facet-controls > .stack > .facet > .options {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    margin-block: 0;
+    padding-block-start: var(--facet-controls-spacing);
+    padding-inline-start: 0;
+    gap: var(--facet-controls-spacing);
   }
 }

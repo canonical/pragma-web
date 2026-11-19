@@ -68,14 +68,14 @@ export default function FacetControls({
     (value === null ? t("facets.none") : value);
 
   /** A facet's values, each a link that adds or lifts it, with its count. */
-  const renderValues = (facet: FacetCount) => {
+  const renderValues = (facet: FacetCount, listClassName: string) => {
     const values = readApplied(applied, facet.field);
     return (
-      <ul className="values">
+      <ul className={listClassName}>
         {facet.values.map((bucket) => {
           const on = values.includes(bucket.value);
           return (
-            <li key={bucket.value ?? ""}>
+            <li className="bucket" key={bucket.value ?? ""}>
               <RouterLink
                 aria-current={on ? "true" : undefined}
                 className="value"
@@ -159,7 +159,7 @@ export default function FacetControls({
             >
               {readButton(facet)}
             </summary>
-            {renderValues(facet)}
+            {renderValues(facet, "values")}
           </details>
         ))
       ) : (
@@ -171,7 +171,7 @@ export default function FacetControls({
               key={facet.field}
             >
               <h3 className="heading">{facet.label}</h3>
-              {renderValues(facet)}
+              {renderValues(facet, "options")}
             </section>
           ))}
           {chips.length > 0 ? (
