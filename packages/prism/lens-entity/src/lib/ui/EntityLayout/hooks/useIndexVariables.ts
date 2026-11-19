@@ -3,10 +3,10 @@ import { useSearchParams } from "@canonical/router-react";
 import { useLazyLoadQuery } from "react-relay";
 import type { EntityFacetScopeQuery } from "../../../../__generated__/EntityFacetScopeQuery.graphql.js";
 import entityFacetScopeQueryNode from "../../../../__generated__/EntityFacetScopeQuery.graphql.js";
-import type { EntityIndexQuery$variables } from "../../../../__generated__/EntityIndexQuery.graphql.js";
 import buildEntityIndexVariables from "../../../buildEntityIndexVariables.js";
 import readFacetParams from "../../../readFacetParams.js";
 import selectFacetParams from "../../../selectFacetParams.js";
+import type { EntityIndexVariables } from "../../../types.js";
 
 /**
  * The index operation's variables for the current address: the binding's
@@ -22,7 +22,7 @@ import selectFacetParams from "../../../selectFacetParams.js";
  */
 export default function useIndexVariables(
   binding: EntityBinding,
-): EntityIndexQuery$variables {
+): EntityIndexVariables {
   const search = Object.fromEntries(useSearchParams());
   const names = selectFacetParams(search);
   const scope = useLazyLoadQuery<EntityFacetScopeQuery>(
@@ -32,14 +32,14 @@ export default function useIndexVariables(
   );
   if (names.length === 0) return buildEntityIndexVariables(binding);
   const facets = new Set(
-    scope.facetedInstances?.facets.map(({ field }) => field) ?? [],
+    scope.facetedInstances.facets.map(({ field }) => field),
   );
   return buildEntityIndexVariables(
     binding,
     readFacetParams(
       search,
       names.filter((name) => facets.has(name)),
-      scope.ontologies ?? [],
+      scope.ontologies,
     ),
   );
 }

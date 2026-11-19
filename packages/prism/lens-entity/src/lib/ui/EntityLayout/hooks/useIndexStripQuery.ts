@@ -52,10 +52,7 @@ export default function useIndexStripQuery(
         count: value.count,
       })),
     })),
-    applied: filters.map(({ field, values }) => ({
-      field,
-      values: (values ?? []).map((value) => value ?? null),
-    })),
+    applied: filters,
     namespaces: ontologies,
     visible: facetedInstances.edges.filter(({ node }) =>
       matchesEntityText(text, node._meta),

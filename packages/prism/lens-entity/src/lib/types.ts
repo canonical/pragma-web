@@ -1,3 +1,4 @@
+import type { FacetFilter } from "@canonical/prism-contract";
 import type {
   FilterPlacement,
   LensRenderers,
@@ -6,6 +7,7 @@ import type {
 import type { ListLines } from "@canonical/prism-projections";
 import type { DataRouteDefinition } from "@canonical/router-core";
 import type { ComponentType, ReactElement } from "react";
+import type { EntityIndexQuery$variables } from "../__generated__/EntityIndexQuery.graphql.js";
 
 /** One ontology's addressing identity, as the graph states it. */
 export interface OntologyNamespace {
@@ -80,3 +82,11 @@ export type EntityRoutes<TId extends string> = {
  * or more, or any number.
  */
 export type Cardinality = "one" | "optional" | "many" | "any";
+
+/**
+ * The index operation's variables as the lens builds them: each filter's
+ * values a list, a value's IRI or null for the "none" bucket.
+ */
+export type EntityIndexVariables = EntityIndexQuery$variables & {
+  readonly filters: readonly FacetFilter[] | null;
+};

@@ -1,7 +1,7 @@
 import type { FacetFilter } from "@canonical/prism-contract";
 import type { EntityBinding } from "@canonical/prism-core";
-import type { EntityIndexQuery$variables } from "../__generated__/EntityIndexQuery.graphql.js";
 import { ENTITY_PAGE_SIZE } from "./constants.js";
+import type { EntityIndexVariables } from "./types.js";
 
 /**
  * Build the index's variables: the binding's class, the facet filters the
@@ -19,7 +19,7 @@ import { ENTITY_PAGE_SIZE } from "./constants.js";
 export default function buildEntityIndexVariables(
   binding: EntityBinding,
   filters: readonly FacetFilter[] = [],
-): EntityIndexQuery$variables {
+): EntityIndexVariables {
   return {
     classUri: binding.classUri,
     classId: binding.classUri,

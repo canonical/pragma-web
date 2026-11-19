@@ -61,6 +61,33 @@ describe("warmEntityIndex", () => {
     );
   });
 
+  it("resolves once the scope and the filtered index are in the store", async () => {
+    const fetchFn = vi.fn<FetchFunction>(async (request) => ({
+      data:
+        request.name === "EntityFacetScopeQuery"
+          ? {
+              ontologies: [],
+              facetedInstances: { facets: [{ field: "servesLine" }] },
+            }
+          : {
+              ontologies: [],
+              ontologyClass: null,
+              facetedInstances: {
+                totalCount: 0,
+                facets: [],
+                edges: [],
+                pageInfo: { endCursor: null, hasNextPage: false },
+              },
+            },
+    }));
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+
+    await expect(
+      warmEntityIndex(STATIONS_BINDING, { servesLine: "none" }),
+    ).resolves.toBeUndefined();
+    expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+
   it("fetches nothing filtered when no environment is published", async () => {
     await expect(
       warmEntityIndex(STATIONS_BINDING, { servesLine: "none" }),
