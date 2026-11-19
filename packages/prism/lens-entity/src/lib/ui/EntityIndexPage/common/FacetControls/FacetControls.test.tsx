@@ -167,6 +167,34 @@ describe("FacetControls", () => {
       );
     });
 
+    it("marks a value that would match nothing as empty", () => {
+      renderAt(
+        "/stations",
+        <FacetControls
+          applied={[]}
+          facets={[
+            {
+              field: "servesLine",
+              label: "Line",
+              values: [
+                {
+                  value: "https://metro.example/onto#ringway",
+                  label: "Ringway",
+                  count: 0,
+                },
+              ],
+            },
+          ]}
+          namespaces={NAMESPACES}
+          placement="bar"
+        />,
+      );
+      expect(screen.getByRole("link", { name: "Ringway 0" })).toHaveClass(
+        "value",
+        "is-empty",
+      );
+    });
+
     it("lifts an applied value from its own link", () => {
       renderAt(
         "/stations?servesLine=metro:circle-line",

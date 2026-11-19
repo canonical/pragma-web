@@ -88,7 +88,11 @@
     white-space: nowrap;
   }
 
-  .ds.facet-controls > .facet > .values > .bucket > .value[aria-current="true"] {
+  .ds.facet-controls
+    > .facet
+    > .values
+    > .bucket
+    > .value[aria-current="true"] {
     font-weight: var(--facet-controls-applied-font-weight);
   }
 
