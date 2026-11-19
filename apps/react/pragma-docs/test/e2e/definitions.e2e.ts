@@ -1161,6 +1161,12 @@ describe.each(["1440", "912"])("an opened view at %s px", (width) => {
       expect(boxes.length).toBeGreaterThan(1);
       expect(boxes.filter(({ across }) => !across)).toEqual([]);
       expect(namesInWayBack).toBe(false);
+      // The opened namespace's label row names its bridges, outside the way
+      // back: ds's reach its two stubs, surface's reach ds.
+      expect(
+        names.filter(({ ns }) => ns === prefix).length,
+        `${prefix}'s label row`,
+      ).toBeGreaterThan(0);
       // A bridge into a stub counts relations no loaded namespace serves
       // between two prefixes; its order is read below all the same.
       for (const name of names.filter(({ to }) => loaded.has(to))) {
