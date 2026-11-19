@@ -22,6 +22,7 @@ export default function InspectorProbe({
   return (
     <TermInspector
       {...props}
+      classEdges={data.classEdges}
       classRef={data.ontologyClass}
       namespaces={data.ontologies.map(({ prefix, namespace }) => ({
         prefix,

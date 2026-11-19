@@ -12,7 +12,9 @@ import useCapturedExplorer from "../../../../../../testing/useCapturedExplorer.j
 import type { TermInspector_ontologies$key } from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
 import termInspectorOntologiesFragmentNode from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
 import weighStroke from "../../../../classGraph/weighStroke.js";
+import listUndeclaredEdges from "../../../../classGraph/listUndeclaredEdges.js";
 import { MESSAGES } from "../../../../i18n/index.js";
+import classEdges from "../../../../../../testing/records/classEdges.js";
 import { useLensFilter } from "../../../LensFilterProvider/index.js";
 import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 import GraphOverview from "./GraphOverview.js";
@@ -32,6 +34,7 @@ function Overview(): ReactElement {
       </output>
       <GraphOverview
         className="custom-class"
+        classEdges={classEdges}
         data-testid="overview"
         ontologies={ontologies}
       />
@@ -217,5 +220,42 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(
       within(overview).getByRole("heading", { name: "Gestures" }),
     ).toBeInTheDocument();
+  });
+
+  it("opens on a count line whose figures link to the namespace rows that add up to them", () => {
+    const root = renderOverview();
+    const line = root.firstElementChild;
+    expect(line?.className).toBe("count-line");
+    const links = [...(line?.querySelectorAll("a.count-link") ?? [])];
+    expect(links).toHaveLength(4);
+    for (const link of links) {
+      expect(link.getAttribute("href")).toBe("#graph-overview-namespaces");
+    }
+    const rows = root.querySelectorAll("#graph-overview-namespaces .namespace");
+    expect(links.at(1)?.textContent).toBe(`${rows.length} namespaces`);
+    const sum = (index: number): number =>
+      [...rows].reduce(
+        (total, row) =>
+          total +
+          Number(row.querySelector(".figures")?.textContent?.split(" · ").at(index)?.split(" ").at(0)),
+        0,
+      );
+    expect(links.at(0)?.textContent).toBe(`${sum(0)} classes`);
+    expect(links.at(2)?.textContent).toBe(`${sum(1)} instances`);
+    expect(links.at(3)?.textContent).toBe(`${sum(2)} relations`);
+  });
+
+  it("lists each undeclared observed edge as a row, with its count", () => {
+    const root = renderOverview();
+    const undeclared = listUndeclaredEdges(classEdges);
+    expect(undeclared.length).toBeGreaterThan(0);
+    const rows = root.querySelectorAll(".undeclared tbody tr");
+    expect(rows).toHaveLength(undeclared.length);
+    for (const [index, row] of [...rows].entries()) {
+      expect(row.querySelectorAll("td a")).toHaveLength(3);
+      expect(row.querySelector("td.figure")?.textContent).toBe(
+        String(undeclared.at(index)?.count),
+      );
+    }
   });
 });

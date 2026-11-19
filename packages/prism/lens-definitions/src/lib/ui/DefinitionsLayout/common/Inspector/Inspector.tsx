@@ -22,6 +22,7 @@ export default function Inspector(): ReactElement {
   const { term, data, namespaces } = useExplorerQuery();
   return (
     <TermInspector
+      classEdges={data.classEdges}
       classRef={data.ontologyClass}
       namespaces={namespaces}
       ontologies={data.ontologies}

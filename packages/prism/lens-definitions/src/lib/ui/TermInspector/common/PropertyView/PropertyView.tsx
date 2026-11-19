@@ -13,8 +13,10 @@ const componentCssClassName = "ds property-view";
 /**
  * The inspector's view of a property: its tag, name and address, its
  * definition, then its kind, functionality, range, domain and inverse as
- * key-value rows, each key above its value. Every reference is a term
- * link.
+ * key-value rows, each key above its value; then its class edges, a table
+ * row each: the class its statements start from and the one they point
+ * to as term links, the statements counted and whether its domain and
+ * range declare the edge as figures. Every reference is a term link.
  *
  * `import { PropertyView } from "../PropertyView/index.js";`
  *
@@ -25,10 +27,12 @@ export default function PropertyView({
   data,
   term,
   namespaces,
+  classEdges = [],
   className,
   ...props
 }: PropertyViewProps): ReactElement {
   const t = useMessages();
+  const edges = classEdges.filter((edge) => edge.property === data.uri);
   return (
     <article
       {...props}
@@ -94,6 +98,46 @@ export default function PropertyView({
           )}
         </dd>
       </dl>
+      <section className="section">
+        <h3 className="label">{t("inspector.property.edges")}</h3>
+        {edges.length === 0 ? (
+          <p className="prose">{t("inspector.property.edges.none")}</p>
+        ) : (
+          <table className="edges">
+            <thead>
+              <tr>
+                <th scope="col">{t("inspector.edges.subject")}</th>
+                <th scope="col">{t("inspector.edges.object")}</th>
+                <th className="figure" scope="col">
+                  {t("inspector.edges.count")}
+                </th>
+                <th className="figure" scope="col">
+                  {t("inspector.edges.declared")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {edges.map((edge) => (
+                <tr
+                  className="row"
+                  key={`${edge.subjectClass} ${edge.objectClass}`}
+                >
+                  <td>
+                    <TermLink label={null} namespaces={namespaces} uri={edge.subjectClass} />
+                  </td>
+                  <td>
+                    <TermLink label={null} namespaces={namespaces} uri={edge.objectClass} />
+                  </td>
+                  <td className="figure">{edge.count}</td>
+                  <td className="figure">
+                    {t(edge.declared ? "inspector.yes" : "inspector.no")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
     </article>
   );
 }

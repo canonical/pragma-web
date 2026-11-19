@@ -10,6 +10,7 @@ import type {
   TermInspector_ontologies$key,
 } from "../../../__generated__/TermInspector_ontologies.graphql.js";
 import type { TermInspector_property$key } from "../../../__generated__/TermInspector_property.graphql.js";
+import type { ClassEdgeInput } from "../../classGraph/types.js";
 import type { OntologyNamespace } from "../../types.js";
 
 type OwnProps = {
@@ -23,6 +24,8 @@ type OwnProps = {
   readonly ontologies: TermInspector_ontologies$key;
   /** The ontologies' (prefix, namespace) pairs, for compacting IRIs. */
   readonly namespaces: readonly OntologyNamespace[];
+  /** The class edges the graph counts, for the overview and a property. */
+  readonly classEdges?: readonly ClassEdgeInput[];
 };
 
 /**

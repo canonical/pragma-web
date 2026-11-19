@@ -2,20 +2,25 @@
 
 import { type ReactElement, useMemo } from "react";
 import countNamespaceRelations from "../../../../classGraph/countNamespaceRelations.js";
+import listUndeclaredEdges from "../../../../classGraph/listUndeclaredEdges.js";
 import { useMessages } from "../../../../i18n/index.js";
 import { ClassGraph } from "../../../ClassGraph/index.js";
 import { useLensFilter } from "../../../LensFilterProvider/index.js";
 import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 import layOutSpecimen from "./layOutSpecimen.js";
 import layOutStrokeSpecimen from "./layOutStrokeSpecimen.js";
+import { TermLink } from "../TermLink/index.js";
+import { NAMESPACES_ID } from "./constants.js";
 import type { GraphOverviewProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds graph-overview";
 
 /**
- * The inspector with no selection: an overview of the graph in view, in
- * three sections. "Reading the graph" is the legend, each row a tiny graph
+ * The inspector with no selection: an overview of the graph in view. It
+ * opens on a count line, the graph's classes, namespaces, instances and
+ * relations, each figure a link to the namespace rows, whose figures add
+ * up to it; then come four sections. "Reading the graph" is the legend, each row a tiny graph
  * drawn by the graph's own layout and drawing (a concrete class, an
  * abstract one, a hub, a subclass bus, a relation, a bundle, a loop), so
  * it cannot drift from what it explains, then the relation's strokes: its
@@ -25,8 +30,10 @@ const componentCssClassName = "ds graph-overview";
  * fitted by the canvas's own code (only the two elements are written
  * again here, since a specimen has no layout). "Namespaces" has a row per
  * ontology with its classes, instances and relations, each a button that
- * fits the graph's camera to that region. "Gestures" says how to move
- * about the graph.
+ * fits the graph's camera to that region. "Observed, not declared" lists,
+ * a row each, the class edges the instances state that no property's
+ * domain and range declare: from, property and to as term links, and the
+ * statements counted. "Gestures" says how to move about the graph.
  *
  * `import { GraphOverview } from "../GraphOverview/index.js";`
  *
@@ -36,6 +43,7 @@ const componentCssClassName = "ds graph-overview";
  */
 export default function GraphOverview({
   ontologies,
+  classEdges = [],
   className,
   ...props
 }: GraphOverviewProps): ReactElement {
@@ -49,11 +57,40 @@ export default function GraphOverview({
       })),
     [t],
   );
+  const namespaces = ontologies.map(({ prefix, namespace }) => ({
+    prefix,
+    namespace,
+  }));
+  const rows = ontologies.map((ontology) => ({
+    prefix: ontology.prefix,
+    classes: ontology.classes.length,
+    instances: ontology.classes.reduce(
+      (sum, klass) => sum + klass.instanceCount,
+      0,
+    ),
+    relations: countNamespaceRelations(ontology.properties),
+  }));
+  const total = (figure: "classes" | "instances" | "relations"): number =>
+    rows.reduce((sum, row) => sum + row[figure], 0);
+  const counts = [
+    ["inspector.overview.count.classes", total("classes")],
+    ["inspector.overview.count.namespaces", rows.length],
+    ["inspector.overview.count.instances", total("instances")],
+    ["inspector.overview.count.relations", total("relations")],
+  ] as const;
+  const undeclared = listUndeclaredEdges(classEdges);
   return (
     <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
+      <p className="count-line">
+        {counts.map(([key, count]) => (
+          <a className="count-link" href={`#${NAMESPACES_ID}`} key={key}>
+            {t(key, { count })}
+          </a>
+        ))}
+      </p>
       <section className="section">
         <h3 className="label">{t("inspector.overview.legend")}</h3>
         <ul className="legend">
@@ -127,34 +164,65 @@ export default function GraphOverview({
           ))}
         </ul>
       </section>
-      <section className="section">
+      <section className="section" id={NAMESPACES_ID}>
         <h3 className="label">{t("inspector.overview.namespaces")}</h3>
         <ul className="namespaces">
-          {ontologies.map((ontology) => (
-            <li key={ontology.prefix}>
+          {rows.map((row) => (
+            <li key={row.prefix}>
               <button
                 aria-label={t("inspector.overview.fit", {
-                  prefix: ontology.prefix,
+                  prefix: row.prefix,
                 })}
                 className="namespace"
-                onClick={() => requestRegion(ontology.prefix)}
+                onClick={() => requestRegion(row.prefix)}
                 type="button"
               >
-                <span className="abbreviation">{ontology.prefix}</span>
+                <span className="abbreviation">{row.prefix}</span>
                 <span className="figures">
-                  {t("inspector.overview.namespace", {
-                    classes: ontology.classes.length,
-                    instances: ontology.classes.reduce(
-                      (sum, klass) => sum + klass.instanceCount,
-                      0,
-                    ),
-                    relations: countNamespaceRelations(ontology.properties),
-                  })}
+                  {t("inspector.overview.namespace", row)}
                 </span>
               </button>
             </li>
           ))}
         </ul>
+      </section>
+      <section className="section undeclared">
+        <h3 className="label">{t("inspector.overview.undeclared")}</h3>
+        {undeclared.length === 0 ? (
+          <p className="prose">{t("inspector.overview.undeclared.none")}</p>
+        ) : (
+          <table className="edges">
+            <thead>
+              <tr>
+                <th scope="col">{t("inspector.edges.subject")}</th>
+                <th scope="col">{t("inspector.edges.property")}</th>
+                <th scope="col">{t("inspector.edges.object")}</th>
+                <th className="figure" scope="col">
+                  {t("inspector.edges.count")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {undeclared.map((edge) => (
+                <tr
+                  className="row"
+                  key={`${edge.subjectClass} ${edge.property} ${edge.objectClass}`}
+                >
+                  <td>
+                    <TermLink label={null} namespaces={namespaces} uri={edge.subjectClass} />
+                  </td>
+                  <td>
+                    <TermLink label={null} namespaces={namespaces} uri={edge.property} />
+                  </td>
+                  <td>
+                    <TermLink label={null} namespaces={namespaces} uri={edge.objectClass} />
+                  </td>
+                  <td className="figure">{edge.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
       <section className="section">
         <h3 className="label">{t("inspector.overview.gestures")}</h3>

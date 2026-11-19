@@ -7,6 +7,7 @@ import {
   PROPERTY_TERM,
 } from "../../../../../../testing/fixtures.js";
 import InspectorProbe from "../../../../../../testing/InspectorProbe.js";
+import classEdges from "../../../../../../testing/records/classEdges.js";
 import definitionsExplorerRecordsProperty from "../../../../../../testing/records/definitionsExplorerRecordsProperty.js";
 
 describe("PropertyView", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
@@ -23,5 +24,28 @@ describe("PropertyView", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(view).not.toBeNull();
     expect(view?.querySelectorAll(".key")).toHaveLength(5);
     expect(view?.getAttribute("aria-labelledby")).toBe("term-inspector-title");
+  });
+
+  it("lists the property's class edges, the classes as links and the counts as figures", () => {
+    const { container } = render(
+      createStripHarness(
+        `/definitions/${encodeURIComponent(PROPERTY_TERM)}`,
+        definitionsExplorerRecordsProperty,
+        createFetchSpy(),
+        <InspectorProbe term={PROPERTY_TERM} />,
+      ),
+    );
+    const own = classEdges.filter(
+      (edge) => edge.property === "https://ds.canonical.com/hasSubcomponent",
+    );
+    expect(own.length).toBeGreaterThan(0);
+    const rows = container.querySelectorAll(".property-view .edges tbody tr");
+    expect(rows).toHaveLength(own.length);
+    for (const [index, row] of [...rows].entries()) {
+      expect(row.querySelectorAll("td a")).toHaveLength(2);
+      expect(row.querySelector("td.figure")?.textContent).toBe(
+        String(own.at(index)?.count),
+      );
+    }
   });
 });

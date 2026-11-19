@@ -177,4 +177,36 @@
     grid-column: 1 / -1;
     margin-block: 0;
   }
+
+  /* A list of class edges, the overview's undeclared ones or a
+   * property's: a table row each, its figures flush to the end. */
+  .ds.term-inspector .edges {
+    grid-column: 1 / -1;
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--term-inspector-small-font-size);
+  }
+
+  .ds.term-inspector .edges th,
+  .ds.term-inspector .edges td {
+    padding-block: var(--term-inspector-tag-gap);
+    padding-inline-end: var(--term-inspector-link-gap);
+    border-block-end-width: var(--term-inspector-rule-width);
+    border-block-end-style: solid;
+    border-block-end-color: var(--term-inspector-rule-color);
+    text-align: start;
+    vertical-align: baseline;
+    overflow-wrap: anywhere;
+  }
+
+  .ds.term-inspector .edges th {
+    font-weight: var(--term-inspector-caps-weight);
+    color: var(--term-inspector-muted-color);
+  }
+
+  .ds.term-inspector .edges .figure {
+    padding-inline-end: 0;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
 }

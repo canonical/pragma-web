@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from "react";
 import type { TermInspector_property$data } from "../../../../../__generated__/TermInspector_property.graphql.js";
+import type { ClassEdgeInput } from "../../../../classGraph/types.js";
 import type { OntologyNamespace } from "../../../../types.js";
 
 type OwnProps = {
@@ -11,6 +12,8 @@ type OwnProps = {
   readonly term: string;
   /** The ontologies' (prefix, namespace) pairs, for compacting IRIs. */
   readonly namespaces: readonly OntologyNamespace[];
+  /** The class edges the graph counts; the property's own are listed. */
+  readonly classEdges?: readonly ClassEdgeInput[];
 };
 
 /**
