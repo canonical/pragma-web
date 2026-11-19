@@ -1,6 +1,7 @@
 import { useHome } from "@canonical/prism-core";
 import type { ReactNode } from "react";
 import { useProjectionLink } from "../../../../projections/index.js";
+import { TITLE_LINK_CLASS_NAME } from "../../../../ui/EntityTable/constants.js";
 import type { NodeTitleProps } from "./types.js";
 
 /**
@@ -20,6 +21,8 @@ export default function NodeTitle({
   return href === undefined ? (
     title
   ) : (
-    <LinkComponent href={href}>{title}</LinkComponent>
+    <LinkComponent className={TITLE_LINK_CLASS_NAME} href={href}>
+      {title}
+    </LinkComponent>
   );
 }

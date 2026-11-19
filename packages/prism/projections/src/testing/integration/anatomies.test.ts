@@ -69,6 +69,7 @@ const UI_TOKENS = [
   "--color-focus-ring",
   "--color-foreground-ghost-hover",
   "--color-foreground-secondary",
+  "--color-text",
   "--color-text-muted",
   "--popover-border-width",
   "--popover-color-border",

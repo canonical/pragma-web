@@ -30,7 +30,8 @@ node:
     layout.type: grid
     layout.grid.columns: subgrid
     layout.grid.column: "1 / -1"
-    spacing.gap: grid.gutter
+    spacing.gap.inline: grid.gutter
+    spacing.gap.block: 0
   edges:
     - node:
         role: head
@@ -38,7 +39,8 @@ node:
           layout.type: grid
           layout.grid.columns: subgrid
           layout.grid.column: "1 / -1"
-          spacing.gap: grid.gutter
+          spacing.gap.inline: grid.gutter
+          spacing.gap.block: 0
         edges:
           - node:
               role: header row
@@ -46,7 +48,8 @@ node:
                 layout.type: grid
                 layout.grid.columns: subgrid
                 layout.grid.column: "1 / -1"
-                spacing.gap: grid.gutter
+                spacing.gap.inline: grid.gutter
+                spacing.gap.block: 0
                 layout.align: center
                 size.block: space.400
                 layout.grid.autoRows: space.400
@@ -60,27 +63,49 @@ node:
                     role: title heading
                     styles:
                       layout.grid.column: "span 2"
+                      typography.weight: typography.text.primary.fontWeight
                       size.min.width: 0
                       layout.overflow: hidden
                       typography.align: start
                       typography.whiteSpace: nowrap
                       typography.overflow: ellipsis
                   relation: { cardinality: "1", slotName: heading }
-                - node:
-                    role: column heading
-                    attributes: { data-property: "{field}" }
-                    styles:
-                      size.min.width: 0
-                      layout.overflow: hidden
-                      typography.align: start
-                      typography.whiteSpace: nowrap
-                      typography.overflow: ellipsis
-                    edges:
+                - switch:
+                    on: sorted
+                    cases:
                       - node:
-                          role: sort link
+                          role: column heading
+                          attributes: { data-property: "{field}", aria-sort: "{direction}" }
                           styles:
                             typography.weight: typography.text.primary.fontWeight
-                        relation: { cardinality: "1", slotName: sort }
+                            size.min.width: 0
+                            layout.overflow: hidden
+                            typography.align: start
+                            typography.whiteSpace: nowrap
+                            typography.overflow: ellipsis
+                          edges:
+                            - node:
+                                role: sort link
+                                styles:
+                                  typography.weight: typography.text.primary.fontWeight
+                                  typography.color: inherit
+                                  typography.decoration: none
+                                  typography.decoration@hover: underline
+                                  size.min.width: 0
+                                  layout.overflow: hidden
+                                  typography.overflow: ellipsis
+                              relation: { cardinality: "1", slotName: sort }
+                            - node:
+                                role: direction
+                                styles:
+                                  layout.flex.shrink: 0
+                              relation: { cardinality: "0..1", slotName: direction }
+                      - node:
+                          role: sorted column heading (.is-sorted)
+                          styles:
+                            layout.type: flex
+                            layout.align: center
+                            typography.color: color.text
                   relation: { cardinality: "1..*", slotName: column }
             relation: { cardinality: "1", slotName: header }
       relation: { cardinality: "1", slotName: head }
@@ -90,7 +115,8 @@ node:
           layout.type: grid
           layout.grid.columns: subgrid
           layout.grid.column: "1 / -1"
-          spacing.gap: grid.gutter
+          spacing.gap.inline: grid.gutter
+          spacing.gap.block: 0
         edges:
           - switch:
               on: lines
@@ -101,7 +127,8 @@ node:
                       layout.type: grid
                       layout.grid.columns: subgrid
                       layout.grid.column: "1 / -1"
-                      spacing.gap: grid.gutter
+                      spacing.gap.inline: grid.gutter
+                      spacing.gap.block: 0
                       layout.align: center
                       size.block: space.400
                       layout.grid.autoRows: space.400
@@ -115,11 +142,21 @@ node:
                           role: title cell
                           styles:
                             layout.grid.column: "span 2"
+                            typography.weight: typography.text.primary.fontWeight
+                            typography.color: color.text
                             size.min.width: 0
                             layout.overflow: hidden
                             typography.align: start
                             typography.whiteSpace: nowrap
                             typography.overflow: ellipsis
+                          edges:
+                            - node:
+                                role: link
+                                styles:
+                                  typography.color: inherit
+                                  typography.decoration: none
+                                  typography.decoration@hover: underline
+                              relation: { cardinality: "0..1", slotName: link }
                         relation: { cardinality: "1", slotName: title }
                       - node:
                           role: value cell
