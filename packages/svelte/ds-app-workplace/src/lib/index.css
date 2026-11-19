@@ -29,6 +29,7 @@
 @import url("./components/Example/styles.css");
 @import url("./components/KeyboardKey/styles.css");
 @import url("./components/Section/styles.css");
+@import url("./components/Tabs/styles.css");
 @import url("./group/Cards/styles.css");
 @import url("./group/KeyboardKeys/styles.css");
 @import url("./subcomponent/Spinner/styles.css");
