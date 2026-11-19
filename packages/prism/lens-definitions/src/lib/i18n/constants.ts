@@ -83,6 +83,7 @@ export const MESSAGES = {
   "inspector.overview.namespace":
     "{classes} classes · {instances} instances · {relations} relations",
   "inspector.overview.fit": "Fit the graph to {prefix}",
+  "inspector.overview.open": "Open {prefix}",
   "inspector.overview.count.classes": {
     one: "{count} class",
     other: "{count} classes",

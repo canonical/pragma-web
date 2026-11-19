@@ -13,6 +13,11 @@ type OwnProps = {
   readonly ontologies: InspectorOntologies;
   /** The class edges the graph counts, for the undeclared ones. */
   readonly classEdges?: readonly ClassEdgeInput[];
+  /**
+   * The namespaces the graph draws as one box each, whose rows link to
+   * the explorer opened on them.
+   */
+  readonly boxed?: readonly string[];
 };
 
 /**

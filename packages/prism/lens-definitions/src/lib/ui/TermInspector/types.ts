@@ -26,6 +26,8 @@ type OwnProps = {
   readonly namespaces: readonly OntologyNamespace[];
   /** The class edges the graph counts, for the overview and a property. */
   readonly classEdges?: readonly ClassEdgeInput[];
+  /** The namespaces the graph draws as one box each, for the overview. */
+  readonly boxed?: readonly string[];
 };
 
 /**

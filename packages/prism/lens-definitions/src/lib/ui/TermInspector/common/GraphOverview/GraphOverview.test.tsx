@@ -22,8 +22,10 @@ import GraphOverview from "./GraphOverview.js";
 /** The overview over the store, beside a readout of the asked region. */
 function Overview({
   edges = classEdges,
+  boxed,
 }: {
   readonly edges?: typeof classEdges;
+  readonly boxed?: readonly string[];
 }): ReactElement {
   const { data } = useCapturedExplorer();
   const ontologies = useFragment<TermInspector_ontologies$key>(
@@ -37,6 +39,7 @@ function Overview({
         {region === undefined ? "all" : `${region.prefix} #${region.serial}`}
       </output>
       <GraphOverview
+        boxed={boxed}
         className="custom-class"
         classEdges={edges}
         data-testid="overview"
@@ -46,14 +49,21 @@ function Overview({
   );
 }
 
-/** Mount the overview over the captured store, with its class edges. */
-function renderOverview(edges?: typeof classEdges): HTMLElement {
+/**
+ * Mount the overview over the captured store, with its class edges and
+ * the namespaces drawn as boxes, at an address of the explorer.
+ */
+function renderOverview(
+  edges?: typeof classEdges,
+  boxed?: readonly string[],
+  url = "/definitions",
+): HTMLElement {
   render(
     createStripHarness(
-      "/definitions",
+      url,
       definitionsExplorerRecords,
       createFetchSpy(),
-      <Overview edges={edges} />,
+      <Overview boxed={boxed} edges={edges} />,
     ),
   );
   return screen.getByTestId("overview");
@@ -216,6 +226,37 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     fireEvent.click(cs);
     expect(screen.getByRole("status", { name: "Region" }).textContent).toBe(
       "cs #2",
+    );
+  });
+
+  it("links a boxed namespace's row to the explorer opened on it, keeping the page's view keys, and keeps every row's fit button", () => {
+    const overview = renderOverview(
+      undefined,
+      ["cs"],
+      "/definitions?sheet=filter",
+    );
+    const open = within(overview).getByRole("link", { name: "Open cs" });
+    const href = new URL(open.getAttribute("href") ?? "", "http://site");
+    expect(href.pathname).toBe("/definitions");
+    expect(href.searchParams.get("expand")).toBe("cs");
+    expect(href.searchParams.get("sheet")).toBe("filter");
+    // Only the boxed namespace opens; every row still fits the camera.
+    expect(
+      within(overview).queryAllByRole("link", { name: /^Open / }),
+    ).toHaveLength(1);
+    expect(within(overview).getAllByRole("button")).toHaveLength(3);
+    expect(
+      open
+        .closest(".namespace-row")
+        ?.querySelector(".namespace")
+        ?.getAttribute("aria-label"),
+    ).toBe("Fit the graph to cs");
+  });
+
+  it("opens no namespace from its row when the graph draws none as a box", () => {
+    const overview = renderOverview();
+    expect(within(overview).queryAllByRole("link", { name: /^Open / })).toEqual(
+      [],
     );
   });
 

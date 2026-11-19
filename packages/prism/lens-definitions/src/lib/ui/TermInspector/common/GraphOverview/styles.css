@@ -102,6 +102,15 @@
     list-style: none;
   }
 
+  /* A namespace's row: its fit button, then, for a namespace the graph
+   * draws as one box, the link that opens it. */
+  .ds.graph-overview .namespace-row {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: var(--graph-overview-row-gap);
+  }
+
   .ds.graph-overview .namespace {
     display: flex;
     flex-wrap: wrap;
@@ -138,6 +147,10 @@
     font-size: var(--graph-overview-small-font-size);
     color: var(--graph-overview-muted-color);
     font-variant-numeric: tabular-nums;
+  }
+
+  .ds.graph-overview .open {
+    font-size: var(--graph-overview-small-font-size);
   }
 
   .ds.graph-overview .gestures {

@@ -170,6 +170,7 @@ export default function TermInspector({
   ontologies,
   namespaces,
   classEdges = [],
+  boxed,
   ...props
 }: TermInspectorProps): ReactElement {
   const t = useMessages();
@@ -187,7 +188,13 @@ export default function TermInspector({
   );
   let body: ReactElement;
   if (term === undefined) {
-    body = <GraphOverview classEdges={classEdges} ontologies={ontologyData} />;
+    body = (
+      <GraphOverview
+        boxed={boxed}
+        classEdges={classEdges}
+        ontologies={ontologyData}
+      />
+    );
   } else if (classData) {
     body = (
       <ClassView
