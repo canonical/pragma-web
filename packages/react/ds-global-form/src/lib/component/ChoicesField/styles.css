@@ -63,71 +63,9 @@
         }
       }
 
-      & > input[type="radio"] {
-        appearance: none;
-        box-sizing: border-box;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
-        border: var(--dimension-stroke-thickness-medium) solid
-          var(--color-border);
-        border-radius: 50%;
-        background-color: var(
-          --surface-color-foreground-radio-unselected,
-          var(--color-foreground-radio-unselected)
-        );
-        cursor: inherit;
-        transition:
-          background-color var(--motion-duration-fast) ease,
-          border-color var(--motion-duration-fast) ease;
-
-        &:checked {
-          border-color: var(
-            --surface-color-foreground-radio-selected,
-            var(--color-foreground-radio-selected)
-          );
-          background: radial-gradient(
-            var(
-                --surface-color-foreground-radio-unselected,
-                var(--color-foreground-radio-unselected)
-              )
-              30%,
-            var(
-                --surface-color-foreground-radio-selected,
-                var(--color-foreground-radio-selected)
-              )
-              31%
-          );
-        }
-
-        &:hover:not(:disabled):not(:checked) {
-          background-color: var(--color-foreground-radio-unselected-hover);
-        }
-
-        /* Hover shifts only the dot's fill (channel shade), not a whole-element
-         * brightness filter that would also dim the ring. */
-        &:checked:hover:not(:disabled) {
-          border-color: var(--hover--color-foreground-radio-selected);
-          background: radial-gradient(
-            var(
-                --surface-color-foreground-radio-unselected,
-                var(--color-foreground-radio-unselected)
-              )
-              30%,
-            var(--hover--color-foreground-radio-selected) 31%
-          );
-        }
-
-        &:focus-visible {
-          outline: none;
-          border-color: var(--color-focus-ring);
-          box-shadow: 0 0 0 1px var(--color-focus-ring);
-        }
-
-        &:disabled {
-          border-color: var(--color-border-disabled);
-          background-color: var(--color-foreground-radio-unselected-disabled);
-        }
-      }
+      /* Radio chrome lives in RadioInput's own sheet (subcomponent);
+       * checkbox chrome below stays scoped here because CheckboxInput's
+       * masked-glyph selectors need the group context. */
 
       & > input[type="checkbox"] {
         appearance: none;

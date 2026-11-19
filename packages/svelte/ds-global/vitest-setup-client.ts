@@ -11,5 +11,3 @@ declare module "vitest/browser" {
     emulateMedia: (media: EmulatedMedia) => Promise<void>;
   }
 }
-
-export {};
