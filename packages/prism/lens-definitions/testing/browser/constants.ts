@@ -6,7 +6,7 @@ export const SERVED_GRAPH_QUERY = `{
   ontologies {
     prefix
     namespace
-    classes { uri superclass { uri } }
+    classes { uri instanceCount superclass { uri } }
     properties { uri kind domain { uri } range }
   }
   classEdges { property subjectClass objectClass count declared }

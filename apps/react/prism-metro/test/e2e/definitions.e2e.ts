@@ -17,17 +17,21 @@
 import { GRAPH_BUDGET } from "@canonical/prism-core";
 import {
   launchBrowser,
+  STRIP_VIEWPORTS,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
 import {
   type BridgeLabelMeasure,
   type CanvasMeasure,
+  countServedBridges,
   countServedNeighbourhood,
   fetchServedGraph,
   MIN_FIT,
   measureBridgeLabels,
   measureCanvasSvg,
+  measureOpenedShelf,
   measureWeightLinks,
+  type OpenedShelfMeasure,
   type ServedGraph,
   type ServedWeights,
   sliceCanvasSvg,
@@ -41,6 +45,9 @@ import startServer from "./startServer.js";
 import type { RunningServer } from "./types.js";
 
 const CWD = process.cwd();
+
+/** The sub-pixel rounding a box's edge may stand past the canvas's, in px. */
+const WIDTH_TOLERANCE_PX = 0.5;
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -67,6 +74,48 @@ const listViews = (): readonly string[] => [
   "/definitions",
   ...(served.prefixes ?? []).map((prefix) => `/definitions?expand=${prefix}`),
 ];
+
+/**
+ * Open `path` at a viewport and measure its shelves and label rows once
+ * its fonts have loaded, collecting every uncaught exception.
+ *
+ * @note Impure: opens a browser tab, which it closes.
+ */
+const measureShelfAt = async (
+  path: string,
+  viewport: { readonly width: number; readonly height: number },
+): Promise<{ errors: string[]; shelf: OpenedShelfMeasure }> => {
+  const page = await browser.newPage({
+    viewport: { width: viewport.width, height: viewport.height },
+  });
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  try {
+    const origins = [new URL(server.base).origin, new URL(graph.base).origin];
+    await page.route("**/*", (route) =>
+      origins.includes(new URL(route.request().url()).origin)
+        ? route.continue()
+        : route.fulfill({ status: 204, body: "" }),
+    );
+    await page.routeWebSocket(
+      () => true,
+      () => {
+        // Left unconnected, the dev server's live-reload socket stays silent.
+      },
+    );
+    await page.goto(new URL(path, server.base).href, {
+      waitUntil: "networkidle",
+      timeout: PAGE_SETTLE_MS,
+    });
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    return {
+      errors,
+      shelf: await page.evaluate(measureOpenedShelf, WIDTH_TOLERANCE_PX),
+    };
+  } finally {
+    await page.close();
+  }
+};
 
 /** Each view's canvas, as first served, measured. */
 const measureViews = (): [string, CanvasMeasure][] =>
@@ -317,6 +366,62 @@ describe("the overview's record, on the metro", () => {
         expect(numeral.onLine, numeral.href).toBe(false);
         expect(numeral.onHead, numeral.href).toBe(false);
       }
+    },
+  );
+
+  it("crosses no box with a bridge it does not join, and states each namespace's instances on its box, at rest and with each namespace opened", () => {
+    const instances = new Map(
+      (served.graph?.ontologies ?? []).map((ontology) => [
+        ontology.prefix,
+        ontology.classes.reduce(
+          (sum, klass) => sum + (klass.instanceCount ?? 0),
+          0,
+        ),
+      ]),
+    );
+    let boxes = 0;
+    for (const [path, measure] of measureViews()) {
+      expect(measure.crossingBridges, path).toEqual([]);
+      for (const box of measure.boxes) {
+        boxes += 1;
+        expect(box.instances, `${path} ${box.id}`).toBe(instances.get(box.id));
+      }
+    }
+    expect(boxes).toBeGreaterThan(0);
+  });
+
+  it("names metro's bridge to geo on its label row at rest, with the relations served", async () => {
+    const [desktop] = VIEWPORTS;
+    const { errors, shelf } = await measureShelfAt("/definitions", desktop);
+    expect(errors).toEqual([]);
+    const answer = served.graph;
+    if (answer === undefined) throw new Error("no served graph");
+    expect(shelf.names).toEqual([
+      {
+        ns: "metro",
+        to: "geo",
+        relations: countServedBridges(answer).get("geo metro"),
+      },
+    ]);
+    expect(shelf.namesInWayBack).toBe(false);
+  });
+
+  it.each(
+    STRIP_VIEWPORTS.filter(({ name }) => name === "1440" || name === "912")
+      .flatMap((viewport) =>
+        ["geo", "metro"].map((prefix) => [prefix, viewport.name, viewport] as const),
+      ),
+  )(
+    "wraps the shelf under %s opened within the canvas at %s px",
+    async (prefix, _width, viewport) => {
+      const { errors, shelf } = await measureShelfAt(
+        `/definitions?expand=${prefix}`,
+        viewport,
+      );
+      expect(errors).toEqual([]);
+      expect(shelf.boxes.length).toBeGreaterThan(0);
+      expect(shelf.boxes.filter(({ across }) => !across)).toEqual([]);
+      expect(shelf.namesInWayBack).toBe(false);
     },
   );
 

@@ -40,12 +40,15 @@ import {
 import {
   type BridgeLabelMeasure,
   type CanvasMeasure,
+  countServedBridges,
   countServedNeighbourhood,
   fetchServedGraph,
   MIN_FIT,
   measureBridgeLabels,
   measureCanvasSvg,
+  measureOpenedShelf,
   measureWeightLinks,
+  type OpenedShelfMeasure,
   type ServedWeights,
   sliceCanvasSvg,
   type WeightLinkMeasure,
@@ -1060,6 +1063,55 @@ describe("a drill's link against its address", () => {
   });
 });
 
+describe.each(["1440", "912"])("an opened view at %s px", (width) => {
+  const viewport = [...VIEWPORTS, ...STRIP_VIEWPORTS].find(
+    (candidate) => candidate.name === width,
+  );
+  const bridges = new Map<string, number>();
+
+  beforeAll(async () => {
+    const graph = await fetchServedGraph(
+      new URL(new URL(DEFAULT_GRAPHQL_URL).pathname, server.graphBase).href,
+    );
+    for (const [pair, count] of countServedBridges(graph)) {
+      bridges.set(pair, count);
+    }
+  }, PAGE_SETTLE_MS);
+
+  it.each(["surface", "ds"])(
+    "wraps the shelf under %s opened within the canvas, its label rows naming their bridges heaviest first as served",
+    async (prefix) => {
+      if (viewport === undefined) throw new Error(`no ${width} viewport`);
+      const seen: { shelf?: OpenedShelfMeasure } = {};
+      const { errors } = await openExplorer(
+        `/definitions?expand=${prefix}`,
+        viewport,
+        async (page) => {
+          seen.shelf = await page.evaluate(
+            measureOpenedShelf,
+            WIDTH_TOLERANCE_PX,
+          );
+        },
+      );
+      expect(errors).toEqual([]);
+      const { boxes = [], names = [], namesInWayBack } = seen.shelf ?? {};
+      expect(boxes.length).toBeGreaterThan(1);
+      expect(boxes.filter(({ across }) => !across)).toEqual([]);
+      expect(namesInWayBack).toBe(false);
+      for (const name of names) {
+        expect(name.relations, `${name.ns} to ${name.to}`).toBe(
+          bridges.get([name.ns, name.to].sort().join(" ")),
+        );
+      }
+      for (const [index, name] of names.entries()) {
+        const before = names[index - 1];
+        if (before?.ns !== name.ns) continue;
+        expect(before.relations).toBeGreaterThanOrEqual(name.relations);
+      }
+    },
+  );
+});
+
 describe("at 912 px, on a canvas narrower than the drawing", () => {
   const tablet = STRIP_VIEWPORTS.find((viewport) => viewport.name === "912");
 
@@ -1095,6 +1147,7 @@ describe("the overview's record, on the docs site", () => {
   const [desktop] = VIEWPORTS;
   const served: {
     weights?: ServedWeights;
+    instances?: ReadonlyMap<string, number>;
     prefixes?: readonly string[];
     classes?: number;
   } = {};
@@ -1122,6 +1175,15 @@ describe("the overview's record, on the docs site", () => {
       new URL(new URL(DEFAULT_GRAPHQL_URL).pathname, server.graphBase).href,
     );
     served.weights = weighServedRelations(graph);
+    served.instances = new Map(
+      graph.ontologies.map((ontology) => [
+        ontology.prefix,
+        ontology.classes.reduce(
+          (sum, klass) => sum + (klass.instanceCount ?? 0),
+          0,
+        ),
+      ]),
+    );
     served.prefixes = graph.ontologies.map((ontology) => ontology.prefix);
     served.classes = graph.ontologies.reduce(
       (sum, ontology) => sum + ontology.classes.length,
@@ -1207,6 +1269,20 @@ describe("the overview's record, on the docs site", () => {
       expect(measure.sharedBridgeLines, path).toEqual([]);
       expect(measure.framingBridges, path).toEqual([]);
     }
+  });
+
+  it("crosses no box with a bridge it does not join, and states each namespace's instances on its box, at rest and with each namespace opened", () => {
+    let boxes = 0;
+    for (const [path, measure] of measureViews()) {
+      expect(measure.crossingBridges, path).toEqual([]);
+      for (const box of measure.boxes) {
+        boxes += 1;
+        expect(box.instances, `${path} ${box.id}`).toBe(
+          served.instances?.get(box.id),
+        );
+      }
+    }
+    expect(boxes).toBeGreaterThan(0);
   });
 
   it("states each relation's weight by its stroke, 1, 2, 4 or 8 px and dashed exactly at 0, the served count of its heaviest relation, and none into a stub with no statements counted", () => {
