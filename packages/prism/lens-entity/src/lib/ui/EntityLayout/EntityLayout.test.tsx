@@ -15,6 +15,7 @@ import createRecordedFetch from "../../../../testing/createRecordedFetch.js";
 import createWarmEnvironment from "../../../../testing/createWarmEnvironment.js";
 import {
   ENTITY_TEST_TIMEOUT_MS,
+  LIST_RENDERERS,
   STATION_COUNT,
   STATIONS_BINDING,
 } from "../../../../testing/fixtures.js";
@@ -25,6 +26,7 @@ const STATIONS_LAYOUT = {
   binding: STATIONS_BINDING,
   label: "Stations",
   rail: <nav aria-label="Site rail" />,
+  renderers: LIST_RENDERERS,
 } as const;
 
 /** The strip socket named `slot`. */

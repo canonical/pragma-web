@@ -17,7 +17,10 @@ import type { EntityIndexPaginationQuery } from "../../../../../__generated__/En
 import type { EntityIndexQuery } from "../../../../../__generated__/EntityIndexQuery.graphql.js";
 import entityIndexQueryNode from "../../../../../__generated__/EntityIndexQuery.graphql.js";
 import buildEntityIndexVariables from "../../../../buildEntityIndexVariables.js";
-import { ENTITY_PAGE_SIZE } from "../../../../constants.js";
+import {
+  DEFAULT_LIST_RENDERERS,
+  ENTITY_PAGE_SIZE,
+} from "../../../../constants.js";
 import { useMessages } from "../../../../i18n/index.js";
 import matchesEntityText from "../../../../matchesEntityText.js";
 import {
@@ -97,7 +100,7 @@ const componentCssClassName = "ds entity-index";
  * derived here.
  *
  * The renderer and the search text are the address's (`as`, `q`), read
- * through the lens's renderers over the site's defaults; the strip's switch
+ * through the lens's renderers (the table alone where it declares none); the strip's switch
  * and search write them. The entries render through the site's projections
  * as cards in the `cards` renderer and as rows in any other, so a site that
  * maps an arm for the class's type renders its entries its own way, and
@@ -128,7 +131,10 @@ export default function EntityIndex({
   ...props
 }: EntityIndexProps): ReactElement {
   const t = useMessages();
-  const { active } = useRenderers("list", renderers?.list);
+  const { active } = useRenderers(
+    "list",
+    renderers?.list ?? DEFAULT_LIST_RENDERERS,
+  );
   const text = useSearchParam(VIEW_PARAMS.query) ?? "";
   const sort = useSearchParam(VIEW_PARAMS.sort) ?? undefined;
   const selected = useSearchParam(VIEW_PARAMS.select) ?? undefined;

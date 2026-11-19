@@ -26,6 +26,13 @@ export const ENTITY_URI_PARAM = "uri";
  */
 export const ENTITY_PAGE_SIZE = 100;
 
+/**
+ * The list renderers an index offers when its lens declares none: the table
+ * alone. Cards draw a sidecar a lens vouches for, so a lens that has one
+ * declares them.
+ */
+export const DEFAULT_LIST_RENDERERS: readonly string[] = ["table"];
+
 /** The catalog key that names each cardinality, in the fields table and the
  * relations. */
 export const CARDINALITY_MESSAGES: Readonly<Record<Cardinality, MessageKey>> = {
