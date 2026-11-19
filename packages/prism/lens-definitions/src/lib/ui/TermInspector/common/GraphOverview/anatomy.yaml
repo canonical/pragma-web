@@ -182,23 +182,9 @@ node:
     - node:
         role: undeclared
         # The class edges the instances state that no property declares,
-        # a table row each: from, property, to as term links; the
-        # statements as a figure flush to the end. A sentence when none.
-        edges:
-          - node:
-              role: edges
-              styles:
-                layout.grid.column: "1 / -1"
-                layout.width: 100%
-                typography.size: typography.text.secondary.fontSize
-              edges:
-                - node:
-                    role: row
-                    styles:
-                      spacing.internal.block: space.050
-                      border.block.end: 1px solid color.border.muted
-                  relation: { cardinality: "0..*", slotName: row }
-            relation: { cardinality: "0..1", slotName: edges }
+        # in the inspector's edge table (its `edges` slot): from, property,
+        # to as term links; the statements as a figure flush to the end. A
+        # sentence when none.
       relation: { cardinality: "1", slotName: undeclared }
     - node:
         role: gestures

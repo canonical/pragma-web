@@ -735,7 +735,8 @@ describe("ClassGraph", () => {
         const edge = requireDefined(
           metro.layout.edges.find(
             (candidate) =>
-              candidate.id === link.closest("[data-edge]")?.getAttribute("data-edge"),
+              candidate.id ===
+              link.closest("[data-edge]")?.getAttribute("data-edge"),
           ),
           "the numeral's edge",
         );

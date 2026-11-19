@@ -12,6 +12,7 @@ import {
   defineClass,
   FOUR_NAMESPACE_GRAPH,
 } from "../../../../testing/fixtures.js";
+import nameClassGraphTerms from "../../../../testing/nameClassGraphTerms.js";
 import metroGraph from "../../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../../testing/records/ontologyGraph.js";
 import chooseAddressDrill from "../../classGraph/chooseAddressDrill.js";
@@ -50,12 +51,6 @@ function renderCanvas(input: ClassGraphInput, drill?: string): string {
     budget: GRAPH_BUDGET,
     ...(drill === undefined ? {} : { drill }),
   });
-  const terms = new Map(
-    input.classes.map((klass) => [
-      klass.uri,
-      `${klass.prefix}:${klass.uri.split(/[#/:]/).at(-1)}`,
-    ]),
-  );
   const html = renderToString(
     createRouterHarness(
       <HierarchyWell
@@ -66,7 +61,7 @@ function renderCanvas(input: ClassGraphInput, drill?: string): string {
         layout={layout}
         onHoverTerm={() => {}}
         term={undefined}
-        terms={terms}
+        terms={nameClassGraphTerms(input)}
       />,
     ),
   );

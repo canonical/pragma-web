@@ -5,16 +5,16 @@ import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
 import createStripHarness from "../../../../../../testing/createStripHarness.js";
 import { DEFINITIONS_TEST_TIMEOUT_MS } from "../../../../../../testing/fixtures.js";
+import classEdges from "../../../../../../testing/records/classEdges.js";
 import definitionsExplorerRecords from "../../../../../../testing/records/definitionsExplorerRecords.js";
 import metroGraph from "../../../../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../../../../testing/records/ontologyGraph.js";
 import useCapturedExplorer from "../../../../../../testing/useCapturedExplorer.js";
 import type { TermInspector_ontologies$key } from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
 import termInspectorOntologiesFragmentNode from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
-import weighStroke from "../../../../classGraph/weighStroke.js";
 import listUndeclaredEdges from "../../../../classGraph/listUndeclaredEdges.js";
+import weighStroke from "../../../../classGraph/weighStroke.js";
 import { MESSAGES } from "../../../../i18n/index.js";
-import classEdges from "../../../../../../testing/records/classEdges.js";
 import { useLensFilter } from "../../../LensFilterProvider/index.js";
 import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 import GraphOverview from "./GraphOverview.js";
@@ -237,7 +237,14 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       [...rows].reduce(
         (total, row) =>
           total +
-          Number(row.querySelector(".figures")?.textContent?.split(" · ").at(index)?.split(" ").at(0)),
+          Number(
+            row
+              .querySelector(".figures")
+              ?.textContent?.split(" · ")
+              .at(index)
+              ?.split(" ")
+              .at(0),
+          ),
         0,
       );
     expect(links.at(0)?.textContent).toBe(`${sum(0)} classes`);
@@ -253,7 +260,7 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(rows).toHaveLength(undeclared.length);
     for (const [index, row] of [...rows].entries()) {
       expect(row.querySelectorAll("td a")).toHaveLength(3);
-      expect(row.querySelector("td.figure")?.textContent).toBe(
+      expect(row.querySelector("td.is-figure")?.textContent).toBe(
         String(undeclared.at(index)?.count),
       );
     }

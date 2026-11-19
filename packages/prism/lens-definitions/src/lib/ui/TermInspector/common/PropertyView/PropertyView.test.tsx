@@ -43,7 +43,7 @@ describe("PropertyView", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(rows).toHaveLength(own.length);
     for (const [index, row] of [...rows].entries()) {
       expect(row.querySelectorAll("td a")).toHaveLength(2);
-      expect(row.querySelector("td.figure")?.textContent).toBe(
+      expect(row.querySelector("td.is-figure")?.textContent).toBe(
         String(own.at(index)?.count),
       );
     }

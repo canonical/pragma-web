@@ -40,7 +40,6 @@
     /* The fade; zero under reduced motion. */
     --class-graph-fade-duration: var(--motion-duration-fast);
     --class-graph-weight-link-color: var(--color-text-link);
-    --class-graph-weight-link-hover: var(--color-text-link-hover);
   }
 
   .ds.class-graph .rule {
@@ -219,10 +218,6 @@
     color: var(--class-graph-weight-link-color);
     cursor: pointer;
     pointer-events: all;
-  }
-
-  .ds.class-graph .weight-link:hover {
-    color: var(--class-graph-weight-link-hover);
   }
 
   .ds.class-graph .weight-halo {

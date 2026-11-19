@@ -256,7 +256,9 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
         .getAllByRole("term")
         .map((key) => key.textContent),
     ).toEqual(["Kind", "Functional", "Range", "Domain", "Inverse"]);
-    expect(within(requireDetails(panel)).getByText("ds:Subcomponent")).toBeInTheDocument();
+    expect(
+      within(requireDetails(panel)).getByText("ds:Subcomponent"),
+    ).toBeInTheDocument();
     expect(
       within(panel).getByRole("link", { name: "Component" }),
     ).toHaveAttribute("href", "/definitions/ds%3AComponent");

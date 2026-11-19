@@ -187,9 +187,7 @@ export default function TermInspector({
   );
   let body: ReactElement;
   if (term === undefined) {
-    body = (
-      <GraphOverview classEdges={classEdges} ontologies={ontologyData} />
-    );
+    body = <GraphOverview classEdges={classEdges} ontologies={ontologyData} />;
   } else if (classData) {
     body = (
       <ClassView

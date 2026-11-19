@@ -106,12 +106,16 @@ export default function PropertyView({
           <table className="edges">
             <thead>
               <tr>
-                <th scope="col">{t("inspector.edges.subject")}</th>
-                <th scope="col">{t("inspector.edges.object")}</th>
-                <th className="figure" scope="col">
+                <th className="cell is-heading" scope="col">
+                  {t("inspector.edges.subject")}
+                </th>
+                <th className="cell is-heading" scope="col">
+                  {t("inspector.edges.object")}
+                </th>
+                <th className="cell is-heading is-figure" scope="col">
                   {t("inspector.edges.count")}
                 </th>
-                <th className="figure" scope="col">
+                <th className="cell is-heading is-figure" scope="col">
                   {t("inspector.edges.declared")}
                 </th>
               </tr>
@@ -122,14 +126,22 @@ export default function PropertyView({
                   className="row"
                   key={`${edge.subjectClass} ${edge.objectClass}`}
                 >
-                  <td>
-                    <TermLink label={null} namespaces={namespaces} uri={edge.subjectClass} />
+                  <td className="cell">
+                    <TermLink
+                      label={null}
+                      namespaces={namespaces}
+                      uri={edge.subjectClass}
+                    />
                   </td>
-                  <td>
-                    <TermLink label={null} namespaces={namespaces} uri={edge.objectClass} />
+                  <td className="cell">
+                    <TermLink
+                      label={null}
+                      namespaces={namespaces}
+                      uri={edge.objectClass}
+                    />
                   </td>
-                  <td className="figure">{edge.count}</td>
-                  <td className="figure">
+                  <td className="cell is-figure">{edge.count}</td>
+                  <td className="cell is-figure">
                     {t(edge.declared ? "inspector.yes" : "inspector.no")}
                   </td>
                 </tr>

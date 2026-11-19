@@ -3,6 +3,7 @@ import type {
   ClassGraphInput,
   ClassGraphLayout,
 } from "../src/lib/classGraph/types.js";
+import nameClassGraphTerms from "./nameClassGraphTerms.js";
 import ontologyGraph from "./records/ontologyGraph.js";
 
 /** A class graph laid out, with each class's and relation's compact term. */
@@ -26,21 +27,15 @@ export interface ClassGraphSetup {
 export default function createClassGraphSetup(
   input: ClassGraphInput = ontologyGraph,
 ): ClassGraphSetup {
-  const nameTerm = (uri: string, prefix: string): string =>
-    `${prefix}:${uri.split(/[#/:]/).at(-1)}`;
-  const classTerms = new Map(
-    input.classes.map((klass) => [klass.uri, nameTerm(klass.uri, klass.prefix)]),
-  );
-  const relationTerms = input.relations.map((relation) => {
-    const base = relation.uri.replace(/[^#/:]+$/, "");
-    const prefix =
-      input.classes.find((klass) => klass.uri.startsWith(base))?.prefix ??
-      base;
-    return [relation.uri, nameTerm(relation.uri, prefix)] as const;
-  });
+  const terms = nameClassGraphTerms(input);
+  const classUris = new Set(input.classes.map((klass) => klass.uri));
   return {
     layout: layOutClassGraph(input),
-    terms: new Map([...classTerms, ...relationTerms]),
-    uris: new Map([...classTerms].map(([uri, term]) => [term, uri])),
+    terms,
+    uris: new Map(
+      [...terms]
+        .filter(([uri]) => classUris.has(uri))
+        .map(([uri, term]) => [term, uri]),
+    ),
   };
 }

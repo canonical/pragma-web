@@ -172,6 +172,47 @@ node:
                             typography.color: color.text.muted
                         relation: { cardinality: "1", slotName: group-label }
                   relation: { cardinality: "0..*", slotName: group }
+                - node:
+                    # A list of class edges, a table row each: a property's
+                    # edges (subject, object, statements, declared), or the
+                    # overview's undeclared ones (subject, property,
+                    # object, statements); terms as links, figures flush
+                    # to the end.
+                    role: edges
+                    styles:
+                      layout.grid.column: "1 / -1"
+                      size.inline: 100%
+                      layout.table.collapse: collapse
+                      typography.size: typography.text.secondary.fontSize
+                    edges:
+                      - switch:
+                          on: internal
+                          cases:
+                            - node:
+                                role: cell
+                                styles:
+                                  spacing.internal.block.start: space.050
+                                  spacing.internal.block.end: space.050
+                                  spacing.internal.inline.end: space.100
+                                  appearance.border.width: 1px
+                                  appearance.border.style: solid
+                                  appearance.border.bottom.color: color.border.muted
+                                  typography.align: start
+                                  layout.verticalAlign: baseline
+                                  typography.wrap: anywhere
+                            - node:
+                                role: column heading (.is-heading)
+                                styles:
+                                  typography.weight: typography.text.secondary.fontWeight
+                                  typography.color: color.text.muted
+                            - node:
+                                role: figure (.is-figure)
+                                styles:
+                                  spacing.internal.inline.end: 0
+                                  typography.align: end
+                                  typography.variant.numeric: tabular-nums
+                        relation: { cardinality: "1..*", slotName: cell }
+                  relation: { cardinality: "0..1", slotName: edges }
             relation: { cardinality: "1..*", slotName: section }
           - node:
               role: details

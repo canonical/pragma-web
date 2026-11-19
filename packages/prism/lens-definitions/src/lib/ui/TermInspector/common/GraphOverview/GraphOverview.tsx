@@ -6,11 +6,10 @@ import listUndeclaredEdges from "../../../../classGraph/listUndeclaredEdges.js";
 import { useMessages } from "../../../../i18n/index.js";
 import { ClassGraph } from "../../../ClassGraph/index.js";
 import { useLensFilter } from "../../../LensFilterProvider/index.js";
-import { SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
+import { TermLink } from "../TermLink/index.js";
+import { NAMESPACES_ID, SPECIMENS, STROKE_SPECIMENS } from "./constants.js";
 import layOutSpecimen from "./layOutSpecimen.js";
 import layOutStrokeSpecimen from "./layOutStrokeSpecimen.js";
-import { TermLink } from "../TermLink/index.js";
-import { NAMESPACES_ID } from "./constants.js";
 import type { GraphOverviewProps } from "./types.js";
 import "./styles.css";
 
@@ -194,10 +193,16 @@ export default function GraphOverview({
           <table className="edges">
             <thead>
               <tr>
-                <th scope="col">{t("inspector.edges.subject")}</th>
-                <th scope="col">{t("inspector.edges.property")}</th>
-                <th scope="col">{t("inspector.edges.object")}</th>
-                <th className="figure" scope="col">
+                <th className="cell is-heading" scope="col">
+                  {t("inspector.edges.subject")}
+                </th>
+                <th className="cell is-heading" scope="col">
+                  {t("inspector.edges.property")}
+                </th>
+                <th className="cell is-heading" scope="col">
+                  {t("inspector.edges.object")}
+                </th>
+                <th className="cell is-heading is-figure" scope="col">
                   {t("inspector.edges.count")}
                 </th>
               </tr>
@@ -208,16 +213,28 @@ export default function GraphOverview({
                   className="row"
                   key={`${edge.subjectClass} ${edge.property} ${edge.objectClass}`}
                 >
-                  <td>
-                    <TermLink label={null} namespaces={namespaces} uri={edge.subjectClass} />
+                  <td className="cell">
+                    <TermLink
+                      label={null}
+                      namespaces={namespaces}
+                      uri={edge.subjectClass}
+                    />
                   </td>
-                  <td>
-                    <TermLink label={null} namespaces={namespaces} uri={edge.property} />
+                  <td className="cell">
+                    <TermLink
+                      label={null}
+                      namespaces={namespaces}
+                      uri={edge.property}
+                    />
                   </td>
-                  <td>
-                    <TermLink label={null} namespaces={namespaces} uri={edge.objectClass} />
+                  <td className="cell">
+                    <TermLink
+                      label={null}
+                      namespaces={namespaces}
+                      uri={edge.objectClass}
+                    />
                   </td>
-                  <td className="figure">{edge.count}</td>
+                  <td className="cell is-figure">{edge.count}</td>
                 </tr>
               ))}
             </tbody>

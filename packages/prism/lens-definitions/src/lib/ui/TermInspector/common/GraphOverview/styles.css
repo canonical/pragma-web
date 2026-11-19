@@ -151,8 +151,7 @@
     grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
-    column-gap: var(--graph-overview-gap);
-    row-gap: var(--graph-overview-row-gap);
+    gap: var(--graph-overview-gap);
     margin-block: 0;
     font-weight: var(--graph-overview-bold-weight);
     font-variant-numeric: tabular-nums;

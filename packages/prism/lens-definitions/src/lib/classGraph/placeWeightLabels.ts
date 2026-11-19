@@ -11,8 +11,8 @@ import {
   requireAt,
   requireDefined,
 } from "@canonical/prism-core";
-import measureRegionHeading from "./measureRegionHeading.js";
 import { WEIGHT_LABEL_AT, WEIGHT_LABEL_GAP } from "./constants.js";
+import measureRegionHeading from "./measureRegionHeading.js";
 import type {
   ClassGraphLayout,
   DrawnEdgeLabel,
@@ -144,7 +144,12 @@ export default function placeWeightLabels(
       ),
       h: REGION_LABEL_ROW,
     })),
-    ...layout.regions.map((region) => ({ x: region.x, y: region.y, w: region.w, h: 1 })),
+    ...layout.regions.map((region) => ({
+      x: region.x,
+      y: region.y,
+      w: region.w,
+      h: 1,
+    })),
     ...layout.edges.flatMap((edge) =>
       edge.heads.map((head) => {
         const box = boundPath(head);
@@ -178,7 +183,9 @@ export default function placeWeightLabels(
       const own = seated.indexOf(label.box);
       seated.splice(own, 1);
       const nw = counted
-        ? Math.ceil(measureTextWidth(String(counted.count), "regular", LABEL_SIZE)) +
+        ? Math.ceil(
+            measureTextWidth(String(counted.count), "regular", LABEL_SIZE),
+          ) +
           2 * LABEL_HALO
         : 0;
       const nh = LABEL_SIZE + 2 * LABEL_HALO;

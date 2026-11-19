@@ -443,6 +443,7 @@ export default function ClassGraph({
           x={numeral.box.x}
           y={numeral.box.y}
         />
+        {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the numeral, so assistive technology reads it once. */}
         <text
           aria-hidden="true"
           className="weight-halo"
@@ -579,81 +580,80 @@ export default function ClassGraph({
         {drawnBridges.map((label) => {
           const { dx, dy } = seatOf(label.edge);
           return (
-              <g data-edge={label.edge} key={label.edge}>
-                {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
-                <text
-                  aria-hidden="true"
-                  className="label-halo is-bridge"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinejoin="round"
-                  strokeWidth={LABEL_HALO_STROKE}
-                  textAnchor="middle"
-                  x={label.cx + dx}
-                  y={label.box.y + dy + bridgeBaseline}
-                >
-                  {label.text}
-                </text>
-                <text
-                  className="edge-label is-bridge"
-                  fill="currentColor"
-                  textAnchor="middle"
-                  x={label.cx + dx}
-                  y={label.box.y + dy + bridgeBaseline}
-                >
-                  {label.text}
-                </text>
-                {drawNumeral(label.edge)}
-              </g>
+            <g data-edge={label.edge} key={label.edge}>
+              {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
+              <text
+                aria-hidden="true"
+                className="label-halo is-bridge"
+                fill="none"
+                stroke="currentColor"
+                strokeLinejoin="round"
+                strokeWidth={LABEL_HALO_STROKE}
+                textAnchor="middle"
+                x={label.cx + dx}
+                y={label.box.y + dy + bridgeBaseline}
+              >
+                {label.text}
+              </text>
+              <text
+                className="edge-label is-bridge"
+                fill="currentColor"
+                textAnchor="middle"
+                x={label.cx + dx}
+                y={label.box.y + dy + bridgeBaseline}
+              >
+                {label.text}
+              </text>
+              {drawNumeral(label.edge)}
+            </g>
           );
         })}
         {drawnFocus.map((label) => {
-              const { dx, dy } = seatOf(label.edge);
-              const lines = label.lines.map((line, index) => (
-                <tspan
-                  key={line}
-                  x={label.cx + dx}
-                  y={
-                    label.box.y +
-                    dy +
-                    LABEL_HALO +
-                    labelBaseline +
-                    index * LABEL_LINE_PITCH
-                  }
-                >
-                  {line}
-                </tspan>
-              ));
-              const isFocusLabel =
-                focus !== undefined && label.edge !== activeEdge;
-              return (
-                <g data-edge={label.edge} key={label.edge}>
-                  {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
-                  <text
-                    aria-hidden="true"
-                    className="label-halo"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinejoin="round"
-                    strokeWidth={LABEL_HALO_STROKE}
-                    textAnchor="middle"
-                  >
-                    {lines}
-                  </text>
-                  <text
-                    className={joinClasses(
-                      "edge-label",
-                      isFocusLabel && "is-focus",
-                    )}
-                    fill="currentColor"
-                    textAnchor="middle"
-                  >
-                    {lines}
-                  </text>
-                  {drawNumeral(label.edge)}
-                </g>
-              );
-            })}
+          const { dx, dy } = seatOf(label.edge);
+          const lines = label.lines.map((line, index) => (
+            <tspan
+              key={line}
+              x={label.cx + dx}
+              y={
+                label.box.y +
+                dy +
+                LABEL_HALO +
+                labelBaseline +
+                index * LABEL_LINE_PITCH
+              }
+            >
+              {line}
+            </tspan>
+          ));
+          const isFocusLabel = focus !== undefined && label.edge !== activeEdge;
+          return (
+            <g data-edge={label.edge} key={label.edge}>
+              {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text takes no focus; the halo repeats the label, so assistive technology reads it once. */}
+              <text
+                aria-hidden="true"
+                className="label-halo"
+                fill="none"
+                stroke="currentColor"
+                strokeLinejoin="round"
+                strokeWidth={LABEL_HALO_STROKE}
+                textAnchor="middle"
+              >
+                {lines}
+              </text>
+              <text
+                className={joinClasses(
+                  "edge-label",
+                  isFocusLabel && "is-focus",
+                )}
+                fill="currentColor"
+                textAnchor="middle"
+              >
+                {lines}
+              </text>
+              {drawNumeral(label.edge)}
+            </g>
+          );
+        })}
       </g>
     </g>
   );

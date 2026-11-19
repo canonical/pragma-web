@@ -290,26 +290,6 @@ node:
         on: internal
         cases:
           - node:
-              # A count's numeral, seated with its edge's label clear of
-              # every line, off the arrowheads, inside the viewBox: an
-              # <a class="weight-link" tabindex="-1"> to the property's
-              # term page, out of the tab order (the inspector's rows carry
-              # the keyboard route); a real pointer click opens it. Drawn
-              # only at full zoom and for a count above 0.
-              role: weight-link
-              styles:
-                typography.color: color.text.link
-                interaction.pointerEvents: all
-                interaction.cursor: pointer
-              edges:
-                - node:
-                    role: weight-label
-                    styles:
-                      typography.size: typography.text.secondary.fontSize
-                      typography.variant.numeric: tabular-nums
-                      typography.decoration: underline
-                  relation: { cardinality: "1", slotName: numeral }
-          - node:
               role: label halo
               styles:
                 typography.size: typography.text.secondary.fontSize
@@ -339,3 +319,32 @@ node:
               styles:
                 typography.color: color.text.branded
       relation: { cardinality: "0..*", slotName: edge-label }
+    - node:
+        # A count's numeral, seated with its edge's label clear of every
+        # line, off the arrowheads, inside the viewBox: an
+        # <a class="weight-link" tabindex="-1"> to the property's term
+        # page, out of the tab order (the inspector's rows carry the
+        # keyboard route); a real pointer click opens it. Drawn only at
+        # full zoom and for a count above 0, on a halo as an edge label.
+        role: weight link
+        styles:
+          typography.color: color.text.link
+          interaction.pointerEvents: all
+          interaction.cursor: pointer
+        edges:
+          - node:
+              role: weight halo
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                interaction.pointerEvents: none
+            relation: { cardinality: "1", slotName: weight-halo }
+          - node:
+              role: weight label
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.variant.numeric: tabular-nums
+                typography.decoration: underline
+                interaction.pointerEvents: none
+            relation: { cardinality: "1", slotName: weight-label }
+      relation: { cardinality: "0..*", slotName: weight-link }

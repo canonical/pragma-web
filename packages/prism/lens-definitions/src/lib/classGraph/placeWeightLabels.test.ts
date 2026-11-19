@@ -99,7 +99,10 @@ describe("placeWeightLabels", () => {
       expect(
         heads.some(
           ([x, y]) =>
-            x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h,
+            x >= box.x &&
+            x <= box.x + box.w &&
+            y >= box.y &&
+            y <= box.y + box.h,
         ),
       ).toBe(false);
       expect(
