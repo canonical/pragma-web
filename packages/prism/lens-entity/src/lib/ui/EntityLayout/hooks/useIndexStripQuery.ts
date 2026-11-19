@@ -42,10 +42,7 @@ export default function useIndexStripQuery(
   const filters = variables.filters ?? [];
   return {
     count: ontologyClass?.instanceCount ?? 0,
-    total:
-      filters.length === 0
-        ? (ontologyClass?.instanceCount ?? 0)
-        : facetedInstances.totalCount,
+    total: ontologyClass?.instanceCount ?? 0,
     facets: facetedInstances.facets.map(({ field, label, values }) => ({
       field,
       label,

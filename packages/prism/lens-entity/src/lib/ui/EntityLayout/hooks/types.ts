@@ -13,7 +13,8 @@ export interface UseIndexStripQueryResult {
   /** How many loaded entries the search shows. */
   readonly visible: number;
   /** The total the shown entries are counted against: the class's
-   * instances, or the matching set's where a facet filter applies. */
+   * instances, whatever facet filter applies, so a filter reads as the
+   * part of the class it leaves ("6 of 26 entries"). */
   readonly total: number;
   /** The class's facets, each value counted over the matching set. */
   readonly facets: readonly FacetCount[];

@@ -38,7 +38,7 @@ describe("EntityStatus", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("counts the shown entries out of the matching set where a facet applies", async () => {
+  it("counts the shown entries out of the class's instances where a facet applies", async () => {
     const station = "https://metro.example/onto#Station";
     const ontologies = [
       { prefix: "metro", namespace: "https://metro.example/onto#" },
@@ -78,7 +78,7 @@ describe("EntityStatus", () => {
       }),
     );
     expect(
-      await screen.findByRole("status", { name: "1 of 6 entries" }),
+      await screen.findByRole("status", { name: "1 of 26 entries" }),
     ).toBeInTheDocument();
     expect(fetchFn.mock.lastCall?.[1].filters).toEqual([
       {
