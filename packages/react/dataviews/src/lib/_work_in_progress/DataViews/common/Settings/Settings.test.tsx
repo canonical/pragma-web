@@ -1,3 +1,4 @@
+import { assertInvariant } from "@canonical/dataviews-core/bindings";
 /**
  * DataViews.Settings in its table: the settings cell holding the menu, every
  * change written to the presentation and announced, nothing asked of the
@@ -10,26 +11,31 @@ import {
   type QueryLocation,
 } from "@canonical/dataviews-core";
 import { createRecordingLocation } from "@canonical/dataviews-core/testing";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { describe, expect, it, onTestFinished, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
 import declareMachineOrdering from "../../../../../../testing/declareMachineOrdering.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import fakeAnnouncerClock from "../../../../../../testing/fakeAnnouncerClock.js";
+import installPopoverStandIn from "../../../../../../testing/installPopoverStandIn.js";
+import openMenuFrom from "../../../../../../testing/openMenuFrom.js";
 import readAnnouncements from "../../../../../../testing/readAnnouncements.js";
 import type { MachineProvider } from "../../../../../../testing/types.js";
+import waitForFocus from "../../../../../../testing/waitForFocus.js";
+import waitForFrames from "../../../../../../testing/waitForFrames.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 
@@ -102,12 +108,8 @@ const findTrigger = (): HTMLElement => {
 };
 
 /** Choose one item from the settings menu. */
-const choose = (name: string): void => {
-  fireEvent.click(findTrigger());
-  const menu = document.querySelector<HTMLElement>("[role='menu']");
-  if (menu === null) {
-    throw new Error("expected the settings menu open");
-  }
+const choose = async (name: string): Promise<void> => {
+  const menu = await openMenuFrom(findTrigger());
   fireEvent.click(within(menu).getByRole("menuitem", { name }));
 };
 
@@ -116,6 +118,14 @@ const readAnnouncement = async (): Promise<string | null> =>
   (await readAnnouncements()).at(-1) ?? null;
 
 describe("DataViews.Settings", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("throws outside a table's settings cell", () => {
     const { provider } = createProvider();
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -138,7 +148,12 @@ describe("DataViews.Settings", () => {
     expect(cell).toHaveClass("ds", "data-table-settings-cell");
     // Last in the header row, after every column's heading.
     expect(cell?.parentElement?.lastElementChild).toBe(cell);
-    expect(cell).toHaveAccessibleName("Table settings");
+    // Its one control is the menu's button, named for the settings.
+    expect(
+      within(assertInvariant(cell, "the trigger sits in a cell")).getByRole(
+        "button",
+      ),
+    ).toBe(findTrigger());
     view.unmount();
     render(
       <DataTable provider={provider} columns={columns} label="Machines" />,
@@ -148,7 +163,7 @@ describe("DataViews.Settings", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("works in a standalone table, with no root", () => {
+  it("works in a standalone table, with no root", async () => {
     const { provider } = createProvider();
     render(
       <DataTable
@@ -158,7 +173,7 @@ describe("DataViews.Settings", () => {
         settings={<DataViews.Settings />}
       />,
     );
-    choose("Hide Cores");
+    await choose("Hide Cores");
     expect(listShown()).toEqual(["Name", "Status"]);
   });
 
@@ -170,10 +185,10 @@ describe("DataViews.Settings", () => {
     const requests = source.calls.length;
     const writes = recording.writes.length;
     const slice = provider.state.get().slice;
-    choose("Hide Status");
+    await choose("Hide Status");
     expect(listShown()).toEqual(["Name", "Cores"]);
     expect(await readAnnouncement()).toBe("Status hidden");
-    expect(findTrigger()).toHaveFocus();
+    await waitForFocus(findTrigger());
     expect(provider.presentation.state.get().presentation).toEqual({
       "table.hidden": ["status"],
     });
@@ -187,23 +202,23 @@ describe("DataViews.Settings", () => {
     fakeAnnouncerClock();
     const { provider } = createProvider();
     render(<Composition provider={provider} />);
-    choose("Hide Status");
+    await choose("Hide Status");
     await readAnnouncement();
-    choose("Show Status");
+    await choose("Show Status");
     expect(listShown()).toEqual(["Name", "Status", "Cores"]);
     expect(await readAnnouncement()).toBe("Status shown, position 2 of 3");
-    expect(findTrigger()).toHaveFocus();
+    await waitForFocus(findTrigger());
   });
 
   it("moves a column, announcing where it now stands each time", async () => {
     fakeAnnouncerClock();
     const { provider } = createProvider();
     render(<Composition provider={provider} />);
-    choose("Move Cores left");
+    await choose("Move Cores left");
     expect(listShown()).toEqual(["Name", "Cores", "Status"]);
     expect(await readAnnouncement()).toBe("Cores moved to position 2 of 3");
-    expect(findTrigger()).toHaveFocus();
-    choose("Move Cores left");
+    await waitForFocus(findTrigger());
+    await choose("Move Cores left");
     expect(listShown()).toEqual(["Cores", "Name", "Status"]);
     // The same kind of words again are a new announcement, unaltered.
     expect(await readAnnouncement()).toBe("Cores moved to position 1 of 3");
@@ -213,7 +228,7 @@ describe("DataViews.Settings", () => {
     fakeAnnouncerClock();
     const { provider } = createProvider();
     render(<Composition provider={provider} />);
-    choose("Name is always shown");
+    await choose("Name is always shown");
     expect(await readAnnouncement()).toBe("Name is always shown");
     expect(listShown()).toEqual(["Name", "Status", "Cores"]);
     const hideable: readonly DataTableColumn[] = [
@@ -225,9 +240,9 @@ describe("DataViews.Settings", () => {
       <Composition provider={other.provider} declared={hideable} />,
     );
     const table = within(view.container);
-    fireEvent.click(table.getByRole("button", { name: "Table settings" }));
+    await openMenuFrom(table.getByRole("button", { name: "Table settings" }));
     fireEvent.click(screen.getByRole("menuitem", { name: "Hide Status" }));
-    fireEvent.click(table.getByRole("button", { name: "Table settings" }));
+    await openMenuFrom(table.getByRole("button", { name: "Table settings" }));
     const hideLast = screen.getByRole("menuitem", { name: "Hide Cores" });
     expect(hideLast).toHaveClass("disabled");
     fireEvent.click(hideLast);
@@ -236,10 +251,10 @@ describe("DataViews.Settings", () => {
     });
   });
 
-  it("offers no reset with nothing to clear, leaving the menu open", () => {
+  it("offers no reset with nothing to clear, leaving the menu open", async () => {
     const { provider } = createProvider();
     render(<Composition provider={provider} />);
-    fireEvent.click(findTrigger());
+    await openMenuFrom(findTrigger());
     const reset = screen.getByRole("menuitem", {
       name: "Reset table settings",
     });
@@ -255,12 +270,12 @@ describe("DataViews.Settings", () => {
    * left and Name widened, the reset still to choose. Answers the provider,
    * its source and the location's record.
    */
-  const renderArranged = () => {
+  const renderArranged = async () => {
     const recording = createRecordingLocation({ href: "/machines" });
     const { provider, source } = createProvider(recording.location);
     render(<Composition provider={provider} />);
-    choose("Hide Status");
-    choose("Move Cores left");
+    await choose("Hide Status");
+    await choose("Move Cores left");
     act(() => {
       provider.presentation.arrange({ "table.width.name": 240 });
     });
@@ -269,34 +284,34 @@ describe("DataViews.Settings", () => {
 
   it("resets widths, order and hidden columns, announcing it and returning focus to its button", async () => {
     fakeAnnouncerClock();
-    const { provider } = renderArranged();
+    const { provider } = await renderArranged();
     await readAnnouncement();
-    choose("Reset table settings");
+    await choose("Reset table settings");
     expect(listShown()).toEqual(["Name", "Status", "Cores"]);
     expect(provider.presentation.state.get().presentation).toEqual({});
     expect(await readAnnouncement()).toBe("Table settings reset");
-    expect(findTrigger()).toHaveFocus();
+    await waitForFocus(findTrigger());
   });
 
-  it("resets the arrangement asking the source for nothing", () => {
-    const { provider, source, recording } = renderArranged();
+  it("resets the arrangement asking the source for nothing", async () => {
+    const { provider, source, recording } = await renderArranged();
     const requests = source.calls.length;
     const writes = recording.writes.length;
     const slice = provider.state.get().slice;
-    choose("Reset table settings");
+    await choose("Reset table settings");
     expect(provider.presentation.state.get().presentation).toEqual({});
     expect(source.calls).toHaveLength(requests);
     expect(recording.writes).toHaveLength(writes);
     expect(provider.state.get().slice).toBe(slice);
   });
 
-  it("resets the columns a followed link chose, back to the arrangement declared", () => {
+  it("resets the columns a followed link chose, back to the arrangement declared", async () => {
     const { provider } = createProvider(
       createMemoryLocation({ href: "/machines?table.hidden=status" }),
     );
     render(<Composition provider={provider} />);
     expect(listShown()).toEqual(["Name", "Cores"]);
-    choose("Reset table settings");
+    await choose("Reset table settings");
     expect(listShown()).toEqual(["Name", "Status", "Cores"]);
     expect(provider.presentation.state.get().presentation).toEqual({});
   });
@@ -309,10 +324,10 @@ describe("DataViews.Settings", () => {
         <Composition provider={provider} />
       </StrictMode>,
     );
-    choose("Hide Status");
+    await choose("Hide Status");
     expect(listShown()).toEqual(["Name", "Cores"]);
     expect(await readAnnouncement()).toBe("Status hidden");
-    expect(findTrigger()).toHaveFocus();
+    await waitForFocus(findTrigger());
   });
 
   it("hides columns in the arrangement a saved view remembers", async () => {
@@ -332,7 +347,7 @@ describe("DataViews.Settings", () => {
     };
     const author = createViewer();
     const authoring = render(<Composition provider={author.provider} />);
-    choose("Hide Status");
+    await choose("Hide Status");
     const created = await act(() => author.views.saveAs("Without status"));
     if (created.status !== "saved") {
       throw new Error(`the view was not saved: ${created.status}`);
@@ -347,7 +362,7 @@ describe("DataViews.Settings", () => {
     await act(() => reader.views.open(created.view.id));
     expect(listShown()).toEqual(["Name", "Cores"]);
     // The view holds no change of the reader's own to reset.
-    fireEvent.click(findTrigger());
+    await openMenuFrom(findTrigger());
     expect(
       screen.getByRole("menuitem", { name: "Reset table settings" }),
     ).toHaveClass("disabled");
@@ -356,12 +371,9 @@ describe("DataViews.Settings", () => {
   it("has no axe violations with the menu closed and open", async () => {
     const { provider } = createProvider();
     const view = render(<Composition provider={provider} />);
-    choose("Hide Status");
+    await choose("Hide Status");
     await expectNoAxeViolations(view.container);
-    fireEvent.click(findTrigger());
-    await waitFor(() =>
-      expect(screen.getAllByRole("menuitem").at(0)).toHaveFocus(),
-    );
+    await openMenuFrom(findTrigger());
     await expectNoAxeViolations(document.body);
   });
 
@@ -379,7 +391,7 @@ describe("DataViews.Settings", () => {
       const container = document.createElement("div");
       container.innerHTML = markup;
       return new Map(
-        [...container.querySelectorAll("details a")].map((link) => [
+        [...container.querySelectorAll("[popover] a[href]")].map((link) => [
           link.textContent ?? "",
           link.getAttribute("href") ?? "",
         ]),
@@ -428,10 +440,10 @@ describe("DataViews.Settings", () => {
     // One case a link, so each draws two tables, whatever the count.
     it.each(offeredLinks)(
       "leads $name from $href to the arrangement the menu's own item makes",
-      ({ href, name, destination }) => {
+      async ({ href, name, destination }) => {
         const { provider } = createProvider(createMemoryLocation({ href }));
         const view = render(<Composition provider={provider} />);
-        choose(name);
+        await choose(name);
         const enhanced = listShown();
         view.unmount();
         expect(listShownAt(destination)).toEqual(enhanced);
@@ -457,7 +469,7 @@ describe("DataViews.Settings", () => {
       }
     });
 
-    it("hydrates what the server drew and hands a focused link's focus to the menu button", async () => {
+    it("hydrates what the server drew, keeping focus in the open menu", async () => {
       const href = "/machines?status=running";
       const markup = renderMarkup(href);
       const container = document.createElement("div");
@@ -472,8 +484,15 @@ describe("DataViews.Settings", () => {
         container.remove();
         errors.mockRestore();
       });
-      const link = container.querySelector<HTMLElement>("details a");
-      link?.focus();
+      // The popover opens with no script, and the reader moves to a link.
+      fireEvent.click(
+        within(container).getByRole("button", { name: "Table settings" }),
+      );
+      const link = within(container).getByRole("link", {
+        name: "Hide Status",
+        hidden: true,
+      });
+      link.focus();
       await act(async () => {
         root = hydrateRoot(
           container,
@@ -483,10 +502,14 @@ describe("DataViews.Settings", () => {
         );
       });
       expect(errors).not.toHaveBeenCalled();
-      expect(container.querySelector("details")).toBeNull();
-      expect(
-        within(container).getByRole("button", { name: "Table settings" }),
-      ).toHaveFocus();
+      // Focus stays in the menu, now driven by scripts, not on the page.
+      await waitForFrames(
+        () =>
+          container
+            .querySelector('[role="menu"]')
+            ?.contains(document.activeElement) || null,
+        "focus inside the open menu",
+      );
     });
   });
 });

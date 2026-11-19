@@ -66,9 +66,7 @@ describe("RendererSwitch stylesheet", () => {
     expect(sheet).toMatch(
       /& > \.choice \{ display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var\(--renderer-switch-choice-gap\); \}/,
     );
-    expect(sheet).toMatch(
-      /--renderer-switch-choice-gap: var\(--dimension-050\);/,
-    );
+    expect(sheet).toMatch(/--renderer-switch-choice-gap: var\(--space-050\);/);
     expect(sheet).not.toMatch(/--form-input-/);
   });
 

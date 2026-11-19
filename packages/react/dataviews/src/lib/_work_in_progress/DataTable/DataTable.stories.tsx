@@ -1,3 +1,4 @@
+import { Icon } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
@@ -277,6 +278,20 @@ export const Sortable: Story = {
     render: tableCode,
   }),
   render: renderMachines(sortableColumns),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByRole("columnheader", { name: "Host" });
+    await expect(host).not.toHaveAttribute("aria-sort");
+    const hostSort = within(host).getByRole("button", { name: "Host" });
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).toHaveAttribute("aria-sort", "ascending"));
+    await userEvent.click(hostSort);
+    await waitFor(() =>
+      expect(host).toHaveAttribute("aria-sort", "descending"),
+    );
+    // A third press returns to the source's own order, leaving the story at rest.
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).not.toHaveAttribute("aria-sort"));
+  },
 };
 
 /**
@@ -379,6 +394,18 @@ export const SortLimitedToOneTerm: Story = {
   render: renderMachines(markResizable(sortableColumns, ["status"]), {
     source: createOneTermSource,
   }),
+  play: async ({ canvas }) => {
+    await userEvent.click(await canvas.findByRole("button", { name: "Host" }));
+    const status = canvas.getByRole("columnheader", { name: "Status" });
+    within(status).getByRole("button", { name: "Status" }).focus();
+    // One call, so Shift is still held when Enter activates the button.
+    await userEvent.keyboard("{Shift>}{Enter}{/Shift}");
+    await expect(
+      await within(status).findByText(
+        "Sort unchanged: this source orders by at most 1 term.",
+      ),
+    ).toBeInTheDocument();
+  },
 };
 
 /**
@@ -631,6 +658,15 @@ export const MixedResizableColumns: Story = {
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(markResizable(plainColumns, ["name", "region"])),
+  play: async ({ canvas }) => {
+    await canvas.findByRole("separator", { name: "Host" });
+    await expect(
+      canvas.getByRole("separator", { name: "Region" }),
+    ).toBeInTheDocument();
+    for (const name of ["Status", "Cores", "Owner"]) {
+      await expect(canvas.queryByRole("separator", { name })).toBeNull();
+    }
+  },
 };
 
 /**
@@ -862,9 +898,21 @@ export const SpaceAfterFixedColumns: Story = {
 };
 
 const statusDisplay = {
-  running: { label: "Running", tone: "var(--color-icon-success)" },
-  failed: { label: "Failed", tone: "var(--color-icon-destructive)" },
-  pending: { label: "Pending", tone: "var(--color-icon-muted)" },
+  running: {
+    label: "Running",
+    icon: "success",
+    tone: "var(--color-icon-success)",
+  },
+  failed: {
+    label: "Failed",
+    icon: "error",
+    tone: "var(--color-icon-destructive)",
+  },
+  pending: {
+    label: "Pending",
+    icon: "queued",
+    tone: "var(--color-icon-muted)",
+  },
 } as const;
 
 const isStatus = (value: unknown): value is keyof typeof statusDisplay =>
@@ -875,11 +923,11 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
   if (!isStatus(value)) {
     return null;
   }
-  const { label, tone } = statusDisplay[value];
+  const { label, icon, tone } = statusDisplay[value];
   return (
     <span>
-      <span aria-hidden="true" style={{ color: tone }}>
-        ●{" "}
+      <span style={{ color: tone }}>
+        <Icon icon={icon} />{" "}
       </span>
       {label}
     </span>
@@ -896,18 +944,21 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
 export const CustomCellRenderer: Story = {
   parameters: showConsumerCode({
     parts: ["DataTable", "type DisplayFieldCellProps", "type DataTableColumn"],
-    declarations: `const statusDisplay: Record<string, { label: string; tone: string }> = {
-  running: { label: "Running", tone: "var(--color-icon-success)" },
-  failed: { label: "Failed", tone: "var(--color-icon-destructive)" },
-  pending: { label: "Pending", tone: "var(--color-icon-muted)" },
+    imports: `import type { IconName } from "@canonical/ds-assets";
+import { Icon } from "@canonical/react-ds-global";
+import { machineCollection, machines } from "./machines.js";`,
+    declarations: `const statusDisplay: Record<string, { label: string; icon: IconName; tone: string }> = {
+  running: { label: "Running", icon: "success", tone: "var(--color-icon-success)" },
+  failed: { label: "Failed", icon: "error", tone: "var(--color-icon-destructive)" },
+  pending: { label: "Pending", icon: "queued", tone: "var(--color-icon-muted)" },
 };
 
 const StatusCell = ({ value }: DisplayFieldCellProps) => {
   const shown = statusDisplay[String(value)];
   return shown ? (
     <span>
-      <span aria-hidden="true" style={{ color: shown.tone }}>
-        ●{" "}
+      <span style={{ color: shown.tone }}>
+        <Icon icon={shown.icon} />{" "}
       </span>
       {shown.label}
     </span>

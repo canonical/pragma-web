@@ -20,11 +20,11 @@
    * so an application linking only this one gets cards that read correctly and
    * line up by nothing — the recipe says so beside the layout. */
   .ds.data-cards {
-    --data-cards-gap: var(--dimension-200);
-    --data-cards-status-padding-block: var(--dimension-100);
-    --data-cards-select-all-gap: var(--dimension-050);
-    --data-cards-field-row-gap: var(--dimension-050);
-    --data-cards-field-column-gap: var(--dimension-200);
+    --data-cards-gap: var(--space-200);
+    --data-cards-status-padding-block: var(--space-100);
+    --data-cards-select-all-gap: var(--space-050);
+    --data-cards-field-row-gap: var(--space-050);
+    --data-cards-field-column-gap: var(--space-200);
 
     display: flex;
     flex-direction: column;
@@ -44,11 +44,9 @@
       gap: var(--data-cards-select-all-gap);
     }
 
-    & .data-card > .header {
-      justify-content: flex-start;
-    }
-
+    /* The title takes the header's room, so it starts beside the checkbox. */
     & .data-card .title {
+      flex: 1 1 auto;
       overflow-wrap: anywhere;
     }
 

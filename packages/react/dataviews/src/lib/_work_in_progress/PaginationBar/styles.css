@@ -8,21 +8,22 @@
    * `PaginationBar.anatomy.yaml`. Every value below is one it binds; what it
    * could not bind is recorded there, never hardcoded here.
    *
-   * The selects and buttons are the design system's own. The bar themes them
-   * through their channels — the form layer's input tokens and the Button's
-   * padding — and overrides only what a row of them needs: a select's width,
-   * and each icon-only button's square.
+   * The selects and icon buttons are the design system's own. The bar themes
+   * the selects through the form layer's input tokens and overrides only
+   * what a row of them needs: a select's width.
    */
   .ds.data-table-pagination-bar {
     /* The component tokens, each a binding to a design token, set on the
        bar so no token leaks onto the page: a theme or a host retunes the
        bar by setting them, and the anatomy names what each binds. */
-    --data-table-pagination-bar-gap: var(--dimension-100);
-    --data-table-pagination-bar-gap-control: var(--dimension-050);
+    --data-table-pagination-bar-gap: var(--space-100);
+    --data-table-pagination-bar-gap-control: var(--space-050);
     /* The inset a control keeps from the divider beside it. */
-    --data-table-pagination-bar-inset-inline: var(--dimension-100);
+    --data-table-pagination-bar-inset-inline: var(--space-100);
+    /* shim: design-tokens stroke */
     --data-table-pagination-bar-border-width: var(
-      --dimension-stroke-thickness-medium
+      --stroke-width-border,
+      var(--dimension-stroke-thickness-medium)
     );
     --data-table-pagination-bar-border-color: var(--color-border-muted);
     --data-table-pagination-bar-font-family: var(
@@ -34,24 +35,26 @@
     --data-table-pagination-bar-font-weight: var(
       --typography-text-primary-font-weight
     );
+    /* shim: design-tokens stroke */
     --data-table-pagination-bar-divider-inline-size: var(
-      --dimension-stroke-thickness-medium
+      --stroke-width-border,
+      var(--dimension-stroke-thickness-medium)
     );
-    --data-table-pagination-bar-divider-block-size: var(--dimension-300);
+    /* shim: design-tokens size */
+    --data-table-pagination-bar-divider-block-size: var(
+      --size-divider-block,
+      var(--dimension-300)
+    );
+    /* shim: design-tokens stacking */
+    --data-table-pagination-bar-stacking: var(--stacking-sticky, 1);
     --data-table-pagination-bar-divider-color: var(--color-border-muted);
-    --data-table-pagination-bar-control-padding-inline-end: var(
-      --dimension-100
-    );
 
     /* The channel-bound tokens, resolved where the channels are set: the
        leading inset reads the density channel, as the table's cells do; the
-       control size is one density line; the colours are the surface the bar
-       sits on, so the rows it covers do not show through. */
+       colours are the surface the bar sits on, so the rows it covers do not
+       show through. */
     --data-table-pagination-bar-padding-inline-start: var(
       --density-padding-inline
-    );
-    --data-table-pagination-bar-control-size: var(
-      --density-line-height-effective
     );
     --data-table-pagination-bar-color-text: var(
       --surface-color-text,
@@ -65,7 +68,7 @@
     /* Held to the bottom of whatever scrolls it, over the rows beneath. */
     position: sticky;
     inset-block-end: 0;
-    z-index: 1;
+    z-index: var(--data-table-pagination-bar-stacking);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -79,13 +82,6 @@
     background-color: var(--data-table-pagination-bar-color-background);
     border-block-start: var(--data-table-pagination-bar-border-width) solid
       var(--data-table-pagination-bar-border-color);
-
-    /* The design's compact, borderless dropdown, on the select's own tokens. */
-    --form-input-height: var(--data-table-pagination-bar-control-size);
-    --form-input-padding-block: var(--dimension-050);
-    --form-input-padding-inline: var(--dimension-100);
-    --form-input-background: var(--color-foreground-ghost);
-    --form-input-border-color: transparent;
 
     & > .sizing,
     & > .paging {
@@ -127,18 +123,6 @@
     & > .paging > .navigation {
       display: flex;
       align-items: center;
-    }
-
-    /* Icon-only Buttons collapse without a label. Each is held to a square
-       one row tall, its icon centred and its side padding equal. */
-    & > .paging > .navigation > .ds.button {
-      --button-padding-inline-end: var(
-        --data-table-pagination-bar-control-padding-inline-end
-      );
-      min-block-size: var(--data-table-pagination-bar-control-size);
-      min-inline-size: var(--data-table-pagination-bar-control-size);
-      align-items: center;
-      justify-content: center;
     }
 
     /* Until the design's skip icons ship: a bar with an arrow meeting it,

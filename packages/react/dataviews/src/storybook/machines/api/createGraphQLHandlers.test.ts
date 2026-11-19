@@ -190,6 +190,318 @@ describe("createGraphQLHandlers", () => {
     expect(readIds(body)).toEqual(["m-01"]);
   });
 
+  it("pins what it answers to representative variables", async () => {
+    for (const [variables, expected] of [
+      [
+        {
+          first: 12,
+          where: { status: ["running"], coresGte: 8, coresLte: 32 },
+        },
+        {
+          ids: ["m-03", "m-05", "m-07"],
+          pageInfo: { endCursor: "Mw==", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, where: { nameContains: "AR" } },
+        {
+          ids: ["m-03", "m-11", "m-12"],
+          pageInfo: { endCursor: "Mw==", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, where: { nameStartsWith: "c", regionContains: "-2" } },
+        {
+          ids: ["m-03"],
+          pageInfo: { endCursor: "MQ==", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, where: { ownerStartsWith: "EX:A" } },
+        {
+          ids: ["m-01"],
+          pageInfo: { endCursor: "MQ==", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, where: { ownerContains: "e" } },
+        {
+          ids: [
+            "m-01",
+            "m-02",
+            "m-03",
+            "m-04",
+            "m-05",
+            "m-06",
+            "m-07",
+            "m-08",
+            "m-09",
+            "m-10",
+            "m-11",
+            "m-12",
+          ],
+          pageInfo: { endCursor: "MTI=", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        {
+          first: 12,
+          where: { status: ["failed", "pending"], statusIsNone: ["pending"] },
+        },
+        {
+          ids: ["m-02", "m-06", "m-10"],
+          pageInfo: { endCursor: "Mw==", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, where: { statusIsNone: "running" } },
+        {
+          ids: ["m-02", "m-04", "m-06", "m-08", "m-10", "m-12"],
+          pageInfo: { endCursor: "Ng==", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, where: { search: "EX:I" } },
+        {
+          ids: ["m-09"],
+          pageInfo: { endCursor: "MQ==", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        {
+          first: 12,
+          where: { search: "example" },
+          orderBy: [{ field: "status", direction: "ASC" }],
+        },
+        {
+          ids: [
+            "m-01",
+            "m-03",
+            "m-05",
+            "m-07",
+            "m-09",
+            "m-11",
+            "m-02",
+            "m-06",
+            "m-10",
+            "m-04",
+            "m-08",
+            "m-12",
+          ],
+          pageInfo: { endCursor: "MTI=", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, orderBy: [{ field: "status", direction: "DESC" }] },
+        {
+          ids: [
+            "m-04",
+            "m-08",
+            "m-12",
+            "m-02",
+            "m-06",
+            "m-10",
+            "m-01",
+            "m-03",
+            "m-05",
+            "m-07",
+            "m-09",
+            "m-11",
+          ],
+          pageInfo: { endCursor: "MTI=", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, orderBy: [{ field: "name", direction: "DESC" }] },
+        {
+          ids: [
+            "m-12",
+            "m-11",
+            "m-10",
+            "m-09",
+            "m-08",
+            "m-07",
+            "m-06",
+            "m-05",
+            "m-04",
+            "m-03",
+            "m-02",
+            "m-01",
+          ],
+          pageInfo: { endCursor: "MTI=", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 12, orderBy: [{ field: "cores", direction: "ASC" }] },
+        {
+          ids: [
+            "m-04",
+            "m-10",
+            "m-01",
+            "m-06",
+            "m-11",
+            "m-02",
+            "m-07",
+            "m-12",
+            "m-03",
+            "m-08",
+            "m-05",
+            "m-09",
+          ],
+          pageInfo: { endCursor: "MTI=", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        {
+          first: 4,
+          after: "NA==",
+          orderBy: [{ field: "region", direction: "ASC" }],
+        },
+        {
+          ids: ["m-01", "m-02", "m-07", "m-10"],
+          pageInfo: { endCursor: "OA==", hasNextPage: true },
+          facets: {},
+        },
+      ],
+      [
+        {
+          first: 5,
+          after: "Nw==",
+          orderBy: [{ field: "owner", direction: "DESC" }],
+        },
+        {
+          ids: ["m-05", "m-04", "m-03", "m-02", "m-01"],
+          pageInfo: { endCursor: "MTI=", hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 5, after: "MTI=" },
+        {
+          ids: [],
+          pageInfo: { endCursor: null, hasNextPage: false },
+          facets: {},
+        },
+      ],
+      [
+        { first: 1, facets: ["status", "cores"] },
+        {
+          ids: ["m-01"],
+          pageInfo: { endCursor: "MQ==", hasNextPage: true },
+          facets: {
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 6 } },
+                { value: "failed", count: { kind: "exact", value: 3 } },
+                { value: "pending", count: { kind: "exact", value: 3 } },
+              ],
+            },
+            cores: { kind: "range", min: 2, max: 64 },
+          },
+        },
+      ],
+      [
+        {
+          first: 1,
+          where: { status: "failed", coresGte: 8 },
+          facets: ["status", "cores"],
+        },
+        {
+          ids: ["m-02"],
+          pageInfo: { endCursor: "MQ==", hasNextPage: false },
+          facets: {
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 4 } },
+                { value: "failed", count: { kind: "exact", value: 1 } },
+                { value: "pending", count: { kind: "exact", value: 2 } },
+              ],
+            },
+            cores: { kind: "range", min: 2, max: 8 },
+          },
+        },
+      ],
+      [
+        {
+          first: 1,
+          where: { search: "ex:a", coresLte: 8 },
+          facets: ["cores", "status"],
+        },
+        {
+          ids: ["m-01"],
+          pageInfo: { endCursor: "MQ==", hasNextPage: false },
+          facets: {
+            cores: { kind: "range", min: 4, max: 4 },
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 1 } },
+              ],
+            },
+          },
+        },
+      ],
+      [
+        {
+          first: 1,
+          where: { nameContains: "zzz" },
+          facets: ["status", "cores"],
+        },
+        {
+          ids: [],
+          pageInfo: { endCursor: null, hasNextPage: false },
+          facets: {
+            status: { kind: "values", values: [] },
+            cores: { kind: "range", min: null, max: null },
+          },
+        },
+      ],
+      [
+        {
+          first: 12,
+          where: { regionContains: "us", statusIsNone: ["pending"] },
+          orderBy: { field: "cores", direction: "DESC" },
+          facets: "status",
+        },
+        {
+          ids: ["m-03", "m-11"],
+          pageInfo: { endCursor: "Mg==", hasNextPage: false },
+          facets: {
+            status: {
+              kind: "values",
+              values: [
+                { value: "running", count: { kind: "exact", value: 2 } },
+                { value: "pending", count: { kind: "exact", value: 2 } },
+              ],
+            },
+          },
+        },
+      ],
+    ] as const) {
+      const { body } = await requestGraphQL("live", variables);
+      const { edges, pageInfo, facets } = readConnection(body);
+      expect({
+        ids: edges.map((edge) => edge.node.id),
+        pageInfo,
+        facets,
+      }).toEqual(expected);
+    }
+  });
+
   it("refuses what it cannot run rather than answering more", async () => {
     for (const [variables, message] of [
       [{ first: 0 }, '"first" is not a positive whole number'],

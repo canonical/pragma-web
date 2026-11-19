@@ -197,7 +197,7 @@ import { platform } from "./router.js";`,
     query: "page=1&size=5",
     render: pageCode,
   }),
-  render: function Render(args) {
+  render: function RenderRealDestinations(args) {
     const [location] = useState(() =>
       createMemoryLocation({ href: "/machines" }),
     );

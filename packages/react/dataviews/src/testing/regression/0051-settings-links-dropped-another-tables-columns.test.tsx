@@ -36,7 +36,7 @@ describe("regression 0051 — settings links dropped another table's columns", (
         settings={<DataViews.Settings />}
       />,
     );
-    const hide = [...container.querySelectorAll("details a")].find(
+    const hide = [...container.querySelectorAll("[popover] a[href]")].find(
       (link) => link.textContent === "Hide Status",
     );
     const params = new URLSearchParams(hide?.getAttribute("href") ?? "");

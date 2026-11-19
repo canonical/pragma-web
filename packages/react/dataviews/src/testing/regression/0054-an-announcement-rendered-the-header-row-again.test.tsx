@@ -13,10 +13,20 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
+import installPopoverStandIn from "../../../testing/installPopoverStandIn.js";
+import openMenuFrom from "../../../testing/openMenuFrom.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
 import HeaderCell from "../../lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/HeaderCell.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -40,6 +50,14 @@ beforeEach(() => {
 });
 
 describe("regression 0054 — an announcement rendered the header row again", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("renders no header cell to say that a column is always shown", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
@@ -55,7 +73,7 @@ describe("regression 0054 — an announcement rendered the header row again", ()
         settings={<DataViews.Settings />}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "Table settings" }));
+    await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));
     const item = screen.getByRole("menuitem", {
       name: "Name is always shown",
     });

@@ -9,10 +9,12 @@
 import type { ViewPresentation } from "@canonical/dataviews-core";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { act } from "react";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
 import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import installPopoverStandIn from "../../../testing/installPopoverStandIn.js";
+import openMenuFrom from "../../../testing/openMenuFrom.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
@@ -27,18 +29,16 @@ const columns: readonly DataTableColumn[] = [
  * its settings cell and the item within the open menu, as a named role
  * query over the whole document names every button and item it meets.
  */
-const choose = (name: string): void => {
+const choose = async (name: string): Promise<void> => {
   const cell = document.querySelector<HTMLElement>(
     ".ds.data-table-settings-cell",
   );
   if (cell === null) {
     throw new Error("expected the table's settings cell");
   }
-  fireEvent.click(within(cell).getByRole("button", { name: "Table settings" }));
-  const menu = document.querySelector<HTMLElement>("[role='menu']");
-  if (menu === null) {
-    throw new Error("expected the settings menu open");
-  }
+  const menu = await openMenuFrom(
+    within(cell).getByRole("button", { name: "Table settings" }),
+  );
   fireEvent.click(within(menu).getByRole("menuitem", { name }));
 };
 
@@ -99,30 +99,38 @@ const renderOrdered = (arrangement?: ViewPresentation) => {
 };
 
 describe("hidden columns keep the ordering", () => {
-  it("keeps the first term's heading claiming as the second term's column is hidden", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
+  it("keeps the first term's heading claiming as the second term's column is hidden", async () => {
     const { expectOrderingKept } = renderOrdered();
     expect(listClaims()).toEqual([["Status", "descending"]]);
-    choose("Hide Cores");
+    await choose("Hide Cores");
     expect(listClaims()).toEqual([["Status", "descending"]]);
     expectOrderingKept();
   });
 
-  it("lets no heading claim while the first term's column is hidden, and lists both terms in the sort panel", () => {
+  it("lets no heading claim while the first term's column is hidden, and lists both terms in the sort panel", async () => {
     const { expectOrderingKept } = renderOrdered({ "table.hidden": ["cores"] });
     // No later term's column takes the claim over.
-    choose("Hide Status");
-    choose("Show Cores");
+    await choose("Hide Status");
+    await choose("Show Cores");
     expect(listClaims()).toEqual([]);
     expect(listTerms()).toEqual(["status, descending", "cores, ascending"]);
     expectOrderingKept();
   });
 
-  it("claims from wherever the first term's column stands once it is shown again", () => {
+  it("claims from wherever the first term's column stands once it is shown again", async () => {
     const { expectOrderingKept } = renderOrdered({
       "table.hidden": ["status"],
     });
-    choose("Show Status");
-    choose("Move Status left");
+    await choose("Show Status");
+    await choose("Move Status left");
     expect(listClaims()).toEqual([["Status", "descending"]]);
     expectOrderingKept();
   });

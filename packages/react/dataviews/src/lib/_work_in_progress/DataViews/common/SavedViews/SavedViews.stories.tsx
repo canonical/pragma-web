@@ -1,20 +1,15 @@
 import {
   createMemoryLocation,
-  type QueryLocation,
   type ViewDraft,
   type ViewStore,
 } from "@canonical/dataviews-core";
 import type { IndexedDBFactory } from "@canonical/dataviews-core/indexeddb";
 import { Button } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import {
-  type ReactElement,
-  type ReactNode,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { type ReactElement, type ReactNode, useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
+import QueryInTheLocation from "../../../../../storybook/machines/QueryInTheLocation.js";
 import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProvider } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
@@ -243,7 +238,7 @@ function AnotherTab({
  */
 export const AConflictBetweenTabs: Story = {
   parameters,
-  render: function Render(args) {
+  render: function RenderAConflictBetweenTabs(args) {
     const { store, openAnotherTab } = useStoryViewStore({
       seed: [failedMachines],
     });
@@ -379,22 +374,6 @@ export const StorageUnavailable: Story = {
   },
 };
 
-/** The query the location carries, shown the way an address bar would. */
-function QueryInTheLocation({
-  location,
-}: {
-  readonly location: QueryLocation;
-}): ReactElement {
-  const query = useSyncExternalStore(location.subscribe, () =>
-    location.read().toString(),
-  );
-  return (
-    <p>
-      <output aria-label="Location">{`/machines?${query}`}</output>
-    </p>
-  );
-}
-
 /**
  * The query in the URL: opening a view applies its query, and the provider
  * writes that query to its location like any other edit. The query travels
@@ -415,7 +394,7 @@ import { platform } from "./router.js";`,
     store: true,
     render: composition,
   }),
-  render: function Render(args) {
+  render: function RenderWithTheQueryInTheUrl(args) {
     // A memory location stands in for the browser's here, so the story
     // never rewrites the page's own address.
     const [location] = useState(() =>

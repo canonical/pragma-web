@@ -21,9 +21,9 @@
 #                                         activation changed nothing, shown
 #                                         and not live: the table's announcer
 #                                         says it once
-#   header menu     design none yet       DOM `ds contextual-menu menu`, the
-#                                         design system's ContextualMenu
-#   menu trigger    design none yet       DOM `button.trigger`
+#   header menu     design none yet       DOM `ds data-table-header-menu`,
+#                                         the design system's DropdownButton
+#                                         with no chevron, on its IconButton
 #   resize handle   design "Resize handle wrapper" + "Column resizing handle"
 #                                         DOM `ds data-table-resize-handle`,
 #                                         a wrapper with no box of its own
@@ -159,11 +159,15 @@ node:
       relation:
         cardinality: "0..1"
     # Once scripts run, on a column that can be sorted, hidden or moved: the
-    # column's menu, the design system's ContextualMenu, carrying its sort
-    # where it offers one, then Hide column where it may be hidden, and Move
-    # column left and right, each disabled where it would change nothing.
+    # column's menu, the design system's DropdownButton with no chevron,
+    # carrying its sort where it offers one, then Hide column where it may be
+    # hidden, and Move column left and right, each disabled where it would
+    # change nothing.
     - node:
-        uri: global.component.contextual_menu
+        uri: global.component.dropdown_button
+        props:
+          icon: menu-contextual
+          importance: tertiary
       relation:
         cardinality: "0..1"
     # Absent on the last column, whatever it declares: its trailing edge is

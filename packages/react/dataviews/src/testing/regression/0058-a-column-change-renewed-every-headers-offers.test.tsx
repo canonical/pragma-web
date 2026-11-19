@@ -8,28 +8,43 @@
  * not moved. Offers are now read from one resolution of the arrangement, and
  * a column keeps its offers object while its changes hold.
  *
- * The open menu is counted by a pass-through counter on the design system's
- * menu, as regression 0014 counts it: a menu given new offers renders again.
+ * The open menu is counted by a pass-through counter on the open menu's
+ * list, as regression 0014 counts it: a menu given new offers renders again.
  */
 
-import { ContextualMenu } from "@canonical/react-ds-global";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
+import installPopoverStandIn from "../../../testing/installPopoverStandIn.js";
+import openMenuFrom from "../../../testing/openMenuFrom.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
+import MenuList from "../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js";
 
-// Each call of the spied menu is a render of the open column menu.
-vi.mock("@canonical/react-ds-global", async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import("@canonical/react-ds-global")>();
-  return { ...actual, ContextualMenu: vi.fn(actual.ContextualMenu) };
-});
+// Each call of the spied list is a render of the open column menu.
+vi.mock(
+  "../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("../../lib/common/DropdownButtonStandIn/common/MenuList/MenuList.js")
+      >();
+    return { default: vi.fn(actual.default) };
+  },
+);
 
-const renders = vi.mocked(ContextualMenu);
+const renders = vi.mocked(MenuList);
 
 describe("regression 0058 — a column change renewed every header's offers", () => {
-  it("renders no open menu whose column's changes hold, through a width and a hide elsewhere", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
+  it("renders no open menu whose column's changes hold, through a width and a hide elsewhere", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });
@@ -45,10 +60,9 @@ describe("regression 0058 — a column change renewed every header's offers", ()
         label="Machines"
       />,
     );
-    fireEvent.click(
+    await openMenuFrom(
       screen.getByRole("button", { name: "Column options for Status" }),
     );
-    expect(screen.getByRole("menu", { hidden: true })).toBeInTheDocument();
     renders.mockClear();
     act(() => {
       provider.presentation.arrange({ "table.width.name": 240 });

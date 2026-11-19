@@ -11,24 +11,26 @@
    * The name and delete dialogs are the platform's modal `dialog`, opened
    * by their commands; only their contents are laid out here.
    *
-   * The select and the name input are the design system's own, themed
-   * through the form layer's channels. The overrides are their width — in a
-   * row of controls each takes its content's — and the name input's border
-   * once the user has given it a name the collection refuses, which the
-   * validity API marks and the form layer's error channel colours.
+   * The select and the name input are the design system's own, sized by
+   * the density scope they sit in. The overrides are their width — in a row
+   * of controls each takes its content's — and the name input's error
+   * channel once the user has given it a name the collection refuses.
    */
   .ds.data-views-saved-views {
+    --data-views-saved-views-gap: var(--space-100);
+    --data-views-saved-views-gap-control: var(--space-050);
+    --data-views-saved-views-color-text: var(--color-text);
+    --data-views-saved-views-color-text-muted: var(--color-text-muted);
+    --data-views-saved-views-color-text-error: var(--color-text-error);
+
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--dimension-100);
-    color: var(--color-text);
+    gap: var(--data-views-saved-views-gap);
+    color: var(--data-views-saved-views-color-text);
     font-family: var(--typography-text-primary-font-family);
     font-size: var(--typography-text-primary-font-size);
     font-weight: var(--typography-text-primary-font-weight);
-    --form-input-height: var(--density-line-height-effective);
-    --form-input-padding-block: var(--dimension-050);
-    --form-input-padding-inline: var(--dimension-100);
 
     & :where(p) {
       margin: 0;
@@ -42,7 +44,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--dimension-050);
+      gap: var(--data-views-saved-views-gap-control);
     }
 
     /* The input chrome fills its container; in a row it takes its content. */
@@ -51,21 +53,22 @@
       inline-size: auto;
     }
 
+    /* A name the collection refuses: the input's own error channel, set
+       on its chrome from the native validity state. */
     &
       > .ds.data-views-saved-views-name-form
       > form
-      > .ds.input.text
-      > input:user-invalid {
-      border-color: var(--form-input-border-color-error);
+      > .ds.input.chrome:has(> input:user-invalid) {
+      --form-input-border-color-bottom: var(--form-input-border-color-error);
     }
 
     & > .picker > .modified,
     & > .notices {
-      color: var(--color-text-muted);
+      color: var(--data-views-saved-views-color-text-muted);
     }
 
     & > .ds.data-views-saved-views-name-form > form > .error {
-      color: var(--color-text-error);
+      color: var(--data-views-saved-views-color-text-error);
     }
   }
 }

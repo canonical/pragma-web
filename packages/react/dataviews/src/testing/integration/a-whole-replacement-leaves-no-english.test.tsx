@@ -18,13 +18,22 @@ import {
 import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { describe, expect, it, onTestFinished } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+} from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
 import createTokenMessages from "../../../testing/createTokenMessages.js";
 import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import findEnglish from "../../../testing/findEnglish.js";
+import installPopoverStandIn from "../../../testing/installPopoverStandIn.js";
+import openMenuFrom from "../../../testing/openMenuFrom.js";
 import type { MachineProvider } from "../../../testing/types.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
@@ -94,6 +103,14 @@ const renderListed = async (
 };
 
 describe("a whole replacement leaves no English", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("in what a server renders before any script runs", () => {
     const html = renderToString(<Composition provider={createProvider()} />);
     const container = document.createElement("div");
@@ -139,7 +156,7 @@ describe("a whole replacement leaves no English", () => {
 
   it("in the settings menu its button opens", async () => {
     await renderListed(createProvider());
-    fireEvent.click(screen.getByRole("button", { name: "‹tableSettings›" }));
+    await openMenuFrom(screen.getByRole("button", { name: "‹tableSettings›" }));
     expect(screen.getByRole("menu")).toBeVisible();
     expect(findEnglish(document.body, english)).toEqual([]);
   });

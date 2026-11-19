@@ -6,7 +6,7 @@
 # review against the DSL's JSON schema. Pinned props on a named node
 # (`props:`) are 0.3.0's; older schemas refuse them. The root carries the
 # design-system graph's IRI; its parts are role nodes, and the controls
-# reference the design system's own Button and SelectInput.
+# reference the design system's own IconButton and SelectInput.
 #
 # Names — one per part, the same in the design, the DOM and here:
 #   pagination bar  design "Table pagination"   graph "DataTable.PaginationBar"
@@ -38,32 +38,23 @@
 # The stylesheet binds each path through the bar's own
 # `--data-table-pagination-bar-*` tokens, all declared on the bar.
 #
-# The two selects are the design system's SelectInput, themed through the form
-# layer's own channels on the bar, never restyled:
-#   --form-input-height          density/line-height-effective
-#   --form-input-padding-block   dimension/050
-#   --form-input-padding-inline  dimension/100
-#   --form-input-background      color/foreground/ghost
-#   --form-input-border-color    none: the design draws the dropdown borderless
-# One property is overridden rather than themed: the input chrome fills its
-# container's width, and in a bar it takes its content's. Its caret is the
-# form layer's own, drawn in `color/icon`. The chrome comes from the
+# The bar's root carries the Density modifier `dense`, which the DSL cannot
+# name, so its selects and icon buttons take the dense cell. The two selects
+# are the design system's SelectInput in its own chrome: the design's
+# borderless dropdown has no SelectInput modifier, a gap sent to the design
+# owners. One property is overridden: the input chrome fills its container's
+# width, and in a bar it takes its content's. The chrome comes from the
 # `@canonical/react-ds-global-form` stylesheet, which the page loads.
 #
-# The four page controls are drawn as the design system's Button, tertiary: a
-# ghost fill with no border, its hover, active and focus states the Button's
-# own. A control to a page the collection can reach is a real link, because
-# the baseline pages by navigating; the Button has no link rendering, so the
-# link carries the Button's classes and icon slot by hand (a link variant of
-# the Button is asked of the design system, and the borrowing is recorded on
-# the control). A control to an unreachable page is the Button, disabled. An
-# icon-only Button collapses to its icon, because the Button seats its height
-# on a label, so the bar holds each to a square of the density line
-# (`density/line-height-effective`) with its icon centred in it: the one
-# place it overrides the Button's box. The design draws 36×36. The trailing
-# inline padding is set to `dimension/100` through the Button's own padding
-# channel. A disabled tertiary Button draws a border its enabled state hides;
-# the design draws no disabled state, and the Button's own is kept.
+# The four page controls are the design system's IconButton, tertiary, where
+# the page cannot be reached, and a link of their own (`ds page-control`)
+# where it can, because the baseline pages by navigating. The link is drawn
+# as the icon button is: a square of the density line
+# (`density/line-height-effective`) with its icon centred and a ghost fill.
+# The design draws 36×36. A disabled tertiary IconButton draws a border its
+# enabled state hides; the design draws no disabled state, and the
+# IconButton's own is kept. The controls take no Tooltip: an unreachable
+# one is disabled, and the links are named by their icon.
 #
 # The links take the design system's shared link contract: `LinkComponent`
 # renders each through the consumer's router link, which navigates itself,
@@ -129,7 +120,7 @@
 #     and whenever there is no total for the current query and page size —
 #     before results, while a replacement query loads, or from a source that
 #     publishes none or only a lower bound. A
-#     reachable page is a link; an unreachable one is the Button's `@disabled`.
+#     reachable page is a link; an unreachable one is the IconButton's `@disabled`.
 #   - The page select lists every page the query's total makes, keeping
 #     that list while a page move loads (a new query, page size or generation
 #     drops it), and lists a window past the last page after the pages there
@@ -256,46 +247,34 @@ node:
                 layout.align: center
               edges:
                 - node:
-                    uri: global.component.button
+                    uri: global.component.icon_button
                     props:
                       importance: tertiary
                       icon: back-to-top
-                    styles:
-                      size.min.width: density/line-height-effective
-                      size.min.height: density/line-height-effective
                   relation:
                     cardinality: "1"
                     slotName: first
                 - node:
-                    uri: global.component.button
+                    uri: global.component.icon_button
                     props:
                       importance: tertiary
                       icon: chevron-left
-                    styles:
-                      size.min.width: density/line-height-effective
-                      size.min.height: density/line-height-effective
                   relation:
                     cardinality: "1"
                     slotName: previous
                 - node:
-                    uri: global.component.button
+                    uri: global.component.icon_button
                     props:
                       importance: tertiary
                       icon: chevron-right
-                    styles:
-                      size.min.width: density/line-height-effective
-                      size.min.height: density/line-height-effective
                   relation:
                     cardinality: "1"
                     slotName: next
                 - node:
-                    uri: global.component.button
+                    uri: global.component.icon_button
                     props:
                       importance: tertiary
                       icon: back-to-top
-                    styles:
-                      size.min.width: density/line-height-effective
-                      size.min.height: density/line-height-effective
                   relation:
                     cardinality: "1"
                     slotName: last

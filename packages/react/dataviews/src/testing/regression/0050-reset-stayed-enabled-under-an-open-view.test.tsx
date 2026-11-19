@@ -11,12 +11,14 @@
  */
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
 import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
+import installPopoverStandIn from "../../../testing/installPopoverStandIn.js";
+import openMenuFrom from "../../../testing/openMenuFrom.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
@@ -25,6 +27,14 @@ beforeEach(() => {
 });
 
 describe("regression 0050 — reset stayed enabled under an open view", () => {
+  let uninstallPopovers: () => void;
+  beforeAll(() => {
+    uninstallPopovers = installPopoverStandIn();
+  });
+  afterAll(() => {
+    uninstallPopovers();
+  });
+
   it("offers no reset and announces none while only the view hides a column", async () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
@@ -58,7 +68,7 @@ describe("regression 0050 — reset stayed enabled under an open view", () => {
       provider.presentation.arrange({ "table.hidden": undefined });
     });
     await act(() => views.open(created.view.id));
-    fireEvent.click(screen.getByRole("button", { name: "Table settings" }));
+    await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));
     const reset = screen.getByRole("menuitem", {
       name: "Reset table settings",
     });

@@ -651,7 +651,7 @@ describe("PaginationBar", () => {
     const next = screen.getByRole("link", { name: "Next page" });
     expect(next).toHaveAttribute("data-router-link");
     expect(next).toHaveAttribute("href", "?page=2&size=2");
-    expect(next).toHaveClass("ds", "button", "tertiary", "next");
+    expect(next).toHaveClass("ds", "page-control", "next");
     fireEvent.click(next);
     // The router's link saw the click; the bar moved nothing itself.
     expect(seen).toEqual(["?page=2&size=2"]);
@@ -745,6 +745,17 @@ describe("PaginationBar", () => {
     const nav = screen.getByRole("navigation", { name: "Pagination" });
     expect(nav).toHaveClass("ds", "data-table-pagination-bar", "footer");
     expect(nav).toHaveAttribute("id", "machines-pages");
+  });
+
+  it("sets the Dense modifier after its base class", () => {
+    mount(makeProvider().provider, { className: "footer" });
+    const nav = screen.getByRole("navigation", { name: "Pagination" });
+    expect([...nav.classList]).toEqual([
+      "ds",
+      "data-table-pagination-bar",
+      "dense",
+      "footer",
+    ]);
   });
 
   it("speaks the words it is given, keeping English only where none are given", () => {

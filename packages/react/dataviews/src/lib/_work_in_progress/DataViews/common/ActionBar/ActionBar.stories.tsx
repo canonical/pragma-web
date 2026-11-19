@@ -28,6 +28,9 @@ const meta = {
   title: "_work_in_progress/DataViews/ActionBar",
   component: Component,
   decorators: [withAppScope],
+  // The deselect's Tooltip portals to the page, so docs preview each story
+  // in its own frame.
+  parameters: { docs: { story: { inline: false, iframeHeight: "360px" } } },
 } satisfies Meta<typeof Component>;
 
 export default meta;

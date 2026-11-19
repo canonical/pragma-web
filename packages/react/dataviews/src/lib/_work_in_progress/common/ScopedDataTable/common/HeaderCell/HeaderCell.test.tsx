@@ -309,15 +309,10 @@ describe("HeaderCell", () => {
 
     it("sits beside the menu whose open state hides it", () => {
       mount({ sortable: true, reason: "Refused." });
-      fireEvent.click(
-        screen.getByRole("button", { name: "Column options for Name" }),
-      );
-      // The stylesheet hides the reason while the column's menu is open.
+      // The stylesheet hides the reason while this button's menu is open.
       expect(
-        getHeader().querySelector(
-          ':scope > .menu > .trigger[aria-expanded="true"]',
-        ),
-      ).not.toBeNull();
+        screen.getByRole("button", { name: "Column options for Name" }),
+      ).toBe(getHeader().querySelector(":scope > .ds.data-table-header-menu"));
       expect(getHeader().querySelector(":scope > .sort-reason")).not.toBeNull();
     });
   });

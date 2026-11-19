@@ -183,7 +183,9 @@ export default function PaginationBar<
     <nav
       {...rest}
       aria-label={label ?? messages.pagination}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      className={[componentCssClassName, "dense", className]
+        .filter(Boolean)
+        .join(" ")}
       data-hydrated={hydrated ? "" : undefined}
     >
       <div className="sizing">

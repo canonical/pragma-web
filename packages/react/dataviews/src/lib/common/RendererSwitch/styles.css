@@ -11,8 +11,8 @@
    * bottom left in a right-to-left one.
    */
   .ds.renderer-switch {
-    --renderer-switch-gap: var(--dimension-200);
-    --renderer-switch-choice-gap: var(--dimension-050);
+    --renderer-switch-gap: var(--space-200);
+    --renderer-switch-choice-gap: var(--space-050);
 
     display: flex;
     flex-direction: column;
