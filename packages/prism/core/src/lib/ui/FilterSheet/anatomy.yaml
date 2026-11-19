@@ -1,5 +1,6 @@
 ---
-# FilterSheet — the sheet the folded filters open below two groups: a
+# FilterSheet — the sheet the folded filters open, the fold below two
+# groups and the facet bar's "More filters" wider: a
 # native dialog whose open state is the address's (`sheet=filter`), so it
 # opens from the fold's link without scripting and closes through a link
 # to the address without the parameter; hydrated, Escape closes it the
@@ -10,9 +11,9 @@
 # title, then the close link at the end, drawn as the trail's links
 # are) and a scrolling content column:
 # the count, the applied chips, Search, then the facets, one gutter apart,
-# the same parts the panel or the bar hold at wider widths. It is not
-# displayed unless it is open below two groups, whatever the address says:
-# the bar and the panel exist at wider widths.
+# the same parts the panel or the bar hold at wider widths, and every
+# facet the bar folds. It is displayed only while it is open, at every
+# width.
 #
 # Why not the published SidePanel: it opens only through its imperative
 # handle, so a link to `?sheet=filter` could not open it before hydration.
@@ -28,10 +29,8 @@
 #     replaced, so the open sheet covers the page beneath, border-box so
 #     its padding stays inside it.
 #
-# Reflow, bound in styles.css:
-#   @container shell (width < 912px)  below two groups: the open sheet is a
-#     flex column (`[open]`); closed, or at two groups and wider, it is not
-#     displayed.
+# States, bound in styles.css: open (`[open]`), a flex column; closed, not
+# displayed.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
 # component.padding.block, component.padding.inline, and the semantic
@@ -62,6 +61,7 @@ node:
     appearance.background: color.background
     typography.color: color.text
     layout.type: none
+    layout.type@expanded: flex
     layout.direction: column
     spacing.gap: grid.gutter
   edges:
