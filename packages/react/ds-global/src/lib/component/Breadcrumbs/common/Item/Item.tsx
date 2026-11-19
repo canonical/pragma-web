@@ -22,7 +22,6 @@ const Item = ({
   className,
   LinkComponent = "a",
   // Destructure Item props we don't spread to DOM
-  key: _key,
   items: _items,
   Component: _Component,
   ...props
