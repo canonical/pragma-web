@@ -43,7 +43,7 @@ const measureName = (prefix: string, relations: number): number =>
 
 describe("nameRegionBridges", () => {
   it("names a region's own bridges, the heaviest first, then by prefix", () => {
-    expect(nameRegionBridges(regionOf(4000), BRIDGES, false)).toEqual({
+    expect(nameRegionBridges(regionOf(4000), BRIDGES, false, false)).toEqual({
       named: [
         { prefix: "cs", relations: 5 },
         { prefix: "anatomy", relations: 2 },
@@ -55,17 +55,17 @@ describe("nameRegionBridges", () => {
 
   it("names only as many as fit in the region's width, after its heading", () => {
     const heading = measureRegionHeading("ds", 3, true);
-    expect(nameRegionBridges(regionOf(heading), BRIDGES, true)).toEqual({
+    expect(nameRegionBridges(regionOf(heading), BRIDGES, true, false)).toEqual({
       named: [],
       none: false,
     });
     const one = heading + measureName("cs", 5);
-    expect(nameRegionBridges(regionOf(one), BRIDGES, true).named).toEqual([
-      { prefix: "cs", relations: 5 },
-    ]);
-    expect(nameRegionBridges(regionOf(one - 1), BRIDGES, true).named).toEqual(
-      [],
-    );
+    expect(
+      nameRegionBridges(regionOf(one), BRIDGES, true, false).named,
+    ).toEqual([{ prefix: "cs", relations: 5 }]);
+    expect(
+      nameRegionBridges(regionOf(one - 1), BRIDGES, true, false).named,
+    ).toEqual([]);
   });
 
   it("says a region with no bridge has none, where the words fit", () => {
@@ -77,12 +77,27 @@ describe("nameRegionBridges", () => {
         "regular",
         LABEL_SIZE,
       );
-    expect(nameRegionBridges(regionOf(heading + words), [], false)).toEqual({
+    expect(
+      nameRegionBridges(regionOf(heading + words), [], false, false),
+    ).toEqual({
       named: [],
       none: true,
     });
-    expect(nameRegionBridges(regionOf(heading + words - 1), [], false)).toEqual(
-      { named: [], none: false },
+    expect(
+      nameRegionBridges(regionOf(heading + words - 1), [], false, false),
+    ).toEqual({ named: [], none: false });
+  });
+
+  it("says nothing of a region with no bridge on a term's neighbourhood", () => {
+    expect(nameRegionBridges(regionOf(4000), [], false, true)).toEqual({
+      named: [],
+      none: false,
+    });
+  });
+
+  it("names a region's bridges on a term's neighbourhood as elsewhere", () => {
+    expect(nameRegionBridges(regionOf(4000), BRIDGES, false, true)).toEqual(
+      nameRegionBridges(regionOf(4000), BRIDGES, false, false),
     );
   });
 
@@ -91,7 +106,8 @@ describe("nameRegionBridges", () => {
     const metro = layout.regions.find(({ prefix }) => prefix === "metro");
     expect(
       metro &&
-        nameRegionBridges(metro, listRegionBridges(layout.model), false).named,
+        nameRegionBridges(metro, listRegionBridges(layout.model), false, false)
+          .named,
     ).toEqual([{ prefix: "geo", relations: 3 }]);
   });
 
@@ -106,7 +122,12 @@ describe("nameRegionBridges", () => {
       const bridges = listRegionBridges(layout.model);
       for (const region of layout.regions) {
         const opened = layout.drilled === region.prefix;
-        const { named, none } = nameRegionBridges(region, bridges, opened);
+        const { named, none } = nameRegionBridges(
+          region,
+          bridges,
+          opened,
+          layout.focus !== undefined,
+        );
         const heading = measureRegionHeading(
           region.prefix,
           region.members,

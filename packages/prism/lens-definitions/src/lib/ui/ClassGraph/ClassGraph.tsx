@@ -479,13 +479,19 @@ export default function ClassGraph({
   };
   const bridges = useMemo(() => listRegionBridges(layout.model), [layout]);
   // A region's label row names its bridges after its heading, outside the
-  // way back, as many as its width holds, or says it has none; drawn only
+  // way back, as many as its width holds, or says it has none (never on a
+  // term page, whose layout holds only the class's neighbours); drawn only
   // at full, as its count.
   const drawBridgeNames = (region: LaidOutRegion): ReactElement | null => {
     const opened =
       buildDrillHref !== undefined && layout.drilled === region.prefix;
     if (bucket !== "full") return null;
-    const { named, none } = nameRegionBridges(region, bridges, opened);
+    const { named, none } = nameRegionBridges(
+      region,
+      bridges,
+      opened,
+      layout.focus !== undefined,
+    );
     return named.length === 0 && !none ? null : (
       <text
         className="region-bridges"
