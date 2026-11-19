@@ -11,11 +11,11 @@ import {
   serveNodeValues,
 } from "@canonical/prism-contract";
 import {
-  defaultFieldResolver,
   type ExecutionResult,
   extendSchema,
   type GraphQLFieldResolver,
   type GraphQLInterfaceType,
+  type GraphQLObjectType,
   type GraphQLResolveInfo,
   type GraphQLSchema,
   getNamedType,
@@ -89,14 +89,19 @@ const createRun =
     return result.data;
   };
 
-/** The IRI of the node a field is resolved on, read by its own `uri` field. */
+/**
+ * The IRI of the node a field is resolved on, read by its own `uri` field.
+ *
+ * @note Every node type the compiler emits resolves `uri` itself, so its
+ * resolver is read without a fallback.
+ */
 const readNodeUri = async (
   source: unknown,
   context: unknown,
   info: GraphQLResolveInfo,
 ): Promise<string> => {
-  const resolve =
-    info.parentType.getFields().uri?.resolve ?? defaultFieldResolver;
+  const resolve = info.parentType.getFields().uri
+    .resolve as GraphQLFieldResolver<unknown, unknown>;
   return String(
     await resolve(source, {}, context, { ...info, fieldName: "uri" }),
   );
@@ -165,12 +170,12 @@ export const extendWithList = (schema: GraphQLSchema): GraphQLSchema => {
       facets: selection.facets,
     };
   };
-  const query = extended.getQueryType()?.getFields();
-  if (query !== undefined) {
-    query.facetedInstances.resolve = faceted as GraphQLFieldResolver<
-      unknown,
-      unknown
-    >;
-  }
+  // The extension SDL extends `Query`, so the extended schema has one.
+  (
+    extended.getQueryType() as GraphQLObjectType
+  ).getFields().facetedInstances.resolve = faceted as GraphQLFieldResolver<
+    unknown,
+    unknown
+  >;
   return extended;
 };
