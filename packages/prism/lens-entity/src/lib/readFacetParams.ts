@@ -16,12 +16,12 @@ import type { OntologyNamespace } from "./types.js";
  * @returns The filters, in the fields' order.
  */
 export default function readFacetParams(
-  search: Readonly<Record<string, unknown>>,
+  search: object,
   fields: readonly string[],
   namespaces: readonly OntologyNamespace[],
 ): readonly FacetFilter[] {
   return fields.flatMap((field) => {
-    const text = search[field];
+    const text: unknown = Reflect.get(search, field);
     if (typeof text !== "string" || text === "") return [];
     const values = text
       .split(FACET_VALUE_SEPARATOR)

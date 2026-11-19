@@ -16,7 +16,6 @@ import entityIndexFragmentNode from "../../../../../__generated__/EntityIndex_qu
 import type { EntityIndexPaginationQuery } from "../../../../../__generated__/EntityIndexPaginationQuery.graphql.js";
 import type { EntityIndexQuery } from "../../../../../__generated__/EntityIndexQuery.graphql.js";
 import entityIndexQueryNode from "../../../../../__generated__/EntityIndexQuery.graphql.js";
-import buildEntityIndexVariables from "../../../../buildEntityIndexVariables.js";
 import {
   DEFAULT_LIST_RENDERERS,
   ENTITY_PAGE_SIZE,
@@ -28,6 +27,7 @@ import {
   EntityStatus,
   SocketGuard,
 } from "../../../EntityLayout/common/index.js";
+import useIndexVariables from "../../../EntityLayout/hooks/useIndexVariables.js";
 import type { EntityIndexProps } from "./types.js";
 import "./styles.css";
 
@@ -41,10 +41,16 @@ import "./styles.css";
  * `EntityIndexQuery` is the whole index, one operation, the pagination
  * fragment's first page riding the root.
  *
- * `EntityIndex_query` reaches the collection through the TBox: the contract
- * has no root field that names a subject, so the class's instances come
- * from `ontologyClass(uri:)`, the class supplied by the site's binding. The `@connection` key and
- * `@refetchable` generate `EntityIndexPaginationQuery` for "Load more".
+ * `EntityIndex_query` reads the class's instances through the providers'
+ * `facetedInstances`, narrowed by the facet filters the address applies,
+ * with the facets' counts and the matching set's `totalCount`; the class's
+ * own `instanceCount` and the graph's prefixes ride beside it. The
+ * `@connection` key and `@refetchable` generate `EntityIndexPaginationQuery`
+ * for "Load more".
+ *
+ * `EntityFacetScopeQuery` names the facets and the prefixes a filtered
+ * address needs before the index can be asked: only a filtered address
+ * reads it, so an unfiltered index stays one request.
  *
  * `title` and `curie` ride beside the list's spread because the search
  * filters on them; the list's spread carries each node's `values`, so the
@@ -53,33 +59,78 @@ import "./styles.css";
  */
 const declareEntityIndexOperations = (): unknown => [
   graphql`
-    query EntityIndexQuery($classUri: String!, $count: Int!, $cursor: String) {
+    query EntityIndexQuery(
+      $classUri: String!
+      $classId: ID!
+      $filters: [FieldFilter!]
+      $count: Int!
+      $cursor: String
+    ) {
       ...EntityIndex_query
-        @arguments(classUri: $classUri, count: $count, cursor: $cursor)
+        @arguments(
+          classUri: $classUri
+          classId: $classId
+          filters: $filters
+          count: $count
+          cursor: $cursor
+        )
+    }
+  `,
+  graphql`
+    query EntityFacetScopeQuery($classId: ID!) {
+      ontologies {
+        prefix
+        namespace
+      }
+      facetedInstances(classUri: $classId, first: 0) {
+        facets {
+          field
+        }
+      }
     }
   `,
   graphql`
     fragment EntityIndex_query on Query
     @argumentDefinitions(
       classUri: { type: "String!" }
+      classId: { type: "ID!" }
+      filters: { type: "[FieldFilter!]" }
       count: { type: "Int!" }
       cursor: { type: "String" }
     )
     @refetchable(queryName: "EntityIndexPaginationQuery") {
+      ontologies {
+        prefix
+        namespace
+      }
       ontologyClass(uri: $classUri) {
         uri
         instanceCount
-        instances(first: $count, after: $cursor)
-          @connection(key: "EntityIndex_instances") {
-          edges {
-            node {
-              uri
-              _meta {
-                title
-                curie
-              }
-              ...NodeList_node
+      }
+      facetedInstances(
+        classUri: $classId
+        filters: $filters
+        first: $count
+        after: $cursor
+      ) @connection(key: "EntityIndex_facetedInstances") {
+        totalCount
+        facets {
+          field
+          label
+          values {
+            value
+            label
+            count
+          }
+        }
+        edges {
+          node {
+            uri
+            _meta {
+              title
+              curie
             }
+            ...NodeList_node
           }
         }
       }
@@ -140,13 +191,13 @@ export default function EntityIndex({
   const selected = useSearchParam(VIEW_PARAMS.select) ?? undefined;
   const query = useLazyLoadQuery<EntityIndexQuery>(
     entityIndexQueryNode,
-    buildEntityIndexVariables(binding),
+    useIndexVariables(binding),
   );
   const { data, hasNext, isLoadingNext, loadNext } = usePaginationFragment<
     EntityIndexPaginationQuery,
     EntityIndex_query$key
   >(entityIndexFragmentNode, query);
-  const edges = data.ontologyClass?.instances.edges ?? [];
+  const edges = data.facetedInstances.edges;
   const visible = edges.filter(({ node }) =>
     matchesEntityText(text, node._meta),
   );

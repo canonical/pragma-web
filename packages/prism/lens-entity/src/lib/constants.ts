@@ -4,6 +4,8 @@
  * field's cardinality.
  */
 
+import type { CacheConfig } from "relay-runtime";
+
 import type { MessageKey } from "./i18n/index.js";
 import type { Cardinality } from "./types.js";
 
@@ -50,3 +52,9 @@ export const FACET_NONE = "none";
 
 /** Between a facet's applied values in the address. */
 export const FACET_VALUE_SEPARATOR = ",";
+
+/** A warm's fetch policy: answer from the store when it holds the data, and
+ * fetch otherwise. */
+export const STORE_OR_NETWORK: CacheConfig & {
+  readonly fetchPolicy: "store-or-network";
+} = { fetchPolicy: "store-or-network" };

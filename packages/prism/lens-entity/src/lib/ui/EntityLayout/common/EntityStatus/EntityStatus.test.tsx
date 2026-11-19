@@ -2,7 +2,8 @@
 
 import { createEnvironment } from "@canonical/prism-core";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import type { FetchFunction } from "relay-runtime";
+import { describe, expect, it, vi } from "vitest";
 import createEntitySite from "../../../../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
 import createWarmEnvironment from "../../../../../../testing/createWarmEnvironment.js";
@@ -35,6 +36,56 @@ describe("EntityStatus", () => {
     expect(status).toHaveAttribute("aria-live", "polite");
     expect(status.className).toBe("ds count-line ds entity-status site");
     expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("counts the shown entries out of the matching set where a facet applies", async () => {
+    const station = "https://metro.example/onto#Station";
+    const ontologies = [
+      { prefix: "metro", namespace: "https://metro.example/onto#" },
+    ];
+    const fetchFn = vi.fn<FetchFunction>(async (request) => ({
+      data:
+        request.name === "EntityFacetScopeQuery"
+          ? {
+              ontologies,
+              facetedInstances: { facets: [{ field: "servesLine" }] },
+            }
+          : {
+              ontologies,
+              ontologyClass: { uri: station, instanceCount: 26 },
+              facetedInstances: {
+                totalCount: 6,
+                facets: [],
+                edges: [
+                  {
+                    cursor: "a",
+                    node: {
+                      __typename: "Station",
+                      uri: "https://metro.example/onto#bank",
+                      _meta: { title: "Bank", curie: "metro:bank" },
+                    },
+                  },
+                ],
+                pageInfo: { endCursor: "a", hasNextPage: false },
+              },
+            },
+    }));
+    render(
+      createEntitySite({
+        url: "/stations?servesLine=metro%3Acircle-line",
+        environment: createEnvironment({ fetchFn }),
+        children: <EntityStatus binding={STATIONS_BINDING} />,
+      }),
+    );
+    expect(
+      await screen.findByRole("status", { name: "1 of 6 entries" }),
+    ).toBeInTheDocument();
+    expect(fetchFn.mock.lastCall?.[1].filters).toEqual([
+      {
+        field: "servesLine",
+        values: ["https://metro.example/onto#circle-line"],
+      },
+    ]);
   });
 
   it("counts only the entries the address's search text shows", {

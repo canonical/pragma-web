@@ -42,448 +42,35 @@ export default [
     operation: "EntityIndexQuery",
     variables: {
       classUri: "metro:Nowhere",
+      classId: "metro:Nowhere",
+      filters: null,
       count: 100,
       cursor: null,
     },
     response: {
       data: {
+        ontologies: [
+          {
+            prefix: "metro",
+            namespace: "https://metro.example/onto#",
+          },
+          {
+            prefix: "geo",
+            namespace: "https://geo.example/onto#",
+          },
+          {
+            prefix: "rdfs",
+            namespace: "http://www.w3.org/2000/01/rdf-schema#",
+          },
+        ],
         ontologyClass: null,
-      },
-    },
-  },
-  {
-    operation: "EntityIndexQuery",
-    variables: {
-      classUri: "metro:Station",
-      count: 100,
-      cursor: null,
-    },
-    response: {
-      data: {
-        ontologyClass: {
-          uri: "https://metro.example/onto#Station",
-          instanceCount: 16,
-          instances: {
-            edges: [
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#",
-                  _meta: {
-                    title: "https://metro.example/onto#",
-                    curie: "metro:",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8j",
-              },
-              {
-                node: {
-                  __typename: "Interchange",
-                  uri: "https://metro.example/onto#central-exchange",
-                  _meta: {
-                    title: "Central Exchange",
-                    curie: "metro:central-exchange",
-                    type: {
-                      uri: "https://metro.example/onto#Interchange",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Interchange",
-                      },
-                    },
-                    definition: "The busiest transfer point on the network.",
-                  },
-                  __isNode: "Interchange",
-                },
-                cursor:
-                  "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jY2VudHJhbC1leGNoYW5nZQ==",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#eastcliff",
-                  _meta: {
-                    title: "Eastcliff",
-                    curie: "metro:eastcliff",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZWFzdGNsaWZm",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#foundry-row",
-                  _meta: {
-                    title: "Foundry Row",
-                    curie: "metro:foundry-row",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZm91bmRyeS1yb3c=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#ghost",
-                  _meta: {
-                    title: "ghost",
-                    curie: "metro:ghost",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ2hvc3Q=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#greenhithe",
-                  _meta: {
-                    title: "Greenhithe",
-                    curie: "metro:greenhithe",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ3JlZW5oaXRoZQ==",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#harbourside",
-                  _meta: {
-                    title: "Harbourside",
-                    curie: "metro:harbourside",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jaGFyYm91cnNpZGU=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#kilnwood",
-                  _meta: {
-                    title: "Kilnwood",
-                    curie: "metro:kilnwood",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8ja2lsbndvb2Q=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#marsh-end",
-                  _meta: {
-                    title: "Marsh End",
-                    curie: "metro:marsh-end",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbWFyc2gtZW5k",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#northgate",
-                  _meta: {
-                    title: "Northgate",
-                    curie: "metro:northgate",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: "The northern terminus.",
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbm9ydGhnYXRl",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#quarry-hill",
-                  _meta: {
-                    title: "Quarry Hill",
-                    curie: "metro:quarry-hill",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcXVhcnJ5LWhpbGw=",
-              },
-              {
-                node: {
-                  __typename: "Interchange",
-                  uri: "https://metro.example/onto#riverside-junction",
-                  _meta: {
-                    title: "Riverside Junction",
-                    curie: "metro:riverside-junction",
-                    type: {
-                      uri: "https://metro.example/onto#Interchange",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Interchange",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Interchange",
-                },
-                cursor:
-                  "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcml2ZXJzaWRlLWp1bmN0aW9u",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#saltford",
-                  _meta: {
-                    title: "Saltford",
-                    curie: "metro:saltford",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jc2FsdGZvcmQ=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#tannery-lane",
-                  _meta: {
-                    title: "Tannery Lane",
-                    curie: "metro:tannery-lane",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Interchange",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdGFubmVyeS1sYW5l",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#verge-park",
-                  _meta: {
-                    title: "Verge Park",
-                    curie: "metro:verge-park",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdmVyZ2UtcGFyaw==",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#willowbank",
-                  _meta: {
-                    title: "Willowbank",
-                    curie: "metro:willowbank",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
-              },
-            ],
-            pageInfo: {
-              endCursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
-              hasNextPage: false,
-            },
+        facetedInstances: {
+          totalCount: 0,
+          facets: [],
+          edges: [],
+          pageInfo: {
+            endCursor: null,
+            hasNextPage: false,
           },
         },
       },
@@ -493,159 +80,633 @@ export default [
     operation: "EntityIndexQuery",
     variables: {
       classUri: "metro:Station",
+      classId: "metro:Station",
+      filters: null,
+      count: 100,
+      cursor: null,
+    },
+    response: {
+      data: {
+        ontologies: [
+          {
+            prefix: "metro",
+            namespace: "https://metro.example/onto#",
+          },
+          {
+            prefix: "geo",
+            namespace: "https://geo.example/onto#",
+          },
+          {
+            prefix: "rdfs",
+            namespace: "http://www.w3.org/2000/01/rdf-schema#",
+          },
+        ],
+        ontologyClass: {
+          uri: "https://metro.example/onto#Station",
+          instanceCount: 16,
+        },
+        facetedInstances: {
+          totalCount: 16,
+          facets: [],
+          edges: [
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#",
+                _meta: {
+                  title: "https://metro.example/onto#",
+                  curie: "metro:",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8j",
+            },
+            {
+              node: {
+                __typename: "Interchange",
+                uri: "https://metro.example/onto#central-exchange",
+                _meta: {
+                  title: "Central Exchange",
+                  curie: "metro:central-exchange",
+                  type: {
+                    uri: "https://metro.example/onto#Interchange",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Interchange",
+                    },
+                  },
+                  definition: "The busiest transfer point on the network.",
+                },
+                __isNode: "Interchange",
+              },
+              cursor:
+                "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jY2VudHJhbC1leGNoYW5nZQ==",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#eastcliff",
+                _meta: {
+                  title: "Eastcliff",
+                  curie: "metro:eastcliff",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZWFzdGNsaWZm",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#foundry-row",
+                _meta: {
+                  title: "Foundry Row",
+                  curie: "metro:foundry-row",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZm91bmRyeS1yb3c=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#ghost",
+                _meta: {
+                  title: "ghost",
+                  curie: "metro:ghost",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ2hvc3Q=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#greenhithe",
+                _meta: {
+                  title: "Greenhithe",
+                  curie: "metro:greenhithe",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ3JlZW5oaXRoZQ==",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#harbourside",
+                _meta: {
+                  title: "Harbourside",
+                  curie: "metro:harbourside",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jaGFyYm91cnNpZGU=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#kilnwood",
+                _meta: {
+                  title: "Kilnwood",
+                  curie: "metro:kilnwood",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8ja2lsbndvb2Q=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#marsh-end",
+                _meta: {
+                  title: "Marsh End",
+                  curie: "metro:marsh-end",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbWFyc2gtZW5k",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#northgate",
+                _meta: {
+                  title: "Northgate",
+                  curie: "metro:northgate",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: "The northern terminus.",
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbm9ydGhnYXRl",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#quarry-hill",
+                _meta: {
+                  title: "Quarry Hill",
+                  curie: "metro:quarry-hill",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcXVhcnJ5LWhpbGw=",
+            },
+            {
+              node: {
+                __typename: "Interchange",
+                uri: "https://metro.example/onto#riverside-junction",
+                _meta: {
+                  title: "Riverside Junction",
+                  curie: "metro:riverside-junction",
+                  type: {
+                    uri: "https://metro.example/onto#Interchange",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Interchange",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Interchange",
+              },
+              cursor:
+                "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcml2ZXJzaWRlLWp1bmN0aW9u",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#saltford",
+                _meta: {
+                  title: "Saltford",
+                  curie: "metro:saltford",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jc2FsdGZvcmQ=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#tannery-lane",
+                _meta: {
+                  title: "Tannery Lane",
+                  curie: "metro:tannery-lane",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Interchange",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdGFubmVyeS1sYW5l",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#verge-park",
+                _meta: {
+                  title: "Verge Park",
+                  curie: "metro:verge-park",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdmVyZ2UtcGFyaw==",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#willowbank",
+                _meta: {
+                  title: "Willowbank",
+                  curie: "metro:willowbank",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
+            },
+          ],
+          pageInfo: {
+            endCursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
+            hasNextPage: false,
+          },
+        },
+      },
+    },
+  },
+  {
+    operation: "EntityIndexQuery",
+    variables: {
+      classUri: "metro:Station",
+      classId: "metro:Station",
+      filters: null,
       count: 5,
       cursor: null,
     },
     response: {
       data: {
+        ontologies: [
+          {
+            prefix: "metro",
+            namespace: "https://metro.example/onto#",
+          },
+          {
+            prefix: "geo",
+            namespace: "https://geo.example/onto#",
+          },
+          {
+            prefix: "rdfs",
+            namespace: "http://www.w3.org/2000/01/rdf-schema#",
+          },
+        ],
         ontologyClass: {
           uri: "https://metro.example/onto#Station",
           instanceCount: 16,
-          instances: {
-            edges: [
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#",
-                  _meta: {
-                    title: "https://metro.example/onto#",
-                    curie: "metro:",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
+        },
+        facetedInstances: {
+          totalCount: 16,
+          facets: [],
+          edges: [
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#",
+                _meta: {
+                  title: "https://metro.example/onto#",
+                  curie: "metro:",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
                       },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8j",
-              },
-              {
-                node: {
-                  __typename: "Interchange",
-                  uri: "https://metro.example/onto#central-exchange",
-                  _meta: {
-                    title: "Central Exchange",
-                    curie: "metro:central-exchange",
-                    type: {
-                      uri: "https://metro.example/onto#Interchange",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Interchange",
+                      {
+                        uri: "https://metro.example/onto#Stop",
                       },
+                    ],
+                    _meta: {
+                      title: "Station",
                     },
-                    definition: "The busiest transfer point on the network.",
                   },
-                  __isNode: "Interchange",
+                  definition: null,
                 },
-                cursor:
-                  "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jY2VudHJhbC1leGNoYW5nZQ==",
+                __isNode: "Station",
               },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#eastcliff",
-                  _meta: {
-                    title: "Eastcliff",
-                    curie: "metro:eastcliff",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZWFzdGNsaWZm",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#foundry-row",
-                  _meta: {
-                    title: "Foundry Row",
-                    curie: "metro:foundry-row",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZm91bmRyeS1yb3c=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#ghost",
-                  _meta: {
-                    title: "ghost",
-                    curie: "metro:ghost",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ2hvc3Q=",
-              },
-            ],
-            pageInfo: {
-              endCursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ2hvc3Q=",
-              hasNextPage: true,
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8j",
             },
+            {
+              node: {
+                __typename: "Interchange",
+                uri: "https://metro.example/onto#central-exchange",
+                _meta: {
+                  title: "Central Exchange",
+                  curie: "metro:central-exchange",
+                  type: {
+                    uri: "https://metro.example/onto#Interchange",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Interchange",
+                    },
+                  },
+                  definition: "The busiest transfer point on the network.",
+                },
+                __isNode: "Interchange",
+              },
+              cursor:
+                "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jY2VudHJhbC1leGNoYW5nZQ==",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#eastcliff",
+                _meta: {
+                  title: "Eastcliff",
+                  curie: "metro:eastcliff",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZWFzdGNsaWZm",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#foundry-row",
+                _meta: {
+                  title: "Foundry Row",
+                  curie: "metro:foundry-row",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZm91bmRyeS1yb3c=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#ghost",
+                _meta: {
+                  title: "ghost",
+                  curie: "metro:ghost",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ2hvc3Q=",
+            },
+          ],
+          pageInfo: {
+            endCursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ2hvc3Q=",
+            hasNextPage: true,
           },
         },
       },
@@ -655,303 +716,321 @@ export default [
     operation: "EntityIndexPaginationQuery",
     variables: {
       classUri: "metro:Station",
+      classId: "metro:Station",
+      filters: null,
       count: 100,
       cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ2hvc3Q=",
     },
     response: {
       data: {
+        ontologies: [
+          {
+            prefix: "metro",
+            namespace: "https://metro.example/onto#",
+          },
+          {
+            prefix: "geo",
+            namespace: "https://geo.example/onto#",
+          },
+          {
+            prefix: "rdfs",
+            namespace: "http://www.w3.org/2000/01/rdf-schema#",
+          },
+        ],
         ontologyClass: {
           uri: "https://metro.example/onto#Station",
           instanceCount: 16,
-          instances: {
-            edges: [
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#greenhithe",
-                  _meta: {
-                    title: "Greenhithe",
-                    curie: "metro:greenhithe",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
+        },
+        facetedInstances: {
+          totalCount: 16,
+          facets: [],
+          edges: [
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#greenhithe",
+                _meta: {
+                  title: "Greenhithe",
+                  curie: "metro:greenhithe",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
                       },
+                    ],
+                    _meta: {
+                      title: "Station",
                     },
-                    definition: null,
                   },
-                  __isNode: "Station",
+                  definition: null,
                 },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ3JlZW5oaXRoZQ==",
+                __isNode: "Station",
               },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#harbourside",
-                  _meta: {
-                    title: "Harbourside",
-                    curie: "metro:harbourside",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jaGFyYm91cnNpZGU=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#kilnwood",
-                  _meta: {
-                    title: "Kilnwood",
-                    curie: "metro:kilnwood",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8ja2lsbndvb2Q=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#marsh-end",
-                  _meta: {
-                    title: "Marsh End",
-                    curie: "metro:marsh-end",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbWFyc2gtZW5k",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#northgate",
-                  _meta: {
-                    title: "Northgate",
-                    curie: "metro:northgate",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: "The northern terminus.",
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbm9ydGhnYXRl",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#quarry-hill",
-                  _meta: {
-                    title: "Quarry Hill",
-                    curie: "metro:quarry-hill",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcXVhcnJ5LWhpbGw=",
-              },
-              {
-                node: {
-                  __typename: "Interchange",
-                  uri: "https://metro.example/onto#riverside-junction",
-                  _meta: {
-                    title: "Riverside Junction",
-                    curie: "metro:riverside-junction",
-                    type: {
-                      uri: "https://metro.example/onto#Interchange",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Interchange",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Interchange",
-                },
-                cursor:
-                  "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcml2ZXJzaWRlLWp1bmN0aW9u",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#saltford",
-                  _meta: {
-                    title: "Saltford",
-                    curie: "metro:saltford",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jc2FsdGZvcmQ=",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#tannery-lane",
-                  _meta: {
-                    title: "Tannery Lane",
-                    curie: "metro:tannery-lane",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Station",
-                        },
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Interchange",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdGFubmVyeS1sYW5l",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#verge-park",
-                  _meta: {
-                    title: "Verge Park",
-                    curie: "metro:verge-park",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdmVyZ2UtcGFyaw==",
-              },
-              {
-                node: {
-                  __typename: "Station",
-                  uri: "https://metro.example/onto#willowbank",
-                  _meta: {
-                    title: "Willowbank",
-                    curie: "metro:willowbank",
-                    type: {
-                      uri: "https://metro.example/onto#Station",
-                      visibility: "PROMINENT",
-                      superclasses: [
-                        {
-                          uri: "https://metro.example/onto#Stop",
-                        },
-                      ],
-                      _meta: {
-                        title: "Station",
-                      },
-                    },
-                    definition: null,
-                  },
-                  __isNode: "Station",
-                },
-                cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
-              },
-            ],
-            pageInfo: {
-              endCursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
-              hasNextPage: false,
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jZ3JlZW5oaXRoZQ==",
             },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#harbourside",
+                _meta: {
+                  title: "Harbourside",
+                  curie: "metro:harbourside",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jaGFyYm91cnNpZGU=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#kilnwood",
+                _meta: {
+                  title: "Kilnwood",
+                  curie: "metro:kilnwood",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8ja2lsbndvb2Q=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#marsh-end",
+                _meta: {
+                  title: "Marsh End",
+                  curie: "metro:marsh-end",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbWFyc2gtZW5k",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#northgate",
+                _meta: {
+                  title: "Northgate",
+                  curie: "metro:northgate",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: "The northern terminus.",
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jbm9ydGhnYXRl",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#quarry-hill",
+                _meta: {
+                  title: "Quarry Hill",
+                  curie: "metro:quarry-hill",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcXVhcnJ5LWhpbGw=",
+            },
+            {
+              node: {
+                __typename: "Interchange",
+                uri: "https://metro.example/onto#riverside-junction",
+                _meta: {
+                  title: "Riverside Junction",
+                  curie: "metro:riverside-junction",
+                  type: {
+                    uri: "https://metro.example/onto#Interchange",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Interchange",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Interchange",
+              },
+              cursor:
+                "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jcml2ZXJzaWRlLWp1bmN0aW9u",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#saltford",
+                _meta: {
+                  title: "Saltford",
+                  curie: "metro:saltford",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jc2FsdGZvcmQ=",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#tannery-lane",
+                _meta: {
+                  title: "Tannery Lane",
+                  curie: "metro:tannery-lane",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Station",
+                      },
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Interchange",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdGFubmVyeS1sYW5l",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#verge-park",
+                _meta: {
+                  title: "Verge Park",
+                  curie: "metro:verge-park",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jdmVyZ2UtcGFyaw==",
+            },
+            {
+              node: {
+                __typename: "Station",
+                uri: "https://metro.example/onto#willowbank",
+                _meta: {
+                  title: "Willowbank",
+                  curie: "metro:willowbank",
+                  type: {
+                    uri: "https://metro.example/onto#Station",
+                    visibility: "PROMINENT",
+                    superclasses: [
+                      {
+                        uri: "https://metro.example/onto#Stop",
+                      },
+                    ],
+                    _meta: {
+                      title: "Station",
+                    },
+                  },
+                  definition: null,
+                },
+                __isNode: "Station",
+              },
+              cursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
+            },
+          ],
+          pageInfo: {
+            endCursor: "aHR0cHM6Ly9tZXRyby5leGFtcGxlL29udG8jd2lsbG93YmFuaw==",
+            hasNextPage: false,
           },
         },
       },

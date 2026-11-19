@@ -7,6 +7,7 @@ import {
 import { route } from "@canonical/router-core";
 import type { ReactElement } from "react";
 import { ENTITY_ROUTE_SUFFIX } from "./constants.js";
+import entitySearch from "./entitySearch.js";
 import readUriParam from "./readUriParam.js";
 import type { EntityLensOptions, EntityRoutes } from "./types.js";
 import { EntityIcon } from "./ui/EntityIcon/index.js";
@@ -90,9 +91,9 @@ export default function createEntityRoutes<const TId extends string>(
 
   const index = route({
     url: `/${id}`,
-    search: viewSearch,
+    search: entitySearch,
     content: EntityIndexContent,
-    warm: () => warmEntityIndex(binding),
+    warm: (_params, search) => warmEntityIndex(binding, search),
     meta: routeLensFacet.of({ label, icon, order, tier: 1 }),
   });
   const entity = route({
