@@ -73,6 +73,20 @@
     grid-column: span 2;
   }
 
+  /* Every cell reads from its column's start, as its header does, on one
+   * line: a value longer than its column ends in an ellipsis rather than
+   * wrapping past the row's height. */
+  .ds.entity-table .heading,
+  .ds.entity-table .column,
+  .ds.entity-table .title,
+  .ds.entity-table .value {
+    min-width: 0;
+    overflow: hidden;
+    text-align: start;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .ds.entity-table .sort {
     font-weight: var(--entity-table-sort-font-weight);
   }

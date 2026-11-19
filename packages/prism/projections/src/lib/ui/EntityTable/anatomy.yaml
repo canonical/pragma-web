@@ -59,10 +59,21 @@ node:
                     role: title heading
                     styles:
                       layout.grid.column: "span 2"
+                      size.min.width: 0
+                      layout.overflow: hidden
+                      typography.align: start
+                      typography.whiteSpace: nowrap
+                      typography.overflow: ellipsis
                   relation: { cardinality: "1", slotName: heading }
                 - node:
                     role: column heading
                     attributes: { data-property: "{field}" }
+                    styles:
+                      size.min.width: 0
+                      layout.overflow: hidden
+                      typography.align: start
+                      typography.whiteSpace: nowrap
+                      typography.overflow: ellipsis
                     edges:
                       - node:
                           role: sort link
@@ -103,10 +114,21 @@ node:
                           role: title cell
                           styles:
                             layout.grid.column: "span 2"
+                            size.min.width: 0
+                            layout.overflow: hidden
+                            typography.align: start
+                            typography.whiteSpace: nowrap
+                            typography.overflow: ellipsis
                         relation: { cardinality: "1", slotName: title }
                       - node:
                           role: value cell
                           attributes: { data-property: "{field}" }
+                          styles:
+                            size.min.width: 0
+                            layout.overflow: hidden
+                            typography.align: start
+                            typography.whiteSpace: nowrap
+                            typography.overflow: ellipsis
                         relation: { cardinality: "0..*", slotName: value }
                 - node:
                     role: two-line row (.is-two-line)
