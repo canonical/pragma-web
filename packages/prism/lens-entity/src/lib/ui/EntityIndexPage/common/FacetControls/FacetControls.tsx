@@ -175,9 +175,9 @@ export default function FacetControls({
             </section>
           ))}
           {chips.length > 0 ? (
-            <p aria-label={t("facets.chips")} className="chips">
+            <section aria-label={t("facets.chips")} className="chips">
               {chips}
-            </p>
+            </section>
           ) : null}
         </div>
       )}
