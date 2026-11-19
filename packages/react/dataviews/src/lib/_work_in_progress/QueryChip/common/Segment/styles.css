@@ -1,0 +1,205 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* Its tokens are the chip's, set on .ds.query-chip for each unity. A
+     chip-wide state, such as selected, reaches it through
+     --query-chip-segment-state-background and --query-chip-segment-state-text,
+     which the chip's body sets. */
+  .ds.query-chip-segment {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--dimension-050);
+    box-sizing: border-box;
+    min-inline-size: var(--dimension-300);
+    min-block-size: var(--dimension-300);
+    margin: 0;
+    padding-block: var(--dimension-025);
+    padding-inline: var(--query-chip-segment-padding-inline, 0.375rem);
+    border: 0;
+    border-radius: 0;
+    /* A native button does not inherit the chip's font. */
+    font-family: var(--typography-text-secondary-font-family);
+    font-size: var(--typography-text-secondary-font-size);
+    font-weight: var(--typography-text-secondary-font-weight);
+    letter-spacing: var(--typography-text-secondary-letter-spacing);
+    line-height: var(--typography-text-secondary-line-height);
+    color: var(
+      --query-chip-segment-state-text,
+      var(
+        --modifier-color-text-onForegroundSecondary,
+        var(--query-chip-segment-text, var(--color-text-onForegroundSecondary))
+      )
+    );
+    background: var(
+      --query-chip-segment-state-background,
+      var(
+        --modifier-color-foreground-secondary,
+        var(--query-chip-segment-background, var(--color-foreground-secondary))
+      )
+    );
+
+    & > .text {
+      min-inline-size: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* The glyph's shape comes from the --modifier-icon channel, through a
+       CSS mask: a stand-in until the anatomy DSL's glyph binding is ruled,
+       which replaces it. */
+    & > .glyph {
+      flex: none;
+      inline-size: var(--dimension-200);
+      block-size: var(--dimension-200);
+      background-color: var(
+        --modifier-color-icon,
+        var(--color-icon-onForegroundSecondary)
+      );
+      mask: var(--modifier-icon) center / contain no-repeat;
+    }
+
+    /* Criticality Error's own glyph: the glyph's own `error` class takes
+       the shape from the criticality shim, whatever mark the Segment
+       carries. */
+    & > .glyph[data-fault] {
+      background-color: var(--color-icon-onForegroundSecondary-error);
+    }
+
+    &:is(button) {
+      cursor: text;
+    }
+
+    &:is(button):enabled:hover {
+      background: var(
+        --query-chip-segment-background-hover,
+        var(--color-foreground-secondary-hover)
+      );
+    }
+
+    /* The chip's body draws one ring around the clause. */
+    &:focus-visible {
+      outline: none;
+    }
+
+    &[data-invalid] {
+      color: var(
+        --query-chip-segment-text-invalid,
+        var(--color-text-onForegroundSecondary-error)
+      );
+      background: var(
+        --query-chip-segment-background-invalid,
+        var(--color-foreground-secondary-error)
+      );
+    }
+
+    &:is(:disabled, [data-disabled]) {
+      color: var(
+        --query-chip-segment-text-disabled,
+        var(--color-text-onForegroundSecondary-disabled)
+      );
+      background: var(
+        --query-chip-segment-background-disabled,
+        var(--color-foreground-secondary-disabled)
+      );
+      cursor: default;
+    }
+  }
+
+  /* Condition: one block per value, each giving the operator segment its
+     fill, text and icon channels and its mark, so a theme can re-point any
+     value alone. The mark of the values aliased to Information is pinned to
+     the plain icon colour, as no channel routes it per value yet, so no
+     Criticality colour around the chip reaches it. The value is
+     a data attribute, not a class, because a
+     bare value class such as `range` would match another component's root.
+     A stand-in until @canonical/design-tokens has Condition
+     positions: Inclusion, Match, Range and Presence take the Information
+     shades, and Exclusion its own negation tone below. The marks with no
+     glyph in @canonical/ds-assets are drawn here. */
+  .ds.query-chip-segment[data-condition="inclusion"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    /* = */
+    --modifier-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 4.75h10v1.5H3zm0 5h10v1.5H3z'/%3E%3C/svg%3E");
+  }
+
+  /* Exclusion's negation tone, a named stand-in built from the teal
+     primitives, the hue furthest from Information and from every Criticality
+     value, until @canonical/design-tokens declares the Exclusion position.
+     teal.70 arrives with the next design-tokens release; until it is pinned,
+     the fill falls back to teal.100. */
+  .ds.query-chip-segment[data-condition="exclusion"] {
+    --modifier-color-foreground-secondary: light-dark(
+      var(--color-palette-teal-70, var(--color-palette-teal-100)),
+      var(--color-palette-teal-820)
+    );
+    --modifier-color-text-onForegroundSecondary: light-dark(
+      var(--color-palette-teal-700),
+      var(--color-palette-teal-180)
+    );
+    --modifier-color-icon: light-dark(
+      var(--color-palette-teal-700),
+      var(--color-palette-teal-180)
+    );
+    /* ≠ */
+    --modifier-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 4.75h10v1.5H3zm0 5h10v1.5H3z'/%3E%3Cpath d='m10.35 1.6 1.3.75-6 11.05-1.3-.75z'/%3E%3C/svg%3E");
+  }
+
+  .ds.query-chip-segment[data-condition="match"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    --modifier-icon: url("/icons/search.svg#search");
+  }
+
+  .ds.query-chip-segment[data-condition="range"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    /* ↔ */
+    --modifier-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.56 7.25h6.88l-1.72-1.72 1.06-1.06L14.31 8l-3.53 3.53-1.06-1.06 1.72-1.72H4.56l1.72 1.72-1.06 1.06L1.69 8l3.53-3.53 1.06 1.06z'/%3E%3C/svg%3E");
+  }
+
+  .ds.query-chip-segment[data-condition="presence"] {
+    --modifier-color-foreground-secondary: var(
+      --color-foreground-secondary-information
+    );
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary-information
+    );
+    --modifier-color-icon: var(--color-icon-onForegroundSecondary);
+    --modifier-icon: url("/icons/status-small.svg#status-small");
+  }
+
+  /* Under forced colours the fills and masks are replaced, so the glyph is
+     painted in the text colour and each part keeps an edge. */
+  @media (forced-colors: active) {
+    .ds.query-chip-segment {
+      border: var(--dimension-stroke-thickness-medium) solid ButtonBorder;
+
+      & > .glyph {
+        forced-color-adjust: none;
+        background-color: CanvasText;
+      }
+
+      &[data-invalid] {
+        border-color: Mark;
+        border-width: var(--dimension-stroke-thickness-large);
+      }
+    }
+  }
+}

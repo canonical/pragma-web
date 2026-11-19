@@ -34,6 +34,14 @@ export {
 export type { PaginationBarProps } from "./_work_in_progress/PaginationBar/index.js";
 export { PaginationBar } from "./_work_in_progress/PaginationBar/index.js";
 export type {
+  QueryChipEntryProps,
+  QueryChipProps,
+  QueryChipSegmentProps,
+} from "./_work_in_progress/QueryChip/index.js";
+export { QueryChip } from "./_work_in_progress/QueryChip/index.js";
+export type { QueryChipsProps } from "./_work_in_progress/QueryChips/index.js";
+export { QueryChips } from "./_work_in_progress/QueryChips/index.js";
+export type {
   DisplayField,
   DisplayFieldCellProps,
 } from "./common/index.js";

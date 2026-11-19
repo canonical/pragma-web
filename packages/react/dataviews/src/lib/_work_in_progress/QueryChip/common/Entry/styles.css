@@ -1,0 +1,103 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* Its tokens are the chip's, set on .ds.query-chip. */
+  /* The input and its format template share one grid cell, so the part is
+     as wide as the wider of the two; the suffix takes the next column. */
+  .ds.query-chip-entry {
+    display: inline-grid;
+    align-items: stretch;
+    color: var(--query-chip-entry-text, var(--color-text));
+    background: var(
+      --surface-color-foreground-input,
+      var(--query-chip-entry-background, var(--color-foreground-input))
+    );
+
+    /* The input carries the part's box, padding and underline, so the whole
+       part is its target, 24 by 24 px at least. */
+    & > .input {
+      grid-area: 1 / 1;
+      field-sizing: content;
+      max-inline-size: var(--query-chip-entry-max-inline-size, 16rem);
+      box-sizing: border-box;
+      min-inline-size: var(--dimension-300);
+      min-block-size: var(--dimension-300);
+      margin: 0;
+      padding-block: 0;
+      padding-inline: var(--query-chip-segment-padding-inline, 0.375rem);
+      border: 0;
+      border-block-end: var(
+          --query-chip-entry-underline-width,
+          var(--dimension-stroke-thickness-medium)
+        )
+        solid
+        var(--query-chip-entry-underline-color, var(--color-border-highlighted));
+      appearance: none;
+      font: inherit;
+      letter-spacing: inherit;
+      color: inherit;
+      background: transparent;
+    }
+
+    & > .input::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    /* The chip's body draws one ring around the clause. */
+    & > .input:focus-visible {
+      outline: none;
+    }
+
+    /* Behind the typed text: what is typed holds its place, and the rest
+       of the template shows after it. */
+    & > .template {
+      grid-area: 1 / 1;
+      align-self: center;
+      padding-inline: var(--query-chip-segment-padding-inline, 0.375rem);
+      pointer-events: none;
+      white-space: pre;
+      max-inline-size: var(--query-chip-entry-max-inline-size, 16rem);
+      overflow: hidden;
+      color: var(--color-text-muted);
+
+      & > .typed {
+        visibility: hidden;
+      }
+    }
+
+    & > .suffix {
+      grid-area: 1 / 2;
+      align-self: center;
+      padding-inline-end: var(--query-chip-segment-padding-inline, 0.375rem);
+      color: var(--color-text-muted);
+    }
+
+    &[data-invalid] > .input {
+      border-block-end-color: var(
+        --query-chip-entry-underline-color-invalid,
+        var(--color-border-error)
+      );
+    }
+
+    &:has(> .input:disabled) {
+      color: var(--query-chip-entry-text-disabled, var(--color-text-disabled));
+      background: var(
+        --query-chip-entry-background-disabled,
+        var(--color-foreground-input-disabled)
+      );
+    }
+
+    & > .input:disabled {
+      cursor: default;
+    }
+  }
+
+  /* Under forced colours the underline's colour is replaced, so a fault
+     thickens it. */
+  @media (forced-colors: active) {
+    .ds.query-chip-entry[data-invalid] > .input {
+      border-block-end-color: Mark;
+      border-block-end-width: var(--dimension-stroke-thickness-large);
+    }
+  }
+}
