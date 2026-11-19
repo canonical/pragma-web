@@ -53,6 +53,21 @@ describe("SelectInput (presentational)", () => {
     );
   });
 
+  it("sets an option's title when the option names one", () => {
+    const filters = [
+      { label: "Open", value: "open", title: "Not yet assigned" },
+      { label: "Closed", value: "closed" },
+    ];
+    render(<SelectInput name="status" options={filters} />);
+    expect(screen.getByRole("option", { name: "Open" })).toHaveAttribute(
+      "title",
+      "Not yet assigned",
+    );
+    expect(screen.getByRole("option", { name: "Closed" })).not.toHaveAttribute(
+      "title",
+    );
+  });
+
   it("leaves lang off options that name none", () => {
     render(<SelectInput name="color" options={options} />);
     expect(screen.getByRole("option", { name: "Red" })).not.toHaveAttribute(
