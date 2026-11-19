@@ -428,6 +428,87 @@ describe("the overview's record, on the metro", () => {
     },
   );
 
+  // A boxed namespace's inspector row opens it, by a link; the opened
+  // namespace's row keeps its fit button and opens nothing.
+  it("opens a boxed namespace from its inspector row by a real click, its row then fitting it only", async () => {
+    const [desktop] = VIEWPORTS;
+    const page = await browser.newPage({
+      viewport: { width: desktop.width, height: desktop.height },
+    });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    const readRows = (): Promise<{
+      opens: string[];
+      boxes: string[];
+      fits: number;
+    }> =>
+      page.evaluate(() => ({
+        opens: [
+          ...document.querySelectorAll(
+            ".ds.graph-overview .namespace-row .open",
+          ),
+        ].map(
+          (link) =>
+            new URL(
+              link.getAttribute("href") ?? "",
+              document.baseURI,
+            ).searchParams.get("expand") ?? "",
+        ),
+        boxes: [
+          ...document.querySelectorAll(
+            '.ds.graph-canvas svg.viewport g.node[data-kind="region"]',
+          ),
+        ].map((node) => node.getAttribute("data-id") ?? ""),
+        fits: document.querySelectorAll(
+          ".ds.graph-overview .namespace-row .namespace",
+        ).length,
+      }));
+    let before: Awaited<ReturnType<typeof readRows>> | undefined;
+    let after: Awaited<ReturnType<typeof readRows>> | undefined;
+    let opened: string | null = null;
+    let target = "";
+    try {
+      const origins = [new URL(server.base).origin, new URL(graph.base).origin];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.routeWebSocket(
+        () => true,
+        () => {
+          // Left unconnected, the dev server's live-reload socket stays silent.
+        },
+      );
+      await page.goto(new URL("/definitions?expand=geo", server.base).href, {
+        waitUntil: "networkidle",
+        timeout: PAGE_SETTLE_MS,
+      });
+      before = await readRows();
+      target = before.opens.at(0) ?? "";
+      await page
+        .locator(".ds.graph-overview .namespace-row .open", {
+          hasText: `Open ${target}`,
+        })
+        .click();
+      await page.waitForURL(new RegExp(`[?&]expand=${target}`));
+      await page.waitForLoadState("networkidle");
+      opened = new URL(page.url()).searchParams.get("expand");
+      after = await readRows();
+    } finally {
+      await page.close();
+    }
+    expect(errors).toEqual([]);
+    expect(before?.opens).not.toContain("geo");
+    expect(before?.opens.toSorted()).toEqual(before?.boxes.toSorted());
+    expect(target).not.toBe("");
+    expect(opened).toBe(target);
+    expect(after?.opens).not.toContain(target);
+    expect(after?.opens).toContain("geo");
+    // Every row keeps its fit button, the opened namespace's included.
+    expect(after?.fits).toBe(served.prefixes?.length);
+  });
+
   it("fetches no more classes than the budget's figure for fetched nodes", () => {
     expect(served.classes).toBeGreaterThan(0);
     expect(served.classes).toBeLessThanOrEqual(GRAPH_BUDGET.fetchedNodesMax);

@@ -768,6 +768,67 @@ describe("the drill through the address, at 1440 px", () => {
     expect(new URL(seen.url ?? "").pathname).toBe("/definitions");
   });
 
+  /** The namespaces the inspector's rows open, in row order. */
+  const listOpenRows = (page: Page): Promise<string[]> =>
+    page.evaluate(() =>
+      [
+        ...document.querySelectorAll(".ds.graph-overview .namespace-row .open"),
+      ].map(
+        (link) =>
+          new URL(
+            link.getAttribute("href") ?? "",
+            document.baseURI,
+          ).searchParams.get("expand") ?? "",
+      ),
+    );
+
+  // A boxed namespace's inspector row opens it, by a link; the opened
+  // namespace's row keeps its fit button and opens nothing.
+  it("opens a boxed namespace from its inspector row by a real click, its row then fitting it only", async () => {
+    const seen: {
+      rows?: string[];
+      boxes?: string[];
+      opened?: string[];
+      openedBoxes?: string[];
+      fits?: number;
+      rowCount?: number;
+      url?: string;
+    } = {};
+    const { errors } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        seen.rows = await listOpenRows(page);
+        seen.boxes = await listBoxes(page);
+        await page
+          .locator(".ds.graph-overview .namespace-row .open", {
+            hasText: "Open surface",
+          })
+          .click();
+        await page.waitForURL(/[?&]expand=surface/);
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        seen.url = page.url();
+        seen.opened = await listOpenRows(page);
+        seen.openedBoxes = await listBoxes(page);
+        seen.fits = await page
+          .locator(".ds.graph-overview .namespace-row .namespace")
+          .count();
+        seen.rowCount = await page
+          .locator(".ds.graph-overview .namespace-row")
+          .count();
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(seen.rows?.toSorted()).toEqual(seen.boxes?.toSorted());
+    expect(seen.rows).toEqual(expect.arrayContaining(["surface", "ds"]));
+    expect(new URL(seen.url ?? "").searchParams.get("expand")).toBe("surface");
+    expect(seen.opened).not.toContain("surface");
+    expect(seen.opened?.toSorted()).toEqual(seen.openedBoxes?.toSorted());
+    // Every row keeps its fit button, the opened namespace's included.
+    expect(seen.fits).toBe(seen.rowCount);
+    expect(seen.rowCount).toBeGreaterThan(seen.opened?.length ?? 0);
+  });
+
   it("reaches a box by Tab from the graph's tab stop, and Enter follows it", async () => {
     const seen: { focused?: string; url?: string } = {};
     const { errors } = await openExplorer(
