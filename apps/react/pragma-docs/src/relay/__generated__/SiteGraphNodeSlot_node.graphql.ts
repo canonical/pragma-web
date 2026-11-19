@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<54aff77d4016e9eec205541b79bcb388>>
+ * @generated SignedSource<<92cf642fc661bbd623e45cf645aef4b5>>
  * @lightSyntaxTransform
  */
 
@@ -10,7 +10,7 @@
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type SiteGraphNodeSlot_node$data = {
-  readonly __typename: string;
+  readonly " $fragmentSpreads": FragmentRefs<"DocsGraphNodeProjection_node">;
   readonly " $fragmentType": "SiteGraphNodeSlot_node";
 };
 export type SiteGraphNodeSlot_node$key = {
@@ -25,17 +25,15 @@ const node: ReaderFragment = {
   "name": "SiteGraphNodeSlot_node",
   "selections": [
     {
-      "alias": null,
       "args": null,
-      "kind": "ScalarField",
-      "name": "__typename",
-      "storageKey": null
+      "kind": "FragmentSpread",
+      "name": "DocsGraphNodeProjection_node"
     }
   ],
   "type": "Node",
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "653229988822315054d06505d1753ab0";
+(node as any).hash = "6eb06d20c7451df65a59f7d8e585b738";
 
 export default node;

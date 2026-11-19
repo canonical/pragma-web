@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8697d2d8f34e7520464623da1e091be8>>
+ * @generated SignedSource<<e78ac3ebedfdf793c4448a1b5e235065>>
  * @lightSyntaxTransform
  */
 
@@ -27,8 +27,11 @@ export type DocsChipProjection_node$data = {
     readonly " $fragmentSpreads": FragmentRefs<"ModifierFamilyChip_node">;
   } | null | undefined;
   readonly Node: {
-    readonly " $fragmentSpreads": FragmentRefs<"ChipProjection_node">;
+    readonly " $fragmentSpreads": FragmentRefs<"NodeChip_node">;
   };
+  readonly OntologyClass: {
+    readonly " $fragmentSpreads": FragmentRefs<"OntologyClassChip_node">;
+  } | null | undefined;
   readonly Pattern: {
     readonly " $fragmentSpreads": FragmentRefs<"UIBlockChip_node">;
   } | null | undefined;
@@ -67,7 +70,7 @@ return {
           {
             "args": null,
             "kind": "FragmentSpread",
-            "name": "ChipProjection_node"
+            "name": "NodeChip_node"
           }
         ],
         "type": "Node",
@@ -75,6 +78,22 @@ return {
       },
       "kind": "AliasedInlineFragmentSpread",
       "name": "Node"
+    },
+    {
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "OntologyClassChip_node"
+          }
+        ],
+        "type": "OntologyClass",
+        "abstractKey": null
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "OntologyClass"
     },
     {
       "fragment": {
@@ -160,6 +179,6 @@ return {
 };
 })();
 
-(node as any).hash = "b33e54b83fcd3b7a52ea5bb558a367a2";
+(node as any).hash = "70626cfd0b40fa50d9adc9c0c5193ab0";
 
 export default node;

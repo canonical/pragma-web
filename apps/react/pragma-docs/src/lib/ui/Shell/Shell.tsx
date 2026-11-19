@@ -20,7 +20,11 @@ import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
 import { DocsPeek } from "../DocsPeek/index.js";
 import { SiteRenderers } from "../SiteRenderers/index.js";
-import { AMBIENT_NAMESPACE, GRID_PRESET_CLASS_NAMES } from "./constants.js";
+import {
+  AMBIENT_NAMESPACE,
+  GRID_PRESET_CLASS_NAMES,
+  SITE_SWITCHES,
+} from "./constants.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
 
@@ -81,6 +85,7 @@ export default function Shell<
               <ProjectionLinkProvider
                 LinkComponent={RouterLink}
                 peek={renderPeek}
+                site={SITE_SWITCHES}
               >
                 <AmbientNamespaceProvider namespace={AMBIENT_NAMESPACE}>
                   <SiteRenderers>

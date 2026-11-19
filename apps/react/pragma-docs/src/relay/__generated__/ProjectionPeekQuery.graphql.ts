@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6d3538c669789c58f946db5ba25f8f1e>>
+ * @generated SignedSource<<86a3a3c4b201c27d34f2a224d253db96>>
  * @lightSyntaxTransform
  */
 
@@ -51,37 +51,155 @@ v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "title",
+  "name": "__typename",
   "storageKey": null
 },
 v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "definition",
+  "name": "title",
   "storageKey": null
 },
 v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
+  "name": "definition",
+  "storageKey": null
+},
+v6 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "EntityMeta",
+  "kind": "LinkedField",
+  "name": "_meta",
+  "plural": false,
+  "selections": [
+    (v4/*:: as any*/)
+  ],
+  "storageKey": null
+},
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
   "name": "uri",
   "storageKey": null
 },
-v6 = [
+v8 = [
+  (v6/*:: as any*/),
+  (v7/*:: as any*/)
+],
+v9 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "version",
+  "storageKey": null
+},
+v10 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "summary",
+  "storageKey": null
+},
+v11 = [
   {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
+    "kind": "Literal",
+    "name": "first",
+    "value": 1
+  }
+],
+v12 = [
+  {
+    "kind": "InlineFragment",
     "selections": [
-      (v3/*:: as any*/)
+      (v9/*:: as any*/),
+      (v10/*:: as any*/),
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "Tier",
+        "kind": "LinkedField",
+        "name": "tier",
+        "plural": false,
+        "selections": (v8/*:: as any*/),
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": (v11/*:: as any*/),
+        "concreteType": "UIBlockConnection",
+        "kind": "LinkedField",
+        "name": "inheritsFroms",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "UIBlockEdge",
+            "kind": "LinkedField",
+            "name": "edges",
+            "plural": true,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": null,
+                "kind": "LinkedField",
+                "name": "node",
+                "plural": false,
+                "selections": [
+                  (v3/*:: as any*/),
+                  (v6/*:: as any*/),
+                  (v7/*:: as any*/)
+                ],
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ],
+        "storageKey": "inheritsFroms(first:1)"
+      },
+      {
+        "alias": null,
+        "args": (v11/*:: as any*/),
+        "concreteType": "TagConnection",
+        "kind": "LinkedField",
+        "name": "documentationStages",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "TagEdge",
+            "kind": "LinkedField",
+            "name": "edges",
+            "plural": true,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "Tag",
+                "kind": "LinkedField",
+                "name": "node",
+                "plural": false,
+                "selections": (v8/*:: as any*/),
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ],
+        "storageKey": "documentationStages(first:1)"
+      }
     ],
-    "storageKey": null
-  },
-  (v5/*:: as any*/)
+    "type": "UIBlock",
+    "abstractKey": "__isUIBlock"
+  }
 ];
 return {
   "fragment": {
@@ -136,13 +254,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "__typename",
-            "storageKey": null
-          },
+          (v3/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -152,8 +264,8 @@ return {
             "plural": false,
             "selections": [
               (v2/*:: as any*/),
-              (v3/*:: as any*/),
               (v4/*:: as any*/),
+              (v5/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -161,7 +273,7 @@ return {
                 "kind": "LinkedField",
                 "name": "type",
                 "plural": false,
-                "selections": (v6/*:: as any*/),
+                "selections": (v8/*:: as any*/),
                 "storageKey": null
               }
             ],
@@ -171,7 +283,7 @@ return {
             "kind": "TypeDiscriminator",
             "abstractKey": "__isNode"
           },
-          (v5/*:: as any*/),
+          (v7/*:: as any*/),
           {
             "kind": "InlineFragment",
             "selections": [
@@ -182,7 +294,7 @@ return {
                 "name": "isAbstract",
                 "storageKey": null
               },
-              (v4/*:: as any*/),
+              (v5/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -190,11 +302,142 @@ return {
                 "kind": "LinkedField",
                 "name": "superclass",
                 "plural": false,
-                "selections": (v6/*:: as any*/),
+                "selections": (v8/*:: as any*/),
                 "storageKey": null
               }
             ],
             "type": "OntologyClass",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": (v12/*:: as any*/),
+            "type": "Component",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": (v12/*:: as any*/),
+            "type": "Pattern",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": (v12/*:: as any*/),
+            "type": "Layout",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              (v9/*:: as any*/),
+              (v10/*:: as any*/),
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "ModifierFamily",
+                "kind": "LinkedField",
+                "name": "modifierFamily",
+                "plural": false,
+                "selections": (v8/*:: as any*/),
+                "storageKey": null
+              }
+            ],
+            "type": "Modifier",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              (v10/*:: as any*/),
+              {
+                "alias": null,
+                "args": [
+                  {
+                    "kind": "Literal",
+                    "name": "first",
+                    "value": 100
+                  }
+                ],
+                "concreteType": "ModifierConnection",
+                "kind": "LinkedField",
+                "name": "modifiers",
+                "plural": false,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "ModifierEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Modifier",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v7/*:: as any*/)
+                        ],
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": "modifiers(first:100)"
+              }
+            ],
+            "type": "ModifierFamily",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "description",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": (v11/*:: as any*/),
+                "concreteType": "CategoryConnection",
+                "kind": "LinkedField",
+                "name": "categories",
+                "plural": false,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "CategoryEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Category",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": (v8/*:: as any*/),
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": "categories(first:1)"
+              }
+            ],
+            "type": "CodeStandard",
             "abstractKey": null
           }
         ],
@@ -203,12 +446,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "15e46433cdf9ff02396ca932fbea0f2c",
+    "cacheID": "e226608b86e27bd61c2108a1e7c6c554",
     "id": null,
     "metadata": {},
     "name": "ProjectionPeekQuery",
     "operationKind": "query",
-    "text": "query ProjectionPeekQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    _meta {\n      curie\n    }\n    ...CardProjection_node\n    uri\n  }\n}\n\nfragment CardProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeCard_node\n  ...SiteCardSlot_node\n  ...OntologyClassCard_node\n}\n\nfragment NodeCard_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    definition\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassCard_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n  superclass {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment SiteCardSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n"
+    "text": "query ProjectionPeekQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    _meta {\n      curie\n    }\n    ...CardProjection_node\n    uri\n  }\n}\n\nfragment CardProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeCard_node\n  ...SiteCardSlot_node\n  ...OntologyClassCard_node\n}\n\nfragment CodeStandardCard_node on CodeStandard {\n  __typename\n  description\n  _meta {\n    title\n    curie\n  }\n  categories(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n\nfragment DocsCardProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeCard_node\n  ...OntologyClassCard_node\n  ... on Component {\n    ...UIBlockCard_node\n  }\n  ... on Pattern {\n    ...UIBlockCard_node\n  }\n  ... on Layout {\n    ...UIBlockCard_node\n  }\n  ...ModifierCard_node\n  ...ModifierFamilyCard_node\n  ...CodeStandardCard_node\n}\n\nfragment ModifierCard_node on Modifier {\n  __typename\n  version\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifierFamily {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment ModifierFamilyCard_node on ModifierFamily {\n  __typename\n  summary\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeCard_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n    definition\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassCard_node on OntologyClass {\n  __typename\n  isAbstract\n  definition\n  _meta {\n    title\n    curie\n  }\n  superclass {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n\nfragment SiteCardSlot_node on Node {\n  __isNode: __typename\n  ...DocsCardProjection_node\n}\n\nfragment UIBlockCard_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  version\n  summary\n  _meta {\n    title\n    curie\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n  inheritsFroms(first: 1) {\n    edges {\n      node {\n        __typename\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

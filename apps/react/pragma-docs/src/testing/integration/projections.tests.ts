@@ -219,6 +219,11 @@ describe("the app's projections", () => {
       "ModifierFamilyRow",
       "ModifierGraphNode",
       "ModifierRow",
+      "SiteCardSlot",
+      "SiteChipSlot",
+      "SiteCommandSlot",
+      "SiteGraphNodeSlot",
+      "SiteRowSlot",
       "UIBlockCard",
       "UIBlockChip",
       "UIBlockCommand",
@@ -248,7 +253,7 @@ describe("the site's composites", () => {
       const arms = readCompositeArms(
         readNodeFragment(join(APP_ROOT, "src", "lib", "ui", name)),
       );
-      expect(arms.get("Node")).toEqual([`${word}Projection_node`]);
+      expect(arms.get("Node")).toEqual([`Node${word}_node`]);
       const typed = [...arms.keys()].filter((alias) => alias !== "Node");
       expect(typed.sort()).toEqual(Object.keys(types).sort());
       for (const alias of typed) {
