@@ -49,6 +49,7 @@ node:
                 spacing.gap: grid.gutter
                 layout.align: center
                 size.block: space.400
+                layout.grid.autoRows: space.400
                 layout.overflow: hidden
                 appearance.border.width: 1px
                 appearance.border.style: solid

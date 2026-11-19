@@ -55,6 +55,9 @@
     color: var(--entity-table-muted-color);
   }
 
+  /* Each line of a row, the header's too, is the row's own height: the
+   * cells that find no column on the first line leave below the clip. */
+  .ds.entity-table .header,
   .ds.entity-table .row {
     grid-auto-rows: var(--entity-table-row-size);
   }
