@@ -53,4 +53,51 @@ describe("Tabs Item (internal renderer)", () => {
     expect(screen.getByText("A").closest("a")).not.toHaveAttribute("href");
     expect(screen.getByRole("listitem")).toHaveAttribute("data-disabled");
   });
+
+  it("renders the slot after the label, inside the link", () => {
+    inList(
+      <Item
+        item={{
+          url: "/a",
+          label: "Alerts",
+          slot: <span data-testid="count">3</span>,
+        }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const link = screen.getByRole("link", { name: /^Alerts/ });
+    const slot = screen.getByTestId("count").parentElement;
+    expect(slot).toHaveClass("slot");
+    expect(slot?.parentElement).toBe(link);
+    expect(link.firstChild?.textContent).toBe("Alerts");
+    expect(link.lastChild).toBe(slot);
+  });
+
+  it("renders the slot inside the inert text of an item without a url", () => {
+    inList(
+      <Item
+        item={{ key: "soon", label: "Coming soon", slot: "…" }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const slot = screen.getByText("…");
+    expect(slot).toHaveClass("slot");
+    expect(slot.parentElement).toHaveClass("tabs-link");
+    expect(slot.parentElement?.tagName).toBe("SPAN");
+  });
+
+  it("renders no slot wrapper for an empty slot", () => {
+    inList(
+      <Item
+        item={{ url: "/a", label: "A", slot: null }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: "A" }).querySelector(".slot"),
+    ).toBeNull();
+  });
 });

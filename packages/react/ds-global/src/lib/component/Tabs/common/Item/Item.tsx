@@ -11,14 +11,21 @@ const componentCssClassName = "ds tabs-item";
  *
  * Renders an `<li>` whose content is a link when the item has a `url` (via the
  * `LinkComponent`, default `"a"`) or inert text otherwise — never a button.
- * The active tab is marked `aria-current="page"`.
+ * The active tab is marked `aria-current="page"`. The item's `slot`, when
+ * present, follows the label inside the link or inert text.
  */
 const Item = ({
   item,
   active,
   LinkComponent,
 }: ItemProps): React.ReactElement => {
-  const { url, label, disabled, className } = item;
+  const { url, label, disabled, className, slot } = item;
+  const content = (
+    <>
+      {label}
+      {slot ? <span className="slot">{slot}</span> : null}
+    </>
+  );
   const Link = LinkComponent;
   const inert = !url;
   return (
@@ -34,11 +41,11 @@ const Item = ({
           href={disabled ? undefined : url}
           aria-current={active ? "page" : undefined}
         >
-          {label}
+          {content}
         </Link>
       ) : (
         <span className="tabs-link" aria-current={active ? "page" : undefined}>
-          {label}
+          {content}
         </span>
       )}
     </li>

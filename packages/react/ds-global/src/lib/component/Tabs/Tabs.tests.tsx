@@ -111,4 +111,25 @@ describe("Tabs", () => {
     ).toBeInTheDocument();
     expect(screen.queryAllByRole("listitem")).toHaveLength(0);
   });
+
+  it("renders each child tab's slot after its label", () => {
+    render(
+      <Tabs
+        aria-label="Sections"
+        navigationRoot={{
+          key: "root",
+          items: [
+            { url: "/alerts", label: "Alerts", slot: <span>12</span> },
+            { url: "/logs", label: "Logs" },
+          ],
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole("link", { name: /^Alerts/ }).querySelector(".slot"),
+    ).toHaveTextContent("12");
+    expect(
+      screen.getByRole("link", { name: "Logs" }).querySelector(".slot"),
+    ).toBeNull();
+  });
 });
