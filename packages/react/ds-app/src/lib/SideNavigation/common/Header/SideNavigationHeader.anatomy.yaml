@@ -5,7 +5,7 @@
 # repositioning the anatomy DSL does not currently express per-state; the
 # `layout.justify: space-between` below models the expanded arrangement only.
 node:
-  uri: apps.subcomponent.side-navigation-header
+  uri: apps.subcomponent.side_navigation-header
   styles:
     layout.type: flow
     layout.direction: row
@@ -33,7 +33,7 @@ node:
         cardinality: "0..1"
         slotName: brand
     - node:
-        uri: apps.subcomponent.side-navigation-collapse-toggle
+        uri: apps.subcomponent.side_navigation-collapse_toggle
       relation:
         cardinality: "1"
         slotName: collapse

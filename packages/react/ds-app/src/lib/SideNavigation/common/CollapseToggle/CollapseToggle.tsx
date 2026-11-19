@@ -56,7 +56,7 @@ const CollapseToggleTrigger = ({
  * type across state changes, so the button — and with it keyboard focus
  * and hover state — survives every toggle instead of remounting.
  *
- * @implements ds:apps.subcomponent.side-navigation-collapse-toggle
+ * @implements ds:apps.subcomponent.side_navigation-collapse_toggle
  */
 const CollapseToggle = ({
   expanded = true,

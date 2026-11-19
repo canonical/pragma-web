@@ -3,7 +3,7 @@
 # navigation rail. Carries the disclosure ARIA contract (aria-expanded,
 # aria-controls pointing at the Content region).
 node:
-  uri: apps.subcomponent.side-navigation-collapse-toggle
+  uri: apps.subcomponent.side_navigation-collapse_toggle
   styles:
     layout.type: flow
     layout.direction: row

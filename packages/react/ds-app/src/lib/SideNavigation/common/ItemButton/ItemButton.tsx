@@ -14,7 +14,7 @@ const componentCssClassName = "ds side-navigation-item-button";
  * `children`. Content is composed via `children`,
  * matching `Button`'s own convention.
  *
- * @implements ds:apps.subcomponent.side-navigation-item-button
+ * @implements ds:apps.subcomponent.side_navigation-item_button
  */
 const ItemButton = ({
   children,

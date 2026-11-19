@@ -14,7 +14,7 @@ const componentCssClassName = "ds side-navigation-header";
  * switches to a centred column — the toggle relocates below the logo rather
  * than beside it — driven by `data-expanded` on the root.
  *
- * @implements ds:apps.subcomponent.side-navigation-header
+ * @implements ds:apps.subcomponent.side_navigation-header
  */
 const Header = ({
   className,

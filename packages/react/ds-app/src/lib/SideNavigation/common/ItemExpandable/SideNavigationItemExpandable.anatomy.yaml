@@ -5,7 +5,7 @@
 # supplies the disclosure semantics itself. Cannot link (no url) and cannot
 # nest further (children are SideNavigation.Item only).
 node:
-  uri: apps.subcomponent.side-navigation-item-expandable
+  uri: apps.subcomponent.side_navigation-item_expandable
   styles:
     layout.type: stack
     layout.direction: column
@@ -49,7 +49,7 @@ node:
         cardinality: "1"
         slotName: default
     - node:
-        uri: apps.subcomponent.side-navigation-item
+        uri: apps.subcomponent.side_navigation-item
       relation:
         cardinality: "0..*"
         slotName: children

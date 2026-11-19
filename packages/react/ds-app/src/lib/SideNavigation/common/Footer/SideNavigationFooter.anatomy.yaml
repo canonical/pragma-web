@@ -6,7 +6,7 @@
 # icon and omits the logout item itself. A free-form `$custom`/root-item
 # escape hatch is retained for footers that need a whole WD405 tree.
 node:
-  uri: apps.subcomponent.side-navigation-footer
+  uri: apps.subcomponent.side_navigation-footer
   styles:
     layout.type: stack
     layout.direction: column

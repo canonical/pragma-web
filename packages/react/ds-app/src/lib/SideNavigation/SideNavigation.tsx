@@ -39,7 +39,7 @@ const componentCssClassName = "ds side-navigation";
  * (`cs:react.component.subcomponent_export_api` — no dot-static exports),
  * and render exclusively from data.
  *
- * @implements ds:apps.pattern.side-navigation
+ * @implements ds:apps.component.side_navigation
  */
 const SideNavigation = ({
   className,

@@ -9,7 +9,7 @@
 # Footer-only (SideNavigation.ItemButton). Identity follows
 # getItemId: `url` when present, otherwise `key`.
 node:
-  uri: apps.subcomponent.side-navigation-item
+  uri: apps.subcomponent.side_navigation-item
   styles:
     layout.type: stack
     layout.direction: column
