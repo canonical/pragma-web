@@ -1,3 +1,4 @@
+import { Icon } from "@canonical/react-ds-global";
 import { forwardRef, type ReactElement } from "react";
 import type { SelectInputProps } from "./types.js";
 import "./styles.css";
@@ -21,24 +22,30 @@ export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
     ref,
   ): ReactElement {
     return (
-      <select
-        id={id}
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      <div
         style={style}
-        ref={ref}
-        {...nativeProps}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
-        {options.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            disabled={option.disabled}
-            lang={option.lang}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
+        {/* `id` goes on the <select> (not the wrapper) so the Field label's
+         * `htmlFor` targets a labelable element. */}
+        <select id={id} className="p" ref={ref} {...nativeProps}>
+          {options.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+              lang={option.lang}
+            >
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {/* A <select> is a replaced element — no ::before/::after, no children
+         * — so the chevron overlays it as a grid sibling in the wrapper. */}
+        {!nativeProps.multiple && (
+          <Icon icon="chevron-down" className="chevron" />
+        )}
+      </div>
     );
   },
 );

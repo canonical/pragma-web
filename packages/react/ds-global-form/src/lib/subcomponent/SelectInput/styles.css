@@ -1,56 +1,47 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* Chevron indicator, painted with CSS gradients so it takes the theme colour.
-   * A `background-image` SVG cannot be recoloured by CSS (no inheritance into
-   * the image document), which left the caret black on dark themes — the same
-   * reason the checkbox/accordion glyphs are masks. A <select> is a replaced
-   * element with no ::before/::after to mask, so the chevron is drawn instead:
-   * two diagonally-striped gradient squares butted together form a down-chevron
-   * STROKE (transparent → colour → transparent along each diagonal), coloured by
-   * --color-icon like every other control glyph. */
+  /* Composite input: the wrapper carries the chrome (`.ds.input.chrome` in
+   * index.css paints border, background and height here) and the <select> is
+   * the bare text-bearing leaf. A <select> is a replaced element — no
+   * ::before/::after, no children — so the chevron-down icon overlays it:
+   * leaf and icon stack in one grid area, and the leaf's end padding keeps
+   * the option text clear of the glyph. */
   .ds.input.select {
-    appearance: none;
-    --select-caret-color: var(--color-icon, currentColor);
-    --select-caret-half: 0.4em; /* each square; the chevron is two halves wide */
-    /* left half: rising stroke ╱ */
-    background-image:
-      linear-gradient(
-        45deg,
-        transparent 42%,
-        var(--select-caret-color) 42%,
-        var(--select-caret-color) 58%,
-        transparent 58%
-      ),
-      /* right half: falling stroke ╲ */
-      linear-gradient(
-        135deg,
-        transparent 42%,
-        var(--select-caret-color) 42%,
-        var(--select-caret-color) 58%,
-        transparent 58%
-      );
-    background-repeat: no-repeat;
-    background-position:
-      right calc(var(--form-input-padding-inline) + var(--select-caret-half))
-      center,
-      right var(--form-input-padding-inline) center;
-    background-size: var(--select-caret-half) var(--select-caret-half);
-    /* This element IS the text-bearing leaf, so it carries the inline padding
-     * (`.ds.input.chrome` provides only the block padding). The end side leaves
-     * room for the chevron. */
-    padding-inline-start: var(--form-input-padding-inline);
-    padding-inline-end: calc(var(--form-input-padding-inline) * 2 + 1em);
+    direction: inherit;
+    display: inline-grid;
+    align-items: center;
+    grid-template-areas: "select";
+    padding: 0;
 
-    /* The padding above is logical, so in right-to-left text the room for
-       the chevron opens on the left; `background-position` has no logical
-       keywords, so the chevron moves there explicitly. Mirrored, the two
-       gradient squares swap halves: the 45deg square is the outer one. */
-    &:dir(rtl) {
-      background-position:
-        left var(--form-input-padding-inline) center,
-        left calc(var(--form-input-padding-inline) + var(--select-caret-half))
-        center;
+    & > * {
+      grid-area: select;
+    }
+
+    & > select {
+      appearance: none;
+      box-sizing: border-box;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-family: inherit;
+      outline: none;
+      /* Baseline engine provides font-size, line-height, padding-block via
+       * the `.p` class; the leaf carries the inline padding (`.ds.input.chrome`
+       * provides only the block padding, and the wrapper zeroes it). The end
+       * side leaves room for the chevron overlay. */
+      padding-inline-start: var(--form-input-padding-inline);
+      padding-inline-end: calc(var(--form-input-padding-inline) * 2 + 1em);
+    }
+
+    & > .chevron {
+      justify-self: end;
+      /* The density seat stretches the wrapper's items; the glyph keeps its
+       * own height and rides the line instead of distorting. */
+      align-self: center;
+      pointer-events: none;
+      margin-inline-end: var(--form-input-padding-inline);
+      color: var(--color-icon, currentColor);
     }
   }
 }
