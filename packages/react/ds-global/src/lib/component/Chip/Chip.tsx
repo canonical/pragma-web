@@ -1,83 +1,116 @@
 import type React from "react";
-import "./styles.css";
+import { useMemo } from "react";
+import { Icon } from "../Icon/index.js";
+import Context from "./common/Context.js";
+import { Dismiss } from "./common/index.js";
+import type { ChipContextValue } from "./common/types.js";
 import type { ChipProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds chip";
 
 /**
  * A chip is a compact, interactive component used to represent an attribute,
- * entity, or filter while facilitating secondary actions.
+ * entity, while facilitating secondary actions. Chips elevate specific
+ * information in the visual hierarchy, such as categories or selected tags,
+ * allowing users to trigger contextual behaviors like filtering, triggering a
+ * Popover, selection, or dismissal. Unlike the Tag, chips are always
+ * actionable. Chips should complement, rather than replace, the primary page
+ * actions.
  *
- * The root element is variable: a chip with an `onClick` renders a `<button>`
- * (and extends button props), one without renders a `<span>` (and extends span
- * props). Each branch spreads only the native props of its own root — the
- * DS-owned props are destructured out first so none of them leak to the DOM.
+ * A chip has exactly one action, and it decides which of two ways the chip is
+ * used:
+ *
+ * - **Action chip**: pass `onClick`. The whole chip is a `<button>` and takes
+ *   focus, for example to apply a filter or open a popover.
+ * - **Dismissible chip**: pass one `Chip.Dismiss` child instead. The chip is a
+ *   `<span>` and only its dismiss control takes focus, for example to remove
+ *   an applied filter.
+ *
+ * The full `lead: value` text is exposed as a native tooltip, so a truncated
+ * value stays readable.
+ *
+ * `import { Chip } from "@canonical/react-ds-global";`
  *
  * @implements ds:global.component.chip
  */
 const Chip = (props: ChipProps): React.ReactElement => {
-  const className = [
-    componentCssClassName,
-    props.criticality,
-    props.release,
-    props.className,
-  ]
+  const { value, lead, icon, badge, criticality, className, children } = props;
+  const text = lead ? `${lead}: ${value}` : value;
+
+  const contextValue = useMemo<ChipContextValue>(
+    () => ({ defaultDismissLabel: `Dismiss ${text}` }),
+    [text],
+  );
+
+  const rootClassName = [componentCssClassName, criticality, className]
     .filter(Boolean)
     .join(" ");
 
   const content = (
     <>
-      {props.lead && <span className="lead">{props.lead}</span>}
-      {props.value && <span className="value">{props.value}</span>}
-      {props.onDismiss && (
-        <button
-          type="button"
-          className="dismiss"
-          aria-label="Dismiss"
-          onClick={() => props.onDismiss?.()}
-        />
+      {icon && (
+        <span className="icon">
+          <Icon icon={icon} />
+        </span>
       )}
+      {lead && (
+        <>
+          {/* the fragment is necessary because it renders a span and an empty space after the span */}
+          <span className="lead">{`${lead}:`}</span>{" "}
+        </>
+      )}
+      <span className="value">{value}</span>
+      {badge && <span className="badge">{badge}</span>}
     </>
   );
 
-  // Interactive chip → <button>. Its native button props (including onClick)
-  // are forwarded after the DS-owned props are stripped off.
+  // Remove the chip's own props, so only native props reach the element
+  // (otherwise `value="Bob"` would become an HTML attribute).
+  // This is repeated in each branch on purpose: `ChipProps` is button props
+  // or span props, and only after checking `onClick` does TypeScript know
+  // which. Destructured once above the `if`, `rest` would fit neither element.
   if (props.onClick) {
     const {
-      criticality: _criticality,
-      release: _release,
-      lead: _lead,
       value: _value,
-      onDismiss: _onDismiss,
+      lead: _lead,
+      icon: _icon,
+      badge: _badge,
+      criticality: _criticality,
       className: _className,
+      children: _children,
       ...rest
     } = props;
     return (
-      // Default type="button" so a Chip inside a <form> doesn't submit it on
-      // click (the native default is "submit"); placed before the spread so a
-      // caller can still override it via the native `type` prop.
-      <button type="button" className={className} {...rest}>
+      // `type` and `title` are defaults placed before the spread, so a caller
+      // can still override either through the native prop.
+      <button type="button" title={text} {...rest} className={rootClassName}>
         {content}
       </button>
     );
   }
 
-  // Static chip → <span>.
   const {
-    criticality: _criticality,
-    release: _release,
-    lead: _lead,
     value: _value,
-    onDismiss: _onDismiss,
-    onClick: _onClick,
+    lead: _lead,
+    icon: _icon,
+    badge: _badge,
+    criticality: _criticality,
     className: _className,
+    children: _children,
+    onClick: _onClick,
     ...rest
   } = props;
   return (
-    <span className={className} {...rest}>
-      {content}
+    <span title={text} {...rest} className={rootClassName}>
+      <Context.Provider value={contextValue}>
+        {content}
+        {children}
+      </Context.Provider>
     </span>
   );
 };
+
+Chip.Dismiss = Dismiss;
 
 export default Chip;

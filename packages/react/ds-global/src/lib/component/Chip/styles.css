@@ -52,10 +52,6 @@
       font-variant-numeric: oldstyle-nums;
     }
 
-    & > .lead + .value::before {
-      content: ": ";
-    }
-
     & > .lead,
     & > .value {
       display: inline;
