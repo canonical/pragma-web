@@ -10,29 +10,29 @@
   .ds.data-table {
     /* Component tier. Semantic tokens not yet in design-tokens are read
        through marked shims over today's values. */
-    /* shim: design-tokens stroke, rung 2.5 */
+    /* shim: design-tokens stroke */
     --data-table-border-width: var(
       --stroke-width-border,
       var(--dimension-stroke-thickness-medium)
     );
-    /* shim: design-tokens stroke, rung 2.5 */
+    /* shim: design-tokens stroke */
     --data-table-focus-width: var(
       --stroke-width-focus,
       var(--dimension-stroke-thickness-large)
     );
-    /* shim: design-tokens stroke, rung 2.5 */
+    /* shim: design-tokens stroke */
     --data-table-resize-mark-inline-size: var(
       --stroke-width-mark,
       var(--dimension-stroke-thickness-large)
     );
-    /* shim: design-tokens size, rung 2.5 */
+    /* shim: design-tokens size */
     --data-table-resize-mark-block-size: var(
       --size-mark-block,
       var(--dimension-250)
     );
-    /* shim: design-tokens size, rung 2.5 */
+    /* shim: design-tokens size */
     --data-table-control-track: var(--size-control-track, var(--dimension-400));
-    /* shim: design-tokens size, rung 2.5 */
+    /* shim: design-tokens size */
     --data-table-resize-target: var(
       --size-target-minimum,
       var(--dimension-300)
@@ -40,9 +40,9 @@
     --data-table-gap: var(--space-050);
     --data-table-overlay-padding-block: var(--space-050);
     --data-table-status-padding-block: var(--space-300);
-    /* shim: design-tokens stacking, rung 2.5 */
+    /* shim: design-tokens stacking */
     --data-table-stacking-sticky: var(--stacking-sticky, 1);
-    /* shim: design-tokens stacking, rung 2.5 */
+    /* shim: design-tokens stacking */
     --data-table-stacking-overlay: var(--stacking-overlay, 1);
     /* Local stacking: the parts' steps order only among themselves. */
     isolation: isolate;
@@ -127,14 +127,14 @@
 
     /* Selected: a selection token, shimmed over the information tint. */
     &[aria-selected="true"] {
-      /* shim: design-tokens selection, rung 2.5 */
+      /* shim: design-tokens selection */
       background-color: var(
         --color-background-selected,
         var(--color-foreground-secondary-information)
       );
 
       &:hover {
-        /* shim: design-tokens selection, rung 2.5 */
+        /* shim: design-tokens selection */
         background-color: var(
           --color-background-selected-hover,
           var(--color-foreground-secondary-information-hover)
