@@ -1,3 +1,4 @@
+import { Icon } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
@@ -862,9 +863,21 @@ export const SpaceAfterFixedColumns: Story = {
 };
 
 const statusDisplay = {
-  running: { label: "Running", tone: "var(--color-icon-success)" },
-  failed: { label: "Failed", tone: "var(--color-icon-destructive)" },
-  pending: { label: "Pending", tone: "var(--color-icon-muted)" },
+  running: {
+    label: "Running",
+    icon: "success",
+    tone: "var(--color-icon-success)",
+  },
+  failed: {
+    label: "Failed",
+    icon: "error",
+    tone: "var(--color-icon-destructive)",
+  },
+  pending: {
+    label: "Pending",
+    icon: "queued",
+    tone: "var(--color-icon-muted)",
+  },
 } as const;
 
 const isStatus = (value: unknown): value is keyof typeof statusDisplay =>
@@ -875,11 +888,11 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
   if (!isStatus(value)) {
     return null;
   }
-  const { label, tone } = statusDisplay[value];
+  const { label, icon, tone } = statusDisplay[value];
   return (
     <span>
-      <span aria-hidden="true" style={{ color: tone }}>
-        ●{" "}
+      <span style={{ color: tone }}>
+        <Icon icon={icon} />{" "}
       </span>
       {label}
     </span>
@@ -896,18 +909,21 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
 export const CustomCellRenderer: Story = {
   parameters: showConsumerCode({
     parts: ["DataTable", "type DisplayFieldCellProps", "type DataTableColumn"],
-    declarations: `const statusDisplay: Record<string, { label: string; tone: string }> = {
-  running: { label: "Running", tone: "var(--color-icon-success)" },
-  failed: { label: "Failed", tone: "var(--color-icon-destructive)" },
-  pending: { label: "Pending", tone: "var(--color-icon-muted)" },
+    imports: `import type { IconName } from "@canonical/ds-assets";
+import { Icon } from "@canonical/react-ds-global";
+import { machineCollection, machines } from "./machines.js";`,
+    declarations: `const statusDisplay: Record<string, { label: string; icon: IconName; tone: string }> = {
+  running: { label: "Running", icon: "success", tone: "var(--color-icon-success)" },
+  failed: { label: "Failed", icon: "error", tone: "var(--color-icon-destructive)" },
+  pending: { label: "Pending", icon: "queued", tone: "var(--color-icon-muted)" },
 };
 
 const StatusCell = ({ value }: DisplayFieldCellProps) => {
   const shown = statusDisplay[String(value)];
   return shown ? (
     <span>
-      <span aria-hidden="true" style={{ color: shown.tone }}>
-        ●{" "}
+      <span style={{ color: shown.tone }}>
+        <Icon icon={shown.icon} />{" "}
       </span>
       {shown.label}
     </span>
