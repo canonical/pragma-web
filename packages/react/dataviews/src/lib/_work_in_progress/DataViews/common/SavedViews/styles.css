@@ -11,11 +11,9 @@
    * The name and delete dialogs are the platform's modal `dialog`, opened
    * by their commands; only their contents are laid out here.
    *
-   * The select and the name input are the design system's own, themed
-   * through the form layer's channels. The overrides are their width — in a
-   * row of controls each takes its content's — and the name input's border
-   * once the user has given it a name the collection refuses, which the
-   * validity API marks and the form layer's error channel colours.
+   * The select is the design system's own, themed through the form layer's
+   * channels; in a row of controls it takes its content's width. The name
+   * form lays itself out.
    */
   .ds.data-views-saved-views {
     display: flex;
@@ -37,7 +35,6 @@
     /* A closed dialog keeps the platform's own `display: none`. */
     & > .picker,
     & > .commands,
-    & > .ds.data-views-saved-views-name-form > form,
     & > .ds.data-views-saved-views-confirm[open] {
       display: flex;
       flex-wrap: wrap;
@@ -45,27 +42,14 @@
       gap: var(--dimension-050);
     }
 
-    /* The input chrome fills its container; in a row it takes its content. */
-    & > .picker > .ds.input.select,
-    & > .ds.data-views-saved-views-name-form > form > .ds.input.text {
+    /* The select's chrome fills its container; in a row it takes its content. */
+    & > .picker > .ds.input.select {
       inline-size: auto;
-    }
-
-    &
-      > .ds.data-views-saved-views-name-form
-      > form
-      > .ds.input.text
-      > input:user-invalid {
-      border-color: var(--form-input-border-color-error);
     }
 
     & > .picker > .modified,
     & > .notices {
       color: var(--color-text-muted);
-    }
-
-    & > .ds.data-views-saved-views-name-form > form > .error {
-      color: var(--color-text-error);
     }
   }
 }
