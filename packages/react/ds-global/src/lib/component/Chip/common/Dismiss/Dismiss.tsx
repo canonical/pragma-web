@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { Icon } from "../../../Icon/index.js";
 import Context from "../Context.js";
 import type { DismissProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds chip-dismiss";
 
