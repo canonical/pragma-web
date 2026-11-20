@@ -86,9 +86,15 @@ A long page collapses below its first 8 events, behind a strip revealing 4 more 
 
 <Canvas of={Stories.CollapsedInTheMiddle} sourceState="none" />
 
+## Past the page
+
+The timeline reads the core's pagination as the pagination bar does. Once every event on the page shows and a later page exists, show more grows the window by one step from the collection's first event, so the events shown stay in place and the next ones join them, on a source that reaches its pages by number or by token alike. The strip counts every event still hidden, on the page and past it, as exactly as the source counts the collection. Show all reveals the page's own hidden events. Before scripts run, show more is a link to the grown window, where the provider has a location.
+
+<Canvas of={Stories.PastThePage} sourceState="none" />
+
 ## Status
 
-A polite line, never seen, says how many of the page's events are shown, as the count changes. The timeline also shows the core's status as the table does: loading, failed, nothing to show, or events kept beneath a status saying they no longer answer the query.
+A polite line, never seen, says how many of the collection's events are shown, as the count changes. The timeline also shows the core's status as the table does: loading, failed, nothing to show, or events kept beneath a status saying they no longer answer the query.
 
 <Canvas of={Stories.Loading} sourceState="none" />
 
@@ -115,4 +121,4 @@ These notes are provisional, recorded for a spike and re-evaluated when the time
 | Date | 1.3.1, 4.1.2 | A `time` element carrying its ISO value, its other form described by a tooltip; where toggling is allowed, a pressed-state button |
 | Controls | 1.3.1, 2.1.1, 2.4.4, 4.1.2 | The design system's menus for the filters, a reset and the order control, each named even where its label is hidden; links before scripts run; a refusal shown beside its control and announced |
 | Event checkbox and select all | 1.3.1, 2.1.1, 4.1.2 | Native checkboxes backed by the provider's selection, shared with every renderer on the provider |
-| Collapsed events | 1.3.1, 2.1.1 | A strip stating how many events are hidden, with native buttons revealing more or all |
+| Collapsed events | 1.3.1, 2.1.1, 2.4.3 | A strip stating how many events are hidden, on the page and past it, with native buttons revealing more or all; reaching past the page keeps the strip, and its focus, while the next events load, and is a link before scripts run |

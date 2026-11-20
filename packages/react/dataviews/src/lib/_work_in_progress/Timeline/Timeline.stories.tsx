@@ -1,6 +1,7 @@
-import type {
-  RowRecord,
-  SchemaFieldDefinition,
+import {
+  createMemoryLocation,
+  type RowRecord,
+  type SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState } from "react";
@@ -113,6 +114,30 @@ export const Expanded: Story = {
 export const CollapsedInTheMiddle: Story = {
   render: (args) => <ReviewTimeline {...args} />,
   args: { expansion: { method: "middle", initialVisible: 6, step: 3 } },
+};
+
+/**
+ * A log longer than its page: the source answers six events at a time.
+ * Once the page shows whole, show more grows the window by one step from
+ * the first event, so the events shown stay in place and the next ones join
+ * them; the strip counts every event still hidden, past the page too.
+ */
+export const PastThePage: Story = {
+  render: (args) => (
+    <ReviewTimeline
+      {...args}
+      config={{
+        location: createMemoryLocation({ href: "/reviews?size=6" }),
+      }}
+    />
+  ),
+  args: { expansion: { initialVisible: 6, step: 6 } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(await canvas.findByText("18 hidden")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Show 6 more" }));
+    await expect(await canvas.findByText("12 hidden")).toBeInTheDocument();
+  },
 };
 
 /** The date leading each marker, and markers of two sizes: large where a reviewer's run starts. */
