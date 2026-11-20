@@ -85,7 +85,10 @@ export default function EventList({
   return (
     <>
       <p className="showing" aria-live="polite">
-        {messages.eventsShown(topCount + bottomCount, events.length)}
+        {messages.eventsShown(topCount + bottomCount, {
+          kind: "exact",
+          value: events.length,
+        })}
       </p>
       {events.length === 0 ? null : (
         <ol className={componentCssClassName}>
