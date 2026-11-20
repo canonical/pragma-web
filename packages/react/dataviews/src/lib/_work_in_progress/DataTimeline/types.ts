@@ -254,14 +254,14 @@ type OwnProps<
 };
 
 /**
- * Timeline props. The root is a `section` named by `label`, so it extends
+ * DataTimeline props. The root is a `section` named by `label`, so it extends
  * native section props, less `children`, since its content is the records,
  * and `aria-label`, `aria-labelledby` and `aria-busy`, which it sets.
  *
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export type TimelineProps<
+export type DataTimelineProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = OwnProps<TFields, TRow> &

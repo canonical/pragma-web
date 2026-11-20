@@ -8,9 +8,9 @@ import {
 import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
 import DataViews from "../../Provider.js";
 import { DataTable } from "../DataTable/index.js";
-import Timeline from "./Timeline.js";
+import DataTimeline from "./DataTimeline.js";
 
-describe("DataViews Timeline", () => {
+describe("DataViews DataTimeline", () => {
   it("renders the enclosing root's records as events, sharing its selection", () => {
     const { provider } = createActivityProvider({ rows: ACTIVITY_PAGE });
     render(
@@ -18,7 +18,7 @@ describe("DataViews Timeline", () => {
         provider={provider}
         messages={{ selectRow: (name) => `Pick ${name}` }}
       >
-        <Timeline mapping={ACTIVITY_MAPPING} label="Activity" selectable />
+        <DataTimeline mapping={ACTIVITY_MAPPING} label="Activity" selectable />
         <DataTable
           columns={[{ id: "summary", header: "Summary" }]}
           label="Activity table"
@@ -39,7 +39,7 @@ describe("DataViews Timeline", () => {
   it("throws outside a DataViews root, naming the part", () => {
     silenceRenderErrors();
     expect(() =>
-      render(<Timeline mapping={ACTIVITY_MAPPING} label="Activity" />),
-    ).toThrow("DataViews.Timeline must be used inside a DataViews root");
+      render(<DataTimeline mapping={ACTIVITY_MAPPING} label="Activity" />),
+    ).toThrow("DataViews.DataTimeline must be used inside a DataViews root");
   });
 });

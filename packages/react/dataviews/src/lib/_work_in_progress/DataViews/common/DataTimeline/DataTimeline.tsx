@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
-import { ScopedTimeline } from "../../../Timeline/index.js";
+import { ScopedDataTimeline } from "../../../DataTimeline/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
-import type { DataViewsTimelineProps } from "./types.js";
+import type { DataViewsDataTimelineProps } from "./types.js";
 
 /**
  * The collection's records as a timeline, bound to the enclosing root's
@@ -14,10 +14,12 @@ import type { DataViewsTimelineProps } from "./types.js";
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export default function Timeline(props: DataViewsTimelineProps): ReactElement {
-  const { provider, messages, announce } = useDataViewsRoot("Timeline");
+export default function DataTimeline(
+  props: DataViewsDataTimelineProps,
+): ReactElement {
+  const { provider, messages, announce } = useDataViewsRoot("DataTimeline");
   return (
-    <ScopedTimeline
+    <ScopedDataTimeline
       {...props}
       provider={provider}
       messages={messages}

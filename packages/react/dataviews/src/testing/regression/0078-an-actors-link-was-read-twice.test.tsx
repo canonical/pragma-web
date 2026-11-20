@@ -12,7 +12,7 @@ import {
   activity,
   createActivityProvider,
 } from "../../../testing/activities.js";
-import { Timeline } from "../../lib/_work_in_progress/Timeline/index.js";
+import { DataTimeline } from "../../lib/_work_in_progress/DataTimeline/index.js";
 
 describe("an event whose actor links to a profile", () => {
   it("offers the profile once", () => {
@@ -20,7 +20,7 @@ describe("an event whose actor links to a profile", () => {
       rows: [activity("a-1", 1)],
     });
     render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"

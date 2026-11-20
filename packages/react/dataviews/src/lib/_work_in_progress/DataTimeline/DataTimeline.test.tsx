@@ -34,10 +34,10 @@ import { COUNTED_EXACTLY } from "../../../../testing/fixtures.js";
 import readAnnouncements from "../../../../testing/readAnnouncements.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
 import { DataTable } from "../DataTable/index.js";
-import Timeline from "./Timeline.js";
-import type { TimelineProps, TimelineRenderContext } from "./types.js";
+import DataTimeline from "./DataTimeline.js";
+import type { DataTimelineProps, TimelineRenderContext } from "./types.js";
 
-type Props = Partial<TimelineProps<ActivityFields, Activity>>;
+type Props = Partial<DataTimelineProps<ActivityFields, Activity>>;
 
 /** A timeline whose source answers every request at once with `answered`. */
 const loadedTimeline = (
@@ -46,7 +46,7 @@ const loadedTimeline = (
 ) => {
   const { provider, source } = createActivityProvider({ rows: answered });
   const view = render(
-    <Timeline
+    <DataTimeline
       provider={provider}
       mapping={ACTIVITY_MAPPING}
       label="Activity"
@@ -60,7 +60,7 @@ const loadedTimeline = (
 const manualTimeline = (extra: Props = {}) => {
   const { provider, source } = createActivityProvider();
   const view = render(
-    <Timeline
+    <DataTimeline
       provider={provider}
       mapping={ACTIVITY_MAPPING}
       label="Activity"
@@ -104,7 +104,7 @@ const pagedTimeline = (counted: boolean, extra: Props = {}) => {
     provider.navigateWindow({ size: 4 });
   });
   const view = render(
-    <Timeline
+    <DataTimeline
       provider={provider}
       mapping={ACTIVITY_MAPPING}
       label="Activity"
@@ -114,19 +114,19 @@ const pagedTimeline = (counted: boolean, extra: Props = {}) => {
   return { provider, source, view };
 };
 
-describe("Timeline", () => {
+describe("DataTimeline", () => {
   it("refuses a value that is not a provider", () => {
     silenceRenderErrors();
     expect(() =>
       render(
-        <Timeline
+        <DataTimeline
           provider={{} as DataViewsProvider<ActivityFields, Activity>}
           mapping={ACTIVITY_MAPPING}
           label="Activity"
         />,
       ),
     ).toThrow(
-      "Timeline requires a provider created by createDataViewsProvider",
+      "DataTimeline requires a provider created by createDataViewsProvider",
     );
   });
 
@@ -136,14 +136,14 @@ describe("Timeline", () => {
     for (const dateTime of ["summary", "nowhere"]) {
       expect(() =>
         render(
-          <Timeline
+          <DataTimeline
             provider={provider}
             mapping={{ ...ACTIVITY_MAPPING, dateTime }}
             label="Activity"
           />,
         ),
       ).toThrow(
-        `Timeline reads its dates from "${dateTime}", which is not a date field`,
+        `DataTimeline reads its dates from "${dateTime}", which is not a date field`,
       );
     }
   });
@@ -189,7 +189,7 @@ describe("Timeline", () => {
   it("adds what decorate gives each event, calling the latest one", () => {
     const { provider, source } = createActivityProvider();
     const view = render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -197,7 +197,7 @@ describe("Timeline", () => {
       />,
     );
     view.rerender(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -217,14 +217,14 @@ describe("Timeline", () => {
   it("reads the events again under a mapping naming other fields", () => {
     const { provider } = createActivityProvider({ rows: [activity("a-1", 1)] });
     const view = render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
       />,
     );
     view.rerender(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={{ ...ACTIVITY_MAPPING, description: "kind" }}
         label="Activity"
@@ -257,7 +257,7 @@ describe("Timeline", () => {
     ).toBeInTheDocument();
     const { provider } = createActivityProvider({ rows: [activity("a-2", 2)] });
     render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={{ dateTime: "at", eventLabel: "kind" }}
         label="Labelled"
@@ -271,7 +271,7 @@ describe("Timeline", () => {
       rows: [activity("a-3", 3)],
     });
     render(
-      <Timeline
+      <DataTimeline
         provider={bare}
         mapping={{ dateTime: "at" }}
         label="Bare"
@@ -315,7 +315,7 @@ describe("Timeline", () => {
     const { provider } = createActivityProvider({ rows: ACTIVITY_PAGE });
     render(
       <>
-        <Timeline
+        <DataTimeline
           provider={provider}
           mapping={ACTIVITY_MAPPING}
           label="Activity"
@@ -475,7 +475,7 @@ describe("Timeline", () => {
     expect(screen.getByRole("button", { name: "Actor" })).toBeInTheDocument();
     const { provider } = createActivityProvider({ rows: ACTIVITY_PAGE });
     render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Bare"
@@ -498,7 +498,7 @@ describe("Timeline", () => {
       facets: [],
     });
     render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -609,7 +609,7 @@ describe("Timeline", () => {
       provider.navigateWindow({ size: 4 });
     });
     render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -742,7 +742,7 @@ describe("Timeline", () => {
       facets: [],
     });
     render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -764,7 +764,7 @@ describe("Timeline", () => {
     const latest = vi.fn();
     const { provider, source } = createActivityProvider();
     const view = render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -773,7 +773,7 @@ describe("Timeline", () => {
     );
     expect(first).toHaveBeenLastCalledWith([]);
     view.rerender(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -814,7 +814,7 @@ describe("Timeline", () => {
   });
 });
 
-describe("Timeline dates", () => {
+describe("DataTimeline dates", () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(Date.UTC(2024, 5, 3, 9));
@@ -838,7 +838,7 @@ describe("Timeline dates", () => {
   });
 });
 
-describe("Timeline hydrating what the server drew", () => {
+describe("DataTimeline hydrating what the server drew", () => {
   it("draws the events, dates and checkboxes the server drew, with no mismatch", async () => {
     const errors = vi.spyOn(console, "error");
     onTestFinished(() => {
@@ -855,7 +855,7 @@ describe("Timeline hydrating what the server drew", () => {
       });
       provider.refresh();
       return (
-        <Timeline
+        <DataTimeline
           provider={provider}
           mapping={ACTIVITY_MAPPING}
           label="Activity"

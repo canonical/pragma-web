@@ -17,13 +17,13 @@ import {
 } from "../../../storybook/activities/fixtures.js";
 import { withAppScope, withFrame } from "../../../storybook/decorators.js";
 import { RendererSwitch } from "../../common/index.js";
-import { Timeline as ConnectedTimeline } from "../DataViews/common/Timeline/index.js";
+import { DataTimeline as ConnectedTimeline } from "../DataViews/common/DataTimeline/index.js";
 import { DataViews } from "../DataViews/index.js";
-import Component from "./Timeline.js";
-import type { TimelineDecoration, TimelineProps } from "./types.js";
+import Component from "./DataTimeline.js";
+import type { DataTimelineProps, TimelineDecoration } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/Timeline",
+  title: "_work_in_progress/DataViews/Renderers/DataTimeline",
   component: Component,
   decorators: [withAppScope, withFrame("48rem")],
   args: {
@@ -44,7 +44,7 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 type StoryTimelineProps = Omit<
-  TimelineProps<readonly SchemaFieldDefinition[]>,
+  DataTimelineProps<readonly SchemaFieldDefinition[]>,
   "provider" | "mapping"
 > & { readonly config?: ActivityProviderConfig };
 

@@ -5,7 +5,7 @@ import type {
 } from "@canonical/dataviews-core";
 import type { ReactNode } from "react";
 import type { AnnouncerTopic } from "../../../../common/index.js";
-import type { TimelineProps } from "../../types.js";
+import type { DataTimelineProps } from "../../types.js";
 
 /**
  * Props of the scoped timeline: the timeline's own, with the words resolved
@@ -14,10 +14,10 @@ import type { TimelineProps } from "../../types.js";
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export type ScopedTimelineProps<
+export type ScopedDataTimelineProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = Omit<TimelineProps<TFields, TRow>, "messages"> & {
+> = Omit<DataTimelineProps<TFields, TRow>, "messages"> & {
   /** Every message the timeline renders and announces, resolved. */
   readonly messages: DataViewsMessages;
   /** Say an outcome through the announcer of the timeline's UI scope. */
