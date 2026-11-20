@@ -14,7 +14,7 @@ import {
   createActivityProvider,
 } from "../../../testing/activities.js";
 import countExactly from "../../../testing/countExactly.js";
-import { Timeline } from "../../lib/_work_in_progress/Timeline/index.js";
+import { DataTimeline } from "../../lib/_work_in_progress/DataTimeline/index.js";
 
 describe("a page holding one actor's events", () => {
   it("offers every actor the collection holds", () => {
@@ -35,7 +35,7 @@ describe("a page holding one actor's events", () => {
         }),
     });
     render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"

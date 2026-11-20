@@ -17,9 +17,9 @@ import {
   activities,
   createActivityProvider,
 } from "../../../../testing/activities.js";
-import Timeline from "./Timeline.js";
+import DataTimeline from "./DataTimeline.js";
 
-describe("Timeline on the server", () => {
+describe("DataTimeline on the server", () => {
   it("draws the events of the URL's query, with native checkboxes and the dates written in the given zone", () => {
     const provider = createDataViewsProvider({
       collection: activities,
@@ -32,7 +32,7 @@ describe("Timeline on the server", () => {
     });
     provider.refresh();
     const markup = renderToString(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -62,7 +62,7 @@ describe("Timeline on the server", () => {
     });
     provider.refresh();
     const markup = renderToString(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -77,7 +77,7 @@ describe("Timeline on the server", () => {
     const { provider } = createActivityProvider();
     provider.refresh();
     const markup = renderToString(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -100,7 +100,7 @@ describe("Timeline on the server", () => {
     });
     provider.refresh();
     const markup = renderToString(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"
@@ -141,7 +141,7 @@ describe("Timeline on the server", () => {
     });
     provider.refresh();
     const markup = renderToString(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"

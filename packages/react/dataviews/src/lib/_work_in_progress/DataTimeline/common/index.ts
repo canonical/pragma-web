@@ -4,6 +4,6 @@ export * from "./EventList/index.js";
 export * from "./ExpansionIndicator/index.js";
 export * from "./Header/index.js";
 export * from "./Marker/index.js";
-export * from "./ScopedTimeline/index.js";
+export * from "./ScopedDataTimeline/index.js";
 export * from "./SelectAllOnPage/index.js";
 export * from "./SelectEvent/index.js";

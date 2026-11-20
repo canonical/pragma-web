@@ -1,11 +1,11 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
-import * as Stories from "./Timeline.stories";
+import * as Stories from "./DataTimeline.stories";
 
 <Meta of={Stories} name="Recipes" />
 
-# Timeline recipes
+# DataTimeline recipes
 
-`Timeline` shows a collection's records as events in time: one event per record on the page, in the order the query puts them, each marked on a shared axis. It reads what the table reads — the provider's rows, the core's status and the selection — and its controls filter and order the collection through the provider, never the page alone. `Timeline` takes a provider; its connected twin reads the enclosing `DataViews` root instead. Both are work-in-progress spikes: neither is exported from the package root, and their shape may change or they may be withdrawn.
+`DataTimeline` shows a collection's records as events in time: one event per record on the page, in the order the query puts them, each marked on a shared axis. It reads what the table reads — the provider's rows, the core's status and the selection — and its controls filter and order the collection through the provider, never the page alone. `DataTimeline` takes a provider; its connected twin reads the enclosing `DataViews` root instead. Both are work-in-progress spikes: neither is exported from the package root, and their shape may change or they may be withdrawn.
 
 ## Mapping records to events
 
@@ -19,7 +19,7 @@ import {
 import { useState } from "react";
 import { activities, activityCollection } from "./activities.js";
 // A work-in-progress spike: not yet exported from the package root.
-import { Timeline } from "./Timeline.js";
+import { DataTimeline } from "./DataTimeline.js";
 
 export function ReviewActivity() {
   const [provider] = useState(() =>
@@ -30,7 +30,7 @@ export function ReviewActivity() {
     }),
   );
   return (
-    <Timeline
+    <DataTimeline
       provider={provider}
       label="Review activity"
       mapping={{
@@ -116,7 +116,7 @@ These notes are provisional, recorded for a spike and re-evaluated when the time
 
 | Surface | Principal criteria | Behaviour today |
 |---|---|---|
-| Timeline | 1.3.1, 1.3.2, 2.4.3 | A region named by `label`, busy while a request is outstanding, holding an ordered list of events in result order |
+| DataTimeline | 1.3.1, 1.3.2, 2.4.3 | A region named by `label`, busy while a request is outstanding, holding an ordered list of events in result order |
 | Event | 1.1.1, 1.3.1, 2.4.4 | The actor's name, a link where the record names one; the marker's duplicate link is taken out of the reading and tab order |
 | Date | 1.3.1, 4.1.2 | A `time` element carrying its ISO value, its other form described by a tooltip; where toggling is allowed, a pressed-state button |
 | Controls | 1.3.1, 2.1.1, 2.4.4, 4.1.2 | The design system's menus for the filters, a reset and the order control, each named even where its label is hidden; links before scripts run; a refusal shown beside its control and announced |

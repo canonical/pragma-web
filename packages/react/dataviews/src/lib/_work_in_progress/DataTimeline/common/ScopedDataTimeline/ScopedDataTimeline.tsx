@@ -39,7 +39,7 @@ import {
 import { EventList, type NamedEvent } from "../EventList/index.js";
 import { Header } from "../Header/index.js";
 import { SelectAllOnPage } from "../SelectAllOnPage/index.js";
-import type { ScopedTimelineProps } from "./types.js";
+import type { ScopedDataTimelineProps } from "./types.js";
 
 const componentCssClassName = "ds data-timeline";
 
@@ -60,12 +60,12 @@ const NO_FORMATS: TimelineDateTimeFormats = {};
 
 /**
  * The timeline itself, speaking through the announcer and the words of the
- * UI scope it is placed in: its own as a standalone `Timeline`, or a
+ * UI scope it is placed in: its own as a standalone `DataTimeline`, or a
  * `DataViews` root's.
  *
  * @implements ds:global.pattern.timeline
  */
-export default function ScopedTimeline<
+export default function ScopedDataTimeline<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 >({
@@ -94,15 +94,15 @@ export default function ScopedTimeline<
   onVisibleItemsChange,
   className,
   ...rest
-}: ScopedTimelineProps<TFields, TRow>): ReactElement {
+}: ScopedDataTimelineProps<TFields, TRow>): ReactElement {
   if (!isDataViewsProvider(provider)) {
     throw new Error(
-      "Timeline requires a provider created by createDataViewsProvider",
+      "DataTimeline requires a provider created by createDataViewsProvider",
     );
   }
   if (provider.collection.schema.findField(mapping.dateTime)?.kind !== "date") {
     throw new Error(
-      `Timeline reads its dates from "${mapping.dateTime}", which is not a date field`,
+      `DataTimeline reads its dates from "${mapping.dateTime}", which is not a date field`,
     );
   }
   useEffect(() => provider.observe(), [provider]);

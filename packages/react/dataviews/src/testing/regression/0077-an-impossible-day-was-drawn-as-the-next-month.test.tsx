@@ -12,7 +12,7 @@ import {
   activity,
   createActivityProvider,
 } from "../../../testing/activities.js";
-import { Timeline } from "../../lib/_work_in_progress/Timeline/index.js";
+import { DataTimeline } from "../../lib/_work_in_progress/DataTimeline/index.js";
 
 describe("an event on a day the calendar does not have", () => {
   it("is drawn without a date, never on another day", () => {
@@ -20,7 +20,7 @@ describe("an event on a day the calendar does not have", () => {
       rows: [{ ...activity("a-1", 1), at: "2024-02-30T09:00:00Z" }],
     });
     const { container } = render(
-      <Timeline
+      <DataTimeline
         provider={provider}
         mapping={ACTIVITY_MAPPING}
         label="Activity"

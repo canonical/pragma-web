@@ -5,16 +5,17 @@ import type {
 import type { ReactElement } from "react";
 import { Announcer } from "../../common/index.js";
 import { useAnnouncer, useMessages } from "../../hooks/index.js";
-import { ScopedTimeline } from "./common/index.js";
-import type { TimelineProps } from "./types.js";
+import { ScopedDataTimeline } from "./common/index.js";
+import type { DataTimelineProps } from "./types.js";
 import "./styles.css";
 
 /**
- * A timeline renders the records of one collection as events in time: one
+ * DataTimeline renders the records of one collection as events in time: one
  * event per record on the page, in the order the query puts them. It does not
- * fetch, sort or page; it reads what the table reads — the query's rows, the
- * core's status and the selection — and its controls edit the collection's
- * query, never the page alone.
+ * fetch or sort; it reads what the table reads — the query's rows, the core's
+ * status, the pagination and the selection — and its controls edit the
+ * collection's query, never the page alone. Once the page shows whole, its
+ * show more grows the provider's window past the page.
  *
  * Each record is read through `mapping`, whose `dateTime` must name a `date`
  * field. Every word comes from `messages`, over English, and every outcome is
@@ -28,15 +29,15 @@ import "./styles.css";
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export default function Timeline<
+export default function DataTimeline<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->({ messages, ...props }: TimelineProps<TFields, TRow>): ReactElement {
+>({ messages, ...props }: DataTimelineProps<TFields, TRow>): ReactElement {
   const words = useMessages(messages);
   const { ref, announce } = useAnnouncer();
   return (
     <>
-      <ScopedTimeline {...props} messages={words} announce={announce} />
+      <ScopedDataTimeline {...props} messages={words} announce={announce} />
       <Announcer ref={ref} />
     </>
   );
