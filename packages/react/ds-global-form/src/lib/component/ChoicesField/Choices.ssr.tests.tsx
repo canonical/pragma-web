@@ -39,7 +39,7 @@ describe("Choices (SSR)", () => {
         layout="stacked"
       />,
     );
-    expect(html).toContain("ds option-description");
+    expect(html).toContain("ds field-description");
     expect(html).toContain("A warm colour");
   });
 });
