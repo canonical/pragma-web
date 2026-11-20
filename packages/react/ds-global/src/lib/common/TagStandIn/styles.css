@@ -1,0 +1,63 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.tag {
+    /* Component tokens — sourced from @canonical/design-tokens. They mirror
+       the chip's static look, which the tag stands in for. */
+    --tag-color-background: var(--color-foreground-secondary);
+    --tag-color-border: var(--color-border-high-contrast);
+    --tag-color-text: var(--color-text);
+
+    --tag-border-radius: 1rem;
+    --tag-font-size: var(--font-size-small);
+    --tag-font-weight: var(--font-weight-default);
+    --tag-line-height: var(--line-height-small);
+    --tag-border-width: var(--spacing-border-width);
+    --tag-padding-vertical: var(--spacing-vertical-xsmall);
+    --tag-padding-horizontal: var(--spacing-horizontal-small);
+    --tag-margin-bottom: var(--spacing-vertical-small);
+    --tag-margin-left: var(--spacing-horizontal-medium);
+
+    border-color: var(--modifier-color-border, var(--tag-color-border));
+    border-style: solid;
+    border-radius: var(--tag-border-radius);
+    border-width: var(--tag-border-width);
+
+    color: var(--modifier-color-text, var(--tag-color-text));
+    background-color: var(
+      --modifier-color-foreground-secondary,
+      var(--tag-color-background)
+    );
+
+    display: inline-flex;
+    align-items: baseline;
+
+    user-select: none;
+    white-space: nowrap;
+
+    font-size: var(--tag-font-size);
+    font-weight: var(--tag-font-weight);
+    line-height: var(--tag-line-height);
+
+    margin-block-end: var(--tag-margin-bottom);
+    margin-inline-end: var(--tag-margin-left);
+    padding-block: var(--tag-padding-vertical);
+    padding-inline: var(--tag-padding-horizontal);
+
+    & > .lead {
+      font-variant-caps: all-small-caps;
+      font-variant-numeric: oldstyle-nums;
+    }
+
+    & > .lead + .value::before {
+      content: ": ";
+    }
+
+    & > .lead,
+    & > .value {
+      display: inline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

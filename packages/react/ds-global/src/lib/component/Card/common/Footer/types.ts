@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
-  /** Required child contents: tags and labels (e.g. `Chip`), not CTAs or links */
+  /** Required child contents: tags and labels (e.g. `Tag`), not CTAs or links */
   children: ReactNode;
 };
 

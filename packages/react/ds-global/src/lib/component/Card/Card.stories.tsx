@@ -1,6 +1,6 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
 import * as decorators from "../../../storybook/decorators.js";
-import { Chip } from "../Chip/index.js";
+import { TagStandIn } from "../../common/TagStandIn/index.js";
 import Component from "./Card.js";
 import type { CardProps } from "./types.js";
 
@@ -84,9 +84,9 @@ export const HeaderContentFooter: StoryFn<CardProps> = (props) => (
       </p>
     </Component.Content>
     <Component.Footer>
-      <Chip value="LTS" />
-      <Chip value="Desktop" />
-      <Chip value="Server" />
+      <TagStandIn value="LTS" />
+      <TagStandIn value="Desktop" />
+      <TagStandIn value="Server" />
     </Component.Footer>
   </Component>
 );

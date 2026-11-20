@@ -43,6 +43,7 @@
 @import url("./_work_in_progress/grid/GridCard/styles.css");
 @import url("./_work_in_progress/grid/InnerGridDemo/styles.css");
 @import url("./_work_in_progress/grid/SettingsView/styles.css");
+@import url("./common/TagStandIn/styles.css");
 @import url("./component/Accordion/common/Item/styles.css");
 @import url("./component/Accordion/styles.css");
 @import url("./component/Badge/styles.css");
