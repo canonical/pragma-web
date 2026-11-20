@@ -108,7 +108,7 @@
   /* Body font tier for the field label/description/error, which lost `.p`. Scoped
      to just these (NOT the headings, which keep their own tier). */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
+    :is(.ds.field-label, .ds.field-description, .ds.field-error) {
     font-size: var(--typography-text-primary-font-size);
     font-family: var(--typography-text-primary-font-family);
   }
@@ -118,13 +118,13 @@
      them as margin-block only; the padding seat (below) applies to text only,
      so the marks keep their own sheets' `padding: 0`. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(
-    .ds.field-label,
-    .ds.field-description,
-    .ds.field-error,
-    .ds.option > input,
-    .field-toggle-control > input
-  ) {
+    :is(
+      .ds.field-label,
+      .ds.field-description,
+      .ds.field-error,
+      .ds.option > input,
+      .field-toggle-control > input
+    ) {
     line-height: 1;
     /* Baseline within a line-height:1 box (font-relative cap approximation). */
     --natural-baseline: calc((1em + 1cap) / 2);
@@ -142,7 +142,7 @@
 
   /* Padding seat: seated text only. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
+    :is(.ds.field-label, .ds.field-description, .ds.field-error) {
     padding-block-start: var(--space-before);
     padding-block-end: 0;
   }
@@ -160,7 +160,7 @@
    * rule wins for the text family. Direct chromes (select/date/time) and the
    * textarea keep the previous model until their own cutover pass. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  .ds.input:is(.text, .number, .password, .phone) {
+    .ds.input:is(.text, .number, .password, .phone) {
     /* The COMPOSITE chrome family — every wrapper with an inner <input> leaf
        (text, number, password, phone). One selector, one seat: the wrapper is
        the box, the leaf carries the line. */
@@ -350,15 +350,16 @@
    * partition above), so its box is its OWN snapped line-height and the engine's
    * --end-nudge already lands its bottom on the grid. Adding a density fill on top
    * would double-pad. Prose bottom rhythm belongs to the engine / `.editorial`. */
-  :is(.comfortable, .dense, .app, .site, .docs) :is(
-    .ds.field-label,
-    .ds.field-description,
-    .ds.field-error,
-    /* Marks read --seat-after as margin-block-end; the padding fill below
+  :is(.comfortable, .dense, .app, .site, .docs)
+    :is(
+      .ds.field-label,
+      .ds.field-description,
+      .ds.field-error,
+      /* Marks read --seat-after as margin-block-end; the padding fill below
          applies to text only, so the marks keep `padding: 0`. */
-    .ds.option > input,
-    .field-toggle-control > input
-  ) {
+      .ds.option > input,
+      .field-toggle-control > input
+    ) {
     --seat-after: max(
       0px,
       calc(
@@ -374,7 +375,7 @@
 
   /* The padding fill: seated text only. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
+    :is(.ds.field-label, .ds.field-description, .ds.field-error) {
     padding-block-end: var(--seat-after);
   }
 

@@ -54,8 +54,7 @@
       width: var(--typography-text-primary-font-size);
       padding: 0;
       margin-block: var(--space-before, 0) var(--seat-after, 0);
-      border: var(--dimension-stroke-thickness-medium) solid
-        var(--color-border);
+      border: var(--dimension-stroke-thickness-medium) solid var(--color-border);
       border-radius: 50%;
       background-color: var(
         --surface-color-foreground-radio-unselected,
@@ -125,8 +124,7 @@
       width: var(--typography-text-primary-font-size);
       padding: 0;
       margin-block: var(--space-before, 0) var(--seat-after, 0);
-      border: var(--dimension-stroke-thickness-medium) solid
-        var(--color-border);
+      border: var(--dimension-stroke-thickness-medium) solid var(--color-border);
       border-radius: var(--dimension-radius-small);
       background-color: var(
         --surface-color-foreground-checkbox-unselected,
@@ -190,9 +188,7 @@
 
       &:disabled {
         border-color: var(--color-border-disabled);
-        background-color: var(
-          --color-foreground-checkbox-unselected-disabled
-        );
+        background-color: var(--color-foreground-checkbox-unselected-disabled);
       }
 
       /* A checked+disabled box must keep the SELECTED (not unselected) disabled
@@ -203,9 +199,7 @@
         border-color: var(--color-foreground-checkbox-selected-disabled);
 
         &::before {
-          background-color: var(
-            --color-foreground-checkbox-checkmark-disabled
-          );
+          background-color: var(--color-foreground-checkbox-checkmark-disabled);
         }
       }
     }
