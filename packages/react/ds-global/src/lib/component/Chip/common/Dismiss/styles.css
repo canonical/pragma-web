@@ -1,0 +1,50 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.chip-dismiss {
+    --chip-dismiss-size: var(--dimension-200);
+    --chip-dismiss-icon-size: var(--dimension-175);
+    /* Sizes the <Icon> glyph inside the control. */
+    --icon-size: var(--chip-dismiss-icon-size);
+
+    /* The radius, icon colour and transition are the enclosing chip's tokens,
+       so the control follows the chip's criticality and disabled state. */
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    inline-size: var(--chip-dismiss-size);
+    block-size: var(--chip-dismiss-size);
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    border-radius: var(--chip-border-radius);
+    background-color: transparent;
+    color: var(--chip-color-icon);
+    cursor: pointer;
+
+    transition: background-color var(--chip-transition-duration)
+      var(--motion-easing-standard);
+
+    &:hover:not(:disabled) {
+      background-color: var(--hover--color-foreground-secondary);
+    }
+
+    &:active:not(:disabled) {
+      background-color: var(--active--color-foreground-secondary);
+    }
+
+    &:focus-visible {
+      outline: var(--focus-outline-width, 2px) solid
+        var(--modifier-color-focus-ring, var(--color-focus-ring, currentColor));
+      outline-offset: var(--focus-outline-offset, 2px);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+}

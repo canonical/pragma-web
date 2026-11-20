@@ -55,6 +55,7 @@
 @import url("./component/Card/common/Header/styles.css");
 @import url("./component/Card/common/Image/styles.css");
 @import url("./component/Card/styles.css");
+@import url("./component/Chip/common/Dismiss/styles.css");
 @import url("./component/Chip/styles.css");
 @import url("./component/ContextualMenu/common/Item/styles.css");
 @import url("./component/ContextualMenu/styles.css");
