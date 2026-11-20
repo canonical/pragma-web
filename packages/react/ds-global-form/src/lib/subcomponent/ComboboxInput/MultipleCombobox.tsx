@@ -106,6 +106,10 @@ const MultipleCombobox = ({
     setInputValue, // Function to set input value
   } = useCombobox({
     items,
+    // The selection lives in useMultipleSelection, not here. Pinning this to
+    // null stops useCombobox remembering the last pick: otherwise picking that
+    // option again (after removing its chip) is not a change and is ignored.
+    selectedItem: null,
     onInputValueChange,
     onSelectedItemChange: ({ selectedItem }) => {
       if (

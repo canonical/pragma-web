@@ -146,12 +146,16 @@ The `Field` component uses `inputType` to select the appropriate input component
 | `checkbox` | Checkbox | Boolean toggle |
 | `range` | Range | Slider input |
 | `select` | Select | Dropdown selection |
-| `simple-choices` | SimpleChoices | Radio buttons or checkboxes |
+| `choices`, `rich-choices` | Choices | Radio buttons or checkboxes |
 | `combobox` | Combobox | Searchable dropdown |
 | `hidden` | Hidden | Hidden input |
 | `custom` | Your component | Pass via `CustomComponent` prop |
 
-All fields are wrapped with `withWrapper`, which provides form registration, labels, descriptions, error display, and middleware support.
+Built-in fields provide form binding and field chrome. Custom fields are rendered directly and own their binding and chrome.
+
+`FieldProps` is a discriminated union. When migrating from the previously unchecked type, preserve literal `inputType` values with `satisfies FieldProps[]`, provide `options` for selects (use `[]` when middleware supplies them) and a `label` or `controlLabel` for toggles. Extend it with a type intersection rather than `interface extends FieldProps`; use `FieldProps<CustomProps>` for a custom component with additional required props. Custom-field declarations require TypeScript 5.5 or newer: although `NoInfer` was introduced in 5.4, the reserved-prop conditional does not resolve correctly in 5.4.
+
+Built-in `Field` variants determine the native input type from `inputType`; do not pass a separate native `type` prop. Custom components may define their own `type` prop.
 
 ### Custom Fields
 
@@ -169,7 +173,7 @@ import { MyColorPicker } from "./MyColorPicker";
 />
 ```
 
-Custom components must be wrapped with `withWrapper`. Custom components must satisfy the `InputProps` type and integrate with react-hook-form via `useFormContext`.
+Custom components receive the supplied props except `inputType`, `CustomComponent` and React's `key`. They must implement any needed registration, labels, errors, conditions and middleware themselves; `withWrapper` is internal. JSX checks the custom component's props. For typed maps, use `FieldProps<MyCustomProps>[]`; a map with different custom components needs a union of those types and narrowing before rendering each custom variant. See the Creating Custom Fields guide for an example.
 
 ### Standalone Inputs
 
@@ -200,6 +204,7 @@ Middleware are higher-order components that wrap fields to add functionality. Th
   name="country"
   inputType="select"
   label="Country"
+  options={[]}
   middleware={[addRESTOptions("/api/countries")]}
 />
 ```
@@ -216,6 +221,7 @@ import { addRESTOptions } from "@canonical/react-ds-global-form";
 <Field
   name="category"
   inputType="select"
+  options={[]}
   middleware={[
     addRESTOptions("/api/categories", {
       transformData: (data) => data.categories,

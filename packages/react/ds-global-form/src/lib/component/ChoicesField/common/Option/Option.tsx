@@ -6,6 +6,7 @@ import { Label } from "../../../../subcomponent/Field/index.js";
 import { RadioInput } from "../../../../subcomponent/RadioInput/index.js";
 import useOptionAriaProperties from "../../../../utils/hooks/useOptionAriaProperties.js";
 import type { OptionProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds option";
 

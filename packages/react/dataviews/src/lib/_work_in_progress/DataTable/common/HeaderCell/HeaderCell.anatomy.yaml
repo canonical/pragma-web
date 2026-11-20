@@ -1,0 +1,192 @@
+---
+# DataTable.HeaderCell — one column heading: its label, the sort control when
+# the column offers sorting, the column's menu when it can be sorted, hidden
+# or moved, and the resize handle when it offers resizing.
+#
+# Anatomy DSL 0.3.0, checked in review against the DSL's JSON schema.
+# A named subcomponent, not a role: it carries a contract of its own — sort,
+# resize and focus — independent of the table around it. Named is not
+# exported; the component is private to DataTable.
+#
+# Names — one per part, the same in the design, the DOM and here:
+#   HeaderCell      design "HeaderCell"   DOM `ds data-table-header-cell`
+#   sort control    design "Sort by icon wrapper"   DOM `a.sort` until scripts
+#                                         take over, `button.sort` after
+#   sort icon       design `sort-both` (hidden at rest)   DOM `svg.ds.icon`
+#   precedence      design none yet       DOM `span.precedence`
+#   description     design none           DOM `span[hidden]`, the direction
+#                                         and precedence the sort control is
+#                                         described by
+#   reason          design none yet       DOM `span.sort-reason`, why the last
+#                                         activation changed nothing, shown
+#                                         and not live: the table's announcer
+#                                         says it once
+#   header menu     design none yet       DOM `ds contextual-menu menu`, the
+#                                         design system's ContextualMenu
+#   menu trigger    design none yet       DOM `button.trigger`
+#   resize handle   design "Resize handle wrapper" + "Column resizing handle"
+#                                         DOM `ds data-table-resize-handle`,
+#                                         a wrapper with no box of its own
+#                                         holding `div.strip`, the separator,
+#                                         and while placing `span.resize-hint`
+#
+# States:
+#   - The ordering in force — the query's terms, or the source's default when
+#     it states none — is shown by the sort icon on every column it names:
+#     `chevron-up` ascending, `chevron-down` descending, nothing at rest, as
+#     the design hides its icon at rest. From two terms a precedence numeral
+#     follows the icon. Only the first term's heading carries `aria-sort`;
+#     every other heading omits it. The design owners have not drawn the
+#     numeral yet: it takes the heading's own type. The chevrons stand in for
+#     the design's `sort-both`, which `@canonical/ds-assets` does not ship yet;
+#     when it lands the switch collapses to one icon.
+#   - Focus sits on the controls (the sort link or button, the menu trigger,
+#     the resize handle), not on the cell: the table claims table semantics,
+#     not grid.
+#   - No hover reveal at rest: the package has no opacity token and the design
+#     shows nothing at rest.
+#   - The resize handle's behaviour — idle, previewing, keyboard step (±16px
+#     per arrow key), cancelled (Escape or a cancelled pointer) — changes no
+#     style and is recorded here, not as states.
+#   - Placing: a press on the resize handle that does not travel starts
+#     placing the column's edge; the next press in the header row moves it
+#     there. A press on the edge again, a press outside the row, Escape, or
+#     focus leaving the header cell ends it. While placing, the handle's root
+#     carries `data-mode="placing"`, the strip's hairline takes
+#     `color/focus-ring`, and `span.resize-hint` below the heading says where
+#     to press and how to cancel. The hint and a refused sort's reason are
+#     both drawn below the heading, so the reason is hidden while placing
+#     and the hint stands in its place; the reason returns when placing
+#     ends, if it still stands. The table's status is carried as a data
+#     attribute the same way. The change to the code standards that admits
+#     `data-*` states on a component's root is canonical/pragma-core#127.
+#
+# The resize mark is a pseudo-element, which the DSL cannot express. It is a
+# 3×20 hairline centred in the strip's 24px pointer target:
+#   width  dimension/stroke/thickness/large (3px)
+#   height dimension/250 (20px)
+#   colour color/border/muted; on hover, on focus and while placing,
+#          color/focus-ring
+#
+# A header cell holding a resize handle drops its trailing inline padding:
+# the handle carries that inset itself. The DSL cannot condition a style on
+# a child, so this is recorded here.
+#
+# Icons take `1em` from the Icon component, so beside 14px text they render at
+# 14px; the design draws 16px, and the package has no icon-size token.
+#
+# `color/focus-ring` is the package's `color.focusRing`, whose camelCase id the
+# DSL's token-path grammar cannot spell.
+#
+# The sort control is described by its direction and precedence, as
+# "descending, 2nd of 3", from a hidden element; a refused activation's
+# reason is shown below the heading once scripts run, while focus is in the
+# heading or its own menu, and goes once focus leaves both, the ordering
+# changes, or the column leaves the arrangement. The reason is no live
+# region: the table's announcer says it once, when it happens, as it says
+# every accepted ordering. Every word comes from the messages record.
+#
+# Accessibility: "Sort/header menu/resize" (2.1.1, 2.5.2, 2.5.7-2.5.8, 4.1.2),
+# with 1.4.1 — the ordering is `aria-sort` and the description, never only
+# the chevron or the numeral. The resize handle meets 2.5.7 with a press,
+# then a press where the column should end, beside the drag and the arrow
+# keys, and 2.5.8 with a 24px strip, the minimum target at every density.
+node:
+  uri: apps.subcomponent.data_table-header_cell
+  styles:
+    layout.type: stack
+    layout.direction: row
+    layout.align: center
+    layout.overflow: visible
+    spacing.gap: dimension/050
+    spacing.internal.inline: density/padding-inline
+    typography.weight: typography/text/primary/bold/font-weight
+  edges:
+    # The column's `sortable` prop, honoured only where the provider's source
+    # declares the field sortable, chooses a sort control or a plain label.
+    - switch:
+        "on": props
+        cases:
+          - node:
+              role: sort control
+              styles:
+                layout.type: stack
+                layout.direction: row
+                layout.align: center
+                spacing.gap: dimension/050
+                interaction.cursor: pointer
+                appearance.outline@focus: color/focus-ring
+                appearance.outline.width@focus: dimension/stroke/thickness/large
+              edges:
+                - node:
+                    role: label
+                  relation:
+                    cardinality: "1"
+                # The ordering chooses the icon; none at rest.
+                - switch:
+                    "on": internal
+                    cases:
+                      - node:
+                          uri: global.component.icon
+                          props:
+                            icon: chevron-up
+                      - node:
+                          uri: global.component.icon
+                          props:
+                            icon: chevron-down
+                  relation:
+                    cardinality: "0..1"
+                # The column's place in an ordering of two terms or more.
+                - node:
+                    role: precedence
+                  relation:
+                    cardinality: "0..1"
+          - node:
+              role: label
+      relation:
+        cardinality: "1"
+        slotName: label
+    # On a column the ordering names: its direction and precedence, which
+    # the sort control, or the heading itself, is described by. Hidden.
+    - node:
+        role: description
+      relation:
+        cardinality: "0..1"
+    # Once scripts run, on a sortable column: why its last activation
+    # changed nothing, shown below the heading while it stands.
+    - node:
+        role: reason
+      relation:
+        cardinality: "0..1"
+    # Once scripts run, on a column that can be sorted, hidden or moved: the
+    # column's menu, the design system's ContextualMenu, carrying its sort
+    # where it offers one, then Hide column where it may be hidden, and Move
+    # column left and right, each disabled where it would change nothing.
+    - node:
+        uri: global.component.contextual_menu
+      relation:
+        cardinality: "0..1"
+    # Absent on the last column, whatever it declares: its trailing edge is
+    # the table's own edge. Absent too until scripts take over, since only
+    # they make its keys resize.
+    # The handle's root has no box of its own: its strip is the target and
+    # the separator, and its hint is drawn below the heading.
+    - node:
+        role: resize handle
+        edges:
+          - node:
+              role: strip
+              styles:
+                size.width: dimension/300
+                interaction.cursor: col-resize
+                appearance.outline@focus: color/focus-ring
+                appearance.outline.width@focus: dimension/stroke/thickness/large
+            relation:
+              cardinality: "1"
+          # Present only while placing: where to press, and how to cancel.
+          - node:
+              role: hint
+            relation:
+              cardinality: "0..1"
+      relation:
+        cardinality: "0..1"

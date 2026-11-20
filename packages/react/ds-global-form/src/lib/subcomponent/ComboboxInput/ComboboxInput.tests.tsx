@@ -146,3 +146,42 @@ describe("ComboboxField (multiple) reset", () => {
     expect(onSubmit.mock.calls[0]?.[0]).toEqual({ fruit: [] });
   });
 });
+
+describe("ComboboxInput (multiple) re-selection", () => {
+  it("re-adds an option after its chip is removed", () => {
+    // Regression: useCombobox kept the last pick as its internal selectedItem,
+    // so choosing that same option again was not a change and never fired —
+    // the removed option could not be added back.
+    function Controlled() {
+      const [value, setValue] = useState<string[]>([]);
+      return (
+        <ComboboxInput
+          isMultiple
+          options={fruits}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+        />
+      );
+    }
+    const { container } = render(<Controlled />);
+    const input = screen.getByRole("combobox");
+    // The menu is a `popover`, which jsdom reports as hidden — hence `hidden`.
+    const pick = (label: string) => {
+      fireEvent.click(input);
+      fireEvent.click(
+        screen.getByRole("option", { name: label, hidden: true }),
+      );
+    };
+
+    pick("Apple");
+    expect(chipLabels(container)).toEqual(["Apple"]);
+
+    const chip = container.querySelector(".selected-items .chip");
+    if (!chip) throw new Error("chip not rendered");
+    fireEvent.click(chip);
+    expect(chipLabels(container)).toEqual([]);
+
+    pick("Apple");
+    expect(chipLabels(container)).toEqual(["Apple"]);
+  });
+});

@@ -25,7 +25,7 @@ const TooltipEngine = ({
   Message,
   icon,
   open,
-  distance = "6px",
+  distance = "16px",
   targetElementId,
   targetElementClassName,
   targetElementStyle,

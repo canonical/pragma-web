@@ -21,7 +21,7 @@ export default function OverviewPage(): ReactElement {
 
   function formatRelative(minutesAgo: number): string {
     const { value, unit } = selectRelativeTime(minutesAgo);
-    return formatters.relativeTime(value, unit, { numeric: "auto" });
+    return formatters.formatRelativeTime(value, unit, { numeric: "auto" });
   }
   const router = useRouter();
 
@@ -75,7 +75,7 @@ export default function OverviewPage(): ReactElement {
                 <Tile.Header>{t("dashboard.overview.running")}</Tile.Header>
                 <Tile.Content>
                   <p className="figure">
-                    {formatters.number(OVERVIEW_FIGURES.running)}
+                    {formatters.formatNumber(OVERVIEW_FIGURES.running)}
                   </p>
                 </Tile.Content>
               </Tile>
@@ -85,7 +85,7 @@ export default function OverviewPage(): ReactElement {
                 <Tile.Header>{t("dashboard.overview.stopped")}</Tile.Header>
                 <Tile.Content>
                   <p className="figure">
-                    {formatters.number(OVERVIEW_FIGURES.stopped)}
+                    {formatters.formatNumber(OVERVIEW_FIGURES.stopped)}
                   </p>
                 </Tile.Content>
               </Tile>
@@ -95,14 +95,14 @@ export default function OverviewPage(): ReactElement {
                 <Tile.Header>{t("dashboard.overview.storage")}</Tile.Header>
                 <Tile.Content>
                   <p className="figure">
-                    {formatters.number(
+                    {formatters.formatNumber(
                       OVERVIEW_FIGURES.storageUsedTb,
                       TERABYTES,
                     )}
                   </p>
                   <p className="muted">
                     {t("dashboard.overview.storageOf", {
-                      total: formatters.number(
+                      total: formatters.formatNumber(
                         OVERVIEW_FIGURES.storageTotalTb,
                         TERABYTES,
                       ),
@@ -116,7 +116,7 @@ export default function OverviewPage(): ReactElement {
                 <Tile.Header>{t("dashboard.overview.alerts")}</Tile.Header>
                 <Tile.Content>
                   <p className="figure">
-                    {formatters.number(OVERVIEW_FIGURES.alerts)}
+                    {formatters.formatNumber(OVERVIEW_FIGURES.alerts)}
                   </p>
                 </Tile.Content>
               </Tile>

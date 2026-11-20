@@ -96,6 +96,20 @@ export const Loading: Story = {
 
 The addon adds a toolbar button to toggle MSW globally. When enabled (default), all handlers defined in story parameters intercept matching requests. Disable MSW to test how components behave when API requests reach actual endpoints.
 
+## Stories on One Page
+
+One worker serves every story shown on a page, from before its loaders run until it is torn down. Where two stories answer one route, the story rendered last wins: give each its own path, or render one in its own iframe with `parameters.docs.story: { inline: false, iframeHeight }`.
+
+A story opts out with `parameters.msw.disable`. On its own canvas its requests reach the network; on a docs page, the other stories' handlers can still answer them.
+
+```typescript
+export const AgainstTheNetwork: Story = {
+  parameters: {
+    msw: { disable: true },
+  },
+};
+```
+
 ## Panel
 
 The MSW panel in the addon bar shows which handlers are active for the current story. Use this to verify your handlers are correctly registered and to debug request matching issues.
@@ -133,7 +147,7 @@ http.get("/api/search", ({ request }) => {
 
 ### Requests not being intercepted
 
-Verify the service worker is loaded in DevTools under Application > Service Workers. If missing, re-run `npx msw init public/` and restart Storybook.
+Verify the service worker is loaded in DevTools under Application > Service Workers. The addon registers `./mockServiceWorker.js`, beside the preview's page. If missing, re-run `npx msw init public/` and restart Storybook. On a page without service workers, MSW intercepts requests inside the page instead. In Node, as in vitest's jsdom, the addon starts no worker: serve the handlers with `setupServer` from `msw/node`.
 
 Check that request URLs in handlers match exactly, including any leading slashes and query parameters.
 
@@ -143,7 +157,7 @@ Ensure both `msw` and the addon are installed. The `http` and `HttpResponse` imp
 
 ### Handlers work in one story but not another
 
-Each story's handlers are scoped to that story. Define common handlers at the meta level if they should apply to all stories in a file:
+A story's own `parameters.msw.handlers` replace its meta's. Define common handlers at the meta level if they should apply to all stories in a file:
 
 ```typescript
 const meta: Meta<typeof Component> = {

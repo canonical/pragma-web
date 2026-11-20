@@ -1,0 +1,330 @@
+/**
+ * Compile-time contract tests for the package's public type surface: every
+ * exported type is reachable through the barrel, and the connected parts'
+ * props take their root's native props except the ones each part derives.
+ */
+
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import type {
+  DataViewsMessages,
+  EmptyOr,
+  ReadonlyChannel,
+  RowRecord,
+  SchemaFieldDefinition,
+} from "@canonical/dataviews-core";
+import type { ReactElement } from "react";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import type {
+  DataTableColumn,
+  DataTableProps,
+  DataTableVirtualization,
+  DataViewsActionsProps,
+  DataViewsDataTableProps,
+  DataViewsFiltersProps,
+  DataViewsPaginationProps,
+  DataViewsProps,
+  DataViewsSavedViewsProps,
+  DataViewsSearchProps,
+  DataViewsSortPanelProps,
+  DisplayField,
+  DisplayFieldCellProps,
+  PaginationBarProps,
+  UseDataViewsCellResult,
+  UseDataViewsFilterResult,
+  UseDataViewsResult,
+} from "./index.js";
+import * as dataviewsReact from "./index.js";
+import type { VirtualRowsConfig } from "./lib/virtualization/index.js";
+import { virtualizeRows } from "./lib/virtualization/index.js";
+
+type Fields = readonly SchemaFieldDefinition[];
+
+/** Every type the package root re-exports, as one enumerable tuple. */
+type EveryPublicType = [
+  DataViewsActionsProps,
+  DataViewsDataTableProps,
+  DisplayField,
+  DisplayFieldCellProps,
+  DataTableColumn,
+  DataTableProps<Fields>,
+  DataTableVirtualization,
+  DataViewsProps<Fields>,
+  DataViewsFiltersProps,
+  PaginationBarProps<Fields>,
+  DataViewsPaginationProps,
+  DataViewsSearchProps,
+  DataViewsSortPanelProps,
+  UseDataViewsCellResult,
+  UseDataViewsFilterResult<unknown>,
+  UseDataViewsResult<Fields>,
+  DataViewsSavedViewsProps,
+];
+
+/**
+ * The type names an entry-point barrel puts on the surface. Only an
+ * explicit `export type { … } from` line counts: a barrel that re-exported a
+ * domain whole would carry whatever that domain carries, so the walk fails
+ * on one rather than following it.
+ */
+const listTypeSurface = (barrel: string): string[] => {
+  const text = readFileSync(barrel, "utf8");
+  const wildcard = text.match(/^export (?:type )?\* from "[^"]+";/m);
+  if (wildcard !== null) {
+    throw new Error(`${barrel} re-exports a domain whole: ${wildcard[0]}`);
+  }
+  const names: string[] = [];
+  for (const [, list = ""] of text.matchAll(
+    /^export type \{([^}]*)\} from "[^"]+";/gms,
+  )) {
+    for (const entry of list.split(",")) {
+      const name = entry
+        .trim()
+        .split(/\s+as\s+/)
+        .pop();
+      if (name !== undefined && name !== "") {
+        names.push(name);
+      }
+    }
+  }
+  return names;
+};
+
+/** The names this file pins for one entry point, read from its own import. */
+const listPinned = (specifier: string): string[] => {
+  // Resolved from the package root, which is where the suite runs: the
+  // module's own URL is not a file URL in every project this runs under.
+  const text = readFileSync(path.resolve("src/index.types.test.ts"), "utf8");
+  // The type-only import statement, which the pins are read from; a value
+  // import from the same barrel is deliberately kept apart from it.
+  const block = text.match(
+    new RegExp(`import type \\{([^}]*)\\} from "${specifier}";`, "s"),
+  );
+  if (block === null) {
+    throw new Error(`this file must import its pins from ${specifier}`);
+  }
+  return (block[1] ?? "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry !== "");
+};
+
+describe("public surface types", () => {
+  it("re-exports the full type surface from the barrel", () => {
+    // The import above is checked by the compiler, so a name that leaves
+    // the barrel fails to compile. This is the other direction: a name that
+    // *enters* it without a decision, which no type assertion can catch.
+    const surface = [
+      ...new Set(listTypeSurface(path.resolve("src/lib/index.ts"))),
+    ].sort();
+    expect(surface).toEqual(listPinned("\\./index\\.js").sort());
+    // No member of the surface has collapsed to `any`.
+    expectTypeOf<EveryPublicType[number]>().not.toBeAny();
+  });
+
+  it("publishes the root through one line of the package entry", () => {
+    // The entry file is what `.` resolves to; the walk above reads the
+    // barrel behind it, so the entry must hold that barrel and nothing else.
+    const text = readFileSync(path.resolve("src/index.ts"), "utf8");
+    const exports = text.match(/^export .*$/gm) ?? [];
+    expect(exports).toEqual(['export * from "./lib/index.js";']);
+  });
+
+  it("names every entry point in the manifest, and no other", () => {
+    const manifest = JSON.parse(
+      readFileSync(path.resolve("package.json"), "utf8"),
+    ) as {
+      readonly exports: Record<string, unknown>;
+      readonly sideEffects: unknown;
+    };
+    expect(Object.keys(manifest.exports).sort()).toEqual([
+      ".",
+      "./index.css",
+      "./package.json",
+      "./virtualization",
+    ]);
+    expect(manifest.exports["./virtualization"]).toEqual({
+      types: "./dist/types/lib/virtualization/index.d.ts",
+      import: "./dist/esm/lib/virtualization/index.js",
+    });
+    // Only the stylesheets a component imports for its own effect survive
+    // tree-shaking; everything else is pure.
+    expect(manifest.sideEffects).toEqual(["**/*.css"]);
+  });
+
+  it("re-exports the virtualization entry point's types name by name", () => {
+    const surface = listTypeSurface(
+      path.resolve("src/lib/virtualization/index.ts"),
+    );
+    expect(surface).toEqual(listPinned("\\./lib/virtualization/index\\.js"));
+    expectTypeOf<VirtualRowsConfig["estimatedRowHeight"]>().toBeNumber();
+  });
+
+  it("keeps what the parts share among themselves off the root", () => {
+    // The cell context the table installs, the virtualization key it reads and
+    // the row parts a virtualized body reuses are reached by sibling
+    // components through their owner's barrel and by no application.
+    expect(Object.keys(dataviewsReact).sort()).toEqual([
+      "DataTable",
+      "DataViews",
+      "PaginationBar",
+      "useDataViews",
+      "useDataViewsCell",
+      "useDataViewsFilter",
+      "useDataViewsValue",
+    ]);
+  });
+});
+
+describe("the virtualization prop", () => {
+  it("takes the descriptor virtualizeRows makes, and only that", () => {
+    expectTypeOf(
+      virtualizeRows({ estimatedRowHeight: 40 }),
+    ).toEqualTypeOf<DataTableVirtualization>();
+    expectTypeOf<
+      DataTableProps<Fields, RowRecord>["virtualization"]
+    >().toEqualTypeOf<DataTableVirtualization | undefined>();
+    // What a descriptor carries is keyed by a symbol no entry point
+    // exports, so a descriptor has nothing to read and cannot be written
+    // by hand.
+    expectTypeOf<DataTableVirtualization>().not.toHaveProperty(
+      "estimatedRowHeight",
+    );
+    expectTypeOf<{
+      readonly estimatedRowHeight: number;
+    }>().not.toExtend<DataTableVirtualization>();
+    expectTypeOf<VirtualRowsConfig>().toEqualTypeOf<{
+      readonly estimatedRowHeight: number;
+    }>();
+  });
+});
+
+describe("the pagination bar's props", () => {
+  it("requires the provider it pages and derives its contents", () => {
+    expectTypeOf<PaginationBarProps<Fields>>()
+      .toHaveProperty("provider")
+      .not.toBeNullable();
+    expectTypeOf<PaginationBarProps<Fields>>().not.toHaveProperty("children");
+    expectTypeOf<PaginationBarProps<Fields>>().not.toHaveProperty("role");
+    expectTypeOf<PaginationBarProps<Fields>>().not.toHaveProperty("aria-label");
+  });
+
+  it("is the connected part's props with the provider and the messages", () => {
+    // The connected part is the same bar; only where its provider and its
+    // words come from differs — the root supplies both.
+    expectTypeOf<DataViewsPaginationProps>().not.toHaveProperty("provider");
+    expectTypeOf<DataViewsPaginationProps>().not.toHaveProperty("messages");
+    expectTypeOf<
+      Omit<PaginationBarProps<Fields>, "provider" | "messages">
+    >().toEqualTypeOf<DataViewsPaginationProps>();
+  });
+
+  it("takes the words a standalone bar speaks, any of them or all", () => {
+    expectTypeOf<PaginationBarProps<Fields>["messages"]>().toEqualTypeOf<
+      Partial<DataViewsMessages> | undefined
+    >();
+    expectTypeOf<DataViewsProps<Fields>["messages"]>().toEqualTypeOf<
+      Partial<DataViewsMessages> | undefined
+    >();
+  });
+});
+
+describe("the hooks' results", () => {
+  it("type the record and the applied value by the collection they were given", () => {
+    expectTypeOf<
+      UseDataViewsCellResult<{ readonly id: string }>["record"]
+    >().toEqualTypeOf<ReadonlyChannel<{ readonly id: string }>>();
+    expectTypeOf<UseDataViewsFilterResult<number>["applied"]>().toEqualTypeOf<
+      EmptyOr<number>
+    >();
+  });
+
+  it("hand a child the provider's commands and this root's filters, and nothing that starts or resets it", () => {
+    expectTypeOf<UseDataViewsResult<Fields>>().toHaveProperty("filters");
+    expectTypeOf<UseDataViewsResult<Fields>>().toHaveProperty("runAction");
+    // The presentation reaches every child: the settings part will edit it.
+    expectTypeOf<UseDataViewsResult<Fields>>().toHaveProperty("presentation");
+    expectTypeOf<UseDataViewsResult<Fields>>().not.toHaveProperty("observe");
+    expectTypeOf<UseDataViewsResult<Fields>>().not.toHaveProperty("reset");
+  });
+});
+
+describe("connected part props", () => {
+  it("keeps the connected table's provider out of its props", () => {
+    // The root supplies it; the records are the widest shape, narrowed by a
+    // custom cell through `useDataViewsCell(collection)`.
+    expectTypeOf<DataViewsDataTableProps>().not.toHaveProperty("provider");
+    // Nor its words: the root supplies those too.
+    expectTypeOf<DataViewsDataTableProps>().not.toHaveProperty("messages");
+    expectTypeOf<DataTableProps<Fields>["messages"]>().toEqualTypeOf<
+      Partial<DataViewsMessages> | undefined
+    >();
+    expectTypeOf<DataViewsDataTableProps>().toHaveProperty("columns");
+    // The presentation is the one authority for the arrangement: no
+    // layout record is passed, and a column may declare `hideable`.
+    expectTypeOf<DataTableProps<Fields>>().not.toHaveProperty("layout");
+    expectTypeOf<DataTableColumn>()
+      .toHaveProperty("hideable")
+      .toEqualTypeOf<boolean | undefined>();
+    // The settings cell is filled by one named prop, never by children, and
+    // what fills it takes no props: the table supplies everything it reads.
+    expectTypeOf<DataTableProps<Fields>>()
+      .toHaveProperty("settings")
+      .toEqualTypeOf<ReactElement | undefined>();
+    expectTypeOf<DataTableProps<Fields>>().not.toHaveProperty("children");
+    expectTypeOf(dataviewsReact.DataViews.Settings).parameters.toEqualTypeOf<
+      []
+    >();
+    expectTypeOf<
+      Omit<DataTableProps<Fields, RowRecord>, "provider" | "messages">
+    >().toEqualTypeOf<DataViewsDataTableProps>();
+  });
+
+  it("keeps what Filters derives out of its props", () => {
+    // Its controls come from the provider, its name from its legend, and
+    // the form's method and submission are the baseline's.
+    expectTypeOf<DataViewsFiltersProps>().not.toHaveProperty("children");
+    expectTypeOf<DataViewsFiltersProps>().not.toHaveProperty("method");
+    expectTypeOf<DataViewsFiltersProps>().not.toHaveProperty("onSubmit");
+    expectTypeOf<DataViewsFiltersProps>().not.toHaveProperty("aria-label");
+    expectTypeOf<DataViewsFiltersProps>().not.toHaveProperty("aria-labelledby");
+    expectTypeOf<DataViewsFiltersProps>().toHaveProperty("action");
+  });
+
+  it("keeps what Search derives out of its props", () => {
+    // The props are the search input's; what binds it to the applied
+    // search and to its form is the part's.
+    expectTypeOf<DataViewsSearchProps>().not.toHaveProperty("type");
+    expectTypeOf<DataViewsSearchProps>().not.toHaveProperty("name");
+    expectTypeOf<DataViewsSearchProps>().not.toHaveProperty("value");
+    expectTypeOf<DataViewsSearchProps>().not.toHaveProperty("defaultValue");
+    expectTypeOf<DataViewsSearchProps>().not.toHaveProperty("onChange");
+    expectTypeOf<DataViewsSearchProps>().not.toHaveProperty("form");
+    expectTypeOf<DataViewsSearchProps>().not.toHaveProperty("aria-label");
+    expectTypeOf<DataViewsSearchProps>().toHaveProperty("placeholder");
+    expectTypeOf<DataViewsSearchProps>().toHaveProperty("label");
+  });
+
+  it("keeps what Pagination derives out of its props", () => {
+    expectTypeOf<DataViewsPaginationProps>().not.toHaveProperty("children");
+    expectTypeOf<DataViewsPaginationProps>().not.toHaveProperty("role");
+    expectTypeOf<DataViewsPaginationProps>().not.toHaveProperty("aria-label");
+    expectTypeOf<DataViewsPaginationProps>().not.toHaveProperty(
+      "aria-labelledby",
+    );
+    expectTypeOf<DataViewsPaginationProps>().toHaveProperty("id");
+  });
+
+  it("keeps what Actions derives out of its props", () => {
+    // Its name comes from its label and the group role is its own; its
+    // children are the caller's actions.
+    expectTypeOf<DataViewsActionsProps>().not.toHaveProperty("role");
+    expectTypeOf<DataViewsActionsProps>().not.toHaveProperty("aria-label");
+    expectTypeOf<DataViewsActionsProps>().not.toHaveProperty("aria-labelledby");
+    expectTypeOf<DataViewsActionsProps>().not.toHaveProperty("selection");
+    // The bar holds its root to hand the focus back; the caller's own ref
+    // is merged with that, never dropped.
+    expectTypeOf<DataViewsActionsProps>().toHaveProperty("ref");
+    expectTypeOf<DataViewsActionsProps>().toHaveProperty("children");
+  });
+});

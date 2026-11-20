@@ -4,260 +4,97 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Creating Custom Fields
 
-This guide covers how to create custom field components for use with the `Field` component's `inputType="custom"` option.
+`Field` renders a custom component directly, passing its props except `inputType` and `CustomComponent`; React also consumes `key`. It does not add form binding, labels, errors, conditional display, middleware, or unmount handling to a custom component. Implement the capabilities your field needs. `withWrapper` and its wrapper hooks are internal and are not package exports.
 
-## When to create custom fields
-
-Use a custom field when the built-in input types don't cover your use case:
-
-- Specialized inputs (color pickers, date ranges, rich text editors)
-- Complex composite inputs (address fields, phone with country code)
-- Third-party component integration
-
-For simple variations of existing inputs, consider middleware instead.
-
-## Type requirements
-
-Custom fields must satisfy the `InputProps` type:
-
-```typescript
-import type { InputProps } from "@canonical/react-ds-global-form";
-
-type MyFieldProps = InputProps<{
-  // Your additional props here
-  myCustomProp?: string;
-}>;
-```
-
-The base `InputProps` includes:
-
-<table>
-  <thead>
-    <tr>
-      <th>Prop</th>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td><code>name</code></td><td><code>string</code></td><td>Field name for form registration</td></tr>
-    <tr><td><code>registerProps</code></td><td><code>RegisterOptions</code></td><td>react-hook-form registration options</td></tr>
-    <tr><td><code>aria-labelledby</code></td><td><code>string</code></td><td>ID of label element</td></tr>
-    <tr><td><code>aria-describedby</code></td><td><code>string</code></td><td>ID of description element</td></tr>
-    <tr><td><code>aria-errormessage</code></td><td><code>string</code></td><td>ID of error message element</td></tr>
-    <tr><td><code>aria-invalid</code></td><td><code>boolean</code></td><td>Whether field has validation error</td></tr>
-  </tbody>
-</table>
-
-## The withWrapper HOC
-
-All custom fields must be wrapped with `withWrapper`. This HOC provides:
-
-- Form registration via react-hook-form
-- Label and description rendering
-- Error message display
-- ARIA attribute injection for accessibility
-- Middleware composition support
-
-Without `withWrapper`, your field won't integrate with the form system.
-
-## Step-by-step example
-
-Here's how to create a custom color picker field:
-
-### 1. Define the props type
-
-```typescript
-import type { InputProps } from "@canonical/react-ds-global-form";
-
-type ColorPickerProps = InputProps<{
-  swatches?: string[];
-  showHexInput?: boolean;
-}>;
-```
-
-### 2. Create the component
-
-Use [`useFormContext`](https://react-hook-form.com/docs/useformcontext) from react-hook-form to register the field:
-
-```typescript
-import { useFormContext } from "react-hook-form";
-
-const ColorPickerInput = ({
-  name,
-  registerProps,
-  swatches = ["#ff0000", "#00ff00", "#0000ff"],
-  showHexInput = true,
-  "aria-labelledby": ariaLabelledby,
-  "aria-describedby": ariaDescribedby,
-  "aria-errormessage": ariaErrormessage,
-  "aria-invalid": ariaInvalid,
-  ...props
-}: ColorPickerProps) => {
-  const { register, watch, setValue } = useFormContext();
-  const currentValue = watch(name);
-
-  return (
-    <div className="color-picker">
-      <div className="swatches">
-        {swatches.map((color) => (
-          <button
-            key={color}
-            type="button"
-            className={currentValue === color ? "selected" : ""}
-            style={{ backgroundColor: color }}
-            onClick={() => setValue(name, color)}
-            aria-label={`Select ${color}`}
-          />
-        ))}
-      </div>
-      {showHexInput && (
-        <input
-          type="text"
-          placeholder="#000000"
-          aria-labelledby={ariaLabelledby}
-          aria-describedby={ariaDescribedby}
-          aria-errormessage={ariaErrormessage}
-          aria-invalid={ariaInvalid}
-          {...register(name, registerProps)}
-        />
-      )}
-    </div>
-  );
-};
-```
-
-### 3. Wrap with withWrapper
-
-```typescript
-import { withWrapper } from "@canonical/react-ds-global-form";
-
-export const ColorPicker = withWrapper<ColorPickerProps>(ColorPickerInput);
-```
-
-### 4. Use with Field
+For example, this component registers a custom input using the `Form` provider and supplies its own label and validation message:
 
 ```tsx
-import { Field } from "@canonical/react-ds-global-form";
-import { ColorPicker } from "./ColorPicker";
-
-<Field
-  name="brandColor"
-  inputType="custom"
-  CustomComponent={ColorPicker}
-  label="Brand Color"
-  description="Choose your primary brand color"
-  swatches={["#E95420", "#0066CC", "#333333"]}
-/>
-```
-
-## Complete example
-
-```typescript
-// ColorPicker.tsx
+import { Field, Form, type InputProps } from "@canonical/react-ds-global-form";
 import { useFormContext } from "react-hook-form";
-import { withWrapper } from "@canonical/react-ds-global-form";
-import type { InputProps } from "@canonical/react-ds-global-form";
 
-type ColorPickerProps = InputProps<{
-  swatches?: string[];
-  showHexInput?: boolean;
-}>;
+type CodeProps = InputProps<{ label: string; maxCharacters: number }>;
 
-const ColorPickerInput = ({
-  name,
-  registerProps,
-  swatches = ["#ff0000", "#00ff00", "#0000ff"],
-  showHexInput = true,
-  "aria-labelledby": ariaLabelledby,
-  "aria-describedby": ariaDescribedby,
-  "aria-errormessage": ariaErrormessage,
-  "aria-invalid": ariaInvalid,
-}: ColorPickerProps) => {
-  const { register, watch, setValue } = useFormContext();
-  const currentValue = watch(name);
-
-  const handleSwatchClick = (color: string) => {
-    setValue(name, color, { shouldValidate: true });
-  };
-
+function CodeField({ name, label, maxCharacters, registerProps }: CodeProps) {
+  const { register, getFieldState, formState } = useFormContext();
+  const { error } = getFieldState(name, formState);
+  const errorId = `${name}-error`;
   return (
-    <div className="color-picker">
-      <div className="swatches" role="listbox" aria-labelledby={ariaLabelledby}>
-        {swatches.map((color) => (
-          <button
-            key={color}
-            type="button"
-            role="option"
-            aria-selected={currentValue === color}
-            className={currentValue === color ? "selected" : ""}
-            style={{ backgroundColor: color }}
-            onClick={() => handleSwatchClick(color)}
-            aria-label={`Select color ${color}`}
-          />
-        ))}
-      </div>
-      {showHexInput && (
-        <input
-          type="text"
-          pattern="^#[0-9A-Fa-f]{6}$"
-          placeholder="#000000"
-          aria-labelledby={ariaLabelledby}
-          aria-describedby={ariaDescribedby}
-          aria-errormessage={ariaErrormessage}
-          aria-invalid={ariaInvalid}
-          {...register(name, {
-            ...registerProps,
-            pattern: {
-              value: /^#[0-9A-Fa-f]{6}$/,
-              message: "Enter a valid hex color (e.g., #E95420)",
-            },
-          })}
-        />
-      )}
+    <div>
+      <label htmlFor={name}>{label}</label>
+      <input
+        id={name}
+        maxLength={maxCharacters}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
+        {...register(name, registerProps)}
+      />
+      {error && <p id={errorId} role="alert">{error.message}</p>}
     </div>
   );
-};
+}
 
-export const ColorPicker = withWrapper<ColorPickerProps>(ColorPickerInput);
-```
-
-## Wrapper options
-
-The `withWrapper` function accepts optional configuration:
-
-```typescript
-export default withWrapper<MyFieldProps>(MyField, {
-  mockLabel: true, // Use <legend> instead of <label> (for fieldsets)
-});
-```
-
-## Controlled vs uncontrolled
-
-The examples above use react-hook-form's uncontrolled approach with [`register`](https://react-hook-form.com/docs/useform/register). For controlled components (like third-party libraries that require a `value` prop), use the [`Controller`](https://react-hook-form.com/docs/usecontroller/controller) component:
-
-```typescript
-import { Controller, useFormContext } from "react-hook-form";
-
-const ControlledInput = ({ name, registerProps, ...props }: MyFieldProps) => {
-  const { control } = useFormContext();
-
+function Example() {
   return (
-    <Controller
-      name={name}
-      control={control}
-      rules={registerProps}
-      render={({ field }) => (
-        <ThirdPartyInput
-          value={field.value}
-          onChange={field.onChange}
-          onBlur={field.onBlur}
-          {...props}
-        />
-      )}
-    />
+    <Form onSubmit={(values) => console.log(values)}>
+      <Field inputType="custom" CustomComponent={CodeField} name="code"
+        label="Code" maxCharacters={8} registerProps={{ required: "Enter a code" }} />
+      <button type="submit">Submit</button>
+    </Form>
   );
-};
-
-export const MyField = withWrapper<MyFieldProps>(ControlledInput);
+}
 ```
+
+The component's props are inferred in JSX: required custom props and their types are checked. `inputType`, `CustomComponent`, and React's `key` are reserved and cannot be custom component props. For a typed field map, supply the custom component's props to `FieldProps`:
+
+```tsx
+import type { FieldProps } from "@canonical/react-ds-global-form";
+
+const fields = [
+  { inputType: "text", name: "title", label: "Title" },
+  { inputType: "custom", CustomComponent: CodeField, name: "code", label: "Code", maxCharacters: 8 },
+] satisfies FieldProps<CodeProps>[];
+
+fields.map((field) => <Field key={field.name} {...field} />);
+```
+
+For a map with different custom components, use a separate discriminant to preserve each component/props pair. For example, alongside `CodeField` above:
+
+```tsx
+type PrefixProps = InputProps<{ label: string; prefix: string }>;
+
+function PrefixField({ name, label, prefix }: PrefixProps) {
+  const { register } = useFormContext();
+  return (
+    <label>
+      {label}
+      <input placeholder={prefix} {...register(name)} />
+    </label>
+  );
+}
+
+type Definition =
+  | { kind: "builtin"; field: Exclude<FieldProps, { inputType: "custom" }> }
+  | { kind: "code"; field: Extract<FieldProps<CodeProps>, { inputType: "custom" }> }
+  | { kind: "prefix"; field: Extract<FieldProps<PrefixProps>, { inputType: "custom" }> };
+
+const definitions: Definition[] = [
+  { kind: "builtin", field: { inputType: "text", name: "title", label: "Title" } },
+  { kind: "code", field: { inputType: "custom", CustomComponent: CodeField, name: "code", label: "Code", maxCharacters: 8 } },
+  { kind: "prefix", field: { inputType: "custom", CustomComponent: PrefixField, name: "prefix", label: "Prefix", prefix: "Example" } },
+];
+
+function MappedField({ definition }: { definition: Definition }) {
+  switch (definition.kind) {
+    case "builtin": return <Field {...definition.field} />;
+    case "code": return <Field {...definition.field} />;
+    case "prefix": return <Field {...definition.field} />;
+  }
+}
+
+// Render inside a Form:
+definitions.map((definition) => <MappedField key={definition.field.name} definition={definition} />);
+```
+
+`inputType` alone cannot distinguish different custom variants, and spreading their heterogeneous union into `Field` does not infer a single matching props type. `FieldProps` without a type argument accepts custom components that can be rendered with a `name` string. Field names are strings, not paths inferred from the form's model.
+
+For controlled third-party inputs use react-hook-form's `useController` or `Controller` inside the custom component, supplying its value, change and blur handlers. Forward accessibility attributes to the focusable control and provide suitable labels and error relationships.

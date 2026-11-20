@@ -3,7 +3,7 @@
 import type { ExampleControlField } from "../ui/index.js";
 import * as transformers from "./transformers.js";
 
-export const FONT_FAMILY_FIELD: ExampleControlField = {
+export const FONT_FAMILY_FIELD = {
   name: "--font-family",
   label: "Font family",
   inputType: "select",
@@ -13,7 +13,7 @@ export const FONT_FAMILY_FIELD: ExampleControlField = {
     { value: "Times New Roman", label: "Times New Roman" },
     { value: "Ubuntu variable", label: "Ubuntu" },
   ],
-};
+} satisfies ExampleControlField;
 
 export const FONT_SIZE_FIELD: ExampleControlField = {
   name: "--font-size",

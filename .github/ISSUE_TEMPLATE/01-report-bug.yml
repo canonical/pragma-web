@@ -1,0 +1,86 @@
+name: Report a bug
+description: Something in Pragma is broken, looks wrong or does not work as expected.
+labels:
+  - "Type: bug"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form when something does not match its design, documentation or tokens.
+
+        - It works as designed but should work differently: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+        - Only the documentation is wrong: [propose a documentation change](https://github.com/canonical/pragma-web/issues/new?template=04-propose-docs-change.yml).
+        - Not sure the problem is in Pragma: [ask for support](https://github.com/canonical/pragma-web/issues/new?template=08-ask-support.yml).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of bug
+      options:
+        - Design (looks wrong)
+        - Code (behaves wrong)
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Where you saw it
+      description: A link to the page, product, Storybook story or design file where the bug appears. Used to locate the bug without knowing which package it comes from.
+      placeholder: https://…
+    validations:
+      required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package and version (optional)
+      description: If known. Used to check whether the bug is already fixed in a later release. Leave empty if unsure.
+      placeholder: "@canonical/react-ds-global 0.12.0"
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      placeholder: Button
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should happen, or what it should look like. Used to distinguish a bug from intended behaviour.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Used to reproduce the bug and to verify the fix. If the bug is in the code rather than in use (for example a stylesheet referencing a token that does not exist), point at the file or line instead.
+      placeholder: |
+        1. Render …
+        2. Click …
+  - type: textarea
+    id: references
+    attributes:
+      label: References (optional)
+      description: For example screenshots, a design file, a documentation page, a working example or a reproduction (CodeSandbox, StackBlitz, a branch).
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and viewport
+      placeholder: Firefox 140, 375×812
+  - type: checkboxes
+    id: a11y
+    attributes:
+      label: Accessibility
+      options:
+        - label: This bug affects accessibility.
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Triage usually replies within a week. Updates are posted on this issue.

@@ -1,0 +1,16 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * The refused clauses of a followed link: each reason, then its Clear.
+   * The list keeps its markers, so it stays a list wherever it is read.
+   */
+  .ds.data-views-filters-link-refusals {
+    & > .list > li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--dimension-100);
+    }
+  }
+}

@@ -288,7 +288,7 @@ export const SideLayout: Story = {
 
 type TemplateProps = {
   fieldMap: FieldProps[];
-  otherProps?: Partial<FieldProps>;
+  otherProps?: { disabled?: boolean; isOptional?: boolean };
 };
 
 const FixtureTemplate: StoryFn<TemplateProps> = ({

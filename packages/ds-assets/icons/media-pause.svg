@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="media-pause">
+    <path d="M5.5 14H4V2H5.5V14Z" fill="currentColor"/>
+    <path d="M12 14H10.5V2H12V14Z" fill="currentColor"/>
+  </g>
+</svg>

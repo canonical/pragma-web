@@ -12,19 +12,27 @@ Launchpad is Canonical's software collaboration platform — these components un
 <PackageInfo
   name="@canonical/react-ds-app-launchpad"
   version="0.11.0"
-  tier="apps_wpe"
+  tier="apps_launchpad"
   framework="react"
   status="prerelease"
-  dependencies={["@canonical/ds-utils", "@canonical/styles", "highlight.js", "react-markdown", "react-tooltip"]}
+  dependencies={[
+    "@canonical/ds-utils",
+    "@canonical/styles",
+    "highlight.js",
+    "react-markdown",
+    "react-tooltip",
+  ]}
   links={{
-    source: "https://github.com/canonical/pragma-web/tree/main/packages/react/ds-app-launchpad",
-    ontology: "https://github.com/canonical/pragma-core/tree/main/packages/semantics/design-system",
+    source:
+      "https://github.com/canonical/pragma-web/tree/main/packages/react/ds-app-launchpad",
+    ontology:
+      "https://github.com/canonical/pragma-core/tree/main/packages/semantics/design-system",
   }}
 />
 
 ## Architecture
 
-The WPE (Web & Platform Engineering) tier extends Apps with product-specific functionality. Components here are highly specialized and may not be suitable for use outside the Launchpad ecosystem.
+The Launchpad tier extends Apps with product-specific functionality. Components here are highly specialized and may not be suitable for use outside the Launchpad ecosystem.
 
 ```
 @canonical/react-ds-global (dependency)
@@ -47,12 +55,36 @@ Launchpad Application
     </tr>
   </thead>
   <tbody>
-    <tr><td>DiffChangeMarker</td><td>Line-level diff annotations</td><td>C</td></tr>
-    <tr><td>EditableBlock</td><td>Inline editable content regions</td><td>C</td></tr>
-    <tr><td>FileTree</td><td>Hierarchical file browser</td><td>B</td></tr>
-    <tr><td>GitDiffViewer</td><td>Side-by-side and unified diff display</td><td>B</td></tr>
-    <tr><td>MarkdownEditor</td><td>Rich markdown editing with preview</td><td>C</td></tr>
-    <tr><td>RelativeTime</td><td>Human-readable time distances</td><td>B</td></tr>
+    <tr>
+      <td>DiffChangeMarker</td>
+      <td>Line-level diff annotations</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <td>EditableBlock</td>
+      <td>Inline editable content regions</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <td>FileTree</td>
+      <td>Hierarchical file browser</td>
+      <td>B</td>
+    </tr>
+    <tr>
+      <td>GitDiffViewer</td>
+      <td>Side-by-side and unified diff display</td>
+      <td>B</td>
+    </tr>
+    <tr>
+      <td>MarkdownEditor</td>
+      <td>Rich markdown editing with preview</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <td>RelativeTime</td>
+      <td>Human-readable time distances</td>
+      <td>B</td>
+    </tr>
   </tbody>
 </table>
 
@@ -68,10 +100,22 @@ Components understand Launchpad concepts:
     </tr>
   </thead>
   <tbody>
-    <tr><td>Code hosting</td><td>Branches, diffs, file hierarchies</td></tr>
-    <tr><td>Bug tracking</td><td>Status indicators, importance levels</td></tr>
-    <tr><td>Collaboration</td><td>Comments, merge proposals</td></tr>
-    <tr><td>Time</td><td>Relative timestamps, activity feeds</td></tr>
+    <tr>
+      <td>Code hosting</td>
+      <td>Branches, diffs, file hierarchies</td>
+    </tr>
+    <tr>
+      <td>Bug tracking</td>
+      <td>Status indicators, importance levels</td>
+    </tr>
+    <tr>
+      <td>Collaboration</td>
+      <td>Comments, merge proposals</td>
+    </tr>
+    <tr>
+      <td>Time</td>
+      <td>Relative timestamps, activity feeds</td>
+    </tr>
   </tbody>
 </table>
 
@@ -86,7 +130,7 @@ import { FileTree } from "@canonical/react-ds-app-launchpad";
   data={directoryStructure}
   onSelect={handleFileSelect}
   expandedPaths={["src", "src/components"]}
-/>
+/>;
 ```
 
 ## GitDiffViewer
@@ -96,11 +140,7 @@ Display code changes with syntax highlighting:
 ```tsx
 import { GitDiffViewer } from "@canonical/react-ds-app-launchpad";
 
-<GitDiffViewer
-  diff={unifiedDiff}
-  mode="split"
-  language="typescript"
-/>
+<GitDiffViewer diff={unifiedDiff} mode="split" language="typescript" />;
 ```
 
 ## Installation

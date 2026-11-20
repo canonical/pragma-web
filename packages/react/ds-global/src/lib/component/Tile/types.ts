@@ -1,15 +1,14 @@
-import type { ComponentProps, ReactElement } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 import type { ContentProps } from "./common/Content/types.js";
 import type { HeaderProps } from "./common/Header/types.js";
 
 type OwnProps = {
   /**
-   * Tile.Header and Tile.Content elements
-   * DOM order: Header first, Content second (per DSL edges)
+   * Tile.Header and Tile.Content elements, Header first. Typed as `ReactNode`
+   * so conditional children (`{cond && <Tile.Header />}`) and fragments are
+   * accepted; the Tile renders them as given.
    */
-  children:
-    | ReactElement<HeaderProps | ContentProps>
-    | ReactElement<HeaderProps | ContentProps>[];
+  children: ReactNode;
 };
 
 /**

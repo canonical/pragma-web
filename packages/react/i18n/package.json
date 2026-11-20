@@ -1,7 +1,7 @@
 {
   "name": "@canonical/i18n-react",
-  "description": "React bindings for @canonical/i18n-core: I18nProvider and the useTranslation, useLocale, and useFormatters hooks.",
-  "version": "0.45.0",
+  "description": "React bindings for @canonical/i18n-core: I18nProvider and the useLocalized, useLocale, useFormatters and useTranslation hooks.",
+  "version": "0.47.0",
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -31,6 +31,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "build:all": "bun run build",
@@ -45,15 +48,15 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@canonical/i18n-core": "^0.45.0",
+    "@canonical/i18n-core": "^0.47.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@canonical/biome-config": "0.43.0",
-    "@canonical/typescript-config-react": "^0.45.0",
-    "@canonical/webarchitect": "0.44.0",
+    "@biomejs/biome": "2.6.8",
+    "@canonical/biome-config": "0.46.0",
+    "@canonical/typescript-config-react": "^0.47.0",
+    "@canonical/webarchitect": "0.46.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.0.0",
@@ -61,7 +64,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/coverage-v8": "^5.0.0",
-    "jsdom": "^28.1.0",
+    "jsdom": "^31.0.0",
     "typescript": "^7.0.2",
     "vite": "^8.0.1",
     "vitest": "^5.0.0"

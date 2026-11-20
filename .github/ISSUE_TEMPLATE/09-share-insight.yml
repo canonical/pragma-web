@@ -1,0 +1,45 @@
+name: Share an insight
+description: Share an observation about how Pragma is used, without asking for a specific change.
+labels:
+  - "Type: insight"
+  - "Status: needs triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search the [open issues](https://github.com/canonical/pragma-web/issues) first. Issues are public: do not include confidential information.
+
+        Use this form to share an observation without requesting a specific change.
+
+        - You know what should change: [propose a change](https://github.com/canonical/pragma-web/issues/new?template=03-propose-change.yml).
+  - type: textarea
+    id: observation
+    attributes:
+      label: What you observed
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Where it came from
+      description: Used to assess how representative it is, and who to contact for detail.
+      placeholder: User research, a support thread, a product team …
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links, screenshots or quotes.
+  - type: textarea
+    id: reach
+    attributes:
+      label: Who is affected, and how often
+  - type: textarea
+    id: direction
+    attributes:
+      label: Suggested direction (optional)
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next:** Insights are read at triage and may not get a direct reply. They are closed once taken into account.

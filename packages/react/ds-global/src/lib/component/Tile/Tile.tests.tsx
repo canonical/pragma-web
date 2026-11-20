@@ -77,4 +77,19 @@ describe("Tile", () => {
     expect(children[0]).toHaveClass("tile-header");
     expect(children[1]).toHaveClass("tile-content");
   });
+
+  it("accepts conditional children and fragments", () => {
+    const showHeader: boolean = false;
+    render(
+      <Tile data-testid="tile">
+        {showHeader && <Tile.Header>Header</Tile.Header>}
+        <>
+          <Tile.Content>Content</Tile.Content>
+        </>
+      </Tile>,
+    );
+    const tile = screen.getByTestId("tile");
+    expect(tile.children).toHaveLength(1);
+    expect(tile.children[0]).toHaveClass("tile-content");
+  });
 });

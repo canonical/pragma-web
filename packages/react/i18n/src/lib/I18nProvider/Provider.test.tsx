@@ -1,25 +1,14 @@
-import {
-  createLocaleSource,
-  type I18nConfig,
-  type Locale,
-  type Messages,
-} from "@canonical/i18n-core";
+import { createLocaleSource, type Locale } from "@canonical/i18n-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import useLocale from "../hooks/useLocale.js";
-import useTranslation from "../hooks/useTranslation.js";
+import { memo } from "react";
+import { afterEach, describe, expect, it } from "vitest";
+import {
+  greetingCatalogs as catalogs,
+  localeConfig as config,
+  effectsOff,
+} from "../../../testing/fixtures.js";
+import { useLocale, useTranslation } from "../hooks/index.js";
 import I18nProvider from "./Provider.js";
-
-const config: I18nConfig = {
-  locales: ["en", "fr", "ar"],
-  defaultLocale: "en",
-  rtlLocales: ["ar"],
-};
-
-const catalogs: Record<Locale, Messages> = {
-  en: { greeting: "Hello, {name}!" },
-  fr: { greeting: "Bonjour, {name} !" },
-};
 
 function Greeting(): React.ReactElement {
   const { t } = useTranslation();
@@ -41,6 +30,15 @@ function SwitchTo({ locale }: { locale: Locale }): React.ReactElement {
 }
 
 describe("I18nProvider", () => {
+  afterEach(() => {
+    document.documentElement.lang = "";
+    document.documentElement.dir = "";
+  });
+
+  it("shows as I18nProvider in React DevTools and component stacks", () => {
+    expect(I18nProvider.displayName).toBe("I18nProvider");
+  });
+
   it("renders translated content for the default locale", () => {
     render(
       <I18nProvider config={config} catalogs={catalogs}>
@@ -61,9 +59,8 @@ describe("I18nProvider", () => {
 
   it("binds to an external locale source when provided", () => {
     const source = createLocaleSource(config, {
+      ...effectsOff,
       initial: "fr",
-      persist: false,
-      reflect: false,
     });
     render(
       <I18nProvider config={config} catalogs={catalogs} source={source}>
@@ -73,30 +70,73 @@ describe("I18nProvider", () => {
     expect(screen.getByText("fr")).toBeTruthy();
   });
 
+  it("leaves the document as an external source reflected it", () => {
+    const source = createLocaleSource(config, {
+      initial: "ar",
+      persist: false,
+    });
+    expect(document.documentElement.lang).toBe("ar");
+    render(
+      <I18nProvider config={config} catalogs={catalogs} source={source}>
+        <ShowLocale />
+      </I18nProvider>,
+    );
+    expect(document.documentElement.lang).toBe("ar");
+    expect(document.documentElement.dir).toBe("rtl");
+  });
+
   it("keeps a runtime locale switch across provider re-renders", () => {
-    const ui = (locale: Locale): React.ReactElement => (
+    const buildApp = (locale: Locale): React.ReactElement => (
       <I18nProvider config={config} catalogs={catalogs} locale={locale}>
         <Greeting />
         <ShowLocale />
         <SwitchTo locale="fr" />
       </I18nProvider>
     );
-    const { rerender } = render(ui("en"));
+    const { rerender } = render(buildApp("en"));
     fireEvent.click(screen.getByText("switch-fr"));
     expect(screen.getByText("Bonjour, Ada !")).toBeTruthy();
 
     // A parent re-render — even one passing a different `locale` prop — must
     // not clobber the runtime choice: the prop is the SSR-negotiated initial.
-    rerender(ui("ar"));
+    rerender(buildApp("ar"));
     expect(screen.getByText("fr")).toBeTruthy();
     expect(screen.getByText("Bonjour, Ada !")).toBeTruthy();
   });
 
+  it("needs no catalogs", () => {
+    render(
+      <I18nProvider config={config} locale="fr">
+        <ShowLocale />
+      </I18nProvider>,
+    );
+    expect(screen.getByText("fr")).toBeTruthy();
+  });
+
+  it("keeps the context value stable across re-renders without catalogs", () => {
+    let renders = 0;
+    const Reader = memo(function Reader(): React.ReactElement {
+      const { locale } = useLocale();
+      renders += 1;
+      return <span>{locale}</span>;
+    });
+    const { rerender } = render(
+      <I18nProvider config={config}>
+        <Reader />
+      </I18nProvider>,
+    );
+    rerender(
+      <I18nProvider config={config}>
+        <Reader />
+      </I18nProvider>,
+    );
+    expect(renders).toBe(1);
+  });
+
   it("propagates a shared external source switch to every provider tree", () => {
     const source = createLocaleSource(config, {
+      ...effectsOff,
       initial: "en",
-      persist: false,
-      reflect: false,
     });
     render(
       <>

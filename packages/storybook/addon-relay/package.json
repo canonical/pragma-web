@@ -1,6 +1,6 @@
 {
   "name": "@canonical/storybook-addon-relay",
-  "version": "0.45.0",
+  "version": "0.47.0",
   "type": "module",
   "files": [
     "dist"
@@ -63,10 +63,10 @@
     "relay-test-utils": "^21.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@canonical/biome-config": "0.43.0",
-    "@canonical/typescript-config-react": "^0.45.0",
-    "@canonical/webarchitect": "0.44.0",
+    "@biomejs/biome": "2.6.8",
+    "@canonical/biome-config": "0.46.0",
+    "@canonical/typescript-config-react": "^0.47.0",
+    "@canonical/webarchitect": "0.46.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.0.0",
     "@types/react": "^19.2.14",
@@ -76,7 +76,7 @@
     "@types/relay-test-utils": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/coverage-v8": "^5.0.0",
-    "jsdom": "^28.1.0",
+    "jsdom": "^31.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-relay": "^21.0.1",

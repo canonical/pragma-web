@@ -106,7 +106,7 @@ When adding a new Storybook-enabled package, assign it to the pool matching its 
 | App packages | 6008 | `@canonical/react-ds-app-portal` | `packages/react/ds-app-portal` |
 | App packages | 6008 | `@canonical/svelte-ds-app` | `packages/svelte/ds-app` |
 | App packages | 6008 | `@canonical/svelte-ds-app-launchpad` | `packages/svelte/ds-app-launchpad` |
-| App packages | 6008 | `@canonical/svelte-ds-app-wpe` | `packages/svelte/ds-app-wpe` |
+| App packages | 6008 | `@canonical/svelte-ds-app-workplace` | `packages/svelte/ds-app-workplace` |
 | Apps | 6009 | `@canonical/react-boilerplate-vite` | `apps/react/boilerplate-vite` |
 | Apps | 6009 | `@canonical/ds-demo-site` | `apps/react/demo` |
 | Apps | 6009 | `@canonical/react-tokens` | `packages/react/tokens` |
@@ -256,7 +256,7 @@ The following tables list all workspace packages with their location and purpose
 | `@canonical/ssr-adapter-vercel` | `packages/react/ssr-adapter-vercel` | Vercel deployment adapter for `@canonical/react-ssr` (**internal**) |
 | `@canonical/react-head` | `packages/react/head` | Declarative head management for React that renders head tags on the server and the client |
 | `@canonical/react-hooks` | `packages/react/hooks` | Shared React hooks: preferences, navigation tree |
-| `@canonical/i18n-react` | `packages/react/i18n` | React bindings for `@canonical/i18n-core`: I18nProvider plus useTranslation, useLocale, and useFormatters hooks |
+| `@canonical/i18n-react` | `packages/react/i18n` | React bindings for `@canonical/i18n-core`: I18nProvider plus the useLocalized, useLocale, useFormatters and (deprecated) useTranslation hooks |
 | `@canonical/router-react` | `packages/react/router` | React bindings for `@canonical/router-core` |
 | `@canonical/react-tokens` | `packages/react/tokens` | Token explorer components (TokenTable, TokenSwatch) for browsing design tokens in Storybook |
 
@@ -267,7 +267,7 @@ The following tables list all workspace packages with their location and purpose
 | `@canonical/svelte-ds-global` | `packages/svelte/ds-global` | Global components for Svelte 5 |
 | `@canonical/svelte-ds-app` | `packages/svelte/ds-app` | App components for Svelte 5 |
 | `@canonical/svelte-ds-app-launchpad` | `packages/svelte/ds-app-launchpad` | Launchpad-specific Svelte components |
-| `@canonical/svelte-ds-app-wpe` | `packages/svelte/ds-app-wpe` | WPE-specific Svelte components |
+| `@canonical/svelte-ds-app-workplace` | `packages/svelte/ds-app-workplace` | Workplace-specific Svelte components |
 | `@canonical/svelte-ssr-test` | `packages/svelte/ssr-test` | Test package for Svelte SSR testing |
 
 ### Web Components

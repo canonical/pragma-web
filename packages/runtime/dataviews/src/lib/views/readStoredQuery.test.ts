@@ -1,0 +1,55 @@
+import { describe, expect, it } from "vitest";
+import buildStoredView from "../../../testing/buildStoredView.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
+import { createCollection } from "../collection/index.js";
+import readStoredQuery from "./readStoredQuery.js";
+import type { SavedView } from "./types.js";
+
+const collection = createCollection({
+  fields: [
+    { field: "status", kind: "choices", options: ["failed", "running"] },
+  ],
+  identify: readId,
+});
+
+const host = {
+  schema: collection.schema,
+  capabilities: declare({ filter: { status: ["isAny"] } }),
+};
+
+const buildStored = (query: string): SavedView => buildStoredView({ query });
+
+describe("readStoredQuery", () => {
+  it("reads a stored query as the collection's slice", () => {
+    const { slice, issues } = readStoredQuery(
+      buildStored("status=failed"),
+      host,
+    );
+    expect(slice.filter).toEqual([
+      { field: "status", operator: "isAny", operands: ["failed"] },
+    ]);
+    expect(issues).toEqual([]);
+  });
+
+  it("refuses a clause the source cannot run and a parameter naming no field", () => {
+    const { issues } = readStoredQuery(
+      buildStored("status=failed&region=eu&q=alder"),
+      host,
+    );
+    expect(issues).toEqual([
+      {
+        parameter: "q",
+        field: null,
+        code: "undeclared-field",
+        reason: "this source cannot search",
+      },
+      {
+        parameter: "region",
+        field: "region",
+        code: "unknown-field",
+        reason: '"region" names no field of this collection',
+      },
+    ]);
+  });
+});

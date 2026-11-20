@@ -28,6 +28,7 @@ Middleware is applied at the `Field` level through the `middleware` prop, which 
   name="country"
   inputType="select"
   label="Country"
+  options={[]}
   middleware={[myMiddleware, anotherMiddleware]}
 />
 ```
@@ -73,6 +74,7 @@ import { Field, addRESTOptions } from "@canonical/react-ds-global-form";
   name="country"
   inputType="select"
   label="Country"
+  options={[]}
   middleware={[
     addRESTOptions("/api/countries", {
       // HTTP method (default: "GET")
@@ -297,6 +299,7 @@ Usage — a city select that populates when the country field changes:
   name="city"
   inputType="select"
   label="City"
+  options={[]}
   middleware={[
     addFetchRelated({
       endpoint: "/api/cities",
@@ -398,6 +401,7 @@ When a field needs several middleware, pass them as an array. The composition or
   name="product"
   inputType="combobox"
   label="Product"
+  options={[]}
   middleware={[
     withAnalytics("product-search"),   // Outermost — sees all props
     addRESTOptions("/api/products"),    // Middle — injects options

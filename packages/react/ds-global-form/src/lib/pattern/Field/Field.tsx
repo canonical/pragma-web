@@ -21,67 +21,92 @@ import { TextField } from "../../component/TextField/index.js";
 import { TimeField } from "../../component/TimeField/index.js";
 import type { FieldProps } from "./types.js";
 
+const withoutRoutingProps = <T extends { inputType: string }>(
+  props: T,
+): T extends unknown
+  ? Omit<T, "inputType" | "CustomComponent" | "type">
+  : never => {
+  const {
+    inputType: _,
+    CustomComponent: _component,
+    type: _type,
+    ...rest
+  } = props as T & {
+    CustomComponent?: unknown;
+    type?: unknown;
+  };
+  return rest as T extends unknown
+    ? Omit<T, "inputType" | "CustomComponent" | "type">
+    : never;
+};
+
 /**
- * description of the Field component
- * @returns {React.ReactElement} - Rendered Field
+ * A form field is the unit that pairs a single input with the surrounding meaning a user needs to act on it: a label naming what is being asked, optional descriptive guidance, the input itself, and validation feedback when an entry is rejected. It is the common frame every concrete form control adopts so that labelling, help text, optionality and error reporting behave the same across a form.
+ *
+ * This router has no single native root; the selected field renders its own root.
  *
  * `import { Field } from "@canonical/react-ds-global-form";`
+ *
+ * @implements ds:global.pattern.field
  */
-const Field = ({
-  inputType,
-  CustomComponent,
-  ...props
-}: FieldProps): React.ReactElement => {
-  switch (inputType) {
+const Field = <P extends { name: string } = { name: string }>(
+  props: FieldProps<P>,
+): React.ReactElement => {
+  switch (props.inputType) {
     case "textarea":
-      return <TextareaField {...props} />;
+      return <TextareaField {...withoutRoutingProps(props)} />;
     case "checkbox":
-      return <CheckboxField {...props} />;
+      return <CheckboxField {...withoutRoutingProps(props)} />;
     case "switch":
-      return <SwitchField {...props} />;
+      return <SwitchField {...withoutRoutingProps(props)} />;
     case "rating":
-      return <RatingField {...props} />;
+      return <RatingField {...withoutRoutingProps(props)} />;
     case "range":
-      return <RangeField {...props} />;
+      return <RangeField {...withoutRoutingProps(props)} />;
     case "select":
-      return <SelectField {...props} />;
+      return <SelectField {...withoutRoutingProps(props)} />;
     case "choices":
-      return <ChoicesField {...props} />;
+      return <ChoicesField {...withoutRoutingProps(props)} />;
     case "combobox":
-      return <ComboboxField {...props} />;
+      return <ComboboxField {...withoutRoutingProps(props)} />;
     case "hidden":
-      return <HiddenField {...props} />;
+      return <HiddenField {...withoutRoutingProps(props)} />;
     case "date":
-      return <DateField {...props} />;
+      return <DateField {...withoutRoutingProps(props)} />;
     case "time":
-      return <TimeField {...props} />;
+      return <TimeField {...withoutRoutingProps(props)} />;
     case "datetime":
-      return <DateTimeField {...props} />;
+      return <DateTimeField {...withoutRoutingProps(props)} />;
     case "file":
-      return <FileUploadField {...props} />;
+      return <FileUploadField {...withoutRoutingProps(props)} />;
     case "color":
-      return <ColorField {...props} />;
+      return <ColorField {...withoutRoutingProps(props)} />;
     case "phone":
-      return <PhoneField {...props} />;
+      return <PhoneField {...withoutRoutingProps(props)} />;
     case "password":
-      return <PasswordField {...props} />;
+      return <PasswordField {...withoutRoutingProps(props)} />;
     case "number":
-      return <NumberField {...props} />;
+      return <NumberField {...withoutRoutingProps(props)} />;
     case "rich-choices":
-      return <RichChoicesField {...props} />;
+      return <RichChoicesField {...withoutRoutingProps(props)} />;
     case "custom":
-      if (!CustomComponent) {
+      if (!props.CustomComponent) {
         throw new Error(
           'Field with inputType="custom" requires a CustomComponent prop.',
         );
       }
-      return <CustomComponent {...props} />;
+      {
+        const { inputType: _, CustomComponent, ...customProps } = props;
+        return <CustomComponent {...(customProps as unknown as P)} />;
+      }
     default:
-      return <TextField inputType={inputType} {...props} />;
+      return (
+        <TextField
+          {...withoutRoutingProps(props)}
+          inputType={props.inputType}
+        />
+      );
   }
 };
 
-/**
- * @implements ds:global.pattern.field
- */
 export default Field;

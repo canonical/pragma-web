@@ -56,6 +56,7 @@ export const RESTOptions: Story = {
   args: {
     name: "optionsField",
     inputType: "select",
+    options: [],
     middleware: [
       middleware.addRESTOptions("/api/options", {
         transformData: (data) => data.options,
