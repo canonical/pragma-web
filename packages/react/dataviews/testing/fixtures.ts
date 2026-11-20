@@ -627,10 +627,15 @@ export const MESSAGE_SAMPLES: {
   chartLowest: null,
   chartHighest: null,
   eventsShown: [
-    [1, 1],
-    [8, 20],
+    [1, { kind: "exact", value: 1 }],
+    [8, { kind: "at-least", value: 20 }],
+    [8, { kind: "unknown" }],
   ],
-  eventsHidden: [[1], [12]],
+  eventsHidden: [
+    [{ kind: "exact", value: 1 }],
+    [{ kind: "at-least", value: 12 }],
+    [{ kind: "unknown" }],
+  ],
   showMoreEvents: [[1], [4]],
   showAllEvents: null,
   filterBy: null,

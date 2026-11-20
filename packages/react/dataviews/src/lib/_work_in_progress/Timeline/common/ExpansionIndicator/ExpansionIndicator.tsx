@@ -21,7 +21,9 @@ export default function ExpansionIndicator({
   const more = Math.min(step, hiddenCount);
   return (
     <div className={componentCssClassName}>
-      <span className="summary">{messages.eventsHidden(hiddenCount)}</span>
+      <span className="summary">
+        {messages.eventsHidden({ kind: "exact", value: hiddenCount })}
+      </span>
       {more > 0 ? (
         <button type="button" className="command" onClick={onShowMore}>
           {messages.showMoreEvents(more)}
