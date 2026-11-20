@@ -19,7 +19,12 @@ import {
   useStableValue,
 } from "../../../../hooks/index.js";
 import { describeStatus } from "../../../../utils/index.js";
-import { useDateTimeFormats, useTimelineHeader } from "../../hooks/index.js";
+import { DEFAULT_EXPANSION_STEP } from "../../constants.js";
+import {
+  useDateTimeFormats,
+  useTimelineHeader,
+  useTimelineReach,
+} from "../../hooks/index.js";
 import type {
   TimelineDateTimeFormats,
   TimelineDecoration,
@@ -40,6 +45,15 @@ const componentCssClassName = "ds data-timeline";
 
 /** The row scopes serve the select-all control alone, which observes no field. */
 const NO_FIELDS: readonly string[] = [];
+
+/**
+ * Whether the page's identities only extend the ones held: a window grown
+ * past the page keeps the events it showed, and what was revealed with them.
+ */
+const isExtended = (held: readonly string[], next: readonly string[]) =>
+  held.length > 0 &&
+  next.length >= held.length &&
+  held.every((id, at) => next[at] === id);
 
 /** Every date format left to its default. */
 const NO_FORMATS: TimelineDateTimeFormats = {};
@@ -161,8 +175,18 @@ export default function ScopedTimeline<
     messages,
     announce,
   });
-  // A new page starts collapsed again; the same page refreshed keeps what was revealed.
-  const page = useMemo(() => model.ids.join("\u0000"), [model]);
+  // A new page starts collapsed again; the same page refreshed, or grown
+  // past its end, keeps what was revealed.
+  const held = useStableValue(model.ids, isExtended);
+  const page = useMemo(() => held.join("\u0000"), [held]);
+  const reach = useTimelineReach({
+    provider,
+    count: events.length,
+    step:
+      expansion === false
+        ? DEFAULT_EXPANSION_STEP
+        : (expansion.step ?? DEFAULT_EXPANSION_STEP),
+  });
   const formats = useDateTimeFormats(dateTimeFormats);
   const describe = useCallback(
     (shown: DisplayStatus) => describeStatus(shown, messages),
@@ -201,6 +225,9 @@ export default function ScopedTimeline<
           renderItem={renderItem ?? null}
           order={order}
           isFiltered={isFiltered}
+          total={reach.total}
+          requestMore={reach.requestMore}
+          moreHref={reach.moreHref}
         />
         {trailing === undefined ? null : (
           <div className="trailing">{trailing}</div>

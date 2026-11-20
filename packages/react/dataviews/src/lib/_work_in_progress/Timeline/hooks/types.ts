@@ -1,4 +1,5 @@
 import type {
+  Count,
   DataViewsMessages,
   DataViewsProvider,
   SchemaFieldDefinition,
@@ -13,13 +14,19 @@ import type {
   TimelineItem,
 } from "../types.js";
 
-/** What `useTimelineExpansion` takes: the events on the page, and how they collapse. */
+/** What `useTimelineExpansion` takes: the events on the page, how they collapse, and how to reach past the page. */
 export type UseTimelineExpansionProps = {
   /** How many events the page holds. */
   readonly count: number;
   readonly method?: TimelineCollapsingMethod | undefined;
   readonly initialVisible?: number | undefined;
   readonly step?: number | undefined;
+  /**
+   * Asks the collection for the events past the page, or null where the
+   * page holds the last of them. Show more calls it once every event on the
+   * page is revealed.
+   */
+  readonly requestMore?: (() => void) | null | undefined;
 };
 
 /** What `useTimelineExpansion` answers: which events show, and the commands revealing the rest. */
@@ -29,10 +36,12 @@ export type UseTimelineExpansionResult = {
   /** The events shown after the top ones: below the indicator under `middle`, from the start otherwise. */
   readonly bottomCount: number;
   readonly hiddenCount: number;
-  /** Where the indicator stands, or null while nothing is hidden. */
+  /** Where the indicator stands, or null while nothing is hidden on the page or past it. */
   readonly indicatorPosition: "bottom" | "middle" | null;
   /** How many events "show more" reveals. */
   readonly step: number;
+  /** Whether "show more" asks the collection for events past the page, every event on it being revealed. */
+  readonly fetchesMore: boolean;
   readonly showMore: () => void;
   readonly showAll: () => void;
 };
@@ -80,3 +89,31 @@ export type UseTimelineHeaderProps<
 
 /** What `useTimelineHeader` answers: the controls the source allows, wired to its query. */
 export type UseTimelineHeaderResult = HeaderProps;
+
+/** What `useTimelineReach` takes: the provider, the events on the page, and how many one step asks for. */
+export type UseTimelineReachProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object,
+> = {
+  readonly provider: DataViewsProvider<TFields, TRow>;
+  /** How many events the page holds. */
+  readonly count: number;
+  /** How many more events one "show more" asks the collection for. */
+  readonly step: number;
+};
+
+/** What `useTimelineReach` answers: how many events the collection holds, and the way to the next ones. */
+export type UseTimelineReachResult = {
+  /**
+   * How many events the collection holds, as exactly as the source counts
+   * them; the page's own count where nothing lies past it.
+   */
+  readonly total: Count;
+  /**
+   * Grows the window by one step from the collection's first event, or null
+   * where the page holds the last of them.
+   */
+  readonly requestMore: (() => void) | null;
+  /** Where the grown window is spelled for the location, or null without one. */
+  readonly moreHref: string | null;
+};

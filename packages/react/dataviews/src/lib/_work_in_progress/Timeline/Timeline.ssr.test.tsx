@@ -50,6 +50,29 @@ describe("Timeline on the server", () => {
     expect(markup).not.toContain('role="tooltip"');
   });
 
+  it("links show more to the window grown past the page", () => {
+    const provider = createDataViewsProvider({
+      collection: activities,
+      source: createArraySource({
+        rows: ACTIVITY_PAGE,
+        collection: activities,
+      }),
+      location: createMemoryLocation({ href: "/activity?size=2" }),
+      facets: ["actor", "kind"],
+    });
+    provider.refresh();
+    const markup = renderToString(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+      />,
+    );
+    expect(markup).toMatch(
+      /<a[^>]*href="\?[^"]*size=6[^"]*"[^>]*>Show 3 more<\/a>/u,
+    );
+  });
+
   it("says it is loading where the source cannot answer within the call", () => {
     const { provider } = createActivityProvider();
     provider.refresh();
