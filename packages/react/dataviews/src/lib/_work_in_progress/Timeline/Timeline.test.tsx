@@ -1,6 +1,7 @@
 import {
   createArraySource,
   createDataViewsProvider,
+  createPage,
   type DataViewsProvider,
   declareCapabilities,
   type SourceDelivery,
@@ -83,6 +84,35 @@ const readDrawn = (): readonly (string | undefined)[] =>
     .queryAllByRole("listitem")
     .filter((item) => !item.classList.contains("expansion"))
     .map((item) => item.querySelector(".payload")?.textContent);
+
+/** Twelve events, one a day, the collection the window grows over. */
+const TWELVE = Array.from({ length: 12 }, (_unused, at) =>
+  activity(`a-${at + 1}`, at + 1),
+);
+
+/** A timeline over a source answering each window of `TWELVE`, counted as `counted` says. */
+const pagedTimeline = (counted: boolean, extra: Props = {}) => {
+  const { provider, source } = createActivityProvider({
+    answer: ({ window: { page, size } }) => {
+      const rows = TWELVE.slice((page - 1) * size, page * size);
+      return counted
+        ? createPage({ rows, matched: TWELVE.length })
+        : createPage({ rows, more: page * size < TWELVE.length });
+    },
+  });
+  act(() => {
+    provider.navigateWindow({ size: 4 });
+  });
+  const view = render(
+    <Timeline
+      provider={provider}
+      mapping={ACTIVITY_MAPPING}
+      label="Activity"
+      {...extra}
+    />,
+  );
+  return { provider, source, view };
+};
 
 describe("Timeline", () => {
   it("refuses a value that is not a provider", () => {
@@ -513,6 +543,98 @@ describe("Timeline", () => {
     expect(line).toHaveTextContent("Showing 8 of 10 events");
     fireEvent.click(screen.getByRole("button", { name: "Show all" }));
     expect(line).toHaveTextContent("Showing 10 of 10 events");
+  });
+
+  it("reaches past the page from show more, keeping the events it shows", () => {
+    const { provider, view } = pagedTimeline(true);
+    const line = view.container.querySelector(".showing");
+    expect(readDrawn()).toHaveLength(4);
+    expect(line).toHaveTextContent("Showing 4 of 12 events");
+    expect(screen.getByText("8 hidden")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Show all" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Show 4 more" }));
+    expect(provider.state.get().window).toMatchObject({ page: 1, size: 8 });
+    expect(readDrawn()).toEqual(
+      TWELVE.slice(0, 8).map(({ summary }) => summary),
+    );
+    expect(line).toHaveTextContent("Showing 8 of 12 events");
+    fireEvent.click(screen.getByRole("button", { name: "Show 4 more" }));
+    expect(readDrawn()).toHaveLength(12);
+    expect(screen.queryByText(/hidden/u)).toBeNull();
+  });
+
+  it("reveals the page's own hidden events before reaching past it", () => {
+    const { provider } = pagedTimeline(true, {
+      expansion: { initialVisible: 2, step: 2 },
+    });
+    expect(screen.getByText("10 hidden")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Show 2 more" }));
+    expect(provider.state.get().window.size).toBe(4);
+    expect(readDrawn()).toHaveLength(4);
+    fireEvent.click(screen.getByRole("button", { name: "Show 2 more" }));
+    expect(provider.state.get().window).toMatchObject({ page: 1, size: 6 });
+    expect(readDrawn()).toHaveLength(6);
+  });
+
+  it("offers no more than the collection holds past the page", () => {
+    pagedTimeline(true, { expansion: { step: 10 } });
+    expect(
+      screen.getByRole("button", { name: "Show 8 more" }),
+    ).toBeInTheDocument();
+  });
+
+  it("reaches past the page where the source only says more exist", () => {
+    const { view } = pagedTimeline(false, { expansion: false });
+    expect(view.container.querySelector(".showing")).toHaveTextContent(
+      "Showing 4 events",
+    );
+    expect(screen.getByText("More not yet shown")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Show 4 more" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show 4 more" }));
+    expect(readDrawn()).toHaveLength(12);
+    expect(screen.queryByText("More not yet shown")).toBeNull();
+  });
+
+  it("counts the page's hidden events among the uncounted ones past it", () => {
+    pagedTimeline(false, { expansion: { initialVisible: 2 } });
+    expect(screen.getByText("More not yet shown")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Show 2 more" }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps show more, and its focus, while the grown window loads", () => {
+    const { provider, source } = createActivityProvider();
+    act(() => {
+      provider.navigateWindow({ size: 4 });
+    });
+    render(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+      />,
+    );
+    act(() => {
+      source.latest().deliver({
+        status: "succeeded",
+        page: createPage({ rows: TWELVE.slice(0, 4), matched: 12 }),
+      });
+    });
+    const more = screen.getByRole("button", { name: "Show 4 more" });
+    more.focus();
+    fireEvent.click(more);
+    expect(readRegion()).toHaveAttribute("aria-busy", "true");
+    expect(readDrawn()).toHaveLength(4);
+    expect(screen.getByRole("button", { name: "Show 4 more" })).toHaveFocus();
+    act(() => {
+      source.latest().deliver({
+        status: "succeeded",
+        page: createPage({ rows: TWELVE.slice(0, 8), matched: 12 }),
+      });
+    });
+    expect(readDrawn()).toHaveLength(8);
+    expect(screen.getByRole("button", { name: "Show 4 more" })).toHaveFocus();
   });
 
   it("says it shows none of none while nothing has arrived", () => {

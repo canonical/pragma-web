@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import useTimelineExpansion from "./useTimelineExpansion.js";
 
 describe("useTimelineExpansion", () => {
@@ -104,6 +104,72 @@ describe("useTimelineExpansion", () => {
       bottomCount: 0,
       hiddenCount: 3,
       indicatorPosition: "bottom",
+    });
+  });
+
+  it("asks for the events past the page once every event on it shows", () => {
+    const requestMore = vi.fn();
+    const { result } = renderHook(() =>
+      useTimelineExpansion({
+        count: 10,
+        initialVisible: 6,
+        step: 4,
+        requestMore,
+      }),
+    );
+    expect(result.current).toMatchObject({
+      hiddenCount: 4,
+      fetchesMore: false,
+      indicatorPosition: "bottom",
+    });
+    act(() => result.current.showMore());
+    expect(requestMore).not.toHaveBeenCalled();
+    expect(result.current).toMatchObject({
+      bottomCount: 10,
+      hiddenCount: 0,
+      fetchesMore: true,
+      indicatorPosition: "bottom",
+    });
+    act(() => result.current.showMore());
+    expect(requestMore).toHaveBeenCalledOnce();
+  });
+
+  it("shows every event that arrives past the page", () => {
+    const requestMore = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ count }) =>
+        useTimelineExpansion({ count, initialVisible: 4, requestMore }),
+      { initialProps: { count: 4 } },
+    );
+    act(() => result.current.showMore());
+    rerender({ count: 8 });
+    expect(result.current).toMatchObject({ bottomCount: 8, hiddenCount: 0 });
+  });
+
+  it("reaches past the page from the bottom under the middle method", () => {
+    const { result } = renderHook(() =>
+      useTimelineExpansion({
+        count: 4,
+        method: "middle",
+        initialVisible: 4,
+        requestMore: () => {},
+      }),
+    );
+    expect(result.current).toMatchObject({
+      topCount: 2,
+      bottomCount: 2,
+      indicatorPosition: "bottom",
+      fetchesMore: true,
+    });
+  });
+
+  it("offers nothing past the last page", () => {
+    const { result } = renderHook(() =>
+      useTimelineExpansion({ count: 4, initialVisible: 4, requestMore: null }),
+    );
+    expect(result.current).toMatchObject({
+      indicatorPosition: null,
+      fetchesMore: false,
     });
   });
 

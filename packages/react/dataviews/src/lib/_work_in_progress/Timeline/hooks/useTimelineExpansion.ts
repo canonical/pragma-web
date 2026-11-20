@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { DEFAULT_EXPANSION_STEP } from "../constants.js";
 import type {
   UseTimelineExpansionProps,
   UseTimelineExpansionResult,
@@ -8,18 +9,19 @@ import type {
  * Which of a page's events show while it is collapsed, and the commands
  * revealing the rest. `bottom` shows the first `initialVisible` events and
  * reveals downward; `middle` shows the first and last halves of them and
- * reveals the hidden middle from below; `none` shows every event.
+ * reveals the hidden middle from below; `none` shows every event. Once every
+ * event on the page shows, show more asks the collection for the events past
+ * it, and every event that arrives is shown: the collection is asked for
+ * only as many as one step reveals.
  */
 export default function useTimelineExpansion({
   count,
   method = "bottom",
   initialVisible = 8,
-  step = 4,
+  step = DEFAULT_EXPANSION_STEP,
+  requestMore = null,
 }: UseTimelineExpansionProps): UseTimelineExpansionResult {
   const [revealed, setRevealed] = useState(0);
-  const showMore = useCallback(() => {
-    setRevealed((current) => current + step);
-  }, [step]);
   const showAll = useCallback(() => {
     setRevealed(Number.POSITIVE_INFINITY);
   }, []);
@@ -34,8 +36,24 @@ export default function useTimelineExpansion({
         : visible;
   const bottomCount = Math.min(initialBottom + revealed, count - topCount);
   const hiddenCount = count - topCount - bottomCount;
+  const fetchesMore = hiddenCount === 0 && requestMore !== null;
+  const showMore = useCallback(() => {
+    if (fetchesMore) {
+      // The window grows by one step, so whatever arrives is shown whole.
+      setRevealed(Number.POSITIVE_INFINITY);
+      requestMore?.();
+      return;
+    }
+    setRevealed((current) => current + step);
+  }, [fetchesMore, requestMore, step]);
   const indicatorPosition =
-    hiddenCount === 0 ? null : method === "middle" ? "middle" : "bottom";
+    hiddenCount > 0
+      ? method === "middle"
+        ? "middle"
+        : "bottom"
+      : fetchesMore
+        ? "bottom"
+        : null;
   return useMemo(
     () => ({
       topCount,
@@ -43,6 +61,7 @@ export default function useTimelineExpansion({
       hiddenCount,
       indicatorPosition,
       step,
+      fetchesMore,
       showMore,
       showAll,
     }),
@@ -52,6 +71,7 @@ export default function useTimelineExpansion({
       hiddenCount,
       indicatorPosition,
       step,
+      fetchesMore,
       showMore,
       showAll,
     ],
