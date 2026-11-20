@@ -4,7 +4,7 @@
  * 4px baseline grid, applied as classes on an ancestor (an app root, or a section):
  *
  *   CONTEXT  .app / .site / .docs  — the surface. Sets the comfortable/dense
- *            PAIR for every density primitive. `.docs` shares `.site`'s values.
+ *            PAIR for context-sensitive primitives. `.docs` shares `.site`'s values.
  *   DENSITY  .comfortable / .dense — picks within the context pair.
  *
  * This is the LOWEST layer of the density system, and it lives in @canonical/styles
@@ -21,16 +21,21 @@
  *     --density-line-height-effective  the same, with the full fallback chain
  *     --density-target-baseline-px     the grid line a control's baseline lands on
  *     --density-padding-inline         inline padding for a cell
+ *     --density-padding-block          compact block padding before borders
  *     --density-space-sm / -md / -lg   three vertical spacing rungs for a cell
  *
- * Every value is a WHOLE multiple of --baseline-height (from spacing.css), so
- * vertical rhythm holds in all four cells. Sites/docs run one baseline looser than
- * apps on the height (+4px) and on each rung, so the looser surface breathes.
+ * Control heights, inline padding and spacing rungs are WHOLE multiples of
+ * --baseline-height (from spacing.css), so vertical rhythm holds in all four
+ * cells. Compact block padding uses --dimension-025 in comfortable density and
+ * zero in dense density; consumers subtract their own borders and clamp at zero.
+ * Sites/docs run one baseline looser than apps on the height (+4px) and on each
+ * rung, so the looser surface breathes.
  *
  *                    app                 site / docs
  *                    comfy   dense       comfy   dense
  *   line-height      32 (8)  24 (6)      36 (9)  28 (7)
  *   padding-inline   16 (4)   8 (2)      16 (4)  12 (3)
+ *   padding-block     2 (½)   0 (0)       2 (½)   0 (0)
  *   space-lg         40 (10) 32 (8)      44 (11) 36 (9)   ← between fields
  *   space-md          8 (2)   4 (1)       8 (2)   8 (2)   ← label → control
  *   space-sm          8 (2)   4 (1)       8 (2)   8 (2)   ← desc/error → input
@@ -112,9 +117,10 @@
   }
 
   /* ── Density family: pick within the context pair ────────────────────────────
-   * Each density tier resolves every GENERIC primitive from the context's
-   * *-comfy / *-dense pair. Fallbacks cover the app-comfortable defaults when no
-   * context class is present (a plain `.comfortable` still works). */
+   * Each density tier resolves context-sensitive primitives from the context's
+   * *-comfy / *-dense pair. Compact block padding is shared by all contexts.
+   * Fallbacks cover the app defaults when no context class is present
+   * (a plain `.comfortable` still works). */
   .comfortable {
     --density-line-height: var(
       --density-lh-comfy,
@@ -124,6 +130,7 @@
       --density-pad-inline-comfy,
       calc(var(--baseline-height) * 4)
     );
+    --density-padding-block: var(--dimension-025);
     --density-space-lg: var(
       --density-space-lg-comfy,
       calc(var(--baseline-height) * 10)
@@ -150,6 +157,7 @@
       --density-pad-inline-dense,
       calc(var(--baseline-height) * 2)
     );
+    --density-padding-block: 0px;
     --density-space-lg: var(
       --density-space-lg-dense,
       calc(var(--baseline-height) * 8)

@@ -2,9 +2,9 @@
  *
  * The generated `@canonical/design-tokens/dist/modifiers.criticality.css`
  * exposes the colour channels for each criticality (`--modifier-color-icon`,
- * `-text`, `-border`, `-foreground-secondary`) but is missing two channels this
- * shim fills in, keyed off the criticality class. Remove each block once its
- * channel is generated upstream in the criticality modifier tokens.
+ * `-text`, `-border`, `-foreground-secondary`) but is missing three channels
+ * this shim fills in, keyed off the criticality class. Remove each block once
+ * its channel is generated upstream in the criticality modifier tokens.
  *
  * Design contract — components listen to the CHANNEL, never to the class. A
  * consumer must not key off `.information` / `.warning`; it reads the generic
@@ -35,6 +35,18 @@
  * per criticality; it just isn't wired into the modifier family. This exposes
  * it as a channel so on-surface criticality components read it generically.
  *
+ * ── 3. Disabled secondary-surface channel (--modifier-color-foreground-secondary-disabled) ──
+ * The generated states layer DERIVES a disabled shade with
+ * `color-mix(in oklch, <channel> 34%, background)`. The background token is
+ * authored `oklch(… 0 0)` — an explicit hue 0 on an achromatic colour — and a
+ * manually specified hue is not powerless per CSS Color 4 §4.4.1, so the mix
+ * interpolates the hue toward 0: a disabled success surface drifts green →
+ * orange. The token set already carries authored per-criticality disabled
+ * tints (`--color-foreground-secondary-*-disabled`); this exposes them as a
+ * channel so components on the secondary surface read the authored tint under
+ * a criticality, and fall back to the derived mix otherwise (neutral mixes are
+ * achromatic — no hue to drift).
+ *
  * Layer: ds.modifiers, the layer the generated `modifiers.criticality.css` this
  * file extends opens for itself. Imported after it so these class rules compose
  * at equal specificity, later source order. Custom properties only, so nothing
@@ -50,6 +62,9 @@
     --modifier-color-foreground-primary-disabled: var(
       --color-foreground-primary-information-disabled
     );
+    --modifier-color-foreground-secondary-disabled: var(
+      --color-foreground-secondary-information-disabled
+    );
   }
 
   .success {
@@ -59,6 +74,9 @@
     );
     --modifier-color-foreground-primary-disabled: var(
       --color-foreground-primary-success-disabled
+    );
+    --modifier-color-foreground-secondary-disabled: var(
+      --color-foreground-secondary-success-disabled
     );
   }
 
@@ -70,6 +88,9 @@
     --modifier-color-foreground-primary-disabled: var(
       --color-foreground-primary-warning-disabled
     );
+    --modifier-color-foreground-secondary-disabled: var(
+      --color-foreground-secondary-warning-disabled
+    );
   }
 
   .error {
@@ -79,6 +100,9 @@
     );
     --modifier-color-foreground-primary-disabled: var(
       --color-foreground-primary-error-disabled
+    );
+    --modifier-color-foreground-secondary-disabled: var(
+      --color-foreground-secondary-error-disabled
     );
   }
 }
