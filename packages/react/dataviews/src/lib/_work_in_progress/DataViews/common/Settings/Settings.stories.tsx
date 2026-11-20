@@ -41,6 +41,15 @@ const renderCode = `<DataViews provider={provider}>
   <DataViews.DataTable columns={columns} label="Machines" settings={<DataViews.Settings />} />
 </DataViews>`;
 
+/** Close the open settings menu from its button, leaving the story at rest. */
+const closeMenu = async (canvas: ReturnType<typeof within>): Promise<void> => {
+  const trigger = canvas.getByRole("button", { name: "Table settings" });
+  await userEvent.click(trigger);
+  await waitFor(() =>
+    expect(trigger).toHaveAttribute("aria-expanded", "false"),
+  );
+};
+
 /**
  * Hide the owner and put the status first before the story renders.
  *
@@ -85,6 +94,17 @@ export const Default: Story = {
     render: renderCode,
   }),
   render: (args) => <Collection {...pickStoryWords(args)} />,
+  play: async ({ canvas }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Table settings" }),
+    );
+    await expect(
+      await within(document.body).findByRole("menuitem", {
+        name: "Host is always shown",
+      }),
+    ).toBeInTheDocument();
+    await closeMenu(canvas);
+  },
 };
 
 /**
@@ -136,4 +156,19 @@ export const ArrangedByTheViewer: Story = {
   render: (args) => (
     <Collection {...pickStoryWords(args)} prepare={arrangeForTheViewer} />
   ),
+  play: async ({ canvas }) => {
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Table settings" }),
+    );
+    const menu = await within(document.body).findByRole("menu", {
+      name: "Table settings",
+    });
+    await expect(
+      within(menu).getAllByRole("menuitem").at(0),
+    ).toHaveAccessibleName("Hide Status");
+    await expect(
+      within(menu).getByRole("menuitem", { name: "Show Owner" }),
+    ).toBeInTheDocument();
+    await closeMenu(canvas);
+  },
 };

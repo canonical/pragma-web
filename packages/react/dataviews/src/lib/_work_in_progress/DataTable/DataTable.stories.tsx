@@ -278,6 +278,20 @@ export const Sortable: Story = {
     render: tableCode,
   }),
   render: renderMachines(sortableColumns),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByRole("columnheader", { name: "Host" });
+    await expect(host).not.toHaveAttribute("aria-sort");
+    const hostSort = within(host).getByRole("button", { name: "Host" });
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).toHaveAttribute("aria-sort", "ascending"));
+    await userEvent.click(hostSort);
+    await waitFor(() =>
+      expect(host).toHaveAttribute("aria-sort", "descending"),
+    );
+    // A third press returns to the source's own order, leaving the story at rest.
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).not.toHaveAttribute("aria-sort"));
+  },
 };
 
 /**
@@ -380,6 +394,25 @@ export const SortLimitedToOneTerm: Story = {
   render: renderMachines(markResizable(sortableColumns, ["status"]), {
     source: createOneTermSource,
   }),
+  play: async ({ canvas }) => {
+    const hostSort = await canvas.findByRole("button", { name: "Host" });
+    const host = canvas.getByRole("columnheader", { name: "Host" });
+    await userEvent.click(hostSort);
+    const status = canvas.getByRole("columnheader", { name: "Status" });
+    within(status).getByRole("button", { name: "Status" }).focus();
+    // One call, so Shift is still held when Enter activates the button.
+    await userEvent.keyboard("{Shift>}{Enter}{/Shift}");
+    const refusal = "Sort unchanged: this source orders by at most 1 term.";
+    await expect(await within(status).findByText(refusal)).toBeInTheDocument();
+    await expect(host).toHaveAttribute("aria-sort", "ascending");
+    // Two more presses return to the source's order, leaving the story at rest.
+    await userEvent.click(hostSort);
+    await userEvent.click(hostSort);
+    await waitFor(() => expect(host).not.toHaveAttribute("aria-sort"));
+    await waitFor(() =>
+      expect(within(status).queryByText(refusal)).not.toBeInTheDocument(),
+    );
+  },
 };
 
 /**
@@ -632,6 +665,15 @@ export const MixedResizableColumns: Story = {
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(markResizable(plainColumns, ["name", "region"])),
+  play: async ({ canvas }) => {
+    await canvas.findByRole("separator", { name: "Host" });
+    await expect(
+      canvas.getByRole("separator", { name: "Region" }),
+    ).toBeInTheDocument();
+    for (const name of ["Status", "Cores", "Owner"]) {
+      await expect(canvas.queryByRole("separator", { name })).toBeNull();
+    }
+  },
 };
 
 /**
