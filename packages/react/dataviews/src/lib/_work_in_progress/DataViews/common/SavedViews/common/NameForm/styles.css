@@ -6,7 +6,7 @@
    * and a name the collection refuses colouring the input's error channel.
    */
   .ds.data-views-saved-views-name-form {
-    --data-views-saved-views-name-form-gap: var(--dimension-050);
+    --data-views-saved-views-name-form-gap: var(--space-050);
     --data-views-saved-views-name-form-color-error: var(--form-error-color);
 
     &:has(input:user-invalid) {

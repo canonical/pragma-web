@@ -16,11 +16,16 @@
    * form lays itself out.
    */
   .ds.data-views-saved-views {
+    --data-views-saved-views-gap: var(--space-100);
+    --data-views-saved-views-gap-control: var(--space-050);
+    --data-views-saved-views-color-text: var(--color-text);
+    --data-views-saved-views-color-text-muted: var(--color-text-muted);
+
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--dimension-100);
-    color: var(--color-text);
+    gap: var(--data-views-saved-views-gap);
+    color: var(--data-views-saved-views-color-text);
     font-family: var(--typography-text-primary-font-family);
     font-size: var(--typography-text-primary-font-size);
     font-weight: var(--typography-text-primary-font-weight);
@@ -36,7 +41,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--dimension-050);
+      gap: var(--data-views-saved-views-gap-control);
     }
 
     /* The select's chrome fills its container; in a row it takes its content. */
@@ -46,7 +51,7 @@
 
     & > .picker > .modified,
     & > .notices {
-      color: var(--color-text-muted);
+      color: var(--data-views-saved-views-color-text-muted);
     }
   }
 }
