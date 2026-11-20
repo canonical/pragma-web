@@ -1,5 +1,5 @@
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
-import { Badge, Button, Chip, Label } from "@canonical/react-ds-global";
+import { Badge, Button, Label } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta = {
@@ -44,17 +44,6 @@ export const LifecycleOnLabel: Story = {
         <Label key={value} lifecycle={value}>
           {value}
         </Label>
-      ))}
-    </div>
-  ),
-};
-
-export const ReleaseOnChip: Story = {
-  name: "Release",
-  render: () => (
-    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-      {MODIFIER_FAMILIES.release.map((value) => (
-        <Chip key={value} lead="Status" value={value} release={value} />
       ))}
     </div>
   ),

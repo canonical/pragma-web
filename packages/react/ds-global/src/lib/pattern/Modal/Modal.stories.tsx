@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef } from "react";
+import { TagStandIn } from "../../common/TagStandIn/index.js";
 import { Button } from "../../component/Button/index.js";
-import { Chip } from "../../component/Chip/index.js";
 import { InlineCode } from "../../component/InlineCode/index.js";
 import { KeyboardKey } from "../../component/KeyboardKey/index.js";
 import Component from "./Provider.js";
@@ -264,7 +264,7 @@ const close = () => modalRef.current?.close();
 /**
  * Content is an open slot, not a text field: it takes arbitrary React, so
  * other components compose inside it. Here a paragraph, a KeyboardKey
- * shortcut hint, an InlineCode command and a row of Chips share one modal.
+ * shortcut hint, an InlineCode command and a row of tags share one modal.
  * Each child brings its own margins, so the slot's outermost element owns
  * the spacing rather than leaving the browser defaults to stack on top of
  * the content padding.
@@ -302,9 +302,9 @@ const RichContentStory = () => {
               gap: "var(--dimension-100, 8px)",
             }}
           >
-            <Chip lead="Status" value="Running" criticality="success" />
-            <Chip lead="Image" value="ubuntu:24.04" />
-            <Chip lead="Agent" value="beta" release="beta" />
+            <TagStandIn lead="Status" value="Running" criticality="success" />
+            <TagStandIn lead="Image" value="ubuntu:24.04" />
+            <TagStandIn lead="Agent" value="beta" />
           </div>
         </div>
       </Component.Content>
@@ -347,9 +347,9 @@ const close = () => modalRef.current?.close();
       </p>
       <InlineCode>ssh ubuntu@10.0.1.42 -i ~/.ssh/id_ed25519</InlineCode>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--dimension-100, 8px)" }}>
-        <Chip lead="Status" value="Running" criticality="success" />
-        <Chip lead="Image" value="ubuntu:24.04" />
-        <Chip lead="Agent" value="beta" release="beta" />
+        <TagStandIn lead="Status" value="Running" criticality="success" />
+        <TagStandIn lead="Image" value="ubuntu:24.04" />
+        <TagStandIn lead="Agent" value="beta" />
       </div>
     </div>
   </Modal.Content>

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Chip } from "../Chip/index.js";
+import { TagStandIn } from "../../common/TagStandIn/index.js";
 import Component from "./Card.js";
 
 describe("Card component", () => {
@@ -16,7 +16,7 @@ describe("Card component", () => {
         <Component.Header>Title</Component.Header>
         <Component.Content>Body</Component.Content>
         <Component.Footer>
-          <Chip value="tag" />
+          <TagStandIn value="tag" />
         </Component.Footer>
       </Component>,
     );
@@ -27,7 +27,7 @@ describe("Card component", () => {
     // that follows (the seam-collapse selector targets this adjacency).
     expect(header.nextElementSibling).toHaveClass("card-content");
     expect(screen.getByText("Body")).toHaveClass("card-content");
-    // Footer carries tags and labels (e.g. Chip), not CTAs or links.
+    // Footer carries tags and labels (e.g. Tag), not CTAs or links.
     expect(screen.getByText("tag")).toBeInTheDocument();
     expect(container.querySelector(".card-footer a")).toBeNull();
   });
