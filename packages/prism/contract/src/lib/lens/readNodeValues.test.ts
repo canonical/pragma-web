@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SERVED_STATION_FIELDS } from "../../testing/fixtures.js";
+import { NUMBER_FORMAT, NUMBER_LOCALE } from "./constants.js";
 import { deriveListFields } from "./deriveListFields.js";
 import { readNodeValues } from "./readNodeValues.js";
 
@@ -46,10 +47,15 @@ describe("readNodeValues", () => {
     const [value] = readNodeValues(pick("platformCount"), () => [
       { text: "1600", uri: null },
     ]);
-    expect(value).toMatchObject({
-      text: new Intl.NumberFormat().format(1600),
-      type: "number",
-    });
+    expect(value).toMatchObject({ text: "1,600", type: "number" });
+  });
+
+  it("groups a whole number in the fixed locale, not the runtime's default", () => {
+    const [value] = readNodeValues(pick("platformCount"), () => [
+      { text: "-1234567", uri: null },
+    ]);
+    expect(value?.text).toBe("-1,234,567");
+    expect(NUMBER_FORMAT.resolvedOptions().locale).toBe(NUMBER_LOCALE);
   });
 
   it("keeps a text field's value as read", () => {

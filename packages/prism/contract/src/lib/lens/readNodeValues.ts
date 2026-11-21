@@ -7,7 +7,8 @@ import type { ListField, NodeValue, ReadValue } from "./types.js";
 
 /**
  * A value's text as its field's type reads it: a whole number grouped in
- * the runtime's locale, any other value as read.
+ * the fixed locale `en`, whatever the runtime's default, any other value as
+ * read.
  */
 const formatValue = (field: ListField, text: string): string =>
   field.type === "number" && /^-?\d+$/.test(text)

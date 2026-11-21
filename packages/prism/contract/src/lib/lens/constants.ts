@@ -70,10 +70,14 @@ export const VALUE_SEPARATOR = ", ";
 export const LIST_SHOWN_VALUES = 1;
 
 /**
- * How a list shows a number field's value: grouped, in the runtime's
- * locale, as served data carries no reader's locale.
+ * The one locale a list's whole numbers are grouped in, on the server and
+ * the browser alike: served data carries no reader's locale, and the
+ * runtime's default differs between the two.
  */
-export const NUMBER_FORMAT = new Intl.NumberFormat();
+export const NUMBER_LOCALE = "en";
+
+/** How a list shows a number field's whole value: grouped in `NUMBER_LOCALE`. */
+export const NUMBER_FORMAT = new Intl.NumberFormat(NUMBER_LOCALE);
 
 /**
  * The facet every faceted list may carry beside its lens's fields: the

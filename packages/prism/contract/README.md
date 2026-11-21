@@ -182,6 +182,9 @@ Its limits:
 
 - A number value shows without a unit until a field states one: no
   served field states a unit yet.
+- A whole number is grouped in the one locale `en`, on the server and
+  the browser alike, whatever the number means: a year or an identifier
+  would read grouped, until a field can say how its number reads.
 - A relation field that holds a connection is not read as a value, so its
   column stays empty.
 
