@@ -26,6 +26,9 @@
       --typography-text-primary-font-weight
     );
     --entity-table-sorted-color: var(--color-text);
+    /* The header's labels: at most two lines, an inset above the rule. */
+    --entity-table-header-lines: 2;
+    --entity-table-header-inset: var(--space-100);
     /* A folded row's title is its first line, across the row. */
     --entity-table-fold-title-basis: 100%;
     /* A folded row's lines: 24px each, the first a half inset from the
@@ -80,6 +83,16 @@
     grid-auto-rows: var(--entity-table-row-size);
   }
 
+  /* The header row is two lines high, its labels standing at its foot, an
+   * inset above its rule: a label wider than its column, a number's one
+   * column among them, wraps onto the second line rather than being cut,
+   * and only a label longer than two lines ends in an ellipsis. */
+  .ds.entity-table .header {
+    block-size: var(--entity-table-two-line-row-size);
+    grid-auto-rows: var(--entity-table-two-line-row-size);
+    align-items: end;
+  }
+
   .ds.entity-table .row[aria-selected="true"] {
     background: var(--entity-table-selected-background);
   }
@@ -90,8 +103,8 @@
   }
 
   /* The title and each text or list value share the canvas's free
-   * columns two each, a number one, so headers and values read whole
-   * where the canvas has room. */
+   * columns two each, a number one, so values read whole where the canvas
+   * has room; a header that needs more wraps onto its second line. */
   .ds.entity-table .heading,
   .ds.entity-table .title,
   .ds.entity-table .column,
@@ -116,6 +129,18 @@
     text-align: start;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  .ds.entity-table .heading,
+  .ds.entity-table .column {
+    padding-block-end: var(--entity-table-header-inset);
+    white-space: normal;
+  }
+
+  .ds.entity-table .sort {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--entity-table-header-lines);
   }
 
   /* Headers and titles read as the table's text, at the regular weight:
@@ -143,11 +168,16 @@
   }
 
   /* The sorted column's header is in ink, its direction marked after the
-   * label, outside the label's ellipsis so a cut label keeps it. */
+   * label's last line, outside the label so a long label keeps it; a
+   * number's stands at its column's end. */
   .ds.entity-table .column.is-sorted {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     color: var(--entity-table-sorted-color);
+  }
+
+  .ds.entity-table .column.is-number.is-sorted {
+    justify-content: flex-end;
   }
 
   .ds.entity-table .sort {

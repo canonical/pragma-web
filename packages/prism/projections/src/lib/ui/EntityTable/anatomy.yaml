@@ -15,7 +15,10 @@
 # subgrid of the package; a hairline closes each row. A row is clipped at
 # its own height, so the value cells that find no column on its line leave
 # whole, the last first. A text or list value cell spans two columns, a
-# number's (.is-number) one, read from its end, its header too. Each
+# number's (.is-number) one, read from its end, its header too. The
+# header row is two lines high (56px), its labels at its foot an inset
+# above the rule: a label wider than its column wraps onto the second line
+# (clamped at two), so a number's one column reads its header whole. Each
 # value cell holds its field's label (term),
 # hidden, then its text (detail); a cell with no value holds neither.
 #
@@ -74,9 +77,9 @@ node:
                 layout.grid.column: "1 / -1"
                 spacing.gap.inline: grid.gutter
                 spacing.gap.block: 0
-                layout.align: center
-                size.block: space.400
-                layout.grid.autoRows: space.400
+                layout.align: end
+                size.block: "calc(2 * var(--space-300) + var(--space-100))"
+                layout.grid.autoRows: "calc(2 * var(--space-300) + var(--space-100))"
                 layout.overflow: hidden
                 appearance.border.width: 1px
                 appearance.border.style: solid
@@ -91,8 +94,8 @@ node:
                       size.min.width: 0
                       layout.overflow: hidden
                       typography.align: start
-                      typography.whiteSpace: nowrap
-                      typography.overflow: ellipsis
+                      typography.whiteSpace: normal
+                      spacing.padding.block.end: space.100
                   relation: { cardinality: "1", slotName: heading }
                 - switch:
                     on: sorted
@@ -106,12 +109,13 @@ node:
                             size.min.width: 0
                             layout.overflow: hidden
                             typography.align: start
-                            typography.whiteSpace: nowrap
-                            typography.overflow: ellipsis
+                            typography.whiteSpace: normal
+                            spacing.padding.block.end: space.100
                           edges:
                             - node:
                                 role: sort link
                                 styles:
+                                  typography.lineClamp: 2
                                   typography.weight: typography.text.primary.fontWeight
                                   typography.color: inherit
                                   typography.decoration: none
@@ -134,7 +138,8 @@ node:
                           role: sorted column heading (.is-sorted)
                           styles:
                             layout.type: flex
-                            layout.align: center
+                            layout.align: end
+                            layout.justify@number: end
                             typography.color: color.text
                   relation: { cardinality: "1..*", slotName: column }
             relation: { cardinality: "1", slotName: header }
