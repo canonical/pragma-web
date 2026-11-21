@@ -1106,7 +1106,37 @@ export default [
                   "type": {
                     "label": "Geo point",
                     "uri": "https://geo.example/onto#GeoPoint"
-                  }
+                  },
+                  "groups": [
+                    {
+                      "predicateUri": "https://geo.example/onto#latitude",
+                      "predicate": {
+                        "label": "latitude",
+                        "uri": "https://geo.example/onto#latitude"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "51.5412",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://geo.example/onto#longitude",
+                      "predicate": {
+                        "label": "longitude",
+                        "uri": "https://geo.example/onto#longitude"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "-0.1435",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -1123,7 +1153,37 @@ export default [
               "values": [
                 {
                   "__typename": "StatementNested",
-                  "type": null
+                  "type": null,
+                  "groups": [
+                    {
+                      "predicateUri": "https://metro.example/onto#x",
+                      "predicate": {
+                        "label": "x",
+                        "uri": "https://metro.example/onto#x"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "0",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://metro.example/onto#y",
+                      "predicate": {
+                        "label": "y",
+                        "uri": "https://metro.example/onto#y"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "0",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -1505,7 +1565,37 @@ export default [
                   "type": {
                     "label": "Geo point",
                     "uri": "https://geo.example/onto#GeoPoint"
-                  }
+                  },
+                  "groups": [
+                    {
+                      "predicateUri": "https://geo.example/onto#latitude",
+                      "predicate": {
+                        "label": "latitude",
+                        "uri": "https://geo.example/onto#latitude"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "51.5074",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://geo.example/onto#longitude",
+                      "predicate": {
+                        "label": "longitude",
+                        "uri": "https://geo.example/onto#longitude"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "-0.1278",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -1522,7 +1612,37 @@ export default [
               "values": [
                 {
                   "__typename": "StatementNested",
-                  "type": null
+                  "type": null,
+                  "groups": [
+                    {
+                      "predicateUri": "https://metro.example/onto#x",
+                      "predicate": {
+                        "label": "x",
+                        "uri": "https://metro.example/onto#x"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "0",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://metro.example/onto#y",
+                      "predicate": {
+                        "label": "y",
+                        "uri": "https://metro.example/onto#y"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "9",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -1933,11 +2053,259 @@ export default [
               "values": [
                 {
                   "__typename": "StatementNested",
-                  "type": null
+                  "type": null,
+                  "groups": [
+                    {
+                      "predicateUri": "https://metro.example/onto#calls",
+                      "predicate": {
+                        "label": "calls",
+                        "uri": "https://metro.example/onto#calls"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Interchange",
+                            "uri": "https://metro.example/onto#central-exchange",
+                            "__isNode": "Interchange",
+                            "_meta": {
+                              "title": "Central Exchange",
+                              "curie": "metro:central-exchange"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Station",
+                            "uri": "https://metro.example/onto#kilnwood",
+                            "__isNode": "Station",
+                            "_meta": {
+                              "title": "Kilnwood",
+                              "curie": "metro:kilnwood"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Station",
+                            "uri": "https://metro.example/onto#quarry-hill",
+                            "__isNode": "Station",
+                            "_meta": {
+                              "title": "Quarry Hill",
+                              "curie": "metro:quarry-hill"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Interchange",
+                            "uri": "https://metro.example/onto#riverside-junction",
+                            "__isNode": "Interchange",
+                            "_meta": {
+                              "title": "Riverside Junction",
+                              "curie": "metro:riverside-junction"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Interchange",
+                            "uri": "https://metro.example/onto#tannery-lane",
+                            "__isNode": "Interchange",
+                            "_meta": {
+                              "title": "Tannery Lane",
+                              "curie": "metro:tannery-lane"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Station",
+                            "uri": "https://metro.example/onto#willowbank",
+                            "__isNode": "Station",
+                            "_meta": {
+                              "title": "Willowbank",
+                              "curie": "metro:willowbank"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://metro.example/onto#isLoop",
+                      "predicate": {
+                        "label": "is loop",
+                        "uri": "https://metro.example/onto#isLoop"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "true",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://metro.example/onto#reverse",
+                      "predicate": {
+                        "label": "reverse",
+                        "uri": "https://metro.example/onto#reverse"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementNested",
+                          "type": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "http://www.w3.org/2000/01/rdf-schema#label",
+                      "predicate": {
+                        "label": "label",
+                        "uri": "http://www.w3.org/2000/01/rdf-schema#label"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "Clockwise",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
                   "__typename": "StatementNested",
-                  "type": null
+                  "type": null,
+                  "groups": [
+                    {
+                      "predicateUri": "https://metro.example/onto#calls",
+                      "predicate": {
+                        "label": "calls",
+                        "uri": "https://metro.example/onto#calls"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Interchange",
+                            "uri": "https://metro.example/onto#central-exchange",
+                            "__isNode": "Interchange",
+                            "_meta": {
+                              "title": "Central Exchange",
+                              "curie": "metro:central-exchange"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Station",
+                            "uri": "https://metro.example/onto#kilnwood",
+                            "__isNode": "Station",
+                            "_meta": {
+                              "title": "Kilnwood",
+                              "curie": "metro:kilnwood"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Station",
+                            "uri": "https://metro.example/onto#quarry-hill",
+                            "__isNode": "Station",
+                            "_meta": {
+                              "title": "Quarry Hill",
+                              "curie": "metro:quarry-hill"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Interchange",
+                            "uri": "https://metro.example/onto#riverside-junction",
+                            "__isNode": "Interchange",
+                            "_meta": {
+                              "title": "Riverside Junction",
+                              "curie": "metro:riverside-junction"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Interchange",
+                            "uri": "https://metro.example/onto#tannery-lane",
+                            "__isNode": "Interchange",
+                            "_meta": {
+                              "title": "Tannery Lane",
+                              "curie": "metro:tannery-lane"
+                            }
+                          }
+                        },
+                        {
+                          "__typename": "StatementNode",
+                          "node": {
+                            "__typename": "Station",
+                            "uri": "https://metro.example/onto#willowbank",
+                            "__isNode": "Station",
+                            "_meta": {
+                              "title": "Willowbank",
+                              "curie": "metro:willowbank"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://metro.example/onto#isLoop",
+                      "predicate": {
+                        "label": "is loop",
+                        "uri": "https://metro.example/onto#isLoop"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "true",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://metro.example/onto#reverse",
+                      "predicate": {
+                        "label": "reverse",
+                        "uri": "https://metro.example/onto#reverse"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementNested",
+                          "type": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "http://www.w3.org/2000/01/rdf-schema#label",
+                      "predicate": {
+                        "label": "label",
+                        "uri": "http://www.w3.org/2000/01/rdf-schema#label"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "Anticlockwise",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -2286,7 +2654,37 @@ export default [
                   "type": {
                     "label": "Geo point",
                     "uri": "https://geo.example/onto#GeoPoint"
-                  }
+                  },
+                  "groups": [
+                    {
+                      "predicateUri": "https://geo.example/onto#latitude",
+                      "predicate": {
+                        "label": "latitude",
+                        "uri": "https://geo.example/onto#latitude"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "51.5008",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://geo.example/onto#longitude",
+                      "predicate": {
+                        "label": "longitude",
+                        "uri": "https://geo.example/onto#longitude"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "-0.1246",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -2303,7 +2701,37 @@ export default [
               "values": [
                 {
                   "__typename": "StatementNested",
-                  "type": null
+                  "type": null,
+                  "groups": [
+                    {
+                      "predicateUri": "https://metro.example/onto#x",
+                      "predicate": {
+                        "label": "x",
+                        "uri": "https://metro.example/onto#x"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "9",
+                          "lang": null
+                        }
+                      ]
+                    },
+                    {
+                      "predicateUri": "https://metro.example/onto#y",
+                      "predicate": {
+                        "label": "y",
+                        "uri": "https://metro.example/onto#y"
+                      },
+                      "values": [
+                        {
+                          "__typename": "StatementLiteral",
+                          "lexical": "18",
+                          "lang": null
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },

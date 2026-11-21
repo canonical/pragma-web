@@ -120,10 +120,13 @@ describe("EntityDetail", () => {
       CENTRAL_EXCHANGE_CURIE,
     );
     expect(
-      [...container.querySelectorAll(".facts dt")].map(
+      [...container.querySelectorAll(".facts dt:not(.statement-group dt)")].map(
         (term) => term.textContent,
       ),
     ).toEqual(["location", "serves lines", "transfer minutes"]);
+    expect(
+      container.querySelector(".facts .nested")?.textContent,
+    ).toMatch(/^latitude.+longitude.+$/);
     expect(container.querySelectorAll(".facts .values a")).toHaveLength(3);
     expect(readSections(container)).toEqual([
       "p-platformCount|platform count · 1",

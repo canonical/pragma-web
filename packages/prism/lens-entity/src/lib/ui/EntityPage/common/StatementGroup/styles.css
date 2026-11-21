@@ -24,6 +24,29 @@
     padding-inline-start: 0;
   }
 
+  /* A nested value: its predicates and their values on one wrapping line. */
+  .ds.statement-group > .values > .value > .nested {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--statement-group-gap);
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+
+  .ds.statement-group > .values > .value > .nested > .pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--statement-group-gap);
+  }
+
+  .ds.statement-group > .values > .value > .nested > .pair > .term {
+    color: var(--statement-group-shown-color);
+  }
+
+  .ds.statement-group > .values > .value > .nested > .pair > .held {
+    margin-inline-start: 0;
+  }
+
   .ds.statement-group > .shown {
     grid-column: 1 / -1;
     margin-block-start: 0;

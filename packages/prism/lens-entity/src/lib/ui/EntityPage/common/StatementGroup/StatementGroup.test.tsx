@@ -49,7 +49,40 @@ const craftAnswer = () => {
       lang: "fr",
     },
     { __typename: "StatementForeign", curie: "x:a" },
-    { __typename: "StatementNested", type: null },
+    { __typename: "StatementNested", type: null, groups: [] },
+    {
+      __typename: "StatementNested",
+      type: { label: "Geo point" },
+      groups: [
+        {
+          predicateUri: "https://geo.example/onto#latitude",
+          predicate: { label: "latitude" },
+          values: [
+            {
+              __typename: "StatementLiteral",
+              lexical: "51.5074",
+              lang: null,
+            },
+          ],
+        },
+        {
+          predicateUri: "https://geo.example/onto#longitude",
+          predicate: null,
+          values: [
+            {
+              __typename: "StatementLiteral",
+              lexical: "-0.1278",
+              lang: null,
+            },
+          ],
+        },
+        {
+          predicateUri: "https://geo.example/onto#empty",
+          predicate: null,
+          values: [],
+        },
+      ],
+    },
     // A kind a later contract may add, which this reader does not know.
     { __typename: "StatementQuoted" },
   ];
@@ -92,7 +125,7 @@ describe("StatementGroup", () => {
   }, async () => {
     const { container } = await renderGroup();
     const values = [...container.querySelectorAll(".values > .value")];
-    expect(values).toHaveLength(5);
+    expect(values).toHaveLength(6);
     expect(values.at(0)?.querySelector("a")?.getAttribute("href")).toBe(
       "/lines/metro%3Acircle-line",
     );
@@ -101,7 +134,13 @@ describe("StatementGroup", () => {
     );
     expect(values.at(2)?.querySelector("code")?.textContent).toBe("x:a");
     expect(values.at(3)?.textContent).toBe("A nested value");
-    expect(values.at(4)?.childNodes).toHaveLength(0);
+    expect(
+      [...(values.at(4)?.querySelectorAll(".nested > .pair") ?? [])].map(
+        (pair) =>
+          [...pair.children].map(({ textContent }) => textContent).join(" "),
+      ),
+    ).toEqual(["latitude 51.5074", "longitude -0.1278"]);
+    expect(values.at(5)?.childNodes).toHaveLength(0);
   });
 
   it("ends a group cut at its bound with how many of its values it shows, never a link", {
@@ -111,7 +150,7 @@ describe("StatementGroup", () => {
     const group = container.querySelector('[data-probe="group"]');
     expect(group?.querySelector("a.all")).toBeNull();
     expect(group?.querySelector(":scope > p.shown")?.textContent).toBe(
-      "5 of 30 shown",
+      "6 of 30 shown",
     );
   });
 });

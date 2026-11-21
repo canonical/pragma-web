@@ -13,10 +13,32 @@ node:
   element: div
   styles: { layout.type: grid, layout.grid.columns: subgrid, layout.grid.column: "1 / -1", spacing.gap: grid.gutter }
   edges:
-    - node: { role: values, element: ul, styles: { layout.grid.column: "1 / -1", layout.type: flex, layout.wrap: wrap, spacing.gap: grid.gutter, layout.listStyle: none, spacing.internal.inline.start: 0, spacing.external.block.start: 0, spacing.external.block.end: 0 } }
+    - node:
+        role: values
+        element: ul
+        styles: { layout.grid.column: "1 / -1", layout.type: flex, layout.wrap: wrap, spacing.gap: grid.gutter, layout.listStyle: none, spacing.internal.inline.start: 0, spacing.external.block.start: 0, spacing.external.block.end: 0 }
+        edges:
+          - node:
+              role: value
+              element: li
+              edges:
+                - node:
+                    role: nested
+                    element: dl
+                    styles: { layout.type: flex, layout.wrap: wrap, spacing.gap: grid.gutter, spacing.external.block.start: 0, spacing.external.block.end: 0 }
+                    edges:
+                      - node:
+                          role: pair
+                          element: div
+                          styles: { layout.type: flex, layout.wrap: wrap, spacing.gap: grid.gutter }
+                          edges:
+                            - node: { role: term, element: dt, styles: { typography.color: color.text.muted } }
+                              relation: { cardinality: "1", slotName: term }
+                            - node: { role: held, element: dd, styles: { spacing.external.inline.start: 0 } }
+                              relation: { cardinality: "1..*", slotName: held }
+                        relation: { cardinality: "1..*", slotName: pair }
+                  relation: { cardinality: "0..1", slotName: nested }   # a nested value's own values
+            relation: { cardinality: "1..12", slotName: value }
       relation: { cardinality: "1", slotName: values }
-      edges:
-        - node: { role: value, element: li }
-          relation: { cardinality: "1..12", slotName: value }
     - node: { role: shown, element: p, styles: { layout.grid.column: "1 / -1", spacing.external.block.start: 0, spacing.external.block.end: 0, typography.color: color.text.muted } }
       relation: { cardinality: "0..1", slotName: shown }    # "12 of 30 shown", when total > shown
