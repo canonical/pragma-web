@@ -154,6 +154,10 @@ describe("EntityDetail", () => {
     expect(container.querySelector(".status .address")?.textContent).toBe(
       CENTRAL_EXCHANGE_CURIE,
     );
+    // The class is its chip, which names it and links to its home.
+    const kind = container.querySelector(".status .kind");
+    expect(kind?.textContent).toBe("Interchange");
+    console.log("KIND", kind?.innerHTML);
   });
 
   it("indexes the sections it renders, in order, Referenced by with its count last", {

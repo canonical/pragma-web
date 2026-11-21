@@ -755,13 +755,13 @@ export default [
             type: {
               uri: "https://geo.example/onto#Zone",
               label: "Fare zone",
-              superclasses: [],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 title: "Fare zone",
                 curie: "geo:Zone",
               },
+              superclasses: [],
             },
             label: "Coastal Zone",
             comment: null,
@@ -942,17 +942,17 @@ export default [
             type: {
               uri: "https://metro.example/onto#Station",
               label: "Station",
-              superclasses: [
-                {
-                  uri: "https://metro.example/onto#Stop",
-                },
-              ],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 title: "Station",
                 curie: "metro:Station",
               },
+              superclasses: [
+                {
+                  uri: "https://metro.example/onto#Stop",
+                },
+              ],
             },
             label: "Northgate",
             comment: null,
@@ -1439,6 +1439,12 @@ export default [
             type: {
               uri: "https://metro.example/onto#Interchange",
               label: "Interchange",
+              __isNode: "OntologyClass",
+              __typename: "OntologyClass",
+              _meta: {
+                title: "Interchange",
+                curie: "metro:Interchange",
+              },
               superclasses: [
                 {
                   uri: "https://metro.example/onto#Station",
@@ -1447,12 +1453,6 @@ export default [
                   uri: "https://metro.example/onto#Stop",
                 },
               ],
-              __isNode: "OntologyClass",
-              __typename: "OntologyClass",
-              _meta: {
-                title: "Interchange",
-                curie: "metro:Interchange",
-              },
             },
             label: "Central Exchange",
             comment: null,
@@ -2066,13 +2066,13 @@ export default [
             type: {
               uri: "https://metro.example/onto#Line",
               label: "Line",
-              superclasses: [],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 title: "Line",
                 curie: "metro:Line",
               },
+              superclasses: [],
             },
             label: "Circle Line",
             comment: "Runs both directions; timetable is symmetric.",
@@ -2736,17 +2736,17 @@ export default [
             type: {
               uri: "https://metro.example/onto#Station",
               label: "Station",
-              superclasses: [
-                {
-                  uri: "https://metro.example/onto#Stop",
-                },
-              ],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 title: "Station",
                 curie: "metro:Station",
               },
+              superclasses: [
+                {
+                  uri: "https://metro.example/onto#Stop",
+                },
+              ],
             },
             label: "Harbourside",
             comment: "Step-free to all platforms.",
@@ -3228,17 +3228,17 @@ export default [
             type: {
               uri: "https://metro.example/onto#Station",
               label: "Station",
-              superclasses: [
-                {
-                  uri: "https://metro.example/onto#Stop",
-                },
-              ],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 title: "Station",
                 curie: "metro:Station",
               },
+              superclasses: [
+                {
+                  uri: "https://metro.example/onto#Stop",
+                },
+              ],
             },
             label: "Northgate",
             comment: null,
@@ -3438,13 +3438,13 @@ export default [
             type: {
               uri: "https://metro.example/onto#Line",
               label: "Line",
-              superclasses: [],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 title: "Line",
                 curie: "metro:Line",
               },
+              superclasses: [],
             },
             label: "Circle Line",
             comment: "Runs both directions; timetable is symmetric.",
@@ -3585,13 +3585,13 @@ export default [
             type: {
               uri: "https://metro.example/onto#CarType",
               label: "Car type",
-              superclasses: [],
               __isNode: "OntologyClass",
               __typename: "OntologyClass",
               _meta: {
                 title: "Car type",
                 curie: "metro:CarType",
               },
+              superclasses: [],
             },
             label: "Series 50 driving motor car",
             comment: null,

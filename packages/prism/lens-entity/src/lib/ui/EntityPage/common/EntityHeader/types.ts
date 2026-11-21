@@ -1,12 +1,12 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
   /** The entity's name: the page's level-1 heading. */
   readonly title: string;
   /** The entity's address in compact form, which Copy writes. */
   readonly address: string;
-  /** The entity's class, in the reader's language. */
-  readonly kind: string;
+  /** The entity's class: its linked chip, or its name in the reader's language. */
+  readonly kind: ReactNode;
   /** The entity's one-line description; no summary row when omitted. */
   readonly summary?: string;
 };

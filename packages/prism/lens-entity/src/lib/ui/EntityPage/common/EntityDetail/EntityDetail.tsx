@@ -9,6 +9,7 @@ import {
   type SectionedViewSection,
   useRenderers,
 } from "@canonical/prism-core";
+import { ChipProjection } from "@canonical/prism-projections";
 import { InlineCode } from "@canonical/react-ds-global";
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
@@ -22,7 +23,6 @@ import entityStatementsQueryNode from "../../../../../__generated__/EntityStatem
 import buildEntityPageVariables from "../../../../buildEntityPageVariables.js";
 import { Message, useMessages } from "../../../../i18n/index.js";
 import isInstanceOf from "../../../../isInstanceOf.js";
-import labelClass from "../../../../labelClass.js";
 import labelIncomingGroup from "../../../../labelIncomingGroup.js";
 import labelOutgoingGroup from "../../../../labelOutgoingGroup.js";
 import listStatementSections from "../../../../listStatementSections.js";
@@ -77,6 +77,7 @@ const declareEntityPageQueries = (): unknown => [
           type {
             uri
             label
+            ...ChipProjection_node
             superclasses {
               uri
             }
@@ -280,7 +281,7 @@ export default function EntityDetail({
         header={
           <EntityHeader
             address={entity._meta.curie}
-            kind={labelClass(entity._meta.type, ontologies)}
+            kind={<ChipProjection node={entity._meta.type} />}
             summary={served ? readEntitySummary(entity._meta) : undefined}
             title={entity._meta.title}
           />
