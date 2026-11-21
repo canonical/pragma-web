@@ -24,8 +24,13 @@
     gap: var(--component-header-gap);
   }
 
+  /* The class's mark before the name, one gutter apart, on the name's
+   * baseline. */
   .ds.component-header > .heading {
     grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: var(--component-header-gap);
     margin-block: 0;
   }
 
