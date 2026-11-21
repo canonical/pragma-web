@@ -22,3 +22,5 @@ export type { EntityLayoutProps } from "./ui/EntityLayout/index.js";
 export { EntityLayout } from "./ui/EntityLayout/index.js";
 export type { EntityPageProps } from "./ui/EntityPage/index.js";
 export { EntityPage } from "./ui/EntityPage/index.js";
+export type { EntityPanelProps } from "./ui/EntityPanel/index.js";
+export { EntityPanel } from "./ui/EntityPanel/index.js";

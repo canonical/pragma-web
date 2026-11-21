@@ -238,4 +238,5 @@ two groups of columns through the one container query on the shell, at
 - Routes: `createEntityRoutes`; types `EntityRoutes`, `EntityLensOptions`.
 - Layout: `EntityLayout`; types `EntityLayoutProps`.
 - Pages: `EntityIndexPage`, `EntityPage`; types `EntityIndexPageProps`, `EntityPageProps`.
+- Details panel, an entity's identity, values and closed relation groups beside another view: `EntityPanel`; types `EntityPanelProps`.
 - Addresses, for a site's own routes that take an entity's address the way the lens's do: `expandAddress`, `readUriParam`; types `OntologyNamespace`.
