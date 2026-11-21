@@ -12,6 +12,10 @@ describe("countTypeFacets", () => {
       { type: "a", count: 1 },
       { type: "b", count: 1 },
     ]);
+    expect(countTypeFacets(["a", "b"])).toEqual([
+      { type: "a", count: 1 },
+      { type: "b", count: 1 },
+    ]);
   });
 
   it("counts nothing for no matches", () => {

@@ -293,4 +293,6 @@ export interface SearchMatch {
   readonly value: string;
   /** The entry's title, which breaks ties between equal matches. */
   readonly title: string;
+  /** The IRI of the type the entry is counted under. */
+  readonly type: string;
 }

@@ -1069,23 +1069,6 @@ export const createExampleProvider = (
       ),
     ),
   ];
-  const searchEntryByUri = new Map(
-    searchEntries.map((entry) => [entry.uri, entry]),
-  );
-
-  /**
-   * The entry a match was made on.
-   *
-   * @throws When no entry has the match's IRI: matches come from the entries.
-   */
-  const entryOf = (uri: string): SearchEntry => {
-    const entry = searchEntryByUri.get(uri);
-    if (entry === undefined) {
-      throw new Error(`no search entry for ${uri}`);
-    }
-    return entry;
-  };
-
   /**
    * Answer one search: rank the entries for the text, keep the types asked
    * for, page the rest as every connection is paged, and resolve each
@@ -1094,16 +1077,14 @@ export const createExampleProvider = (
    */
   const buildSearchView = (args: SearchArgs): View => {
     const needle = args.text.trim().toLowerCase();
-    const matches = rankSearchEntries(searchEntries, args.text).map(
-      (match) => ({ match, entry: entryOf(match.uri) }),
-    );
+    const matches = rankSearchEntries(searchEntries, args.text);
     const types = new Set((args.types ?? []).map(expandUri));
     const kept =
       types.size === 0
         ? matches
-        : matches.filter(({ entry }) => types.has(entry.type));
-    const page = sliceConnection(kept, ({ match }) => match.uri, args);
-    const edges = page.items.flatMap(({ match }) => {
+        : matches.filter((match) => types.has(match.type));
+    const page = sliceConnection(kept, (match) => match.uri, args);
+    const edges = page.items.flatMap((match) => {
       const node = resolveNode(match.uri);
       return node === null
         ? []
@@ -1121,7 +1102,7 @@ export const createExampleProvider = (
     return {
       ...buildNodeConnectionView(edges, page),
       total: kept.length,
-      facets: countTypeFacets(matches.map(({ entry }) => entry.type)).map(
+      facets: countTypeFacets(matches.map((match) => match.type)).map(
         ({ type, count }) => ({ type: nullableClassView(type), count }),
       ),
     };

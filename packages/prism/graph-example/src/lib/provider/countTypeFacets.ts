@@ -1,8 +1,5 @@
 import type { TypeCount } from "./types.js";
 
-const compareText = (a: string, b: string): number =>
-  a < b ? -1 : a > b ? 1 : 0;
-
 /**
  * Count search matches by type: one entry per type with a match, the most
  * matches first, then the type's IRI in code-point order.
@@ -17,7 +14,10 @@ export const countTypeFacets = (
   for (const type of types) {
     counts.set(type, (counts.get(type) ?? 0) + 1);
   }
-  return [...counts]
-    .map(([type, count]) => ({ type, count }))
-    .sort((a, b) => b.count - a.count || compareText(a.type, b.type));
+  return (
+    [...counts]
+      .map(([type, count]) => ({ type, count }))
+      // Each type is counted once, so two entries never hold the same IRI.
+      .sort((a, b) => b.count - a.count || (a.type < b.type ? -1 : 1))
+  );
 };

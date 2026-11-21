@@ -29,5 +29,6 @@ export const matchSearchEntry = (
         position: match.position,
         value: match.value,
         title: entry.title,
+        type: entry.type,
       };
 };

@@ -21,6 +21,7 @@ describe("matchSearchEntry", () => {
       position: 0,
       value: "Depot",
       title: "Depot",
+      type: `${M}Station`,
     });
   });
 
@@ -31,6 +32,7 @@ describe("matchSearchEntry", () => {
       position: 6,
       value: "metro:platform-bay",
       title: "Bay",
+      type: `${M}Station`,
     });
   });
 
@@ -41,6 +43,7 @@ describe("matchSearchEntry", () => {
       position: 27,
       value: "Platform cover against the rain.",
       title: "Canopy",
+      type: `${M}Station`,
     });
   });
 
