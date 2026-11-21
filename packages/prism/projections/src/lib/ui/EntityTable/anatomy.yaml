@@ -15,8 +15,8 @@
 # subgrid of the package; a hairline closes each row. A row is clipped at
 # its own height, so the value cells that find no column on its line leave
 # whole, the last first. A text or list value cell spans two columns, a
-# number's (.is-number) one, read from its end, its header too; a folded
-# row reads every value from its start. Each value cell holds its field's label (term),
+# number's (.is-number) one, read from its end, its header too. Each
+# value cell holds its field's label (term),
 # hidden, then its text (detail); a cell with no value holds neither.
 #
 # Below two groups (the shell's container query at 912px) the table folds

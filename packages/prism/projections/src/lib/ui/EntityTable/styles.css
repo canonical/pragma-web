@@ -160,10 +160,6 @@
     text-align: end;
   }
 
-  .ds.entity-table .column.is-number.is-sorted {
-    justify-content: flex-end;
-  }
-
   /* A value's label, which only a folded row shows, muted before its
    * text. */
   .ds.entity-table .term {
@@ -194,11 +190,9 @@
       flex-basis: var(--entity-table-fold-title-basis);
     }
 
-    .ds.entity-table .value,
-    .ds.entity-table .value.is-number {
+    .ds.entity-table .value {
       flex-grow: 1;
       flex-basis: 0;
-      text-align: start;
     }
 
     .ds.entity-table .value.is-later {
