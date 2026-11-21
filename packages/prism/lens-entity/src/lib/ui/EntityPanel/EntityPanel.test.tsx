@@ -89,6 +89,8 @@ describe("EntityPanel", () => {
     const open = panel?.querySelector(".identity .headline > a.open");
     expect(open?.getAttribute("href")).toBe("/lines/metro%3Acircle-line");
     expect(open?.textContent).toBe("Open");
+    // The panel links to the entity's home and is never one itself (W6b-A7).
+    expect(container.querySelector("[data-canonical]")).toBeNull();
     expect(panel?.querySelector(".identity .address")?.textContent).toBe(
       CIRCLE_LINE_CURIE,
     );

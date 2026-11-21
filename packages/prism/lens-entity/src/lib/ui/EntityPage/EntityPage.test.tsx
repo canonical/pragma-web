@@ -67,6 +67,16 @@ describe("EntityPage", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
+  it("marks its header as the station's one canonical home (W6b-A7)", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    await renderStation(NORTHGATE_CURIE);
+    const canonical = document.querySelectorAll("[data-canonical]");
+    expect(canonical).toHaveLength(1);
+    expect(canonical[0]).toHaveClass("entity-header");
+    expect(canonical[0]).toHaveAttribute("data-canonical", NORTHGATE_IRI);
+  });
+
   it("renders the same station reached by its absolute IRI", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {

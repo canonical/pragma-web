@@ -281,6 +281,7 @@ export default function EntityDetail({
         header={
           <EntityHeader
             address={entity._meta.curie}
+            data-canonical={entity.uri}
             kind={<ChipProjection node={entity._meta.type} />}
             summary={served ? readEntitySummary(entity._meta) : undefined}
             title={entity._meta.title}
