@@ -7,7 +7,7 @@ import createWarmEnvironment from "../../../../testing/createWarmEnvironment.js"
 import { ENTITY_TEST_TIMEOUT_MS } from "../../../../testing/fixtures.js";
 
 describe("EntityPage on the server", () => {
-  it("renders the station's title, summary, fields and relations from the warm store", {
+  it("renders the station's title, summary and home mark from the warm store", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const url = "/stations/metro%3Anorthgate";
@@ -19,10 +19,13 @@ describe("EntityPage on the server", () => {
       /<h1 class="title"><svg[^>]*>.*?<\/svg>Northgate<\/h1>/,
     );
     expect(html).toContain("The northern terminus.");
-    // Eight fields and four relations, each a key value under its rule.
-    expect(html.match(/<div class="pair">/g)).toHaveLength(12);
-    expect(html).toContain('class="ds field-list"');
-    expect(html).toContain('class="ds relations"');
+    expect(html).toContain('class="ds entity-summary');
+    expect(html).toContain(
+      'data-canonical="https://metro.example/onto#northgate"',
+    );
+    // A site that serves no statements shows no field list in their place.
+    expect(html).not.toContain("field-list");
+    expect(html).not.toContain('class="ds relations"');
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });
