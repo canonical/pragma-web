@@ -4,18 +4,46 @@ import { graphql } from "react-relay";
 /**
  * Codegen source of truth for `MetroSearchQuery`, the search page's one
  * operation: one page of the provider's `search` extension, each result
- * through the site's chip switch beside its passage and the ranges of the
- * text in it, and the total. Nothing calls it: the route's warm and the
+ * through the site's chip switch with its type, beside its passage and the
+ * ranges of the text in it; the total, the type facets and whether a page
+ * follows; and, from the third page, the cursor the previous page starts
+ * after. Nothing calls it: the route's warm and the
  * page read the compiled artifact, because an evaluated tag throws
  * wherever no Relay transform has run.
  */
 const declareMetroSearchQuery = (): unknown => graphql`
-  query MetroSearchQuery($text: String!, $first: Int) {
-    search(text: $text, first: $first) {
+  query MetroSearchQuery(
+    $text: String!
+    $first: Int
+    $after: String
+    $types: [ID!]
+    $hasPrevious: Boolean = false
+    $previousFirst: Int
+  ) {
+    search(text: $text, first: $first, after: $after, types: $types) {
       total
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      facets {
+        count
+        type {
+          uri
+          label
+          _meta {
+            title
+          }
+        }
+      }
       edges {
         cursor
         node {
+          _meta {
+            type {
+              uri
+            }
+          }
           ...MetroChipProjection_node
         }
         match {
@@ -25,6 +53,12 @@ const declareMetroSearchQuery = (): unknown => graphql`
             length
           }
         }
+      }
+    }
+    previous: search(text: $text, first: $previousFirst, types: $types)
+      @include(if: $hasPrevious) {
+      pageInfo {
+        endCursor
       }
     }
   }

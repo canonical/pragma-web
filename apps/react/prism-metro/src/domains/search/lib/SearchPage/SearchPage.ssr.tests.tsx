@@ -30,6 +30,7 @@ describe("SearchPage SSR", () => {
     expect(html).toContain('class="ds search-page"');
     expect(html).toContain(`>${MESSAGES["search.title"]}</h1>`);
     expect(html).toContain("1 result");
-    expect(html).toContain('<p class="passage">Northgate interchange</p>');
+    expect(html).toContain('class="ds search-passage passage"');
+    expect(html).toContain('<mark class="match">Northgate</mark>');
   });
 });

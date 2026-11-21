@@ -1,11 +1,13 @@
-import { prefetchQuery, type ViewSearch } from "@canonical/prism-core";
+import { prefetchQuery } from "@canonical/prism-core";
 import buildSearchVariables from "./buildSearchVariables.js";
-import readSearchText from "./readSearchText.js";
 import { searchQueryNode } from "./searchQuery.js";
+import { readSearchState } from "./searchValues.js";
+import type { SearchValues } from "./types.js";
 
 /**
  * Warm the store for the search page: prefetch `MetroSearchQuery` for the
- * address's text. The search route declares it as its `warm`.
+ * address's text, type and page; nothing for an address with no text,
+ * whose page queries nothing. The search route declares it as its `warm`.
  *
  * @param _params - The route's params; the search route has none.
  * @param search - The route's search values, which carry the text.
@@ -16,10 +18,9 @@ import { searchQueryNode } from "./searchQuery.js";
  */
 export default function warmSearch(
   _params: unknown,
-  search: ViewSearch,
+  search: SearchValues,
 ): Promise<void> {
-  return prefetchQuery(
-    searchQueryNode,
-    buildSearchVariables(readSearchText(search)),
-  );
+  const { text, ...state } = readSearchState(search);
+  if (text.trim() === "") return Promise.resolve();
+  return prefetchQuery(searchQueryNode, buildSearchVariables(text, state));
 }

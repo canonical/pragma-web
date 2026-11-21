@@ -164,4 +164,14 @@ export const MESSAGES = {
   "search.none": "Nothing matches the search.",
   "search.loading": "Searching…",
   "search.error": "The search could not be answered. Try again in a moment.",
+  "search.field": "Search text",
+  "search.placeholder": "Search the graph",
+  "search.submit": "Search",
+  "search.position": "{first}–{last} of {total}",
+  "search.empty": "Type a word in the field above to search every lens.",
+  "search.doors": "Lenses to browse",
+  "search.spelling":
+    "Check the spelling, or search for a shorter part of the word.",
+  "search.definitions": "Browse the Definitions, where every type is listed.",
+  "search.palette": "Or open the palette with Ctrl K to jump to a page.",
 } as const;
