@@ -1,0 +1,56 @@
+# TypeFacetBar — the Type facet of an index of mixed types, open as the
+# second band under the strip (FilterBar's band: the strip's height, one
+# muted rule beneath, 36 + 2 x 8 + 1 = 53px at the default density). Its
+# label, then one value per type: the type's name and its count. A value
+# with results is a link that applies the type (the applied one marked
+# current); a value with none is greyed and is not a link.
+#
+# Every decision is read through a component token declared on the root
+# (`--type-facet-bar-*`), bound to the symbol named here.
+#
+# Token ledger: none.
+node:
+  uri: prism.component.type_facet_bar
+  styles:
+    layout.type: flex
+    layout.align: center
+    spacing.gap: grid.gutter
+    size.min.height: density.line_height
+    spacing.internal.block: component.padding.block
+    border.block.end: color.border.muted
+  edges:
+    - node:
+        role: label
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: label }
+    - node:
+        role: values
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: grid.gutter
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+        edges:
+          - node:
+              role: value
+              edges:
+                - node:
+                    role: name
+                  relation: { cardinality: "1", slotName: name }
+                - node:
+                    role: count
+                    styles:
+                      typography.color: color.text.muted
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "1", slotName: count }
+            relation: { cardinality: "1..*", slotName: value }
+      relation: { cardinality: "1", slotName: values }
+    - node:
+        role: zero value
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: zero }

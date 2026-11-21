@@ -1,0 +1,32 @@
+# PaginationBar — the pagination bar of PS17 V1 under an index that pages:
+# a link to the previous page when there is one, the page's position
+# ("21–40 of 41"), and a link to the next page when there is one. Links, so
+# it pages without scripting; a missing end is left out, never a dead link.
+# The three sit on one line, the position muted between the links, the
+# links at the two ends.
+#
+# Every decision is read through a component token declared on the root
+# (`--pagination-bar-*`), bound to the symbol named here.
+#
+# Token ledger: none.
+node:
+  uri: prism.component.pagination_bar
+  styles:
+    layout.type: flex
+    layout.align: center
+    layout.justify: space-between
+    spacing.gap: grid.gutter
+    spacing.internal.block: component.padding.block
+  edges:
+    - node:
+        role: previous
+      relation: { cardinality: "0..1", slotName: previous }
+    - node:
+        role: position
+        styles:
+          typography.color: color.text.muted
+          typography.variant.numeric: tabular-nums
+      relation: { cardinality: "1", slotName: position }
+    - node:
+        role: next
+      relation: { cardinality: "0..1", slotName: next }
