@@ -14,5 +14,6 @@ type NodeValue {
   field: ID!
   label: String!
   text: String
-  uri: ID
+  uri: String
+  type: String!
 }

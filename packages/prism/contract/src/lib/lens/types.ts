@@ -237,6 +237,8 @@ export interface NodeValue {
   readonly field: string;
   /** The field's label, which a table's header reads. */
   readonly label: string;
+  /** How the field's values read, which sets a table's column. */
+  readonly type: ListFieldType;
   /** The values' texts joined, or null when the node has none. */
   readonly text: string | null;
   /** The IRI of the value when it is exactly one entity, else null. */

@@ -549,7 +549,9 @@ type NodeValue {
   "The values' texts joined, or null when the node has none."
   text: String
   "The IRI of the value when it is exactly one entity."
-  uri: ID
+  uri: String
+  "How the field's values read: text, number, flag, date or choices."
+  type: String!
 }
 
 "Keeps the nodes holding one of `values` for `field`; a null value stands for none."

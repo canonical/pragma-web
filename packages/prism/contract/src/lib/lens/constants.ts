@@ -60,6 +60,15 @@ export const PROMINENT_VISIBILITY: TermVisibility = "PROMINENT";
 /** What joins a field's values when a list shows them as one text. */
 export const VALUE_SEPARATOR = ", ";
 
+/** How many of a field's values a list shows before it counts the rest. */
+export const LIST_SHOWN_VALUES = 1;
+
+/**
+ * How a list shows a number field's value: grouped, in the runtime's
+ * locale, as served data carries no reader's locale.
+ */
+export const NUMBER_FORMAT = new Intl.NumberFormat();
+
 /**
  * The facet every faceted list may carry beside its lens's fields: the
  * node's own class, its values the class IRIs. A list of one class with

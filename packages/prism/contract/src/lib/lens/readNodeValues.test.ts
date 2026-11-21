@@ -33,11 +33,29 @@ describe("readNodeValues", () => {
     });
   });
 
-  it("joins several values and carries no IRI", () => {
+  it("shows a list's first value and how many more, and carries no IRI", () => {
     const [value] = readNodeValues(pick("servesLine"), () => [
       { text: "Circle Line", uri: "http://example.org/circle" },
       { text: "Red Line", uri: "http://example.org/red" },
+      { text: "Ringway Line", uri: "http://example.org/ringway" },
     ]);
-    expect(value).toMatchObject({ text: "Circle Line, Red Line", uri: null });
+    expect(value).toMatchObject({ text: "Circle Line +2", uri: null });
+  });
+
+  it("groups a number field's value and answers the field's type", () => {
+    const [value] = readNodeValues(pick("platformCount"), () => [
+      { text: "1600", uri: null },
+    ]);
+    expect(value).toMatchObject({
+      text: new Intl.NumberFormat().format(1600),
+      type: "number",
+    });
+  });
+
+  it("keeps a text field's value as read", () => {
+    const [value] = readNodeValues(pick("name"), () => [
+      { text: "007", uri: null },
+    ]);
+    expect(value).toMatchObject({ text: "007", type: "text" });
   });
 });

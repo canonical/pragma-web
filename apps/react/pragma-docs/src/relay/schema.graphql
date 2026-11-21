@@ -5763,7 +5763,10 @@ type NodeValue {
   text: String
 
   """The IRI of the value when it is exactly one entity."""
-  uri: ID
+  uri: String
+
+  """How the field's values read: text, number, flag, date or choices."""
+  type: String!
 }
 
 """

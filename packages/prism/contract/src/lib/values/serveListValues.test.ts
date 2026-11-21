@@ -96,7 +96,7 @@ describe("serveNodeValues", () => {
       "stepFree",
     ]);
     expect(values.slice(0, 2)).toMatchObject([
-      { text: "red, blue", uri: null },
+      { text: "red +1", uri: null },
       { text: "2", uri: null },
     ]);
   });
@@ -105,8 +105,14 @@ describe("serveNodeValues", () => {
     expect(
       await serveNodeValues(run, SDL, "ex:a", ["zone", "missing", "name"]),
     ).toEqual([
-      { field: "zone", label: "zone", text: "z1", uri: "ex:z1" },
-      { field: "name", label: "name", text: null, uri: null },
+      {
+        field: "zone",
+        label: "zone",
+        type: "choices",
+        text: "z1",
+        uri: "ex:z1",
+      },
+      { field: "name", label: "name", type: "text", text: null, uri: null },
     ]);
   });
 
@@ -116,7 +122,7 @@ describe("serveNodeValues", () => {
 
   it("answers none for fields the node's type cannot read", async () => {
     expect(await serveNodeValues(run, SDL, "ex:a", ["note"])).toEqual([
-      { field: "note", label: "note", text: null, uri: null },
+      { field: "note", label: "note", type: "text", text: null, uri: null },
     ]);
   });
 });

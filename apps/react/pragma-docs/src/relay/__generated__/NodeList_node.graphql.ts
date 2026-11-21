@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8a28c6f9a679b5ab23db8c8d399cab15>>
+ * @generated SignedSource<<82a530bd27b4e83835ea0f76c05300d2>>
  * @lightSyntaxTransform
  */
 
@@ -28,6 +28,7 @@ export type NodeList_node$data = ReadonlyArray<{
     readonly field: string;
     readonly label: string;
     readonly text: string | null | undefined;
+    readonly type: string;
   }>;
   readonly " $fragmentSpreads": FragmentRefs<"CardProjection_node" | "RowProjection_node">;
   readonly " $fragmentType": "NodeList_node";
@@ -145,6 +146,13 @@ return {
           "kind": "ScalarField",
           "name": "text",
           "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "type",
+          "storageKey": null
         }
       ],
       "storageKey": null
@@ -165,6 +173,6 @@ return {
 };
 })();
 
-(node as any).hash = "0ef74dd5ec3372a29ffc814acc600342";
+(node as any).hash = "2f51970cc214c0c966630705f53c5d91";
 
 export default node;
