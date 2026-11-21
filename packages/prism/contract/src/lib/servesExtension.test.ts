@@ -22,6 +22,12 @@ describe("servesExtension", () => {
   it("finds each extension a provider declares with its signature", () => {
     expect(servesExtension(extendedSdl, "source")).toBe(true);
     expect(servesExtension(extendedSdl, "facetedInstances")).toBe(true);
+    expect(servesExtension(extendedSdl, "search")).toBe(true);
+  });
+
+  it("refuses the search field that returns a NodeConnection without types", () => {
+    const sdl = `${contractSdl}\nextend type Query { search(text: String!, first: Int, after: String): NodeConnection! }`;
+    expect(servesExtension(sdl, "search")).toBe(false);
   });
 
   it("finds an extension on the type it is declared on, not on Query", () => {

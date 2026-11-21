@@ -18,6 +18,7 @@ describe("listServedExtensions", () => {
       "source",
       "values",
       "facetedInstances",
+      "search",
     ]);
   });
 
