@@ -354,6 +354,15 @@ type Query {
   search(text: String!, first: Int, after: String): NodeConnection!
   "The statements whose subject is `uri` (an absolute IRI), as Turtle with the provider's prefixes, or null when the graph holds none."
   source(uri: ID!): String
+  "The statements about the entity `uri` (an absolute IRI) in one direction, or null when the graph holds no such entity."
+  statements(
+    uri: ID!
+    "A path into a value reached from `uri`: predicate local names, each followed by a record key or a zero-based index."
+    path: [String!]
+    "How many values each group returns, from 1 to 50."
+    perPredicate: Int = 12
+    direction: StatementDirection = OUT
+  ): StatementGroups
 }
 
 # =============================================================================
@@ -771,15 +780,4 @@ type StatementForeign {
   curie: String!
 }
 
-extend type Query {
-  "The statements about the entity `uri` (an absolute IRI) in one direction, or null when the graph holds no such entity."
-  statements(
-    uri: ID!
-    "A path into a value reached from `uri`: predicate local names, each followed by a record key or a zero-based index."
-    path: [String!]
-    "How many values each group returns, from 1 to 50."
-    perPredicate: Int = 12
-    direction: StatementDirection = OUT
-  ): StatementGroups
-}
 
