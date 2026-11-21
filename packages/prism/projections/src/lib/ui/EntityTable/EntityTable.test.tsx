@@ -130,7 +130,7 @@ describe("EntityTable", () => {
     });
     const cells = Array.from(container.querySelectorAll("td"));
     expect(cells.map((cell) => cell.className)).toEqual([
-      "value",
+      "value is-empty",
       "value",
       "value",
       "value is-later",

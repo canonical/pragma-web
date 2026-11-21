@@ -26,7 +26,7 @@ const componentCssClassName = "ds entity-table";
  * groups a container rule hides the header row and folds each row into a
  * scented row of two lines, the title over its first two values that are
  * not empty, each after its label, whole or not at all; an empty cell
- * holds nothing and the folded row hides it, and the values after those
+ * (`is-empty`) holds nothing and the folded row hides it; the values after those
  * two are marked `is-later` and hidden. One markup serves every width; no
  * width is measured.
  *
@@ -105,6 +105,7 @@ export default function EntityTable({
                   className={[
                     "value",
                     columns.at(index)?.numeric ? "is-number" : null,
+                    text === null ? "is-empty" : null,
                     text === null || folded.includes(field) ? null : "is-later",
                   ]
                     .filter(Boolean)

@@ -18,7 +18,7 @@
 # number's (.is-number) one, read from its end, its header too. The
 # header row is two lines high (56px), its labels at its foot an inset
 # above the rule: a label wider than its column wraps onto the second line
-# (clamped at two), so a number's one column reads its header whole. Each
+# so a number's one column reads its header whole. Each
 # value cell holds its field's label (term),
 # hidden, then its text (detail); a cell with no value holds neither.
 #
@@ -30,12 +30,9 @@
 # the second, each showing its label before its text ("Platforms 8"),
 # whole or not at all: a value keeps its width (no grow, no shrink, no
 # ellipsis), and one with no room left moves to a third line, below the
-# row's clip. An empty cell (:empty) and the later cells (.is-later, marked
-# after the first two that are not empty) are hidden. The second line
-# starts with an item an inset wide (the row's ::before, order 1), which the
-# title leaves no room for on the first line; the first value stands back
-# over it by a negative inset, so a value wider than the line moves to the
-# third. The lines stand from the row's top: a half inset (2px), the title,
+# row's clip; each value carries the gutter after it. An empty cell
+# (.is-empty) and the later cells (.is-later, marked after the first two
+# that are not empty) are hidden. The lines stand from the row's top: a half inset (2px), the title,
 # an inset (4px), the values.
 #
 # Token ledger (no symbol to bind):
@@ -45,8 +42,7 @@
 #   1px for the hairline under each row, as the key-value list's rule.
 #   100% for a folded row's title basis: the title is its first line.
 #   space.300 (24px) for a folded row's line, space.100 / 2 (2px) above
-#   its first line, space.100 (4px) between its lines and for the second
-#   line's start.
+#   its first line, space.100 (4px) between its lines.
 #   A space stands between a value's label and its text, which the folded
 #   row shows as one line.
 #
@@ -95,7 +91,7 @@ node:
                       layout.overflow: hidden
                       typography.align: start
                       typography.whiteSpace: normal
-                      spacing.padding.block.end: space.100
+                      spacing.internal.block.end: space.100
                   relation: { cardinality: "1", slotName: heading }
                 - switch:
                     on: sorted
@@ -110,12 +106,11 @@ node:
                             layout.overflow: hidden
                             typography.align: start
                             typography.whiteSpace: normal
-                            spacing.padding.block.end: space.100
+                            spacing.internal.block.end: space.100
                           edges:
                             - node:
                                 role: sort link
                                 styles:
-                                  typography.lineClamp: 2
                                   typography.weight: typography.text.primary.fontWeight
                                   typography.color: inherit
                                   typography.decoration: none
@@ -137,9 +132,6 @@ node:
                       - node:
                           role: sorted column heading (.is-sorted)
                           styles:
-                            layout.type: flex
-                            layout.align: end
-                            layout.justify@number: end
                             typography.color: color.text
                   relation: { cardinality: "1..*", slotName: column }
             relation: { cardinality: "1", slotName: header }
@@ -220,6 +212,11 @@ node:
                             # below two groups it leaves the row.
                             - node:
                                 role: later value cell (.is-later)
+                                attributes: { data-property: "{field}" }
+                            # A cell with no value: it holds nothing, and
+                            # below two groups it leaves the row.
+                            - node:
+                                role: empty value cell (.is-empty)
                                 attributes: { data-property: "{field}" }
                             - node:
                                 role: number value cell (.is-number)

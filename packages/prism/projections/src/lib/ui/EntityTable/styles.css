@@ -26,18 +26,15 @@
       --typography-text-primary-font-weight
     );
     --entity-table-sorted-color: var(--color-text);
-    /* The header's labels: at most two lines, an inset above the rule. */
-    --entity-table-header-lines: 2;
+    /* The header's labels stand an inset above the rule. */
     --entity-table-header-inset: var(--space-100);
     /* A folded row's title is its first line, across the row. */
     --entity-table-fold-title-basis: 100%;
     /* A folded row's lines: 24px each, the first a half inset from the
-     * row's top, the second an inset under it, and the second line's start
-     * an inset wide. */
+     * row's top, the second an inset under it. */
     --entity-table-line-size: var(--space-300);
     --entity-table-fold-inset: calc(var(--space-100) / 2);
     --entity-table-fold-line-gap: var(--space-100);
-    --entity-table-fold-start-size: var(--space-100);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -64,8 +61,6 @@
     grid-column: 1 / -1;
     column-gap: var(--entity-table-gap);
     row-gap: 0;
-    align-items: center;
-    block-size: var(--entity-table-row-size);
     overflow: hidden;
     border-bottom-width: var(--entity-table-rule-width);
     border-bottom-style: solid;
@@ -78,15 +73,16 @@
 
   /* Each line of a row, the header's too, is the row's own height: the
    * cells that find no column on the first line leave below the clip. */
-  .ds.entity-table .header,
   .ds.entity-table .row {
+    align-items: center;
+    block-size: var(--entity-table-row-size);
     grid-auto-rows: var(--entity-table-row-size);
   }
 
   /* The header row is two lines high, its labels standing at its foot, an
    * inset above its rule: a label wider than its column, a number's one
    * column among them, wraps onto the second line rather than being cut,
-   * and only a label longer than two lines ends in an ellipsis. */
+   * whole. */
   .ds.entity-table .header {
     block-size: var(--entity-table-two-line-row-size);
     grid-auto-rows: var(--entity-table-two-line-row-size);
@@ -117,11 +113,19 @@
     grid-column: span 1;
   }
 
-  /* Every cell reads from its column's start, as its header does, on one
-   * line: a value longer than its column ends in an ellipsis rather than
-   * wrapping past the row's height. */
+  /* Every cell reads from its column's start. A header wraps, standing an
+   * inset above the rule; a title or a value holds one line, and one
+   * longer than its column ends in an ellipsis rather than wrapping past
+   * the row's height. */
   .ds.entity-table .heading,
-  .ds.entity-table .column,
+  .ds.entity-table .column {
+    min-width: 0;
+    overflow: hidden;
+    text-align: start;
+    white-space: normal;
+    padding-block-end: var(--entity-table-header-inset);
+  }
+
   .ds.entity-table .title,
   .ds.entity-table .value {
     min-width: 0;
@@ -129,18 +133,6 @@
     text-align: start;
     white-space: nowrap;
     text-overflow: ellipsis;
-  }
-
-  .ds.entity-table .heading,
-  .ds.entity-table .column {
-    padding-block-end: var(--entity-table-header-inset);
-    white-space: normal;
-  }
-
-  .ds.entity-table .sort {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: var(--entity-table-header-lines);
   }
 
   /* Headers and titles read as the table's text, at the regular weight:
@@ -168,16 +160,9 @@
   }
 
   /* The sorted column's header is in ink, its direction marked after the
-   * label's last line, outside the label so a long label keeps it; a
-   * number's stands at its column's end. */
+   * label's last word, at the column's end for a number. */
   .ds.entity-table .column.is-sorted {
-    display: flex;
-    align-items: flex-end;
     color: var(--entity-table-sorted-color);
-  }
-
-  .ds.entity-table .column.is-number.is-sorted {
-    justify-content: flex-end;
   }
 
   .ds.entity-table .sort {
@@ -239,32 +224,17 @@
       flex-basis: var(--entity-table-fold-title-basis);
     }
 
-    /* The second line's start: an item an inset wide, a line high, that
-     * the title leaves no room for on the first line. The first value
-     * stands back over it, so it starts at the row's start, and a value
-     * wider than the line moves to the third, which is clipped. */
-    .ds.entity-table .row::before {
-      content: "";
-      order: 1;
-      flex: 0 0 var(--entity-table-fold-start-size);
-      block-size: var(--entity-table-line-size);
-    }
-
-    /* A value keeps its whole width and never ends in an ellipsis: one
-     * that has no room left on the second line moves to the third. Each
-     * after the first stands the gutter from the one before it. */
+    /* A value keeps its whole width, so it never reaches an ellipsis: one
+     * that has no room left on the second line, the gutter after it
+     * included, moves to the third. */
     .ds.entity-table .value {
-      order: 2;
-      flex: 0 0 auto;
-      margin-inline-start: calc(-1 * var(--entity-table-fold-start-size));
-      text-overflow: clip;
+      flex-grow: 0;
+      flex-shrink: 0;
+      flex-basis: auto;
+      margin-inline-end: var(--entity-table-gap);
     }
 
-    .ds.entity-table .value:not(:empty) ~ .value {
-      margin-inline-start: var(--entity-table-gap);
-    }
-
-    .ds.entity-table .value:empty,
+    .ds.entity-table .value.is-empty,
     .ds.entity-table .value.is-later {
       display: none;
     }
