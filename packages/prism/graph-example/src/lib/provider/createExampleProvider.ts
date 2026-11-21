@@ -53,8 +53,8 @@ import { exampleDataset } from "./dataset.js";
 import { declareClassEdges } from "./declareClassEdges.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
 import { expandCurie } from "./expandCurie.js";
-import groupRecordStatements from "./groupRecordStatements.js";
 import { extractReferences } from "./extractReferences.js";
+import groupRecordStatements from "./groupRecordStatements.js";
 import { isNetworkEntity } from "./isNetworkEntity.js";
 import listRecordStatements from "./listRecordStatements.js";
 import { observeClassEdges } from "./observeClassEdges.js";
@@ -79,8 +79,6 @@ import type {
   ExampleNetworkEntity,
   ExampleOntology,
   ExampleProperty,
-  RecordStatement,
-  RecordTerm,
   ExampleProvider,
   ExampleRollingStock,
   ExampleRoute,
@@ -88,6 +86,8 @@ import type {
   ExampleUnitPlacement,
   LangMap,
   ProseTexts,
+  RecordStatement,
+  RecordTerm,
   SearchEntry,
 } from "./types.js";
 import writeEntityTurtle from "./writeEntityTurtle.js";
@@ -1080,19 +1080,16 @@ export const createExampleProvider = (
         listRecordStatements(record, dataset),
       ]),
     );
-    const incoming = [...outgoing].reduce(
-      (index, [subject, statements]) => {
-        for (const { predicate, object } of statements) {
-          if (object.kind !== "node") continue;
-          index.set(object.uri, [
-            ...(index.get(object.uri) ?? []),
-            { predicate, object: { kind: "node", uri: subject } },
-          ]);
-        }
-        return index;
-      },
-      new Map<string, readonly RecordStatement[]>(),
-    );
+    const incoming = [...outgoing].reduce((index, [subject, statements]) => {
+      for (const { predicate, object } of statements) {
+        if (object.kind !== "node") continue;
+        index.set(object.uri, [
+          ...(index.get(object.uri) ?? []),
+          { predicate, object: { kind: "node", uri: subject } },
+        ]);
+      }
+      return index;
+    }, new Map<string, readonly RecordStatement[]>());
     statementIndex = { outgoing, incoming };
     return statementIndex;
   };
@@ -1141,7 +1138,11 @@ export const createExampleProvider = (
     }
     const node = resolveNode(term.uri);
     return node === null
-      ? { __typename: "StatementForeign", uri: term.uri, curie: curieOf(term.uri) }
+      ? {
+          __typename: "StatementForeign",
+          uri: term.uri,
+          curie: curieOf(term.uri),
+        }
       : { __typename: "StatementNode", node };
   };
 

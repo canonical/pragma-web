@@ -46,7 +46,12 @@ const toLangStatements = (
     object:
       lang === ""
         ? toTyped(text, "string")
-        : { kind: "literal", lexical: text, datatype: RDF_LANG_STRING_URI, lang },
+        : {
+            kind: "literal",
+            lexical: text,
+            datatype: RDF_LANG_STRING_URI,
+            lang,
+          },
   }));
 
 /** A value with no IRI, its statements read on demand. */

@@ -58,7 +58,10 @@ describe("listRecordStatements", () => {
 
   it("nests a diagram position and states its coordinates", () => {
     const [position] = objectsOf(
-      listRecordStatements(recordOf(`${METRO}central-exchange`), exampleDataset),
+      listRecordStatements(
+        recordOf(`${METRO}central-exchange`),
+        exampleDataset,
+      ),
       "diagramPosition",
     );
     expect(expand(position).map(({ object }) => object)).toEqual([
@@ -82,10 +85,9 @@ describe("listRecordStatements", () => {
       listRecordStatements(recordOf(`${METRO}north-line`), exampleDataset),
       "routes",
     );
-    expect(routes.map((route) => route.kind === "nested" && route.key)).toEqual([
-      "southbound",
-      "northbound",
-    ]);
+    expect(routes.map((route) => route.kind === "nested" && route.key)).toEqual(
+      ["southbound", "northbound"],
+    );
     const [reverse] = objectsOf(expand(routes.at(0)), "reverse");
     expect(reverse?.kind === "nested" && reverse.key).toBe("northbound");
     expect(objectsOf(expand(reverse), "isLoop")).toEqual([

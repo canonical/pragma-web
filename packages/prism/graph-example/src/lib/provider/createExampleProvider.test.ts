@@ -2715,18 +2715,25 @@ describe("Query.statements", () => {
   });
 
   it("cuts every group to the bound asked for, keeping its total", async () => {
-    const result = await read({ uri: `${METRO}central-exchange`, perPredicate: 1 });
+    const result = await read({
+      uri: `${METRO}central-exchange`,
+      perPredicate: 1,
+    });
     for (const group of result.groups) {
       expect(group.values.length).toBeLessThanOrEqual(1);
     }
     expect(
-      result.groups.find(({ predicateUri }) => predicateUri.endsWith("#servesLine"))
-        ?.total,
+      result.groups.find(({ predicateUri }) =>
+        predicateUri.endsWith("#servesLine"),
+      )?.total,
     ).toBe(3);
   });
 
   it("holds the bound between 1 and 50 whatever the reader asks", async () => {
-    const none = await read({ uri: `${METRO}central-exchange`, perPredicate: 0 });
+    const none = await read({
+      uri: `${METRO}central-exchange`,
+      perPredicate: 0,
+    });
     expect(none.groups.every(({ values }) => values.length === 1)).toBe(true);
   });
 
@@ -2786,11 +2793,16 @@ describe("Query.statements", () => {
 
   it("answers null for a path that selects nothing, or one read inwards", async () => {
     expect(
-      (await run(STATEMENTS, { uri: `${METRO}north-line`, path: ["routes", "nowhere"] }))
-        .statements,
+      (
+        await run(STATEMENTS, {
+          uri: `${METRO}north-line`,
+          path: ["routes", "nowhere"],
+        })
+      ).statements,
     ).toBeNull();
     expect(
-      (await run(STATEMENTS, { uri: `${METRO}north-line`, path: ["routes"] })).statements,
+      (await run(STATEMENTS, { uri: `${METRO}north-line`, path: ["routes"] }))
+        .statements,
     ).toBeNull();
     expect(
       (
@@ -2804,7 +2816,9 @@ describe("Query.statements", () => {
   });
 
   it("answers null for an IRI the dataset holds no record of", async () => {
-    expect((await run(STATEMENTS, { uri: `${METRO}nowhere` })).statements).toBeNull();
+    expect(
+      (await run(STATEMENTS, { uri: `${METRO}nowhere` })).statements,
+    ).toBeNull();
   });
 
   it("states a class's type and superclass", async () => {
@@ -2817,8 +2831,11 @@ describe("Query.statements", () => {
       },
     ]);
     expect(
-      result.groups.find(({ predicateUri }) => predicateUri.endsWith("#subClassOf"))
-        ?.values,
-    ).toEqual([{ __typename: "StatementNode", node: { uri: `${METRO}Station` } }]);
+      result.groups.find(({ predicateUri }) =>
+        predicateUri.endsWith("#subClassOf"),
+      )?.values,
+    ).toEqual([
+      { __typename: "StatementNode", node: { uri: `${METRO}Station` } },
+    ]);
   });
 });
