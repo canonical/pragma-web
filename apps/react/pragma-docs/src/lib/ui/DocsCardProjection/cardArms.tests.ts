@@ -106,11 +106,17 @@ describe("the docs' card arms", () => {
         expect(listSelectedNames(arm.selections), uri).toEqual(
           expect.arrayContaining([...prominent]),
         );
-        return [readLocalName(uri)];
+        return [{ type: readLocalName(uri), prominent }];
       });
-      expect([...new Set(checked)].sort()).toEqual(
+      expect([...new Set(checked.map(({ type }) => type))].sort()).toEqual(
         Object.keys(CARD_ARMS).sort(),
       );
+      // Without a prominent field anywhere, every arm would pass unread.
+      expect(
+        checked
+          .filter(({ prominent }) => prominent.length > 0)
+          .map(({ type }) => type),
+      ).not.toEqual([]);
     },
     BOOT_TIMEOUT_MS,
   );
