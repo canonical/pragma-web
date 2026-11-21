@@ -207,4 +207,18 @@ describe("EntityPanel", () => {
     expect(status?.getAttribute("role")).toBe("status");
     expect(status?.textContent).toContain(NOWHERE);
   });
+
+  it("says what its host gives it for an IRI nothing answers to", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderPanel({
+      uri: NOWHERE,
+      node: { data: { node: null } },
+      statements: { data: { outgoing: null, incoming: null } },
+      notFound: <p className="unknown">Unknown term</p>,
+    });
+    const panel = container.querySelector("section.ds.entity-panel");
+    expect(panel?.querySelector(".not-found")).toBeNull();
+    expect(panel?.querySelector(".unknown")?.textContent).toBe("Unknown term");
+  });
 });

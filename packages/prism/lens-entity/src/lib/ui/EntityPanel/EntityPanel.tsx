@@ -62,7 +62,7 @@ const componentCssClassName = "ds entity-panel";
  * scripting, and it takes no generated id, so the server's markup and the
  * hydrated tree agree. A site whose provider does not serve `statements`
  * gets the identity alone; an IRI nothing answers to renders the
- * not-found status.
+ * not-found status, or the host's own words for it.
  *
  * `import { EntityPanel } from "@canonical/prism-lens-entity";`
  *
@@ -73,6 +73,7 @@ const componentCssClassName = "ds entity-panel";
 export default function EntityPanel({
   className,
   headingLevel = 2,
+  notFound,
   uri,
   ...props
 }: EntityPanelProps): ReactElement {
@@ -104,12 +105,14 @@ export default function EntityPanel({
   if (node === null || node === undefined) {
     return (
       <section {...props} aria-label={uri} className={rootClassName}>
-        <p className="not-found" role="status">
-          <Message
-            elements={{ address: <InlineCode>{uri}</InlineCode> }}
-            id="page.notFound"
-          />
-        </p>
+        {notFound ?? (
+          <p className="not-found" role="status">
+            <Message
+              elements={{ address: <InlineCode>{uri}</InlineCode> }}
+              id="page.notFound"
+            />
+          </p>
+        )}
       </section>
     );
   }

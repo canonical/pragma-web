@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
   /** The entity's absolute IRI. */
@@ -9,6 +9,12 @@ type OwnProps = {
    * sits one level below it.
    */
   readonly headingLevel?: 2 | 3;
+  /**
+   * What the panel says when nothing answers to `uri`, in place of its own
+   * not-found status: a host that knows more about the address it was
+   * asked for words it.
+   */
+  readonly notFound?: ReactNode;
 };
 
 /**
