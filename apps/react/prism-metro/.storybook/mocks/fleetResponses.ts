@@ -65,7 +65,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       uri: "https://metro.example/onto#RollingStock",
                       visibility: "PROMINENT",
                       superclasses: [],
-                      _meta: { title: "Rolling stock" },
+                      _meta: {
+                        title: "Rolling stock",
+                      },
                     },
                     definition: null,
                   },
@@ -74,7 +76,7 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       field: "formations",
                       label: "formations",
                       text: "Series 50 four-car",
-                      uri: "https://metro.example/onto#series-50-four-car",
+                      type: "choices",
                     },
                   ],
                   formations: [
@@ -82,7 +84,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       uri: "https://metro.example/onto#series-50-four-car",
                       length: 62000,
                       capacity: 460,
-                      _meta: { title: "Series 50 four-car" },
+                      _meta: {
+                        title: "Series 50 four-car",
+                      },
                       units: [
                         {
                           position: 1,
@@ -109,7 +113,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "T",
                                   hasCab: false,
                                   length: 15000,
-                                  _meta: { title: "Series 50 trailer car" },
+                                  _meta: {
+                                    title: "Series 50 trailer car",
+                                  },
                                   uri: "https://metro.example/onto#car-50-trailer",
                                 },
                               },
@@ -142,7 +148,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "T",
                                   hasCab: false,
                                   length: 15000,
-                                  _meta: { title: "Series 50 trailer car" },
+                                  _meta: {
+                                    title: "Series 50 trailer car",
+                                  },
                                   uri: "https://metro.example/onto#car-50-trailer",
                                 },
                               },
@@ -167,7 +175,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       uri: "https://metro.example/onto#RollingStock",
                       visibility: "PROMINENT",
                       superclasses: [],
-                      _meta: { title: "Rolling stock" },
+                      _meta: {
+                        title: "Rolling stock",
+                      },
                     },
                     definition: null,
                   },
@@ -176,7 +186,7 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       field: "formations",
                       label: "formations",
                       text: "Series 70 fixed formation",
-                      uri: "https://metro.example/onto#series-70-fixed",
+                      type: "choices",
                     },
                   ],
                   formations: [
@@ -184,7 +194,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       uri: "https://metro.example/onto#series-70-fixed",
                       length: 107200,
                       capacity: 880,
-                      _meta: { title: "Series 70 fixed formation" },
+                      _meta: {
+                        title: "Series 70 fixed formation",
+                      },
                       units: [
                         {
                           position: 1,
@@ -211,7 +223,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "M",
                                   hasCab: false,
                                   length: 17600,
-                                  _meta: { title: "Series 70 motor car" },
+                                  _meta: {
+                                    title: "Series 70 motor car",
+                                  },
                                   uri: "https://metro.example/onto#car-70-motor",
                                 },
                               },
@@ -222,7 +236,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "T",
                                   hasCab: false,
                                   length: 17600,
-                                  _meta: { title: "Series 70 trailer car" },
+                                  _meta: {
+                                    title: "Series 70 trailer car",
+                                  },
                                   uri: "https://metro.example/onto#car-70-trailer",
                                 },
                               },
@@ -233,7 +249,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "T",
                                   hasCab: false,
                                   length: 17600,
-                                  _meta: { title: "Series 70 trailer car" },
+                                  _meta: {
+                                    title: "Series 70 trailer car",
+                                  },
                                   uri: "https://metro.example/onto#car-70-trailer",
                                 },
                               },
@@ -244,7 +262,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "M",
                                   hasCab: false,
                                   length: 17600,
-                                  _meta: { title: "Series 70 motor car" },
+                                  _meta: {
+                                    title: "Series 70 motor car",
+                                  },
                                   uri: "https://metro.example/onto#car-70-motor",
                                 },
                               },
@@ -282,7 +302,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       uri: "https://metro.example/onto#RollingStock",
                       visibility: "PROMINENT",
                       superclasses: [],
-                      _meta: { title: "Rolling stock" },
+                      _meta: {
+                        title: "Rolling stock",
+                      },
                     },
                     definition: null,
                   },
@@ -290,8 +312,8 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                     {
                       field: "formations",
                       label: "formations",
-                      text: "Series 90 three-car, Series 90 six-car",
-                      uri: null,
+                      text: "Series 90 three-car +1",
+                      type: "choices",
                     },
                   ],
                   formations: [
@@ -299,7 +321,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       uri: "https://metro.example/onto#series-90-three-car",
                       length: 60000,
                       capacity: 490,
-                      _meta: { title: "Series 90 three-car" },
+                      _meta: {
+                        title: "Series 90 three-car",
+                      },
                       units: [
                         {
                           position: 1,
@@ -326,7 +350,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "T",
                                   hasCab: false,
                                   length: 20000,
-                                  _meta: { title: "Series 90 trailer car" },
+                                  _meta: {
+                                    title: "Series 90 trailer car",
+                                  },
                                   uri: "https://metro.example/onto#car-90-trailer",
                                 },
                               },
@@ -353,7 +379,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       uri: "https://metro.example/onto#series-90-six-car",
                       length: 120000,
                       capacity: 980,
-                      _meta: { title: "Series 90 six-car" },
+                      _meta: {
+                        title: "Series 90 six-car",
+                      },
                       units: [
                         {
                           position: 1,
@@ -380,7 +408,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "T",
                                   hasCab: false,
                                   length: 20000,
-                                  _meta: { title: "Series 90 trailer car" },
+                                  _meta: {
+                                    title: "Series 90 trailer car",
+                                  },
                                   uri: "https://metro.example/onto#car-90-trailer",
                                 },
                               },
@@ -426,7 +456,9 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                                   code: "T",
                                   hasCab: false,
                                   length: 20000,
-                                  _meta: { title: "Series 90 trailer car" },
+                                  _meta: {
+                                    title: "Series 90 trailer car",
+                                  },
                                   uri: "https://metro.example/onto#car-90-trailer",
                                 },
                               },

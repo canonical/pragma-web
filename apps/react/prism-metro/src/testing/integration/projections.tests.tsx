@@ -104,11 +104,11 @@ describe("the lines lens's table", {
     const circle = [
       ...container.querySelectorAll(".entity-table > tbody > tr"),
     ].find((row) => row.querySelector("th")?.textContent === CIRCLE_LINE_TITLE);
+    // A list shows its first value and how many more: six stops.
     expect(
-      circle
-        ?.querySelector('td.value[data-property="servedBy"] .detail')
-        ?.textContent?.split(", "),
-    ).toHaveLength(6);
+      circle?.querySelector('td.value[data-property="servedBy"] .detail')
+        ?.textContent,
+    ).toMatch(/^[^,]+ \+5$/);
     expect(
       container.querySelector('th.column[data-property="servedBy"] a.sort'),
     ).toHaveAttribute("href", "/lines?sort=servedBy");
