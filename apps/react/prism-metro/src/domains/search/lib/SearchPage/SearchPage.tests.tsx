@@ -1,7 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.46.0
 
 import { setPrefetchEnvironment } from "@canonical/prism-core";
-import { screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import renderLensPage from "../../../../../testing/renderLensPage.js";
 import startMetroGraph from "../../../../../testing/startMetroGraph.js";
@@ -71,5 +71,76 @@ describe("SearchPage", () => {
       await screen.findByText("Nothing matches the search."),
     ).toBeInTheDocument();
     expect(document.querySelector(".ds.search-page .results")).toBeNull();
+  });
+
+  it("gives each Type facet the provider's total for the text with it applied (W8-A6)", async () => {
+    renderLensPage("/search?q=the", graph.url);
+    await findPassages();
+    const facets = [
+      ...document.querySelectorAll<HTMLAnchorElement>(
+        ".ds.search-page .ds.type-facet-bar .value a",
+      ),
+    ].map((link) => ({
+      href: link.getAttribute("href") ?? "",
+      count: link.querySelector(".count")?.textContent ?? "",
+    }));
+    expect(facets.length).toBeGreaterThan(1);
+    for (const { href, count } of facets) {
+      cleanup();
+      renderLensPage(href, graph.url);
+      expect(
+        await screen.findByText(
+          new RegExp(`^${count} results?$`),
+          {},
+          { timeout: 5000 },
+        ),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it("renders no result through the generic Node chip (W8-A8)", async () => {
+    renderLensPage("/search?q=the", graph.url);
+    await findPassages();
+    for (const result of document.querySelectorAll(".ds.search-page .result")) {
+      expect(result.firstElementChild?.classList.contains("node-chip")).toBe(
+        false,
+      );
+    }
+  });
+
+  it("pages the results by 20, linking the next page with its cursor (W8-A9)", async () => {
+    renderLensPage("/search?q=e", graph.url);
+    await findPassages();
+    const total = Number(
+      (await screen.findByText(/^\d+ results?$/)).textContent?.split(" ")[0],
+    );
+    expect(total).toBeGreaterThan(20);
+    expect(document.querySelectorAll(".ds.search-page .result")).toHaveLength(
+      20,
+    );
+    const bar = document.querySelector(".ds.search-page .ds.pagination-bar");
+    expect(bar?.textContent).toContain(`1–20 of ${total}`);
+    const next = bar?.querySelector<HTMLAnchorElement>("a.next");
+    expect(next?.getAttribute("href")).toMatch(/[?&]page=2\b/);
+    expect(next?.getAttribute("href")).toMatch(/[?&]after=/);
+  });
+
+  it("offers the lenses as doors when the address carries no text (W8-A9)", async () => {
+    renderLensPage("/search", graph.url);
+    const doors = await screen.findByRole("list", { name: "Lenses to browse" });
+    expect(doors.querySelectorAll("a.door").length).toBeGreaterThan(0);
+    expect(document.querySelector(".ds.search-page .results")).toBeNull();
+  });
+
+  it("offers the next steps when nothing matches (W8-A9)", async () => {
+    renderLensPage("/search?q=zzzz", graph.url);
+    await screen.findByText("Nothing matches the search.");
+    const hints = document.querySelector(".ds.search-page .none .hints");
+    expect(hints?.textContent).toContain("Ctrl K");
+    expect(
+      screen.getByRole("link", {
+        name: "Browse the Definitions, where every type is listed.",
+      }),
+    ).toHaveAttribute("href", "/definitions");
   });
 });
