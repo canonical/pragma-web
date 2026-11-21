@@ -6,8 +6,11 @@
 # value or the number applied (.button.is-applied), its values an overlay
 # list of links, each with its count (the "none" bucket last). The facets
 # left are the sheet's; the facet bar's "More filters" opens it. In the
-# panel and the sheet every facet stacks with its values and counts, then
-# a chip per applied value, a link that lifts it. Nothing is clipped and
+# panel and the sheet every facet stacks with its values and counts, its
+# own parts (.option, .option-value, .option-count) styled as the bar's:
+# in ink, underlined only under the pointer, the count muted at the line's
+# end, the applied value bold, a value that would match nothing muted;
+# then a chip per applied value, a link that lifts it. Nothing is clipped and
 # nothing hidden takes focus; one server HTML serves every width.
 #
 # Every decision is read through a component token declared on the root
@@ -143,6 +146,36 @@ node:
                       spacing.internal.block.start: space.100
                       spacing.internal.inline.start: 0
                       spacing.gap: space.100
+                    edges:
+                      - node:
+                          role: option (a value's item)
+                          edges:
+                            - switch:
+                                on: matches
+                                cases:
+                                  - node:
+                                      role: option value (a link that toggles it, as the bar's value)
+                                      styles:
+                                        layout.type: flex
+                                        layout.justify: space-between
+                                        spacing.gap: space.100
+                                        typography.color: inherit
+                                        typography.decoration: none
+                                        typography.decoration@hover: underline
+                                        typography.whiteSpace: nowrap
+                                        typography.weight@selected: typography.text.primary.bold.fontWeight
+                                      edges:
+                                        - node:
+                                            role: option count
+                                            styles:
+                                              typography.color: color.text.muted
+                                          relation: { cardinality: "1", slotName: option-count }
+                                  - node:
+                                      role: empty option value (.is-empty)
+                                      styles:
+                                        typography.color: color.text.muted
+                              relation: { cardinality: "1", slotName: option-value }
+                        relation: { cardinality: "0..*", slotName: option }
                   relation: { cardinality: "1", slotName: options }
             relation: { cardinality: "0..*", slotName: facet }
       relation: { cardinality: "0..1", slotName: stack }

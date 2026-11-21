@@ -68,18 +68,24 @@ export default function FacetControls({
     facet.values.find((bucket) => bucket.value === value)?.label ??
     (value === null ? t("facets.none") : value);
 
-  /** A facet's values, each a link that adds or lifts it, with its count. */
-  const renderValues = (facet: FacetCount, listClassName: string) => {
+  /**
+   * A facet's values, each a link that adds or lifts it, with its count:
+   * the bar's overlay list or the stack's list, each with its own parts.
+   */
+  const renderValues = (facet: FacetCount) => {
     const values = readApplied(applied, facet.field);
+    const [list, item, link, count] = inBar
+      ? ["values", "bucket", "value", "count"]
+      : ["options", "option", "option-value", "option-count"];
     return (
-      <ul className={listClassName}>
+      <ul className={list}>
         {facet.values.map((bucket) => {
           const on = values.includes(bucket.value);
           return (
-            <li className="bucket" key={bucket.value ?? ""}>
+            <li className={item} key={bucket.value ?? ""}>
               <RouterLink
                 aria-current={on ? "true" : undefined}
-                className={bucket.count === 0 ? "value is-empty" : "value"}
+                className={bucket.count === 0 ? `${link} is-empty` : link}
                 href={hrefWith(
                   facet.field,
                   on
@@ -88,7 +94,7 @@ export default function FacetControls({
                 )}
               >
                 {readLabel(facet, bucket.value)}{" "}
-                <span className="count">{bucket.count}</span>
+                <span className={count}>{bucket.count}</span>
               </RouterLink>
             </li>
           );
@@ -161,7 +167,7 @@ export default function FacetControls({
               {readButton(facet)}
               <Icon aria-hidden="true" className="caret" icon="chevron-down" />
             </summary>
-            {renderValues(facet, "values")}
+            {renderValues(facet)}
           </details>
         ))
       ) : (
@@ -173,7 +179,7 @@ export default function FacetControls({
               key={facet.field}
             >
               <h3 className="heading">{facet.label}</h3>
-              {renderValues(facet, "options")}
+              {renderValues(facet)}
             </section>
           ))}
           {chips.length > 0 ? (

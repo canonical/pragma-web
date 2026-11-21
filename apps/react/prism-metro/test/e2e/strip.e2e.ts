@@ -576,8 +576,8 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
             facets: [...(dialog?.querySelectorAll("section.facet") ?? [])].map(
               (facet) => ({
                 heading: facet.querySelector(".heading")?.textContent ?? "",
-                counts: [...facet.querySelectorAll(".count")].map((count) =>
-                  Number(count.textContent),
+                counts: [...facet.querySelectorAll(".option-count")].map(
+                  (count) => Number(count.textContent),
                 ),
               }),
             ),

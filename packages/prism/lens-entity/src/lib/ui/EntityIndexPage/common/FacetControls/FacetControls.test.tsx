@@ -225,7 +225,12 @@ describe("FacetControls", () => {
       expect(
         screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent),
       ).toEqual(["Line", "Zone", "Kind", "Opened"]);
-      expect(screen.getByRole("link", { name: "1863 3" })).toBeInTheDocument();
+      const value = screen.getByRole("link", { name: "1863 3" });
+      // The sheet's values are its own parts, not the bar's overlay's.
+      expect(value).toHaveClass("option-value");
+      expect(value.closest("li")).toHaveClass("option");
+      expect(value.querySelector(".option-count")).toHaveTextContent("3");
+      expect(value.closest(".bucket")).toBeNull();
       const chip = screen.getByRole("link", {
         name: "Remove the filter Line: Circle Line",
       });
