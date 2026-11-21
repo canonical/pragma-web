@@ -13,16 +13,19 @@ import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ElementType, ReactElement, ReactNode } from "react";
 import { HOMES, SITE_ROUTES } from "../../testing/fixtures.js";
+import type { SiteExtension } from "../../testing/types.js";
 
 /** The site's renderers, over a provider that serves source. */
 const SiteRenderers = ({
   children,
+  extensions,
 }: {
   readonly children: ReactNode;
+  readonly extensions: readonly SiteExtension[];
 }): ReactElement => (
   <RenderersProvider
     defaults={{ list: useListRenderers(), page: usePageRenderers() }}
-    extensions={["source"]}
+    extensions={extensions}
   >
     {children}
   </RenderersProvider>
@@ -34,6 +37,8 @@ const formatDocumentTitle = (title: string): string => `${title} — Metro`;
 interface WithSiteOptions {
   /** The address the story's router starts at. Defaults to the stations. */
   readonly url?: string;
+  /** The extensions the site's provider serves; `source` alone when omitted. */
+  readonly extensions?: readonly SiteExtension[];
 }
 
 /**
@@ -55,7 +60,7 @@ interface WithSiteOptions {
  * ```
  */
 const withSite =
-  ({ url = "/stations" }: WithSiteOptions = {}) =>
+  ({ url = "/stations", extensions = ["source"] }: WithSiteOptions = {}) =>
   (Story: ElementType): ReactElement => (
     <HeadProvider titleTemplate={formatDocumentTitle}>
       <RouterProvider
@@ -65,7 +70,7 @@ const withSite =
       >
         <HomesProvider homes={HOMES}>
           <ProjectionLinkProvider LinkComponent={RouterLink}>
-            <SiteRenderers>
+            <SiteRenderers extensions={extensions}>
               <Story />
             </SiteRenderers>
           </ProjectionLinkProvider>

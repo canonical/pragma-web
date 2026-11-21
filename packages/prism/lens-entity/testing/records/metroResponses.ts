@@ -673,6 +673,7 @@ export default [
                 title: "Fare zone",
                 type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
               },
+              label: "Fare zone",
             },
             fields: [
               {
@@ -685,13 +686,106 @@ export default [
                   kind: "DATATYPE",
                   range: "String",
                 },
+                order: null,
+                visibility: null,
+                group: null,
               },
             ],
             curie: "geo:coastal-zone",
             definition: null,
             comment: null,
+            label: "Coastal Zone",
           },
           __isNode: "Zone",
+        },
+      },
+    },
+  },
+  {
+    operation: "EntityStatementsQuery",
+    variables: { uri: "https://geo.example/onto#coastal-zone" },
+    response: {
+      data: {
+        outgoing: {
+          total: 2,
+          groups: [
+            {
+              predicateUri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "OntologyClass",
+                    uri: "https://geo.example/onto#Zone",
+                    __isNode: "OntologyClass",
+                    _meta: { title: "Fare zone", curie: "geo:Zone" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2000/01/rdf-schema#label",
+              total: 1,
+              predicate: {
+                label: "label",
+                pluralLabel: null,
+                uri: "http://www.w3.org/2000/01/rdf-schema#label",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Coastal Zone",
+                  lang: null,
+                },
+              ],
+            },
+          ],
+        },
+        incoming: {
+          total: 3,
+          groups: [
+            {
+              predicateUri: "https://geo.example/onto#inZone",
+              total: 3,
+              predicate: {
+                label: "in zone",
+                inverseLabel: "stops",
+                inversePluralLabel: "stops",
+                uri: "https://geo.example/onto#inZone",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Station",
+                    uri: "https://metro.example/onto#eastcliff",
+                    __isNode: "Station",
+                    _meta: { title: "Eastcliff", curie: "metro:eastcliff" },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Station",
+                    uri: "https://metro.example/onto#harbourside",
+                    __isNode: "Station",
+                    _meta: { title: "Harbourside", curie: "metro:harbourside" },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Station",
+                    uri: "https://metro.example/onto#saltford",
+                    __isNode: "Station",
+                    _meta: { title: "Saltford", curie: "metro:saltford" },
+                  },
+                },
+              ],
+            },
+          ],
         },
       },
     },
@@ -720,6 +814,7 @@ export default [
                 title: "Station",
                 type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
               },
+              label: "Station",
             },
             fields: [
               {
@@ -732,6 +827,12 @@ export default [
                   kind: "DATATYPE",
                   range: "Int",
                 },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "servesLine",
@@ -742,6 +843,12 @@ export default [
                   uri: "https://metro.example/onto#servesLine",
                   kind: "OBJECT",
                   range: "metro:Line",
+                },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
                 },
               },
               {
@@ -754,6 +861,12 @@ export default [
                   kind: "OBJECT",
                   range: "geo:GeoPoint",
                 },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
+                },
               },
               {
                 name: "inZone",
@@ -764,6 +877,12 @@ export default [
                   uri: "https://geo.example/onto#inZone",
                   kind: "OBJECT",
                   range: "geo:Zone",
+                },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
                 },
               },
               {
@@ -776,6 +895,12 @@ export default [
                   kind: "DATATYPE",
                   range: "String",
                 },
+                order: 1,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "note",
@@ -787,14 +912,177 @@ export default [
                   kind: "ANNOTATION",
                   range: "String",
                 },
+                order: null,
+                visibility: "HIDDEN",
+                group: null,
               },
             ],
             curie: "metro:northgate",
             definition: "The northern terminus.",
             comment: null,
+            label: "Northgate",
           },
           __isNode: "Station",
         },
+      },
+    },
+  },
+  {
+    operation: "EntityStatementsQuery",
+    variables: { uri: "https://metro.example/onto#northgate" },
+    response: {
+      data: {
+        outgoing: {
+          total: 10,
+          groups: [
+            {
+              predicateUri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "OntologyClass",
+                    uri: "https://metro.example/onto#Station",
+                    __isNode: "OntologyClass",
+                    _meta: { title: "Station", curie: "metro:Station" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://geo.example/onto#inZone",
+              total: 1,
+              predicate: {
+                label: "in zone",
+                pluralLabel: "in zones",
+                uri: "https://geo.example/onto#inZone",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Zone",
+                    uri: "https://geo.example/onto#central-zone",
+                    __isNode: "Zone",
+                    _meta: { title: "Central Zone", curie: "geo:central-zone" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://geo.example/onto#location",
+              total: 1,
+              predicate: {
+                label: "location",
+                pluralLabel: null,
+                uri: "https://geo.example/onto#location",
+              },
+              values: [
+                {
+                  __typename: "StatementNested",
+                  type: {
+                    label: "Geo point",
+                    uri: "https://geo.example/onto#GeoPoint",
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#diagramPosition",
+              total: 1,
+              predicate: {
+                label: "diagram position",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#diagramPosition",
+              },
+              values: [{ __typename: "StatementNested", type: null }],
+            },
+            {
+              predicateUri: "https://metro.example/onto#platformCount",
+              total: 1,
+              predicate: {
+                label: "platform count",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#platformCount",
+              },
+              values: [
+                { __typename: "StatementLiteral", lexical: "4", lang: null },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#platformLength",
+              total: 1,
+              predicate: {
+                label: "platform length",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#platformLength",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "125000",
+                  lang: null,
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#servesLine",
+              total: 1,
+              predicate: {
+                label: "serves line",
+                pluralLabel: "serves lines",
+                uri: "https://metro.example/onto#servesLine",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Line",
+                    uri: "https://metro.example/onto#north-line",
+                    __isNode: "Line",
+                    _meta: { title: "North Line", curie: "metro:north-line" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2000/01/rdf-schema#label",
+              total: 2,
+              predicate: {
+                label: "label",
+                pluralLabel: null,
+                uri: "http://www.w3.org/2000/01/rdf-schema#label",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Northgate",
+                  lang: null,
+                },
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Porte-Nord",
+                  lang: "fr",
+                },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2004/02/skos/core#definition",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "The northern terminus.",
+                  lang: null,
+                },
+              ],
+            },
+          ],
+        },
+        incoming: { total: 0, groups: [] },
       },
     },
   },
@@ -825,6 +1113,7 @@ export default [
                 title: "Interchange",
                 type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
               },
+              label: "Interchange",
             },
             fields: [
               {
@@ -837,6 +1126,12 @@ export default [
                   kind: "DATATYPE",
                   range: "Int",
                 },
+                order: 2,
+                visibility: "PROMINENT",
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "platformCount",
@@ -847,6 +1142,12 @@ export default [
                   uri: "https://metro.example/onto#platformCount",
                   kind: "DATATYPE",
                   range: "Int",
+                },
+                order: 3,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
                 },
               },
               {
@@ -859,6 +1160,12 @@ export default [
                   kind: "OBJECT",
                   range: "metro:Line",
                 },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
+                },
               },
               {
                 name: "location",
@@ -869,6 +1176,12 @@ export default [
                   uri: "https://geo.example/onto#location",
                   kind: "OBJECT",
                   range: "geo:GeoPoint",
+                },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
                 },
               },
               {
@@ -881,6 +1194,12 @@ export default [
                   kind: "OBJECT",
                   range: "geo:Zone",
                 },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
+                },
               },
               {
                 name: "name",
@@ -891,6 +1210,12 @@ export default [
                   uri: "https://metro.example/onto#name",
                   kind: "DATATYPE",
                   range: "String",
+                },
+                order: 1,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
                 },
               },
               {
@@ -903,14 +1228,205 @@ export default [
                   kind: "ANNOTATION",
                   range: "String",
                 },
+                order: null,
+                visibility: "HIDDEN",
+                group: null,
               },
             ],
             curie: "metro:central-exchange",
             definition: "The busiest transfer point on the network.",
             comment: null,
+            label: "Central Exchange",
           },
           __isNode: "Interchange",
         },
+      },
+    },
+  },
+  {
+    operation: "EntityStatementsQuery",
+    variables: { uri: "https://metro.example/onto#central-exchange" },
+    response: {
+      data: {
+        outgoing: {
+          total: 12,
+          groups: [
+            {
+              predicateUri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "OntologyClass",
+                    uri: "https://metro.example/onto#Interchange",
+                    __isNode: "OntologyClass",
+                    _meta: { title: "Interchange", curie: "metro:Interchange" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://geo.example/onto#inZone",
+              total: 1,
+              predicate: {
+                label: "in zone",
+                pluralLabel: "in zones",
+                uri: "https://geo.example/onto#inZone",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Zone",
+                    uri: "https://geo.example/onto#central-zone",
+                    __isNode: "Zone",
+                    _meta: { title: "Central Zone", curie: "geo:central-zone" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://geo.example/onto#location",
+              total: 1,
+              predicate: {
+                label: "location",
+                pluralLabel: null,
+                uri: "https://geo.example/onto#location",
+              },
+              values: [
+                {
+                  __typename: "StatementNested",
+                  type: {
+                    label: "Geo point",
+                    uri: "https://geo.example/onto#GeoPoint",
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#diagramPosition",
+              total: 1,
+              predicate: {
+                label: "diagram position",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#diagramPosition",
+              },
+              values: [{ __typename: "StatementNested", type: null }],
+            },
+            {
+              predicateUri: "https://metro.example/onto#platformCount",
+              total: 1,
+              predicate: {
+                label: "platform count",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#platformCount",
+              },
+              values: [
+                { __typename: "StatementLiteral", lexical: "8", lang: null },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#platformLength",
+              total: 1,
+              predicate: {
+                label: "platform length",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#platformLength",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "160000",
+                  lang: null,
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#servesLine",
+              total: 3,
+              predicate: {
+                label: "serves line",
+                pluralLabel: "serves lines",
+                uri: "https://metro.example/onto#servesLine",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Line",
+                    uri: "https://metro.example/onto#circle-line",
+                    __isNode: "Line",
+                    _meta: { title: "Circle Line", curie: "metro:circle-line" },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Line",
+                    uri: "https://metro.example/onto#coastal-line",
+                    __isNode: "Line",
+                    _meta: {
+                      title: "Coastal Line",
+                      curie: "metro:coastal-line",
+                    },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Line",
+                    uri: "https://metro.example/onto#north-line",
+                    __isNode: "Line",
+                    _meta: { title: "North Line", curie: "metro:north-line" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#transferMinutes",
+              total: 1,
+              predicate: {
+                label: "transfer minutes",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#transferMinutes",
+              },
+              values: [
+                { __typename: "StatementLiteral", lexical: "4", lang: null },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2000/01/rdf-schema#label",
+              total: 1,
+              predicate: {
+                label: "label",
+                pluralLabel: null,
+                uri: "http://www.w3.org/2000/01/rdf-schema#label",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Central Exchange",
+                  lang: null,
+                },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2004/02/skos/core#definition",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "The busiest transfer point on the network.",
+                  lang: null,
+                },
+              ],
+            },
+          ],
+        },
+        incoming: { total: 0, groups: [] },
       },
     },
   },
@@ -938,6 +1454,7 @@ export default [
                 title: "Line",
                 type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
               },
+              label: "Line",
             },
             fields: [
               {
@@ -950,6 +1467,12 @@ export default [
                   kind: "DATATYPE",
                   range: "String",
                 },
+                order: 1,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "servedBy",
@@ -961,13 +1484,226 @@ export default [
                   kind: "OBJECT",
                   range: "metro:Station",
                 },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
+                },
               },
             ],
             curie: "metro:circle-line",
             definition: null,
             comment: "Runs both directions; timetable is symmetric.",
+            label: "Circle Line",
           },
           __isNode: "Line",
+        },
+      },
+    },
+  },
+  {
+    operation: "EntityStatementsQuery",
+    variables: { uri: "https://metro.example/onto#circle-line" },
+    response: {
+      data: {
+        outgoing: {
+          total: 9,
+          groups: [
+            {
+              predicateUri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "OntologyClass",
+                    uri: "https://metro.example/onto#Line",
+                    __isNode: "OntologyClass",
+                    _meta: { title: "Line", curie: "metro:Line" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#code",
+              total: 1,
+              predicate: {
+                label: "code",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#code",
+              },
+              values: [
+                { __typename: "StatementLiteral", lexical: "2", lang: null },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#colour",
+              total: 1,
+              predicate: {
+                label: "colour",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#colour",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "#f2b705",
+                  lang: null,
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#formations",
+              total: 1,
+              predicate: {
+                label: "formations",
+                pluralLabel: "formations",
+                uri: "https://metro.example/onto#formations",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Formation",
+                    uri: "https://metro.example/onto#series-70-fixed",
+                    __isNode: "Formation",
+                    _meta: {
+                      title: "Series 70 fixed formation",
+                      curie: "metro:series-70-fixed",
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#routes",
+              total: 2,
+              predicate: {
+                label: "routes",
+                pluralLabel: "routes",
+                uri: "https://metro.example/onto#routes",
+              },
+              values: [
+                { __typename: "StatementNested", type: null },
+                { __typename: "StatementNested", type: null },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2000/01/rdf-schema#comment",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Runs both directions; timetable is symmetric.",
+                  lang: null,
+                },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2000/01/rdf-schema#label",
+              total: 2,
+              predicate: {
+                label: "label",
+                pluralLabel: null,
+                uri: "http://www.w3.org/2000/01/rdf-schema#label",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Circle Line",
+                  lang: null,
+                },
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Ligne Circulaire",
+                  lang: "fr",
+                },
+              ],
+            },
+          ],
+        },
+        incoming: {
+          total: 6,
+          groups: [
+            {
+              predicateUri: "https://metro.example/onto#servesLine",
+              total: 6,
+              predicate: {
+                label: "serves line",
+                inverseLabel: "served by",
+                inversePluralLabel: "served by",
+                uri: "https://metro.example/onto#servesLine",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Interchange",
+                    uri: "https://metro.example/onto#central-exchange",
+                    __isNode: "Interchange",
+                    _meta: {
+                      title: "Central Exchange",
+                      curie: "metro:central-exchange",
+                    },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Station",
+                    uri: "https://metro.example/onto#kilnwood",
+                    __isNode: "Station",
+                    _meta: { title: "Kilnwood", curie: "metro:kilnwood" },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Station",
+                    uri: "https://metro.example/onto#quarry-hill",
+                    __isNode: "Station",
+                    _meta: { title: "Quarry Hill", curie: "metro:quarry-hill" },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Interchange",
+                    uri: "https://metro.example/onto#riverside-junction",
+                    __isNode: "Interchange",
+                    _meta: {
+                      title: "Riverside Junction",
+                      curie: "metro:riverside-junction",
+                    },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Interchange",
+                    uri: "https://metro.example/onto#tannery-lane",
+                    __isNode: "Interchange",
+                    _meta: {
+                      title: "Tannery Lane",
+                      curie: "metro:tannery-lane",
+                    },
+                  },
+                },
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Station",
+                    uri: "https://metro.example/onto#willowbank",
+                    __isNode: "Station",
+                    _meta: { title: "Willowbank", curie: "metro:willowbank" },
+                  },
+                },
+              ],
+            },
+          ],
         },
       },
     },
@@ -996,6 +1732,7 @@ export default [
                 title: "Station",
                 type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
               },
+              label: "Station",
             },
             fields: [
               {
@@ -1008,6 +1745,12 @@ export default [
                   kind: "DATATYPE",
                   range: "Int",
                 },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "servesLine",
@@ -1018,6 +1761,12 @@ export default [
                   uri: "https://metro.example/onto#servesLine",
                   kind: "OBJECT",
                   range: "metro:Line",
+                },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
                 },
               },
               {
@@ -1030,6 +1779,12 @@ export default [
                   kind: "OBJECT",
                   range: "geo:GeoPoint",
                 },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
+                },
               },
               {
                 name: "inZone",
@@ -1040,6 +1795,12 @@ export default [
                   uri: "https://geo.example/onto#inZone",
                   kind: "OBJECT",
                   range: "geo:Zone",
+                },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
                 },
               },
               {
@@ -1052,6 +1813,12 @@ export default [
                   kind: "DATATYPE",
                   range: "String",
                 },
+                order: 1,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "note",
@@ -1063,14 +1830,175 @@ export default [
                   kind: "ANNOTATION",
                   range: "String",
                 },
+                order: null,
+                visibility: "HIDDEN",
+                group: null,
               },
             ],
             curie: "metro:harbourside",
             definition: null,
             comment: "Step-free to all platforms.",
+            label: "Harbourside",
           },
           __isNode: "Station",
         },
+      },
+    },
+  },
+  {
+    operation: "EntityStatementsQuery",
+    variables: { uri: "https://metro.example/onto#harbourside" },
+    response: {
+      data: {
+        outgoing: {
+          total: 9,
+          groups: [
+            {
+              predicateUri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "OntologyClass",
+                    uri: "https://metro.example/onto#Station",
+                    __isNode: "OntologyClass",
+                    _meta: { title: "Station", curie: "metro:Station" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://geo.example/onto#inZone",
+              total: 1,
+              predicate: {
+                label: "in zone",
+                pluralLabel: "in zones",
+                uri: "https://geo.example/onto#inZone",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Zone",
+                    uri: "https://geo.example/onto#coastal-zone",
+                    __isNode: "Zone",
+                    _meta: { title: "Coastal Zone", curie: "geo:coastal-zone" },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://geo.example/onto#location",
+              total: 1,
+              predicate: {
+                label: "location",
+                pluralLabel: null,
+                uri: "https://geo.example/onto#location",
+              },
+              values: [
+                {
+                  __typename: "StatementNested",
+                  type: {
+                    label: "Geo point",
+                    uri: "https://geo.example/onto#GeoPoint",
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#diagramPosition",
+              total: 1,
+              predicate: {
+                label: "diagram position",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#diagramPosition",
+              },
+              values: [{ __typename: "StatementNested", type: null }],
+            },
+            {
+              predicateUri: "https://metro.example/onto#platformCount",
+              total: 1,
+              predicate: {
+                label: "platform count",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#platformCount",
+              },
+              values: [
+                { __typename: "StatementLiteral", lexical: "2", lang: null },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#platformLength",
+              total: 1,
+              predicate: {
+                label: "platform length",
+                pluralLabel: null,
+                uri: "https://metro.example/onto#platformLength",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "125000",
+                  lang: null,
+                },
+              ],
+            },
+            {
+              predicateUri: "https://metro.example/onto#servesLine",
+              total: 1,
+              predicate: {
+                label: "serves line",
+                pluralLabel: "serves lines",
+                uri: "https://metro.example/onto#servesLine",
+              },
+              values: [
+                {
+                  __typename: "StatementNode",
+                  node: {
+                    __typename: "Line",
+                    uri: "https://metro.example/onto#coastal-line",
+                    __isNode: "Line",
+                    _meta: {
+                      title: "Coastal Line",
+                      curie: "metro:coastal-line",
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2000/01/rdf-schema#comment",
+              total: 1,
+              predicate: null,
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Step-free to all platforms.",
+                  lang: null,
+                },
+              ],
+            },
+            {
+              predicateUri: "http://www.w3.org/2000/01/rdf-schema#label",
+              total: 1,
+              predicate: {
+                label: "label",
+                pluralLabel: null,
+                uri: "http://www.w3.org/2000/01/rdf-schema#label",
+              },
+              values: [
+                {
+                  __typename: "StatementLiteral",
+                  lexical: "Harbourside",
+                  lang: null,
+                },
+              ],
+            },
+          ],
+        },
+        incoming: { total: 0, groups: [] },
       },
     },
   },
@@ -1098,6 +2026,7 @@ export default [
                 title: "Station",
                 type: { uri: "http://www.w3.org/2000/01/rdf-schema#Class" },
               },
+              label: "Station",
             },
             fields: [
               {
@@ -1110,6 +2039,12 @@ export default [
                   kind: "DATATYPE",
                   range: "Int",
                 },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "servesLine",
@@ -1120,6 +2055,12 @@ export default [
                   uri: "https://metro.example/onto#servesLine",
                   kind: "OBJECT",
                   range: "metro:Line",
+                },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
                 },
               },
               {
@@ -1132,6 +2073,12 @@ export default [
                   kind: "OBJECT",
                   range: "geo:GeoPoint",
                 },
+                order: 1,
+                visibility: "PROMINENT",
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
+                },
               },
               {
                 name: "inZone",
@@ -1142,6 +2089,12 @@ export default [
                   uri: "https://geo.example/onto#inZone",
                   kind: "OBJECT",
                   range: "geo:Zone",
+                },
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 3,
+                  uri: "https://metro.example/onto#section.place",
                 },
               },
               {
@@ -1154,6 +2107,12 @@ export default [
                   kind: "DATATYPE",
                   range: "String",
                 },
+                order: 1,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
               },
               {
                 name: "note",
@@ -1165,11 +2124,15 @@ export default [
                   kind: "ANNOTATION",
                   range: "String",
                 },
+                order: null,
+                visibility: "HIDDEN",
+                group: null,
               },
             ],
             curie: "metro:northgate",
             definition: "The northern terminus.",
             comment: null,
+            label: "Northgate",
           },
           __isNode: "Station",
         },
@@ -1186,6 +2149,147 @@ export default [
       data: {
         ontologyClass: { uri: "https://metro.example/onto#Station" },
         node: null,
+      },
+    },
+  },
+  {
+    operation: "EntityStatementsQuery",
+    variables: { uri: "https://metro.example/onto#nowhere" },
+    response: { data: { outgoing: null, incoming: null } },
+  },
+  {
+    operation: "EntityPageQuery",
+    variables: {
+      classUri: "metro:Line",
+      id: "https://metro.example/onto#circle-line",
+    },
+    response: {
+      data: {
+        ontologyClass: { uri: "https://metro.example/onto#Line" },
+        node: {
+          __typename: "Line",
+          uri: "https://metro.example/onto#circle-line",
+          _meta: {
+            title: "Circle Line",
+            curie: "metro:circle-line",
+            type: {
+              uri: "https://metro.example/onto#Line",
+              label: "Line",
+              superclasses: [],
+              __isNode: "OntologyClass",
+              __typename: "OntologyClass",
+              _meta: { title: "Line", curie: "metro:Line" },
+            },
+            label: "Circle Line",
+            definition: null,
+            comment: "Runs both directions; timetable is symmetric.",
+            fields: [
+              {
+                name: "name",
+                order: 1,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
+                property: {
+                  uri: "https://metro.example/onto#name",
+                  kind: "DATATYPE",
+                  range: "String",
+                },
+                required: true,
+                singular: true,
+                inherited: false,
+              },
+              {
+                name: "servedBy",
+                order: 2,
+                visibility: null,
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
+                },
+                property: {
+                  uri: "https://metro.example/onto#servedBy",
+                  kind: "OBJECT",
+                  range: "metro:Station",
+                },
+                required: false,
+                singular: false,
+                inherited: false,
+              },
+              {
+                name: "code",
+                order: 2,
+                visibility: "PROMINENT",
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
+                property: {
+                  uri: "https://metro.example/onto#code",
+                  kind: "DATATYPE",
+                  range: "String",
+                },
+                required: true,
+                singular: true,
+                inherited: false,
+              },
+              {
+                name: "colour",
+                order: 3,
+                visibility: null,
+                group: {
+                  order: 1,
+                  uri: "https://metro.example/onto#section.overview",
+                },
+                property: {
+                  uri: "https://metro.example/onto#colour",
+                  kind: "DATATYPE",
+                  range: "String",
+                },
+                required: true,
+                singular: true,
+                inherited: false,
+              },
+              {
+                name: "routes",
+                order: 1,
+                visibility: null,
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
+                },
+                property: {
+                  uri: "https://metro.example/onto#routes",
+                  kind: "OBJECT",
+                  range: "metro:Route",
+                },
+                required: true,
+                singular: false,
+                inherited: false,
+              },
+              {
+                name: "formations",
+                order: 3,
+                visibility: null,
+                group: {
+                  order: 2,
+                  uri: "https://metro.example/onto#section.service",
+                },
+                property: {
+                  uri: "https://metro.example/onto#formations",
+                  kind: "OBJECT",
+                  range: "metro:Formation",
+                },
+                required: true,
+                singular: false,
+                inherited: false,
+              },
+            ],
+          },
+          __isNode: "Line",
+        },
       },
     },
   },

@@ -1,0 +1,126 @@
+import { createEnvironment } from "@canonical/prism-core";
+import { render } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { useLazyLoadQuery } from "react-relay";
+import { fetchQuery } from "relay-runtime";
+import { describe, expect, it } from "vitest";
+import createEntitySite from "../../../../../../testing/createEntitySite.js";
+import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
+import {
+  CENTRAL_EXCHANGE_CURIE,
+  ENTITY_TEST_TIMEOUT_MS,
+} from "../../../../../../testing/fixtures.js";
+import metroResponses from "../../../../../../testing/records/metroResponses.js";
+import type { EntityStatementsQuery } from "../../../../../__generated__/EntityStatementsQuery.graphql.js";
+import entityStatementsQueryNode from "../../../../../__generated__/EntityStatementsQuery.graphql.js";
+import StatementGroup from "./StatementGroup.js";
+
+const URI = "https://metro.example/onto#central-exchange";
+
+/** The recorded answer for Central Exchange's statements. */
+const RECORDED = metroResponses.find(
+  ({ operation, variables }) =>
+    operation === "EntityStatementsQuery" && variables.uri === URI,
+);
+
+/**
+ * The recorded "serves lines" group, its first line kept beside a value of
+ * every other kind, its total past what it holds.
+ */
+const craftAnswer = () => {
+  const answer = structuredClone(RECORDED?.response) as {
+    data: {
+      outgoing: {
+        groups: { predicateUri: string; total: number; values: unknown[] }[];
+      };
+    };
+  };
+  const group = answer.data.outgoing.groups.find(({ predicateUri }) =>
+    predicateUri.endsWith("#servesLine"),
+  );
+  if (group === undefined) throw new Error("craftAnswer: no servesLine group");
+  group.total = 30;
+  group.values = [
+    group.values.at(0),
+    {
+      __typename: "StatementLiteral",
+      lexical: "Gare centrale",
+      lang: "fr",
+    },
+    { __typename: "StatementForeign", curie: "x:a" },
+    { __typename: "StatementNested", type: null },
+  ];
+  answer.data.outgoing.groups = [group];
+  return answer;
+};
+
+/** The first outgoing group of the store's statements, as its section shows it. */
+const FirstGroup = ({
+  allHref,
+}: {
+  readonly allHref?: string;
+}): ReactElement => {
+  const { outgoing } = useLazyLoadQuery<EntityStatementsQuery>(
+    entityStatementsQueryNode,
+    { uri: URI },
+    { fetchPolicy: "store-only" },
+  );
+  const group = outgoing?.groups.at(0);
+  if (group === undefined) throw new Error("FirstGroup: no group in the store");
+  return <StatementGroup allHref={allHref} data-probe="group" group={group} />;
+};
+
+/** The group over a store holding the crafted answer. */
+const renderGroup = async (allHref?: string) => {
+  const fetchFn = createFetchSpy();
+  fetchFn.mockResolvedValue(craftAnswer());
+  const environment = createEnvironment({ fetchFn });
+  await fetchQuery(environment, entityStatementsQueryNode, {
+    uri: URI,
+  }).toPromise();
+  return render(
+    createEntitySite({
+      url: `/stations/${encodeURIComponent(CENTRAL_EXCHANGE_CURIE)}`,
+      environment,
+      children: <FirstGroup allHref={allHref} />,
+    }),
+  );
+};
+
+describe("StatementGroup", () => {
+  it("renders each value by its kind: a linked chip, text in its language, a compact form", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderGroup();
+    const values = [...container.querySelectorAll(".values > .value")];
+    expect(values).toHaveLength(4);
+    expect(values.at(0)?.querySelector("a")?.getAttribute("href")).toBe(
+      "/lines/metro%3Acircle-line",
+    );
+    expect(values.at(1)?.querySelector('[lang="fr"]')?.textContent).toBe(
+      "Gare centrale",
+    );
+    expect(values.at(2)?.querySelector("code")?.textContent).toBe("x:a");
+    expect(values.at(3)?.textContent).toBe("A nested value");
+  });
+
+  it("names no link to all the values when the caller names no index", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderGroup();
+    expect(container.querySelector(".all")).toBeNull();
+  });
+
+  it("follows the shown values with All N when the caller names where they are listed", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderGroup(
+      "/stations?near=metro%3Acentral-exchange",
+    );
+    const all = container.querySelector('[data-probe="group"] > a.all');
+    expect(all?.textContent).toBe("All 30");
+    expect(all?.getAttribute("href")).toBe(
+      "/stations?near=metro%3Acentral-exchange",
+    );
+  });
+});

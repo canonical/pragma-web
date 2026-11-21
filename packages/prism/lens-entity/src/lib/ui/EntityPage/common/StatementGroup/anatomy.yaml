@@ -1,0 +1,21 @@
+---
+# StatementGroup: one predicate
+# group's values as a section's content: literals as text, nodes as linked
+# MentionChips (no peek inside a peek), at most 12, then "All N" when
+# total > shown and the values' class has an index route; the count is in
+# the section title / summary, never here. Reference: PS9 V1, 63a.
+#
+# Token ledger (on `.ds.statement-group`):
+#   --statement-group-gap: --grid-gutter     between values
+node:
+  uri: prism.subcomponent.statement_group
+  element: div
+  styles: { layout.type: grid, layout.grid.columns: subgrid, layout.grid.column: "1 / -1", spacing.gap: grid.gutter }
+  edges:
+    - node: { role: values, element: ul, styles: { layout.grid.column: "1 / -1", layout.type: flex, layout.wrap: wrap, spacing.gap: grid.gutter, layout.listStyle: none, spacing.internal.inline.start: 0, spacing.external.block.start: 0, spacing.external.block.end: 0 } }
+      relation: { cardinality: "1", slotName: values }
+      edges:
+        - node: { role: value, element: li }
+          relation: { cardinality: "1..12", slotName: value }
+    - node: { role: all, element: a, styles: { layout.grid.column: "1 / -1" } }
+      relation: { cardinality: "0..1", slotName: all }      # "All N", RouterLink

@@ -58,10 +58,12 @@ describe("the lens's components", () => {
       "SocketGuard",
       "Trail",
       "EntityDetail",
+      "EntityHeader",
       "EntityHeading",
       "EntitySummary",
       "FieldList",
       "Relations",
+      "StatementGroup",
     ]);
   });
 

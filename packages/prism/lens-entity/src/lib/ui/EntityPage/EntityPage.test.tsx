@@ -55,7 +55,7 @@ describe("EntityPage", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Northgate" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(NORTHGATE_CURIE)).toHaveClass("ds", "inline-code");
+    expect(screen.getByText(NORTHGATE_CURIE)).toHaveClass("address");
     expect(screen.getByText("The northern terminus.")).toBeInTheDocument();
     expect(
       document.querySelector(".ds.entity-summary .type")?.textContent,

@@ -9,6 +9,8 @@ import type { EntityNamespacesQuery } from "../__generated__/EntityNamespacesQue
 import entityNamespacesQueryNode from "../__generated__/EntityNamespacesQuery.graphql.js";
 import type { EntityPageQuery } from "../__generated__/EntityPageQuery.graphql.js";
 import entityPageQueryNode from "../__generated__/EntityPageQuery.graphql.js";
+import type { EntityStatementsQuery } from "../__generated__/EntityStatementsQuery.graphql.js";
+import entityStatementsQueryNode from "../__generated__/EntityStatementsQuery.graphql.js";
 import buildEntityPageVariables from "./buildEntityPageVariables.js";
 import readUriParam from "./readUriParam.js";
 
@@ -101,5 +103,15 @@ function warmEntityPage(
       STORE_OR_NETWORK,
     ).toPromise(),
     warmPageRenderer(variables.id, search, environment),
+    fetchQuery<EntityStatementsQuery>(
+      environment,
+      entityStatementsQueryNode,
+      { uri: variables.id },
+      STORE_OR_NETWORK,
+    )
+      .toPromise()
+      // A provider that does not serve `statements` refuses the field; the
+      // page then reads the class's fields and never asks for it.
+      .catch(() => undefined),
   ]).then(() => undefined);
 }

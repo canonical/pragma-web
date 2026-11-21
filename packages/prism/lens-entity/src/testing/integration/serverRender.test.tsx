@@ -43,7 +43,9 @@ describe("server rendering", () => {
       LAYOUT,
     );
 
-    expect(html).toContain('<h1 class="title">Northgate</h1>');
+    expect(html).toMatch(
+      /<h1 class="title"><svg[^>]*>.*?<\/svg>Northgate<\/h1>/,
+    );
     expect(html).toContain('class="ds field-list"');
     // Six fields and three relations, each a key value.
     expect(html.match(/<div class="pair">/g)).toHaveLength(9);

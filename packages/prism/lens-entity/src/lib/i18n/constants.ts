@@ -43,4 +43,9 @@ export const MESSAGES = {
   "relations.heading": "Relations",
   "relations.empty": "The class declares no relation to another entity.",
   "relations.value": "to {range}, {cardinality}",
+  "statements.group": "{label} · {count}",
+  "statements.referencedBy": "Referenced by · {count}",
+  "statements.inverse": "Has this as {label}",
+  "statements.all": "All {count}",
+  "statements.nested": "A nested value",
 } as const;
