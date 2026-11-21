@@ -12,16 +12,14 @@ import catalogRecords from "../../__fixtures__/catalogRecords.js";
 
 describe("ComponentsCatalogPage", () => {
   it(
-    "shows its heading over the catalog as a table by default, from the warm store",
+    "shows its heading over the catalog as two-line rows by default, from the warm store",
     () => {
       const fetchFn = createFetchSpy();
       const { container } = render(catalogPage(catalogRecords, fetchFn));
       expect(
         screen.getByRole("heading", { level: 1, name: "Components" }),
       ).toHaveClass("heading");
-      expect(
-        container.querySelectorAll(".ds.entity-table > .body > .row").length,
-      ).toBe(7);
+      expect(container.querySelectorAll(".ds.entity-row").length).toBe(7);
       expect(container.querySelector(".ds.entity-card")).toBeNull();
       expect(fetchFn).not.toHaveBeenCalled();
     },

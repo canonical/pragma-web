@@ -15,7 +15,7 @@ describe("CatalogList SSR", () => {
     );
     expect(html).toContain('id="catalog-tier-global"');
     expect(html).toMatch(/class="[^"]*\bnode-list\b[^"]*"/);
-    expect(html).toContain('class="ds entity-table');
+    expect(html).toContain('class="ds entity-row');
     expect(html).toContain('<p class="more">');
   });
 });

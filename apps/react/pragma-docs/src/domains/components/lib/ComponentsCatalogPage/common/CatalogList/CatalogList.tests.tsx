@@ -134,29 +134,23 @@ describe("CatalogList", () => {
   );
 
   it(
-    "lists each tier as a table of the lens's facts, two lines a row",
+    "lists each tier as two-line rows, the catalog leaving every value out",
     () => {
       const { container } = render(
         catalogPage(catalogRecords, createFetchSpy(), createCatalogRouter()),
       );
-      const tables = [...container.querySelectorAll(".ds.entity-table")];
-      expect(tables).toHaveLength(3);
-      const rows = tables.flatMap((table) => [
-        ...table.querySelectorAll(":scope > .body > .row"),
-      ]);
+      expect(container.querySelector(".ds.entity-table")).toBeNull();
+      const rows = [...container.querySelectorAll(".ds.entity-row")];
       expect(rows).toHaveLength(7);
       for (const row of rows) {
-        expect(row).toHaveClass("is-two-line");
-        expect(
-          row.querySelectorAll(".value[data-property]").length,
-        ).toBeGreaterThan(0);
+        expect(row.querySelector(".summary")).not.toBeNull();
       }
     },
     HARNESS_TEST_TIMEOUT_MS,
   );
 
   it(
-    "highlights the component the address selects, in the table and the cards",
+    "highlights the component the address selects, in the rows and the cards",
     () => {
       const tableView = render(
         catalogPage(
@@ -168,7 +162,7 @@ describe("CatalogList", () => {
         ),
       );
       const selected = [
-        ...tableView.container.querySelectorAll('[aria-selected="true"]'),
+        ...tableView.container.querySelectorAll('[aria-current="true"]'),
       ];
       expect(selected).toHaveLength(1);
       expect(selected.at(0)?.textContent).toContain("Button");

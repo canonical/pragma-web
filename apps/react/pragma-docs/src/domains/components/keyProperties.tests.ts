@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
 /** The app's source folder. */
 const SOURCE_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
-/** The files that may name the properties a list shows: the provider's site lens, since the site keeps no lens file of its own. */
-const LENS_FILES: readonly string[] = [];
+/** The files that may name the properties a list shows: the components lens's list configuration. */
+const LENS_FILES: readonly string[] = ["domains/components/constants.ts"];
 
 /** The index lists, each of which draws its nodes through `NodeList`. */
 const INDEX_LISTS: readonly string[] = [

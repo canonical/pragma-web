@@ -17,6 +17,7 @@ import {
   CATALOG_PAGE_SIZE,
   componentsCatalogVariables,
 } from "../../../../catalogQuery.js";
+import { CATALOG_LIST_OMITS } from "../../../../constants.js";
 import groupByTier from "./groupByTier.js";
 import type { CatalogListProps } from "./types.js";
 import "./styles.css";
@@ -76,8 +77,9 @@ const nameTierAnchor = (tier: string): string =>
 /**
  * The catalog: one jump link per tier, then each tier as a page section
  * whose content is its components through the shared list of nodes, in
- * the renderer the address selects: the table of the facts the component
- * lens displays, two lines a row, or the cards, each through the site's
+ * the renderer the address selects: two-line rows, each a component's
+ * summary and its documentation's stage, as the list leaves every value
+ * field out, or the cards, each through the site's
  * card arm, which the package's switch reaches through the site slot. The
  * sort and the selected component are the address's (`sort=`, `select=`),
  * and each tier's list sorts its own components. Tiers run Global first, the rest
@@ -169,6 +171,7 @@ export default function CatalogList({
           <NodeList
             lines="two"
             nodes={nodes}
+            omits={CATALOG_LIST_OMITS}
             renderer={listRenderer}
             selected={selected}
             sort={sort}
