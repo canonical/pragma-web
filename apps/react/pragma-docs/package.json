@@ -14,6 +14,7 @@
     "#domains/marketing": "./src/domains/marketing/index.ts",
     "#domains/modifiers/lib": "./src/domains/modifiers/lib/index.ts",
     "#domains/playground": "./src/domains/playground/index.ts",
+    "#domains/search": "./src/domains/search/index.ts",
     "#domains/standards": "./src/domains/standards/index.ts",
     "#domains/standards/lib": "./src/domains/standards/lib/index.ts",
     "#graphql-endpoint": "./src/relay/graphqlEndpoint.ts",

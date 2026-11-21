@@ -126,6 +126,7 @@ describe("the app's components", () => {
         "marketing",
         "modifiers",
         "playground",
+        "search",
         "standards",
       ].map((domain) => join(APP_ROOT, "src", "domains", domain, "lib")),
     );

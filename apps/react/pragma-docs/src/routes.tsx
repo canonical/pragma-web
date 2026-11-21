@@ -10,11 +10,13 @@ import { guidesLayout, guidesRoutes } from "#domains/guides";
 import { journeysLayout, journeysRoutes } from "#domains/journeys";
 import { marketingLayout, marketingRoutes } from "#domains/marketing";
 import { playgroundLayout, playgroundRoutes } from "#domains/playground";
+import { offerSearchRoutes } from "#domains/search";
 import { standardsLayout, standardsRoutes } from "#domains/standards";
 import { withAuth } from "#lib/authGuard";
 import { NotFoundPage } from "#lib/ui";
 import { SiteColophon } from "#lib/ui/SiteColophon";
 import { SiteRail } from "#lib/ui/SiteRail";
+import { SITE_EXTENSIONS } from "./extensions.js";
 
 /**
  * The page every URL no route matches renders, at its own `/not-found`: the
@@ -106,6 +108,9 @@ const appRoutes = {
   definitionsTerm,
   standardEntity,
   journeysJob,
+  // The search page reads the provider's `search` extension, so the table
+  // lists it only when the site's provider serves that extension.
+  ...offerSearchRoutes(SITE_EXTENSIONS),
 } as const;
 
 export type AppRoutes = typeof appRoutes;
