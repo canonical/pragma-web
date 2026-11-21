@@ -17,16 +17,18 @@
     align-self: start;
   }
 
-  .ds.fleet-index .title {
+  /* The index's own heading and lines, its children only: the list's
+   * table names its title cells and rows by the same classes. */
+  .ds.fleet-index > .title {
     grid-column: 1 / -1;
   }
 
-  .ds.fleet-index .status {
+  .ds.fleet-index > .status {
     grid-column: 1 / -1;
     color: var(--fleet-index-secondary-color);
   }
 
-  .ds.fleet-index .error {
+  .ds.fleet-index > .error {
     grid-column: 1 / -1;
     color: var(--fleet-index-error-color);
   }

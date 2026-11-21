@@ -28,7 +28,8 @@
  * than run under the value or widen the canvas, and once for its fields'
  * keys, a key carrying the inherited tag on the same line height as a
  * plain one. Every row of the station and fleet indexes is 32px, and 56px
- * below two groups, where the table folds into scented rows.
+ * below two groups, where the table folds into scented rows; each fleet
+ * row shows its formations after the script has run.
  */
 import {
   launchBrowser,
@@ -41,10 +42,14 @@ import {
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { NORTHGATE_CURIE } from "../../testing/fixtures.js";
+import {
+  NORTHGATE_CURIE,
+  ROLLING_STOCK_COUNT,
+} from "../../testing/fixtures.js";
 import {
   CARDS_PATHS,
   DEV_READY_MS,
+  FLEET_PATH,
   GRAPH_READY_MS,
   INDEX_CARD_SELECTOR,
   INDEX_ROW_SELECTOR,
@@ -78,6 +83,40 @@ const DOCUMENT_PATHS = [
   "/",
   "/not-found",
 ] as const;
+
+/**
+ * Read each table row's first value cell as the reader sees it: its text,
+ * whether its label shows, and whether it is painted inside its row. It
+ * runs in the page.
+ *
+ * @param selector - The rows' selector.
+ * @returns One entry per row.
+ * @note Impure: reads the page's layout.
+ */
+function readFirstValues(selector: string): readonly {
+  readonly text: string;
+  readonly labelShown: boolean;
+  readonly painted: boolean;
+}[] {
+  return [...document.querySelectorAll(selector)].map((row) => {
+    const cell = row.querySelector("td.value");
+    const rowBox = row.getBoundingClientRect();
+    const box = cell?.getBoundingClientRect();
+    const label = cell?.querySelector(".term");
+    return {
+      text: cell?.querySelector(".detail")?.textContent ?? "",
+      labelShown:
+        label !== null &&
+        label !== undefined &&
+        getComputedStyle(label).display !== "none",
+      painted:
+        box !== undefined &&
+        box.width > 0 &&
+        box.top >= rowBox.top &&
+        box.bottom <= rowBox.bottom,
+    };
+  });
+}
 
 /**
  * Set `name` as the text of the page's first key and measure the pair: the
@@ -361,6 +400,23 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         viewport.width < TABLE_FOLD_WIDTH_PX ? TWO_LINE_ROW_PX : ROW_PX;
       expect(rows.length).toBeGreaterThan(0);
       expect(rows.filter((row) => row.height !== height)).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
+
+  // Once the script has run, each stock's row shows its formations, its
+  // first value, painted inside the row; below two groups after its label.
+  it("shows each fleet row's formations", async () => {
+    const page = await open(FLEET_PATH);
+    try {
+      const cells = await page.evaluate(readFirstValues, INDEX_ROW_SELECTOR);
+      expect(cells).toHaveLength(ROLLING_STOCK_COUNT);
+      for (const cell of cells) {
+        expect(cell.text).not.toBe("");
+        expect(cell.painted).toBe(true);
+        expect(cell.labelShown).toBe(viewport.width < TABLE_FOLD_WIDTH_PX);
+      }
     } finally {
       await page.close();
     }
