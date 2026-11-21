@@ -124,9 +124,9 @@ describe("EntityDetail", () => {
         (term) => term.textContent,
       ),
     ).toEqual(["location", "serves lines", "transfer minutes"]);
-    expect(
-      container.querySelector(".facts .nested")?.textContent,
-    ).toMatch(/^latitude.+longitude.+$/);
+    expect(container.querySelector(".facts .nested")?.textContent).toMatch(
+      /^latitude.+longitude.+$/,
+    );
     expect(container.querySelectorAll(".facts .values a")).toHaveLength(3);
     expect(readSections(container)).toEqual([
       "p-platformCount|platform count · 1",

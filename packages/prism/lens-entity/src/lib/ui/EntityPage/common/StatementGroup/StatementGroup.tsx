@@ -135,7 +135,9 @@ function renderValue(value: StatementValue, nested: string): ReactNode {
     <dl className="nested">
       {held.map(({ predicate, predicateUri, values }) => (
         <div className="pair" key={predicateUri}>
-          <dt className="term">{predicate?.label ?? readLocalName(predicateUri)}</dt>
+          <dt className="term">
+            {predicate?.label ?? readLocalName(predicateUri)}
+          </dt>
           {values.map((held, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: a value has no identity but its place in the provider's order
             <dd className="held" key={index}>
