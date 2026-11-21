@@ -18,8 +18,9 @@ const componentCssClassName = "ds entity-table";
  * draws its direction after its label. The selected row is highlighted and
  * marked selected.
  *
- * It is a subgrid of the grid that holds it: the title spans two columns
- * and each value one, and a row is clipped at its own height, so the
+ * It is a subgrid of the grid that holds it: the title spans two columns,
+ * a text or list value two and a number one (`is-number`, read from its
+ * end, its header too), and a row is clipped at its own height, so the
  * values that find no column leave whole, the last first. Each value cell
  * also holds its field's label, which only the folded row shows: below two
  * groups a container rule hides the header row and folds each row into a
@@ -54,10 +55,16 @@ export default function EntityTable({
           <th className="heading" scope="col">
             {t("table.title")}
           </th>
-          {columns.map(({ field, header, href, sorted }) => (
+          {columns.map(({ field, header, href, numeric, sorted }) => (
             <th
               aria-sort={sorted}
-              className={sorted === undefined ? "column" : "column is-sorted"}
+              className={[
+                "column",
+                numeric ? "is-number" : null,
+                sorted === undefined ? null : "is-sorted",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               data-property={field}
               key={field}
               scope="col"
@@ -88,9 +95,13 @@ export default function EntityTable({
             </th>
             {cells.map(({ field, text }, index) => (
               <td
-                className={
-                  index < FOLDED_VALUE_COUNT ? "value" : "value is-later"
-                }
+                className={[
+                  "value",
+                  columns.at(index)?.numeric ? "is-number" : null,
+                  index < FOLDED_VALUE_COUNT ? null : "is-later",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 data-property={field}
                 key={field}
               >

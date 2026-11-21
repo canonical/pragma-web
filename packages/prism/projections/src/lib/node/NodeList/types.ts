@@ -43,6 +43,8 @@ export interface ListedValue {
   readonly field: string;
   readonly label: string;
   readonly text?: string | null;
+  /** How the field's values read; a number's text shows grouped. */
+  readonly type?: string;
 }
 
 /** A node with the values it shows, when read. */

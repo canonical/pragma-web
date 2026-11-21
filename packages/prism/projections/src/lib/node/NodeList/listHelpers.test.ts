@@ -91,6 +91,18 @@ describe("orderByValue", () => {
     ).toEqual(["a", "c", "b"]);
   });
 
+  it("orders grouped numbers by their value", () => {
+    const length = (text: string) => ({
+      values: [{ field: "length", label: "Length", text, type: "number" }],
+    });
+    expect(
+      orderByValue([length("1,600"), length("999")], {
+        field: "length",
+        descending: false,
+      }).map((node) => node.values.at(0)?.text),
+    ).toEqual(["999", "1,600"]);
+  });
+
   it("keeps tied nodes in their order", () => {
     const tied = [
       zoned("a", "Zone 1"),

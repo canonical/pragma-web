@@ -12,6 +12,12 @@ export interface ListColumn {
   readonly field: string;
   /** The header's text: the field's label. */
   readonly header: string;
+  /**
+   * Whether the field holds numbers: its column takes one canvas column
+   * and its header and values read from its end; a text or list column
+   * takes two. Text when omitted.
+   */
+  readonly numeric?: boolean;
   /** The address that sorts the list by this field. */
   readonly href: string;
   /** The order the list is sorted in by this field, when it is. */

@@ -14,6 +14,7 @@ import { EntityList } from "../../ui/index.js";
 import { CardProjection } from "../CardProjection/index.js";
 import { RowProjection } from "../RowProjection/index.js";
 import { NodeTitle } from "./common/index.js";
+import { NUMBER_FIELD_TYPE } from "./constants.js";
 import findListedType from "./findListedType.js";
 import orderByValue from "./orderByValue.js";
 import readListSort from "./readListSort.js";
@@ -49,6 +50,7 @@ const declareNodeFragment = (): unknown => graphql`
       field
       label
       text
+      type
     }
     ...CardProjection_node
     ...RowProjection_node
@@ -121,9 +123,10 @@ export default function NodeList({
     fields.length > 0 &&
     findListedType(data) !== null
   ) {
-    const columns = fields.map(({ field, label }) => ({
+    const columns = fields.map(({ field, label, type }) => ({
       field,
       header: label,
+      numeric: type === NUMBER_FIELD_TYPE,
       href: buildViewHref(pathname, {
         ...search,
         [VIEW_PARAMS.sort]: writeNextSort(field, order),

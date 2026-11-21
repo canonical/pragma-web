@@ -82,9 +82,19 @@
     grid-auto-rows: var(--entity-table-two-line-row-size);
   }
 
+  /* The title and each text or list value share the canvas's free
+   * columns two each, a number one, so headers and values read whole
+   * where the canvas has room. */
   .ds.entity-table .heading,
-  .ds.entity-table .title {
+  .ds.entity-table .title,
+  .ds.entity-table .column,
+  .ds.entity-table .value {
     grid-column: span 2;
+  }
+
+  .ds.entity-table .column.is-number,
+  .ds.entity-table .value.is-number {
+    grid-column: span 1;
   }
 
   /* Every cell reads from its column's start, as its header does, on one
@@ -144,6 +154,16 @@
     flex-shrink: 0;
   }
 
+  /* A number reads from its column's end, its header too. */
+  .ds.entity-table .column.is-number,
+  .ds.entity-table .value.is-number {
+    text-align: end;
+  }
+
+  .ds.entity-table .column.is-number.is-sorted {
+    justify-content: flex-end;
+  }
+
   /* A value's label, which only a folded row shows, muted before its
    * text. */
   .ds.entity-table .term {
@@ -174,9 +194,11 @@
       flex-basis: var(--entity-table-fold-title-basis);
     }
 
-    .ds.entity-table .value {
+    .ds.entity-table .value,
+    .ds.entity-table .value.is-number {
       flex-grow: 1;
       flex-basis: 0;
+      text-align: start;
     }
 
     .ds.entity-table .value.is-later {
