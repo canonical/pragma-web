@@ -11,7 +11,7 @@ import {
  *
  * @throws When `owner` has no such field or the field is not object-typed.
  */
-const followField = (
+export const followField = (
   owner: GraphQLObjectType | GraphQLInterfaceType,
   name: string,
 ): GraphQLObjectType => {

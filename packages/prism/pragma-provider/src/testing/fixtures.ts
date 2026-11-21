@@ -188,7 +188,8 @@ export const EXTRACTION_CASES: readonly ExtractionCase[] = [
  * two of the same length that differ only in case, and two identical titles.
  * Listed out of rank order, so the order is the ranking's, not the index's.
  */
-export const SEARCH_ENTRIES: readonly SearchEntry[] = [
+export const SEARCH_ENTRIES: readonly SearchEntry[] = (
+  [
   {
     uri: `${DS}alert`,
     title: "Alert",
@@ -237,7 +238,8 @@ export const SEARCH_ENTRIES: readonly SearchEntry[] = [
     definition: null,
   },
   { uri: `${DS}knob`, title: "Knob", curie: "ds:knob", definition: null },
-];
+  ] as const
+).map((entry) => ({ ...entry, type: `${DS}Component` }));
 
 /** The cases `rankSearchEntries` is held to over {@link SEARCH_ENTRIES}. */
 export const RANKING_CASES: readonly RankingCase[] = [

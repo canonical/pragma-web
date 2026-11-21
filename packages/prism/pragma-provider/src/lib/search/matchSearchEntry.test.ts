@@ -18,7 +18,9 @@ describe("matchSearchEntry", () => {
       uri: `${DS}alert`,
       tier: 0,
       position: 0,
+      value: "Alert",
       title: "Alert",
+      type: `${DS}Component`,
     });
   });
 
@@ -27,7 +29,9 @@ describe("matchSearchEntry", () => {
       uri: `${DS}callout`,
       tier: 1,
       position: 3,
+      value: "ds:notice-callout",
       title: "Callout",
+      type: `${DS}Component`,
     });
   });
 
@@ -36,7 +40,9 @@ describe("matchSearchEntry", () => {
       uri: `${DS}toast`,
       tier: 2,
       position: 13,
+      value: "Notice of an event that dismisses itself.",
       title: "Toast",
+      type: `${DS}Component`,
     });
   });
 

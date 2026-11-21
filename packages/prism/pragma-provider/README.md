@@ -160,9 +160,18 @@ The provider adds a second root field, for finding a node by what it is called:
 
 ```graphql
 extend type Query {
-  search(text: String!, first: Int, after: String): NodeConnection!
+  search(text: String!, first: Int, after: String, types: [ID!]): SearchConnection!
 }
 ```
+
+`SearchConnection` carries `edges { node cursor match { field passage ranges { start
+length } } }`, `pageInfo`, `total` and `facets { type count }`, with the names and
+descriptions of ke-graphql's own search option, so a client reads either the same way.
+`match.passage` is the matched value, or at most 160 UTF-16 code units of it around the
+first occurrence, and `ranges` places every occurrence lying wholly inside it. An instance
+is counted under its most specific class and a class under `owl:Class` (its `_meta.type`);
+`types` keeps the results of the listed class IRIs, `total` counts after that filter and
+`facets` before it, most first, so a facet's count is the total its filter would show.
 
 **The rule.** The text is trimmed and lowercased; empty text, or text that is only
 whitespace, matches nothing. A node matches when its title, its CURIE or its definition
@@ -176,7 +185,7 @@ every machine.
 schema's own `node(id:)`: instances and `OntologyClass` nodes alike. What `node(id:)`
 resolves to null, properties and ontologies among it, is left out. Each node is read once,
 at boot, with the same query a client would send (`uri` and `_meta { curie title
-definition }`), so search matches exactly what `_meta` serves. A node that fails to read
+definition type { uri visibility } }`), so search matches exactly what `_meta` serves. A node that fails to read
 fails the boot, naming its IRI, rather than the first search.
 
 **The cost.** On the installed ref packages, the demand model's shims included, 1,103

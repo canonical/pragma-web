@@ -5,6 +5,7 @@
 // =============================================================================
 
 import { toBase64 } from "@canonical/ke-graphql";
+import { servesExtension } from "@canonical/prism-contract";
 import { describe, expect, it } from "vitest";
 import { createPragmaProvider } from "../../lib/provider/index.js";
 import { CORPUS_REFS_ROOT } from "../corpus.js";
@@ -72,11 +73,78 @@ describe("Query.search", () => {
   const rank = async (text: string): Promise<readonly string[]> =>
     (await search({ text })).edges.map((edge) => edge.node.uri);
 
-  it("is declared in the compiled schema", async () => {
+  it("is declared in the compiled schema as the search extension", async () => {
     const { api } = await booted;
-    expect(api.sdl).toContain(
-      "search(text: String!, first: Int, after: String): NodeConnection!",
+    expect(servesExtension(api.sdl, "search")).toBe(true);
+  });
+
+  /** POST `query` with `variables`, and return its search, which must not error. */
+  const read = async (
+    query: string,
+    variables: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> => {
+    const { handle } = await booted;
+    const response = await handle(
+      new Request("http://localhost/graphql", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ query, variables }),
+      }),
     );
+    const body = (await response.json()) as {
+      readonly data?: { readonly search: Record<string, unknown> };
+      readonly errors?: unknown;
+    };
+    expect(body.errors).toBeUndefined();
+    const found = body.data?.search;
+    if (found === undefined) throw new Error("search answered no page");
+    return found;
+  };
+
+  it("gives each result its match: the field, a passage and its ranges", async () => {
+    const page = await read(
+      `query($text: String!) { search(text: $text, first: 1) {
+        edges { node { uri } match { field passage ranges { start length } } }
+      } }`,
+      { text: "surface" },
+    );
+    expect(page.edges).toEqual([
+      {
+        node: { uri: `${DS}card` },
+        match: {
+          field: "skos:definition",
+          passage: "A surface grouping a title, a summary and actions.",
+          ranges: [{ start: 2, length: 7 }],
+        },
+      },
+    ]);
+  });
+
+  it("counts the matches by type before the types filter, and the total after it", async () => {
+    const query = `query($text: String!, $types: [ID!]) {
+      search(text: $text, types: $types) {
+        total
+        edges { node { uri } }
+        facets { type { uri } count }
+      }
+    }`;
+    const all = await read(query, { text: "job" });
+    const facets = all.facets as readonly {
+      readonly type: { readonly uri: string };
+      readonly count: number;
+    }[];
+    expect(facets.map((facet) => facet.type.uri)).toContain(
+      "http://www.w3.org/2002/07/owl#Class",
+    );
+    expect(all.total).toBe(facets.reduce((sum, facet) => sum + facet.count, 0));
+    for (const facet of facets) {
+      const narrowed = await read(query, {
+        text: "job",
+        types: [facet.type.uri],
+      });
+      expect(narrowed.total).toBe(facet.count);
+      expect(narrowed.facets).toEqual(all.facets);
+    }
   });
 
   it("ranks title matches by length and position, then definition matches", async () => {
@@ -110,6 +178,11 @@ describe("Query.search", () => {
   });
 
   it.each(["", "  "])("answers %j with the empty page", async (text) => {
+    expect(
+      await read("query($text: String!) { search(text: $text) { total facets { count } } }", {
+        text,
+      }),
+    ).toEqual({ total: 0, facets: [] });
     expect(await search({ text })).toEqual({
       edges: [],
       pageInfo: {

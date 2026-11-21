@@ -1,6 +1,9 @@
 import {
   type ExecutionResult,
   experimentalExecuteIncrementally,
+  type GraphQLObjectType,
+  type GraphQLResolveInfo,
+  GraphQLSchema,
   parse,
 } from "graphql";
 import { describe, expect, it } from "vitest";
@@ -46,6 +49,17 @@ describe("createSearchExtensions", () => {
     expect(() =>
       factory({ type: () => undefined, iface: () => undefined }),
     ).toThrow("the compiled schema has no Node interface for Query.search");
+  });
+
+  it("refuses to resolve a facet's type in a schema with no Query.ontologyClass", async () => {
+    const facet = (await booted).api.schema.getType(
+      "TypeFacet",
+    ) as GraphQLObjectType;
+    const resolve = facet.getFields().type?.resolve;
+    const info = { schema: new GraphQLSchema({}) } as GraphQLResolveInfo;
+    expect(() =>
+      resolve?.({ type: "urn:x", count: 1 }, {}, {}, info),
+    ).toThrow("the schema has no Query.ontologyClass resolver for search");
   });
 
   it("reports a context without a search index as an error", async () => {
