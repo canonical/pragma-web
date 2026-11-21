@@ -1,13 +1,28 @@
 import type React from "react";
-import type { MouseEventHandler, RefCallback } from "react";
-import { useCallback, useRef } from "react";
+import type {
+  ComponentProps,
+  MouseEventHandler,
+  ReactEventHandler,
+  RefCallback,
+} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Context from "./Context.js";
 import { Content, Footer, Header } from "./common/index.js";
 import useModalState from "./hooks/useModalState.js";
 import type { ModalProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds modal";
+const componentCssClassNameBase = "modal";
+const componentCssClassName = `ds ${componentCssClassNameBase}`;
+const componentCssClassNameNonModalBackdrop = `ds ${componentCssClassNameBase}-non-modal-backdrop`;
+
+const isModal = (element: HTMLDialogElement): boolean => {
+  try {
+    return element.matches(":modal");
+  } catch {
+    return false;
+  }
+};
 
 /**
  * A modal is a focused container that sits on top of the main view, requiring
@@ -58,18 +73,46 @@ const Provider = ({
   children,
   className,
   onClick,
+  onClose,
+  onToggle,
+  open,
+  onOpenChange,
   "aria-label": ariaLabel,
   ...props
 }: ModalProps): React.ReactElement => {
   const dialogRef = useRef<HTMLDialogElement>(null);
+
+  /**
+   * Capture the initial value of `open` for SSR paint. After hydration, the
+   * dialog's open attribute is driven imperatively via `showModal()` and `close()`.
+   */
+  const [initialOpen] = useState(open);
+
+  const isUpgradingRef = useRef(false);
+  const lastReportedOpenRef = useRef<boolean | undefined>(open);
+
+  useEffect(() => {
+    lastReportedOpenRef.current = open;
+  }, [open]);
+
+  const notifyOpenChange = useCallback(
+    (newOpen: boolean) => {
+      if (lastReportedOpenRef.current !== newOpen) {
+        lastReportedOpenRef.current = newOpen;
+        onOpenChange?.(newOpen);
+      }
+    },
+    [onOpenChange],
+  );
+
   // The dialog is always attached to the component's own ref, because closing
-  // from the inside needs the node. The consumer's ref — required, since
-  // opening goes through it — is merged in rather than substituted, which
-  // keeps this ref stable across renders and lets the prop take a callback
-  // ref too.
+  // from the inside needs the node. The consumer's ref is merged in rather
+  // than substituted, which keeps this ref stable across renders and lets the
+  // prop take a callback ref too.
   const attachDialog = useCallback<RefCallback<HTMLDialogElement>>(
     (node) => {
       dialogRef.current = node;
+      if (!ref) return;
       if (typeof ref !== "function") {
         ref.current = node;
         return;
@@ -91,6 +134,43 @@ const Provider = ({
   // calls — the provider state, centralised in its own hook.
   const { titleId, onDismiss } = useModalState(dialogRef);
 
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    // Suppress the transition on mount so that when we upgrade to modal
+    // the open fade doesn't play.
+    dialog.classList.add("no-transition");
+
+    if (open) {
+      if (dialog.open && !isModal(dialog)) {
+        // SSR open case: dialog is open but non-modal.
+        // showModal() throws when called on an open non-modal dialog,
+        // so close it first while suppressing the "upgrade" close event.
+        isUpgradingRef.current = true;
+        dialog.addEventListener(
+          "close",
+          (e) => {
+            e.stopImmediatePropagation();
+          },
+          { once: true, capture: true },
+        );
+        dialog.close();
+        isUpgradingRef.current = false;
+      }
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+    } else if (open === false) {
+      if (dialog.open) {
+        dialog.close();
+      }
+    }
+
+    // Re-enable the transition after the sync so that later changes animate.
+    dialog.classList.remove("no-transition");
+  }, [open]);
+
   // A click landing on the <dialog> itself is a backdrop click: the box has
   // no padding of its own, so every inner pixel belongs to a child. The
   // consumer's own handler is called first and composed with, not replaced
@@ -105,8 +185,37 @@ const Provider = ({
     [onClick, closeOnBackdropClick, onDismiss],
   );
 
+  const handleClose = useCallback<ReactEventHandler<HTMLDialogElement>>(
+    (event) => {
+      onClose?.(event);
+      if (!isUpgradingRef.current) {
+        notifyOpenChange(false);
+      }
+    },
+    [onClose, notifyOpenChange],
+  );
+
+  const handleToggle = useCallback<
+    NonNullable<ComponentProps<"dialog">["onToggle"]>
+  >(
+    (event) => {
+      onToggle?.(event);
+      if (!isUpgradingRef.current) {
+        if ("newState" in event) {
+          notifyOpenChange(event.newState === "open");
+        }
+      }
+    },
+    [onToggle, notifyOpenChange],
+  );
+
   return (
     <Context.Provider value={{ titleId, onDismiss }}>
+      {/* A non-modal dialog has no real `::backdrop` so we need to fake one.
+          The non-modal backdrop displays via CSS only when followed by a non-modal open dialog. */}
+      {initialOpen ? (
+        <div className={componentCssClassNameNonModalBackdrop} />
+      ) : null}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: the click handler only identifies clicks landing on the backdrop, which has no keyboard equivalent; keyboard dismissal is Escape, handled natively by the dialog's cancel event */}
       <dialog
         ref={attachDialog}
@@ -126,6 +235,9 @@ const Provider = ({
         // head. Escape is a way out the consumer can delay, not deny; `onClose`
         // is where to hear that it happened.
         onClick={handleClick}
+        onClose={handleClose}
+        onToggle={handleToggle}
+        open={initialOpen || undefined}
         {...props}
       >
         {children}

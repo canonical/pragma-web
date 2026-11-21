@@ -58,6 +58,8 @@
     );
 
     --modal-max-block-size: 80vh;
+    /* Only applies to the non-modal (server-rendered open) state; a modal dialog sits in the top layer. */
+    --modal-z-index: var(--z-index-overlay, 100);
   }
 
   .ds.modal {
@@ -99,21 +101,71 @@
     border: none;
     border-radius: var(--modal-border-radius);
 
+    &,
+    &::backdrop {
+      opacity: 0;
+      transition-behavior: allow-discrete;
+      transition-property: display, opacity, overlay;
+      transition-duration: var(--motion-duration-fast);
+    }
+
+    /* Backdrop mutes the page while the modal is active */
+    &::backdrop {
+      background-color: var(--modal-color-backdrop);
+      backdrop-filter: blur(var(--modal-backdrop-blur));
+    }
+
+    &.no-transition {
+      &,
+      &::backdrop {
+        transition: none;
+      }
+    }
+
     /*
       A closed <dialog> is `display: none` by user-agent rule. Declaring display
       unconditionally here would beat that and leave the modal permanently
       visible, so the stack layout is scoped to the open state.
     */
-    &[open] {
+    &[open],
+    &:open {
       /* layout.type: stack, layout.direction: vertical */
       display: flex;
       flex-direction: column;
+
+      &,
+      &::backdrop {
+        opacity: 1;
+      }
     }
 
-    /* edges[0]: backdrop — mutes the page while the modal is active */
-    &::backdrop {
+    /* Starting styles only for modal dialogs, so the SSR opened shows up immediately */
+    &:modal {
+      @starting-style {
+        &,
+        &::backdrop {
+          opacity: 0;
+        }
+      }
+    }
+
+    &:not(:modal) {
+      position: fixed;
+      inset: 0;
+      z-index: var(--modal-z-index);
+    }
+  }
+
+  .ds.modal-non-modal-backdrop {
+    display: none;
+
+    &:has(+ .ds.modal:open:not(:modal)),
+    &:has(+ .ds.modal[open]:not(:modal)) {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: var(--modal-z-index);
       background-color: var(--modal-color-backdrop);
-      backdrop-filter: blur(var(--modal-backdrop-blur));
     }
   }
 }

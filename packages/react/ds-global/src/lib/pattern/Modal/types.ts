@@ -7,23 +7,7 @@ import type {
   RefObject,
 } from "react";
 
-type OwnProps = {
-  /**
-   * The handle on the underlying `<dialog>`, and the only way the modal opens:
-   * `ref.current?.showModal()`, with `ref.current?.close()` closing it. The prop
-   * is required because the modal is only ever opened through `showModal()`, so
-   * a modal with no ref is a modal that can never open — every modal needs a ref:
-   * withModal hands its factory the ref to attach and a
-   * directly-composed modal driven by a trigger takes a stored ref. Requiring the prop turns
-   * the withModal factory's duty — attaching the ref it receives —
-   * into a compile error instead of a silent nothing.
-   *
-   * `showModal()` throws on a dialog that is already open. A trigger sitting
-   * on the page cannot be clicked while the modal holds it inert, so it needs
-   * no guard; anything that can fire twice — a keyboard shortcut, an effect —
-   * should check `ref.current.open` first.
-   */
-  ref: RefCallback<HTMLDialogElement> | RefObject<HTMLDialogElement | null>;
+type BaseOwnProps = {
   /**
    * Whether clicking the backdrop dismisses the modal. Defaults to `false`, so
    * backdrop dismissal is opt-in. Independent of the header's `undismissible`.
@@ -35,27 +19,61 @@ type OwnProps = {
    * content carries the main information the modal conveys.
    */
   children: ReactNode;
+  /**
+   * Callback fired when the open state changes, whether triggered by invoker commands,
+   * the Escape key, a backdrop click, or programmatic changes.
+   */
+  onOpenChange?: (open: boolean) => void;
 };
+
+type ControlledOwnProps = BaseOwnProps & {
+  /**
+   * `open` serves two purposes:
+   * - As an SSR mechanism to render the modal already open without client-side JS.
+   *   Note: a dialog displayed this way is non-modal, so the component styles emulate
+   *   a modal and, once hydrated, upgrade it to a real one.
+   * - As a controlled prop once hydrated: setting it maps to `showModal()` / `close()`,
+   *   and `onOpenChange` is called to reflect state changes triggered by other means
+   *   (e.g., invoker commands, Escape press, outside click).
+   */
+  open: boolean;
+  /**
+   * Optional handle on the underlying `<dialog>` when controlled via `open`.
+   */
+  ref?: RefCallback<HTMLDialogElement> | RefObject<HTMLDialogElement | null>;
+};
+
+type UncontrolledOwnProps = BaseOwnProps & {
+  /**
+   * `open` is omitted in uncontrolled mode: use `ref.current?.showModal()` to
+   * open the modal.
+   */
+  open?: never;
+  /**
+   * The handle on the underlying `<dialog>`, and the only way an uncontrolled
+   * modal opens: `ref.current?.showModal()`, with `ref.current?.close()` closing it.
+   * The prop is required when `open` is omitted so an uncontrolled modal that can
+   * never open fails at compile time rather than silently doing nothing.
+   */
+  ref: RefCallback<HTMLDialogElement> | RefObject<HTMLDialogElement | null>;
+};
+
+type OwnProps = ControlledOwnProps | UncontrolledOwnProps;
 
 /**
  * Props for the Modal pattern
  *
  * @implements ds:global.pattern.modal
  *
- * `open` is omitted because a `<dialog>` carrying the `open` attribute is
- * *non-modal*: no top layer, no backdrop, no focus trap. The modal is only
- * ever opened through `showModal()`, so the open state lives in the DOM
- * element and not in a prop. Use the `ref` to open or close it.
+ * It renders a native `<dialog>` opened as a modal. In addition to imperative
+ * control via `ref`, the modal supports declarative and SSR open states via
+ * `open` and `onOpenChange`.
  *
- * `onClose` is *not* omitted: the native `close` event is how a consumer hears
- * that the modal is gone, whichever way out the user took, and it replaces the
- * `onOpenChange` callback a controlled modal would need. It does not say *which*
- * way out that was — an action that needs to be told apart from a dismissal
- * should close the modal with `ref.current?.close(value)` and read
- * `event.currentTarget.returnValue`.
+ * `onClose` is also supported: the native `close` event fires whenever the modal
+ * is closed, whichever way out the user took.
  */
 export type ModalProps = OwnProps &
-  Omit<ComponentProps<"dialog">, keyof OwnProps | "open">;
+  Omit<ComponentProps<"dialog">, keyof OwnProps>;
 
 /**
  * The shared modal API threaded to the composed subcomponents through the
