@@ -13,12 +13,14 @@ import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The fields the header reads: the component's name, its summary, its
+ * The fields the header reads: the component's address, which marks the
+ * header as the component's one canonical home, its name, its summary, its
  * compact address, which names it when it has no name, its tier and its
  * first documentation stage.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment ComponentHeader_node on Component {
+    uri
     name
     summary
     _meta {
@@ -85,6 +87,7 @@ export default function ComponentHeader({
     <header
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      data-canonical={data.uri}
     >
       <h1 className="heading" id="component-entity-title">
         <ComponentsIcon className="mark" />

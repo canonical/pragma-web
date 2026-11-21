@@ -38,6 +38,27 @@ describe("ComponentHeader", () => {
   );
 
   it(
+    "marks the header as the component's one canonical home (W6b-A7)",
+    () => {
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const canonical = document.querySelectorAll("[data-canonical]");
+      expect(canonical).toHaveLength(1);
+      expect(canonical[0]).toHaveClass("component-header");
+      expect(canonical[0]).toHaveAttribute(
+        "data-canonical",
+        "https://ds.canonical.com/global.component.button",
+      );
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
     "names the component in the page's heading over its summary",
     () => {
       render(
