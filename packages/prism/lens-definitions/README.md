@@ -166,7 +166,9 @@ another lens and back starts afresh.
   on the inspector region's three columns: a key or a field's name on the
   first, its value on the rest, row after row.
   With no term it explains the graph with a legend drawn by the graph's own
-  code, a row per namespace that fits the camera to it, and the gestures.
+  code, a row per namespace that fits the camera to it, and the gestures;
+  the row of a namespace drawn as one box also links to it opened ("Open
+  surface").
 
 ## The overview
 
@@ -181,15 +183,32 @@ server, deterministically: two renders of a page give the same SVG.
   holds. Bridges are drawn in the strong line and named at rest by their
   property, near their head. A bridge runs through the channels beside
   columns and the gaps between regions and shelves; past a shelf it goes
-  out by the gap facing the other end and round the nearer margin. Every
+  out by the gap facing the other end and down the nearest gap between
+  two regions of the shelves passed that has room for its lane, round the
+  nearer margin only where none has. Every
   bridge keeps a lane of its own in each channel, gap and margin it runs
   along, whatever namespaces it joins, so no two share a line. A label
-  with no room of its own is named when either end is in focus.
+  with no room of its own is named when either end is in focus. A
+  region's label row names its bridges after its class count, the
+  heaviest first ("· 3 relations to geo"), as many as the region's width
+  holds; it is never widened for them, and the opened namespace's names
+  sit after its way back, outside the link.
 - **Weights.** A relation's line states how many statements the graph
   holds for it (`Query.classEdges`): 1px below 10, 2px from 10, 4px from
   100 and 8px from 1000; a relation with no statements yet is dashed. A
   line that bundles several relations between two classes weighs the
-  heaviest of them.
+  heaviest of them. At full zoom a counted line's figure is drawn beside
+  its label, clear of every line, head and heading and inside the
+  drawing, as a link to its property's page; it takes the pointer and
+  stays out of the tab order, where the inspector's rows carry the same
+  links. A line with no statements draws no figure, nor does a line
+  whose label names more than one relation: its weight counts only the
+  heaviest, and the inspector's rows carry each relation's count.
+- **The inspector at rest.** With nothing selected the inspector opens on
+  a count line: the graph's classes, namespaces, instances and
+  relations, each a link to the namespace rows below that add up to it
+  (`#graph-overview-namespaces`). It then lists, a row each, the edges
+  between classes the instances state that no property declares.
 - **Stubs.** A class the relations reach that no loaded ontology holds is
   a dashed stub, named by its well-known prefix (`rdf:List`), else by its
   host and last segment, never two alike. A store counts a statement
@@ -208,24 +227,47 @@ server, deterministically: two renders of a page give the same SVG.
   A layer of more than twelve classes is laid as balanced consecutive
   columns.
 - **An opened view.** A box links to its namespace opened, at the
-  address `/definitions?expand=<prefix>` (`/definitions?expand=surface`):
-  the namespace drawn class by class and packed first, the others as
-  boxes. Its heading is the way back to the overview at rest, and says so
+  address `/definitions?expand=<prefix>` (`/definitions?expand=surface`),
+  and so does the box's row in the inspector at rest, a link "Open
+  <prefix>" under the row's fit button, keeping the address's other view
+  keys; the opened namespace's row keeps its fit button and opens
+  nothing; a namespace's chip in the facet bar stays a filter. The view
+  draws the namespace class by class and packed first, the others as
+  boxes, their shelves wrapped within the legible window of the
+  narrowest canvas the graph is drawn on (480px; 656px on the design
+  canvas). A box states its namespace's instances beside its prefix, as
+  a class states its own. The opened namespace's heading is the way
+  back to the overview at rest, and says so
   after its count ("· all namespaces"), keeping the address's other view
-  keys. A term page of a class inside a box opens
-  that namespace too. Every view opens by one rule: the whole map where it
+  keys. Every view opens by one rule: the whole map where it
   fits the canvas with every label at 12px or more on screen (a zoom of
   12/14), otherwise the map's top-left corner at that zoom; a term page
   frames its class instead.
+- **A term page.** A class's page draws its neighbourhood one hop deep,
+  whatever namespaces it crosses: the class, its superclass, its
+  subclasses and every class one object property away in either
+  direction, with a stub for a range no loaded ontology holds, banded by
+  namespace and held to the node budget (a class with more neighbours
+  than the budget keeps those joined to it by the most relations). The
+  rail still lists every class in the map's order, and a phone lists the
+  neighbourhood's classes as rows in that order.
 - **Its task.** The drawing states the task it serves, for tests and
   audits: `data-task="shape"` with the namespaces it draws for in
   `data-set` (every drawn namespace at rest, the opened one in an opened
   view), or `data-task="neighbourhood"` with the selected class in
   `data-focus` on a term page.
-- **The stated limits.** Three lanes in a channel beside a column: a
+- **The stated limits.** The canvas names only the labels it can seat:
+  on a term page a relation whose label finds no seat is drawn unnamed.
+  A label the canvas seats may lie on a line of its own bundle; the
+  inspector names it too.
+  The term page's inspector lists every relation of the class with the
+  statements served on its edge, the heaviest first, its count a link to
+  the property, so each one drawn is named there. Three lanes in a channel beside a column: a
   fourth bridge there runs closer than 4px to its neighbour, and from six
-  they lie on one line; a gap or a margin keeps nine 4px apart. A namespace with more classes than the budget
-  leaves room for is drawn whole, over the budget, when it is opened.
+  they lie on one line; a gap or a margin keeps nine 4px apart. A
+  namespace with more classes than the budget leaves room for is drawn
+  whole, over the budget, when it is opened: no deeper subtree folds into
+  its root, so such a namespace would open past the budget.
   More namespaces than the budget has nodes are all drawn as boxes, over
   the budget. The explorer reads every class of every loaded namespace,
   however many: nothing bounds what it fetches, so a graph of more
@@ -242,13 +284,15 @@ server, deterministically: two renders of a page give the same SVG.
   past the box sized for the English words. The layout's cost grows with
   the number of namespaces: the overview lays the whole graph out again
   each time it draws one more namespace as a box, so thirty namespaces
-  take thirty layouts (about 0.7s on a developer's machine).
-
-Not in this package yet: the term page's neighbourhood across namespaces
-(the classes of other namespaces a class relates to, drawn around it);
-the counts as links to the rows they count; the inspector's count line
-with nothing selected; and the list of the relations the graph observes
-that no ontology declares.
+  take thirty layouts (about 0.7s on a developer's machine). A
+  property's page lists its edges between classes, a row each, with the
+  statements counted for each: the classes are links, the counts are
+  figures, as no page lists a property's statements between two
+  classes. The count line's figures link to the namespace rows, not to
+  a list of what they count. A region's label row names its bridges with
+  their counts as plain text, not as links. The canvas's numerals are
+  out of the tab order, so a keyboard reaches a count's property only
+  through the inspector's rows.
 
 ## Styling
 

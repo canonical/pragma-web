@@ -111,8 +111,9 @@ function listSidesPassed(
  * column; its size in bytes and elements; the zoom at which its viewBox
  * fills the design canvas; the nodes and regions whose corner is off the
  * lattice; each relation's stroke, weight and kind; the bridges that run
- * on one line for a stretch; and the bridges that run along three sides
- * of a region they leave or enter.
+ * on one line for a stretch; the bridges that run along three sides of a
+ * region they leave or enter, and those that cross a box they do not
+ * join; and each namespace's box with its instances.
  */
 export default function measureCanvasSvg(svg: string): CanvasMeasure {
   const nodes = listTags(svg, '<g class="node');
@@ -154,11 +155,12 @@ export default function measureCanvasSvg(svg: string): CanvasMeasure {
       focus: classes.includes("is-focus"),
     };
   });
-  const bridges = listTags(svg, '<path class="relation')
-    .filter((path) =>
-      (path.get("class") ?? "").split(" ").includes("is-bridge"),
-    )
-    .map((path) => readBridgeRoute(path.get("d") ?? ""));
+  const bridgePaths = listTags(svg, '<path class="relation').filter((path) =>
+    (path.get("class") ?? "").split(" ").includes("is-bridge"),
+  );
+  const bridges = bridgePaths.map((path) =>
+    readBridgeRoute(path.get("d") ?? ""),
+  );
   const sharedBridgeLines = bridges.flatMap((route, index) =>
     bridges
       .slice(index + 1)
@@ -195,6 +197,41 @@ export default function measureCanvasSvg(svg: string): CanvasMeasure {
       )
       .map((region) => `${route.d} round ${region.ns}`),
   );
+  const boxesOf = nodes.map((node) => ({
+    id: node.get("data-id") ?? "",
+    x: Number(node.get("data-x")),
+    y: Number(node.get("data-y")),
+    w: Number(node.get("data-w")),
+    h: Number(node.get("data-h")),
+  }));
+  const crossingBridges = bridgePaths.flatMap((path, index) => {
+    const joined = new Set([
+      path.get("data-from") ?? "",
+      ...(path.get("data-to") ?? "").split(" "),
+    ]);
+    const runs = bridges[index]?.runs ?? [];
+    return boxesOf
+      .filter(
+        (box) =>
+          !joined.has(box.id) &&
+          runs.some((run) =>
+            run.down
+              ? run.line > box.x &&
+                run.line < box.x + box.w &&
+                overlaps(run.from, run.to, box.y, box.y + box.h)
+              : run.line > box.y &&
+                run.line < box.y + box.h &&
+                overlaps(run.from, run.to, box.x, box.x + box.w),
+          ),
+      )
+      .map((box) => `${path.get("d") ?? ""} across ${box.id}`);
+  });
+  const boxes = nodes
+    .filter((node) => node.get("data-kind") === "region")
+    .map((node) => ({
+      id: node.get("data-id") ?? "",
+      instances: Number(node.get("data-instances")),
+    }));
   return {
     nodes: nodes.length,
     kinds,
@@ -209,5 +246,7 @@ export default function measureCanvasSvg(svg: string): CanvasMeasure {
     bridgeLabels: svg.match(/class="edge-label is-bridge"/g)?.length ?? 0,
     sharedBridgeLines,
     framingBridges,
+    crossingBridges,
+    boxes,
   };
 }

@@ -36,6 +36,28 @@ describe("packShelves", () => {
     expect(packing.fit).toBeGreaterThan(0);
   });
 
+  it("wraps a shelf of several regions at the width given, a wider region alone", () => {
+    const sizes = [
+      { w: 800, h: 400 },
+      { w: 160, h: 48 },
+      { w: 160, h: 48 },
+      { w: 160, h: 48 },
+      { w: 160, h: 48 },
+    ];
+    const packing = packShelves(sizes, { maxWidth: 480 });
+    for (const shelf of packing.shelves) {
+      const w =
+        shelf.reduce((sum, index) => sum + (sizes[index]?.w ?? 0), 0) +
+        48 * (shelf.length - 1);
+      if (shelf.length > 1) expect(w).toBeLessThanOrEqual(480);
+    }
+    expect(packing.shelves.flat()).toEqual([0, 1, 2, 3, 4]);
+    // Unbounded, the four boxes share one shelf as wide as the first.
+    expect(packShelves(sizes).shelves.some((shelf) => shelf.length === 4)).toBe(
+      true,
+    );
+  });
+
   it("refuses to pack nothing", () => {
     expect(() => packShelves([])).toThrow(/no region to pack/);
   });

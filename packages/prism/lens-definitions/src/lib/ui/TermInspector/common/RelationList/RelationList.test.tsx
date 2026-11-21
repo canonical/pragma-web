@@ -43,6 +43,73 @@ describe("RelationList", () => {
     expect(second?.textContent).toBe("ds:viaTag→unstated");
   });
 
+  it("ends a counted relation with its statements, a link to the property where there are any", () => {
+    render(
+      createRouterHarness(
+        <RelationList
+          direction="outgoing"
+          namespaces={NAMESPACES}
+          relations={[
+            {
+              predicate: {
+                uri: "https://ds.canonical.com/category",
+                label: "category",
+              },
+              other: {
+                uri: "https://ds.canonical.com/TagCategory",
+                label: "Tag Category",
+              },
+              count: 726,
+            },
+            {
+              predicate: {
+                uri: "https://ds.canonical.com/viaTag",
+                label: null,
+              },
+              other: null,
+              count: 0,
+            },
+          ]}
+        />,
+      ),
+    );
+    const [first, second] = screen.getAllByRole("listitem");
+    expect(first?.textContent).toBe("category→Tag Category726");
+    expect(
+      within(first as HTMLElement).getByRole("link", {
+        name: "726 statements of category: open the property",
+      }),
+    ).toHaveAttribute("href", "/definitions/ds%3Acategory");
+    expect(second?.querySelector(".count")?.textContent).toBe("0");
+    expect(second?.querySelector(".count a")).toBeNull();
+  });
+
+  it("names an unlabelled property's count link by its short term", () => {
+    render(
+      createRouterHarness(
+        <RelationList
+          direction="outgoing"
+          namespaces={NAMESPACES}
+          relations={[
+            {
+              predicate: {
+                uri: "https://ds.canonical.com/viaTag",
+                label: null,
+              },
+              other: null,
+              count: 3,
+            },
+          ]}
+        />,
+      ),
+    );
+    expect(
+      screen.getByRole("link", {
+        name: "3 statements of ds:viaTag: open the property",
+      }),
+    ).toHaveAttribute("href", "/definitions/ds%3AviaTag");
+  });
+
   it("points the arrow back for incoming relations", () => {
     render(
       createRouterHarness(

@@ -36,10 +36,12 @@ export const MESSAGES = {
   "well.label": "Class graph",
   "well.name.stub": "Class {term}, outside the loaded namespaces, {relations}",
   "well.name.region":
-    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it",
+    "Namespace {prefix}, drawn as one box: {classes}, {instances}, {held}, {relations} drawn from it",
   "well.name.region.open":
-    "Namespace {prefix}, drawn as one box: {classes}, {held}, {relations} drawn from it. Opens the namespace",
+    "Namespace {prefix}, drawn as one box: {classes}, {instances}, {held}, {relations} drawn from it. Opens the namespace",
   "well.region.back.words": "· all namespaces",
+  "well.region.bridge": "· {relations} to {prefix}",
+  "well.region.bridges.none": "· no relations to other namespaces",
   "well.region.back":
     "Namespace {prefix}, opened, {classes}: back to the overview of every namespace",
   "well.name":
@@ -50,11 +52,19 @@ export const MESSAGES = {
     one: "{count} class",
     other: "{count} classes",
   },
+  "well.weight.link": {
+    one: "{count} statement of {property}: open the property",
+    other: "{count} statements of {property}: open the property",
+  },
   "well.relations.count": {
     one: "{count} relation",
     other: "{count} relations",
   },
   "well.region.holds": "{classes}, {relations}",
+  "well.instances.count": {
+    one: "{count} instance",
+    other: "{count} instances",
+  },
   "well.phone.label": "Class graph, in rail order",
   "rail.label": "Ontology terms",
   "rail.classes": "Classes",
@@ -74,6 +84,33 @@ export const MESSAGES = {
   "inspector.overview.namespace":
     "{classes} classes · {instances} instances · {relations} relations",
   "inspector.overview.fit": "Fit the graph to {prefix}",
+  "inspector.overview.open": "Open {prefix}",
+  "inspector.overview.count.classes": {
+    one: "{count} class",
+    other: "{count} classes",
+  },
+  "inspector.overview.count.namespaces": {
+    one: "{count} namespace",
+    other: "{count} namespaces",
+  },
+  "inspector.overview.count.instances": {
+    one: "{count} instance",
+    other: "{count} instances",
+  },
+  "inspector.overview.count.relations": {
+    one: "{count} relation",
+    other: "{count} relations",
+  },
+  "inspector.overview.undeclared": "Observed, not declared",
+  "inspector.overview.undeclared.none":
+    "Every relation the instances state is declared.",
+  "inspector.edges.subject": "From",
+  "inspector.edges.property": "Property",
+  "inspector.edges.object": "To",
+  "inspector.edges.count": "Statements",
+  "inspector.edges.declared": "Declared",
+  "inspector.property.edges": "Between classes",
+  "inspector.property.edges.none": "No statements between classes yet.",
   "legend.concrete": "A concrete class with its instance count",
   "legend.abstract":
     "An abstract class: a hollow box and an italic label, never a count",
@@ -128,6 +165,10 @@ export const MESSAGES = {
   "inspector.fields.inherited": "Inherited from {class}",
   "inspector.relations": "Relations ({count})",
   "inspector.relations.none": "No relations.",
+  "inspector.relations.count": {
+    one: "{count} statement of {property}: open the property",
+    other: "{count} statements of {property}: open the property",
+  },
   "inspector.relations.outgoing": "Outgoing",
   "inspector.relations.incoming": "Incoming",
   "inspector.relations.inherited": "Inherited from {class}",

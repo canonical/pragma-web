@@ -234,6 +234,64 @@ describe("ClassGraph", () => {
     },
   );
 
+  it.each(["full", "hubs"] as const)(
+    "names a region's bridges after its heading, outside the way back, at the %s zoom by its count's rule",
+    (bucket) => {
+      zoom.bucket = bucket;
+      const container = draw({
+        layout: layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+          budget: GRAPH_BUDGET,
+          drill: "surface",
+        }),
+        terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
+        buildDrillHref: (prefix) =>
+          prefix === undefined
+            ? "/definitions"
+            : `/definitions?expand=${prefix}`,
+      });
+      const names = container.querySelector(
+        '.region[data-ns="surface"] > text.region-bridges',
+      );
+      expect(container.querySelector(".way-back .region-bridges")).toBeNull();
+      if (bucket === "hubs") {
+        expect(names).toBeNull();
+        return;
+      }
+      expect(
+        [...(names?.querySelectorAll("tspan") ?? [])].map((name) => [
+          name.getAttribute("data-ns"),
+          name.getAttribute("data-relations"),
+          name.textContent,
+        ]),
+      ).toEqual([
+        ["ds", "1", "· 1 relation to ds"],
+        ["vocab", "1", "· 1 relation to vocab"],
+      ]);
+    },
+  );
+
+  it("says on its label row that a region with no bridge has none", () => {
+    const container = draw({
+      layout: layOutClassGraph(FOUR_NAMESPACE_GRAPH, { budget: GRAPH_BUDGET }),
+      terms: createClassGraphSetup(FOUR_NAMESPACE_GRAPH).terms,
+    });
+    const names = container.querySelector(
+      '.region[data-ns="cs"] > text.region-bridges',
+    );
+    expect(names?.querySelectorAll("tspan[data-ns]")).toHaveLength(0);
+    expect(names?.querySelector("tspan[data-none]")?.textContent).toBe(
+      "· no relations to other namespaces",
+    );
+  });
+
+  it("names metro's three relations to geo on its label row", () => {
+    const container = draw({ layout: metro.layout, terms: metro.terms });
+    expect(
+      container.querySelector('.region[data-ns="metro"] .region-bridges')
+        ?.textContent,
+    ).toBe("· 3 relations to geo");
+  });
+
   it("makes each class a link with one tab stop, named for assistive technology", () => {
     const container = draw({ tabStop: uri("ds:Component") });
     const links = container.querySelectorAll("a.target");
@@ -430,9 +488,15 @@ describe("ClassGraph", () => {
       const resting = nodeOf(draw(own), "surface");
       expect(resting.getAttribute("data-kind")).toBe("region");
       expect(resting.getAttribute("data-classes")).toBe("31");
-      // A box states no instance figure until one is served for it; a
-      // class states its own.
-      expect(resting.hasAttribute("data-instances")).toBe(false);
+      // A box states its namespace's instances, the sum of its classes'
+      // figures, as a class states its own.
+      expect(resting.getAttribute("data-instances")).toBe(
+        String(
+          FOUR_NAMESPACE_GRAPH.classes
+            .filter((klass) => klass.prefix === "surface")
+            .reduce((sum, klass) => sum + klass.instanceCount, 0),
+        ),
+      );
       expect(
         draw(own)
           .querySelector('.node[data-kind="concrete"]')
@@ -446,7 +510,7 @@ describe("ClassGraph", () => {
       expect(resting.getAttribute("role")).toBe("img");
       // What leaves the box is the edges drawn from it.
       expect(resting.getAttribute("aria-label")).toBe(
-        "Namespace surface, drawn as one box: 31 classes, 0 relations, 2 relations drawn from it",
+        `Namespace surface, drawn as one box: 31 classes, ${resting.getAttribute("data-instances")} instances, 0 relations, 2 relations drawn from it`,
       );
       zoom.bucket = "full";
       const container = draw(own);
@@ -572,6 +636,27 @@ describe("ClassGraph", () => {
       zoom.bucket = "overview";
       expect(labelOf(draw({ ...own, focus: bridge.from }))).toBeNull();
     });
+  });
+
+  it("draws a term page's relations by colour alone, at their weight's own width", () => {
+    const station = requireEntry(metro.uris, "metro:Station");
+    const container = draw({
+      focus: station,
+      layout: layOutClassGraph(metroGraph, {
+        budget: GRAPH_BUDGET,
+        focus: station,
+      }),
+      terms: metro.terms,
+    });
+    const accented = [...container.querySelectorAll("path.relation.is-focus")];
+    expect(accented.length).toBeGreaterThan(0);
+    for (const path of accented) {
+      const { width } = weighStroke(Number(path.getAttribute("data-weight")));
+      expect(path.getAttribute("stroke-width")).toBe(String(width));
+    }
+    expect(
+      accented.some((path) => path.getAttribute("stroke-width") === "1"),
+    ).toBe(true);
   });
 
   it("keeps a focused relation with no statements dashed, at the focus's 2px", () => {
@@ -724,5 +809,66 @@ describe("ClassGraph", () => {
     const root = container.querySelector(".ds.class-graph");
     expect(root?.getAttribute("class")).toBe("ds class-graph custom-class");
     expect(root?.getAttribute("aria-label")).toBe("Classes");
+  });
+
+  describe("a count's numeral", () => {
+    it("links each counted label's numeral to its property, out of the tab order and of its label's group", () => {
+      const container = draw({ layout: metro.layout, terms: metro.terms });
+      const links = [...container.querySelectorAll("a.weight-link")];
+      expect(links.length).toBeGreaterThan(0);
+      for (const link of links) {
+        const edge = requireDefined(
+          metro.layout.edges.find(
+            (candidate) => candidate.id === link.getAttribute("data-weight-of"),
+          ),
+          "the numeral's edge",
+        );
+        const weight = requireDefined(edge.bundle?.weight, "a weight");
+        expect(link.closest("[data-edge]")).toBeNull();
+        expect(link.getAttribute("tabindex")).toBe("-1");
+        expect(link.getAttribute("data-count")).toBe(String(weight));
+        expect(link.querySelector("text.weight-label")?.textContent).toBe(
+          String(weight),
+        );
+        const property = requireDefined(
+          edge.bundle?.relations.find((relation) =>
+            decodeURIComponent(link.getAttribute("href") ?? "").endsWith(
+              metro.terms.get(relation.uri) ?? "?",
+            ),
+          ),
+          "the property the numeral links",
+        );
+        expect("count" in property && property.count).toBe(weight);
+      }
+    });
+
+    it("draws no numeral on a zero edge, and none below full zoom", () => {
+      const counted = requireDefined(
+        draw({ layout: metro.layout, terms: metro.terms })
+          .querySelector("a.weight-link")
+          ?.getAttribute("data-weight-of") ?? undefined,
+        "a counted edge",
+      );
+      const zero = {
+        ...metro.layout,
+        edges: metro.layout.edges.map((edge) =>
+          edge.id === counted && edge.bundle !== undefined
+            ? { ...edge, bundle: { ...edge.bundle, weight: 0 } }
+            : edge,
+        ),
+      };
+      const container = draw({ layout: zero, terms: metro.terms });
+      expect(
+        container.querySelector(
+          `a.weight-link[data-weight-of="${CSS.escape(counted)}"]`,
+        ),
+      ).toBeNull();
+      for (const link of container.querySelectorAll("a.weight-link")) {
+        expect(Number(link.getAttribute("data-count"))).toBeGreaterThan(0);
+      }
+      zoom.bucket = "hubs";
+      const hubs = draw({ layout: metro.layout, terms: metro.terms });
+      expect(hubs.querySelectorAll("a.weight-link")).toHaveLength(0);
+    });
   });
 });

@@ -377,6 +377,11 @@ export interface ClassGraphLayout {
    * opening frames its region, not the whole graph.
    */
   readonly drilled?: string;
+  /**
+   * The IRI of the class whose one-hop neighbourhood the layout draws, on a
+   * term page; absent on the overview and an opened view.
+   */
+  readonly focus?: string;
   /** The zoom at which the viewBox fits the design canvas. */
   readonly fitZoom: number;
   /** The channel the packer settled on. */
@@ -422,6 +427,25 @@ export interface Bridge {
   readonly relations: number;
 }
 
+/**
+ * A bridge as a region's label row names it: the region across it and how
+ * many relations cross between the two.
+ */
+export interface RegionBridgeName {
+  /** The prefix of the region at the bridge's other end. */
+  readonly prefix: string;
+  /** How many relations cross between the two. */
+  readonly relations: number;
+}
+
+/** What a region's label row says of its bridges. */
+export interface RegionBridgeNames {
+  /** The bridges named, the heaviest first, as many as fit. */
+  readonly named: readonly RegionBridgeName[];
+  /** Whether the row says the region has no bridge: only where it has none and the words fit. */
+  readonly none: boolean;
+}
+
 /** What the layered engine is given for every region of one layout. */
 export interface LayerSettings {
   /** How many barycentre sweeps order the columns. */
@@ -451,6 +475,13 @@ export interface ClassGraphLayoutOptions {
    * view is not held to the overview's fit.
    */
   readonly drill?: string;
+  /**
+   * The IRI of the class a term page focuses, within a budget: the view
+   * draws its one-hop neighbourhood (`gatherNeighbourhoodInput`) and not
+   * the overview, and `drill` goes unread. A focus that is no class of the
+   * input draws as though none were given.
+   */
+  readonly focus?: string;
 }
 
 /** A packing of regions into shelves. */
@@ -546,4 +577,37 @@ export interface NeighbourBridgeEnds {
   readonly portA: number;
   readonly endX: number;
   readonly portB: number;
+}
+
+/** An edge's label as drawn: its edge id and its box with its halo. */
+export interface DrawnEdgeLabel {
+  readonly edge: string;
+  readonly box: Rect;
+}
+
+/** A relation's count, drawn as a numeral that links to its property. */
+export interface WeightNumeral {
+  /** The full IRI of the property whose statements the count is. */
+  readonly property: string;
+  /** The statements the edge covers: its bundle's weight, above 0. */
+  readonly count: number;
+  /** The numeral's box with its halo. */
+  readonly box: Rect;
+  /** The numeral's centre. */
+  readonly cx: number;
+  readonly cy: number;
+}
+
+/**
+ * An edge's label seated with its count: how far the label moves from
+ * where it was placed, and its numeral, when the edge counts statements
+ * and a clear place holds it.
+ */
+export interface PlacedWeightLabel {
+  /** The edge id. */
+  readonly edge: string;
+  /** The label's shift from its placed box, in whole pixels. */
+  readonly dx: number;
+  readonly dy: number;
+  readonly numeral: WeightNumeral | undefined;
 }

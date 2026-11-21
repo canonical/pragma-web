@@ -214,17 +214,16 @@ describe("the reader's choices across the lens's routes", () => {
     expect(screen.getByRole("searchbox")).toHaveValue("st");
     expect(readScreenScale(container)).toBeCloseTo(opened, 10);
 
-    // A class the index draws at rest keeps the drawing, so its page and
-    // the way back resume the reader's camera: the zoom stays as it was.
+    // A term page draws its class's neighbourhood, another drawing: its
+    // page opens as a load of it does, and the way back opens the index
+    // anew, the camera kept for the other drawing forgotten.
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
     const kept = readScreenScale(container);
-    const keptLevel = readZoomLevel(container);
     expect(kept).not.toBeCloseTo(opened, 10);
-    expect(keptLevel).toMatch(/^\d+%$/);
+    expect(readZoomLevel(container)).toMatch(/^\d+%$/);
     const fresh = mountLens("/definitions/anatomy%3ANode");
     const freshScale = readScreenScale(fresh.container);
     fresh.unmount();
-    expect(freshScale).not.toBeCloseTo(kept, 10);
     await act(async () => {
       await router.navigate("definitionsTerm", {
         params: { term: "anatomy:Node" },
@@ -233,13 +232,11 @@ describe("the reader's choices across the lens's routes", () => {
     expect(
       container.querySelector('.desktop .node[data-id="anatomy:Node"]'),
     ).not.toBeNull();
-    expect(readScreenScale(container)).toBeCloseTo(kept, 10);
-    expect(readZoomLevel(container)).toBe(keptLevel);
+    expect(readScreenScale(container)).toBeCloseTo(freshScale, 10);
     await act(async () => {
       await router.navigate("definitions");
     });
-    expect(readScreenScale(container)).toBeCloseTo(kept, 10);
-    expect(readZoomLevel(container)).toBe(keptLevel);
+    expect(readScreenScale(container)).toBeCloseTo(opened, 10);
 
     // A visit to another lens ends the session: back on the index, the
     // reader starts from the defaults.

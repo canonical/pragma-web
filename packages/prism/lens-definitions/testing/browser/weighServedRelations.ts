@@ -1,3 +1,4 @@
+import expandServedRange from "./expandServedRange.js";
 import type { ServedGraph, ServedWeights } from "./types.js";
 
 /**
@@ -21,14 +22,7 @@ export default function weighServedRelations(
   );
   const termOf = (uri: string, prefix: string): string =>
     `${prefix}:${uri.slice((namespaceOf.get(prefix) ?? "").length)}`;
-  // A range may be served compact, as `ds:UIBlock`.
-  const expand = (range: string): string => {
-    const [prefix = "", local = ""] = range.split(/:(.*)/s);
-    const namespace = namespaceOf.get(prefix);
-    return range.includes("://") || namespace === undefined
-      ? range
-      : `${namespace}${local}`;
-  };
+  const expand = expandServedRange(graph);
   const counts = new Map(
     graph.classEdges
       .filter((edge) => edge.declared)

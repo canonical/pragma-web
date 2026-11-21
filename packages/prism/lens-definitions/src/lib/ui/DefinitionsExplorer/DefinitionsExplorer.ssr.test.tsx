@@ -14,10 +14,9 @@ describe("DefinitionsExplorer SSR", () => {
     expect(html).toContain('class="ds definitions-explorer"');
     expect(html).toContain('data-slot="explorer-rail"');
     expect(html).toContain('data-slot="explorer-canvas"');
-    // The term's namespace drilled into: ds's 20 classes, a box for
-    // anatomy and one for cs, and the two stubs, reached from a class or
-    // from a box.
-    expect(html.match(/<g class="node[ "]/g)).toHaveLength(24);
+    // The term's one-hop neighbourhood: ds:UIBlock, its superclass, its
+    // subclasses and the classes its relations reach, 14 in all.
+    expect(html.match(/<g class="node[ "]/g)).toHaveLength(14);
     expect(html).toContain('class="ring is-selected"');
     expect(html).toContain('aria-current="page"');
     expect(fetchFn).not.toHaveBeenCalled();
@@ -53,12 +52,12 @@ describe("DefinitionsExplorer SSR", () => {
         /data-from="cs:CodeStandard" data-kind="relation" data-to="cs:Example" data-weight="(\d+)"/,
       )?.[1],
     ).toBe("0");
-    expect(html.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
+    expect(rest.match(/stroke-dasharray="4 4"/g)?.length).toBeGreaterThan(0);
     // ds:consumesSymbol reaches dt:TokenSymbol, a class of a namespace the
     // store does not load: its 0 measures nothing, so the bridge claims no
     // weight and is drawn as the plain line, neither weighed nor dashed.
     const stub = [
-      ...html.matchAll(/<path class="relation is-bridge[^>]*>/g),
+      ...rest.matchAll(/<path class="relation is-bridge[^>]*>/g),
     ].filter(([tag]) => tag.includes("dt:TokenSymbol"));
     expect(stub).toHaveLength(1);
     expect(stub.at(0)?.at(0)).not.toContain("data-weight");
@@ -177,15 +176,27 @@ describe("DefinitionsExplorer SSR", () => {
         "?expand=anatomy",
       ),
     );
-    const canvas = html.slice(html.indexOf('data-slot="explorer-canvas"'));
-    // The selection's drill, as with no parameter: ds drawn class by class.
-    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(24);
+    const canvasOf = (page: string): string =>
+      page.slice(page.indexOf('data-slot="explorer-canvas"'));
+    const canvas = canvasOf(html);
+    // The term's neighbourhood, as with no parameter.
+    expect(canvas).toBe(
+      canvasOf(
+        renderToString(
+          createDefinitionsPage(
+            UIBLOCK_TERM,
+            definitionsExplorerRecords,
+            createFetchSpy(),
+          ),
+        ),
+      ),
+    );
+    expect(canvas.match(/<g class="node[ "]/g)).toHaveLength(14);
     expect(canvas).not.toContain("expand=");
     expect(canvas).not.toContain("way-back");
-    expect(canvas).toMatch(/data-kind="region"[^>]*role="img"/);
   });
 
-  it("leads the phone's list with a term page's namespace, which its selection opens", () => {
+  it("lists a term page's neighbourhood on the phone, its namespace first", () => {
     for (const search of ["", "?expand=anatomy"]) {
       const html = renderToString(
         createDefinitionsPage(
@@ -196,15 +207,10 @@ describe("DefinitionsExplorer SSR", () => {
         ),
       );
       const phone = html.slice(html.indexOf('class="ds phone-graph'));
-      // ds, a box at rest, is opened by the selection and packed first:
-      // its header comes before every box and stub.
+      // ds, a box at rest, is the selection's namespace, packed first; the
+      // neighbourhood draws no box.
       expect(phone.match(/<g data-ns="([^"]+)"/)?.[1], search).toBe("ds");
-      expect(phone.indexOf('data-ns="ds"'), search).toBeLessThan(
-        phone.indexOf('data-kind="region"'),
-      );
-      expect(phone.indexOf('data-ns="ds"'), search).toBeLessThan(
-        phone.indexOf('data-kind="stub"'),
-      );
+      expect(phone, search).not.toContain('data-kind="region"');
     }
   });
 });

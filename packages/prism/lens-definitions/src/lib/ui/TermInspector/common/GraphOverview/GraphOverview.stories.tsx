@@ -24,3 +24,9 @@ type Story = StoryObj<typeof InspectorProbe>;
 
 /** The overview the inspector shows with no term. */
 export const Default: Story = {};
+
+/**
+ * The overview where the graph draws ds as one box: ds's row also links
+ * to the explorer opened on it, and every row keeps its fit button.
+ */
+export const BoxedNamespace: Story = { args: { boxed: ["ds"] } };

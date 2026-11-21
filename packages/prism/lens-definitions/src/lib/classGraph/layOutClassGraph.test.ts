@@ -39,6 +39,7 @@ import {
   MIN_FIT,
   PHONE,
   SHELF_GAP,
+  SHELF_MAX_WIDTH,
 } from "./constants.js";
 import layOutClassGraph from "./layOutClassGraph.js";
 import opensWhole from "./opensWhole.js";
@@ -637,7 +638,7 @@ describe("layOutClassGraph", () => {
       });
     });
 
-    it("draws a drilled namespace of more classes than the budget leaves room for whole, over the node budget: a limit of this layout", () => {
+    it("draws an opened namespace of more classes than the node budget whole, over the budget, folding no deeper subtree into its root: a stated limit of this layout", () => {
       const layout = layOutClassGraph(
         {
           ...SIXTY_CLASS_GRAPH,
@@ -651,6 +652,15 @@ describe("layOutClassGraph", () => {
       expect(measure.nodes).toBe(61);
       expect(measure.nodes).toBeGreaterThan(GRAPH_BUDGET.drawnNodesMax);
       expect(measure.band).toBeLessThanOrEqual(GRAPH_BUDGET.bandMembersMax);
+      // Each of its classes is a class of its own: none stands for a
+      // folded subtree.
+      const big = [...layout.nodes.values()].filter(
+        (node) => node.prefix === "big",
+      );
+      expect(big).toHaveLength(SIXTY_CLASS_GRAPH.classes.length);
+      expect(
+        big.every((node) => node.kind === "class" && node.members === 1),
+      ).toBe(true);
       expect(requireEntry(layout.nodes, "region:aa").kind).toBe("region");
     });
 
@@ -1229,5 +1239,142 @@ describe("layOutClassGraph", () => {
       expect(startX).toBe(from.x + from.w);
       expect(endX).toBe(to.x + to.w);
     });
+  });
+
+  describe("a term page's focus", () => {
+    const STATION = "https://metro.example/onto#Station";
+    const focused = layOutClassGraph(metroGraph, {
+      budget: GRAPH_BUDGET,
+      focus: STATION,
+    });
+    const classes = new Map(
+      metroGraph.classes.map((klass) => [klass.uri, klass]),
+    );
+
+    it("names its class and draws that class's one-hop neighbourhood", () => {
+      const station = requireEntry(classes, STATION);
+      const near = new Set([
+        STATION,
+        ...(station.superclass === null ? [] : [station.superclass]),
+        ...metroGraph.classes
+          .filter((klass) => klass.superclass === STATION)
+          .map((klass) => klass.uri),
+        ...metroGraph.relations.flatMap(({ domain, range }) =>
+          domain === STATION && range !== null
+            ? [range]
+            : range === STATION && domain !== null
+              ? [domain]
+              : [],
+        ),
+      ]);
+      expect(focused.focus).toBe(STATION);
+      const drawn = [...focused.nodes.keys()].filter((id) => classes.has(id));
+      expect(new Set(drawn)).toEqual(
+        new Set([...near].filter((id) => classes.has(id))),
+      );
+      expect(drawn.length).toBeLessThan(metroGraph.classes.length);
+    });
+
+    it("draws as though none were given when it names no class", () => {
+      const unknown = layOutClassGraph(metroGraph, {
+        budget: GRAPH_BUDGET,
+        focus: "https://metro.example/onto#Nowhere",
+      });
+      expect(unknown.focus).toBeUndefined();
+      expect(unknown).toEqual(
+        layOutClassGraph(metroGraph, { budget: GRAPH_BUDGET }),
+      );
+    });
+
+    it("leaves a drill unread", () => {
+      const other = requireDefined(
+        metroGraph.classes.find(
+          (klass) => klass.prefix !== requireEntry(classes, STATION).prefix,
+        ),
+        "a class of another namespace",
+      ).prefix;
+      const both = layOutClassGraph(metroGraph, {
+        budget: GRAPH_BUDGET,
+        focus: STATION,
+        drill: other,
+      });
+      expect(both.drilled).toBeUndefined();
+      expect(both).toEqual(focused);
+    });
+
+    it("packs its class's namespace first", () => {
+      expect(requireAt(focused.regions, 0).prefix).toBe(
+        requireEntry(classes, STATION).prefix,
+      );
+    });
+  });
+
+  describe("an opened view", () => {
+    // Each straight stretch of a path drawn with absolute M, H and V.
+    const listStretches = (d: string) => {
+      const stretches: [number, number, number, number][] = [];
+      let x = 0;
+      let y = 0;
+      for (const [, command, values] of d.matchAll(/([MHV])([^MHV]*)/g)) {
+        const numbers = (values ?? "")
+          .trim()
+          .split(/[\s,]+/)
+          .map(Number);
+        if (command === "M") [x = 0, y = 0] = numbers;
+        if (command === "H") {
+          const to = numbers.at(-1) ?? x;
+          stretches.push([x, y, to, y]);
+          x = to;
+        }
+        if (command === "V") {
+          const to = numbers.at(-1) ?? y;
+          stretches.push([x, y, x, to]);
+          y = to;
+        }
+      }
+      return stretches;
+    };
+    const crosses = (
+      [x1, y1, x2, y2]: readonly number[],
+      box: { x: number; y: number; w: number; h: number },
+    ) =>
+      Math.max(x1 ?? 0, x2 ?? 0) > box.x &&
+      Math.min(x1 ?? 0, x2 ?? 0) < box.x + box.w &&
+      Math.max(y1 ?? 0, y2 ?? 0) > box.y &&
+      Math.min(y1 ?? 0, y2 ?? 0) < box.y + box.h;
+
+    it.each(["surface", "ds", "cs", "anatomy"])(
+      "wraps the shelves under %s within the narrowest legible window, its bridges crossing no box they do not join",
+      (drill) => {
+        const layout = layOutClassGraph(FOUR_NAMESPACE_GRAPH, {
+          budget: GRAPH_BUDGET,
+          drill,
+        });
+        // Regions side by side on one shelf overlap down the page.
+        for (const region of layout.regions) {
+          const shelf = layout.regions.filter(
+            (other) =>
+              other.y < region.y + region.h && region.y < other.y + other.h,
+          );
+          if (shelf.length < 2) continue;
+          const left = Math.min(...shelf.map((other) => other.x));
+          const right = Math.max(...shelf.map((other) => other.x + other.w));
+          expect(right - left).toBeLessThanOrEqual(SHELF_MAX_WIDTH);
+        }
+        const bridges = layout.edges.filter((edge) => edge.bridge === true);
+        expect(bridges.length).toBeGreaterThan(0);
+        for (const edge of bridges) {
+          const joined = new Set([edge.from, ...edge.to]);
+          for (const stretch of listStretches(edge.d)) {
+            for (const node of layout.nodes.values()) {
+              if (joined.has(node.uri)) continue;
+              expect(crosses(stretch, node), `${edge.id} ${node.uri}`).toBe(
+                false,
+              );
+            }
+          }
+        }
+      },
+    );
   });
 });
