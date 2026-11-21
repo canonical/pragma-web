@@ -1,5 +1,5 @@
 /**
- * The activity collection the Timeline stories share: a review log of a
+ * The activity collection the DataTimeline stories share: a review log of a
  * merge proposal, its collection and mapping, and sources answering it at
  * once, never, with a failure, or with nothing.
  */
@@ -13,7 +13,7 @@ import {
   type Source,
 } from "@canonical/dataviews-core";
 import { useState } from "react";
-import type { TimelineFieldMapping } from "../../lib/_work_in_progress/Timeline/index.js";
+import type { TimelineFieldMapping } from "../../lib/_work_in_progress/DataTimeline/index.js";
 
 /** One activity of the review log. */
 export type Activity = {

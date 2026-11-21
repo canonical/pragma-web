@@ -385,8 +385,16 @@ export type DataViewsMessages = {
   readonly tableRenderer: string;
 
   // The timeline.
-  /** How many events a collapsed timeline hides. */
-  readonly eventsHidden: (count: number) => string;
+  /**
+   * How many events a timeline shows, said politely as it changes, out of
+   * how many the collection holds, as exactly as the source counts them.
+   */
+  readonly eventsShown: (shown: number, total: Count) => string;
+  /**
+   * How many events a timeline hides — collapsed on the page, or past it —
+   * as exactly as the source counts them.
+   */
+  readonly eventsHidden: (count: Count) => string;
   /** The command revealing the next events, by how many it reveals. */
   readonly showMoreEvents: (count: number) => string;
   /** The command revealing every hidden event. */

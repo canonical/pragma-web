@@ -399,7 +399,20 @@ describe("DEFAULT_MESSAGES", () => {
   });
 
   it("words the timeline's collapsed events", () => {
-    expect(m.eventsHidden(1200)).toBe("1,200 hidden");
+    const exactly = (value: number) => ({ kind: "exact", value }) as const;
+    expect(m.eventsShown(8, exactly(20))).toBe("Showing 8 of 20 events");
+    expect(m.eventsShown(1, exactly(1))).toBe("Showing 1 of 1 event");
+    expect(m.eventsShown(0, exactly(0))).toBe("Showing 0 of 0 events");
+    expect(m.eventsShown(8, { kind: "at-least", value: 21 })).toBe(
+      "Showing 8 of at least 21 events",
+    );
+    expect(m.eventsShown(8, { kind: "unknown" })).toBe("Showing 8 events");
+    expect(m.eventsShown(1, { kind: "unknown" })).toBe("Showing 1 event");
+    expect(m.eventsHidden(exactly(1200))).toBe("1,200 hidden");
+    expect(m.eventsHidden({ kind: "at-least", value: 12 })).toBe(
+      "At least 12 hidden",
+    );
+    expect(m.eventsHidden({ kind: "unknown" })).toBe("More not yet shown");
     expect(m.showMoreEvents(4)).toBe("Show 4 more");
     expect(m.showAllEvents).toBe("Show all");
   });

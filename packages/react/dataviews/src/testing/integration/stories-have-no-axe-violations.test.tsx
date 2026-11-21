@@ -14,6 +14,7 @@ import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCar
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
+import * as timelineStories from "../../lib/_work_in_progress/DataTimeline/DataTimeline.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
@@ -21,7 +22,6 @@ import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataV
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
-import * as timelineStories from "../../lib/_work_in_progress/Timeline/Timeline.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -67,7 +67,7 @@ const played = {
   DataCards: composeStories(dataCardsStories),
   DataChart: composeStories(dataChartStories),
   DataChartWithTable: composeStories(dataChartWithTableStories),
-  Timeline: composeStories(timelineStories),
+  DataTimeline: composeStories(timelineStories),
   // The links with a refused clause, on a memory location and no mock API.
   Composition: Object.fromEntries(
     Object.entries(composeStories(compositionStories)).filter(([name]) =>

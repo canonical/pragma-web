@@ -261,7 +261,9 @@ export const FRENCH: DataViewsMessages = {
   tableRenderer: "Tableau",
 
   eventsHidden: (events) =>
-    `${count(events)} ${plural(events, "masqué", "masqués")}`,
+    events.kind === "unknown"
+      ? "D’autres ne sont pas encore affichés"
+      : `${events.kind === "at-least" ? "Au moins " : ""}${count(events.value)} ${plural(events.value, "masqué", "masqués")}`,
   showMoreEvents: (events) => `Afficher ${count(events)} de plus`,
   showAllEvents: "Tout afficher",
   filterBy: "Filtrer par :",
@@ -274,4 +276,8 @@ export const FRENCH: DataViewsMessages = {
   sortLatest: "Plus récents",
   sortEarliest: "Plus anciens",
   orderByDate: "Trier par date",
+  eventsShown: (shown, events) =>
+    events.kind === "unknown"
+      ? `${count(shown)} ${plural(shown, "événement affiché", "événements affichés")}`
+      : `${count(shown)} ${plural(shown, "événement affiché", "événements affichés")} sur ${total(events)}`,
 };
