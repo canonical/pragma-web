@@ -85,6 +85,7 @@ export const LENS_OPERATION_VARIABLES: Record<
   },
   EntityNamespacesQuery: {},
   EntityPageQuery: { id: SAMPLE_ENTITY_URI, classUri: SAMPLE_CLASS_URI },
+  EntityStatementsQuery: { uri: SAMPLE_ENTITY_URI },
 };
 
 /** The metro namespace, which `metro:` names. */
