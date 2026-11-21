@@ -30,15 +30,19 @@ node:
           layout.type: flex
           layout.direction: column
           spacing.gap: grid.gutter
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
         edges:
           - node:
               role: result
-            relation: { cardinality: "0..n", slotName: result }
-            edges:
-              - node:
-                  uri: metro.component.metro_chip_projection
-                relation: { cardinality: "1", slotName: node }
-              - node:
-                  role: passage
-                relation: { cardinality: "1", slotName: passage }
+              edges:
+                - node:
+                    uri: metro.component.metro_chip_projection
+                  relation: { cardinality: "1", slotName: node }
+                - node:
+                    role: passage
+                  relation: { cardinality: "1", slotName: passage }
+            relation: { cardinality: "0..*", slotName: result }
       relation: { cardinality: "0..1", slotName: results }
