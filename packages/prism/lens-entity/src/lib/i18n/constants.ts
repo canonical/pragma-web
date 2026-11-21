@@ -49,4 +49,6 @@ export const MESSAGES = {
   "statements.shown": "{shown} of {total} shown",
   "statements.nested": "A nested value",
   "statements.properties": "Properties",
+  "panel.open": "Open",
+  "panel.open.label": "Open {title}",
 } as const;

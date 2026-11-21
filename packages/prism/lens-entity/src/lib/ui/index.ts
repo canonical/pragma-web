@@ -4,3 +4,4 @@ export * from "./EntityIcon/index.js";
 export * from "./EntityIndexPage/index.js";
 export * from "./EntityLayout/index.js";
 export * from "./EntityPage/index.js";
+export * from "./EntityPanel/index.js";

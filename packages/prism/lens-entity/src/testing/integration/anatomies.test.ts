@@ -46,6 +46,7 @@ describe("the lens's components", () => {
       "EntityIndexPage",
       "EntityLayout",
       "EntityPage",
+      "EntityPanel",
     ]);
   });
 
