@@ -701,3 +701,83 @@ type CarPosition {
   reversed: Boolean!
 }
 
+# The `statements` provider extension: one bounded read of an entity's
+# statements, in either direction, grouped by predicate. A provider serves it
+# by appending this text to the contract's SDL; a provider that does not stays
+# valid, since the field is outside the contract.
+
+"Which side of a statement the entity stands on."
+enum StatementDirection {
+  "Statements whose subject is the entity."
+  OUT
+  "Statements whose object is the entity."
+  IN
+}
+
+"An entity's statements in one direction, grouped by predicate."
+type StatementGroups {
+  "The entity the statements are about, or null for a value reached by `path`."
+  subject: Node
+  "One group per predicate: rdf:type first, then the lens's order, then by CURIE."
+  groups: [StatementGroup!]!
+  "Every statement in this direction, before the per-predicate bound."
+  total: Int!
+}
+
+"The statements sharing one predicate, bounded, with their true count."
+type StatementGroup {
+  "The predicate as the TBox declares it, or null when the TBox does not."
+  predicate: OntologyProperty
+  "The predicate's absolute IRI."
+  predicateUri: ID!
+  "How many statements the graph holds with this predicate, before the bound."
+  total: Int!
+  "The first values, by lexical form then IRI, at most the bound asked for."
+  values: [StatementValue!]!
+}
+
+"One value of a statement: the other side from the entity."
+union StatementValue =
+  | StatementNode
+  | StatementLiteral
+  | StatementNested
+  | StatementForeign
+
+"A value that is a node the graph resolves."
+type StatementNode {
+  node: Node!
+}
+
+"A literal value."
+type StatementLiteral {
+  lexical: String!
+  "The datatype's absolute IRI."
+  datatype: ID!
+  "The language tag, or null for a literal without one."
+  lang: String
+}
+
+"A blank node or value-class instance, expanded in place, at most two levels deep."
+type StatementNested {
+  type: OntologyClass
+  groups: [StatementGroup!]!
+}
+
+"An IRI in a namespace the provider has not loaded."
+type StatementForeign {
+  uri: ID!
+  curie: String!
+}
+
+extend type Query {
+  "The statements about the entity `uri` (an absolute IRI) in one direction, or null when the graph holds no such entity."
+  statements(
+    uri: ID!
+    "A path into a value reached from `uri`: predicate local names, each followed by a record key or a zero-based index."
+    path: [String!]
+    "How many values each group returns, from 1 to 50."
+    perPredicate: Int = 12
+    direction: StatementDirection = OUT
+  ): StatementGroups
+}
+
