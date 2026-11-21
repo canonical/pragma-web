@@ -4,7 +4,7 @@ import { RouterLink } from "@canonical/prism-core";
 import { Icon } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
 import { useMessages } from "../../i18n/index.js";
-import { SORT_DIRECTION_ICON } from "./constants.js";
+import { FOLDED_VALUE_COUNT, SORT_DIRECTION_ICON } from "./constants.js";
 import type { EntityTableProps } from "./types.js";
 import "./styles.css";
 
@@ -20,8 +20,12 @@ const componentCssClassName = "ds entity-table";
  *
  * It is a subgrid of the grid that holds it: the title spans two columns
  * and each value one, and a row is clipped at its own height, so the
- * values that find no column leave whole, the last first. Below two groups
- * the header row is hidden by a container rule; no width is measured.
+ * values that find no column leave whole, the last first. Each value cell
+ * also holds its field's label, which only the folded row shows: below two
+ * groups a container rule hides the header row and folds each row into a
+ * scented row of two lines, the title over its first two values, each
+ * after its label, the later values marked `is-later` and hidden. One
+ * markup serves every width; no width is measured.
  *
  * Native props reach the `<table>` root; a consumer `className` merges after
  * the table's own.
@@ -82,9 +86,22 @@ export default function EntityTable({
             <th className="title" scope="row">
               {title}
             </th>
-            {cells.map(({ field, text }) => (
-              <td className="value" data-property={field} key={field}>
-                {text}
+            {cells.map(({ field, text }, index) => (
+              <td
+                className={
+                  index < FOLDED_VALUE_COUNT ? "value" : "value is-later"
+                }
+                data-property={field}
+                key={field}
+              >
+                {text === null ? null : (
+                  <>
+                    <span className="term">
+                      {columns.find((column) => column.field === field)?.header}
+                    </span>{" "}
+                    <span className="detail">{text}</span>
+                  </>
+                )}
               </td>
             ))}
           </tr>

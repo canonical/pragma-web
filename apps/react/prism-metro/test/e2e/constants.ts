@@ -80,6 +80,12 @@ export const CLOSE_ICON_ID = "close";
 export const ROWS_PATHS = ["/stations", "/fleet"] as const;
 
 /**
+ * The width below which a table of facts folds into scented rows: two
+ * groups of the shell's grid.
+ */
+export const TABLE_FOLD_WIDTH_PX = 912;
+
+/**
  * An index's rows, in the canvas: the table of facts' body rows on a
  * single-type index, the scented rows on a mixed one.
  */

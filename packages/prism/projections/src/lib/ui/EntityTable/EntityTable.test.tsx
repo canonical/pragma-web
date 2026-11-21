@@ -49,13 +49,49 @@ describe("EntityTable", () => {
       .getAllByRole("cell")
       .filter((cell) => cell.dataset.property !== undefined);
     expect(
-      cells.map((cell) => [cell.dataset.property, cell.textContent]),
+      cells.map((cell) => [
+        cell.dataset.property,
+        cell.querySelector(".detail")?.textContent ?? "",
+      ]),
     ).toEqual([
       ["servesLine", "Central Line"],
       ["inZone", "Zone 1"],
       ["servesLine", "Northern Line"],
       ["inZone", ""],
     ]);
+  });
+
+  it("labels each value with its field's header, for the folded row", () => {
+    renderTable();
+    const [first, , , empty] = screen
+      .getAllByRole("cell")
+      .filter((cell) => cell.dataset.property !== undefined);
+    expect(first?.querySelector(".term")?.textContent).toBe("Line");
+    expect(first?.textContent).toBe("Line Central Line");
+    expect(empty?.childElementCount).toBe(0);
+  });
+
+  it("marks the values after the first two as the folded row's later ones", () => {
+    const { container } = renderTable({
+      columns: [
+        ...ENTITY_TABLE_PROPS.columns,
+        { field: "platformCount", header: "Platforms", href: "/x" },
+      ],
+      rows: [
+        {
+          key: "a",
+          title: "Bank",
+          cells: [
+            { field: "servesLine", text: "Central Line" },
+            { field: "inZone", text: "Zone 1" },
+            { field: "platformCount", text: "8" },
+          ],
+        },
+      ],
+    });
+    expect(
+      Array.from(container.querySelectorAll("td"), (cell) => cell.className),
+    ).toEqual(["value", "value", "value is-later"]);
   });
 
   it("highlights the selected row only", () => {

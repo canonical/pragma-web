@@ -14,14 +14,23 @@
 # gutter stands between the rows and between their columns, as in every
 # subgrid of the package; a hairline closes each row. A row is clipped at
 # its own height, so the value cells that find no column on its line leave
-# whole, the last first. Below two groups the header row is hidden and a
-# row keeps the title and the facts that fit: the scented row's facts.
+# whole, the last first. Each value cell holds its field's label (term),
+# hidden, then its text (detail); a cell with no value holds neither.
+#
+# Below two groups (the shell's container query at 912px) the table folds
+# into scented rows, from the same markup: the header row is hidden, and
+# every row is two lines, 56px: the title across the row's whole width,
+# then its first two value cells, each two columns wide and showing its
+# label before its text ("Platforms 8"); the later cells (.is-later) are
+# hidden. The two 24px lines stand centred in the row, 4px from its edges.
 #
 # Token ledger (no symbol to bind):
 #   space.400 (32px) for a one-line row's block size: the matrix's row.
 #   2 x space.300 + space.100 (56px) for a two-line row's block size: two
 #   24px lines between 4px insets, as W3's two-line row.
 #   1px for the hairline under each row, as the key-value list's rule.
+#   space.300 (24px) for each line of a folded row. A space stands between
+#   a value's label and its text, which the folded row shows as one line.
 #
 # Roster namespaces: grid.gutter, space.100, space.300, space.400.
 node:
@@ -158,15 +167,33 @@ node:
                                   typography.decoration@hover: underline
                               relation: { cardinality: "0..1", slotName: link }
                         relation: { cardinality: "1", slotName: title }
-                      - node:
-                          role: value cell
-                          attributes: { data-property: "{field}" }
-                          styles:
-                            size.min.width: 0
-                            layout.overflow: hidden
-                            typography.align: start
-                            typography.whiteSpace: nowrap
-                            typography.overflow: ellipsis
+                      - switch:
+                          on: folded
+                          cases:
+                            - node:
+                                role: value cell
+                                attributes: { data-property: "{field}" }
+                                styles:
+                                  size.min.width: 0
+                                  layout.overflow: hidden
+                                  typography.align: start
+                                  typography.whiteSpace: nowrap
+                                  typography.overflow: ellipsis
+                                edges:
+                                  - node:
+                                      role: term
+                                      styles:
+                                        layout.type: none
+                                        typography.color: color.text.muted
+                                    relation: { cardinality: "0..1", slotName: term }
+                                  - node:
+                                      role: detail
+                                    relation: { cardinality: "0..1", slotName: detail }
+                            # Every value after the folded row's first two:
+                            # below two groups it leaves the row.
+                            - node:
+                                role: later value cell (.is-later)
+                                attributes: { data-property: "{field}" }
                         relation: { cardinality: "0..*", slotName: value }
                 - node:
                     role: two-line row (.is-two-line)

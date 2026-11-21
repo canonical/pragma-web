@@ -106,7 +106,7 @@ describe("the lines lens's table", {
     ].find((row) => row.querySelector("th")?.textContent === CIRCLE_LINE_TITLE);
     expect(
       circle
-        ?.querySelector('td.value[data-property="servedBy"]')
+        ?.querySelector('td.value[data-property="servedBy"] .detail')
         ?.textContent?.split(", "),
     ).toHaveLength(6);
     expect(

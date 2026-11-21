@@ -26,6 +26,8 @@
       --typography-text-primary-font-weight
     );
     --entity-table-sorted-color: var(--color-text);
+    /* Each of a folded row's two lines: the matrix's 24px line. */
+    --entity-table-fold-line-size: var(--space-300);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -142,11 +144,44 @@
     flex-shrink: 0;
   }
 
-  /* Below two groups the rows read as scented rows: no header row, the
-   * title and the facts that fit. */
+  /* A value's label, which only a folded row shows, muted before its
+   * text. */
+  .ds.entity-table .term {
+    display: none;
+    color: var(--entity-table-muted-color);
+  }
+
+  /* Below two groups the table folds into scented rows: no header row,
+   * and each row two lines, 56px, whatever it declares: the title across
+   * the row, then its first two values, each two columns wide after its
+   * label; the later values leave. The two lines stand centred in the
+   * row. */
   @container shell (width < 912px) {
     .ds.entity-table .header {
       display: none;
+    }
+
+    .ds.entity-table .row,
+    .ds.entity-table .row.is-two-line {
+      block-size: var(--entity-table-two-line-row-size);
+      grid-auto-rows: var(--entity-table-fold-line-size);
+      align-content: center;
+    }
+
+    .ds.entity-table .title {
+      grid-column: 1 / -1;
+    }
+
+    .ds.entity-table .value {
+      grid-column: span 2;
+    }
+
+    .ds.entity-table .value.is-later {
+      display: none;
+    }
+
+    .ds.entity-table .term {
+      display: inline;
     }
   }
 }

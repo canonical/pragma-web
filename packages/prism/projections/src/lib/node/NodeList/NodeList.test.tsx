@@ -257,7 +257,10 @@ describe("NodeList's table of facts", () => {
     const { container } = renderTable();
     const cells = Array.from(
       container.querySelectorAll("tbody > tr.row:first-child td.value"),
-      (cell) => [cell.getAttribute("data-property"), cell.textContent],
+      (cell) => [
+        cell.getAttribute("data-property"),
+        cell.querySelector(".detail")?.textContent,
+      ],
     );
     expect(cells).toEqual([
       ["code", "NG"],

@@ -27,13 +27,15 @@
  * field name longer than its key's track, which must clip there rather
  * than run under the value or widen the canvas, and once for its fields'
  * keys, a key carrying the inherited tag on the same line height as a
- * plain one. Every row of the station and fleet indexes is 32px.
+ * plain one. Every row of the station and fleet indexes is 32px, and 56px
+ * below two groups, where the table folds into scented rows.
  */
 import {
   launchBrowser,
   measurePage,
   measureRowHeights,
   ROW_PX,
+  TWO_LINE_ROW_PX,
   type ThemedMeasure,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
@@ -50,6 +52,7 @@ import {
   PAGE_SETTLE_MS,
   ROWS_PATHS,
   STATION_IRI_PATH,
+  TABLE_FOLD_WIDTH_PX,
   TERM_IRI_PATH,
   WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
@@ -348,13 +351,16 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
   );
 
   // A row's height comes from `lines` alone, and neither index opts its
-  // rows into two lines: every row is one line high.
-  it.each(ROWS_PATHS)("draws every row of %s one line high", async (path) => {
+  // rows into two lines: every row is one line high. Below two groups each
+  // table row folds into a scented row of two lines.
+  it.each(ROWS_PATHS)("draws every row of %s at its height", async (path) => {
     const page = await open(path);
     try {
       const rows = await page.evaluate(measureRowHeights, INDEX_ROW_SELECTOR);
+      const height =
+        viewport.width < TABLE_FOLD_WIDTH_PX ? TWO_LINE_ROW_PX : ROW_PX;
       expect(rows.length).toBeGreaterThan(0);
-      expect(rows.filter(({ height }) => height !== ROW_PX)).toEqual([]);
+      expect(rows.filter((row) => row.height !== height)).toEqual([]);
     } finally {
       await page.close();
     }

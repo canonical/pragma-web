@@ -18,3 +18,9 @@ export const SORT_DIRECTION_ICON = {
  * the list that builds the rows gives it to the link it puts in the cell.
  */
 export const TITLE_LINK_CLASS_NAME = "link";
+
+/**
+ * How many value cells a row keeps below two groups, where it folds into a
+ * scented row: the title's line, then these values, each after its label.
+ */
+export const FOLDED_VALUE_COUNT = 2;
