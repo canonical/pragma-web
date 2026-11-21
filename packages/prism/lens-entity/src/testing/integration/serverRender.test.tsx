@@ -47,8 +47,9 @@ describe("server rendering", () => {
       /<h1 class="title"><svg[^>]*>.*?<\/svg>Northgate<\/h1>/,
     );
     expect(html).toContain('class="ds field-list"');
-    // Six fields and three relations, each a key value.
-    expect(html.match(/<div class="pair">/g)).toHaveLength(9);
+    // Eight fields (two of them inherited) and four relations, each a key
+    // value.
+    expect(html.match(/<div class="pair">/g)).toHaveLength(12);
     expect(html).toContain(">metro:servesLine</code>");
     expect(requestsAfterWarm).toBe(0);
   });
