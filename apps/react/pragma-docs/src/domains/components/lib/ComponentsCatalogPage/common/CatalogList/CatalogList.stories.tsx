@@ -57,3 +57,19 @@ export const Table: Story = {};
 
 /** The catalog as cards. */
 export const Cards: Story = { args: { renderer: CARDS } };
+
+/** The component the address selects (`select=`), highlighted in the table. */
+export const Selected: Story = {
+  parameters: {
+    router: { url: "/?select=ds%3Aglobal.component.button" },
+    relay: {
+      mockResolvers: {
+        Component: () => ({ __typename: "Component" }),
+        EntityMeta: () => ({
+          curie: "ds:global.component.button",
+          title: "Button",
+        }),
+      },
+    },
+  },
+};
