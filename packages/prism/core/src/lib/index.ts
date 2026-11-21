@@ -180,6 +180,7 @@ export type {
   MentionChipProps,
   ModeStripProps,
   NotFoundBodyProps,
+  PaginationBarProps,
   RailBrand,
   RailProps,
   RendererSwitchProps,
@@ -190,6 +191,8 @@ export type {
   ThemeSelectorProps,
   TurtleToken,
   TurtleTokenRole,
+  TypeFacetBarProps,
+  TypeFacetValue,
   WorkspaceLayoutProps,
 } from "./ui/index.js";
 export {
@@ -215,12 +218,14 @@ export {
   makeLensContext,
   NotFoundBody,
   orderSections,
+  PaginationBar,
   Rail,
   RendererSwitch,
   RouterLink,
   SectionedView,
   SourceView,
   ThemeSelector,
+  TypeFacetBar,
   useGraphZoomBucket,
   WorkspaceLayout,
 } from "./ui/index.js";
