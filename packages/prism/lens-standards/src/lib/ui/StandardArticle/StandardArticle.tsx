@@ -129,7 +129,7 @@ export default function StandardArticle({
         />
       }
       header={
-        <header className="masthead">
+        <header className="masthead" data-canonical={data.uri}>
           <h1 className="heading" id="standard-reading-title">
             {data._meta.title}
           </h1>

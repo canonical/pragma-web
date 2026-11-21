@@ -65,6 +65,16 @@ describe("StandardArticle", () => {
     expect(article?.textContent).not.toContain("A *complex* component");
   });
 
+  it("marks its masthead as the standard's one canonical home (W6b-A7)", {
+    timeout: STANDARDS_TEST_TIMEOUT_MS,
+  }, () => {
+    const { container } = renderExemplar(standardEntityRecords);
+    const canonical = container.querySelectorAll("[data-canonical]");
+    expect(canonical).toHaveLength(1);
+    expect(canonical[0]).toHaveClass("masthead");
+    expect(canonical[0]).toHaveAttribute("data-canonical", LINK_COMPONENT_URI);
+  });
+
   it("renders the header and, with no prose, the description's paragraph blocks", {
     timeout: STANDARDS_TEST_TIMEOUT_MS,
   }, () => {
