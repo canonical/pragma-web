@@ -19,14 +19,40 @@ const renderMetroRail = (props: MetroRailProps = {}) =>
   );
 
 describe("MetroRail", () => {
-  it("lists the lenses the router's table declares, in rail order", () => {
+  it("lists Search, then the lenses the router's table declares, in rail order (W8-A1)", () => {
     renderMetroRail();
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(
       [...nav.querySelectorAll(".lenses .label")].map(
         (label) => label.textContent,
       ),
-    ).toEqual(["Network", "Stations", "Lines", "Definitions", "Fleet"]);
+    ).toEqual([
+      "Search",
+      "Network",
+      "Stations",
+      "Lines",
+      "Definitions",
+      "Fleet",
+    ]);
+    expect(screen.getByRole("link", { name: "Search" })).toHaveAttribute(
+      "href",
+      "/search",
+    );
+  });
+
+  it("leaves Search out when the table has no search route (W8-A1)", () => {
+    const { search: _search, ...routes } = appRoutes;
+    render(
+      <RouterProvider
+        router={createRouter(routes, {
+          adapter: createMemoryAdapter("/stations"),
+          notFound: notFoundRoute,
+        })}
+      >
+        <MetroRail />
+      </RouterProvider>,
+    );
+    expect(screen.queryByRole("link", { name: "Search" })).toBeNull();
   });
 
   it("links the site brand to the landing", () => {

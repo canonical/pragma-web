@@ -1,0 +1,12 @@
+---
+# SearchIcon — the rail's Search glyph: a magnifier, a 16-unit shape
+# filled in currentColor, always aria-hidden because the rail entry's
+# label names it. Drawn as the design system's search icon is.
+# Binds no styles: its size is the rail's.
+node:
+  uri: metro.component.search_icon
+  edges:
+    - node:
+        role: glyph
+      relation:
+        cardinality: "1"
