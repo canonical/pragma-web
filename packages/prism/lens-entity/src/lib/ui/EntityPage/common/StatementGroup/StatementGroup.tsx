@@ -1,4 +1,3 @@
-import { RouterLink } from "@canonical/prism-core";
 import { ChipProjection } from "@canonical/prism-projections";
 import type { ReactElement, ReactNode } from "react";
 import { graphql, useFragment } from "react-relay";
@@ -53,8 +52,9 @@ type StatementValue = StatementGroup_group$data["values"][number];
  * One predicate group's values as a section's content: each node as its
  * linked chip, which links through the site's homes; each literal as text
  * in its language; at most the provider's bound of values (12 by default),
- * then "All N" when the caller names where all of them are listed. The
- * group's count stands in the section's title, never here.
+ * then, when the group holds more than it shows, one muted line that says
+ * how many of them it shows. The group's count stands in the section's
+ * title, never here.
  *
  * `import { StatementGroup } from "../StatementGroup/index.js";`
  *
@@ -63,7 +63,6 @@ type StatementValue = StatementGroup_group$data["values"][number];
  *   scope.
  */
 export default function StatementGroup({
-  allHref,
   className,
   group,
   ...props
@@ -83,10 +82,10 @@ export default function StatementGroup({
           </li>
         ))}
       </ul>
-      {allHref !== undefined && total > values.length ? (
-        <RouterLink className="all" href={allHref}>
-          {t("statements.all", { count: total })}
-        </RouterLink>
+      {total > values.length ? (
+        <p className="shown">
+          {t("statements.shown", { shown: values.length, total })}
+        </p>
       ) : null}
     </div>
   );

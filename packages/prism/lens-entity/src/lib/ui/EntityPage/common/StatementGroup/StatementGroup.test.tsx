@@ -58,11 +58,7 @@ const craftAnswer = () => {
 };
 
 /** The first outgoing group of the store's statements, as its section shows it. */
-const FirstGroup = ({
-  allHref,
-}: {
-  readonly allHref?: string;
-}): ReactElement => {
+const FirstGroup = (): ReactElement => {
   const { outgoing } = useLazyLoadQuery<EntityStatementsQuery>(
     entityStatementsQueryNode,
     { uri: URI },
@@ -70,11 +66,11 @@ const FirstGroup = ({
   );
   const group = outgoing?.groups.at(0);
   if (group === undefined) throw new Error("FirstGroup: no group in the store");
-  return <StatementGroup allHref={allHref} data-probe="group" group={group} />;
+  return <StatementGroup data-probe="group" group={group} />;
 };
 
 /** The group over a store holding the crafted answer. */
-const renderGroup = async (allHref?: string) => {
+const renderGroup = async () => {
   const fetchFn = createFetchSpy();
   fetchFn.mockResolvedValue(craftAnswer());
   const environment = createEnvironment({ fetchFn });
@@ -85,7 +81,7 @@ const renderGroup = async (allHref?: string) => {
     createEntitySite({
       url: `/stations/${encodeURIComponent(CENTRAL_EXCHANGE_CURIE)}`,
       environment,
-      children: <FirstGroup allHref={allHref} />,
+      children: <FirstGroup />,
     }),
   );
 };
@@ -108,23 +104,14 @@ describe("StatementGroup", () => {
     expect(values.at(4)?.childNodes).toHaveLength(0);
   });
 
-  it("names no link to all the values when the caller names no index", {
+  it("ends a group cut at its bound with how many of its values it shows, never a link", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { container } = await renderGroup();
-    expect(container.querySelector(".all")).toBeNull();
-  });
-
-  it("follows the shown values with All N when the caller names where they are listed", {
-    timeout: ENTITY_TEST_TIMEOUT_MS,
-  }, async () => {
-    const { container } = await renderGroup(
-      "/stations?near=metro%3Acentral-exchange",
-    );
-    const all = container.querySelector('[data-probe="group"] > a.all');
-    expect(all?.textContent).toBe("All 30");
-    expect(all?.getAttribute("href")).toBe(
-      "/stations?near=metro%3Acentral-exchange",
+    const group = container.querySelector('[data-probe="group"]');
+    expect(group?.querySelector("a.all")).toBeNull();
+    expect(group?.querySelector(":scope > p.shown")?.textContent).toBe(
+      "5 of 30 shown",
     );
   });
 });

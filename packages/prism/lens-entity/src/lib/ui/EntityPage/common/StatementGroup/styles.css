@@ -2,9 +2,10 @@
 
 @layer ds.components.global {
   /* One predicate's values, as chips and text that wrap across the
-   * section's columns, then the link to all of them. */
+   * section's columns, then how many of them it shows when it is cut. */
   .ds.statement-group {
     --statement-group-gap: var(--grid-gutter);
+    --statement-group-shown-color: var(--color-text-muted);
 
     grid-column: 1 / -1;
     display: grid;
@@ -23,7 +24,10 @@
     padding-inline-start: 0;
   }
 
-  .ds.statement-group > .all {
+  .ds.statement-group > .shown {
     grid-column: 1 / -1;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    color: var(--statement-group-shown-color);
   }
 }

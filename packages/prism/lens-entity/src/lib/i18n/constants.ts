@@ -46,6 +46,6 @@ export const MESSAGES = {
   "statements.group": "{label} · {count}",
   "statements.referencedBy": "Referenced by · {count}",
   "statements.inverse": "Has this as {label}",
-  "statements.all": "All {count}",
+  "statements.shown": "{shown} of {total} shown",
   "statements.nested": "A nested value",
 } as const;
