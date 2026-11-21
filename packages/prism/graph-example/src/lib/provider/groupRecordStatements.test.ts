@@ -46,6 +46,21 @@ describe("groupRecordStatements", () => {
     ]);
   });
 
+  it("keeps two equal values, in the order they were stated", () => {
+    const first = literal("x");
+    const second = literal("x");
+    const [group] = groupRecordStatements(
+      [
+        { predicate: "urn:p#a", object: first },
+        { predicate: "urn:p#a", object: second },
+      ],
+      12,
+      (uri) => uri,
+    );
+    expect(group?.values.at(0)).toBe(first);
+    expect(group?.values.at(1)).toBe(second);
+  });
+
   it("cuts each group to the bound and keeps its true total", () => {
     const [, , group] = groupRecordStatements(STATEMENTS, 2, (uri) => uri);
     expect(group?.total).toBe(4);

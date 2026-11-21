@@ -307,3 +307,6 @@ export interface RecordStatementGroup {
   readonly total: number;
   readonly values: readonly RecordTerm[];
 }
+
+/** A sort rank and the key that orders within it, in code-point order. */
+export type RankedKey = readonly [rank: number, key: string];
