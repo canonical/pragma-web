@@ -13,6 +13,12 @@
 # entity, so the list leaves it out of its items. The renderer's name and
 # the empty line are the lens's: it reads the renderer from the page's
 # address and passes its name.
+# In the `table` renderer, a list whose nodes share one type up to their
+# superclasses is EntityTable's table of facts instead: a row per node, its
+# title linked to the node's home, a value cell per field of the node's
+# `values` (the lens's display fields, the omitted ones left out), headed
+# by the first node's labels as sort links. The selected row is the node
+# whose address or compact address the page's `select=` names.
 node:
   uri: prism.component.node_list
   projection:
@@ -47,5 +53,34 @@ node:
                 field: _meta.type.visibility
             relation:
               cardinality: "0..*"
+          - node:
+              uri: prism.component.entity_table
+              edges:
+                - node:
+                    role: title cell
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "0..*"
+                - node:
+                    role: selection key
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..*"
+                - node:
+                    role: listed type
+                    projection:
+                      field: _meta.type.uri
+                  relation:
+                    cardinality: "0..*"
+                - node:
+                    role: listed supertype
+                    projection:
+                      field: _meta.type.superclasses.uri
+                  relation:
+                    cardinality: "0..*"
+            relation:
+              cardinality: "0..1"
       relation:
         cardinality: "1"

@@ -24,6 +24,10 @@ import "./styles.css";
 const declareNodeFragment = (): unknown => graphql`
   fragment InterchangeCard_node on Interchange {
     __typename
+    location {
+      latitude
+      longitude
+    }
     platformCount
     transferMinutes
     _meta {

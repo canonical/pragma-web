@@ -5,6 +5,7 @@ import type {
   FilterPlacement,
   LensRenderers,
 } from "@canonical/prism-core";
+import type { ListLines } from "@canonical/prism-projections";
 import type { ComponentProps } from "react";
 
 type OwnProps = {
@@ -14,6 +15,10 @@ type OwnProps = {
   readonly renderers?: LensRenderers;
   /** Where the lens places its filters; the bar when omitted. */
   readonly filters?: FilterPlacement;
+  /** How many lines a row takes; one when omitted. */
+  readonly lines?: ListLines;
+  /** The value fields the table leaves out, by served name. */
+  readonly tableOmits?: readonly string[];
 };
 
 /**

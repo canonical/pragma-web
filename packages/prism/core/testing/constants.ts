@@ -192,7 +192,8 @@ export const CAMEL_LIFTS: readonly (readonly [string, string])[] = [
 /**
  * The selector suffix each anatomy interaction state binds; a pressed
  * toggle button is selected, as a link to the current page or the current
- * section is. `:focus` serves
+ * section is, and as the current item of a set (`aria-current="true"`, such
+ * as a list's selected entity) is. `:focus` serves
  * an element that takes focus only by script, which never shows a keyboard
  * ring; every other focusable element binds `:focus-visible`.
  */
@@ -204,6 +205,7 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":hover": "hover",
   '[aria-current="location"]': "selected",
   '[aria-current="page"]': "selected",
+  '[aria-current="true"]': "selected",
   '[aria-disabled="true"]': "disabled",
   '[aria-pressed="true"]': "selected",
   '[aria-selected="true"]': "selected",

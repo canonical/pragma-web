@@ -3,6 +3,7 @@
 import { Cards } from "@canonical/react-ds-global";
 import { Children, type ReactElement } from "react";
 import { useMessages } from "../../i18n/index.js";
+import { EntityTable } from "../EntityTable/index.js";
 import {
   DEFAULT_ENTITY_LIST_RENDERER,
   ENTITY_LIST_CARD_SPAN,
@@ -22,6 +23,10 @@ const componentCssClassName = "ds entity-list";
  * no toolbar: the strip's view group switches the renderer and its count
  * line counts the entries.
  *
+ * Given `columns` and `rows`, the `table` renderer draws the table of facts
+ * (`EntityTable`) in place of its children: a header of sort links and a
+ * row of values per entity, `lines` high, the `selected` row highlighted.
+ *
  * Native props reach the `<div>` root; a consumer `className` merges after
  * the list's own.
  *
@@ -34,11 +39,22 @@ export default function EntityList({
   renderer = DEFAULT_ENTITY_LIST_RENDERER,
   empty,
   children,
+  columns,
+  rows,
+  lines,
+  selected,
   className,
   ...props
 }: EntityListProps): ReactElement {
   const t = useMessages();
-  const isEmpty = Children.toArray(children).length === 0;
+  const table =
+    renderer === "table" && columns !== undefined && rows !== undefined
+      ? { columns, rows }
+      : null;
+  const isEmpty =
+    table === null
+      ? Children.toArray(children).length === 0
+      : table.rows.length === 0;
   return (
     <div
       {...props}
@@ -46,6 +62,13 @@ export default function EntityList({
     >
       {isEmpty ? (
         <p className="empty">{empty ?? t("list.empty")}</p>
+      ) : table !== null ? (
+        <EntityTable
+          columns={table.columns}
+          lines={lines}
+          rows={table.rows}
+          selected={selected}
+        />
       ) : renderer === "cards" ? (
         <Cards cardSpan={ENTITY_LIST_CARD_SPAN}>{children}</Cards>
       ) : (

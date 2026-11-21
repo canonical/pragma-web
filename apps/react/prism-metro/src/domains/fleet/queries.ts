@@ -29,8 +29,7 @@ const declareFleetIndexQuery = (): unknown => graphql`
           node {
             __typename
             uri
-            ...MetroRowProjection_node
-            ...MetroCardProjection_node
+            ...NodeList_node
           }
         }
       }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3eb8a1c445f954eedfed4092081cc4a9>>
+ * @generated SignedSource<<05363a8fe3cc93625c39ae7f09b0fe91>>
  * @lightSyntaxTransform
  */
 
@@ -27,8 +27,11 @@ export type DocsCommandProjection_node$data = {
     readonly " $fragmentSpreads": FragmentRefs<"ModifierFamilyCommand_node">;
   } | null | undefined;
   readonly Node: {
-    readonly " $fragmentSpreads": FragmentRefs<"CommandProjection_node">;
+    readonly " $fragmentSpreads": FragmentRefs<"NodeCommand_node">;
   };
+  readonly OntologyClass: {
+    readonly " $fragmentSpreads": FragmentRefs<"OntologyClassCommand_node">;
+  } | null | undefined;
   readonly Pattern: {
     readonly " $fragmentSpreads": FragmentRefs<"UIBlockCommand_node">;
   } | null | undefined;
@@ -67,7 +70,7 @@ return {
           {
             "args": null,
             "kind": "FragmentSpread",
-            "name": "CommandProjection_node"
+            "name": "NodeCommand_node"
           }
         ],
         "type": "Node",
@@ -75,6 +78,22 @@ return {
       },
       "kind": "AliasedInlineFragmentSpread",
       "name": "Node"
+    },
+    {
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "OntologyClassCommand_node"
+          }
+        ],
+        "type": "OntologyClass",
+        "abstractKey": null
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "OntologyClass"
     },
     {
       "fragment": {
@@ -160,6 +179,6 @@ return {
 };
 })();
 
-(node as any).hash = "16c2fb14a3a9fca6e831c61e17fdd359";
+(node as any).hash = "2b7bd812ec3db5fce0416b4a313aec54";
 
 export default node;

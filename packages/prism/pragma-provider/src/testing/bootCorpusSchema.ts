@@ -26,6 +26,7 @@ import {
   collectTtlSources,
   harvestPrefixes,
 } from "../lib/sources/index.js";
+import { extendWithList } from "../lib/values/index.js";
 import { CORPUS_REFS_ROOT } from "./corpus.js";
 
 /**
@@ -60,9 +61,11 @@ export const bootCorpusSchema = async (
   }
   const query = createStoreQueryFn(store);
   return {
-    schema: extendWithLens(
-      api.schema,
-      indexSiteLens(lens, await readTBoxOutline(query)),
+    schema: extendWithList(
+      extendWithLens(
+        api.schema,
+        indexSiteLens(lens, await readTBoxOutline(query)),
+      ),
     ),
     context: api.createContext(store),
     query,

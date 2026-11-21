@@ -5,6 +5,7 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import createEntitySite from "../../../../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
+import { LIST_RENDERERS } from "../../../../../../testing/fixtures.js";
 import EntityView from "./EntityView.js";
 
 describe("EntityView on the server", () => {
@@ -13,7 +14,7 @@ describe("EntityView on the server", () => {
       createEntitySite({
         url: "/stations?as=cards",
         environment: createEnvironment({ fetchFn: createFetchSpy() }),
-        children: <EntityView kind="list" />,
+        children: <EntityView kind="list" renderers={LIST_RENDERERS} />,
       }),
     );
     expect(html).toContain('href="/stations"');

@@ -1,6 +1,10 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { RowProjection, requireArmKey } from "@canonical/prism-projections";
+import {
+  NodeRow,
+  OntologyClassRow,
+  requireArmKey,
+} from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { UIBlockRow } from "#domains/components/lib";
@@ -12,8 +16,8 @@ import type { DocsRowProjectionProps } from "./types.js";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields DocsRowProjection reads from the Node it dispatches: its
- * typename; the package's row switch, spread aliased as `Node`, for
- * every type the site does not project itself; and the arm of each
+ * typename; the package's `Node` arm, spread aliased as `Node`, for
+ * every type no other arm takes; the package's ontology class arm; and the arm of each
  * design-system type, aliased by the type it is on. The three UI-block
  * types share one arm, each narrowed by an inline fragment, so each alias
  * holds a key for its own type alone.
@@ -21,7 +25,8 @@ import type { DocsRowProjectionProps } from "./types.js";
 const declareNodeFragment = (): unknown => graphql`
   fragment DocsRowProjection_node on Node {
     __typename
-    ...RowProjection_node @alias(as: "Node")
+    ...NodeRow_node @alias(as: "Node")
+    ...OntologyClassRow_node @alias(as: "OntologyClass")
     ... on Component @alias(as: "Component") {
       ...UIBlockRow_node
     }
@@ -44,9 +49,11 @@ void declareNodeFragment;
  * explicit switch, the cases being `DOCS_ROW_TYPES`: a component, a pattern
  * or a layout renders through `UIBlockRow`, a modifier through
  * `ModifierRow`, a modifier family through `ModifierFamilyRow` and a
- * code standard through `CodeStandardRow`; every other node through the
- * package's `RowProjection`, which renders an ontology class through its
- * own arm and any other node through its `Node` arm.
+ * code standard through `CodeStandardRow`; an ontology class through the
+ * package's class arm, `OntologyClassRow`; every other node through the
+ * package's `Node` arm, `NodeRow`. It spreads the package's arms, not its
+ * switch: the package's switch reaches this one through the site slot, so
+ * spreading it here would make a fragment cycle.
  *
  * It renders no element of its own: the arm renders the root, an `<li>`,
  * and every native prop reaches it.
@@ -107,7 +114,14 @@ export default function DocsRowProjection({
           node={requireArmKey(data.CodeStandard, data.__typename)}
         />
       );
+    case "OntologyClass":
+      return (
+        <OntologyClassRow
+          {...props}
+          node={requireArmKey(data.OntologyClass, data.__typename)}
+        />
+      );
     default:
-      return <RowProjection {...props} node={data.Node} />;
+      return <NodeRow {...props} node={data.Node} />;
   }
 }

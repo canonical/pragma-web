@@ -1,4 +1,10 @@
-import { buildSchema, type GraphQLField } from "graphql";
+import {
+  buildSchema,
+  type GraphQLField,
+  type GraphQLSchema,
+  isInterfaceType,
+  isObjectType,
+} from "graphql";
 import { PROVIDER_EXTENSIONS } from "./constants.js";
 import type { ProviderExtension } from "./types.js";
 
@@ -22,9 +28,23 @@ const matchesSignature = (
   );
 };
 
+/** The extension's field on the type it is declared on, `Query` by default. */
+const findExtensionField = (
+  schema: GraphQLSchema,
+  extension: ProviderExtension,
+): GraphQLField<unknown, unknown> | undefined => {
+  const declared = PROVIDER_EXTENSIONS[extension];
+  const owner =
+    "on" in declared ? schema.getType(declared.on) : schema.getQueryType();
+  return isObjectType(owner) || isInterfaceType(owner)
+    ? owner.getFields()[extension]
+    : undefined;
+};
+
 /**
- * Whether a provider's schema serves one extension: its `Query` declares the
- * extension's root field with the declared signature. A field of the right
+ * Whether a provider's schema serves one extension: it declares the
+ * extension's field (on `Query`, or on the type it names) with the
+ * declared signature. A field of the right
  * name with another signature does not serve it, and neither does an SDL
  * that does not build, since a reader could select nothing from it.
  *
@@ -38,7 +58,7 @@ export function servesExtension(
 ): boolean {
   let field: GraphQLField<unknown, unknown> | undefined;
   try {
-    field = buildSchema(providerSdl).getQueryType()?.getFields()[extension];
+    field = findExtensionField(buildSchema(providerSdl), extension);
   } catch {
     return false;
   }

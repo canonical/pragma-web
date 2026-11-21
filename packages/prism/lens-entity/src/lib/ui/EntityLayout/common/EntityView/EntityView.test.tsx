@@ -5,6 +5,7 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createEntitySite from "../../../../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
+import { LIST_RENDERERS } from "../../../../../../testing/fixtures.js";
 import EntityView from "./EntityView.js";
 
 /** The view tenant at `url` under the test site's renderers. */
@@ -24,7 +25,7 @@ const renderView = (
 
 describe("EntityView", () => {
   it("offers the index's list renderers as links, the default current", () => {
-    renderView("/stations?q=cen", { kind: "list" });
+    renderView("/stations?q=cen", { kind: "list", renderers: LIST_RENDERERS });
     const tabs = within(screen.getByRole("navigation", { name: "Show as" }));
     expect(tabs.getByRole("link", { name: "Table" })).toHaveAttribute(
       "href",
@@ -47,6 +48,12 @@ describe("EntityView", () => {
       "aria-current",
       "page",
     );
+  });
+
+  it("W4-A5 offers no cards where the lens declares no list renderers", () => {
+    const { container } = renderView("/stations?as=cards", { kind: "list" });
+    expect(screen.queryByRole("link", { name: "Cards" })).toBeNull();
+    expect(container.querySelector("nav")).toBeNull();
   });
 
   it("draws no switch when the lens declares one renderer", () => {

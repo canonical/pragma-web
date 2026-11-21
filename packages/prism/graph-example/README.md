@@ -72,11 +72,11 @@ types with no IRI of their own: the embeddable `GeoPoint`; `Route`, `Call` and
 which carry the fleet model (see both below). `findBreakingChanges(contractOnly, extended)` returns zero, and
 `satisfiesContract(readProviderSdl())` returns **zero violations**.
 
-**The extension adds two root fields, `prose` and `search`, and no other.** Every entity
-type this provider declares is reachable through the contract's own five root fields —
-`node(id:)` and `OntologyClass.instances`. Adding provider root fields for them would
-have been easier and would have demonstrated less. `prose` and `search` are the
-exceptions because neither is part of the contract (see below).
+**The extension adds four root fields, `prose`, `search`, `source` and
+`facetedInstances`, and no other.** Every entity type this provider declares is reachable
+through the contract's own five root fields — `node(id:)` and `OntologyClass.instances`.
+Adding provider root fields for them would have been easier and would have demonstrated
+less. The four are the exceptions because none is part of the contract (see below).
 
 ---
 
@@ -481,6 +481,18 @@ car positions), each under its subject's and its object's class. Inverses the pr
 reads backwards (`servedBy`, `stops`, `stock`, `lines`) are not stored, so their declared
 edges are served with count 0. `formations` has no domain, so its statements are served
 as undeclared edges.
+
+## List values and facets — hand-written
+
+`schema/extension.graphql` declares the contract's two list extensions by hand: `values`
+on `Node`, on `Stop` and on every entity type, the `NodeValue`, `FieldFilter`,
+`FieldSort`, `FacetValue` and `Facet` types, a `FacetedConnection`, and
+`Query.facetedInstances`. Their resolvers call the contract's `serveNodeValues` and
+`serveFacetedInstances` against the provider's own schema, so they read the lens and the
+data the same way a client would. `facetedInstances` takes the matching IRIs and pages
+them with the provider's own connection slicing, serving the set's `totalCount` and its
+facets beside the page. A station's `platformCount` and `platformLength` are `Int`, which
+the contract reads as numbers.
 
 ---
 

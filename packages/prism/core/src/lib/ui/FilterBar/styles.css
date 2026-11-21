@@ -16,6 +16,7 @@
     --filter-bar-divider-color: var(--color-border-muted);
     /* One baseline pair, between the controls. */
     --filter-bar-spacing: var(--space-100);
+    --filter-bar-more-color: var(--color-text-link);
 
     grid-column: 1 / -1;
     display: grid;
@@ -49,12 +50,34 @@
     gap: var(--filter-bar-spacing);
   }
 
-  /* Below three groups the columns from the fifth line are narrower than
-   * a lens's facet buttons (about 330px at 1366), so the controls start on
-   * the first column line and the bar stays one line. */
+  /* "More filters" opens the sheet: from three groups up only when the
+   * lens has facets the bar does not hold. */
+  .ds.filter-bar > .controls > .more {
+    display: none;
+    color: var(--filter-bar-more-color);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .ds.filter-bar > .controls > .more:hover {
+    text-decoration: underline;
+  }
+
+  .ds.filter-bar > .controls > .more.is-needed {
+    display: inline;
+  }
+
+  /* Below three groups the columns from the fifth line (about 330px at
+   * 1366, 216px at 912) are narrower than a lens's first group: the bar
+   * holds "More filters" alone, and nothing hidden takes focus. */
   @container shell (width < 1376px) {
-    .ds.filter-bar > .controls {
-      grid-column: 1 / -1;
+    .ds.filter-bar > .controls > .facets,
+    .ds.filter-bar > .controls > .chips {
+      display: none;
+    }
+
+    .ds.filter-bar > .controls > .more {
+      display: inline;
     }
   }
 

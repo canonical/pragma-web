@@ -1,0 +1,11 @@
+---
+# SiteCommandSlot: the site's command switch as the package's command switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to DocsCommandProjection,
+# whose case renders the root.
+node:
+  uri: docs.component.site_command_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: docs.component.docs_command_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

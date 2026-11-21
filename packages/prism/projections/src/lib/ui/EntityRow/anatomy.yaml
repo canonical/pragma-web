@@ -144,6 +144,9 @@
 #                                      the identity takes the free width
 #                                      before the facts (a
 #                                      number, read only by the reflow).
+#   @selected (aria-current="true", the address's select=): the row of the
+#   selected entity takes color.background.layer2, as the table of facts
+#   marks its selected row.
 #   layout.flex.basis auto, 0 and space.200, layout.flex.grow 0 and 1,
 #   size.max.width max-content, spacing.external.inline.end auto:
 #   keywords and numbers of the yielding order.
@@ -160,6 +163,7 @@ node:
     layout.listStyle: none
     typography.size: typography.text.primary.fontSize
     typography.lineHeight: space.300
+    appearance.background@selected: color.background.layer2
   edges:
     - node:
         role: identity

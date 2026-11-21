@@ -10,7 +10,8 @@ import type { FilterPlacement } from "./types.js";
 /**
  * The search parameters a view keeps its state in, by role: the renderer
  * (`as`; `view` is left to saved views), the search text, the open sheet,
- * the graph's kind, its selection and what it has expanded. What `expand`
+ * the graph's kind, its selection, what it has expanded and the list's
+ * sort (`sort=<field>` ascending, `sort=-<field>` descending). What `expand`
  * holds is the graph's to define: a relation, for a graph of an entity's
  * neighbourhood; a namespace's prefix, for the Definitions overview, which
  * draws that namespace opened and the others as one box each.
@@ -22,7 +23,11 @@ export const VIEW_PARAMS = {
   graph: "graph",
   select: "select",
   expand: "expand",
+  sort: "sort",
 } as const;
+
+/** The prefix of a `sort` value that orders its field descending. */
+export const DESCENDING_SORT_PREFIX = "-";
 
 /** The `sheet` value that opens the folded filters below two groups. */
 export const FILTER_SHEET = "filter";

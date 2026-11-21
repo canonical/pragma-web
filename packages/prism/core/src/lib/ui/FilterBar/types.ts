@@ -7,11 +7,16 @@ type OwnProps = {
   readonly facets: ReactNode;
   /** The applied filters, as chips. */
   readonly chips?: ReactNode;
+  /**
+   * Whether the lens has facets the bar does not hold: "More filters" then
+   * shows at every width, not only below three groups.
+   */
+  readonly folded?: boolean;
 };
 
 /**
- * Props accepted by `FilterBar`: the facets and the chips, and the native
- * props of its `<div>` root.
+ * Props accepted by `FilterBar`: the facets, the chips and whether the bar
+ * is folded, and the native props of its `<div>` root.
  *
  * `children` is excluded: the bar's content is its two slots.
  */

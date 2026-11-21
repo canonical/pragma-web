@@ -1,0 +1,11 @@
+---
+# SiteRowSlot: the site's row switch as the package's row switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to DocsRowProjection,
+# whose case renders the root.
+node:
+  uri: docs.component.site_row_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: docs.component.docs_row_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

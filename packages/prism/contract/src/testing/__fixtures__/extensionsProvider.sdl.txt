@@ -1,3 +1,48 @@
 extend type Query {
   source(uri: ID!): String
+  facetedInstances(classUri: ID!, filters: [FieldFilter!], sort: FieldSort, first: Int, after: String): FacetedConnection!
+}
+
+extend interface Node {
+  values(fields: [ID!]): [NodeValue!]!
+}
+
+extend type OntologyClass {
+  values(fields: [ID!]): [NodeValue!]!
+}
+
+type NodeValue {
+  field: ID!
+  label: String!
+  text: String
+  uri: ID
+}
+
+input FieldFilter {
+  field: String!
+  values: [ID]
+}
+
+input FieldSort {
+  field: String!
+  descending: Boolean
+}
+
+type FacetValue {
+  value: ID
+  label: String
+  count: Int!
+}
+
+type Facet {
+  field: String!
+  label: String!
+  values: [FacetValue!]!
+}
+
+type FacetedConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+  facets: [Facet!]!
 }

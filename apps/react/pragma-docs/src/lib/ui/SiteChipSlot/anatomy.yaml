@@ -1,0 +1,11 @@
+---
+# SiteChipSlot: the site's chip switch as the package's chip switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to DocsChipProjection,
+# whose case renders the root.
+node:
+  uri: docs.component.site_chip_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: docs.component.docs_chip_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

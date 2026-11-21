@@ -4,6 +4,8 @@
  * field's cardinality.
  */
 
+import type { CacheConfig } from "relay-runtime";
+
 import type { MessageKey } from "./i18n/index.js";
 import type { Cardinality } from "./types.js";
 
@@ -26,6 +28,13 @@ export const ENTITY_URI_PARAM = "uri";
  */
 export const ENTITY_PAGE_SIZE = 100;
 
+/**
+ * The list renderers an index offers when its lens declares none: the table
+ * alone. Cards draw a sidecar a lens vouches for, so a lens that has one
+ * declares them.
+ */
+export const DEFAULT_LIST_RENDERERS: readonly string[] = ["table"];
+
 /** The catalog key that names each cardinality, in the fields table and the
  * relations. */
 export const CARDINALITY_MESSAGES: Readonly<Record<Cardinality, MessageKey>> = {
@@ -34,3 +43,18 @@ export const CARDINALITY_MESSAGES: Readonly<Record<Cardinality, MessageKey>> = {
   many: "cardinality.many",
   any: "cardinality.any",
 };
+
+/** How many of the lens's facets the bar holds when the lens sets none. */
+export const DEFAULT_BAR_FACETS = 3;
+
+/** The address's word for a facet's "none" bucket (`?servesLine=none`). */
+export const FACET_NONE = "none";
+
+/** Between a facet's applied values in the address. */
+export const FACET_VALUE_SEPARATOR = ",";
+
+/** A warm's fetch policy: answer from the store when it holds the data, and
+ * fetch otherwise. */
+export const STORE_OR_NETWORK: CacheConfig & {
+  readonly fetchPolicy: "store-or-network";
+} = { fetchPolicy: "store-or-network" };

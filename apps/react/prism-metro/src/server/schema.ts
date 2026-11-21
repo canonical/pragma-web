@@ -23,35 +23,35 @@ const SCHEMA_PATH = fileURLToPath(
 );
 
 /** The provider's one `extend type Query { … }` block, with its fields. */
-const QUERY_EXTENSION = /^extend type Query \{\n([\s\S]*?)\n\}\n\n?/m;
-
-/** The contract's root type, up to its closing brace at column 0. */
-const QUERY_BLOCK = /^(type Query \{\n[\s\S]*?)\n\}/m;
+/** An `extend type` or `extend interface` block, its kind, name and fields. */
+const EXTENSION_BLOCK =
+  /^extend (type|interface) (\w+) \{\n([\s\S]*?)\n\}\n\n?/m;
 
 /**
- * Splice the fields of the SDL's `extend type Query` block into its
- * `type Query` block and drop the extension block.
- *
- * @param sdl - The provider's SDL.
- * @returns The SDL with every root field inside `type Query`.
- * @throws When the SDL carries no `type Query` or no `extend type Query`.
+ * Folds every `extend` block into the type or interface it extends: Relay
+ * reads a field declared only in an `extend` block of a server schema as
+ * client data and never sends it.
  */
-const spliceQueryExtension = (sdl: string): string => {
-  const extension = QUERY_EXTENSION.exec(sdl);
-  if (extension === null || !QUERY_BLOCK.test(sdl)) {
+const foldExtensions = (sdl: string): string => {
+  const extension = EXTENSION_BLOCK.exec(sdl);
+  if (extension === null) return sdl;
+  const [, kind, name, fields] = extension;
+  const target = new RegExp(
+    `^(${kind} ${name}\\b[^{]*\\{\\n[\\s\\S]*?)\\n\\}`,
+    "m",
+  );
+  if (!target.test(sdl)) {
     throw new Error(
-      "[schema] the provider's SDL carries no `type Query` or no `extend type Query` block",
+      `[schema] the provider's SDL extends ${kind} ${name}, which it does not declare`,
     );
   }
-  const fields = extension.at(1);
-  return sdl
-    .replace(QUERY_EXTENSION, "")
-    .replace(QUERY_BLOCK, (_, block: string) => `${block}\n${fields}\n}`);
+  return foldExtensions(
+    sdl
+      .replace(EXTENSION_BLOCK, "")
+      .replace(target, (_, block: string) => `${block}\n${fields}\n}`),
+  );
 };
 
-writeFileSync(
-  SCHEMA_PATH,
-  `${spliceQueryExtension(createExampleProvider().sdl)}\n`,
-);
+writeFileSync(SCHEMA_PATH, `${foldExtensions(createExampleProvider().sdl)}\n`);
 
 console.info(`[schema] wrote ${SCHEMA_PATH}`);

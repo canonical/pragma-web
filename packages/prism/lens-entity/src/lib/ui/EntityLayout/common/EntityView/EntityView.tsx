@@ -2,11 +2,13 @@
 
 import { RendererSwitch, useRenderers } from "@canonical/prism-core";
 import type { ReactElement } from "react";
+import { DEFAULT_LIST_RENDERERS } from "../../../../constants.js";
 import type { EntityViewProps } from "./types.js";
 
 /**
  * The strip's view tenant: the renderers the page offers, the index's list
- * renderers or an entity page's page renderers, as core's switch of links,
+ * renderers (the table alone where the lens declares none) or an entity
+ * page's page renderers, as core's switch of links,
  * the one the address names current. A page that offers one renderer draws
  * no switch.
  *
@@ -19,7 +21,7 @@ export default function EntityView({
   kind,
   renderers,
 }: EntityViewProps): ReactElement {
-  const list = useRenderers("list", renderers?.list);
+  const list = useRenderers("list", renderers?.list ?? DEFAULT_LIST_RENDERERS);
   const page = useRenderers("page", renderers?.page);
   const { offered, active } = kind === "list" ? list : page;
   return <RendererSwitch active={active.name} renderers={offered} />;

@@ -134,17 +134,55 @@ describe("CatalogList", () => {
   );
 
   it(
-    "lists its rows in two lines, each block's summary under its title",
+    "lists each tier as two-line rows, the catalog leaving every value out",
     () => {
       const { container } = render(
         catalogPage(catalogRecords, createFetchSpy(), createCatalogRouter()),
       );
-      const rows = [...container.querySelectorAll(".ds.ui-block-row")];
-      const summaries = rows.flatMap((row) => [
-        ...row.querySelectorAll(":scope > .summary"),
-      ]);
-      expect(rows.length).toBeGreaterThan(0);
-      expect(summaries.length).toBeGreaterThan(0);
+      expect(container.querySelector(".ds.entity-table")).toBeNull();
+      const rows = [...container.querySelectorAll(".ds.entity-row")];
+      expect(rows).toHaveLength(7);
+      for (const row of rows) {
+        expect(row.querySelector(".summary")).not.toBeNull();
+      }
+    },
+    HARNESS_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "highlights the component the address selects, in the rows and the cards",
+    () => {
+      const tableView = render(
+        catalogPage(
+          catalogRecords,
+          createFetchSpy(),
+          createCatalogRouter(
+            "/components?select=ds%3Aglobal.component.button",
+          ),
+        ),
+      );
+      const selected = [
+        ...tableView.container.querySelectorAll('[aria-current="true"]'),
+      ];
+      expect(selected).toHaveLength(1);
+      expect(selected.at(0)?.textContent).toContain("Button");
+      expect(tableView.container.querySelector("input")).toBeNull();
+      tableView.unmount();
+      const cardsView = render(
+        catalogPage(
+          catalogRecords,
+          createFetchSpy(),
+          createCatalogRouter(
+            "/components?as=cards&select=ds%3Aglobal.component.button",
+          ),
+        ),
+      );
+      const current = [
+        ...cardsView.container.querySelectorAll('[aria-current="true"]'),
+      ];
+      expect(current).toHaveLength(1);
+      expect(current.at(0)).toHaveClass("entity-card");
+      expect(current.at(0)?.textContent).toContain("Button");
     },
     HARNESS_TEST_TIMEOUT_MS,
   );

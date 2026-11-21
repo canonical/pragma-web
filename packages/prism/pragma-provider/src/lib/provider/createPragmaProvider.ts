@@ -90,6 +90,7 @@ import {
   harvestPrefixes,
   resolveRefRoots,
 } from "../sources/index.js";
+import { extendWithList } from "../values/index.js";
 import { composeExtensions } from "./composeExtensions.js";
 import { printServedSdl } from "./printServedSdl.js";
 
@@ -178,7 +179,9 @@ export const createPragmaProvider = async (
       `[graphql] the site lens names ${iri}, which the graph does not declare; its entry is not served.`,
     );
   }
-  const schema = extendWithLens(api.schema, lensIndex);
+  // `Node.values` and `Query.facetedInstances` read the lens, so they are
+  // served on the schema that carries it.
+  const schema = extendWithList(extendWithLens(api.schema, lensIndex));
   const classEdges = await countClassEdges(query, outline);
   // Built once, here, from the served schema itself: what search matches
   // is exactly what `_meta` serves, and a node that fails to read fails the

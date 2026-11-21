@@ -7,12 +7,19 @@ import {
   FilterFold,
   FilterSheet,
   ModeStrip,
+  useViewLocation,
   VIEW_PARAMS,
 } from "@canonical/prism-core";
 import { useRouterState, useSearchParam } from "@canonical/router-react";
 import type { ReactElement } from "react";
-import { ENTITY_ROUTE_SUFFIX } from "../../constants.js";
 import {
+  DEFAULT_BAR_FACETS,
+  ENTITY_ROUTE_SUFFIX,
+  FACET_VALUE_SEPARATOR,
+} from "../../constants.js";
+import selectFacetParams from "../../selectFacetParams.js";
+import {
+  EntityFacets,
   EntitySearch,
   EntityStatus,
   EntityView,
@@ -21,6 +28,17 @@ import {
 } from "./common/index.js";
 import type { EntityLayoutProps } from "./types.js";
 
+/** How many facet values the address applies, over every facet param. */
+const countFacetValues = (search: object): number =>
+  selectFacetParams(search).reduce(
+    (sum, name) =>
+      sum +
+      String(Reflect.get(search, name))
+        .split(FACET_VALUE_SEPARATOR)
+        .filter((value) => value !== "").length,
+    0,
+  );
+
 /**
  * The entity lens's page layout: the site's rail and colophon around the
  * routed page, with the strip carrying the breadcrumb trail, the page's
@@ -28,8 +46,13 @@ import type { EntityLayoutProps } from "./types.js";
  * count of entries shown when the lens places its filters in the bar (in
  * the panel they are the index's, and the strip shows the same count only
  * below two groups, where the panel is not displayed), and the fold below
- * two groups. The index's sheet holds the search and the count below two
- * groups, opened through the address (`sheet=filter`).
+ * two groups, counting the facet values and the search the address
+ * applies. Where the lens places its filters in the bar and its class has
+ * facets, the facet bar under the strip holds the first `barFacets` of
+ * them (three by default), folding the rest under "More filters". The
+ * index's sheet holds the count, the search and every facet with its
+ * counts and the applied chips, opened through the address
+ * (`sheet=filter`).
  *
  * The search text and the renderer live in the address, so the strip and
  * the index in the canvas, siblings, read the same state without sharing
@@ -55,6 +78,7 @@ export default function EntityLayout({
   label,
   renderers,
   filters = DEFAULT_FILTER_PLACEMENT,
+  barFacets = DEFAULT_BAR_FACETS,
   ...props
 }: EntityLayoutProps): ReactElement {
   const { match } = useRouterState();
@@ -65,6 +89,8 @@ export default function EntityLayout({
   const text = useSearchParam(VIEW_PARAMS.query) ?? "";
   const sheetOpen = useSearchParam(VIEW_PARAMS.sheet) === FILTER_SHEET;
   const inBar = filters === "bar";
+  const { search } = useViewLocation();
+  const applied = countFacetValues(search) + (text === "" ? 0 : 1);
   const count = (
     <SocketGuard>
       <EntityStatus binding={binding} />
@@ -74,21 +100,32 @@ export default function EntityLayout({
     <DocumentLayout
       {...props}
       strip={
-        <ModeStrip
-          count={onIndex ? count : null}
-          countFolded={!inBar}
-          fold={onIndex ? <FilterFold count={text === "" ? 0 : 1} /> : null}
-          search={onIndex && inBar ? <EntitySearch /> : null}
-          trail={<Trail binding={binding} label={label} />}
-          view={
-            onIndex || onEntity ? (
-              <EntityView
-                kind={onIndex ? "list" : "page"}
-                renderers={renderers}
+        <>
+          <ModeStrip
+            count={onIndex ? count : null}
+            countFolded={!inBar}
+            fold={onIndex ? <FilterFold count={applied} /> : null}
+            search={onIndex && inBar ? <EntitySearch /> : null}
+            trail={<Trail binding={binding} label={label} />}
+            view={
+              onIndex || onEntity ? (
+                <EntityView
+                  kind={onIndex ? "list" : "page"}
+                  renderers={renderers}
+                />
+              ) : null
+            }
+          />
+          {onIndex && inBar ? (
+            <SocketGuard>
+              <EntityFacets
+                barFacets={barFacets}
+                binding={binding}
+                placement="bar"
               />
-            ) : null
-          }
-        />
+            </SocketGuard>
+          ) : null}
+        </>
       }
     >
       {children}
@@ -98,6 +135,9 @@ export default function EntityLayout({
             <>
               {count}
               <EntitySearch />
+              <SocketGuard>
+                <EntityFacets binding={binding} placement="sheet" />
+              </SocketGuard>
             </>
           ) : null}
         </FilterSheet>

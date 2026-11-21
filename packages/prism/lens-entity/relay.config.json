@@ -14,7 +14,8 @@
       "schemaConfig": {
         "nodeInterfaceIdField": "uri",
         "nodeInterfaceIdVariableName": "id"
-      }
+      },
+      "schemaExtensions": ["projections/schema"]
     },
     "lens-entity": {
       "base": "prism-projections",

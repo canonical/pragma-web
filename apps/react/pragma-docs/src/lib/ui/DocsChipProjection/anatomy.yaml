@@ -5,9 +5,9 @@
 # matrix: one EntityChip per type, each type filling the slots it has).
 # It renders no element of its own: the case its node's type selects
 # renders the root. A design-system type reads through the site's own
-# projection; every other type through the package's dispatcher, which
-# takes ontology classes through their arm and any other node through its
-# Node arm. The cases are the site composite's aliased arms (the
+# projection; an ontology class through the package's class arm; any
+# other node through the package's Node arm (its arms, not its dispatcher,
+# which reaches this one through the site slot). The cases are the site composite's aliased arms (the
 # DOCS_<FORM>_TYPES constant), by the same names; the three UI-block types share one projection.
 node:
   uri: docs.component.docs_chip_projection
@@ -42,7 +42,11 @@ node:
               projection:
                 on: CodeStandard
           - node:
-              uri: prism.component.chip_projection
+              uri: prism.component.ontology_class_chip
+              projection:
+                on: OntologyClass
+          - node:
+              uri: prism.component.node_chip
               projection:
                 on: Node
       relation:

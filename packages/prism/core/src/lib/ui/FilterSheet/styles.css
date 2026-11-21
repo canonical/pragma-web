@@ -4,8 +4,9 @@
 
 @layer ds.components.global {
   /* A non-modal dialog over the whole viewport, on the page's background:
-   * the header, then the filters in a scrolling column. It is not
-   * displayed unless it is open below two groups. */
+   * the header, then the filters in a scrolling column. It is displayed
+   * only while it is open, at every width: the fold opens it below two
+   * groups, "More filters" wider. */
   .ds.filter-sheet {
     --filter-sheet-stack: 1;
     --filter-sheet-padding-block: var(--component-padding-block);
@@ -74,10 +75,7 @@
     min-block-size: 0;
   }
 
-  /* Below two groups the open sheet is displayed. */
-  @container shell (width < 912px) {
-    .ds.filter-sheet[open] {
-      display: flex;
-    }
+  .ds.filter-sheet[open] {
+    display: flex;
   }
 }

@@ -113,6 +113,7 @@ describe("InterchangeCard", () => {
       ["platformCount", "8"],
       ["inZone", "Central Zone"],
       ["servesLine", "North Line, Circle Line, Coastal Line"],
+      ["location", "51.5, -0.1"],
       ["transferMinutes", "4 minutes"],
     ]);
     for (const slot of [".address", ".kind", ".status", ".specimen"]) {
@@ -132,6 +133,7 @@ describe("InterchangeCard", () => {
         transferMinutes: null,
         inZone: null,
         servesLine: [],
+        location: null,
         _meta: { ...MOCK_INTERCHANGE._meta, definition: null },
       },
     );

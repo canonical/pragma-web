@@ -1,6 +1,10 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { CardProjection, requireArmKey } from "@canonical/prism-projections";
+import {
+  NodeCard,
+  OntologyClassCard,
+  requireArmKey,
+} from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { UIBlockCard } from "#domains/components/lib";
@@ -12,8 +16,8 @@ import type { DocsCardProjectionProps } from "./types.js";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields DocsCardProjection reads from the Node it dispatches: its
- * typename; the package's card switch, spread aliased as `Node`, for
- * every type the site does not project itself; and the arm of each
+ * typename; the package's `Node` arm, spread aliased as `Node`, for
+ * every type no other arm takes; the package's ontology class arm; and the arm of each
  * design-system type, aliased by the type it is on. The three UI-block
  * types share one arm, each narrowed by an inline fragment, so each alias
  * holds a key for its own type alone.
@@ -21,7 +25,8 @@ import type { DocsCardProjectionProps } from "./types.js";
 const declareNodeFragment = (): unknown => graphql`
   fragment DocsCardProjection_node on Node {
     __typename
-    ...CardProjection_node @alias(as: "Node")
+    ...NodeCard_node @alias(as: "Node")
+    ...OntologyClassCard_node @alias(as: "OntologyClass")
     ... on Component @alias(as: "Component") {
       ...UIBlockCard_node
     }
@@ -44,9 +49,11 @@ void declareNodeFragment;
  * explicit switch, the cases being `DOCS_CARD_TYPES`: a component, a pattern
  * or a layout renders through `UIBlockCard`, a modifier through
  * `ModifierCard`, a modifier family through `ModifierFamilyCard` and a
- * code standard through `CodeStandardCard`; every other node through the
- * package's `CardProjection`, which renders an ontology class through its
- * own arm and any other node through its `Node` arm.
+ * code standard through `CodeStandardCard`; an ontology class through the
+ * package's class arm, `OntologyClassCard`; every other node through the
+ * package's `Node` arm, `NodeCard`. It spreads the package's arms, not its
+ * switch: the package's switch reaches this one through the site slot, so
+ * spreading it here would make a fragment cycle.
  *
  * It renders no element of its own: the arm renders the root, a `<div>`,
  * and every native prop reaches it.
@@ -104,7 +111,14 @@ export default function DocsCardProjection({
           node={requireArmKey(data.CodeStandard, data.__typename)}
         />
       );
+    case "OntologyClass":
+      return (
+        <OntologyClassCard
+          {...props}
+          node={requireArmKey(data.OntologyClass, data.__typename)}
+        />
+      );
     default:
-      return <CardProjection {...props} node={data.Node} />;
+      return <NodeCard {...props} node={data.Node} />;
   }
 }

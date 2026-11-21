@@ -31,4 +31,9 @@ export interface StopFacts {
   readonly inZone?: Titled | null;
   /** The lines that call at the station. */
   readonly servesLine: readonly Titled[];
+  /** Where the station stands, null when the graph asserts no place. */
+  readonly location?: {
+    readonly latitude: number;
+    readonly longitude: number;
+  } | null;
 }

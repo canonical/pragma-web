@@ -9,6 +9,7 @@
     "**/__generated__/**",
     "packages/prism/*/src/**/*.test.tsx",
     "packages/prism/*/src/**/*.stories.tsx",
+    "packages/prism/projections/src/lib/site/**",
     "**/dist/**"
   ],
   "projects": {

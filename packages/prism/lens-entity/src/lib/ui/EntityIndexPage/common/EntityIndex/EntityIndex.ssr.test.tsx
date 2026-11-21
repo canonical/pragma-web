@@ -6,6 +6,7 @@ import createEntitySite from "../../../../../../testing/createEntitySite.js";
 import createWarmEnvironment from "../../../../../../testing/createWarmEnvironment.js";
 import {
   ENTITY_TEST_TIMEOUT_MS,
+  LIST_RENDERERS,
   STATIONS_BINDING,
 } from "../../../../../../testing/fixtures.js";
 import EntityIndex from "./EntityIndex.js";
@@ -19,7 +20,9 @@ describe("EntityIndex on the server", () => {
       createEntitySite({
         url: "/stations?as=cards",
         environment,
-        children: <EntityIndex binding={STATIONS_BINDING} />,
+        children: (
+          <EntityIndex binding={STATIONS_BINDING} renderers={LIST_RENDERERS} />
+        ),
       }),
     );
     expect(html).toContain('class="ds entity-index" data-renderer="cards"');

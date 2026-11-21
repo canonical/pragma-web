@@ -5,12 +5,12 @@ import type { EntityIndex_query$key } from "../../../../__generated__/EntityInde
 import entityIndexFragmentNode from "../../../../__generated__/EntityIndex_query.graphql.js";
 import type { EntityIndexQuery } from "../../../../__generated__/EntityIndexQuery.graphql.js";
 import entityIndexQueryNode from "../../../../__generated__/EntityIndexQuery.graphql.js";
-import buildEntityIndexVariables from "../../../buildEntityIndexVariables.js";
 import matchesEntityText from "../../../matchesEntityText.js";
 import type {
   UseIndexStripQueryProps,
   UseIndexStripQueryResult,
 } from "./types.js";
+import useIndexVariables from "./useIndexVariables.js";
 
 /**
  * Read what the strip's status states: how many instances the bound class
@@ -31,19 +31,31 @@ import type {
 export default function useIndexStripQuery(
   binding: UseIndexStripQueryProps,
 ): UseIndexStripQueryResult {
+  const variables = useIndexVariables(binding);
   const query = useLazyLoadQuery<EntityIndexQuery>(
     entityIndexQueryNode,
-    buildEntityIndexVariables(binding),
+    variables,
   );
-  const { ontologyClass } = useFragment<EntityIndex_query$key>(
-    entityIndexFragmentNode,
-    query,
-  );
+  const { ontologies, ontologyClass, facetedInstances } =
+    useFragment<EntityIndex_query$key>(entityIndexFragmentNode, query);
   const text = useSearchParam(VIEW_PARAMS.query) ?? "";
-  const edges = ontologyClass?.instances.edges ?? [];
+  const filters = variables.filters ?? [];
   return {
     count: ontologyClass?.instanceCount ?? 0,
-    visible: edges.filter(({ node }) => matchesEntityText(text, node._meta))
-      .length,
+    total: ontologyClass?.instanceCount ?? 0,
+    facets: facetedInstances.facets.map(({ field, label, values }) => ({
+      field,
+      label,
+      values: values.map((value) => ({
+        value: value.value ?? null,
+        label: value.label ?? null,
+        count: value.count,
+      })),
+    })),
+    applied: filters,
+    namespaces: ontologies,
+    visible: facetedInstances.edges.filter(({ node }) =>
+      matchesEntityText(text, node._meta),
+    ).length,
   };
 }

@@ -10,8 +10,12 @@
  * 1440, the stations index's count whole beside the filter button at 448,
  * the count ending on the band's last
  * line, the facet bar
- * one band of the strip's height only where a lens has facets, its
- * controls inside the band, a panel's count in the strip only below two
+ * one band of the strip's height only where a lens has facets, kept in
+ * place as the canvas scrolls, its controls inside the band and starting
+ * under Search, a chip applied in the sheet showing on the bar's button
+ * or, below 1376px, the bar holding "More filters" alone, the filtered
+ * stations' count reading the rows shown, the sheet listing the facets
+ * with their counts at 390, a panel's count in the strip only below two
  * groups, the folded
  * renderer menu's options as links that change only `as`, each a full
  * target, the folded sheet covering a phone's viewport, and no link to the
@@ -75,6 +79,12 @@ const STRIP_PATHS = [
   WORKSPACE_PATH,
   "/not-found",
 ] as const;
+
+/** The stations index with "Line is Circle Line" applied. */
+const CIRCLE_PATH = `/stations?servesLine=${encodeURIComponent(CIRCLE_LINE_CURIE)}`;
+
+/** How many of the 26 stations the Circle Line serves. */
+const CIRCLE_STATIONS = 6;
 
 /** The indexes whose count closes the strip's filtering group. */
 const COUNTED_PATHS = ["/stations", "/stations?q=cen"] as const;
@@ -210,45 +220,78 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
   });
 
   it("draws the facet bar as one 53px band only where the lens has facets", async () => {
-    expect((await measure("/stations")).bar).toBeNull();
-    const bar = (await measure(WORKSPACE_PATH)).bar;
-    if (viewport.width >= 912) {
-      expect(Math.abs((bar ?? 0) - STRIP_HEIGHT_PX)).toBeLessThanOrEqual(
-        BAND_TOLERANCE_PX,
-      );
-    } else {
-      expect(bar).toBeNull();
+    expect((await measure("/lines")).bar).toBeNull();
+    for (const path of ["/stations", CIRCLE_PATH, WORKSPACE_PATH]) {
+      const bar = (await measure(path)).bar;
+      if (viewport.width >= 912) {
+        expect(
+          Math.abs((bar ?? 0) - STRIP_HEIGHT_PX),
+          path,
+        ).toBeLessThanOrEqual(BAND_TOLERANCE_PX);
+      } else {
+        expect(bar, path).toBeNull();
+      }
     }
   });
 
-  it.runIf(viewport.width === 1366 || viewport.width === 912)(
-    "keeps the facet bar's controls inside the band, a chip applied",
+  // A chip is applied in the sheet (ruling 74). From 1376px up the bar's
+  // own button shows it pressed; below, the bar holds "More filters" alone
+  // (ruling 72). Either way the bar stays one 53px band.
+  it.runIf(viewport.width >= 912)(
+    "applies a chip in the sheet and keeps the facet bar one band",
     async () => {
-      const page = await open(WORKSPACE_PATH);
+      const page = await open(`${WORKSPACE_PATH}?sheet=filter`);
       try {
-        const states = [await page.evaluate(measureStrip)];
         const chip = await page
-          .locator('[data-region="filter-bar"] button[aria-pressed="false"]')
+          .locator(
+            '[data-region="filter-sheet"][open] button[aria-pressed="false"]',
+          )
           .first()
           .elementHandle();
-        if (chip !== null) {
-          await expect
-            .poll(
-              async () => {
-                await chip.click();
-                return chip.getAttribute("aria-pressed");
-              },
-              { timeout: PAGE_SETTLE_MS },
-            )
-            .not.toBe("false");
-          states.push(await page.evaluate(measureStrip));
-        }
-        for (const strip of states) {
-          expect(strip.barOverflow).toBe(false);
-          expect(strip.controlsRight).not.toBeNull();
-          expect(strip.controlsRight ?? 0).toBeLessThanOrEqual(
-            (strip.contentEnd ?? 0) + EDGE_TOLERANCE_PX,
+        expect(chip).not.toBeNull();
+        const name = (await chip?.textContent()) ?? "";
+        await expect
+          .poll(
+            async () => {
+              await chip?.click();
+              return chip?.getAttribute("aria-pressed");
+            },
+            { timeout: PAGE_SETTLE_MS },
+          )
+          .toBe("true");
+        const strip = await page.evaluate(measureStrip);
+        expect(
+          Math.abs((strip.bar ?? 0) - STRIP_HEIGHT_PX),
+        ).toBeLessThanOrEqual(BAND_TOLERANCE_PX);
+        expect(strip.barOverflow).toBe(false);
+        expect(strip.controlsRight ?? 0).toBeLessThanOrEqual(
+          (strip.contentEnd ?? 0) + EDGE_TOLERANCE_PX,
+        );
+        const bar = await page.evaluate((text) => {
+          const controls = document.querySelector(
+            '[data-region="filter-bar"] > .controls',
           );
+          const shown = [...(controls?.children ?? [])]
+            .filter((slot) => getComputedStyle(slot).display !== "none")
+            .map((slot) => slot.getAttribute("data-slot"));
+          const own = [
+            ...(controls?.querySelectorAll<HTMLButtonElement>(
+              '[data-slot="facets"] button',
+            ) ?? []),
+          ].find((button) => button.textContent === text);
+          return {
+            x: controls?.getBoundingClientRect().x ?? null,
+            shown,
+            pressed: own?.getAttribute("aria-pressed") ?? null,
+          };
+        }, name);
+        // From two groups up the controls start under Search.
+        expect(bar.x).not.toBeNull();
+        expect(bar.x ?? 0).toBeCloseTo(strip.groups.filtering?.x ?? -1, 0);
+        if (viewport.width >= 1376) {
+          expect(bar.pressed).toBe("true");
+        } else {
+          expect(bar.shown).toEqual(["more"]);
         }
       } finally {
         await page.close();
@@ -436,6 +479,123 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
         expect(sheet.open).toBe(true);
         expect(sheet.width).toBeCloseTo(viewport.width, 0);
         expect(sheet.height).toBeCloseTo(viewport.height, 0);
+        expect(sheet.scrolls).toBe(false);
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
+  it.runIf(viewport.width >= 912)(
+    "keeps the stations' facet bar in place as the canvas scrolls",
+    async () => {
+      const page = await open("/stations");
+      try {
+        const tops = await page.evaluate(async () => {
+          const bar = document.querySelector('[data-region="filter-bar"]');
+          const before = bar?.getBoundingClientRect().top ?? null;
+          for (const region of document.querySelectorAll(".canvas")) {
+            region.scrollTop = region.scrollHeight;
+          }
+          window.scrollTo(0, document.body.scrollHeight);
+          await new Promise(requestAnimationFrame);
+          return { before, after: bar?.getBoundingClientRect().top ?? null };
+        });
+        expect(tops.before).not.toBeNull();
+        expect(tops.after).toBe(tops.before);
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
+  // The facet bar's controls start under Search; below 1376px the bar
+  // holds "More filters" alone (ruling 72) and the applied facet shows on
+  // its button from 1376px up (ruling 74). The count reads the rows shown.
+  it.runIf(viewport.width >= 912)(
+    "starts the facet controls under Search, Line is Circle Line applied",
+    async () => {
+      const page = await open(CIRCLE_PATH);
+      try {
+        const strip = await page.evaluate(measureStrip);
+        const bar = await page.evaluate(() => {
+          const controls = document.querySelector(
+            '[data-region="filter-bar"] > .controls',
+          );
+          return {
+            x: controls?.getBoundingClientRect().x ?? null,
+            shown: [...(controls?.children ?? [])]
+              .filter((slot) => getComputedStyle(slot).display !== "none")
+              .map((slot) => slot.getAttribute("data-slot")),
+            applied: [
+              ...(controls?.querySelectorAll("summary.button.is-applied") ??
+                []),
+            ].map((button) => button.textContent),
+            rows: document.querySelectorAll("tr.row").length,
+          };
+        });
+        expect(bar.x).not.toBeNull();
+        expect(bar.x ?? 0).toBeCloseTo(strip.groups.filtering?.x ?? -1, 0);
+        expect(strip.barOverflow).toBe(false);
+        expect(
+          Math.abs((strip.bar ?? 0) - STRIP_HEIGHT_PX),
+        ).toBeLessThanOrEqual(BAND_TOLERANCE_PX);
+        if (viewport.width >= 1376) {
+          expect(bar.shown).toEqual(["facets"]);
+          expect(bar.applied).toHaveLength(1);
+          expect(bar.applied.at(0)).toContain("Circle Line");
+        } else {
+          expect(bar.shown).toEqual(["more"]);
+        }
+        expect(bar.rows).toBe(CIRCLE_STATIONS);
+        await expect
+          .poll(() =>
+            page
+              .getByRole("status", {
+                name: `${CIRCLE_STATIONS} of 26 entries`,
+              })
+              .count(),
+          )
+          .toBe(1);
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
+  it.runIf(viewport.width === 390)(
+    "lists the facets with their counts in the sheet, nothing sideways",
+    async () => {
+      const page = await open(`${CIRCLE_PATH}&sheet=filter`);
+      try {
+        const sheet = await page.evaluate(() => {
+          const dialog = document.querySelector(
+            '[data-region="filter-sheet"][open]',
+          );
+          return {
+            facets: [...(dialog?.querySelectorAll("section.facet") ?? [])].map(
+              (facet) => ({
+                heading: facet.querySelector(".heading")?.textContent ?? "",
+                counts: [...facet.querySelectorAll(".option-count")].map(
+                  (count) => Number(count.textContent),
+                ),
+              }),
+            ),
+            chips: dialog?.querySelectorAll(".chip").length ?? 0,
+            scrolls:
+              document.documentElement.scrollWidth >
+              document.documentElement.clientWidth,
+          };
+        });
+        // The stations' line, zone and kind facets, each value counted.
+        expect(sheet.facets).toHaveLength(3);
+        for (const { heading, counts } of sheet.facets) {
+          expect(heading).not.toBe("");
+          expect(counts.length).toBeGreaterThan(0);
+          expect(counts.every(Number.isInteger)).toBe(true);
+          expect(Math.max(...counts)).toBeGreaterThan(0);
+        }
+        expect(sheet.chips).toBe(1);
         expect(sheet.scrolls).toBe(false);
       } finally {
         await page.close();

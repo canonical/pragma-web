@@ -205,34 +205,64 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
-  it.runIf(viewport.width === 1366 || viewport.width === 912)(
-    "keeps the facet bar's controls inside the band, a chip applied",
+  // A chip is applied in the sheet (ruling 74). From 1376px up the bar's
+  // own button shows it pressed; below, the bar holds "More filters" alone
+  // (ruling 72). Either way the bar stays one 53px band.
+  it.runIf(viewport.width >= 912)(
+    "applies a chip in the sheet and keeps the facet bar one band",
     async () => {
-      const page = await open(WORKSPACE_PATH);
+      const page = await open(`${WORKSPACE_PATH}?sheet=filter`);
       try {
-        const states = [await page.evaluate(measureStrip)];
         const chip = await page
-          .locator('[data-region="filter-bar"] button[aria-pressed="false"]')
+          .locator(
+            '[data-region="filter-sheet"][open] button[aria-pressed="false"]',
+          )
           .first()
           .elementHandle();
-        if (chip !== null) {
-          await expect
-            .poll(
-              async () => {
-                await chip.click();
-                return chip.getAttribute("aria-pressed");
-              },
-              { timeout: PAGE_SETTLE_MS },
-            )
-            .not.toBe("false");
-          states.push(await page.evaluate(measureStrip));
-        }
-        for (const strip of states) {
-          expect(strip.barOverflow).toBe(false);
-          expect(strip.controlsRight).not.toBeNull();
-          expect(strip.controlsRight ?? 0).toBeLessThanOrEqual(
-            (strip.contentEnd ?? 0) + EDGE_TOLERANCE_PX,
+        expect(chip).not.toBeNull();
+        const name = (await chip?.textContent()) ?? "";
+        await expect
+          .poll(
+            async () => {
+              await chip?.click();
+              return chip?.getAttribute("aria-pressed");
+            },
+            { timeout: PAGE_SETTLE_MS },
+          )
+          .toBe("true");
+        const strip = await page.evaluate(measureStrip);
+        expect(
+          Math.abs((strip.bar ?? 0) - STRIP_HEIGHT_PX),
+        ).toBeLessThanOrEqual(BAND_TOLERANCE_PX);
+        expect(strip.barOverflow).toBe(false);
+        expect(strip.controlsRight ?? 0).toBeLessThanOrEqual(
+          (strip.contentEnd ?? 0) + EDGE_TOLERANCE_PX,
+        );
+        const bar = await page.evaluate((text) => {
+          const controls = document.querySelector(
+            '[data-region="filter-bar"] > .controls',
           );
+          const shown = [...(controls?.children ?? [])]
+            .filter((slot) => getComputedStyle(slot).display !== "none")
+            .map((slot) => slot.getAttribute("data-slot"));
+          const own = [
+            ...(controls?.querySelectorAll<HTMLButtonElement>(
+              '[data-slot="facets"] button',
+            ) ?? []),
+          ].find((button) => button.textContent === text);
+          return {
+            x: controls?.getBoundingClientRect().x ?? null,
+            shown,
+            pressed: own?.getAttribute("aria-pressed") ?? null,
+          };
+        }, name);
+        // From two groups up the controls start under Search.
+        expect(bar.x).not.toBeNull();
+        expect(bar.x ?? 0).toBeCloseTo(strip.groups.filtering?.x ?? -1, 0);
+        if (viewport.width >= 1376) {
+          expect(bar.pressed).toBe("true");
+        } else {
+          expect(bar.shown).toEqual(["more"]);
         }
       } finally {
         await page.close();

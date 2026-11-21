@@ -12,11 +12,16 @@ import createEntitySite from "../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import {
   ENTITY_TEST_TIMEOUT_MS,
+  LIST_RENDERERS,
   STATIONS_BINDING,
 } from "../../../testing/fixtures.js";
 import renderServerMarkup from "../../../testing/renderServerMarkup.js";
 
-const LAYOUT = { binding: STATIONS_BINDING, label: "Stations" } as const;
+const LAYOUT = {
+  binding: STATIONS_BINDING,
+  label: "Stations",
+  renderers: LIST_RENDERERS,
+} as const;
 
 afterEach(() => {
   vi.restoreAllMocks();
