@@ -354,8 +354,13 @@ type Query {
   classEdges: [ClassEdge!]!
   "The prose authored for the entity `uri` names (an absolute IRI), or null when it has none."
   prose(uri: ID!): Prose
-  "Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en."
-  search(text: String!, first: Int, after: String): NodeConnection!
+  "Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en. `types` keeps the matches whose type (their `_meta.type`) is one of the IRIs given; null or empty keeps every type. An instance of a hidden class is never a match."
+  search(
+    text: String!
+    first: Int
+    after: String
+    types: [ID!]
+  ): SearchConnection!
   "The statements whose subject is `uri` (an absolute IRI), as Turtle with the provider's prefixes, or null when the graph holds none."
   source(uri: ID!): String
   "The instances of the class `classUri` names that `filters` keep, in `sort`'s order (the IRIs' without one), with their number and the facets of the class's list fields and of its kind."
@@ -578,6 +583,54 @@ type Facet {
   field: String!
   label: String!
   values: [FacetValue!]!
+}
+
+"A page of search results, ranked best first."
+type SearchConnection {
+  "The page's results, in rank order."
+  edges: [SearchEdge!]!
+  "Cursor pagination over the ranked results."
+  pageInfo: PageInfo!
+  "Every match after the `types` filter, before paging."
+  total: Int!
+  "One entry per type with matches, counted without the `types` filter, most matches first."
+  facets: [TypeFacet!]!
+}
+
+"One search result with its cursor and its match."
+type SearchEdge {
+  "The result: an instance, or an OntologyClass."
+  node: Node!
+  "Opaque cursor for `after`."
+  cursor: String!
+  "Where the search text matched the result."
+  match: SearchMatch!
+}
+
+"Where the search text matched a result."
+type SearchMatch {
+  "The predicate the match is in, as a CURIE, or `uri` when the text matched the result's CURIE."
+  field: String!
+  "The matched value, or at most 160 characters of it around the first occurrence."
+  passage: String!
+  "Every occurrence of the search text lying wholly inside the passage."
+  ranges: [MatchRange!]!
+}
+
+"One occurrence of the search text in a passage."
+type MatchRange {
+  "Offset of the occurrence from the passage's start, in UTF-16 code units."
+  start: Int!
+  "Length of the occurrence, in UTF-16 code units."
+  length: Int!
+}
+
+"The number of matches of one type."
+type TypeFacet {
+  "The type the matches are counted under: the result's `_meta.type`."
+  type: OntologyClass!
+  "Every match of this type, before paging."
+  count: Int!
 }
 
 "A page of a faceted set, the set's size and its facets."
