@@ -259,4 +259,9 @@ export const FRENCH: DataViewsMessages = {
 
   chartRenderer: "Graphique",
   tableRenderer: "Tableau",
+
+  eventsHidden: (events) =>
+    `${count(events)} ${plural(events, "masqué", "masqués")}`,
+  showMoreEvents: (events) => `Afficher ${count(events)} de plus`,
+  showAllEvents: "Tout afficher",
 };
