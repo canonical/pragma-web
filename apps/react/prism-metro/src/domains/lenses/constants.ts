@@ -23,11 +23,13 @@ export const STATIONS_LENS = {
 /**
  * The lines lens in the rail: its label and its place, second. Its index
  * places its filters (the count and the search) in a panel beside the
- * list.
+ * list. Its table leaves out the line's colour, a code no reader reads as
+ * text: the line's mark carries it, and a table's row draws no mark.
  */
 export const LINES_LENS = {
   label: MESSAGES["lens.lines"],
   order: 2,
   filters: "panel",
   renderers: METRO_LIST_RENDERERS,
+  tableOmits: ["colour"],
 } as const satisfies EntityLensOptions;
