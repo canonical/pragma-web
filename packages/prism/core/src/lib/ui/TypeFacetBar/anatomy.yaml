@@ -1,3 +1,4 @@
+---
 # TypeFacetBar — the Type facet of an index of mixed types, open as the
 # second band under the strip (FilterBar's band: the strip's height, one
 # muted rule beneath, 36 + 2 x 8 + 1 = 53px at the default density). Its
@@ -8,16 +9,22 @@
 # Every decision is read through a component token declared on the root
 # (`--type-facet-bar-*`), bound to the symbol named here.
 #
-# Token ledger: none.
+# Token ledger:
+#   --type-facet-bar-divider-width: 1px  the hairline below the band.
 node:
   uri: prism.component.type_facet_bar
   styles:
+    layout.grid.column: "1 / -1"
     layout.type: flex
     layout.align: center
     spacing.gap: grid.gutter
-    size.min.height: density.line_height
-    spacing.internal.block: component.padding.block
-    border.block.end: color.border.muted
+    layout.boxSizing: content-box
+    size.min.block: density.line.height
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.bottom.color: color.border.muted
   edges:
     - node:
         role: label

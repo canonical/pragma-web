@@ -20,9 +20,9 @@
     box-sizing: content-box;
     min-block-size: var(--type-facet-bar-min-block-size);
     padding-block: var(--type-facet-bar-padding-block);
-    border-block-end-width: var(--type-facet-bar-divider-width);
-    border-block-end-style: solid;
-    border-block-end-color: var(--type-facet-bar-divider-color);
+    border-bottom-width: var(--type-facet-bar-divider-width);
+    border-bottom-style: solid;
+    border-bottom-color: var(--type-facet-bar-divider-color);
   }
 
   .ds.type-facet-bar .label {

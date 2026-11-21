@@ -405,6 +405,12 @@ site's own catalog, and the factory holds no reader-facing string.
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
   `ThemeSelectorProps`, `KeyValueListProps`, `KeyValuePair`,
   `NotFoundBodyProps`.
+- Index bands: `TypeFacetBar` (the Type facet of an index of mixed types,
+  open as a band under the strip: each type with its count, a type no
+  result has greyed and not linked, the applied one current) and
+  `PaginationBar` (the previous and next links of an index that pages,
+  an end without a page left out); types `TypeFacetBarProps`,
+  `TypeFacetValue`, `PaginationBarProps`.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
   lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
   show only the text that renders at 12px or more; types

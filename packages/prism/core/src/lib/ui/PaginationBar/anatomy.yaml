@@ -1,3 +1,4 @@
+---
 # PaginationBar — the pagination bar of PS17 V1 under an index that pages:
 # a link to the previous page when there is one, the page's position
 # ("21–40 of 41"), and a link to the next page when there is one. Links, so
@@ -16,7 +17,8 @@ node:
     layout.align: center
     layout.justify: space-between
     spacing.gap: grid.gutter
-    spacing.internal.block: component.padding.block
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
   edges:
     - node:
         role: previous
@@ -24,6 +26,8 @@ node:
     - node:
         role: position
         styles:
+          spacing.external.inline.start: auto
+          spacing.external.inline.end: auto
           typography.color: color.text.muted
           typography.variant.numeric: tabular-nums
       relation: { cardinality: "1", slotName: position }
