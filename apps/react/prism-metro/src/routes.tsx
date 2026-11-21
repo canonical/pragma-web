@@ -12,7 +12,9 @@ import {
 } from "#domains/lenses";
 import { homeLayout, homeRoutes } from "#domains/metro";
 import { networkLayout, networkRoutes } from "#domains/network";
+import { offerSearchRoutes } from "#domains/search";
 import { NotFoundPage } from "#lib/ui";
+import { SITE_EXTENSIONS } from "./extensions.js";
 
 /**
  * The page every URL no route matches renders, at its own `/not-found`: the
@@ -91,6 +93,9 @@ export const appRoutes = {
   fleetUnit,
   fleetCarType,
   fleetStock,
+  // The search page reads the provider's `search` extension, so the table
+  // lists it only when the site's provider serves that extension.
+  ...offerSearchRoutes(SITE_EXTENSIONS),
 } as const;
 
 /**

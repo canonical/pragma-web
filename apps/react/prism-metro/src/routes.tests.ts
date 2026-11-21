@@ -86,6 +86,10 @@ describe("appRoutes", () => {
     expect(match?.kind === "route" && match.name).toBe("fleetFormation");
   });
 
+  it("lists the search page, since the site's provider serves search", () => {
+    expect(router.buildPath("search")).toBe("/search");
+  });
+
   it("lands an unknown URL on the not-found route", () => {
     expect(router.match("/nowhere")?.kind).toBe("not-found");
   });

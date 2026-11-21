@@ -1,0 +1,26 @@
+/* Scaffolded by @canonical/summon-component:react v0.46.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* A page of the canvas: it spans every column of the page grid, its
+   * title, summary and results one gutter apart, and the results one
+   * gutter apart from each other. */
+  .ds.search-page {
+    --search-page-gap: var(--grid-gutter);
+
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--search-page-gap);
+
+    > .results {
+      display: flex;
+      flex-direction: column;
+      gap: var(--search-page-gap);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+  }
+}

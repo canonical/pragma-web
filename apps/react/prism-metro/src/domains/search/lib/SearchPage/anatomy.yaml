@@ -1,0 +1,44 @@
+---
+# SearchPage — the search route's page, in the document archetype's
+# canvas: its title (also the document's), a summary of how many results
+# match, then one entry per result in rank order: the result through the
+# site's chip switch over the passage of its value that holds the text.
+# It spans every column of the canvas's page grid; title, summary and list
+# sit one gutter apart, and so do the entries.
+#
+# Every decision is read through a component token declared on the root
+# (`--search-page-*`), bound to the symbol named here.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: metro.component.search_page
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: page title
+      relation: { cardinality: "1", slotName: title }
+    - node:
+        role: result summary
+      relation: { cardinality: "1", slotName: summary }
+    - node:
+        role: results
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              role: result
+            relation: { cardinality: "0..n", slotName: result }
+            edges:
+              - node:
+                  uri: metro.component.metro_chip_projection
+                relation: { cardinality: "1", slotName: node }
+              - node:
+                  role: passage
+                relation: { cardinality: "1", slotName: passage }
+      relation: { cardinality: "0..1", slotName: results }

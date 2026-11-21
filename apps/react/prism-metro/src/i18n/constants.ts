@@ -159,4 +159,9 @@ export const MESSAGES = {
     other: "{count} stations",
   },
   "notFound.title": "Page not found",
+  "search.title": "Search",
+  "search.results": { one: "{count} result", other: "{count} results" },
+  "search.none": "Nothing matches the search.",
+  "search.loading": "Searching…",
+  "search.error": "The search could not be answered. Try again in a moment.",
 } as const;
