@@ -206,7 +206,7 @@ describe("EntityDetail", () => {
     const referenced = container.querySelector("#referenced-by")?.parentElement;
     expect(
       [...(referenced?.querySelectorAll("h3") ?? [])].map((h) => h.textContent),
-    ).toEqual(["Has this as serves line · 6"]);
+    ).toEqual(["serves line (inverse) · 6"]);
     expect(container.textContent).not.toContain("property to");
   });
 

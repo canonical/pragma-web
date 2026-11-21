@@ -45,7 +45,7 @@ export const MESSAGES = {
   "relations.value": "to {range}, {cardinality}",
   "statements.group": "{label} · {count}",
   "statements.referencedBy": "Referenced by · {count}",
-  "statements.inverse": "Has this as {label}",
+  "statements.inverse": "{label} (inverse)",
   "statements.shown": "{shown} of {total} shown",
   "statements.nested": "A nested value",
 } as const;

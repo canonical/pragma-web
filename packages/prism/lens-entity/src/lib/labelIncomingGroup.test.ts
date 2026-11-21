@@ -5,7 +5,7 @@ import labelIncomingGroup from "./labelIncomingGroup.js";
 const SERVES_LINE = "https://metro.example/onto#servesLine";
 
 /** Words the entity's side as the catalog does. */
-const nameInverse = (label: string): string => `Has this as ${label}`;
+const nameInverse = (label: string): string => `${label} (inverse)`;
 
 describe("labelIncomingGroup", () => {
   it("names many holders by the property's inverse plural label", () => {
@@ -55,13 +55,13 @@ describe("labelIncomingGroup", () => {
         METRO_NAMESPACES,
         nameInverse,
       ),
-    ).toBe("Has this as serves line");
+    ).toBe("serves line (inverse)");
     expect(
       labelIncomingGroup(
         { predicateUri: SERVES_LINE, total: 2, predicate: undefined },
         METRO_NAMESPACES,
         nameInverse,
       ),
-    ).toBe("Has this as metro:servesLine");
+    ).toBe("metro:servesLine (inverse)");
   });
 });
