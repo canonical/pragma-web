@@ -32,4 +32,5 @@ export const MESSAGES = {
   "renderer.table": "Table",
   "renderer.cards": "Cards",
   "table.title": "Name",
+  "searchResultGroup.count": "· {count}",
 } as const;

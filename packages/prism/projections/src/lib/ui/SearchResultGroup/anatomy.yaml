@@ -1,0 +1,43 @@
+# SearchResultGroup — one type's results on a search page: a heading with
+# the type's name and its count ("Component · 6"), then its rows, which
+# are the site's dispatched rows in rank order. Heading and rows one gutter
+# apart.
+#
+# Every decision is read through a component token declared on the root
+# (`--search-result-group-*`), bound to the symbol named here.
+#
+# Token ledger: none.
+node:
+  uri: prism.component.search_result_group
+  styles:
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: heading
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+        edges:
+          - node:
+              role: title
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: count
+              styles:
+                typography.color: color.text.muted
+                typography.variant.numeric: tabular-nums
+            relation: { cardinality: "1", slotName: count }
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: rows
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: grid.gutter
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+      relation: { cardinality: "1", slotName: rows }
