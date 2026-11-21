@@ -7,10 +7,22 @@ import type { ModalProps } from "./types.js";
 
 /*
   jsdom 28 implements HTMLDialogElement but not the top layer: `showModal` and
-  `close` are absent. Stub them to toggle the `open` attribute, which is all the
-  component and these assertions depend on.
+  `close` are absent. Stub them to toggle the `open` attribute, track `:modal`
+  state, and dispatch toggle events.
 */
 beforeAll(() => {
+  const origMatches = Element.prototype.matches;
+  (
+    Element.prototype as unknown as {
+      matches: typeof Element.prototype.matches;
+    }
+  ).matches = function matches(this: Element, selector: string): boolean {
+    if (selector === ":modal" && this instanceof HTMLDialogElement) {
+      return Boolean((this as unknown as { __isModal?: boolean }).__isModal);
+    }
+    return origMatches.call(this, selector);
+  } as typeof Element.prototype.matches;
+
   if (!HTMLDialogElement.prototype.showModal) {
     HTMLDialogElement.prototype.showModal = function showModal(
       this: HTMLDialogElement,
@@ -24,6 +36,13 @@ beforeAll(() => {
         );
       }
       this.open = true;
+      (this as unknown as { __isModal?: boolean }).__isModal = true;
+      const toggle = new Event("toggle");
+      Object.defineProperties(toggle, {
+        newState: { value: "open" },
+        oldState: { value: "closed" },
+      });
+      this.dispatchEvent(toggle);
     };
   }
   if (!HTMLDialogElement.prototype.close) {
@@ -35,8 +54,15 @@ beforeAll(() => {
       // the return value the caller passed.
       if (!this.open) return;
       this.open = false;
+      (this as unknown as { __isModal?: boolean }).__isModal = false;
       if (returnValue !== undefined) this.returnValue = returnValue;
       this.dispatchEvent(new Event("close"));
+      const toggle = new Event("toggle");
+      Object.defineProperties(toggle, {
+        newState: { value: "closed" },
+        oldState: { value: "open" },
+      });
+      this.dispatchEvent(toggle);
     };
   }
 });
@@ -488,6 +514,109 @@ describe("Modal pattern", () => {
       );
       screen.getByText("Placeholder content").click();
       expect(container.querySelector("dialog")).toHaveAttribute("open");
+    });
+  });
+
+  describe("controlled open prop", () => {
+    it("opens when open prop is set to true", () => {
+      const { rerender, container } = render(
+        <Component open={false}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      expect(container.querySelector("dialog")).not.toHaveAttribute("open");
+
+      rerender(
+        <Component open={true}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      expect(container.querySelector("dialog")).toHaveAttribute("open");
+    });
+
+    it("closes when open prop is set to false", () => {
+      const { rerender, container } = render(
+        <Component open={true}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      expect(container.querySelector("dialog")).toHaveAttribute("open");
+
+      rerender(
+        <Component open={false}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      expect(container.querySelector("dialog")).not.toHaveAttribute("open");
+    });
+
+    it("upgrades a server-rendered open dialog to a true modal on mount", () => {
+      render(
+        <Component open={true}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      const dialog = screen.getByRole("dialog") as HTMLDialogElement;
+      expect(dialog).toHaveAttribute("open");
+      expect(dialog.matches(":modal")).toBe(true);
+    });
+
+    it("does not call onClose or onOpenChange during hydration upgrade to modal", () => {
+      const onClose = vi.fn();
+      const onOpenChange = vi.fn();
+      render(
+        <Component open={true} onClose={onClose} onOpenChange={onOpenChange}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      expect(onClose).not.toHaveBeenCalled();
+      expect(onOpenChange).not.toHaveBeenCalled();
+    });
+
+    it("calls onOpenChange(false) when closed by the header close button", () => {
+      const onOpenChange = vi.fn();
+      render(
+        <Component open={true} onOpenChange={onOpenChange}>
+          <Component.Header>Title</Component.Header>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      screen.getByRole("button", { name: "Close" }).click();
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it("calls onOpenChange(false) when closed by clicking the backdrop", () => {
+      const onOpenChange = vi.fn();
+      render(
+        <Component open={true} closeOnBackdropClick onOpenChange={onOpenChange}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      screen.getByRole("dialog").click();
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it("calls onOpenChange(false) when closed natively via dialog.close()", () => {
+      const onOpenChange = vi.fn();
+      const ref = createRef<HTMLDialogElement>();
+      render(
+        <Component ref={ref} open={true} onOpenChange={onOpenChange}>
+          <Component.Content>Placeholder content</Component.Content>
+        </Component>,
+      );
+      ref.current?.close();
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it("works without passing a ref", () => {
+      expect(() => {
+        render(
+          <Component open={true}>
+            <Component.Content>Placeholder content</Component.Content>
+          </Component>,
+        );
+      }).not.toThrow();
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
   });
 });
