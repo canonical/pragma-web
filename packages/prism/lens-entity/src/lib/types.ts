@@ -145,3 +145,24 @@ export interface StatementPartition<G> {
   readonly values: readonly PartitionedGroup<G>[];
   readonly relations: readonly PartitionedGroup<G>[];
 }
+
+/** A section of the entity page that holds one property group's values, as key values. */
+export interface ValuesSection<G> {
+  readonly kind: "values";
+  readonly id: string;
+  /** The field the section is ordered by: its group's first. */
+  readonly field: string;
+  readonly title: string;
+  readonly groups: readonly G[];
+}
+
+/** A section of the entity page that holds one relation's values. */
+export interface RelationSection<G> {
+  readonly kind: "relation";
+  readonly id: string;
+  readonly field: string;
+  readonly group: G;
+}
+
+/** One of the entity page's statement sections. */
+export type StatementSection<G> = ValuesSection<G> | RelationSection<G>;

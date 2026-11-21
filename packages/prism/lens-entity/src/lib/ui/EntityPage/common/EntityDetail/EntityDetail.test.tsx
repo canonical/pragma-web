@@ -112,7 +112,7 @@ describe("EntityDetail", () => {
     expect(document.title).toBe("Northgate — Stations");
   });
 
-  it("leads with the prominent values as facts, then one section per group with its true count", {
+  it("leads with the prominent values as facts, then one section per property group of key values", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { container } = await renderServed(
@@ -129,11 +129,24 @@ describe("EntityDetail", () => {
     );
     expect(container.querySelectorAll(".facts .values a")).toHaveLength(3);
     expect(readSections(container)).toEqual([
-      "p-platformCount|platform count · 1",
-      "p-platformLength|platform length · 1",
-      "p-inZone|in zone · 1",
-      "p-diagramPosition|diagram position · 1",
+      "g-metro-section-overview|Overview",
+      "g-metro-section-place|Place",
       "referenced-by|Referenced by · 6",
+    ]);
+    // A property group's values are key values under its label, with no count.
+    expect(
+      [
+        ...(container
+          .querySelector("#g-metro-section-overview")
+          ?.closest(".section")
+          ?.querySelectorAll(".ds.key-value-list > .pair") ?? []),
+      ].map((pair) => [
+        pair.querySelector(".key")?.textContent,
+        pair.querySelector(".value")?.textContent,
+      ]),
+    ).toEqual([
+      ["platform count", "8"],
+      ["platform length", expect.stringMatching(/^\d+$/)],
     ]);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(
       "Central Exchange",

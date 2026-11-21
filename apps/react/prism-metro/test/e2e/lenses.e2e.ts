@@ -119,7 +119,9 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(status).toBe(200);
     expect(html).toMatch(/<h1[^>]*>(?:<svg.*?<\/svg>)?Northgate<\/h1>/s);
     expect(html).toContain('class="ds sectioned-view"');
-    expect(html).toContain(">platform count · 1</h2>");
+    // Values sit under their property group, with no count.
+    expect(html).toContain(">Overview</h2>");
+    expect(html).not.toContain(">platform count · 1</h2>");
     expect(html).not.toContain('class="ds field-list"');
     // Every group is named from the reader's side, never as a schema.
     expect(html).not.toContain("property to");

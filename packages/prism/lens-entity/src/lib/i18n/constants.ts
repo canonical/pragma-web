@@ -48,4 +48,5 @@ export const MESSAGES = {
   "statements.inverse": "{label} (inverse)",
   "statements.shown": "{shown} of {total} shown",
   "statements.nested": "A nested value",
+  "statements.properties": "Properties",
 } as const;

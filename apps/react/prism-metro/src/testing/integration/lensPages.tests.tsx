@@ -80,7 +80,10 @@ describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
     );
     expect(fact.nextElementSibling?.querySelector("a")).not.toBeNull();
     expect(
-      screen.getByRole("heading", { level: 2, name: "platform count · 1" }),
+      screen.getByRole("heading", { level: 2, name: "Overview" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("platform count", { selector: "dt" }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "Fields" })).toBeNull();
   });

@@ -20,12 +20,12 @@ import entityPageQueryNode from "../../../../../__generated__/EntityPageQuery.gr
 import type { EntityStatementsQuery } from "../../../../../__generated__/EntityStatementsQuery.graphql.js";
 import entityStatementsQueryNode from "../../../../../__generated__/EntityStatementsQuery.graphql.js";
 import buildEntityPageVariables from "../../../../buildEntityPageVariables.js";
-import compactIri from "../../../../compactIri.js";
 import { Message, useMessages } from "../../../../i18n/index.js";
 import isInstanceOf from "../../../../isInstanceOf.js";
 import labelClass from "../../../../labelClass.js";
 import labelIncomingGroup from "../../../../labelIncomingGroup.js";
 import labelOutgoingGroup from "../../../../labelOutgoingGroup.js";
+import listStatementSections from "../../../../listStatementSections.js";
 import partitionStatements from "../../../../partitionStatements.js";
 import readEntitySummary from "../../../../readEntitySummary.js";
 import useServesStatements from "../../../../useServesStatements.js";
@@ -120,9 +120,6 @@ const componentCssClassName = "ds entity-detail";
 /** The id of the section that lists what points at the entity. */
 const REFERENCED_BY_ID = "referenced-by";
 
-/** The prefix of a property group's section id: no field name meets the view's own ids. */
-const SECTION_ID_PREFIX = "p-";
-
 /**
  * The entity page's data-reading interior: it reads the graph's namespaces,
  * then the page's operation with the address expanded through them, and,
@@ -130,8 +127,9 @@ const SECTION_ID_PREFIX = "p-";
  * both directions, all from the store the route's warm filled and with the
  * same builders. It lays the entity on the sectioned view: the identity
  * header; its prominent values as the facts; one section per property
- * group, ordered as the lens orders its fields, each titled with the label
- * of the reader's side and its true count; then "Referenced by", one group
+ * group (`sh:group`) holding its values as key values, and one per
+ * relation titled with the label of the reader's side and its true count,
+ * all ordered as the lens orders its fields; then "Referenced by", one group
  * per incoming predicate under its inverse label, with the total in its
  * title so the section index carries it. A site whose provider does not
  * serve `statements` gets the header over the class's fields and relations,
@@ -204,11 +202,8 @@ export default function EntityDetail({
   const isPage = active.name === PAGE_RENDERER_NAMES.page;
   const outgoing = served ? statements.outgoing : null;
   const incoming = served ? statements.incoming : null;
-  const { prominent, values, relations } = partitionStatements(
-    outgoing?.groups ?? [],
-    entity._meta,
-  );
-  const facts = prominent.map(
+  const partition = partitionStatements(outgoing?.groups ?? [], entity._meta);
+  const facts = partition.prominent.map(
     (group): KeyValuePair => ({
       id: group.predicateUri,
       term: labelOutgoingGroup(group, ontologies),
@@ -217,20 +212,34 @@ export default function EntityDetail({
   );
   const sections: SectionedViewSection[] = [
     ...orderSections(
-      [...values, ...relations].map(({ group, field: lensField }) => {
-        const field =
-          lensField?.name ?? compactIri(group.predicateUri, ontologies);
-        return {
-          field,
-          id: `${SECTION_ID_PREFIX}${field.replaceAll(/[^\w-]/g, "-")}`,
-          title: t("statements.group", {
-            label: labelOutgoingGroup(group, ontologies),
-            count: group.total,
-          }),
-          content: <StatementGroup group={group} />,
-        };
-      }),
+      listStatementSections(partition, ontologies, t("statements.properties")),
       entity._meta.fields,
+    ).map(
+      (section): SectionedViewSection =>
+        section.kind === "values"
+          ? {
+              id: section.id,
+              title: section.title,
+              content: (
+                <KeyValueList
+                  pairs={section.groups.map(
+                    (group): KeyValuePair => ({
+                      id: group.predicateUri,
+                      term: labelOutgoingGroup(group, ontologies),
+                      value: <StatementGroup group={group} />,
+                    }),
+                  )}
+                />
+              ),
+            }
+          : {
+              id: section.id,
+              title: t("statements.group", {
+                label: labelOutgoingGroup(section.group, ontologies),
+                count: section.group.total,
+              }),
+              content: <StatementGroup group={section.group} />,
+            },
     ),
     ...(incoming === null || incoming === undefined || incoming.total === 0
       ? []
