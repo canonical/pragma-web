@@ -1,0 +1,164 @@
+import type { ModifierFamily } from "@canonical/ds-types";
+import type { ReactNode } from "react";
+
+/**
+ * The size of one event's marker on the timeline's axis.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineMarkerSize = "large" | "medium" | "small";
+
+/**
+ * The marker sizes a timeline draws. A two-size combination gives the first
+ * event of each run of one actor the larger size; `all-sizes` also gives the
+ * first event of each run of one event type, within an actor's run, the
+ * medium size.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineMarkerCombination =
+  | "all-sizes"
+  | "large-medium"
+  | "large-small"
+  | "medium-small"
+  | "large"
+  | "medium"
+  | "small";
+
+/**
+ * How a long page of events collapses: not at all, below its first events,
+ * or between its first and last events.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineCollapsingMethod = "none" | "bottom" | "middle";
+
+/**
+ * Whether an event's date leads its marker or trails its content.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineDateTimePosition = "leading" | "trailing";
+
+/**
+ * The graphic marking one event. The first of `customGraphic`, `imageUrl`,
+ * `icon` and `initials` given is drawn; a small marker draws none.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineMarker = {
+  readonly customGraphic?: ReactNode;
+  /** Drawn only with `alt`; without it, the generic user icon is drawn. */
+  readonly imageUrl?: string;
+  readonly alt?: string;
+  readonly icon?: ReactNode;
+  readonly initials?: string;
+  /** Overrides the size the marker combination gives the event. */
+  readonly size?: TimelineMarkerSize;
+};
+
+/**
+ * One event as the timeline draws it, mapped from one record.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineItem = {
+  /** The record's identity. */
+  readonly id: string;
+  /** The record's date value: a calendar date, or a date-time with an offset. */
+  readonly dateTime: string;
+  /** The actor's identity; consecutive events of one actor form a run. */
+  readonly actorId?: string;
+  readonly actorName?: string;
+  /** Where the actor's name and marker link to. */
+  readonly actorLink?: string;
+  /** The event type's identity; consecutive events of one type form a run. */
+  readonly eventType?: string;
+  readonly eventLabel?: string;
+  readonly description?: string;
+  /** Drawn below the event's own row. */
+  readonly customContent?: ReactNode;
+  readonly marker?: TimelineMarker;
+  /** Draw only the marker and `customContent`. */
+  readonly fullyCustom?: boolean;
+  readonly showName?: boolean;
+  readonly showDescription?: boolean;
+  readonly showDateTime?: boolean;
+  readonly criticality?: ModifierFamily<"criticality">;
+};
+
+/**
+ * What a timeline's `decorate` adds to an event mapped from a record:
+ * anything but its identity and its date, which the record decides.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineDecoration = Partial<Omit<TimelineItem, "id" | "dateTime">>;
+
+/**
+ * The record fields an event's parts are read from, by field name. Each value
+ * is read as text; a field holding anything else leaves its part out.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineFieldMapping = {
+  /** A field of kind `date`. */
+  readonly dateTime: string;
+  readonly actorId?: string;
+  readonly actorName?: string;
+  readonly actorLink?: string;
+  readonly eventType?: string;
+  readonly eventLabel?: string;
+  readonly description?: string;
+};
+
+/**
+ * How a long page of events collapses, and how much each step reveals.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineExpansion = {
+  /** Defaults to `bottom`. */
+  readonly method?: TimelineCollapsingMethod;
+  /** The events shown before any is revealed. Defaults to 8. */
+  readonly initialVisible?: number;
+  /** The events each "show more" reveals. Defaults to 4. */
+  readonly step?: number;
+};
+
+/**
+ * How an event's date is written. The absolute form is the default; the
+ * relative form is its alternate, shown in the tooltip and on toggling.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineDateTimeFormats = {
+  /** The BCP 47 locale dates are written in. Defaults to `en`. */
+  readonly locale?: string;
+  /**
+   * The time zone a date-time is written in; the runtime's own when left
+   * out. A server render passes it, so the server writes what the client
+   * hydrates. A calendar date is written as the date it names in any zone.
+   */
+  readonly timeZone?: string;
+  readonly formatAbsolute?: (value: string, locale: string) => string;
+  readonly formatRelative?: (
+    value: string,
+    now: number,
+    locale: string,
+  ) => string;
+  /** Activating a date switches every event between the two forms. Defaults to true. */
+  readonly toggleable?: boolean;
+  /** Hovering a date shows its alternate form. Defaults to true. */
+  readonly tooltip?: boolean;
+};
