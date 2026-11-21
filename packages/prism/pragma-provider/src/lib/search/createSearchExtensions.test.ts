@@ -57,9 +57,9 @@ describe("createSearchExtensions", () => {
     ) as GraphQLObjectType;
     const resolve = facet.getFields().type?.resolve;
     const info = { schema: new GraphQLSchema({}) } as GraphQLResolveInfo;
-    expect(() =>
-      resolve?.({ type: "urn:x", count: 1 }, {}, {}, info),
-    ).toThrow("the schema has no Query.ontologyClass resolver for search");
+    expect(() => resolve?.({ type: "urn:x", count: 1 }, {}, {}, info)).toThrow(
+      "the schema has no Query.ontologyClass resolver for search",
+    );
   });
 
   it("reports a context without a search index as an error", async () => {

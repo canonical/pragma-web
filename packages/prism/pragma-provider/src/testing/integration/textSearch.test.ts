@@ -179,9 +179,12 @@ describe("Query.search", () => {
 
   it.each(["", "  "])("answers %j with the empty page", async (text) => {
     expect(
-      await read("query($text: String!) { search(text: $text) { total facets { count } } }", {
-        text,
-      }),
+      await read(
+        "query($text: String!) { search(text: $text) { total facets { count } } }",
+        {
+          text,
+        },
+      ),
     ).toEqual({ total: 0, facets: [] });
     expect(await search({ text })).toEqual({
       edges: [],
