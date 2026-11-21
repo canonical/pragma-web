@@ -111,14 +111,41 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(Object.keys(records).length).toBeGreaterThan(0);
   });
 
-  it("renders a station's page with its fields", async () => {
+  it("renders a station's page from its statements, on the sectioned view", async () => {
     const { status, html } = await fetchPage(
       script,
       "/stations/metro%3Anorthgate",
     );
     expect(status).toBe(200);
-    expect(html).toMatch(/<h1[^>]*>Northgate<\/h1>/);
-    expect(html).toContain('class="ds field-list"');
+    expect(html).toMatch(/<h1[^>]*>(?:<svg.*?<\/svg>)?Northgate<\/h1>/s);
+    expect(html).toContain('class="ds sectioned-view"');
+    expect(html).toContain(">platform count · 1</h2>");
+    expect(html).not.toContain('class="ds field-list"');
+    // Every group is named from the reader's side, never as a schema.
+    expect(html).not.toContain("property to");
+  });
+
+  it("leads Central Exchange with its prominent values, each group bounded and counted", async () => {
+    const { status, html } = await fetchPage(
+      script,
+      "/stations/metro%3Acentral-exchange",
+    );
+    expect(status).toBe(200);
+    const facts = html.split('class="facts"').at(1)?.split("</dl>").at(0);
+    expect(
+      [...String(facts).matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((term) =>
+        term.at(1),
+      ),
+    ).toEqual(["location", "serves lines", "transfer minutes"]);
+    const groups = html.split('class="ds statement-group').slice(1);
+    expect(groups.length).toBeGreaterThan(0);
+    for (const group of groups) {
+      const values = group.split("</ul>").at(0) ?? "";
+      expect(values.split('class="value"').length - 1).toBeLessThanOrEqual(12);
+    }
+    // No index route lists a group's values yet, so no group links to all.
+    expect(html).not.toContain('class="ds router-link all"');
+    expect(html).not.toContain("property to");
   });
 
   it("renders the lines index with the line rows", async () => {
