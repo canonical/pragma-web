@@ -7,7 +7,7 @@ import { route } from "@canonical/router-core";
 import { type ReactElement, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
-import { SearchPage } from "./lib/index.js";
+import { SearchForm, SearchPage } from "./lib/index.js";
 import { readSearchState, searchValues } from "./searchValues.js";
 import type { SearchValues } from "./types.js";
 import warmSearch from "./warmSearch.js";
@@ -29,30 +29,7 @@ const SearchContent = ({
   return (
     <DocumentLayout
       rail={<MetroRail />}
-      strip={
-        <ModeStrip
-          search={
-            <form
-              aria-label={t("search.title")}
-              className="ds search-form"
-              method="get"
-            >
-              <input
-                aria-label={t("search.field")}
-                className="input"
-                defaultValue={state.text}
-                key={state.text}
-                name="q"
-                placeholder={t("search.placeholder")}
-                type="search"
-              />
-              <button className="ds button submit" type="submit">
-                {t("search.submit")}
-              </button>
-            </form>
-          }
-        />
-      }
+      strip={<ModeStrip search={<SearchForm text={state.text} />} />}
     >
       <ErrorBoundary
         fallback={

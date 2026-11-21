@@ -1,13 +1,21 @@
 ---
 # SearchPage — the search route's page, in the document archetype's
-# canvas: its title (also the document's), a summary of how many results
-# match, then one entry per result in rank order: the result through the
-# site's chip switch over the passage of its value that holds the text.
-# It spans every column of the canvas's page grid; title, summary and list
-# sit one gutter apart, and so do the entries.
+# canvas: its title (also the document's), then one of three states.
+# With a text that matches: a summary of how many results match, the Type
+# facet band while two or more types match, the results grouped by type
+# (the prominent type first, then ascending count), each result through
+# the site's chip switch over the passage that holds the text, and the
+# pagination bar, 20 results a page. With a text that matches nothing:
+# the no-match state, saying so and offering the next steps (the
+# spelling, the Definitions when the site has them, the palette). With no
+# text: what the field is for, and each searchable type as a door with
+# its total. It spans every column of the canvas's page grid; its parts
+# sit one gutter apart, and so do the groups, the doors and the hints.
 #
 # Every decision is read through a component token declared on the root
 # (`--search-page-*`), bound to the symbol named here.
+#
+# Token ledger: none.
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -22,10 +30,57 @@ node:
         role: page title
       relation: { cardinality: "1", slotName: title }
     - node:
-        role: result summary
-      relation: { cardinality: "1", slotName: summary }
+        role: result summary, or what the field is for
+      relation: { cardinality: "0..1", slotName: summary }
     - node:
-        role: results
+        uri: prism.component.type_facet_bar
+      relation: { cardinality: "0..1", slotName: facets }
+    - node:
+        role: results, grouped by type
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              uri: prism.component.search_result_group
+              edges:
+                - node:
+                    role: result
+                    styles:
+                      layout.type: flex
+                      layout.direction: column
+                      size.min.width: 0
+                    edges:
+                      - node:
+                          uri: metro.component.metro_chip_projection
+                        relation: { cardinality: "1", slotName: node }
+                      - node:
+                          uri: prism.component.search_passage
+                        relation: { cardinality: "1", slotName: passage }
+                  relation: { cardinality: "1..*", slotName: result }
+            relation: { cardinality: "1..*", slotName: group }
+      relation: { cardinality: "0..1", slotName: results }
+    - node:
+        uri: prism.component.pagination_bar
+      relation: { cardinality: "0..1", slotName: pagination }
+    - node:
+        role: the no-match state
+        edges:
+          - node:
+              role: next steps
+              styles:
+                layout.type: flex
+                layout.direction: column
+                spacing.gap: grid.gutter
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+            relation: { cardinality: "1", slotName: hints }
+      relation: { cardinality: "0..1", slotName: none }
+    - node:
+        role: the searchable types as doors
         styles:
           layout.type: flex
           layout.direction: column
@@ -36,13 +91,17 @@ node:
           spacing.internal.inline.start: 0
         edges:
           - node:
-              role: result
+              role: door, a link to the type's results
+              styles:
+                layout.type: inline-flex
+                layout.align: center
+                spacing.gap: grid.gutter
               edges:
                 - node:
-                    uri: metro.component.metro_chip_projection
-                  relation: { cardinality: "1", slotName: node }
+                    role: mark
+                  relation: { cardinality: "1", slotName: icon }
                 - node:
-                    role: passage
-                  relation: { cardinality: "1", slotName: passage }
-            relation: { cardinality: "0..*", slotName: result }
-      relation: { cardinality: "0..1", slotName: results }
+                    role: name
+                  relation: { cardinality: "1", slotName: name }
+            relation: { cardinality: "1..*", slotName: door }
+      relation: { cardinality: "0..1", slotName: doors }
