@@ -6,7 +6,12 @@
  * @module lib
  */
 
-export { PROVIDER_EXTENSIONS } from "./constants.js";
+export {
+  PROVIDER_EXTENSIONS,
+  STATEMENTS_MAX_DEPTH,
+  STATEMENTS_PER_PREDICATE,
+  STATEMENTS_PER_PREDICATE_MAX,
+} from "./constants.js";
 export { readContractSdl } from "./contractSdl.js";
 export type {
   ClassEdge,
@@ -40,6 +45,7 @@ export {
   satisfiesContract,
 } from "./satisfiesContract.js";
 export { servesExtension } from "./servesExtension.js";
+export { readStatementsSdl } from "./statementsSdl.js";
 export type {
   AssertSatisfiesContractOptions,
   ContractResult,

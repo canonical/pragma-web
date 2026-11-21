@@ -10,7 +10,8 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js"
     },
-    "./schema/contract.graphql": "./schema/contract.graphql"
+    "./schema/contract.graphql": "./schema/contract.graphql",
+    "./schema/statements.graphql": "./schema/statements.graphql"
   },
   "files": [
     "dist",

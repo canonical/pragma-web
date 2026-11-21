@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { readContractSdl } from "./contractSdl.js";
 import { servesExtension } from "./servesExtension.js";
+import { readStatementsSdl } from "./statementsSdl.js";
 
 const contractSdl = readContractSdl();
 
@@ -12,15 +13,25 @@ const extendedSdl = `${contractSdl}\n${readFileSync(
     import.meta.url,
   ),
   "utf8",
-)}`;
+)}\n${readStatementsSdl()}`;
 
 describe("servesExtension", () => {
   it("finds each extension a provider declares with its signature", () => {
     expect(servesExtension(extendedSdl, "source")).toBe(true);
+    expect(servesExtension(extendedSdl, "statements")).toBe(true);
+  });
+
+  it("refuses statements without its direction argument", () => {
+    const sdl = `${contractSdl}\n${readStatementsSdl().replace(
+      "direction: StatementDirection = OUT",
+      "",
+    )}`;
+    expect(servesExtension(sdl, "statements")).toBe(false);
   });
 
   it("finds none on the bare contract", () => {
     expect(servesExtension(contractSdl, "source")).toBe(false);
+    expect(servesExtension(contractSdl, "statements")).toBe(false);
   });
 
   it("refuses a field of the right name with another argument type", () => {

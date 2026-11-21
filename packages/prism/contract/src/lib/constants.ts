@@ -41,6 +41,9 @@ export const DEFAULT_PROVIDER_NAME = "provider";
 /** The schema directory sits at the package root, beside src/ and dist/. */
 export const SCHEMA_RELATIVE_PATH = "schema/contract.graphql";
 
+/** The `statements` extension's SDL, beside the contract's. */
+export const STATEMENTS_SCHEMA_RELATIVE_PATH = "schema/statements.graphql";
+
 /** From src/lib/ (vitest, ts-node) the package root is two levels up. */
 export const SOURCE_LAYOUT_PREFIX = "../..";
 
@@ -57,4 +60,26 @@ export const BUILD_LAYOUT_PREFIX = "../../..";
 export const PROVIDER_EXTENSIONS = {
   /** One entity's statements as Turtle, or null when the graph holds none. */
   source: { args: [["uri", "ID!"]], type: "String" },
+  /**
+   * One entity's statements grouped by predicate, in one direction, each
+   * group bounded with its true total (`schema/statements.graphql`).
+   */
+  statements: {
+    args: [
+      ["uri", "ID!"],
+      ["path", "[String!]"],
+      ["perPredicate", "Int"],
+      ["direction", "StatementDirection"],
+    ],
+    type: "StatementGroups",
+  },
 } as const;
+
+/** How many values a `statements` group returns when the reader names none. */
+export const STATEMENTS_PER_PREDICATE = 12;
+
+/** The most values a `statements` group returns, whatever the reader asks. */
+export const STATEMENTS_PER_PREDICATE_MAX = 50;
+
+/** How many levels of nested values a `statements` group expands in place. */
+export const STATEMENTS_MAX_DEPTH = 2;
