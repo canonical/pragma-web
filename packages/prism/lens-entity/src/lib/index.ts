@@ -11,7 +11,6 @@
 export { default as createEntityRoutes } from "./createEntityRoutes.js";
 export { default as expandAddress } from "./expandAddress.js";
 export { default as readUriParam } from "./readUriParam.js";
-export { default as warmEntityPanel } from "./warmEntityPanel.js";
 export type {
   EntityLensOptions,
   EntityRoutes,
@@ -25,3 +24,4 @@ export type { EntityPageProps } from "./ui/EntityPage/index.js";
 export { EntityPage } from "./ui/EntityPage/index.js";
 export type { EntityPanelProps } from "./ui/EntityPanel/index.js";
 export { EntityPanel } from "./ui/EntityPanel/index.js";
+export { default as warmEntityPanel } from "./warmEntityPanel.js";

@@ -85,7 +85,9 @@ const LineAside = ({
   address,
 }: Pick<NetworkLinePageProps, "address">): ReactElement | null => {
   const line = useLineView({ address });
-  return line === undefined ? null : <EntityPanel headingLevel={2} uri={line.uri} />;
+  return line === undefined ? null : (
+    <EntityPanel headingLevel={2} uri={line.uri} />
+  );
 };
 
 /**
