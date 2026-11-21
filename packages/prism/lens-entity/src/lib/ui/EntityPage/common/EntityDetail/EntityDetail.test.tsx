@@ -131,6 +131,7 @@ describe("EntityDetail", () => {
       // Predicates the class names no field for: their compact form.
       "p-metro-diagramPosition|diagram position · 1",
       "p-metro-platformLength|platform length · 1",
+      "referenced-by|Referenced by · 6",
     ]);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(
       "Central Exchange",

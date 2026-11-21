@@ -106,25 +106,14 @@ const declareEntityPageQueries = (): unknown => [
       outgoing: statements(uri: $uri, direction: OUT) {
         total
         groups {
-          predicateUri
-          total
-          predicate {
-            label
-            pluralLabel
-          }
+          ...statementGroupLabels_group @relay(mask: false)
           ...StatementGroup_group
         }
       }
       incoming: statements(uri: $uri, direction: IN) {
         total
         groups {
-          predicateUri
-          total
-          predicate {
-            label
-            inverseLabel
-            inversePluralLabel
-          }
+          ...statementGroupLabels_group @relay(mask: false)
           ...StatementGroup_group
         }
       }
