@@ -96,7 +96,7 @@ const readIndex = (root: ParentNode): readonly string[] =>
   );
 
 describe("EntityDetail", () => {
-  it("lays the header over the class's fields and relations when the site serves no statements", {
+  it("lays the header over the entity's summary alone when the site serves no statements", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { container } = await renderDetail(NORTHGATE_CURIE);
@@ -107,7 +107,7 @@ describe("EntityDetail", () => {
       [...(root?.querySelectorAll(".body > .ds") ?? [])].map((child) =>
         child.classList.item(1),
       ),
-    ).toEqual(["entity-summary", "field-list", "relations"]);
+    ).toEqual(["entity-summary"]);
     expect(readSections(container)).toEqual([]);
     expect(document.title).toBe("Northgate — Stations");
   });
@@ -262,7 +262,7 @@ describe("EntityDetail", () => {
     const drawn = screen.getByRole("region", { name: "Northgate" });
     expect(drawn.dataset.probe).toBe("page-renderer");
     expect([...drawn.children].map((child) => child.classList.item(1))).toEqual(
-      ["entity-summary", "field-list", "relations"],
+      ["entity-summary"],
     );
   });
 

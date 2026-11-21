@@ -35,7 +35,7 @@ describe("server rendering", () => {
     expect(requestsAfterWarm).toBe(0);
   });
 
-  it("renders a station's page, its fields in full, from its warm", {
+  it("renders a station's page, its header and summary, from its warm", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { html, requestsAfterWarm } = await renderServerMarkup(
@@ -46,11 +46,12 @@ describe("server rendering", () => {
     expect(html).toMatch(
       /<h1 class="title"><svg[^>]*>.*?<\/svg>Northgate<\/h1>/,
     );
-    expect(html).toContain('class="ds field-list"');
-    // Eight fields (two of them inherited) and four relations, each a key
-    // value.
-    expect(html.match(/<div class="pair">/g)).toHaveLength(12);
-    expect(html).toContain(">metro:servesLine</code>");
+    expect(html).toContain('class="ds entity-summary');
+    // A site that serves no statements shows no field list in their place.
+    expect(html).not.toContain("field-list");
+    expect(html).toContain(
+      'data-canonical="https://metro.example/onto#northgate"',
+    );
     expect(requestsAfterWarm).toBe(0);
   });
 });

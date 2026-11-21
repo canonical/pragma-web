@@ -1,8 +1,8 @@
 ---
 # EntityDetail — the entity page's data-bearing interior: it reads the
 # graph's namespaces and the page's one operation from the warm store and
-# renders the entity, its heading, its summary, then the fields and the
-# relations its class declares as key values; or, for an address nothing in
+# renders the entity, its header, which marks the page as the entity's one
+# home (data-canonical), its summary, then its statements; or, for an address nothing in
 # the graph answers to or a node outside the bound class, a status line
 # naming the address in the published InlineCode. It sets the document
 # title either way.
@@ -42,9 +42,3 @@ node:
     - node:
         uri: prism.subcomponent.entity_summary
       relation: { cardinality: "0..1", slotName: summary }
-    - node:
-        uri: prism.subcomponent.field_list
-      relation: { cardinality: "0..1", slotName: fields }
-    - node:
-        uri: prism.subcomponent.relations
-      relation: { cardinality: "0..1", slotName: relations }

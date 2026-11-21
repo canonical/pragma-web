@@ -9,7 +9,7 @@ import useMessages from "./useMessages.js";
 describe("useMessages", () => {
   it("reads the English catalog when no translator is provided", () => {
     const { result } = renderHook(() => useMessages());
-    expect(result.current("fields.heading")).toBe(MESSAGES["fields.heading"]);
+    expect(result.current("page.loading")).toBe(MESSAGES["page.loading"]);
   });
 
   it("fills every placeholder from the values", () => {
@@ -39,6 +39,6 @@ describe("useMessages", () => {
       <MessagesContext value={translate}>{children}</MessagesContext>
     );
     const { result } = renderHook(() => useMessages(), { wrapper });
-    expect(result.current("fields.heading")).toBe("fr:fields.heading");
+    expect(result.current("page.loading")).toBe("fr:page.loading");
   });
 });

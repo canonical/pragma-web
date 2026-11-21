@@ -27,7 +27,7 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** A station: its heading, its summary, its fields and its relations. */
+/** A station: its header, its prominent values and its statements. */
 export const AStation: Story = {};
 
 /** An address nothing in the graph answers to: a status naming it. */

@@ -66,12 +66,6 @@ export type EntityRoutes<TId extends string> = {
 };
 
 /**
- * How many values a field takes on its class: exactly one, at most one, one
- * or more, or any number.
- */
-export type Cardinality = "one" | "optional" | "many" | "any";
-
-/**
  * What a statement group's label is read from: its predicate's labels in
  * the site's language, each absent when the ontology states none, its
  * predicate's IRI and its true count.

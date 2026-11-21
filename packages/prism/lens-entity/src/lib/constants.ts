@@ -1,11 +1,7 @@
 /**
  * The entity lens's domain constants: the names it derives from a binding,
- * the page size it asks the graph for, and the catalog keys that name a
- * field's cardinality.
+ * and the page size it asks the graph for.
  */
-
-import type { MessageKey } from "./i18n/index.js";
-import type { Cardinality } from "./types.js";
 
 /**
  * The suffix the entity route's name adds to the binding's id: the binding
@@ -25,12 +21,3 @@ export const ENTITY_URI_PARAM = "uri";
  * an invisible truncation.
  */
 export const ENTITY_PAGE_SIZE = 100;
-
-/** The catalog key that names each cardinality, in the fields table and the
- * relations. */
-export const CARDINALITY_MESSAGES: Readonly<Record<Cardinality, MessageKey>> = {
-  one: "cardinality.one",
-  optional: "cardinality.optional",
-  many: "cardinality.many",
-  any: "cardinality.any",
-};

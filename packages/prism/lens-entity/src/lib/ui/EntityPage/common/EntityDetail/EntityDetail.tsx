@@ -31,8 +31,6 @@ import readEntitySummary from "../../../../readEntitySummary.js";
 import useServesStatements from "../../../../useServesStatements.js";
 import { EntityHeader } from "../EntityHeader/index.js";
 import { EntitySummary } from "../EntitySummary/index.js";
-import { FieldList } from "../FieldList/index.js";
-import { Relations } from "../Relations/index.js";
 import { StatementGroup } from "../StatementGroup/index.js";
 import type { EntityDetailProps } from "./types.js";
 import "./styles.css";
@@ -85,8 +83,6 @@ const declareEntityPageQueries = (): unknown => [
           label
           comment
           ...statementGroupPartition_meta @relay(mask: false)
-          ...FieldList_meta
-          ...Relations_meta
         }
         ...EntitySummary_node
       }
@@ -133,11 +129,12 @@ const REFERENCED_BY_ID = "referenced-by";
  * all ordered as the lens orders its fields; then "Referenced by", one group
  * per incoming predicate under its inverse label, with the total in its
  * title so the section index carries it. A site whose provider does not
- * serve `statements` gets the header over the class's fields and relations,
- * and nothing says what is missing. An address nothing answers to renders
+ * serve `statements` gets the header over the entity's summary, and
+ * nothing says what is missing. The header carries `data-canonical`, the
+ * entity's IRI: this page is the entity's one home. An address nothing answers to renders
  * the not-found status. It sets the document title either way. The
  * active page renderer draws the body before the sections (the page's own
- * renderer: the fallback's fields and relations, else nothing); under any
+ * renderer: the fallback's summary, else nothing); under any
  * other (Turtle, for `as=turtle`) what it draws stands in place of the
  * sections.
  *
@@ -292,13 +289,7 @@ export default function EntityDetail({
         {active.render({
           uri: entity.uri,
           title: entity._meta.title,
-          children: served ? null : (
-            <>
-              <EntitySummary node={entity} />
-              <FieldList meta={entity._meta} namespaces={ontologies} />
-              <Relations meta={entity._meta} namespaces={ontologies} />
-            </>
-          ),
+          children: served ? null : <EntitySummary node={entity} />,
         })}
       </SectionedView>
     </div>

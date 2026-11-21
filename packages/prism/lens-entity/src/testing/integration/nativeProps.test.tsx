@@ -31,8 +31,6 @@ import {
   EntityDetail,
   EntityHeading,
   EntitySummary,
-  FieldList,
-  Relations,
 } from "../../lib/ui/EntityPage/common/index.js";
 import { EntityPage } from "../../lib/ui/EntityPage/index.js";
 
@@ -73,16 +71,6 @@ const EntityPartsProbe = () => {
       <KeyValueList
         pairs={[{ id: "probe", term: "Term", value: "Value" }]}
         {...nativeProps("key-values")}
-      />
-      <FieldList
-        meta={node._meta}
-        namespaces={METRO_NAMESPACES}
-        {...nativeProps("fields")}
-      />
-      <Relations
-        meta={node._meta}
-        namespaces={METRO_NAMESPACES}
-        {...nativeProps("relations")}
       />
     </>
   );
@@ -139,8 +127,6 @@ describe("native props", () => {
     expectRoot("heading", "entity-heading");
     expectRoot("summary", "entity-summary");
     expectRoot("key-values", "key-value-list");
-    expectRoot("fields", "field-list");
-    expectRoot("relations", "relations");
   });
 
   it("reach the root of the layout", {
