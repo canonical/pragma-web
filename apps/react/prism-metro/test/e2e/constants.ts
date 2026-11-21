@@ -79,6 +79,9 @@ export const CLOSE_ICON_ID = "close";
  */
 export const ROWS_PATHS = ["/stations", "/fleet"] as const;
 
+/** The indexes drawn as a table of facts: the stations, lines and fleet. */
+export const TABLE_PATHS = ["/stations", "/lines", "/fleet"] as const;
+
 /** The fleet index, a table of the rolling stocks' facts. */
 export const FLEET_PATH = "/fleet";
 

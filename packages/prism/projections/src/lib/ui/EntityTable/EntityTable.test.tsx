@@ -108,6 +108,36 @@ describe("EntityTable", () => {
     ).toEqual(["value", "value", "value is-later"]);
   });
 
+  it("folds the first two values that are not empty, an empty cell holding nothing", () => {
+    const { container } = renderTable({
+      columns: [
+        ...ENTITY_TABLE_PROPS.columns,
+        { field: "platformCount", header: "Platforms", href: "/x" },
+        { field: "platformLength", header: "Length", href: "/x" },
+      ],
+      rows: [
+        {
+          key: "a",
+          title: "Bank",
+          cells: [
+            { field: "servesLine", text: null },
+            { field: "inZone", text: "Zone 1" },
+            { field: "platformCount", text: "8" },
+            { field: "platformLength", text: "120" },
+          ],
+        },
+      ],
+    });
+    const cells = Array.from(container.querySelectorAll("td"));
+    expect(cells.map((cell) => cell.className)).toEqual([
+      "value",
+      "value",
+      "value",
+      "value is-later",
+    ]);
+    expect(cells.at(0)?.childNodes).toHaveLength(0);
+  });
+
   it("highlights the selected row only", () => {
     renderTable({ selected: "b" });
     const [, first, second] = screen.getAllByRole("row");

@@ -58,6 +58,7 @@ import {
   ROWS_PATHS,
   STATION_IRI_PATH,
   TABLE_FOLD_WIDTH_PX,
+  TABLE_PATHS,
   TERM_IRI_PATH,
   WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
@@ -115,6 +116,43 @@ function readFirstValues(selector: string): readonly {
         box.top >= rowBox.top &&
         box.bottom <= rowBox.bottom,
     };
+  });
+}
+
+/**
+ * Read each value cell a row shows, one painted on its row's lines, as
+ * whether it is cut: its text running past the cell's end, or the cell
+ * past its row's end. It runs in the page.
+ *
+ * @param selector - The rows' selector.
+ * @returns One entry per shown value cell, with its text.
+ * @note Impure: reads the page's layout.
+ */
+function readShownValues(selector: string): readonly {
+  readonly text: string;
+  readonly cut: boolean;
+}[] {
+  return [...document.querySelectorAll(selector)].flatMap((row) => {
+    const rowBox = row.getBoundingClientRect();
+    return [...row.querySelectorAll("td.value")].flatMap((cell) => {
+      const box = cell.getBoundingClientRect();
+      const shown =
+        getComputedStyle(cell).display !== "none" &&
+        box.width > 0 &&
+        box.top >= rowBox.top &&
+        box.bottom <= rowBox.bottom;
+      if (!shown) return [];
+      const detail = cell.querySelector(".detail")?.getBoundingClientRect();
+      return [
+        {
+          text: cell.textContent ?? "",
+          cut:
+            cell.scrollWidth > cell.clientWidth + 1 ||
+            (detail !== undefined && detail.right > box.right + 1) ||
+            box.right > rowBox.right + 1,
+        },
+      ];
+    });
   });
 }
 
@@ -417,6 +455,22 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         expect(cell.painted).toBe(true);
         expect(cell.labelShown).toBe(viewport.width < TABLE_FOLD_WIDTH_PX);
       }
+    } finally {
+      await page.close();
+    }
+  });
+
+  // Below two groups a folded row shows each value whole or not at all:
+  // no shown value is cut, and an empty value leaves its place.
+  it.each(TABLE_PATHS)("cuts no folded value of %s", async (path) => {
+    const page = await open(path);
+    try {
+      const values = await page.evaluate(readShownValues, INDEX_ROW_SELECTOR);
+      const folded = viewport.width < TABLE_FOLD_WIDTH_PX;
+      expect(values.length).toBeGreaterThan(0);
+      expect(
+        values.filter((value) => folded && (value.cut || value.text === "")),
+      ).toEqual([]);
     } finally {
       await page.close();
     }

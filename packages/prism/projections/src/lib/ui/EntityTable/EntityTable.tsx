@@ -24,9 +24,11 @@ const componentCssClassName = "ds entity-table";
  * values that find no column leave whole, the last first. Each value cell
  * also holds its field's label, which only the folded row shows: below two
  * groups a container rule hides the header row and folds each row into a
- * scented row of two lines, the title over its first two values, each
- * after its label, the later values marked `is-later` and hidden. One
- * markup serves every width; no width is measured.
+ * scented row of two lines, the title over its first two values that are
+ * not empty, each after its label, whole or not at all; an empty cell
+ * holds nothing and the folded row hides it, and the values after those
+ * two are marked `is-later` and hidden. One markup serves every width; no
+ * width is measured.
  *
  * Native props reach the `<table>` root; a consumer `className` merges after
  * the table's own.
@@ -84,39 +86,48 @@ export default function EntityTable({
         </tr>
       </thead>
       <tbody className="body">
-        {rows.map(({ key, title, cells }) => (
-          <tr
-            aria-selected={key === selected ? "true" : undefined}
-            className={lines === "two" ? "row is-two-line" : "row"}
-            key={key}
-          >
-            <th className="title" scope="row">
-              {title}
-            </th>
-            {cells.map(({ field, text }, index) => (
-              <td
-                className={[
-                  "value",
-                  columns.at(index)?.numeric ? "is-number" : null,
-                  index < FOLDED_VALUE_COUNT ? null : "is-later",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                data-property={field}
-                key={field}
-              >
-                {text === null ? null : (
-                  <>
-                    <span className="term">
-                      {columns.find((column) => column.field === field)?.header}
-                    </span>{" "}
-                    <span className="detail">{text}</span>
-                  </>
-                )}
-              </td>
-            ))}
-          </tr>
-        ))}
+        {rows.map(({ key, title, cells }) => {
+          const folded = cells
+            .filter((cell) => cell.text !== null)
+            .slice(0, FOLDED_VALUE_COUNT)
+            .map((cell) => cell.field);
+          return (
+            <tr
+              aria-selected={key === selected ? "true" : undefined}
+              className={lines === "two" ? "row is-two-line" : "row"}
+              key={key}
+            >
+              <th className="title" scope="row">
+                {title}
+              </th>
+              {cells.map(({ field, text }, index) => (
+                <td
+                  className={[
+                    "value",
+                    columns.at(index)?.numeric ? "is-number" : null,
+                    text === null || folded.includes(field) ? null : "is-later",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  data-property={field}
+                  key={field}
+                >
+                  {text === null ? null : (
+                    <>
+                      <span className="term">
+                        {
+                          columns.find((column) => column.field === field)
+                            ?.header
+                        }
+                      </span>{" "}
+                      <span className="detail">{text}</span>
+                    </>
+                  )}
+                </td>
+              ))}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

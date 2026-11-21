@@ -28,6 +28,13 @@
     --entity-table-sorted-color: var(--color-text);
     /* A folded row's title is its first line, across the row. */
     --entity-table-fold-title-basis: 100%;
+    /* A folded row's lines: 24px each, the first a half inset from the
+     * row's top, the second an inset under it, and the second line's start
+     * an inset wide. */
+    --entity-table-line-size: var(--space-300);
+    --entity-table-fold-inset: calc(var(--space-100) / 2);
+    --entity-table-fold-line-gap: var(--space-100);
+    --entity-table-fold-start-size: var(--space-100);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -169,10 +176,12 @@
 
   /* Below two groups the table folds into scented rows: no header row,
    * and each row two lines, 56px, whatever it declares: a wrapping line
-   * rather than the canvas's columns, three below one group, so the title
-   * takes the first line across the row and its first two values share
-   * the second, each after its label; the later values leave. The two
-   * lines stand centred in the row. */
+   * rather than the canvas's columns, three below one group. The title
+   * takes the first line across the row; its first two values that are
+   * not empty share the second, each after its label, whole or not at all;
+   * an empty cell and the later values leave. The lines stand from the
+   * row's top, a half inset above the first, an inset between them, so a
+   * third line falls below the row's clip. */
   @container shell (width < 912px) {
     .ds.entity-table .header {
       display: none;
@@ -183,18 +192,49 @@
       block-size: var(--entity-table-two-line-row-size);
       display: flex;
       flex-wrap: wrap;
-      align-content: center;
+      align-content: flex-start;
+      column-gap: 0;
+      row-gap: var(--entity-table-fold-line-gap);
+      padding-block-start: var(--entity-table-fold-inset);
+    }
+
+    /* Every item of a folded row is one line high. */
+    .ds.entity-table .title,
+    .ds.entity-table .value {
+      block-size: var(--entity-table-line-size);
+      padding-block: 0;
     }
 
     .ds.entity-table .title {
       flex-basis: var(--entity-table-fold-title-basis);
     }
 
-    .ds.entity-table .value {
-      flex-grow: 1;
-      flex-basis: 0;
+    /* The second line's start: an item an inset wide, a line high, that
+     * the title leaves no room for on the first line. The first value
+     * stands back over it, so it starts at the row's start, and a value
+     * wider than the line moves to the third, which is clipped. */
+    .ds.entity-table .row::before {
+      content: "";
+      order: 1;
+      flex: 0 0 var(--entity-table-fold-start-size);
+      block-size: var(--entity-table-line-size);
     }
 
+    /* A value keeps its whole width and never ends in an ellipsis: one
+     * that has no room left on the second line moves to the third. Each
+     * after the first stands the gutter from the one before it. */
+    .ds.entity-table .value {
+      order: 2;
+      flex: 0 0 auto;
+      margin-inline-start: calc(-1 * var(--entity-table-fold-start-size));
+      text-overflow: clip;
+    }
+
+    .ds.entity-table .value:not(:empty) ~ .value {
+      margin-inline-start: var(--entity-table-gap);
+    }
+
+    .ds.entity-table .value:empty,
     .ds.entity-table .value.is-later {
       display: none;
     }
