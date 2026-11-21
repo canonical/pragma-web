@@ -29,8 +29,11 @@
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: docs.subcomponent.component_header
+  # The root reads the component's IRI and carries it as data-canonical:
+  # the header marks the page as the component's one home.
   projection:
     on: Component
+    field: uri
   styles:
     layout.type: grid
     layout.grid.columns: subgrid
