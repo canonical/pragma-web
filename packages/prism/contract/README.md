@@ -142,6 +142,49 @@ list is sorted by property, subject class and object class.
 the compiler attaches `_meta: EntityMeta!` to every generated type, so a
 provider cannot omit it.
 
+## The browser entry and the list fields
+
+The package's root reads the shipped SDL from disk with `node:fs`, which
+a browser cannot load. Client code imports runtime values from
+`@canonical/prism-contract/browser` (the site lens model,
+`deriveListFields`, `readNodeValues`, `selectFacetedInstances` and
+`KIND_FACET_FIELD`) and only types from the root.
+
+`deriveListFields(served)` turns the fields a class serves with their
+lens (`OntologyClass.properties`) into its list fields and the displayed
+ones, in the lens's order: hidden fields dropped, each field typed text,
+number, date, flag or choices, sortable when it holds one value that is
+not an entity, facetable when its values are entities or a flag. A field
+reads as a number when its range is in `NUMBER_RANGES`: the XML Schema
+numeric datatypes, and GraphQL's `Int` and `Float`, which a provider that
+types its literals by its own schema serves as a range.
+
+Two provider extensions serve a list, declared in `PROVIDER_EXTENSIONS`
+beside `source`, their types in `LIST_EXTENSION_TYPES_SDL`:
+
+- `Node.values(fields: [ID!]): [NodeValue!]!`: a node's values for the
+  fields named, or without names for the fields its class's lens
+  displays. A `NodeValue` carries the field's served name, its label, the
+  values' text (null when it has none), `uri`, a `String` holding the
+  value's IRI when it is exactly one entity, and `type`, how the values
+  read.
+- `Query.facetedInstances(classUri, filters, sort, first, after)`: a
+  class's instances that the filters keep, in the sort's order, with
+  their `totalCount` and the facets of its list fields and of its kind,
+  each value counted with every filter but its own field's, a null value
+  counting the nodes with none.
+
+`serveNodeValues` and `serveFacetedInstances` answer both through the
+provider's own schema, and `readNodeValues` formats the cells, so every
+provider serves the same values.
+
+Its limits:
+
+- A number value shows without a unit until a field states one: no
+  served field states a unit yet.
+- A relation field that holds a connection is not read as a value, so its
+  column stays empty.
+
 ## The check
 
 ```ts
