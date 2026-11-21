@@ -186,6 +186,21 @@ describe("Node.values", () => {
     );
   });
 
+  it("types a station's platform count and length as numbers", async () => {
+    const data = await run(
+      `query Values($id: ID!) { node(id: $id) { values(fields: ["platformCount", "platformLength"]) { field type } } }`,
+      { id: "https://metro.example/onto#central-exchange" },
+    );
+    expect(data).toEqual({
+      node: {
+        values: [
+          { field: "platformCount", type: "number" },
+          { field: "platformLength", type: "number" },
+        ],
+      },
+    });
+  });
+
   it("answers the fields named, a class's too", async () => {
     const data = await run(
       `{ ontologyClass(uri: "metro:Line") { values(fields: ["label"]) { field } instances(first: 1) { edges { node { values(fields: ["code"]) { field text } } } } } }`,

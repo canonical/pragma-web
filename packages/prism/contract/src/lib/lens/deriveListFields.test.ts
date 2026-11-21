@@ -37,6 +37,19 @@ describe("deriveListFields", () => {
       });
     });
 
+    it("reads GraphQL's number scalars as number ranges", () => {
+      const ranged = (range: string) =>
+        deriveListFields(
+          SERVED_STATION_FIELDS.map((served) =>
+            served.name === "platformCount"
+              ? { ...served, property: { ...served.property, range } }
+              : served,
+          ),
+        ).fields.find((field) => field.id === "platformCount")?.type;
+      expect(ranged("Int")).toBe("number");
+      expect(ranged("Float")).toBe("number");
+    });
+
     it("labels a field by its property, else by its name", () => {
       expect(byId.get("platformCount")?.label).toBe("platform count");
       expect(byId.get("stepFree")?.label).toBe("stepFree");

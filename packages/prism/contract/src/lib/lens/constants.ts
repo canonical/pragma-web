@@ -16,9 +16,15 @@ export const HIDDEN_VISIBILITY: TermVisibility = "HIDDEN";
 /** The XML Schema namespace the ranges of literal properties use. */
 const XSD = "http://www.w3.org/2001/XMLSchema#";
 
-/** The datatype ranges whose values a list reads as numbers. */
-export const NUMBER_RANGES: ReadonlySet<string> = new Set(
-  [
+/**
+ * The datatype ranges whose values a list reads as numbers: XML Schema's
+ * numeric datatypes, and GraphQL's two number scalars, which a provider
+ * that types its literals by its own schema serves as a range ("Int").
+ */
+export const NUMBER_RANGES: ReadonlySet<string> = new Set([
+  "Int",
+  "Float",
+  ...[
     "decimal",
     "double",
     "float",
@@ -36,7 +42,7 @@ export const NUMBER_RANGES: ReadonlySet<string> = new Set(
     "unsignedShort",
     "unsignedByte",
   ].map((name) => `${XSD}${name}`),
-);
+]);
 
 /** The datatype ranges whose values a list reads as dates. */
 export const DATE_RANGES: ReadonlySet<string> = new Set(
