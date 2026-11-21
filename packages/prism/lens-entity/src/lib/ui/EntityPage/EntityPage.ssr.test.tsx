@@ -19,8 +19,8 @@ describe("EntityPage on the server", () => {
       /<h1 class="title"><svg[^>]*>.*?<\/svg>Northgate<\/h1>/,
     );
     expect(html).toContain("The northern terminus.");
-    // Six fields and three relations, each a key value under its rule.
-    expect(html.match(/<div class="pair">/g)).toHaveLength(9);
+    // Eight fields and four relations, each a key value under its rule.
+    expect(html.match(/<div class="pair">/g)).toHaveLength(12);
     expect(html).toContain('class="ds field-list"');
     expect(html).toContain('class="ds relations"');
     expect(fetchFn).not.toHaveBeenCalled();

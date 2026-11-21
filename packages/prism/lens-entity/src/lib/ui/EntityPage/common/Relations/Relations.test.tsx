@@ -25,6 +25,6 @@ describe("Relations", () => {
     expect(relations).toHaveClass("ds", "relations");
     expect(
       relations.querySelectorAll(".ds.key-value-list > .pair"),
-    ).toHaveLength(3);
+    ).toHaveLength(4);
   });
 });

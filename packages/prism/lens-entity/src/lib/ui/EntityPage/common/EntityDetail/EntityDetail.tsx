@@ -26,6 +26,7 @@ import isInstanceOf from "../../../../isInstanceOf.js";
 import labelClass from "../../../../labelClass.js";
 import labelIncomingGroup from "../../../../labelIncomingGroup.js";
 import labelOutgoingGroup from "../../../../labelOutgoingGroup.js";
+import partitionStatements from "../../../../partitionStatements.js";
 import readEntitySummary from "../../../../readEntitySummary.js";
 import useServesStatements from "../../../../useServesStatements.js";
 import { EntityHeader } from "../EntityHeader/index.js";
@@ -81,19 +82,8 @@ const declareEntityPageQueries = (): unknown => [
             }
           }
           label
-          definition
           comment
-          fields {
-            name
-            order
-            visibility
-            group {
-              order
-            }
-            property {
-              uri
-            }
-          }
+          ...statementGroupPartition_meta @relay(mask: false)
           ...FieldList_meta
           ...Relations_meta
         }
@@ -107,6 +97,7 @@ const declareEntityPageQueries = (): unknown => [
         total
         groups {
           ...statementGroupLabels_group @relay(mask: false)
+          ...statementGroupPartition_group @relay(mask: false)
           ...StatementGroup_group
         }
       }
@@ -114,6 +105,7 @@ const declareEntityPageQueries = (): unknown => [
         total
         groups {
           ...statementGroupLabels_group @relay(mask: false)
+          ...statementGroupPartition_group @relay(mask: false)
           ...StatementGroup_group
         }
       }
@@ -124,21 +116,6 @@ void declareEntityPageQueries;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds entity-detail";
-
-/**
- * The predicates whose values the header already shows: the class in the
- * status line, the name in the heading.
- */
-const HEADER_PREDICATES: ReadonlySet<string> = new Set([
-  "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-  "http://www.w3.org/2000/01/rdf-schema#label",
-]);
-
-/** The predicates the header's summary reads, the first one held winning. */
-const SUMMARY_PREDICATES = {
-  definition: "http://www.w3.org/2004/02/skos/core#definition",
-  comment: "http://www.w3.org/2000/01/rdf-schema#comment",
-} as const;
 
 /** The id of the section that lists what points at the entity. */
 const REFERENCED_BY_ID = "referenced-by";
@@ -227,49 +204,32 @@ export default function EntityDetail({
   const isPage = active.name === PAGE_RENDERER_NAMES.page;
   const outgoing = served ? statements.outgoing : null;
   const incoming = served ? statements.incoming : null;
-  const prominent = new Set(
-    entity._meta.fields
-      .filter(({ visibility }) => visibility === "PROMINENT")
-      .map(({ property }) => property.uri),
+  const { prominent, values, relations } = partitionStatements(
+    outgoing?.groups ?? [],
+    entity._meta,
   );
-  const fieldNames = new Map(
-    entity._meta.fields.map(({ name, property }) => [property.uri, name]),
+  const facts = prominent.map(
+    (group): KeyValuePair => ({
+      id: group.predicateUri,
+      term: labelOutgoingGroup(group, ontologies),
+      value: <StatementGroup group={group} />,
+    }),
   );
-  const summaryPredicate =
-    entity._meta.definition != null
-      ? SUMMARY_PREDICATES.definition
-      : SUMMARY_PREDICATES.comment;
-  const groups = (outgoing?.groups ?? []).filter(
-    ({ predicateUri }) =>
-      !HEADER_PREDICATES.has(predicateUri) && predicateUri !== summaryPredicate,
-  );
-  const facts = groups
-    .filter(({ predicateUri }) => prominent.has(predicateUri))
-    .map(
-      (group): KeyValuePair => ({
-        id: group.predicateUri,
-        term: labelOutgoingGroup(group, ontologies),
-        value: <StatementGroup group={group} />,
-      }),
-    );
   const sections: SectionedViewSection[] = [
     ...orderSections(
-      groups
-        .filter(({ predicateUri }) => !prominent.has(predicateUri))
-        .map((group) => {
-          const field =
-            fieldNames.get(group.predicateUri) ??
-            compactIri(group.predicateUri, ontologies);
-          return {
-            field,
-            id: `${SECTION_ID_PREFIX}${field.replaceAll(/[^\w-]/g, "-")}`,
-            title: t("statements.group", {
-              label: labelOutgoingGroup(group, ontologies),
-              count: group.total,
-            }),
-            content: <StatementGroup group={group} />,
-          };
-        }),
+      [...values, ...relations].map(({ group, field: lensField }) => {
+        const field =
+          lensField?.name ?? compactIri(group.predicateUri, ontologies);
+        return {
+          field,
+          id: `${SECTION_ID_PREFIX}${field.replaceAll(/[^\w-]/g, "-")}`,
+          title: t("statements.group", {
+            label: labelOutgoingGroup(group, ontologies),
+            count: group.total,
+          }),
+          content: <StatementGroup group={group} />,
+        };
+      }),
       entity._meta.fields,
     ),
     ...(incoming === null || incoming === undefined || incoming.total === 0

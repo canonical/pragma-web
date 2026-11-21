@@ -95,3 +95,53 @@ export interface EntityDescription {
   readonly definition: string | null | undefined;
   readonly comment: string | null | undefined;
 }
+
+/** A field of the entity's class as the statements' partition reads it. */
+export interface PartitionField {
+  readonly name: string;
+  readonly order?: number | null;
+  readonly visibility?: string | null;
+  readonly group?: {
+    readonly uri: string;
+    readonly label?: string | null;
+    readonly order?: number | null;
+  } | null;
+  readonly property: { readonly uri: string };
+}
+
+/** What the statements' partition reads of the entity: its summary's source and its class's fields. */
+export interface PartitionMeta {
+  readonly definition: string | null | undefined;
+  readonly fields: readonly PartitionField[];
+}
+
+/** What the partition reads of a group: its predicate and, of each node it holds, the node's class's visibility. */
+export interface PartitionGroup {
+  readonly predicateUri: string;
+  readonly values: readonly {
+    readonly __typename: string;
+    readonly node?: {
+      readonly _meta: {
+        readonly type: { readonly visibility?: string | null };
+      };
+    };
+  }[];
+}
+
+/** A group the partition kept, beside the lens's field for its predicate when the lens has one. */
+export interface PartitionedGroup<G> {
+  readonly group: G;
+  readonly field: PartitionField | undefined;
+}
+
+/**
+ * An entity's outgoing statement groups, split as the page and the panel
+ * show them: the prominent groups, the groups of values (literals, nested
+ * values, nodes of hidden classes) and the relations (nodes of a shown
+ * class), the header's and the summary's predicates left out.
+ */
+export interface StatementPartition<G> {
+  readonly prominent: readonly G[];
+  readonly values: readonly PartitionedGroup<G>[];
+  readonly relations: readonly PartitionedGroup<G>[];
+}

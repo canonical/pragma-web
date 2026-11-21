@@ -130,10 +130,9 @@ describe("EntityDetail", () => {
     expect(container.querySelectorAll(".facts .values a")).toHaveLength(3);
     expect(readSections(container)).toEqual([
       "p-platformCount|platform count · 1",
+      "p-platformLength|platform length · 1",
       "p-inZone|in zone · 1",
-      // Predicates the class names no field for: their compact form.
-      "p-metro-diagramPosition|diagram position · 1",
-      "p-metro-platformLength|platform length · 1",
+      "p-diagramPosition|diagram position · 1",
       "referenced-by|Referenced by · 6",
     ]);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(

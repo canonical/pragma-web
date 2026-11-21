@@ -23,7 +23,7 @@ import EntityPage from "./EntityPage.js";
 const HARBOURSIDE_CURIE = "metro:harbourside";
 
 /** A fare zone, whose class declares no relation. */
-const COASTAL_ZONE_CURIE = "geo:coastal-zone";
+const CAR_TYPE_CURIE = "metro:car-50-driving";
 
 /** The annotation property every station inherits. */
 const NOTE_IRI = "https://metro.example/onto#note";
@@ -76,7 +76,7 @@ describe("EntityPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("lists the six fields of the station's class as key values, own and inherited", {
+  it("lists the eight fields of the station's class as key values, own and inherited", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     await renderStation(NORTHGATE_CURIE);
@@ -88,6 +88,10 @@ describe("EntityPage", () => {
         "metro:platformCount, Datatype property to Int, at most one",
       ],
       [
+        "platformLength",
+        "metro:platformLength, Datatype property to Int, at most one",
+      ],
+      [
         "servesLine",
         "metro:servesLine, Object property to metro:Line, one or more",
       ],
@@ -96,6 +100,10 @@ describe("EntityPage", () => {
         "geo:location, Object property to geo:GeoPoint, at most one",
       ],
       ["inZone", "geo:inZone, Object property to geo:Zone, at most one"],
+      [
+        "diagramPosition",
+        "metro:diagramPosition, Object property to metro:DiagramPoint, at most one",
+      ],
       ["nameinherited", "metro:name, Datatype property to String, exactly one"],
       [
         "noteinherited",
@@ -124,6 +132,7 @@ describe("EntityPage", () => {
       ["servesLine", "to metro:Line, one or more"],
       ["location", "to geo:GeoPoint, at most one"],
       ["inZone", "to geo:Zone, at most one"],
+      ["diagramPosition", "to metro:DiagramPoint, at most one"],
     ]);
   });
 
@@ -154,13 +163,17 @@ describe("EntityPage", () => {
   }, async () => {
     render(
       createEntitySite({
-        url: stationUrl(COASTAL_ZONE_CURIE),
+        url: stationUrl(CAR_TYPE_CURIE),
         environment: createEnvironment({ fetchFn: createRecordedFetch() }),
         children: (
           <EntityPage
-            binding={{ id: "zones", classUri: "geo:Zone", typename: "Zone" }}
-            label="Zones"
-            uri={COASTAL_ZONE_CURIE}
+            binding={{
+              id: "car-types",
+              classUri: "metro:CarType",
+              typename: "CarType",
+            }}
+            label="Car types"
+            uri={CAR_TYPE_CURIE}
           />
         ),
       }),

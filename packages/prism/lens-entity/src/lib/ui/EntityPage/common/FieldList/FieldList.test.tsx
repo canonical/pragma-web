@@ -27,7 +27,7 @@ describe("FieldList", () => {
     const fields = screen.getByRole("region", { name: "Fields" });
     expect(fields).toHaveClass("ds", "field-list");
     expect(fields.querySelectorAll(".ds.key-value-list > .pair")).toHaveLength(
-      6,
+      8,
     );
     expect(fields.querySelectorAll(".inherited")).toHaveLength(2);
   });
