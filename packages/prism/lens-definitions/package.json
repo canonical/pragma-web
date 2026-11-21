@@ -65,6 +65,7 @@
   "dependencies": {
     "@canonical/i18n-core": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
+    "@canonical/prism-lens-entity": "^0.44.1",
     "@canonical/prism-projections": "^0.44.1",
     "@canonical/react-ds-global": "^0.44.1",
     "@canonical/react-head": "^0.44.1",

@@ -27,6 +27,8 @@ import type { OntologyNamespace } from "../../types.js";
 
 const UNKNOWN_TERM = "ds:NoSuchTerm";
 
+const UNKNOWN_IRI = "https://ds.canonical.com/NoSuchTerm";
+
 /** The id of the UI Block lookup's record, and of one of its parts. */
 const UIBLOCK = 'client:root:ontologyClass(uri:"ds:UIBlock")';
 
@@ -44,6 +46,8 @@ const unknownTermRecords = {
     ...(definitionsExplorerRecords["client:root"] as Record<string, unknown>),
     [`ontologyClass(uri:"${UNKNOWN_TERM}")`]: null,
     [`ontologyProperty(uri:"${UNKNOWN_TERM}")`]: null,
+    // The details panel's lookup at the term's expanded address.
+    [`node(id:"${UNKNOWN_IRI}")`]: null,
   },
 } as unknown as RecordMap;
 
@@ -424,10 +428,11 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     ).toBeInTheDocument();
   });
 
-  it("alerts on a term the graph does not know, without fetching", () => {
+  it("alerts on a term the graph does not know in the details panel, without fetching", () => {
     const fetchFn = createFetchSpy();
     renderInspector(UNKNOWN_TERM, unknownTermRecords, fetchFn);
     const alert = screen.getByRole("alert");
+    expect(alert.closest("section.ds.entity-panel")).not.toBeNull();
     expect(alert.textContent).toBe(
       `No term at ${UNKNOWN_TERM}. The rail lists every term the ontologies carry.`,
     );
