@@ -36,8 +36,8 @@ import {
   measurePage,
   measureRowHeights,
   ROW_PX,
-  TWO_LINE_ROW_PX,
   type ThemedMeasure,
+  TWO_LINE_ROW_PX,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
