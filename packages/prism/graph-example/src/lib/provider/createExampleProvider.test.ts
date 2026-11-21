@@ -2777,6 +2777,22 @@ describe("Query.statements", () => {
     );
   });
 
+  it("counts a node a nested value names for the record holding the value", async () => {
+    const result = await read({
+      uri: `${METRO}central-exchange`,
+      direction: "IN",
+    });
+    const calls = result.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#calls"),
+    );
+    // Six routes call at the interchange: two on each of its three lines.
+    expect(calls?.total).toBe(6);
+    expect(calls?.values).toContainEqual({
+      __typename: "StatementNode",
+      node: { uri: `${METRO}north-line` },
+    });
+  });
+
   it("follows a path to a line's route by its key", async () => {
     const result = await read({
       uri: `${METRO}north-line`,

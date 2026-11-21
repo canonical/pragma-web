@@ -1066,6 +1066,26 @@ export const createExampleProvider = (
    *
    * @note Impure: fills the index once.
    */
+  /**
+   * The nodes a record's statements name, at any depth: a node a nested
+   * value holds (a route's call holding its stop) counts under the
+   * predicate that names it, for the record that holds the nested value,
+   * the nearest holder with an IRI. It reads one level of nested values:
+   * a nested value's own nested values restate their holder (a route's
+   * reverse holds the route's calls again), and counting them would count
+   * each call twice.
+   */
+  const listHeldNodes = (
+    statements: readonly RecordStatement[],
+    nested = false,
+  ): readonly { readonly predicate: string; readonly uri: string }[] =>
+    statements.flatMap(({ predicate, object }) => {
+      if (object.kind === "node") return [{ predicate, uri: object.uri }];
+      if (object.kind === "nested" && !nested)
+        return listHeldNodes(object.statements(), true);
+      return [];
+    });
+
   let statementIndex:
     | {
         readonly outgoing: ReadonlyMap<string, readonly RecordStatement[]>;
@@ -1081,10 +1101,9 @@ export const createExampleProvider = (
       ]),
     );
     const incoming = [...outgoing].reduce((index, [subject, statements]) => {
-      for (const { predicate, object } of statements) {
-        if (object.kind !== "node") continue;
-        index.set(object.uri, [
-          ...(index.get(object.uri) ?? []),
+      for (const { predicate, uri } of listHeldNodes(statements)) {
+        index.set(uri, [
+          ...(index.get(uri) ?? []),
           { predicate, object: { kind: "node", uri: subject } },
         ]);
       }
