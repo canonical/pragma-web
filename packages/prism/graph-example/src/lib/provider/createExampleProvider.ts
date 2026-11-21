@@ -1084,21 +1084,16 @@ export const createExampleProvider = (
         ? matches
         : matches.filter((match) => types.has(match.type));
     const page = sliceConnection(kept, (match) => match.uri, args);
-    const edges = page.items.flatMap((match) => {
-      const node = resolveNode(match.uri);
-      return node === null
-        ? []
-        : [
-            {
-              node,
-              cursor: toCursor(match.uri),
-              match: {
-                field: SEARCH_MATCH_FIELDS[match.tier],
-                ...buildSearchPassage(match.value, needle, match.position),
-              },
-            },
-          ];
-    });
+    // Every entry is a visible instance or a class, so `node` resolves for
+    // each; `SearchEdge.node` is non-null and would reject one that did not.
+    const edges = page.items.map((match) => ({
+      node: resolveNode(match.uri),
+      cursor: toCursor(match.uri),
+      match: {
+        field: SEARCH_MATCH_FIELDS[match.tier],
+        ...buildSearchPassage(match.value, needle, match.position),
+      },
+    }));
     return {
       ...buildNodeConnectionView(edges, page),
       total: kept.length,
