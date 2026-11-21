@@ -43,7 +43,7 @@ node:
           layout.grid.column: "1 / -1"
           layout.type: flex
           layout.align: baseline
-          spacing.gap.inline: grid.gutter
+          spacing.gap: grid.gutter
           spacing.external.block.start: 0
           spacing.external.block.end: 0
         edges:

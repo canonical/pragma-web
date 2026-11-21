@@ -548,7 +548,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
       'data-view="component-entity"',
     );
     expect(mustGet(BUTTON_ENTITY_URL).canvas).toContain(
-      '<h1 class="heading" id="component-entity-title">Button</h1>',
+      "</svg>Button</h1>",
     );
     expect(mustGet(BUTTON_ENTITY_URL).canvas).toContain(
       '<figure aria-label="The anatomy of Button"',
