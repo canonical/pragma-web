@@ -26,11 +26,7 @@ describe("SearchPage SSR", () => {
       }),
     );
     const html = renderToString(
-      createSiteTree(
-        environment,
-        <SearchPage text="but" />,
-        "/search?q=but",
-      ),
+      createSiteTree(environment, <SearchPage text="but" />, "/search?q=but"),
     );
     expect(html).toContain('class="ds search-page"');
     expect(html).toContain(`>${MESSAGES["search.title"]}</h1>`);

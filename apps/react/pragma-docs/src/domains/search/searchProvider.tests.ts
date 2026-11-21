@@ -15,7 +15,13 @@ const BOOT_TIMEOUT_MS = 60_000;
 interface SearchAnswer {
   readonly total: number;
   readonly edges: readonly {
-    readonly node: { readonly uri: string; readonly _meta: { readonly curie: string; readonly type: { readonly uri: string } } };
+    readonly node: {
+      readonly uri: string;
+      readonly _meta: {
+        readonly curie: string;
+        readonly type: { readonly uri: string };
+      };
+    };
     readonly match: { readonly passage: string };
   }[];
   readonly facets: readonly {
@@ -32,10 +38,7 @@ const SEARCH = `query($text: String!, $types: [ID!]) {
   }
 }`;
 
-let search: (
-  text: string,
-  types?: readonly string[],
-) => Promise<SearchAnswer>;
+let search: (text: string, types?: readonly string[]) => Promise<SearchAnswer>;
 
 beforeAll(async () => {
   const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
