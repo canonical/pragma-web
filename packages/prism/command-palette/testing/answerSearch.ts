@@ -19,6 +19,6 @@ export default function answerSearch(
 ): (operation: OperationDescriptor) => GraphQLSingularResponse {
   return (operation) =>
     MockPayloadGenerator.generate(operation, {
-      NodeConnection: () => ({ edges: nodes.map((node) => ({ node })) }),
+      SearchConnection: () => ({ edges: nodes.map((node) => ({ node })) }),
     });
 }

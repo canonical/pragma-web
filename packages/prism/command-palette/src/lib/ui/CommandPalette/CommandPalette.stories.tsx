@@ -13,7 +13,7 @@ import Component from "./CommandPalette.js";
 /** The story's mock environment, answering every search with the ranking. */
 const answerWithRanking: RelayParameters = {
   mockResolvers: {
-    NodeConnection: () => ({
+    SearchConnection: () => ({
       edges: RANKED_RESULTS.map((node) => ({ node })),
     }),
   },
