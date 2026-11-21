@@ -19,18 +19,20 @@
 #
 # Below two groups (the shell's container query at 912px) the table folds
 # into scented rows, from the same markup: the header row is hidden, and
-# every row is two lines, 56px: the title across the row's whole width,
-# then its first two value cells, each two columns wide and showing its
-# label before its text ("Platforms 8"); the later cells (.is-later) are
-# hidden. The two 24px lines stand centred in the row, 4px from its edges.
+# every row is two lines, 56px, a wrapping flex line rather than the
+# canvas's columns (three below one group): the title the first line
+# (basis 100%), then its first two value cells sharing the second (grow 1,
+# basis 0), each showing its label before its text ("Platforms 8"); the
+# later cells (.is-later) are hidden. The two 24px lines stand centred in the row, 4px from its edges.
 #
 # Token ledger (no symbol to bind):
 #   space.400 (32px) for a one-line row's block size: the matrix's row.
 #   2 x space.300 + space.100 (56px) for a two-line row's block size: two
 #   24px lines between 4px insets, as W3's two-line row.
 #   1px for the hairline under each row, as the key-value list's rule.
-#   space.300 (24px) for each line of a folded row. A space stands between
-#   a value's label and its text, which the folded row shows as one line.
+#   100% for a folded row's title basis: the title is its first line.
+#   A space stands between a value's label and its text, which the folded
+#   row shows as one line.
 #
 # Roster namespaces: grid.gutter, space.100, space.300, space.400.
 node:

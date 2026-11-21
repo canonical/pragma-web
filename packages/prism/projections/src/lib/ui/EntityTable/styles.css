@@ -26,8 +26,8 @@
       --typography-text-primary-font-weight
     );
     --entity-table-sorted-color: var(--color-text);
-    /* Each of a folded row's two lines: the matrix's 24px line. */
-    --entity-table-fold-line-size: var(--space-300);
+    /* A folded row's title is its first line, across the row. */
+    --entity-table-fold-title-basis: 100%;
 
     display: grid;
     grid-template-columns: subgrid;
@@ -152,10 +152,11 @@
   }
 
   /* Below two groups the table folds into scented rows: no header row,
-   * and each row two lines, 56px, whatever it declares: the title across
-   * the row, then its first two values, each two columns wide after its
-   * label; the later values leave. The two lines stand centred in the
-   * row. */
+   * and each row two lines, 56px, whatever it declares: a wrapping line
+   * rather than the canvas's columns, three below one group, so the title
+   * takes the first line across the row and its first two values share
+   * the second, each after its label; the later values leave. The two
+   * lines stand centred in the row. */
   @container shell (width < 912px) {
     .ds.entity-table .header {
       display: none;
@@ -164,16 +165,18 @@
     .ds.entity-table .row,
     .ds.entity-table .row.is-two-line {
       block-size: var(--entity-table-two-line-row-size);
-      grid-auto-rows: var(--entity-table-fold-line-size);
+      display: flex;
+      flex-wrap: wrap;
       align-content: center;
     }
 
     .ds.entity-table .title {
-      grid-column: 1 / -1;
+      flex-basis: var(--entity-table-fold-title-basis);
     }
 
     .ds.entity-table .value {
-      grid-column: span 2;
+      flex-grow: 1;
+      flex-basis: 0;
     }
 
     .ds.entity-table .value.is-later {
