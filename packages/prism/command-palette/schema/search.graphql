@@ -6,7 +6,12 @@
 
 extend type Query {
   "Every node whose title, CURIE or definition contains `text`, ignoring case, ranked best first; `types` keeps the results whose type is one of the IRIs given."
-  search(text: String!, first: Int, after: String, types: [ID!]): SearchConnection!
+  search(
+    text: String!
+    first: Int
+    after: String
+    types: [ID!]
+  ): SearchConnection!
 }
 
 "A page of search results, ranked best first."
