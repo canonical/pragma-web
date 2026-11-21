@@ -5,12 +5,12 @@ import {
   ErrorBoundary,
   useRenderers,
 } from "@canonical/prism-core";
+import { EntityPanel } from "@canonical/prism-lens-entity";
 import { Head } from "@canonical/react-head";
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
-import { MetroCardProjection } from "#lib/ui";
 import { NETWORK_RENDERERS } from "../../constants.js";
 import useStationView from "../hooks/useStationView.js";
 import { NetworkStrip } from "../NetworkStrip/index.js";
@@ -97,13 +97,13 @@ const StationMain = ({
   );
 };
 
-/** The station's card, as its site projects it. */
+/** The station's details panel: its identity, values and relation groups. */
 const StationAside = ({
   address,
 }: Pick<NetworkStationPageProps, "address">): ReactElement | null => {
   const station = useStationView({ address });
   return station === undefined ? null : (
-    <MetroCardProjection node={station.card} />
+    <EntityPanel headingLevel={2} uri={station.uri} />
   );
 };
 
@@ -111,8 +111,8 @@ const StationAside = ({
  * A station's page in the network lens, a document: the metro rail, the
  * network strip with the page's renderers, the station's title and, drawn
  * by the active page renderer, its place on every route in the main column
- * (at `as=turtle`, its Turtle source), and its card, as its
- * site projects it, in the aside. A station no route calls at renders a
+ * (at `as=turtle`, its Turtle source), and its details panel in the
+ * aside. A station no route calls at renders a
  * status saying so, linking to its entry in the stations lens; an address
  * that names no station renders the page's not-found status. It renders its
  * own archetype, because its aside reads the station's own data, and each

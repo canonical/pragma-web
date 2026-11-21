@@ -3,7 +3,7 @@ import {
   type ViewSearch,
   warmPageRenderer,
 } from "@canonical/prism-core";
-import { readUriParam } from "@canonical/prism-lens-entity";
+import { readUriParam, warmEntityPanel } from "@canonical/prism-lens-entity";
 import { type CacheConfig, fetchQuery } from "relay-runtime";
 import networkLineQueryNode from "#relay/__generated__/NetworkLineQuery.graphql.js";
 import networkNamespacesQueryNode, {
@@ -78,6 +78,7 @@ export default function warmNetworkNode(
           STORE_OR_NETWORK,
         ).toPromise(),
         warmPageRenderer(variables.id, search, environment),
+        warmEntityPanel(environment, variables.id),
       ]);
     })
     .then(() => undefined);

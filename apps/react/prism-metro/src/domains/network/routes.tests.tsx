@@ -89,7 +89,11 @@ describe("networkRoutes", () => {
       "NetworkMapQuery",
       "NetworkNamespacesQuery",
       "NetworkStationQuery",
+      "EntityPanelQuery",
+      "EntityStatementsQuery",
       "NetworkLineQuery",
+      "EntityPanelQuery",
+      "EntityStatementsQuery",
     ]);
   });
 });

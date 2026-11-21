@@ -150,6 +150,23 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(html).not.toContain("property to");
   });
 
+  it("asides a line's details panel, every group closed and counted (W6b-A6)", async () => {
+    const { status, html } = await fetchPage(
+      script,
+      "/network/lines/metro%3Acircle-line",
+    );
+    expect(status).toBe(200);
+    const panel = html.split('class="ds entity-panel').at(1) ?? "";
+    expect(panel).toContain("Circle Line");
+    const summaries = [...panel.matchAll(/<summary[^>]*>(.*?)<\/summary>/gs)];
+    expect(summaries.length).toBeGreaterThan(0);
+    for (const [, summary] of summaries) {
+      expect(summary.replace(/<[^>]+>/g, "")).toMatch(/\d/);
+    }
+    expect(panel).not.toMatch(/<details[^>]*\sopen/);
+    expect(panel).toContain("Referenced by");
+  });
+
   it("renders the lines index with the line rows", async () => {
     const { status, html } = await fetchPage(script, "/lines");
     expect(status).toBe(200);

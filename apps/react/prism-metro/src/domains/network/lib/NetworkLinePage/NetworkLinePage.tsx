@@ -5,13 +5,13 @@ import {
   ErrorBoundary,
   useRenderers,
 } from "@canonical/prism-core";
+import { EntityPanel } from "@canonical/prism-lens-entity";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
 import { NETWORK_RENDERERS } from "../../constants.js";
 import useLineView from "../hooks/useLineView.js";
-import { LinePanel } from "../LinePanel/index.js";
 import { NetworkStrip } from "../NetworkStrip/index.js";
 import { RouteStrip } from "../RouteStrip/index.js";
 import type { NetworkLinePageProps } from "./types.js";
@@ -80,12 +80,12 @@ const LineMain = ({
   );
 };
 
-/** The line's facts. */
+/** The line's details panel: its identity, values and relation groups. */
 const LineAside = ({
   address,
 }: Pick<NetworkLinePageProps, "address">): ReactElement | null => {
   const line = useLineView({ address });
-  return line === undefined ? null : <LinePanel line={line} />;
+  return line === undefined ? null : <EntityPanel headingLevel={2} uri={line.uri} />;
 };
 
 /**
@@ -93,7 +93,7 @@ const LineAside = ({
  * network strip with the page's renderers, the line's title and one strip
  * per route it draws in the main column (or, at `as=turtle`, its Turtle
  * source), and the line's
- * facts in the aside. An address the network does not route renders the
+ * details panel in the aside. An address the network does not route renders the
  * page's not-found status. It renders its own archetype, because its aside
  * reads the line's own data, and each region reads under its own boundary.
  *
