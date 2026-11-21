@@ -121,12 +121,11 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(html).toContain('class="ds field-list"');
   });
 
-  it("renders the lines index with the line rows", async () => {
+  it("renders the lines index as rows of its table", async () => {
     const { status, html } = await fetchPage(script, "/lines");
     expect(status).toBe(200);
-    expect(html).toMatch(
-      /<li [^>]*class="ds entity-row ds line-row"[^>]*>.*?Circle Line/s,
-    );
+    expect(html).toMatch(/<table [^>]*class="ds entity-table[ "]/);
+    expect(html).toMatch(/<tr [^>]*class="row"[^>]*>.*?Circle Line/s);
   });
 
   it("renders the Definitions lens with the ontology's terms", async () => {
