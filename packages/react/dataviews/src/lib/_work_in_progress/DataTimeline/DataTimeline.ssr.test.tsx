@@ -69,7 +69,7 @@ describe("DataTimeline on the server", () => {
       />,
     );
     expect(markup).toMatch(
-      /<a[^>]*href="\?[^"]*size=6[^"]*"[^>]*>Show 3 more<\/a>/u,
+      /<a[^>]*href="\?[^"]*size=6[^"]*"[^>]*><span class="label">Show 3 more<\/span><\/a>/u,
     );
   });
 

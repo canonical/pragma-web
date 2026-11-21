@@ -23,13 +23,16 @@
       color: var(--color-text-link);
       font: inherit;
       font-weight: var(--typography-weight-semi-bold);
-      text-decoration: underline;
+      text-decoration: none;
       cursor: pointer;
 
       &::before {
         content: "•" / "";
         color: var(--color-text-muted);
-        text-decoration: none;
+      }
+
+      & > .label {
+        text-decoration: underline;
       }
 
       &:focus-visible {
