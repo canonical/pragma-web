@@ -250,8 +250,15 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
               '[data-slot="facets"] button',
             ) ?? []),
           ].find((button) => button.textContent === text);
-          return { shown, pressed: own?.getAttribute("aria-pressed") ?? null };
+          return {
+            x: controls?.getBoundingClientRect().x ?? null,
+            shown,
+            pressed: own?.getAttribute("aria-pressed") ?? null,
+          };
         }, name);
+        // From two groups up the controls start under Search.
+        expect(bar.x).not.toBeNull();
+        expect(bar.x ?? 0).toBeCloseTo(strip.groups.filtering?.x ?? -1, 0);
         if (viewport.width >= 1376) {
           expect(bar.pressed).toBe("true");
         } else {
