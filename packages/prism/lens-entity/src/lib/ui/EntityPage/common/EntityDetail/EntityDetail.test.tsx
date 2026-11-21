@@ -71,6 +71,18 @@ const renderServed = async (
   );
 };
 
+/** The part of a statements answer whose inverse labels a test strips. */
+interface StrippedStatements {
+  readonly incoming: {
+    readonly groups: readonly {
+      readonly predicate: {
+        inverseLabel: string | null;
+        inversePluralLabel: string | null;
+      };
+    }[];
+  };
+}
+
 /** The headings of the view's sections, as `id|title`. */
 const readSections = (root: ParentNode): readonly string[] =>
   [...root.querySelectorAll(".sectioned-view .section > .heading")].map(
@@ -154,6 +166,47 @@ describe("EntityDetail", () => {
       [...(referenced?.querySelectorAll("h3") ?? [])].map((h) => h.textContent),
     ).toEqual(["served by · 6"]);
     expect(referenced?.querySelectorAll(".values a")).toHaveLength(6);
+    expect(container.textContent).not.toContain("property to");
+  });
+
+  it("words an incoming group whose property names no inverse from the entity's side", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const url = `/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`;
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation(async (request, variables, ...rest) => {
+      const response = (await recorded(request, variables, ...rest)) as {
+        data: StrippedStatements;
+      };
+      if (request.name === "EntityStatementsQuery") {
+        for (const { predicate } of response.data.incoming.groups) {
+          predicate.inverseLabel = null;
+          predicate.inversePluralLabel = null;
+        }
+      }
+      return response;
+    });
+    const environment = createEnvironment({ fetchFn });
+    await warmRoute(environment, url);
+    const { container } = render(
+      createEntitySite({
+        url,
+        environment,
+        extensions: ["source", "statements"],
+        children: (
+          <EntityDetail
+            binding={LINES_BINDING}
+            label="X"
+            uri={CIRCLE_LINE_CURIE}
+          />
+        ),
+      }),
+    );
+    const referenced = container.querySelector("#referenced-by")?.parentElement;
+    expect(
+      [...(referenced?.querySelectorAll("h3") ?? [])].map((h) => h.textContent),
+    ).toEqual(["Has this as serves line · 6"]);
     expect(container.textContent).not.toContain("property to");
   });
 

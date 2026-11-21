@@ -70,3 +70,28 @@ export type EntityRoutes<TId extends string> = {
  * or more, or any number.
  */
 export type Cardinality = "one" | "optional" | "many" | "any";
+
+/**
+ * What a statement group's label is read from: its predicate's labels in
+ * the site's language, each absent when the ontology states none, its
+ * predicate's IRI and its true count.
+ */
+export interface StatementGroupLabels {
+  readonly predicateUri: string;
+  readonly total: number;
+  readonly predicate:
+    | {
+        readonly label?: string | null;
+        readonly pluralLabel?: string | null;
+        readonly inverseLabel?: string | null;
+        readonly inversePluralLabel?: string | null;
+      }
+    | null
+    | undefined;
+}
+
+/** What an entity's one-line description is read from. */
+export interface EntityDescription {
+  readonly definition: string | null | undefined;
+  readonly comment: string | null | undefined;
+}

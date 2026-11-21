@@ -25,7 +25,8 @@ const RECORDED = metroResponses.find(
 
 /**
  * The recorded "serves lines" group, its first line kept beside a value of
- * every other kind, its total past what it holds.
+ * every other kind and one of a kind the reader does not know, its total
+ * past what it holds.
  */
 const craftAnswer = () => {
   const answer = structuredClone(RECORDED?.response) as {
@@ -49,6 +50,8 @@ const craftAnswer = () => {
     },
     { __typename: "StatementForeign", curie: "x:a" },
     { __typename: "StatementNested", type: null },
+    // A kind a later contract may add, which this reader does not know.
+    { __typename: "StatementQuoted" },
   ];
   answer.data.outgoing.groups = [group];
   return answer;
@@ -88,12 +91,12 @@ const renderGroup = async (allHref?: string) => {
 };
 
 describe("StatementGroup", () => {
-  it("renders each value by its kind: a linked chip, text in its language, a compact form", {
+  it("renders each value by its kind: a linked chip, text in its language, a compact form, none for a kind it does not know", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { container } = await renderGroup();
     const values = [...container.querySelectorAll(".values > .value")];
-    expect(values).toHaveLength(4);
+    expect(values).toHaveLength(5);
     expect(values.at(0)?.querySelector("a")?.getAttribute("href")).toBe(
       "/lines/metro%3Acircle-line",
     );
@@ -102,6 +105,7 @@ describe("StatementGroup", () => {
     );
     expect(values.at(2)?.querySelector("code")?.textContent).toBe("x:a");
     expect(values.at(3)?.textContent).toBe("A nested value");
+    expect(values.at(4)?.childNodes).toHaveLength(0);
   });
 
   it("names no link to all the values when the caller names no index", {

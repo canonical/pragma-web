@@ -23,6 +23,10 @@ import buildEntityPageVariables from "../../../../buildEntityPageVariables.js";
 import compactIri from "../../../../compactIri.js";
 import { Message, useMessages } from "../../../../i18n/index.js";
 import isInstanceOf from "../../../../isInstanceOf.js";
+import labelClass from "../../../../labelClass.js";
+import labelIncomingGroup from "../../../../labelIncomingGroup.js";
+import labelOutgoingGroup from "../../../../labelOutgoingGroup.js";
+import readEntitySummary from "../../../../readEntitySummary.js";
 import useServesStatements from "../../../../useServesStatements.js";
 import { EntityHeader } from "../EntityHeader/index.js";
 import { EntitySummary } from "../EntitySummary/index.js";
@@ -153,13 +157,6 @@ const REFERENCED_BY_ID = "referenced-by";
 /** The prefix of a property group's section id: no field name meets the view's own ids. */
 const SECTION_ID_PREFIX = "p-";
 
-type PageEntity = NonNullable<EntityPageQuery["response"]["node"]>;
-type Statements = EntityStatementsQuery["response"];
-type OutgoingGroup = NonNullable<Statements["outgoing"]>["groups"][number];
-type IncomingGroup = NonNullable<Statements["incoming"]>["groups"][number];
-type Translate = ReturnType<typeof useMessages>;
-type Namespaces = EntityNamespacesQuery["response"]["ontologies"];
-
 /**
  * The entity page's data-reading interior: it reads the graph's namespaces,
  * then the page's operation with the address expanded through them, and,
@@ -262,7 +259,7 @@ export default function EntityDetail({
     .map(
       (group): KeyValuePair => ({
         id: group.predicateUri,
-        term: labelOutgoing(group, ontologies),
+        term: labelOutgoingGroup(group, ontologies),
         value: <StatementGroup group={group} />,
       }),
     );
@@ -278,7 +275,7 @@ export default function EntityDetail({
             field,
             id: `${SECTION_ID_PREFIX}${field.replaceAll(/[^\w-]/g, "-")}`,
             title: t("statements.group", {
-              label: labelOutgoing(group, ontologies),
+              label: labelOutgoingGroup(group, ontologies),
               count: group.total,
             }),
             content: <StatementGroup group={group} />,
@@ -296,7 +293,9 @@ export default function EntityDetail({
               <section className="referenced-by" key={group.predicateUri}>
                 <h3 className="title">
                   {t("statements.group", {
-                    label: labelIncoming(group, ontologies, t),
+                    label: labelIncomingGroup(group, ontologies, (inverse) =>
+                      t("statements.inverse", { label: inverse }),
+                    ),
                     count: group.total,
                   })}
                 </h3>
@@ -323,11 +322,8 @@ export default function EntityDetail({
         header={
           <EntityHeader
             address={entity._meta.curie}
-            kind={
-              entity._meta.type.label ??
-              compactIri(entity._meta.type.uri, ontologies)
-            }
-            summary={served ? readSummary(entity) : undefined}
+            kind={labelClass(entity._meta.type, ontologies)}
+            summary={served ? readEntitySummary(entity._meta) : undefined}
             title={entity._meta.title}
           />
         }
@@ -346,40 +342,5 @@ export default function EntityDetail({
         })}
       </SectionedView>
     </div>
-  );
-}
-
-/** The entity's one-line description: its definition, else its comment. */
-function readSummary(entity: PageEntity): string | undefined {
-  return entity._meta.definition ?? entity._meta.comment ?? undefined;
-}
-
-/** An outgoing group's label: the property's plural for many values, else its label. */
-function labelOutgoing(group: OutgoingGroup, namespaces: Namespaces): string {
-  const { predicate } = group;
-  return (
-    (group.total > 1 ? predicate?.pluralLabel : undefined) ??
-    predicate?.label ??
-    compactIri(group.predicateUri, namespaces)
-  );
-}
-
-/**
- * An incoming group's label, from the entity's side: the property's inverse
- * label (its plural for many values); a property with none is named as
- * what the entity is to its holders.
- */
-function labelIncoming(
-  group: IncomingGroup,
-  namespaces: Namespaces,
-  t: Translate,
-): string {
-  const { predicate } = group;
-  return (
-    (group.total > 1 ? predicate?.inversePluralLabel : undefined) ??
-    predicate?.inverseLabel ??
-    t("statements.inverse", {
-      label: predicate?.label ?? compactIri(group.predicateUri, namespaces),
-    })
   );
 }
