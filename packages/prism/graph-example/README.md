@@ -439,7 +439,7 @@ than imported so the two packages stay independent.
 
 ## Search — hand-written
 
-`Query.search(text: String!, first: Int, after: String): NodeConnection!` finds nodes by
+`Query.search(text: String!, first: Int, after: String, types: [ID!]): SearchConnection!` finds nodes by
 what they are called, the same extension the pragma provider serves, written here by
 hand over the records and classes `node(id:)` already serves.
 
@@ -454,6 +454,14 @@ like every other connection here: 20 a page unless `first` says otherwise, an un
 `after` starts from the head, a negative `first` is an error, and `hasPreviousPage` is
 true after a cursor. The two providers differ there, as the contract leaves them free to;
 a client that wants a page size passes `first`.
+
+Each edge carries its `match`: the field the text was found in (`rdfs:label` for the
+title, `uri` for the CURIE, `skos:definition`), a passage of that field's value (the
+whole value when it fits in 160 code units, else 160 of them with the first occurrence
+centred) and the ranges of every occurrence inside the passage. A result's type is its
+`_meta.type`: an instance's class, `rdfs:Class` for a class. `types` keeps the results
+of the types it names; `total` counts what it keeps and `facets` counts every match by
+type before it, most first, so a facet's count is the total its filter would show.
 
 `matchSearchEntry.ts` and `rankSearchEntries.ts` repeat the pragma provider's functions
 of the same names on purpose. This package depends on the contract and `graphql` and on

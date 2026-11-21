@@ -388,6 +388,90 @@ describe("Query.search", () => {
     expect(await rank("  NORTH  ")).toEqual(await rank("north"));
   });
 
+  /** The selection of a result's match, the total and the type facet. */
+  const SEARCH_MATCHES = `query Search($text: String!, $types: [ID!]) {
+    search(text: $text, first: 100, types: $types) {
+      edges { node { uri } match { field passage ranges { start length } } }
+      total
+      facets { type { uri } count }
+    }
+  }`;
+
+  /** What `SEARCH_MATCHES` answers. */
+  interface SearchMatches {
+    readonly edges: readonly {
+      readonly node: { readonly uri: string };
+      readonly match: {
+        readonly field: string;
+        readonly passage: string;
+        readonly ranges: readonly { start: number; length: number }[];
+      };
+    }[];
+    readonly total: number;
+    readonly facets: readonly {
+      readonly type: { readonly uri: string };
+      readonly count: number;
+    }[];
+  }
+
+  /** Run `SEARCH_MATCHES` for `text`, narrowed to `types` when given. */
+  const searchMatches = async (
+    text: string,
+    types?: readonly string[],
+  ): Promise<SearchMatches> =>
+    ((await run(SEARCH_MATCHES, { text, types })) as { search: SearchMatches })
+      .search;
+
+  it.each(["line", "north", "station", "e"])(
+    "gives every %s result a passage of at most 160 characters holding the text",
+    async (text) => {
+      const { edges } = await searchMatches(text);
+      expect(edges.length).toBeGreaterThan(0);
+      for (const { match } of edges) {
+        expect(match.passage.length).toBeLessThanOrEqual(160);
+        expect(match.passage.toLowerCase()).toContain(text);
+        expect(match.ranges.length).toBeGreaterThan(0);
+        for (const range of match.ranges) {
+          expect(
+            match.passage
+              .slice(range.start, range.start + range.length)
+              .toLowerCase(),
+          ).toBe(text);
+        }
+      }
+    },
+  );
+
+  it("names the field each match is in", async () => {
+    const { edges } = await searchMatches("north");
+    expect(edges.at(0)).toMatchObject({
+      node: { uri: `${M}northgate` },
+      match: { field: "rdfs:label", passage: "Northgate" },
+    });
+  });
+
+  it("counts the matches by type, most first, before the types filter", async () => {
+    const all = await searchMatches("line");
+    expect(all.total).toBe(all.edges.length);
+    expect(all.facets.reduce((sum, facet) => sum + facet.count, 0)).toBe(
+      all.total,
+    );
+    const counts = all.facets.map((facet) => facet.count);
+    expect(counts).toEqual(counts.toSorted((a, b) => b - a));
+    for (const facet of all.facets) {
+      const narrowed = await searchMatches("line", [facet.type.uri]);
+      expect(narrowed.total).toBe(facet.count);
+      expect(narrowed.edges).toHaveLength(facet.count);
+      expect(narrowed.facets).toEqual(all.facets);
+    }
+  });
+
+  it("keeps every type for an empty types list", async () => {
+    expect((await searchMatches("line", [])).total).toBe(
+      (await searchMatches("line")).total,
+    );
+  });
+
   it("answers empty text with the empty page", async () => {
     expect(await search({ text: "" })).toEqual({
       edges: [],

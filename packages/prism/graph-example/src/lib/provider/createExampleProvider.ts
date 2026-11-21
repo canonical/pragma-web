@@ -31,6 +31,7 @@ import {
   weighClassEdges,
 } from "@canonical/prism-contract";
 import { buildSchema, graphql, isObjectType } from "graphql";
+import { buildSearchPassage } from "./buildSearchPassage.js";
 import {
   type ConnectionArgs,
   sliceConnection,
@@ -47,8 +48,11 @@ import {
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
+  SEARCH_FIELDS,
+  SEARCH_MATCH_FIELDS,
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
+import { countTypeFacets } from "./countTypeFacets.js";
 import { exampleDataset } from "./dataset.js";
 import { declareClassEdges } from "./declareClassEdges.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
@@ -132,6 +136,7 @@ interface ProseRecord {
 /** Arguments of `Query.search`. */
 interface SearchArgs extends ConnectionArgs {
   readonly text: string;
+  readonly types?: readonly string[] | null;
 }
 
 /** Arguments of `Node.values`. */
@@ -1022,17 +1027,19 @@ export const createExampleProvider = (
   // to; ranking and paging happen per request.
   // -------------------------------------------------------------------
 
-  /** One node's search entry: its title, CURIE and definition. */
+  /** One node's search entry: its title, CURIE, definition and type. */
   const buildSearchEntry = (
     uri: string,
     labels: LangMap | undefined,
     definitions: LangMap | undefined,
     typename: string,
+    type: string,
   ): SearchEntry => ({
     uri,
     title: resolveTitle(labels, DEFAULT_LANG, uri, typename),
     curie: curieOf(uri),
     definition: resolveLabel(definitions, DEFAULT_LANG),
+    type,
   });
 
   // An instance of a hidden class is a value, never a search result; the
@@ -1049,23 +1056,81 @@ export const createExampleProvider = (
           entity.labels,
           entity.definitions,
           entity.typename,
+          entity.type,
         ),
       ),
+    // A class is counted under the type its `_meta.type` names.
     ...dataset.classes.map((cls) =>
-      buildSearchEntry(cls.uri, cls.labels, cls.definitions, "OntologyClass"),
+      buildSearchEntry(
+        cls.uri,
+        cls.labels,
+        cls.definitions,
+        "OntologyClass",
+        classByUri.has(META_CLASS_URI) ? META_CLASS_URI : cls.uri,
+      ),
     ),
   ];
+  const searchEntryByUri = new Map(
+    searchEntries.map((entry) => [entry.uri, entry]),
+  );
 
   /**
-   * Build one page of ranked IRIs as a `NodeConnection`, each node resolved
-   * as `node(id:)` resolves it.
+   * The entry a match was made on.
+   *
+   * @throws When no entry has the match's IRI: matches come from the entries.
    */
-  const buildSearchView = (
-    uris: readonly string[],
-    args: ConnectionArgs,
-  ): View => {
-    const page = sliceConnection(uris, (uri) => uri, args);
-    return buildNodeConnectionView(buildNodeEdges(page.items), page);
+  const entryOf = (uri: string): SearchEntry => {
+    const entry = searchEntryByUri.get(uri);
+    if (entry === undefined) {
+      throw new Error(`no search entry for ${uri}`);
+    }
+    return entry;
+  };
+
+  /**
+   * Answer one search: rank the entries for the text, keep the types asked
+   * for, page the rest as every connection is paged, and resolve each
+   * result's node beside its match; count the matches by type before the
+   * types filter, so a facet's count is the total its filter would show.
+   */
+  const buildSearchView = (args: SearchArgs): View => {
+    const needle = args.text.trim().toLowerCase();
+    const matches = rankSearchEntries(searchEntries, args.text).map(
+      (match) => ({ match, entry: entryOf(match.uri) }),
+    );
+    const types = new Set((args.types ?? []).map(expandUri));
+    const kept =
+      types.size === 0
+        ? matches
+        : matches.filter(({ entry }) => types.has(entry.type));
+    const page = sliceConnection(kept, ({ match }) => match.uri, args);
+    const edges = page.items.flatMap(({ match, entry }) => {
+      const node = resolveNode(match.uri);
+      const field = SEARCH_FIELDS[match.tier];
+      return node === null
+        ? []
+        : [
+            {
+              node,
+              cursor: toCursor(match.uri),
+              match: {
+                field: SEARCH_MATCH_FIELDS[match.tier],
+                ...buildSearchPassage(
+                  entry[field] ?? "",
+                  needle,
+                  match.position,
+                ),
+              },
+            },
+          ];
+    });
+    return {
+      ...buildNodeConnectionView(edges, page),
+      total: kept.length,
+      facets: countTypeFacets(matches.map(({ entry }) => entry.type)).map(
+        ({ type, count }) => ({ type: nullableClassView(type), count }),
+      ),
+    };
   };
 
   /** Expand the prefixed convenience form (`"metro:Station"`) to an absolute IRI. */
@@ -1098,8 +1163,7 @@ export const createExampleProvider = (
       return prose === undefined ? null : buildProseView(prose);
     },
     classEdges: () => classEdges,
-    search: (args: SearchArgs) =>
-      buildSearchView(rankSearchEntries(searchEntries, args.text), args),
+    search: (args: SearchArgs) => buildSearchView(args),
     source: (args: { uri: string }) => {
       const record =
         recordByUri.get(args.uri)?.entity ?? classByUri.get(args.uri);

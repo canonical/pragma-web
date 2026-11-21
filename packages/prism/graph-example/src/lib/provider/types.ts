@@ -258,6 +258,27 @@ export interface SearchEntry {
   readonly curie: string;
   /** `_meta.definition` in the default language, or null when it has none. */
   readonly definition: string | null;
+  /** The IRI of the type the entry is counted under: `_meta.type`'s. */
+  readonly type: string;
+}
+
+/** A search match's passage and where the text occurs in it. */
+export interface SearchPassage {
+  /** At most `SEARCH_PASSAGE_LENGTH` code units of the matched value. */
+  readonly passage: string;
+  /** Every occurrence of the text lying wholly inside the passage. */
+  readonly ranges: readonly {
+    readonly start: number;
+    readonly length: number;
+  }[];
+}
+
+/** The number of search matches of one type. */
+export interface TypeCount {
+  /** The type's IRI. */
+  readonly type: string;
+  /** Its matches. */
+  readonly count: number;
 }
 
 /** How one entry matches a search: which field, and where in it. */

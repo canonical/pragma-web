@@ -110,6 +110,19 @@ export const REFERENCE_IRI = /^[A-Za-z][A-Za-z0-9+.-]*:[^\s<>"{}|\\^`]+$/;
 export const SEARCH_FIELDS = ["title", "curie", "definition"] as const;
 
 /**
+ * The field each search tier reports a match in, in `SEARCH_FIELDS` order:
+ * the title's predicate, `uri` for the CURIE, and the definition's predicate.
+ */
+export const SEARCH_MATCH_FIELDS = [
+  "rdfs:label",
+  "uri",
+  "skos:definition",
+] as const;
+
+/** The longest passage a search match reports, in UTF-16 code units. */
+export const SEARCH_PASSAGE_LENGTH = 160;
+
+/**
  * The vocabularies a Turtle source may name by prefix beside the dataset's
  * own ontologies.
  */
