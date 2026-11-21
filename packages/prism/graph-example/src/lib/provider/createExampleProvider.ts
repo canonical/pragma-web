@@ -48,7 +48,6 @@ import {
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
-  SEARCH_FIELDS,
   SEARCH_MATCH_FIELDS,
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
@@ -1104,9 +1103,8 @@ export const createExampleProvider = (
         ? matches
         : matches.filter(({ entry }) => types.has(entry.type));
     const page = sliceConnection(kept, ({ match }) => match.uri, args);
-    const edges = page.items.flatMap(({ match, entry }) => {
+    const edges = page.items.flatMap(({ match }) => {
       const node = resolveNode(match.uri);
-      const field = SEARCH_FIELDS[match.tier];
       return node === null
         ? []
         : [
@@ -1115,11 +1113,7 @@ export const createExampleProvider = (
               cursor: toCursor(match.uri),
               match: {
                 field: SEARCH_MATCH_FIELDS[match.tier],
-                ...buildSearchPassage(
-                  entry[field] ?? "",
-                  needle,
-                  match.position,
-                ),
+                ...buildSearchPassage(match.value, needle, match.position),
               },
             },
           ];

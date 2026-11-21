@@ -289,6 +289,8 @@ export interface SearchMatch {
   readonly tier: number;
   /** Where in that field the text starts, lowercased. */
   readonly position: number;
+  /** The value of the field that matched, as the entry holds it. */
+  readonly value: string;
   /** The entry's title, which breaks ties between equal matches. */
   readonly title: string;
 }

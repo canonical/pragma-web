@@ -19,6 +19,7 @@ describe("matchSearchEntry", () => {
       uri: `${M}depot`,
       tier: 0,
       position: 0,
+      value: "Depot",
       title: "Depot",
     });
   });
@@ -28,6 +29,7 @@ describe("matchSearchEntry", () => {
       uri: `${M}bay`,
       tier: 1,
       position: 6,
+      value: "metro:platform-bay",
       title: "Bay",
     });
   });
@@ -37,6 +39,7 @@ describe("matchSearchEntry", () => {
       uri: `${M}canopy`,
       tier: 2,
       position: 27,
+      value: "Platform cover against the rain.",
       title: "Canopy",
     });
   });
