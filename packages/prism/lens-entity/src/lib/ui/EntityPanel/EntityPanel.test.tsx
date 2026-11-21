@@ -12,10 +12,10 @@ import {
   ENTITY_TEST_TIMEOUT_MS,
 } from "../../../../testing/fixtures.js";
 import metroResponses from "../../../../testing/records/metroResponses.js";
+import type { SiteExtension } from "../../../../testing/types.js";
 import entityNamespacesQueryNode from "../../../__generated__/EntityNamespacesQuery.graphql.js";
 import entityPanelQueryNode from "../../../__generated__/EntityPanelQuery.graphql.js";
 import entityStatementsQueryNode from "../../../__generated__/EntityStatementsQuery.graphql.js";
-import type { SiteExtension } from "../../../../testing/types.js";
 import EntityPanel from "./EntityPanel.js";
 import type { EntityPanelProps } from "./types.js";
 
@@ -100,7 +100,9 @@ describe("EntityPanel", () => {
       expect(group.querySelector(":scope > summary")?.textContent).toMatch(
         / · \d+$/,
       );
-      expect(group.querySelector(":scope > .ds.statement-group")).not.toBeNull();
+      expect(
+        group.querySelector(":scope > .ds.statement-group"),
+      ).not.toBeNull();
     }
     const referencedBy = panel?.querySelector(":scope > .referenced-by");
     expect(referencedBy?.querySelector("h3.heading")?.textContent).toMatch(
@@ -121,7 +123,9 @@ describe("EntityPanel", () => {
       headingLevel: 3,
     });
     expect(container.querySelector(".identity h3.title")).not.toBeNull();
-    expect(container.querySelector(".referenced-by > h4.heading")).not.toBeNull();
+    expect(
+      container.querySelector(".referenced-by > h4.heading"),
+    ).not.toBeNull();
   });
 
   it("gives a site without statements the identity alone, saying nothing is missing", {
@@ -158,6 +162,35 @@ describe("EntityPanel", () => {
     });
     expect(container.querySelector("a.open")).toBeNull();
     expect(container.querySelector(".referenced-by")).toBeNull();
+  });
+
+  it("words an incoming group whose property names no inverse from the entity's side", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const recorded = metroResponses.find(
+      ({ operation, variables }) =>
+        operation === "EntityStatementsQuery" && variables.uri === CIRCLE_LINE,
+    );
+    const statements = structuredClone(recorded?.response) as {
+      data: {
+        incoming: {
+          groups: { predicate: Record<string, unknown> | null }[];
+        };
+      };
+    };
+    for (const group of statements.data.incoming.groups) {
+      if (group.predicate !== null) {
+        group.predicate.inverseLabel = null;
+        group.predicate.inversePluralLabel = null;
+      }
+    }
+    const { container } = await renderPanel({
+      uri: CIRCLE_LINE,
+      statements: statements as GraphQLResponse,
+    });
+    expect(
+      container.querySelector(".referenced-by summary")?.textContent,
+    ).toMatch(/\(inverse\) · \d+$/);
   });
 
   it("renders the not-found status for an IRI nothing answers to", {

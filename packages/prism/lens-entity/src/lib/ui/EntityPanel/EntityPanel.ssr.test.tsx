@@ -48,7 +48,9 @@ describe("EntityPanel on the server", () => {
         children: <EntityPanel uri={CIRCLE_LINE} />,
       }),
     );
-    expect(html).toContain('<section aria-label="Circle Line" class="ds entity-panel">');
+    expect(html).toContain(
+      '<section aria-label="Circle Line" class="ds entity-panel">',
+    );
     expect(html).toContain('<details class="group"><summary class="summary">');
     expect(html).not.toContain("<details open");
     expect(html).not.toMatch(/id="(?:«|:)r/);

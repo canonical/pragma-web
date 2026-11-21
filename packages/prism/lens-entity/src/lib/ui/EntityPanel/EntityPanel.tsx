@@ -131,11 +131,7 @@ export default function EntityPanel({
     t("statements.inverse", { label: inverse });
 
   return (
-    <section
-      {...props}
-      aria-label={node._meta.title}
-      className={rootClassName}
-    >
+    <section {...props} aria-label={node._meta.title} className={rootClassName}>
       <header className="identity">
         <div className="headline">
           <Heading className="title">{node._meta.title}</Heading>
@@ -168,7 +164,9 @@ export default function EntityPanel({
           <StatementGroup className="body" group={group} />
         </details>
       ))}
-      {incoming === null || incoming === undefined || incoming.total === 0 ? null : (
+      {incoming === null ||
+      incoming === undefined ||
+      incoming.total === 0 ? null : (
         <section className="referenced-by">
           <Subheading className="heading">
             {t("statements.referencedBy", { count: incoming.total })}
