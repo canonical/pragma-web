@@ -2791,6 +2791,26 @@ describe("Query.statements", () => {
     ]);
   });
 
+  it("follows a path by the index a route holds in the listed values", async () => {
+    const listed = await read({ uri: `${METRO}north-line` });
+    const routes = listed.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#routes"),
+    );
+    const byIndex = await Promise.all(
+      (routes?.values ?? []).map((_, index) =>
+        read({ uri: `${METRO}north-line`, path: ["routes", String(index)] }),
+      ),
+    );
+    expect(byIndex.map(({ groups }) => groups)).toEqual(
+      (routes?.values ?? []).map(({ groups }) =>
+        (groups as readonly { predicateUri: string; total: number }[]).map(
+          (group) => expect.objectContaining(group),
+        ),
+      ),
+    );
+    expect(byIndex.length).toBeGreaterThan(1);
+  });
+
   it("answers null for a path that selects nothing, or one read inwards", async () => {
     expect(
       (

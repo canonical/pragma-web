@@ -1167,7 +1167,10 @@ export const createExampleProvider = (
   /**
    * The statements a `path` reaches from a subject's: per pair of segments,
    * the nested value of the predicate of that local name whose key is the
-   * second segment. Null when a segment selects nothing.
+   * second segment, else, for a zero-based index, the nested value at that
+   * position among the group's nested values as `values` lists them (the
+   * addressing the pragma provider shares). Null when a segment selects
+   * nothing.
    */
   const followStatementPath = (
     statements: readonly RecordStatement[],
@@ -1176,13 +1179,16 @@ export const createExampleProvider = (
     const [name, key, ...rest] = path;
     if (name === undefined) return statements;
     if (key === undefined) return null;
-    const nested = statements
+    const nestedValues = statements
       .filter(({ predicate }) => predicate.endsWith(`#${name}`))
       .map(({ object }) => object)
-      .find((object) => object.kind === "nested" && object.key === key);
-    return nested?.kind === "nested"
-      ? followStatementPath(nested.statements(), rest)
-      : null;
+      .filter((object) => object.kind === "nested");
+    const nested =
+      nestedValues.find((object) => object.key === key) ??
+      (/^\d+$/.test(key) ? nestedValues.at(Number(key)) : undefined);
+    return nested === undefined
+      ? null
+      : followStatementPath(nested.statements(), rest);
   };
 
   /** Resolve `Query.statements`. */
