@@ -41,6 +41,20 @@ describe("EntityTable", () => {
     expect(headers.at(1)).not.toHaveAttribute("aria-sort");
   });
 
+  it("marks a number column's header and cells to read from their end", () => {
+    const { container } = renderTable({
+      columns: ENTITY_TABLE_PROPS.columns.map((column, index) =>
+        index === 0 ? { ...column, numeric: true } : column,
+      ),
+    });
+    const field = ENTITY_TABLE_PROPS.columns.at(0)?.field;
+    const marked = [...container.querySelectorAll(".is-number")];
+    expect(marked.length).toBe(1 + ENTITY_TABLE_PROPS.rows.length);
+    for (const cell of marked) {
+      expect(cell).toHaveAttribute("data-property", field);
+    }
+  });
+
   it("draws a row per entity with its values under their fields", () => {
     renderTable();
     const rows = screen.getAllByRole("row").slice(1);
