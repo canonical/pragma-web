@@ -204,9 +204,8 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
   it("renders the fleet index as rows in the table, by default", async () => {
     const { status, html } = await fetchPage(script, "/fleet");
     expect(status).toBe(200);
-    expect(html).toMatch(
-      /<li [^>]*class="ds entity-row ds rolling-stock-row"[^>]*>.*?Series 90/s,
-    );
+    expect(html).toMatch(/<table [^>]*class="ds entity-table[ "]/);
+    expect(html).toMatch(/<tr [^>]*class="row"[^>]*>.*?Series 90/s);
     expect(html).not.toContain("rolling-stock-card");
   });
 
