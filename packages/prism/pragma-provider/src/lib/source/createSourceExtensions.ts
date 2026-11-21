@@ -12,43 +12,11 @@ import {
   GraphQLString,
 } from "graphql";
 import type { ExtensionFactory } from "../extensions/index.js";
-import { MAX_BLANK_DEPTH, STANDARD_PREFIXES } from "./constants.js";
+import { buildDescribeQuery } from "./buildDescribeQuery.js";
+import { collectPrefixes } from "./collectPrefixes.js";
+import { MAX_BLANK_DEPTH } from "./constants.js";
 import type { SourceArgs } from "./types.js";
 import { writeTurtle } from "./writeTurtle.js";
-
-/**
- * The prefixes a document may use: the well-known vocabularies, then the
- * compiled ontologies', which win on a shared name.
- */
-const collectPrefixes = (
-  context: CompilerContext,
-): ReadonlyMap<string, string> =>
-  new Map([
-    ...STANDARD_PREFIXES,
-    ...[...context.namespaces.values()].map(
-      ({ prefix, uri }) => [prefix, uri] as const,
-    ),
-  ]);
-
-/**
- * The query for the statements `depth` blank nodes below `uri`: at depth 0
- * those whose subject is `uri`, below that those whose subject is a blank
- * node reached from `uri` through `depth` blank nodes in a row.
- */
-const buildDescribeQuery = (uri: string, depth: number): string => {
-  const nodes = [
-    `<${uri}>`,
-    ...Array.from({ length: depth }, (_, index) => `?b${index}`),
-  ];
-  const subject = nodes.at(-1);
-  const steps = nodes
-    .slice(1)
-    .map(
-      (node, index) =>
-        `${nodes.at(index)} ?q${index} ${node} . FILTER(isBlank(${node}))`,
-    );
-  return `CONSTRUCT { ${subject} ?p ?o } WHERE { ${steps.join(" ")} ${subject} ?p ?o }`;
-};
 
 /**
  * Resolve one entity's statements as Turtle: the statements whose subject

@@ -1,28 +1,5 @@
-import {
-  type GraphQLInterfaceType,
-  type GraphQLObjectType,
-  getNamedType,
-  isObjectType,
-} from "graphql";
-
-/**
- * The object type a field of `owner` returns, unwrapped from lists and
- * non-null.
- *
- * @throws When `owner` has no such field or the field is not object-typed.
- */
-const followField = (
-  owner: GraphQLObjectType | GraphQLInterfaceType,
-  name: string,
-): GraphQLObjectType => {
-  const target = getNamedType(owner.getFields()[name]?.type);
-  if (!isObjectType(target)) {
-    throw new Error(
-      `${owner.name}.${name} is not an object-typed field, so an extension cannot reach NodeConnection through Node._meta.type.instances`,
-    );
-  }
-  return target;
-};
+import type { GraphQLInterfaceType, GraphQLObjectType } from "graphql";
+import { followField } from "./followField.js";
 
 /**
  * The compiled schema's `NodeConnection`, reached from the `Node` interface.
