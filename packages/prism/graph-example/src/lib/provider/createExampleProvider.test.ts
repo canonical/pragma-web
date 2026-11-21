@@ -27,6 +27,7 @@ import {
   DIAGRAM_POINT_CLASS_URI,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
+  METRO_NAMESPACE as METRO,
   ROUTE_CLASS_URI,
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
@@ -79,7 +80,7 @@ describe("the schema", () => {
     expect(provider.sdl).toContain("type Station implements Node");
   });
 
-  it("adds three root fields, prose, search and source, to the contract's six", () => {
+  it("adds four root fields, prose, search, source and statements, to the contract's six", () => {
     const query = provider.schema.getQueryType();
     expect(Object.keys(query?.getFields() ?? {}).sort()).toEqual([
       "classEdges",
@@ -91,6 +92,7 @@ describe("the schema", () => {
       "prose",
       "search",
       "source",
+      "statements",
     ]);
   });
 
@@ -2642,5 +2644,181 @@ describe("Query.classEdges", () => {
       [`${M}unit`, `${M}UnitPosition`, `${M}Unit`, 1, true],
       [`${M}units`, `${M}Formation`, `${M}UnitPosition`, 1, true],
     ]);
+  });
+});
+
+describe("Query.statements", () => {
+  const STATEMENTS = `query Statements($uri: ID!, $path: [String!], $perPredicate: Int, $direction: StatementDirection) {
+    statements(uri: $uri, path: $path, perPredicate: $perPredicate, direction: $direction) {
+      subject { uri }
+      total
+      groups {
+        predicateUri
+        predicate { uri }
+        total
+        values {
+          __typename
+          ... on StatementNode { node { uri } }
+          ... on StatementLiteral { lexical datatype lang }
+          ... on StatementForeign { uri curie }
+          ... on StatementNested { type { uri } groups { predicateUri total } }
+        }
+      }
+    }
+  }`;
+
+  type Groups = {
+    readonly subject: { readonly uri: string } | null;
+    readonly total: number;
+    readonly groups: readonly {
+      readonly predicateUri: string;
+      readonly predicate: { readonly uri: string } | null;
+      readonly total: number;
+      readonly values: readonly Record<string, unknown>[];
+    }[];
+  };
+
+  const read = async (variables: Record<string, unknown>): Promise<Groups> =>
+    (await run(STATEMENTS, variables)).statements as Groups;
+
+  it("groups Central Exchange's outgoing statements by predicate, rdf:type first", async () => {
+    const result = await read({ uri: `${METRO}central-exchange` });
+    expect(result.subject?.uri).toBe(`${METRO}central-exchange`);
+    expect(result.groups.map(({ predicateUri }) => predicateUri)).toEqual([
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+      "https://geo.example/onto#inZone",
+      "https://geo.example/onto#location",
+      "https://metro.example/onto#diagramPosition",
+      "https://metro.example/onto#platformCount",
+      "https://metro.example/onto#platformLength",
+      "https://metro.example/onto#servesLine",
+      "https://metro.example/onto#transferMinutes",
+      "http://www.w3.org/2000/01/rdf-schema#label",
+      "http://www.w3.org/2004/02/skos/core#definition",
+    ]);
+  });
+
+  it("returns every value of a group up to the bound, with the store's true total", async () => {
+    const result = await read({ uri: `${METRO}central-exchange` });
+    const servesLine = result.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#servesLine"),
+    );
+    expect(servesLine?.total).toBe(3);
+    expect(servesLine?.values).toEqual([
+      { __typename: "StatementNode", node: { uri: `${METRO}circle-line` } },
+      { __typename: "StatementNode", node: { uri: `${METRO}coastal-line` } },
+      { __typename: "StatementNode", node: { uri: `${METRO}north-line` } },
+    ]);
+    expect(result.total).toBe(
+      result.groups.reduce((sum, { total }) => sum + total, 0),
+    );
+  });
+
+  it("cuts every group to the bound asked for, keeping its total", async () => {
+    const result = await read({ uri: `${METRO}central-exchange`, perPredicate: 1 });
+    for (const group of result.groups) {
+      expect(group.values.length).toBeLessThanOrEqual(1);
+    }
+    expect(
+      result.groups.find(({ predicateUri }) => predicateUri.endsWith("#servesLine"))
+        ?.total,
+    ).toBe(3);
+  });
+
+  it("holds the bound between 1 and 50 whatever the reader asks", async () => {
+    const none = await read({ uri: `${METRO}central-exchange`, perPredicate: 0 });
+    expect(none.groups.every(({ values }) => values.length === 1)).toBe(true);
+  });
+
+  it("types literals and expands a location in place", async () => {
+    const result = await read({ uri: `${METRO}central-exchange` });
+    const byLocal = (name: string) =>
+      result.groups.find(({ predicateUri }) => predicateUri.endsWith(name));
+    expect(byLocal("#platformCount")?.values).toEqual([
+      {
+        __typename: "StatementLiteral",
+        lexical: "8",
+        datatype: "http://www.w3.org/2001/XMLSchema#integer",
+        lang: null,
+      },
+    ]);
+    expect(byLocal("#location")?.values).toEqual([
+      {
+        __typename: "StatementNested",
+        type: { uri: GEO_POINT_CLASS_URI },
+        groups: [
+          { predicateUri: "https://geo.example/onto#latitude", total: 1 },
+          { predicateUri: "https://geo.example/onto#longitude", total: 1 },
+        ],
+      },
+    ]);
+    expect(byLocal("#type")?.predicate).toBeNull();
+    expect(byLocal("#servesLine")?.predicate?.uri).toBe(`${METRO}servesLine`);
+  });
+
+  it("reads the statements pointing at a line from the stops' side", async () => {
+    const result = await read({ uri: `${METRO}north-line`, direction: "IN" });
+    const servesLine = result.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#servesLine"),
+    );
+    expect(servesLine?.values).toContainEqual({
+      __typename: "StatementNode",
+      node: { uri: `${METRO}central-exchange` },
+    });
+    expect(result.total).toBe(
+      result.groups.reduce((sum, { total }) => sum + total, 0),
+    );
+  });
+
+  it("follows a path to a line's route by its key", async () => {
+    const result = await read({
+      uri: `${METRO}north-line`,
+      path: ["routes", "southbound"],
+    });
+    expect(result.subject).toBeNull();
+    expect(result.groups.map(({ predicateUri }) => predicateUri)).toEqual([
+      `${METRO}calls`,
+      `${METRO}isLoop`,
+      `${METRO}reverse`,
+      "http://www.w3.org/2000/01/rdf-schema#label",
+    ]);
+  });
+
+  it("answers null for a path that selects nothing, or one read inwards", async () => {
+    expect(
+      (await run(STATEMENTS, { uri: `${METRO}north-line`, path: ["routes", "nowhere"] }))
+        .statements,
+    ).toBeNull();
+    expect(
+      (await run(STATEMENTS, { uri: `${METRO}north-line`, path: ["routes"] })).statements,
+    ).toBeNull();
+    expect(
+      (
+        await run(STATEMENTS, {
+          uri: `${METRO}north-line`,
+          path: ["routes", "southbound"],
+          direction: "IN",
+        })
+      ).statements,
+    ).toBeNull();
+  });
+
+  it("answers null for an IRI the dataset holds no record of", async () => {
+    expect((await run(STATEMENTS, { uri: `${METRO}nowhere` })).statements).toBeNull();
+  });
+
+  it("states a class's type and superclass", async () => {
+    const result = await read({ uri: `${METRO}Interchange` });
+    expect(result.groups.at(0)?.values).toEqual([
+      {
+        __typename: "StatementForeign",
+        uri: "http://www.w3.org/2002/07/owl#Class",
+        curie: "http://www.w3.org/2002/07/owl#Class",
+      },
+    ]);
+    expect(
+      result.groups.find(({ predicateUri }) => predicateUri.endsWith("#subClassOf"))
+        ?.values,
+    ).toEqual([{ __typename: "StatementNode", node: { uri: `${METRO}Station` } }]);
   });
 });

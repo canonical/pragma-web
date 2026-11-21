@@ -23,6 +23,9 @@ import {
   indexSiteLens,
   type LensGroup,
   type SiteLens,
+  STATEMENTS_MAX_DEPTH,
+  STATEMENTS_PER_PREDICATE,
+  STATEMENTS_PER_PREDICATE_MAX,
   selectLiteral,
   weighClassEdges,
 } from "@canonical/prism-contract";
@@ -43,14 +46,17 @@ import {
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
+  TURTLE_STANDARD_PREFIXES,
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
 import { exampleDataset } from "./dataset.js";
 import { declareClassEdges } from "./declareClassEdges.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
 import { expandCurie } from "./expandCurie.js";
+import groupRecordStatements from "./groupRecordStatements.js";
 import { extractReferences } from "./extractReferences.js";
 import { isNetworkEntity } from "./isNetworkEntity.js";
+import listRecordStatements from "./listRecordStatements.js";
 import { observeClassEdges } from "./observeClassEdges.js";
 import { outlineDataset } from "./outlineDataset.js";
 import { readProviderSdl } from "./providerSdl.js";
@@ -73,6 +79,8 @@ import type {
   ExampleNetworkEntity,
   ExampleOntology,
   ExampleProperty,
+  RecordStatement,
+  RecordTerm,
   ExampleProvider,
   ExampleRollingStock,
   ExampleRoute,
@@ -123,6 +131,14 @@ interface ProseRecord {
   readonly availableLanguages: readonly string[];
   /** Candidate IRIs across every language, in order of first mention. */
   readonly references: readonly string[];
+}
+
+/** Arguments of `Query.statements`. */
+interface StatementsArgs {
+  readonly uri: string;
+  readonly path?: readonly string[] | null;
+  readonly perPredicate?: number | null;
+  readonly direction?: "OUT" | "IN" | null;
 }
 
 /** Arguments of `Query.search`. */
@@ -1032,8 +1048,175 @@ export const createExampleProvider = (
     expandCurie(value, dataset.ontologies);
 
   // -------------------------------------------------------------------
-  // The contract's six root fields, plus `prose`, `search` and `source`:
-  // the three root fields this provider adds (see schema/extension.graphql for why each is
+  // `statements`: each record's statements, out and in, grouped and bounded.
+  // -------------------------------------------------------------------
+
+  /** Every record that makes statements: the entities, then the classes. */
+  const statementRecords: readonly (ExampleEntity | ExampleClass)[] = [
+    ...dataset.entities,
+    ...dataset.classes,
+  ];
+
+  /**
+   * Each record's statements out, and for each node the statements naming
+   * it as their object (the subject as the value read from the node's
+   * side), indexed on the first `statements` read: a dataset may name a
+   * value through a property it does not declare, which only that read
+   * refuses.
+   *
+   * @note Impure: fills the index once.
+   */
+  let statementIndex:
+    | {
+        readonly outgoing: ReadonlyMap<string, readonly RecordStatement[]>;
+        readonly incoming: ReadonlyMap<string, readonly RecordStatement[]>;
+      }
+    | undefined;
+  const indexStatements = (): NonNullable<typeof statementIndex> => {
+    if (statementIndex !== undefined) return statementIndex;
+    const outgoing = new Map(
+      statementRecords.map((record) => [
+        record.uri,
+        listRecordStatements(record, dataset),
+      ]),
+    );
+    const incoming = [...outgoing].reduce(
+      (index, [subject, statements]) => {
+        for (const { predicate, object } of statements) {
+          if (object.kind !== "node") continue;
+          index.set(object.uri, [
+            ...(index.get(object.uri) ?? []),
+            { predicate, object: { kind: "node", uri: subject } },
+          ]);
+        }
+        return index;
+      },
+      new Map<string, readonly RecordStatement[]>(),
+    );
+    statementIndex = { outgoing, incoming };
+    return statementIndex;
+  };
+
+  /** Every prefix a predicate's compact form may take: the standard
+   * vocabularies' and the dataset's ontologies', which win on a shared name. */
+  const statementPrefixes = [
+    ...new Map([
+      ...TURTLE_STANDARD_PREFIXES,
+      ...dataset.ontologies.map(
+        ({ prefix, namespace }) => [prefix, namespace] as const,
+      ),
+    ]),
+  ].toSorted(([, a], [, b]) => b.length - a.length);
+
+  /** A predicate's compact form, which orders the groups: the longest
+   * namespace it starts with, else the whole IRI. */
+  const compactPredicate = (uri: string): string => {
+    const match = statementPrefixes.find(([, namespace]) =>
+      uri.startsWith(namespace),
+    );
+    return match === undefined
+      ? uri
+      : `${match[0]}:${uri.slice(match[1].length)}`;
+  };
+
+  /** A term as a `StatementValue`, nested values expanded to `depth`. */
+  const buildStatementValueView = (term: RecordTerm, depth: number): View => {
+    if (term.kind === "literal") {
+      const { lexical, datatype, lang } = term;
+      return { __typename: "StatementLiteral", lexical, datatype, lang };
+    }
+    if (term.kind === "nested") {
+      return {
+        __typename: "StatementNested",
+        type: () => nullableClassView(term.type ?? undefined),
+        groups: () =>
+          depth < STATEMENTS_MAX_DEPTH
+            ? buildStatementGroupViews(
+                term.statements(),
+                STATEMENTS_PER_PREDICATE,
+                depth + 1,
+              )
+            : [],
+      };
+    }
+    const node = resolveNode(term.uri);
+    return node === null
+      ? { __typename: "StatementForeign", uri: term.uri, curie: curieOf(term.uri) }
+      : { __typename: "StatementNode", node };
+  };
+
+  /** Statements as `StatementGroup` views, at nesting `depth`. */
+  const buildStatementGroupViews = (
+    statements: readonly RecordStatement[],
+    perPredicate: number,
+    depth: number,
+  ): View[] =>
+    groupRecordStatements(statements, perPredicate, compactPredicate).map(
+      ({ predicate, total, values }) => ({
+        predicate: () => {
+          const property = propertyByUri.get(predicate);
+          return property === undefined ? null : propertyView(property);
+        },
+        predicateUri: predicate,
+        total,
+        values: values.map((value) => buildStatementValueView(value, depth)),
+      }),
+    );
+
+  /**
+   * The statements a `path` reaches from a subject's: per pair of segments,
+   * the nested value of the predicate of that local name whose key is the
+   * second segment. Null when a segment selects nothing.
+   */
+  const followStatementPath = (
+    statements: readonly RecordStatement[],
+    path: readonly string[],
+  ): readonly RecordStatement[] | null => {
+    const [name, key, ...rest] = path;
+    if (name === undefined) return statements;
+    if (key === undefined) return null;
+    const nested = statements
+      .filter(({ predicate }) => predicate.endsWith(`#${name}`))
+      .map(({ object }) => object)
+      .find((object) => object.kind === "nested" && object.key === key);
+    return nested?.kind === "nested"
+      ? followStatementPath(nested.statements(), rest)
+      : null;
+  };
+
+  /** Resolve `Query.statements`. */
+  const resolveStatements = ({
+    uri,
+    path,
+    perPredicate,
+    direction,
+  }: StatementsArgs): View | null => {
+    const { outgoing: outgoingByUri, incoming: incomingByUri } =
+      indexStatements();
+    const outgoing = outgoingByUri.get(uri);
+    if (outgoing === undefined) return null;
+    const bound = Math.min(
+      Math.max(perPredicate ?? STATEMENTS_PER_PREDICATE, 1),
+      STATEMENTS_PER_PREDICATE_MAX,
+    );
+    const isPath = path !== null && path !== undefined && path.length > 0;
+    const statements =
+      direction === "IN"
+        ? isPath
+          ? null
+          : (incomingByUri.get(uri) ?? [])
+        : followStatementPath(outgoing, path ?? []);
+    if (statements === null) return null;
+    return {
+      subject: () => (isPath ? null : resolveNode(uri)),
+      groups: buildStatementGroupViews(statements, bound, 1),
+      total: statements.length,
+    };
+  };
+
+  // -------------------------------------------------------------------
+  // The contract's six root fields, plus `prose`, `search`, `source` and
+  // `statements`: the four root fields this provider adds (see schema/extension.graphql for why each is
   // a root field). Every type the provider declares is reachable from here.
   // -------------------------------------------------------------------
 
@@ -1064,6 +1247,7 @@ export const createExampleProvider = (
         recordByUri.get(args.uri)?.entity ?? classByUri.get(args.uri);
       return record === undefined ? null : writeEntityTurtle(record, dataset);
     },
+    statements: resolveStatements,
   };
 
   return { schema, rootValue, sdl };

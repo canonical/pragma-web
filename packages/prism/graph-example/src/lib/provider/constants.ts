@@ -164,3 +164,23 @@ export const STORED_OBJECT_PROPERTY_URIS = {
   cars: `${METRO_NAMESPACE}cars`,
   carType: `${METRO_NAMESPACE}carType`,
 } as const;
+
+/** `rdf:type`, the predicate a record's class is stated with. */
+export const RDF_TYPE_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+
+/** `owl:Class`, the type every class of the dataset is stated with. */
+export const OWL_CLASS_URI = "http://www.w3.org/2002/07/owl#Class";
+
+/** `rdfs:subClassOf`, the predicate a class's superclass is stated with. */
+export const SUBCLASS_OF_URI = `${RDFS_NAMESPACE}subClassOf`;
+
+/** `skos:definition`, the predicate a record's definitions are stated with. */
+export const SKOS_DEFINITION_URI =
+  "http://www.w3.org/2004/02/skos/core#definition";
+
+/** The XML Schema namespace, whose datatypes type the dataset's literals. */
+export const XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema#";
+
+/** `rdf:langString`, the datatype of a literal with a language tag. */
+export const RDF_LANG_STRING_URI =
+  "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";

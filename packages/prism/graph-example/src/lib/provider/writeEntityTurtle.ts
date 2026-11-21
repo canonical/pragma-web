@@ -5,6 +5,7 @@ import {
   TURTLE_RECORD_KEYS,
   TURTLE_STANDARD_PREFIXES,
 } from "./constants.js";
+import findPropertyIri from "./findPropertyIri.js";
 import type {
   ExampleClass,
   ExampleDataset,
@@ -70,22 +71,6 @@ const writeNumber = (value: number, writer: TermWriter): string =>
   Number.isInteger(value)
     ? String(value)
     : `${writeString(String(value))}^^${writer.iri("http://www.w3.org/2001/XMLSchema#double")}`;
-
-/**
- * The property IRI a record key is written with, by its local name.
- *
- * @throws When the dataset declares no property of that name: every value
- *   a record holds is stated through a declared property.
- */
-const findPropertyIri = (key: string, dataset: ExampleDataset): string => {
-  const property = dataset.properties.find(({ uri }) =>
-    uri.endsWith(`#${key}`),
-  );
-  if (property === undefined) {
-    throw new Error(`the dataset declares no property named ${key}`);
-  }
-  return property.uri;
-};
 
 /** One predicate and its objects, written. */
 type PredicateLine = readonly [predicate: string, objects: readonly string[]];
