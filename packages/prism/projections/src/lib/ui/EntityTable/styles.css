@@ -30,11 +30,11 @@
     --entity-table-header-inset: var(--space-100);
     /* A folded row's title is its first line, across the row. */
     --entity-table-fold-title-basis: 100%;
-    /* A folded row's lines: 24px each, the first a half inset from the
-     * row's top, the second an inset under it. */
+    /* A folded row's lines: 24px each, the first 2px from the row's top,
+     * the second 4px under it, so both end inside the 56px row. */
     --entity-table-line-size: var(--space-300);
-    --entity-table-fold-inset: calc(var(--space-100) / 2);
-    --entity-table-fold-line-gap: var(--space-100);
+    --entity-table-fold-inset: var(--space-025);
+    --entity-table-fold-line-gap: var(--space-050);
 
     display: grid;
     grid-template-columns: subgrid;

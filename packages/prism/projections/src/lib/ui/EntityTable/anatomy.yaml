@@ -32,8 +32,8 @@
 # ellipsis), and one with no room left moves to a third line, below the
 # row's clip; each value carries the gutter after it. An empty cell
 # (.is-empty) and the later cells (.is-later, marked after the first two
-# that are not empty) are hidden. The lines stand from the row's top: a half inset (2px), the title,
-# an inset (4px), the values.
+# that are not empty) are hidden. The lines stand from the row's top:
+# 2px, the title, 4px, the values, which end 2px above the row's end.
 #
 # Token ledger (no symbol to bind):
 #   space.400 (32px) for a one-line row's block size: the matrix's row.
@@ -41,12 +41,13 @@
 #   24px lines between 4px insets, as W3's two-line row.
 #   1px for the hairline under each row, as the key-value list's rule.
 #   100% for a folded row's title basis: the title is its first line.
-#   space.300 (24px) for a folded row's line, space.100 / 2 (2px) above
-#   its first line, space.100 (4px) between its lines.
+#   space.300 (24px) for a folded row's line, space.025 (2px) above
+#   its first line, space.050 (4px) between its lines.
 #   A space stands between a value's label and its text, which the folded
 #   row shows as one line.
 #
-# Roster namespaces: grid.gutter, space.100, space.300, space.400.
+# Roster namespaces: grid.gutter, space.025, space.050, space.100,
+# space.300, space.400.
 node:
   uri: prism.component.entity_table
   styles:
