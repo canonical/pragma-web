@@ -7,9 +7,11 @@ describe("comparePredicates", () => {
   const compare = comparePredicates((uri) => uri.replace("urn:x:", "x:"));
 
   it("puts rdf:type first, then orders by compact form", () => {
-    expect(
-      ["urn:x:b", RDF_TYPE, "urn:x:a"].toSorted(compare),
-    ).toEqual([RDF_TYPE, "urn:x:a", "urn:x:b"]);
+    expect(["urn:x:b", RDF_TYPE, "urn:x:a"].toSorted(compare)).toEqual([
+      RDF_TYPE,
+      "urn:x:a",
+      "urn:x:b",
+    ]);
     expect(compare("urn:x:a", RDF_TYPE)).toBe(1);
   });
 

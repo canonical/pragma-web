@@ -147,7 +147,9 @@ describe("createStatementsExtensions", () => {
     const read = await ask({ uri: `${DS}card` });
     expect(read?.subject).toEqual({ uri: `${DS}card` });
     // The provider describes the card itself too: rdfs:label, skos:definition.
-    expect(read?.groups.map(({ predicateUri, total }) => [predicateUri, total])).toEqual([
+    expect(
+      read?.groups.map(({ predicateUri, total }) => [predicateUri, total]),
+    ).toEqual([
       [RDF_TYPE, 1],
       [`${DS}part`, 3],
       [`${DS}related`, 2],
@@ -277,7 +279,12 @@ describe("createStatementsExtensions", () => {
       path: ["part", "1", "part", "0"],
     });
     expect(findGroup(inner, `${DS}name`)?.values).toEqual([
-      { __typename: "StatementLiteral", lexical: "inner", datatype: `${XSD}string`, lang: null },
+      {
+        __typename: "StatementLiteral",
+        lexical: "inner",
+        datatype: `${XSD}string`,
+        lang: null,
+      },
     ]);
     expect(await ask({ uri: `${DS}card`, path: ["part", "0"] })).toEqual({
       subject: null,
@@ -287,7 +294,12 @@ describe("createStatementsExtensions", () => {
   }, 120_000);
 
   it("refuses a path that selects nothing, or one read inwards", async () => {
-    for (const path of [["part", "9"], ["part"], ["part", "x"], ["tier", "0"]]) {
+    for (const path of [
+      ["part", "9"],
+      ["part"],
+      ["part", "x"],
+      ["tier", "0"],
+    ]) {
       expect(await ask({ uri: `${DS}card`, path })).toBeNull();
     }
     expect(await ask({ uri: `${DS}nothing`, path: ["part", "0"] })).toBeNull();
@@ -329,9 +341,7 @@ describe("createStatementsExtensions", () => {
       query: new GraphQLObjectType({ name: "Query", fields: { ...Query } }),
     });
     const store = await createStore({
-      sources: [
-        { content: `<urn:a> <urn:p> <urn:b> .`, path: "probe.ttl" },
-      ],
+      sources: [{ content: `<urn:a> <urn:p> <urn:b> .`, path: "probe.ttl" }],
     });
     const result = await graphql({
       schema,
@@ -353,7 +363,10 @@ describe("createStatementsExtensions over the installed design system", () => {
     const read = await ask({ uri: BUTTON });
     expect(read?.groups).toHaveLength(14);
     expect(read?.total).toBe(43);
-    const bindings = findGroup(read, "https://ds.canonical.com/hasTokenBinding");
+    const bindings = findGroup(
+      read,
+      "https://ds.canonical.com/hasTokenBinding",
+    );
     expect(bindings?.total).toBe(24);
     expect(bindings?.values).toHaveLength(12);
     for (const { total, values } of read?.groups ?? []) {
@@ -367,8 +380,8 @@ describe("createStatementsExtensions over the installed design system", () => {
     const via = findGroup(read, "https://ds.canonical.com/viaBlock");
     expect(via?.total).toBe(144);
     expect(via?.values).toHaveLength(50);
-    expect(
-      read?.groups.reduce((sum, { total }) => sum + total, 0),
-    ).toBe(read?.total);
+    expect(read?.groups.reduce((sum, { total }) => sum + total, 0)).toBe(
+      read?.total,
+    );
   }, 180_000);
 });

@@ -83,7 +83,6 @@ import {
 } from "../prose/index.js";
 import { createSearchExtensions, indexSearch } from "../search/index.js";
 import { createSourceExtensions } from "../source/index.js";
-import { createStatementsExtensions } from "../statements/index.js";
 import {
   collectProseSidecars,
   collectTtlSources,
@@ -91,6 +90,7 @@ import {
   harvestPrefixes,
   resolveRefRoots,
 } from "../sources/index.js";
+import { createStatementsExtensions } from "../statements/index.js";
 import { composeExtensions } from "./composeExtensions.js";
 import { printServedSdl } from "./printServedSdl.js";
 

@@ -37,9 +37,9 @@ import {
   buildCountQuery,
   buildWindowQuery,
 } from "./buildStatementQueries.js";
+import { compactIri } from "./compactIri.js";
 import { compareCodePoints } from "./compareCodePoints.js";
 import { comparePredicates } from "./comparePredicates.js";
-import { compactIri } from "./compactIri.js";
 import { compareTerms } from "./compareTerms.js";
 import { groupTermStatements } from "./groupTermStatements.js";
 import { selectTerms } from "./selectTerms.js";
@@ -87,7 +87,9 @@ const resolveRootField = (
 ): unknown => {
   const resolve = info.schema.getQueryType()?.getFields()[name]?.resolve;
   if (resolve === undefined) {
-    throw new Error(`the schema has no Query.${name} to resolve values through`);
+    throw new Error(
+      `the schema has no Query.${name} to resolve values through`,
+    );
   }
   return resolve(undefined, args, context, info);
 };
@@ -282,7 +284,12 @@ const resolveValue = async (
           : [],
     };
   }
-  const node = await resolveRootField(info, "node", { id: term.value }, context);
+  const node = await resolveRootField(
+    info,
+    "node",
+    { id: term.value },
+    context,
+  );
   return node == null
     ? {
         __typename: "StatementForeign",
@@ -414,7 +421,12 @@ export const createStatementsExtensions =
           ) =>
             typeUri === null
               ? null
-              : resolveRootField(info, "ontologyClass", { uri: typeUri }, context),
+              : resolveRootField(
+                  info,
+                  "ontologyClass",
+                  { uri: typeUri },
+                  context,
+                ),
         },
         groups: { type: groupList },
       }),
@@ -422,7 +434,12 @@ export const createStatementsExtensions =
     const statementValue = new GraphQLUnionType({
       name: "StatementValue",
       description: "One value of a statement: the other side from the entity.",
-      types: [statementNode, statementLiteral, statementNested, statementForeign],
+      types: [
+        statementNode,
+        statementLiteral,
+        statementNested,
+        statementForeign,
+      ],
       resolveType: ({ __typename }: StatementValueSource) => __typename,
     });
     const statementGroup = new GraphQLObjectType<
