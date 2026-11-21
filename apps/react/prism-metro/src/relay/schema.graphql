@@ -367,12 +367,14 @@ type Query {
 # contract's superset rule is for (contract.graphql:39-42). `buildSchema` over
 # the contract alone cannot serve instance data.
 #
-# THREE ROOT FIELDS ARE ADDED: `prose`, `search` and `source`, at the end of
-# this file. Every entity type below is reachable through the contract's own
-# root fields — `node(id:)` and `OntologyClass.instances` — and adding a root
-# field for them would have been easier and would have proved less: the point
-# is that the contract's five roots suffice for the graph. Prose, search and
-# source are not part of the contract; they are provider extensions, and each
+# FOUR ROOT FIELDS ARE ADDED: `prose`, `search` and `source`, at the end of
+# this file, and `statements`, whose SDL the contract ships and
+# `readProviderSdl` appends to this file's. Every entity type below is
+# reachable through the contract's own root fields — `node(id:)` and
+# `OntologyClass.instances` — and adding a root field for them would have
+# been easier and would have proved less: the point is that the contract's
+# five roots suffice for the graph. Prose, search, source and statements are
+# not part of the contract; they are provider extensions, and each
 # is a root field because that is the one position a reader can select the
 # same way against every provider that offers it. A compiled provider can add
 # fields only to the object types it generates and to Query, never to `Node`,
