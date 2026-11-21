@@ -25,7 +25,9 @@ export default function ExpansionIndicator({
 }: ExpansionIndicatorProps): ReactElement {
   const messages = useContext(MessagesContext);
   const { link, button } = useHydrationFocusHandoff({ hydrated });
-  const label = messages.showMoreEvents(step);
+  // The label alone is underlined: a decoration on the command would reach
+  // the separator dot drawn before it, which no rule on the dot can lift.
+  const label = <span className="label">{messages.showMoreEvents(step)}</span>;
   let more: ReactElement | null = null;
   if (step > 0) {
     more =
@@ -50,7 +52,7 @@ export default function ExpansionIndicator({
       {more}
       {onShowAll === null ? null : (
         <button type="button" className="command" onClick={onShowAll}>
-          {messages.showAllEvents}
+          <span className="label">{messages.showAllEvents}</span>
         </button>
       )}
     </div>
