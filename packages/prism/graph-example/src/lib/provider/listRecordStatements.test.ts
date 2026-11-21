@@ -100,6 +100,19 @@ describe("listRecordStatements", () => {
     ]);
   });
 
+  it("states no reverse for a loop route that has none", () => {
+    const [route] = objectsOf(
+      listRecordStatements(
+        recordOf(`${METRO}ringway-clockwise`),
+        exampleDataset,
+      ),
+      "routes",
+    );
+    const statements = expand(route);
+    expect(objectsOf(statements, "reverse")).toEqual([]);
+    expect(objectsOf(statements, "calls").length).toBeGreaterThan(0);
+  });
+
   it("indexes a unit's cars and states their position, type and reversal", () => {
     const cars = objectsOf(
       listRecordStatements(recordOf(`${METRO}unit-70`), exampleDataset),

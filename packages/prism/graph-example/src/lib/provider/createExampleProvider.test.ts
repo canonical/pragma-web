@@ -2821,6 +2821,81 @@ describe("Query.statements", () => {
     ).toBeNull();
   });
 
+  it("reads a bound the reader leaves null as the default", async () => {
+    const unnamed = await read({ uri: `${METRO}circle-line` });
+    const nulled = await read({
+      uri: `${METRO}circle-line`,
+      perPredicate: null,
+    });
+    expect(nulled).toEqual(unnamed);
+  });
+
+  it("expands nested values two levels deep and no further", async () => {
+    const data = await run(`{ statements(uri: "${METRO}north-line") {
+      groups { predicateUri values { ... on StatementNested {
+        groups { predicateUri values { ... on StatementNested {
+          groups { predicateUri } } } } } } } } }`);
+    type Level = {
+      readonly predicateUri: string;
+      readonly values: readonly { readonly groups?: readonly Level[] }[];
+    };
+    const groups = (data.statements as { readonly groups: readonly Level[] })
+      .groups;
+    const route = groups
+      .find(({ predicateUri }) => predicateUri.endsWith("#routes"))
+      ?.values.at(0);
+    const reverse = route?.groups?.find(({ predicateUri }) =>
+      predicateUri.endsWith("#reverse"),
+    );
+    expect(reverse?.values).toEqual([{ groups: [] }]);
+  });
+
+  describe("on a purpose-built dataset", () => {
+    const dataset: ExampleDataset = {
+      ontologies: [],
+      classes: [{ uri: "urn:C", isAbstract: false, properties: [] }],
+      properties: [
+        {
+          uri: "urn:p#code",
+          range: "String",
+          kind: "DATATYPE",
+          functional: true,
+        },
+      ],
+      entities: [
+        {
+          uri: "urn:e",
+          type: "urn:C",
+          typename: "Station",
+          labels: { "": "E" },
+          code: "E1",
+        },
+      ],
+    };
+
+    it("orders a predicate outside every known namespace by its whole IRI", async () => {
+      const data = await runWith(
+        dataset,
+        `{ statements(uri: "urn:e") { groups { predicateUri } } }`,
+      );
+      expect(data.statements).toEqual({
+        groups: [
+          { predicateUri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" },
+          { predicateUri: "http://www.w3.org/2000/01/rdf-schema#label" },
+          { predicateUri: "urn:p#code" },
+        ],
+      });
+    });
+
+    it("reads no statements into an entity nothing names", async () => {
+      const data = await runWith(
+        dataset,
+        `{ statements(uri: "urn:e", direction: IN) { total groups { predicateUri } } }`,
+      );
+      expect(data.statements).toEqual({ total: 0, groups: [] });
+    });
+  });
+
   it("states a class's type and superclass", async () => {
     const result = await read({ uri: `${METRO}Interchange` });
     expect(result.groups.at(0)?.values).toEqual([
