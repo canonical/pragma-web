@@ -1,6 +1,7 @@
+---
 # SearchPassage — the passage of a search result that holds the text: one
 # muted line of at most 160 characters (the provider cuts it), each range
-# of the text in it marked. Its overflow is cut with an ellipsis.
+# of the text in it marked: in the text colour and bold, no background. Its overflow is cut with an ellipsis.
 #
 # Every decision is read through a component token declared on the root
 # (`--search-passage-*`), bound to the symbol named here.
@@ -18,6 +19,6 @@ node:
     - node:
         role: match
         styles:
-          typography.color: color.text.default
-          color.background: color.background.highlight
+          typography.color: color.text
+          typography.weight: typography.text.primary.bold.fontWeight
       relation: { cardinality: "0..*", slotName: match }

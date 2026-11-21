@@ -107,6 +107,8 @@ describe("the package's components", () => {
       "EntityList",
       "EntityRow",
       "EntityTable",
+      "SearchPassage",
+      "SearchResultGroup",
       "SwatchMark",
       "TokenMark",
       "TokenSwatch",

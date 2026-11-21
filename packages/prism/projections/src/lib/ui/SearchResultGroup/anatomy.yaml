@@ -1,3 +1,4 @@
+---
 # SearchResultGroup — one type's results on a search page: a heading with
 # the type's name and its count ("Component · 6"), then its rows, which
 # are the site's dispatched rows in rank order. Heading and rows one gutter

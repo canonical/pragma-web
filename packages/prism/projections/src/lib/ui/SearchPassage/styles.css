@@ -8,7 +8,9 @@
   .ds.search-passage {
     --search-passage-color: var(--color-text-muted);
     --search-passage-match-color: var(--color-text);
-    --search-passage-match-background: var(--color-background-highlight);
+    --search-passage-match-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
 
     color: var(--search-passage-color);
     margin-block-start: 0;
@@ -20,6 +22,6 @@
   /* A run that holds the text. */
   .ds.search-passage .match {
     color: var(--search-passage-match-color);
-    background-color: var(--search-passage-match-background);
+    font-weight: var(--search-passage-match-font-weight);
   }
 }
