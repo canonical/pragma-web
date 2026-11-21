@@ -18,5 +18,5 @@ node:
       edges:
         - node: { role: value, element: li }
           relation: { cardinality: "1..12", slotName: value }
-    - node: { role: shown, element: p, styles: { layout.grid.column: "1 / -1", spacing.external.block.start: 0, spacing.external.block.end: 0, color.text: muted } }
+    - node: { role: shown, element: p, styles: { layout.grid.column: "1 / -1", spacing.external.block.start: 0, spacing.external.block.end: 0, typography.color: color.text.muted } }
       relation: { cardinality: "0..1", slotName: shown }    # "12 of 30 shown", when total > shown
