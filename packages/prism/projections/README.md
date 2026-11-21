@@ -362,11 +362,46 @@ superclasses draws a table of facts from each node's `values` (less the
 `omits`), headers sorting by `sort=`; a mixed list keeps the rows.
 
 ```tsx
+const sort = useSearchParam(VIEW_PARAMS.sort) ?? undefined;
+const selected = useSearchParam(VIEW_PARAMS.select) ?? undefined;
+
 <NodeList
   nodes={data.instances.edges.map(({ node }) => node)}
   renderer={active.name === "cards" ? "cards" : "table"}
-/>
+  selected={selected}
+  sort={sort}
+/>;
 ```
+
+The node `selected` names, by IRI or curie (the address's `select=`), is
+highlighted in every renderer: the table marks its row selected, and a
+row or a card is `aria-current`. It is one row carried in the address,
+so it survives a reload and a renderer switch; there are no checkboxes.
+The entity lens's indexes, the metro's fleet and the docs catalog all list
+through `NodeList`.
+
+Where the shell is 912px wide or wider, the table is a header row of sort
+links over one row per node, its number columns aligned to their end. In
+a narrower shell the stylesheet folds each row into a scented row of two
+lines, 56px: the title, then its first two values, each after its
+field's label; the header row and the further values are hidden. One
+server HTML serves every width, and no renderer measures it.
+
+`NodeList`'s `sort`, `selected`, `omits` and `lines` stay optional: an
+address without `sort=` or `select=` names no order and no selection, a
+list with nothing to leave out omits nothing, and a row is one line unless
+its index opts into two. `EntityList`'s `columns`, `rows`, `lines` and
+`selected`, and `EntityTable`'s `lines` and `selected`, stay optional for
+the same reason: a list of children has no columns, and a table may have
+no selected row.
+
+Its limits:
+
+- A table's row carries no type mark: the table lists one type, which the
+  page's heading names, and its title cell is the title alone.
+- The docs catalog leaves every field out of its table, so it keeps its
+  two-line rows; the standards index keeps its own long-fact rows and does
+  not list through `NodeList`.
 
 ## Prose links
 

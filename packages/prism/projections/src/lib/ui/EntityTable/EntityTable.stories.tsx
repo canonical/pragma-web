@@ -28,8 +28,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** One line a row, the second row selected. */
-export const Default: Story = { args: { selected: "b" } };
+/** One line a row, none selected. */
+export const Default: Story = {};
+
+/** The row the address selects (`select=`), highlighted. */
+export const Selected: Story = { args: { selected: "b" } };
 
 /** Two lines a row, as an index that opts in declares. */
 export const TwoLines: Story = { args: { lines: "two" } };
