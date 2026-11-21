@@ -51,6 +51,7 @@ import type {
   StatementsArgs,
   TermStatement,
 } from "./types.js";
+import { writeSignature } from "./writeSignature.js";
 
 /** A resolved `StatementValue`, its member named for the union. */
 type StatementValueSource =
@@ -111,16 +112,6 @@ const indexStatements = (
       ]),
     new Map<string, readonly TermStatement[]>(),
   );
-
-/**
- * A blank node's statements as one text, which orders blank nodes that
- * carry no key of their own the same on every read.
- */
-const writeSignature = (label: string, blanks: BlankStatements): string =>
-  (blanks.get(label) ?? [])
-    .map(({ predicate, term }) => `${predicate} ${term.value}`)
-    .toSorted()
-    .join("\n");
 
 /**
  * Read the statements `uri` makes and those of every blank node below it,
@@ -192,11 +183,13 @@ const readPathStatements = async (
 /**
  * Read `uri`'s statements in one direction: their count per predicate,
  * then each predicate's first `perPredicate` values, then the statements
- * of the blank nodes among those values. Null when the graph holds neither
- * a statement nor a node for `uri`.
+ * of the blank nodes among those values. A group holding blank values reads
+ * all of its values, since the store cannot order blank nodes by their
+ * statements: the first `perPredicate` are then those `compareTerms` puts
+ * first, so a blank value's position among them is its `path` index.
  *
- * @note Impure: queries the store, once to count, once per predicate and
- * once for the blank values.
+ * @note Impure: queries the store, once to count, once or twice per
+ * predicate and once for the blank values.
  */
 const readEntityStatements = async (
   query: QueryFn,
@@ -208,19 +201,29 @@ const readEntityStatements = async (
   const counts = (await selectTerms(query, buildCountQuery(uri, direction)))
     .map((row) => ({ predicate: row.p.value, total: Number(row.n.value) }))
     .toSorted((a, b) => comparePredicates(compact)(a.predicate, b.predicate));
-  const windows = await Promise.all(
-    counts.map(async ({ predicate, total }) => ({
-      predicate,
-      total,
-      terms: (
-        await selectTerms(
-          query,
-          buildWindowQuery(uri, direction, predicate, perPredicate),
-        )
+  const readWindow = async (
+    predicate: string,
+    limit: number,
+  ): Promise<readonly Term[]> =>
+    (
+      await selectTerms(
+        query,
+        buildWindowQuery(uri, direction, predicate, limit),
       )
-        .map((row) => row.v)
-        .toSorted(compareTerms),
-    })),
+    ).map((row) => row.v);
+  const windows = await Promise.all(
+    counts.map(async ({ predicate, total }) => {
+      const first = await readWindow(predicate, perPredicate);
+      const hasBlank = first.some((term) => term.termType === "BlankNode");
+      return {
+        predicate,
+        total,
+        terms:
+          hasBlank && total > first.length
+            ? await readWindow(predicate, total)
+            : first,
+      };
+    }),
   );
   const blanks = windows.some(({ terms }) =>
     terms.some((term) => term.termType === "BlankNode"),
@@ -233,7 +236,14 @@ const readEntityStatements = async (
     : new Map<string, readonly TermStatement[]>();
   return {
     subject: uri,
-    groups: windows.map((window) => ({ ...window, depth: 1, blanks, compact })),
+    groups: windows.map(({ predicate, total, terms }) => ({
+      predicate,
+      total,
+      terms: terms.toSorted(compareTerms(blanks)).slice(0, perPredicate),
+      depth: 1,
+      blanks,
+      compact,
+    })),
     total: counts.reduce((sum, { total }) => sum + total, 0),
   };
 };

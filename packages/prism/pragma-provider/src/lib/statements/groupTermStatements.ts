@@ -37,7 +37,7 @@ export const groupTermStatements = (
     .map(([predicate, terms]) => ({
       predicate,
       total: terms.length,
-      terms: terms.toSorted(compareTerms).slice(0, perPredicate),
+      terms: terms.toSorted(compareTerms(blanks)).slice(0, perPredicate),
       depth,
       blanks,
       compact,

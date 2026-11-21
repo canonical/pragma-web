@@ -293,6 +293,32 @@ describe("createStatementsExtensions", () => {
     });
   }, 120_000);
 
+  it("lists blank values in the order a path index counts them", async () => {
+    const listed = findGroup(await ask({ uri: `${DS}card` }), `${DS}part`);
+    const paths = await Promise.all(
+      [0, 1, 2].map((index) =>
+        ask({ uri: `${DS}card`, path: ["part", String(index)] }),
+      ),
+    );
+    expect(
+      paths.map((read) => read?.groups.map(({ predicateUri }) => predicateUri)),
+    ).toEqual(
+      listed?.values.map(({ groups }) =>
+        (groups as readonly { predicateUri: string }[]).map(
+          ({ predicateUri }) => predicateUri,
+        ),
+      ),
+    );
+    const first = findGroup(
+      await ask({ uri: `${DS}card`, per: 1 }),
+      `${DS}part`,
+    );
+    expect(first?.total).toBe(3);
+    expect(first?.values).toEqual([
+      { __typename: "StatementNested", type: null, groups: [] },
+    ]);
+  }, 120_000);
+
   it("refuses a path that selects nothing, or one read inwards", async () => {
     for (const path of [
       ["part", "9"],
