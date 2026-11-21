@@ -96,10 +96,7 @@ describe("ComponentHeader", () => {
           ],
         ],
         ["address", []],
-        [
-          "ds copy-button",
-          expect.arrayContaining([["announcement", ""]]),
-        ],
+        ["ds copy-button", expect.arrayContaining([["announcement", ""]])],
       ]);
       expect(line?.querySelector(".address")).toHaveTextContent(BUTTON_URI);
       expect(line?.querySelector(".address")?.tagName).toBe("CODE");

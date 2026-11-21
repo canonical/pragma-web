@@ -18,9 +18,7 @@ describe("ComponentEntityPage SSR", () => {
     expect(html).toContain(
       '<section class="ds component-entity-page" data-view="component-entity">',
     );
-    expect(html).toContain(
-      "</svg>Button</h1>",
-    );
+    expect(html).toContain("</svg>Button</h1>");
     expect(html).toContain('<figure aria-label="The anatomy of Button"');
     expect(fetchFn).not.toHaveBeenCalled();
   });

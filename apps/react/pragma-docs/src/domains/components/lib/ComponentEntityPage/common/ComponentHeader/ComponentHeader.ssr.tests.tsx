@@ -18,7 +18,7 @@ describe("ComponentHeader SSR", () => {
     expect(html).toContain(
       '<h1 class="heading" id="component-entity-title"><svg',
     );
-    expect(html).toContain('</svg>Button</h1>');
+    expect(html).toContain("</svg>Button</h1>");
     expect(html).toContain(
       '<code class="address">ds:global.component.button</code><span class="ds copy-button">',
     );
