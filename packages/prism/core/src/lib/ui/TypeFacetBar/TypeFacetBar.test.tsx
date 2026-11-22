@@ -79,6 +79,16 @@ describe("TypeFacetBar", () => {
     ).not.toHaveClass("current");
   });
 
+  it("leaves the chip out on the facet bar, the applied value still bold", () => {
+    renderRouted(<TypeFacetBar facets={FACETS} withChip={false} />);
+    expect(
+      screen.queryByRole("link", { name: "Remove the filter Type: Station" }),
+    ).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "Station 6" }).closest("li"),
+    ).toHaveClass("current");
+  });
+
   it("closes the facet with the applied type's chip, which releases it", () => {
     renderRouted(<TypeFacetBar facets={FACETS} />);
     const chip = screen.getByRole("link", {

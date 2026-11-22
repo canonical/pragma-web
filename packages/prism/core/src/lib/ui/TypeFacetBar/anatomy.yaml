@@ -7,7 +7,9 @@
 # current (its value carries the `current` modifier, its link
 # `aria-current`) and drawn bold, and its link releases it. A value with
 # none is greyed and is not a link. When a type is applied, a chip naming
-# it closes the facet; pressing it releases the type.
+# it closes the facet in the filter sheet; pressing it releases the type.
+# The facet bar holds one line and leaves the chip out: its bold value
+# says which type is applied.
 #
 # Every decision is read through a component token declared on the root
 # (`--type-facet-bar-*`), bound to the symbol named here.

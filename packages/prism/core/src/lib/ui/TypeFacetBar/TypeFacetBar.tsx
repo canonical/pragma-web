@@ -13,9 +13,10 @@ const componentCssClassName = "ds type-facet-bar";
  * under the strip and of the filter sheet: its name, then each type with
  * its count. A type with results is a link applying it; the applied one is
  * marked current, drawn bold, and its link releases it. A type with none
- * is greyed and is not a link. An applied type closes the facet with its
- * chip, a link that releases it. The facet is named by `aria-label`, not
- * an id, so the bar and the sheet can both hold it.
+ * is greyed and is not a link. In the filter sheet an applied type closes
+ * the facet with its chip, a link that releases it; the facet bar, one
+ * line, leaves the chip out (`withChip={false}`). The facet is named by
+ * `aria-label`, not an id, so the bar and the sheet can both hold it.
  *
  * `import { TypeFacetBar } from "@canonical/prism-core";`
  *
@@ -24,12 +25,13 @@ const componentCssClassName = "ds type-facet-bar";
 export default function TypeFacetBar({
   facets,
   label,
+  withChip = true,
   className,
   ...props
 }: TypeFacetBarProps): ReactElement {
   const t = useMessages();
   const name = label ?? t("facet.type");
-  const applied = facets.find((facet) => facet.selected);
+  const applied = withChip ? facets.find((facet) => facet.selected) : undefined;
   return (
     <nav
       aria-label={name}

@@ -19,10 +19,17 @@ type OwnProps = {
   readonly facets: readonly TypeFacetValue[];
   /** The facet's name; the catalog's "Type" when absent. */
   readonly label?: string;
+  /**
+   * Whether an applied type's chip closes the facet: true in the filter
+   * sheet, false on the facet bar, which holds one line and shows the
+   * applied type by its bold value alone. True when absent.
+   */
+  readonly withChip?: boolean;
 };
 
 /**
- * Props accepted by `TypeFacetBar`: its values and name, then the native
+ * Props accepted by `TypeFacetBar`: its values, its name and whether it
+ * shows the applied type's chip, then the native
  * props of its `<nav>` root.
  *
  * `children` is excluded: the bar renders its own values.
