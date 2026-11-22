@@ -11,7 +11,7 @@ import {
   ProjectionLinkProvider,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
-import type { AnyRoute, RouteMap } from "@canonical/router-core";
+import type { AnyRoute, RouteArgs, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
@@ -67,6 +67,9 @@ const renderPeek = (uri: string): ReactElement => <MetroPeek uri={uri} />;
  * Generic over the route map rather than bound to `AppRoutes`, so the test
  * harnesses mount it over route tables of their own.
  *
+ * When the routes hold the search page, the palette hands its text to
+ * that page's address, which the router builds.
+ *
  * `import { Shell } from "#lib/ui";`
  *
  * @implements metro.component.shell
@@ -109,7 +112,27 @@ export default function Shell<
                           <p className="loading">{MESSAGES["shell.loading"]}</p>
                         }
                       />
-                      <CommandPalette />
+                      <CommandPalette
+                        searchHref={
+                          "search" in router.routes
+                            ? (text: string): string =>
+                                router.buildPath<
+                                  Extract<keyof TRoutes, string>
+                                >(
+                                  // The guard above found the search page in
+                                  // the routes, which the generic map cannot
+                                  // know.
+                                  "search" as Extract<keyof TRoutes, string>,
+                                  ...([
+                                    { search: { q: text } },
+                                  ] as unknown as RouteArgs<
+                                    TRoutes,
+                                    Extract<keyof TRoutes, string>
+                                  >),
+                                )
+                            : undefined
+                        }
+                      />
                     </div>
                   </SiteRenderers>
                 </AmbientNamespaceProvider>
