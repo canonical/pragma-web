@@ -1,10 +1,10 @@
-import { createEnvironment } from "@canonical/prism-core";
+import { createEnvironment, routeLensFacet } from "@canonical/prism-core";
 import {
   createMemoryAdapter,
   createRouter,
   route,
 } from "@canonical/router-core";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { searchRoutes } from "#domains/search";
 import Shell from "./Shell.js";
@@ -12,6 +12,10 @@ import Shell from "./Shell.js";
 /** What the palette reads of its props here. */
 interface PaletteProps {
   readonly searchHref?: (text: string) => string;
+  readonly destinations?: {
+    readonly places: readonly { label: string; href: string }[];
+    readonly recent: readonly { label: string; href: string }[];
+  };
 }
 
 const palette = vi.hoisted(() => ({
@@ -64,5 +68,37 @@ describe("Shell's palette", () => {
     await screen.findByRole("heading", { name: "Landing" });
     expect(palette.props).toBeDefined();
     expect(palette.props?.searchHref).toBeUndefined();
+  });
+
+  it("is given each lens's home and the pages read before, to jump to without search", async () => {
+    const router = createRouter(
+      {
+        landing: route({ url: "/", content: Landing }),
+        lines: route({
+          url: "/lines",
+          content: Landing,
+          meta: routeLensFacet.of({
+            label: "Lines",
+            icon: () => null,
+            order: 1,
+            tier: 1,
+          }),
+        }),
+      },
+      { adapter: createMemoryAdapter("/") },
+    );
+    render(<Shell environment={environment} router={router} />);
+    await screen.findByRole("heading", { name: "Landing" });
+    expect(palette.props?.destinations).toEqual({
+      places: [{ label: "Lines", href: "/lines" }],
+      recent: [],
+    });
+    document.title = "Landing";
+    await act(async () => {
+      await router.navigate("lines");
+    });
+    expect(palette.props?.destinations?.recent).toEqual([
+      { label: "Landing", href: "/" },
+    ]);
   });
 });
