@@ -11,11 +11,13 @@
 # text: what the field is for, and each searchable type as a door with
 # its total. It spans every column of the canvas's page grid; its parts
 # sit one gutter apart, and so do the groups, the doors and the hints.
+# A result's passage holds the 75ch reading measure.
 #
 # Every decision is read through a component token declared on the root
 # (`--search-page-*`), bound to the symbol named here.
 #
-# Token ledger: none.
+# Token ledger:
+#   --search-page-prose-measure: 75ch  a passage's reading measure.
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -57,6 +59,8 @@ node:
                         relation: { cardinality: "1", slotName: node }
                       - node:
                           uri: prism.component.search_passage
+                          styles:
+                            size.max.width: "75ch"
                         relation: { cardinality: "1", slotName: passage }
                   relation: { cardinality: "1..*", slotName: result }
             relation: { cardinality: "1..*", slotName: group }

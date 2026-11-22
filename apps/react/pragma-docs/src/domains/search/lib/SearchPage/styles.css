@@ -9,6 +9,8 @@
   .ds.search-page {
     --search-page-gap: var(--grid-gutter);
     --search-page-total-color: var(--color-text-muted);
+    /* The reading measure of a result's passage: 75 characters. */
+    --search-page-prose-measure: 75ch;
 
     grid-column: 1 / -1;
     display: flex;
@@ -28,6 +30,11 @@
     display: flex;
     flex-direction: column;
     min-inline-size: 0;
+  }
+
+  /* A result's passage holds the reading measure. */
+  .ds.search-page .passage {
+    max-inline-size: var(--search-page-prose-measure);
   }
 
   /* The types as doors: a list without its native bullets and indent,
