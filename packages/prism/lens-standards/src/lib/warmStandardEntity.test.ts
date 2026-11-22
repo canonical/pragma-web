@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 describe("warmStandardEntity", () => {
-  it("prefetches the entity query with the binding's class and the param", () => {
+  it("prefetches the entity query with the binding's class and the param, and the standard's statements", () => {
     const fetchFn = createFetchSpy();
     setPrefetchEnvironment(createEnvironment({ fetchFn }));
 
@@ -25,15 +25,39 @@ describe("warmStandardEntity", () => {
       uri: LINK_COMPONENT_URI,
     });
 
-    expect(fetchFn).toHaveBeenCalledTimes(1);
-    const [request, variables] = fetchFn.mock.lastCall ?? [];
-    expect(request?.name).toBe("StandardEntityQuery");
-    expect(variables).toEqual(
-      buildStandardEntityVariables(
-        STANDARDS_BINDING_FIXTURE.classUri,
-        LINK_COMPONENT_URI,
-      ),
+    expect(
+      fetchFn.mock.calls.map(([request, variables]) => [
+        request.name,
+        variables,
+      ]),
+    ).toEqual([
+      [
+        "StandardEntityQuery",
+        buildStandardEntityVariables(
+          STANDARDS_BINDING_FIXTURE.classUri,
+          LINK_COMPONENT_URI,
+        ),
+      ],
+      ["StandardStatementsQuery", { uri: LINK_COMPONENT_URI }],
+    ]);
+  });
+
+  it("settles when the provider refuses the statements it does not serve", async () => {
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation((request) =>
+      request.name === "StandardStatementsQuery"
+        ? Promise.reject(new Error('Cannot query field "statements"'))
+        : Promise.resolve({
+            data: { boundClass: null, node: null, body: null },
+          }),
     );
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+
+    await expect(
+      warmStandardEntity(STANDARDS_BINDING_FIXTURE, {
+        uri: LINK_COMPONENT_URI,
+      }),
+    ).resolves.toBeUndefined();
   });
 
   it("warms the standard's Turtle beside it when the address asks", () => {

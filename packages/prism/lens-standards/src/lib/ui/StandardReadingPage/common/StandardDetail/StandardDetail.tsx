@@ -7,9 +7,12 @@ import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import type { StandardEntityQuery } from "../../../../../__generated__/StandardEntityQuery.graphql.js";
 import standardEntityQueryNode from "../../../../../__generated__/StandardEntityQuery.graphql.js";
+import type { StandardStatementsQuery } from "../../../../../__generated__/StandardStatementsQuery.graphql.js";
+import standardStatementsQueryNode from "../../../../../__generated__/StandardStatementsQuery.graphql.js";
 import { STANDARDS_RENDERERS } from "../../../../constants.js";
 import { Message, useMessages } from "../../../../i18n/index.js";
 import { buildStandardEntityVariables } from "../../../../standardEntityQuery.js";
+import useServesStatements from "../../../../useServesStatements.js";
 import { StandardArticle } from "../../../StandardArticle/index.js";
 import type { StandardDetailProps } from "./types.js";
 import "./styles.css";
@@ -57,13 +60,35 @@ const declareStandardEntityQuery = (): unknown => graphql`
   }
 `;
 void declareStandardEntityQuery;
+
+/**
+ * Codegen source of truth for `StandardStatementsQuery`: the standard's
+ * statements in both directions, from the `statements` extension, which
+ * the article draws as its Do, Don't, Related standards and Applies to
+ * sections. A query of its own, because a provider that does not serve the
+ * extension refuses the field: the page asks for it only where the site
+ * serves it. Nothing calls it.
+ */
+const declareStandardStatementsQuery = (): unknown => graphql`
+  query StandardStatementsQuery($uri: ID!) {
+    outgoing: statements(uri: $uri, direction: OUT) {
+      ...StandardArticle_outgoing
+    }
+    incoming: statements(uri: $uri, direction: IN) {
+      ...StandardArticle_incoming
+    }
+  }
+`;
+void declareStandardStatementsQuery;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds standard-detail";
 
 /**
- * The reading page's data-bearing interior: one `useLazyLoadQuery`, the
- * article fragment fanning out below. A node that is absent, or that is not
+ * The reading page's data-bearing interior: the standard's query, the
+ * article fragment fanning out below, and, where the site serves them, the
+ * standard's statements, from which the article draws its further
+ * sections. A node that is absent, or that is not
  * an instance of the bound class, renders the not-found alert naming the
  * address: an unknown address is a page with an honest alert, never an HTTP
  * 404, because the address space is the graph's, not the router's. It sets
@@ -82,7 +107,7 @@ const componentCssClassName = "ds standard-detail";
  * @implements prism.subcomponent.standard_detail
  * @note Impure: reads the Relay store, the translator and the site's
  *   renderers in scope, and suspends while the store does not hold the
- *   standard.
+ *   standard, or its statements where the site serves them.
  */
 export default function StandardDetail({
   classUri,
@@ -92,9 +117,16 @@ export default function StandardDetail({
 }: StandardDetailProps): ReactElement {
   const t = useMessages();
   const { active } = useRenderers("page", STANDARDS_RENDERERS.page);
+  const served = useServesStatements();
   const data = useLazyLoadQuery<StandardEntityQuery>(
     standardEntityQueryNode,
     buildStandardEntityVariables(classUri, uri),
+  );
+  const statements = useLazyLoadQuery<StandardStatementsQuery>(
+    standardStatementsQueryNode,
+    { uri },
+    // A site that does not serve the field is never asked for it.
+    { fetchPolicy: served ? "store-or-network" : "store-only" },
   );
   const bound = data.boundClass;
   const permitted = new Set(
@@ -115,6 +147,8 @@ export default function StandardDetail({
           <Head title={standard._meta.title} />
           <StandardArticle
             body={data.body ?? null}
+            incoming={statements.incoming}
+            outgoing={statements.outgoing}
             source={
               active.name === PAGE_RENDERER_NAMES.page
                 ? undefined

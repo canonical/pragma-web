@@ -5,7 +5,9 @@
 @layer ds.components.global {
   .ds.standard-article {
     /* The article is core's sectioned view, which places its regions; the
-     * article styles what it puts in them and declares no token. */
+     * article styles what it puts in them. */
+    --standard-article-gap: var(--grid-gutter);
+    --standard-article-shown-color: var(--color-text-muted);
   }
 
   /* The header holds the title alone and spans the header's every column. */
@@ -19,8 +21,33 @@
     grid-column: 1 / -1;
   }
 
-  /* A description keeps its hand-written line breaks. */
-  .ds.standard-article .paragraph {
+  /* A description keeps its hand-written line breaks, in the rule and in
+   * an example alike. */
+  .ds.standard-article .paragraph,
+  .ds.standard-article .examples .description {
     white-space: pre-line;
+  }
+
+  /* An example section's examples and a section's chips take the section's
+   * every column; the chips wrap. */
+  .ds.standard-article .examples,
+  .ds.standard-article .chips,
+  .ds.standard-article .shown {
+    grid-column: 1 / -1;
+  }
+
+  .ds.standard-article .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--standard-article-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* A group cut at its bound says how many it shows, a fact in muted ink. */
+  .ds.standard-article .shown {
+    margin: 0;
+    color: var(--standard-article-shown-color);
   }
 }
