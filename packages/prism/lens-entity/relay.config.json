@@ -19,7 +19,7 @@
     },
     "lens-entity": {
       "base": "prism-projections",
-      "schema": "contract/schema/contract.graphql",
+      "schema": "lens-entity/.relay/schema.graphql",
       "language": "typescript",
       "eagerEsModules": true,
       "output": "lens-entity/src/__generated__",

@@ -5,13 +5,15 @@
  * check reads. `schema:check` reruns it and fails on a diff, so the
  * committed file cannot drift from the provider.
  *
- * The provider adds its root fields (`prose`, `search`) in one
- * `extend type Query { … }` block. relay-compiler reads `extend type` in a
- * schema file as a client schema extension: it compiles those fields as
- * `ClientExtension` selections and never sends them to the server, so the
- * palette's search would run with its root field stripped. The block's
- * fields are therefore spliced into the contract's `type Query { … }` and
- * the block itself is dropped; the rest of the SDL is written as emitted.
+ * The provider adds its root fields (`prose`, `search`, `source`,
+ * `facetedInstances`, then `statements`) and `Node.values` in `extend`
+ * blocks. relay-compiler reads `extend type` in a schema file as a client
+ * schema extension: it compiles those fields as `ClientExtension`
+ * selections and never sends them to the server, so the palette's search
+ * would run with its root field stripped. Every block's fields are
+ * therefore folded into the type or interface it extends, in the SDL's
+ * order, and the blocks themselves are dropped; the rest of the SDL is
+ * written as emitted.
  * It writes the schema of the build without search beside it.
  */
 import { writeFileSync } from "node:fs";

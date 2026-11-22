@@ -590,6 +590,7 @@
       "dependencies": {
         "@canonical/i18n-core": "^0.44.1",
         "@canonical/prism-core": "^0.44.1",
+        "@canonical/prism-lens-entity": "^0.44.1",
         "@canonical/prism-projections": "^0.44.1",
         "@canonical/react-ds-global": "^0.44.1",
         "@canonical/react-head": "^0.44.1",
@@ -632,6 +633,7 @@
       "version": "0.44.1",
       "dependencies": {
         "@canonical/i18n-core": "^0.44.1",
+        "@canonical/prism-contract": "^0.44.1",
         "@canonical/prism-core": "^0.44.1",
         "@canonical/prism-projections": "^0.44.1",
         "@canonical/react-ds-global": "^0.44.1",
@@ -645,7 +647,6 @@
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.43.0",
-        "@canonical/prism-contract": "^0.44.1",
         "@canonical/storybook-addon-relay": "^0.44.1",
         "@canonical/storybook-config": "^0.44.1",
         "@canonical/styles": "^0.44.1",
@@ -663,6 +664,7 @@
         "@types/relay-test-utils": "^19.0.0",
         "@vitejs/plugin-react": "^6.0.0",
         "@vitest/coverage-v8": "^5.0.0",
+        "graphql": "^16.11.0",
         "jsdom": "^28.1.0",
         "react-dom": "^19.2.4",
         "relay-compiler": "^21.0.1",

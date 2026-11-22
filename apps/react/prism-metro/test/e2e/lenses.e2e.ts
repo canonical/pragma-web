@@ -111,14 +111,70 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(Object.keys(records).length).toBeGreaterThan(0);
   });
 
-  it("renders a station's page with its fields", async () => {
+  it("renders a station's page from its statements, on the sectioned view", async () => {
     const { status, html } = await fetchPage(
       script,
       "/stations/metro%3Anorthgate",
     );
     expect(status).toBe(200);
-    expect(html).toMatch(/<h1[^>]*>Northgate<\/h1>/);
-    expect(html).toContain('class="ds field-list"');
+    expect(html).toMatch(/<h1[^>]*>(?:<svg.*?<\/svg>)?Northgate<\/h1>/s);
+    expect(html).toContain('class="ds sectioned-view"');
+    // Values sit under their property group, with no count.
+    expect(html).toContain(">Overview</h2>");
+    expect(html).not.toContain(">platform count · 1</h2>");
+    expect(html).not.toContain('class="ds field-list"');
+    // Every group is named from the reader's side, never as a schema.
+    expect(html).not.toContain("property to");
+  });
+
+  it("leads Central Exchange with its prominent values, each group bounded and counted", async () => {
+    const { status, html } = await fetchPage(
+      script,
+      "/stations/metro%3Acentral-exchange",
+    );
+    expect(status).toBe(200);
+    // A nested value's own terms (the location's latitude and longitude)
+    // are not facts: the list is read with them left out.
+    const facts = html
+      .split('class="facts"')
+      .at(1)
+      ?.replace(/<dl class="nested">.*?<\/dl>/gs, "")
+      .split("</dl>")
+      .at(0);
+    expect(
+      [...String(facts).matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((term) =>
+        term.at(1),
+      ),
+    ).toEqual(["location", "serves lines", "transfer minutes"]);
+    const groups = html.split('class="ds statement-group').slice(1);
+    expect(groups.length).toBeGreaterThan(0);
+    for (const group of groups) {
+      const values = group.split("</ul>").at(0) ?? "";
+      expect(values.split('class="value"').length - 1).toBeLessThanOrEqual(12);
+    }
+    // No index route lists a group's values yet, so no group links to all.
+    expect(html).not.toContain('class="ds router-link all"');
+    expect(html).not.toContain("property to");
+  });
+
+  it("asides a line's details panel, every group closed and counted (W6b-A6)", async () => {
+    const { status, html } = await fetchPage(
+      script,
+      "/network/lines/metro%3Acircle-line",
+    );
+    expect(status).toBe(200);
+    const panel = html.split('class="ds entity-panel').at(1) ?? "";
+    expect(panel).toContain("Circle Line");
+    const summaries = [...panel.matchAll(/<summary[^>]*>(.*?)<\/summary>/gs)];
+    expect(summaries.length).toBeGreaterThan(0);
+    for (const [, summary] of summaries) {
+      expect(summary.replace(/<[^>]+>/g, "")).toMatch(/\d/);
+    }
+    expect(panel).not.toMatch(/<details[^>]*\sopen/);
+    expect(panel).toContain("Referenced by");
+    // Open goes to the line's own page, not to the workspace route it sits on.
+    const open = /<a [^>]*class="[^"]*\bopen\b[^"]*"[^>]*>/.exec(panel)?.at(0);
+    expect(open).toContain('href="/lines/metro%3Acircle-line"');
   });
 
   it("renders the lines index as rows of its table", async () => {

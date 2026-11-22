@@ -29,10 +29,7 @@ import {
 import { EntityLayout } from "../../lib/ui/EntityLayout/index.js";
 import {
   EntityDetail,
-  EntityHeading,
   EntitySummary,
-  FieldList,
-  Relations,
 } from "../../lib/ui/EntityPage/common/index.js";
 import { EntityPage } from "../../lib/ui/EntityPage/index.js";
 
@@ -64,25 +61,10 @@ const EntityPartsProbe = () => {
   if (node === null || node === undefined) throw new Error("no Northgate");
   return (
     <>
-      <EntityHeading
-        address={node._meta.curie}
-        title={node._meta.title}
-        {...nativeProps("heading")}
-      />
       <EntitySummary node={node} {...nativeProps("summary")} />
       <KeyValueList
         pairs={[{ id: "probe", term: "Term", value: "Value" }]}
         {...nativeProps("key-values")}
-      />
-      <FieldList
-        meta={node._meta}
-        namespaces={METRO_NAMESPACES}
-        {...nativeProps("fields")}
-      />
-      <Relations
-        meta={node._meta}
-        namespaces={METRO_NAMESPACES}
-        {...nativeProps("relations")}
       />
     </>
   );
@@ -136,11 +118,8 @@ describe("native props", () => {
     );
     expectRoot("page", "entity-page");
     expectRoot("detail", "entity-detail");
-    expectRoot("heading", "entity-heading");
     expectRoot("summary", "entity-summary");
     expectRoot("key-values", "key-value-list");
-    expectRoot("fields", "field-list");
-    expectRoot("relations", "relations");
   });
 
   it("reach the root of the layout", {

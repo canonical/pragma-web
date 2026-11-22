@@ -1,4 +1,8 @@
-import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
+import {
+  createEnvironment,
+  createStaticRouter,
+  HomesProvider,
+} from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
@@ -6,6 +10,7 @@ import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { definitionsRoutes } from "../src/lib/routes.js";
 import { DefinitionsLayout } from "../src/lib/ui/DefinitionsLayout/index.js";
+import { HOMES } from "./fixtures.js";
 
 /** What `createDefinitionsLayout` mounts the layout with. */
 export interface DefinitionsLayoutSetup {
@@ -25,8 +30,9 @@ export interface DefinitionsLayoutSetup {
 
 /**
  * Build `DefinitionsLayout` under the providers a site mounts it in: a
- * Relay environment over `records` and a static router over the lens's two
- * routes at `url`, which the strip's sockets read the current term from.
+ * Relay environment over `records`, a static router over the lens's two
+ * routes at `url`, which the strip's sockets read the current term from,
+ * and the homes the inspector's Open reads.
  *
  * @param setup - The URL, store, network, site slots, routed page and root
  *   class names.
@@ -45,9 +51,11 @@ export default function createDefinitionsLayout({
       environment={createEnvironment({ records, fetchFn })}
     >
       <RouterProvider router={createStaticRouter(definitionsRoutes, url)}>
-        <DefinitionsLayout className={className} rail={rail}>
-          {children}
-        </DefinitionsLayout>
+        <HomesProvider homes={HOMES}>
+          <DefinitionsLayout className={className} rail={rail}>
+            {children}
+          </DefinitionsLayout>
+        </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>
   );

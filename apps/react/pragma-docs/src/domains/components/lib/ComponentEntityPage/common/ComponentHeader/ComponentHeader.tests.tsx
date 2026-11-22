@@ -13,6 +13,52 @@ import {
 
 describe("ComponentHeader", () => {
   it(
+    "leads the name with the class's mark and copies the address, as the entity page does",
+    () => {
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const heading = screen.getByRole("heading", { level: 1, name: "Button" });
+      expect(heading.firstElementChild?.tagName.toLowerCase()).toBe("svg");
+      expect(heading.firstElementChild).toHaveClass("mark");
+      expect(heading.firstElementChild).toHaveAttribute("aria-hidden", "true");
+      const copy = screen.getByRole("button", { name: "Copy" });
+      expect(copy.closest(".status-line")?.querySelector(".address")).toBe(
+        document.querySelector(".ds.component-header .address"),
+      );
+      expect(copy.closest(".locator")?.lastElementChild?.contains(copy)).toBe(
+        true,
+      );
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "marks the header as the component's one canonical home (W6b-A7)",
+    () => {
+      render(
+        entityPageAt(
+          BUTTON_URI,
+          componentEntityRecordsButton,
+          createFetchSpy(),
+        ),
+      );
+      const canonical = document.querySelectorAll("[data-canonical]");
+      expect(canonical).toHaveLength(1);
+      expect(canonical[0]).toHaveClass("component-header");
+      expect(canonical[0]).toHaveAttribute(
+        "data-canonical",
+        "https://ds.canonical.com/global.component.button",
+      );
+    },
+    ENTITY_TEST_TIMEOUT_MS,
+  );
+
+  it(
     "names the component in the page's heading over its summary",
     () => {
       render(
@@ -70,7 +116,13 @@ describe("ComponentHeader", () => {
             ["separator", "·"],
           ],
         ],
-        ["address", []],
+        [
+          "locator",
+          [
+            ["address", expect.any(String)],
+            ["ds copy-button", expect.stringContaining("Copy")],
+          ],
+        ],
       ]);
       expect(line?.querySelector(".address")).toHaveTextContent(BUTTON_URI);
       expect(line?.querySelector(".address")?.tagName).toBe("CODE");
@@ -132,7 +184,8 @@ describe("ComponentHeader", () => {
       const line = document.querySelector(
         ".ds.component-header > .status-line",
       );
-      expect(line?.textContent).toBe(BUTTON_URI);
+      expect(line?.querySelector(".part")).toBeNull();
+      expect(line?.querySelector(".address")?.textContent).toBe(BUTTON_URI);
       expect(line?.querySelector(".separator")).toBeNull();
     },
     ENTITY_TEST_TIMEOUT_MS,

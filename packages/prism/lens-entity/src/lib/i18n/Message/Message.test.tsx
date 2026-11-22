@@ -30,7 +30,7 @@ describe("Message", () => {
           property: <code>metro:servesLine</code>,
           range: <code>metro:Line</code>,
         }}
-        id="fields.value"
+        id="statements.group"
       />,
       { wrapper },
     );
@@ -42,12 +42,12 @@ describe("Message", () => {
   it("fills plain-text placeholders from the values", () => {
     const { container } = render(
       <Message
-        elements={{ range: <code>metro:Line</code> }}
-        id="relations.value"
-        values={{ cardinality: "one or more" }}
+        elements={{ label: <code>metro:servesLine</code> }}
+        id="statements.group"
+        values={{ count: "4" }}
       />,
     );
-    expect(container.innerHTML).toBe("to <code>metro:Line</code>, one or more");
+    expect(container.innerHTML).toBe("<code>metro:servesLine</code> · 4");
   });
 
   it("keeps a placeholder named twice apart, each in its own place", () => {
@@ -56,7 +56,7 @@ describe("Message", () => {
       <MessagesContext value={translate}>{children}</MessagesContext>
     );
     const { container } = render(
-      <Message elements={{ range: <code>a</code> }} id="relations.value" />,
+      <Message elements={{ range: <code>a</code> }} id="statements.group" />,
       { wrapper },
     );
     expect(container.innerHTML).toBe("<code>a</code> / <code>a</code>");

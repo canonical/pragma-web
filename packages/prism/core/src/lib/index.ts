@@ -132,6 +132,7 @@ export {
   resolveRenderers,
   usePageRenderers,
   useRenderers,
+  useServesStatements,
   useViewLocation,
   VIEW_PARAMS,
   viewSearch,

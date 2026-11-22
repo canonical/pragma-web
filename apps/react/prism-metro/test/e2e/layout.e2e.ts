@@ -24,12 +24,13 @@
  * a multiple of 4px. The station index is measured in both its views, the
  * cards of the station and line indexes reaching the canvas's end, and
  * a station page once more with a
- * field name longer than its key's track, which must clip there rather
- * than run under the value or widen the canvas, and once for its fields'
- * keys, a key carrying the inherited tag on the same line height as a
- * plain one. Every row of the station and fleet indexes is 32px, and 56px
- * below two groups, where the table folds into scented rows; each fleet
- * row shows its formations after the script has run.
+ * property's label longer than its key's track, which must clip there
+ * rather than run under the value or widen the canvas, and once for its
+ * key values' keys, each on one line at its row's top; Central Exchange's
+ * three prominent values, which end by y 454 at 1440px. Every row of the
+ * station and fleet indexes is 32px, and 56px below two groups, where the
+ * table folds into scented rows; each fleet row shows its formations after
+ * the script has run.
  */
 import {
   launchBrowser,
@@ -43,6 +44,7 @@ import {
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  CENTRAL_EXCHANGE_CURIE,
   NORTHGATE_CURIE,
   ROLLING_STOCK_COUNT,
 } from "../../testing/fixtures.js";
@@ -68,8 +70,17 @@ import type { RunningServer } from "./types.js";
 
 const CWD = process.cwd();
 
-/** A station's page, whose fields are key values. */
+/** A station's page, whose property groups are key values. */
 const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
+
+/** The interchange's page, which leads with three prominent values. */
+const CENTRAL_EXCHANGE_PATH = `/stations/${encodeURIComponent(CENTRAL_EXCHANGE_CURIE)}`;
+
+/** The key values' line, which every representation shares. */
+const ROW_LINE_PX = 24;
+
+/** Where Central Exchange's prominent values end at 1440px, at the latest. */
+const PROMINENT_END_PX = 454;
 
 /**
  * Pages on the document archetype: the station index in both its views and
@@ -161,7 +172,7 @@ function readShownValues(selector: string): readonly {
  * key's overflow, its end and the value's start and top, the key's bottom,
  * and the canvas's scroll and client widths. It runs in the page.
  *
- * @param name - The field name to set.
+ * @param name - The property label to set.
  * @returns The measurements.
  * @note Impure: rewrites the page's first key.
  */
@@ -175,14 +186,13 @@ function placeLongKey(name: string): {
   readonly canvasClientWidth: number;
 } {
   const pair = document.querySelector(".ds.key-value-list > .pair");
-  const key = pair?.querySelector(".key");
-  const code = key?.querySelector("code");
-  const value = pair?.querySelector(".value");
+  const key = pair?.querySelector(":scope > .key");
+  const value = pair?.querySelector(":scope > .value");
   const canvas = document.querySelector("main.ds.canvas");
-  if (!key || !code || !value || !canvas) {
+  if (!key || !value || !canvas) {
     throw new Error("the page has no key value to measure");
   }
-  code.textContent = name;
+  key.textContent = name;
   const keyBox = key.getBoundingClientRect();
   const valueBox = value.getBoundingClientRect();
   return {
@@ -197,20 +207,52 @@ function placeLongKey(name: string): {
 }
 
 /**
- * Measure the height of every key of the page's fields, split by whether
- * the key carries the inherited tag. It runs in the page.
+ * Measure every key of the page's key values, nested values' terms left
+ * out: the lines its text takes, counted by their tops, and how far its
+ * text's top sits below the key's. It runs in the page.
  *
- * @returns The heights of the tagged keys and of the plain ones.
+ * @returns Each key's label, its lines and its text's offset.
  */
-function measureFieldKeys(): {
-  readonly tagged: readonly number[];
-  readonly plain: readonly number[];
-} {
-  const keys = [...document.querySelectorAll(".ds.field-list .key")];
-  const heightOf = (key: Element): number => key.getBoundingClientRect().height;
+function measureKeys(): readonly {
+  readonly label: string;
+  readonly lines: number;
+  readonly textOffset: number;
+}[] {
+  return [
+    ...document.querySelectorAll(".ds.key-value-list > .pair > .key"),
+  ].map((key) => {
+    const text = document.createRange();
+    text.selectNodeContents(key);
+    const rects = [...text.getClientRects()];
+    return {
+      label: key.textContent ?? "",
+      lines: new Set(rects.map(({ top }) => Math.round(top))).size,
+      textOffset:
+        text.getBoundingClientRect().top - key.getBoundingClientRect().top,
+    };
+  });
+}
+
+/**
+ * Measure the page's facts: how many pairs they hold, where they end, and
+ * the canvas's scroll and client widths. It runs in the page.
+ *
+ * @returns The measurements, or `null` when the page has no facts.
+ */
+function measureFacts(): {
+  readonly pairs: number;
+  readonly bottom: number;
+  readonly canvasScrollWidth: number;
+  readonly canvasClientWidth: number;
+} | null {
+  const facts = document.querySelector(".facts");
+  const canvas = document.querySelector("main.ds.canvas");
+  if (!facts || !canvas) return null;
   return {
-    tagged: keys.filter((key) => key.querySelector(".inherited")).map(heightOf),
-    plain: keys.filter((key) => !key.querySelector(".inherited")).map(heightOf),
+    pairs: facts.querySelectorAll(".ds.key-value-list > .pair").length,
+    bottom: facts.getBoundingClientRect().bottom + canvas.scrollTop,
+    canvasScrollWidth: canvas.scrollWidth,
+    canvasClientWidth: canvas.clientWidth,
   };
 }
 
@@ -494,16 +536,45 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
-  it("keeps a key carrying the inherited tag on a plain key's line", async () => {
+  it("sets every key of a station's key values on one line, at its row's top", async () => {
     const page = await open(STATION_PATH);
     try {
-      const { tagged, plain } = await page.evaluate(measureFieldKeys);
-      expect(tagged.length).toBeGreaterThan(0);
-      expect(plain.length).toBeGreaterThan(0);
-      expect(new Set([...plain, ...tagged])).toEqual(new Set(plain));
-      expect(new Set(plain).size).toBe(1);
+      const keys = await page.evaluate(measureKeys);
+      expect(keys.length).toBeGreaterThan(0);
+      for (const key of keys) {
+        expect(key.lines, key.label).toBe(1);
+        // Within the 24px line's half-leading, whatever its value's height.
+        expect(key.textOffset, key.label).toBeGreaterThanOrEqual(0);
+        expect(key.textOffset, key.label).toBeLessThan(ROW_LINE_PX / 2);
+      }
     } finally {
       await page.close();
     }
   });
+
+  it("leads Central Exchange with its three prominent values, the canvas not scrolling sideways", async () => {
+    const page = await open(CENTRAL_EXCHANGE_PATH);
+    try {
+      const facts = await page.evaluate(measureFacts);
+      expect(facts?.pairs).toBe(3);
+      expect(facts?.canvasScrollWidth).toBeLessThanOrEqual(
+        Number(facts?.canvasClientWidth),
+      );
+    } finally {
+      await page.close();
+    }
+  });
+
+  it.runIf(viewport.width === 1440)(
+    "ends Central Exchange's prominent values by y 454",
+    async () => {
+      const page = await open(CENTRAL_EXCHANGE_PATH);
+      try {
+        const facts = await page.evaluate(measureFacts);
+        expect(facts?.bottom).toBeLessThanOrEqual(PROMINENT_END_PX);
+      } finally {
+        await page.close();
+      }
+    },
+  );
 });

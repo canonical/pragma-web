@@ -3,10 +3,12 @@ import { buildSchema } from "graphql";
 import { describe, expect, it } from "vitest";
 import { INVALID_SCHEMA, INVALID_SDL } from "./constants.js";
 import { readContractSdl } from "./contractSdl.js";
+import { listServedExtensions } from "./listServedExtensions.js";
 import {
   assertSatisfiesContract,
   satisfiesContract,
 } from "./satisfiesContract.js";
+import { readStatementsSdl } from "./statementsSdl.js";
 import type { ContractResult } from "./types.js";
 
 const loadFixture = (name: string): string =>
@@ -146,6 +148,21 @@ describe("satisfiesContract: which type serves the operation", () => {
 });
 
 describe("the real contract", () => {
+  it("holds a provider to the contract alone, with or without statements", () => {
+    const contract = readContractSdl();
+    const served = `${contract}\n${readStatementsSdl()}`;
+    expect(satisfiesContract(contract)).toEqual({
+      satisfied: true,
+      violations: [],
+    });
+    expect(satisfiesContract(served)).toEqual({
+      satisfied: true,
+      violations: [],
+    });
+    expect(listServedExtensions(contract)).not.toContain("statements");
+    expect(listServedExtensions(served)).toContain("statements");
+  });
+
   it("satisfies itself, and is not degenerate", () => {
     // findBreakingChanges(X, X) is [] for EVERY X, including a truncated or
     // accidentally emptied contract.graphql — so this assertion alone would

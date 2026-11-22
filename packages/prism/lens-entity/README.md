@@ -4,9 +4,9 @@ The class-bound docs view of a Prism documentation site. For each class a
 site binds, the lens gives two pages: an index of the class's instances in
 the shared list view of `@canonical/prism-projections`, in the renderers
 the lens declares (the table and the cards by default), with a search over
-the loaded entries, and a page per instance, as a page or as Turtle, with its
-title, its definition and comment, its class, and the fields and the
-relations its class declares, as key values on the page's grid.
+the loaded entries, and a page per instance, as a page or as Turtle, read
+from the entity's statements: its header, its prominent values, a section
+per group of values and relations, and "Referenced by".
 
 The lens is **Tier 1**: its four operations (`EntityIndexQuery` and its
 pagination query, `EntityNamespacesQuery`, `EntityPageQuery`) and their
@@ -181,29 +181,47 @@ instances. Check it at three points:
 
 ## What the entity page shows
 
-- The entity's title as the page's heading over its compact address.
-- Its definition and its comment, each when the graph asserts one.
-- The class it is an instance of, mentioned through the site's chip
-  projection.
-- The fields its class declares, own and inherited, as key values: each
-  field's name as the key, and as the value one sentence with the property it
-  answers to and the range of its values in compact form, the property's
-  kind and the field's cardinality.
-- Its relations, as key values: each field of object kind, with the class
-  its values belong to and its cardinality.
+- The header: the class's mark before the entity's name, the page's one
+  level-1 heading; its summary; the status line with the class's chip and
+  the compact address followed by Copy, which announces "Copied". The
+  header carries `data-canonical` with the entity's IRI: the page is the
+  entity's one home, and every other view (the details panel among them)
+  links there and never carries the marker.
+- Its prominent values as the page's facts, then one section per group of
+  values and per relation, each titled with the label of the reader's side
+  and its true count, in the order the lens gives its fields.
+- "Referenced by", one group per incoming predicate under its inverse
+  label, its total in the title so the section index carries it.
 
-Every key starts on the main column's first line and every value on its
-third; below two groups of columns a pair stacks, the key over the value.
+A site whose provider does not serve the `statements` extension gets the
+header over the entity's definition, comment and class, and nothing says
+what is missing. An address nothing in the graph answers to, and a node
+that is not an instance of the bound class or of one of its subclasses,
+render a not-found status in the canvas.
 
-An address nothing in the graph answers to, and a node that is not an
-instance of the bound class or of one of its subclasses, render a not-found
-status in the canvas.
+`EntityPanel` shows the same entity beside another view: its identity with
+Open beside the title, its values, and every relation and "Referenced by"
+group as a closed disclosure with its count in the summary. Its host may
+pass `notFound`, what the panel says in place of its own status for an IRI
+nothing answers to.
 
-The relations are the ones the class declares, not the entities this one is
-related to. The contract's `_meta.fields` describes the class's schema and
-holds no values, and no contract field returns the value of an arbitrary
-field on an arbitrary entity: reading the nodes behind a field needs a
-selection on the entity's concrete type, which a Tier-1 lens cannot write.
+### Limits
+
+- A group shows at most 12 values. A group cut there keeps its true count
+  in its title and ends with one muted line, "12 of 30 shown", a fact and
+  not a link: no route lists one entity's group yet, so there is no
+  "All N" link. The details panel's groups do the same.
+- Nested values are expanded two levels down, the contract's bound: a
+  value nested deeper, such as a route's reverse, comes with no values and
+  shows as its class's chip ("Route").
+- Which values lead the page is the data's: Central Exchange marks three of
+  its properties as prominent (location, serves lines, transfer minutes),
+  and the page shows those three.
+- Counts are the provider's: the design system serves Button 145 incoming
+  statements, 144 token bindings and one `inheritsFrom`.
+- The header's mark is the lens's glyph, the same for every type: each
+  type's own mark is drawn inside the site's chip, and no export gives it
+  alone.
 
 ## Rail placement
 
@@ -263,4 +281,5 @@ two groups of columns through the one container query on the shell, at
 - Routes: `createEntityRoutes`; types `EntityRoutes`, `EntityLensOptions`.
 - Layout: `EntityLayout`; types `EntityLayoutProps`.
 - Pages: `EntityIndexPage`, `EntityPage`; types `EntityIndexPageProps`, `EntityPageProps`.
+- Details panel, an entity's identity, values and closed relation groups beside another view, and the warm a route that shows it calls: `EntityPanel`, `warmEntityPanel`; types `EntityPanelProps`.
 - Addresses, for a site's own routes that take an entity's address the way the lens's do: `expandAddress`, `readUriParam`; types `OntologyNamespace`.

@@ -16,5 +16,18 @@
  */
 
 export { LINK_COMPONENT_URI } from "../../../../packages/prism/lens-standards/testing/fixtures.js";
-export { default as standardEntityRecords } from "../../../../packages/prism/lens-standards/testing/records/standardEntityRecords.js";
+
+import lensStandardEntityRecords from "../../../../packages/prism/lens-standards/testing/records/standardEntityRecords.js";
+import standardStatementsRecords from "../../../../packages/prism/lens-standards/testing/records/standardStatementsRecords.js";
+import mergeRecordMaps from "./mergeRecordMaps.js";
+
+/**
+ * The exemplar standard's reading page store on this site, which serves
+ * `statements`: the standard's own records and its statements, the two
+ * operations the page reads.
+ */
+export const standardEntityRecords = mergeRecordMaps(
+  lensStandardEntityRecords,
+  standardStatementsRecords,
+);
 export { default as standardsIndexRecords } from "../../../../packages/prism/lens-standards/testing/records/standardsIndexRecords.js";

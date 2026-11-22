@@ -21,7 +21,7 @@ describe("ClassView", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     );
     const view = container.querySelector(".ds.class-view");
     expect(view).not.toBeNull();
-    expect(view?.querySelectorAll(".section")).toHaveLength(6);
+    expect(view?.querySelectorAll(".section")).toHaveLength(7);
     expect(view?.getAttribute("aria-labelledby")).toBe("term-inspector-title");
   });
 });

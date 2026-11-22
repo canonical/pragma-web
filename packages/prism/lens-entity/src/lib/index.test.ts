@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
+import * as packageRoot from "../index.js";
 import * as publicApi from "./index.js";
+import { EntityPanel } from "./ui/EntityPanel/index.js";
 
 /**
  * Read a file that sits next to this test, located from vitest's `testPath`,
@@ -72,5 +74,9 @@ describe("the package barrel", () => {
         .join("\n"),
     );
     expect(collectBarrelTypeNames()).toEqual(documented);
+  });
+
+  it("hands the details panel to a consumer importing the package root", () => {
+    expect(packageRoot.EntityPanel).toBe(EntityPanel);
   });
 });

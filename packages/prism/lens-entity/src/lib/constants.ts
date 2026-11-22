@@ -1,13 +1,10 @@
 /**
  * The entity lens's domain constants: the names it derives from a binding,
- * the page size it asks the graph for, and the catalog keys that name a
- * field's cardinality.
+ * the page size it asks the graph for, the length past which the details
+ * panel closes a text, and the index's renderers, facets and fetch policy.
  */
 
 import type { CacheConfig } from "relay-runtime";
-
-import type { MessageKey } from "./i18n/index.js";
-import type { Cardinality } from "./types.js";
 
 /**
  * The suffix the entity route's name adds to the binding's id: the binding
@@ -29,20 +26,17 @@ export const ENTITY_URI_PARAM = "uri";
 export const ENTITY_PAGE_SIZE = 100;
 
 /**
+ * The longest text the details panel shows open, in characters: a literal
+ * longer than this, or one over several lines, is drawn as a closed group.
+ */
+export const PANEL_TEXT_LIMIT = 120;
+
+/**
  * The list renderers an index offers when its lens declares none: the table
  * alone. Cards draw a sidecar a lens vouches for, so a lens that has one
  * declares them.
  */
 export const DEFAULT_LIST_RENDERERS: readonly string[] = ["table"];
-
-/** The catalog key that names each cardinality, in the fields table and the
- * relations. */
-export const CARDINALITY_MESSAGES: Readonly<Record<Cardinality, MessageKey>> = {
-  one: "cardinality.one",
-  optional: "cardinality.optional",
-  many: "cardinality.many",
-  any: "cardinality.any",
-};
 
 /** How many of the lens's facets the bar holds when the lens sets none. */
 export const DEFAULT_BAR_FACETS = 3;

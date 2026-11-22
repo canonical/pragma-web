@@ -12,8 +12,8 @@ const componentCssClassName = "ds entity-page";
 /**
  * The lens's entity route content (`/${id}/:uri`, the route `${id}Entity`):
  * one instance of the bound class, with its title and compact address, its
- * definition and comment, its class, and the fields and the relations its
- * class declares, as key values on the page's grid.
+ * definition and comment, its class, and its statements in sections on the
+ * page's grid.
  *
  * The address may be compact (`metro:northgate`, the form the site's homes
  * build links from) or absolute. An address nothing in the graph answers to,

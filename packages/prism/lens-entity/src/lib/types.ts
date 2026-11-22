@@ -78,10 +78,100 @@ export type EntityRoutes<TId extends string> = {
 };
 
 /**
- * How many values a field takes on its class: exactly one, at most one, one
- * or more, or any number.
+ * What a statement group's label is read from: its predicate's labels in
+ * the site's language, each absent when the ontology states none, its
+ * predicate's IRI and its true count.
  */
-export type Cardinality = "one" | "optional" | "many" | "any";
+export interface StatementGroupLabels {
+  readonly predicateUri: string;
+  readonly total: number;
+  readonly predicate:
+    | {
+        readonly label?: string | null;
+        readonly pluralLabel?: string | null;
+        readonly inverseLabel?: string | null;
+        readonly inversePluralLabel?: string | null;
+      }
+    | null
+    | undefined;
+}
+
+/** What an entity's one-line description is read from. */
+export interface EntityDescription {
+  readonly definition: string | null | undefined;
+  readonly comment: string | null | undefined;
+}
+
+/** A field of the entity's class as the statements' partition reads it. */
+export interface PartitionField {
+  readonly name: string;
+  readonly order?: number | null;
+  readonly visibility?: string | null;
+  readonly group?: {
+    readonly uri: string;
+    readonly label?: string | null;
+    readonly order?: number | null;
+  } | null;
+  readonly property: { readonly uri: string };
+}
+
+/** What the statements' partition reads of the entity: its summary's source and its class's fields. */
+export interface PartitionMeta {
+  readonly definition: string | null | undefined;
+  readonly fields: readonly PartitionField[];
+}
+
+/** What the partition reads of a group: its predicate and, of each node it holds, the node's class's visibility. */
+export interface PartitionGroup {
+  readonly predicateUri: string;
+  readonly values: readonly {
+    readonly __typename: string;
+    readonly node?: {
+      readonly _meta: {
+        readonly type: { readonly visibility?: string | null };
+      };
+    };
+  }[];
+}
+
+/** A group the partition kept, beside the lens's field for its predicate when the lens has one. */
+export interface PartitionedGroup<G> {
+  readonly group: G;
+  readonly field: PartitionField | undefined;
+}
+
+/**
+ * An entity's outgoing statement groups, split as the page and the panel
+ * show them: the prominent groups, the groups of values (literals, nested
+ * values, nodes of hidden classes) and the relations (nodes of a shown
+ * class), the header's and the summary's predicates left out.
+ */
+export interface StatementPartition<G> {
+  readonly prominent: readonly G[];
+  readonly values: readonly PartitionedGroup<G>[];
+  readonly relations: readonly PartitionedGroup<G>[];
+}
+
+/** A section of the entity page that holds one property group's values, as key values. */
+export interface ValuesSection<G> {
+  readonly kind: "values";
+  readonly id: string;
+  /** The field the section is ordered by: its group's first. */
+  readonly field: string;
+  readonly title: string;
+  readonly groups: readonly G[];
+}
+
+/** A section of the entity page that holds one relation's values. */
+export interface RelationSection<G> {
+  readonly kind: "relation";
+  readonly id: string;
+  readonly field: string;
+  readonly group: G;
+}
+
+/** One of the entity page's statement sections. */
+export type StatementSection<G> = ValuesSection<G> | RelationSection<G>;
 
 /**
  * The index operation's variables as the lens builds them: each filter's

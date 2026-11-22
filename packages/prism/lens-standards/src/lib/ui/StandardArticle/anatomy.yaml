@@ -2,12 +2,18 @@
 # StandardArticle — a standard as a document, laid on core's sectioned view
 # (prism.component.sectioned_view: the article's root is the view's, with
 # the article's class beside the view's). It hands the view its header, its
-# facts and its one section:
+# facts and its sections, in this order:
 #   - the header: the title as the page's level-1 heading;
 #   - the facts: a KeyValueList of the address and the class;
 #   - the section `rule`: the prose rendered from Markdown (StandardProse),
 #     or the description split into paragraphs on blank lines, or a line
-#     saying there is none.
+#     saying there is none;
+#   - from the standard's statements, where the site serves them, each
+#     section only when it has a value: `do` and `dont`, the examples
+#     (`cs:do`, `cs:dont`: a description, then the code in its language);
+#     `related`, the standards it extends (`cs:extends`) as chips; and
+#     `applies-to`, what points at the standard, as chips. A section whose
+#     group is cut at its bound ends with one muted line, "12 of 30 shown".
 # A reader that draws the standard another way passes it as `source`: it
 # stands in place of the sections (Turtle shows the standard's statements),
 # and the page has no section and no index.
@@ -19,11 +25,25 @@
 # measure, so the article sets none. Its space is element-owned:
 # `.editorial` gives its headings and paragraphs their space after, and
 # `.content-flow` clears the last block's. A description keeps its
-# hand-written line breaks.
+# hand-written line breaks. An example's code keeps its lines: a line
+# wider than the column scrolls inside the code block, and the examples
+# give up their content's width (min width 0), so the code never widens
+# the section past the page.
 #
 # Token ledger:
-#   layout.grid.column "1 / -1" (header and prose): structure.
+#   layout.grid.column "1 / -1" (header, prose, examples, chips, shown):
+#     structure.
 #   typography.whiteSpace pre-line: a keyword.
+#   size.min.width 0 (examples), layout.overflow.inline auto (code): the
+#     code block scrolls inside itself at a narrow width.
+#   --standard-article-gap: var(--grid-gutter), the gap between chips.
+#   --standard-article-shown-color: var(--color-text-muted), the muted
+#     "N of M shown" line.
+#   --standard-article-code-background: var(--color-background-layer2), the
+#     code block's layer under an example's code.
+#   --standard-article-code-padding-block, --standard-article-code-padding-inline:
+#     var(--component-padding-block), var(--component-padding-inline), the
+#     code's inset on that layer.
 node:
   uri: prism.component.standard_article
   edges:
@@ -62,6 +82,57 @@ node:
               styles:
                 layout.grid.column: "1 / -1"
       relation: { cardinality: "0..1", slotName: prose }   # the rule section's content
+    - node:
+        role: examples (one section's examples, carrying .editorial and .content-flow)
+        styles:
+          layout.grid.column: "1 / -1"
+          size.min.width: 0
+        edges:
+          - node:
+              role: example (one example)
+              edges:
+                - node:
+                    role: description (what the example shows, as plain text)
+                    styles:
+                      typography.whiteSpace: pre-line
+                  relation: { cardinality: "1", slotName: description }
+                - node:
+                    role: code (the example's code, a pre with its language as data-language)
+                    styles:
+                      appearance.background: color.background.layer2
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.block.end: component.padding.block
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                      layout.overflow.inline: auto
+                  relation: { cardinality: "1", slotName: code }
+            relation: { cardinality: "1..*", slotName: example }
+      relation: { cardinality: "0..2", slotName: examples }  # the do and dont sections' content
+    - node:
+        role: chips (a list of chips, wrapping, gap --standard-article-gap)
+        element: ul
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.wrap: wrap
+          layout.listStyle: none
+          spacing.gap: grid.gutter
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+        edges:
+          - node:
+              uri: prism.component.chip_projection
+            relation: { cardinality: "1..*", slotName: chip }
+      relation: { cardinality: "0..2", slotName: chips }  # the related and applies-to sections' content
+    - node:
+        role: shown (the muted line of a cut group, "12 of 30 shown")
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
+      relation: { cardinality: "0..4", slotName: shown }
     - node:
         uri: prism.component.entity_source
       relation: { cardinality: "0..1", slotName: source }  # in place of the sections

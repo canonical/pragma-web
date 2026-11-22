@@ -3,6 +3,7 @@ import {
   type ViewSearch,
   warmPageRenderer,
 } from "@canonical/prism-core";
+import standardStatementsQueryNode from "../__generated__/StandardStatementsQuery.graphql.js";
 import {
   buildStandardEntityVariables,
   readUriParam,
@@ -19,8 +20,9 @@ import type { StandardsBinding } from "./types.js";
  * @param params - The matched route params, carrying the percent-decoded
  *   absolute IRI as `uri`.
  * @param search - The matched view search, which selects the renderer.
- * @returns A promise that settles when the store holds the data or the
- *   fetch fails.
+ * @returns A promise that settles once every fetch has: resolved when the
+ *   store holds the data, rejected with the first failure but that of the
+ *   statements.
  * @throws When `uri` is missing, empty or not a string.
  * @note Impure: fetches into the published prefetch environment through
  *   `prefetchQuery` and `warmPageRenderer`, which read that environment at
@@ -32,11 +34,19 @@ export default function warmStandardEntity(
   search: ViewSearch = {},
 ): Promise<void> {
   const uri = readUriParam(params);
-  return Promise.all([
+  // Every fetch settles before the warm does, so no request outlives the
+  // page's prepare step, even when the standard's own fetch fails first.
+  return Promise.allSettled([
     prefetchQuery(
       standardEntityQueryNode,
       buildStandardEntityVariables(binding.classUri, uri),
     ),
     warmPageRenderer(uri, search),
-  ]).then(() => undefined);
+    prefetchQuery(standardStatementsQueryNode, { uri }).catch(() => undefined),
+  ]).then((results) => {
+    const failed = results.find(
+      (result): result is PromiseRejectedResult => result.status === "rejected",
+    );
+    if (failed !== undefined) throw failed.reason;
+  });
 }

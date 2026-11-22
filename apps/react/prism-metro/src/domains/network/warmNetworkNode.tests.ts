@@ -31,6 +31,13 @@ const warmLikeTheServer = (
   }
 };
 
+/** The variables of the first request `fetchFn` made for `name`. */
+const findVariables = (
+  fetchFn: ReturnType<typeof createMetroFetch>,
+  name: string,
+): unknown =>
+  fetchFn.mock.calls.find(([request]) => request.name === name)?.at(1);
+
 describe("warmNetworkNode", () => {
   it("resolves with no request when no environment is published", async () => {
     await expect(
@@ -50,9 +57,17 @@ describe("warmNetworkNode", () => {
     expect(fetchFn.mock.calls.map(([request]) => request.name)).toEqual([
       "NetworkNamespacesQuery",
       "NetworkStationQuery",
+      "EntityPanelQuery",
+      "EntityStatementsQuery",
     ]);
-    const [, variables] = fetchFn.mock.lastCall ?? [];
-    expect(variables).toEqual({ id: `${METRO_NAMESPACE}tannery-lane` });
+    expect(findVariables(fetchFn, "NetworkStationQuery")).toEqual({
+      id: `${METRO_NAMESPACE}tannery-lane`,
+    });
+    // The aside's details panel reads the same IRI; the store already holds
+    // the namespaces it reads.
+    expect(findVariables(fetchFn, "EntityPanelQuery")).toEqual({
+      id: `${METRO_NAMESPACE}tannery-lane`,
+    });
   });
 
   it("warms the station's Turtle source beside its page at as=turtle", async () => {
@@ -67,9 +82,12 @@ describe("warmNetworkNode", () => {
       "NetworkNamespacesQuery",
       "NetworkStationQuery",
       "EntitySourceQuery",
+      "EntityPanelQuery",
+      "EntityStatementsQuery",
     ]);
-    const [, variables] = fetchFn.mock.lastCall ?? [];
-    expect(variables).toEqual({ uri: `${METRO_NAMESPACE}tannery-lane` });
+    expect(findVariables(fetchFn, "EntitySourceQuery")).toEqual({
+      uri: `${METRO_NAMESPACE}tannery-lane`,
+    });
   });
 
   it("reads the line an absolute address names", async () => {
@@ -77,8 +95,9 @@ describe("warmNetworkNode", () => {
     await warmLikeTheServer(createEnvironment({ fetchFn }), "line", {
       uri: `${METRO_NAMESPACE}circle-line`,
     });
-    const [request] = fetchFn.mock.lastCall ?? [];
-    expect(request?.name).toBe("NetworkLineQuery");
+    expect(findVariables(fetchFn, "NetworkLineQuery")).toEqual({
+      id: `${METRO_NAMESPACE}circle-line`,
+    });
   });
 
   it("reads a station no route calls at, as every other", async () => {
@@ -86,8 +105,9 @@ describe("warmNetworkNode", () => {
     await warmLikeTheServer(createEnvironment({ fetchFn }), "stop", {
       uri: "metro:ghost",
     });
-    const [, variables] = fetchFn.mock.lastCall ?? [];
-    expect(variables).toEqual({ id: `${METRO_NAMESPACE}ghost` });
+    expect(findVariables(fetchFn, "NetworkStationQuery")).toEqual({
+      id: `${METRO_NAMESPACE}ghost`,
+    });
   });
 
   it("makes no request when the store already holds both operations", async () => {

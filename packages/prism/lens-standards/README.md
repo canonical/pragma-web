@@ -9,7 +9,13 @@ carries more than one page.
 The reading page shows a standard's title, compact address and class, then
 its prose rendered as Markdown, and refuses an address whose node is not one
 of the bound class's instances. A standard with no prose shows its
-description instead.
+description instead. Where the site serves the `statements` extension, the
+page adds, each only when it has a value, the standard's examples to follow
+and to avoid (Do, Don't: each a description and its code), the standards it
+extends (Related standards) and what points at it (Applies to), as chips; a
+group cut at the provider's bound of 12 says how many it shows. A site that
+does not serve `statements` is never asked for it, and its page shows the
+rule alone.
 
 The lens is **Tier 2**: its operations compile against
 `@canonical/prism-contract`'s SDL plus the Prose extension

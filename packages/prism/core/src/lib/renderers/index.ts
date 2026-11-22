@@ -20,6 +20,7 @@ export {
 export {
   usePageRenderers,
   useRenderers,
+  useServesStatements,
   useViewLocation,
 } from "./hooks/index.js";
 export { default as RenderersProvider } from "./Provider.js";

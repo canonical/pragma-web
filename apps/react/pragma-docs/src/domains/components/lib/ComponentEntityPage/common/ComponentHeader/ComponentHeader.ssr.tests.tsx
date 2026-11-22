@@ -14,9 +14,15 @@ describe("ComponentHeader SSR", () => {
     const html = renderToString(
       entityPageAt(BUTTON_URI, componentEntityRecordsButton, createFetchSpy()),
     );
-    expect(html).toContain('<header class="ds component-header">');
     expect(html).toContain(
-      '<h1 class="heading" id="component-entity-title">Button</h1>',
+      '<header class="ds component-header" data-canonical="https://ds.canonical.com/global.component.button">',
+    );
+    expect(html).toContain(
+      '<h1 class="heading" id="component-entity-title"><svg',
+    );
+    expect(html).toContain("</svg>Button</h1>");
+    expect(html).toContain(
+      '<code class="address">ds:global.component.button</code><span class="ds copy-button">',
     );
   });
 });

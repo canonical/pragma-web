@@ -30,8 +30,9 @@ import { viteFetchMiddleware } from "@canonical/react-ssr/server";
 import { createServer as createViteServer } from "vite";
 import { resolveGraphqlUrl } from "#graphql-endpoint";
 import { getAuthRedirectHref } from "#lib/authGuard";
-import prepareRelayData from "./prepareRelayData.js";
 import resolveRouteStatus from "./resolveRouteStatus.js";
+
+type PrepareRelayData = typeof import("./prepareRelayData.js").default;
 
 const PORT = Number(process.env.PORT) || 5174;
 
@@ -106,6 +107,13 @@ Bun.serve({
       const { extractPreferences } = await vite.ssrLoadModule(
         "@canonical/react-hooks",
       );
+
+      // The prepare step loads through Vite as the render does, so the
+      // lens packages' warms fetch the app's compile of their queries, the
+      // one the site's arms read.
+      const { default: prepareRelayData } = (await vite.ssrLoadModule(
+        "/src/server/prepareRelayData.ts",
+      )) as { readonly default: PrepareRelayData };
 
       const { theme } = extractPreferences(req.headers.get("cookie"));
       // Execute the matched route's query against the graph server and

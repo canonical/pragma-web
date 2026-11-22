@@ -80,7 +80,7 @@ describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
     expect(columns).not.toContain("diagramPosition");
   });
 
-  it("shows a station's page with the fields its class declares", async () => {
+  it("shows a station's page from its statements: header, facts, sections", async () => {
     renderLensPage("/stations/metro%3Anorthgate", graph.url);
     expect(
       await screen.findByRole(
@@ -89,8 +89,19 @@ describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
         WAIT,
       ),
     ).toBeInTheDocument();
-    const fields = await screen.findByRole("region", { name: "Fields" }, WAIT);
-    expect(within(fields).getByText("servesLine")).toBeInTheDocument();
+    const fact = await screen.findByText(
+      "serves line",
+      { selector: "dt" },
+      WAIT,
+    );
+    expect(fact.nextElementSibling?.querySelector("a")).not.toBeNull();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Overview" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("platform count", { selector: "dt" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Fields" })).toBeNull();
   });
 
   it("opens a station's network page from the stations index on the client", async () => {

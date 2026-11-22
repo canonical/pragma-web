@@ -1,11 +1,14 @@
 ---
-# ComponentHeader — the component page's header: the name as the page's
-# level-1 heading (the compact address when it has no name), the summary
+# ComponentHeader — the component page's header: the class's mark before
+# the name as the page's level-1 heading (the compact address when it has
+# no name), the summary
 # on a reading measure of six intrinsic columns and at most 75 characters,
 # then the status line: the tier and the first documentation stage, each
 # only when the graph records it, and the compact address in the code
 # face, muted, separated by middle dots (PS3 V1 `p.mockup-status-line`),
-# each dot held on one line with the value before it.
+# each dot held on one line with the value before it, then core's Copy
+# control for the address, which announces "Copied" (the entity page's
+# header has the same parts).
 # The page says the three here only; its facts hold the rest.
 # Application UI, not prose: the heading and the summary sit one gutter
 # apart.
@@ -26,8 +29,11 @@
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: docs.subcomponent.component_header
+  # The root reads the component's IRI and carries it as data-canonical:
+  # the header marks the page as the component's one home.
   projection:
     on: Component
+    field: uri
   styles:
     layout.type: grid
     layout.grid.columns: subgrid
@@ -38,9 +44,17 @@ node:
         role: heading (the page's level-1 heading, the name, else the address)
         styles:
           layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.align: baseline
+          spacing.gap: grid.gutter
           spacing.external.block.start: 0
           spacing.external.block.end: 0
         edges:
+          - node:
+              role: mark (the Component class's glyph, hidden from assistive technology)
+              element: svg
+              attributes: { aria-hidden: "true" }
+            relation: { cardinality: "1", slotName: mark }
           - node:
               role: name
               projection:
@@ -137,13 +151,28 @@ node:
                   relation: { cardinality: "1", slotName: separator }
             relation: { cardinality: "0..1", slotName: part }
           - node:
-              role: address
-              element: code
-              projection:
-                field: _meta.curie
+              role: locator (the address and Copy, which wrap together)
+              element: span
               styles:
+                layout.type: flex
+                layout.wrap: nowrap
+                layout.align: baseline
+                spacing.gap.inline: space.100
                 size.min.width: 0
-                typography.fontFamily: typography.text.primary.code.fontFamily
-                typography.wrap: anywhere
-            relation: { cardinality: "1", slotName: address }
+              edges:
+                - node:
+                    role: address
+                    element: code
+                    projection:
+                      field: _meta.curie
+                    styles:
+                      size.min.width: 0
+                      typography.fontFamily: typography.text.primary.code.fontFamily
+                      typography.wrap: anywhere
+                  relation: { cardinality: "1", slotName: address }
+                - node:
+                    role: copy (core's CopyButton for the address, "Copied" announced)
+                    element: button
+                  relation: { cardinality: "1", slotName: copy }
+            relation: { cardinality: "1", slotName: locator }
       relation: { cardinality: "1", slotName: status-line }

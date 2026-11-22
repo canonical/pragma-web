@@ -1,4 +1,4 @@
-import compactIri from "./compactIri.js";
+import { compactIri } from "@canonical/prism-contract/browser";
 import { FACET_NONE, FACET_VALUE_SEPARATOR } from "./constants.js";
 import type { OntologyNamespace } from "./types.js";
 

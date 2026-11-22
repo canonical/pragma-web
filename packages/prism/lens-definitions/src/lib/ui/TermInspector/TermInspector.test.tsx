@@ -6,6 +6,7 @@
  * unknown-term alert; and each absent field read honestly.
  */
 
+import { HomesProvider } from "@canonical/prism-core";
 import { render, screen, within } from "@testing-library/react";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
@@ -27,6 +28,8 @@ import type { OntologyNamespace } from "../../types.js";
 
 const UNKNOWN_TERM = "ds:NoSuchTerm";
 
+const UNKNOWN_IRI = "https://ds.canonical.com/NoSuchTerm";
+
 /** The id of the UI Block lookup's record, and of one of its parts. */
 const UIBLOCK = 'client:root:ontologyClass(uri:"ds:UIBlock")';
 
@@ -44,6 +47,8 @@ const unknownTermRecords = {
     ...(definitionsExplorerRecords["client:root"] as Record<string, unknown>),
     [`ontologyClass(uri:"${UNKNOWN_TERM}")`]: null,
     [`ontologyProperty(uri:"${UNKNOWN_TERM}")`]: null,
+    // The details panel's lookup at the term's expanded address.
+    [`node(id:"${UNKNOWN_IRI}")`]: null,
   },
 } as unknown as RecordMap;
 
@@ -111,7 +116,7 @@ function renderInspector(
 function sectionOf(panel: HTMLElement, name: string | RegExp): HTMLElement {
   const section = within(panel)
     .getByRole("heading", { level: 3, name })
-    .closest("section");
+    .closest<HTMLElement>(".section");
   if (section === null) throw new Error(`no section ${String(name)}`);
   return section;
 }
@@ -167,12 +172,12 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
   it("lists the subclasses, the fields by where they come from, and the relations both ways", () => {
     const panel = renderInspector(UIBLOCK_TERM, definitionsExplorerRecords);
     expect(
-      within(sectionOf(panel, "Subclasses")).getByRole("link", {
+      within(sectionOf(panel, /^Subclasses · \d+$/)).getByRole("link", {
         name: "Component",
       }),
     ).toHaveAttribute("href", "/definitions/ds%3AComponent");
 
-    const fields = sectionOf(panel, "Fields (9)");
+    const fields = sectionOf(panel, "Fields · 9");
     expect(
       within(fields).getByRole("link", { name: "guidelines" }),
     ).toBeInTheDocument();
@@ -183,7 +188,7 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(inherited.nextElementSibling?.textContent).toContain("decisionLog");
     expect(within(fields).getByText("ds:SemverString")).toBeInTheDocument();
 
-    const relations = sectionOf(panel, /^Relations \(\d+\)$/);
+    const relations = sectionOf(panel, /^Relations · \d+$/);
     const outgoing = within(relations).getByRole("heading", {
       level: 4,
       name: "Outgoing",
@@ -191,18 +196,42 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(outgoing.nextElementSibling?.textContent).toContain(
       "hasTokenBinding→Token Binding",
     );
-    const incoming = within(relations).getByRole("heading", {
-      level: 4,
-      name: "Incoming",
-    });
-    expect(incoming.nextElementSibling?.textContent).toContain(
+    expect(sectionOf(panel, /^Referenced by · \d+$/).textContent).toContain(
       "hasVariant←UI Block",
     );
+    for (const section of panel.querySelectorAll("details.section")) {
+      expect(section).not.toHaveAttribute("open");
+    }
     expect(
-      within(sectionOf(panel, "Instances")).getByText(
+      within(sectionOf(panel, /^Instances · \d+$/)).getByText(
         "No named instances (0 recorded).",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("draws Open beside a class's name only away from the class's home", () => {
+    const renderAt = (home: string): HTMLElement => {
+      render(
+        createStripHarness(
+          `/definitions/${encodeURIComponent(UIBLOCK_TERM)}`,
+          definitionsExplorerRecords,
+          createFetchSpy(),
+          <HomesProvider homes={{ OntologyClass: () => home }}>
+            <InspectorProbe term={UIBLOCK_TERM} />
+          </HomesProvider>,
+        ),
+      );
+      return screen
+        .getAllByRole("complementary", { name: "Term inspector" })
+        .at(-1) as HTMLElement;
+    };
+    const away = renderAt("/classes/ui-block");
+    expect(within(away).getByRole("link", { name: /^Open / })).toHaveAttribute(
+      "href",
+      "/classes/ui-block",
+    );
+    const home = renderAt(`/definitions/${encodeURIComponent(UIBLOCK_TERM)}`);
+    expect(within(home).queryByRole("link", { name: /^Open / })).toBeNull();
   });
 
   it("names both ends of a relation whose range is a compact term", () => {
@@ -210,15 +239,14 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       UIBLOCK_TERM,
       compactRanges(definitionsExplorerRecords),
     );
-    const relations = sectionOf(panel, /^Relations \(\d+\)$/);
+    const relations = sectionOf(panel, /^Relations · \d+$/);
     expect(
       within(relations).getByRole("heading", { level: 4, name: "Outgoing" })
         .nextElementSibling?.textContent,
     ).toContain("hasTokenBinding→Token Binding");
-    expect(
-      within(relations).getByRole("heading", { level: 4, name: "Incoming" })
-        .nextElementSibling?.textContent,
-    ).toContain("hasVariant←UI Block");
+    expect(sectionOf(panel, /^Referenced by · \d+$/).textContent).toContain(
+      "hasVariant←UI Block",
+    );
   });
 
   it("groups inherited relations under the class they come from", () => {
@@ -298,7 +326,7 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       COMPONENT_TERM,
       definitionsExplorerRecordsComponent,
     );
-    const instances = sectionOf(panel, "Instances");
+    const instances = sectionOf(panel, /^Instances · \d+$/);
     expect(
       within(instances).queryByRole("link", { name: "Accordion" }),
     ).toBeNull();
@@ -316,7 +344,7 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       COMPONENT_TERM,
       repointFirstInstance("OntologyClass"),
     );
-    const instances = sectionOf(panel, "Instances");
+    const instances = sectionOf(panel, /^Instances · \d+$/);
     expect(within(instances).getAllByRole("link")).toHaveLength(1);
   });
 
@@ -328,7 +356,7 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
       }),
     );
     expect(
-      within(sectionOf(panel, "Instances")).queryByText(/and more/),
+      within(sectionOf(panel, /^Instances · \d+$/)).queryByText(/and more/),
     ).toBeNull();
   });
 
@@ -412,7 +440,7 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
         "client:root:ontologies:0:properties:0": { domain: null },
       }),
     );
-    expect(sectionOf(panel, /^Relations/).textContent).toContain(
+    expect(sectionOf(panel, /^Referenced by/).textContent).toContain(
       "viaBlock←unstated",
     );
   });
@@ -424,10 +452,17 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     ).toBeInTheDocument();
   });
 
-  it("alerts on a term the graph does not know, without fetching", () => {
+  it("alerts on a term the graph does not know in the details panel, without fetching", () => {
     const fetchFn = createFetchSpy();
     renderInspector(UNKNOWN_TERM, unknownTermRecords, fetchFn);
     const alert = screen.getByRole("alert");
+    const entityPanel = alert.closest("section.ds.entity-panel");
+    expect(entityPanel).not.toBeNull();
+    // The panel keeps its own column of blocks, not the views' subgrid.
+    expect(entityPanel?.parentElement?.matches(".ds.term-inspector")).toBe(
+      true,
+    );
+    expect(entityPanel?.classList.contains("view")).toBe(false);
     expect(alert.textContent).toBe(
       `No term at ${UNKNOWN_TERM}. The rail lists every term the ontologies carry.`,
     );

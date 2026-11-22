@@ -383,19 +383,15 @@ describe("server matrix (2×3) serves correctly", () => {
             // 5d. Silent-rot closures. The graph's classes and edges could
             //     rot to zero or partial while every literal above still
             //     matched. Graph counts are never pinned, since the live
-            //     graph grows; instead every class the rail lists is in
-            //     the well, drawn as its own node or held by a namespace's
-            //     box (which states its classes in `data-classes`), so
-            //     the drawn classes plus the boxed ones must equal the
-            //     rail's class-link count, and every drawn class must have
-            //     its rail link, all derived from THIS response
-            //     (drift-proof, catches a partial graph). External stubs
-            //     are no class of a loaded namespace and the rail lists
-            //     none. Floors catch the both-surfaces-rot-to-zero case
-            //     the equality alone would wave through (0 === 0), and
-            //     subclass buses stay strictly below the drawn nodes —
-            //     each joins a superclass to its subclasses, and every
-            //     drawn ontology has a root.
+            //     graph grows. A term page draws the term's neighbourhood
+            //     (W7b), not the whole graph, so every class it draws must
+            //     have its rail link and what it draws and boxes is at most
+            //     what the rail lists, all derived from THIS response. The
+            //     rail still lists every class; external stubs are no class
+            //     of a loaded namespace and the rail lists none. Floors
+            //     catch the rot-to-zero case, and subclass buses stay
+            //     strictly below the drawn nodes: each joins a superclass
+            //     to its subclasses.
             const wellNodeCount = (
               definitionsTermHtml.match(/<g class="node[ "]/g) ?? []
             ).length;
@@ -432,12 +428,13 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(
               drawnClassTerms.filter((term) => !railClassTerms.includes(term)),
             ).toEqual([]);
-            expect(drawnClassTerms.length + boxedClassCount).toBe(
-              railClassTerms.length,
-            );
+            expect(
+              drawnClassTerms.length + boxedClassCount,
+            ).toBeLessThanOrEqual(railClassTerms.length);
             expect(railClassTerms.length).toBeGreaterThan(20);
             expect(drawnClassTerms.length).toBeGreaterThan(0);
-            expect(wellNodeCount).toBeGreaterThan(20);
+            // The term and at least one neighbour.
+            expect(wellNodeCount).toBeGreaterThan(1);
             expect(wellEdgeCount).toBeGreaterThan(0);
             expect(wellEdgeCount).toBeLessThan(wellNodeCount);
             //     A box draws no subclass edge inside it, so the buses
@@ -460,29 +457,23 @@ describe("server matrix (2×3) serves correctly", () => {
             //     classes, are in the server markup too.
             expect(definitionsTermHtml).toMatch(/<path class="relation[ "]/);
 
-            //   THE SELECTION'S FADE IS SERVER-RENDERED, asserted against
-            //   the LIVE graph rather than a fixture. The term is in the
-            //   URL, so the fade is a pure function of data both sides
-            //   hold and belongs in the first paint. Some classes fade and
-            //   some do NOT — a fade that swallowed everything would
-            //   convey nothing, so the spared neighbourhood is what proves
-            //   the rule is a neighbourhood and not a wash.
-            const fadedNodeCount = (
-              definitionsTermHtml.match(/<g class="node is-faded"/g) ?? []
-            ).length;
-            expect(fadedNodeCount).toBeGreaterThan(0);
-            expect(fadedNodeCount).toBeLessThan(wellNodeCount);
+            //   THE SELECTION IS SERVER-RENDERED: the term is in the URL,
+            //   so the drawing states its task, a neighbourhood around the
+            //   term, and the term is drawn with its ring in the first
+            //   paint.
+            expect(definitionsTermHtml).toContain('data-task="neighbourhood"');
+            expect(definitionsTermHtml).toContain('data-focus="ds:UIBlock"');
+            expect(wellNodeTerms.has("ds:UIBlock")).toBe(true);
             expect(definitionsTermHtml).toContain('class="ring is-selected"');
 
-            //   …and the term-LESS address fades nothing, because nothing
-            //   is selected. Same graph, no privileged centre.
+            //   …and the term-LESS address fades and selects nothing.
             expect(definitionsHtml).not.toContain("is-faded");
             expect(definitionsHtml).not.toContain("is-selected");
 
             //   THE RAIL DIMS, IT NEVER HIDES. Server-side the filter is
             //   the no-op, so no rail item may carry the dim marker while
-            //   every class the graph draws is still listed (asserted by
-            //   the equality above).
+            //   every class the graph draws is still listed (asserted
+            //   above).
             expect(definitionsTermHtml).not.toContain("is-dimmed");
 
             //   THE STRIP IS CLAIMED AND USEFUL: both sockets carry real
@@ -501,8 +492,7 @@ describe("server matrix (2×3) serves correctly", () => {
             // instances chip.
             expect(chipCount).toBeGreaterThanOrEqual(6);
             // The figure's counts agree with the classes the rail lists,
-            // which the graph draws or boxes (asserted above), so the
-            // figure can never flatter the graph. Both sides derive from
+            // so the figure can never flatter the graph. Both sides derive from
             // THIS response, with no pinned graph counts: the abstract
             // tally is read off the rail's own abstract marks, as a box
             // states no abstraction for the classes it holds.
@@ -582,6 +572,17 @@ describe("server matrix (2×3) serves correctly", () => {
             const definitionsClassHtml = await definitionsClass.text();
             expect(definitionsClassHtml).toMatch(
               /href="\/components\/ds%3A[^"]+"/,
+            );
+
+            //     An instance selected in the explorer renders its
+            //     details panel on the server, from the store the
+            //     route's warm filled:
+            const definitionsInstance = await fetch(
+              `${server.base}/definitions/ds%3Aglobal.component.button`,
+            );
+            expect(definitionsInstance.status).toBe(200);
+            expect(await definitionsInstance.text()).toContain(
+              'class="ds entity-panel',
             );
 
             //     …and the third ontology rides the explorer's rail:

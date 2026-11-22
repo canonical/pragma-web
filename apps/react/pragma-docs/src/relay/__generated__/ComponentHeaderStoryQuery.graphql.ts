@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c3256f15f6f5966d51e84eff78a70d8b>>
+ * @generated SignedSource<<d3b0277d17e27e4ca41c0a3d75f3ec42>>
  * @lightSyntaxTransform
  */
 
@@ -32,14 +32,14 @@ v1 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "name",
+  "name": "uri",
   "storageKey": null
 },
 v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "uri",
+  "name": "name",
   "storageKey": null
 },
 v3 = {
@@ -108,6 +108,7 @@ return {
         "plural": false,
         "selections": [
           (v1/*:: as any*/),
+          (v2/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -141,8 +142,8 @@ return {
             "name": "tier",
             "plural": false,
             "selections": [
-              (v1/*:: as any*/),
-              (v2/*:: as any*/)
+              (v2/*:: as any*/),
+              (v1/*:: as any*/)
             ],
             "storageKey": null
           },
@@ -194,7 +195,7 @@ return {
                         ],
                         "storageKey": null
                       },
-                      (v2/*:: as any*/)
+                      (v1/*:: as any*/)
                     ],
                     "storageKey": null
                   }
@@ -203,15 +204,14 @@ return {
               }
             ],
             "storageKey": "documentationStages(first:1)"
-          },
-          (v2/*:: as any*/)
+          }
         ],
         "storageKey": "component(uri:\"ds:global.component.button\")"
       }
     ]
   },
   "params": {
-    "cacheID": "c7e00441aab67a5dd55b41f62cb65082",
+    "cacheID": "19d33b1984efb580ee66072106270b59",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -259,7 +259,7 @@ return {
     },
     "name": "ComponentHeaderStoryQuery",
     "operationKind": "query",
-    "text": "query ComponentHeaderStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentHeader_node\n    uri\n  }\n}\n\nfragment ComponentHeader_node on Component {\n  name\n  summary\n  _meta {\n    curie\n  }\n  tier {\n    name\n    uri\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ComponentHeaderStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentHeader_node\n    uri\n  }\n}\n\nfragment ComponentHeader_node on Component {\n  uri\n  name\n  summary\n  _meta {\n    curie\n  }\n  tier {\n    name\n    uri\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
   }
 };
 })();

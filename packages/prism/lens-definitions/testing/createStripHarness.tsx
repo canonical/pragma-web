@@ -2,8 +2,13 @@ import {
   createEnvironment,
   createStaticRouter,
   HomesProvider,
+  RenderersProvider,
+  usePageRenderers,
 } from "@canonical/prism-core";
-import { ProjectionLinkProvider } from "@canonical/prism-projections";
+import {
+  ProjectionLinkProvider,
+  useListRenderers,
+} from "@canonical/prism-projections";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
@@ -12,6 +17,20 @@ import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { definitionsRoutes } from "../src/lib/routes.js";
 import { LensFilterProvider } from "../src/lib/ui/LensFilterProvider/index.js";
 import { HOMES } from "./fixtures.js";
+
+/** The site's renderers, over a provider that serves no extension. */
+const SiteRenderers = ({
+  children,
+}: {
+  readonly children: ReactNode;
+}): ReactElement => (
+  <RenderersProvider
+    defaults={{ list: useListRenderers(), page: usePageRenderers() }}
+    extensions={[]}
+  >
+    {children}
+  </RenderersProvider>
+);
 
 /**
  * Mount strip tenants under the providers `DefinitionsLayout` renders them
@@ -39,7 +58,9 @@ export default function createStripHarness(
       <RouterProvider router={createStaticRouter(definitionsRoutes, url)}>
         <HomesProvider homes={HOMES}>
           <ProjectionLinkProvider>
-            <LensFilterProvider>{children}</LensFilterProvider>
+            <SiteRenderers>
+              <LensFilterProvider>{children}</LensFilterProvider>
+            </SiteRenderers>
           </ProjectionLinkProvider>
         </HomesProvider>
       </RouterProvider>

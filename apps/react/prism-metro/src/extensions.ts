@@ -8,6 +8,7 @@ import selectSiteExtensions from "./selectSiteExtensions.js";
  */
 export const SCHEMA_EXTENSIONS = [
   "source",
+  "statements",
   "values",
   "facetedInstances",
   "search",
@@ -16,9 +17,9 @@ export const SCHEMA_EXTENSIONS = [
 /**
  * The provider extensions the site's provider serves: the committed
  * schema's, without `search` when `PRISM_SEARCH` is `off`. The site offers
- * what reads them (Turtle reads `source`, the search page reads `search`)
- * only when they are here. A test pins each setting's list to the schema
- * the provider then serves.
+ * what reads them (Turtle reads `source`, the entity page reads
+ * `statements`, the search page reads `search`) only when they are here. A
+ * test pins each setting's list to the schema the provider then serves.
  */
 export const SITE_EXTENSIONS = selectSiteExtensions(
   SCHEMA_EXTENSIONS,

@@ -53,11 +53,28 @@ describe("warmEntity", () => {
     expect(fetchFn.mock.calls.map(([request]) => request.name)).toEqual([
       "EntityNamespacesQuery",
       "EntityPageQuery",
+      "EntityStatementsQuery",
     ]);
-    expect(fetchFn.mock.lastCall?.at(1)).toEqual({
+    expect(fetchFn.mock.calls.at(1)?.at(1)).toEqual({
       id: NORTHGATE_IRI,
       classUri: "metro:Station",
     });
+    expect(fetchFn.mock.lastCall?.at(1)).toEqual({ uri: NORTHGATE_IRI });
+  });
+
+  it("settles when the provider refuses the statements it does not serve", async () => {
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation((request, variables, ...rest) =>
+      request.name === "EntityStatementsQuery"
+        ? Promise.reject(new Error('Cannot query field "statements"'))
+        : recorded(request, variables, ...rest),
+    );
+    await expect(
+      warmLikeTheServer(createEnvironment({ fetchFn }), {
+        uri: NORTHGATE_CURIE,
+      }),
+    ).resolves.toBeUndefined();
   });
 
   it("makes no request when the store already holds both operations", async () => {
@@ -76,7 +93,7 @@ describe("warmEntity", () => {
     await warmLikeTheServer(createEnvironment({ fetchFn }), {
       uri: NORTHGATE_IRI,
     });
-    expect(fetchFn.mock.lastCall?.at(1)).toEqual({
+    expect(fetchFn.mock.calls.at(1)?.at(1)).toEqual({
       id: NORTHGATE_IRI,
       classUri: "metro:Station",
     });

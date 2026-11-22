@@ -6,7 +6,8 @@
  * @module extensions
  */
 
-export { findNodeConnection, followField } from "./findNodeConnection.js";
+export { findNodeConnection } from "./findNodeConnection.js";
+export { followField } from "./followField.js";
 export { resolveNodeEdges } from "./resolveNodeEdges.js";
 export { toNodeConnection } from "./toNodeConnection.js";
 export type {
