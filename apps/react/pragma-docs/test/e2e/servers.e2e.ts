@@ -584,6 +584,17 @@ describe("server matrix (2×3) serves correctly", () => {
               /href="\/components\/ds%3A[^"]+"/,
             );
 
+            //     An instance selected in the explorer renders its
+            //     details panel on the server, from the store the
+            //     route's warm filled:
+            const definitionsInstance = await fetch(
+              `${server.base}/definitions/ds%3Aglobal.component.button`,
+            );
+            expect(definitionsInstance.status).toBe(200);
+            expect(await definitionsInstance.text()).toContain(
+              'class="ds entity-panel',
+            );
+
             //     …and the third ontology rides the explorer's rail:
             expect(definitionsHtml).toMatch(/href="\/definitions\/anatomy%3A/);
 
