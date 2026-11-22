@@ -243,6 +243,8 @@ export const MESSAGES = {
   "search.error": "The search could not be answered. Try again in a moment.",
   "search.placeholder": "Search the design system",
   "search.position": "{first}–{last} of {total}",
+  "search.limit":
+    "Only the first {count} results are listed: add a word or apply a type to narrow them.",
   "search.empty": "Type a word in the search field to search every lens.",
   "search.doors": "Lenses to browse",
   "search.spelling":

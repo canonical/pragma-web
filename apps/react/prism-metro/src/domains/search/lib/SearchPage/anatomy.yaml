@@ -6,7 +6,8 @@
 # grouped by type
 # (the prominent type first, then ascending count), each result through
 # the site's chip switch over the passage that holds the text, and the
-# pagination bar, 20 results a page. With a text that matches nothing:
+# pagination bar, 20 results a page, through the first 100 results (the
+# largest page a provider answers), the last such page saying so. With a text that matches nothing:
 # the no-match state, saying so and offering the next steps (the
 # spelling, the Definitions when the site has them, the palette). With no
 # text: what the field is for, and each lens as a door to its home with
@@ -58,6 +59,9 @@ node:
     - node:
         uri: prism.component.pagination_bar
       relation: { cardinality: "0..1", slotName: pagination }
+    - node:
+        role: the line that ends the last page listed, the 100th result's, when more match
+      relation: { cardinality: "0..1", slotName: limit }
     - node:
         role: the no-match state
         edges:

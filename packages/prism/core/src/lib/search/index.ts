@@ -7,7 +7,7 @@
  */
 
 export { default as buildSearchVariables } from "./buildSearchVariables.js";
-export { SEARCH_PAGE_SIZE } from "./constants.js";
+export { SEARCH_PAGE_SIZE, SEARCH_RESULT_LIMIT } from "./constants.js";
 export {
   default as groupSearchEdges,
   type GroupSearchOptions,

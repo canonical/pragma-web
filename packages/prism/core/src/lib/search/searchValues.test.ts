@@ -52,4 +52,15 @@ describe("readSearchState", () => {
       page: 1,
     });
   });
+
+  it("reads the fifth page, the last of the first 100 results, and no later one", () => {
+    expect(readSearchState({ q: "but", after: "c", page: "5" }).page).toBe(5);
+    expect(readSearchState({ q: "but", after: "c", page: "6" })).toEqual({
+      text: "but",
+      type: undefined,
+      after: undefined,
+      page: 1,
+    });
+    expect(readSearchState({ q: "but", after: "c", page: "8" }).page).toBe(1);
+  });
 });

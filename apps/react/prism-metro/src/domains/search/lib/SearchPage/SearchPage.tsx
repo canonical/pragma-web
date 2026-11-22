@@ -8,6 +8,7 @@ import {
   orderSearchFacets,
   PaginationBar,
   SEARCH_PAGE_SIZE,
+  SEARCH_RESULT_LIMIT,
   type SearchValues,
   TypeFacetBar,
 } from "@canonical/prism-core";
@@ -111,7 +112,8 @@ export function SearchFacets({
 
 /**
  * The page's results for a text: the results grouped by type and, when
- * they run past one page, the pagination bar; or, when nothing matches, the no-match state. The
+ * they run past one page, the pagination bar, the last page of the first
+ * `SEARCH_RESULT_LIMIT` saying no more are listed; or, when nothing matches, the no-match state. The
  * strip holds their count and the facet bar under it the Type facet.
  *
  * @note Impure: reads `MetroSearchQuery` from the Relay store, fetching it
@@ -150,6 +152,9 @@ function SearchResults({
     );
   }
   const first = (page - 1) * SEARCH_PAGE_SIZE + 1;
+  const isLimited =
+    search.pageInfo.hasNextPage &&
+    page * SEARCH_PAGE_SIZE >= SEARCH_RESULT_LIMIT;
   const previousValues: SearchValues | undefined =
     page === 1
       ? undefined
@@ -197,7 +202,9 @@ function SearchResults({
             total: String(search.total),
           })}
           nextHref={
-            search.pageInfo.hasNextPage && search.pageInfo.endCursor
+            search.pageInfo.hasNextPage &&
+            search.pageInfo.endCursor &&
+            !isLimited
               ? href({
                   q: text,
                   type,
@@ -210,6 +217,11 @@ function SearchResults({
             previousValues === undefined ? undefined : href(previousValues)
           }
         />
+      )}
+      {isLimited && (
+        <p className="limit">
+          {t("search.limit", { count: String(SEARCH_RESULT_LIMIT) })}
+        </p>
       )}
     </>
   );

@@ -159,6 +159,7 @@ export {
   orderSearchFacets,
   readSearchState,
   SEARCH_PAGE_SIZE,
+  SEARCH_RESULT_LIMIT,
   searchValues,
 } from "./search/index.js";
 export type { StoredThemeProviderProps } from "./theme/index.js";

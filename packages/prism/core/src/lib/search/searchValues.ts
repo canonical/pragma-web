@@ -1,5 +1,6 @@
 import type { StandardSchemaV1 } from "@canonical/router-core";
 import { VIEW_PARAMS } from "../renderers/constants.js";
+import { SEARCH_PAGE_SIZE, SEARCH_RESULT_LIMIT } from "./constants.js";
 import type { SearchState, SearchValues } from "./types.js";
 
 /** Keep a value only when it is a string with text in it. */
@@ -39,15 +40,19 @@ export const searchValues: StandardSchemaV1<
 
 /**
  * Read the search page's state from its address values: a page number
- * that is not a whole number from 1 reads as the first page, whose
- * results start after no cursor.
+ * that is not a whole number from 1, or that starts past
+ * `SEARCH_RESULT_LIMIT`, reads as the first page, whose results start
+ * after no cursor.
  *
  * @param values - The route's search values.
  * @returns The text, the applied type, the cursor and the page.
  */
 export function readSearchState(values: SearchValues): SearchState {
   const page = Number(values.page ?? "1");
-  const isLater = Number.isInteger(page) && page > 1;
+  const isLater =
+    Number.isInteger(page) &&
+    page > 1 &&
+    page * SEARCH_PAGE_SIZE <= SEARCH_RESULT_LIMIT;
   return {
     text: values.q ?? "",
     type: values.type,

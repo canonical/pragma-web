@@ -5,6 +5,7 @@ import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
+import { MESSAGES } from "#i18n";
 import createSiteTree from "../../../../../testing/createSiteTree.js";
 import { MOCK_UI_BLOCK } from "../../../../../testing/projectionEntities.js";
 import resolveRoot from "../../../../../testing/resolveRoot.js";
@@ -180,6 +181,17 @@ describe("SearchPage", () => {
     const next = bar?.querySelector<HTMLAnchorElement>("a.next");
     expect(next?.getAttribute("href")).toMatch(/[?&]page=2\b/);
     expect(next?.getAttribute("href")).toMatch(/[?&]after=cursor-20\b/);
+  });
+
+  it("ends the fifth page without a next page, saying only 100 are listed", () => {
+    renderPage({ text: "but", after: "cursor-80", page: 5 }, 145);
+    const bar = document.querySelector(".ds.search-page .ds.pagination-bar");
+    expect(bar?.textContent).toContain("81–100 of 145");
+    expect(bar?.querySelector("a.next")).toBeNull();
+    expect(bar?.querySelector("a.previous")).not.toBeNull();
+    expect(document.querySelector(".ds.search-page .limit")?.textContent).toBe(
+      MESSAGES["search.limit"].replace("{count}", "100"),
+    );
   });
 
   it("offers the lenses as doors when the address carries no text (W8-A9)", () => {
