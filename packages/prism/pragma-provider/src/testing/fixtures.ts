@@ -188,56 +188,68 @@ export const EXTRACTION_CASES: readonly ExtractionCase[] = [
  * two of the same length that differ only in case, and two identical titles.
  * Listed out of rank order, so the order is the ranking's, not the index's.
  */
-export const SEARCH_ENTRIES: readonly SearchEntry[] = [
-  {
-    uri: `${DS}alert`,
-    title: "Alert",
-    curie: "ds:alert",
-    definition: "Tells the reader something happened.",
-  },
-  {
-    uri: `${DS}alert-banner`,
-    title: "Alert banner",
-    curie: "ds:alert-banner",
-    definition: "An alert pinned to the top of the page.",
-  },
-  {
-    uri: `${DS}banner-group`,
-    title: "Banner group",
-    curie: "ds:banner-group",
-    definition: null,
-  },
-  { uri: `${DS}banner`, title: "Banner", curie: "ds:banner", definition: null },
-  {
-    uri: `${DS}toast`,
-    title: "Toast",
-    curie: "ds:toast",
-    definition: "Notice of an event that dismisses itself.",
-  },
-  {
-    uri: `${DS}callout`,
-    title: "Callout",
-    curie: "ds:notice-callout",
-    definition: null,
-  },
-  { uri: `${DS}notice`, title: "Notice", curie: "ds:notice", definition: null },
-  { uri: `${DS}a-tabs`, title: "tabs", curie: "ds:a-tabs", definition: null },
-  { uri: `${DS}z-tabs`, title: "Tabs", curie: "ds:z-tabs", definition: null },
-  {
-    uri: `${DS}chip-legacy`,
-    title: "Chip",
-    curie: "ds:chip-legacy",
-    definition: null,
-  },
-  { uri: `${DS}chip`, title: "Chip", curie: "ds:chip", definition: null },
-  {
-    uri: `${DS}keyline`,
-    title: "Keyline",
-    curie: "ds:keyline",
-    definition: null,
-  },
-  { uri: `${DS}knob`, title: "Knob", curie: "ds:knob", definition: null },
-];
+export const SEARCH_ENTRIES: readonly SearchEntry[] = (
+  [
+    {
+      uri: `${DS}alert`,
+      title: "Alert",
+      curie: "ds:alert",
+      definition: "Tells the reader something happened.",
+    },
+    {
+      uri: `${DS}alert-banner`,
+      title: "Alert banner",
+      curie: "ds:alert-banner",
+      definition: "An alert pinned to the top of the page.",
+    },
+    {
+      uri: `${DS}banner-group`,
+      title: "Banner group",
+      curie: "ds:banner-group",
+      definition: null,
+    },
+    {
+      uri: `${DS}banner`,
+      title: "Banner",
+      curie: "ds:banner",
+      definition: null,
+    },
+    {
+      uri: `${DS}toast`,
+      title: "Toast",
+      curie: "ds:toast",
+      definition: "Notice of an event that dismisses itself.",
+    },
+    {
+      uri: `${DS}callout`,
+      title: "Callout",
+      curie: "ds:notice-callout",
+      definition: null,
+    },
+    {
+      uri: `${DS}notice`,
+      title: "Notice",
+      curie: "ds:notice",
+      definition: null,
+    },
+    { uri: `${DS}a-tabs`, title: "tabs", curie: "ds:a-tabs", definition: null },
+    { uri: `${DS}z-tabs`, title: "Tabs", curie: "ds:z-tabs", definition: null },
+    {
+      uri: `${DS}chip-legacy`,
+      title: "Chip",
+      curie: "ds:chip-legacy",
+      definition: null,
+    },
+    { uri: `${DS}chip`, title: "Chip", curie: "ds:chip", definition: null },
+    {
+      uri: `${DS}keyline`,
+      title: "Keyline",
+      curie: "ds:keyline",
+      definition: null,
+    },
+    { uri: `${DS}knob`, title: "Knob", curie: "ds:knob", definition: null },
+  ] as const
+).map((entry) => ({ ...entry, type: `${DS}Component` }));
 
 /** The cases `rankSearchEntries` is held to over {@link SEARCH_ENTRIES}. */
 export const RANKING_CASES: readonly RankingCase[] = [

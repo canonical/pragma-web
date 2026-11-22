@@ -4,7 +4,8 @@
 # the highlighted result's EntityCard on the right. It is the ARIA
 # combobox pattern with a listbox popup: the field is the combobox and keeps
 # the focus; the arrow keys move the highlighted option of the listbox it
-# controls (aria-activedescendant), wrapping at both ends; Enter opens the
+# controls (aria-activedescendant), wrapping at both ends; typing
+# highlights none until an arrow key moves to one; Enter opens the
 # highlighted result's home; a pointer moving over a result highlights it.
 # Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, frames 502:1753 and 502:1827 (the
 # palette with its results and its preview) and 504:327 (the row's slots).
@@ -198,3 +199,27 @@ node:
               projection:
                 field: search
       relation: { cardinality: "1", slotName: body }
+    - node:
+        role: hand-off line, a link handing the field's text to the site's search page
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.width: 1px
+          appearance.border.style: "solid none none"
+          appearance.border.block.start.color: color.border.muted
+        edges:
+          - node:
+              role: link to the search page for the text
+            relation: { cardinality: "1", slotName: link }
+          - node:
+              role: link to the search page for the text, highlighted (.is-active)
+              styles:
+                appearance.outline.width: 2px
+                appearance.outline.style: solid
+                appearance.outline.color: color.focusRing
+            relation: { cardinality: "0..1", slotName: link }
+      relation: { cardinality: "0..1", slotName: handoff }

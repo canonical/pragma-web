@@ -32,3 +32,6 @@ export const SITE_SWITCHES = {
   command: SiteCommandSlot,
   graphNode: SiteGraphNodeSlot,
 } as const satisfies SiteSwitches;
+
+/** How many of the pages read before the palette lists. */
+export const RECENT_PAGE_LIMIT = 5;

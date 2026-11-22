@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { RouterLink } from "@canonical/prism-core";
 import {
   CardProjection,
   ProjectionLinkProvider,
@@ -77,15 +78,20 @@ const componentCssClassName = "ds command-palette-search";
  * card on the right. It is the ARIA combobox pattern with a listbox popup:
  * the field is the combobox and keeps the focus; the arrow keys move the
  * highlighted option of the listbox it controls (`aria-activedescendant`),
- * wrapping at both ends; Enter chooses the highlighted result, opening its
- * home; a pointer moving over a result highlights it. Escape is the
- * dialog's. A pointer pressing a heading, a result or the status line
- * leaves the focus in the field, so the keys keep reaching it; a press in
+ * wrapping at both ends; typing highlights none until an arrow key moves
+ * to one; Enter chooses the highlighted result, opening its home, and with
+ * none highlighted follows the hand-off line when there is one; a pointer
+ * moving over a result highlights it. Escape is the dialog's. A pointer
+ * pressing a heading, a result or the status line leaves the focus in the
+ * field, so the keys keep reaching it; a press in
  * the preview selects its text, as anywhere on the site, and a click there
  * that selects nothing gives the field the focus back.
  *
  * The field's text, trimmed, reaches the graph's search deferred: while the
  * next results load, the last ones stay on screen and the listbox is busy.
+ * The hand-off line carries the field's text itself, so Enter opens the
+ * search page for what the field reads, loaded or not; it is the site's
+ * link, so following it navigates the router instead of loading a document.
  * Each session of the palette searches afresh, so a failed search is
  * retried once the palette reopens.
  * An empty field sends no query and shows a one-line hint; a text nothing
@@ -114,17 +120,21 @@ export default function CommandPaletteSearch({
   onChoose,
   onHighlight,
   session,
+  searchHref,
+  initialText = "",
   className,
   ...props
 }: CommandPaletteSearchProps): ReactElement {
   const t = useMessages();
   const listboxId = useId();
-  const [text, setText] = useState("");
-  const [highlighted, setHighlighted] = useState(0);
+  const [text, setText] = useState(initialText);
+  const [highlighted, setHighlighted] = useState<number | null>(null);
   const activeOption = useRef<HTMLLIElement>(null);
   const field = useRef<HTMLInputElement>(null);
+  const handoff = useRef<HTMLAnchorElement>(null);
   const preview = useRef<HTMLElement>(null);
-  const searched = useDeferredValue(text.trim());
+  const typed = text.trim();
+  const searched = useDeferredValue(typed);
   const data = useLazyLoadQuery<CommandPaletteSearchQuery>(
     searchQuery,
     { text: searched, first: SEARCH_PAGE_SIZE, searching: searched !== "" },
@@ -133,9 +143,23 @@ export default function CommandPaletteSearch({
   const nodes = data.search?.edges.map(({ node }) => node) ?? [];
   const groups = groupResultsByType(nodes);
   const results = groups.flatMap((group) => group.results);
-  const active = results.at(Math.min(highlighted, results.length - 1));
-  const activeId =
-    active === undefined ? undefined : `${listboxId}-${active.index}`;
+  const handoffHref =
+    searchHref === undefined || typed === "" ? undefined : searchHref(typed);
+  const onHandoff =
+    handoffHref !== undefined &&
+    highlighted !== null &&
+    highlighted >= results.length;
+  const active =
+    onHandoff || highlighted === null
+      ? undefined
+      : results.at(Math.min(highlighted, results.length - 1));
+  const stops = results.length + (handoffHref === undefined ? 0 : 1);
+  const handoffId = `${listboxId}-handoff`;
+  const activeId = onHandoff
+    ? handoffId
+    : active === undefined
+      ? undefined
+      : `${listboxId}-${active.index}`;
   const listed = results.length > 0;
 
   /**
@@ -156,13 +180,14 @@ export default function CommandPaletteSearch({
   );
 
   /**
-   * Take the field's new text, and highlight the first result again.
+   * Take the field's new text, and highlight no result: Enter then hands
+   * the text to the site's search page until an arrow key moves to one.
    *
    * @note Impure: sets the component's state.
    */
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setText(event.target.value);
-    setHighlighted(0);
+    setHighlighted(null);
   };
 
   /**
@@ -209,8 +234,10 @@ export default function CommandPaletteSearch({
   };
 
   /**
-   * Move the highlight with the arrow keys, wrapping at both ends, and
-   * choose the highlighted result with Enter. While an input method is
+   * Move the highlight with the arrow keys, wrapping at both ends, from
+   * none to the first (down) or the last stop (up), and choose the
+   * highlighted result with Enter; with none highlighted, Enter follows
+   * the hand-off line when there is one, and does nothing otherwise. While an input method is
    * composing text, every key is the input method's: it may move through
    * its candidates with the arrows and commit one with Enter.
    *
@@ -220,14 +247,20 @@ export default function CommandPaletteSearch({
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.nativeEvent.isComposing) return;
     const step = ARROW_STEPS.get(event.key);
-    if (step !== undefined && active !== undefined) {
+    if (step !== undefined && stops > 0) {
       event.preventDefault();
-      setHighlighted((active.index + step + results.length) % results.length);
+      const current = onHandoff ? results.length : active?.index;
+      setHighlighted(
+        current === undefined
+          ? (stops + Math.min(step, 0)) % stops
+          : (current + step + stops) % stops,
+      );
       return;
     }
     if (event.key === "Enter") {
       event.preventDefault();
-      activeOption.current?.click();
+      if (active === undefined) handoff.current?.click();
+      else activeOption.current?.click();
     }
   };
 
@@ -258,7 +291,7 @@ export default function CommandPaletteSearch({
         {listed ? (
           <ProjectionLinkProvider LinkComponent={CommandPaletteTitle}>
             <div
-              aria-busy={searched !== text.trim()}
+              aria-busy={searched !== typed}
               aria-label={t("search.results")}
               className="results"
               id={listboxId}
@@ -319,6 +352,20 @@ export default function CommandPaletteSearch({
           </section>
         )}
       </div>
+      {handoffHref === undefined ? null : (
+        <p className="handoff">
+          <RouterLink
+            className={onHandoff ? "link is-active" : "link"}
+            href={handoffHref}
+            id={handoffId}
+            onClick={onChoose}
+            onPointerMove={() => setHighlighted(results.length)}
+            ref={handoff}
+          >
+            {t("palette.handoff", { text: typed })}
+          </RouterLink>
+        </p>
+      )}
     </div>
   );
 }

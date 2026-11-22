@@ -30,18 +30,17 @@ const compareMatches = (a: SearchMatch, b: SearchMatch): number =>
  *
  * @param entries - The entries to search.
  * @param text - The search text, as the client sent it.
- * @returns The matching entries' IRIs, best first; none when `text` is
+ * @returns The matches, best first; none when `text` is
  * empty or only whitespace.
  */
 export const rankSearchEntries = (
   entries: readonly SearchEntry[],
   text: string,
-): readonly string[] => {
+): readonly SearchMatch[] => {
   const needle = text.trim().toLowerCase();
   if (needle === "") return [];
   return entries
     .map((entry) => matchSearchEntry(entry, needle))
     .filter((match) => match !== undefined)
-    .sort(compareMatches)
-    .map((match) => match.uri);
+    .sort(compareMatches);
 };

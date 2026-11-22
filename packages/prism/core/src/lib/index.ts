@@ -145,6 +145,24 @@ export { collectLenses, routeLensFacet } from "./routeLens/index.js";
 export { createStaticRouter } from "./router/index.js";
 export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
+export type {
+  GroupSearchOptions,
+  OfferedSearchRoutes,
+  SearchGroup,
+  SearchState,
+  SearchValues,
+  SearchVariables,
+} from "./search/index.js";
+export {
+  buildSearchVariables,
+  groupSearchEdges,
+  offerSearchRoutes,
+  orderSearchFacets,
+  readSearchState,
+  SEARCH_PAGE_SIZE,
+  SEARCH_RESULT_LIMIT,
+  searchValues,
+} from "./search/index.js";
 export type { StoredThemeProviderProps } from "./theme/index.js";
 export { StoredThemeProvider, useStoredTheme } from "./theme/index.js";
 export type {
@@ -181,16 +199,21 @@ export type {
   MentionChipProps,
   ModeStripProps,
   NotFoundBodyProps,
+  PaginationBarProps,
   RailBrand,
   RailProps,
   RendererSwitchProps,
   RouterLinkProps,
+  SearchFormProps,
+  SearchIconProps,
   SectionedViewProps,
   SectionedViewSection,
   SourceViewProps,
   ThemeSelectorProps,
   TurtleToken,
   TurtleTokenRole,
+  TypeFacetBarProps,
+  TypeFacetValue,
   WorkspaceLayoutProps,
 } from "./ui/index.js";
 export {
@@ -216,12 +239,16 @@ export {
   makeLensContext,
   NotFoundBody,
   orderSections,
+  PaginationBar,
   Rail,
   RendererSwitch,
   RouterLink,
+  SearchForm,
+  SearchIcon,
   SectionedView,
   SourceView,
   ThemeSelector,
+  TypeFacetBar,
   useGraphZoomBucket,
   WorkspaceLayout,
 } from "./ui/index.js";

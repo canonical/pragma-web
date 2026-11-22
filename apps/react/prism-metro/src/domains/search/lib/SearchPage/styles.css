@@ -1,0 +1,62 @@
+/* Scaffolded by @canonical/summon-component:react v0.46.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* A page of the canvas: it spans every column of the page grid, its
+   * title, summary, facet band, groups and pagination bar one gutter
+   * apart. */
+  .ds.search-page {
+    --search-page-gap: var(--grid-gutter);
+    --search-page-total-color: var(--color-text-muted);
+
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--search-page-gap);
+  }
+
+  /* The groups, one gutter apart. */
+  .ds.search-page .results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--search-page-gap);
+  }
+
+  /* The types as doors: a list without its native bullets and indent,
+   * one gutter apart. */
+  .ds.search-page .doors {
+    display: flex;
+    flex-direction: column;
+    gap: var(--search-page-gap);
+    list-style: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+  }
+
+  /* A door: its mark, its name and its total on one line. */
+  .ds.search-page .door {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--search-page-gap);
+  }
+
+  /* A door's total: muted, in figures of one width. */
+  .ds.search-page .total {
+    color: var(--search-page-total-color);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The no-match state's next steps: a list without its native bullets
+   * and indent, one gutter apart. */
+  .ds.search-page .hints {
+    display: flex;
+    flex-direction: column;
+    gap: var(--search-page-gap);
+    list-style: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+  }
+}

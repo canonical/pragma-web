@@ -89,6 +89,19 @@ export const PROVIDER_EXTENSIONS = {
     ],
     type: "FacetedConnection!",
   },
+  /**
+   * Every node by text, ranked, each result with its matched passage, and
+   * the matches counted by type before `types` narrows them.
+   */
+  search: {
+    args: [
+      ["text", "String!"],
+      ["first", "Int"],
+      ["after", "String"],
+      ["types", "[ID!]"],
+    ],
+    type: "SearchConnection!",
+  },
 } as const;
 
 /** How many values a `statements` group returns when the reader names none. */

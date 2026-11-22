@@ -4,8 +4,8 @@
  * The command palette in a real browser, end to end: the dev cell (its
  * graph server alongside) serves the lobby, and Chromium drives the palette
  * as a reader does. Ctrl+K opens it with the field focused; a component's
- * title lists its matches with the first highlighted and its card in the
- * preview, flush in its panel; the arrow keys move the highlight and the preview with it; Tab
+ * title lists its matches; ArrowDown highlights the first, its card in
+ * the preview, flush in its panel; the arrow keys move the highlight and the preview with it; Tab
  * leaves the field for the preview's link, never for the scrolling results;
  * a drag in the preview selects its text, and a click there gives the field
  * the focus back;
@@ -24,7 +24,7 @@ import {
 import type { Browser, Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { COMPONENT_TITLE } from "../../testing/fixtures.js";
-import { DEV_READY_MS, PAGE_SETTLE_MS } from "./constants.js";
+import { DEV_READY_MS, FOCUS_SETTLE_MS, PAGE_SETTLE_MS } from "./constants.js";
 import { type RunningServer, startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
@@ -87,14 +87,20 @@ const openLobby = async (
 const findPalette = (page: Page) => page.locator("dialog.command-palette");
 
 /**
- * Open the palette with `chord` and search for `text`, waiting until a
- * result is highlighted.
+ * Open the palette with `chord`, search for `text`, and highlight the
+ * first result with ArrowDown, waiting until it is highlighted.
  *
  * @note Impure: drives the tab.
  */
 const search = async (page: Page, text: string, chord = "Control+k") => {
   await page.keyboard.press(chord);
   await page.keyboard.type(text);
+  await findPalette(page)
+    .getByRole("option")
+    .first()
+    .waitFor({ timeout: PAGE_SETTLE_MS });
+  // Typing highlights no result; the first arrow press highlights the first.
+  await page.keyboard.press("ArrowDown");
   await findPalette(page)
     .getByRole("option", { selected: true })
     .waitFor({ timeout: PAGE_SETTLE_MS });
@@ -293,12 +299,15 @@ describe("the command palette", () => {
   it("selects the preview's text with a drag, and gives the field the focus back after a click", async () => {
     const page = await openLobby();
     await search(page, COMPONENT_TITLE);
+    // A plain line of the card, never its linked title: a UI block's card
+    // names no kind (its mark says it), so its facts' terms and its status
+    // stand in.
     const kind = findPalette(page)
       .getByRole("region", { name: "Preview" })
-      .locator(".kind")
+      .locator(".description .kind, .facts .term, .body > .status")
       .first();
     const box = await kind.boundingBox();
-    if (box === null) throw new Error("the preview shows no kind");
+    if (box === null) throw new Error("the preview shows no plain line");
     const middle = box.y + box.height / 2;
     await page.mouse.move(box.x + 1, middle);
     await page.mouse.down();
@@ -309,6 +318,13 @@ describe("the command palette", () => {
     ).toBeGreaterThan(0);
     await kind.click();
     const field = findPalette(page).getByRole("combobox");
+    // The palette reads the selection in the task after the click, so the
+    // focus comes back then, not within the click.
+    await page.waitForFunction(
+      (input) => input === document.activeElement,
+      await field.elementHandle(),
+      { timeout: FOCUS_SETTLE_MS },
+    );
     expect(
       await field.evaluate((input) => input === document.activeElement),
     ).toBe(true);

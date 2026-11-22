@@ -53,11 +53,12 @@ export default defineConfig(({ mode }) => ({
   // source and artifact directories here. Its filter leaves out every file
   // outside this app's `src`, the packages' included.
   //
-  // The app runs the lens and projection packages on its own compile: `bun
-  // run relay` compiles their documents beside the app's against this app's
-  // schema, and redirectPackageArtifacts() resolves each package's artifact
-  // import to the app's artifact of the same name, so the packages' queries
-  // fetch what the site's own arms read through the site slots.
+  // The app runs the lens, projection and command palette packages on its
+  // own compile: `bun run relay` compiles their documents beside the app's
+  // against this app's schema, and redirectPackageArtifacts() resolves each
+  // package's artifact import to the app's artifact of the same name, so the
+  // packages' queries (the palette's search among them) fetch what the
+  // site's own arms read through the site slots.
   //
   // createIconsPlugin() serves the @canonical/ds-assets icons at /icons in
   // dev and copies them into the client build output: an arm's mark is an

@@ -4,15 +4,19 @@ import { rankSearchEntries } from "./rankSearchEntries.js";
 
 describe("rankSearchEntries", () => {
   it.each(RANKING_CASES)("$name", ({ text, expected }) => {
-    expect(rankSearchEntries(SEARCH_ENTRIES, text)).toEqual(expected);
+    expect(
+      rankSearchEntries(SEARCH_ENTRIES, text).map((match) => match.uri),
+    ).toEqual(expected);
   });
 
   it.each(RANKING_CASES)(
     "$name, whatever the index's order",
     ({ text, expected }) => {
-      expect(rankSearchEntries(SEARCH_ENTRIES.toReversed(), text)).toEqual(
-        expected,
-      );
+      expect(
+        rankSearchEntries(SEARCH_ENTRIES.toReversed(), text).map(
+          (match) => match.uri,
+        ),
+      ).toEqual(expected);
     },
   );
 

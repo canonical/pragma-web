@@ -8,8 +8,8 @@ import type { SearchEntry, SearchIndex, SearchIndexSources } from "./types.js";
 /** What `SEARCH_ENTRY_QUERY` selects of one node. */
 interface SearchEntryNode {
   readonly uri: string;
-  readonly _meta: Omit<SearchEntry, "uri"> & {
-    readonly type: { readonly visibility: string | null };
+  readonly _meta: Omit<SearchEntry, "uri" | "type"> & {
+    readonly type: { readonly uri: string; readonly visibility: string | null };
   };
 }
 
@@ -46,8 +46,8 @@ const readSearchEntry = async (
   if (node === null || node._meta.type.visibility === HIDDEN_VISIBILITY) {
     return undefined;
   }
-  const { curie, title, definition } = node._meta;
-  return { uri: node.uri, curie, title, definition };
+  const { curie, title, definition, type } = node._meta;
+  return { uri: node.uri, curie, title, definition, type: type.uri };
 };
 
 /**

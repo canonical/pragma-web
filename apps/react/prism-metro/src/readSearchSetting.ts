@@ -1,0 +1,20 @@
+/**
+ * Read the `PRISM_SEARCH` setting: Vite's env first, then the process env.
+ *
+ * The builds replace Vite's member access with the value set when they ran,
+ * so `PRISM_SEARCH=off` at build leaves search out of the bundles; the graph
+ * server and the schema writer run under Bun, whose Vite env is the process
+ * env, and read it as they start.
+ *
+ * @returns The setting, or undefined when it is not set.
+ * @note Impure: reads the ambient environment.
+ */
+export default function readSearchSetting(): string | undefined {
+  return (
+    // Vite replaces `import.meta.env` at build with the build's `PRISM_`
+    // values (its `envPrefix`), so the optional access reads them too.
+    import.meta.env?.PRISM_SEARCH ??
+    // The browser bundle has no `process`.
+    globalThis.process?.env.PRISM_SEARCH
+  );
+}

@@ -1,4 +1,8 @@
-import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
+import {
+  DocumentLayout,
+  ModeStrip,
+  offerSearchRoutes,
+} from "@canonical/prism-core";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { group, route } from "@canonical/router-core";
 import { fleetLayout, fleetRoutes } from "#domains/fleet";
@@ -12,7 +16,9 @@ import {
 } from "#domains/lenses";
 import { homeLayout, homeRoutes } from "#domains/metro";
 import { networkLayout, networkRoutes } from "#domains/network";
+import { searchRoutes } from "#domains/search";
 import { NotFoundPage } from "#lib/ui";
+import { SITE_EXTENSIONS } from "./extensions.js";
 
 /**
  * The page every URL no route matches renders, at its own `/not-found`: the
@@ -91,6 +97,9 @@ export const appRoutes = {
   fleetUnit,
   fleetCarType,
   fleetStock,
+  // The search page reads the provider's `search` extension, so the table
+  // lists it only when the site's provider serves that extension.
+  ...offerSearchRoutes(SITE_EXTENSIONS, searchRoutes),
 } as const;
 
 /**

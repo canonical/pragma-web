@@ -1,6 +1,7 @@
 extend type Query {
   source(uri: ID!): String
   facetedInstances(classUri: ID!, filters: [FieldFilter!], sort: FieldSort, first: Int, after: String): FacetedConnection!
+  search(text: String!, first: Int, after: String, types: [ID!]): SearchConnection!
 }
 
 extend interface Node {
@@ -45,4 +46,33 @@ type FacetedConnection {
   pageInfo: PageInfo!
   totalCount: Int!
   facets: [Facet!]!
+}
+
+type SearchConnection {
+  edges: [SearchEdge!]!
+  pageInfo: PageInfo!
+  total: Int!
+  facets: [TypeFacet!]!
+}
+
+type SearchEdge {
+  node: Node!
+  cursor: String!
+  match: SearchMatch!
+}
+
+type SearchMatch {
+  field: String!
+  passage: String!
+  ranges: [MatchRange!]!
+}
+
+type MatchRange {
+  start: Int!
+  length: Int!
+}
+
+type TypeFacet {
+  type: OntologyClass!
+  count: Int!
 }

@@ -15,7 +15,7 @@ export const NODE_FIELDS_QUERY = `query NodeFields($id: ID!) { node(id: $id) { _
 export const CLASS_FIELDS_QUERY = `query ClassFields($uri: String!) { ontologyClass(uri: $uri) { uri properties { ${SERVED_FIELD_SELECTION} } instanceCount } }`;
 
 /** A class's instances, each with its type name and its own class. */
-export const CLASS_INSTANCES_QUERY = `query ClassInstances($uri: String!, $first: Int) { ontologyClass(uri: $uri) { instances(first: $first) { edges { node { uri __typename _meta { type { uri label } } } } } } }`;
+export const CLASS_INSTANCES_QUERY = `query ClassInstances($uri: String!, $first: Int, $after: String) { ontologyClass(uri: $uri) { instances(first: $first, after: $after) { edges { node { uri __typename _meta { type { uri label } } } } pageInfo { hasNextPage endCursor } } } }`;
 
 /** What a field holding a node is read by: its IRI and its title. */
 export const NODE_VALUE_SELECTION = "{ uri _meta { title } }";

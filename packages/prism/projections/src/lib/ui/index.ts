@@ -7,6 +7,8 @@ export * from "./EntityGraphNode/index.js";
 export * from "./EntityList/index.js";
 export * from "./EntityRow/index.js";
 export * from "./EntityTable/index.js";
+export * from "./SearchPassage/index.js";
+export * from "./SearchResultGroup/index.js";
 export * from "./SwatchMark/index.js";
 export * from "./TokenMark/index.js";
 export * from "./TokenSwatch/index.js";

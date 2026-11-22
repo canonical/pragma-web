@@ -1,12 +1,14 @@
 /**
  * The contract check's public surface: the shipped SDL, the predicate, the
  * assertion built on it, and the provider extensions a schema serves; the
- * site lens model, its resolver and the list fields it derives; and the
- * class-edge weights.
+ * site lens model, its resolver and the list fields it derives; the
+ * class-edge weights; and the pattern a provider's search matches a
+ * text with.
  *
  * @module lib
  */
 
+export { buildSearchPattern } from "./buildSearchPattern.js";
 export { default as compactIri } from "./compactIri.js";
 export { default as compareCodePoints } from "./compareCodePoints.js";
 export {

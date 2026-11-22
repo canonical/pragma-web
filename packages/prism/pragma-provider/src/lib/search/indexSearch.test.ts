@@ -16,13 +16,25 @@ describe("indexSearch", () => {
       title: "Card",
       curie: "ds:card",
       definition: "A surface grouping a title, a summary and actions.",
+      type: `${DS}Component`,
     });
     expect(index).toContainEqual({
       uri: `${DS}scorecard`,
       title: "Scorecard",
       curie: "ds:scorecard",
       definition: null,
+      type: `${DS}Component`,
     });
+  });
+
+  it("counts an instance under its class, and a class under owl:Class", async () => {
+    const index = await indexSearch(await booted);
+    expect(index.find((entry) => entry.uri === `${DS}button`)?.type).toBe(
+      `${DS}Component`,
+    );
+    expect(index.find((entry) => entry.uri === `${DS}Component`)?.type).toBe(
+      "http://www.w3.org/2002/07/owl#Class",
+    );
   });
 
   it("indexes classes as well as their instances", async () => {

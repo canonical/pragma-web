@@ -163,12 +163,12 @@ describe("Shell", () => {
     expect(screen.getByText("Foreign prefix: geo:")).toBeInTheDocument();
   });
 
-  it("mounts the command palette once, closed", async () => {
+  it("mounts the command palette once, closed, reading Jump to over routes with no search page", async () => {
     renderShell();
     await screen.findByRole("heading", { name: "Probe content" });
     const dialogs = screen.getAllByRole("dialog", { hidden: true });
     expect(dialogs).toHaveLength(1);
-    expect(dialogs.at(0)).toHaveAttribute("aria-label", "Search the graph");
+    expect(dialogs.at(0)).toHaveAttribute("aria-label", "Jump to");
     expect(dialogs.at(0)).not.toHaveAttribute("open");
   });
 

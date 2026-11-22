@@ -2,7 +2,9 @@
 
 The command palette of a Prism documentation site: a modal the reader opens
 with Cmd+K or Ctrl+K from anywhere on the site, which searches the graph by
-text and opens the canonical home of the result the reader chooses. The
+text and opens the canonical home of the result the reader chooses, or hands
+the text to the site's search page. On a site whose provider serves no
+search it reads "Jump to" and narrows the site's own destinations. The
 field runs across the top; the results list on the left as the site's
 command rows, grouped by type in the order the search ranked them; the
 highlighted result's card shows on the right; the keys that move, open and
@@ -10,11 +12,14 @@ close sit under them.
 
 The package is **Tier 2**: its query compiles against
 `@canonical/prism-contract`'s SDL plus the search extension
-(`schema/search.graphql`), `Query.search(text:, first:, after:)`, which
-returns the nodes whose title, compact address or definition holds the text,
-best first. It runs over any provider that conforms to the contract and
-serves that extension; both providers in this repository,
-`@canonical/prism-pragma-provider` and `@canonical/prism-graph-example`, do.
+(`schema/search.graphql`), `Query.search(text:, first:, after:, types:)`,
+whose `SearchConnection` holds the nodes whose title, compact address or
+definition holds the text, best first, each edge with its `node` and the
+passage that matched, beside the total and the type facets. It runs over any
+provider that conforms to the contract and serves that extension; both
+providers in this repository, `@canonical/prism-pragma-provider` and
+`@canonical/prism-graph-example`, do. Without it, the palette sends no query
+(see "Without search").
 
 ## Installation
 
@@ -66,7 +71,24 @@ the preview is not shown. It reads the shell's query container, `shell`, so
 it re-flows only under a shell that is one.
 
 The palette's native props reach its `<dialog>`. Its `onClose` is called
-whenever the palette closes, however the reader closed it.
+whenever the palette closes, however the reader closed it. Two props of its
+own say what the site offers:
+
+- `searchHref(text)`: the address of the site's search page for a text,
+  from the site's router, given only when the provider serves search. The
+  results then end with the hand-off line, a link reading "Search
+  everything for “…”" to that address.
+- `destinations` (`PaletteDestinations`): the site's places, each lens's
+  home in the rail's order, and the pages read before, latest first, each
+  a `PaletteDestination` (`label`, `href`). The field narrows them when the
+  site gives no `searchHref`; they are ignored while it gives one.
+
+## Without search
+
+A site whose provider serves no search mounts the palette without
+`searchHref`. The dialog is then named "Jump to", the field narrows the
+`destinations` on the client under "Places" and "Recent pages", no query is
+sent, and nothing says search is missing: no hand-off line is drawn.
 
 ## Keys
 
@@ -76,8 +98,12 @@ whenever the palette closes, however the reader closed it.
   and needs no switch to turn it off.
 - ↑ and ↓ in the field: move the highlight through the results, wrapping at
   both ends. A pointer moving over a result highlights it too.
-- Enter in the field: choose the highlighted result. A click on a result,
-  or following the link of the preview's title, chooses it too.
+- Typing highlights no result; ↓ highlights the first. Enter in the field
+  chooses the highlighted result. With nothing highlighted, Enter follows
+  the hand-off line to the site's search page when the site gives
+  `searchHref`, and does nothing otherwise. ↑ from the first result reaches
+  the hand-off line. A click on a result, or following the link of the
+  preview's title, chooses it too.
 - While an input method composes text in the field, the arrows and Enter
   are its own: they move through its candidates and commit one.
 - Escape, or a click on the backdrop (pressed and released there): close
@@ -91,7 +117,8 @@ the last opening are gone.
 The palette is the published Modal, a `<dialog>` opened with
 `showModal()`: the backdrop, the focus trap, the page's inertness and Escape
 are the platform's, and the dialog's focusing steps put the focus in the
-field. The dialog is named by its `aria-label`, "Search the graph".
+field. The dialog is named by its `aria-label`, "Search the graph", or
+"Jump to" on a site without search.
 
 The search is the ARIA combobox pattern with a listbox popup. The field is
 the combobox and keeps the focus, even when a pointer presses a heading,
@@ -166,4 +193,5 @@ field's focus ring, drawn inside it since the dialog clips.
 
 ## Public API
 
-- `CommandPalette`; types `CommandPaletteProps`.
+- `CommandPalette`; types `CommandPaletteProps`, `PaletteDestinations` and
+  `PaletteDestination`.

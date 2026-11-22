@@ -34,6 +34,7 @@ import {
   weighClassEdges,
 } from "@canonical/prism-contract";
 import { buildSchema, graphql, isObjectType } from "graphql";
+import { buildSearchPassage } from "./buildSearchPassage.js";
 import {
   type ConnectionArgs,
   sliceConnection,
@@ -50,9 +51,11 @@ import {
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
+  SEARCH_MATCH_FIELDS,
   TURTLE_STANDARD_PREFIXES,
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
+import { countTypeFacets } from "./countTypeFacets.js";
 import { exampleDataset } from "./dataset.js";
 import { declareClassEdges } from "./declareClassEdges.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
@@ -62,6 +65,7 @@ import groupRecordStatements from "./groupRecordStatements.js";
 import { isNetworkEntity } from "./isNetworkEntity.js";
 import listRecordStatements from "./listRecordStatements.js";
 import { observeClassEdges } from "./observeClassEdges.js";
+import omitSearch from "./omitSearch.js";
 import { outlineDataset } from "./outlineDataset.js";
 import { readProviderSdl } from "./providerSdl.js";
 import { rankSearchEntries } from "./rankSearchEntries.js";
@@ -84,6 +88,7 @@ import type {
   ExampleOntology,
   ExampleProperty,
   ExampleProvider,
+  ExampleProviderOptions,
   ExampleRollingStock,
   ExampleRoute,
   ExampleUnit,
@@ -148,6 +153,7 @@ interface StatementsArgs {
 /** Arguments of `Query.search`. */
 interface SearchArgs extends ConnectionArgs {
   readonly text: string;
+  readonly types?: readonly string[] | null;
 }
 
 /** Arguments of `Node.values`. */
@@ -186,15 +192,22 @@ const namespaceOf = (uri: string): string =>
  * reference, a class cycle, an entity of an unknown class) are reachable from
  * tests with a purpose-built dataset rather than being untestable dead code.
  * The lens is a parameter for the same reason: a purpose-built lens reaches
- * the resolution rules the metro's own does not exercise.
+ * the resolution rules the metro's own does not exercise. With
+ * `options.search` false the provider serves no search: its SDL leaves out
+ * `Query.search` and the types only it reads, as a provider without the
+ * extension declares it.
  *
  * @note Impure: reads the provider SDL from the filesystem on every call.
  */
 export const createExampleProvider = (
   dataset: ExampleDataset = exampleDataset,
   lens: SiteLens = siteLens,
+  options: ExampleProviderOptions = {},
 ): ExampleProvider => {
-  const sdl = readProviderSdl();
+  const sdl =
+    options.search === false
+      ? omitSearch(readProviderSdl())
+      : readProviderSdl();
   const schema = buildSchema(sdl);
   const outline = outlineDataset(dataset);
   const lensIndex = indexSiteLens(lens, outline);
@@ -1038,17 +1051,19 @@ export const createExampleProvider = (
   // to; ranking and paging happen per request.
   // -------------------------------------------------------------------
 
-  /** One node's search entry: its title, CURIE and definition. */
+  /** One node's search entry: its title, CURIE, definition and type. */
   const buildSearchEntry = (
     uri: string,
     labels: LangMap | undefined,
     definitions: LangMap | undefined,
     typename: string,
+    type: string,
   ): SearchEntry => ({
     uri,
     title: resolveTitle(labels, DEFAULT_LANG, uri, typename),
     curie: curieOf(uri),
     definition: resolveLabel(definitions, DEFAULT_LANG),
+    type,
   });
 
   // An instance of a hidden class is a value, never a search result; the
@@ -1065,23 +1080,52 @@ export const createExampleProvider = (
           entity.labels,
           entity.definitions,
           entity.typename,
+          entity.type,
         ),
       ),
+    // A class is counted under the type its `_meta.type` names.
     ...dataset.classes.map((cls) =>
-      buildSearchEntry(cls.uri, cls.labels, cls.definitions, "OntologyClass"),
+      buildSearchEntry(
+        cls.uri,
+        cls.labels,
+        cls.definitions,
+        "OntologyClass",
+        classByUri.has(META_CLASS_URI) ? META_CLASS_URI : cls.uri,
+      ),
     ),
   ];
-
   /**
-   * Build one page of ranked IRIs as a `NodeConnection`, each node resolved
-   * as `node(id:)` resolves it.
+   * Answer one search: rank the entries for the text, keep the types asked
+   * for, page the rest as every connection is paged, and resolve each
+   * result's node beside its match; count the matches by type before the
+   * types filter, so a facet's count is the total its filter would show.
    */
-  const buildSearchView = (
-    uris: readonly string[],
-    args: ConnectionArgs,
-  ): View => {
-    const page = sliceConnection(uris, (uri) => uri, args);
-    return buildNodeConnectionView(buildNodeEdges(page.items), page);
+  const buildSearchView = (args: SearchArgs): View => {
+    const needle = args.text.trim().toLowerCase();
+    const matches = rankSearchEntries(searchEntries, args.text);
+    const types = new Set((args.types ?? []).map(expandUri));
+    const kept =
+      types.size === 0
+        ? matches
+        : matches.filter((match) => types.has(match.type));
+    const page = sliceConnection(kept, (match) => match.uri, args);
+    // Every entry is a visible instance or a class, so `node` resolves for
+    // each; `SearchEdge.node` is non-null and would reject one that did not.
+    const edges = page.items.map((match) => ({
+      node: resolveNode(match.uri),
+      cursor: toCursor(match.uri),
+      match: {
+        field: SEARCH_MATCH_FIELDS[match.tier],
+        ...buildSearchPassage(match.value, needle),
+      },
+    }));
+    return {
+      ...buildNodeConnectionView(edges, page),
+      total: kept.length,
+      facets: countTypeFacets(matches.map((match) => match.type)).map(
+        ({ type, count }) => ({ type: nullableClassView(type), count }),
+      ),
+    };
   };
 
   /** Expand the prefixed convenience form (`"metro:Station"`) to an absolute IRI. */
@@ -1314,8 +1358,7 @@ export const createExampleProvider = (
       return prose === undefined ? null : buildProseView(prose);
     },
     classEdges: () => classEdges,
-    search: (args: SearchArgs) =>
-      buildSearchView(rankSearchEntries(searchEntries, args.text), args),
+    search: (args: SearchArgs) => buildSearchView(args),
     source: (args: { uri: string }) => {
       const record =
         recordByUri.get(args.uri)?.entity ?? classByUri.get(args.uri);

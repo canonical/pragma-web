@@ -11,7 +11,9 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 import { Message, useMessages } from "../../i18n/index.js";
+import { CommandPaletteJump } from "../CommandPaletteJump/index.js";
 import { CommandPaletteSearch } from "../CommandPaletteSearch/index.js";
+import { NO_DESTINATIONS } from "./constants.js";
 import useBackdropClose from "./hooks/useBackdropClose.js";
 import useOpenShortcut from "./hooks/useOpenShortcut.js";
 import type { CommandPaletteProps } from "./types.js";
@@ -49,6 +51,13 @@ const componentCssClassName = "ds command-palette";
  * closes, since the platform tells of a closing only in a later task,
  * which a quick reopening can come before.
  *
+ * Given `searchHref`, the search ends with a line handing the text to the
+ * site's search page, and Enter with a text and no result highlighted
+ * opens that page. Without it, the site's provider serves no search: the
+ * palette reads "Jump to", sends no query, and its field narrows the
+ * site's `destinations` (its places and the pages read before) on the
+ * client; nothing in it says search is missing.
+ *
  * Mount it once, inside the site's providers: the Relay environment, whose
  * provider serves the search extension; the router; the homes; and the
  * projection link provider.
@@ -64,6 +73,8 @@ const componentCssClassName = "ds command-palette";
  *   pointer's gesture on it, and focuses a failure's line.
  */
 export default function CommandPalette({
+  searchHref,
+  destinations = NO_DESTINATIONS,
   className,
   onClick,
   onPointerDown,
@@ -73,19 +84,22 @@ export default function CommandPalette({
   const t = useMessages();
   const dialog = useRef<HTMLDialogElement>(null);
   const [session, setSession] = useState(0);
+  const [carriedText, setCarriedText] = useState("");
   const [failed, setFailed] = useState(false);
   const [highlightDisabled, setHighlightDisabled] = useState(false);
 
   /**
-   * Start the opening's session: a new, empty search, and a cleared
+   * Start the opening's session: a new search, holding the text the chord
+   * carried from the page's search field, and a cleared
    * failure. It is rendered at once, before the dialog opens, so the
    * dialog's focusing steps find the new session's field.
    *
    * @note Impure: sets the session and renders it synchronously.
    */
-  const startSession = useCallback((): void => {
+  const startSession = useCallback((text: string): void => {
     flushSync(() => {
       setSession((current) => current + 1);
+      setCarriedText(text);
     });
   }, []);
   useOpenShortcut({ dialog, onOpen: startSession });
@@ -120,7 +134,9 @@ export default function CommandPalette({
   return (
     <Modal
       {...props}
-      aria-label={t("palette.label")}
+      aria-label={t(
+        searchHref === undefined ? "palette.jumpTo" : "palette.label",
+      )}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       onClick={backdrop.onClick}
       onPointerDown={backdrop.onPointerDown}
@@ -141,14 +157,25 @@ export default function CommandPalette({
           }
           resetKey={session}
         >
-          <Suspense fallback={null}>
-            <CommandPaletteSearch
+          {searchHref === undefined ? (
+            <CommandPaletteJump
+              destinations={destinations}
+              initialText={carriedText}
               key={session}
               onChoose={close}
-              onHighlight={setHighlightDisabled}
-              session={session}
             />
-          </Suspense>
+          ) : (
+            <Suspense fallback={null}>
+              <CommandPaletteSearch
+                initialText={carriedText}
+                key={session}
+                onChoose={close}
+                onHighlight={setHighlightDisabled}
+                searchHref={searchHref}
+                session={session}
+              />
+            </Suspense>
+          )}
         </ErrorBoundary>
       </ClientOnly>
       <div className="hints">

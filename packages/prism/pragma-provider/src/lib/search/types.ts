@@ -15,6 +15,11 @@ export interface SearchEntry {
   readonly curie: string;
   /** `_meta.definition` in the default language, or null when it has none. */
   readonly definition: string | null;
+  /**
+   * The IRI of the type the entry is counted under: `_meta.type`'s, the
+   * most specific class of an instance and owl:Class for a class.
+   */
+  readonly type: string;
 }
 
 /** Every node `node(id:)` resolves, as search entries, in no set order. */
@@ -26,10 +31,33 @@ export interface SearchMatch {
   readonly uri: string;
   /** The field that matched, as its place in `SEARCH_FIELDS`. */
   readonly tier: number;
-  /** Where in that field the text starts, lowercased. */
+  /** Where in that field's value, as written, the text starts. */
   readonly position: number;
+  /** The value of the field that matched, as the entry holds it. */
+  readonly value: string;
   /** The entry's title, which breaks ties between equal matches. */
   readonly title: string;
+  /** The IRI of the type the entry is counted under. */
+  readonly type: string;
+}
+
+/** A search match's passage and where the text occurs in it. */
+export interface SearchPassage {
+  /** At most `SEARCH_PASSAGE_LENGTH` code units of the matched value. */
+  readonly passage: string;
+  /** Every occurrence of the text lying wholly inside the passage. */
+  readonly ranges: readonly {
+    readonly start: number;
+    readonly length: number;
+  }[];
+}
+
+/** The number of search matches of one type. */
+export interface TypeCount {
+  /** The type's IRI. */
+  readonly type: string;
+  /** Its matches. */
+  readonly count: number;
 }
 
 /** What the search index is built from. */

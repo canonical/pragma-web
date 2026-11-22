@@ -41,6 +41,7 @@ const EXTERNAL_TOKENS = [
   "--card-content-padding-inline",
   "--color-background",
   "--color-border",
+  "--color-border-muted",
   "--color-focus-ring",
   "--color-text",
   "--color-text-error",
@@ -49,6 +50,7 @@ const EXTERNAL_TOKENS = [
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-font-size",
   "--typography-text-primary-line-height",
+  "--typography-text-secondary-font-size",
 ];
 
 /**

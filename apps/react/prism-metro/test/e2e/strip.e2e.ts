@@ -64,6 +64,9 @@ const ADDRESS_PATTERN = /^[a-z][\w-]*:/;
 /** A station's page. */
 const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
 
+/** The search page for a text that matches two or more types. */
+const SEARCH_PATH = "/search?q=the";
+
 /** The pages whose strip is measured. */
 const STRIP_PATHS = [
   "/stations",
@@ -78,6 +81,7 @@ const STRIP_PATHS = [
   `/network/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`,
   WORKSPACE_PATH,
   "/not-found",
+  SEARCH_PATH,
 ] as const;
 
 /** The stations index with "Line is Circle Line" applied. */
@@ -216,6 +220,31 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
         path,
       ).toEqual([]);
       expect(strip.viewHrefs, path).toEqual([]);
+    }
+  });
+
+  it("keeps the search page's Type facet out of the strip, its bar unscrolled (W8-A6)", async () => {
+    const page = await open(SEARCH_PATH);
+    try {
+      const found = await page.evaluate(() => {
+        const bar = document.querySelector<HTMLElement>(
+          ".ds.filter-bar:has(.ds.type-facet-bar)",
+        );
+        return {
+          inStrip: document.querySelectorAll(
+            ".ds.mode-strip .ds.type-facet-bar, .ds.mode-strip .ds.filter-bar",
+          ).length,
+          bar:
+            bar === null
+              ? null
+              : { scroll: bar.scrollHeight, client: bar.clientHeight },
+        };
+      });
+      expect(found.inStrip).toBe(0);
+      expect(found.bar).not.toBeNull();
+      expect(found.bar?.scroll).toBe(found.bar?.client);
+    } finally {
+      await page.close();
     }
   });
 

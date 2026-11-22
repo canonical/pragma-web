@@ -159,4 +159,19 @@ export const MESSAGES = {
     other: "{count} stations",
   },
   "notFound.title": "Page not found",
+  "search.title": "Search",
+  "search.results": { one: "{count} result", other: "{count} results" },
+  "search.none": "Nothing matches “{text}”.",
+  "search.loading": "Searching…",
+  "search.error": "The search could not be answered. Try again in a moment.",
+  "search.placeholder": "Search the graph",
+  "search.position": "{first}–{last} of {total}",
+  "search.limit":
+    "Only the first {count} results are listed: add a word or apply a type to narrow them.",
+  "search.empty": "Type a word in the search field to search every lens.",
+  "search.doors": "Lenses to browse",
+  "search.spelling":
+    "Check the spelling, or search for a shorter part of the word.",
+  "search.definitions": "Browse the Definitions, where every type is listed.",
+  "search.palette": "Or open the palette with Ctrl K to jump to a page.",
 } as const;

@@ -1,0 +1,87 @@
+// Scaffolded by @canonical/summon-component:react v0.46.0
+
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { MESSAGES } from "../../i18n/index.js";
+import SearchForm from "./SearchForm.js";
+
+describe("SearchForm", () => {
+  it("is a GET form whose field, named q, carries the text", () => {
+    render(<SearchForm placeholder="Search the graph" text="but" />);
+    const form = screen.getByRole("form", {
+      name: MESSAGES["searchForm.label"],
+    });
+    expect(form.getAttribute("method")).toBe("get");
+    const field = screen.getByRole("searchbox", {
+      name: MESSAGES["searchForm.field"],
+    });
+    expect(field).toHaveValue("but");
+    expect(field.getAttribute("name")).toBe("q");
+    expect(
+      screen.getByRole("button", { name: MESSAGES["searchForm.submit"] }),
+    ).toBeInTheDocument();
+  });
+
+  it("focuses the field on /, unless the focus is in a text entry", () => {
+    render(<SearchForm placeholder="Search the graph" text="" />);
+    const field = screen.getByRole("searchbox");
+    expect(fireEvent.keyDown(document, { key: "/", ctrlKey: true })).toBe(true);
+    expect(field).not.toHaveFocus();
+    expect(fireEvent.keyDown(document.body, { key: "/" })).toBe(false);
+    expect(field).toHaveFocus();
+    const other = document.createElement("textarea");
+    document.body.append(other);
+    other.focus();
+    expect(fireEvent.keyDown(other, { key: "/" })).toBe(true);
+    expect(other).toHaveFocus();
+    other.remove();
+  });
+
+  it("clears the field on Escape, then leaves it", () => {
+    render(<SearchForm placeholder="Search the graph" text="but" />);
+    const field = screen.getByRole("searchbox");
+    field.focus();
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(field).toHaveValue("");
+    expect(field).toHaveFocus();
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(field).not.toHaveFocus();
+  });
+
+  it("leaves every other key, and an Escape an input method composes, to the field", () => {
+    render(<SearchForm placeholder="Search the graph" text="but" />);
+    const field = screen.getByRole("searchbox");
+    field.focus();
+    expect(fireEvent.keyDown(field, { key: "a" })).toBe(true);
+    expect(fireEvent.keyDown(field, { key: "Escape", isComposing: true })).toBe(
+      true,
+    );
+    expect(field).toHaveValue("but");
+    expect(field).toHaveFocus();
+  });
+
+  it("applies custom className", () => {
+    render(
+      <SearchForm
+        className="custom-class"
+        placeholder="Search the graph"
+        text=""
+      />,
+    );
+    const form = screen.getByRole("form", {
+      name: MESSAGES["searchForm.label"],
+    });
+    expect(form.className).toBe("ds search-form custom-class");
+  });
+
+  it("passes through additional props", () => {
+    render(
+      <SearchForm
+        data-testid="test-component"
+        placeholder="Search the graph"
+        text=""
+      />,
+    );
+    expect(screen.getByTestId("test-component")).toBeInTheDocument();
+  });
+});

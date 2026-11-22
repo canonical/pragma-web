@@ -1,0 +1,32 @@
+/* Scaffolded by @canonical/summon-component:react v0.46.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* One muted line without the paragraph's margins, cut with an ellipsis
+   * when narrower than its text. */
+  .ds.search-passage {
+    --search-passage-color: var(--color-text-muted);
+    --search-passage-match-color: var(--color-text);
+    --search-passage-match-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+    /* A match drops the user agent's highlight: its text colour and
+     * weight carry it, legible in both themes. */
+    --search-passage-match-background: transparent;
+
+    color: var(--search-passage-color);
+    margin-block-start: 0;
+    margin-block-end: 0;
+    overflow-x: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* A run that holds the text. */
+  .ds.search-passage .match {
+    color: var(--search-passage-match-color);
+    font-weight: var(--search-passage-match-font-weight);
+    background-color: var(--search-passage-match-background);
+  }
+}

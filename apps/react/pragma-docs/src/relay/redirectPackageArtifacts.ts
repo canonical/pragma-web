@@ -34,8 +34,8 @@ function isInside(path: string, directory: string): boolean {
 /**
  * A Vite plugin that runs the packages the app compiles on the app's own
  * Relay compile. The app's `relay.config.json` lists, beside the app's own
- * `src`, the source directories of the lens and projection packages it
- * renders, all compiled by the app's project against the app's schema.
+ * `src`, the source directories of the lens, projection and command
+ * palette packages it renders, all compiled by the app's project against the app's schema.
  * When a module under one of those directories imports one of its
  * package's own artifacts, the plugin resolves the import to the artifact
  * of the same name the app's compile wrote, so the package's queries fetch

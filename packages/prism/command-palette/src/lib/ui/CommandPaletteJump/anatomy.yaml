@@ -1,0 +1,132 @@
+---
+# CommandPaletteJump — the palette on a site whose provider serves no
+# search: a field that narrows the site's own destinations on the client,
+# and nothing that says search is missing. It is the ARIA combobox pattern
+# with a listbox popup, as the palette's search is: the field is the
+# combobox and keeps the focus; the arrow keys move the highlighted option
+# of the listbox it controls (aria-activedescendant), wrapping at both
+# ends, from none to the first (down) or the last (up); typing highlights
+# none; Enter follows the highlighted option's link, and with none
+# highlighted does nothing; a pointer moving over an option highlights it.
+# Escape is the dialog's.
+# Slot order: query; then the results (each group a heading, then its
+# options) or, in their place, one status line. The two never render
+# together.
+#
+# The destinations are the site's, handed in by its shell: its places (the
+# home of each lens, in rail order) and the pages read before,
+# latest first. The field's text, trimmed, keeps those whose label holds
+# it, ignoring case; the groups keep their order and an emptied group is
+# not shown. It sends no query: the package's search operation is never
+# run in this mode.
+#
+# Each option holds one link, the site's router link, out of the tab
+# order: the field keeps the focus and Enter follows the highlighted
+# option's link (cs:react.component.link_component).
+#
+# Every decision is read through a component token declared on the root
+# (`--command-palette-jump-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind):
+#   --command-palette-jump-rule-width: 1px   stroke thickness.
+#   --command-palette-jump-focus-ring-width: 2px,
+#   --command-palette-jump-focus-ring-offset: -2px
+#     the field's and the highlighted option's ring, drawn inside, since
+#     the dialog clips.
+#   transparent, inherit: keywords, written raw. The field takes the
+#     dialog's surface and the palette's text; they are no design decision.
+#   space.300 (24px) for the line height: the matrix's line.
+#
+# Roster namespaces (accepted and tracked): component.padding.block,
+# component.padding.inline, space.300 (a line height),
+# typography.text.primary.fontSize and
+# typography.text.primary.smallcaps.letter.spacing.
+node:
+  uri: prism.component.command_palette_jump
+  styles:
+    layout.type: flex
+    layout.direction: column
+    layout.flex.grow: 1
+    layout.flex.shrink: 1
+    size.min.block: 0
+    typography.size: typography.text.primary.fontSize
+    typography.lineHeight: space.300
+  edges:
+    - node:
+        role: query
+        styles:
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.width: 1px
+          appearance.border.style: "none none solid"
+          appearance.border.bottom.color: color.border.muted
+          appearance.background: transparent
+          typography.color: inherit
+          typography.fontFamily: inherit
+          typography.size: inherit
+          typography.lineHeight: inherit
+          appearance.outline.width@focus: 2px
+          appearance.outline.style@focus: solid
+          appearance.outline.color@focus: color.focusRing
+          appearance.outline.offset@focus: -2px
+      relation: { cardinality: "1", slotName: query }
+    - node:
+        role: results
+        styles:
+          layout.flex.grow: 1
+          layout.flex.shrink: 1
+          size.min.block: 0
+          layout.overflow.block: auto
+          spacing.internal.block.end: component.padding.block
+        edges:
+          - node:
+              role: group
+              styles:
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+              edges:
+                - node:
+                    role: heading
+                    styles:
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                      typography.color: color.text.muted
+                      typography.variant.caps: all-small-caps
+                      typography.letterSpacing: typography.text.primary.smallcaps.letter.spacing
+                  relation: { cardinality: "1", slotName: heading }
+                - node:
+                    role: option
+                    styles:
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.block.end: component.padding.block
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                    edges:
+                      - node:
+                          role: link to the destination, the site's router link
+                        relation: { cardinality: "1", slotName: link }
+                  relation: { cardinality: "1..*", slotName: option }
+                - node:
+                    role: option, highlighted (.is-active)
+                    styles:
+                      appearance.outline.width: 2px
+                      appearance.outline.style: solid
+                      appearance.outline.color: color.focusRing
+                      appearance.outline.offset: -2px
+                  relation: { cardinality: "0..1", slotName: option }
+            relation: { cardinality: "1..*", slotName: group }
+      relation: { cardinality: "0..1", slotName: results }
+    - node:
+        role: status
+        styles:
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: status }

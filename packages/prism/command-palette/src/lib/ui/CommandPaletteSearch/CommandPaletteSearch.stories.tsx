@@ -15,7 +15,7 @@ import Component from "./CommandPaletteSearch.js";
 /** The story's mock environment, answering every search with `nodes`. */
 const answerWith = (nodes: readonly NodePayload[]): RelayParameters => ({
   mockResolvers: {
-    NodeConnection: () => ({ edges: nodes.map((node) => ({ node })) }),
+    SearchConnection: () => ({ edges: nodes.map((node) => ({ node })) }),
   },
 });
 

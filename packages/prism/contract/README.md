@@ -185,6 +185,16 @@ beside `source`, their types in `LIST_EXTENSION_TYPES_SDL`:
   each value counted with every filter but its own field's, a null value
   counting the nodes with none.
 
+A third, `search`, is opt-in: a site offers its search page, its rail
+entry and the palette's hand-off only where the provider serves it.
+
+- `Query.search(text, first, after, types): SearchConnection!`: every
+  node whose text contains `text`, ignoring case, ranked, each edge with
+  its `node` and a `match` (the field, a passage of at most 160
+  characters around the first occurrence, and the occurrences' ranges);
+  `total` counts the matches after `types`, `facets` counts them by type
+  before it, so a facet's count is the total its filter would show.
+
 `serveNodeValues` and `serveFacetedInstances` answer both through the
 provider's own schema, and `readNodeValues` formats the cells, so every
 provider serves the same values.

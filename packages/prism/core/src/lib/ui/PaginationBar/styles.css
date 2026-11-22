@@ -1,0 +1,27 @@
+/* Scaffolded by @canonical/summon-component:react v0.46.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* One line: the previous link, the position, the next link, one gutter
+   * apart and pushed to the two ends. */
+  .ds.pagination-bar {
+    --pagination-bar-gap: var(--grid-gutter);
+    --pagination-bar-padding-block: var(--component-padding-block);
+    --pagination-bar-position-color: var(--color-text-muted);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pagination-bar-gap);
+    padding-block: var(--pagination-bar-padding-block);
+  }
+
+  /* The position, muted, its numerals of one width; centred when an end
+   * is missing. */
+  .ds.pagination-bar .position {
+    margin-inline: auto;
+    color: var(--pagination-bar-position-color);
+    font-variant-numeric: tabular-nums;
+  }
+}

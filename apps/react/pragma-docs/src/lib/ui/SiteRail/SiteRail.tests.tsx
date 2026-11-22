@@ -21,7 +21,7 @@ const renderSiteRail = (props: SiteRailProps = {}) =>
   );
 
 describe("SiteRail", () => {
-  it("lists the lenses the router's table declares, in rail order", () => {
+  it("lists Search, then the lenses the router's table declares, in rail order (W8-A1)", () => {
     renderSiteRail();
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(
@@ -29,6 +29,7 @@ describe("SiteRail", () => {
         (label) => label.textContent,
       ),
     ).toEqual([
+      "Search",
       "Home",
       "Components",
       "Definitions",

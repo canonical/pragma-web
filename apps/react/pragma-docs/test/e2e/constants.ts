@@ -13,6 +13,13 @@ export const PREVIEW_READY_MS = 90_000;
 /** How long a page may take to settle once it is requested. */
 export const PAGE_SETTLE_MS = 30_000;
 
+/**
+ * How long the palette may take to give its field the focus back after a
+ * click in its preview: it reads the selection in the task after the
+ * click, once the browser has collapsed a selection the click landed in.
+ */
+export const FOCUS_SETTLE_MS = 5_000;
+
 /** A page on the workspace archetype: the Definitions explorer. */
 export const WORKSPACE_PATH = "/definitions";
 
@@ -199,3 +206,12 @@ export const MIN_SCREEN_TEXT_PX = 12;
  * user units: the node's 1px border and its 8px inset.
  */
 export const GRAPH_NODE_TEXT_INSET = 9;
+
+/** The desktop viewport the palette's and the search page's cases run at. */
+export const DESKTOP_VIEWPORT = { width: 1440, height: 900 } as const;
+
+/** A phone's viewport, below two groups: the strip folds its filters. */
+export const PHONE_VIEWPORT = { width: 390, height: 844 } as const;
+
+/** A text whose results span two or more types, so the facet bar shows. */
+export const SEARCH_MIXED_TEXT = "but";

@@ -4,8 +4,11 @@ import type { MouseEventHandler, PointerEventHandler, RefObject } from "react";
 export type UseOpenShortcutProps = {
   /** The palette's dialog, which the chord opens. */
   readonly dialog: RefObject<HTMLDialogElement | null>;
-  /** Called on the chord, just before the closed dialog opens. */
-  readonly onOpen: () => void;
+  /**
+   * Called on the chord, just before the closed dialog opens, with the
+   * text it carries: the page's search field's, when the focus is in one.
+   */
+  readonly onOpen: (text: string) => void;
 };
 
 /** What `useOpenShortcut` returns: nothing; it only listens. */

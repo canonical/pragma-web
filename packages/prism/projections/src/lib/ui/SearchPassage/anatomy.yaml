@@ -1,0 +1,28 @@
+---
+# SearchPassage — the passage of a search result that holds the text: one
+# muted line of at most 160 characters (the provider cuts it), each range
+# of the text in it marked: in the text colour and bold, no background. Its overflow is cut with an ellipsis.
+#
+# Every decision is read through a component token declared on the root
+# (`--search-passage-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   --search-passage-match-background: transparent  a match drops the
+#     user agent's highlight, so its text stays legible in both themes.
+node:
+  uri: prism.component.search_passage
+  styles:
+    typography.color: color.text.muted
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+    layout.overflow.inline: clip
+    typography.overflow: ellipsis
+    typography.whiteSpace: nowrap
+  edges:
+    - node:
+        role: match
+        styles:
+          typography.color: color.text
+          typography.weight: typography.text.primary.bold.fontWeight
+          appearance.background: transparent
+      relation: { cardinality: "0..*", slotName: match }

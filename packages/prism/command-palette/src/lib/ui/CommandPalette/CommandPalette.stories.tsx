@@ -7,13 +7,17 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { withPaletteSite } from "../../../../.storybook/decorators/index.js";
-import { RANKED_RESULTS } from "../../../../testing/fixtures.js";
+import {
+  COMPONENT_HREF,
+  RANKED_RESULTS,
+  SEARCH_HREF,
+} from "../../../../testing/fixtures.js";
 import Component from "./CommandPalette.js";
 
 /** The story's mock environment, answering every search with the ranking. */
 const answerWithRanking: RelayParameters = {
   mockResolvers: {
-    NodeConnection: () => ({
+    SearchConnection: () => ({
       edges: RANKED_RESULTS.map((node) => ({ node })),
     }),
   },
@@ -25,6 +29,7 @@ const meta: Meta<typeof Component> = {
   tags: ["autodocs"],
   decorators: [withPaletteSite(), withRelayEnvironment],
   parameters: { relay: answerWithRanking },
+  args: { searchHref: SEARCH_HREF },
 };
 
 export default meta;
@@ -53,5 +58,26 @@ export const Open: Story = {
     await expect(
       await within(dialog).findAllByRole("option", { selected: true }),
     ).toHaveLength(1);
+  },
+};
+
+/**
+ * A site whose provider serves no search: the palette reads "Jump to" and
+ * its field narrows the site's own destinations, sending no query.
+ */
+export const JumpTo: Story = {
+  args: {
+    searchHref: undefined,
+    destinations: {
+      places: [{ label: "Components", href: COMPONENT_HREF }],
+      recent: [{ label: "Layout switcher", href: COMPONENT_HREF }],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    const field = await body.findByRole("combobox", { hidden: true });
+    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.type(field, "comp");
+    await expect(body.getAllByRole("option")).toHaveLength(1);
   },
 };

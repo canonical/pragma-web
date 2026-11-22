@@ -15,11 +15,18 @@ import {
   GRAPHQL_PATH,
 } from "@canonical/prism-graph-example";
 import { DEFAULT_GRAPHQL_URL } from "#relay";
+import { SEARCH_OFF } from "../constants.js";
+import readSearchSetting from "../readSearchSetting.js";
 
 const defaultUrl = new URL(DEFAULT_GRAPHQL_URL);
 const port = Number(process.env.GRAPH_PORT) || Number(defaultUrl.port);
 const endpoint = `http://${defaultUrl.hostname}:${port}${GRAPHQL_PATH}`;
-const handler = createExampleHandler(createExampleProvider(), { endpoint });
+const handler = createExampleHandler(
+  createExampleProvider(undefined, undefined, {
+    search: readSearchSetting() !== SEARCH_OFF,
+  }),
+  { endpoint },
+);
 
 Bun.serve({
   hostname: defaultUrl.hostname,

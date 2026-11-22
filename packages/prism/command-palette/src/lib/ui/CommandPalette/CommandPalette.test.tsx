@@ -16,12 +16,16 @@ import createSiteTree from "../../../../testing/createSiteTree.js";
 import {
   COMPONENT_HREF,
   RANKED_RESULTS,
+  SEARCH_HREF,
   STATION_NODE,
 } from "../../../../testing/fixtures.js";
 import CommandPalette from "./CommandPalette.js";
 import type { CommandPaletteProps } from "./types.js";
 
-/** Render the palette under the site's providers. */
+/**
+ * Render the palette under the site's providers, given the search page's
+ * address unless `props` says otherwise.
+ */
 const renderPalette = (props: CommandPaletteProps = {}) => {
   const environment = createSearchEnvironment();
   const router = createSiteRouter();
@@ -29,7 +33,7 @@ const renderPalette = (props: CommandPaletteProps = {}) => {
     createSiteTree({
       environment,
       router,
-      children: <CommandPalette {...props} />,
+      children: <CommandPalette searchHref={SEARCH_HREF} {...props} />,
     }),
   );
   return { ...view, environment, router };
@@ -85,6 +89,20 @@ describe("CommandPalette", () => {
     expect(screen.getByRole("combobox")).toHaveFocus();
   });
 
+  it("carries the text of the page's search field Ctrl+K is pressed in", () => {
+    const { environment } = renderPalette();
+    const field = document.createElement("input");
+    field.type = "search";
+    field.value = "lay";
+    document.body.append(field);
+    field.focus();
+    open();
+    field.remove();
+    expect(
+      environment.mock.getAllOperations().at(0)?.request.variables,
+    ).toMatchObject({ text: "lay", searching: true });
+  });
+
   it("opens empty after it closes, and tells the consumer it closed", async () => {
     const onClose = vi.fn();
     const { environment } = renderPalette({ onClose });
@@ -133,6 +151,9 @@ describe("CommandPalette", () => {
       );
     });
     expect(readHints()).toEqual(["↑ ↓ to move", "↵ to open", "Esc to close"]);
+    // Up from none reaches the hand-off line, the last stop; up again, the
+    // last result.
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowUp" });
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowUp" });
     expect(screen.getByRole("option", { selected: true })).toHaveAttribute(
       "aria-disabled",
@@ -150,6 +171,7 @@ describe("CommandPalette", () => {
     await act(async () => {
       environment.mock.resolveMostRecentOperation(answerSearch(RANKED_RESULTS));
     });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown" });
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
     expect(findDialog().open).toBe(false);
     await waitFor(() => {
@@ -164,6 +186,7 @@ describe("CommandPalette", () => {
     await act(async () => {
       environment.mock.resolveMostRecentOperation(answerSearch(RANKED_RESULTS));
     });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown" });
     fireEvent.click(
       within(screen.getByRole("region", { name: "Preview" })).getByRole("link"),
     );
@@ -248,5 +271,54 @@ describe("CommandPalette", () => {
       "ds modal ds command-palette custom-class",
     );
     expect(findDialog()).toHaveAttribute("id", "palette");
+  });
+
+  describe("without the search page's address", () => {
+    /** The site's destinations, as a shell hands them. */
+    const destinations = {
+      places: [{ label: "Components", href: COMPONENT_HREF }],
+      recent: [{ label: "Layout", href: "/shelves/ds%3ALayout" }],
+    };
+
+    it("reads Jump to and sends no search request as the reader types", () => {
+      const { environment } = renderPalette({
+        searchHref: undefined,
+        destinations,
+      });
+      expect(findDialog()).toHaveAttribute("aria-label", "Jump to");
+      open();
+      expect(screen.getByRole("combobox", { name: "Jump to" })).toHaveFocus();
+      type("comp");
+      expect(
+        screen.getAllByRole("option").map((option) => option.textContent),
+      ).toEqual(["Components"]);
+      expect(environment.mock.getAllOperations()).toHaveLength(0);
+      expect(findDialog().querySelector(".handoff")).toBeNull();
+      expect(findDialog().textContent).not.toMatch(/search/i);
+    });
+
+    it("carries the page's text in, and closes on a followed destination", async () => {
+      const { router } = renderPalette({ searchHref: undefined, destinations });
+      const field = document.createElement("input");
+      field.type = "search";
+      field.value = "comp";
+      document.body.append(field);
+      field.focus();
+      open();
+      field.remove();
+      expect(screen.getByRole("combobox")).toHaveValue("comp");
+      fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown" });
+      fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+      expect(findDialog().open).toBe(false);
+      await waitFor(() => {
+        expect(router.getState().location.pathname).toBe(COMPONENT_HREF);
+      });
+    });
+
+    it("lists nothing when the site hands it no destinations", () => {
+      renderPalette({ searchHref: undefined });
+      open();
+      expect(screen.queryByRole("option")).toBeNull();
+    });
   });
 });

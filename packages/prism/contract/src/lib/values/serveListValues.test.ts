@@ -45,7 +45,13 @@ const KINDS: Readonly<Record<string, string>> = {
   "ex:d": "Interchange",
 };
 
-/** Answers the four queries over two stations, an unknown node or class as null. */
+/** The most instances the mock answers a page, as a provider caps its pages. */
+const PAGE_CAP = 3;
+
+/**
+ * Answers the four queries over the stations, the instances by pages of
+ * `PAGE_CAP`, an unknown node or class as null.
+ */
 const run: RunQuery = async (source, variables) => {
   const id = String(variables.id ?? variables.uri);
   if (source === NODE_FIELDS_QUERY) {
@@ -65,10 +71,16 @@ const run: RunQuery = async (source, variables) => {
   }
   if (source === CLASS_INSTANCES_QUERY) {
     expect(variables.first).toBe(4);
+    const from = Number(variables.after ?? 0);
+    const uris = Object.keys(STATIONS).slice(from, from + PAGE_CAP);
     return {
       ontologyClass: {
         instances: {
-          edges: Object.keys(STATIONS).map((uri) => ({
+          pageInfo: {
+            hasNextPage: from + uris.length < Object.keys(STATIONS).length,
+            endCursor: String(from + uris.length),
+          },
+          edges: uris.map((uri) => ({
             node: {
               uri,
               __typename: "Station",
@@ -150,6 +162,14 @@ describe("serveFacetedInstances", () => {
       sort: { field: "platformCount" },
     });
     expect(selection.uris).toEqual(["ex:b", "ex:c", "ex:a", "ex:d"]);
+  });
+
+  it("reads every instance across the provider's pages", async () => {
+    const selection = await serveFacetedInstances(run, SDL, {
+      classUri: "ex:Station",
+    });
+    expect(selection.totalCount).toBe(4);
+    expect(selection.uris).toEqual(["ex:a", "ex:b", "ex:c", "ex:d"]);
   });
 
   it("answers an empty set for an unknown class", async () => {

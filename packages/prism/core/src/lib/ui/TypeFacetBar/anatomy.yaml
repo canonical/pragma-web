@@ -1,0 +1,83 @@
+---
+# TypeFacetBar — the Type facet of an index of mixed types: the content of
+# the facet bar under the strip (FilterBar holds the band: the strip's
+# height, one muted rule beneath) and of the filter sheet below it. Its
+# label, then one value per type: the type's name and its count. A value
+# with results is a link that applies the type; the applied one is marked
+# current (its value carries the `current` modifier, its link
+# `aria-current`) and drawn bold, and its link releases it. A value with
+# none is greyed and is not a link. When a type is applied, a chip naming
+# it closes the facet in the filter sheet; pressing it releases the type.
+# The facet bar holds one line and leaves the chip out: its bold value
+# says which type is applied.
+#
+# Every decision is read through a component token declared on the root
+# (`--type-facet-bar-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   --type-facet-bar-chip-border-width: 1px  the hairline around the chip.
+node:
+  uri: prism.component.type_facet_bar
+  styles:
+    layout.type: flex
+    layout.wrap: wrap
+    layout.align: center
+    spacing.gap: grid.gutter
+    size.min.width: 0
+  edges:
+    - node:
+        role: label
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: label }
+    - node:
+        role: values
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: grid.gutter
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+        edges:
+          - node:
+              role: value
+              styles:
+                typography.whiteSpace: nowrap
+              edges:
+                - node:
+                    role: name
+                  relation: { cardinality: "1", slotName: name }
+                - node:
+                    role: count
+                    styles:
+                      typography.color: color.text.muted
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "1", slotName: count }
+            relation: { cardinality: "1..*", slotName: value }
+          - node:
+              role: current value
+              styles:
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "0..1", slotName: current }
+      relation: { cardinality: "1", slotName: values }
+    - node:
+        role: zero value
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: zero }
+    - node:
+        role: chip
+        styles:
+          typography.whiteSpace: nowrap
+          spacing.internal.block.start: space.050
+          spacing.internal.block.end: space.050
+          spacing.internal.inline.start: space.100
+          spacing.internal.inline.end: space.100
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.color: color.border.muted
+          typography.color: color.text
+          typography.decoration: none
+      relation: { cardinality: "0..1", slotName: chip }

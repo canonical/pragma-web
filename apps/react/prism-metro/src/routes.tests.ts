@@ -2,7 +2,7 @@
 
 import { collectLenses } from "@canonical/prism-core";
 import { createRouter } from "@canonical/router-core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { HOME_LENS_MESSAGES } from "#domains/metro";
 import {
   CIRCLE_LINE_CURIE,
@@ -84,6 +84,21 @@ describe("appRoutes", () => {
   it("matches a formation's address to its page, not to a stock's", () => {
     const match = router.match("/fleet/formations/metro%3Aseries-90-six-car");
     expect(match?.kind === "route" && match.name).toBe("fleetFormation");
+  });
+
+  it("lists the search page, since the site's provider serves search", () => {
+    expect(router.buildPath("search")).toBe("/search");
+  });
+
+  it("lists no search page when the metro is built with PRISM_SEARCH=off (W8-A2)", async () => {
+    vi.stubEnv("PRISM_SEARCH", "off");
+    vi.resetModules();
+    const { appRoutes: offRoutes } = await import("./routes.js");
+    vi.unstubAllEnvs();
+    expect("search" in offRoutes).toBe(false);
+    expect(Object.keys(offRoutes)).toEqual(
+      Object.keys(appRoutes).filter((name) => name !== "search"),
+    );
   });
 
   it("lands an unknown URL on the not-found route", () => {

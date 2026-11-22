@@ -1,7 +1,9 @@
 import {
+  type CollectedLens,
   collectLenses,
   Rail,
   type RailBrand,
+  SearchIcon,
   ThemeSelector,
 } from "@canonical/prism-core";
 import { useRouter } from "@canonical/router-react";
@@ -15,9 +17,26 @@ const METRO_BRAND: RailBrand = {
   to: "home",
 };
 
+/** The search route's name, which the rail's Search entry links to. */
+const SEARCH_ROUTE = "search";
+
 /**
- * The metro site's rail: the site brand, linked to the landing, every
- * lens the running router's table declares, in rail order, and the site's
+ * The rail's Search entry, ahead of every lens: present only when the
+ * route table holds the search route, which it does only when the site's
+ * provider serves the `search` extension.
+ */
+const SEARCH_ENTRY: CollectedLens = {
+  name: SEARCH_ROUTE,
+  label: MESSAGES["search.title"],
+  icon: SearchIcon,
+  order: 0,
+  tier: 1,
+};
+
+/**
+ * The metro site's rail: the site brand, linked to the landing, the
+ * Search entry when the table holds the search route, every lens the
+ * running router's table declares, in rail order, and the site's
  * utility cluster, which holds the theme control.
  *
  * It reads the table off the router rather than importing the app's routes,
@@ -31,7 +50,13 @@ export default function MetroRail(props: MetroRailProps): ReactElement {
   const router = useRouter();
   // Keyed on the route table, a stable reference for the router's lifetime,
   // so the walk and the invariants it enforces run once.
-  const entries = useMemo(() => collectLenses(router.routes), [router.routes]);
+  const entries = useMemo(
+    () =>
+      SEARCH_ROUTE in router.routes
+        ? [SEARCH_ENTRY, ...collectLenses(router.routes)]
+        : collectLenses(router.routes),
+    [router.routes],
+  );
   return (
     <Rail {...props} brand={METRO_BRAND} entries={entries}>
       <p className="utilities-label" id="rail-utilities-label">

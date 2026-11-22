@@ -14,6 +14,7 @@
  * therefore folded into the type or interface it extends, in the SDL's
  * order, and the blocks themselves are dropped; the rest of the SDL is
  * written as emitted.
+ * It writes the schema of the build without search beside it.
  */
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -22,6 +23,15 @@ import { createExampleProvider } from "@canonical/prism-graph-example";
 /** The file relay-compiler reads (`relay.config.json` → `schema`). */
 const SCHEMA_PATH = fileURLToPath(
   new URL("../relay/schema.graphql", import.meta.url),
+);
+
+/**
+ * The schema the provider serves with `PRISM_SEARCH=off`, without search:
+ * Relay compiles against the full schema in both builds, and a test pins
+ * the off build's extensions to this one.
+ */
+const NO_SEARCH_SCHEMA_PATH = fileURLToPath(
+  new URL("../../testing/schema.no-search.graphql", import.meta.url),
 );
 
 /** An `extend type` or `extend interface` block, its kind, name and fields. */
@@ -53,6 +63,19 @@ const foldExtensions = (sdl: string): string => {
   );
 };
 
-writeFileSync(SCHEMA_PATH, `${foldExtensions(createExampleProvider().sdl)}\n`);
+/**
+ * The schema file's text for `sdl`: its extensions folded, ending in one
+ * newline (leaving search out can leave a blank line at the end).
+ */
+const formatSchema = (sdl: string): string =>
+  `${foldExtensions(sdl).trimEnd()}\n`;
 
-console.info(`[schema] wrote ${SCHEMA_PATH}`);
+writeFileSync(SCHEMA_PATH, formatSchema(createExampleProvider().sdl));
+writeFileSync(
+  NO_SEARCH_SCHEMA_PATH,
+  formatSchema(
+    createExampleProvider(undefined, undefined, { search: false }).sdl,
+  ),
+);
+
+console.info(`[schema] wrote ${SCHEMA_PATH} and ${NO_SEARCH_SCHEMA_PATH}`);

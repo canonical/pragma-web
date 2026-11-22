@@ -1,0 +1,111 @@
+---
+# SearchPage — the search route's page, in the document archetype's
+# canvas, an index: its title (also the document's), then one of three states.
+# With a text that matches (the strip holds their count, and the facet bar
+# under it the Type facet while two or more types match): the results
+# grouped by type
+# (the prominent type first, then ascending count), each result through
+# the site's chip switch over the passage that holds the text, and the
+# pagination bar, 20 results a page, through the first 100 results (the
+# largest page a provider answers), the last such page saying so. With a text that matches nothing:
+# the no-match state, saying so and offering the next steps (the
+# spelling, the Definitions when the site has them, the palette). With no
+# text: what the field is for, and each lens as a door to its home with
+# the total of the class it lists (none where it lists no single class). It spans every column of the canvas's page grid; its parts
+# sit one gutter apart, and so do the groups, the doors and the hints.
+#
+# Every decision is read through a component token declared on the root
+# (`--search-page-*`), bound to the symbol named here.
+#
+# Token ledger: none.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: metro.component.search_page
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: page title
+      relation: { cardinality: "1", slotName: title }
+    - node:
+        role: what the field is for
+      relation: { cardinality: "0..1", slotName: summary }
+    - node:
+        role: results, grouped by type
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              uri: prism.component.search_result_group
+              edges:
+                - node:
+                    role: result, its inline chip over its passage
+                    edges:
+                      - node:
+                          uri: metro.component.metro_chip_projection
+                        relation: { cardinality: "1", slotName: node }
+                      - node:
+                          uri: prism.component.search_passage
+                        relation: { cardinality: "1", slotName: passage }
+                  relation: { cardinality: "1..*", slotName: result }
+            relation: { cardinality: "1..*", slotName: group }
+      relation: { cardinality: "0..1", slotName: results }
+    - node:
+        uri: prism.component.pagination_bar
+      relation: { cardinality: "0..1", slotName: pagination }
+    - node:
+        role: the line that ends the last page listed, the 100th result's, when more match
+      relation: { cardinality: "0..1", slotName: limit }
+    - node:
+        role: the no-match state
+        edges:
+          - node:
+              role: next steps
+              styles:
+                layout.type: flex
+                layout.direction: column
+                spacing.gap: grid.gutter
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+            relation: { cardinality: "1", slotName: hints }
+      relation: { cardinality: "0..1", slotName: none }
+    - node:
+        role: the lenses as doors
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: grid.gutter
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+        edges:
+          - node:
+              role: door, a link to the lens's home, with its class's total
+              styles:
+                layout.type: inline-flex
+                layout.align: center
+                spacing.gap: grid.gutter
+              edges:
+                - node:
+                    role: mark
+                  relation: { cardinality: "1", slotName: icon }
+                - node:
+                    role: name
+                  relation: { cardinality: "1", slotName: name }
+                - node:
+                    role: total of the class the lens lists, muted, in tabular figures
+                    styles:
+                      typography.color: color.text.muted
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "0..1", slotName: total }
+            relation: { cardinality: "1..*", slotName: door }
+      relation: { cardinality: "0..1", slotName: doors }

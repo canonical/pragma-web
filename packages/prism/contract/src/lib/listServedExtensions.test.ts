@@ -20,6 +20,7 @@ describe("listServedExtensions", () => {
       "statements",
       "values",
       "facetedInstances",
+      "search",
     ]);
   });
 

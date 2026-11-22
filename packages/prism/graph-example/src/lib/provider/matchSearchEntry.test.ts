@@ -19,7 +19,9 @@ describe("matchSearchEntry", () => {
       uri: `${M}depot`,
       tier: 0,
       position: 0,
+      value: "Depot",
       title: "Depot",
+      type: `${M}Station`,
     });
   });
 
@@ -28,7 +30,9 @@ describe("matchSearchEntry", () => {
       uri: `${M}bay`,
       tier: 1,
       position: 6,
+      value: "metro:platform-bay",
       title: "Bay",
+      type: `${M}Station`,
     });
   });
 
@@ -37,7 +41,9 @@ describe("matchSearchEntry", () => {
       uri: `${M}canopy`,
       tier: 2,
       position: 27,
+      value: "Platform cover against the rain.",
       title: "Canopy",
+      type: `${M}Station`,
     });
   });
 
@@ -60,6 +66,14 @@ describe("matchSearchEntry", () => {
     expect(matchSearchEntry(entryNamed("z-exit"), "exit")).toMatchObject({
       tier: 0,
       position: 0,
+    });
+  });
+
+  it("places the match on the value as written when lowercasing lengthens it", () => {
+    const entry = { ...entryNamed("depot"), title: "İstanbul line" };
+    expect(matchSearchEntry(entry, "line")).toMatchObject({
+      tier: 0,
+      position: 9,
     });
   });
 });

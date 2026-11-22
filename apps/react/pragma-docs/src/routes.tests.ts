@@ -41,4 +41,8 @@ describe("appRoutes", () => {
       "6": "guides",
     });
   });
+
+  it("lists the search page at /search, since the site's provider serves search", () => {
+    expect(appRoutes.search.url).toBe("/search");
+  });
 });

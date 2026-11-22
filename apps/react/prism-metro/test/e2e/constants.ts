@@ -97,3 +97,12 @@ export const TABLE_FOLD_WIDTH_PX = 912;
  */
 export const INDEX_ROW_SELECTOR =
   "main.ds.canvas :is(.ds.entity-table > .body > .row, .ds.entity-row)";
+
+/** The desktop viewport the palette's and the search page's cases run at. */
+export const DESKTOP_VIEWPORT = { width: 1440, height: 900 } as const;
+
+/** A phone's viewport, below two groups: the strip folds its filters. */
+export const PHONE_VIEWPORT = { width: 390, height: 844 } as const;
+
+/** A text whose results span two or more types, so the facet bar shows. */
+export const SEARCH_MIXED_TEXT = "line";

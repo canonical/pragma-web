@@ -5,6 +5,49 @@
 # relay project.
 
 extend type Query {
-  "Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en."
-  search(text: String!, first: Int, after: String): NodeConnection!
+  "Every node whose title, CURIE or definition contains `text`, ignoring case, ranked best first; `types` keeps the results whose type is one of the IRIs given."
+  search(
+    text: String!
+    first: Int
+    after: String
+    types: [ID!]
+  ): SearchConnection!
+}
+
+"A page of search results, ranked best first."
+type SearchConnection {
+  edges: [SearchEdge!]!
+  pageInfo: PageInfo!
+  "Every match after the `types` filter, before paging."
+  total: Int!
+  "One entry per type with matches, counted without the `types` filter."
+  facets: [TypeFacet!]!
+}
+
+"One search result with its cursor and its match."
+type SearchEdge {
+  node: Node!
+  cursor: String!
+  match: SearchMatch!
+}
+
+"Where the search text matched a result."
+type SearchMatch {
+  "The predicate the match is in, as a CURIE, or `uri` for the CURIE."
+  field: String!
+  "At most 160 characters of the matched value around the first occurrence."
+  passage: String!
+  ranges: [MatchRange!]!
+}
+
+"One occurrence of the search text in a passage."
+type MatchRange {
+  start: Int!
+  length: Int!
+}
+
+"The number of matches of one type."
+type TypeFacet {
+  type: OntologyClass!
+  count: Int!
 }

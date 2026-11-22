@@ -469,6 +469,10 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityListProps`, `EntityListRenderer`, `EntityTableProps`,
   `EntityTableRow`, `EntityTableCell`, `ListColumn` (a table column and
   its sort link), `ListLines`.
+- Search results: `SearchResultGroup` (the results of one type under its
+  heading and count) and `SearchPassage` (the passage of a result that
+  holds the text, each range of the text in it marked); types
+  `SearchResultGroupProps`, `SearchPassageProps`, `PassageRange`.
 - Marks and swatches: `SwatchMark` (the 16px mark of an entity whose
   colour is its own data, such as a line), `TokenMark` (a design token's
   16px mark, its light and dark values side by side) and `TokenSwatch`
