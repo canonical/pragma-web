@@ -81,3 +81,11 @@ export interface AssertSatisfiesContractOptions
 
 /** The name of one provider extension, a key of `PROVIDER_EXTENSIONS`. */
 export type ProviderExtension = keyof typeof PROVIDER_EXTENSIONS;
+
+/** One prefix and the namespace IRI it stands for, as a graph declares it. */
+export interface PrefixBinding {
+  /** The compact prefix, e.g. `metro`. */
+  readonly prefix: string;
+  /** The full namespace IRI, e.g. `https://metro.example/onto#`. */
+  readonly namespace: string;
+}

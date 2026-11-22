@@ -223,6 +223,11 @@ export const siteLens: SiteLens = {
     { uri: `${GEO}stops`, pluralLabels: { en: "stops" } },
     { uri: `${GEO}location`, visibility: "PROMINENT" },
     {
+      uri: `${METRO}calls`,
+      inverseLabels: { en: "Called at by" },
+      inversePluralLabels: { en: "Called at by" },
+    },
+    {
       uri: `${METRO}stop`,
       inverseLabels: { en: "Called at by" },
       inversePluralLabels: { en: "Called at by" },

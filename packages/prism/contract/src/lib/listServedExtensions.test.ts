@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { readContractSdl } from "./contractSdl.js";
 import { listServedExtensions } from "./listServedExtensions.js";
+import { readStatementsSdl } from "./statementsSdl.js";
 
 const contractSdl = readContractSdl();
 
@@ -13,9 +14,10 @@ describe("listServedExtensions", () => {
         import.meta.url,
       ),
       "utf8",
-    )}`;
+    )}\n${readStatementsSdl()}`;
     expect(listServedExtensions(sdl)).toEqual([
       "source",
+      "statements",
       "values",
       "facetedInstances",
     ]);

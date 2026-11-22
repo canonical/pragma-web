@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readStatementsSdl } from "@canonical/prism-contract";
 import { buildSchema } from "graphql";
 import { describe, expect, it } from "vitest";
 import {
@@ -40,11 +41,12 @@ describe("the shipped paths", () => {
 });
 
 describe("readProviderSdl", () => {
-  it("is the contract followed by the extension, never a vendored copy", () => {
+  it("is the contract, the extension, then the statements SDL, never a vendored copy", () => {
     const sdl = readProviderSdl();
     const extension = readExtensionSdl();
     expect(sdl).toContain("interface Node");
-    expect(sdl.endsWith(extension)).toBe(true);
+    expect(sdl).toContain(extension);
+    expect(sdl.endsWith(readStatementsSdl())).toBe(true);
     expect(sdl.indexOf("interface Node")).toBeLessThan(
       sdl.indexOf("type Station implements Node"),
     );

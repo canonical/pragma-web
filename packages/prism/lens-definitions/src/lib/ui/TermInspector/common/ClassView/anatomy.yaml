@@ -24,4 +24,4 @@ node:
           - node:
               uri: prism.component.instance_item
             relation: { cardinality: "0..*" }
-      relation: { cardinality: "6", slotName: section }
+      relation: { cardinality: "7", slotName: section }   # lineage and definition open; subclasses, instances, fields, relations and Referenced by closed disclosures

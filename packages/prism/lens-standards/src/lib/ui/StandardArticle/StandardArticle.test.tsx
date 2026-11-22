@@ -13,16 +13,19 @@ import { expectSectionIndex } from "@canonical/prism-core/testing";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
+import createRecordedFetch from "../../../../testing/createRecordedFetch.js";
 import createStandardsPage from "../../../../testing/createStandardsPage.js";
 import {
   LINK_COMPONENT_CURIE,
   LINK_COMPONENT_PROSE_KEY,
   LINK_COMPONENT_URI,
+  PROPS_STANDARD_URI,
   STANDARDS_BINDING_FIXTURE,
   STANDARDS_TEST_TIMEOUT_MS,
 } from "../../../../testing/fixtures.js";
 import patchRecords from "../../../../testing/patchRecords.js";
 import standardEntityRecords from "../../../../testing/records/standardEntityRecords.js";
+import standardStatementsResponses from "../../../../testing/records/standardStatementsResponses.js";
 import { StandardReadingPage } from "../StandardReadingPage/index.js";
 
 /** The `_meta` record of the exemplar standard in the captured store. */
@@ -63,6 +66,16 @@ describe("StandardArticle", () => {
     );
     expect(article?.querySelector(".paragraph")).toBeNull();
     expect(article?.textContent).not.toContain("A *complex* component");
+  });
+
+  it("marks its masthead as the standard's one canonical home (W6b-A7)", {
+    timeout: STANDARDS_TEST_TIMEOUT_MS,
+  }, () => {
+    const { container } = renderExemplar(standardEntityRecords);
+    const canonical = container.querySelectorAll("[data-canonical]");
+    expect(canonical).toHaveLength(1);
+    expect(canonical[0]).toHaveClass("masthead");
+    expect(canonical[0]).toHaveAttribute("data-canonical", LINK_COMPONENT_URI);
   });
 
   it("renders the header and, with no prose, the description's paragraph blocks", {
@@ -126,5 +139,135 @@ describe("StandardArticle", () => {
       "No description recorded.",
     );
     expect(container.querySelector(".paragraph")).toBeNull();
+  });
+});
+
+/** The reading page at `uri` on a site that serves `statements`. */
+const renderServed = (
+  uri: string,
+  records: Parameters<typeof patchRecords>[0] | undefined,
+  fetchFn = createRecordedFetch(),
+) =>
+  render(
+    createStandardsPage(
+      `/standards/${encodeURIComponent(uri)}`,
+      records,
+      fetchFn,
+      <StandardReadingPage
+        classUri={STANDARDS_BINDING_FIXTURE.classUri}
+        params={{ uri }}
+      />,
+      ["source", "statements"],
+    ),
+  );
+
+/** The section whose heading is `title`, or a thrown error. */
+const findSection = async (title: string): Promise<HTMLElement> => {
+  const heading = await screen.findByRole("heading", { level: 2, name: title });
+  const section = heading.closest("section");
+  if (!section) throw new Error(`the ${title} heading is in no section`);
+  return section;
+};
+
+describe("StandardArticle's sections from the standard's statements", () => {
+  it("draws Do, Don't and Related standards after the rule, in that order", {
+    timeout: STANDARDS_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = renderServed(
+      LINK_COMPONENT_URI,
+      standardEntityRecords,
+    );
+
+    const doSection = await findSection("Do");
+    const article = container.querySelector(".ds.standard-article");
+    if (!article) throw new Error("the page has no standard's article");
+    expectSectionIndex(article, [
+      { id: "rule", title: "Rule" },
+      { id: "do", title: "Do" },
+      { id: "dont", title: "Don't" },
+      { id: "related", title: "Related standards" },
+    ]);
+    expect(doSection.querySelector(".description")?.textContent).toMatch(
+      /^Inject the link via a single `LinkComponent` prop/,
+    );
+    const code = doSection.querySelector("pre.code");
+    expect(code).toHaveAttribute("data-language", "typescript");
+    // The code opens on its first line, not on the long string's newline.
+    expect(code?.textContent).toMatch(/^\/\/ types\.ts/);
+    expect(
+      (await findSection("Don't")).querySelectorAll(".example"),
+    ).toHaveLength(1);
+    expect((await findSection("Related standards")).textContent).toContain(
+      "Documented and spreadable props",
+    );
+    // Nothing points at the exemplar, so it has no "Applies to".
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Applies to" }),
+    ).not.toBeInTheDocument();
+    expect(container.querySelector(".shown")).toBeNull();
+  });
+
+  it("lists the standards that point at a standard under Applies to", {
+    timeout: STANDARDS_TEST_TIMEOUT_MS,
+  }, async () => {
+    renderServed(PROPS_STANDARD_URI, undefined);
+
+    const section = await findSection("Applies to");
+    expect(section.querySelectorAll(".chips > li")).toHaveLength(3);
+    expect(section.textContent).toContain(
+      "Router integration via LinkComponent",
+    );
+  });
+
+  it("says how many a group shows when the graph holds more", {
+    timeout: STANDARDS_TEST_TIMEOUT_MS,
+  }, async () => {
+    const responses = structuredClone(standardStatementsResponses);
+    const exemplar = responses.at(0)?.response as
+      | {
+          data: {
+            outgoing: { groups: { predicateUri: string; total: number }[] };
+          };
+        }
+      | undefined;
+    // The exemplar's one example to follow, as if the graph held three.
+    const doGroup = exemplar?.data.outgoing.groups.find(
+      (group) =>
+        group.predicateUri === "http://pragma.canonical.com/codestandards#do",
+    );
+    if (!doGroup) throw new Error("the recorded statements have no cs:do");
+    doGroup.total = 3;
+
+    renderServed(
+      LINK_COMPONENT_URI,
+      standardEntityRecords,
+      createRecordedFetch(responses),
+    );
+
+    expect((await findSection("Do")).querySelector(".shown")?.textContent).toBe(
+      "1 of 3 shown",
+    );
+  });
+
+  it("asks nothing of a site that does not serve statements", {
+    timeout: STANDARDS_TEST_TIMEOUT_MS,
+  }, () => {
+    const fetchFn = createFetchSpy();
+    render(
+      createStandardsPage(
+        `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
+        standardEntityRecords,
+        fetchFn,
+        <StandardReadingPage
+          classUri={STANDARDS_BINDING_FIXTURE.classUri}
+          params={{ uri: LINK_COMPONENT_URI }}
+        />,
+      ),
+    );
+
+    expect(fetchFn).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Do" }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -25,6 +25,9 @@ import {
   type LensGroup,
   type RunQuery,
   type SiteLens,
+  STATEMENTS_MAX_DEPTH,
+  STATEMENTS_PER_PREDICATE,
+  STATEMENTS_PER_PREDICATE_MAX,
   selectLiteral,
   serveFacetedInstances,
   serveNodeValues,
@@ -47,6 +50,7 @@ import {
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
+  TURTLE_STANDARD_PREFIXES,
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
 import { exampleDataset } from "./dataset.js";
@@ -54,7 +58,9 @@ import { declareClassEdges } from "./declareClassEdges.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
 import { expandCurie } from "./expandCurie.js";
 import { extractReferences } from "./extractReferences.js";
+import groupRecordStatements from "./groupRecordStatements.js";
 import { isNetworkEntity } from "./isNetworkEntity.js";
+import listRecordStatements from "./listRecordStatements.js";
 import { observeClassEdges } from "./observeClassEdges.js";
 import { outlineDataset } from "./outlineDataset.js";
 import { readProviderSdl } from "./providerSdl.js";
@@ -84,6 +90,8 @@ import type {
   ExampleUnitPlacement,
   LangMap,
   ProseTexts,
+  RecordStatement,
+  RecordTerm,
   SearchEntry,
 } from "./types.js";
 import writeEntityTurtle from "./writeEntityTurtle.js";
@@ -127,6 +135,14 @@ interface ProseRecord {
   readonly availableLanguages: readonly string[];
   /** Candidate IRIs across every language, in order of first mention. */
   readonly references: readonly string[];
+}
+
+/** Arguments of `Query.statements`. */
+interface StatementsArgs {
+  readonly uri: string;
+  readonly path?: readonly string[] | null;
+  readonly perPredicate?: number | null;
+  readonly direction?: "OUT" | "IN" | null;
 }
 
 /** Arguments of `Query.search`. */
@@ -1073,8 +1089,208 @@ export const createExampleProvider = (
     expandCurie(value, dataset.ontologies);
 
   // -------------------------------------------------------------------
-  // The contract's six root fields, plus `prose`, `search`, `source` and
-  // `facetedInstances`: the four root fields this provider adds (see schema/extension.graphql for why each is
+  // `statements`: each record's statements, out and in, grouped and bounded.
+  // -------------------------------------------------------------------
+
+  /** Every record that makes statements: the entities, then the classes. */
+  const statementRecords: readonly (ExampleEntity | ExampleClass)[] = [
+    ...dataset.entities,
+    ...dataset.classes,
+  ];
+
+  /**
+   * Each record's statements out, and for each node the statements naming
+   * it as their object (the subject as the value read from the node's
+   * side), indexed on the first `statements` read: a dataset may name a
+   * value through a property it does not declare, which only that read
+   * refuses.
+   *
+   * @note Impure: fills the index once.
+   */
+  /**
+   * The nodes a record's statements name, at any depth: a node a nested
+   * value holds (a route's call holding its stop) counts under the
+   * predicate that names it, for the record that holds the nested value,
+   * the nearest holder with an IRI. It reads one level of nested values:
+   * a nested value's own nested values restate their holder (a route's
+   * reverse holds the route's calls again), and counting them would count
+   * each call twice.
+   */
+  const listHeldNodes = (
+    statements: readonly RecordStatement[],
+    nested = false,
+  ): readonly { readonly predicate: string; readonly uri: string }[] =>
+    statements.flatMap(({ predicate, object }) => {
+      if (object.kind === "node") return [{ predicate, uri: object.uri }];
+      if (object.kind === "nested" && !nested)
+        return listHeldNodes(object.statements(), true);
+      return [];
+    });
+
+  let statementIndex:
+    | {
+        readonly outgoing: ReadonlyMap<string, readonly RecordStatement[]>;
+        readonly incoming: ReadonlyMap<string, readonly RecordStatement[]>;
+      }
+    | undefined;
+  const indexStatements = (): NonNullable<typeof statementIndex> => {
+    if (statementIndex !== undefined) return statementIndex;
+    const outgoing = new Map(
+      statementRecords.map((record) => [
+        record.uri,
+        listRecordStatements(record, dataset),
+      ]),
+    );
+    const incoming = [...outgoing].reduce((index, [subject, statements]) => {
+      for (const { predicate, uri } of listHeldNodes(statements)) {
+        index.set(uri, [
+          ...(index.get(uri) ?? []),
+          { predicate, object: { kind: "node", uri: subject } },
+        ]);
+      }
+      return index;
+    }, new Map<string, readonly RecordStatement[]>());
+    statementIndex = { outgoing, incoming };
+    return statementIndex;
+  };
+
+  /** Every prefix a predicate's compact form may take: the standard
+   * vocabularies' and the dataset's ontologies', which win on a shared name. */
+  const statementPrefixes = [
+    ...new Map([
+      ...TURTLE_STANDARD_PREFIXES,
+      ...dataset.ontologies.map(
+        ({ prefix, namespace }) => [prefix, namespace] as const,
+      ),
+    ]),
+  ].toSorted(([, a], [, b]) => b.length - a.length);
+
+  /** A predicate's compact form, which orders the groups: the longest
+   * namespace it starts with, else the whole IRI. */
+  const compactPredicate = (uri: string): string => {
+    const match = statementPrefixes.find(([, namespace]) =>
+      uri.startsWith(namespace),
+    );
+    return match === undefined
+      ? uri
+      : `${match[0]}:${uri.slice(match[1].length)}`;
+  };
+
+  /** A term as a `StatementValue`, nested values expanded to `depth`, each
+   * of their groups cut to `perPredicate`. */
+  const buildStatementValueView = (
+    term: RecordTerm,
+    perPredicate: number,
+    depth: number,
+  ): View => {
+    if (term.kind === "literal") {
+      const { lexical, datatype, lang } = term;
+      return { __typename: "StatementLiteral", lexical, datatype, lang };
+    }
+    if (term.kind === "nested") {
+      return {
+        __typename: "StatementNested",
+        type: () => nullableClassView(term.type ?? undefined),
+        groups: () =>
+          depth < STATEMENTS_MAX_DEPTH
+            ? buildStatementGroupViews(
+                term.statements(),
+                perPredicate,
+                depth + 1,
+              )
+            : [],
+      };
+    }
+    const node = resolveNode(term.uri);
+    return node === null
+      ? {
+          __typename: "StatementForeign",
+          uri: term.uri,
+          curie: curieOf(term.uri),
+        }
+      : { __typename: "StatementNode", node };
+  };
+
+  /** Statements as `StatementGroup` views, at nesting `depth`. */
+  const buildStatementGroupViews = (
+    statements: readonly RecordStatement[],
+    perPredicate: number,
+    depth: number,
+  ): View[] =>
+    groupRecordStatements(statements, perPredicate, compactPredicate).map(
+      ({ predicate, total, values }) => ({
+        predicate: () => {
+          const property = propertyByUri.get(predicate);
+          return property === undefined ? null : propertyView(property);
+        },
+        predicateUri: predicate,
+        total,
+        values: values.map((value) =>
+          buildStatementValueView(value, perPredicate, depth),
+        ),
+      }),
+    );
+
+  /**
+   * The statements a `path` reaches from a subject's: per pair of segments,
+   * the nested value of the predicate of that local name whose key is the
+   * second segment, else, for a zero-based index, the nested value at that
+   * position among the group's nested values as `values` lists them (the
+   * addressing the pragma provider shares). Null when a segment selects
+   * nothing.
+   */
+  const followStatementPath = (
+    statements: readonly RecordStatement[],
+    path: readonly string[],
+  ): readonly RecordStatement[] | null => {
+    const [name, key, ...rest] = path;
+    if (name === undefined) return statements;
+    if (key === undefined) return null;
+    const nestedValues = statements
+      .filter(({ predicate }) => predicate.endsWith(`#${name}`))
+      .map(({ object }) => object)
+      .filter((object) => object.kind === "nested");
+    const nested =
+      nestedValues.find((object) => object.key === key) ??
+      (/^\d+$/.test(key) ? nestedValues.at(Number(key)) : undefined);
+    return nested === undefined
+      ? null
+      : followStatementPath(nested.statements(), rest);
+  };
+
+  /** Resolve `Query.statements`. */
+  const resolveStatements = ({
+    uri,
+    path,
+    perPredicate,
+    direction,
+  }: StatementsArgs): View | null => {
+    const { outgoing: outgoingByUri, incoming: incomingByUri } =
+      indexStatements();
+    const outgoing = outgoingByUri.get(uri);
+    if (outgoing === undefined) return null;
+    const bound = Math.min(
+      Math.max(perPredicate ?? STATEMENTS_PER_PREDICATE, 1),
+      STATEMENTS_PER_PREDICATE_MAX,
+    );
+    const isPath = path !== null && path !== undefined && path.length > 0;
+    const statements =
+      direction === "IN"
+        ? isPath
+          ? null
+          : (incomingByUri.get(uri) ?? [])
+        : followStatementPath(outgoing, path ?? []);
+    if (statements === null) return null;
+    return {
+      subject: () => (isPath ? null : resolveNode(uri)),
+      groups: buildStatementGroupViews(statements, bound, 1),
+      total: statements.length,
+    };
+  };
+
+  // -------------------------------------------------------------------
+  // The contract's six root fields, plus `prose`, `search`, `source`,
+  // `facetedInstances` and `statements`: the five root fields this provider adds (see schema/extension.graphql for why each is
   // a root field). Every type the provider declares is reachable from here.
   // -------------------------------------------------------------------
 
@@ -1105,6 +1321,7 @@ export const createExampleProvider = (
         recordByUri.get(args.uri)?.entity ?? classByUri.get(args.uri);
       return record === undefined ? null : writeEntityTurtle(record, dataset);
     },
+    statements: resolveStatements,
     facetedInstances: async (args: FacetedArgs, context?: ExampleContext) => {
       const selection = await serveFacetedInstances(
         createRun(context),

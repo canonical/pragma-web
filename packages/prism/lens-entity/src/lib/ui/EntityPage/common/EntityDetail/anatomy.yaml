@@ -1,8 +1,9 @@
 ---
 # EntityDetail — the entity page's data-bearing interior: it reads the
 # graph's namespaces and the page's one operation from the warm store and
-# renders the entity, its heading, its summary, then the fields and the
-# relations its class declares as key values; or, for an address nothing in
+# lays the entity on core's sectioned view: its header, which marks the
+# page as the entity's one home (data-canonical), its prominent facts, its
+# statement sections and Referenced by; or, for an address nothing in
 # the graph answers to or a node outside the bound class, a status line
 # naming the address in the published InlineCode. It sets the document
 # title either way.
@@ -35,16 +36,52 @@ node:
           - node:
               uri: global.component.inline_code
             relation: { cardinality: "1" }
-      relation: { cardinality: "0..1", slotName: not-found }
+      relation: { cardinality: "0..1", slotName: not-found }   # instead of the view
+    # Core's sectioned view lays out every part below; its grid, contents
+    # bar and section headings are its own, so this node adds no styles.
     - node:
-        uri: prism.subcomponent.entity_heading
-      relation: { cardinality: "0..1", slotName: heading }
-    - node:
-        uri: prism.subcomponent.entity_summary
-      relation: { cardinality: "0..1", slotName: summary }
-    - node:
-        uri: prism.subcomponent.field_list
-      relation: { cardinality: "0..1", slotName: fields }
-    - node:
-        uri: prism.subcomponent.relations
-      relation: { cardinality: "0..1", slotName: relations }
+        uri: prism.component.sectioned_view
+      relation: { cardinality: "0..1", slotName: view }
+      edges:
+        - node:
+            uri: prism.subcomponent.entity_header       # data-canonical: the entity's one home
+          relation: { cardinality: "1", slotName: header }
+        # The prominent values, on the page's own view only: core's
+        # KeyValueList, each term the outgoing label (with the true total
+        # when the group is cut at its bound), each value a StatementGroup.
+        - node:
+            uri: prism.component.key_value_list
+            role: facts
+          relation: { cardinality: "0..1", slotName: facts }
+          edges:
+            - node: { uri: prism.subcomponent.statement_group }
+              relation: { cardinality: "1..*" }
+        # One section per property group (a KeyValueList of StatementGroups)
+        # and one per relation (a StatementGroup), titled with the label of
+        # the reader's side and its true count; ordered by core's
+        # orderSections. On the page's own view only.
+        - node:
+            role: section (property group or relation)
+          relation: { cardinality: "0..*", slotName: sections }
+          edges:
+            - node: { uri: prism.component.key_value_list }
+              relation: { cardinality: "0..1" }
+            - node: { uri: prism.subcomponent.statement_group }
+              relation: { cardinality: "0..*" }
+        # "Referenced by · N": one group per incoming predicate under its
+        # inverse label and count, when anything points at the entity.
+        - node:
+            role: section (referenced by, id "referenced-by")
+          relation: { cardinality: "0..1", slotName: sections }
+          edges:
+            - node: { uri: prism.subcomponent.referenced_by_group }
+              relation: { cardinality: "1..*" }
+        # What the active page renderer draws: the fallback's summary
+        # (EntitySummary) when the site serves no statements, the entity's
+        # Turtle under `as=turtle`, else nothing.
+        - node:
+            role: body (the active page renderer's)
+          relation: { cardinality: "0..1", slotName: children }
+          edges:
+            - node: { uri: prism.subcomponent.entity_summary }
+              relation: { cardinality: "0..1" }

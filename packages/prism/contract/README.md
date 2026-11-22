@@ -142,6 +142,17 @@ list is sorted by property, subject class and object class.
 the compiler attaches `_meta: EntityMeta!` to every generated type, so a
 provider cannot omit it.
 
+### The statements extension
+
+`statements` is a provider extension, not part of the contract a provider must
+satisfy: a provider that serves it adds `readStatementsSdl()` to its schema and is
+listed by `listServedExtensions`. It answers one entity's statements grouped by
+predicate in code-point order (`compareCodePoints`), each group cut to
+`perPredicate` (`STATEMENTS_PER_PREDICATE`, held between 1 and
+`STATEMENTS_PER_PREDICATE_MAX`) with its true `total`, nested values expanded
+`STATEMENTS_MAX_DEPTH` levels down: their groups at the first, their type alone
+at the second.
+
 ## The browser entry and the list fields
 
 The package's root reads the shipped SDL from disk with `node:fs`, which
@@ -326,10 +337,23 @@ import { readContractSdl } from "@canonical/prism-contract";
 `contractSdl` option is omitted — so the whole package is **Node/Bun only**.
 For a consumer that wants the file rather than its contents, the
 `./schema/contract.graphql` subpath export is the handle; the package
-deliberately publishes no constant naming its own on-disk layout. There is no browser entry
-point: the check belongs in provider gates and CI steps, which run
-server-side. (The `contractSdl` option exists to substitute a toy contract in
-tests, not to make the module bundleable.)
+deliberately publishes no constant naming its own on-disk layout. The check
+belongs in provider gates and CI steps, which run server-side. (The
+`contractSdl` option exists to substitute a toy contract in tests, not to make
+the module bundleable.)
+
+## The browser entry
+
+```ts
+import { compactIri, compareCodePoints } from "@canonical/prism-contract/browser";
+```
+
+The root reads the SDL from the filesystem when it loads, so client code never
+imports it for a value. `./browser` holds the contract's pure helpers, the ones
+a lens shares with the providers: `compactIri`, which compacts an IRI by the
+longest declared namespace, and `compareCodePoints`, the code-point order the
+statements extension sorts by, with the `PrefixBinding` type. It imports
+nothing from `node:`; the root re-exports the same functions for server code.
 
 The SDL itself lives in the `schema/` directory at the package root and is
 published alongside `dist/`.

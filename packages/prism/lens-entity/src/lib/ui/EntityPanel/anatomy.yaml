@@ -1,0 +1,79 @@
+---
+# EntityPanel (lens-entity src/lib/ui/EntityPanel/): the details panel, PS15
+# V2. Identity (mark, name, class, address) with Open beside the title,
+# prominent and plain values open as a KeyValueList, each long text (past
+# 120 characters or over several lines) a closed <details> whose summary
+# is its label, then each group of
+# values held by the entity (such as a line's routes) and each relation
+# and each Referenced by group as a closed <details> (Accordion item, works
+# without JS) whose summary carries the label and the count. Not a second
+# SectionedView. No useId: aria-labels and fixed ids only.
+#
+# Every group is a native <details> without styles of its own, so it
+# keeps the browser's disclosure marker and works without JS.
+#
+# Token ledger (on `.ds.entity-panel`):
+#   --entity-panel-gap: --grid-gutter                 between blocks
+#   --entity-panel-not-found-color: color.text.muted  the not-found status
+node:
+  uri: prism.component.entity_panel
+  element: section
+  styles: { layout.type: flex, layout.direction: column, spacing.gap: grid.gutter }
+  edges:
+    - node:
+        role: identity
+        element: header
+        styles: { layout.type: flex, layout.direction: column, spacing.gap: grid.gutter }
+        edges:
+          - node:
+              role: headline
+              element: div
+              styles: { layout.type: flex, layout.wrap: wrap, spacing.gap: grid.gutter }
+              edges:
+                - node: { role: title, element: h2, styles: { spacing.external.block.start: 0, spacing.external.block.end: 0 } }
+                  relation: { cardinality: "1", slotName: title }   # h2, or h3 under a heading
+                - node: { role: open, element: a, uri: prism.component.router_link }
+                  relation: { cardinality: "0..1", slotName: open }  # Open, to the entity's own page, unless the panel sits on it
+            relation: { cardinality: "1", slotName: headline }
+          - node: { role: kind, element: p, styles: { layout.type: flex, layout.wrap: wrap, spacing.gap: grid.gutter, spacing.external.block.start: 0, spacing.external.block.end: 0 } }
+            relation: { cardinality: "1", slotName: kind }   # class chip + address
+      relation: { cardinality: "0..1", slotName: identity }
+    - node: { role: not-found, element: p, styles: { spacing.external.block.start: 0, spacing.external.block.end: 0, typography.color: color.text.muted } }
+      relation: { cardinality: "0..1", slotName: not-found }   # instead of every other part
+    - node: { role: values, element: dl }
+      relation: { cardinality: "0..1", slotName: values }      # the prominent values, then the plain ones
+    - node:
+        role: text
+        element: details
+        edges:
+          - node: { role: summary, element: summary }
+            relation: { cardinality: "1", slotName: summary }  # label
+          - node: { role: body, element: div, styles: { typography.whiteSpace: pre-line } }
+            relation: { cardinality: "1", slotName: body }     # StatementGroup, plain text with its line breaks
+      relation: { cardinality: "0..*", slotName: text }        # a value past 120 characters or over several lines, closed
+    - node:
+        role: group
+        element: details
+        edges:
+          - node: { role: summary, element: summary }
+            relation: { cardinality: "1", slotName: summary }  # label + count
+          - node: { role: body, element: div }
+            relation: { cardinality: "1", slotName: body }     # StatementGroup
+      relation: { cardinality: "0..*", slotName: group }       # a held group or a relation, closed
+    - node:
+        role: referenced-by
+        element: section
+        styles: { layout.type: flex, layout.direction: column, spacing.gap: grid.gutter }
+        edges:
+          - node: { role: heading, element: h3, styles: { spacing.external.block.start: 0, spacing.external.block.end: 0 } }
+            relation: { cardinality: "1", slotName: heading }
+          - node:
+              role: group
+              element: details
+              edges:
+                - node: { role: summary, element: summary }
+                  relation: { cardinality: "1", slotName: summary }  # label + count
+                - node: { role: body, element: div }
+                  relation: { cardinality: "1", slotName: body }     # StatementGroup
+            relation: { cardinality: "1..*", slotName: group }   # an incoming group, closed
+      relation: { cardinality: "0..1", slotName: referenced-by }

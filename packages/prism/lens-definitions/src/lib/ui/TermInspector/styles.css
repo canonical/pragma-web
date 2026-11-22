@@ -53,6 +53,15 @@
     gap: var(--term-inspector-gap);
   }
 
+  /* An instance's details panel, across the inspector's columns: it keeps
+   * its own column of blocks rather than the views' subgrid. The views'
+   * address, group, key and value rules reach their parts through the
+   * view's child chain, so none of them reaches the panel's own parts of
+   * the same names. */
+  .ds.term-inspector .panel {
+    grid-column: 1 / -1;
+  }
+
   .ds.term-inspector .header {
     grid-column: 1 / -1;
     display: flex;
@@ -79,6 +88,13 @@
     color: var(--term-inspector-muted-color);
   }
 
+  /* The name, with Open beside it. */
+  .ds.term-inspector .headline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--term-inspector-link-gap);
+  }
+
   .ds.term-inspector .name {
     margin-block: 0;
     font-size: var(--term-inspector-name-font-size);
@@ -86,7 +102,7 @@
     overflow-wrap: anywhere;
   }
 
-  .ds.term-inspector .address {
+  .ds.term-inspector > .view > .header > .address {
     margin-block: 0;
     font-size: var(--term-inspector-small-font-size);
     color: var(--term-inspector-muted-color);
@@ -110,7 +126,15 @@
     border-block-start-color: var(--term-inspector-rule-color);
   }
 
+  /* Inline, so a disclosure's marker stands on its line. */
+  /* A class's section but its lineage and definition: a closed native
+   * disclosure; its content opens below its summary. */
+  .ds.term-inspector .section.is-disclosure {
+    display: block;
+  }
+
   .ds.term-inspector .label {
+    display: inline;
     grid-column: 1 / -1;
     margin-block: 0;
     font-size: var(--term-inspector-small-font-size);
@@ -135,7 +159,7 @@
   }
 
   /* A group's label over its rows, on the section's lines. */
-  .ds.term-inspector .group {
+  .ds.term-inspector > .view > .section > .group {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
@@ -159,7 +183,7 @@
     margin-block: 0;
   }
 
-  .ds.term-inspector .key {
+  .ds.term-inspector > .view > .details > .key {
     grid-column: 1 / span 1;
     font-size: var(--term-inspector-small-font-size);
     font-weight: var(--term-inspector-caps-weight);
@@ -167,7 +191,7 @@
     color: var(--term-inspector-muted-color);
   }
 
-  .ds.term-inspector .value {
+  .ds.term-inspector > .view > .details > .value {
     grid-column: 2 / -1;
     margin-inline-start: 0;
     overflow-wrap: anywhere;

@@ -2,7 +2,8 @@
   "root": "../../..",
   "sources": {
     "apps/react/pragma-docs/src": "pragma-docs",
-    "packages/prism/projections/src": "pragma-docs"
+    "packages/prism/projections/src": "pragma-docs",
+    "packages/prism/lens-entity/src": "pragma-docs"
   },
   "excludes": [
     "**/node_modules/**",
@@ -10,6 +11,7 @@
     "packages/prism/*/src/**/*.test.tsx",
     "packages/prism/*/src/**/*.stories.tsx",
     "packages/prism/projections/src/lib/site/**",
+    "**/.relay/**",
     "**/dist/**"
   ],
   "projects": {

@@ -27,6 +27,7 @@ import {
   DIAGRAM_POINT_CLASS_URI,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
+  METRO_NAMESPACE as METRO,
   ROUTE_CLASS_URI,
   UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
@@ -79,7 +80,7 @@ describe("the schema", () => {
     expect(provider.sdl).toContain("type Station implements Node");
   });
 
-  it("adds four root fields, prose, search, source and facetedInstances, to the contract's six", () => {
+  it("adds five root fields, prose, search, source, facetedInstances and statements, to the contract's six", () => {
     const query = provider.schema.getQueryType();
     expect(Object.keys(query?.getFields() ?? {}).sort()).toEqual([
       "classEdges",
@@ -92,6 +93,7 @@ describe("the schema", () => {
       "prose",
       "search",
       "source",
+      "statements",
     ]);
   });
 
@@ -2532,6 +2534,9 @@ describe("the type lens", () => {
       stop: ontologyProperty(uri: "metro:stop") {
         visibility pluralLabel inverseLabel inversePluralLabel inverseVisibility
       }
+      calls: ontologyProperty(uri: "metro:calls") {
+        inverseLabel inversePluralLabel
+      }
     }`);
     expect(data).toEqual({
       servesLine: {
@@ -2547,6 +2552,10 @@ describe("the type lens", () => {
         inverseLabel: "Called at by",
         inversePluralLabel: "Called at by",
         inverseVisibility: null,
+      },
+      calls: {
+        inverseLabel: "Called at by",
+        inversePluralLabel: "Called at by",
       },
     });
   });
@@ -2642,6 +2651,356 @@ describe("Query.classEdges", () => {
       [`${M}stop`, `${M}Call`, `${M}Stop`, 4, true],
       [`${M}unit`, `${M}UnitPosition`, `${M}Unit`, 1, true],
       [`${M}units`, `${M}Formation`, `${M}UnitPosition`, 1, true],
+    ]);
+  });
+});
+
+describe("Query.statements", () => {
+  const STATEMENTS = `query Statements($uri: ID!, $path: [String!], $perPredicate: Int, $direction: StatementDirection) {
+    statements(uri: $uri, path: $path, perPredicate: $perPredicate, direction: $direction) {
+      subject { uri }
+      total
+      groups {
+        predicateUri
+        predicate { uri }
+        total
+        values {
+          __typename
+          ... on StatementNode { node { uri } }
+          ... on StatementLiteral { lexical datatype lang }
+          ... on StatementForeign { uri curie }
+          ... on StatementNested { type { uri } groups { predicateUri total } }
+        }
+      }
+    }
+  }`;
+
+  type Groups = {
+    readonly subject: { readonly uri: string } | null;
+    readonly total: number;
+    readonly groups: readonly {
+      readonly predicateUri: string;
+      readonly predicate: { readonly uri: string } | null;
+      readonly total: number;
+      readonly values: readonly Record<string, unknown>[];
+    }[];
+  };
+
+  const read = async (variables: Record<string, unknown>): Promise<Groups> =>
+    (await run(STATEMENTS, variables)).statements as Groups;
+
+  it("groups Central Exchange's outgoing statements by predicate, rdf:type first", async () => {
+    const result = await read({ uri: `${METRO}central-exchange` });
+    expect(result.subject?.uri).toBe(`${METRO}central-exchange`);
+    expect(result.groups.map(({ predicateUri }) => predicateUri)).toEqual([
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+      "https://geo.example/onto#inZone",
+      "https://geo.example/onto#location",
+      "https://metro.example/onto#diagramPosition",
+      "https://metro.example/onto#platformCount",
+      "https://metro.example/onto#platformLength",
+      "https://metro.example/onto#servesLine",
+      "https://metro.example/onto#transferMinutes",
+      "http://www.w3.org/2000/01/rdf-schema#label",
+      "http://www.w3.org/2004/02/skos/core#definition",
+    ]);
+  });
+
+  it("returns every value of a group up to the bound, with the store's true total", async () => {
+    const result = await read({ uri: `${METRO}central-exchange` });
+    const servesLine = result.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#servesLine"),
+    );
+    expect(servesLine?.total).toBe(3);
+    expect(servesLine?.values).toEqual([
+      { __typename: "StatementNode", node: { uri: `${METRO}circle-line` } },
+      { __typename: "StatementNode", node: { uri: `${METRO}coastal-line` } },
+      { __typename: "StatementNode", node: { uri: `${METRO}north-line` } },
+    ]);
+    expect(result.total).toBe(
+      result.groups.reduce((sum, { total }) => sum + total, 0),
+    );
+  });
+
+  it("cuts every group to the bound asked for, keeping its total", async () => {
+    const result = await read({
+      uri: `${METRO}central-exchange`,
+      perPredicate: 1,
+    });
+    for (const group of result.groups) {
+      expect(group.values.length).toBeLessThanOrEqual(1);
+    }
+    expect(
+      result.groups.find(({ predicateUri }) =>
+        predicateUri.endsWith("#servesLine"),
+      )?.total,
+    ).toBe(3);
+  });
+
+  it("cuts a nested value's groups to the bound asked for too", async () => {
+    const { statements } = (await run(
+      `query Nested($uri: ID!, $perPredicate: Int) {
+        statements(uri: $uri, perPredicate: $perPredicate) {
+          groups { values { ... on StatementNested { groups { total values { __typename } } } } }
+        }
+      }`,
+      { uri: `${METRO}north-line`, perPredicate: 1 },
+    )) as {
+      statements: {
+        groups: {
+          values: { groups?: { total: number; values: unknown[] }[] }[];
+        }[];
+      };
+    };
+    const nested = statements.groups.flatMap(({ values }) =>
+      values.flatMap(({ groups }) => groups ?? []),
+    );
+    expect(nested.some(({ total }) => total > 1)).toBe(true);
+    for (const { values } of nested) {
+      expect(values.length).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("holds the bound between 1 and 50 whatever the reader asks", async () => {
+    const none = await read({
+      uri: `${METRO}central-exchange`,
+      perPredicate: 0,
+    });
+    expect(none.groups.every(({ values }) => values.length === 1)).toBe(true);
+  });
+
+  it("types literals and expands a location in place", async () => {
+    const result = await read({ uri: `${METRO}central-exchange` });
+    const byLocal = (name: string) =>
+      result.groups.find(({ predicateUri }) => predicateUri.endsWith(name));
+    expect(byLocal("#platformCount")?.values).toEqual([
+      {
+        __typename: "StatementLiteral",
+        lexical: "8",
+        datatype: "http://www.w3.org/2001/XMLSchema#integer",
+        lang: null,
+      },
+    ]);
+    expect(byLocal("#location")?.values).toEqual([
+      {
+        __typename: "StatementNested",
+        type: { uri: GEO_POINT_CLASS_URI },
+        groups: [
+          { predicateUri: "https://geo.example/onto#latitude", total: 1 },
+          { predicateUri: "https://geo.example/onto#longitude", total: 1 },
+        ],
+      },
+    ]);
+    expect(byLocal("#type")?.predicate).toBeNull();
+    expect(byLocal("#servesLine")?.predicate?.uri).toBe(`${METRO}servesLine`);
+  });
+
+  it("reads the statements pointing at a line from the stops' side", async () => {
+    const result = await read({ uri: `${METRO}north-line`, direction: "IN" });
+    const servesLine = result.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#servesLine"),
+    );
+    expect(servesLine?.values).toContainEqual({
+      __typename: "StatementNode",
+      node: { uri: `${METRO}central-exchange` },
+    });
+    expect(result.total).toBe(
+      result.groups.reduce((sum, { total }) => sum + total, 0),
+    );
+  });
+
+  it("counts a node a nested value names for the record holding the value", async () => {
+    const result = await read({
+      uri: `${METRO}central-exchange`,
+      direction: "IN",
+    });
+    const calls = result.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#calls"),
+    );
+    // Six routes call at the interchange: two on each of its three lines.
+    expect(calls?.total).toBe(6);
+    expect(calls?.values).toContainEqual({
+      __typename: "StatementNode",
+      node: { uri: `${METRO}north-line` },
+    });
+  });
+
+  it("follows a path to a line's route by its key", async () => {
+    const result = await read({
+      uri: `${METRO}north-line`,
+      path: ["routes", "southbound"],
+    });
+    expect(result.subject).toBeNull();
+    expect(result.groups.map(({ predicateUri }) => predicateUri)).toEqual([
+      `${METRO}calls`,
+      `${METRO}isLoop`,
+      `${METRO}reverse`,
+      "http://www.w3.org/2000/01/rdf-schema#label",
+    ]);
+  });
+
+  it("follows a path by the index a route holds in the listed values", async () => {
+    const listed = await read({ uri: `${METRO}north-line` });
+    const routes = listed.groups.find(({ predicateUri }) =>
+      predicateUri.endsWith("#routes"),
+    );
+    const byIndex = await Promise.all(
+      (routes?.values ?? []).map((_, index) =>
+        read({ uri: `${METRO}north-line`, path: ["routes", String(index)] }),
+      ),
+    );
+    expect(byIndex.map(({ groups }) => groups)).toEqual(
+      (routes?.values ?? []).map(({ groups }) =>
+        (groups as readonly { predicateUri: string; total: number }[]).map(
+          (group) => expect.objectContaining(group),
+        ),
+      ),
+    );
+    expect(byIndex.length).toBeGreaterThan(1);
+  });
+
+  it("answers null for a path that selects nothing, or one read inwards", async () => {
+    expect(
+      (
+        await run(STATEMENTS, {
+          uri: `${METRO}north-line`,
+          path: ["routes", "nowhere"],
+        })
+      ).statements,
+    ).toBeNull();
+    expect(
+      (await run(STATEMENTS, { uri: `${METRO}north-line`, path: ["routes"] }))
+        .statements,
+    ).toBeNull();
+    expect(
+      (
+        await run(STATEMENTS, {
+          uri: `${METRO}north-line`,
+          path: ["routes", "southbound"],
+          direction: "IN",
+        })
+      ).statements,
+    ).toBeNull();
+  });
+
+  it("answers null for an IRI the dataset holds no record of", async () => {
+    expect(
+      (await run(STATEMENTS, { uri: `${METRO}nowhere` })).statements,
+    ).toBeNull();
+  });
+
+  it("reads a bound the reader leaves null as the default", async () => {
+    const unnamed = await read({ uri: `${METRO}circle-line` });
+    const nulled = await read({
+      uri: `${METRO}circle-line`,
+      perPredicate: null,
+    });
+    expect(nulled).toEqual(unnamed);
+  });
+
+  it("expands nested values two levels deep and no further", async () => {
+    const data = await run(`{ statements(uri: "${METRO}north-line") {
+      groups { predicateUri values { ... on StatementNested {
+        groups { predicateUri values { ... on StatementNested {
+          groups { predicateUri } } } } } } } } }`);
+    type Level = {
+      readonly predicateUri: string;
+      readonly values: readonly { readonly groups?: readonly Level[] }[];
+    };
+    const groups = (data.statements as { readonly groups: readonly Level[] })
+      .groups;
+    const route = groups
+      .find(({ predicateUri }) => predicateUri.endsWith("#routes"))
+      ?.values.at(0);
+    const reverse = route?.groups?.find(({ predicateUri }) =>
+      predicateUri.endsWith("#reverse"),
+    );
+    expect(reverse?.values).toEqual([{ groups: [] }]);
+  });
+
+  describe("on a purpose-built dataset", () => {
+    const dataset: ExampleDataset = {
+      ontologies: [],
+      classes: [{ uri: "urn:C", isAbstract: false, properties: [] }],
+      properties: [
+        {
+          uri: "urn:p#code",
+          range: "String",
+          kind: "DATATYPE",
+          functional: true,
+        },
+      ],
+      entities: [
+        {
+          uri: "urn:e",
+          type: "urn:C",
+          typename: "Station",
+          labels: { "": "E" },
+          code: "E1",
+        },
+      ],
+    };
+
+    it("cuts a group of more than 50 values to 50 whatever the reader asks", async () => {
+      const data = await runWith(
+        {
+          ...dataset,
+          entities: Array.from({ length: 60 }, (_, index) => ({
+            uri: `urn:e${index}`,
+            type: "urn:C",
+            typename: "Station",
+            labels: { "": "E" },
+            code: "E",
+          })),
+        },
+        `{ statements(uri: "urn:C", direction: IN, perPredicate: 5000) { groups { total values { __typename } } } }`,
+      );
+      expect(data.statements).toEqual({
+        groups: [{ total: 60, values: expect.any(Array) }],
+      });
+      const [group] = (data.statements as { groups: { values: unknown[] }[] })
+        .groups;
+      expect(group?.values).toHaveLength(50);
+    });
+
+    it("orders a predicate outside every known namespace by its whole IRI", async () => {
+      const data = await runWith(
+        dataset,
+        `{ statements(uri: "urn:e") { groups { predicateUri } } }`,
+      );
+      expect(data.statements).toEqual({
+        groups: [
+          { predicateUri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" },
+          { predicateUri: "http://www.w3.org/2000/01/rdf-schema#label" },
+          { predicateUri: "urn:p#code" },
+        ],
+      });
+    });
+
+    it("reads no statements into an entity nothing names", async () => {
+      const data = await runWith(
+        dataset,
+        `{ statements(uri: "urn:e", direction: IN) { total groups { predicateUri } } }`,
+      );
+      expect(data.statements).toEqual({ total: 0, groups: [] });
+    });
+  });
+
+  it("states a class's type and superclass", async () => {
+    const result = await read({ uri: `${METRO}Interchange` });
+    expect(result.groups.at(0)?.values).toEqual([
+      {
+        __typename: "StatementForeign",
+        uri: "http://www.w3.org/2002/07/owl#Class",
+        curie: "http://www.w3.org/2002/07/owl#Class",
+      },
+    ]);
+    expect(
+      result.groups.find(({ predicateUri }) =>
+        predicateUri.endsWith("#subClassOf"),
+      )?.values,
+    ).toEqual([
+      { __typename: "StatementNode", node: { uri: `${METRO}Station` } },
     ]);
   });
 });

@@ -90,6 +90,7 @@ import {
   harvestPrefixes,
   resolveRefRoots,
 } from "../sources/index.js";
+import { createStatementsExtensions } from "../statements/index.js";
 import { extendWithList } from "../values/index.js";
 import { composeExtensions } from "./composeExtensions.js";
 import { printServedSdl } from "./printServedSdl.js";
@@ -123,13 +124,15 @@ export const createPragmaProvider = async (
   const graphql = createSchemaPlugin({
     // `Prose` and `Query.prose(uri:)`: Markdown sidecars served beside the
     // compiled graph; `Query.search`: text search over every node;
-    // `Query.source`: one entity's statements as Turtle; `Query.classEdges`:
+    // `Query.source`: one entity's statements as Turtle; `Query.statements`:
+    // its statements grouped by predicate; `Query.classEdges`:
     // the contract's weighed class edges. See `createProseExtensions` for why
     // each is a root field.
     extensions: composeExtensions([
       createProseExtensions(),
       createSearchExtensions(),
       createSourceExtensions(),
+      createStatementsExtensions(),
       createClassEdgesExtension(),
     ]),
     incremental: true,

@@ -2,17 +2,22 @@
 
 import {
   createEnvironment,
+  type EntityBinding,
   type PageRendererProps,
   type Renderer,
 } from "@canonical/prism-core";
 import { render, screen } from "@testing-library/react";
+import type { GraphQLResponse } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import createEntitySite from "../../../../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
 import createRecordedFetch from "../../../../../../testing/createRecordedFetch.js";
 import createWarmEnvironment from "../../../../../../testing/createWarmEnvironment.js";
 import {
+  CENTRAL_EXCHANGE_CURIE,
+  CIRCLE_LINE_CURIE,
   ENTITY_TEST_TIMEOUT_MS,
+  LINES_BINDING,
   NORTHGATE_CURIE,
   STATIONS_BINDING,
   UNKNOWN_ADDRESS,
@@ -46,20 +51,187 @@ const renderDetail = async (address: string, search = "") => {
   );
 };
 
+/**
+ * The interior at `address` under `path`, on a site whose provider serves
+ * `statements`.
+ */
+const renderServed = async (
+  path: string,
+  address: string,
+  binding: EntityBinding = STATIONS_BINDING,
+) => {
+  const url = `/${path}/${encodeURIComponent(address)}`;
+  const { environment } = await createWarmEnvironment(url);
+  return render(
+    createEntitySite({
+      url,
+      environment,
+      extensions: ["source", "statements"],
+      children: <EntityDetail binding={binding} label="X" uri={address} />,
+    }),
+  );
+};
+
+/** The part of a statements answer whose inverse labels a test strips. */
+interface StrippedStatements {
+  readonly incoming: {
+    readonly groups: readonly {
+      readonly predicate: {
+        inverseLabel: string | null;
+        inversePluralLabel: string | null;
+      };
+    }[];
+  };
+}
+
+/** The headings of the view's sections, as `id|title`. */
+const readSections = (root: ParentNode): readonly string[] =>
+  [...root.querySelectorAll(".sectioned-view .section > .heading")].map(
+    (heading) => `${heading.id}|${heading.textContent}`,
+  );
+
+/** The entries of the view's section bar, as `fragment|title`. */
+const readIndex = (root: ParentNode): readonly string[] =>
+  [...root.querySelectorAll(".contents-bar a")].map(
+    (link) => `${link.getAttribute("href")?.slice(1)}|${link.textContent}`,
+  );
+
 describe("EntityDetail", () => {
-  it("renders the entity's heading, summary, fields and relations in its root", {
+  it("lays the header over the entity's summary alone when the site serves no statements", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { container } = await renderDetail(NORTHGATE_CURIE);
     const root = container.querySelector('[data-probe="detail"]');
     expect(root?.className).toBe("ds entity-detail site");
+    expect(root?.querySelector("header")?.className).toBe("ds entity-header");
     expect(
-      [...(root?.children ?? [])].map((child) => child.classList.item(1)),
-    ).toEqual(["entity-heading", "entity-summary", "field-list", "relations"]);
+      [...(root?.querySelectorAll(".body > .ds") ?? [])].map((child) =>
+        child.classList.item(1),
+      ),
+    ).toEqual(["entity-summary"]);
+    expect(readSections(container)).toEqual([]);
     expect(document.title).toBe("Northgate — Stations");
   });
 
-  it("draws the body through the page renderer's render", {
+  it("leads with the prominent values as facts, then one section per property group of key values", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderServed(
+      "stations",
+      CENTRAL_EXCHANGE_CURIE,
+    );
+    expect(
+      [...container.querySelectorAll(".facts dt:not(.statement-group dt)")].map(
+        (term) => term.textContent,
+      ),
+    ).toEqual(["location", "serves lines", "transfer minutes"]);
+    expect(container.querySelector(".facts .nested")?.textContent).toMatch(
+      /^latitude.+longitude.+$/,
+    );
+    expect(container.querySelectorAll(".facts .values a")).toHaveLength(3);
+    expect(readSections(container)).toEqual([
+      "g-metro-section-overview|Overview",
+      "g-metro-section-place|Place",
+      "referenced-by|Referenced by · 6",
+    ]);
+    // A property group's values are key values under its label, with no count.
+    expect(
+      [
+        ...(container
+          .querySelector("#g-metro-section-overview")
+          ?.closest(".section")
+          ?.querySelectorAll(".ds.key-value-list > .pair") ?? []),
+      ].map((pair) => [
+        pair.querySelector(".key")?.textContent,
+        pair.querySelector(".value")?.textContent,
+      ]),
+    ).toEqual([
+      ["platform count", "8"],
+      ["platform length", expect.stringMatching(/^\d+$/)],
+    ]);
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(
+      "Central Exchange",
+    );
+    expect(container.querySelector(".status .address")?.textContent).toBe(
+      CENTRAL_EXCHANGE_CURIE,
+    );
+    // The class is its chip, which names it and links to its home.
+    const kind = container.querySelector(".status .kind");
+    expect(kind?.textContent).toBe("Interchange");
+    console.log("KIND", kind?.innerHTML);
+  });
+
+  it("indexes the sections it renders, in order, Referenced by with its count last", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderServed(
+      "lines",
+      CIRCLE_LINE_CURIE,
+      LINES_BINDING,
+    );
+    const sections = readSections(container);
+    expect(readIndex(container)).toEqual(sections);
+    expect(sections.at(-1)).toBe("referenced-by|Referenced by · 6");
+  });
+
+  it("names an incoming group from the entity's side, never as the property's schema", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderServed(
+      "lines",
+      CIRCLE_LINE_CURIE,
+      LINES_BINDING,
+    );
+    const referenced = container.querySelector("#referenced-by")?.parentElement;
+    expect(
+      [...(referenced?.querySelectorAll("h3") ?? [])].map((h) => h.textContent),
+    ).toEqual(["Served by · 6"]);
+    expect(referenced?.querySelectorAll(".values a")).toHaveLength(6);
+    expect(container.textContent).not.toContain("property to");
+  });
+
+  it("words an incoming group whose property names no inverse from the entity's side", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const url = `/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`;
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation(async (request, variables, ...rest) => {
+      const response = (await recorded(request, variables, ...rest)) as {
+        data: StrippedStatements;
+      };
+      if (request.name === "EntityStatementsQuery") {
+        for (const { predicate } of response.data.incoming.groups) {
+          predicate.inverseLabel = null;
+          predicate.inversePluralLabel = null;
+        }
+      }
+      return response;
+    });
+    const environment = createEnvironment({ fetchFn });
+    await warmRoute(environment, url);
+    const { container } = render(
+      createEntitySite({
+        url,
+        environment,
+        extensions: ["source", "statements"],
+        children: (
+          <EntityDetail
+            binding={LINES_BINDING}
+            label="X"
+            uri={CIRCLE_LINE_CURIE}
+          />
+        ),
+      }),
+    );
+    const referenced = container.querySelector("#referenced-by")?.parentElement;
+    expect(
+      [...(referenced?.querySelectorAll("h3") ?? [])].map((h) => h.textContent),
+    ).toEqual(["Serves line (inverse) · 6"]);
+    expect(container.textContent).not.toContain("property to");
+  });
+
+  it("draws the fallback body through the page renderer's render", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment(
@@ -91,8 +263,103 @@ describe("EntityDetail", () => {
     const drawn = screen.getByRole("region", { name: "Northgate" });
     expect(drawn.dataset.probe).toBe("page-renderer");
     expect([...drawn.children].map((child) => child.classList.item(1))).toEqual(
-      ["entity-summary", "field-list", "relations"],
+      ["entity-summary"],
     );
+  });
+
+  it("counts a prominent fact cut at its bound in its term, and says how many it shows", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const url = `/stations/${encodeURIComponent(CENTRAL_EXCHANGE_CURIE)}`;
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    // Central Exchange serves fewer lines than the bound: the provider is
+    // made to report 20, so the group shows fewer values than it holds.
+    fetchFn.mockImplementation(async (request, variables, ...rest) => {
+      // The recorded fetch answers with a plain response, never a stream.
+      const response = (await recorded(
+        request,
+        variables,
+        ...rest,
+      )) as GraphQLResponse;
+      if (request.name !== "EntityStatementsQuery") return response;
+      const data = (
+        response as unknown as {
+          data: {
+            outgoing: {
+              groups: { total: number; values: { __typename: string }[] }[];
+            };
+          };
+        }
+      ).data;
+      for (const group of data.outgoing.groups) {
+        if (
+          group.values.length > 1 &&
+          group.values.every(({ __typename }) => __typename === "StatementNode")
+        ) {
+          group.total = 20;
+        }
+      }
+      return response;
+    });
+    const environment = createEnvironment({ fetchFn });
+    await warmRoute(environment, url);
+    const { container } = render(
+      createEntitySite({
+        url,
+        environment,
+        extensions: ["source", "statements"],
+        children: (
+          <EntityDetail
+            binding={STATIONS_BINDING}
+            label="Stations"
+            uri={CENTRAL_EXCHANGE_CURIE}
+          />
+        ),
+      }),
+    );
+    await screen.findByRole("heading", { level: 1 });
+    const pair = [
+      ...container.querySelectorAll(".facts .pair:not(.statement-group .pair)"),
+    ].find((candidate) =>
+      candidate.querySelector(".key")?.textContent?.startsWith("serves lines"),
+    );
+    expect(pair?.querySelector(".key")?.textContent).toBe("serves lines · 20");
+    const shown = pair?.querySelector(".shown")?.textContent;
+    expect(shown).toMatch(/^\d+ of 20 shown$/);
+  });
+
+  it("draws neither facts nor sections under another renderer, only the header", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const url = `/stations/${encodeURIComponent(CENTRAL_EXCHANGE_CURIE)}?as=turtle`;
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation((request, variables, ...rest) =>
+      request.name === "EntitySourceQuery"
+        ? Promise.resolve({ data: { source: "<s> a <o> ." } })
+        : recorded(request, variables, ...rest),
+    );
+    const environment = createEnvironment({ fetchFn });
+    await warmRoute(environment, url);
+    const { container } = render(
+      createEntitySite({
+        url,
+        environment,
+        extensions: ["source", "statements"],
+        children: (
+          <EntityDetail
+            binding={STATIONS_BINDING}
+            label="Stations"
+            uri={CENTRAL_EXCHANGE_CURIE}
+          />
+        ),
+      }),
+    );
+    expect(await screen.findByRole("figure")).toHaveTextContent("<s> a <o> .");
+    expect(container.querySelector(".ds.entity-header")).not.toBeNull();
+    expect(container.querySelector(".facts")).toBeNull();
+    expect(readSections(container)).toEqual([]);
   });
 
   it("renders the entity's Turtle under its heading from the warm store", {
@@ -124,9 +391,8 @@ describe("EntityDetail", () => {
       }),
     );
     const root = container.querySelector('[data-probe="detail"]');
-    expect(
-      [...(root?.children ?? [])].map((child) => child.classList.item(1)),
-    ).toEqual(["entity-heading", "entity-source"]);
+    expect(root?.querySelector("header")?.className).toBe("ds entity-header");
+    expect(root?.querySelector(".entity-source")).not.toBeNull();
     expect(screen.getByRole("figure")).toHaveTextContent("<s> a <o> .");
     expect(fetchFn).not.toHaveBeenCalled();
   });

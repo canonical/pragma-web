@@ -79,7 +79,7 @@ describe("createStandardsRoutes", () => {
       },
     );
 
-    const [request, variables] = fetchFn.mock.lastCall ?? [];
+    const [request, variables] = fetchFn.mock.calls.at(0) ?? [];
     expect(request?.name).toBe("StandardEntityQuery");
     expect(variables).toEqual({
       uri: LINK_COMPONENT_URI,

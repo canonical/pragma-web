@@ -437,6 +437,19 @@ than imported so the two packages stay independent.
 
 ---
 
+## Statements — a provider extension, hand-written
+
+`Query.statements(uri, path, perPredicate, direction)` (SDL from the contract's
+`readStatementsSdl()`) answers one entity's statements grouped by predicate,
+`rdf:type` first and then by compact predicate, each group's values in code-point
+order. A group returns at most `perPredicate` values (12 by default, held between 1
+and 50) and its true `total`; a nested value (a line's route) carries its own
+groups, cut to the same bound, one level down, and only its type below that
+(`STATEMENTS_MAX_DEPTH`). `direction: IN` reads the statements naming the entity;
+the index holds an entity's own statements, not those its nested values hold, so a
+route's `calls` are not read inwards here. `path` selects a nested value by route
+key and reads its statements.
+
 ## Search — hand-written
 
 `Query.search(text: String!, first: Int, after: String): NodeConnection!` finds nodes by

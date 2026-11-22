@@ -15,7 +15,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readContractSdl } from "@canonical/prism-contract";
+import { readContractSdl, readStatementsSdl } from "@canonical/prism-contract";
 
 /** The schema directory sits at the package root, beside src/ and dist/. */
 const SCHEMA_RELATIVE_PATH = "schema/extension.graphql";
@@ -68,7 +68,8 @@ export const readExtensionSdl = (): string =>
   readFileSync(EXTENSION_SCHEMA_PATH, "utf8");
 
 /**
- * The full SDL this provider serves: the contract first, the extension after.
+ * The full SDL this provider serves: the contract first, its own extension
+ * after, then the contract's `statements` extension.
  * Handing callers text rather than a GraphQLSchema keeps every consumer free
  * to build it with THEIR graphql instance — two majors coexist in this repo.
  *
@@ -76,4 +77,4 @@ export const readExtensionSdl = (): string =>
  * own SDL from the filesystem, on every call.
  */
 export const readProviderSdl = (): string =>
-  [readContractSdl(), readExtensionSdl()].join("\n");
+  [readContractSdl(), readExtensionSdl(), readStatementsSdl()].join("\n");

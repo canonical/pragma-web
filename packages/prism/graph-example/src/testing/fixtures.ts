@@ -93,7 +93,10 @@ export const LENS_OPERATION_VARIABLES: Record<
   },
   EntityFacetScopeQuery: { classId: SAMPLE_CLASS_URI },
   EntityNamespacesQuery: {},
+  EntityPanelQuery: { id: SAMPLE_ENTITY_URI },
   EntityPageQuery: { id: SAMPLE_ENTITY_URI, classUri: SAMPLE_CLASS_URI },
+  EntityStatementsQuery: { uri: SAMPLE_ENTITY_URI },
+  StandardStatementsQuery: { uri: SAMPLE_ENTITY_URI },
 };
 
 /** The metro namespace, which `metro:` names. */
@@ -1351,8 +1354,8 @@ export const TURTLE_METRO_LENS: readonly LensReadingClass[] = [
           uri: "https://metro.example/onto#calls",
           visibility: null,
           pluralLabel: null,
-          inverseLabel: null,
-          inversePluralLabel: null,
+          inverseLabel: "Called at by",
+          inversePluralLabel: "Called at by",
           inverseVisibility: null,
         },
         group: {

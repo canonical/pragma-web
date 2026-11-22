@@ -18,7 +18,7 @@ const PACKAGE_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
 
 /** The semantic tokens the components' tokens bind beyond the shim. */
-const EXTERNAL_TOKENS = ["--color-text-muted"];
+const EXTERNAL_TOKENS = ["--color-background-layer2", "--color-text-muted"];
 
 /**
  * The one reach into another component the lens makes: below two groups

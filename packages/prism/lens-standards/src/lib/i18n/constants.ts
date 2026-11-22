@@ -30,6 +30,11 @@ export const MESSAGES = {
     "No standard found at {uri}. The standards index lists every standard the graph carries.",
   "article.definition.none": "No description recorded.",
   "article.section.rule": "Rule",
+  "article.section.do": "Do",
+  "article.section.dont": "Don't",
+  "article.section.related": "Related standards",
+  "article.section.appliesTo": "Applies to",
+  "article.shown": "{shown} of {total} shown",
   "article.fact.address": "Address",
   "article.fact.class": "Class",
 } as const;

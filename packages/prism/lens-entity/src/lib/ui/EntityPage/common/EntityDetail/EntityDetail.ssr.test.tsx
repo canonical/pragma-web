@@ -31,7 +31,9 @@ describe("EntityDetail on the server", () => {
       }),
     );
     expect(html).toContain('<div class="ds entity-detail">');
-    expect(html).toContain('<h1 class="title">Northgate</h1>');
+    expect(html).toMatch(
+      /<h1 class="title"><svg[^>]*>.*?<\/svg>Northgate<\/h1>/,
+    );
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });

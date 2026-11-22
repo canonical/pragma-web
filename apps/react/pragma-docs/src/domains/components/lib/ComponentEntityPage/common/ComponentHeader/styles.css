@@ -24,8 +24,13 @@
     gap: var(--component-header-gap);
   }
 
+  /* The class's mark before the name, one gutter apart, on the name's
+   * baseline. */
   .ds.component-header > .heading {
     grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: var(--component-header-gap);
     margin-block: 0;
   }
 
@@ -76,7 +81,16 @@
     opacity: 0;
   }
 
-  .ds.component-header > .status-line > .address {
+  /* The address and its Copy wrap together; a long address breaks inside
+   * its own box beside Copy. */
+  .ds.component-header > .status-line > .locator {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    column-gap: var(--component-header-status-gap-inline);
+    min-width: 0;
+  }
+  .ds.component-header > .status-line > .locator > .address {
     min-width: 0;
     font-family: var(--component-header-address-font-family);
     overflow-wrap: anywhere;

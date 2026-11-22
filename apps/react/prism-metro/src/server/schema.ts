@@ -5,13 +5,15 @@
  * check reads. `schema:check` reruns it and fails on a diff, so the
  * committed file cannot drift from the provider.
  *
- * The provider adds its root fields (`prose`, `search`) in one
- * `extend type Query { … }` block. relay-compiler reads `extend type` in a
- * schema file as a client schema extension: it compiles those fields as
- * `ClientExtension` selections and never sends them to the server, so the
- * palette's search would run with its root field stripped. The block's
- * fields are therefore spliced into the contract's `type Query { … }` and
- * the block itself is dropped; the rest of the SDL is written as emitted.
+ * The provider adds its root fields (`prose`, `search`, `source`,
+ * `facetedInstances`, then `statements`) and `Node.values` in `extend`
+ * blocks. relay-compiler reads `extend type` in a schema file as a client
+ * schema extension: it compiles those fields as `ClientExtension`
+ * selections and never sends them to the server, so the palette's search
+ * would run with its root field stripped. Every block's fields are
+ * therefore folded into the type or interface it extends, in the SDL's
+ * order, and the blocks themselves are dropped; the rest of the SDL is
+ * written as emitted.
  */
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -22,7 +24,6 @@ const SCHEMA_PATH = fileURLToPath(
   new URL("../relay/schema.graphql", import.meta.url),
 );
 
-/** The provider's one `extend type Query { … }` block, with its fields. */
 /** An `extend type` or `extend interface` block, its kind, name and fields. */
 const EXTENSION_BLOCK =
   /^extend (type|interface) (\w+) \{\n([\s\S]*?)\n\}\n\n?/m;

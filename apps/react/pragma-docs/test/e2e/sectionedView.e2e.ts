@@ -304,6 +304,30 @@ describe("the sectioned view's contents bar below three groups", () => {
     },
   );
 
+  it.each(BAR_VIEWPORTS)(
+    "opens a standard's page at $width on the bar, its sections drawn from its statements",
+    async (viewport) => {
+      const page = await open(STANDARD_PATH, { viewport });
+      try {
+        const measure = await page.evaluate(measureBar);
+        expect(measure.firstChildIsBar).toBe(true);
+        expect(measure.contentsDisplay).toBe("none");
+        expect(measure.barPosition).toBe("sticky");
+        expect(measure.barHeight).toBeGreaterThan(0);
+        expect(measure.barHeight).toBeLessThanOrEqual(
+          BAR_MAX_BLOCK_SIZE_PX + TOLERANCE_PX,
+        );
+        expect(measure.headings.map(({ id }) => id)).toEqual([
+          "rule",
+          "do",
+          "dont",
+        ]);
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
   it("shows no bar at 1440, where the aside holds the index", async () => {
     const page = await open(BUTTON_PATH);
     try {

@@ -71,8 +71,14 @@ const UIBLOCK_CLASS_KEY = `ontologyClass(uri:"${UIBLOCK_TERM}")`;
  */
 const STUB_RESPONSES: Readonly<Record<string, unknown>> = {
   ComponentProbeQuery: COMPONENT_PROBE_RESPONSE,
+  // The selected term answers as a class, as UI Block does in the graph:
+  // an instance's term would also warm its details panel.
   DefinitionsExplorerQuery: {
-    data: { ontologies: [], ontologyClass: null, ontologyProperty: null },
+    data: {
+      ontologies: [],
+      ontologyClass: { __typename: "OntologyClass" },
+      ontologyProperty: null,
+    },
   },
 };
 
@@ -147,11 +153,15 @@ describe("prepareRelayData over HTTP", () => {
 
   // Every data-bearing URL the app serves, with the operation its route's
   // `warm` sends and the variables its domain builds from the URL,
-  // percent-decoding included.
+  // percent-decoding included, and any further operation it sends beside.
   const urlCases: ReadonlyArray<{
     readonly url: string;
     readonly operationName: string;
     readonly variables: Readonly<Record<string, unknown>>;
+    readonly also?: {
+      readonly operationName: string;
+      readonly variables: Readonly<Record<string, unknown>>;
+    };
   }> = [
     {
       url: "/playground",
@@ -199,6 +209,12 @@ describe("prepareRelayData over HTTP", () => {
         uri: STANDARD_URI,
         classUri: STANDARDS_BINDING.classUri,
       },
+      // The standard's statements, from which its reading page draws Do,
+      // Don't, Related standards and Applies to.
+      also: {
+        operationName: "StandardStatementsQuery",
+        variables: { uri: STANDARD_URI },
+      },
     },
     {
       url: "/journeys",
@@ -231,7 +247,9 @@ describe("prepareRelayData over HTTP", () => {
       },
     },
   ];
-  for (const { url, operationName, variables } of urlCases) {
+  for (const { url, operationName, variables } of urlCases.filter(
+    (entry) => entry.also === undefined,
+  )) {
     it(`sends one ${operationName} with the URL's variables for ${url}`, async () => {
       const consoleError = vi
         .spyOn(console, "error")
@@ -246,6 +264,30 @@ describe("prepareRelayData over HTTP", () => {
       const request = readSoleRequest();
       expect(request.body.operationName).toBe(operationName);
       expect(request.body.variables).toEqual(variables);
+    });
+  }
+
+  for (const { url, operationName, variables, also } of urlCases) {
+    if (also === undefined) continue;
+    it(`sends one ${operationName} and one ${also.operationName} with the URL's variables for ${url}`, async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      try {
+        await prepareRelayData(url, graphqlUrl);
+      } finally {
+        consoleError.mockRestore();
+      }
+
+      expect(
+        captured.map(({ body }) => [body.operationName, body.variables]),
+      ).toEqual(
+        expect.arrayContaining([
+          [operationName, variables],
+          [also.operationName, also.variables],
+        ]),
+      );
+      expect(captured).toHaveLength(2);
     });
   }
 

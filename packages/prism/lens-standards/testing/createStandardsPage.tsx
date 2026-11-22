@@ -1,3 +1,4 @@
+import type { ProviderExtension } from "@canonical/prism-contract";
 import {
   createEnvironment,
   createStaticRouter,
@@ -22,15 +23,17 @@ import { HOMES, STANDARDS_BINDING_FIXTURE } from "./fixtures.js";
 /** The lens's own two routes, bound as a pragma site binds them. */
 const routes = createStandardsRoutes(STANDARDS_BINDING_FIXTURE);
 
-/** The site's renderers, over a provider that serves source. */
+/** The site's renderers, over a provider that serves `extensions`. */
 const SiteRenderers = ({
   children,
+  extensions,
 }: {
   readonly children: ReactNode;
+  readonly extensions: readonly ProviderExtension[];
 }): ReactElement => (
   <RenderersProvider
     defaults={{ list: useListRenderers(), page: usePageRenderers() }}
-    extensions={["source"]}
+    extensions={extensions}
   >
     {children}
   </RenderersProvider>
@@ -48,12 +51,15 @@ const formatDocumentTitle = (title: string): string => `${title} — Docs`;
  * The homes, the projection link provider and the page's ambient namespace,
  * `cs` (the docs site declares it in its standards layout), sit inside the router, because
  * a mention in a standard's prose renders as a chip that links to its home
- * through it, and the site's renderers over a provider that serves source.
+ * through it, and the site's renderers over a provider that serves
+ * `extensions`.
  *
  * @param url - The URL the static router matches.
  * @param records - The store to seed the environment with, or undefined.
  * @param fetchFn - The network the environment falls back to.
  * @param page - The page, or layout, to mount.
+ * @param extensions - The provider extensions the site serves; `source`
+ *   alone when omitted, a site that does not serve `statements`.
  * @returns The page under its providers, ready to render.
  */
 export default function createStandardsPage(
@@ -61,6 +67,7 @@ export default function createStandardsPage(
   records: RecordMap | undefined,
   fetchFn: FetchFunction,
   page: ReactNode,
+  extensions: readonly ProviderExtension[] = ["source"],
 ): ReactElement {
   return (
     <HeadProvider titleTemplate={formatDocumentTitle}>
@@ -71,7 +78,7 @@ export default function createStandardsPage(
           <HomesProvider homes={HOMES}>
             <ProjectionLinkProvider>
               <AmbientNamespaceProvider namespace="cs">
-                <SiteRenderers>{page}</SiteRenderers>
+                <SiteRenderers extensions={extensions}>{page}</SiteRenderers>
               </AmbientNamespaceProvider>
             </ProjectionLinkProvider>
           </HomesProvider>

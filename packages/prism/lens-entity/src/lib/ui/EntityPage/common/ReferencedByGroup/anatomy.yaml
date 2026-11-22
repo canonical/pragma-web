@@ -1,0 +1,20 @@
+---
+# ReferencedByGroup: one group of what references the entity, inside the
+# entity page's Referenced by section: its title (the group's label from the
+# entity's side, and its true count) above its values. A subgrid of the
+# section's columns, so neither part is put in one column: the title and the
+# values each span every column. Reference: PS9 V1, 63a.
+#
+# Token ledger (on `.ds.referenced-by-group`):
+#   --referenced-by-group-gap: --grid-gutter   between the title and the values
+#   layout.grid.column "1 / -1": structure, a span in columns.
+node:
+  uri: prism.subcomponent.referenced_by_group
+  element: section
+  styles: { layout.type: grid, layout.grid.columns: subgrid, layout.grid.column: "1 / -1", spacing.gap: grid.gutter }
+  edges:
+    - node: { role: title, element: h3, styles: { layout.grid.column: "1 / -1", spacing.external.block.start: 0, spacing.external.block.end: 0 } }
+      relation: { cardinality: "1", slotName: title }   # label + count
+    - node:
+        uri: prism.subcomponent.statement_group   # spans every column itself
+      relation: { cardinality: "1", slotName: values }

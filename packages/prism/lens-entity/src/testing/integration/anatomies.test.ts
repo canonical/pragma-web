@@ -48,6 +48,7 @@ describe("the lens's components", () => {
       "EntityIndexPage",
       "EntityLayout",
       "EntityPage",
+      "EntityPanel",
     ]);
   });
 
@@ -62,10 +63,10 @@ describe("the lens's components", () => {
       "SocketGuard",
       "Trail",
       "EntityDetail",
-      "EntityHeading",
+      "EntityHeader",
       "EntitySummary",
-      "FieldList",
-      "Relations",
+      "ReferencedByGroup",
+      "StatementGroup",
     ]);
   });
 

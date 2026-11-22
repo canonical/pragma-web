@@ -31,20 +31,15 @@ import {
  * the source tree and the published build, and which one is live is not
  * knowable from the module's own text.
  */
-export const resolveContractSchemaPath = (here: string): string => {
-  const sourceCandidate = resolve(
-    here,
-    SOURCE_LAYOUT_PREFIX,
-    SCHEMA_RELATIVE_PATH,
-  );
+export const resolveContractSchemaPath = (
+  here: string,
+  relativePath: string = SCHEMA_RELATIVE_PATH,
+): string => {
+  const sourceCandidate = resolve(here, SOURCE_LAYOUT_PREFIX, relativePath);
   if (existsSync(sourceCandidate)) {
     return sourceCandidate;
   }
-  const buildCandidate = resolve(
-    here,
-    BUILD_LAYOUT_PREFIX,
-    SCHEMA_RELATIVE_PATH,
-  );
+  const buildCandidate = resolve(here, BUILD_LAYOUT_PREFIX, relativePath);
   if (existsSync(buildCandidate)) {
     return buildCandidate;
   }
@@ -52,7 +47,7 @@ export const resolveContractSchemaPath = (here: string): string => {
   // directory chosen by which branch of a probe ran last, so name both and say
   // what their absence means: a published package missing its schema/.
   throw new Error(
-    `@canonical/prism-contract: the contract SDL is missing. Looked for ${sourceCandidate} and ${buildCandidate}. An installed copy that reaches here is missing its schema/ directory.`,
+    `@canonical/prism-contract: the SDL ${relativePath} is missing. Looked for ${sourceCandidate} and ${buildCandidate}. An installed copy that reaches here is missing its schema/ directory.`,
   );
 };
 

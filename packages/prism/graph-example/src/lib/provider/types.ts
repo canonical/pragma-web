@@ -271,3 +271,42 @@ export interface SearchMatch {
   /** The entry's title, which breaks ties between equal matches. */
   readonly title: string;
 }
+
+/**
+ * The object of one statement a record makes, as `statements` reads it: a
+ * node by its IRI, a literal, or a value with no IRI (a location, a route, a
+ * unit's placement) whose own statements are read on demand, since a route
+ * and its reverse name each other.
+ */
+export type RecordTerm =
+  | { readonly kind: "node"; readonly uri: string }
+  | {
+      readonly kind: "literal";
+      readonly lexical: string;
+      readonly datatype: string;
+      readonly lang: string | null;
+    }
+  | {
+      readonly kind: "nested";
+      /** The value's class, or null when the record states none. */
+      readonly type: string | null;
+      /** What a `path` segment selects it by: its record key, else its index. */
+      readonly key: string;
+      readonly statements: () => readonly RecordStatement[];
+    };
+
+/** One statement a record, or a value it holds, makes. */
+export interface RecordStatement {
+  readonly predicate: string;
+  readonly object: RecordTerm;
+}
+
+/** One predicate's statements, bounded, with the true count. */
+export interface RecordStatementGroup {
+  readonly predicate: string;
+  readonly total: number;
+  readonly values: readonly RecordTerm[];
+}
+
+/** A sort rank and the key that orders within it, in code-point order. */
+export type RankedKey = readonly [rank: number, key: string];
