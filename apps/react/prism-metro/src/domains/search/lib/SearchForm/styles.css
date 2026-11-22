@@ -6,6 +6,16 @@
   /* The field and the button on one line, one gutter apart. */
   .ds.search-form {
     --search-form-gap: var(--grid-gutter);
+    --search-form-inset-block: var(--space-050);
+    --search-form-inset-inline: var(--space-100);
+    --search-form-border-width: 1px;
+    --search-form-field-border-color: var(--color-border-muted);
+    --search-form-submit-border-color: var(--color-border);
+    --search-form-background: var(--color-background);
+    --search-form-color: var(--color-text);
+    --search-form-font-size: var(--typography-text-secondary-font-size);
+    --search-form-focus-ring-width: 2px;
+    --search-form-focus-ring-color: var(--color-focus-ring);
 
     display: flex;
     align-items: center;
@@ -19,5 +29,35 @@
     flex-shrink: 1;
     flex-basis: auto;
     min-inline-size: 0;
+  }
+
+  /* The field and the button share one frame: an inset, a hairline, the
+   * page's background and text, the strip's secondary size. */
+  .ds.search-form .input,
+  .ds.search-form .submit {
+    padding-block: var(--search-form-inset-block);
+    padding-inline: var(--search-form-inset-inline);
+    border-width: var(--search-form-border-width);
+    border-style: solid;
+    border-color: var(--search-form-field-border-color);
+    background: var(--search-form-background);
+    color: var(--search-form-color);
+    font: inherit;
+    font-size: var(--search-form-font-size);
+  }
+
+  /* The button keeps its label's width, framed a step stronger. */
+  .ds.search-form .submit {
+    flex-shrink: 0;
+    border-color: var(--search-form-submit-border-color);
+    cursor: pointer;
+  }
+
+  .ds.search-form .input:focus-visible,
+  .ds.search-form .submit:focus-visible {
+    outline-width: var(--search-form-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--search-form-focus-ring-color);
+    outline-offset: 0;
   }
 }
