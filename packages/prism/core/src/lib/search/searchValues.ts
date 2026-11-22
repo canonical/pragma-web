@@ -7,8 +7,9 @@ const readText = (value: unknown): string | undefined =>
 
 /**
  * The search route's search schema: the text (`q`), the applied type
- * (`type`), the cursor the page starts after (`after`) and the page's
- * number (`page`); any other key is dropped.
+ * (`type`), the cursor the page starts after (`after`), the page's
+ * number (`page`) and the open sheet (`sheet`, which the strip's fold
+ * sets); any other key is dropped.
  */
 export const searchValues: StandardSchemaV1<
   Readonly<Record<string, unknown>>,
@@ -24,6 +25,7 @@ export const searchValues: StandardSchemaV1<
         type: readText(raw.type),
         after: readText(raw.after),
         page: readText(raw.page),
+        sheet: readText(raw.sheet),
       };
       return {
         value: Object.fromEntries(

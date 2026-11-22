@@ -1,4 +1,4 @@
-/** The search page's address values: its text, the applied type and the page. */
+/** The search page's address values: text, type, page and open sheet. */
 export interface SearchValues {
   /** The search text, as the address holds it. */
   readonly q?: string;
@@ -8,6 +8,8 @@ export interface SearchValues {
   readonly after?: string;
   /** The page's number, from 1, as the address holds it. */
   readonly page?: string;
+  /** The open sheet, `filter` while the fold's sheet is open. */
+  readonly sheet?: string;
 }
 
 /** The search page's state, read from its address values. */

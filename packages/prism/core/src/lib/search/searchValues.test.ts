@@ -2,18 +2,26 @@ import { describe, expect, it } from "vitest";
 import { readSearchState, searchValues } from "./searchValues.js";
 
 describe("searchValues", () => {
-  it("keeps the text, type, cursor and page and drops any other key", async () => {
+  it("keeps the text, type, cursor, page and sheet and drops any other key", async () => {
     const result = await searchValues["~standard"].validate({
       q: "but",
       type: "ex:A",
       after: "c",
       page: "2",
       as: "table",
-      sheet: "",
+      sheet: "filter",
     });
     expect(result).toEqual({
-      value: { q: "but", type: "ex:A", after: "c", page: "2" },
+      value: { q: "but", type: "ex:A", after: "c", page: "2", sheet: "filter" },
     });
+  });
+
+  it("drops a key whose value has no text", async () => {
+    const result = await searchValues["~standard"].validate({
+      q: "but",
+      sheet: "",
+    });
+    expect(result).toEqual({ value: { q: "but" } });
   });
 });
 
@@ -33,6 +41,12 @@ describe("readSearchState", () => {
     });
     expect(readSearchState({ after: "c", page: "x" })).toEqual({
       text: "",
+      type: undefined,
+      after: undefined,
+      page: 1,
+    });
+    expect(readSearchState({ q: "but", after: "c" })).toEqual({
+      text: "but",
       type: undefined,
       after: undefined,
       page: 1,
