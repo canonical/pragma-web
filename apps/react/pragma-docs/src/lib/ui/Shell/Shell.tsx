@@ -2,6 +2,7 @@
 
 import { CommandPalette } from "@canonical/prism-command-palette";
 import {
+  collectLenses,
   HomesProvider,
   RouterLink,
   StoredThemeProvider,
@@ -13,7 +14,7 @@ import {
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteArgs, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
-import type { ReactElement } from "react";
+import { type ReactElement, useMemo } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
@@ -25,6 +26,7 @@ import {
   GRID_PRESET_CLASS_NAMES,
   SITE_SWITCHES,
 } from "./constants.js";
+import useRecentPages from "./hooks/useRecentPages.js";
 import type { ShellProps } from "./types.js";
 import "./styles.css";
 
@@ -63,7 +65,9 @@ const renderPeek = (uri: string): ReactElement => <DocsPeek uri={uri} />;
  * route map imports components from `src/lib/`.
  *
  * When the routes hold the search page, the palette hands its text to
- * that page's address, which the router builds.
+ * that page's address, which the router builds. Otherwise it jumps to the
+ * site's destinations: each lens's home, in the rail's order, and the
+ * pages read before, which the Shell keeps.
  *
  * `import { Shell } from "#lib/ui";`
  *
@@ -79,6 +83,20 @@ export default function Shell<
   className,
   ...props
 }: ShellProps<TRoutes, TNotFound>): ReactElement {
+  const recent = useRecentPages(router);
+  // Keyed on the route table, a stable reference for the router's
+  // lifetime; a lens's index route takes no params.
+  const places = useMemo(
+    () =>
+      collectLenses(router.routes).map(({ name, label }) => ({
+        label,
+        href: router.buildPath(
+          name,
+          ...([] as unknown as RouteArgs<TRoutes, typeof name>),
+        ),
+      })),
+    [router],
+  );
   return (
     <StoredThemeProvider theme={theme}>
       <HeadProvider titleTemplate={formatDocumentTitle}>
@@ -127,6 +145,7 @@ export default function Shell<
                                 )
                             : undefined
                         }
+                        destinations={{ places, recent }}
                       />
                     </div>
                   </SiteRenderers>
