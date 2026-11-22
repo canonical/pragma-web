@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import EntityHeader from "./EntityHeader.js";
 
 describe("EntityHeader", () => {
-  it("names the entity in the one level-1 heading, its class and address in the status line", () => {
+  it("names the entity in the one level-1 heading, its class, then its address and Copy as one pair", () => {
     const { container } = render(
       <EntityHeader
         address="metro:northgate"
@@ -19,7 +19,11 @@ describe("EntityHeader", () => {
     expect(status?.querySelector(".address")?.textContent).toBe(
       "metro:northgate",
     );
-    expect(status?.lastElementChild?.classList.contains("copy-button")).toBe(
+    const locator = status?.querySelector(".locator");
+    expect(locator?.firstElementChild?.classList.contains("address")).toBe(
+      true,
+    );
+    expect(locator?.lastElementChild?.classList.contains("copy-button")).toBe(
       true,
     );
     expect(container.querySelector(".summary")).toBeNull();

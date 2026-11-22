@@ -10,7 +10,8 @@ const componentCssClassName = "ds entity-header";
  * The entity page's identity header: the class's mark before the entity's
  * name, the page's one level-1 heading; its summary; then the status line,
  * the class and the compact address followed by Copy, which announces
- * "Copied" through its live region.
+ * "Copied" through its live region. The address and Copy wrap as one, and
+ * only the address is muted: the class's chip keeps its own colours.
  *
  * `import { EntityHeader } from "../EntityHeader/index.js";`
  *
@@ -36,8 +37,10 @@ export default function EntityHeader({
       {summary === undefined ? null : <p className="summary">{summary}</p>}
       <p className="status">
         <span className="kind">{kind}</span>
-        <code className="address">{address}</code>
-        <CopyButton text={address} />
+        <span className="locator">
+          <code className="address">{address}</code>
+          <CopyButton text={address} />
+        </span>
       </p>
     </header>
   );

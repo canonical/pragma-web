@@ -5,7 +5,7 @@
    * status line, each across the main column. */
   .ds.entity-header {
     --entity-header-gap: var(--grid-gutter);
-    --entity-header-status-color: var(--color-text-muted);
+    --entity-header-address-color: var(--color-text-muted);
 
     grid-column: 1 / -1;
     display: grid;
@@ -32,6 +32,22 @@
     flex-wrap: wrap;
     align-items: baseline;
     gap: var(--entity-header-gap);
-    color: var(--entity-header-status-color);
+  }
+
+  /* The address and its Copy wrap together; a long address breaks inside
+   * its own box beside Copy. */
+  .ds.entity-header > .status > .locator {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: var(--entity-header-gap);
+    min-width: 0;
+  }
+
+  /* Only the address is muted: the kind chip keeps its own colours. */
+  .ds.entity-header > .status > .locator > .address {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--entity-header-address-color);
   }
 }
