@@ -133,7 +133,14 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
       "/stations/metro%3Acentral-exchange",
     );
     expect(status).toBe(200);
-    const facts = html.split('class="facts"').at(1)?.split("</dl>").at(0);
+    // A nested value's own terms (the location's latitude and longitude)
+    // are not facts: the list is read with them left out.
+    const facts = html
+      .split('class="facts"')
+      .at(1)
+      ?.replace(/<dl class="nested">.*?<\/dl>/gs, "")
+      .split("</dl>")
+      .at(0);
     expect(
       [...String(facts).matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((term) =>
         term.at(1),
