@@ -135,7 +135,7 @@ describe("EntityPanel", () => {
       [
         ...(panel?.querySelectorAll(":scope > details.group > summary") ?? []),
       ].map(({ textContent }) => textContent),
-    ).toEqual(["routes · 2", "formations · 1"]);
+    ).toEqual(["Routes · 2", "Formations · 1"]);
     const groups = [...(panel?.querySelectorAll("details.group") ?? [])];
     expect(groups.length).toBeGreaterThan(0);
     for (const group of groups) {
@@ -174,10 +174,7 @@ describe("EntityPanel", () => {
     const texts = [...(panel?.querySelectorAll(":scope > details.text") ?? [])];
     expect(
       texts.map((text) => text.querySelector(":scope > summary")?.textContent),
-    ).toEqual([
-      expect.stringMatching(/^code$/i),
-      expect.stringMatching(/^colour$/i),
-    ]);
+    ).toEqual(["Code", "Colour"]);
     expect(texts.every((text) => !text.hasAttribute("open"))).toBe(true);
     expect(
       texts.map((text) => text.querySelector(".body")?.textContent),

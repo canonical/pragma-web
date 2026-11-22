@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { METRO_NAMESPACES } from "../../testing/fixtures.js";
+import capitalizeLabel from "./capitalizeLabel.js";
 import labelIncomingGroup from "./labelIncomingGroup.js";
 
 const SERVES_LINE = "https://metro.example/onto#servesLine";
@@ -61,6 +62,41 @@ describe("labelIncomingGroup", () => {
         { predicateUri: SERVES_LINE, total: 2, predicate: undefined },
         METRO_NAMESPACES,
         nameInverse,
+      ),
+    ).toBe("metro:servesLine (inverse)");
+  });
+
+  it("sets a declared label's case as a heading asks, and a compact IRI as it is", () => {
+    expect(
+      labelIncomingGroup(
+        {
+          predicateUri: SERVES_LINE,
+          total: 1,
+          predicate: { label: "serves line", inverseLabel: "served by" },
+        },
+        METRO_NAMESPACES,
+        nameInverse,
+        capitalizeLabel,
+      ),
+    ).toBe("Served by");
+    expect(
+      labelIncomingGroup(
+        {
+          predicateUri: SERVES_LINE,
+          total: 2,
+          predicate: { label: "serves line", inverseLabel: null },
+        },
+        METRO_NAMESPACES,
+        nameInverse,
+        capitalizeLabel,
+      ),
+    ).toBe("Serves line (inverse)");
+    expect(
+      labelIncomingGroup(
+        { predicateUri: SERVES_LINE, total: 2, predicate: undefined },
+        METRO_NAMESPACES,
+        nameInverse,
+        capitalizeLabel,
       ),
     ).toBe("metro:servesLine (inverse)");
   });

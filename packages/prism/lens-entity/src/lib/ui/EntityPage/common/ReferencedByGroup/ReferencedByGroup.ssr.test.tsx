@@ -30,7 +30,7 @@ describe("ReferencedByGroup on the server", () => {
       }),
     );
     expect(html).toContain(
-      '<section class="ds referenced-by-group"><h3 class="title">served by · 6</h3><div class="ds statement-group">',
+      '<section class="ds referenced-by-group"><h3 class="title">Served by · 6</h3><div class="ds statement-group">',
     );
   });
 });

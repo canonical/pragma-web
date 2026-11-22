@@ -37,7 +37,7 @@ describe("ReferencedByGroup", () => {
       ),
     ).toEqual(["H3.title", "DIV.ds statement-group"]);
     expect(groups.at(0)?.querySelector(":scope > .title")?.textContent).toBe(
-      "served by · 6",
+      "Served by · 6",
     );
     expect(groups.at(0)?.querySelectorAll(".values a")).toHaveLength(6);
   });

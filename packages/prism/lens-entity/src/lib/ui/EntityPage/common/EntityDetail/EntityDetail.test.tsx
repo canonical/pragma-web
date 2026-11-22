@@ -184,7 +184,7 @@ describe("EntityDetail", () => {
     const referenced = container.querySelector("#referenced-by")?.parentElement;
     expect(
       [...(referenced?.querySelectorAll("h3") ?? [])].map((h) => h.textContent),
-    ).toEqual(["served by · 6"]);
+    ).toEqual(["Served by · 6"]);
     expect(referenced?.querySelectorAll(".values a")).toHaveLength(6);
     expect(container.textContent).not.toContain("property to");
   });
@@ -226,7 +226,7 @@ describe("EntityDetail", () => {
     const referenced = container.querySelector("#referenced-by")?.parentElement;
     expect(
       [...(referenced?.querySelectorAll("h3") ?? [])].map((h) => h.textContent),
-    ).toEqual(["serves line (inverse) · 6"]);
+    ).toEqual(["Serves line (inverse) · 6"]);
     expect(container.textContent).not.toContain("property to");
   });
 

@@ -21,6 +21,7 @@ import entityPageQueryNode from "../../../../../__generated__/EntityPageQuery.gr
 import type { EntityStatementsQuery } from "../../../../../__generated__/EntityStatementsQuery.graphql.js";
 import entityStatementsQueryNode from "../../../../../__generated__/EntityStatementsQuery.graphql.js";
 import buildEntityPageVariables from "../../../../buildEntityPageVariables.js";
+import capitalizeLabel from "../../../../capitalizeLabel.js";
 import { Message, useMessages } from "../../../../i18n/index.js";
 import isInstanceOf from "../../../../isInstanceOf.js";
 import labelIncomingGroup from "../../../../labelIncomingGroup.js";
@@ -234,7 +235,11 @@ export default function EntityDetail({
           : {
               id: section.id,
               title: t("statements.group", {
-                label: labelOutgoingGroup(section.group, ontologies),
+                label: labelOutgoingGroup(
+                  section.group,
+                  ontologies,
+                  capitalizeLabel,
+                ),
                 count: section.group.total,
               }),
               content: <StatementGroup group={section.group} />,
@@ -251,8 +256,11 @@ export default function EntityDetail({
                 group={group}
                 key={group.predicateUri}
                 title={t("statements.group", {
-                  label: labelIncomingGroup(group, ontologies, (inverse) =>
-                    t("statements.inverse", { label: inverse }),
+                  label: labelIncomingGroup(
+                    group,
+                    ontologies,
+                    (inverse) => t("statements.inverse", { label: inverse }),
+                    capitalizeLabel,
                   ),
                   count: group.total,
                 })}

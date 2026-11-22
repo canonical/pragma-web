@@ -17,6 +17,7 @@ import type { EntityPanelQuery } from "../../../__generated__/EntityPanelQuery.g
 import entityPanelQueryNode from "../../../__generated__/EntityPanelQuery.graphql.js";
 import type { EntityStatementsQuery } from "../../../__generated__/EntityStatementsQuery.graphql.js";
 import entityStatementsQueryNode from "../../../__generated__/EntityStatementsQuery.graphql.js";
+import capitalizeLabel from "../../capitalizeLabel.js";
 import { PANEL_TEXT_LIMIT } from "../../constants.js";
 import { Message, useMessages } from "../../i18n/index.js";
 import labelIncomingGroup from "../../labelIncomingGroup.js";
@@ -178,7 +179,7 @@ export default function EntityPanel({
       {texts.map((group) => (
         <details className="text" key={group.predicateUri}>
           <summary className="summary">
-            {labelOutgoingGroup(group, ontologies)}
+            {labelOutgoingGroup(group, ontologies, capitalizeLabel)}
           </summary>
           <StatementGroup className="body" group={group} />
         </details>
@@ -187,7 +188,7 @@ export default function EntityPanel({
         <details className="group" key={group.predicateUri}>
           <summary className="summary">
             {t("statements.group", {
-              label: labelOutgoingGroup(group, ontologies),
+              label: labelOutgoingGroup(group, ontologies, capitalizeLabel),
               count: group.total,
             })}
           </summary>
@@ -205,7 +206,12 @@ export default function EntityPanel({
             <details className="group" key={group.predicateUri}>
               <summary className="summary">
                 {t("statements.group", {
-                  label: labelIncomingGroup(group, ontologies, nameInverse),
+                  label: labelIncomingGroup(
+                    group,
+                    ontologies,
+                    nameInverse,
+                    capitalizeLabel,
+                  ),
                   count: group.total,
                 })}
               </summary>
