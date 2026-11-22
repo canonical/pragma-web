@@ -1,4 +1,5 @@
 import type { StandardSchemaV1 } from "@canonical/router-core";
+import { VIEW_PARAMS } from "../renderers/constants.js";
 import type { SearchState, SearchValues } from "./types.js";
 
 /** Keep a value only when it is a string with text in it. */
@@ -8,8 +9,8 @@ const readText = (value: unknown): string | undefined =>
 /**
  * The search route's search schema: the text (`q`), the applied type
  * (`type`), the cursor the page starts after (`after`), the page's
- * number (`page`) and the open sheet (`sheet`, which the strip's fold
- * sets); any other key is dropped.
+ * number (`page`) and the open sheet (the view parameter `sheet`, which
+ * the strip's fold sets); any other key is dropped.
  */
 export const searchValues: StandardSchemaV1<
   Readonly<Record<string, unknown>>,
@@ -25,7 +26,7 @@ export const searchValues: StandardSchemaV1<
         type: readText(raw.type),
         after: readText(raw.after),
         page: readText(raw.page),
-        sheet: readText(raw.sheet),
+        [VIEW_PARAMS.sheet]: readText(raw[VIEW_PARAMS.sheet]),
       };
       return {
         value: Object.fromEntries(
