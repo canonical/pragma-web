@@ -34,6 +34,11 @@
 #   --standard-article-gap: var(--grid-gutter), the gap between chips.
 #   --standard-article-shown-color: var(--color-text-muted), the muted
 #     "N of M shown" line.
+#   --standard-article-code-background: var(--color-background-layer2), the
+#     code block's layer under an example's code.
+#   --standard-article-code-padding-block, --standard-article-code-padding-inline:
+#     var(--component-padding-block), var(--component-padding-inline), the
+#     code's inset on that layer.
 node:
   uri: prism.component.standard_article
   edges:
@@ -87,6 +92,10 @@ node:
                   relation: { cardinality: "1", slotName: description }
                 - node:
                     role: code (the example's code, a pre with its language as data-language)
+                    styles:
+                      background: --standard-article-code-background
+                      spacing.padding.block: --standard-article-code-padding-block
+                      spacing.padding.inline: --standard-article-code-padding-inline
                   relation: { cardinality: "1", slotName: code }
             relation: { cardinality: "1..*", slotName: example }
       relation: { cardinality: "0..2", slotName: examples }  # the do and dont sections' content
