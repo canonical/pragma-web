@@ -206,3 +206,12 @@ export const MIN_SCREEN_TEXT_PX = 12;
  * user units: the node's 1px border and its 8px inset.
  */
 export const GRAPH_NODE_TEXT_INSET = 9;
+
+/** The desktop viewport the palette's and the search page's cases run at. */
+export const DESKTOP_VIEWPORT = { width: 1440, height: 900 } as const;
+
+/** A phone's viewport, below two groups: the strip folds its filters. */
+export const PHONE_VIEWPORT = { width: 390, height: 844 } as const;
+
+/** A text whose results span two or more types, so the facet bar shows. */
+export const SEARCH_MIXED_TEXT = "but";
