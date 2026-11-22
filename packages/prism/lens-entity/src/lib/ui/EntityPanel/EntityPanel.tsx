@@ -58,9 +58,9 @@ const componentCssClassName = "ds entity-panel";
  * identity (its name; Open beside it, to the entity's own page, the one
  * that marks it canonical, through the site's link component, unless the
  * panel already sits on that page; its class's chip and its compact
- * address) and its prominent values, both
- * open; then each other group the entity holds (a value, a value held by
- * it such as a line's routes, or a relation) and each group of what
+ * address), its prominent values and its plain values, all
+ * open; then each group of values held by it, such as a line's routes,
+ * each relation it holds, and each group of what
  * references it, a closed disclosure whose summary carries the group's
  * label and its true count, which opens on the group's values (12, then
  * how many of them it shows). The disclosures are native, so the panel works without
@@ -128,16 +128,20 @@ export default function EntityPanel({
   const outgoing = served ? statements.outgoing : null;
   const incoming = served ? statements.incoming : null;
   const partition = partitionStatements(outgoing?.groups ?? [], node._meta);
-  const values = partition.prominent.map(
+  const held = partition.values
+    .filter(({ group }) => holdsNested(group))
+    .map(({ group }) => group);
+  const plain = partition.values
+    .filter(({ group }) => !holdsNested(group))
+    .map(({ group }) => group);
+  const values = [...partition.prominent, ...plain].map(
     (group): KeyValuePair => ({
       id: group.predicateUri,
       term: labelOutgoingGroup(group, ontologies),
       value: <StatementGroup group={group} />,
     }),
   );
-  const groups = [...partition.values, ...partition.relations].map(
-    ({ group }) => group,
-  );
+  const groups = [...held, ...partition.relations.map(({ group }) => group)];
   const nameInverse = (inverse: string): string =>
     t("statements.inverse", { label: inverse });
 
@@ -196,5 +200,14 @@ export default function EntityPanel({
         </section>
       )}
     </section>
+  );
+}
+
+/** Whether a group's values are held by the entity, such as a line's routes. */
+function holdsNested(group: {
+  values: readonly { __typename: string }[];
+}): boolean {
+  return group.values.some(
+    ({ __typename }) => __typename === "StatementNested",
   );
 }
