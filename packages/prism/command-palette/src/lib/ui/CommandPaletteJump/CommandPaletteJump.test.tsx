@@ -131,6 +131,17 @@ describe("CommandPaletteJump", () => {
     );
   });
 
+  it("leaves the field's other keys alone, and the arrows while nothing is listed", () => {
+    renderJump({ destinations: { places: [], recent: [] } });
+    const arrow = fireEvent.keyDown(screen.getByRole("combobox"), {
+      key: "ArrowDown",
+    });
+    const home = fireEvent.keyDown(screen.getByRole("combobox"), {
+      key: "Home",
+    });
+    expect([arrow, home]).toEqual([true, true]);
+  });
+
   it("highlights the option a pointer moves over", () => {
     renderJump();
     fireEvent.pointerMove(screen.getByRole("option", { name: "Definitions" }));

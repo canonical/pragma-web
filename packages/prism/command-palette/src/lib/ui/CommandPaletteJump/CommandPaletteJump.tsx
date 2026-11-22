@@ -65,7 +65,7 @@ export default function CommandPaletteJump({
   const listboxId = useId();
   const [text, setText] = useState(initialText);
   const [highlighted, setHighlighted] = useState<number | null>(null);
-  const activeOption = useRef<HTMLLIElement>(null);
+  const activeLink = useRef<HTMLAnchorElement>(null);
   const narrowed = text.trim();
   const groups = narrowDestinations(destinations, narrowed);
   const stops = groups.reduce(
@@ -77,13 +77,12 @@ export default function CommandPaletteJump({
   const listed = stops > 0;
 
   /**
-   * Hold the highlighted option's element, for Enter to follow its link,
-   * and scroll it into the options' view as the highlight reaches it.
+   * Scroll the highlighted option into the options' view as the highlight
+   * reaches it.
    *
-   * @note Impure: writes the ref and scrolls the options.
+   * @note Impure: scrolls the options.
    */
   const attachActiveOption = useCallback((option: HTMLLIElement | null) => {
-    activeOption.current = option;
     option?.scrollIntoView({ block: "nearest" });
   }, []);
 
@@ -119,9 +118,7 @@ export default function CommandPaletteJump({
     }
     if (event.key === "Enter") {
       event.preventDefault();
-      if (active !== undefined) {
-        activeOption.current?.querySelector("a")?.click();
-      }
+      activeLink.current?.click();
     }
   };
 
@@ -186,6 +183,7 @@ export default function CommandPaletteJump({
                       className="link"
                       href={destination.href}
                       onClick={onChoose}
+                      ref={index === active ? activeLink : undefined}
                       tabIndex={-1}
                     >
                       {destination.label}
