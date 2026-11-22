@@ -414,6 +414,7 @@ site's own catalog, and the factory holds no reader-facing string.
 - Search: `SearchForm` (the strip's Search on a site's search route, a GET
   form whose field q carries the text, under the site's placeholder),
   `SearchIcon` (the rail's Search glyph), `SEARCH_PAGE_SIZE`,
+  `SEARCH_RESULT_LIMIT` (the most results the search page lists),
   `buildSearchVariables` (a search query's variables for a text and the
   page's state), `groupSearchEdges` and `orderSearchFacets` (a page's
   results by type, the site's prominent type first, then ascending count),
