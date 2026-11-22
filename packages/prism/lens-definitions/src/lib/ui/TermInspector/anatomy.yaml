@@ -90,14 +90,26 @@ node:
                         relation: { cardinality: "1..2", slotName: tag }
                   relation: { cardinality: "1", slotName: tags }
                 - node:
-                    role: name
+                    role: headline
                     styles:
-                      spacing.external.block.start: 0
-                      spacing.external.block.end: 0
-                      typography.size: 1rem
-                      typography.weight: typography.text.primary.bold.fontWeight
-                      typography.wrap: anywhere
-                  relation: { cardinality: "1", slotName: name }
+                      layout.type: flex
+                      layout.wrap: wrap
+                      spacing.gap: space.100
+                    edges:
+                      - node:
+                          role: name
+                          styles:
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            typography.size: 1rem
+                            typography.weight: typography.text.primary.bold.fontWeight
+                            typography.wrap: anywhere
+                        relation: { cardinality: "1", slotName: name }
+                      - node:
+                          role: open (to the class's home, unless the inspector sits on it)
+                          uri: prism.component.router_link
+                        relation: { cardinality: "0..1", slotName: open }
+                  relation: { cardinality: "1", slotName: headline }
                 - node:
                     role: address
                     styles:
@@ -107,116 +119,127 @@ node:
                       typography.color: color.text.muted
                   relation: { cardinality: "1", slotName: address }
             relation: { cardinality: "1", slotName: header }
-          - node:
-              role: section
-              styles:
-                layout.type: grid
-                layout.grid.columns: subgrid
-                layout.grid.column: "1 / -1"
-                spacing.gap: grid.gutter
-                spacing.external.inline.start: "calc(-1 * var(--component-padding-inline))"
-                spacing.external.inline.end: "calc(-1 * var(--component-padding-inline))"
-                spacing.internal.block.start: container.gap.default
-                spacing.internal.inline.start: component.padding.inline
-                spacing.internal.inline.end: component.padding.inline
-                appearance.border.width: 1px
-                appearance.border.style: solid
-                appearance.border.block.start.color: color.border.muted
-              edges:
+          - switch:
+              on: internal
+              cases:
                 - node:
-                    role: label
-                    styles:
-                      layout.grid.column: "1 / -1"
-                      spacing.external.block.start: 0
-                      spacing.external.block.end: 0
-                      typography.size: typography.text.secondary.fontSize
-                      typography.weight: typography.text.secondary.fontWeight
-                      typography.variant.caps: all-small-caps
-                      typography.color: color.text.muted
-                  relation: { cardinality: "1", slotName: label }
-                - node:
-                    role: prose
-                    styles:
-                      layout.grid.column: "1 / -1"
-                      spacing.external.block.start: 0
-                      spacing.external.block.end: 0
-                  relation: { cardinality: "0..2", slotName: prose }
-                - node:
-                    role: terms
-                    styles:
-                      layout.grid.column: "1 / -1"
-                      layout.type: flex
-                      layout.wrap: wrap
-                      spacing.gap: space.100
-                      spacing.external.block.start: 0
-                      spacing.external.block.end: 0
-                      spacing.internal.inline.start: 0
-                      layout.listStyle: none
-                  relation: { cardinality: "0..1", slotName: terms }
-                - node:
-                    role: group
+                    role: section
                     styles:
                       layout.type: grid
                       layout.grid.columns: subgrid
                       layout.grid.column: "1 / -1"
                       spacing.gap: grid.gutter
+                      spacing.external.inline.start: "calc(-1 * var(--component-padding-inline))"
+                      spacing.external.inline.end: "calc(-1 * var(--component-padding-inline))"
+                      spacing.internal.block.start: container.gap.default
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.block.start.color: color.border.muted
                     edges:
                       - node:
-                          role: group label
+                          role: label
                           styles:
+                            layout.type: inline
                             layout.grid.column: "1 / -1"
                             spacing.external.block.start: 0
                             spacing.external.block.end: 0
                             typography.size: typography.text.secondary.fontSize
                             typography.weight: typography.text.secondary.fontWeight
+                            typography.variant.caps: all-small-caps
                             typography.color: color.text.muted
-                        relation: { cardinality: "1", slotName: group-label }
-                  relation: { cardinality: "0..*", slotName: group }
-                - node:
-                    # A list of class edges, a table row each: a property's
-                    # edges (subject, object, statements, declared), or the
-                    # overview's undeclared ones (subject, property,
-                    # object, statements); terms as links, figures flush
-                    # to the end.
-                    role: edges
-                    styles:
-                      layout.grid.column: "1 / -1"
-                      size.inline: 100%
-                      layout.table.collapse: collapse
-                      typography.size: typography.text.secondary.fontSize
-                    edges:
-                      - switch:
-                          on: internal
-                          cases:
+                        relation: { cardinality: "1", slotName: label }
+                      - node:
+                          role: prose
+                          styles:
+                            layout.grid.column: "1 / -1"
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                        relation: { cardinality: "0..2", slotName: prose }
+                      - node:
+                          role: terms
+                          styles:
+                            layout.grid.column: "1 / -1"
+                            layout.type: flex
+                            layout.wrap: wrap
+                            spacing.gap: space.100
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            spacing.internal.inline.start: 0
+                            layout.listStyle: none
+                        relation: { cardinality: "0..1", slotName: terms }
+                      - node:
+                          role: group
+                          styles:
+                            layout.type: grid
+                            layout.grid.columns: subgrid
+                            layout.grid.column: "1 / -1"
+                            spacing.gap: grid.gutter
+                          edges:
                             - node:
-                                role: cell
+                                role: group label
                                 styles:
-                                  spacing.internal.block.start: space.050
-                                  spacing.internal.block.end: space.050
-                                  spacing.internal.inline.end: space.100
-                                  appearance.border.width: 1px
-                                  appearance.border.style: solid
-                                  appearance.border.bottom.color: color.border.muted
-                                  typography.align: start
-                                  layout.verticalAlign: baseline
-                                  # A term breaks first right after its prefix's colon, inside its local name only where the column cannot hold it whole.
-                                  typography.wrap: anywhere
-                            - node:
-                                role: column heading (.is-heading)
-                                styles:
+                                  layout.grid.column: "1 / -1"
+                                  spacing.external.block.start: 0
+                                  spacing.external.block.end: 0
+                                  typography.size: typography.text.secondary.fontSize
                                   typography.weight: typography.text.secondary.fontWeight
                                   typography.color: color.text.muted
-                                  typography.wrap: normal
-                            - node:
-                                role: figure (.is-figure)
-                                styles:
-                                  spacing.internal.inline.end: 0
-                                  spacing.internal.inline.start: space.100
-                                  typography.wrap: normal
-                                  typography.align: end
-                                  typography.variant.numeric: tabular-nums
-                        relation: { cardinality: "1..*", slotName: cell }
-                  relation: { cardinality: "0..1", slotName: edges }
+                              relation: { cardinality: "1", slotName: group-label }
+                        relation: { cardinality: "0..*", slotName: group }
+                      - node:
+                          # A list of class edges, a table row each: a property's
+                          # edges (subject, object, statements, declared), or the
+                          # overview's undeclared ones (subject, property,
+                          # object, statements); terms as links, figures flush
+                          # to the end.
+                          role: edges
+                          styles:
+                            layout.grid.column: "1 / -1"
+                            size.inline: 100%
+                            layout.table.collapse: collapse
+                            typography.size: typography.text.secondary.fontSize
+                          edges:
+                            - switch:
+                                on: internal
+                                cases:
+                                  - node:
+                                      role: cell
+                                      styles:
+                                        spacing.internal.block.start: space.050
+                                        spacing.internal.block.end: space.050
+                                        spacing.internal.inline.end: space.100
+                                        appearance.border.width: 1px
+                                        appearance.border.style: solid
+                                        appearance.border.bottom.color: color.border.muted
+                                        typography.align: start
+                                        layout.verticalAlign: baseline
+                                        # A term breaks first right after its prefix's colon, inside its local name only where the column cannot hold it whole.
+                                        typography.wrap: anywhere
+                                  - node:
+                                      role: column heading (.is-heading)
+                                      styles:
+                                        typography.weight: typography.text.secondary.fontWeight
+                                        typography.color: color.text.muted
+                                        typography.wrap: normal
+                                  - node:
+                                      role: figure (.is-figure)
+                                      styles:
+                                        spacing.internal.inline.end: 0
+                                        spacing.internal.inline.start: space.100
+                                        typography.wrap: normal
+                                        typography.align: end
+                                        typography.variant.numeric: tabular-nums
+                              relation: { cardinality: "1..*", slotName: cell }
+                        relation: { cardinality: "0..1", slotName: edges }
+                - node:
+                    # Every section of a class but its lineage and its
+                    # definition: a closed native disclosure, its label in
+                    # the summary with the count; its content opens below.
+                    role: disclosed section (.is-disclosure)
+                    styles:
+                      layout.type: block
             relation: { cardinality: "1..*", slotName: section }
           - node:
               role: details

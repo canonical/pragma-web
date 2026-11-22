@@ -88,6 +88,13 @@
     color: var(--term-inspector-muted-color);
   }
 
+  /* The name, with Open beside it. */
+  .ds.term-inspector .headline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--term-inspector-link-gap);
+  }
+
   .ds.term-inspector .name {
     margin-block: 0;
     font-size: var(--term-inspector-name-font-size);
@@ -119,7 +126,15 @@
     border-block-start-color: var(--term-inspector-rule-color);
   }
 
+  /* Inline, so a disclosure's marker stands on its line. */
+  /* A class's section but its lineage and definition: a closed native
+   * disclosure; its content opens below its summary. */
+  .ds.term-inspector .section.is-disclosure {
+    display: block;
+  }
+
   .ds.term-inspector .label {
+    display: inline;
     grid-column: 1 / -1;
     margin-block: 0;
     font-size: var(--term-inspector-small-font-size);
