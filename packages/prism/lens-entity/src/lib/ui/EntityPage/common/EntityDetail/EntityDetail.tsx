@@ -8,6 +8,7 @@ import {
   SectionedView,
   type SectionedViewSection,
   useRenderers,
+  useServesStatements,
 } from "@canonical/prism-core";
 import { ChipProjection } from "@canonical/prism-projections";
 import { InlineCode } from "@canonical/react-ds-global";
@@ -29,7 +30,6 @@ import labelOutgoingGroup from "../../../../labelOutgoingGroup.js";
 import listStatementSections from "../../../../listStatementSections.js";
 import partitionStatements from "../../../../partitionStatements.js";
 import readEntitySummary from "../../../../readEntitySummary.js";
-import useServesStatements from "../../../../useServesStatements.js";
 import { EntityHeader } from "../EntityHeader/index.js";
 import { EntitySummary } from "../EntitySummary/index.js";
 import { ReferencedByGroup } from "../ReferencedByGroup/index.js";

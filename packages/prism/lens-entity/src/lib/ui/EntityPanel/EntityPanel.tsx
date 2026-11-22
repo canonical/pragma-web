@@ -5,6 +5,7 @@ import {
   type KeyValuePair,
   RouterLink,
   useHome,
+  useServesStatements,
 } from "@canonical/prism-core";
 import { ChipProjection } from "@canonical/prism-projections";
 import { InlineCode } from "@canonical/react-ds-global";
@@ -23,7 +24,6 @@ import { Message, useMessages } from "../../i18n/index.js";
 import labelIncomingGroup from "../../labelIncomingGroup.js";
 import labelOutgoingGroup from "../../labelOutgoingGroup.js";
 import partitionStatements from "../../partitionStatements.js";
-import useServesStatements from "../../useServesStatements.js";
 import { StatementGroup } from "../EntityPage/common/StatementGroup/index.js";
 import type { EntityPanelProps } from "./types.js";
 import "./styles.css";

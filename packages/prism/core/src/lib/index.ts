@@ -130,6 +130,7 @@ export {
   resolveRenderers,
   usePageRenderers,
   useRenderers,
+  useServesStatements,
   VIEW_PARAMS,
   viewSearch,
   warmPageRenderer,

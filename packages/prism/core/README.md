@@ -471,7 +471,8 @@ site's own catalog, and the factory holds no reader-facing string.
   `FILTER_SHEET`, `FILTER_PLACEMENTS`,
   `DEFAULT_FILTER_PLACEMENT`, `RENDERER_KINDS`, `PAGE_RENDERER_NAMES`,
   `RENDERER_LABEL_KEYS`, `usePageRenderers` (core's page renderers, Page
-  and Turtle), `warmPageRenderer` (a route's warm calls it so the server
+  and Turtle), `useServesStatements` (whether the site's provider serves
+  statements), `warmPageRenderer` (a route's warm calls it so the server
   page already holds what the address's page renderer reads); types `Renderer`, `RendererDeclaration`,
   `RendererDefaults`, `RendererFacts`, `RendererKind`, `LensRenderers`,
   `ListRendererProps`, `PageRendererProps`, `ResolvedRenderers`,
