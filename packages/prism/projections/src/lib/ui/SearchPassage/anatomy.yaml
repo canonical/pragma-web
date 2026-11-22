@@ -6,7 +6,9 @@
 # Every decision is read through a component token declared on the root
 # (`--search-passage-*`), bound to the symbol named here.
 #
-# Token ledger: none.
+# Token ledger:
+#   --search-passage-match-background: transparent  a match drops the
+#     user agent's highlight, so its text stays legible in both themes.
 node:
   uri: prism.component.search_passage
   styles:
@@ -21,4 +23,5 @@ node:
         styles:
           typography.color: color.text
           typography.weight: typography.text.primary.bold.fontWeight
+          appearance.background: transparent
       relation: { cardinality: "0..*", slotName: match }

@@ -11,6 +11,9 @@
     --search-passage-match-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
+    /* A match drops the user agent's highlight: its text colour and
+     * weight carry it, legible in both themes. */
+    --search-passage-match-background: transparent;
 
     color: var(--search-passage-color);
     margin-block-start: 0;
@@ -23,5 +26,6 @@
   .ds.search-passage .match {
     color: var(--search-passage-match-color);
     font-weight: var(--search-passage-match-font-weight);
+    background-color: var(--search-passage-match-background);
   }
 }
