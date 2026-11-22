@@ -18,3 +18,18 @@ type OwnProps = {
  */
 export type SearchPageProps = OwnProps &
   Omit<ComponentProps<"section">, keyof OwnProps | "children">;
+
+/**
+ * Props accepted by the strip's parts of the search page (its count and
+ * its Type facet): the address's text and page state.
+ */
+export type SearchStateProps = OwnProps;
+
+/**
+ * Props accepted by `SearchFacets`: the address's text and page state, and
+ * where the facet stands.
+ */
+export type SearchFacetsProps = OwnProps & {
+  /** The facet bar under the strip, or the filter sheet. */
+  readonly placement: "bar" | "sheet";
+};

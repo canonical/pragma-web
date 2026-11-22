@@ -245,7 +245,7 @@ export const MESSAGES = {
   "search.placeholder": "Search the design system",
   "search.submit": "Search",
   "search.position": "{first}–{last} of {total}",
-  "search.empty": "Type a word in the field above to search every lens.",
+  "search.empty": "Type a word in the search field to search every lens.",
   "search.doors": "Lenses to browse",
   "search.spelling":
     "Check the spelling, or search for a shorter part of the word.",

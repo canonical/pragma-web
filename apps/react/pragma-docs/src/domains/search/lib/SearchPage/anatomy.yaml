@@ -1,8 +1,9 @@
 ---
 # SearchPage — the search route's page, in the document archetype's
 # canvas: its title (also the document's), then one of three states.
-# With a text that matches: a summary of how many results match, the Type
-# facet band while two or more types match, the results grouped by type
+# With a text that matches (the strip holds their count, and the facet bar
+# under it the Type facet while two or more types match): the results
+# grouped by type
 # (the prominent type first, then ascending count), each result through
 # the site's chip switch over the passage that holds the text, and the
 # pagination bar, 20 results a page. With a text that matches nothing:
@@ -32,11 +33,8 @@ node:
         role: page title
       relation: { cardinality: "1", slotName: title }
     - node:
-        role: result summary, or what the field is for
+        role: what the field is for
       relation: { cardinality: "0..1", slotName: summary }
-    - node:
-        uri: prism.component.type_facet_bar
-      relation: { cardinality: "0..1", slotName: facets }
     - node:
         role: results, grouped by type
         styles:
@@ -52,6 +50,7 @@ node:
                     styles:
                       layout.type: flex
                       layout.direction: column
+                      layout.align: start
                       size.min.width: 0
                     edges:
                       - node:

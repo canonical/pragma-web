@@ -1,12 +1,13 @@
 // Scaffolded by @canonical/summon-component:react v0.46.0
 
 import { render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree from "../../../../../testing/createSiteTree.js";
 import { MOCK_UI_BLOCK } from "../../../../../testing/projectionEntities.js";
 import resolveRoot from "../../../../../testing/resolveRoot.js";
-import SearchPage from "./SearchPage.js";
+import SearchPage, { SearchCount, SearchFacets } from "./SearchPage.js";
 import type { SearchPageProps } from "./types.js";
 
 /** Two facets of the sample's types, as the provider counts them. */
@@ -19,7 +20,11 @@ const FACETS = [
  * Render the page with the given props over a mock graph answering
  * `total` results, twenty of them on the page, in two facets.
  */
-const renderPage = (props: SearchPageProps, total = 45): void => {
+const renderPage = (
+  props: SearchPageProps,
+  total = 45,
+  ui: ReactElement = <SearchPage {...props} />,
+): void => {
   vi.stubGlobal("jest", vi);
   const environment = createMockEnvironment();
   environment.mock.queueOperationResolver((operation) =>
@@ -38,7 +43,7 @@ const renderPage = (props: SearchPageProps, total = 45): void => {
       Node: resolveRoot(MOCK_UI_BLOCK),
     }),
   );
-  render(createSiteTree(environment, <SearchPage {...props} />, "/search"));
+  render(createSiteTree(environment, ui, "/search"));
 };
 
 /** Render the page for "but" over a mock graph answering `total` results. */
@@ -77,7 +82,6 @@ describe("SearchPage", () => {
     expect(result?.querySelector(".passage")?.textContent).toBe(
       "Buttons trigger actions",
     );
-    expect(screen.getByText("1 result")).toBeInTheDocument();
   });
 
   it("says nothing matches when the provider finds nothing, and lists nothing", () => {
@@ -86,11 +90,28 @@ describe("SearchPage", () => {
     expect(document.querySelector(".ds.search-page .results")).toBeNull();
   });
 
-  it("gives each Type facet the provider's count and a link that applies it (W8-A6)", () => {
+  it("counts the results for the strip, and the page repeats no count (W8-A6)", () => {
+    renderPage({ text: "but" }, 45, <SearchCount text="but" />);
+    expect(document.body).toHaveTextContent("45 results");
+  });
+
+  it("states no count of its own: the strip holds it", () => {
     renderPage({ text: "but" });
+    expect(document.querySelector(".ds.search-page .summary")).toBeNull();
+    expect(
+      document.querySelector(".ds.search-page .ds.type-facet-bar"),
+    ).toBeNull();
+  });
+
+  it("gives each Type facet the provider's count and a link that applies it (W8-A6)", () => {
+    renderPage(
+      { text: "but" },
+      45,
+      <SearchFacets placement="bar" text="but" />,
+    );
     const facets = [
       ...document.querySelectorAll<HTMLAnchorElement>(
-        ".ds.search-page .ds.type-facet-bar .value a",
+        ".ds.filter-bar .ds.type-facet-bar .value a",
       ),
     ];
     expect(facets).toHaveLength(FACETS.length);
