@@ -3,10 +3,12 @@
 import {
   KeyValueList,
   type KeyValuePair,
+  RouterLink,
   useHome,
 } from "@canonical/prism-core";
 import { ChipProjection } from "@canonical/prism-projections";
 import { InlineCode } from "@canonical/react-ds-global";
+import { useRouterState } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import type { EntityNamespacesQuery } from "../../../__generated__/EntityNamespacesQuery.graphql.js";
@@ -53,8 +55,10 @@ const componentCssClassName = "ds entity-panel";
 
 /**
  * The details panel of one entity, wherever a workspace inspects it: the
- * identity (its name, Open beside it when the site gives it a home, its
- * class's chip and its compact address) and its prominent values, both
+ * identity (its name; Open beside it, to the entity's own page, the one
+ * that marks it canonical, through the site's link component, unless the
+ * panel already sits on that page; its class's chip and its compact
+ * address) and its prominent values, both
  * open; then each other group the entity holds (a value, a value held by
  * it such as a line's routes, or a relation) and each group of what
  * references it, a closed disclosure whose summary carries the group's
@@ -68,12 +72,13 @@ const componentCssClassName = "ds entity-panel";
  * `import { EntityPanel } from "@canonical/prism-lens-entity";`
  *
  * @implements prism.component.entity_panel
- * @note Impure: reads the Relay store, the site's homes and the translator
- *   in scope, and suspends while the store does not hold the entity.
+ * @note Impure: reads the Relay store, the site's homes, the router's
+ *   location and the translator in scope, and suspends while the store does not hold the entity.
  */
 export default function EntityPanel({
   className,
   headingLevel = 2,
+  home,
   notFound,
   uri,
   ...props
@@ -93,10 +98,12 @@ export default function EntityPanel({
     // A site that does not serve the field is never asked for it.
     { fetchPolicy: served ? "store-or-network" : "store-only" },
   );
-  const href = useHome({
+  const siteHome = useHome({
     __typename: node?.__typename ?? "Node",
     uri: node?._meta.curie ?? uri,
   });
+  const href = home ?? siteHome;
+  const pathname = useRouterState((state) => state.location.pathname);
   const rootClassName = [componentCssClassName, className]
     .filter(Boolean)
     .join(" ");
@@ -139,14 +146,14 @@ export default function EntityPanel({
       <header className="identity">
         <div className="headline">
           <Heading className="title">{node._meta.title}</Heading>
-          {href === undefined ? null : (
-            <a
+          {href === undefined || href === pathname ? null : (
+            <RouterLink
               aria-label={t("panel.open.label", { title: node._meta.title })}
               className="open"
               href={href}
             >
               {t("panel.open")}
-            </a>
+            </RouterLink>
           )}
         </div>
         <p className="kind">

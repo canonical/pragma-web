@@ -36,6 +36,8 @@ const readNodeAnswer = (uri: string): GraphQLResponse => {
 
 type PanelSetup = {
   readonly uri: string;
+  /** Where the site sits: by default a page other than the entity's own. */
+  readonly url?: string;
   readonly extensions?: readonly SiteExtension[];
   readonly node?: GraphQLResponse;
   readonly statements?: GraphQLResponse;
@@ -65,10 +67,10 @@ const fillStore = async ({ uri, node, statements }: PanelSetup) => {
 
 /** The panel as a site renders it, over a store its reads filled. */
 const renderPanel = async (setup: PanelSetup) => {
-  const { uri, extensions, node, statements, ...props } = setup;
+  const { uri, url, extensions, node, statements, ...props } = setup;
   const environment = await fillStore(setup);
   const site = createEntitySite({
-    url: `/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`,
+    url: url ?? "/stations",
     environment,
     extensions: extensions ?? ["source", "statements"],
     children: <EntityPanel {...props} uri={uri} />,
@@ -126,6 +128,31 @@ describe("EntityPanel", () => {
     ).toBeGreaterThan(0);
     // No generated id, so the server's markup hydrates as it is.
     expect(html).not.toMatch(/id="(?:«|:)r/);
+  });
+
+  it("draws no Open on the entity's own page", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderPanel({
+      uri: CIRCLE_LINE,
+      url: `/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`,
+    });
+    expect(container.querySelector(".identity .title")?.textContent).toBe(
+      "Circle Line",
+    );
+    expect(container.querySelector("a.open")).toBeNull();
+  });
+
+  it("opens the page its host names as the entity's own, through the site's link", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderPanel({
+      uri: CIRCLE_LINE,
+      home: "/lines",
+    });
+    const open = container.querySelector(".identity .headline > a.open");
+    expect(open?.getAttribute("href")).toBe("/lines");
+    expect(open?.classList.contains("router-link")).toBe(true);
   });
 
   it("sets its headings a level down under a heading of its own", {

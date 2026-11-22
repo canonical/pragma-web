@@ -10,6 +10,12 @@ type OwnProps = {
    */
   readonly headingLevel?: 2 | 3;
   /**
+   * The entity's own page, the one that marks it canonical, which Open
+   * targets: given by a host whose site's home for the entity is not that
+   * page (a workspace's selection route), else the site's home.
+   */
+  readonly home?: string;
+  /**
    * What the panel says when nothing answers to `uri`, in place of its own
    * not-found status: a host that knows more about the address it was
    * asked for words it.
