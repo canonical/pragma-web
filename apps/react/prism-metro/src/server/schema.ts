@@ -61,10 +61,19 @@ const foldExtensions = (sdl: string): string => {
   );
 };
 
-writeFileSync(SCHEMA_PATH, `${foldExtensions(createExampleProvider().sdl)}\n`);
+/**
+ * The schema file's text for `sdl`: its extensions folded, ending in one
+ * newline (leaving search out can leave a blank line at the end).
+ */
+const formatSchema = (sdl: string): string =>
+  `${foldExtensions(sdl).trimEnd()}\n`;
+
+writeFileSync(SCHEMA_PATH, formatSchema(createExampleProvider().sdl));
 writeFileSync(
   NO_SEARCH_SCHEMA_PATH,
-  `${foldExtensions(createExampleProvider(undefined, undefined, { search: false }).sdl)}\n`,
+  formatSchema(
+    createExampleProvider(undefined, undefined, { search: false }).sdl,
+  ),
 );
 
 console.info(`[schema] wrote ${SCHEMA_PATH} and ${NO_SEARCH_SCHEMA_PATH}`);

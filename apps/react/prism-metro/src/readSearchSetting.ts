@@ -14,7 +14,7 @@ export default function readSearchSetting(): string | undefined {
     // The literal member access is required: Vite's static replacement only
     // matches `import.meta.env.PRISM_SEARCH` spelled out.
     import.meta.env?.PRISM_SEARCH ??
-    /* v8 ignore next -- runtime detection: the browser bundle has no `process`, unreachable under the test environments */
-    (typeof process === "undefined" ? undefined : process.env.PRISM_SEARCH)
+    // The browser bundle has no `process`.
+    globalThis.process?.env.PRISM_SEARCH
   );
 }
