@@ -6,8 +6,10 @@
  */
 
 export { default as buildRendererSearch } from "./buildRendererSearch.js";
+export { default as buildViewHref } from "./buildViewHref.js";
 export {
   DEFAULT_FILTER_PLACEMENT,
+  DESCENDING_SORT_PREFIX,
   FILTER_PLACEMENTS,
   FILTER_SHEET,
   PAGE_RENDERER_NAMES,
@@ -19,6 +21,7 @@ export {
   usePageRenderers,
   useRenderers,
   useServesStatements,
+  useViewLocation,
 } from "./hooks/index.js";
 export { default as RenderersProvider } from "./Provider.js";
 export { default as readRenderer } from "./readRenderer.js";

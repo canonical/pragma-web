@@ -1,0 +1,11 @@
+---
+# SiteCardSlot: the site's card switch as the package's card switch
+# reaches it, through the site slot the package's composite spreads. It
+# renders no element of its own: it hands the node to DocsCardProjection,
+# whose case renders the root.
+node:
+  uri: docs.component.site_card_slot
+  projection: { on: Node }
+  edges:
+    - node: { uri: docs.component.docs_card_projection, projection: { on: Node } }
+      relation: { cardinality: "1" }

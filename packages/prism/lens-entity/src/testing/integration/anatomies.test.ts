@@ -20,12 +20,14 @@ const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
 /** The semantic tokens the components' tokens bind beyond the shim. */
 const EXTERNAL_TOKENS = [
   "--color-background",
+  "--color-border",
   "--color-border-muted",
   "--color-focus-ring",
   "--color-text",
   "--color-text-muted",
   "--typography-text-secondary-font-size",
   "--typography-text-secondary-line-height",
+  "--typography-text-primary-bold-font-weight",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
@@ -53,6 +55,8 @@ describe("the lens's components", () => {
   it("have their subcomponents found in their parents' common folders", () => {
     expect(subcomponentFolders.map((folder) => basename(folder))).toEqual([
       "EntityIndex",
+      "FacetControls",
+      "EntityFacets",
       "EntitySearch",
       "EntityStatus",
       "EntityView",

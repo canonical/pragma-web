@@ -79,5 +79,21 @@ export const CLOSE_ICON_ID = "close";
  */
 export const ROWS_PATHS = ["/stations", "/fleet"] as const;
 
-/** An index's rows, in the canvas. */
-export const INDEX_ROW_SELECTOR = "main.ds.canvas .ds.entity-row";
+/** The indexes drawn as a table of facts: the stations, lines and fleet. */
+export const TABLE_PATHS = ["/stations", "/lines", "/fleet"] as const;
+
+/** The fleet index, a table of the rolling stocks' facts. */
+export const FLEET_PATH = "/fleet";
+
+/**
+ * The width below which a table of facts folds into scented rows: two
+ * groups of the shell's grid.
+ */
+export const TABLE_FOLD_WIDTH_PX = 912;
+
+/**
+ * An index's rows, in the canvas: the table of facts' body rows on a
+ * single-type index, the scented rows on a mixed one.
+ */
+export const INDEX_ROW_SELECTOR =
+  "main.ds.canvas :is(.ds.entity-table > .body > .row, .ds.entity-row)";

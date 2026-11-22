@@ -31,4 +31,5 @@ export const MESSAGES = {
   "list.empty": "Nothing to list.",
   "renderer.table": "Table",
   "renderer.cards": "Cards",
+  "table.title": "Name",
 } as const;

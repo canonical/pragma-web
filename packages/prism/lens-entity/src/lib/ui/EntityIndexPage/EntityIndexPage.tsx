@@ -33,6 +33,8 @@ export default function EntityIndexPage({
   label,
   renderers,
   filters,
+  lines,
+  tableOmits,
   ...props
 }: EntityIndexPageProps): ReactElement {
   const t = useMessages();
@@ -58,7 +60,9 @@ export default function EntityIndexPage({
           <EntityIndex
             binding={binding}
             filters={filters}
+            lines={lines}
             renderers={renderers}
+            tableOmits={tableOmits}
           />
         </Suspense>
       </ErrorBoundary>

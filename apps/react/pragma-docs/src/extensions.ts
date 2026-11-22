@@ -9,4 +9,6 @@ import type { ProviderExtension } from "@canonical/prism-contract";
 export const SITE_EXTENSIONS = [
   "source",
   "statements",
+  "values",
+  "facetedInstances",
 ] as const satisfies readonly ProviderExtension[];

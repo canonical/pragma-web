@@ -260,6 +260,7 @@ export const resolveRoot =
 export const MOCK_STATION = {
   __typename: "Station",
   platformCount: 4,
+  location: { latitude: 51.53, longitude: -0.12 },
   _meta: {
     title: NORTHGATE_TITLE,
     curie: NORTHGATE_CURIE,
@@ -278,6 +279,7 @@ export const MOCK_STATION = {
 export const MOCK_INTERCHANGE = {
   __typename: "Interchange",
   platformCount: 8,
+  location: { latitude: 51.5, longitude: -0.1 },
   transferMinutes: 4,
   _meta: {
     title: CENTRAL_EXCHANGE_TITLE,
@@ -301,6 +303,7 @@ export const MOCK_INTERCHANGE = {
 export const MOCK_LINE = {
   __typename: "Line",
   colour: "#c8102e",
+  code: "N",
   _meta: {
     title: "North Line",
     curie: "metro:north-line",

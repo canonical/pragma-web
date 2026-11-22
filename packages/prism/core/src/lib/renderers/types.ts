@@ -104,6 +104,8 @@ export interface ViewSearch {
    * overview.
    */
   readonly expand?: string;
+  /** The list's order: a field's id, descending behind a `-`. */
+  readonly sort?: string;
 }
 
 /** The search schema every route with a strip declares. */

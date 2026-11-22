@@ -446,6 +446,15 @@ describe("the component checks", () => {
       ).toThrow(/"\.ds\.container-gap-grid" sets gap from a container gap/);
     });
 
+    it("admits a grid whose rows stand one under the next", () => {
+      expect(() =>
+        assertStylesheets({
+          directory: locate(DRIFTED, "RowGapGrid"),
+          layer: "ds.components.global",
+        }),
+      ).not.toThrow();
+    });
+
     it("refuses a grid that sets no gap", () => {
       expect(() =>
         assertStylesheets({

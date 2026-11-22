@@ -102,8 +102,8 @@ const SEEDED_PAGES = [
     name: "standard reading",
     url: `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
     records: standardEntityRecords,
-    serverMarker: 'class="ds entity-chip ds node-chip"',
-    liveSelector: ".ds.standard-prose .ds.node-chip",
+    serverMarker: 'class="ds entity-chip ds code-standard-chip"',
+    liveSelector: ".ds.standard-prose .ds.code-standard-chip",
     liveText: "one prop",
   },
   // Journeys job block: with no view in the address the job page, like

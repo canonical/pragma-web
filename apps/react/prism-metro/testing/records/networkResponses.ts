@@ -1995,6 +1995,7 @@ export default [
             },
           },
           __isNode: "Interchange",
+          location: null,
           platformCount: 2,
           transferMinutes: 3,
           inZone: null,
@@ -2410,6 +2411,10 @@ export default [
             },
           },
           __isNode: "Station",
+          location: {
+            latitude: 51.5412,
+            longitude: -0.1435,
+          },
           platformCount: 4,
           inZone: {
             _meta: {

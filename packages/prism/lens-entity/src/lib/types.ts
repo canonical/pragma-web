@@ -1,10 +1,13 @@
+import type { FacetFilter } from "@canonical/prism-contract";
 import type {
   FilterPlacement,
   LensRenderers,
   ViewSearchSchema,
 } from "@canonical/prism-core";
+import type { ListLines } from "@canonical/prism-projections";
 import type { DataRouteDefinition } from "@canonical/router-core";
 import type { ComponentType, ReactElement } from "react";
+import type { EntityIndexQuery$variables } from "../__generated__/EntityIndexQuery.graphql.js";
 
 /** One ontology's addressing identity, as the graph states it. */
 export interface OntologyNamespace {
@@ -32,6 +35,15 @@ export interface EntityLensOptions {
   readonly renderers?: LensRenderers;
   /** Where the index places its filters; the bar when omitted. */
   readonly filters?: FilterPlacement;
+  /**
+   * How many facets the index's facet bar holds, in the lens's order; the
+   * rest fold under "More filters". Three when omitted.
+   */
+  readonly barFacets?: number;
+  /** How many lines a row of the index takes; one when omitted. */
+  readonly lines?: ListLines;
+  /** The value fields the index's table leaves out, by served name. */
+  readonly tableOmits?: readonly string[];
 }
 
 /**
@@ -160,3 +172,17 @@ export interface RelationSection<G> {
 
 /** One of the entity page's statement sections. */
 export type StatementSection<G> = ValuesSection<G> | RelationSection<G>;
+
+/**
+ * How many values a field takes on its class: exactly one, at most one, one
+ * or more, or any number.
+ */
+export type Cardinality = "one" | "optional" | "many" | "any";
+
+/**
+ * The index operation's variables as the lens builds them: each filter's
+ * values a list, a value's IRI or null for the "none" bucket.
+ */
+export type EntityIndexVariables = EntityIndexQuery$variables & {
+  readonly filters: readonly FacetFilter[] | null;
+};

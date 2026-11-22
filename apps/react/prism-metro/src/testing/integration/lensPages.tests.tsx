@@ -32,15 +32,19 @@ afterAll(() => graph.close());
 /** How long each query and wait below gives the page to answer. */
 const WAIT = { timeout: LENS_PAGE_WAIT_MS };
 
-/** The rows of the entity index's list view once its query has answered. */
+/** The body rows of the entity index's table once its query has answered. */
 const findIndexRows = async (): Promise<HTMLElement[]> => {
   const canvas = await screen.findByRole("main", {}, WAIT);
   await waitFor(() => {
     expect(
-      canvas.querySelector(".entity-index .entity-list .items"),
+      canvas.querySelector(".entity-index .entity-table > tbody"),
     ).not.toBeNull();
   }, WAIT);
-  return within(canvas).getAllByRole("listitem");
+  return Array.from(
+    canvas.querySelectorAll<HTMLElement>(
+      ".entity-index .entity-table > tbody > tr",
+    ),
+  );
 };
 
 describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
@@ -62,6 +66,18 @@ describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
     );
     expect(hrefs).toContain("/network/stations/metro%3Anorthgate");
     expect(hrefs).not.toContain("/network/stations/metro%3A");
+  });
+
+  it("draws no column for a station's coordinates", async () => {
+    renderLensPage("/stations", graph.url);
+    await findIndexRows();
+    const columns = Array.from(
+      document.querySelectorAll(".entity-table th.column"),
+      (column) => column.getAttribute("data-property"),
+    );
+    expect(columns.length).toBeGreaterThan(0);
+    expect(columns).not.toContain("location");
+    expect(columns).not.toContain("diagramPosition");
   });
 
   it("shows a station's page from its statements: header, facts, sections", async () => {

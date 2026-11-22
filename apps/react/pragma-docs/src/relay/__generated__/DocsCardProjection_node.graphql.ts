@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7584c6196a2f0d7105d4642502d11436>>
+ * @generated SignedSource<<67226eec889a04f061311255983661e8>>
  * @lightSyntaxTransform
  */
 
@@ -27,8 +27,11 @@ export type DocsCardProjection_node$data = {
     readonly " $fragmentSpreads": FragmentRefs<"ModifierFamilyCard_node">;
   } | null | undefined;
   readonly Node: {
-    readonly " $fragmentSpreads": FragmentRefs<"CardProjection_node">;
+    readonly " $fragmentSpreads": FragmentRefs<"NodeCard_node">;
   };
+  readonly OntologyClass: {
+    readonly " $fragmentSpreads": FragmentRefs<"OntologyClassCard_node">;
+  } | null | undefined;
   readonly Pattern: {
     readonly " $fragmentSpreads": FragmentRefs<"UIBlockCard_node">;
   } | null | undefined;
@@ -67,7 +70,7 @@ return {
           {
             "args": null,
             "kind": "FragmentSpread",
-            "name": "CardProjection_node"
+            "name": "NodeCard_node"
           }
         ],
         "type": "Node",
@@ -75,6 +78,22 @@ return {
       },
       "kind": "AliasedInlineFragmentSpread",
       "name": "Node"
+    },
+    {
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "OntologyClassCard_node"
+          }
+        ],
+        "type": "OntologyClass",
+        "abstractKey": null
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "OntologyClass"
     },
     {
       "fragment": {
@@ -160,6 +179,6 @@ return {
 };
 })();
 
-(node as any).hash = "7235d15b3de67261c92a509821bcd72e";
+(node as any).hash = "c65b8244336d60b5b8110e619e1effd1";
 
 export default node;

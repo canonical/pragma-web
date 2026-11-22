@@ -64,15 +64,20 @@ const renderWithNodes = (
     { ...MOCK_NODE, uri: "https://ds.canonical.com/IconButton" },
     { ...MOCK_ONTOLOGY_CLASS, uri: "https://ds.canonical.com/Layout" },
   ],
+  mockClientData = false,
 ) => {
   // relay-test-utils wraps the mock environment's methods in `jest.fn` when
   // NODE_ENV is "test"; vitest's `vi` offers the same surface.
   vi.stubGlobal("jest", vi);
   const environment = createMockEnvironment();
   environment.mock.queueOperationResolver((operation) =>
-    MockPayloadGenerator.generate(operation, {
-      NodeConnection: () => ({ edges: nodes.map((node) => ({ node })) }),
-    }),
+    MockPayloadGenerator.generate(
+      operation,
+      {
+        NodeConnection: () => ({ edges: nodes.map((node) => ({ node })) }),
+      },
+      { mockClientData },
+    ),
   );
   return render(
     createSiteTree(
@@ -126,6 +131,44 @@ describe("NodeList", () => {
     expect(container.querySelector(".ds.ontology-class-card")).not.toBeNull();
   });
 
+  it("marks the selected node's row current by its address or curie", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList nodes={nodes} selected="https://ds.canonical.com/Layout" />
+    ));
+    const current = container.querySelectorAll('ol > [aria-current="true"]');
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveClass("ontology-class-row");
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull();
+  });
+
+  it("keeps the selected node current in the cards", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList
+        nodes={nodes}
+        renderer="cards"
+        selected="https://ds.canonical.com/IconButton"
+      />
+    ));
+    const current = container.querySelectorAll('[aria-current="true"]');
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveClass("node-card");
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull();
+  });
+
+  it("marks no node current when the selection names none listed", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList nodes={nodes} selected="https://ds.canonical.com/Nowhere" />
+    ));
+    expect(container.querySelector('[aria-current="true"]')).toBeNull();
+  });
+
+  it("hands its row height to each row", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList lines="two" nodes={nodes} />
+    ));
+    expect(container.querySelectorAll("ol > li > .summary")).toHaveLength(2);
+  });
+
   it("shows the empty line when every node is hidden", () => {
     renderWithNodes(
       (nodes) => <NodeList empty="No instances." nodes={nodes} />,
@@ -156,5 +199,190 @@ describe("NodeList", () => {
       <NodeList data-testid="test-component" nodes={nodes} />
     ));
     expect(screen.getByTestId("test-component").tagName).toBe("DIV");
+  });
+});
+
+/** The station type and the interchange, a station of its own type. */
+const STATION_TYPE = { uri: "metro:Station", superclasses: [] };
+const INTERCHANGE_TYPE = {
+  uri: "metro:Interchange",
+  superclasses: [{ uri: "metro:Station" }],
+};
+
+/** A listed node of `type` with a code and a zone, as the lens displays them. */
+const createValuedNode = (
+  name: string,
+  code: string,
+  type: object = STATION_TYPE,
+) => ({
+  __typename: "Station",
+  uri: `https://metro.example/${name}`,
+  _meta: {
+    title: name,
+    curie: `metro:${name}`,
+    type: { ...type, visibility: "NORMAL" },
+  },
+  values: [
+    { field: "code", label: "Code", text: code },
+    { field: "inZone", label: "Zone", text: "Zone 1" },
+  ],
+});
+
+/** Two stations, the second an interchange, out of their codes' order. */
+const VALUED_NODES = [
+  createValuedNode("Northgate", "NG"),
+  createValuedNode("Central", "CE", INTERCHANGE_TYPE),
+];
+
+/** NodeList over the valued nodes, the mock answering their client values. */
+const renderTable = (
+  props: Omit<NodeListProps, "nodes"> = {},
+  nodes: readonly object[] = VALUED_NODES,
+) =>
+  renderWithNodes((keys) => <NodeList nodes={keys} {...props} />, nodes, true);
+
+describe("NodeList's table of facts", () => {
+  it("W4-A4 tables a single-type list under a header of sort links", () => {
+    const { container } = renderTable();
+    const table = container.querySelector("table.ds.entity-table");
+    expect(table).not.toBeNull();
+    expect(container.querySelector("ol.items")).toBeNull();
+    expect(
+      container.querySelector('th.column[data-property="code"] a.sort'),
+    ).toHaveAttribute("href", "/?sort=code");
+    expect(container.querySelectorAll("tbody > tr.row")).toHaveLength(2);
+  });
+
+  it("W4-A9 gives each row's cells their field's data-property", () => {
+    const { container } = renderTable();
+    const cells = Array.from(
+      container.querySelectorAll("tbody > tr.row:first-child td.value"),
+      (cell) => [
+        cell.getAttribute("data-property"),
+        cell.querySelector(".detail")?.textContent,
+      ],
+    );
+    expect(cells).toEqual([
+      ["code", "NG"],
+      ["inZone", "Zone 1"],
+    ]);
+  });
+
+  it("titles each row with its node's title", () => {
+    const { container } = renderTable();
+    expect(
+      Array.from(
+        container.querySelectorAll("th.title"),
+        (title) => title.textContent,
+      ),
+    ).toEqual(["Northgate", "Central"]);
+  });
+
+  it("leaves out the columns the lens omits", () => {
+    const { container } = renderTable({ omits: ["inZone"] });
+    expect(container.querySelector('[data-property="inZone"]')).toBeNull();
+    expect(
+      container.querySelector('th.column[data-property="code"]'),
+    ).not.toBeNull();
+  });
+
+  it("orders the rows by the sorted field and marks its header", () => {
+    const { container } = renderTable({ sort: "code" });
+    expect(
+      Array.from(
+        container.querySelectorAll("th.title"),
+        (title) => title.textContent,
+      ),
+    ).toEqual(["Central", "Northgate"]);
+    expect(
+      container.querySelector('th.column[data-property="code"]'),
+    ).toHaveAttribute("aria-sort", "ascending");
+    expect(
+      container.querySelector('th.column[data-property="code"] a.sort'),
+    ).toHaveAttribute("href", "/?sort=-code");
+  });
+
+  it("takes its columns from the answer's first node, whatever the sort", () => {
+    const { container } = renderTable({ sort: "platforms" }, [
+      createValuedNode("Northgate", "NG"),
+      {
+        ...createValuedNode("Central", "CE", INTERCHANGE_TYPE),
+        values: [
+          { field: "code", label: "Code", text: "CE" },
+          { field: "platforms", label: "Platforms", text: "4" },
+        ],
+      },
+    ]);
+    expect(
+      Array.from(
+        container.querySelectorAll("th.title"),
+        (title) => title.textContent,
+      ),
+    ).toEqual(["Central", "Northgate"]);
+    expect(
+      Array.from(container.querySelectorAll("th.column"), (column) =>
+        column.getAttribute("data-property"),
+      ),
+    ).toEqual(["code", "inZone"]);
+  });
+
+  it("marks a descending sort on its header", () => {
+    const { container } = renderTable({ sort: "-code" });
+    expect(
+      Array.from(
+        container.querySelectorAll("th.title"),
+        (title) => title.textContent,
+      ),
+    ).toEqual(["Northgate", "Central"]);
+    expect(
+      container.querySelector('th.column[data-property="code"]'),
+    ).toHaveAttribute("aria-sort", "descending");
+  });
+
+  it("leaves a cell empty where its node shows no value", () => {
+    const { container } = renderTable({ selected: "metro:Nowhere" }, [
+      VALUED_NODES[0],
+      { ...createValuedNode("Bank", "BK"), values: [] },
+      { ...createValuedNode("Monument", "MO"), values: null },
+    ]);
+    const cells = Array.from(
+      container.querySelectorAll("tbody > tr.row:last-child td.value"),
+      (cell) => cell.textContent,
+    );
+    expect(cells).toEqual(["", ""]);
+    expect(container.querySelector('tr[aria-selected="true"]')).toBeNull();
+  });
+
+  it("selects the row the address names, by its uri or its curie", () => {
+    const byCurie = renderTable({ selected: "metro:Central" });
+    expect(
+      byCurie.container.querySelector('tr[aria-selected="true"] th.title')
+        ?.textContent,
+    ).toBe("Central");
+    byCurie.unmount();
+    const byUri = renderTable({ selected: "https://metro.example/Northgate" });
+    expect(
+      byUri.container.querySelectorAll('tr[aria-selected="true"]'),
+    ).toHaveLength(1);
+  });
+
+  it("draws two-line rows where the index asks for them", () => {
+    const { container } = renderTable({ lines: "two" });
+    expect(container.querySelectorAll("tr.row.is-two-line")).toHaveLength(2);
+  });
+
+  it("W4-A4 keeps the rows for a list of more than one type", () => {
+    const { container } = renderTable({}, [
+      VALUED_NODES[0],
+      createValuedNode("CircleLine", "C", { uri: "metro:Line" }),
+    ]);
+    expect(container.querySelector("table")).toBeNull();
+    expect(container.querySelectorAll("ol.items > li")).toHaveLength(2);
+  });
+
+  it("keeps the rows in the cards renderer", () => {
+    const { container } = renderTable({ renderer: "cards" });
+    expect(container.querySelector("table")).toBeNull();
+    expect(container.querySelector(".ds.entity-card")).not.toBeNull();
   });
 });

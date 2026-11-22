@@ -217,6 +217,18 @@ test rather than by construction.
 
 ---
 
+## List values and facets: `Node.values` and `Query.facetedInstances`
+
+The provider serves the contract's two list extensions on the schema that
+carries the site lens, since both read it. `extendWithList` writes their
+SDL from the compiled schema itself: the contract's
+`LIST_EXTENSION_TYPES_SDL`, a `FacetedConnection` over the schema's own
+node edge type, `values` on `Node`, on every interface that implements it and
+on every implementation, and `Query.facetedInstances`. Their resolvers
+call the contract's `serveNodeValues` and `serveFacetedInstances`, which
+run their queries against the served schema in the request's context, so
+a value or a count reads exactly what a client could select.
+
 ## Testing: the hermetic corpus
 
 Pragma's real corpus is the five ref packages, two of them the local shims of the demand

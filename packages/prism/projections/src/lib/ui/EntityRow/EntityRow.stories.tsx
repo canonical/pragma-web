@@ -35,6 +35,11 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
+/** The row the address selects (`select=`): current, highlighted. */
+export const Selected: Story = {
+  args: { ...pickRowArgs(CLASS_ENTITY), "aria-current": "true" },
+};
+
 /** A class, marked abstract. */
 export const Class: Story = { args: pickRowArgs(CLASS_ENTITY) };
 

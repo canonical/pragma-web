@@ -28,7 +28,9 @@
  * rather than run under the value or widen the canvas, and once for its
  * key values' keys, each on one line at its row's top; Central Exchange's
  * three prominent values, which end by y 454 at 1440px. Every row of the
- * station and fleet indexes is 32px.
+ * station and fleet indexes is 32px, and 56px below two groups, where the
+ * table folds into scented rows; each fleet row shows its formations after
+ * the script has run.
  */
 import {
   launchBrowser,
@@ -36,6 +38,7 @@ import {
   measureRowHeights,
   ROW_PX,
   type ThemedMeasure,
+  TWO_LINE_ROW_PX,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
@@ -43,10 +46,12 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   CENTRAL_EXCHANGE_CURIE,
   NORTHGATE_CURIE,
+  ROLLING_STOCK_COUNT,
 } from "../../testing/fixtures.js";
 import {
   CARDS_PATHS,
   DEV_READY_MS,
+  FLEET_PATH,
   GRAPH_READY_MS,
   INDEX_CARD_SELECTOR,
   INDEX_ROW_SELECTOR,
@@ -54,6 +59,8 @@ import {
   PAGE_SETTLE_MS,
   ROWS_PATHS,
   STATION_IRI_PATH,
+  TABLE_FOLD_WIDTH_PX,
+  TABLE_PATHS,
   TERM_IRI_PATH,
   WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
@@ -88,6 +95,77 @@ const DOCUMENT_PATHS = [
   "/",
   "/not-found",
 ] as const;
+
+/**
+ * Read each table row's first value cell as the reader sees it: its text,
+ * whether its label shows, and whether it is painted inside its row. It
+ * runs in the page.
+ *
+ * @param selector - The rows' selector.
+ * @returns One entry per row.
+ * @note Impure: reads the page's layout.
+ */
+function readFirstValues(selector: string): readonly {
+  readonly text: string;
+  readonly labelShown: boolean;
+  readonly painted: boolean;
+}[] {
+  return [...document.querySelectorAll(selector)].map((row) => {
+    const cell = row.querySelector("td.value");
+    const rowBox = row.getBoundingClientRect();
+    const box = cell?.getBoundingClientRect();
+    const label = cell?.querySelector(".term");
+    return {
+      text: cell?.querySelector(".detail")?.textContent ?? "",
+      labelShown:
+        label !== null &&
+        label !== undefined &&
+        getComputedStyle(label).display !== "none",
+      painted:
+        box !== undefined &&
+        box.width > 0 &&
+        box.top >= rowBox.top &&
+        box.bottom <= rowBox.bottom,
+    };
+  });
+}
+
+/**
+ * Read each value cell a row shows, one painted on its row's lines, as
+ * whether it is cut: its text running past the cell's end, or the cell
+ * past its row's end. It runs in the page.
+ *
+ * @param selector - The rows' selector.
+ * @returns One entry per shown value cell, with its text.
+ * @note Impure: reads the page's layout.
+ */
+function readShownValues(selector: string): readonly {
+  readonly text: string;
+  readonly cut: boolean;
+}[] {
+  return [...document.querySelectorAll(selector)].flatMap((row) => {
+    const rowBox = row.getBoundingClientRect();
+    return [...row.querySelectorAll("td.value")].flatMap((cell) => {
+      const box = cell.getBoundingClientRect();
+      const shown =
+        getComputedStyle(cell).display !== "none" &&
+        box.width > 0 &&
+        box.top >= rowBox.top &&
+        box.bottom <= rowBox.bottom;
+      if (!shown) return [];
+      const detail = cell.querySelector(".detail")?.getBoundingClientRect();
+      return [
+        {
+          text: cell.textContent ?? "",
+          cut:
+            cell.scrollWidth > cell.clientWidth + 1 ||
+            (detail !== undefined && detail.right > box.right + 1) ||
+            box.right > rowBox.right + 1,
+        },
+      ];
+    });
+  });
+}
 
 /**
  * Set `name` as the text of the page's first key and measure the pair: the
@@ -392,13 +470,49 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
   );
 
   // A row's height comes from `lines` alone, and neither index opts its
-  // rows into two lines: every row is one line high.
-  it.each(ROWS_PATHS)("draws every row of %s one line high", async (path) => {
+  // rows into two lines: every row is one line high. Below two groups each
+  // table row folds into a scented row of two lines.
+  it.each(ROWS_PATHS)("draws every row of %s at its height", async (path) => {
     const page = await open(path);
     try {
       const rows = await page.evaluate(measureRowHeights, INDEX_ROW_SELECTOR);
+      const height =
+        viewport.width < TABLE_FOLD_WIDTH_PX ? TWO_LINE_ROW_PX : ROW_PX;
       expect(rows.length).toBeGreaterThan(0);
-      expect(rows.filter(({ height }) => height !== ROW_PX)).toEqual([]);
+      expect(rows.filter((row) => row.height !== height)).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
+
+  // Once the script has run, each stock's row shows its formations, its
+  // first value, painted inside the row; below two groups after its label.
+  it("shows each fleet row's formations", async () => {
+    const page = await open(FLEET_PATH);
+    try {
+      const cells = await page.evaluate(readFirstValues, INDEX_ROW_SELECTOR);
+      expect(cells).toHaveLength(ROLLING_STOCK_COUNT);
+      for (const cell of cells) {
+        expect(cell.text).not.toBe("");
+        expect(cell.painted).toBe(true);
+        expect(cell.labelShown).toBe(viewport.width < TABLE_FOLD_WIDTH_PX);
+      }
+    } finally {
+      await page.close();
+    }
+  });
+
+  // Below two groups a folded row shows each value whole or not at all:
+  // no shown value is cut, and an empty value leaves its place.
+  it.each(TABLE_PATHS)("cuts no folded value of %s", async (path) => {
+    const page = await open(path);
+    try {
+      const values = await page.evaluate(readShownValues, INDEX_ROW_SELECTOR);
+      const folded = viewport.width < TABLE_FOLD_WIDTH_PX;
+      expect(values.length).toBeGreaterThan(0);
+      expect(
+        values.filter((value) => folded && (value.cut || value.text === "")),
+      ).toEqual([]);
     } finally {
       await page.close();
     }

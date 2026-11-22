@@ -15,7 +15,12 @@ describe("listServedExtensions", () => {
       ),
       "utf8",
     )}\n${readStatementsSdl()}`;
-    expect(listServedExtensions(sdl)).toEqual(["source", "statements"]);
+    expect(listServedExtensions(sdl)).toEqual([
+      "source",
+      "statements",
+      "values",
+      "facetedInstances",
+    ]);
   });
 
   it("lists no extension a provider serves with another signature", () => {

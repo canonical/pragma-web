@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9fc74c83465ce82025e613a2e30700e2>>
+ * @generated SignedSource<<ab01927d9c5c399c4590c6771f06996e>>
  * @lightSyntaxTransform
  */
 
@@ -17,7 +17,7 @@ export type CatalogList_query$data = {
           readonly name: string | null | undefined;
         } | null | undefined;
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"DocsCardProjection_node" | "DocsRowProjection_node">;
+        readonly " $fragmentSpreads": FragmentRefs<"NodeList_node">;
       };
     }>;
   };
@@ -124,12 +124,7 @@ return {
                 {
                   "args": null,
                   "kind": "FragmentSpread",
-                  "name": "DocsCardProjection_node"
-                },
-                {
-                  "args": null,
-                  "kind": "FragmentSpread",
-                  "name": "DocsRowProjection_node"
+                  "name": "NodeList_node"
                 },
                 {
                   "alias": null,
@@ -185,6 +180,6 @@ return {
 };
 })();
 
-(node as any).hash = "9699d180c1b3be5102d2ab578f415cdd";
+(node as any).hash = "7e9ee984d0171afa95a0228dcef068ec";
 
 export default node;

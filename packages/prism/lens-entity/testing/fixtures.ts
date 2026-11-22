@@ -23,11 +23,22 @@ export const LINES_BINDING = defineBinding({
   typename: "Line",
 });
 
-/** The stations lens's label and rail order. */
-export const STATIONS_LENS: EntityLensOptions = { label: "Stations", order: 1 };
+/** The list renderers both test lenses declare: the table and the cards. */
+export const LIST_RENDERERS = { list: ["table", "cards"] } as const;
 
-/** The lines lens's label and rail order. */
-export const LINES_LENS: EntityLensOptions = { label: "Lines", order: 2 };
+/** The stations lens's label, rail order and list renderers. */
+export const STATIONS_LENS: EntityLensOptions = {
+  label: "Stations",
+  order: 1,
+  renderers: LIST_RENDERERS,
+};
+
+/** The lines lens's label, rail order and list renderers. */
+export const LINES_LENS: EntityLensOptions = {
+  label: "Lines",
+  order: 2,
+  renderers: LIST_RENDERERS,
+};
 
 /** A site's route table holding both lenses. */
 export const SITE_ROUTES = {

@@ -503,13 +503,13 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
       'data-slot="reading-canvas"',
     );
-    // The standard's prose renders with its references as chips, from the
+    // The standard's prose renders with its references as the site's standard chips, from the
     // same warm store: the two links the prose writes to them, one by its
     // compact address and one by its absolute IRI; the third is the
     // standard it extends, under Related standards, from its statements.
     expect(
       mustGet(STANDARD_READING_URL).canvas.match(
-        /class="ds entity-chip ds node-chip"/g,
+        /class="ds entity-chip ds code-standard-chip"/g,
       ),
     ).toHaveLength(3);
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(

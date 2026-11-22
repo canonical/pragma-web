@@ -77,12 +77,21 @@ export const LENS_OPERATION_VARIABLES: Record<
   // bound class's index and its pagination, the namespaces lookup that
   // expands a compact address, and the entity page, which takes the
   // absolute IRI `node(id:)` accepts.
-  EntityIndexQuery: { classUri: SAMPLE_CLASS_URI, count: 5, cursor: null },
-  EntityIndexPaginationQuery: {
+  EntityIndexQuery: {
     classUri: SAMPLE_CLASS_URI,
+    classId: SAMPLE_CLASS_URI,
+    filters: null,
     count: 5,
     cursor: null,
   },
+  EntityIndexPaginationQuery: {
+    classUri: SAMPLE_CLASS_URI,
+    classId: SAMPLE_CLASS_URI,
+    filters: null,
+    count: 5,
+    cursor: null,
+  },
+  EntityFacetScopeQuery: { classId: SAMPLE_CLASS_URI },
   EntityNamespacesQuery: {},
   EntityPanelQuery: { id: SAMPLE_ENTITY_URI },
   EntityPageQuery: { id: SAMPLE_ENTITY_URI, classUri: SAMPLE_CLASS_URI },

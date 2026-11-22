@@ -19,17 +19,21 @@
  */
 
 import {
+  type FacetedInstancesArgs,
   HIDDEN_VISIBILITY,
   indexSiteLens,
   type LensGroup,
+  type RunQuery,
   type SiteLens,
   STATEMENTS_MAX_DEPTH,
   STATEMENTS_PER_PREDICATE,
   STATEMENTS_PER_PREDICATE_MAX,
   selectLiteral,
+  serveFacetedInstances,
+  serveNodeValues,
   weighClassEdges,
 } from "@canonical/prism-contract";
-import { buildSchema, isObjectType } from "graphql";
+import { buildSchema, graphql, isObjectType } from "graphql";
 import {
   type ConnectionArgs,
   sliceConnection,
@@ -146,6 +150,14 @@ interface SearchArgs extends ConnectionArgs {
   readonly text: string;
 }
 
+/** Arguments of `Node.values`. */
+interface ValuesArgs {
+  readonly fields?: readonly string[] | null;
+}
+
+/** Arguments of `Query.facetedInstances`. */
+interface FacetedArgs extends FacetedInstancesArgs, ConnectionArgs {}
+
 /** An entity paired with its built view, the entity narrowed to `E`. */
 interface EntityRecord<E extends ExampleEntity = ExampleEntity> {
   readonly entity: E;
@@ -229,6 +241,33 @@ export const createExampleProvider = (
    */
   const projectsField = (typename: string, name: string): boolean =>
     (fieldNamesByType.get(typename) as ReadonlySet<string>).has(name);
+
+  /**
+   * Runs a query against this provider's own schema in the caller's
+   * context: `values` and `facetedInstances` read only what the schema
+   * serves, as every provider's do.
+   */
+  const createRun =
+    (contextValue: unknown): RunQuery =>
+    async (source, variableValues) => {
+      const result = await graphql({
+        schema,
+        source,
+        rootValue,
+        contextValue,
+        variableValues: { ...variableValues },
+      });
+      const error = result.errors?.at(0);
+      if (error !== undefined) {
+        throw error;
+      }
+      return result.data;
+    };
+
+  /** A node's `values`, read through the schema. */
+  const valuesOf =
+    (uri: string) => (args: ValuesArgs, context?: ExampleContext) =>
+      serveNodeValues(createRun(context), sdl, uri, args.fields);
 
   const classByUri = new Map(dataset.classes.map((cls) => [cls.uri, cls]));
   const propertyByUri = new Map(dataset.properties.map((p) => [p.uri, p]));
@@ -456,6 +495,7 @@ export const createExampleProvider = (
       instanceCount: () => instancesOf(cls).length,
       isAbstract: cls.isAbstract,
       namespace: namespaceOf(cls.uri),
+      values: valuesOf(cls.uri),
       ...classLensView(cls.uri),
     };
   }
@@ -814,6 +854,7 @@ export const createExampleProvider = (
         cls,
       }),
     name: resolveLabel(entity.labels, DEFAULT_LANG),
+    values: valuesOf(entity.uri),
     ...buildTypeFields(entity),
   });
 
@@ -1248,8 +1289,8 @@ export const createExampleProvider = (
   };
 
   // -------------------------------------------------------------------
-  // The contract's six root fields, plus `prose`, `search`, `source` and
-  // `statements`: the four root fields this provider adds (see schema/extension.graphql for why each is
+  // The contract's six root fields, plus `prose`, `search`, `source`,
+  // `facetedInstances` and `statements`: the five root fields this provider adds (see schema/extension.graphql for why each is
   // a root field). Every type the provider declares is reachable from here.
   // -------------------------------------------------------------------
 
@@ -1281,6 +1322,19 @@ export const createExampleProvider = (
       return record === undefined ? null : writeEntityTurtle(record, dataset);
     },
     statements: resolveStatements,
+    facetedInstances: async (args: FacetedArgs, context?: ExampleContext) => {
+      const selection = await serveFacetedInstances(
+        createRun(context),
+        sdl,
+        args,
+      );
+      const page = sliceConnection(selection.uris, (uri) => uri, args);
+      return {
+        ...buildNodeConnectionView(buildNodeEdges(page.items), page),
+        totalCount: selection.totalCount,
+        facets: selection.facets,
+      };
+    },
   };
 
   return { schema, rootValue, sdl };

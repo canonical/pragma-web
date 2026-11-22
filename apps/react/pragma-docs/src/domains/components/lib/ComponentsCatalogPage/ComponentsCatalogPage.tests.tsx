@@ -12,7 +12,7 @@ import catalogRecords from "../../__fixtures__/catalogRecords.js";
 
 describe("ComponentsCatalogPage", () => {
   it(
-    "shows its heading over the catalog as a table by default, from the warm store",
+    "shows its heading over the catalog as two-line rows by default, from the warm store",
     () => {
       const fetchFn = createFetchSpy();
       const { container } = render(catalogPage(catalogRecords, fetchFn));
@@ -37,7 +37,7 @@ describe("ComponentsCatalogPage", () => {
         ),
       );
       expect(container.querySelectorAll(".ds.entity-card").length).toBe(7);
-      expect(container.querySelector(".ds.entity-row")).toBeNull();
+      expect(container.querySelector(".ds.entity-table")).toBeNull();
     },
     HARNESS_TEST_TIMEOUT_MS,
   );

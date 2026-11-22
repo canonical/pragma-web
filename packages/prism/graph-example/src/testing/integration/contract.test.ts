@@ -64,6 +64,7 @@ describe("the extension is a superset, not a redefinition", () => {
       Object.keys(schema.getQueryType()?.getFields() ?? {}).sort(),
     ).toEqual([
       "classEdges",
+      "facetedInstances",
       "node",
       "ontologies",
       "ontology",

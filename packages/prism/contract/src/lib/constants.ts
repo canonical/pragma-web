@@ -51,11 +51,11 @@ export const SOURCE_LAYOUT_PREFIX = "../..";
 export const BUILD_LAYOUT_PREFIX = "../../..";
 
 /**
- * The provider extensions a site may rely on: root fields outside the
- * contract that a provider serves or leaves out, each with the one signature
- * a reader selects it by. A provider serves an extension only when its
- * `Query` declares the field with exactly these arguments, in this order,
- * and this return type.
+ * The provider extensions a site may rely on: fields outside the contract
+ * that a provider serves or leaves out, each with the one signature a reader
+ * selects it by. A provider serves an extension only when its `Query`, or
+ * the type `on` names, declares the field with exactly these arguments, in
+ * this order, and this return type.
  */
 export const PROVIDER_EXTENSIONS = {
   /** One entity's statements as Turtle, or null when the graph holds none. */
@@ -72,6 +72,22 @@ export const PROVIDER_EXTENSIONS = {
       ["direction", "StatementDirection"],
     ],
     type: "StatementGroups",
+  },
+  /**
+   * A node's values for list fields: those named, or without names the ones
+   * its class's lens displays. Declared on `Node`, not on `Query`.
+   */
+  values: { on: "Node", args: [["fields", "[ID!]"]], type: "[NodeValue!]!" },
+  /** A class's instances filtered, sorted and counted by facet. */
+  facetedInstances: {
+    args: [
+      ["classUri", "ID!"],
+      ["filters", "[FieldFilter!]"],
+      ["sort", "FieldSort"],
+      ["first", "Int"],
+      ["after", "String"],
+    ],
+    type: "FacetedConnection!",
   },
 } as const;
 

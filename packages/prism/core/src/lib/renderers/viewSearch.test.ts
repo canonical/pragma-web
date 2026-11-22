@@ -32,6 +32,7 @@ const VIEW_STATE = {
   graph: "orbit",
   select: "ds:a",
   expand: "ds:a:p:out",
+  sort: "-servesLine",
 } as const;
 
 /** A router over `routes`, positioned on the server at `url`. */
@@ -39,7 +40,7 @@ const createViewRouter = (url: string) =>
   createRouter(routes, { adapter: createServerAdapter(url) });
 
 describe("viewSearch", () => {
-  it("passes the view's six parameters through as text", () => {
+  it("passes the view's seven parameters through as text", () => {
     expect(
       read({
         as: "cards",
@@ -48,6 +49,7 @@ describe("viewSearch", () => {
         graph: "orbit",
         select: "ds:a",
         expand: "ds:a:p:out",
+        sort: "-servesLine",
       }),
     ).toEqual({
       as: "cards",
@@ -56,6 +58,7 @@ describe("viewSearch", () => {
       graph: "orbit",
       select: "ds:a",
       expand: "ds:a:p:out",
+      sort: "-servesLine",
     });
   });
 
@@ -72,7 +75,7 @@ describe("viewSearch", () => {
     it("matches the view's parameters from an address", () => {
       const router = createViewRouter("/x");
       const match = router.match(
-        "/x?as=cards&q=cen&sheet=filter&graph=orbit&select=ds:a&expand=ds:a:p:out",
+        "/x?as=cards&q=cen&sheet=filter&graph=orbit&select=ds:a&expand=ds:a:p:out&sort=-servesLine",
       );
       expect(match?.kind).toBe("route");
       expect(match?.kind === "route" && match.search).toEqual(VIEW_STATE);
@@ -87,7 +90,7 @@ describe("viewSearch", () => {
 
     it("matches an address with none of them to an empty search", () => {
       const router = createViewRouter("/x");
-      const match = router.match("/x?sort=name");
+      const match = router.match("/x?view=name");
       expect(match?.kind === "route" && match.search).toEqual({});
     });
   });

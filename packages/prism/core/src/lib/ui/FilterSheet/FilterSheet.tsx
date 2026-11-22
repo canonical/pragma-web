@@ -19,12 +19,13 @@ import "./styles.css";
 const componentCssClassName = "ds filter-sheet";
 
 /**
- * The filter sheet below two groups: a non-modal dialog over the viewport
+ * The filter sheet: a non-modal dialog over the viewport
  * whose open state is the address's (`sheet=filter`), so the fold's link
  * opens it before scripts run and its close link, the address without the
  * parameter, closes it. Once scripts run, Escape closes it the same way
- * and focus moves to its title when it opens. At two groups and wider it
- * is not displayed, whatever the address says.
+ * and focus moves to its title when it opens. The fold opens it below two
+ * groups and the facet bar's "More filters" wider, so it is displayed
+ * whenever it is open, at every width.
  *
  * `import { FilterSheet } from "@canonical/prism-core";`
  *

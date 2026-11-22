@@ -62,13 +62,23 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                     title: "Series 50",
                     curie: "metro:series-50",
                     type: {
+                      uri: "https://metro.example/onto#RollingStock",
+                      visibility: "PROMINENT",
+                      superclasses: [],
                       _meta: {
                         title: "Rolling stock",
                       },
-                      uri: "https://metro.example/onto#RollingStock",
                     },
                     definition: null,
                   },
+                  values: [
+                    {
+                      field: "formations",
+                      label: "formations",
+                      text: "Series 50 four-car",
+                      type: "choices",
+                    },
+                  ],
                   formations: [
                     {
                       uri: "https://metro.example/onto#series-50-four-car",
@@ -162,13 +172,23 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                     title: "Series 70",
                     curie: "metro:series-70",
                     type: {
+                      uri: "https://metro.example/onto#RollingStock",
+                      visibility: "PROMINENT",
+                      superclasses: [],
                       _meta: {
                         title: "Rolling stock",
                       },
-                      uri: "https://metro.example/onto#RollingStock",
                     },
                     definition: null,
                   },
+                  values: [
+                    {
+                      field: "formations",
+                      label: "formations",
+                      text: "Series 70 fixed formation",
+                      type: "choices",
+                    },
+                  ],
                   formations: [
                     {
                       uri: "https://metro.example/onto#series-70-fixed",
@@ -279,13 +299,23 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                     title: "Series 90",
                     curie: "metro:series-90",
                     type: {
+                      uri: "https://metro.example/onto#RollingStock",
+                      visibility: "PROMINENT",
+                      superclasses: [],
                       _meta: {
                         title: "Rolling stock",
                       },
-                      uri: "https://metro.example/onto#RollingStock",
                     },
                     definition: null,
                   },
+                  values: [
+                    {
+                      field: "formations",
+                      label: "formations",
+                      text: "Series 90 three-car +1",
+                      type: "choices",
+                    },
+                  ],
                   formations: [
                     {
                       uri: "https://metro.example/onto#series-90-three-car",

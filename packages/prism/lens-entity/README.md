@@ -98,6 +98,31 @@ On the server, a site prepares the store through each route's `warm`, which
 fetches the route's operations into the published prefetch environment; the
 page then renders from the warm store and hydrates without a second request.
 
+## The index's list and facets
+
+The index lists the class's instances through `NodeList` (see
+`@canonical/prism-projections`): a table of facts where the instances
+share one type, the rows otherwise, and the node the address's `select=`
+names highlighted. Three options of `createEntityRoutes` shape it:
+
+- `lines`: how many lines a row takes, `"one"` (the default) or `"two"`.
+- `tableOmits`: the value fields the table leaves out, by served name.
+- `barFacets`: how many of the lens's facets the facet bar holds, in the
+  lens's order; three when omitted.
+
+`FacetControls` draws the class's facets, as the provider's
+`facetedInstances` counts them, in the bar, the panel or the sheet. In the
+bar it holds the first `barFacets` facets, a button each that opens its
+values with their counts; the rest are the sheet's, which "More filters"
+opens. In the panel and the sheet every facet stacks with its values,
+then a chip per applied value. Every control is a link to the address
+with one value added or lifted, written as a curie where the site's
+prefixes give one, so the controls work before scripts run. The bar
+exists only where the class has facets.
+
+Below 1376px every facet bar holds "More filters" alone, and every facet
+stays one press away in the sheet.
+
 ## Route names your register must carry
 
 The lens links by route name, so a site's route table keeps both routes of a

@@ -11,8 +11,8 @@
       "import": "./dist/esm/index.js"
     },
     "./browser": {
-      "types": "./dist/types/browser.d.ts",
-      "import": "./dist/esm/browser.js"
+      "types": "./dist/types/browser/index.d.ts",
+      "import": "./dist/esm/browser/index.js"
     },
     "./schema/contract.graphql": "./schema/contract.graphql",
     "./schema/statements.graphql": "./schema/statements.graphql"

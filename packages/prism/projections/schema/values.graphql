@@ -1,0 +1,19 @@
+# The list extensions the providers serve beyond the contract. Relay compiles
+# this package against the contract alone, so it reads these fields as client
+# data here; the sites compile them from their served schemas.
+
+extend interface Node {
+  values(fields: [ID!]): [NodeValue!]!
+}
+
+extend type OntologyClass {
+  values(fields: [ID!]): [NodeValue!]!
+}
+
+type NodeValue {
+  field: ID!
+  label: String!
+  text: String
+  uri: String
+  type: String!
+}

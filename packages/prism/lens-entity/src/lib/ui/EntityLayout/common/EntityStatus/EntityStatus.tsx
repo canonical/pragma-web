@@ -10,8 +10,9 @@ const componentCssClassName = "ds entity-status";
 
 /**
  * The index's count, the strip's or the panel's: how many loaded entries
- * the search shows, out of how many instances the class has, as core's
- * count line. It counts with the same matcher the index filters by, over
+ * the search and the facet filters show, out of how many instances the
+ * class has ("6 of 26 entries" with one line applied), as core's count
+ * line. It counts with the same matcher the index filters by, over
  * the same operation and the same search text, so the figure and the canvas
  * cannot disagree; the count line announces the change as the reader types.
  * Below two groups it shows its short form, the shown figure and its noun
@@ -32,16 +33,16 @@ export default function EntityStatus({
   ...props
 }: EntityStatusProps): ReactElement {
   const t = useMessages();
-  const { count, visible } = useIndexStripQuery(binding);
+  const { total, visible } = useIndexStripQuery(binding);
   return (
     <CountLine
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="entity-status"
-      kind={t("status.kind", { count })}
+      kind={t("status.kind", { count: total })}
       shortKind={t("status.kind", { count: visible })}
       shown={visible}
-      total={{ kind: "exact", value: count }}
+      total={{ kind: "exact", value: total }}
     />
   );
 }

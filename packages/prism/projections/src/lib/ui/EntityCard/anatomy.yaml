@@ -59,6 +59,10 @@
 # Every decision is read through a component token declared on the root
 # (`--entity-card-*`), bound to the symbol or the literal named here.
 #
+# The selected entity's card (aria-current="true", the address's select=)
+# takes color.background.layer2, as the table of facts marks its selected
+# row (@selected on the root).
+#
 # Token ledger (no symbol to bind):
 #   --entity-card-line-height: space.300  the matrix's 24px line; no
 #                                       typography token is 24px in every
@@ -102,6 +106,7 @@ node:
   styles:
     typography.size: typography.text.primary.fontSize
     typography.lineHeight: space.300
+    appearance.background@selected: color.background.layer2
   edges:
     - node:
         uri: prism.component.entity_card.specimen

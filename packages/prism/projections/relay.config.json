@@ -8,5 +8,6 @@
   "schemaConfig": {
     "nodeInterfaceIdField": "uri",
     "nodeInterfaceIdVariableName": "id"
-  }
+  },
+  "schemaExtensions": ["./schema"]
 }

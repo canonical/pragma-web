@@ -1,0 +1,38 @@
+input FieldFilter {
+  field: String!
+  values: [ID]
+}
+
+input FieldSort {
+  field: String!
+  descending: Boolean
+}
+
+type FacetValue {
+  value: ID
+  label: String
+  count: Int!
+}
+
+type Facet {
+  field: String!
+  label: String!
+  values: [FacetValue!]!
+}
+
+type FacetedConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+  facets: [Facet!]!
+}
+
+extend type Query {
+  facetedInstances(
+    classUri: ID!
+    filters: [FieldFilter!]
+    sort: FieldSort
+    first: Int
+    after: String
+  ): FacetedConnection!
+}

@@ -148,6 +148,7 @@ describe("DocsChipProjection", () => {
       Modifier: MOCK_MODIFIER,
       ModifierFamily: MOCK_MODIFIER_FAMILY,
       CodeStandard: MOCK_CODE_STANDARD,
+      OntologyClass: MOCK_ONTOLOGY_CLASS,
     };
     const roots = new Map<string, string>(
       CASES.map(([typename, , root]) => [typename, root]),

@@ -57,6 +57,11 @@ type Story = StoryObj<typeof Component>;
 /** A class, with its instances counted. */
 export const Class: Story = { args: pickCardArgs(CLASS_ENTITY) };
 
+/** The card the address selects (`select=`): current, highlighted. */
+export const Selected: Story = {
+  args: { ...pickCardArgs(CLASS_ENTITY), "aria-current": "true" },
+};
+
 /** A class under its superclass: the superclass is one of its facts. */
 export const Subclass: Story = {
   args: {

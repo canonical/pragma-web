@@ -53,7 +53,7 @@ describe("readProviderSdl", () => {
   });
 
   it("carries no vendored contract text in this package's own schema dir", () => {
-    expect(readExtensionSdl()).not.toContain("interface Node");
+    expect(readExtensionSdl()).not.toMatch(/^interface Node/m);
   });
 
   it("builds", () => {

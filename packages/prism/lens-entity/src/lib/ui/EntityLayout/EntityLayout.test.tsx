@@ -15,16 +15,22 @@ import createRecordedFetch from "../../../../testing/createRecordedFetch.js";
 import createWarmEnvironment from "../../../../testing/createWarmEnvironment.js";
 import {
   ENTITY_TEST_TIMEOUT_MS,
+  LIST_RENDERERS,
   STATION_COUNT,
   STATIONS_BINDING,
 } from "../../../../testing/fixtures.js";
 import { MESSAGES } from "../../i18n/index.js";
+import {
+  answerFacets,
+  STATION_FACETS,
+} from "./common/EntityFacets/fixtures.js";
 
 /** The layout the stations lens's site wrapper mounts. */
 const STATIONS_LAYOUT = {
   binding: STATIONS_BINDING,
   label: "Stations",
   rail: <nav aria-label="Site rail" />,
+  renderers: LIST_RENDERERS,
 } as const;
 
 /** The strip socket named `slot`. */
@@ -248,6 +254,32 @@ describe("EntityLayout", () => {
     expect(sheet).toHaveAttribute("open");
     expect(within(sheet as HTMLElement).getByRole("searchbox")).toHaveValue(
       "north",
+    );
+  });
+
+  it("puts the facets in the bar and the sheet, and counts them in the fold", async () => {
+    render(
+      createEntitySite({
+        url: "/stations?servesLine=metro%3Acircle-line&q=north&sheet=filter",
+        environment: createEnvironment({
+          fetchFn: answerFacets(STATION_FACETS),
+        }),
+        layout: STATIONS_LAYOUT,
+      }),
+    );
+    const bar = await screen.findByRole("group", { name: "Facets" });
+    expect(
+      bar.querySelector("summary.button.is-applied")?.textContent,
+    ).toContain("Circle Line");
+    expect(
+      within(readSocket("fold")).getByRole("link", {
+        name: "Filter, 2 applied",
+      }),
+    ).toBeInTheDocument();
+    const sheet = document.querySelector("dialog") as HTMLElement;
+    expect(sheet.querySelectorAll("section.facet")).toHaveLength(3);
+    expect(sheet.querySelector(".chip")?.getAttribute("href")).toBe(
+      "/stations?q=north&sheet=filter",
     );
   });
 

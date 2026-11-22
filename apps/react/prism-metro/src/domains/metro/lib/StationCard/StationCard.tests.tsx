@@ -102,6 +102,7 @@ describe("StationCard", () => {
       ["platformCount", "4"],
       ["inZone", "Central Zone"],
       ["servesLine", "North Line"],
+      ["location", "51.53, -0.12"],
     ]);
     for (const slot of [".address", ".kind", ".status", ".specimen"]) {
       expect(root?.querySelector(slot), slot).toBeNull();
@@ -120,6 +121,7 @@ describe("StationCard", () => {
         platformCount: null,
         inZone: null,
         servesLine: [],
+        location: null,
         _meta: { ...MOCK_STATION._meta, definition: null },
       },
     );

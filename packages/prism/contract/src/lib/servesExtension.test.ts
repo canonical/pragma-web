@@ -6,6 +6,10 @@ import { readStatementsSdl } from "./statementsSdl.js";
 
 const contractSdl = readContractSdl();
 
+/** The list extensions' types alone, without a field that serves them. */
+const LIST_TYPES =
+  "type NodeValue { field: ID! label: String! text: String uri: ID }";
+
 /** The contract extended with every extension a provider may serve. */
 const extendedSdl = `${contractSdl}\n${readFileSync(
   new URL(
@@ -19,6 +23,13 @@ describe("servesExtension", () => {
   it("finds each extension a provider declares with its signature", () => {
     expect(servesExtension(extendedSdl, "source")).toBe(true);
     expect(servesExtension(extendedSdl, "statements")).toBe(true);
+    expect(servesExtension(extendedSdl, "facetedInstances")).toBe(true);
+  });
+
+  it("finds an extension on the type it is declared on, not on Query", () => {
+    expect(servesExtension(extendedSdl, "values")).toBe(true);
+    const sdl = `${contractSdl}\n${LIST_TYPES}\nextend type Query { values(fields: [ID!]): [NodeValue!]! }`;
+    expect(servesExtension(sdl, "values")).toBe(false);
   });
 
   it("refuses statements without its direction argument", () => {

@@ -5,13 +5,15 @@
  * check reads. `schema:check` reruns it and fails on a diff, so the
  * committed file cannot drift from the provider.
  *
- * The provider adds its root fields (`prose`, `search`, `source`, then
- * `statements`) in `extend type Query { … }` blocks. relay-compiler reads `extend type` in a
- * schema file as a client schema extension: it compiles those fields as
- * `ClientExtension` selections and never sends them to the server, so the
- * palette's search would run with its root field stripped. Every block's
- * fields are therefore spliced into the contract's `type Query { … }`, in
- * the SDL's order, and the blocks themselves are dropped; the rest of the SDL is written as emitted.
+ * The provider adds its root fields (`prose`, `search`, `source`,
+ * `facetedInstances`, then `statements`) and `Node.values` in `extend`
+ * blocks. relay-compiler reads `extend type` in a schema file as a client
+ * schema extension: it compiles those fields as `ClientExtension`
+ * selections and never sends them to the server, so the palette's search
+ * would run with its root field stripped. Every block's fields are
+ * therefore folded into the type or interface it extends, in the SDL's
+ * order, and the blocks themselves are dropped; the rest of the SDL is
+ * written as emitted.
  */
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -22,40 +24,35 @@ const SCHEMA_PATH = fileURLToPath(
   new URL("../relay/schema.graphql", import.meta.url),
 );
 
-/** Each of the provider's `extend type Query { … }` blocks, with its fields. */
-const QUERY_EXTENSIONS = /^extend type Query \{\n([\s\S]*?)\n\}\n\n?/gm;
-
-/** The contract's root type, up to its closing brace at column 0. */
-const QUERY_BLOCK = /^(type Query \{\n[\s\S]*?)\n\}/m;
+/** An `extend type` or `extend interface` block, its kind, name and fields. */
+const EXTENSION_BLOCK =
+  /^extend (type|interface) (\w+) \{\n([\s\S]*?)\n\}\n\n?/m;
 
 /**
- * Splice the fields of the SDL's `extend type Query` blocks into its
- * `type Query` block and drop the extension blocks.
- *
- * @param sdl - The provider's SDL.
- * @returns The SDL with every root field inside `type Query`.
- * @throws When the SDL carries no `type Query` or no `extend type Query`.
+ * Folds every `extend` block into the type or interface it extends: Relay
+ * reads a field declared only in an `extend` block of a server schema as
+ * client data and never sends it.
  */
-const spliceQueryExtensions = (sdl: string): string => {
-  const fields = [...sdl.matchAll(QUERY_EXTENSIONS)].map((block) =>
-    block.at(1),
+const foldExtensions = (sdl: string): string => {
+  const extension = EXTENSION_BLOCK.exec(sdl);
+  if (extension === null) return sdl;
+  const [, kind, name, fields] = extension;
+  const target = new RegExp(
+    `^(${kind} ${name}\\b[^{]*\\{\\n[\\s\\S]*?)\\n\\}`,
+    "m",
   );
-  if (fields.length === 0 || !QUERY_BLOCK.test(sdl)) {
+  if (!target.test(sdl)) {
     throw new Error(
-      "[schema] the provider's SDL carries no `type Query` or no `extend type Query` block",
+      `[schema] the provider's SDL extends ${kind} ${name}, which it does not declare`,
     );
   }
-  return sdl
-    .replace(QUERY_EXTENSIONS, "")
-    .replace(
-      QUERY_BLOCK,
-      (_, block: string) => `${block}\n${fields.join("\n")}\n}`,
-    );
+  return foldExtensions(
+    sdl
+      .replace(EXTENSION_BLOCK, "")
+      .replace(target, (_, block: string) => `${block}\n${fields}\n}`),
+  );
 };
 
-writeFileSync(
-  SCHEMA_PATH,
-  `${spliceQueryExtensions(createExampleProvider().sdl)}\n`,
-);
+writeFileSync(SCHEMA_PATH, `${foldExtensions(createExampleProvider().sdl)}\n`);
 
 console.info(`[schema] wrote ${SCHEMA_PATH}`);

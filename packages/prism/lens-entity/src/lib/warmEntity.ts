@@ -4,7 +4,7 @@ import {
   type ViewSearch,
   warmPageRenderer,
 } from "@canonical/prism-core";
-import { type CacheConfig, type Environment, fetchQuery } from "relay-runtime";
+import { type Environment, fetchQuery } from "relay-runtime";
 import type { EntityNamespacesQuery } from "../__generated__/EntityNamespacesQuery.graphql.js";
 import entityNamespacesQueryNode from "../__generated__/EntityNamespacesQuery.graphql.js";
 import type { EntityPageQuery } from "../__generated__/EntityPageQuery.graphql.js";
@@ -12,12 +12,8 @@ import entityPageQueryNode from "../__generated__/EntityPageQuery.graphql.js";
 import type { EntityStatementsQuery } from "../__generated__/EntityStatementsQuery.graphql.js";
 import entityStatementsQueryNode from "../__generated__/EntityStatementsQuery.graphql.js";
 import buildEntityPageVariables from "./buildEntityPageVariables.js";
+import { STORE_OR_NETWORK } from "./constants.js";
 import readUriParam from "./readUriParam.js";
-
-/** Answer from the store when it holds the data, and fetch otherwise. */
-const STORE_OR_NETWORK: CacheConfig & {
-  readonly fetchPolicy: "store-or-network";
-} = { fetchPolicy: "store-or-network" };
 
 /**
  * Warm the store for one entity's page, in two steps: the graph's
