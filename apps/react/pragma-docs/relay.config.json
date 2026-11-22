@@ -2,7 +2,8 @@
   "root": "../../..",
   "sources": {
     "apps/react/pragma-docs/src": "pragma-docs",
-    "packages/prism/projections/src": "pragma-docs"
+    "packages/prism/projections/src": "pragma-docs",
+    "packages/prism/command-palette/src": "pragma-docs"
   },
   "excludes": [
     "**/node_modules/**",

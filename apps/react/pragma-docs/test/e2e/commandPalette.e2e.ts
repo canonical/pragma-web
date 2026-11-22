@@ -299,12 +299,15 @@ describe("the command palette", () => {
   it("selects the preview's text with a drag, and gives the field the focus back after a click", async () => {
     const page = await openLobby();
     await search(page, COMPONENT_TITLE);
+    // A plain line of the card, never its linked title: a UI block's card
+    // names no kind (its mark says it), so its facts' terms and its status
+    // stand in.
     const kind = findPalette(page)
       .getByRole("region", { name: "Preview" })
-      .locator(".kind")
+      .locator(".description .kind, .facts .term, .body > .status")
       .first();
     const box = await kind.boundingBox();
-    if (box === null) throw new Error("the preview shows no kind");
+    if (box === null) throw new Error("the preview shows no plain line");
     const middle = box.y + box.height / 2;
     await page.mouse.move(box.x + 1, middle);
     await page.mouse.down();
