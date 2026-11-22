@@ -143,3 +143,7 @@ export const ONTOLOGY_CLASS_HREF = "/things/ds%3ALayout";
  * route reads the search, and the fragment names a place on the page.
  */
 export const SHELF_HREF = "/shelves/ds%3ALayout?view=rows#layouts";
+
+/** The address of the fixture site's search page for a text. */
+export const SEARCH_HREF = (text: string): string =>
+  `/search?q=${encodeURIComponent(text)}`;

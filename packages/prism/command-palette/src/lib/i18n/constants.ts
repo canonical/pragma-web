@@ -9,6 +9,7 @@
  */
 export const MESSAGES = {
   "palette.label": "Search the graph",
+  "palette.jumpTo": "Jump to",
   "palette.handoff": "Search everything for “{text}”",
   "palette.failure":
     "The search failed. Close the palette and open it again to retry.",
@@ -21,5 +22,11 @@ export const MESSAGES = {
   "search.empty": "Nothing in the graph matches “{text}”.",
   "search.results": "Results",
   "search.preview": "Preview",
+  "jump.placeholder": "Jump to a lens or a page you read",
+  "jump.hint": "Type the name of a lens or of a page you read.",
+  "jump.empty": "No lens or page you read matches “{text}”.",
+  "jump.results": "Destinations",
+  "jump.places": "Places",
+  "jump.recent": "Recent pages",
   "result.homeless": "This result has no page on this site.",
 } as const;

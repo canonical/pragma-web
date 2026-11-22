@@ -11,7 +11,9 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 import { Message, useMessages } from "../../i18n/index.js";
+import { CommandPaletteJump } from "../CommandPaletteJump/index.js";
 import { CommandPaletteSearch } from "../CommandPaletteSearch/index.js";
+import { NO_DESTINATIONS } from "./constants.js";
 import useBackdropClose from "./hooks/useBackdropClose.js";
 import useOpenShortcut from "./hooks/useOpenShortcut.js";
 import type { CommandPaletteProps } from "./types.js";
@@ -51,7 +53,10 @@ const componentCssClassName = "ds command-palette";
  *
  * Given `searchHref`, the search ends with a line handing the text to the
  * site's search page, and Enter with a text and no result highlighted
- * opens that page.
+ * opens that page. Without it, the site's provider serves no search: the
+ * palette reads "Jump to", sends no query, and its field narrows the
+ * site's `destinations` (its places and the pages read before) on the
+ * client; nothing in it says search is missing.
  *
  * Mount it once, inside the site's providers: the Relay environment, whose
  * provider serves the search extension; the router; the homes; and the
@@ -69,6 +74,7 @@ const componentCssClassName = "ds command-palette";
  */
 export default function CommandPalette({
   searchHref,
+  destinations = NO_DESTINATIONS,
   className,
   onClick,
   onPointerDown,
@@ -128,7 +134,9 @@ export default function CommandPalette({
   return (
     <Modal
       {...props}
-      aria-label={t("palette.label")}
+      aria-label={t(
+        searchHref === undefined ? "palette.jumpTo" : "palette.label",
+      )}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       onClick={backdrop.onClick}
       onPointerDown={backdrop.onPointerDown}
@@ -149,16 +157,25 @@ export default function CommandPalette({
           }
           resetKey={session}
         >
-          <Suspense fallback={null}>
-            <CommandPaletteSearch
+          {searchHref === undefined ? (
+            <CommandPaletteJump
+              destinations={destinations}
               initialText={carriedText}
               key={session}
               onChoose={close}
-              onHighlight={setHighlightDisabled}
-              searchHref={searchHref}
-              session={session}
             />
-          </Suspense>
+          ) : (
+            <Suspense fallback={null}>
+              <CommandPaletteSearch
+                initialText={carriedText}
+                key={session}
+                onChoose={close}
+                onHighlight={setHighlightDisabled}
+                searchHref={searchHref}
+                session={session}
+              />
+            </Suspense>
+          )}
         </ErrorBoundary>
       </ClientOnly>
       <div className="hints">

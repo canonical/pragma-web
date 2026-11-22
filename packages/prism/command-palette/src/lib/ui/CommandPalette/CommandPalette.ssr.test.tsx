@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import createSearchEnvironment from "../../../../testing/createSearchEnvironment.js";
 import createSiteRouter from "../../../../testing/createSiteRouter.js";
 import createSiteTree from "../../../../testing/createSiteTree.js";
+import { SEARCH_HREF } from "../../../../testing/fixtures.js";
 import CommandPalette from "./CommandPalette.js";
 
 describe("CommandPalette SSR", () => {
@@ -13,7 +14,7 @@ describe("CommandPalette SSR", () => {
       createSiteTree({
         environment: createSearchEnvironment(),
         router: createSiteRouter(),
-        children: <CommandPalette />,
+        children: <CommandPalette searchHref={SEARCH_HREF} />,
       }),
     );
     expect(html).toMatch(
@@ -24,5 +25,19 @@ describe("CommandPalette SSR", () => {
     expect(html).toContain("to close");
     expect(html).not.toContain('role="combobox"');
     expect(html).not.toContain('role="listbox"');
+  });
+
+  it("reads Jump to without the search page's address", () => {
+    const html = renderToString(
+      createSiteTree({
+        environment: createSearchEnvironment(),
+        router: createSiteRouter(),
+        children: <CommandPalette />,
+      }),
+    );
+    expect(html).toMatch(
+      /^<dialog class="ds modal ds command-palette" aria-label="Jump to">/,
+    );
+    expect(html).not.toContain('role="combobox"');
   });
 });
