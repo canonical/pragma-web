@@ -209,13 +209,16 @@ node:
           spacing.internal.inline.end: component.padding.inline
           appearance.border.width: 1px
           appearance.border.style: "solid none none"
-          appearance.border.top.color: color.border.muted
+          appearance.border.block.start.color: color.border.muted
         edges:
           - node:
-              role: link to the search page for the text, ringed while highlighted
-              styles:
-                appearance.outline.width@highlighted: 2px
-                appearance.outline.style@highlighted: solid
-                appearance.outline.color@highlighted: color.focusRing
+              role: link to the search page for the text
             relation: { cardinality: "1", slotName: link }
+          - node:
+              role: link to the search page for the text, highlighted (.is-active)
+              styles:
+                appearance.outline.width: 2px
+                appearance.outline.style: solid
+                appearance.outline.color: color.focusRing
+            relation: { cardinality: "0..1", slotName: link }
       relation: { cardinality: "0..1", slotName: handoff }

@@ -148,12 +148,14 @@
     margin-block-end: 0;
     padding-block: var(--command-palette-search-padding-block);
     padding-inline: var(--command-palette-search-padding-inline);
-    border-block-start: var(--command-palette-search-rule-width) solid
-      var(--command-palette-search-rule-color);
+    border-width: var(--command-palette-search-rule-width);
+    border-style: solid none none;
+    border-block-start-color: var(--command-palette-search-rule-color);
   }
 
-  .ds.command-palette-search > .handoff > .is-active {
-    outline: var(--command-palette-search-focus-ring-width) solid
-      var(--command-palette-search-focus-ring-color);
+  .ds.command-palette-search > .handoff > .link.is-active {
+    outline-width: var(--command-palette-search-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--command-palette-search-focus-ring-color);
   }
 }

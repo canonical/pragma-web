@@ -338,7 +338,7 @@ export default function CommandPaletteSearch({
       {handoffHref === undefined ? null : (
         <p className="handoff">
           <a
-            className={onHandoff ? "is-active" : undefined}
+            className={onHandoff ? "link is-active" : "link"}
             href={handoffHref}
             id={handoffId}
             onClick={onChoose}
