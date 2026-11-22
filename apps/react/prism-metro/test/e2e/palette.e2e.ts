@@ -7,8 +7,9 @@
  * link to that page. On the search page `/` focuses its field, Escape
  * clears the field and then leaves it, and Ctrl+K pressed in the field
  * opens the palette on its text. On the search page at 390 the strip's
- * fold reaches the field; at 1440 each result's chip is as wide as its
- * text and the facet bar keeps its content inside its one line.
+ * fold reaches the field and each passage is cut inside the page; at 1440
+ * each result's chip is as wide as its text and the facet bar keeps its
+ * content inside its one line.
  */
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page, ViewportSize } from "playwright";
@@ -218,6 +219,28 @@ describe("the search page's bands and results", () => {
     expect(overhangs.length).toBeGreaterThan(0);
     for (const overhang of overhangs) {
       expect(overhang).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("cuts each passage inside the page at 390", async () => {
+    const page = await openPage(
+      `/search?q=${SEARCH_MIXED_TEXT}`,
+      PHONE_VIEWPORT,
+    );
+    const overruns = await page
+      .locator(".ds.search-page .passage")
+      .evaluateAll((passages) =>
+        passages.map((passage) => {
+          const canvas = passage.closest(".ds.search-page");
+          return canvas === null
+            ? Number.POSITIVE_INFINITY
+            : passage.getBoundingClientRect().right -
+                canvas.getBoundingClientRect().right;
+        }),
+      );
+    expect(overruns.length).toBeGreaterThan(0);
+    for (const overrun of overruns) {
+      expect(overrun).toBeLessThanOrEqual(0.5);
     }
   });
 

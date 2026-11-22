@@ -1,6 +1,5 @@
 // Scaffolded by @canonical/summon-component:react v0.46.0
 
-import { readFileSync } from "node:fs";
 import { renderToString } from "react-dom/server";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -42,17 +41,5 @@ describe("SearchPage SSR", () => {
     expect(html).not.toContain('class="summary"');
     expect(html).toContain('class="ds search-passage passage"');
     expect(html).toContain('<mark class="match">But</mark>');
-  });
-
-  it("keeps a result's chip at its own width", () => {
-    const styles = readFileSync(
-      `${process.cwd()}/src/domains/search/lib/SearchPage/styles.css`,
-      "utf8",
-    );
-    const start = styles.indexOf(".ds.search-page .result {");
-    expect(start).toBeGreaterThan(-1);
-    expect(styles.slice(start, styles.indexOf("}", start))).toContain(
-      "align-items: start;",
-    );
   });
 });

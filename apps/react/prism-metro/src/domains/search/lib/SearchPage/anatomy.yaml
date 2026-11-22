@@ -44,12 +44,7 @@ node:
               uri: prism.component.search_result_group
               edges:
                 - node:
-                    role: result
-                    styles:
-                      layout.type: flex
-                      layout.direction: column
-                      layout.align: start
-                      size.min.width: 0
+                    role: result, its inline chip over its passage
                     edges:
                       - node:
                           uri: metro.component.metro_chip_projection
