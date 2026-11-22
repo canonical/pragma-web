@@ -194,6 +194,9 @@ nothing answers to.
   and the page shows those three.
 - Counts are the provider's: the design system serves Button 145 incoming
   statements, 144 token bindings and one `inheritsFrom`.
+- The header's mark is the lens's glyph, the same for every type: each
+  type's own mark is drawn inside the site's chip, and no export gives it
+  alone.
 
 ## Rail placement
 
