@@ -1375,8 +1375,8 @@ export default [
               predicate: {
                 label: "calls",
                 pluralLabel: null,
-                inverseLabel: null,
-                inversePluralLabel: null,
+                inverseLabel: "Called at by",
+                inversePluralLabel: "Called at by",
                 uri: "https://metro.example/onto#calls",
               },
               values: [
@@ -1938,8 +1938,8 @@ export default [
               predicate: {
                 label: "calls",
                 pluralLabel: null,
-                inverseLabel: null,
-                inversePluralLabel: null,
+                inverseLabel: "Called at by",
+                inversePluralLabel: "Called at by",
                 uri: "https://metro.example/onto#calls",
               },
               values: [
@@ -3164,8 +3164,8 @@ export default [
               predicate: {
                 label: "calls",
                 pluralLabel: null,
-                inverseLabel: null,
-                inversePluralLabel: null,
+                inverseLabel: "Called at by",
+                inversePluralLabel: "Called at by",
                 uri: "https://metro.example/onto#calls",
               },
               values: [
