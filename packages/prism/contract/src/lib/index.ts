@@ -6,6 +6,8 @@
  * @module lib
  */
 
+export { default as compactIri } from "./compactIri.js";
+export { default as compareCodePoints } from "./compareCodePoints.js";
 export {
   PROVIDER_EXTENSIONS,
   STATEMENTS_MAX_DEPTH,
@@ -51,6 +53,7 @@ export type {
   ContractResult,
   ContractViolation,
   ContractViolationCode,
+  PrefixBinding,
   ProviderExtension,
   SatisfiesContractOptions,
 } from "./types.js";

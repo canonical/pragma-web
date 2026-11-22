@@ -1,5 +1,5 @@
 import type { Term } from "@canonical/ke";
-import { compareCodePoints } from "./compareCodePoints.js";
+import { compareCodePoints } from "@canonical/prism-contract";
 import type { BlankStatements } from "./types.js";
 import { writeSignature } from "./writeSignature.js";
 

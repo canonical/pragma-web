@@ -1,5 +1,5 @@
+import { compareCodePoints } from "@canonical/prism-contract";
 import { RDF_TYPE } from "../source/index.js";
-import { compareCodePoints } from "./compareCodePoints.js";
 
 /**
  * A comparator ordering predicates as `statements` serves its groups:

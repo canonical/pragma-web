@@ -1,4 +1,4 @@
-import compactIri from "./compactIri.js";
+import { compactIri } from "@canonical/prism-contract";
 import type { OntologyNamespace } from "./types.js";
 
 /**

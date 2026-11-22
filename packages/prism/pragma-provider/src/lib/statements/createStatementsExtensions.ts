@@ -7,6 +7,8 @@ import {
   type QueryFn,
 } from "@canonical/ke-graphql";
 import {
+  compactIri,
+  compareCodePoints,
   STATEMENTS_MAX_DEPTH,
   STATEMENTS_PER_PREDICATE,
   STATEMENTS_PER_PREDICATE_MAX,
@@ -37,8 +39,6 @@ import {
   buildCountQuery,
   buildWindowQuery,
 } from "./buildStatementQueries.js";
-import { compactIri } from "./compactIri.js";
-import { compareCodePoints } from "./compareCodePoints.js";
 import { comparePredicates } from "./comparePredicates.js";
 import { compareTerms } from "./compareTerms.js";
 import { groupTermStatements } from "./groupTermStatements.js";
@@ -328,8 +328,10 @@ const resolveStatements = async (
     STATEMENTS_PER_PREDICATE_MAX,
   );
   const query = createStoreQueryFn(await context.store);
-  const prefixes = collectPrefixes(context);
-  const compact = (iri: string): string => compactIri(iri, prefixes);
+  const namespaces = [...collectPrefixes(context)].map(
+    ([prefix, namespace]) => ({ prefix, namespace }),
+  );
+  const compact = (iri: string): string => compactIri(iri, namespaces);
   if (path !== undefined && path !== null && path.length > 0) {
     return direction === "IN"
       ? null

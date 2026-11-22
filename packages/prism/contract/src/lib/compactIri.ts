@@ -1,4 +1,4 @@
-import type { OntologyNamespace } from "./types.js";
+import type { PrefixBinding } from "./types.js";
 
 /**
  * Compact an absolute IRI into its prefixed form
@@ -17,9 +17,9 @@ import type { OntologyNamespace } from "./types.js";
  */
 export default function compactIri(
   iri: string,
-  namespaces: readonly OntologyNamespace[],
+  namespaces: readonly PrefixBinding[],
 ): string {
-  let best: OntologyNamespace | undefined;
+  let best: PrefixBinding | undefined;
   for (const candidate of namespaces) {
     if (
       iri.startsWith(candidate.namespace) &&

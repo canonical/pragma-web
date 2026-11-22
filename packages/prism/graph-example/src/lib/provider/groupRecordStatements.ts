@@ -1,4 +1,4 @@
-import compareCodePoints from "./compareCodePoints.js";
+import { compareCodePoints } from "@canonical/prism-contract";
 import { RDF_TYPE_URI } from "./constants.js";
 import type {
   RankedKey,

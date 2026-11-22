@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { METRO_NAMESPACES } from "../../testing/fixtures.js";
 import compactIri from "./compactIri.js";
+
+const METRO_NAMESPACES = [
+  { prefix: "metro", namespace: "https://metro.example/onto#" },
+];
 
 describe("compactIri", () => {
   it("compacts an IRI of a declared namespace", () => {

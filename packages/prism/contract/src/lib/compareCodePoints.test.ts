@@ -11,6 +11,18 @@ describe("compareCodePoints", () => {
     ]);
   });
 
+  it("puts an astral character after every character of the BMP", () => {
+    expect(["\u{1F600}", "\uFF46", "a"].toSorted(compareCodePoints)).toEqual([
+      "a",
+      "\uFF46",
+      "\u{1F600}",
+    ]);
+  });
+
+  it("puts a string before every longer string it begins", () => {
+    expect(compareCodePoints("ab", "abc")).toBeLessThan(0);
+  });
+
   it("finds two equal strings equal", () => {
     expect(compareCodePoints("a", "a")).toBe(0);
   });
