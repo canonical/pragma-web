@@ -52,9 +52,7 @@ describe("TypeFacetBar SSR", () => {
       new URL("./styles.css", import.meta.url),
       "utf8",
     );
-    const start = styles.indexOf(
-      '.ds.type-facet-bar .value > [aria-current="true"] {',
-    );
+    const start = styles.indexOf(".ds.type-facet-bar .current {");
     expect(start).toBeGreaterThan(-1);
     expect(styles.slice(start, styles.indexOf("}", start))).toContain(
       "font-weight: var(--type-facet-bar-current-font-weight);",

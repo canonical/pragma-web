@@ -47,7 +47,10 @@ export default function TypeFacetBar({
               <span className="count">{facet.count}</span>
             </li>
           ) : (
-            <li className="value" key={facet.id}>
+            <li
+              className={facet.selected ? "value current" : "value"}
+              key={facet.id}
+            >
               <RouterLink
                 aria-current={facet.selected ? "true" : undefined}
                 href={facet.href}

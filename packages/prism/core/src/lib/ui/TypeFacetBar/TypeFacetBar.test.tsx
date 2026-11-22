@@ -68,9 +68,15 @@ describe("TypeFacetBar", () => {
       "aria-current",
       "true",
     );
+    expect(
+      screen.getByRole("link", { name: "Station 6" }).closest("li"),
+    ).toHaveClass("value", "current");
     expect(screen.getByRole("link", { name: "Line 2" })).not.toHaveAttribute(
       "aria-current",
     );
+    expect(
+      screen.getByRole("link", { name: "Line 2" }).closest("li"),
+    ).not.toHaveClass("current");
   });
 
   it("closes the facet with the applied type's chip, which releases it", () => {

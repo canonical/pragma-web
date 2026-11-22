@@ -15,7 +15,7 @@
     --type-facet-bar-chip-inset-block: var(--space-050);
     --type-facet-bar-chip-inset-inline: var(--space-100);
     --type-facet-bar-chip-border-width: 1px;
-    --type-facet-bar-chip-border-color: var(--color-border);
+    --type-facet-bar-chip-border-color: var(--color-border-muted);
     --type-facet-bar-chip-color: var(--color-text);
 
     display: flex;
@@ -45,8 +45,9 @@
     white-space: nowrap;
   }
 
-  /* The applied type: bold, so the bar says which type it holds. */
-  .ds.type-facet-bar .value > [aria-current="true"] {
+  /* The applied type: bold, so the bar says which type it holds; its
+   * link inherits the weight. */
+  .ds.type-facet-bar .current {
     font-weight: var(--type-facet-bar-current-font-weight);
   }
 

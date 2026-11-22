@@ -4,9 +4,10 @@
 # height, one muted rule beneath) and of the filter sheet below it. Its
 # label, then one value per type: the type's name and its count. A value
 # with results is a link that applies the type; the applied one is marked
-# current and drawn bold, and its link releases it. A value with none is
-# greyed and is not a link. When a type is applied, a chip naming it
-# closes the facet; pressing it releases the type.
+# current (its value carries the `current` modifier, its link
+# `aria-current`) and drawn bold, and its link releases it. A value with
+# none is greyed and is not a link. When a type is applied, a chip naming
+# it closes the facet; pressing it releases the type.
 #
 # Every decision is read through a component token declared on the root
 # (`--type-facet-bar-*`), bound to the symbol named here.
@@ -74,7 +75,7 @@ node:
           spacing.internal.inline.end: space.100
           appearance.border.width: 1px
           appearance.border.style: solid
-          appearance.border.color: color.border
+          appearance.border.color: color.border.muted
           typography.color: color.text
           typography.decoration: none
       relation: { cardinality: "0..1", slotName: chip }
