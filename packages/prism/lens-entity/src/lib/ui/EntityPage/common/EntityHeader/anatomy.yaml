@@ -15,24 +15,33 @@ node:
   element: header
   styles: { layout.type: grid, layout.grid.columns: subgrid, layout.grid.column: "1 / -1", spacing.gap: grid.gutter }
   edges:
-    - node: { role: title, element: h1, styles: { layout.grid.column: "1 / -1", layout.type: flex, layout.align: baseline, spacing.gap: grid.gutter } }
+    - node:
+        role: title
+        element: h1
+        styles: { layout.grid.column: "1 / -1", layout.type: flex, layout.align: baseline, spacing.gap: grid.gutter }
+        edges:
+          - node: { role: mark, element: svg }              # EntityIcon, before the name
+            relation: { cardinality: "1", slotName: mark }
       relation: { cardinality: "1", slotName: title }
-      edges:
-        - node: { role: mark, element: svg }                # EntityIcon, before the name
-          relation: { cardinality: "1" }
     - node: { role: summary, element: p, styles: { layout.grid.column: "1 / -1", spacing.external.block.start: 0, spacing.external.block.end: 0 } }
       relation: { cardinality: "0..1", slotName: summary }
-    - node: { role: status, element: p, styles: { layout.grid.column: "1 / -1", layout.type: flex, layout.wrap: wrap, layout.align: baseline, spacing.gap: grid.gutter, spacing.external.block.start: 0, spacing.external.block.end: 0 } }
+    - node:
+        role: status
+        element: p
+        styles: { layout.grid.column: "1 / -1", layout.type: flex, layout.wrap: wrap, layout.align: baseline, spacing.gap: grid.gutter, spacing.external.block.start: 0, spacing.external.block.end: 0 }
+        edges:
+          - node: { role: kind, element: span }             # the class's chip, its own colours
+            relation: { cardinality: "1", slotName: kind }
+          # The address and its Copy wrap together: one flex item that does
+          # not wrap; a long address breaks inside its own box beside Copy.
+          - node:
+              role: locator
+              element: span
+              styles: { layout.type: flex, layout.wrap: nowrap, layout.align: baseline, spacing.gap: grid.gutter, size.min.width: 0 }
+              edges:
+                - node: { role: address, element: code, styles: { typography.color: color.text.muted, size.min.width: 0, typography.wrap: anywhere } }
+                  relation: { cardinality: "1", slotName: address }
+                - node: { role: copy, element: CopyButton }   # core's; announces "Copied"
+                  relation: { cardinality: "1", slotName: copy }
+            relation: { cardinality: "1", slotName: locator }
       relation: { cardinality: "1", slotName: status }
-      edges:
-        - node: { role: kind, element: span }               # the class's chip, its own colours
-          relation: { cardinality: "1", slotName: kind }
-        # The address and its Copy wrap together: one flex item that does not
-        # wrap; a long address breaks inside its own box beside Copy.
-        - node: { role: locator, element: span, styles: { layout.type: flex, layout.wrap: nowrap, layout.align: baseline, spacing.gap: grid.gutter, sizing.min-width: 0 } }
-          relation: { cardinality: "1" }
-          edges:
-            - node: { role: address, element: code, styles: { typography.color: color.text.muted, sizing.min-width: 0, typography.overflow-wrap: anywhere } }
-              relation: { cardinality: "1", slotName: address }
-            - node: { role: copy, element: CopyButton }     # core's; announces "Copied"
-              relation: { cardinality: "1" }
