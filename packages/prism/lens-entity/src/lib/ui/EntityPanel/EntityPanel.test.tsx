@@ -257,6 +257,49 @@ describe("EntityPanel", () => {
     expect(container.querySelector(".referenced-by")).toBeNull();
   });
 
+  it("counts a group cut below its total by the total, saying how many are shown", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const recorded = metroResponses.find(
+      ({ operation, variables }) =>
+        operation === "EntityStatementsQuery" && variables.uri === CIRCLE_LINE,
+    );
+    type Group = { total: number; values: { __typename: string }[] };
+    const statements = structuredClone(recorded?.response) as {
+      data: {
+        outgoing: { groups: Group[] };
+        incoming: { total: number; groups: Group[] };
+      };
+    };
+    for (const group of statements.data.outgoing.groups) {
+      if (group.values.at(0)?.__typename === "StatementNode") group.total = 30;
+    }
+    const [first] = statements.data.incoming.groups;
+    if (first === undefined) throw new Error("no incoming group recorded");
+    first.total = 30;
+    statements.data.incoming.total = 30;
+    const { container } = await renderPanel({
+      uri: CIRCLE_LINE,
+      statements: statements as GraphQLResponse,
+    });
+    const formations = [
+      ...container.querySelectorAll(".entity-panel > details.group"),
+    ].find(({ textContent }) => textContent?.startsWith("Formations"));
+    expect(formations?.querySelector("summary")?.textContent).toBe(
+      "Formations · 30",
+    );
+    expect(formations?.textContent).toContain("1 of 30 shown");
+    const referencedBy = container.querySelector(".referenced-by");
+    expect(referencedBy?.querySelector("h3.heading")?.textContent).toBe(
+      "Referenced by · 30",
+    );
+    const incoming = referencedBy?.querySelector("details.group");
+    expect(incoming?.querySelector("summary")?.textContent).toMatch(/ · 30$/);
+    expect(incoming?.textContent).toContain(
+      `${first.values.length} of 30 shown`,
+    );
+  });
+
   it("words an incoming group whose property names no inverse from the entity's side", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
