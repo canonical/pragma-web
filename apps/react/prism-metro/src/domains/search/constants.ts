@@ -18,3 +18,10 @@ export const SEARCH_DOOR_CLASSES = {
   lines: LINES_BINDING.classUri,
   fleet: FLEET_CLASS_URI,
 } as const satisfies Readonly<Record<string, string>>;
+
+/**
+ * The site's prominent class: the one its first lens lists, the Stations.
+ * Its group leads a search's results when it has any; the other types
+ * follow by ascending count.
+ */
+export const SEARCH_PROMINENT_CLASS = "https://metro.example/onto#Station";

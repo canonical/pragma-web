@@ -68,7 +68,7 @@ describe("SearchPage", () => {
   it("says nothing matches a text no node holds, and lists nothing", async () => {
     renderLensPage("/search?q=zzzz", graph.url);
     expect(
-      await screen.findByText("Nothing matches the search."),
+      await screen.findByText(/^Nothing matches “.+”\.$/),
     ).toBeInTheDocument();
     expect(document.querySelector(".ds.search-page .results")).toBeNull();
   });
@@ -161,7 +161,7 @@ describe("SearchPage", () => {
 
   it("offers the next steps when nothing matches (W8-A9)", async () => {
     renderLensPage("/search?q=zzzz", graph.url);
-    await screen.findByText("Nothing matches the search.");
+    await screen.findByText(/^Nothing matches “.+”\.$/);
     const hints = document.querySelector(".ds.search-page .none .hints");
     expect(hints?.textContent).toContain("Ctrl K");
     expect(
