@@ -31,6 +31,7 @@ import readEntitySummary from "../../../../readEntitySummary.js";
 import useServesStatements from "../../../../useServesStatements.js";
 import { EntityHeader } from "../EntityHeader/index.js";
 import { EntitySummary } from "../EntitySummary/index.js";
+import { ReferencedByGroup } from "../ReferencedByGroup/index.js";
 import { StatementGroup } from "../StatementGroup/index.js";
 import type { EntityDetailProps } from "./types.js";
 import "./styles.css";
@@ -246,17 +247,16 @@ export default function EntityDetail({
             id: REFERENCED_BY_ID,
             title: t("statements.referencedBy", { count: incoming.total }),
             content: incoming.groups.map((group) => (
-              <section className="referenced-by" key={group.predicateUri}>
-                <h3 className="title">
-                  {t("statements.group", {
-                    label: labelIncomingGroup(group, ontologies, (inverse) =>
-                      t("statements.inverse", { label: inverse }),
-                    ),
-                    count: group.total,
-                  })}
-                </h3>
-                <StatementGroup group={group} />
-              </section>
+              <ReferencedByGroup
+                group={group}
+                key={group.predicateUri}
+                title={t("statements.group", {
+                  label: labelIncomingGroup(group, ontologies, (inverse) =>
+                    t("statements.inverse", { label: inverse }),
+                  ),
+                  count: group.total,
+                })}
+              />
             )),
           },
         ]),
