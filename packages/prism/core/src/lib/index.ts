@@ -144,7 +144,23 @@ export { collectLenses, routeLensFacet } from "./routeLens/index.js";
 export { createStaticRouter } from "./router/index.js";
 export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
-export * from "./search/index.js";
+export type {
+  GroupSearchOptions,
+  OfferedSearchRoutes,
+  SearchGroup,
+  SearchState,
+  SearchValues,
+  SearchVariables,
+} from "./search/index.js";
+export {
+  buildSearchVariables,
+  groupSearchEdges,
+  offerSearchRoutes,
+  orderSearchFacets,
+  readSearchState,
+  SEARCH_PAGE_SIZE,
+  searchValues,
+} from "./search/index.js";
 export type { StoredThemeProviderProps } from "./theme/index.js";
 export { StoredThemeProvider, useStoredTheme } from "./theme/index.js";
 export type {

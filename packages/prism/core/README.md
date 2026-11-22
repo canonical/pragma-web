@@ -411,6 +411,17 @@ site's own catalog, and the factory holds no reader-facing string.
   `PaginationBar` (the previous and next links of an index that pages,
   an end without a page left out); types `TypeFacetBarProps`,
   `TypeFacetValue`, `PaginationBarProps`.
+- Search: `SearchForm` (the strip's Search on a site's search route, a GET
+  form whose field q carries the text, under the site's placeholder),
+  `SearchIcon` (the rail's Search glyph), `SEARCH_PAGE_SIZE`,
+  `buildSearchVariables` (a search query's variables for a text and the
+  page's state), `groupSearchEdges` and `orderSearchFacets` (a page's
+  results by type, the site's prominent type first, then ascending count),
+  `searchValues` and `readSearchState` (the search route's address values
+  and state), `offerSearchRoutes` (a site's search routes, only when its
+  provider serves search); types `SearchFormProps`, `SearchIconProps`,
+  `SearchVariables`, `SearchValues`, `SearchState`, `SearchGroup`,
+  `GroupSearchOptions`, `OfferedSearchRoutes`.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
   lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
   show only the text that renders at 12px or more; types
