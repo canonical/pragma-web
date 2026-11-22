@@ -291,10 +291,23 @@ import { readContractSdl } from "@canonical/prism-contract";
 `contractSdl` option is omitted — so the whole package is **Node/Bun only**.
 For a consumer that wants the file rather than its contents, the
 `./schema/contract.graphql` subpath export is the handle; the package
-deliberately publishes no constant naming its own on-disk layout. There is no browser entry
-point: the check belongs in provider gates and CI steps, which run
-server-side. (The `contractSdl` option exists to substitute a toy contract in
-tests, not to make the module bundleable.)
+deliberately publishes no constant naming its own on-disk layout. The check
+belongs in provider gates and CI steps, which run server-side. (The
+`contractSdl` option exists to substitute a toy contract in tests, not to make
+the module bundleable.)
+
+## The browser entry
+
+```ts
+import { compactIri, compareCodePoints } from "@canonical/prism-contract/browser";
+```
+
+The root reads the SDL from the filesystem when it loads, so client code never
+imports it for a value. `./browser` holds the contract's pure helpers, the ones
+a lens shares with the providers: `compactIri`, which compacts an IRI by the
+longest declared namespace, and `compareCodePoints`, the code-point order the
+statements extension sorts by, with the `PrefixBinding` type. It imports
+nothing from `node:`; the root re-exports the same functions for server code.
 
 The SDL itself lives in the `schema/` directory at the package root and is
 published alongside `dist/`.
