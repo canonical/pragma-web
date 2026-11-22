@@ -13,7 +13,9 @@ import type { UseOpenShortcutProps, UseOpenShortcutResult } from "./types.js";
  * opens once); neither Alt nor Shift is held, so those chords stay the
  * browser's; Cmd or Ctrl is held; the key is K; and the dialog is mounted.
  * The browser's own Ctrl+K is then prevented, and a closed dialog is
- * opened: `onOpen` is called, then `showModal()`. An open dialog is left
+ * opened: `onOpen` is called with the trimmed text of the page's search
+ * field when the focus is in one (the chord carries it into the palette),
+ * else with nothing, then `showModal()`. An open dialog is left
  * as it is, since `showModal()` throws on one. The chord carries a
  * modifier, so it is no character-key shortcut and needs no switch to turn
  * it off (WCAG 2.1.4).
@@ -22,6 +24,15 @@ import type { UseOpenShortcutProps, UseOpenShortcutResult } from "./types.js";
  * @note Impure: attaches a `keydown` listener to `document` while mounted,
  *   and opens the dialog when the chord fires.
  */
+/**
+ * The text the chord carries into the palette: the trimmed value of the
+ * page's search field when the focus is in one, else nothing.
+ */
+const readCarriedText = (focused: Element | null): string =>
+  focused instanceof HTMLInputElement && focused.type === "search"
+    ? focused.value.trim()
+    : "";
+
 export default function useOpenShortcut({
   dialog,
   onOpen,
@@ -36,7 +47,7 @@ export default function useOpenShortcut({
       if (element === null) return;
       event.preventDefault();
       if (element.open) return;
-      onOpen();
+      onOpen(readCarriedText(document.activeElement));
       element.showModal();
     };
 

@@ -67,7 +67,21 @@ describe("useOpenShortcut", () => {
     });
     press({ ctrlKey: true });
     expect(onOpen).toHaveBeenCalledTimes(1);
+    expect(onOpen).toHaveBeenCalledWith("");
     expect(dialog.open).toBe(true);
+  });
+
+  it("carries the trimmed text of the search field the focus is in", () => {
+    const onOpen = vi.fn();
+    render(<Harness onOpen={onOpen} />);
+    const field = document.createElement("input");
+    field.type = "search";
+    field.value = " but ";
+    document.body.append(field);
+    field.focus();
+    press({ ctrlKey: true });
+    field.remove();
+    expect(onOpen).toHaveBeenCalledWith("but");
   });
 
   it("does not open an open dialog again, and still takes the chord", () => {

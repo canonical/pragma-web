@@ -85,6 +85,20 @@ describe("CommandPalette", () => {
     expect(screen.getByRole("combobox")).toHaveFocus();
   });
 
+  it("carries the text of the page's search field Ctrl+K is pressed in", () => {
+    const { environment } = renderPalette();
+    const field = document.createElement("input");
+    field.type = "search";
+    field.value = "lay";
+    document.body.append(field);
+    field.focus();
+    open();
+    field.remove();
+    expect(
+      environment.mock.getAllOperations().at(0)?.request.variables,
+    ).toMatchObject({ text: "lay", searching: true });
+  });
+
   it("opens empty after it closes, and tells the consumer it closed", async () => {
     const onClose = vi.fn();
     const { environment } = renderPalette({ onClose });
@@ -150,6 +164,7 @@ describe("CommandPalette", () => {
     await act(async () => {
       environment.mock.resolveMostRecentOperation(answerSearch(RANKED_RESULTS));
     });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown" });
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
     expect(findDialog().open).toBe(false);
     await waitFor(() => {
@@ -164,6 +179,7 @@ describe("CommandPalette", () => {
     await act(async () => {
       environment.mock.resolveMostRecentOperation(answerSearch(RANKED_RESULTS));
     });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown" });
     fireEvent.click(
       within(screen.getByRole("region", { name: "Preview" })).getByRole("link"),
     );

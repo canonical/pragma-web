@@ -78,19 +78,22 @@ export default function CommandPalette({
   const t = useMessages();
   const dialog = useRef<HTMLDialogElement>(null);
   const [session, setSession] = useState(0);
+  const [carriedText, setCarriedText] = useState("");
   const [failed, setFailed] = useState(false);
   const [highlightDisabled, setHighlightDisabled] = useState(false);
 
   /**
-   * Start the opening's session: a new, empty search, and a cleared
+   * Start the opening's session: a new search, holding the text the chord
+   * carried from the page's search field, and a cleared
    * failure. It is rendered at once, before the dialog opens, so the
    * dialog's focusing steps find the new session's field.
    *
    * @note Impure: sets the session and renders it synchronously.
    */
-  const startSession = useCallback((): void => {
+  const startSession = useCallback((text: string): void => {
     flushSync(() => {
       setSession((current) => current + 1);
+      setCarriedText(text);
     });
   }, []);
   useOpenShortcut({ dialog, onOpen: startSession });
@@ -148,6 +151,7 @@ export default function CommandPalette({
         >
           <Suspense fallback={null}>
             <CommandPaletteSearch
+              initialText={carriedText}
               key={session}
               onChoose={close}
               onHighlight={setHighlightDisabled}

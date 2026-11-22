@@ -4,7 +4,8 @@
 # the highlighted result's EntityCard on the right. It is the ARIA
 # combobox pattern with a listbox popup: the field is the combobox and keeps
 # the focus; the arrow keys move the highlighted option of the listbox it
-# controls (aria-activedescendant), wrapping at both ends; Enter opens the
+# controls (aria-activedescendant), wrapping at both ends; typing
+# highlights none until an arrow key moves to one; Enter opens the
 # highlighted result's home; a pointer moving over a result highlights it.
 # Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, frames 502:1753 and 502:1827 (the
 # palette with its results and its preview) and 504:327 (the row's slots).

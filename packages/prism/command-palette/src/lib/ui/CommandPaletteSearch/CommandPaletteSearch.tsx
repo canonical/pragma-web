@@ -77,10 +77,12 @@ const componentCssClassName = "ds command-palette-search";
  * card on the right. It is the ARIA combobox pattern with a listbox popup:
  * the field is the combobox and keeps the focus; the arrow keys move the
  * highlighted option of the listbox it controls (`aria-activedescendant`),
- * wrapping at both ends; Enter chooses the highlighted result, opening its
- * home; a pointer moving over a result highlights it. Escape is the
- * dialog's. A pointer pressing a heading, a result or the status line
- * leaves the focus in the field, so the keys keep reaching it; a press in
+ * wrapping at both ends; typing highlights none until an arrow key moves
+ * to one; Enter chooses the highlighted result, opening its home, and with
+ * none highlighted follows the hand-off line when there is one; a pointer
+ * moving over a result highlights it. Escape is the dialog's. A pointer
+ * pressing a heading, a result or the status line leaves the focus in the
+ * field, so the keys keep reaching it; a press in
  * the preview selects its text, as anywhere on the site, and a click there
  * that selects nothing gives the field the focus back.
  *
@@ -115,13 +117,14 @@ export default function CommandPaletteSearch({
   onHighlight,
   session,
   searchHref,
+  initialText = "",
   className,
   ...props
 }: CommandPaletteSearchProps): ReactElement {
   const t = useMessages();
   const listboxId = useId();
-  const [text, setText] = useState("");
-  const [highlighted, setHighlighted] = useState(0);
+  const [text, setText] = useState(initialText);
+  const [highlighted, setHighlighted] = useState<number | null>(null);
   const activeOption = useRef<HTMLLIElement>(null);
   const field = useRef<HTMLInputElement>(null);
   const handoff = useRef<HTMLAnchorElement>(null);
@@ -139,10 +142,14 @@ export default function CommandPaletteSearch({
     searchHref === undefined || searched === ""
       ? undefined
       : searchHref(searched);
-  const onHandoff = handoffHref !== undefined && highlighted >= results.length;
-  const active = onHandoff
-    ? undefined
-    : results.at(Math.min(highlighted, results.length - 1));
+  const onHandoff =
+    handoffHref !== undefined &&
+    highlighted !== null &&
+    highlighted >= results.length;
+  const active =
+    onHandoff || highlighted === null
+      ? undefined
+      : results.at(Math.min(highlighted, results.length - 1));
   const stops = results.length + (handoffHref === undefined ? 0 : 1);
   const handoffId = `${listboxId}-handoff`;
   const activeId = onHandoff
@@ -170,13 +177,14 @@ export default function CommandPaletteSearch({
   );
 
   /**
-   * Take the field's new text, and highlight the first result again.
+   * Take the field's new text, and highlight no result: Enter then hands
+   * the text to the site's search page until an arrow key moves to one.
    *
    * @note Impure: sets the component's state.
    */
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setText(event.target.value);
-    setHighlighted(0);
+    setHighlighted(null);
   };
 
   /**
@@ -223,8 +231,10 @@ export default function CommandPaletteSearch({
   };
 
   /**
-   * Move the highlight with the arrow keys, wrapping at both ends, and
-   * choose the highlighted result with Enter. While an input method is
+   * Move the highlight with the arrow keys, wrapping at both ends, from
+   * none to the first (down) or the last stop (up), and choose the
+   * highlighted result with Enter; with none highlighted, Enter follows
+   * the hand-off line when there is one, and does nothing otherwise. While an input method is
    * composing text, every key is the input method's: it may move through
    * its candidates with the arrows and commit one with Enter.
    *
@@ -236,8 +246,12 @@ export default function CommandPaletteSearch({
     const step = ARROW_STEPS.get(event.key);
     if (step !== undefined && stops > 0) {
       event.preventDefault();
-      const current = onHandoff ? results.length : (active?.index ?? 0);
-      setHighlighted((current + step + stops) % stops);
+      const current = onHandoff ? results.length : active?.index;
+      setHighlighted(
+        current === undefined
+          ? (stops + Math.min(step, 0)) % stops
+          : (current + step + stops) % stops,
+      );
       return;
     }
     if (event.key === "Enter") {

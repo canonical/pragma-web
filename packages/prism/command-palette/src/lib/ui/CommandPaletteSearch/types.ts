@@ -28,6 +28,11 @@ type OwnProps = {
    * last result and Enter follows when no result is highlighted.
    */
   readonly searchHref?: (text: string) => string;
+  /**
+   * The text the field opens with: the text of the page's field the
+   * palette was opened from, carried into it. Empty when absent.
+   */
+  readonly initialText?: string;
 };
 
 /**
