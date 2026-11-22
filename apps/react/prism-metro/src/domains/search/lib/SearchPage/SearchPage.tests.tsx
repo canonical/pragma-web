@@ -2,10 +2,23 @@
 
 import { setPrefetchEnvironment } from "@canonical/prism-core";
 import { cleanup, screen, waitFor } from "@testing-library/react";
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import { MESSAGES } from "#i18n";
+import { MOCK_STATION, resolveRoot } from "../../../../../testing/fixtures.js";
 import renderLensPage from "../../../../../testing/renderLensPage.js";
+import renderWithSite from "../../../../../testing/renderWithSite.js";
 import startMetroGraph from "../../../../../testing/startMetroGraph.js";
 import type { MetroGraph } from "../../../../../testing/types.js";
+import SearchPage from "./SearchPage.js";
 
 let graph: MetroGraph;
 
@@ -149,6 +162,36 @@ describe("SearchPage", () => {
     const next = bar?.querySelector<HTMLAnchorElement>("a.next");
     expect(next?.getAttribute("href")).toMatch(/[?&]page=2\b/);
     expect(next?.getAttribute("href")).toMatch(/[?&]after=/);
+  });
+
+  it("ends the fifth page without a next page, saying only 100 are listed", () => {
+    // The metro graph holds fewer than 100 results for any text, so a mock
+    // environment answers with a total past the limit. relay-test-utils
+    // wraps its methods in `jest.fn` under test; vitest's `vi` matches it.
+    vi.stubGlobal("jest", vi);
+    const environment = createMockEnvironment();
+    environment.mock.queueOperationResolver((operation) =>
+      MockPayloadGenerator.generate(operation, {
+        SearchConnection: () => ({
+          total: 145,
+          edges: Array.from({ length: 20 }, () => ({})),
+        }),
+        PageInfo: () => ({ hasNextPage: true, endCursor: "cursor-100" }),
+        Node: resolveRoot(MOCK_STATION),
+      }),
+    );
+    renderWithSite(
+      <SearchPage after="cursor-80" page={5} text="e" />,
+      "/search?q=e&after=cursor-80&page=5",
+      environment,
+    );
+    const bar = document.querySelector(".ds.search-page .ds.pagination-bar");
+    expect(bar?.textContent).toContain("81–100 of 145");
+    expect(bar?.querySelector("a.next")).toBeNull();
+    expect(bar?.querySelector("a.previous")).not.toBeNull();
+    expect(document.querySelector(".ds.search-page .limit")?.textContent).toBe(
+      MESSAGES["search.limit"].replace("{count}", "100"),
+    );
   });
 
   it("draws no pagination bar when the results fit one page (W8-A9)", async () => {
