@@ -159,20 +159,20 @@ node:
                 layout.align: baseline
                 spacing.gap.inline: space.100
                 size.min.width: 0
-            edges:
-              - node:
-                  role: address
-                  element: code
-                  projection:
-                    field: _meta.curie
-                  styles:
-                    size.min.width: 0
-                    typography.fontFamily: typography.text.primary.code.fontFamily
-                    typography.wrap: anywhere
-                relation: { cardinality: "1", slotName: address }
-              - node:
-                  role: copy (core's CopyButton for the address, "Copied" announced)
-                  element: button
-                relation: { cardinality: "1", slotName: copy }
+              edges:
+                - node:
+                    role: address
+                    element: code
+                    projection:
+                      field: _meta.curie
+                    styles:
+                      size.min.width: 0
+                      typography.fontFamily: typography.text.primary.code.fontFamily
+                      typography.wrap: anywhere
+                  relation: { cardinality: "1", slotName: address }
+                - node:
+                    role: copy (core's CopyButton for the address, "Copied" announced)
+                    element: button
+                  relation: { cardinality: "1", slotName: copy }
             relation: { cardinality: "1", slotName: locator }
       relation: { cardinality: "1", slotName: status-line }
