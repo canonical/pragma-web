@@ -1,13 +1,15 @@
-import { type ASTNode, Kind, parse } from "graphql";
+import { type ASTNode, Kind, type Location, parse, visit } from "graphql";
 import { SEARCH_TYPE_NAMES } from "./constants.js";
 
-/** Whether `node` is the `search` field of a `Query` definition or extension. */
-const isSearchFieldOf = (owner: ASTNode, field: ASTNode): boolean =>
+/**
+ * Whether `owner`, the node that holds a field list, is a `Query`
+ * definition or extension.
+ */
+const isQueryType = (owner: ASTNode | readonly ASTNode[]): boolean =>
+  "kind" in owner &&
   (owner.kind === Kind.OBJECT_TYPE_DEFINITION ||
     owner.kind === Kind.OBJECT_TYPE_EXTENSION) &&
-  owner.name.value === "Query" &&
-  field.kind === Kind.FIELD_DEFINITION &&
-  field.name.value === "search";
+  owner.name.value === "Query";
 
 /** Whether `node` defines one of the search extension's own types. */
 const isSearchType = (node: ASTNode): boolean =>
@@ -39,12 +41,18 @@ const widenToLines = (
  * @returns The same SDL without it.
  */
 export default function omitSearch(sdl: string): string {
-  const spans = parse(sdl).definitions.flatMap((definition) => {
-    if (isSearchType(definition)) return [definition.loc];
-    const fields = "fields" in definition ? (definition.fields ?? []) : [];
-    return fields
-      .filter((field) => isSearchFieldOf(definition, field))
-      .map((field) => field.loc);
+  const spans: Array<Location | undefined> = [];
+  visit(parse(sdl), {
+    enter(node) {
+      if (isSearchType(node)) spans.push(node.loc);
+    },
+    FieldDefinition(field, _key, _parent, _path, ancestors) {
+      // The field's parent is its type's field list; its ancestors end with
+      // the type's node.
+      const owner = ancestors.at(-1);
+      if (field.name.value === "search" && owner && isQueryType(owner))
+        spans.push(field.loc);
+    },
   });
   return spans
     .filter((loc) => loc !== undefined)
