@@ -99,6 +99,7 @@ export function SearchFacets({
         }),
         selected: facetType.uri === type,
       }))}
+      withChip={placement !== "bar"}
     />
   );
   return placement === "bar" ? <FilterBar facets={facet} /> : facet;
