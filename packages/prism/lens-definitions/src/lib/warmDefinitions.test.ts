@@ -58,6 +58,30 @@ describe("warmDefinitions", () => {
     );
   });
 
+  it("warms the panel when the environment is cleared once the call returns", async () => {
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation(() => Promise.resolve({ data: {} }));
+    setPrefetchEnvironment(
+      createEnvironment({
+        records: storeInstanceLookups(INSTANCE_TERM),
+        fetchFn,
+      }),
+    );
+
+    // The server's prepare step publishes the environment only while the
+    // route's warm is being called, not while it settles.
+    const warming = warmDefinitions({ term: INSTANCE_TERM });
+    setPrefetchEnvironment(undefined);
+    await warming.catch(() => undefined);
+
+    expect(listRequests(fetchFn).map(({ name }) => name)).toEqual(
+      expect.arrayContaining([
+        "EntityPanelQuery",
+        "EntityStatementsQuery",
+      ]),
+    );
+  });
+
   it("warms no details panel for a class", async () => {
     const fetchFn = createFetchSpy();
     setPrefetchEnvironment(

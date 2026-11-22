@@ -23,17 +23,19 @@ import {
  *   `term` when present.
  * @returns A promise that settles when the store holds the data or the
  *   fetch fails.
- * @note Impure: fetches into the published prefetch environment through
- *   `prefetchQuery`, which reads that environment at the moment of the call,
- *   and reads the explorer's answer back from its store.
+ * @note Impure: fetches into the prefetch environment published at the
+ *   moment of the call (read then, since a server clears it before the
+ *   fetch settles) and reads the explorer's answer back from its store.
  */
 export default function warmDefinitions(
   params: Readonly<Record<string, unknown>>,
 ): Promise<void> {
   const term = readTermParam(params);
   const variables = buildDefinitionsExplorerVariables(term);
+  // Read now: the server's prepare step clears the published environment
+  // as soon as this call returns, before the explorer's fetch settles.
+  const environment = getPrefetchEnvironment();
   return prefetchQuery(definitionsExplorerQueryNode, variables).then(() => {
-    const environment = getPrefetchEnvironment();
     if (term === undefined || environment === undefined) return undefined;
     const { data } = environment.lookup(
       createOperationDescriptor(definitionsExplorerQueryNode, variables)
