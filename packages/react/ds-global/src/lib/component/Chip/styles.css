@@ -95,18 +95,31 @@
        state disables the whole chip. */
     &:disabled,
     &:has(> .chip-dismiss:disabled) {
-      /* A criticality chip takes the AUTHOR-MADE disabled tint through the
-         criticality shim's channel: the derived mix below interpolates the hue
-         toward the background's authored hue 0, which turns a green success
-         surface orange (CSS Color 4 keeps a manually specified hue). Neutral
-         chips fall back to the mix — an achromatic mix has no hue to drift. */
+      /* Every part reads its role's modifier
+         channel, like the button, which the criticality shim re-points at the AUTHORED
+         per-criticality disabled tokens, and the neutral fallback is the
+         authored neutral token. The states layer's derived mixes are not read:
+         they interpolate the hue toward the background's authored hue 0
+         (CSS Color 4 keeps a manually specified hue, turning a green success
+         surface orange), and in dark mode they land barely above the page,
+         while the authored family pairs surface, border and on-surface
+         text/icon by design in both themes. */
       --chip-color-background: var(
         --modifier-color-foreground-secondary-disabled,
-        var(--disabled--color-foreground-secondary)
+        var(--color-foreground-secondary-disabled)
       );
-      --chip-color-border: var(--disabled--color-border);
-      --chip-color-text: var(--disabled--color-text);
-      --chip-color-icon: var(--disabled--color-icon);
+      --chip-color-border: var(
+        --modifier-color-border-disabled,
+        var(--color-border-disabled)
+      );
+      --chip-color-text: var(
+        --modifier-color-text-onForegroundSecondary-disabled,
+        var(--color-text-onForegroundSecondary-disabled)
+      );
+      --chip-color-icon: var(
+        --modifier-color-icon-on-foreground-secondary-disabled,
+        var(--color-icon-onForegroundSecondary-disabled)
+      );
 
       cursor: not-allowed;
     }

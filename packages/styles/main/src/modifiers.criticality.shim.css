@@ -35,17 +35,33 @@
  * per criticality; it just isn't wired into the modifier family. This exposes
  * it as a channel so on-surface criticality components read it generically.
  *
- * ── 3. Disabled secondary-surface channel (--modifier-color-foreground-secondary-disabled) ──
+ * ── 3. Disabled channel group ────────────────────────────────────────────
  * The generated states layer DERIVES a disabled shade with
- * `color-mix(in oklch, <channel> 34%, background)`. The background token is
- * authored `oklch(… 0 0)` — an explicit hue 0 on an achromatic colour — and a
- * manually specified hue is not powerless per CSS Color 4 §4.4.1, so the mix
- * interpolates the hue toward 0: a disabled success surface drifts green →
- * orange. The token set already carries authored per-criticality disabled
- * tints (`--color-foreground-secondary-*-disabled`); this exposes them as a
- * channel so components on the secondary surface read the authored tint under
- * a criticality, and fall back to the derived mix otherwise (neutral mixes are
- * achromatic — no hue to drift).
+ * `color-mix(in oklch, <channel> 34%, background)`. That generic "fade toward
+ * the page" cannot express the authored disabled design: the background token
+ * is authored `oklch(… 0 0)` — an explicit hue 0 on an achromatic colour, and
+ * a manually specified hue is not powerless per CSS Color 4 §4.4.1, so the
+ * mix drags a chromatic channel's hue toward 0 (a disabled success surface
+ * drifts green → orange); and in dark mode the mix lands a few lightness
+ * points above the page, nearly invisible. The token set already carries an
+ * authored disabled FAMILY per criticality — surface, border and on-surface
+ * text/icon tokens hand-picked to pair with each other in both themes — but
+ * the generated criticality modifier exposes none of it. This section wires
+ * each role as a channel:
+ *
+ *   --modifier-color-foreground-primary-disabled        filled surfaces
+ *   --modifier-color-foreground-secondary-disabled      secondary surfaces
+ *   --modifier-color-border-disabled                    borders. This is the
+ *       SAME channel the states shim re-points per anticipation; the two
+ *       families never co-occur on one element, and this file is imported
+ *       after that one, so the criticality value wins where its class sits.
+ *   --modifier-color-text-onForegroundSecondary-disabled      text on a
+ *   --modifier-color-icon-on-foreground-secondary-disabled    secondary icon
+ *
+ * A component on the secondary surface (Chip) reads these channels and falls
+ * back to the authored NEUTRAL `-disabled` tokens — never to the derived mix,
+ * whose neutral output is achromatic but whose strategy (fade toward the
+ * page) the authored family deliberately does not share.
  *
  * Layer: ds.modifiers, the layer the generated `modifiers.criticality.css` this
  * file extends opens for itself. Imported after it so these class rules compose
@@ -65,6 +81,13 @@
     --modifier-color-foreground-secondary-disabled: var(
       --color-foreground-secondary-information-disabled
     );
+    --modifier-color-border-disabled: var(--color-border-information-disabled);
+    --modifier-color-text-onForegroundSecondary-disabled: var(
+      --color-text-on-foreground-secondary-information-disabled
+    );
+    --modifier-color-icon-on-foreground-secondary-disabled: var(
+      --color-icon-on-foreground-secondary-information-disabled
+    );
   }
 
   .success {
@@ -77,6 +100,13 @@
     );
     --modifier-color-foreground-secondary-disabled: var(
       --color-foreground-secondary-success-disabled
+    );
+    --modifier-color-border-disabled: var(--color-border-success-disabled);
+    --modifier-color-text-onForegroundSecondary-disabled: var(
+      --color-text-on-foreground-secondary-success-disabled
+    );
+    --modifier-color-icon-on-foreground-secondary-disabled: var(
+      --color-icon-on-foreground-secondary-success-disabled
     );
   }
 
@@ -91,6 +121,13 @@
     --modifier-color-foreground-secondary-disabled: var(
       --color-foreground-secondary-warning-disabled
     );
+    --modifier-color-border-disabled: var(--color-border-warning-disabled);
+    --modifier-color-text-onForegroundSecondary-disabled: var(
+      --color-text-on-foreground-secondary-warning-disabled
+    );
+    --modifier-color-icon-on-foreground-secondary-disabled: var(
+      --color-icon-on-foreground-secondary-warning-disabled
+    );
   }
 
   .error {
@@ -103,6 +140,13 @@
     );
     --modifier-color-foreground-secondary-disabled: var(
       --color-foreground-secondary-error-disabled
+    );
+    --modifier-color-border-disabled: var(--color-border-error-disabled);
+    --modifier-color-text-onForegroundSecondary-disabled: var(
+      --color-text-on-foreground-secondary-error-disabled
+    );
+    --modifier-color-icon-on-foreground-secondary-disabled: var(
+      --color-icon-on-foreground-secondary-error-disabled
     );
   }
 }
