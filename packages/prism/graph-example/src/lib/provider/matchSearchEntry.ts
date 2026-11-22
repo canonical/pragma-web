@@ -1,4 +1,4 @@
-import { buildSearchPattern } from "./buildSearchPattern.js";
+import { buildSearchPattern } from "@canonical/prism-contract";
 import { SEARCH_FIELDS } from "./constants.js";
 import type { SearchEntry, SearchMatch } from "./types.js";
 
