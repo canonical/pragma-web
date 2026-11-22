@@ -98,6 +98,32 @@ describe("SearchPage", () => {
     }
   });
 
+  it("marks the applied Type facet current, linking it to the address that releases it", async () => {
+    renderLensPage("/search?q=the", graph.url);
+    await findPassages();
+    const href =
+      document
+        .querySelector(".ds.filter-bar .ds.type-facet-bar .value a")
+        ?.getAttribute("href") ?? "";
+    expect(href).toContain("type=");
+    cleanup();
+    renderLensPage(href, graph.url);
+    await findPassages();
+    const links = [
+      ...document.querySelectorAll<HTMLAnchorElement>(
+        ".ds.filter-bar .ds.type-facet-bar .value a",
+      ),
+    ];
+    const applied = links.filter((link) =>
+      link.matches('[aria-current="true"]'),
+    );
+    expect(applied).toHaveLength(1);
+    expect(applied[0]?.getAttribute("href")).toBe("/search?q=the");
+    for (const link of links.filter((other) => !applied.includes(other))) {
+      expect(link.getAttribute("href")).toContain("type=");
+    }
+  });
+
   it("renders no result through the generic Node chip (W8-A8)", async () => {
     renderLensPage("/search?q=the", graph.url);
     await findPassages();
