@@ -29,7 +29,7 @@
   .ds.search-page .result {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: start;
     min-inline-size: 0;
   }
 

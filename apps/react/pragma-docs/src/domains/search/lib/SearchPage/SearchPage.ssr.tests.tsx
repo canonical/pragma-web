@@ -52,7 +52,7 @@ describe("SearchPage SSR", () => {
     const start = styles.indexOf(".ds.search-page .result {");
     expect(start).toBeGreaterThan(-1);
     expect(styles.slice(start, styles.indexOf("}", start))).toContain(
-      "align-items: flex-start;",
+      "align-items: start;",
     );
   });
 });

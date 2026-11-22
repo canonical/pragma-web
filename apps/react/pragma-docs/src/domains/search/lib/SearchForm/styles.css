@@ -29,6 +29,7 @@
     flex-shrink: 1;
     flex-basis: auto;
     min-inline-size: 0;
+    border-color: var(--search-form-field-border-color);
   }
 
   /* The field and the button share one frame: an inset, a hairline, the
@@ -39,7 +40,6 @@
     padding-inline: var(--search-form-inset-inline);
     border-width: var(--search-form-border-width);
     border-style: solid;
-    border-color: var(--search-form-field-border-color);
     background: var(--search-form-background);
     color: var(--search-form-color);
     font: inherit;
@@ -58,6 +58,5 @@
     outline-width: var(--search-form-focus-ring-width);
     outline-style: solid;
     outline-color: var(--search-form-focus-ring-color);
-    outline-offset: 0;
   }
 }
