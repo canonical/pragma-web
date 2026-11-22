@@ -88,7 +88,8 @@ describe("Query.facetedInstances", () => {
   it("counts each facet value as the total its filter leaves", async () => {
     const whole = await facet([]);
     expect(whole.facets.length).toBeGreaterThan(0);
-    expect(whole.edges).toHaveLength(whole.totalCount);
+    // The class outnumbers a page: its total counts past the page's cap.
+    expect(whole.totalCount).toBeGreaterThan(whole.edges.length);
     for (const { field, values } of whole.facets) {
       for (const { value, count } of values) {
         const applied = await facet([{ field, values: [value] }]);
