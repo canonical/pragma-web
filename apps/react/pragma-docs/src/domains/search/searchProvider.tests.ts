@@ -89,6 +89,18 @@ describe("search over the site's provider", () => {
     );
   });
 
+  it("answers the provider's own totals for but: 41 results in five types (W8-A5)", async () => {
+    const answer = await search("but");
+    expect(answer.total).toBe(41);
+    expect(answer.facets.map(({ type, count }) => [type.uri, count])).toEqual([
+      ["http://pragma.canonical.com/codestandards#CodeStandard", 29],
+      ["https://ds.canonical.com/Component", 5],
+      ["http://www.w3.org/2002/07/owl#Class", 3],
+      ["https://ds.canonical.com/Subcomponent", 3],
+      ["https://ds.canonical.com/Group", 1],
+    ]);
+  });
+
   it("totals every result for but once, by type, most first (W8-A5)", async () => {
     const answer = await search("but");
     const counts = answer.facets.map(({ count }) => count);

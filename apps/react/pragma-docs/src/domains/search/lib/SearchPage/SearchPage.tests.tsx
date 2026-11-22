@@ -128,6 +128,29 @@ describe("SearchPage", () => {
     });
   });
 
+  it("marks the applied Type facet current, linking it to the address that releases it", () => {
+    renderPage(
+      { text: "but", type: "ds:Component" },
+      45,
+      <SearchFacets placement="bar" text="but" type="ds:Component" />,
+    );
+    const links = [
+      ...document.querySelectorAll<HTMLAnchorElement>(
+        ".ds.type-facet-bar .value a",
+      ),
+    ];
+    const applied = links.filter((link) =>
+      link.matches('[aria-current="true"]'),
+    );
+    expect(applied).toHaveLength(1);
+    expect(applied[0]?.getAttribute("href")).not.toContain("type=");
+    const others = links.filter((link) => !applied.includes(link));
+    expect(others).toHaveLength(FACETS.length - 1);
+    for (const link of others) {
+      expect(link.getAttribute("href")).toContain("type=");
+    }
+  });
+
   it("renders no result through the generic Node chip (W8-A8)", () => {
     renderPage({ text: "but" });
     const results = document.querySelectorAll(".ds.search-page .result");
