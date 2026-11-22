@@ -17,6 +17,7 @@ import type { EntityPanelQuery } from "../../../__generated__/EntityPanelQuery.g
 import entityPanelQueryNode from "../../../__generated__/EntityPanelQuery.graphql.js";
 import type { EntityStatementsQuery } from "../../../__generated__/EntityStatementsQuery.graphql.js";
 import entityStatementsQueryNode from "../../../__generated__/EntityStatementsQuery.graphql.js";
+import { PANEL_TEXT_LIMIT } from "../../constants.js";
 import { Message, useMessages } from "../../i18n/index.js";
 import labelIncomingGroup from "../../labelIncomingGroup.js";
 import labelOutgoingGroup from "../../labelOutgoingGroup.js";
@@ -59,7 +60,9 @@ const componentCssClassName = "ds entity-panel";
  * that marks it canonical, through the site's link component, unless the
  * panel already sits on that page; its class's chip and its compact
  * address), its prominent values and its plain values, all
- * open; then each group of values held by it, such as a line's routes,
+ * open but a long text (past 120 characters, or over several lines), which
+ * is a closed disclosure whose summary is its label and which shows the
+ * text as plain text with its line breaks; then each group of values held by it, such as a line's routes,
  * each relation it holds, and each group of what
  * references it, a closed disclosure whose summary carries the group's
  * label and its true count, which opens on the group's values (12, then
@@ -134,13 +137,17 @@ export default function EntityPanel({
   const plain = partition.values
     .filter(({ group }) => !holdsNested(group))
     .map(({ group }) => group);
-  const values = [...partition.prominent, ...plain].map(
-    (group): KeyValuePair => ({
-      id: group.predicateUri,
-      term: labelOutgoingGroup(group, ontologies),
-      value: <StatementGroup group={group} />,
-    }),
-  );
+  const shown = [...partition.prominent, ...plain];
+  const texts = shown.filter((group) => holdsLongText(group));
+  const values = shown
+    .filter((group) => !holdsLongText(group))
+    .map(
+      (group): KeyValuePair => ({
+        id: group.predicateUri,
+        term: labelOutgoingGroup(group, ontologies),
+        value: <StatementGroup group={group} />,
+      }),
+    );
   const groups = [...held, ...partition.relations.map(({ group }) => group)];
   const nameInverse = (inverse: string): string =>
     t("statements.inverse", { label: inverse });
@@ -168,6 +175,14 @@ export default function EntityPanel({
       {values.length === 0 ? null : (
         <KeyValueList className="values" pairs={values} />
       )}
+      {texts.map((group) => (
+        <details className="text" key={group.predicateUri}>
+          <summary className="summary">
+            {labelOutgoingGroup(group, ontologies)}
+          </summary>
+          <StatementGroup className="body" group={group} />
+        </details>
+      ))}
       {groups.map((group) => (
         <details className="group" key={group.predicateUri}>
           <summary className="summary">
@@ -209,5 +224,19 @@ function holdsNested(group: {
 }): boolean {
   return group.values.some(
     ({ __typename }) => __typename === "StatementNested",
+  );
+}
+
+/**
+ * Whether a group holds a text too long to read open in the panel: one
+ * past `PANEL_TEXT_LIMIT` characters, or one over several lines.
+ */
+function holdsLongText(group: {
+  values: readonly { __typename: string; lexical?: string }[];
+}): boolean {
+  return group.values.some(
+    ({ lexical }) =>
+      lexical !== undefined &&
+      (lexical.length > PANEL_TEXT_LIMIT || lexical.includes("\n")),
   );
 }

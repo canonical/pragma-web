@@ -1,7 +1,9 @@
 ---
 # EntityPanel (lens-entity src/lib/ui/EntityPanel/): the details panel, PS15
 # V2. Identity (mark, name, class, address) with Open beside the title,
-# prominent and plain values open as a KeyValueList, then each group of
+# prominent and plain values open as a KeyValueList, each long text (past
+# 120 characters or over several lines) a closed <details> whose summary
+# is its label, then each group of
 # values held by the entity (such as a line's routes) and each relation
 # and each Referenced by group as a closed <details> (Accordion item, works
 # without JS) whose summary carries the label and the count. Not a second
@@ -40,6 +42,15 @@ node:
       relation: { cardinality: "0..1", slotName: not-found }   # instead of every other part
     - node: { role: values, element: dl }
       relation: { cardinality: "0..1", slotName: values }      # the prominent values, then the plain ones
+    - node:
+        role: text
+        element: details
+        edges:
+          - node: { role: summary, element: summary }
+            relation: { cardinality: "1", slotName: summary }  # label
+          - node: { role: body, element: div, styles: { typography.whiteSpace: pre-line } }
+            relation: { cardinality: "1", slotName: body }     # StatementGroup, plain text with its line breaks
+      relation: { cardinality: "0..*", slotName: text }        # a value past 120 characters or over several lines, closed
     - node:
         role: group
         element: details

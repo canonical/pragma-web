@@ -34,6 +34,34 @@ const readNodeAnswer = (uri: string): GraphQLResponse => {
   return { data: { node: structuredClone(data.node) } };
 };
 
+/**
+ * The recorded statements of `uri` with the first literal of each group
+ * `texts` names rewritten to the text it gives.
+ */
+const rewriteLiterals = (
+  uri: string,
+  texts: Readonly<Record<string, string>>,
+): GraphQLResponse => {
+  const recorded = metroResponses.find(
+    ({ operation, variables }) =>
+      operation === "EntityStatementsQuery" && variables.uri === uri,
+  );
+  if (recorded === undefined) throw new Error(`no statements for ${uri}`);
+  const answer = structuredClone(recorded.response) as {
+    data: {
+      outgoing: {
+        groups: { predicateUri: string; values: { lexical?: string }[] }[];
+      };
+    };
+  };
+  for (const group of answer.data.outgoing.groups) {
+    const text = texts[group.predicateUri];
+    const first = group.values.at(0);
+    if (text !== undefined && first !== undefined) first.lexical = text;
+  }
+  return answer as GraphQLResponse;
+};
+
 type PanelSetup = {
   readonly uri: string;
   /** Where the site sits: by default a page other than the entity's own. */
@@ -128,6 +156,34 @@ describe("EntityPanel", () => {
     ).toBeGreaterThan(0);
     // No generated id, so the server's markup hydrates as it is.
     expect(html).not.toMatch(/id="(?:«|:)r/);
+  });
+
+  it("closes a long text under its label, its line breaks kept, out of the open values", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const long = "x".repeat(121);
+    const lines = "#f2b705\n#000000";
+    const { container } = await renderPanel({
+      uri: CIRCLE_LINE,
+      statements: rewriteLiterals(CIRCLE_LINE, {
+        "https://metro.example/onto#code": long,
+        "https://metro.example/onto#colour": lines,
+      }),
+    });
+    const panel = container.querySelector("section.ds.entity-panel");
+    const texts = [...(panel?.querySelectorAll(":scope > details.text") ?? [])];
+    expect(
+      texts.map((text) => text.querySelector(":scope > summary")?.textContent),
+    ).toEqual([
+      expect.stringMatching(/^code$/i),
+      expect.stringMatching(/^colour$/i),
+    ]);
+    expect(texts.every((text) => !text.hasAttribute("open"))).toBe(true);
+    expect(
+      texts.map((text) => text.querySelector(".body")?.textContent),
+    ).toEqual([long, lines]);
+    const values = panel?.querySelector(":scope > .values")?.textContent ?? "";
+    expect(values).not.toContain(long);
   });
 
   it("draws no Open on the entity's own page", {

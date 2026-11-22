@@ -1,6 +1,7 @@
 /**
  * The entity lens's domain constants: the names it derives from a binding,
- * and the page size it asks the graph for.
+ * the page size it asks the graph for, and the length past which the
+ * details panel closes a text.
  */
 
 /**
@@ -21,3 +22,9 @@ export const ENTITY_URI_PARAM = "uri";
  * an invisible truncation.
  */
 export const ENTITY_PAGE_SIZE = 100;
+
+/**
+ * The longest text the details panel shows open, in characters: a literal
+ * longer than this, or one over several lines, is drawn as a closed group.
+ */
+export const PANEL_TEXT_LIMIT = 120;

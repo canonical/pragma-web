@@ -46,6 +46,11 @@
     color: var(--entity-panel-count-color);
   }
 
+  /* A long text, opened: plain text that keeps its line breaks. */
+  .ds.entity-panel > .text > .body {
+    white-space: pre-line;
+  }
+
   .ds.entity-panel > .referenced-by {
     display: flex;
     flex-direction: column;
