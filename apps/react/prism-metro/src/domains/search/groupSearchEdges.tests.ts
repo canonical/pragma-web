@@ -38,4 +38,8 @@ describe("groupSearchEdges", () => {
       { type: "X", title: "X", count: 1, edges: [edge("1", "X")] },
     ]);
   });
+
+  it("makes no group when the provider names no type", () => {
+    expect(groupSearchEdges([], [])).toEqual([]);
+  });
 });
