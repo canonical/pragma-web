@@ -1,0 +1,31 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.data-timeline-datetime {
+    color: var(--color-text-muted);
+    font-size: var(--typography-text-primary-font-size);
+    line-height: var(--typography-text-primary-line-height);
+
+    & .value {
+      display: flex;
+      align-items: center;
+      min-block-size: var(--data-timeline-row-height);
+    }
+
+    &:is(button) {
+      display: inline-flex;
+      padding: 0;
+      border: none;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    &:focus-visible {
+      outline: var(--dimension-stroke-thickness-medium) solid
+        var(--color-focus-ring);
+      outline-offset: var(--dimension-025);
+    }
+  }
+}
