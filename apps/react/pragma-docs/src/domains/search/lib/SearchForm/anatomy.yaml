@@ -1,0 +1,32 @@
+---
+# SearchForm — the strip's Search on the search route: a form that sends
+# its text back to the page as the `q` parameter (a plain GET, so it
+# searches without scripting): the field carrying the address's text, then
+# the submit button. The field grows to fill the socket and the button
+# keeps its width, one gutter apart.
+#
+# Every decision is read through a component token declared on the root
+# (`--search-form-*`), bound to the symbol named here.
+#
+# Token ledger: none.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: docs.component.search_form
+  styles:
+    layout.type: flex
+    layout.align: center
+    spacing.gap: grid.gutter
+    size.min.width: 0
+  edges:
+    - node:
+        role: field
+        styles:
+          layout.flex.grow: 1
+          layout.flex.shrink: 1
+          layout.flex.basis: auto
+          size.min.width: 0
+      relation: { cardinality: "1", slotName: input }
+    - node:
+        role: submit button
+      relation: { cardinality: "1", slotName: submit }

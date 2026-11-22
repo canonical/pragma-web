@@ -1,39 +1,192 @@
 // Scaffolded by @canonical/summon-component:react v0.46.0
 
+import {
+  collectLenses,
+  PaginationBar,
+  TypeFacetBar,
+} from "@canonical/prism-core";
+import { SearchPassage, SearchResultGroup } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
+import type { RouteMap } from "@canonical/router-core";
+import { Link, useRouter } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { useLazyLoadQuery } from "react-relay";
 import { useMessages } from "#i18n";
 import { DocsChipProjection } from "#lib/ui";
 import buildSearchVariables from "../../buildSearchVariables.js";
-import { SEARCH_TITLE_ID } from "../../constants.js";
+import { SEARCH_PAGE_SIZE, SEARCH_TITLE_ID } from "../../constants.js";
+import groupSearchEdges from "../../groupSearchEdges.js";
 import { type DocsSearchQuery, searchQueryNode } from "../../searchQuery.js";
+import type { SearchValues } from "../../types.js";
 import type { SearchPageProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds search-page";
 
+/** The route a lens's Definitions live at, when the site has them. */
+const DEFINITIONS_ROUTE = "definitions";
+
 /**
- * The search route's page: its title (the document's title too), how many
- * results match the text, and each result in rank order through the
- * site's chip switch over the passage that holds the text.
+ * The page's results for a text: the Type facet while two or more types
+ * match, the results grouped by type, and the pagination bar; or, when
+ * nothing matches, the no-match state.
+ *
+ * @note Impure: reads `DocsSearchQuery` from the Relay store, fetching it
+ *   when the store lacks it.
+ */
+function SearchResults({
+  text,
+  type,
+  after,
+  page = 1,
+}: Omit<SearchPageProps, "className">): ReactElement {
+  const t = useMessages();
+  const router = useRouter();
+  const { search, previous } = useLazyLoadQuery<DocsSearchQuery>(
+    searchQueryNode,
+    buildSearchVariables(text, { type, after, page }),
+  );
+  const href = (values: SearchValues): string =>
+    router.buildPath("search", { search: { ...values } });
+  if (search.total === 0) {
+    return (
+      <div className="none" role="status">
+        <p>{t("search.none")}</p>
+        <ul className="hints">
+          <li>{t("search.spelling")}</li>
+          {DEFINITIONS_ROUTE in router.routes && (
+            <li>
+              <Link<RouteMap, string> to={DEFINITIONS_ROUTE}>
+                {t("search.definitions")}
+              </Link>
+            </li>
+          )}
+          <li>{t("search.palette")}</li>
+        </ul>
+      </div>
+    );
+  }
+  const first = (page - 1) * SEARCH_PAGE_SIZE + 1;
+  const previousValues: SearchValues | undefined =
+    page === 1
+      ? undefined
+      : page === 2
+        ? { q: text, type }
+        : {
+            q: text,
+            type,
+            after: previous?.pageInfo.endCursor ?? undefined,
+            page: String(page - 1),
+          };
+  return (
+    <>
+      <p className="summary">{t("search.results", { count: search.total })}</p>
+      {search.facets.length > 1 && (
+        <TypeFacetBar
+          className="facets"
+          facets={search.facets.map((facet) => ({
+            id: facet.type.uri,
+            label: facet.type.label ?? facet.type._meta.title,
+            count: facet.count,
+            href: href(
+              facet.type.uri === type
+                ? { q: text }
+                : { q: text, type: facet.type.uri },
+            ),
+            selected: facet.type.uri === type,
+          }))}
+        />
+      )}
+      <div className="results">
+        {groupSearchEdges(search.edges, search.facets).map((group) => (
+          <SearchResultGroup
+            count={group.count}
+            key={group.type}
+            title={group.title}
+          >
+            {group.edges.map(({ cursor, node, match }) => (
+              <li className="result" key={cursor}>
+                <DocsChipProjection node={node} />
+                <SearchPassage
+                  className="passage"
+                  passage={match.passage}
+                  ranges={match.ranges}
+                />
+              </li>
+            ))}
+          </SearchResultGroup>
+        ))}
+      </div>
+      <PaginationBar
+        label={t("search.position", {
+          first: String(first),
+          last: String(first + search.edges.length - 1),
+          total: String(search.total),
+        })}
+        nextHref={
+          search.pageInfo.hasNextPage && search.pageInfo.endCursor
+            ? href({
+                q: text,
+                type,
+                after: search.pageInfo.endCursor,
+                page: String(page + 1),
+              })
+            : undefined
+        }
+        previousHref={
+          previousValues === undefined ? undefined : href(previousValues)
+        }
+      />
+    </>
+  );
+}
+
+/**
+ * The empty state: what the field is for, and the site's lenses as doors.
+ */
+function SearchDoors(): ReactElement {
+  const t = useMessages();
+  const router = useRouter();
+  return (
+    <>
+      <p className="summary">{t("search.empty")}</p>
+      <ul aria-label={t("search.doors")} className="doors">
+        {collectLenses(router.routes).map(({ name, label, icon: Icon }) => (
+          <li key={name}>
+            <Link<RouteMap, string> className="door" to={name}>
+              <span aria-hidden="true" className="icon">
+                <Icon />
+              </span>
+              <span className="name">{label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/**
+ * The search route's page: its title (the document's title too), then
+ * the results for the address's text, grouped by type and paged by
+ * `SEARCH_PAGE_SIZE`; the no-match state when nothing matches; and the
+ * lenses as doors when the address carries no text.
  *
  * `import { SearchPage } from "./lib/index.js";`
  *
  * @implements docs.component.search_page
- * @note Impure: reads `DocsSearchQuery` from the Relay store, fetching it
- *   when the store lacks it.
+ * @note Impure: reads `DocsSearchQuery` from the Relay store when the
+ *   address carries a text, fetching it when the store lacks it.
  */
 export default function SearchPage({
   text,
+  type,
+  after,
+  page,
   className,
   ...props
 }: SearchPageProps): ReactElement {
   const t = useMessages();
-  const { search } = useLazyLoadQuery<DocsSearchQuery>(
-    searchQueryNode,
-    buildSearchVariables(text),
-  );
   return (
     <section
       {...props}
@@ -44,20 +197,10 @@ export default function SearchPage({
       <h1 className="title" id={SEARCH_TITLE_ID}>
         {t("search.title")}
       </h1>
-      <p className="summary">
-        {search.total === 0
-          ? t("search.none")
-          : t("search.results", { count: search.total })}
-      </p>
-      {search.edges.length > 0 && (
-        <ol className="results">
-          {search.edges.map(({ cursor, node, match }) => (
-            <li className="result" key={cursor}>
-              <DocsChipProjection node={node} />
-              <p className="passage">{match.passage}</p>
-            </li>
-          ))}
-        </ol>
+      {text.trim() === "" ? (
+        <SearchDoors />
+      ) : (
+        <SearchResults after={after} page={page} text={text} type={type} />
       )}
     </section>
   );

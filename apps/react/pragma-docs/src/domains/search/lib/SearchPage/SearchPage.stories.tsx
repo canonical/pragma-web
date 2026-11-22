@@ -11,6 +11,7 @@ import {
   MOCK_UI_BLOCK,
 } from "../../../../../testing/projectionEntities.js";
 import resolveRoot from "../../../../../testing/resolveRoot.js";
+import { searchRoutes } from "../../routes.js";
 import Component from "./SearchPage.js";
 
 const meta = {
@@ -18,10 +19,11 @@ const meta = {
   component: Component,
   tags: ["autodocs"],
   // The results render through the site's projections over a mock graph
-  // and link to their homes through the site's router.
+  // and link to their homes, and the facets and pages to the search
+  // route, through the site's router.
   decorators: [
     withProjections(),
-    withRouter({ routes: HOME_ROUTES }),
+    withRouter({ routes: { ...HOME_ROUTES, ...searchRoutes } }),
     withRelayEnvironment,
   ],
   parameters: {

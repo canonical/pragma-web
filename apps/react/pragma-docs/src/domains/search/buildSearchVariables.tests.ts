@@ -5,8 +5,8 @@ import readSearchText from "./readSearchText.js";
 
 describe("buildSearchVariables", () => {
   it("trims the text and asks for one page", () => {
-    expect(buildSearchVariables("  button ")).toEqual({
-      text: "button",
+    expect(buildSearchVariables("  depot ")).toEqual({
+      text: "depot",
       first: SEARCH_PAGE_SIZE,
     });
   });
@@ -14,10 +14,28 @@ describe("buildSearchVariables", () => {
 
 describe("readSearchText", () => {
   it("reads the q parameter", () => {
-    expect(readSearchText({ q: "button" })).toBe("button");
+    expect(readSearchText({ q: "depot" })).toBe("depot");
   });
 
   it("reads no text from an address without one", () => {
     expect(readSearchText({})).toBe("");
+  });
+});
+
+describe("buildSearchVariables with the page's state", () => {
+  it("applies the type and the cursor on the second page", () => {
+    expect(
+      buildSearchVariables("but", { type: "ex:A", after: "c", page: 2 }),
+    ).toEqual({ text: "but", first: 20, types: ["ex:A"], after: "c" });
+  });
+
+  it("asks from the third page for the window that ends before it", () => {
+    expect(buildSearchVariables("but", { after: "c", page: 4 })).toEqual({
+      text: "but",
+      first: 20,
+      after: "c",
+      hasPrevious: true,
+      previousFirst: 40,
+    });
   });
 });
