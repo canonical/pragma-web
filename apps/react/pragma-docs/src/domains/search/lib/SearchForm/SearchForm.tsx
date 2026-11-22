@@ -91,7 +91,7 @@ export default function SearchForm({
         ref={field}
         type="search"
       />
-      <button className="ds button submit" type="submit">
+      <button className="submit" type="submit">
         {t("search.submit")}
       </button>
     </form>

@@ -3,12 +3,16 @@
 # its text back to the page as the `q` parameter (a plain GET, so it
 # searches without scripting): the field carrying the address's text, then
 # the submit button. The field grows to fill the socket and the button
-# keeps its width, one gutter apart.
+# keeps its width, one gutter apart. Both share one frame: an inset, a
+# hairline (muted on the field), the page's background and text colour,
+# the secondary text size, and the focus ring when focused.
 #
 # Every decision is read through a component token declared on the root
 # (`--search-form-*`), bound to the symbol named here.
 #
-# Token ledger: none.
+# Token ledger:
+#   --search-form-border-width: 1px  the frame's hairline.
+#   --search-form-focus-ring-width: 2px  the focus ring's width.
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -26,7 +30,34 @@ node:
           layout.flex.shrink: 1
           layout.flex.basis: auto
           size.min.width: 0
+          spacing.internal.block.start: space.050
+          spacing.internal.block.end: space.050
+          spacing.internal.inline.start: space.100
+          spacing.internal.inline.end: space.100
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.color: color.border.muted
+          appearance.background: color.background
+          typography.color: color.text
+          typography.size: typography.text.secondary.fontSize
+          appearance.outline.width@focus: 2px
+          appearance.outline.color@focus: color.focusRing
       relation: { cardinality: "1", slotName: input }
     - node:
         role: submit button
+        styles:
+          layout.flex.shrink: 0
+          spacing.internal.block.start: space.050
+          spacing.internal.block.end: space.050
+          spacing.internal.inline.start: space.100
+          spacing.internal.inline.end: space.100
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.color: color.border
+          appearance.background: color.background
+          typography.color: color.text
+          typography.size: typography.text.secondary.fontSize
+          interaction.cursor: pointer
+          appearance.outline.width@focus: 2px
+          appearance.outline.color@focus: color.focusRing
       relation: { cardinality: "1", slotName: submit }
