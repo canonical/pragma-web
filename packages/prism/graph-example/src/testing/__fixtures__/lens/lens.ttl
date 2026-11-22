@@ -81,6 +81,9 @@ geo:location prism:visibility prism:prominent .
 metro:stop prism:inverseLabel "Called at by"@en ;
   prism:inversePluralLabel "Called at by"@en .
 
+metro:calls prism:inverseLabel "Called at by"@en ;
+  prism:inversePluralLabel "Called at by"@en .
+
 metro:routes prism:pluralLabel "routes"@en ;
   prism:inverseLabel "Line"@en ;
   prism:inversePluralLabel "Lines"@en .

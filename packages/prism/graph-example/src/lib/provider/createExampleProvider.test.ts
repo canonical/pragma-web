@@ -2533,6 +2533,9 @@ describe("the type lens", () => {
       stop: ontologyProperty(uri: "metro:stop") {
         visibility pluralLabel inverseLabel inversePluralLabel inverseVisibility
       }
+      calls: ontologyProperty(uri: "metro:calls") {
+        inverseLabel inversePluralLabel
+      }
     }`);
     expect(data).toEqual({
       servesLine: {
@@ -2548,6 +2551,10 @@ describe("the type lens", () => {
         inverseLabel: "Called at by",
         inversePluralLabel: "Called at by",
         inverseVisibility: null,
+      },
+      calls: {
+        inverseLabel: "Called at by",
+        inversePluralLabel: "Called at by",
       },
     });
   });
