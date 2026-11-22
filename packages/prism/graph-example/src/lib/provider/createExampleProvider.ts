@@ -1135,8 +1135,13 @@ export const createExampleProvider = (
       : `${match[0]}:${uri.slice(match[1].length)}`;
   };
 
-  /** A term as a `StatementValue`, nested values expanded to `depth`. */
-  const buildStatementValueView = (term: RecordTerm, depth: number): View => {
+  /** A term as a `StatementValue`, nested values expanded to `depth`, each
+   * of their groups cut to `perPredicate`. */
+  const buildStatementValueView = (
+    term: RecordTerm,
+    perPredicate: number,
+    depth: number,
+  ): View => {
     if (term.kind === "literal") {
       const { lexical, datatype, lang } = term;
       return { __typename: "StatementLiteral", lexical, datatype, lang };
@@ -1149,7 +1154,7 @@ export const createExampleProvider = (
           depth < STATEMENTS_MAX_DEPTH
             ? buildStatementGroupViews(
                 term.statements(),
-                STATEMENTS_PER_PREDICATE,
+                perPredicate,
                 depth + 1,
               )
             : [],
@@ -1179,7 +1184,9 @@ export const createExampleProvider = (
         },
         predicateUri: predicate,
         total,
-        values: values.map((value) => buildStatementValueView(value, depth)),
+        values: values.map((value) =>
+          buildStatementValueView(value, perPredicate, depth),
+        ),
       }),
     );
 

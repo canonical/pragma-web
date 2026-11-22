@@ -240,6 +240,7 @@ const readEntityStatements = async (
       predicate,
       total,
       terms: terms.toSorted(compareTerms(blanks)).slice(0, perPredicate),
+      perPredicate,
       depth: 1,
       blanks,
       compact,
@@ -286,7 +287,7 @@ const resolveValue = async (
         group.depth < STATEMENTS_MAX_DEPTH
           ? groupTermStatements(
               statements,
-              STATEMENTS_PER_PREDICATE,
+              group.perPredicate,
               group.depth + 1,
               group.blanks,
               group.compact,

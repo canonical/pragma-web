@@ -38,6 +38,8 @@ export interface StatementGroupSource {
   readonly total: number;
   /** The values kept, in order, at most the bound asked for. */
   readonly terms: readonly Term[];
+  /** The bound asked for, which a nested value's own groups keep too. */
+  readonly perPredicate: number;
   /** How deep the group sits: 1 for the entity's own. */
   readonly depth: number;
   /** The statements of the blank nodes its values may name. */

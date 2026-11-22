@@ -33,7 +33,8 @@ ds:card a ds:Component ;
   ds:related ds:button , <${ELSEWHERE}> ;
   ds:part [ a ds:Component ; ds:name "outer" ; ds:part [ ds:name "inner" ] ] ,
     [ ds:name "second" ] , [] .
-ds:holder a ds:Component ; ds:related ds:card .
+ds:holder a ds:Component ; ds:related ds:card ;
+  ds:part [ ds:name "first" , "second" ] .
 [ ds:related ds:card ] .
 `;
 
@@ -229,6 +230,14 @@ describe("createStatementsExtensions", () => {
     expect(findGroup(one, `${DS}tier`)?.values).toHaveLength(1);
     const many = await ask({ uri: `${DS}card`, per: 99, dir: "OUT" });
     expect(findGroup(many, `${DS}tier`)?.values).toHaveLength(3);
+    const nested = findGroup(
+      await ask({ uri: `${DS}holder`, per: 1 }),
+      `${DS}part`,
+    )
+      ?.values.at(0)
+      ?.groups?.find(({ predicateUri }) => predicateUri === `${DS}name`);
+    expect(nested?.total).toBe(2);
+    expect(nested?.values).toHaveLength(1);
     const unset = await ask({ uri: `${DS}card`, per: null, dir: null });
     expect(findGroup(unset, `${DS}tier`)?.values).toHaveLength(3);
   }, 120_000);
@@ -401,7 +410,7 @@ describe("createStatementsExtensions over the installed design system", () => {
   }, 180_000);
 
   it("serves what names Button: 145 statements, 144 of them token bindings", async () => {
-    const read = await ask({ uri: BUTTON, dir: "IN", per: 50 });
+    const read = await ask({ uri: BUTTON, dir: "IN", per: 99 });
     expect(read?.total).toBe(145);
     const via = findGroup(read, "https://ds.canonical.com/viaBlock");
     expect(via?.total).toBe(144);

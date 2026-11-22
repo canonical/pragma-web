@@ -2736,6 +2736,30 @@ describe("Query.statements", () => {
     ).toBe(3);
   });
 
+  it("cuts a nested value's groups to the bound asked for too", async () => {
+    const { statements } = (await run(
+      `query Nested($uri: ID!, $perPredicate: Int) {
+        statements(uri: $uri, perPredicate: $perPredicate) {
+          groups { values { ... on StatementNested { groups { total values { __typename } } } } }
+        }
+      }`,
+      { uri: `${METRO}north-line`, perPredicate: 1 },
+    )) as {
+      statements: {
+        groups: {
+          values: { groups?: { total: number; values: unknown[] }[] }[];
+        }[];
+      };
+    };
+    const nested = statements.groups.flatMap(({ values }) =>
+      values.flatMap(({ groups }) => groups ?? []),
+    );
+    expect(nested.some(({ total }) => total > 1)).toBe(true);
+    for (const { values } of nested) {
+      expect(values.length).toBeLessThanOrEqual(1);
+    }
+  });
+
   it("holds the bound between 1 and 50 whatever the reader asks", async () => {
     const none = await read({
       uri: `${METRO}central-exchange`,
@@ -2915,6 +2939,28 @@ describe("Query.statements", () => {
         },
       ],
     };
+
+    it("cuts a group of more than 50 values to 50 whatever the reader asks", async () => {
+      const data = await runWith(
+        {
+          ...dataset,
+          entities: Array.from({ length: 60 }, (_, index) => ({
+            uri: `urn:e${index}`,
+            type: "urn:C",
+            typename: "Station",
+            labels: { "": "E" },
+            code: "E",
+          })),
+        },
+        `{ statements(uri: "urn:C", direction: IN, perPredicate: 5000) { groups { total values { __typename } } } }`,
+      );
+      expect(data.statements).toEqual({
+        groups: [{ total: 60, values: expect.any(Array) }],
+      });
+      const [group] = (data.statements as { groups: { values: unknown[] }[] })
+        .groups;
+      expect(group?.values).toHaveLength(50);
+    });
 
     it("orders a predicate outside every known namespace by its whole IRI", async () => {
       const data = await runWith(
