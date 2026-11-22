@@ -30,6 +30,7 @@ const renderPage = (props: SearchPageProps, total = 45): void => {
         edges: Array.from({ length: total === 0 ? 0 : 20 }, () => ({})),
       }),
       PageInfo: () => ({ hasNextPage: total > 20, endCursor: "cursor-20" }),
+      FacetedConnection: () => ({ totalCount: 108 }),
       SearchMatch: () => ({
         passage: "Buttons trigger actions",
         ranges: [{ start: 0, length: 3 }],
@@ -131,6 +132,18 @@ describe("SearchPage", () => {
     const doors = screen.getByRole("list", { name: "Lenses to browse" });
     expect(doors.querySelectorAll("a.door").length).toBeGreaterThan(0);
     expect(document.querySelector(".ds.search-page .results")).toBeNull();
+  });
+
+  it("gives each door its class's total and none where no class is listed (W8-A9)", () => {
+    renderPage({ text: "" });
+    const doors = screen.getByRole("list", { name: "Lenses to browse" });
+    expect(
+      doors.querySelector('a.door[href="/components"] .total')?.textContent,
+    ).toBe("108");
+    expect(
+      doors.querySelector('a.door[href="/standards"] .total')?.textContent,
+    ).toBe("108");
+    expect(doors.querySelector('a.door[href="/guides"] .total')).toBeNull();
   });
 
   it("offers the next steps when nothing matches (W8-A9)", () => {

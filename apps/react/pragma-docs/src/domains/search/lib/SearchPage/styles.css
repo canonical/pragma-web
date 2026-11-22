@@ -8,6 +8,7 @@
    * apart. */
   .ds.search-page {
     --search-page-gap: var(--grid-gutter);
+    --search-page-total-color: var(--color-text-muted);
 
     grid-column: 1 / -1;
     display: flex;
@@ -46,6 +47,12 @@
     display: inline-flex;
     align-items: center;
     gap: var(--search-page-gap);
+  }
+
+  /* A door's total: muted, in figures of one width. */
+  .ds.search-page .door .total {
+    color: var(--search-page-total-color);
+    font-variant-numeric: tabular-nums;
   }
 
   /* The no-match state's next steps: a list without its native bullets
