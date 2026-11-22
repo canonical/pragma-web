@@ -1,6 +1,6 @@
 ---
 # SearchPage — the search route's page, in the document archetype's
-# canvas: its title (also the document's), then one of three states.
+# canvas, an index: its title (also the document's), then one of three states.
 # With a text that matches (the strip holds their count, and the facet bar
 # under it the Type facet while two or more types match): the results
 # grouped by type
@@ -9,8 +9,8 @@
 # pagination bar, 20 results a page. With a text that matches nothing:
 # the no-match state, saying so and offering the next steps (the
 # spelling, the Definitions when the site has them, the palette). With no
-# text: what the field is for, and each searchable type as a door with
-# its total. It spans every column of the canvas's page grid; its parts
+# text: what the field is for, and each lens as a door to its home with
+# the total of the class it lists (none where it lists no single class). It spans every column of the canvas's page grid; its parts
 # sit one gutter apart, and so do the groups, the doors and the hints.
 #
 # Every decision is read through a component token declared on the root
@@ -79,7 +79,7 @@ node:
             relation: { cardinality: "1", slotName: hints }
       relation: { cardinality: "0..1", slotName: none }
     - node:
-        role: the searchable types as doors
+        role: the lenses as doors
         styles:
           layout.type: flex
           layout.direction: column
@@ -90,7 +90,7 @@ node:
           spacing.internal.inline.start: 0
         edges:
           - node:
-              role: door, a link to the type's results
+              role: door, a link to the lens's home, with its class's total
               styles:
                 layout.type: inline-flex
                 layout.align: center
