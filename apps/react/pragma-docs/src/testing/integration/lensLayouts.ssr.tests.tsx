@@ -505,12 +505,16 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     );
     // The standard's prose renders with its references as chips, from the
     // same warm store: the two links the prose writes to them, one by its
-    // compact address and one by its absolute IRI.
+    // compact address and one by its absolute IRI; the third is the
+    // standard it extends, under Related standards, from its statements.
     expect(
       mustGet(STANDARD_READING_URL).canvas.match(
         /class="ds entity-chip ds node-chip"/g,
       ),
-    ).toHaveLength(2);
+    ).toHaveLength(3);
+    expect(mustGet(STANDARD_READING_URL).canvas).toContain(
+      '<h2 class="heading" id="related">Related standards</h2>',
+    );
     // …and a chip of a standard links to that standard's reading page.
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
       `href="/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#react.component.props")}"`,

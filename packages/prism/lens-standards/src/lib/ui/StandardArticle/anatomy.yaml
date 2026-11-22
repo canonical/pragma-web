@@ -92,9 +92,16 @@ node:
       relation: { cardinality: "0..2", slotName: examples }  # the do and dont sections' content
     - node:
         role: chips (a list of chips, wrapping, gap --standard-article-gap)
+        element: ul
         styles:
           layout.grid.column: "1 / -1"
-          layout.gap: var(--standard-article-gap)
+          layout.type: flex
+          layout.wrap: wrap
+          layout.listStyle: none
+          spacing.gap: grid.gutter
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
         edges:
           - node:
               uri: prism.component.chip_projection
@@ -104,7 +111,9 @@ node:
         role: shown (the muted line of a cut group, "12 of 30 shown")
         styles:
           layout.grid.column: "1 / -1"
-          color: var(--standard-article-shown-color)
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
       relation: { cardinality: "0..4", slotName: shown }
     - node:
         uri: prism.component.entity_source
