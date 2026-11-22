@@ -4,7 +4,7 @@
 # searches without scripting): the field carrying the address's text, then
 # the submit button. The field grows to fill the socket and the button
 # keeps its width, one gutter apart. Both share one frame: an inset, a
-# hairline (muted on the field), the page's background and text colour,
+# muted hairline, the page's background and text colour,
 # the secondary text size, and the focus ring when focused.
 #
 # Every decision is read through a component token declared on the root
@@ -60,7 +60,7 @@ node:
           spacing.internal.inline.end: space.100
           appearance.border.width: 1px
           appearance.border.style: solid
-          appearance.border.color: color.border
+          appearance.border.color: color.border.muted
           appearance.background: color.background
           typography.color: color.text
           typography.font: inherit
