@@ -17,6 +17,7 @@ node:
     spacing.external.block.end: 0
     layout.overflow.inline: clip
     typography.overflow: ellipsis
+    typography.whiteSpace: nowrap
   edges:
     - node:
         role: match

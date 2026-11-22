@@ -27,4 +27,16 @@ describe("SearchPassage SSR", () => {
     );
     expect(styles).toContain("--search-passage-match-background: transparent;");
   });
+
+  it("keeps the passage on one line, so its ellipsis can cut it", () => {
+    const styles = readFileSync(
+      new URL("./styles.css", import.meta.url),
+      "utf8",
+    );
+    const start = styles.indexOf(".ds.search-passage {");
+    expect(start).toBeGreaterThan(-1);
+    const root = styles.slice(start, styles.indexOf("\n  }", start));
+    expect(root).toContain("white-space: nowrap;");
+    expect(root).toContain("text-overflow: ellipsis;");
+  });
 });
