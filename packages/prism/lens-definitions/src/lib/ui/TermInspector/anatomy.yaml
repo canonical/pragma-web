@@ -250,7 +250,7 @@ node:
         uri: prism.component.graph_overview
       relation: { cardinality: "0..1" }
     - node:
-        role: panel (an instance's details panel, its own column of blocks; the view's part rules stop at it)
+        role: panel (an instance's details panel, its own column of blocks)
         uri: prism.component.entity_panel
         styles:
           layout.grid.column: "1 / -1"
