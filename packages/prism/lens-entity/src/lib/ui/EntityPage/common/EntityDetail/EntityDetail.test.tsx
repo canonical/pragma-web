@@ -7,6 +7,7 @@ import {
   type Renderer,
 } from "@canonical/prism-core";
 import { render, screen } from "@testing-library/react";
+import type { GraphQLResponse } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import createEntitySite from "../../../../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
@@ -264,6 +265,101 @@ describe("EntityDetail", () => {
     expect([...drawn.children].map((child) => child.classList.item(1))).toEqual(
       ["entity-summary"],
     );
+  });
+
+  it("counts a prominent fact cut at its bound in its term, and says how many it shows", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const url = `/stations/${encodeURIComponent(CENTRAL_EXCHANGE_CURIE)}`;
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    // Central Exchange serves fewer lines than the bound: the provider is
+    // made to report 20, so the group shows fewer values than it holds.
+    fetchFn.mockImplementation(async (request, variables, ...rest) => {
+      // The recorded fetch answers with a plain response, never a stream.
+      const response = (await recorded(
+        request,
+        variables,
+        ...rest,
+      )) as GraphQLResponse;
+      if (request.name !== "EntityStatementsQuery") return response;
+      const data = (
+        response as unknown as {
+          data: {
+            outgoing: {
+              groups: { total: number; values: { __typename: string }[] }[];
+            };
+          };
+        }
+      ).data;
+      for (const group of data.outgoing.groups) {
+        if (
+          group.values.length > 1 &&
+          group.values.every(({ __typename }) => __typename === "StatementNode")
+        ) {
+          group.total = 20;
+        }
+      }
+      return response;
+    });
+    const environment = createEnvironment({ fetchFn });
+    await warmRoute(environment, url);
+    const { container } = render(
+      createEntitySite({
+        url,
+        environment,
+        extensions: ["source", "statements"],
+        children: (
+          <EntityDetail
+            binding={STATIONS_BINDING}
+            label="Stations"
+            uri={CENTRAL_EXCHANGE_CURIE}
+          />
+        ),
+      }),
+    );
+    await screen.findByRole("heading", { level: 1 });
+    const pair = [
+      ...container.querySelectorAll(".facts .pair:not(.statement-group .pair)"),
+    ].find((candidate) =>
+      candidate.querySelector(".key")?.textContent?.startsWith("serves lines"),
+    );
+    expect(pair?.querySelector(".key")?.textContent).toBe("serves lines · 20");
+    const shown = pair?.querySelector(".shown")?.textContent;
+    expect(shown).toMatch(/^\d+ of 20 shown$/);
+  });
+
+  it("draws neither facts nor sections under another renderer, only the header", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const url = `/stations/${encodeURIComponent(CENTRAL_EXCHANGE_CURIE)}?as=turtle`;
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation((request, variables, ...rest) =>
+      request.name === "EntitySourceQuery"
+        ? Promise.resolve({ data: { source: "<s> a <o> ." } })
+        : recorded(request, variables, ...rest),
+    );
+    const environment = createEnvironment({ fetchFn });
+    await warmRoute(environment, url);
+    const { container } = render(
+      createEntitySite({
+        url,
+        environment,
+        extensions: ["source", "statements"],
+        children: (
+          <EntityDetail
+            binding={STATIONS_BINDING}
+            label="Stations"
+            uri={CENTRAL_EXCHANGE_CURIE}
+          />
+        ),
+      }),
+    );
+    expect(await screen.findByRole("figure")).toHaveTextContent("<s> a <o> .");
+    expect(container.querySelector(".ds.entity-header")).not.toBeNull();
+    expect(container.querySelector(".facts")).toBeNull();
+    expect(readSections(container)).toEqual([]);
   });
 
   it("renders the entity's Turtle under its heading from the warm store", {

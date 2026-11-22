@@ -138,7 +138,7 @@ const REFERENCED_BY_ID = "referenced-by";
  * active page renderer draws the body before the sections (the page's own
  * renderer: the fallback's summary, else nothing); under any
  * other (Turtle, for `as=turtle`) what it draws stands in place of the
- * sections.
+ * facts and the sections, under the header.
  *
  * `import { EntityDetail } from "./common/index.js";`
  *
@@ -203,13 +203,23 @@ export default function EntityDetail({
   const outgoing = served ? statements.outgoing : null;
   const incoming = served ? statements.incoming : null;
   const partition = partitionStatements(outgoing?.groups ?? [], entity._meta);
-  const facts = partition.prominent.map(
-    (group): KeyValuePair => ({
-      id: group.predicateUri,
-      term: labelOutgoingGroup(group, ontologies),
-      value: <StatementGroup group={group} />,
-    }),
-  );
+  // The facts belong to the page's own view, as the sections do: another
+  // renderer (Turtle) draws the entity under the header alone. A fact cut
+  // at its bound carries its true total in its term, as a section's title
+  // does; the group itself says how many it shows.
+  const facts = isPage
+    ? partition.prominent.map((group): KeyValuePair => {
+        const label = labelOutgoingGroup(group, ontologies);
+        return {
+          id: group.predicateUri,
+          term:
+            group.total > group.values.length
+              ? t("statements.group", { label, count: group.total })
+              : label,
+          value: <StatementGroup group={group} />,
+        };
+      })
+    : [];
   const sections: SectionedViewSection[] = [
     ...orderSections(
       listStatementSections(partition, ontologies, t("statements.properties")),
