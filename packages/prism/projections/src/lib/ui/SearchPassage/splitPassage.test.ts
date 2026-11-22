@@ -36,4 +36,16 @@ describe("splitPassage", () => {
       { start: 4, text: "ef", matched: true },
     ]);
   });
+
+  it("skips a range that lies inside one already marked", () => {
+    expect(
+      splitPassage("abcdef", [
+        { start: 0, length: 4 },
+        { start: 1, length: 2 },
+      ]).map(({ text, matched }) => [text, matched]),
+    ).toEqual([
+      ["abcd", true],
+      ["ef", false],
+    ]);
+  });
 });
