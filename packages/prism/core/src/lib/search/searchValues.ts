@@ -16,7 +16,7 @@ export const searchValues: StandardSchemaV1<
 > = {
   "~standard": {
     version: 1,
-    vendor: "pragma-docs",
+    vendor: "prism-core",
     validate: (value) => {
       const raw = value as Readonly<Record<string, unknown>>;
       const read: SearchValues = {

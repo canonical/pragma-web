@@ -1,5 +1,4 @@
 import type { ProviderExtension } from "@canonical/prism-contract";
-import { searchRoutes } from "./routes.js";
 
 /**
  * The search routes a site offers for the extensions its provider serves:
@@ -7,21 +6,26 @@ import { searchRoutes } from "./routes.js";
  */
 export type OfferedSearchRoutes<
   TExtensions extends readonly ProviderExtension[],
-> = "search" extends TExtensions[number]
-  ? typeof searchRoutes
-  : Record<never, never>;
+  TRoutes,
+> = "search" extends TExtensions[number] ? TRoutes : Record<never, never>;
 
 /**
- * Offer the search routes to a site's route table only when the site's
+ * Offer a site's search routes to its route table only when the site's
  * provider serves the `search` extension, which their page reads.
  *
  * @param extensions - The extensions the site's provider serves.
+ * @param routes - The site's search routes.
  * @returns The search routes, or no route when `search` is not served.
  */
 export default function offerSearchRoutes<
   const TExtensions extends readonly ProviderExtension[],
->(extensions: TExtensions): OfferedSearchRoutes<TExtensions> {
-  return (
-    extensions.includes("search") ? searchRoutes : {}
-  ) as OfferedSearchRoutes<TExtensions>;
+  TRoutes extends object,
+>(
+  extensions: TExtensions,
+  routes: TRoutes,
+): OfferedSearchRoutes<TExtensions, TRoutes> {
+  return (extensions.includes("search") ? routes : {}) as OfferedSearchRoutes<
+    TExtensions,
+    TRoutes
+  >;
 }

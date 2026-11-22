@@ -15,7 +15,7 @@ const DEFAULT_SIZE = 16;
  *
  * It is always `aria-hidden`: the rail entry's visible label names it.
  *
- * `import { SearchIcon } from "./SearchIcon/index.js";`
+ * `import { SearchIcon } from "@canonical/prism-core";`
  */
 const SearchIcon = ({
   className,

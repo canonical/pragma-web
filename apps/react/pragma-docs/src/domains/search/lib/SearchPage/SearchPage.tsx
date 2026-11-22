@@ -1,9 +1,14 @@
 // Scaffolded by @canonical/summon-component:react v0.46.0
 
 import {
+  buildSearchVariables,
   collectLenses,
   FilterBar,
+  groupSearchEdges,
+  orderSearchFacets,
   PaginationBar,
+  SEARCH_PAGE_SIZE,
+  type SearchValues,
   TypeFacetBar,
 } from "@canonical/prism-core";
 import { SearchPassage, SearchResultGroup } from "@canonical/prism-projections";
@@ -14,20 +19,16 @@ import type { ReactElement } from "react";
 import { useLazyLoadQuery } from "react-relay";
 import { useMessages } from "#i18n";
 import { DocsChipProjection } from "#lib/ui";
-import buildSearchVariables from "../../buildSearchVariables.js";
 import {
   SEARCH_DOOR_CLASSES,
-  SEARCH_PAGE_SIZE,
   SEARCH_PROMINENT_CLASS,
   SEARCH_TITLE_ID,
 } from "../../constants.js";
-import groupSearchEdges, { orderSearchFacets } from "../../groupSearchEdges.js";
 import {
   type DocsSearchDoorsQuery,
   searchDoorsQueryNode,
 } from "../../searchDoorsQuery.js";
 import { type DocsSearchQuery, searchQueryNode } from "../../searchQuery.js";
-import type { SearchValues } from "../../types.js";
 import type {
   SearchFacetsProps,
   SearchPageProps,

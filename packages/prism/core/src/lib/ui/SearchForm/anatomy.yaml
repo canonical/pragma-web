@@ -21,7 +21,7 @@
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
-  uri: metro.component.search_form
+  uri: prism.component.search_form
   styles:
     layout.type: flex
     layout.align: center

@@ -6,7 +6,7 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { useMessages } from "#i18n";
+import { useMessages } from "../../i18n/index.js";
 import type { SearchFormProps } from "./types.js";
 import "./styles.css";
 
@@ -28,20 +28,21 @@ const isTextEntry = (element: Element | null): boolean =>
   (element.isContentEditable || TEXT_ENTRY_TAGS.has(element.tagName));
 
 /**
- * The strip's Search on the search route: a GET form whose field, named
- * `q`, carries the address's text, so submitting it loads the page for
+ * The strip's Search on a site's search route: a GET form whose field,
+ * named `q`, carries the address's text under the site's placeholder, so submitting it loads the page for
  * the new text without scripting. The field is keyed by the text, so a
  * navigation to another text resets it. `/` typed anywhere but in a text
  * entry focuses the field; Escape in the field clears it, then leaves it.
  *
- * `import { SearchForm } from "./lib/index.js";`
+ * `import { SearchForm } from "@canonical/prism-core";`
  *
  * @note Impure: listens to the document's keys while mounted, and moves
  *   the focus and clears the field on the keys above.
- * @implements docs.component.search_form
+ * @implements prism.component.search_form
  */
 export default function SearchForm({
   text,
+  placeholder,
   className,
   ...props
 }: SearchFormProps): ReactElement {
@@ -75,24 +76,24 @@ export default function SearchForm({
 
   return (
     <form
-      aria-label={t("search.title")}
+      aria-label={t("searchForm.label")}
       method="get"
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <input
-        aria-label={t("search.field")}
+        aria-label={t("searchForm.field")}
         className="input"
         defaultValue={text}
         key={text}
         name="q"
         onKeyDown={handleKeyDown}
-        placeholder={t("search.placeholder")}
+        placeholder={placeholder}
         ref={field}
         type="search"
       />
       <button className="submit" type="submit">
-        {t("search.submit")}
+        {t("searchForm.submit")}
       </button>
     </form>
   );

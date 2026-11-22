@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.46.0
 
+import { orderSearchFacets } from "@canonical/prism-core";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
@@ -8,7 +9,6 @@ import createSiteTree from "../../../../../testing/createSiteTree.js";
 import { MOCK_UI_BLOCK } from "../../../../../testing/projectionEntities.js";
 import resolveRoot from "../../../../../testing/resolveRoot.js";
 import { SEARCH_PROMINENT_CLASS } from "../../constants.js";
-import { orderSearchFacets } from "../../groupSearchEdges.js";
 import SearchPage, { SearchCount, SearchFacets } from "./SearchPage.js";
 import type { SearchPageProps } from "./types.js";
 

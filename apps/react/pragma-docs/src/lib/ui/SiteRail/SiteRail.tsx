@@ -4,13 +4,13 @@ import {
   type CollectedLens,
   collectLenses,
   Rail,
+  SearchIcon,
   ThemeSelector,
 } from "@canonical/prism-core";
 import { Link, useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { useMessages } from "#i18n";
 import { PlaygroundIcon } from "#lib/ui/PlaygroundIcon";
-import { SearchIcon } from "#lib/ui/SearchIcon";
 import { SignInIcon } from "#lib/ui/SignInIcon";
 import { SEARCH_ROUTE, SITE_NAME, UTILITIES_LABEL_ID } from "./constants.js";
 import type { SiteRailProps } from "./types.js";

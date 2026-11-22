@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import Component from "./SearchIcon.js";
 
 const meta: Meta<typeof Component> = {
-  title: "_work_in_progress/SearchIcon",
+  title: "Components/SearchIcon",
   component: Component,
   tags: ["autodocs"],
 };

@@ -7,7 +7,9 @@ import SearchForm from "./SearchForm.js";
 
 describe("SearchForm SSR", () => {
   it("server-renders the form with its field carrying the text", () => {
-    const html = renderToString(<SearchForm text="but" />);
+    const html = renderToString(
+      <SearchForm placeholder="Search the graph" text="but" />,
+    );
     expect(html).toContain('class="ds search-form"');
     expect(html).toContain('method="get"');
     expect(html).toContain('name="q"');
@@ -15,11 +17,13 @@ describe("SearchForm SSR", () => {
   });
 
   it("frames the field and the button in the strip's own styles", () => {
-    const html = renderToString(<SearchForm text="but" />);
+    const html = renderToString(
+      <SearchForm placeholder="Search the graph" text="but" />,
+    );
     expect(html).toContain('class="submit"');
     expect(html).not.toContain("ds button");
     const styles = readFileSync(
-      `${process.cwd()}/src/domains/search/lib/SearchForm/styles.css`,
+      `${process.cwd()}/src/lib/ui/SearchForm/styles.css`,
       "utf8",
     );
     const start = styles.lastIndexOf(".ds.search-form .submit {");

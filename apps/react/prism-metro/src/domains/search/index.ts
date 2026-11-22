@@ -5,8 +5,4 @@
  * @module
  */
 
-export {
-  default as offerSearchRoutes,
-  type OfferedSearchRoutes,
-} from "./offerSearchRoutes.js";
 export { searchRoutes } from "./routes.js";

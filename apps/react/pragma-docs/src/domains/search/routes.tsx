@@ -5,6 +5,10 @@ import {
   FilterFold,
   FilterSheet,
   ModeStrip,
+  readSearchState,
+  SearchForm,
+  type SearchValues,
+  searchValues,
   VIEW_PARAMS,
 } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
@@ -12,14 +16,7 @@ import { useSearchParam } from "@canonical/router-react";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { useMessages } from "#i18n";
 import { SiteColophon, SiteRail } from "#lib/ui";
-import {
-  SearchCount,
-  SearchFacets,
-  SearchForm,
-  SearchPage,
-} from "./lib/index.js";
-import { readSearchState, searchValues } from "./searchValues.js";
-import type { SearchValues } from "./types.js";
+import { SearchCount, SearchFacets, SearchPage } from "./lib/index.js";
 import warmSearch from "./warmSearch.js";
 
 /**
@@ -70,7 +67,12 @@ const SearchContent = ({
           <ModeStrip
             count={count}
             fold={<FilterFold count={applied} />}
-            search={<SearchForm text={state.text} />}
+            search={
+              <SearchForm
+                placeholder={t("search.placeholder")}
+                text={state.text}
+              />
+            }
           />
           {hasText ? (
             <StripPart>
@@ -100,7 +102,10 @@ const SearchContent = ({
         {sheetOpen ? (
           <>
             {count}
-            <SearchForm text={state.text} />
+            <SearchForm
+              placeholder={t("search.placeholder")}
+              text={state.text}
+            />
             {hasText ? (
               <StripPart>
                 <SearchFacets {...state} placement="sheet" />

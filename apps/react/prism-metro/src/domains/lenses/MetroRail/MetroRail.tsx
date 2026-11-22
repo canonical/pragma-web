@@ -3,12 +3,12 @@ import {
   collectLenses,
   Rail,
   type RailBrand,
+  SearchIcon,
   ThemeSelector,
 } from "@canonical/prism-core";
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { MESSAGES } from "#i18n";
-import { SearchIcon } from "../SearchIcon/index.js";
 import type { MetroRailProps } from "./types.js";
 
 const METRO_BRAND: RailBrand = {

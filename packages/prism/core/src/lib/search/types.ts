@@ -21,3 +21,19 @@ export interface SearchState {
   /** The page's number, from 1. */
   readonly page: number;
 }
+
+/**
+ * The variables a site's search query takes: the text, one page's size,
+ * the applied types, the cursor, and the windows that tell the groups
+ * that continue and the previous page's cursor.
+ */
+export interface SearchVariables {
+  readonly text: string;
+  readonly first: number;
+  readonly types?: readonly string[];
+  readonly after?: string;
+  readonly hasEarlier?: boolean;
+  readonly earlierFirst?: number;
+  readonly hasPrevious?: boolean;
+  readonly previousFirst?: number;
+}

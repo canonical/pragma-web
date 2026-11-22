@@ -144,6 +144,7 @@ export { collectLenses, routeLensFacet } from "./routeLens/index.js";
 export { createStaticRouter } from "./router/index.js";
 export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
+export * from "./search/index.js";
 export type { StoredThemeProviderProps } from "./theme/index.js";
 export { StoredThemeProvider, useStoredTheme } from "./theme/index.js";
 export type {
@@ -185,6 +186,8 @@ export type {
   RailProps,
   RendererSwitchProps,
   RouterLinkProps,
+  SearchFormProps,
+  SearchIconProps,
   SectionedViewProps,
   SectionedViewSection,
   SourceViewProps,
@@ -222,6 +225,8 @@ export {
   Rail,
   RendererSwitch,
   RouterLink,
+  SearchForm,
+  SearchIcon,
   SectionedView,
   SourceView,
   ThemeSelector,

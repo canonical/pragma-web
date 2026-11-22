@@ -14,10 +14,10 @@ type Story = StoryObj<typeof SearchForm>;
 
 /** The form carrying the address's text. */
 export const Default: Story = {
-  args: { text: "but" },
+  args: { placeholder: "Search the graph", text: "but" },
 };
 
 /** The form on `/search` with no text: the field empty. */
 export const Empty: Story = {
-  args: { text: "" },
+  args: { placeholder: "Search the graph", text: "" },
 };

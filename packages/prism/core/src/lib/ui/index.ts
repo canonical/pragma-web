@@ -23,6 +23,8 @@ export * from "./PaginationBar/index.js";
 export * from "./Rail/index.js";
 export * from "./RendererSwitch/index.js";
 export * from "./RouterLink/index.js";
+export * from "./SearchForm/index.js";
+export * from "./SearchIcon/index.js";
 export * from "./SectionedView/index.js";
 export * from "./SourceView/index.js";
 export * from "./ThemeSelector/index.js";

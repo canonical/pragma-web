@@ -1,10 +1,12 @@
-import { prefetchQuery } from "@canonical/prism-core";
-import buildSearchVariables from "./buildSearchVariables.js";
+import {
+  buildSearchVariables,
+  prefetchQuery,
+  readSearchState,
+  type SearchValues,
+} from "@canonical/prism-core";
 import { SEARCH_DOOR_CLASSES } from "./constants.js";
 import { searchDoorsQueryNode } from "./searchDoorsQuery.js";
 import { searchQueryNode } from "./searchQuery.js";
-import { readSearchState } from "./searchValues.js";
-import type { SearchValues } from "./types.js";
 
 /**
  * Warm the store for the search page: prefetch `MetroSearchQuery` for the

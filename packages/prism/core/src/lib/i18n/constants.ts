@@ -6,6 +6,9 @@
 export const MESSAGES = {
   "canvasSkipLink.label": "Skip to content",
   "rail.label": "Primary",
+  "searchForm.label": "Search",
+  "searchForm.field": "Search text",
+  "searchForm.submit": "Search",
   "themeSelector.label": "Color theme",
   "themeSelector.system": "System",
   "themeSelector.light": "Light",

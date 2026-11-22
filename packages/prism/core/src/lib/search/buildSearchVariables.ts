@@ -1,9 +1,8 @@
 import { SEARCH_PAGE_SIZE } from "./constants.js";
-import type { DocsSearchQuery$variables } from "./searchQuery.js";
-import type { SearchState } from "./types.js";
+import type { SearchState, SearchVariables } from "./types.js";
 
 /**
- * Build the variables of `DocsSearchQuery` for a search text: the text
+ * Build the variables of a site's search query for a search text: the text
  * trimmed and one page of results; with the page's state, the applied
  * type, the cursor the page starts after, from the second page the size
  * of the window that ends where the page starts (whose types tell the
@@ -17,7 +16,7 @@ import type { SearchState } from "./types.js";
 export default function buildSearchVariables(
   text: string,
   state: Partial<Omit<SearchState, "text">> = {},
-): DocsSearchQuery$variables {
+): SearchVariables {
   const { type, after, page = 1 } = state;
   return {
     text: text.trim(),
