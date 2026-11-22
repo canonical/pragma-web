@@ -230,12 +230,12 @@ describe("createStatementsExtensions", () => {
     expect(findGroup(one, `${DS}tier`)?.values).toHaveLength(1);
     const many = await ask({ uri: `${DS}card`, per: 99, dir: "OUT" });
     expect(findGroup(many, `${DS}tier`)?.values).toHaveLength(3);
-    const nested = findGroup(
-      await ask({ uri: `${DS}holder`, per: 1 }),
-      `${DS}part`,
-    )
-      ?.values.at(0)
-      ?.groups?.find(({ predicateUri }) => predicateUri === `${DS}name`);
+    const nested = (
+      findGroup(
+        await ask({ uri: `${DS}holder`, per: 1 }),
+        `${DS}part`,
+      )?.values.at(0)?.groups as readonly ReadGroup[] | undefined
+    )?.find(({ predicateUri }) => predicateUri === `${DS}name`);
     expect(nested?.total).toBe(2);
     expect(nested?.values).toHaveLength(1);
     const unset = await ask({ uri: `${DS}card`, per: null, dir: null });

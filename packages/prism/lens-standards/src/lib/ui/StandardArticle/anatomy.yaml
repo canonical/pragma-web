@@ -93,9 +93,11 @@ node:
                 - node:
                     role: code (the example's code, a pre with its language as data-language)
                     styles:
-                      background: --standard-article-code-background
-                      spacing.padding.block: --standard-article-code-padding-block
-                      spacing.padding.inline: --standard-article-code-padding-inline
+                      appearance.background: color.background.layer2
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.block.end: component.padding.block
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
                   relation: { cardinality: "1", slotName: code }
             relation: { cardinality: "1..*", slotName: example }
       relation: { cardinality: "0..2", slotName: examples }  # the do and dont sections' content
