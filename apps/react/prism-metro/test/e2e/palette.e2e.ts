@@ -6,16 +6,21 @@
  * site's search page for the text; ArrowUp reaches the hand-off line, a
  * link to that page. On the search page `/` focuses its field, Escape
  * clears the field and then leaves it, and Ctrl+K pressed in the field
- * opens the palette on its text.
+ * opens the palette on its text. On the search page at 390 the strip's
+ * fold reaches the field; at 1440 each result's chip is as wide as its
+ * text and the facet bar keeps its content inside its one line.
  */
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
-import type { Browser, Page } from "playwright";
+import type { Browser, Page, ViewportSize } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   CLICK_SETTLE_MS,
+  DESKTOP_VIEWPORT,
   DEV_READY_MS,
   GRAPH_READY_MS,
   PAGE_SETTLE_MS,
+  PHONE_VIEWPORT,
+  SEARCH_MIXED_TEXT,
 } from "./constants.js";
 import startServer from "./startServer.js";
 import type { RunningServer } from "./types.js";
@@ -31,17 +36,18 @@ let browser: Browser;
 const pages: Page[] = [];
 
 /**
- * Open a tab on `path` at 1440 by 900, serving only the cell's and the
- * graph's origins, fonts answered empty and the dev cell's live-reload
- * socket left unconnected, and wait until the page has settled, so the
- * hydrated app receives what the test does next.
+ * Open a tab on `path` at `viewport` (1440 by 900 unless given), serving
+ * only the cell's and the graph's origins, fonts answered empty and the
+ * dev cell's live-reload socket left unconnected, and wait until the page
+ * has settled, so the hydrated app receives what the test does next.
  *
  * @note Impure: opens a browser tab.
  */
-const openPage = async (path: string): Promise<Page> => {
-  const page = await browser.newPage({
-    viewport: { width: 1440, height: 900 },
-  });
+const openPage = async (
+  path: string,
+  viewport: ViewportSize = DESKTOP_VIEWPORT,
+): Promise<Page> => {
+  const page = await browser.newPage({ viewport });
   pages.push(page);
   const origins = new Set([
     new URL(server.base).origin,
@@ -169,5 +175,60 @@ describe("the palette and the search page's field, from the keyboard", () => {
     expect(await findPalette(page).getByRole("combobox").inputValue()).toBe(
       "but",
     );
+  });
+});
+
+describe("the search page's bands and results", () => {
+  it("reaches a field named q through the strip's fold at 390", async () => {
+    const page = await openPage(
+      `/search?q=${SEARCH_MIXED_TEXT}`,
+      PHONE_VIEWPORT,
+    );
+    await page.locator("a.filter-fold").click();
+    await page.waitForURL((url) => url.searchParams.get("sheet") === "filter", {
+      timeout: SETTLE_MS,
+    });
+    const field = page.locator('dialog.filter-sheet[open] input[name="q"]');
+    await field.waitFor({ state: "visible", timeout: SETTLE_MS });
+    expect(await field.inputValue()).toBe(SEARCH_MIXED_TEXT);
+    expect(await field.isEditable()).toBe(true);
+  });
+
+  it("draws each result's chip no wider than its text", async () => {
+    const page = await openPage(`/search?q=${SEARCH_MIXED_TEXT}`);
+    const overhangs = await page
+      .locator(".result > .ds.entity-chip")
+      .evaluateAll((chips) =>
+        chips.map((chip) => {
+          const range = document.createRange();
+          range.selectNodeContents(chip);
+          const style = getComputedStyle(chip);
+          const frame = [
+            style.paddingInlineStart,
+            style.paddingInlineEnd,
+            style.borderInlineStartWidth,
+            style.borderInlineEndWidth,
+          ].reduce((sum, length) => sum + Number.parseFloat(length), 0);
+          return (
+            chip.getBoundingClientRect().width -
+            (range.getBoundingClientRect().width + frame)
+          );
+        }),
+      );
+    expect(overhangs.length).toBeGreaterThan(0);
+    for (const overhang of overhangs) {
+      expect(overhang).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("holds the facet bar to one line, its content inside its box", async () => {
+    const page = await openPage(`/search?q=${SEARCH_MIXED_TEXT}`);
+    const bar = page.locator(".ds.filter-bar");
+    await bar.waitFor({ state: "visible", timeout: SETTLE_MS });
+    const { scrollHeight, clientHeight } = await bar.evaluate((element) => ({
+      scrollHeight: element.scrollHeight,
+      clientHeight: element.clientHeight,
+    }));
+    expect(scrollHeight).toBe(clientHeight);
   });
 });
