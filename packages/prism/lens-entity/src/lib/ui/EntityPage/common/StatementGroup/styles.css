@@ -24,6 +24,13 @@
     padding-inline-start: 0;
   }
 
+  /* A string with no break in it (an address, a long code) wraps
+   * anywhere, so a value never widens a narrow column such as the details
+   * panel past its edge. */
+  .ds.statement-group > .values > .value {
+    overflow-wrap: anywhere;
+  }
+
   /* A nested value: its predicates and their values on one wrapping line. */
   .ds.statement-group > .values > .value > .nested {
     display: flex;

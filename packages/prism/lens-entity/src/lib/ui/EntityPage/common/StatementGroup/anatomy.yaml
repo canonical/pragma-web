@@ -21,6 +21,10 @@ node:
           - node:
               role: value
               element: li
+              # A string with no break in it (an address, a long code)
+              # wraps anywhere, so a value never widens a narrow column
+              # such as the details panel past its edge.
+              styles: { typography.wrap: anywhere }
               edges:
                 - node:
                     role: nested
