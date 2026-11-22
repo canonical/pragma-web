@@ -31,7 +31,7 @@ export interface SearchMatch {
   readonly uri: string;
   /** The field that matched, as its place in `SEARCH_FIELDS`. */
   readonly tier: number;
-  /** Where in that field the text starts, lowercased. */
+  /** Where in that field's value, as written, the text starts. */
   readonly position: number;
   /** The value of the field that matched, as the entry holds it. */
   readonly value: string;

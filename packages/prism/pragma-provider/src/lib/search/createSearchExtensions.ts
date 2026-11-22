@@ -290,7 +290,7 @@ export const createSearchExtensions =
               ...edge,
               match: {
                 field: SEARCH_MATCH_FIELDS[match.tier],
-                ...buildSearchPassage(match.value, needle, match.position),
+                ...buildSearchPassage(match.value, needle),
               },
             };
           },
