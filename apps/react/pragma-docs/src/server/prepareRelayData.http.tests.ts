@@ -71,8 +71,14 @@ const UIBLOCK_CLASS_KEY = `ontologyClass(uri:"${UIBLOCK_TERM}")`;
  */
 const STUB_RESPONSES: Readonly<Record<string, unknown>> = {
   ComponentProbeQuery: COMPONENT_PROBE_RESPONSE,
+  // The selected term answers as a class, as UI Block does in the graph:
+  // an instance's term would also warm its details panel.
   DefinitionsExplorerQuery: {
-    data: { ontologies: [], ontologyClass: null, ontologyProperty: null },
+    data: {
+      ontologies: [],
+      ontologyClass: { __typename: "OntologyClass" },
+      ontologyProperty: null,
+    },
   },
 };
 
