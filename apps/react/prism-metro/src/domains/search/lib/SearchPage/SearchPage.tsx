@@ -14,8 +14,16 @@ import { useLazyLoadQuery } from "react-relay";
 import { useMessages } from "#i18n";
 import { MetroChipProjection } from "#lib/ui";
 import buildSearchVariables from "../../buildSearchVariables.js";
-import { SEARCH_PAGE_SIZE, SEARCH_TITLE_ID } from "../../constants.js";
+import {
+  SEARCH_DOOR_CLASSES,
+  SEARCH_PAGE_SIZE,
+  SEARCH_TITLE_ID,
+} from "../../constants.js";
 import groupSearchEdges from "../../groupSearchEdges.js";
+import {
+  type MetroSearchDoorsQuery,
+  searchDoorsQueryNode,
+} from "../../searchDoorsQuery.js";
 import { type MetroSearchQuery, searchQueryNode } from "../../searchQuery.js";
 import type { SearchValues } from "../../types.js";
 import type { SearchPageProps } from "./types.js";
@@ -142,11 +150,21 @@ function SearchResults({
 }
 
 /**
- * The empty state: what the field is for, and the site's lenses as doors.
+ * The empty state: what the field is for, and the site's lenses as doors,
+ * each with the total of the class it lists; a lens that lists no single
+ * class shows no total.
+ *
+ * @note Impure: reads `MetroSearchDoorsQuery` from the Relay store,
+ *   fetching it when the store lacks it.
  */
 function SearchDoors(): ReactElement {
   const t = useMessages();
   const router = useRouter();
+  const totals: Readonly<
+    Record<string, { readonly totalCount: number } | undefined>
+  > = useLazyLoadQuery<MetroSearchDoorsQuery>(searchDoorsQueryNode, {
+    ...SEARCH_DOOR_CLASSES,
+  });
   return (
     <>
       <p className="summary">{t("search.empty")}</p>
@@ -158,6 +176,9 @@ function SearchDoors(): ReactElement {
                 <Icon />
               </span>
               <span className="name">{label}</span>
+              {totals[name] !== undefined && (
+                <span className="total">{totals[name].totalCount}</span>
+              )}
             </Link>
           </li>
         ))}
@@ -170,13 +191,14 @@ function SearchDoors(): ReactElement {
  * The search route's page: its title (the document's title too), then
  * the results for the address's text, grouped by type and paged by
  * `SEARCH_PAGE_SIZE`; the no-match state when nothing matches; and the
- * lenses as doors when the address carries no text.
+ * lenses as doors, with their totals, when the address carries no text.
  *
  * `import { SearchPage } from "./lib/index.js";`
  *
  * @implements metro.component.search_page
  * @note Impure: reads `MetroSearchQuery` from the Relay store when the
- *   address carries a text, fetching it when the store lacks it.
+ *   address carries a text, `MetroSearchDoorsQuery` when it carries none,
+ *   fetching either when the store lacks it.
  */
 export default function SearchPage({
   text,

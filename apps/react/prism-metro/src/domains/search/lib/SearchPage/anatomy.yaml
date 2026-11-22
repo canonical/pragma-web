@@ -103,5 +103,11 @@ node:
                 - node:
                     role: name
                   relation: { cardinality: "1", slotName: name }
+                - node:
+                    role: total of the class the lens lists, muted, in tabular figures
+                    styles:
+                      typography.color: color.text.muted
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "0..1", slotName: total }
             relation: { cardinality: "1..*", slotName: door }
       relation: { cardinality: "0..1", slotName: doors }

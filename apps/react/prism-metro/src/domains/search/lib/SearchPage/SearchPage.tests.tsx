@@ -132,6 +132,33 @@ describe("SearchPage", () => {
     expect(document.querySelector(".ds.search-page .results")).toBeNull();
   });
 
+  it("gives each door its class's total and none where no class is listed (W8-A9)", async () => {
+    const response = await fetch(graph.url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        query:
+          '{ facetedInstances(classUri: "metro:Station", first: 0) { totalCount } }',
+      }),
+    });
+    const { data } = (await response.json()) as {
+      data: { facetedInstances: { totalCount: number } };
+    };
+    renderLensPage("/search", graph.url);
+    const doors = await screen.findByRole("list", { name: "Lenses to browse" });
+    await waitFor(() =>
+      expect(
+        doors.querySelector('a.door[href="/stations"] .total')?.textContent,
+      ).toBe(String(data.facetedInstances.totalCount)),
+    );
+    expect(data.facetedInstances.totalCount).toBeGreaterThan(0);
+    expect(doors.querySelector('a.door[href="/lines"] .total')).not.toBeNull();
+    expect(doors.querySelector('a.door[href="/fleet"] .total')).not.toBeNull();
+    expect(
+      doors.querySelector('a.door[href="/definitions"] .total'),
+    ).toBeNull();
+  });
+
   it("offers the next steps when nothing matches (W8-A9)", async () => {
     renderLensPage("/search?q=zzzz", graph.url);
     await screen.findByText("Nothing matches the search.");
