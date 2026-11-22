@@ -46,6 +46,18 @@ describe("SearchForm", () => {
     expect(field).not.toHaveFocus();
   });
 
+  it("leaves every other key, and an Escape an input method composes, to the field", () => {
+    render(<SearchForm text="but" />);
+    const field = screen.getByRole("searchbox");
+    field.focus();
+    expect(fireEvent.keyDown(field, { key: "a" })).toBe(true);
+    expect(fireEvent.keyDown(field, { key: "Escape", isComposing: true })).toBe(
+      true,
+    );
+    expect(field).toHaveValue("but");
+    expect(field).toHaveFocus();
+  });
+
   it("applies custom className", () => {
     render(<SearchForm className="custom-class" text="" />);
     const form = screen.getByRole("form", { name: MESSAGES["search.title"] });
