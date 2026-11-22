@@ -2,7 +2,7 @@
 # NetworkLinePage — the content of /network/lines/:uri, a document. It
 # renders prism-core's DocumentLayout with the metro rail, the network
 # strip (its trail and the page's renderers, the page and its Turtle) and,
-# in the three-column aside, the line's LinePanel; its own root is the main
+# in the three-column aside, the line's EntityPanel; its own root is the main
 # column: a subgrid of the canvas's page over every column, holding the
 # line's title and one RouteStrip per route the line draws, or its
 # not-found, loading or error status. It renders its own archetype because

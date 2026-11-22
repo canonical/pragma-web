@@ -2,7 +2,6 @@
 
 export * from "./EntityDetail/index.js";
 export * from "./EntityHeader/index.js";
-export * from "./EntityHeading/index.js";
 export * from "./EntitySummary/index.js";
 export * from "./ReferencedByGroup/index.js";
 export * from "./StatementGroup/index.js";

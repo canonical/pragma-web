@@ -60,7 +60,6 @@ describe("the lens's components", () => {
       "Trail",
       "EntityDetail",
       "EntityHeader",
-      "EntityHeading",
       "EntitySummary",
       "ReferencedByGroup",
       "StatementGroup",
