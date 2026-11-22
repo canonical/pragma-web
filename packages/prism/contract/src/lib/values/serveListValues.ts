@@ -49,6 +49,10 @@ interface ClassInstancesData {
           };
         };
       }[];
+      readonly pageInfo: {
+        readonly hasNextPage: boolean;
+        readonly endCursor: string | null;
+      };
     };
   };
 }
@@ -147,12 +151,23 @@ export async function serveFacetedInstances(
         (field.facetable || field.id === args.sort?.field),
     )
     .map((field) => field.id);
-  const data = (await run(CLASS_INSTANCES_QUERY, {
-    uri: ontologyClass.uri,
-    first: ontologyClass.instanceCount,
-  })) as ClassInstancesData;
+  // A provider caps each page of a connection, so the instances are read
+  // page by page until the last.
+  const edges: ClassInstancesData["ontologyClass"]["instances"]["edges"][number][] =
+    [];
+  let after: string | null = null;
+  do {
+    const data = (await run(CLASS_INSTANCES_QUERY, {
+      uri: ontologyClass.uri,
+      first: ontologyClass.instanceCount,
+      after,
+    })) as ClassInstancesData;
+    const { pageInfo } = data.ontologyClass.instances;
+    edges.push(...data.ontologyClass.instances.edges);
+    after = pageInfo.hasNextPage ? pageInfo.endCursor : null;
+  } while (after !== null);
   const rows: FacetRow[] = await Promise.all(
-    data.ontologyClass.instances.edges.map(async ({ node }) => ({
+    edges.map(async ({ node }) => ({
       uri: node.uri,
       values: {
         ...(await readFieldValues(
