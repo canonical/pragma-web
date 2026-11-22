@@ -54,11 +54,12 @@ const componentCssClassName = "ds entity-panel";
 /**
  * The details panel of one entity, wherever a workspace inspects it: the
  * identity (its name, Open beside it when the site gives it a home, its
- * class's chip and its compact address) and its values, both open; then
- * each relation the entity holds and each group of what references it, a
- * closed disclosure whose summary carries the group's label and its true
- * count, which opens on the group's values (12, then how many of them it
- * shows). The disclosures are native, so the panel works without
+ * class's chip and its compact address) and its prominent values, both
+ * open; then each other group the entity holds (a value, a value held by
+ * it such as a line's routes, or a relation) and each group of what
+ * references it, a closed disclosure whose summary carries the group's
+ * label and its true count, which opens on the group's values (12, then
+ * how many of them it shows). The disclosures are native, so the panel works without
  * scripting, and it takes no generated id, so the server's markup and the
  * hydrated tree agree. A site whose provider does not serve `statements`
  * gets the identity alone; an IRI nothing answers to renders the
@@ -120,15 +121,15 @@ export default function EntityPanel({
   const outgoing = served ? statements.outgoing : null;
   const incoming = served ? statements.incoming : null;
   const partition = partitionStatements(outgoing?.groups ?? [], node._meta);
-  const values = [
-    ...partition.prominent,
-    ...partition.values.map(({ group }) => group),
-  ].map(
+  const values = partition.prominent.map(
     (group): KeyValuePair => ({
       id: group.predicateUri,
       term: labelOutgoingGroup(group, ontologies),
       value: <StatementGroup group={group} />,
     }),
+  );
+  const groups = [...partition.values, ...partition.relations].map(
+    ({ group }) => group,
   );
   const nameInverse = (inverse: string): string =>
     t("statements.inverse", { label: inverse });
@@ -156,7 +157,7 @@ export default function EntityPanel({
       {values.length === 0 ? null : (
         <KeyValueList className="values" pairs={values} />
       )}
-      {partition.relations.map(({ group }) => (
+      {groups.map((group) => (
         <details className="group" key={group.predicateUri}>
           <summary className="summary">
             {t("statements.group", {

@@ -1,8 +1,9 @@
 ---
 # EntityPanel (lens-entity src/lib/ui/EntityPanel/): the details panel, PS15
 # V2. Identity (mark, name, class, address) with Open beside the title,
-# prominent values open as a KeyValueList, then each relation group and
-# each Referenced by group as a closed <details> (Accordion item, works
+# prominent values open as a KeyValueList, then every other outgoing group
+# (a value, a value held by the entity such as a line's routes, a relation)
+# and each Referenced by group as a closed <details> (Accordion item, works
 # without JS) whose summary carries the label and the count. Not a second
 # SectionedView. No useId: aria-labels and fixed ids only.
 #
@@ -38,7 +39,7 @@ node:
     - node: { role: not-found, element: p, styles: { spacing.external.block.start: 0, spacing.external.block.end: 0, typography.color: color.text.muted } }
       relation: { cardinality: "0..1", slotName: not-found }   # instead of every other part
     - node: { role: values, element: dl }
-      relation: { cardinality: "0..1", slotName: values }
+      relation: { cardinality: "0..1", slotName: values }      # the prominent values
     - node:
         role: group
         element: details
@@ -47,7 +48,7 @@ node:
             relation: { cardinality: "1", slotName: summary }  # label + count
           - node: { role: body, element: div }
             relation: { cardinality: "1", slotName: body }     # StatementGroup
-      relation: { cardinality: "0..*", slotName: group }       # a relation, closed
+      relation: { cardinality: "0..*", slotName: group }       # any other outgoing group, closed
     - node:
         role: referenced-by
         element: section

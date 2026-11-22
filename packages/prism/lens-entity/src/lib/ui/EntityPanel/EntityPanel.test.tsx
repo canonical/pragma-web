@@ -94,7 +94,18 @@ describe("EntityPanel", () => {
     expect(panel?.querySelector(".identity .address")?.textContent).toBe(
       CIRCLE_LINE_CURIE,
     );
-    expect(panel?.querySelector(":scope > dl.values")).not.toBeNull();
+    // Only the prominent values are open; a value the line holds, such as
+    // its routes, is a closed group like its relations (M18).
+    expect(
+      [...(panel?.querySelectorAll(":scope > dl.values dt") ?? [])].map(
+        ({ textContent }) => textContent,
+      ),
+    ).toEqual(["code"]);
+    expect(
+      [...(panel?.querySelectorAll(":scope > details.group > summary") ?? [])].map(
+        ({ textContent }) => textContent,
+      ),
+    ).toEqual(["colour · 1", "routes · 2", "formations · 1"]);
     const groups = [...(panel?.querySelectorAll("details.group") ?? [])];
     expect(groups.length).toBeGreaterThan(0);
     for (const group of groups) {
