@@ -116,7 +116,7 @@ function renderInspector(
 function sectionOf(panel: HTMLElement, name: string | RegExp): HTMLElement {
   const section = within(panel)
     .getByRole("heading", { level: 3, name })
-    .closest(".section");
+    .closest<HTMLElement>(".section");
   if (section === null) throw new Error(`no section ${String(name)}`);
   return section;
 }
