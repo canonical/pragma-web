@@ -24,7 +24,7 @@ import {
 import type { Browser, Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { COMPONENT_TITLE } from "../../testing/fixtures.js";
-import { DEV_READY_MS, PAGE_SETTLE_MS } from "./constants.js";
+import { DEV_READY_MS, FOCUS_SETTLE_MS, PAGE_SETTLE_MS } from "./constants.js";
 import { type RunningServer, startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
@@ -318,6 +318,13 @@ describe("the command palette", () => {
     ).toBeGreaterThan(0);
     await kind.click();
     const field = findPalette(page).getByRole("combobox");
+    // The palette reads the selection in the task after the click, so the
+    // focus comes back then, not within the click.
+    await page.waitForFunction(
+      (input) => input === document.activeElement,
+      await field.elementHandle(),
+      { timeout: FOCUS_SETTLE_MS },
+    );
     expect(
       await field.evaluate((input) => input === document.activeElement),
     ).toBe(true);
