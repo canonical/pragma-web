@@ -125,6 +125,36 @@ describe("SearchPage", () => {
     expect(next?.getAttribute("href")).toMatch(/[?&]after=/);
   });
 
+  it("draws no pagination bar when the results fit one page (W8-A9)", async () => {
+    renderLensPage("/search?q=northgate", graph.url);
+    await findPassages();
+    const total = Number(
+      (await screen.findByText(/^\d+ results?$/)).textContent?.split(" ")[0],
+    );
+    expect(total).toBeLessThanOrEqual(20);
+    expect(
+      document.querySelector(".ds.search-page .ds.pagination-bar"),
+    ).toBeNull();
+  });
+
+  it("holds the field and the Type facet in the open filter sheet", async () => {
+    renderLensPage("/search?q=the&sheet=filter", graph.url);
+    await findPassages();
+    const sheet = document.querySelector('[data-region="filter-sheet"]');
+    expect(sheet?.querySelector("form")).not.toBeNull();
+    await waitFor(() =>
+      expect(sheet?.querySelector(".ds.type-facet-bar")).not.toBeNull(),
+    );
+  });
+
+  it("holds only the field in the open filter sheet when there is no text", async () => {
+    renderLensPage("/search?sheet=filter", graph.url);
+    await screen.findByRole("list", { name: "Lenses to browse" });
+    const sheet = document.querySelector('[data-region="filter-sheet"]');
+    expect(sheet?.querySelector("form")).not.toBeNull();
+    expect(sheet?.querySelector(".ds.type-facet-bar")).toBeNull();
+  });
+
   it("offers the lenses as doors when the address carries no text (W8-A9)", async () => {
     renderLensPage("/search", graph.url);
     const doors = await screen.findByRole("list", { name: "Lenses to browse" });
