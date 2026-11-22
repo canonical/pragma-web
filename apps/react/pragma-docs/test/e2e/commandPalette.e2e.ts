@@ -4,8 +4,8 @@
  * The command palette in a real browser, end to end: the dev cell (its
  * graph server alongside) serves the lobby, and Chromium drives the palette
  * as a reader does. Ctrl+K opens it with the field focused; a component's
- * title lists its matches with the first highlighted and its card in the
- * preview, flush in its panel; the arrow keys move the highlight and the preview with it; Tab
+ * title lists its matches; ArrowDown highlights the first, its card in
+ * the preview, flush in its panel; the arrow keys move the highlight and the preview with it; Tab
  * leaves the field for the preview's link, never for the scrolling results;
  * a drag in the preview selects its text, and a click there gives the field
  * the focus back;
@@ -87,14 +87,20 @@ const openLobby = async (
 const findPalette = (page: Page) => page.locator("dialog.command-palette");
 
 /**
- * Open the palette with `chord` and search for `text`, waiting until a
- * result is highlighted.
+ * Open the palette with `chord`, search for `text`, and highlight the
+ * first result with ArrowDown, waiting until it is highlighted.
  *
  * @note Impure: drives the tab.
  */
 const search = async (page: Page, text: string, chord = "Control+k") => {
   await page.keyboard.press(chord);
   await page.keyboard.type(text);
+  await findPalette(page)
+    .getByRole("option")
+    .first()
+    .waitFor({ timeout: PAGE_SETTLE_MS });
+  // Typing highlights no result; the first arrow press highlights the first.
+  await page.keyboard.press("ArrowDown");
   await findPalette(page)
     .getByRole("option", { selected: true })
     .waitFor({ timeout: PAGE_SETTLE_MS });
