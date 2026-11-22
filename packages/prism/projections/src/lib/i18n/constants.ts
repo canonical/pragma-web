@@ -33,4 +33,5 @@ export const MESSAGES = {
   "renderer.cards": "Cards",
   "table.title": "Name",
   "searchResultGroup.count": "· {count}",
+  "searchResultGroup.continued": "· {count}, continued",
 } as const;

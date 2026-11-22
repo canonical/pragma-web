@@ -15,4 +15,13 @@ describe("SearchResultGroup SSR", () => {
     expect(html).toContain("· 1");
     expect(html).toContain("<li>The ds selector namespace</li>");
   });
+
+  it("says a group that began on an earlier page continues", () => {
+    const html = renderToString(
+      <SearchResultGroup continued count={29} title="Code Standard">
+        <li>A standard</li>
+      </SearchResultGroup>,
+    );
+    expect(html).toContain("· 29, continued");
+  });
 });

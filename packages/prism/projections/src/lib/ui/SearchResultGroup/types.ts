@@ -5,6 +5,11 @@ type OwnProps = {
   readonly title: string;
   /** How many results the type holds. */
   readonly count: number;
+  /**
+   * Whether the group began on an earlier page: its heading then says it
+   * continues.
+   */
+  readonly continued?: boolean;
   /** The group's rows: one `<li>` per result, in rank order. */
   readonly children: ReactNode;
 };

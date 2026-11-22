@@ -9,7 +9,8 @@ const componentCssClassName = "ds search-result-group";
 
 /**
  * One type's results on a search page: a heading naming the type and its
- * count, then the rows the site renders for them, in rank order. The
+ * total (followed by "continued" when the group began on an earlier
+ * page), then the rows the site renders for them, in rank order. The
  * section is named by its type.
  *
  * `import { SearchResultGroup } from "@canonical/prism-projections";`
@@ -19,6 +20,7 @@ const componentCssClassName = "ds search-result-group";
 export default function SearchResultGroup({
   title,
   count,
+  continued = false,
   children,
   className,
   ...props
@@ -33,7 +35,12 @@ export default function SearchResultGroup({
       <h2 className="heading">
         <span className="title">{title}</span>{" "}
         <span className="count">
-          {t("searchResultGroup.count", { count: String(count) })}
+          {t(
+            continued
+              ? "searchResultGroup.continued"
+              : "searchResultGroup.count",
+            { count: String(count) },
+          )}
         </span>
       </h2>
       <ol className="rows">{children}</ol>
