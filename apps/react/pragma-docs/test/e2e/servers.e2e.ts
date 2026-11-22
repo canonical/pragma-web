@@ -432,9 +432,11 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(
               drawnClassTerms.filter((term) => !railClassTerms.includes(term)),
             ).toEqual([]);
-            expect(drawnClassTerms.length + boxedClassCount).toBe(
-              railClassTerms.length,
-            );
+            // A term page draws the term's neighbourhood (W7b), not every
+            // class: what it draws and boxes is at most what the rail lists.
+            expect(
+              drawnClassTerms.length + boxedClassCount,
+            ).toBeLessThanOrEqual(railClassTerms.length);
             expect(railClassTerms.length).toBeGreaterThan(20);
             expect(drawnClassTerms.length).toBeGreaterThan(0);
             expect(wellNodeCount).toBeGreaterThan(20);
