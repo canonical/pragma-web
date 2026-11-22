@@ -26,9 +26,9 @@ const RECORDED = metroResponses.find(
 /**
  * The recorded "serves lines" group, its first line kept beside a value of
  * every other kind and one of a kind the reader does not know, its total
- * past what it holds.
+ * past what it holds, then any values `extra` adds.
  */
-const craftAnswer = () => {
+const craftAnswer = (extra: readonly unknown[] = []) => {
   const answer = structuredClone(RECORDED?.response) as {
     data: {
       outgoing: {
@@ -85,6 +85,7 @@ const craftAnswer = () => {
     },
     // A kind a later contract may add, which this reader does not know.
     { __typename: "StatementQuoted" },
+    ...extra,
   ];
   answer.data.outgoing.groups = [group];
   return answer;
@@ -103,9 +104,9 @@ const FirstGroup = (): ReactElement => {
 };
 
 /** The group over a store holding the crafted answer. */
-const renderGroup = async () => {
+const renderGroup = async (extra: readonly unknown[] = []) => {
   const fetchFn = createFetchSpy();
-  fetchFn.mockResolvedValue(craftAnswer());
+  fetchFn.mockResolvedValue(craftAnswer(extra));
   const environment = createEnvironment({ fetchFn });
   await fetchQuery(environment, entityStatementsQueryNode, {
     uri: URI,
@@ -141,6 +142,19 @@ describe("StatementGroup", () => {
       ),
     ).toEqual(["latitude 51.5074", "longitude -0.1278"]);
     expect(values.at(5)?.childNodes).toHaveLength(0);
+  });
+
+  it("draws a node once though several of the group's values name it", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const first = craftAnswer().data.outgoing.groups.at(0)?.values.at(0);
+    const { container } = await renderGroup([first]);
+    expect(container.querySelectorAll(".values > .value")).toHaveLength(6);
+    expect(
+      container.querySelectorAll(
+        '.values a[href="/lines/metro%3Acircle-line"]',
+      ),
+    ).toHaveLength(1);
   });
 
   it("ends a group cut at its bound with how many of its values it shows, never a link", {

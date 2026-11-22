@@ -82,7 +82,9 @@ type HeldValue = NestedValue["groups"][number]["values"][number];
 
 /**
  * One predicate group's values as a section's content: each node as its
- * linked chip, which links through the site's homes; each literal as text
+ * linked chip, which links through the site's homes, once, though several
+ * values the node holds (a line's routes calling at a station) name it;
+ * each literal as text
  * in its language; at most the provider's bound of values (12 by default),
  * then, when the group holds more than it shows, one muted line that says
  * how many of them it shows. The group's count stands in the section's
@@ -107,7 +109,7 @@ export default function StatementGroup({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <ul className="values">
-        {values.map((value, index) => (
+        {listDistinctValues(values).map((value, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: a value has no identity but its place in the provider's order
           <li className="value" key={index}>
             {renderValue(value, t("statements.nested"))}
@@ -121,6 +123,23 @@ export default function StatementGroup({
       ) : null}
     </div>
   );
+}
+
+/**
+ * The values with each node kept at its first place only: the provider
+ * names a value without an IRI, such as a route, by the node that holds
+ * it, so one holder can stand for several of a group's values.
+ */
+function listDistinctValues(
+  values: readonly StatementValue[],
+): readonly StatementValue[] {
+  const seen = new Set<string>();
+  return values.filter((value) => {
+    if (value.__typename !== "StatementNode") return true;
+    if (seen.has(value.node.uri)) return false;
+    seen.add(value.node.uri);
+    return true;
+  });
 }
 
 /**
