@@ -174,12 +174,6 @@ export interface RelationSection<G> {
 export type StatementSection<G> = ValuesSection<G> | RelationSection<G>;
 
 /**
- * How many values a field takes on its class: exactly one, at most one, one
- * or more, or any number.
- */
-export type Cardinality = "one" | "optional" | "many" | "any";
-
-/**
  * The index operation's variables as the lens builds them: each filter's
  * values a list, a value's IRI or null for the "none" bucket.
  */
