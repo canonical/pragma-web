@@ -16,6 +16,5 @@ node:
     - node: { role: title, element: h3, styles: { layout.grid.column: "1 / -1", spacing.external.block.start: 0, spacing.external.block.end: 0 } }
       relation: { cardinality: "1", slotName: title }   # label + count
     - node:
-        uri: prism.subcomponent.statement_group
-        styles: { layout.grid.column: "1 / -1" }
+        uri: prism.subcomponent.statement_group   # spans every column itself
       relation: { cardinality: "1", slotName: values }

@@ -1,8 +1,9 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* One group of what references the entity: its title, then its values,
-   * each across every column of the section. */
+  /* One group of what references the entity: its title, then its values
+   * (a StatementGroup, which spans every column itself), each across every
+   * column of the section. */
   .ds.referenced-by-group {
     --referenced-by-group-gap: var(--grid-gutter);
 
@@ -16,9 +17,5 @@
     grid-column: 1 / -1;
     margin-block-start: 0;
     margin-block-end: 0;
-  }
-
-  .ds.referenced-by-group > .ds.statement-group {
-    grid-column: 1 / -1;
   }
 }

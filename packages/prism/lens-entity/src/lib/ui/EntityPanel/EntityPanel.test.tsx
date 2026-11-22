@@ -104,9 +104,9 @@ describe("EntityPanel", () => {
       ),
     ).toEqual(["code"]);
     expect(
-      [...(panel?.querySelectorAll(":scope > details.group > summary") ?? [])].map(
-        ({ textContent }) => textContent,
-      ),
+      [
+        ...(panel?.querySelectorAll(":scope > details.group > summary") ?? []),
+      ].map(({ textContent }) => textContent),
     ).toEqual(["colour · 1", "routes · 2", "formations · 1"]);
     const groups = [...(panel?.querySelectorAll("details.group") ?? [])];
     expect(groups.length).toBeGreaterThan(0);

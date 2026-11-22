@@ -62,6 +62,7 @@ describe("the lens's components", () => {
       "EntityHeader",
       "EntityHeading",
       "EntitySummary",
+      "ReferencedByGroup",
       "StatementGroup",
     ]);
   });
