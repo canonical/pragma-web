@@ -6,7 +6,12 @@
 
 import type { HomeNode, HomeResolver, Homes } from "@canonical/prism-core";
 import { type Router, route } from "@canonical/router-core";
-import type { ClassPayload, NodePayload, ShelfSearchSchema } from "./types.js";
+import type {
+  ClassPayload,
+  NodePayload,
+  SearchPageSearchSchema,
+  ShelfSearchSchema,
+} from "./types.js";
 
 /**
  * The shelf page's search schema, in the Standard Schema shape the router
@@ -24,14 +29,34 @@ const SHELF_SEARCH: ShelfSearchSchema = {
 };
 
 /**
- * A site's route table: one entity page, addressed by the entity, and a
- * shelf of entities, which keeps the view it shows in its search.
+ * The search page's search schema: it reads the text searched for, and
+ * never fails.
+ */
+const SEARCH_PAGE_SEARCH: SearchPageSearchSchema = {
+  "~standard": {
+    version: 1,
+    vendor: "prism-command-palette-testing",
+    validate: (value) => ({
+      value: { q: String((value as Record<string, unknown>).q ?? "") },
+    }),
+  },
+};
+
+/**
+ * A site's route table: one entity page, addressed by the entity, a shelf
+ * of entities, which keeps the view it shows in its search, and the search
+ * page, which keeps the text searched for in its own.
  */
 export const ROUTES = {
   thing: route({ url: "/things/:uri", content: () => null }),
   shelf: route({
     url: "/shelves/:uri",
     search: SHELF_SEARCH,
+    content: () => null,
+  }),
+  search: route({
+    url: "/search",
+    search: SEARCH_PAGE_SEARCH,
     content: () => null,
   }),
 } as const;

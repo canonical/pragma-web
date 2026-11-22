@@ -45,3 +45,15 @@ export type ShelfSearchSchema = StandardSchemaV1<
   Readonly<Record<string, unknown>>,
   ShelfSearch
 >;
+
+/** What the search page reads from its search parameters. */
+export interface SearchPageSearch {
+  /** The text searched for. */
+  readonly q: string;
+}
+
+/** The search page's search schema, over the raw search parameters. */
+export type SearchPageSearchSchema = StandardSchemaV1<
+  Readonly<Record<string, unknown>>,
+  SearchPageSearch
+>;

@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { RouterLink } from "@canonical/prism-core";
 import {
   CardProjection,
   ProjectionLinkProvider,
@@ -89,7 +90,8 @@ const componentCssClassName = "ds command-palette-search";
  * The field's text, trimmed, reaches the graph's search deferred: while the
  * next results load, the last ones stay on screen and the listbox is busy.
  * The hand-off line carries the field's text itself, so Enter opens the
- * search page for what the field reads, loaded or not.
+ * search page for what the field reads, loaded or not; it is the site's
+ * link, so following it navigates the router instead of loading a document.
  * Each session of the palette searches afresh, so a failed search is
  * retried once the palette reopens.
  * An empty field sends no query and shows a one-line hint; a text nothing
@@ -352,7 +354,7 @@ export default function CommandPaletteSearch({
       </div>
       {handoffHref === undefined ? null : (
         <p className="handoff">
-          <a
+          <RouterLink
             className={onHandoff ? "link is-active" : "link"}
             href={handoffHref}
             id={handoffId}
@@ -361,7 +363,7 @@ export default function CommandPaletteSearch({
             ref={handoff}
           >
             {t("palette.handoff", { text: typed })}
-          </a>
+          </RouterLink>
         </p>
       )}
     </div>

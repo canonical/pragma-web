@@ -314,19 +314,20 @@ describe("CommandPaletteSearch", () => {
       RANKED_RESULTS,
       searchHref,
     );
-    const navigate = vi.spyOn(router, "navigate");
     const handoff = screen.getByRole("link", {
       name: "Search everything for “but”",
     });
-    let followed = "";
-    handoff.addEventListener("click", (event) => {
-      followed = handoff.getAttribute("href") ?? "";
-      event.preventDefault();
+    let loadsDocument = true;
+    handoff.ownerDocument.addEventListener("click", (event) => {
+      loadsDocument = !event.defaultPrevented;
     });
     fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
-    expect(followed).toBe("/search?q=but");
     expect(onChoose).toHaveBeenCalledTimes(1);
-    expect(navigate).not.toHaveBeenCalled();
+    expect(loadsDocument).toBe(false);
+    await waitFor(() =>
+      expect(router.getState().location.pathname).toBe("/search"),
+    );
+    expect(router.getState().location.href).toBe("/search?q=but");
   });
 
   it("hands the field's text to the search page while its results still load (W8-A4)", async () => {
