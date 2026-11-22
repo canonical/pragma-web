@@ -770,3 +770,4 @@ type CarPosition {
   carType: CarType!
   reversed: Boolean!
 }
+
