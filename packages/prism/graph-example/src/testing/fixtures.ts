@@ -84,6 +84,7 @@ export const LENS_OPERATION_VARIABLES: Record<
     cursor: null,
   },
   EntityNamespacesQuery: {},
+  EntityPanelQuery: { id: SAMPLE_ENTITY_URI },
   EntityPageQuery: { id: SAMPLE_ENTITY_URI, classUri: SAMPLE_CLASS_URI },
   EntityStatementsQuery: { uri: SAMPLE_ENTITY_URI },
 };
@@ -1343,8 +1344,8 @@ export const TURTLE_METRO_LENS: readonly LensReadingClass[] = [
           uri: "https://metro.example/onto#calls",
           visibility: null,
           pluralLabel: null,
-          inverseLabel: null,
-          inversePluralLabel: null,
+          inverseLabel: "Called at by",
+          inversePluralLabel: "Called at by",
           inverseVisibility: null,
         },
         group: {
