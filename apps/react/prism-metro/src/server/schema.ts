@@ -12,6 +12,7 @@
  * palette's search would run with its root field stripped. The block's
  * fields are therefore spliced into the contract's `type Query { … }` and
  * the block itself is dropped; the rest of the SDL is written as emitted.
+ * It writes the schema of the build without search beside it.
  */
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -22,7 +23,15 @@ const SCHEMA_PATH = fileURLToPath(
   new URL("../relay/schema.graphql", import.meta.url),
 );
 
-/** The provider's one `extend type Query { … }` block, with its fields. */
+/**
+ * The schema the provider serves with `PRISM_SEARCH=off`, without search:
+ * Relay compiles against the full schema in both builds, and a test pins
+ * the off build's extensions to this one.
+ */
+const NO_SEARCH_SCHEMA_PATH = fileURLToPath(
+  new URL("../../testing/schema.no-search.graphql", import.meta.url),
+);
+
 /** An `extend type` or `extend interface` block, its kind, name and fields. */
 const EXTENSION_BLOCK =
   /^extend (type|interface) (\w+) \{\n([\s\S]*?)\n\}\n\n?/m;
@@ -53,5 +62,9 @@ const foldExtensions = (sdl: string): string => {
 };
 
 writeFileSync(SCHEMA_PATH, `${foldExtensions(createExampleProvider().sdl)}\n`);
+writeFileSync(
+  NO_SEARCH_SCHEMA_PATH,
+  `${foldExtensions(createExampleProvider(undefined, undefined, { search: false }).sdl)}\n`,
+);
 
-console.info(`[schema] wrote ${SCHEMA_PATH}`);
+console.info(`[schema] wrote ${SCHEMA_PATH} and ${NO_SEARCH_SCHEMA_PATH}`);

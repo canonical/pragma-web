@@ -46,6 +46,9 @@ export default defineConfig(({ mode }) => ({
     }),
     react(),
   ],
+  // `PRISM_SEARCH` reaches the bundles beside the `VITE_` variables, so a
+  // build run with `PRISM_SEARCH=off` offers no search (`readSearchSetting`).
+  envPrefix: ["VITE_", "PRISM_"],
   // Honour the PORT env var for `dev` and `preview`, as the SSR servers do.
   server: { port: PORT },
   preview: { port: PORT },

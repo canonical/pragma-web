@@ -1,0 +1,772 @@
+# =============================================================================
+# The Prism data contract.
+#
+# The MINIMAL GraphQL surface any provider must offer for the docsite to run.
+# It is derived from a ke-graphql emission in its DEFAULT configuration — the
+# part no ontology choice can vary:
+#
+#   - the Node interface and PageInfo (compiler/compose.ts)
+#   - NodeConnection / NodeEdge (compiler/compose.ts, the connection factory)
+#   - the hand-written TBox (lib/tbox/buildTBoxSchema.ts): Ontology,
+#     OntologyClass, ClassProperty, OntologyProperty, PropertyKind, EntityMeta
+#   - root fields ontologies / ontology / ontologyClass / ontologyProperty
+#     (buildTBoxSchema.ts) and node(id:) (compiler/wireRelay.ts)
+#
+# Identity is `uri: ID!` — the entity's ABSOLUTE IRI — and every descriptive
+# fact lives behind `_meta: EntityMeta!`. There is no `id`, no `kind`, and no
+# top-level label/comment/definition on Node: the interface is identity plus
+# self-description and nothing else. `_meta.title` is TOTAL (the provider
+# computes a fallback), `_meta.label` is asserted-only and may be null.
+#
+# The contract names NO ontology terms — every type and field here is
+# structural. It is therefore independent of the provider's field-name
+# `prefixing` knob: a schema compiled with `prefixing: "all"` satisfies it
+# exactly as one compiled with `prefixing: "none"` does.
+#
+# Not every compiler option is neutral, though. `relay: false` skips the pass
+# that wires `node(id:)`, so a schema compiled that way fails this contract by
+# exactly that one field. An option that withholds part of the surface the
+# docsite needs produces a non-conforming provider by construction; the relay
+# control in satisfiesContract.test.ts pins that it fails by that field and no
+# other.
+#
+# Deliberately NOT in the contract:
+#
+#   - @defer / @stream. Conditional on `incremental: true`, so a provider that
+#     runs without incremental delivery is still conformant.
+#   - Every ontology-derived type (Component, Job, CodeStandard, ...). Those
+#     depend on which ontology a provider loaded and are not universal.
+#   - Provider extension fields such as OntologyProperty.acceptanceCriteria /
+#     .completionGuidance. Annotation-derived, provider-specific — extensions,
+#     not base.
+#
+# The type lens IS in the contract: how prominently a class, a property or a
+# class's field is shown (TermVisibility), the role a field's values play
+# (PropertyRole), the sections a class's fields fall into (PropertyGroup), a
+# class's glyph, and the plural and inverse labels. Every lens field is
+# nullable, so a provider whose ontology declares no lens answers null and
+# still conforms. The fields and their descriptions are the ones a
+# ke-graphql that reads the type lens emits on its TBox types, so the lens
+# has one shape across the compiler, this contract and every provider.
+#
+# `Query.classEdges` IS in the contract too: the edges between classes, each
+# weighed by the instance statements it covers. No compiler emits it; a
+# provider computes it from its store and its declarations, which is why it is
+# a root field and not a TBox field.
+#
+# EntityMeta IS in the contract: `Node` selects it through `_meta`, and the
+# compiler puts `_meta: EntityMeta!` on every generated type, so no provider
+# can omit the type.
+#
+# A provider satisfies this contract when its schema is a SUPERSET of it —
+# see satisfiesContract(). Extra types, extra fields and extra optional
+# arguments are all fine; anything this file names must be present, at least
+# as permissive, and at least as wide.
+# =============================================================================
+
+"""
+Everything addressable by an absolute IRI. Every non-embeddable type the
+compiler generates implements this: identity plus self-description, nothing
+else.
+"""
+interface Node {
+  "The entity's absolute IRI — the primary key."
+  uri: ID!
+  "Self-describing TBox access for this entity."
+  _meta: EntityMeta!
+  "The node's values for the list fields named, or, without names, for the fields its class's lens displays, in the lens's order."
+  values(fields: [ID!]): [NodeValue!]!
+}
+
+"""
+Self-describing TBox access attached to every Node, plus the generic
+descriptive fields a lens renders without knowing the concrete type. `title`
+is total: the provider computes a fallback chain whose tail is the IRI LOCAL
+NAME (`…#Film` answers "Film"), with the whole IRI below it for the degenerate
+case of an IRI that ends in a separator and so has no local name. `label`,
+`comment`, and
+`definition` are asserted-only and null when nothing is asserted.
+
+`curie` is the DISPLAY form of `uri`, and it lives here rather than beside
+`uri` on `Node` for the reason every derived value does: `uri` is asserted
+identity, `curie` is computed from the provider's namespace inventory, and
+`_meta` is where computed things go. It never replaces `uri` — an address a
+consumer stores, sends, or compares must be the absolute IRI.
+"""
+type EntityMeta {
+  """
+  Compact display form of `uri`: `prefix:local` when the provider's namespace
+  inventory has a match, else the absolute IRI unchanged, else — for a value
+  with no IRI at all (an embedded blank node) — the GraphQL type name. TOTAL,
+  exactly like `title`, and never an identity: `uri` is the only address.
+  """
+  curie: String!
+  title(lang: String = "en"): String!
+  label(lang: String = "en"): String
+  comment(lang: String = "en"): String
+  definition(lang: String = "en"): String
+  type: OntologyClass!
+  fields: [ClassProperty!]!
+  field(name: String!): ClassProperty
+}
+
+"Relay cursor pagination metadata."
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+"Relay connection over the Node interface."
+type NodeConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+}
+
+"One edge of a NodeConnection."
+type NodeEdge {
+  node: Node!
+  cursor: String!
+}
+
+"A loaded ontology namespace."
+type Ontology {
+  prefix: String!
+  namespace: String!
+  label: String
+  classes: [OntologyClass!]!
+  properties: [OntologyProperty!]!
+}
+
+"""
+A class in the TBox — itself a Node, so classes resolve through `node(id:)`
+and appear in NodeConnections like any other entity.
+"""
+type OntologyClass implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  label: String
+  definition: String
+  superclass: OntologyClass
+  superclasses: [OntologyClass!]!
+  subclasses: [OntologyClass!]!
+  properties: [ClassProperty!]!
+  instances(
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): NodeConnection!
+  instanceCount: Int!
+  isAbstract: Boolean!
+  namespace: String!
+
+  """
+  prism:visibility of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  visibility: TermVisibility
+
+  """
+  prism:glyph of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  glyph: String
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); never inherited; null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+  "The class's values for the list fields named, or for the fields its metaclass's lens displays."
+  values(fields: [ID!]): [NodeValue!]!
+}
+
+"""
+Class-scoped view of a property: SHACL cardinality is a fact about a
+(class, property) pair, not about the property alone — and so is `name`.
+"""
+type ClassProperty {
+  """
+  The field name this property answers to ON THIS CLASS — the exact string
+  `EntityMeta.field(name:)` accepts, so `fields { name }` and `field(name:)`
+  round-trip. Class-scoped because the name is: per-class cardinality decides
+  whether the field is pluralized, so one property can be `part` on one class
+  and `parts` on another, and no consumer can derive that from `property.uri`.
+
+  When the property projects no field on this class at all (a provider may
+  omit one — SHACL `sh:maxCount 0`, an unexposed range, an unprojected class)
+  there is no name `field(name:)` would accept; the OWL local name is returned
+  as a label. It tells a consumer nothing `property.uri` did not already, which
+  is the point: the fallback never fabricates a plausible-but-wrong field name.
+  """
+  name: String!
+  property: OntologyProperty!
+  required: Boolean!
+  singular: Boolean!
+  inherited: Boolean!
+
+  """
+  sh:group of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  group: PropertyGroup
+
+  """
+  sh:order of the lens shape targeting this class, else of its nearest ancestor's that declares one, ascending; null when none does.
+  """
+  order: Float
+
+  """
+  shui:propertyRole of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  role: PropertyRole
+
+  """
+  prism:visibility on this class: the lens shape's, else the property's own; null when neither declares one.
+  """
+  visibility: TermVisibility
+}
+
+"A property in the TBox. Not a Node — it has identity but no `_meta`."
+type OntologyProperty {
+  uri: ID!
+  label: String
+  definition: String
+  domain: OntologyClass
+  range: String!
+  kind: PropertyKind!
+  functional: Boolean!
+  inverse: OntologyProperty
+  namespace: String!
+
+  """
+  prism:visibility of the property; null when undeclared.
+  """
+  visibility: TermVisibility
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseLabel, else the declared inverse property's asserted rdfs:label; null when neither exists.
+  """
+  inverseLabel(lang: String = "en"): String
+
+  """
+  prism:inversePluralLabel, else the declared inverse property's prism:pluralLabel; null when neither exists.
+  """
+  inversePluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseVisibility, else the declared inverse property's prism:visibility; null when neither exists.
+  """
+  inverseVisibility: TermVisibility
+}
+
+"How a property relates its subject to its object."
+enum PropertyKind {
+  DATATYPE
+  OBJECT
+  ANNOTATION
+}
+
+"""
+How prominently a term is shown: prominent leads, normal is listed, hidden is a value and never an entity (prism:visibility).
+"""
+enum TermVisibility {
+  PROMINENT
+  NORMAL
+  HIDDEN
+}
+
+"""
+The role a property's values play for their subject (SHACL UI shui:propertyRole).
+"""
+enum PropertyRole {
+  LABEL
+  DESCRIPTION
+  DEPICTION
+  ICON
+  CLASSIFICATION
+}
+
+"""
+A sh:PropertyGroup: a named, ordered section of a class's properties.
+"""
+type PropertyGroup {
+  """
+  The group's IRI.
+  """
+  uri: ID!
+
+  """
+  rdfs:label in `lang` (exact tag, else untagged); null when undeclared.
+  """
+  label(lang: String = "en"): String
+
+  """
+  sh:order: the group's position among a class's groups, ascending; null when undeclared.
+  """
+  order: Float
+}
+
+"""
+An edge between two classes through one property, weighed by the instance
+statements it covers. A declared edge comes from the property's domain and
+range and counts the statements whose subject is an instance of the domain or
+a subclass and whose object is an instance of the range or a subclass; it is
+served with count 0 when none exists. An undeclared edge is a pair of classes
+the store links through the property that no declaration covers.
+"""
+type ClassEdge {
+  "The property's IRI."
+  property: ID!
+  "The IRI of the class the statements start from: the domain when declared."
+  subjectClass: ID!
+  "The IRI of the class the statements point to: the range when declared."
+  objectClass: ID!
+  "The number of instance statements the edge covers; 0 when none."
+  count: Int!
+  "Whether the ontology declares the edge through the property's domain and range."
+  declared: Boolean!
+}
+
+"""
+The universal root fields. A provider adds its own ontology-derived fields.
+
+`ontologyClass(uri:)` and `ontologyProperty(uri:)` take `String!`, not `ID!`:
+these arguments accept the PREFIXED convenience form ("ds:Component") as well
+as the absolute IRI, and live client operations already declare
+`$uri: String!` — promoting the argument to `ID!` would invalidate them
+(String is not a subtype of ID). `node(id:)` is the strict lookup: its
+argument keeps Relay's name `id` and its value is the absolute IRI.
+
+`classEdges` is a provider computation over its whole store, not a TBox
+field: no compiler emits it.
+"""
+type Query {
+  node(id: ID!): Node
+  ontologies: [Ontology!]!
+  ontology(prefix: String!): Ontology
+  ontologyClass(uri: String!): OntologyClass
+  ontologyProperty(uri: String!): OntologyProperty
+  "Every edge between classes, sorted by property, subject class and object class."
+  classEdges: [ClassEdge!]!
+  "The prose authored for the entity `uri` names (an absolute IRI), or null when it has none."
+  prose(uri: ID!): Prose
+  "The statements whose subject is `uri` (an absolute IRI), as Turtle with the provider's prefixes, or null when the graph holds none."
+  source(uri: ID!): String
+  "The instances of the class `classUri` names that `filters` keep, in `sort`'s order (the IRIs' without one), with their number and the facets of the class's list fields and of its kind."
+  facetedInstances(
+    classUri: ID!
+    filters: [FieldFilter!]
+    sort: FieldSort
+    first: Int
+    after: String
+  ): FacetedConnection!
+}
+
+# =============================================================================
+# This provider's own types, appended to the authored contract SDL.
+#
+# WHY THIS FILE EXISTS AT ALL. The contract declares exactly one type that
+# `implements Node` — OntologyClass. A NodeConnection built from the contract
+# alone can therefore contain nothing but ontology classes: there is no type
+# an ABox entity could be. Every provider must extend the contract SDL with
+# its own concrete Node implementers, and that extension is precisely what the
+# contract's superset rule is for (contract.graphql:39-42). `buildSchema` over
+# the contract alone cannot serve instance data.
+#
+# FOUR ROOT FIELDS ARE ADDED: `prose`, `search`, `source` and
+# `facetedInstances`, at the end of this file, and every node gains `values`. Every entity type below is reachable through the contract's own
+# root fields — `node(id:)` and `OntologyClass.instances` — and adding a root
+# field for them would have been easier and would have proved less: the point
+# is that the contract's five roots suffice for the graph. Prose, search and
+# source are not part of the contract; they are provider extensions, and each
+# is a root field because that is the one position a reader can select the
+# same way against every provider that offers it. A compiled provider can add
+# fields only to the object types it generates and to Query, never to `Node`,
+# so a field on each concrete type would need a type-specific fragment to
+# read.
+# =============================================================================
+
+"""
+A metro line. A root class in the TBox (no superclass), so it demonstrates
+that `OntologyClass.superclass` is legitimately null.
+
+`code` is the short code passengers know the line by ("1", "R1"), and
+`colour` is its colour on maps and signs, as a lowercase `#rrggbb` hex
+triplet. Both are non-null: a line without them cannot be drawn or signed.
+
+`routes` lists the directions the line runs. A line does not carry an order of
+its own; each route carries its ordered calls, because direction is data.
+`servedBy` is the set of stops those calls visit, read as the inverse of
+`Stop.servesLine`.
+
+`formations` lists the formations the line is run with, in authored order. A
+line may be run by more than one rolling stock.
+"""
+type Line implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  servedBy: [Stop!]!
+  code: String!
+  colour: String!
+  routes: [Route!]!
+  formations: [Formation!]!
+}
+
+"""
+Anything that serves a line: the GraphQL face of the TBox's `metro:Stop`
+class, which `Station` and its subclass `Interchange` both instantiate.
+
+WHY IT HAS TO EXIST. `Line.servedBy` walks the inverse of `servesLine`, and
+both concrete types carry that property — so the list genuinely holds a mix.
+Declaring it `[Station!]!` said otherwise: an `Interchange` came back through
+it dressed as a `Station`, `... on Interchange` could not be written against
+it, and the schema disagreed with the values it served. GraphQL has no type
+inheritance, so the TBox's subclassing cannot carry the list; an interface
+can, and this is the smallest one that does.
+
+It does NOT try to mirror the class tree. `Stop` is one interface over the
+fields both implementers share; the hierarchy itself still lives in the TBox
+and shows up through `superclasses` / `subclasses` / `inherited`.
+
+`platformLength` is the usable length of the station's shortest platform, in
+whole millimetres, the unit a formation's `length` is measured in, so the two
+compare directly. It is null for a station no route calls at.
+"""
+interface Stop implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  platformCount: Int
+  platformLength: Int
+  location: GeoPoint
+  servesLine: [Line!]!
+  inZone: Zone
+  diagramPosition: DiagramPoint
+}
+
+"""
+A station on the network. `name` is nullable in GraphQL even though the TBox
+marks `metro:name` required on this class: SHACL cardinality is an assertion
+about the data, and this dataset deliberately contains stations that violate
+it so `_meta.title`'s fallback chain has something to fall back from.
+"""
+type Station implements Node & Stop {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  platformCount: Int
+  platformLength: Int
+  location: GeoPoint
+  servesLine: [Line!]!
+  inZone: Zone
+  diagramPosition: DiagramPoint
+}
+
+"""
+A fare band. Lives in the SECOND namespace (`geo:`), which is the point: with
+entities in only one namespace, a `_meta.curie` implementation could hardcode
+a single prefix and still look correct on every row.
+
+`stops` lists the stations and interchanges inside the zone, read as the
+inverse of `Stop.inZone`, so it holds a mix of both types as
+`Line.servedBy` does.
+"""
+type Zone implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  stops: [Stop!]!
+}
+
+"""
+A station where two or more lines meet — a subclass of Station in the TBox.
+GraphQL has no type inheritance, so the relationship lives entirely in the
+TBox and shows up through `superclasses` / `subclasses` / `inherited`.
+"""
+type Interchange implements Node & Stop {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  platformCount: Int
+  platformLength: Int
+  location: GeoPoint
+  servesLine: [Line!]!
+  inZone: Zone
+  diagramPosition: DiagramPoint
+  transferMinutes: Int
+}
+
+"""
+A latitude/longitude pair. NOT a Node: it has no IRI, so it is unreachable
+through `node(id:)` and can never appear in a NodeConnection.
+
+The contract does not require an embeddable — nothing in it references a
+non-Node value type. This one exists to probe the last tier of `_meta.title`'s
+fallback chain (the typename tier, reached only when there is no IRI to fall
+back to) and to show that a provider may add value types freely. Note that it
+still carries `_meta: EntityMeta!`, and EntityMeta.type is non-null, so even a
+coordinate pair needs a class in the TBox.
+"""
+type GeoPoint {
+  _meta: EntityMeta!
+  latitude: Float!
+  longitude: Float!
+}
+
+"Long-form Markdown authored for one entity, per language."
+type Prose {
+  "The text in `lang`, else in the request's locale, else in the default language."
+  markdown(lang: String): String!
+  "The language `markdown` serves without `lang`: the request's locale when authored, else the default."
+  lang: String!
+  "Every authored language, the default first, then the rest in code-point order."
+  availableLanguages: [String!]!
+  "Entities the prose links to across its languages, in order of first mention; destinations node(id:) does not resolve are dropped."
+  references: NodeConnection!
+}
+
+# `values` is the one field every node gains: a table reads its cells from it
+# whatever the node's type. A provider cannot add a field to `Node` without
+# adding it to each implementation, the contract's `OntologyClass` included.
+"A node's value for one list field."
+type NodeValue {
+  "The field's served name."
+  field: ID!
+  "The field's label."
+  label: String!
+  "The values' texts joined, or null when the node has none."
+  text: String
+  "The IRI of the value when it is exactly one entity."
+  uri: String
+  "How the field's values read: text, number, flag, date or choices."
+  type: String!
+}
+
+"Keeps the nodes holding one of `values` for `field`; a null value stands for none."
+input FieldFilter {
+  field: String!
+  values: [ID]
+}
+
+"Orders a set by one field, the nodes without a value last."
+input FieldSort {
+  field: String!
+  descending: Boolean
+}
+
+"One bucket of a facet; a null value is the nodes with none."
+type FacetValue {
+  value: ID
+  label: String
+  count: Int!
+}
+
+"A field's buckets, counted with every filter but the field's own."
+type Facet {
+  field: String!
+  label: String!
+  values: [FacetValue!]!
+}
+
+"A page of a faceted set, the set's size and its facets."
+type FacetedConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+  facets: [Facet!]!
+}
+
+"""
+One direction of a line's service. NOT a Node: a route has no IRI of its own
+and is reached only through `Line.routes`.
+
+Direction is data. The route, not the line, carries the ordered calls, so a
+line that runs both ways has two routes, each listing its calls in the order
+a passenger meets them.
+
+`label` is the route's name as shown to passengers ("To Marsh End",
+"Clockwise"). It is the route's `rdfs:label`, so it agrees with
+`_meta.label` and `_meta.title`.
+
+`isLoop` is true when the service continues from the last call back to the
+first. The first stop is never repeated at the end of `calls`; the closing
+segment is implied.
+
+`reverse` is the same line's route over the same stops the other way. For a
+loop that is the same first stop with the rest reversed. It is null when the
+line runs one direction only. A ring run by two lines in opposite directions
+is two lines with one route each, so neither route has a reverse.
+"""
+type Route {
+  _meta: EntityMeta!
+  label: String!
+  isLoop: Boolean!
+  calls: [Call!]!
+  reverse: Route
+}
+
+"""
+One stop on a route, at its place in the order. NOT a Node: a call exists
+only within its route.
+
+`position` is counted from 1, with no gaps, so the calls of a route are
+numbered 1 to n in the order the service makes them.
+"""
+type Call {
+  _meta: EntityMeta!
+  position: Int!
+  stop: Stop!
+}
+
+"""
+A place on the schematic network diagram. NOT a Node, and NOT a geography:
+`Stop.location` says where a station is on the ground, this says where it
+sits on the map passengers read.
+
+Coordinates are whole grid units. The origin is the north-west corner, `x`
+grows east and `y` grows south, the orientation of a screen, so a drawing
+needs no flip. The network is anchored so its smallest `x` and its smallest
+`y` are both 0.
+
+Every segment between consecutive calls of a route, and the closing segment
+of a loop, is horizontal, vertical or diagonal (octilinear). A station no
+route calls at has no position.
+"""
+type DiagramPoint {
+  _meta: EntityMeta!
+  x: Int!
+  y: Int!
+}
+
+"""
+A class of train: the cars of one design and the formations they run in. A
+root class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`formations` holds the stock's alternative formations in authored order,
+shortest first.
+"""
+type RollingStock implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  formations: [Formation!]!
+}
+
+"""
+A train as it runs: an ordered list of units, each possibly reversed. A root
+class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`units` lists the formation's units from its front, positions counted from 1
+with no gaps.
+
+`stock` is the rolling stock that lists the formation, and `lines` the lines
+run with it, in IRI order. Both are read as inverses of the stock's and the
+lines' `formations`, never stored.
+
+`length` and `capacity` are the sums of its units', computed by the provider
+and never stored. Lengths are whole millimetres, measured over couplers so
+they add up without gaps; capacity is passengers seated plus standing.
+"""
+type Formation implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  stock: RollingStock!
+  units: [UnitPosition!]!
+  length: Int!
+  capacity: Int!
+  lines: [Line!]!
+}
+
+"""
+A set of cars permanently coupled in order: the smallest part of a train that
+runs on its own. A root class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`cars` lists the unit's cars from its front, positions counted from 1 with no
+gaps.
+
+`length` and `capacity` are the sums of its cars' car types, computed by the
+provider and never stored. Lengths are whole millimetres, measured over
+couplers so they add up without gaps; capacity is passengers seated plus
+standing.
+"""
+type Unit implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  cars: [CarPosition!]!
+  length: Int!
+  capacity: Int!
+}
+
+"""
+A kind of car. A root class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`code` is the short code the car type is known by ("DM" for a driving motor
+car, "M" for a motor car, "T" for a trailer). `hasCab` is true when the car
+has a driving cab at its leading end.
+
+`length` is in whole millimetres, measured over couplers, and `capacity` is
+passengers seated plus standing.
+"""
+type CarType implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  values(fields: [ID!]): [NodeValue!]!
+  name: String
+  code: String!
+  hasCab: Boolean!
+  length: Int!
+  capacity: Int!
+}
+
+"""
+One unit in a formation, at its place in the order. NOT a Node: a unit
+position exists only within its formation.
+
+`position` is counted from 1, with no gaps, starting at the formation's front.
+
+`reversed` is true when the unit runs last car first, so an asymmetric unit
+coupled back to back with another puts its cab at the far end of the train.
+"""
+type UnitPosition {
+  _meta: EntityMeta!
+  position: Int!
+  unit: Unit!
+  reversed: Boolean!
+}
+
+"""
+One car in a unit, at its place in the order. NOT a Node: a car position
+exists only within its unit.
+
+`position` is counted from 1, with no gaps, starting at the unit's front.
+
+`reversed` is true when the car's leading end faces the rear of its unit, so a
+driving car at the back of a unit with its cab facing outwards is reversed. A
+car's orientation in a train is its own `reversed` XOR its unit's
+`UnitPosition.reversed`.
+"""
+type CarPosition {
+  _meta: EntityMeta!
+  position: Int!
+  carType: CarType!
+  reversed: Boolean!
+}

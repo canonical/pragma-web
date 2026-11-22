@@ -21,7 +21,7 @@
   "scripts": {
     "graph": "bun run relay && bun src/server/graph.ts",
     "schema": "bun src/server/schema.ts",
-    "schema:check": "bun run schema && git diff --exit-code -- src/relay/schema.graphql",
+    "schema:check": "bun run schema && git diff --exit-code -- src/relay/schema.graphql testing/schema.no-search.graphql",
     "relay": "relay-compiler",
     "dev": "bun run relay && vite",
     "dev:bun": "bun run relay && bun src/server/server.bun.ts",
