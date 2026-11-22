@@ -109,8 +109,10 @@ export default function ComponentHeader({
             </span>
           </span>
         ))}
-        <code className="address">{data._meta.curie}</code>
-        <CopyButton text={data._meta.curie} />
+        <span className="locator">
+          <code className="address">{data._meta.curie}</code>
+          <CopyButton text={data._meta.curie} />
+        </span>
       </p>
     </header>
   );

@@ -30,9 +30,9 @@ describe("ComponentHeader", () => {
       expect(copy.closest(".status-line")?.querySelector(".address")).toBe(
         document.querySelector(".ds.component-header .address"),
       );
-      expect(
-        copy.closest(".status-line")?.lastElementChild?.contains(copy),
-      ).toBe(true);
+      expect(copy.closest(".locator")?.lastElementChild?.contains(copy)).toBe(
+        true,
+      );
     },
     ENTITY_TEST_TIMEOUT_MS,
   );
@@ -116,8 +116,13 @@ describe("ComponentHeader", () => {
             ["separator", "·"],
           ],
         ],
-        ["address", []],
-        ["ds copy-button", expect.arrayContaining([["announcement", ""]])],
+        [
+          "locator",
+          [
+            ["address", expect.any(String)],
+            ["ds copy-button", expect.stringContaining("Copy")],
+          ],
+        ],
       ]);
       expect(line?.querySelector(".address")).toHaveTextContent(BUTTON_URI);
       expect(line?.querySelector(".address")?.tagName).toBe("CODE");
