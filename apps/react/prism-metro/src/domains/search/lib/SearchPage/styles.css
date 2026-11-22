@@ -50,7 +50,7 @@
   }
 
   /* A door's total: muted, in figures of one width. */
-  .ds.search-page .door .total {
+  .ds.search-page .total {
     color: var(--search-page-total-color);
     font-variant-numeric: tabular-nums;
   }
