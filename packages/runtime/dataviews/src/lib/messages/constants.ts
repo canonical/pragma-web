@@ -282,7 +282,10 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   chartRenderer: "Chart",
   tableRenderer: "Table",
 
-  eventsHidden: (count) => `${formatCount(count)} hidden`,
+  eventsHidden: (count) =>
+    count.kind === "unknown"
+      ? "More not yet shown"
+      : `${count.kind === "at-least" ? "At least " : ""}${formatCount(count.value)} hidden`,
   showMoreEvents: (count) => `Show ${formatCount(count)} more`,
   showAllEvents: "Show all",
   filterBy: "Filter by:",
@@ -295,4 +298,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   sortLatest: "Latest",
   sortEarliest: "Earliest",
   orderByDate: "Order by date",
+  eventsShown: (shown, total) =>
+    total.kind === "unknown"
+      ? `Showing ${formatCount(shown)} ${choosePlural(shown, "event", "events")}`
+      : `Showing ${formatCount(shown)} of ${total.kind === "at-least" ? "at least " : ""}${formatCount(total.value)} ${choosePlural(total.value, "event", "events")}`,
 });

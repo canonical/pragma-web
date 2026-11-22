@@ -1,5 +1,5 @@
 /**
- * The activity collection the Timeline tests share: an event record with a
+ * The activity collection the DataTimeline tests share: an event record with a
  * date, an actor and a kind, its collection, the declaration a complete
  * local source makes over it, the mapping a timeline reads it through, and a
  * provider over a manual source the test answers by hand or at once.
@@ -19,7 +19,7 @@ import {
   type SourceCapabilities,
   type SourcePage,
 } from "@canonical/dataviews-core";
-import type { TimelineFieldMapping } from "../src/lib/_work_in_progress/Timeline/index.js";
+import type { TimelineFieldMapping } from "../src/lib/_work_in_progress/DataTimeline/index.js";
 import countExactly from "./countExactly.js";
 import createManualSource from "./createManualSource.js";
 import { COUNTED_EXACTLY } from "./fixtures.js";
@@ -35,7 +35,7 @@ export type Activity = {
   readonly summary: string;
 };
 
-/** The activity collection every Timeline test mounts over. */
+/** The activity collection every DataTimeline test mounts over. */
 export const activities = createCollection({
   identify: (activity: Activity) => activity.id,
   fields: [
@@ -54,7 +54,7 @@ export const activities = createCollection({
 /** The fields of the activity collection, for typed providers. */
 export type ActivityFields = typeof activities.schema.fields;
 
-/** The provider every Timeline test drives, over the activity collection. */
+/** The provider every DataTimeline test drives, over the activity collection. */
 export type ActivityProvider = DataViewsProvider<ActivityFields, Activity>;
 
 /** The mapping a timeline reads an activity through. */

@@ -20,6 +20,12 @@
 @import url("./_work_in_progress/DataChart/styles.css");
 @import url("./_work_in_progress/DataTable/common/SettingsMenu/styles.css");
 @import url("./_work_in_progress/DataTable/styles.css");
+@import url("./_work_in_progress/DataTimeline/common/DateTime/styles.css");
+@import url("./_work_in_progress/DataTimeline/common/Event/styles.css");
+@import url("./_work_in_progress/DataTimeline/common/ExpansionIndicator/styles.css");
+@import url("./_work_in_progress/DataTimeline/common/Header/styles.css");
+@import url("./_work_in_progress/DataTimeline/common/Marker/styles.css");
+@import url("./_work_in_progress/DataTimeline/styles.css");
 @import url("./_work_in_progress/DataViews/common/Actions/styles.css");
 @import url("./_work_in_progress/DataViews/common/Filters/common/BoundFilter/styles.css");
 @import url("./_work_in_progress/DataViews/common/Filters/common/FurtherConjuncts/common/FurtherConjunct/styles.css");
@@ -29,12 +35,6 @@
 @import url("./_work_in_progress/DataViews/common/SavedViews/styles.css");
 @import url("./_work_in_progress/DataViews/common/Search/styles.css");
 @import url("./_work_in_progress/PaginationBar/styles.css");
-@import url("./_work_in_progress/Timeline/common/DateTime/styles.css");
-@import url("./_work_in_progress/Timeline/common/Event/styles.css");
-@import url("./_work_in_progress/Timeline/common/ExpansionIndicator/styles.css");
-@import url("./_work_in_progress/Timeline/common/Header/styles.css");
-@import url("./_work_in_progress/Timeline/common/Marker/styles.css");
-@import url("./_work_in_progress/Timeline/styles.css");
 @import url("./common/Announcer/styles.css");
 @import url("./common/RendererSwitch/styles.css");
 @import url("./virtualization/common/VirtualBody/styles.css");
