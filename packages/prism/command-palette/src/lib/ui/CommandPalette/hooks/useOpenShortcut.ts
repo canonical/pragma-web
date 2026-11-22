@@ -3,6 +3,15 @@ import { PALETTE_SHORTCUT_KEY } from "../constants.js";
 import type { UseOpenShortcutProps, UseOpenShortcutResult } from "./types.js";
 
 /**
+ * The text the chord carries into the palette: the trimmed value of the
+ * page's search field when the focus is in one, else nothing.
+ */
+const readCarriedText = (focused: Element | null): string =>
+  focused instanceof HTMLInputElement && focused.type === "search"
+    ? focused.value.trim()
+    : "";
+
+/**
  * Open the palette's dialog with Cmd+K or Ctrl+K, from anywhere on the page.
  * The listener is ephemeral: attached to the document on mount, detached on
  * unmount, with no state of its own; whether the palette is open lives in
@@ -24,15 +33,6 @@ import type { UseOpenShortcutProps, UseOpenShortcutResult } from "./types.js";
  * @note Impure: attaches a `keydown` listener to `document` while mounted,
  *   and opens the dialog when the chord fires.
  */
-/**
- * The text the chord carries into the palette: the trimmed value of the
- * page's search field when the focus is in one, else nothing.
- */
-const readCarriedText = (focused: Element | null): string =>
-  focused instanceof HTMLInputElement && focused.type === "search"
-    ? focused.value.trim()
-    : "";
-
 export default function useOpenShortcut({
   dialog,
   onOpen,
