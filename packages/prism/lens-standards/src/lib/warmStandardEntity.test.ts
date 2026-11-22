@@ -60,6 +60,22 @@ describe("warmStandardEntity", () => {
     ).resolves.toBeUndefined();
   });
 
+  it("rejects with the standard's own failure once every fetch settles", async () => {
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation((request) =>
+      request.name === "StandardEntityQuery"
+        ? Promise.reject(new Error("the provider is down"))
+        : Promise.resolve({ data: { statements: null } }),
+    );
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+
+    await expect(
+      warmStandardEntity(STANDARDS_BINDING_FIXTURE, {
+        uri: LINK_COMPONENT_URI,
+      }),
+    ).rejects.toThrow("the provider is down");
+  });
+
   it("warms the standard's Turtle beside it when the address asks", () => {
     const fetchFn = createFetchSpy();
     setPrefetchEnvironment(createEnvironment({ fetchFn }));
