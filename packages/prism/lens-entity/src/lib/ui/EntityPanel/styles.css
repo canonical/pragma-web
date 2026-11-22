@@ -7,7 +7,7 @@
    * groups, the gutter between each. */
   .ds.entity-panel {
     --entity-panel-gap: var(--grid-gutter);
-    --entity-panel-count-color: var(--color-text-muted);
+    --entity-panel-not-found-color: var(--color-text-muted);
 
     display: flex;
     flex-direction: column;
@@ -43,7 +43,7 @@
   .ds.entity-panel > .not-found {
     margin-block-start: 0;
     margin-block-end: 0;
-    color: var(--entity-panel-count-color);
+    color: var(--entity-panel-not-found-color);
   }
 
   /* A long text, opened: plain text that keeps its line breaks. */

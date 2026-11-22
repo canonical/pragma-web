@@ -14,7 +14,7 @@
 #
 # Token ledger (on `.ds.entity-panel`):
 #   --entity-panel-gap: --grid-gutter                 between blocks
-#   --entity-panel-count-color: color.text.muted      counts in summaries
+#   --entity-panel-not-found-color: color.text.muted  the not-found status
 node:
   uri: prism.component.entity_panel
   element: section
