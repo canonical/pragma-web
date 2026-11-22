@@ -25,12 +25,17 @@
 # measure, so the article sets none. Its space is element-owned:
 # `.editorial` gives its headings and paragraphs their space after, and
 # `.content-flow` clears the last block's. A description keeps its
-# hand-written line breaks.
+# hand-written line breaks. An example's code keeps its lines: a line
+# wider than the column scrolls inside the code block, and the examples
+# give up their content's width (min width 0), so the code never widens
+# the section past the page.
 #
 # Token ledger:
 #   layout.grid.column "1 / -1" (header, prose, examples, chips, shown):
 #     structure.
 #   typography.whiteSpace pre-line: a keyword.
+#   size.min.width 0 (examples), layout.overflow.inline auto (code): the
+#     code block scrolls inside itself at a narrow width.
 #   --standard-article-gap: var(--grid-gutter), the gap between chips.
 #   --standard-article-shown-color: var(--color-text-muted), the muted
 #     "N of M shown" line.
@@ -81,6 +86,7 @@ node:
         role: examples (one section's examples, carrying .editorial and .content-flow)
         styles:
           layout.grid.column: "1 / -1"
+          size.min.width: 0
         edges:
           - node:
               role: example (one example)
@@ -98,6 +104,7 @@ node:
                       spacing.internal.block.end: component.padding.block
                       spacing.internal.inline.start: component.padding.inline
                       spacing.internal.inline.end: component.padding.inline
+                      layout.overflow.inline: auto
                   relation: { cardinality: "1", slotName: code }
             relation: { cardinality: "1..*", slotName: example }
       relation: { cardinality: "0..2", slotName: examples }  # the do and dont sections' content

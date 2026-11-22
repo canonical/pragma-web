@@ -39,12 +39,20 @@
     grid-column: 1 / -1;
   }
 
+  /* The examples give up their content's width, so a code line wider than
+   * the column never widens the section past the page. */
+  .ds.standard-article .examples {
+    min-inline-size: 0;
+  }
+
   /* An example's code sits on the code block's layer, so it never runs on
-   * into the next example's description. */
+   * into the next example's description; a line wider than the column
+   * scrolls inside the block. */
   .ds.standard-article .code {
     padding-block: var(--standard-article-code-padding-block);
     padding-inline: var(--standard-article-code-padding-inline);
     background: var(--standard-article-code-background);
+    overflow-x: auto;
   }
 
   .ds.standard-article .chips {
