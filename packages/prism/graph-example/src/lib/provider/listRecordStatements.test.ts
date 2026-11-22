@@ -88,8 +88,12 @@ describe("listRecordStatements", () => {
     expect(routes.map((route) => route.kind === "nested" && route.key)).toEqual(
       ["southbound", "northbound"],
     );
+    expect(
+      routes.map((route) => route.kind === "nested" && route.type),
+    ).toEqual([`${METRO}Route`, `${METRO}Route`]);
     const [reverse] = objectsOf(expand(routes.at(0)), "reverse");
     expect(reverse?.kind === "nested" && reverse.key).toBe("northbound");
+    expect(reverse?.kind === "nested" && reverse.type).toBe(`${METRO}Route`);
     expect(objectsOf(expand(reverse), "isLoop")).toEqual([
       {
         kind: "literal",

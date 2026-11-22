@@ -5,6 +5,7 @@ import {
   RDF_LANG_STRING_URI,
   RDF_TYPE_URI,
   RDFS_NAMESPACE,
+  ROUTE_CLASS_URI,
   SKOS_DEFINITION_URI,
   SUBCLASS_OF_URI,
   TURTLE_RECORD_KEYS,
@@ -61,7 +62,10 @@ const toNested = (
   statements: () => readonly RecordStatement[],
 ): RecordTerm => ({ kind: "nested", type, key, statements });
 
-/** The statements one route makes, its reverse a route of the same line. */
+/**
+ * The statements one route makes, its reverse a route of the same line;
+ * each route is of the class the line's `routes` and `reverse` range over.
+ */
 const listRouteStatements = (
   route: ExampleRoute,
   routes: readonly ExampleRoute[],
@@ -84,7 +88,7 @@ const listRouteStatements = (
       : [
           {
             predicate: property("reverse"),
-            object: toNested(null, reverse.key, () =>
+            object: toNested(ROUTE_CLASS_URI, reverse.key, () =>
               listRouteStatements(reverse, routes, dataset),
             ),
           },
@@ -126,7 +130,7 @@ const listValueTerms = (
   if (key === "routes") {
     const routes = value as readonly ExampleRoute[];
     return routes.map((route) =>
-      toNested(null, route.key, () =>
+      toNested(ROUTE_CLASS_URI, route.key, () =>
         listRouteStatements(route, routes, dataset),
       ),
     );
