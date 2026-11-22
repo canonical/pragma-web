@@ -154,6 +154,17 @@ not served.
 
 ---
 
+## Statements: grouped by predicate, bounded, counted
+
+The `statements` extension serves the contract's `readStatementsSdl()` over the
+store: one entity's statements grouped by predicate, each group's values in
+code-point order and cut to `perPredicate` (12 by default, held between 1 and 50),
+its `total` the store's count. A blank value is expanded in place, its own groups
+cut to the same bound one level down and only its type below that
+(`STATEMENTS_MAX_DEPTH`); `direction: IN` reads the subjects naming the entity,
+blank subjects included; `path` follows a blank value by predicate local name and
+index.
+
 ## Search: one root field over titles, CURIEs and definitions
 
 The provider adds a second root field, for finding a node by what it is called:

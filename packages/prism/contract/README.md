@@ -142,6 +142,17 @@ list is sorted by property, subject class and object class.
 the compiler attaches `_meta: EntityMeta!` to every generated type, so a
 provider cannot omit it.
 
+### The statements extension
+
+`statements` is a provider extension, not part of the contract a provider must
+satisfy: a provider that serves it adds `readStatementsSdl()` to its schema and is
+listed by `listServedExtensions`. It answers one entity's statements grouped by
+predicate in code-point order (`compareCodePoints`), each group cut to
+`perPredicate` (`STATEMENTS_PER_PREDICATE`, held between 1 and
+`STATEMENTS_PER_PREDICATE_MAX`) with its true `total`, nested values expanded
+`STATEMENTS_MAX_DEPTH` levels down: their groups at the first, their type alone
+at the second.
+
 ## The check
 
 ```ts

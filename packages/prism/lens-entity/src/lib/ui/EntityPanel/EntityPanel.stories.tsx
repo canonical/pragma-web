@@ -4,7 +4,26 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withSite } from "../../../../.storybook/decorators/index.js";
 import { answerFromRecords } from "../../../../.storybook/mocks/index.js";
 import { CIRCLE_LINE_CURIE } from "../../../../testing/fixtures.js";
+import metroResponses from "../../../../testing/records/metroResponses.js";
 import Component from "./EntityPanel.js";
+
+const answer = answerFromRecords();
+
+/** The panel's node read answered from the page's record of the same id;
+ * every other read from the recordings. */
+const answerPanel: typeof answer = (operation) => {
+  const { name } = operation.request.node.params;
+  const { id } = operation.request.variables;
+  const page = metroResponses.find(
+    ({ operation: recorded, variables }) =>
+      name === "EntityPanelQuery" &&
+      recorded === "EntityPageQuery" &&
+      variables.id === id,
+  );
+  return page === undefined
+    ? answer(operation)
+    : (structuredClone(page.response) as ReturnType<typeof answer>);
+};
 
 const meta: Meta<typeof Component> = {
   title: "Components/EntityPanel",
@@ -14,7 +33,7 @@ const meta: Meta<typeof Component> = {
     withSite({ url: `/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}` }),
   ],
   parameters: {
-    relay: { generateFunction: answerFromRecords() },
+    relay: { generateFunction: answerPanel },
   },
   args: { uri: "https://metro.example/onto#circle-line" },
 };
