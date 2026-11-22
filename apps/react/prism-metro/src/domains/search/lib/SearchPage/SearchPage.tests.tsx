@@ -2,6 +2,7 @@
 
 import { setPrefetchEnvironment } from "@canonical/prism-core";
 import { cleanup, screen, waitFor } from "@testing-library/react";
+import type { Environment } from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import {
   afterAll,
@@ -183,7 +184,7 @@ describe("SearchPage", () => {
     renderWithSite(
       <SearchPage after="cursor-80" page={5} text="e" />,
       "/search?q=e&after=cursor-80&page=5",
-      environment,
+      environment as unknown as Environment,
     );
     const bar = document.querySelector(".ds.search-page .ds.pagination-bar");
     expect(bar?.textContent).toContain("81–100 of 145");
