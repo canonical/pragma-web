@@ -53,6 +53,12 @@
     gap: var(--term-inspector-gap);
   }
 
+  /* An instance's details panel, across the inspector's columns: it keeps
+   * its own column of blocks rather than the views' subgrid. */
+  .ds.term-inspector > .ds.entity-panel {
+    grid-column: 1 / -1;
+  }
+
   .ds.term-inspector .header {
     grid-column: 1 / -1;
     display: flex;

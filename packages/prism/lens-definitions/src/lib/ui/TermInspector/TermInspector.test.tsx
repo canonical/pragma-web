@@ -432,7 +432,13 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     const fetchFn = createFetchSpy();
     renderInspector(UNKNOWN_TERM, unknownTermRecords, fetchFn);
     const alert = screen.getByRole("alert");
-    expect(alert.closest("section.ds.entity-panel")).not.toBeNull();
+    const entityPanel = alert.closest("section.ds.entity-panel");
+    expect(entityPanel).not.toBeNull();
+    // The panel keeps its own column of blocks, not the views' subgrid.
+    expect(entityPanel?.parentElement?.matches(".ds.term-inspector")).toBe(
+      true,
+    );
+    expect(entityPanel?.classList.contains("view")).toBe(false);
     expect(alert.textContent).toBe(
       `No term at ${UNKNOWN_TERM}. The rail lists every term the ontologies carry.`,
     );
