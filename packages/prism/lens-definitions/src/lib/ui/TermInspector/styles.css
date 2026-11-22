@@ -54,19 +54,20 @@
   }
 
   /* An instance's details panel, across the inspector's columns: it keeps
-   * its own column of blocks rather than the views' subgrid. */
+   * its own column of blocks rather than the views' subgrid, and none of
+   * the views' rules below reach its parts (`:not(.panel *)`). */
   .ds.term-inspector .panel {
     grid-column: 1 / -1;
   }
 
-  .ds.term-inspector .header {
+  .ds.term-inspector .header:not(.panel *) {
     grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
     gap: var(--term-inspector-tag-gap);
   }
 
-  .ds.term-inspector .tags {
+  .ds.term-inspector .tags:not(.panel *) {
     display: flex;
     flex-wrap: wrap;
     gap: var(--term-inspector-tag-gap);
@@ -74,7 +75,7 @@
   }
 
   /* A tag names the term's kind in small capitals, in a hairline pill. */
-  .ds.term-inspector .tag {
+  .ds.term-inspector .tag:not(.panel *) {
     padding-inline: var(--term-inspector-tag-padding);
     border-width: var(--term-inspector-rule-width);
     border-style: solid;
@@ -85,14 +86,14 @@
     color: var(--term-inspector-muted-color);
   }
 
-  .ds.term-inspector .name {
+  .ds.term-inspector .name:not(.panel *) {
     margin-block: 0;
     font-size: var(--term-inspector-name-font-size);
     font-weight: var(--term-inspector-bold-weight);
     overflow-wrap: anywhere;
   }
 
-  .ds.term-inspector .address {
+  .ds.term-inspector .address:not(.panel *) {
     margin-block: 0;
     font-size: var(--term-inspector-small-font-size);
     color: var(--term-inspector-muted-color);
@@ -101,7 +102,7 @@
   /* Each section opens on a hairline across the inspector, edge to edge:
    * it bleeds over the inspector's inline padding and pads its content
    * back onto the inspector's lines, a subgrid of them. */
-  .ds.term-inspector .section {
+  .ds.term-inspector .section:not(.panel *) {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
@@ -116,7 +117,7 @@
     border-block-start-color: var(--term-inspector-rule-color);
   }
 
-  .ds.term-inspector .label {
+  .ds.term-inspector .label:not(.panel *) {
     grid-column: 1 / -1;
     margin-block: 0;
     font-size: var(--term-inspector-small-font-size);
@@ -125,12 +126,12 @@
     color: var(--term-inspector-muted-color);
   }
 
-  .ds.term-inspector .prose {
+  .ds.term-inspector .prose:not(.panel *) {
     grid-column: 1 / -1;
     margin-block: 0;
   }
 
-  .ds.term-inspector .terms {
+  .ds.term-inspector .terms:not(.panel *) {
     grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
@@ -141,14 +142,14 @@
   }
 
   /* A group's label over its rows, on the section's lines. */
-  .ds.term-inspector .group {
+  .ds.term-inspector .group:not(.panel *) {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     gap: var(--term-inspector-gap);
   }
 
-  .ds.term-inspector .group-label {
+  .ds.term-inspector .group-label:not(.panel *) {
     grid-column: 1 / -1;
     margin-block: 0;
     font-size: var(--term-inspector-small-font-size);
@@ -157,7 +158,7 @@
   }
 
   /* Each key on the first column, its value on the other two. */
-  .ds.term-inspector .details {
+  .ds.term-inspector .details:not(.panel *) {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
@@ -165,7 +166,7 @@
     margin-block: 0;
   }
 
-  .ds.term-inspector .key {
+  .ds.term-inspector .key:not(.panel *) {
     grid-column: 1 / span 1;
     font-size: var(--term-inspector-small-font-size);
     font-weight: var(--term-inspector-caps-weight);
@@ -173,7 +174,7 @@
     color: var(--term-inspector-muted-color);
   }
 
-  .ds.term-inspector .value {
+  .ds.term-inspector .value:not(.panel *) {
     grid-column: 2 / -1;
     margin-inline-start: 0;
     overflow-wrap: anywhere;
@@ -186,14 +187,14 @@
 
   /* A list of class edges, the overview's undeclared ones or a
    * property's: a table row each, its figures flush to the end. */
-  .ds.term-inspector .edges {
+  .ds.term-inspector .edges:not(.panel *) {
     grid-column: 1 / -1;
     inline-size: 100%;
     border-collapse: collapse;
     font-size: var(--term-inspector-small-font-size);
   }
 
-  .ds.term-inspector .cell {
+  .ds.term-inspector .cell:not(.panel *) {
     padding-block: var(--term-inspector-tag-gap);
     padding-inline-end: var(--term-inspector-link-gap);
     border-bottom-width: var(--term-inspector-rule-width);
@@ -208,13 +209,13 @@
    * breaks first right after its prefix's colon, and inside its local
    * name only where its column, shared by four in the inspector's width,
    * cannot hold it whole: the table never runs past the inspector. */
-  .ds.term-inspector .cell.is-heading {
+  .ds.term-inspector .cell.is-heading:not(.panel *) {
     font-weight: var(--term-inspector-caps-weight);
     color: var(--term-inspector-muted-color);
     overflow-wrap: normal;
   }
 
-  .ds.term-inspector .cell.is-figure {
+  .ds.term-inspector .cell.is-figure:not(.panel *) {
     padding-inline-start: var(--term-inspector-link-gap);
     padding-inline-end: 0;
     text-align: end;
