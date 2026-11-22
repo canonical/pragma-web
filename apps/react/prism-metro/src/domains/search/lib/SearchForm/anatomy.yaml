@@ -14,6 +14,11 @@
 #   --search-form-border-width: 1px  the frame's hairline.
 #   --search-form-focus-ring-width: 2px  the focus ring's width.
 #
+#
+# Keywords: typography.font inherit (a form control takes the page's face
+# before its own size), appearance.border.style and
+# appearance.outline.style@focus solid.
+#
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: metro.component.search_form
@@ -39,8 +44,10 @@ node:
           appearance.border.color: color.border.muted
           appearance.background: color.background
           typography.color: color.text
+          typography.font: inherit
           typography.size: typography.text.secondary.fontSize
           appearance.outline.width@focus: 2px
+          appearance.outline.style@focus: solid
           appearance.outline.color@focus: color.focusRing
       relation: { cardinality: "1", slotName: input }
     - node:
@@ -56,8 +63,10 @@ node:
           appearance.border.color: color.border
           appearance.background: color.background
           typography.color: color.text
+          typography.font: inherit
           typography.size: typography.text.secondary.fontSize
           interaction.cursor: pointer
           appearance.outline.width@focus: 2px
+          appearance.outline.style@focus: solid
           appearance.outline.color@focus: color.focusRing
       relation: { cardinality: "1", slotName: submit }
