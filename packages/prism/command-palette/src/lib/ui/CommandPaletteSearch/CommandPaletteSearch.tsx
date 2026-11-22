@@ -88,6 +88,8 @@ const componentCssClassName = "ds command-palette-search";
  *
  * The field's text, trimmed, reaches the graph's search deferred: while the
  * next results load, the last ones stay on screen and the listbox is busy.
+ * The hand-off line carries the field's text itself, so Enter opens the
+ * search page for what the field reads, loaded or not.
  * Each session of the palette searches afresh, so a failed search is
  * retried once the palette reopens.
  * An empty field sends no query and shows a one-line hint; a text nothing
@@ -129,7 +131,8 @@ export default function CommandPaletteSearch({
   const field = useRef<HTMLInputElement>(null);
   const handoff = useRef<HTMLAnchorElement>(null);
   const preview = useRef<HTMLElement>(null);
-  const searched = useDeferredValue(text.trim());
+  const typed = text.trim();
+  const searched = useDeferredValue(typed);
   const data = useLazyLoadQuery<CommandPaletteSearchQuery>(
     searchQuery,
     { text: searched, first: SEARCH_PAGE_SIZE, searching: searched !== "" },
@@ -139,9 +142,7 @@ export default function CommandPaletteSearch({
   const groups = groupResultsByType(nodes);
   const results = groups.flatMap((group) => group.results);
   const handoffHref =
-    searchHref === undefined || searched === ""
-      ? undefined
-      : searchHref(searched);
+    searchHref === undefined || typed === "" ? undefined : searchHref(typed);
   const onHandoff =
     handoffHref !== undefined &&
     highlighted !== null &&
@@ -288,7 +289,7 @@ export default function CommandPaletteSearch({
         {listed ? (
           <ProjectionLinkProvider LinkComponent={CommandPaletteTitle}>
             <div
-              aria-busy={searched !== text.trim()}
+              aria-busy={searched !== typed}
               aria-label={t("search.results")}
               className="results"
               id={listboxId}
@@ -359,7 +360,7 @@ export default function CommandPaletteSearch({
             onPointerMove={() => setHighlighted(results.length)}
             ref={handoff}
           >
-            {t("palette.handoff", { text: searched })}
+            {t("palette.handoff", { text: typed })}
           </a>
         </p>
       )}

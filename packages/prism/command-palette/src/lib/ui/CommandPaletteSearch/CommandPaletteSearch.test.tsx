@@ -329,6 +329,21 @@ describe("CommandPaletteSearch", () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
+  it("hands the field's text to the search page while its results still load (W8-A4)", async () => {
+    const searchHref = (text: string): string => `/search?q=${text}`;
+    const { environment } = await renderResults(
+      "bu",
+      RANKED_RESULTS,
+      searchHref,
+    );
+    type("but ");
+    expect(environment.mock.getAllOperations()).toHaveLength(1);
+    const handoff = screen.getByRole("link", {
+      name: "Search everything for “but”",
+    });
+    expect(handoff.getAttribute("href")).toBe("/search?q=but");
+  });
+
   it("opens the search page with Enter when nothing matches the text (W8-A4)", async () => {
     const searchHref = (text: string): string => `/search?q=${text}`;
     const { onChoose } = await renderResults("zzz", [], searchHref);
