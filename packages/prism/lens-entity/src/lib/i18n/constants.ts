@@ -33,7 +33,6 @@ export const MESSAGES = {
   "statements.referencedBy": "Referenced by · {count}",
   "statements.inverse": "{label} (inverse)",
   "statements.shown": "{shown} of {total} shown",
-  "statements.nested": "A nested value",
   "statements.properties": "Properties",
   "panel.open": "Open",
   "panel.open.label": "Open {title}",

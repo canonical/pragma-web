@@ -186,6 +186,9 @@ nothing answers to.
   in its title and ends with one muted line, "12 of 30 shown", a fact and
   not a link: no route lists one entity's group yet, so there is no
   "All N" link. The details panel's groups do the same.
+- Nested values are expanded two levels down, the contract's bound: a
+  value nested deeper, such as a route's reverse, comes with no values and
+  shows as its class's chip ("Route").
 - Which values lead the page is the data's: Central Exchange marks three of
   its properties as prominent (location, serves lines, transfer minutes),
   and the page shows those three.

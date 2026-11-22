@@ -23,6 +23,18 @@ const RECORDED = metroResponses.find(
     operation === "EntityStatementsQuery" && variables.uri === URI,
 );
 
+/** A class as the provider answers a nested value's `type`. */
+const defineClass = (local: string, title: string) => ({
+  __isNode: "OntologyClass",
+  __typename: "OntologyClass",
+  uri: `https://metro.example/onto#${local}`,
+  _meta: { title, curie: `metro:${local}` },
+});
+
+const ROUTE_CLASS = defineClass("Route", "Route");
+
+const GEO_POINT_CLASS = defineClass("GeoPoint", "Geo point");
+
 /**
  * The recorded "serves lines" group, its first line kept beside a value of
  * every other kind and one of a kind the reader does not know, its total
@@ -49,10 +61,11 @@ const craftAnswer = (extra: readonly unknown[] = []) => {
       lang: "fr",
     },
     { __typename: "StatementForeign", curie: "x:a" },
-    { __typename: "StatementNested", type: null, groups: [] },
+    // A value nested past the depth bound: its class, and no values.
+    { __typename: "StatementNested", type: ROUTE_CLASS, groups: [] },
     {
       __typename: "StatementNested",
-      type: { label: "Geo point" },
+      type: GEO_POINT_CLASS,
       groups: [
         {
           predicateUri: "https://geo.example/onto#latitude",
@@ -121,12 +134,14 @@ const renderGroup = async (extra: readonly unknown[] = []) => {
 };
 
 describe("StatementGroup", () => {
-  it("renders each value by its kind: a linked chip, text in its language, a compact form, none for a kind it does not know", {
+  it("renders each value by its kind: a linked chip, text in its language, a compact form, a class's chip past the depth bound, none for a kind it does not know", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
-    const { container } = await renderGroup();
+    const { container } = await renderGroup([
+      { __typename: "StatementNested", type: null, groups: [] },
+    ]);
     const values = [...container.querySelectorAll(".values > .value")];
-    expect(values).toHaveLength(6);
+    expect(values).toHaveLength(7);
     expect(values.at(0)?.querySelector("a")?.getAttribute("href")).toBe(
       "/lines/metro%3Acircle-line",
     );
@@ -134,7 +149,8 @@ describe("StatementGroup", () => {
       "Gare centrale",
     );
     expect(values.at(2)?.querySelector("code")?.textContent).toBe("x:a");
-    expect(values.at(3)?.textContent).toBe("A nested value");
+    expect(values.at(3)?.textContent).toBe("Route");
+    expect(container.textContent).not.toContain("A nested value");
     expect(
       [...(values.at(4)?.querySelectorAll(".nested > .pair") ?? [])].map(
         (pair) =>
@@ -142,6 +158,8 @@ describe("StatementGroup", () => {
       ),
     ).toEqual(["latitude 51.5074", "longitude -0.1278"]);
     expect(values.at(5)?.childNodes).toHaveLength(0);
+    // A nested value with neither values nor a class draws nothing.
+    expect(values.at(6)?.childNodes).toHaveLength(0);
   });
 
   it("draws a node once though several of the group's values name it", {

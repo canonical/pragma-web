@@ -1181,8 +1181,13 @@ export default [
                 {
                   __typename: "StatementNested",
                   type: {
-                    label: "Geo point",
+                    __isNode: "OntologyClass",
+                    __typename: "OntologyClass",
                     uri: "https://geo.example/onto#GeoPoint",
+                    _meta: {
+                      title: "Geo point",
+                      curie: "geo:GeoPoint",
+                    },
                   },
                   groups: [
                     {
@@ -1699,8 +1704,13 @@ export default [
                 {
                   __typename: "StatementNested",
                   type: {
-                    label: "Geo point",
+                    __isNode: "OntologyClass",
+                    __typename: "OntologyClass",
                     uri: "https://geo.example/onto#GeoPoint",
+                    _meta: {
+                      title: "Geo point",
+                      curie: "geo:GeoPoint",
+                    },
                   },
                   groups: [
                     {
@@ -2304,7 +2314,15 @@ export default [
               values: [
                 {
                   __typename: "StatementNested",
-                  type: null,
+                  type: {
+                    __isNode: "OntologyClass",
+                    __typename: "OntologyClass",
+                    uri: "https://metro.example/onto#Route",
+                    _meta: {
+                      title: "Route",
+                      curie: "metro:Route",
+                    },
+                  },
                   groups: [
                     {
                       predicateUri: "https://metro.example/onto#calls",
@@ -2410,7 +2428,15 @@ export default [
                       values: [
                         {
                           __typename: "StatementNested",
-                          type: null,
+                          type: {
+                            __isNode: "OntologyClass",
+                            __typename: "OntologyClass",
+                            uri: "https://metro.example/onto#Route",
+                            _meta: {
+                              title: "Route",
+                              curie: "metro:Route",
+                            },
+                          },
                         },
                       ],
                     },
@@ -2433,7 +2459,15 @@ export default [
                 },
                 {
                   __typename: "StatementNested",
-                  type: null,
+                  type: {
+                    __isNode: "OntologyClass",
+                    __typename: "OntologyClass",
+                    uri: "https://metro.example/onto#Route",
+                    _meta: {
+                      title: "Route",
+                      curie: "metro:Route",
+                    },
+                  },
                   groups: [
                     {
                       predicateUri: "https://metro.example/onto#calls",
@@ -2539,7 +2573,15 @@ export default [
                       values: [
                         {
                           __typename: "StatementNested",
-                          type: null,
+                          type: {
+                            __isNode: "OntologyClass",
+                            __typename: "OntologyClass",
+                            uri: "https://metro.example/onto#Route",
+                            _meta: {
+                              title: "Route",
+                              curie: "metro:Route",
+                            },
+                          },
                         },
                       ],
                     },
@@ -2975,8 +3017,13 @@ export default [
                 {
                   __typename: "StatementNested",
                   type: {
-                    label: "Geo point",
+                    __isNode: "OntologyClass",
+                    __typename: "OntologyClass",
                     uri: "https://geo.example/onto#GeoPoint",
+                    _meta: {
+                      title: "Geo point",
+                      curie: "geo:GeoPoint",
+                    },
                   },
                   groups: [
                     {

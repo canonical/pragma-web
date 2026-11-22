@@ -14,7 +14,8 @@ import "./styles.css";
  * each value by its kind: a node as its chip, a literal as its lexical form
  * in its language, a value outside the graph's namespaces as its compact
  * form, a nested value as its own values (its predicates' labels and
- * their values; a value nested deeper names its class).
+ * their values; a value nested past the provider's depth bound, which
+ * comes with no values, as its class's chip).
  */
 const declareGroupFragment = (): unknown => graphql`
   fragment StatementGroup_group on StatementGroup {
@@ -36,7 +37,7 @@ const declareGroupFragment = (): unknown => graphql`
       }
       ... on StatementNested {
         type {
-          label
+          ...ChipProjection_node
         }
         groups {
           predicateUri
@@ -60,7 +61,7 @@ const declareGroupFragment = (): unknown => graphql`
             }
             ... on StatementNested {
               type {
-                label
+                ...ChipProjection_node
               }
             }
           }
@@ -112,7 +113,7 @@ export default function StatementGroup({
         {listDistinctValues(values).map((value, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: a value has no identity but its place in the provider's order
           <li className="value" key={index}>
-            {renderValue(value, t("statements.nested"))}
+            {renderValue(value)}
           </li>
         ))}
       </ul>
@@ -146,10 +147,10 @@ function listDistinctValues(
  * Render one value by its kind: a nested value as its own values, each
  * after its predicate's label, or as its class when it holds none.
  */
-function renderValue(value: StatementValue, nested: string): ReactNode {
-  if (value.__typename !== "StatementNested") return renderHeld(value, nested);
+function renderValue(value: StatementValue): ReactNode {
+  if (value.__typename !== "StatementNested") return renderHeld(value);
   const held = value.groups.filter(({ values }) => values.length > 0);
-  if (held.length === 0) return value.type?.label ?? nested;
+  if (held.length === 0) return renderClass(value.type);
   return (
     <dl className="nested">
       {held.map(({ predicate, predicateUri, values }) => (
@@ -160,7 +161,7 @@ function renderValue(value: StatementValue, nested: string): ReactNode {
           {values.map((held, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: a value has no identity but its place in the provider's order
             <dd className="held" key={index}>
-              {renderHeld(held, nested)}
+              {renderHeld(held)}
             </dd>
           ))}
         </div>
@@ -170,7 +171,7 @@ function renderValue(value: StatementValue, nested: string): ReactNode {
 }
 
 /** Render a value one level down; a value of a kind it does not know is left out. */
-function renderHeld(value: HeldValue, nested: string): ReactNode {
+function renderHeld(value: HeldValue): ReactNode {
   switch (value.__typename) {
     case "StatementNode":
       return <ChipProjection node={value.node} />;
@@ -179,10 +180,21 @@ function renderHeld(value: HeldValue, nested: string): ReactNode {
     case "StatementForeign":
       return <code>{value.curie}</code>;
     case "StatementNested":
-      return value.type?.label ?? nested;
+      return renderClass(value.type);
     default:
       return null;
   }
+}
+
+/**
+ * Render a nested value by its class: the class's chip, which links through
+ * the site's homes where the site gives the class a page; nothing when the
+ * provider names no class, never a filler in its place.
+ */
+function renderClass(type: NestedValue["type"]): ReactNode {
+  return type === null || type === undefined ? null : (
+    <ChipProjection node={type} />
+  );
 }
 
 /** The last segment of an IRI, after its last `#` or `/`: a predicate's name when it has no label. */
