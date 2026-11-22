@@ -177,3 +177,16 @@ export const STORED_OBJECT_PROPERTY_URIS = {
   cars: `${METRO_NAMESPACE}cars`,
   carType: `${METRO_NAMESPACE}carType`,
 } as const;
+
+/**
+ * The types the search extension adds to the SDL, which a provider built
+ * without search leaves out with `Query.search`: the connection, its edge,
+ * the match, the match's range and the type facet.
+ */
+export const SEARCH_TYPE_NAMES: ReadonlySet<string> = new Set([
+  "SearchConnection",
+  "SearchEdge",
+  "SearchMatch",
+  "MatchRange",
+  "TypeFacet",
+]);

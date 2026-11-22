@@ -248,6 +248,12 @@ export interface ExampleProvider {
   readonly sdl: string;
 }
 
+/** How `createExampleProvider` builds its provider. */
+export interface ExampleProviderOptions {
+  /** Whether the provider serves the search extension. Defaults to true. */
+  readonly search?: boolean;
+}
+
 /** One node as search reads it: what text search matches against. */
 export interface SearchEntry {
   /** The node's absolute IRI. */

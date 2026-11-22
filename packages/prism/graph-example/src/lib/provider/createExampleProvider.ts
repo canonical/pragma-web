@@ -59,6 +59,7 @@ import { expandCurie } from "./expandCurie.js";
 import { extractReferences } from "./extractReferences.js";
 import { isNetworkEntity } from "./isNetworkEntity.js";
 import { observeClassEdges } from "./observeClassEdges.js";
+import omitSearch from "./omitSearch.js";
 import { outlineDataset } from "./outlineDataset.js";
 import { readProviderSdl } from "./providerSdl.js";
 import { rankSearchEntries } from "./rankSearchEntries.js";
@@ -81,6 +82,7 @@ import type {
   ExampleOntology,
   ExampleProperty,
   ExampleProvider,
+  ExampleProviderOptions,
   ExampleRollingStock,
   ExampleRoute,
   ExampleUnit,
@@ -174,15 +176,22 @@ const namespaceOf = (uri: string): string =>
  * reference, a class cycle, an entity of an unknown class) are reachable from
  * tests with a purpose-built dataset rather than being untestable dead code.
  * The lens is a parameter for the same reason: a purpose-built lens reaches
- * the resolution rules the metro's own does not exercise.
+ * the resolution rules the metro's own does not exercise. With
+ * `options.search` false the provider serves no search: its SDL leaves out
+ * `Query.search` and the types only it reads, as a provider without the
+ * extension declares it.
  *
  * @note Impure: reads the provider SDL from the filesystem on every call.
  */
 export const createExampleProvider = (
   dataset: ExampleDataset = exampleDataset,
   lens: SiteLens = siteLens,
+  options: ExampleProviderOptions = {},
 ): ExampleProvider => {
-  const sdl = readProviderSdl();
+  const sdl =
+    options.search === false
+      ? omitSearch(readProviderSdl())
+      : readProviderSdl();
   const schema = buildSchema(sdl);
   const outline = outlineDataset(dataset);
   const lensIndex = indexSiteLens(lens, outline);

@@ -121,6 +121,31 @@ describe("the schema", () => {
   });
 });
 
+describe("a provider built without search", () => {
+  it("serves no search field and none of the types only search reads", async () => {
+    const provider = createExampleProvider(undefined, undefined, {
+      search: false,
+    });
+    expect(provider.schema.getQueryType()?.getFields().search).toBeUndefined();
+    for (const name of [
+      "SearchConnection",
+      "SearchEdge",
+      "SearchMatch",
+      "MatchRange",
+      "TypeFacet",
+    ]) {
+      expect(provider.schema.getType(name)).toBeUndefined();
+    }
+    expect(provider.schema.getQueryType()?.getFields().source).toBeDefined();
+    const result = await graphql({
+      schema: provider.schema,
+      source: '{ search(text: "but") { total } }',
+      rootValue: provider.rootValue,
+    });
+    expect(result.errors?.at(0)?.message).toMatch(/search/);
+  });
+});
+
 describe("Query.node", () => {
   it("resolves an entity by absolute IRI", async () => {
     const data = await run(
