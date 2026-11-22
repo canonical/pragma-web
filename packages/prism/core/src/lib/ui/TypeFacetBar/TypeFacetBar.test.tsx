@@ -73,6 +73,27 @@ describe("TypeFacetBar", () => {
     );
   });
 
+  it("closes the facet with the applied type's chip, which releases it", () => {
+    renderRouted(<TypeFacetBar facets={FACETS} />);
+    const chip = screen.getByRole("link", {
+      name: "Remove the filter Type: Station",
+    });
+    expect(chip).toHaveClass("chip");
+    expect(chip).toHaveTextContent("Type: Station");
+    expect(chip).toHaveAttribute("href", "/search?q=n&type=s");
+  });
+
+  it("shows no chip while no type is applied", () => {
+    renderRouted(
+      <TypeFacetBar
+        facets={FACETS.map((facet) => ({ ...facet, selected: false }))}
+      />,
+    );
+    expect(
+      screen.queryByRole("link", { name: /Remove the filter/ }),
+    ).toBeNull();
+  });
+
   it("greys a type with no results and offers no link to it", () => {
     renderRouted(<TypeFacetBar facets={FACETS} />);
     expect(screen.queryByRole("link", { name: /Zone/ })).toBeNull();

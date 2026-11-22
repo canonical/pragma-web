@@ -39,6 +39,8 @@ export const MESSAGES = {
   "pagination.previous": "Previous page",
   "pagination.next": "Next page",
   "facet.type": "Type",
+  "facet.chip": "{facet}: {value}",
+  "facet.release": "Remove the filter {facet}: {value}",
   "copyButton.copy": "Copy",
   "copyButton.copied": "Copied",
   "sourceView.size": "{bytes} bytes",

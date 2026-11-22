@@ -3,26 +3,26 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The second band under the strip, at the strip's height with one muted
-   * rule beneath: the facet's name, then its values on one line. */
+  /* The facet's label, its values, then the applied type's chip, one
+   * gutter apart: the facet bar holds it on its band's one line, the
+   * filter sheet lets it wrap. */
   .ds.type-facet-bar {
     --type-facet-bar-gap: var(--grid-gutter);
-    --type-facet-bar-min-block-size: var(--density-line-height);
-    --type-facet-bar-padding-block: var(--component-padding-block);
-    --type-facet-bar-divider-width: 1px;
-    --type-facet-bar-divider-color: var(--color-border-muted);
     --type-facet-bar-muted: var(--color-text-muted);
+    --type-facet-bar-current-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+    --type-facet-bar-chip-inset-block: var(--space-050);
+    --type-facet-bar-chip-inset-inline: var(--space-100);
+    --type-facet-bar-chip-border-width: 1px;
+    --type-facet-bar-chip-border-color: var(--color-border);
+    --type-facet-bar-chip-color: var(--color-text);
 
-    grid-column: 1 / -1;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--type-facet-bar-gap);
-    box-sizing: content-box;
-    min-block-size: var(--type-facet-bar-min-block-size);
-    padding-block: var(--type-facet-bar-padding-block);
-    border-bottom-width: var(--type-facet-bar-divider-width);
-    border-bottom-style: solid;
-    border-bottom-color: var(--type-facet-bar-divider-color);
+    min-inline-size: 0;
   }
 
   .ds.type-facet-bar .label {
@@ -40,6 +40,16 @@
     padding-inline-start: 0;
   }
 
+  /* A value keeps its name and count together. */
+  .ds.type-facet-bar .value {
+    white-space: nowrap;
+  }
+
+  /* The applied type: bold, so the bar says which type it holds. */
+  .ds.type-facet-bar .value > [aria-current="true"] {
+    font-weight: var(--type-facet-bar-current-font-weight);
+  }
+
   .ds.type-facet-bar .count {
     color: var(--type-facet-bar-muted);
     font-variant-numeric: tabular-nums;
@@ -48,5 +58,17 @@
   /* A type with no results: greyed, its name and count alike. */
   .ds.type-facet-bar .zero {
     color: var(--type-facet-bar-muted);
+  }
+
+  /* The applied type's chip: a framed link that releases it. */
+  .ds.type-facet-bar .chip {
+    white-space: nowrap;
+    padding-block: var(--type-facet-bar-chip-inset-block);
+    padding-inline: var(--type-facet-bar-chip-inset-inline);
+    border-width: var(--type-facet-bar-chip-border-width);
+    border-style: solid;
+    border-color: var(--type-facet-bar-chip-border-color);
+    color: var(--type-facet-bar-chip-color);
+    text-decoration: none;
   }
 }

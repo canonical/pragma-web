@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.46.0
 
+import { readFileSync } from "node:fs";
 import {
   createMemoryAdapter,
   createRouter,
@@ -41,7 +42,22 @@ describe("TypeFacetBar SSR", () => {
       </RouterProvider>,
     );
     expect(html).toContain("ds type-facet-bar");
-    expect(html).toContain('aria-labelledby="type-facet-bar-label"');
+    expect(html).toContain('aria-label="Type"');
+    expect(html).not.toContain(" id=");
     expect(html).toContain('class="value zero"');
+  });
+
+  it("draws the applied type bold", () => {
+    const styles = readFileSync(
+      new URL("./styles.css", import.meta.url),
+      "utf8",
+    );
+    const start = styles.indexOf(
+      '.ds.type-facet-bar .value > [aria-current="true"] {',
+    );
+    expect(start).toBeGreaterThan(-1);
+    expect(styles.slice(start, styles.indexOf("}", start))).toContain(
+      "font-weight: var(--type-facet-bar-current-font-weight);",
+    );
   });
 });
