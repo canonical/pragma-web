@@ -24,8 +24,11 @@ import {
 import type { NodePayload } from "../../../../testing/types.js";
 import CommandPaletteSearch from "./CommandPaletteSearch.js";
 
-/** Render the search under the site's providers. */
-const renderSearch = () => {
+/**
+ * Render the search under the site's providers, handing its text to
+ * `searchHref`'s page when given.
+ */
+const renderSearch = (searchHref?: (text: string) => string) => {
   const environment = createSearchEnvironment();
   const router = createSiteRouter();
   const onChoose = vi.fn();
@@ -39,6 +42,7 @@ const renderSearch = () => {
           <CommandPaletteSearch
             onChoose={onChoose}
             onHighlight={onHighlight}
+            searchHref={searchHref}
             session={0}
           />
         </Suspense>
@@ -60,8 +64,9 @@ const type = (text: string): void => {
 const renderResults = async (
   text: string,
   nodes: readonly NodePayload[] = RANKED_RESULTS,
+  searchHref?: (text: string) => string,
 ) => {
-  const rendered = renderSearch();
+  const rendered = renderSearch(searchHref);
   type(text);
   await act(async () => {
     rendered.environment.mock.resolveMostRecentOperation(answerSearch(nodes));
@@ -248,6 +253,44 @@ describe("CommandPaletteSearch", () => {
     await waitFor(() => {
       expect(router.getState().location.pathname).toBe(COMPONENT_HREF);
     });
+  });
+
+  it("ends with no hand-off line when the site has no search page", async () => {
+    await renderResults("lay");
+    expect(
+      screen.queryByRole("link", { name: /Search everything/ }),
+    ).toBeNull();
+  });
+
+  it("ends with a line handing the text to the search page, reached after the last result (W8-A1)", async () => {
+    const searchHref = (text: string): string => `/search?q=${text}`;
+    const { onChoose } = await renderResults("lay", RANKED_RESULTS, searchHref);
+    const handoff = screen.getByRole("link", {
+      name: "Search everything for “lay”",
+    });
+    expect(handoff.getAttribute("href")).toBe("/search?q=lay");
+    const field = screen.getByRole("combobox");
+    fireEvent.keyDown(field, { key: "ArrowUp" });
+    expect(field.getAttribute("aria-activedescendant")).toBe(handoff.id);
+    expect(handoff).toHaveClass("is-active");
+    handoff.addEventListener("click", (event) => event.preventDefault());
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onChoose).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    expect(handoff).not.toHaveClass("is-active");
+    fireEvent.pointerMove(handoff);
+    expect(handoff).toHaveClass("is-active");
+  });
+
+  it("opens the search page with Enter when nothing matches the text (W8-A4)", async () => {
+    const searchHref = (text: string): string => `/search?q=${text}`;
+    const { onChoose } = await renderResults("zzz", [], searchHref);
+    const handoff = screen.getByRole("link", {
+      name: "Search everything for “zzz”",
+    });
+    handoff.addEventListener("click", (event) => event.preventDefault());
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    expect(onChoose).toHaveBeenCalledTimes(1);
   });
 
   it("names the text nothing in the graph matches", async () => {

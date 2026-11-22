@@ -140,4 +140,20 @@
       display: none;
     }
   }
+
+  /* The hand-off line: under the body, past a rule, a link handing the
+   * field's text to the site's search page; ringed while highlighted. */
+  .ds.command-palette-search > .handoff {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-block: var(--command-palette-search-padding-block);
+    padding-inline: var(--command-palette-search-padding-inline);
+    border-block-start: var(--command-palette-search-rule-width) solid
+      var(--command-palette-search-rule-color);
+  }
+
+  .ds.command-palette-search > .handoff > .is-active {
+    outline: var(--command-palette-search-focus-ring-width) solid
+      var(--command-palette-search-focus-ring-color);
+  }
 }

@@ -21,6 +21,13 @@ type OwnProps = {
    * palette reopens, rather than failing from the store's memory.
    */
   readonly session: number;
+  /**
+   * The address of the site's search page for a text, when the site has
+   * one. Given, the search ends with a hand-off line, a link to that
+   * address for the field's text, which the arrow keys reach after the
+   * last result and Enter follows when no result is highlighted.
+   */
+  readonly searchHref?: (text: string) => string;
 };
 
 /**

@@ -198,3 +198,24 @@ node:
               projection:
                 field: search
       relation: { cardinality: "1", slotName: body }
+    - node:
+        role: hand-off line, a link handing the field's text to the site's search page
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.width: 1px
+          appearance.border.style: "solid none none"
+          appearance.border.top.color: color.border.muted
+        edges:
+          - node:
+              role: link to the search page for the text, ringed while highlighted
+              styles:
+                appearance.outline.width@highlighted: 2px
+                appearance.outline.style@highlighted: solid
+                appearance.outline.color@highlighted: color.focusRing
+            relation: { cardinality: "1", slotName: link }
+      relation: { cardinality: "0..1", slotName: handoff }

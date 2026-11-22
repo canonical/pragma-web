@@ -2,7 +2,15 @@
 
 import type { ComponentProps } from "react";
 
-type OwnProps = Record<never, never>;
+type OwnProps = {
+  /**
+   * The address of the site's search page for a text, from the site's
+   * router, when its provider serves search: the palette's search then
+   * ends with a line handing the text to that page, and Enter with a text
+   * and no result highlighted opens it.
+   */
+  readonly searchHref?: (text: string) => string;
+};
 
 /**
  * Props accepted by `CommandPalette`: the native props of the `<dialog>` it

@@ -49,6 +49,10 @@ const componentCssClassName = "ds command-palette";
  * closes, since the platform tells of a closing only in a later task,
  * which a quick reopening can come before.
  *
+ * Given `searchHref`, the search ends with a line handing the text to the
+ * site's search page, and Enter with a text and no result highlighted
+ * opens that page.
+ *
  * Mount it once, inside the site's providers: the Relay environment, whose
  * provider serves the search extension; the router; the homes; and the
  * projection link provider.
@@ -64,6 +68,7 @@ const componentCssClassName = "ds command-palette";
  *   pointer's gesture on it, and focuses a failure's line.
  */
 export default function CommandPalette({
+  searchHref,
   className,
   onClick,
   onPointerDown,
@@ -146,6 +151,7 @@ export default function CommandPalette({
               key={session}
               onChoose={close}
               onHighlight={setHighlightDisabled}
+              searchHref={searchHref}
               session={session}
             />
           </Suspense>

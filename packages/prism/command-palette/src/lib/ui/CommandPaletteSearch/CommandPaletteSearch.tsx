@@ -114,6 +114,7 @@ export default function CommandPaletteSearch({
   onChoose,
   onHighlight,
   session,
+  searchHref,
   className,
   ...props
 }: CommandPaletteSearchProps): ReactElement {
@@ -123,6 +124,7 @@ export default function CommandPaletteSearch({
   const [highlighted, setHighlighted] = useState(0);
   const activeOption = useRef<HTMLLIElement>(null);
   const field = useRef<HTMLInputElement>(null);
+  const handoff = useRef<HTMLAnchorElement>(null);
   const preview = useRef<HTMLElement>(null);
   const searched = useDeferredValue(text.trim());
   const data = useLazyLoadQuery<CommandPaletteSearchQuery>(
@@ -133,9 +135,21 @@ export default function CommandPaletteSearch({
   const nodes = data.search?.edges.map(({ node }) => node) ?? [];
   const groups = groupResultsByType(nodes);
   const results = groups.flatMap((group) => group.results);
-  const active = results.at(Math.min(highlighted, results.length - 1));
-  const activeId =
-    active === undefined ? undefined : `${listboxId}-${active.index}`;
+  const handoffHref =
+    searchHref === undefined || searched === ""
+      ? undefined
+      : searchHref(searched);
+  const onHandoff = handoffHref !== undefined && highlighted >= results.length;
+  const active = onHandoff
+    ? undefined
+    : results.at(Math.min(highlighted, results.length - 1));
+  const stops = results.length + (handoffHref === undefined ? 0 : 1);
+  const handoffId = `${listboxId}-handoff`;
+  const activeId = onHandoff
+    ? handoffId
+    : active === undefined
+      ? undefined
+      : `${listboxId}-${active.index}`;
   const listed = results.length > 0;
 
   /**
@@ -220,14 +234,16 @@ export default function CommandPaletteSearch({
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.nativeEvent.isComposing) return;
     const step = ARROW_STEPS.get(event.key);
-    if (step !== undefined && active !== undefined) {
+    if (step !== undefined && stops > 0) {
       event.preventDefault();
-      setHighlighted((active.index + step + results.length) % results.length);
+      const current = onHandoff ? results.length : (active?.index ?? 0);
+      setHighlighted((current + step + stops) % stops);
       return;
     }
     if (event.key === "Enter") {
       event.preventDefault();
-      activeOption.current?.click();
+      if (active === undefined) handoff.current?.click();
+      else activeOption.current?.click();
     }
   };
 
@@ -319,6 +335,20 @@ export default function CommandPaletteSearch({
           </section>
         )}
       </div>
+      {handoffHref === undefined ? null : (
+        <p className="handoff">
+          <a
+            className={onHandoff ? "is-active" : undefined}
+            href={handoffHref}
+            id={handoffId}
+            onClick={onChoose}
+            onPointerMove={() => setHighlighted(results.length)}
+            ref={handoff}
+          >
+            {t("palette.handoff", { text: searched })}
+          </a>
+        </p>
+      )}
     </div>
   );
 }

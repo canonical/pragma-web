@@ -9,6 +9,7 @@
  */
 export const MESSAGES = {
   "palette.label": "Search the graph",
+  "palette.handoff": "Search everything for “{text}”",
   "palette.failure":
     "The search failed. Close the palette and open it again to retry.",
   "hints.move": "{up} {down} to move",
