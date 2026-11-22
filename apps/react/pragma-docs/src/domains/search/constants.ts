@@ -17,3 +17,10 @@ export const SEARCH_DOOR_CLASSES = {
   components: "ds:Component",
   standards: STANDARDS_BINDING.classUri,
 } as const satisfies Readonly<Record<string, string>>;
+
+/**
+ * The site's prominent class: the one its first lens lists, the
+ * Components. Its group leads a search's results when it has any; the
+ * other types follow by ascending count.
+ */
+export const SEARCH_PROMINENT_CLASS = "https://ds.canonical.com/Component";

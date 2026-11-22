@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a822bb555ab76217f99ea8aef16c723a>>
+ * @generated SignedSource<<749e2184f1b56a4de79b635320d894f7>>
  * @lightSyntaxTransform
  */
 
@@ -11,13 +11,26 @@ import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type DocsSearchQuery$variables = {
   after?: string | null | undefined;
+  earlierFirst?: number | null | undefined;
   first?: number | null | undefined;
+  hasEarlier?: boolean | null | undefined;
   hasPrevious?: boolean | null | undefined;
   previousFirst?: number | null | undefined;
   text: string;
   types?: ReadonlyArray<string> | null | undefined;
 };
 export type DocsSearchQuery$data = {
+  readonly earlier?: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly _meta: {
+          readonly type: {
+            readonly uri: string;
+          };
+        };
+      };
+    }>;
+  };
   readonly previous?: {
     readonly pageInfo: {
       readonly endCursor: string | null | undefined;
@@ -73,39 +86,49 @@ var v0 = {
 v1 = {
   "defaultValue": null,
   "kind": "LocalArgument",
-  "name": "first"
+  "name": "earlierFirst"
 },
 v2 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "first"
+},
+v3 = {
+  "defaultValue": false,
+  "kind": "LocalArgument",
+  "name": "hasEarlier"
+},
+v4 = {
   "defaultValue": false,
   "kind": "LocalArgument",
   "name": "hasPrevious"
 },
-v3 = {
+v5 = {
   "defaultValue": null,
   "kind": "LocalArgument",
   "name": "previousFirst"
 },
-v4 = {
+v6 = {
   "defaultValue": null,
   "kind": "LocalArgument",
   "name": "text"
 },
-v5 = {
+v7 = {
   "defaultValue": null,
   "kind": "LocalArgument",
   "name": "types"
 },
-v6 = {
+v8 = {
   "kind": "Variable",
   "name": "text",
   "variableName": "text"
 },
-v7 = {
+v9 = {
   "kind": "Variable",
   "name": "types",
   "variableName": "types"
 },
-v8 = [
+v10 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -116,24 +139,24 @@ v8 = [
     "name": "first",
     "variableName": "first"
   },
-  (v6/*:: as any*/),
-  (v7/*:: as any*/)
+  (v8/*:: as any*/),
+  (v9/*:: as any*/)
 ],
-v9 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "total",
   "storageKey": null
 },
-v10 = {
+v12 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "endCursor",
   "storageKey": null
 },
-v11 = {
+v13 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -148,25 +171,25 @@ v11 = {
       "name": "hasNextPage",
       "storageKey": null
     },
-    (v10/*:: as any*/)
+    (v12/*:: as any*/)
   ],
   "storageKey": null
 },
-v12 = {
+v14 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "uri",
   "storageKey": null
 },
-v13 = {
+v15 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "title",
   "storageKey": null
 },
-v14 = {
+v16 = {
   "alias": null,
   "args": null,
   "concreteType": "TypeFacet",
@@ -189,7 +212,7 @@ v14 = {
       "name": "type",
       "plural": false,
       "selections": [
-        (v12/*:: as any*/),
+        (v14/*:: as any*/),
         {
           "alias": null,
           "args": null,
@@ -205,7 +228,7 @@ v14 = {
           "name": "_meta",
           "plural": false,
           "selections": [
-            (v13/*:: as any*/)
+            (v15/*:: as any*/)
           ],
           "storageKey": null
         }
@@ -215,27 +238,39 @@ v14 = {
   ],
   "storageKey": null
 },
-v15 = {
+v17 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v16 = [
-  (v12/*:: as any*/)
+v18 = [
+  (v14/*:: as any*/)
 ],
-v17 = {
+v19 = {
   "alias": null,
   "args": null,
   "concreteType": "OntologyClass",
   "kind": "LinkedField",
   "name": "type",
   "plural": false,
-  "selections": (v16/*:: as any*/),
+  "selections": (v18/*:: as any*/),
   "storageKey": null
 },
-v18 = {
+v20 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "EntityMeta",
+  "kind": "LinkedField",
+  "name": "_meta",
+  "plural": false,
+  "selections": [
+    (v19/*:: as any*/)
+  ],
+  "storageKey": null
+},
+v21 = {
   "alias": null,
   "args": null,
   "concreteType": "SearchMatch",
@@ -278,7 +313,16 @@ v18 = {
   ],
   "storageKey": null
 },
-v19 = {
+v22 = [
+  {
+    "kind": "Variable",
+    "name": "first",
+    "variableName": "earlierFirst"
+  },
+  (v8/*:: as any*/),
+  (v9/*:: as any*/)
+],
+v23 = {
   "condition": "hasPrevious",
   "kind": "Condition",
   "passingValue": true,
@@ -291,8 +335,8 @@ v19 = {
           "name": "first",
           "variableName": "previousFirst"
         },
-        (v6/*:: as any*/),
-        (v7/*:: as any*/)
+        (v8/*:: as any*/),
+        (v9/*:: as any*/)
       ],
       "concreteType": "SearchConnection",
       "kind": "LinkedField",
@@ -307,7 +351,7 @@ v19 = {
           "name": "pageInfo",
           "plural": false,
           "selections": [
-            (v10/*:: as any*/)
+            (v12/*:: as any*/)
           ],
           "storageKey": null
         }
@@ -316,7 +360,14 @@ v19 = {
     }
   ]
 },
-v20 = [
+v24 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v25 = [
   {
     "kind": "TypeDiscriminator",
     "abstractKey": "__isUIBlock"
@@ -330,7 +381,9 @@ return {
       (v2/*:: as any*/),
       (v3/*:: as any*/),
       (v4/*:: as any*/),
-      (v5/*:: as any*/)
+      (v5/*:: as any*/),
+      (v6/*:: as any*/),
+      (v7/*:: as any*/)
     ],
     "kind": "Fragment",
     "metadata": null,
@@ -338,15 +391,15 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v8/*:: as any*/),
+        "args": (v10/*:: as any*/),
         "concreteType": "SearchConnection",
         "kind": "LinkedField",
         "name": "search",
         "plural": false,
         "selections": [
-          (v9/*:: as any*/),
           (v11/*:: as any*/),
-          (v14/*:: as any*/),
+          (v13/*:: as any*/),
+          (v16/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -355,7 +408,7 @@ return {
             "name": "edges",
             "plural": true,
             "selections": [
-              (v15/*:: as any*/),
+              (v17/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -364,18 +417,7 @@ return {
                 "name": "node",
                 "plural": false,
                 "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "EntityMeta",
-                    "kind": "LinkedField",
-                    "name": "_meta",
-                    "plural": false,
-                    "selections": [
-                      (v17/*:: as any*/)
-                    ],
-                    "storageKey": null
-                  },
+                  (v20/*:: as any*/),
                   {
                     "args": null,
                     "kind": "FragmentSpread",
@@ -384,14 +426,55 @@ return {
                 ],
                 "storageKey": null
               },
-              (v18/*:: as any*/)
+              (v21/*:: as any*/)
             ],
             "storageKey": null
           }
         ],
         "storageKey": null
       },
-      (v19/*:: as any*/)
+      {
+        "condition": "hasEarlier",
+        "kind": "Condition",
+        "passingValue": true,
+        "selections": [
+          {
+            "alias": "earlier",
+            "args": (v22/*:: as any*/),
+            "concreteType": "SearchConnection",
+            "kind": "LinkedField",
+            "name": "search",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "SearchEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": null,
+                    "kind": "LinkedField",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      (v20/*:: as any*/)
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ]
+      },
+      (v23/*:: as any*/)
     ],
     "type": "Query",
     "abstractKey": null
@@ -399,27 +482,29 @@ return {
   "kind": "Request",
   "operation": {
     "argumentDefinitions": [
-      (v4/*:: as any*/),
-      (v1/*:: as any*/),
-      (v0/*:: as any*/),
-      (v5/*:: as any*/),
+      (v6/*:: as any*/),
       (v2/*:: as any*/),
-      (v3/*:: as any*/)
+      (v0/*:: as any*/),
+      (v7/*:: as any*/),
+      (v3/*:: as any*/),
+      (v1/*:: as any*/),
+      (v4/*:: as any*/),
+      (v5/*:: as any*/)
     ],
     "kind": "Operation",
     "name": "DocsSearchQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v8/*:: as any*/),
+        "args": (v10/*:: as any*/),
         "concreteType": "SearchConnection",
         "kind": "LinkedField",
         "name": "search",
         "plural": false,
         "selections": [
-          (v9/*:: as any*/),
           (v11/*:: as any*/),
-          (v14/*:: as any*/),
+          (v13/*:: as any*/),
+          (v16/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -428,7 +513,7 @@ return {
             "name": "edges",
             "plural": true,
             "selections": [
-              (v15/*:: as any*/),
+              (v17/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -437,13 +522,7 @@ return {
                 "name": "node",
                 "plural": false,
                 "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "kind": "ScalarField",
-                    "name": "__typename",
-                    "storageKey": null
-                  },
+                  (v24/*:: as any*/),
                   {
                     "alias": null,
                     "args": null,
@@ -452,8 +531,8 @@ return {
                     "name": "_meta",
                     "plural": false,
                     "selections": [
-                      (v17/*:: as any*/),
-                      (v13/*:: as any*/),
+                      (v19/*:: as any*/),
+                      (v15/*:: as any*/),
                       {
                         "alias": null,
                         "args": null,
@@ -468,22 +547,22 @@ return {
                     "kind": "TypeDiscriminator",
                     "abstractKey": "__isNode"
                   },
-                  (v12/*:: as any*/),
+                  (v14/*:: as any*/),
                   {
                     "kind": "InlineFragment",
-                    "selections": (v20/*:: as any*/),
+                    "selections": (v25/*:: as any*/),
                     "type": "Component",
                     "abstractKey": null
                   },
                   {
                     "kind": "InlineFragment",
-                    "selections": (v20/*:: as any*/),
+                    "selections": (v25/*:: as any*/),
                     "type": "Pattern",
                     "abstractKey": null
                   },
                   {
                     "kind": "InlineFragment",
-                    "selections": (v20/*:: as any*/),
+                    "selections": (v25/*:: as any*/),
                     "type": "Layout",
                     "abstractKey": null
                   },
@@ -519,7 +598,7 @@ return {
                                 "kind": "LinkedField",
                                 "name": "node",
                                 "plural": false,
-                                "selections": (v16/*:: as any*/),
+                                "selections": (v18/*:: as any*/),
                                 "storageKey": null
                               }
                             ],
@@ -535,27 +614,70 @@ return {
                 ],
                 "storageKey": null
               },
-              (v18/*:: as any*/)
+              (v21/*:: as any*/)
             ],
             "storageKey": null
           }
         ],
         "storageKey": null
       },
-      (v19/*:: as any*/)
+      {
+        "condition": "hasEarlier",
+        "kind": "Condition",
+        "passingValue": true,
+        "selections": [
+          {
+            "alias": "earlier",
+            "args": (v22/*:: as any*/),
+            "concreteType": "SearchConnection",
+            "kind": "LinkedField",
+            "name": "search",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "SearchEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": null,
+                    "kind": "LinkedField",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      (v24/*:: as any*/),
+                      (v20/*:: as any*/),
+                      (v14/*:: as any*/)
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
+            ],
+            "storageKey": null
+          }
+        ]
+      },
+      (v23/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "1f8216fdc1581f6a816f1b32b5acfcd4",
+    "cacheID": "4affbccf2d9e4661d6d4e66ad9ed7a88",
     "id": null,
     "metadata": {},
     "name": "DocsSearchQuery",
     "operationKind": "query",
-    "text": "query DocsSearchQuery(\n  $text: String!\n  $first: Int\n  $after: String\n  $types: [ID!]\n  $hasPrevious: Boolean = false\n  $previousFirst: Int\n) {\n  search(text: $text, first: $first, after: $after, types: $types) {\n    total\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    facets {\n      count\n      type {\n        uri\n        label\n        _meta {\n          title\n        }\n      }\n    }\n    edges {\n      cursor\n      node {\n        __typename\n        _meta {\n          type {\n            uri\n          }\n        }\n        ...DocsChipProjection_node\n        uri\n      }\n      match {\n        passage\n        ranges {\n          start\n          length\n        }\n      }\n    }\n  }\n  previous: search(text: $text, first: $previousFirst, types: $types) @include(if: $hasPrevious) {\n    pageInfo {\n      endCursor\n    }\n  }\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment DocsChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...OntologyClassChip_node\n  ... on Component {\n    ...UIBlockChip_node\n  }\n  ... on Pattern {\n    ...UIBlockChip_node\n  }\n  ... on Layout {\n    ...UIBlockChip_node\n  }\n  ...ModifierChip_node\n  ...ModifierFamilyChip_node\n  ...CodeStandardChip_node\n}\n\nfragment ModifierChip_node on Modifier {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n"
+    "text": "query DocsSearchQuery(\n  $text: String!\n  $first: Int\n  $after: String\n  $types: [ID!]\n  $hasEarlier: Boolean = false\n  $earlierFirst: Int\n  $hasPrevious: Boolean = false\n  $previousFirst: Int\n) {\n  search(text: $text, first: $first, after: $after, types: $types) {\n    total\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    facets {\n      count\n      type {\n        uri\n        label\n        _meta {\n          title\n        }\n      }\n    }\n    edges {\n      cursor\n      node {\n        __typename\n        _meta {\n          type {\n            uri\n          }\n        }\n        ...DocsChipProjection_node\n        uri\n      }\n      match {\n        passage\n        ranges {\n          start\n          length\n        }\n      }\n    }\n  }\n  earlier: search(text: $text, first: $earlierFirst, types: $types) @include(if: $hasEarlier) {\n    edges {\n      node {\n        __typename\n        _meta {\n          type {\n            uri\n          }\n        }\n        uri\n      }\n    }\n  }\n  previous: search(text: $text, first: $previousFirst, types: $types) @include(if: $hasPrevious) {\n    pageInfo {\n      endCursor\n    }\n  }\n}\n\nfragment CodeStandardChip_node on CodeStandard {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment DocsChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...OntologyClassChip_node\n  ... on Component {\n    ...UIBlockChip_node\n  }\n  ... on Pattern {\n    ...UIBlockChip_node\n  }\n  ... on Layout {\n    ...UIBlockChip_node\n  }\n  ...ModifierChip_node\n  ...ModifierFamilyChip_node\n  ...CodeStandardChip_node\n}\n\nfragment ModifierChip_node on Modifier {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment ModifierFamilyChip_node on ModifierFamily {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n  modifiers(first: 100) {\n    edges {\n      node {\n        uri\n      }\n    }\n  }\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment UIBlockChip_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  uri\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "312025af83bf3f1310609c985b9ff1aa";
+(node as any).hash = "b9ed8c8cb836eeefd7a4086be77d767c";
 
 export default node;

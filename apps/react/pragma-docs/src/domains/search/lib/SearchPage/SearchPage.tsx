@@ -18,9 +18,10 @@ import buildSearchVariables from "../../buildSearchVariables.js";
 import {
   SEARCH_DOOR_CLASSES,
   SEARCH_PAGE_SIZE,
+  SEARCH_PROMINENT_CLASS,
   SEARCH_TITLE_ID,
 } from "../../constants.js";
-import groupSearchEdges from "../../groupSearchEdges.js";
+import groupSearchEdges, { orderSearchFacets } from "../../groupSearchEdges.js";
 import {
   type DocsSearchDoorsQuery,
   searchDoorsQueryNode,
@@ -87,18 +88,20 @@ export function SearchFacets({
   if (search.facets.length < 2) return null;
   const facet = (
     <TypeFacetBar
-      facets={search.facets.map(({ count, type: facetType }) => ({
-        id: facetType.uri,
-        label: facetType.label ?? facetType._meta.title,
-        count,
-        href: router.buildPath("search", {
-          search:
-            facetType.uri === type
-              ? { q: text }
-              : { q: text, type: facetType.uri },
+      facets={orderSearchFacets(search.facets, SEARCH_PROMINENT_CLASS).map(
+        ({ count, type: facetType }) => ({
+          id: facetType.uri,
+          label: facetType.label ?? facetType._meta.title,
+          count,
+          href: router.buildPath("search", {
+            search:
+              facetType.uri === type
+                ? { q: text }
+                : { q: text, type: facetType.uri },
+          }),
+          selected: facetType.uri === type,
         }),
-        selected: facetType.uri === type,
-      }))}
+      )}
       withChip={placement !== "bar"}
     />
   );
@@ -106,8 +109,8 @@ export function SearchFacets({
 }
 
 /**
- * The page's results for a text: the results grouped by type and the
- * pagination bar; or, when nothing matches, the no-match state. The
+ * The page's results for a text: the results grouped by type and, when
+ * they run past one page, the pagination bar; or, when nothing matches, the no-match state. The
  * strip holds their count and the facet bar under it the Type facet.
  *
  * @note Impure: reads `DocsSearchQuery` from the Relay store, fetching it
@@ -121,7 +124,7 @@ function SearchResults({
 }: Omit<SearchPageProps, "className">): ReactElement {
   const t = useMessages();
   const router = useRouter();
-  const { search, previous } = useLazyLoadQuery<DocsSearchQuery>(
+  const { search, earlier, previous } = useLazyLoadQuery<DocsSearchQuery>(
     searchQueryNode,
     buildSearchVariables(text, { type, after, page }),
   );
@@ -130,7 +133,7 @@ function SearchResults({
   if (search.total === 0) {
     return (
       <div className="none" role="status">
-        <p>{t("search.none")}</p>
+        <p>{t("search.none", { text: text.trim() })}</p>
         <ul className="hints">
           <li>{t("search.spelling")}</li>
           {DEFINITIONS_ROUTE in router.routes && (
@@ -160,8 +163,14 @@ function SearchResults({
   return (
     <>
       <div className="results">
-        {groupSearchEdges(search.edges, search.facets).map((group) => (
+        {groupSearchEdges(search.edges, search.facets, {
+          prominent: SEARCH_PROMINENT_CLASS,
+          earlier: new Set(
+            earlier?.edges.map(({ node }) => node._meta.type.uri),
+          ),
+        }).map((group) => (
           <SearchResultGroup
+            continued={group.continued}
             count={group.count}
             key={group.type}
             title={group.title}
@@ -179,26 +188,28 @@ function SearchResults({
           </SearchResultGroup>
         ))}
       </div>
-      <PaginationBar
-        label={t("search.position", {
-          first: String(first),
-          last: String(first + search.edges.length - 1),
-          total: String(search.total),
-        })}
-        nextHref={
-          search.pageInfo.hasNextPage && search.pageInfo.endCursor
-            ? href({
-                q: text,
-                type,
-                after: search.pageInfo.endCursor,
-                page: String(page + 1),
-              })
-            : undefined
-        }
-        previousHref={
-          previousValues === undefined ? undefined : href(previousValues)
-        }
-      />
+      {(previousValues !== undefined || search.pageInfo.hasNextPage) && (
+        <PaginationBar
+          label={t("search.position", {
+            first: String(first),
+            last: String(first + search.edges.length - 1),
+            total: String(search.total),
+          })}
+          nextHref={
+            search.pageInfo.hasNextPage && search.pageInfo.endCursor
+              ? href({
+                  q: text,
+                  type,
+                  after: search.pageInfo.endCursor,
+                  page: String(page + 1),
+                })
+              : undefined
+          }
+          previousHref={
+            previousValues === undefined ? undefined : href(previousValues)
+          }
+        />
+      )}
     </>
   );
 }

@@ -6,7 +6,8 @@ import { graphql } from "react-relay";
  * operation: one page of the provider's `search` extension, each result
  * through the site's chip switch with its type, beside its passage and the
  * ranges of the text in it; the total, the type facets and whether a page
- * follows; and, from the third page, the cursor the previous page starts
+ * follows; from the second page, the types of the results before it; and,
+ * from the third page, the cursor the previous page starts
  * after. Nothing calls it: the route's warm and the
  * page read the compiled artifact, because an evaluated tag throws
  * wherever no Relay transform has run.
@@ -17,6 +18,8 @@ const declareDocsSearchQuery = (): unknown => graphql`
     $first: Int
     $after: String
     $types: [ID!]
+    $hasEarlier: Boolean = false
+    $earlierFirst: Int
     $hasPrevious: Boolean = false
     $previousFirst: Int
   ) {
@@ -51,6 +54,18 @@ const declareDocsSearchQuery = (): unknown => graphql`
           ranges {
             start
             length
+          }
+        }
+      }
+    }
+    earlier: search(text: $text, first: $earlierFirst, types: $types)
+      @include(if: $hasEarlier) {
+      edges {
+        node {
+          _meta {
+            type {
+              uri
+            }
           }
         }
       }

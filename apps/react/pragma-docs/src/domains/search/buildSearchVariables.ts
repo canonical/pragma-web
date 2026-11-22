@@ -5,8 +5,10 @@ import type { SearchState } from "./types.js";
 /**
  * Build the variables of `DocsSearchQuery` for a search text: the text
  * trimmed and one page of results; with the page's state, the applied
- * type, the cursor the page starts after and, from the third page, the
- * size of the window that ends where the previous page starts.
+ * type, the cursor the page starts after, from the second page the size
+ * of the window that ends where the page starts (whose types tell the
+ * groups that continue), and from the third page the size of the window
+ * that ends where the previous page starts.
  *
  * @param text - The search text, as the address holds it.
  * @param state - The applied type, cursor and page, when the address has them.
@@ -22,6 +24,9 @@ export default function buildSearchVariables(
     first: SEARCH_PAGE_SIZE,
     ...(type === undefined ? {} : { types: [type] }),
     ...(after === undefined ? {} : { after }),
+    ...(page > 1
+      ? { hasEarlier: true, earlierFirst: SEARCH_PAGE_SIZE * (page - 1) }
+      : {}),
     ...(page > 2
       ? { hasPrevious: true, previousFirst: SEARCH_PAGE_SIZE * (page - 2) }
       : {}),

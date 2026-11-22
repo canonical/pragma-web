@@ -7,6 +7,8 @@ import { describe, expect, it, vi } from "vitest";
 import createSiteTree from "../../../../../testing/createSiteTree.js";
 import { MOCK_UI_BLOCK } from "../../../../../testing/projectionEntities.js";
 import resolveRoot from "../../../../../testing/resolveRoot.js";
+import { SEARCH_PROMINENT_CLASS } from "../../constants.js";
+import { orderSearchFacets } from "../../groupSearchEdges.js";
 import SearchPage, { SearchCount, SearchFacets } from "./SearchPage.js";
 import type { SearchPageProps } from "./types.js";
 
@@ -86,7 +88,7 @@ describe("SearchPage", () => {
 
   it("says nothing matches when the provider finds nothing, and lists nothing", () => {
     renderSearch(0);
-    expect(screen.getByText("Nothing matches the search.")).toBeInTheDocument();
+    expect(screen.getByText(/^Nothing matches “.+”\.$/)).toBeInTheDocument();
     expect(document.querySelector(".ds.search-page .results")).toBeNull();
   });
 
@@ -114,13 +116,14 @@ describe("SearchPage", () => {
         ".ds.filter-bar .ds.type-facet-bar .value a",
       ),
     ];
-    expect(facets).toHaveLength(FACETS.length);
+    const ordered = orderSearchFacets(FACETS, SEARCH_PROMINENT_CLASS);
+    expect(facets).toHaveLength(ordered.length);
     facets.forEach((link, index) => {
       expect(link.querySelector(".count")?.textContent).toBe(
-        String(FACETS[index]?.count),
+        String(ordered[index]?.count),
       );
       expect(link.getAttribute("href")).toContain(
-        `type=${encodeURIComponent(FACETS[index]?.type.uri ?? "")}`,
+        `type=${encodeURIComponent(ordered[index]?.type.uri ?? "")}`,
       );
     });
   });
@@ -134,6 +137,14 @@ describe("SearchPage", () => {
         false,
       );
     }
+  });
+
+  it("draws no pagination bar when the results fit one page (W8-A9)", () => {
+    renderPage({ text: "but" }, 5);
+    expect(document.querySelector(".ds.search-page .result")).not.toBeNull();
+    expect(
+      document.querySelector(".ds.search-page .ds.pagination-bar"),
+    ).toBeNull();
   });
 
   it("pages the results by 20, linking the next page with its cursor (W8-A9)", () => {
@@ -169,7 +180,7 @@ describe("SearchPage", () => {
 
   it("offers the next steps when nothing matches (W8-A9)", () => {
     renderPage({ text: "zzzz" }, 0);
-    expect(screen.getByText("Nothing matches the search.")).toBeInTheDocument();
+    expect(screen.getByText(/^Nothing matches “.+”\.$/)).toBeInTheDocument();
     const hints = document.querySelector(".ds.search-page .none .hints");
     expect(hints?.textContent).toContain("Ctrl K");
     expect(
