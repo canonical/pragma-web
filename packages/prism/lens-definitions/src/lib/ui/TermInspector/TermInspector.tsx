@@ -222,6 +222,7 @@ export default function TermInspector({
     // details panel, or a term the graph does not hold, which it alerts.
     body = (
       <EntityPanel
+        className="panel"
         notFound={
           <p className="unknown" role="alert">
             <Message

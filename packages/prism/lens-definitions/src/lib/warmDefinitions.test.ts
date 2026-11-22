@@ -75,10 +75,7 @@ describe("warmDefinitions", () => {
     await warming.catch(() => undefined);
 
     expect(listRequests(fetchFn).map(({ name }) => name)).toEqual(
-      expect.arrayContaining([
-        "EntityPanelQuery",
-        "EntityStatementsQuery",
-      ]),
+      expect.arrayContaining(["EntityPanelQuery", "EntityStatementsQuery"]),
     );
   });
 

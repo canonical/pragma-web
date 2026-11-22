@@ -55,7 +55,7 @@
 
   /* An instance's details panel, across the inspector's columns: it keeps
    * its own column of blocks rather than the views' subgrid. */
-  .ds.term-inspector > .ds.entity-panel {
+  .ds.term-inspector .panel {
     grid-column: 1 / -1;
   }
 
