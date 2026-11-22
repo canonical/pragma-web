@@ -44,6 +44,7 @@ import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
+import * as timelineStories from "../../lib/_work_in_progress/Timeline/Timeline.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -91,6 +92,7 @@ const parts = {
   DataChart: composeStories(dataChartStories),
   DataChartWithTable: composeStories(dataChartWithTableStories),
   "Build your own renderer": composeStories(buildARendererStories),
+  Timeline: composeStories(timelineStories),
 };
 
 /**
@@ -114,6 +116,9 @@ const AUTHORED: Readonly<Record<string, readonly string[]>> = {
     "Table",
     "Waiting on an address from the upstream pool.",
   ],
+  // The timeline's story names its own switch, and the table it offers,
+  // the same way.
+  Timeline: ["Show review activity as", "Table"],
 };
 
 /** List every phrase a part's stories author, the shared ones included. */
