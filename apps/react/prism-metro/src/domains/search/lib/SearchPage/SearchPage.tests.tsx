@@ -78,7 +78,7 @@ describe("SearchPage", () => {
     await findPassages();
     const facets = [
       ...document.querySelectorAll<HTMLAnchorElement>(
-        ".ds.search-page .ds.type-facet-bar .value a",
+        ".ds.filter-bar .ds.type-facet-bar .value a",
       ),
     ].map((link) => ({
       href: link.getAttribute("href") ?? "",

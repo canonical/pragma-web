@@ -1,21 +1,48 @@
 import {
   DocumentLayout,
   ErrorBoundary,
+  FILTER_SHEET,
+  FilterFold,
+  FilterSheet,
   ModeStrip,
+  VIEW_PARAMS,
 } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { type ReactElement, Suspense } from "react";
+import { useSearchParam } from "@canonical/router-react";
+import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
-import { SearchForm, SearchPage } from "./lib/index.js";
+import {
+  SearchCount,
+  SearchFacets,
+  SearchForm,
+  SearchPage,
+} from "./lib/index.js";
 import { readSearchState, searchValues } from "./searchValues.js";
 import type { SearchValues } from "./types.js";
 import warmSearch from "./warmSearch.js";
 
 /**
+ * A part of the strip that reads the search from the store: it renders
+ * nothing while the store lacks it or when it fails, so the strip stands.
+ */
+const StripPart = ({
+  children,
+}: {
+  readonly children: ReactNode;
+}): ReactElement => (
+  <ErrorBoundary fallback={null}>
+    <Suspense fallback={null}>{children}</Suspense>
+  </ErrorBoundary>
+);
+
+/**
  * The search route's content: the document archetype with the metro rail
  * and a strip whose Search is a form that sends its text back to this
- * page (a plain GET, so it searches without scripting), and the page for
+ * page (a plain GET, so it searches without scripting) beside the count
+ * of results, the Type facet in the facet bar under it, and below two
+ * groups the fold to the filter sheet, which holds the count, the field
+ * and the facet; then the page for
  * the address's state inside its own error boundary and Suspense, so the
  * rail and strip stand while the results load.
  */
@@ -26,10 +53,31 @@ const SearchContent = ({
 }): ReactElement => {
   const t = useMessages();
   const state = readSearchState(search);
+  const sheetOpen = useSearchParam(VIEW_PARAMS.sheet) === FILTER_SHEET;
+  const hasText = state.text.trim() !== "";
+  const applied = (hasText ? 1 : 0) + (state.type === undefined ? 0 : 1);
+  const count = hasText ? (
+    <StripPart>
+      <SearchCount {...state} />
+    </StripPart>
+  ) : null;
   return (
     <DocumentLayout
       rail={<MetroRail />}
-      strip={<ModeStrip search={<SearchForm text={state.text} />} />}
+      strip={
+        <>
+          <ModeStrip
+            count={count}
+            fold={<FilterFold count={applied} />}
+            search={<SearchForm text={state.text} />}
+          />
+          {hasText ? (
+            <StripPart>
+              <SearchFacets {...state} placement="bar" />
+            </StripPart>
+          ) : null}
+        </>
+      }
     >
       <ErrorBoundary
         fallback={
@@ -47,6 +95,19 @@ const SearchContent = ({
           />
         </Suspense>
       </ErrorBoundary>
+      <FilterSheet open={sheetOpen}>
+        {sheetOpen ? (
+          <>
+            {count}
+            <SearchForm text={state.text} />
+            {hasText ? (
+              <StripPart>
+                <SearchFacets {...state} placement="sheet" />
+              </StripPart>
+            ) : null}
+          </>
+        ) : null}
+      </FilterSheet>
     </DocumentLayout>
   );
 };

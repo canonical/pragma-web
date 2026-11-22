@@ -23,10 +23,11 @@
     gap: var(--search-page-gap);
   }
 
-  /* A result: its chip over its passage. */
+  /* A result: its chip over its passage, the chip at its own width. */
   .ds.search-page .result {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     min-inline-size: 0;
   }
 

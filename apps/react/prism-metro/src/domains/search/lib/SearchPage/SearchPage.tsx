@@ -2,6 +2,7 @@
 
 import {
   collectLenses,
+  FilterBar,
   PaginationBar,
   TypeFacetBar,
 } from "@canonical/prism-core";
@@ -26,7 +27,11 @@ import {
 } from "../../searchDoorsQuery.js";
 import { type MetroSearchQuery, searchQueryNode } from "../../searchQuery.js";
 import type { SearchValues } from "../../types.js";
-import type { SearchPageProps } from "./types.js";
+import type {
+  SearchFacetsProps,
+  SearchPageProps,
+  SearchStateProps,
+} from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds search-page";
@@ -35,9 +40,74 @@ const componentCssClassName = "ds search-page";
 const DEFINITIONS_ROUTE = "definitions";
 
 /**
- * The page's results for a text: the Type facet while two or more types
- * match, the results grouped by type, and the pagination bar; or, when
- * nothing matches, the no-match state.
+ * The strip's count for the address's text: how many results match.
+ *
+ * `import { SearchCount } from "./lib/index.js";`
+ *
+ * @note Impure: reads `MetroSearchQuery` from the Relay store, fetching it
+ *   when the store lacks it.
+ */
+export function SearchCount({
+  text,
+  type,
+  after,
+  page = 1,
+}: SearchStateProps): ReactElement {
+  const t = useMessages();
+  const { search } = useLazyLoadQuery<MetroSearchQuery>(
+    searchQueryNode,
+    buildSearchVariables(text, { type, after, page }),
+  );
+  return <>{t("search.results", { count: search.total })}</>;
+}
+
+/**
+ * The Type facet for the address's text while two or more types match:
+ * in the facet bar under the strip (`placement` "bar"), or alone for the
+ * filter sheet ("sheet"). Each type links to the address with it applied,
+ * the applied one to the address that releases it.
+ *
+ * `import { SearchFacets } from "./lib/index.js";`
+ *
+ * @note Impure: reads `MetroSearchQuery` from the Relay store, fetching it
+ *   when the store lacks it.
+ */
+export function SearchFacets({
+  text,
+  type,
+  after,
+  page = 1,
+  placement,
+}: SearchFacetsProps): ReactElement | null {
+  const router = useRouter();
+  const { search } = useLazyLoadQuery<MetroSearchQuery>(
+    searchQueryNode,
+    buildSearchVariables(text, { type, after, page }),
+  );
+  if (search.facets.length < 2) return null;
+  const facet = (
+    <TypeFacetBar
+      facets={search.facets.map(({ count, type: facetType }) => ({
+        id: facetType.uri,
+        label: facetType.label ?? facetType._meta.title,
+        count,
+        href: router.buildPath("search", {
+          search:
+            facetType.uri === type
+              ? { q: text }
+              : { q: text, type: facetType.uri },
+        }),
+        selected: facetType.uri === type,
+      }))}
+    />
+  );
+  return placement === "bar" ? <FilterBar facets={facet} /> : facet;
+}
+
+/**
+ * The page's results for a text: the results grouped by type and the
+ * pagination bar; or, when nothing matches, the no-match state. The
+ * strip holds their count and the facet bar under it the Type facet.
  *
  * @note Impure: reads `MetroSearchQuery` from the Relay store, fetching it
  *   when the store lacks it.
@@ -88,23 +158,6 @@ function SearchResults({
           };
   return (
     <>
-      <p className="summary">{t("search.results", { count: search.total })}</p>
-      {search.facets.length > 1 && (
-        <TypeFacetBar
-          className="facets"
-          facets={search.facets.map((facet) => ({
-            id: facet.type.uri,
-            label: facet.type.label ?? facet.type._meta.title,
-            count: facet.count,
-            href: href(
-              facet.type.uri === type
-                ? { q: text }
-                : { q: text, type: facet.type.uri },
-            ),
-            selected: facet.type.uri === type,
-          }))}
-        />
-      )}
       <div className="results">
         {groupSearchEdges(search.edges, search.facets).map((group) => (
           <SearchResultGroup

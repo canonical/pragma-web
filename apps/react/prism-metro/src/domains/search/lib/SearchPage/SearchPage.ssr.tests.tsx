@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { MESSAGES } from "#i18n";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import { MOCK_STATION, resolveRoot } from "../../../../../testing/fixtures.js";
-import SearchPage from "./SearchPage.js";
+import SearchPage, { SearchCount, SearchFacets } from "./SearchPage.js";
 
 /**
  * Render a page past the first of a search for "e" against a mock
@@ -37,7 +37,15 @@ const renderLaterPage = (
   return renderToString(
     createProjectionTree(
       environment,
-      <SearchPage after="cursor-40" page={page} text="e" />,
+      <>
+        <SearchFacets
+          after="cursor-40"
+          page={page}
+          placement="sheet"
+          text="e"
+        />
+        <SearchPage after="cursor-40" page={page} text="e" />
+      </>,
     ),
   );
 };
@@ -59,11 +67,18 @@ describe("SearchPage SSR", () => {
       }),
     );
     const html = renderToString(
-      createProjectionTree(environment, <SearchPage text="northgate" />),
+      createProjectionTree(
+        environment,
+        <>
+          <SearchCount text="northgate" />
+          <SearchPage text="northgate" />
+        </>,
+      ),
     );
     expect(html).toContain('class="ds search-page"');
     expect(html).toContain(`>${MESSAGES["search.title"]}</h1>`);
     expect(html).toContain("1 result");
+    expect(html).not.toContain('class="summary"');
     expect(html).toContain('class="ds search-passage passage"');
     expect(html).toContain('<mark class="match">Northgate</mark>');
   });
