@@ -68,4 +68,12 @@ describe("matchSearchEntry", () => {
       position: 0,
     });
   });
+
+  it("places the match on the value as written when lowercasing lengthens it", () => {
+    const entry = { ...entryNamed("depot"), title: "İstanbul line" };
+    expect(matchSearchEntry(entry, "line")).toMatchObject({
+      tier: 0,
+      position: 9,
+    });
+  });
 });

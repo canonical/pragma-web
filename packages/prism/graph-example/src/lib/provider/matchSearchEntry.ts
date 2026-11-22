@@ -1,9 +1,10 @@
+import { buildSearchPattern } from "./buildSearchPattern.js";
 import { SEARCH_FIELDS } from "./constants.js";
 import type { SearchEntry, SearchMatch } from "./types.js";
 
 /**
  * Match one entry against normalised search text: the first of its
- * `SEARCH_FIELDS`, in that order, whose lowercased value contains the text.
+ * `SEARCH_FIELDS`, in that order, whose value contains the text in any case.
  * A missing definition matches nothing.
  *
  * @param entry - The entry to match.
@@ -17,9 +18,10 @@ export const matchSearchEntry = (
   entry: SearchEntry,
   needle: string,
 ): SearchMatch | undefined => {
+  const pattern = buildSearchPattern(needle);
   const match = SEARCH_FIELDS.map((field, tier) => {
     const value = entry[field] ?? "";
-    return { tier, value, position: value.toLowerCase().indexOf(needle) };
+    return { tier, value, position: value.search(pattern) };
   }).find((candidate) => candidate.position !== -1);
   return match === undefined
     ? undefined

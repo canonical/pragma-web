@@ -1100,7 +1100,7 @@ export const createExampleProvider = (
       cursor: toCursor(match.uri),
       match: {
         field: SEARCH_MATCH_FIELDS[match.tier],
-        ...buildSearchPassage(match.value, needle, match.position),
+        ...buildSearchPassage(match.value, needle),
       },
     }));
     return {
