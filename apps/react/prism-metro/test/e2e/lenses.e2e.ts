@@ -172,6 +172,9 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     }
     expect(panel).not.toMatch(/<details[^>]*\sopen/);
     expect(panel).toContain("Referenced by");
+    // Open goes to the line's own page, not to the workspace route it sits on.
+    const open = /<a [^>]*class="[^"]*\bopen\b[^"]*"[^>]*>/.exec(panel)?.at(0);
+    expect(open).toContain('href="/lines/metro%3Acircle-line"');
   });
 
   it("renders the lines index with the line rows", async () => {

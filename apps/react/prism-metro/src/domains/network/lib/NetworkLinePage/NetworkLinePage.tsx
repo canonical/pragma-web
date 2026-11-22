@@ -7,6 +7,7 @@ import {
 } from "@canonical/prism-core";
 import { EntityPanel } from "@canonical/prism-lens-entity";
 import { Head } from "@canonical/react-head";
+import { useRouter } from "@canonical/router-react";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
@@ -80,13 +81,21 @@ const LineMain = ({
   );
 };
 
-/** The line's details panel: its identity, values and relation groups. */
+/**
+ * The line's details panel: its identity, values and relation groups, Open
+ * going to the line's own page in the lines lens.
+ */
 const LineAside = ({
   address,
 }: Pick<NetworkLinePageProps, "address">): ReactElement | null => {
+  const router = useRouter();
   const line = useLineView({ address });
   return line === undefined ? null : (
-    <EntityPanel headingLevel={2} uri={line.uri} />
+    <EntityPanel
+      headingLevel={2}
+      home={router.buildPath("linesEntity", { params: { uri: address } })}
+      uri={line.uri}
+    />
   );
 };
 

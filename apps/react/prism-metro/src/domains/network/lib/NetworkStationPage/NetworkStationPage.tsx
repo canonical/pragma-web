@@ -97,13 +97,21 @@ const StationMain = ({
   );
 };
 
-/** The station's details panel: its identity, values and relation groups. */
+/**
+ * The station's details panel: its identity, values and relation groups,
+ * Open going to the station's own page in the stations lens.
+ */
 const StationAside = ({
   address,
 }: Pick<NetworkStationPageProps, "address">): ReactElement | null => {
+  const router = useRouter();
   const station = useStationView({ address });
   return station === undefined ? null : (
-    <EntityPanel headingLevel={2} uri={station.uri} />
+    <EntityPanel
+      headingLevel={2}
+      home={router.buildPath("stationsEntity", { params: { uri: address } })}
+      uri={station.uri}
+    />
   );
 };
 
