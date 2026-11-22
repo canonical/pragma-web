@@ -5,9 +5,14 @@ interface GroupableEdge {
   };
 }
 
-/** What grouping reads of a type facet: the class, its names and its count. */
-interface GroupableFacet {
+/** What ordering reads of a type facet: the class and its count. */
+interface OrderableFacet {
   readonly count: number;
+  readonly type: { readonly uri: string };
+}
+
+/** What grouping reads of a type facet: the class, its names and its count. */
+interface GroupableFacet extends OrderableFacet {
   readonly type: {
     readonly uri: string;
     readonly label?: string | null;
@@ -41,7 +46,7 @@ export interface GroupSearchOptions {
  * @param prominent - The site's prominent class.
  * @returns The facets in the page's order.
  */
-export function orderSearchFacets<TFacet extends GroupableFacet>(
+export function orderSearchFacets<TFacet extends OrderableFacet>(
   facets: readonly TFacet[],
   prominent?: string,
 ): readonly TFacet[] {
