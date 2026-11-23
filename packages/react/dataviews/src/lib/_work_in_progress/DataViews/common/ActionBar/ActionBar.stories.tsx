@@ -178,8 +178,15 @@ const spellActionsCode = ({
       ...(declarations === "" ? [] : ["useDataViewsValue"]),
     ],
     imports: `import { Button, type ButtonProps } from "@canonical/react-ds-global";
-import { archiveMachines, machineCollection, machines } from "./machines.js";`,
-    declarations: `${selectionActionCode}${declarations}`,
+import {
+  archiveMachines,
+  type Machine,
+  machineCollection,
+  machines,
+} from "./machines.js";`,
+    declarations: `${selectionActionCode}
+
+const nameMachine = (machine: Machine) => machine.name;${declarations}`,
     // Spelled relative to the `source:` line it follows, as the default is.
     source: `createArraySource({
   rows: machines,
@@ -200,7 +207,7 @@ import { archiveMachines, machineCollection, machines } from "./machines.js";`,
     columns={columns}
     label="Machines"
     selectable
-    getRowLabel={(row) => row.name}
+    getRowLabel={nameMachine}
   />
   <DataViews.ActionBar${indicator}>
     <SelectionAction action="archive">Archive</SelectionAction>

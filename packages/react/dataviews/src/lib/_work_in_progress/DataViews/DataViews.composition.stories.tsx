@@ -112,9 +112,12 @@ export const ConnectedParts: Story = {
   parameters: showConsumerCode({
     parts: ["DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],
+    coreTypes: ["RowRecord"],
     imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
-    declarations: `${columnsCode}`,
+    declarations: `${columnsCode}
+
+const nameMachine = (row: RowRecord) => String(row["name"]);`,
     location: "createPlatformLocation(platform)",
     store: true,
     query: "page=1&size=5",
@@ -126,7 +129,7 @@ import { platform } from "./router.js";`,
     columns={columns}
     label="Machines"
     selectable
-    getRowLabel={(row) => String(row["name"])}
+    getRowLabel={nameMachine}
   />
   <DataViews.ActionBar />
   <DataViews.Pagination sizes={[5, 10, 25]} />
@@ -166,9 +169,12 @@ import { platform } from "./router.js";`,
 const queryInTheUrlCode = showConsumerCode({
   parts: ["DataViews", "type DataTableColumn"],
   core: ["createPlatformLocation"],
+  coreTypes: ["RowRecord"],
   imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
-  declarations: `${columnsCode}`,
+  declarations: `${columnsCode}
+
+const nameMachine = (row: RowRecord) => String(row["name"]);`,
   // The router's platform surface: anything with getLocation, navigate
   // and subscribe. The provider adopts the query it carries and writes
   // every edit back.
@@ -180,7 +186,7 @@ import { platform } from "./router.js";`,
     columns={columns}
     label="Machines"
     selectable
-    getRowLabel={(row) => String(row["name"])}
+    getRowLabel={nameMachine}
   />
   <DataViews.ActionBar />
   <DataViews.Pagination sizes={[5, 10, 25]} />

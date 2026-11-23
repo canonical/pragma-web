@@ -35,7 +35,7 @@ describe("constants", () => {
   <DataViews.DataTable
     columns={columns}
     label="Machines"
-    getRowLabel={(row) => String(row["name"])}
+    getRowLabel={nameMachine}
   />
   <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`);

@@ -18,6 +18,7 @@ import {
   createArraySource,
   createDataViewsProvider,
   createPlatformLocation,
+  type RowRecord,
 } from "@canonical/dataviews-core";
 import { createIndexedDBViewStore } from "@canonical/dataviews-core/indexeddb";
 import {
@@ -46,6 +47,8 @@ const columns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];
 
+const nameMachine = (row: RowRecord) => String(row["name"]);
+
 export function Machines() {
   // Built once: the parts observe it, which starts its source and ports.
   const [provider] = useState(() =>
@@ -71,7 +74,7 @@ export function Machines() {
         columns={columns}
         label="Machines"
         selectable
-        getRowLabel={(row) => String(row["name"])}
+        getRowLabel={nameMachine}
       />
       <DataViews.ActionBar />
       <DataViews.Pagination sizes={[5, 10, 25]} />
@@ -111,6 +114,71 @@ export const machineCollection = createCollection({
 The filters and the table's sortable columns offer nothing the source did not declare it can execute — the provider reads the source's capabilities once, and a command outside them is refused at the boundary and moves nothing. Leave `location` out and the query lives in the provider alone; leave `views` out and the collection has no saved views; leave `presentation` out and the arrangement — column widths, order and visibility — lives in memory for the session.
 
 <Canvas of={Stories.ConnectedParts} sourceState="none" />
+
+## Your own words
+
+`messages` over English; a `DataViewsMessages` record names every message.
+
+```tsx
+import type {
+  DataViewsMessages,
+  DataViewsProvider,
+  RowRecord,
+} from "@canonical/dataviews-core";
+import { DataViews, type DataTableColumn } from "@canonical/dataviews-react";
+import { useMemo } from "react";
+import type { Machine, machineCollection } from "./machines.js";
+
+type MachineProvider = DataViewsProvider<
+  typeof machineCollection.schema.fields,
+  Machine
+>;
+
+// At module scope: the root holds its words while their members stay the same.
+const FRENCH: Partial<DataViewsMessages> = {
+  search: "Rechercher",
+  rowsShown: ({ first, shown, total }) => {
+    const range = shown === 0 ? "0" : `${first}–${first + shown - 1}`;
+    if (total.kind === "unknown") return `Lignes ${range}`;
+    const bound = total.kind === "at-least" ? "au moins " : "";
+    return `Lignes ${range} sur ${bound}${total.value}`;
+  },
+};
+
+export function Machines({
+  provider,
+  columns,
+  locale,
+}: {
+  readonly provider: MachineProvider;
+  readonly columns: readonly DataTableColumn[];
+  readonly locale: string;
+}) {
+  // Memoised on the locale.
+  const nameMachine = useMemo(
+    () => (row: RowRecord) => {
+      const name = String(row["name"]);
+      return locale === "fr" ? `machine ${name}` : name;
+    },
+    [locale],
+  );
+  return (
+    <DataViews
+      provider={provider}
+      messages={locale === "fr" ? FRENCH : {}}
+    >
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        selectable
+        getRowLabel={nameMachine}
+      />
+    </DataViews>
+  );
+}
+```
+
+- `getRowLabel` is read by identity: a new function renames every row and card.
 
 ## Keeping the query in the URL
 

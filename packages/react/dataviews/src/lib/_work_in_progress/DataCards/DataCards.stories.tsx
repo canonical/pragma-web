@@ -134,15 +134,19 @@ export const Selectable: Story = {
   render: (args) => <MachineCards {...args} />,
   parameters: showConsumerCode({
     parts: ["type DisplayField"],
-    imports: spikeImports,
-    declarations: fieldsCode,
+    imports: `import { type Machine, machineCollection, machines } from "./machines.js";
+// A work-in-progress spike: not yet exported from the package root.
+import { DataCards } from "./DataCards.js";`,
+    declarations: `${fieldsCode}
+
+const nameMachine = (machine: Machine) => machine.name;`,
     render: `<DataCards
   provider={provider}
   fields={fields}
   title="name"
   label="Machines"
   selectable
-  getRowLabel={(machine) => machine.name}
+  getRowLabel={nameMachine}
 />`,
   }),
   play: async ({ canvas }) => {

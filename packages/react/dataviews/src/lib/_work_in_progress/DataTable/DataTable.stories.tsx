@@ -197,8 +197,14 @@ const selectableTableCode = `<DataTable
   columns={columns}
   label="Machines"
   selectable
-  getRowLabel={(row) => row.name}
+  getRowLabel={nameMachine}
 />`;
+
+/** The machines module, with the record type a namer reads. */
+const typedMachineImports = `import { type Machine, machineCollection, machines } from "./machines.js";`;
+
+/** The namer a selectable table reads, declared at module scope. */
+const nameMachineCode = `const nameMachine = (machine: Machine) => machine.name;`;
 
 /** The table inside a frame of the given width. */
 const spellFramedTableCode = (
@@ -517,7 +523,10 @@ ${sortableColumnsCode}`,
 export const Selectable: Story = {
   parameters: showConsumerCode({
     parts: tableParts,
-    declarations: plainColumnsCode,
+    imports: typedMachineImports,
+    declarations: `${plainColumnsCode}
+
+${nameMachineCode}`,
     render: selectableTableCode,
   }),
   args: { selectable: true },
@@ -554,7 +563,10 @@ export const Selectable: Story = {
 export const SelectAllActsOnDisplayedRows: Story = {
   parameters: showConsumerCode({
     parts: tableParts,
-    declarations: plainColumnsCode,
+    imports: typedMachineImports,
+    declarations: `${plainColumnsCode}
+
+${nameMachineCode}`,
     query: "page=1&size=5",
     prepare: `provider.selection.add(["m-02", "m-09"]);`,
     render: selectableTableCode,
@@ -1045,6 +1057,7 @@ export const CellReadingItsScope: Story = {
       "useDataViewsCell",
       "useDataViewsValue",
     ],
+    imports: typedMachineImports,
     declarations: `function HostCell({ value }: DisplayFieldCellProps) {
   // The collection is the witness: the record is typed as a machine.
   const { record, selected } = useDataViewsCell(machineCollection);
@@ -1069,7 +1082,9 @@ const columns: readonly DataTableColumn[] = [
   { id: "status", header: "Status" },
   { id: "region", header: "Region" },
   { id: "cores", header: "Cores" },
-];`,
+];
+
+${nameMachineCode}`,
     render: selectableTableCode,
   }),
   args: { selectable: true },
@@ -1256,10 +1271,12 @@ const showVirtualizedCode = (
   showConsumerCode({
     parts,
     imports: `import { virtualizeRows } from "@canonical/dataviews-react/virtualization";
-import { machineCollection, machines } from "./machines.js";`,
+import { type Machine, machineCollection, machines } from "./machines.js";`,
     declarations: `// One descriptor serves any number of tables: each keeps its own
 // viewport, measurements and focus.
 const virtualization = virtualizeRows({ estimatedRowHeight: 24 });
+
+${nameMachineCode}
 
 ${columns}`,
     query: "page=1&size=10000",
@@ -1268,7 +1285,7 @@ ${columns}`,
   columns={columns}
   label="Machines"
   selectable
-  getRowLabel={(row) => row.name}
+  getRowLabel={nameMachine}
   virtualization={virtualization}
   style={{ maxBlockSize: "24rem" }}
 />`,
