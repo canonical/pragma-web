@@ -63,7 +63,7 @@ type FilterContext = {
   readonly filters: FilterHandles<readonly SchemaFieldDefinition[]>;
   /** The provider's host: what its source declares, and the query commands. */
   readonly host: ProviderHost;
-  /** The facets answering the applied query, or null while none does. */
+  /** The facets answering the applied filter and search, or null while none does. */
   readonly answered: UseFacetsResult["answered"];
   /** The server's options for a field, as the latest facet lists them. */
   readonly listServerOptions: (field: string) => readonly string[];

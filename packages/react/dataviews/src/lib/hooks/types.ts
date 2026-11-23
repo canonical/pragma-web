@@ -158,11 +158,11 @@ export type UseAnsweredFacetsProps<
     readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = {
-  /** The provider whose result answers the applied query. */
+  /** The provider whose result answers the applied filter and search. */
   readonly provider: DataViewsProvider<TFields, TRow>;
 };
 
-/** The facets answering the applied query, keyed by field, or null while none does. */
+/** The facets answering the applied filter and search, keyed by field, or null while none does. */
 export type UseAnsweredFacetsResult = Readonly<Record<string, Facet>> | null;
 
 /** What the facets hook takes: the provider whose result carries the facets. */
@@ -175,8 +175,8 @@ export type UseFacetsProps<
 /** What the facets hook returns, each keyed by field. */
 export type UseFacetsResult = {
   /**
-   * The facets of the result answering the applied query, or null while no
-   * result answers it: what counts and ranges are read from.
+   * The facets of the result answering the applied filter and search, or
+   * null while no result answers it: what counts and ranges are read from.
    */
   readonly answered: UseAnsweredFacetsResult;
   /**

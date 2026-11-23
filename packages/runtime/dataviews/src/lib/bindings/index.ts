@@ -11,6 +11,7 @@ export {
   areDisplayStatusesEqual,
   DISPLAY_STATUS_PHASES,
   listDisplayEntries,
+  readAnsweredFacets,
   resolveDisplayStatus,
   resolvePagination,
 } from "../display/index.js";
