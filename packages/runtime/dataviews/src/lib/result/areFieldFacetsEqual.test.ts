@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import countExactly from "../../../testing/countExactly.js";
+import { countExactly } from "../../../testing/index.js";
 import areFieldFacetsEqual from "./areFieldFacetsEqual.js";
 import type { Facet } from "./types.js";
 

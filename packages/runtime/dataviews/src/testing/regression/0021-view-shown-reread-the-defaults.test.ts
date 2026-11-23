@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
+import { createStandInPresentationStore } from "../../../testing/index.js";
 import { createPresentation } from "../../lib/presentation/index.js";
 
 describe("regression 0021 — a view shown re-read the defaults", () => {

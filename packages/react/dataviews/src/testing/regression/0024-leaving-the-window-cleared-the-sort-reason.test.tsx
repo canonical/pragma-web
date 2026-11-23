@@ -9,7 +9,7 @@
 
 import { fireEvent } from "@testing-library/react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import renderRefusingTable from "../../../testing/renderRefusingTable.js";
+import { renderRefusingTable } from "../../../testing/index.js";
 
 describe("regression 0024 — leaving the window cleared the sort reason", () => {
   it("keeps the reason when the blur is the window's, not the column's", () => {

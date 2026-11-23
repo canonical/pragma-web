@@ -18,8 +18,10 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { createManualSource } from "@canonical/dataviews-core/testing";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
-import type { IdentifiedRecord as Row } from "../../../../../../testing/types.js";
+import {
+  COUNTED_EXACTLY,
+  type IdentifiedRecord as Row,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import Filters from "./Filters.js";
 

@@ -1,43 +1,46 @@
 import { describe, expect, it } from "vitest";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
+import { declare, declareSort } from "../../../testing/index.js";
 import type { PredicateOperator, SortTerm } from "../query/index.js";
 import copyCapabilities from "./copyCapabilities.js";
 import type { EmptyPlacement, SourceCapabilities } from "./types.js";
 
-const declared = (
+const buildDeclared = (
   overrides: Partial<SourceCapabilities> = {},
 ): SourceCapabilities => declare(overrides);
 
 describe("copyCapabilities", () => {
   it("keeps a field declared with no operator as filterable by none", () => {
-    const copy = copyCapabilities(declared({ filter: { cpu: [] } }));
+    const copy = copyCapabilities(buildDeclared({ filter: { cpu: [] } }));
     expect(copy.filter["cpu"]).toEqual([]);
   });
 
   it("keeps the declared operators of a field that has them", () => {
-    const copy = copyCapabilities(declared({ filter: { status: ["isAny"] } }));
+    const copy = copyCapabilities(
+      buildDeclared({ filter: { status: ["isAny"] } }),
+    );
     expect(copy.filter["status"]).toEqual(["isAny"]);
   });
 
   it("does not change when the declaration is mutated afterwards", () => {
     const filter: Record<string, PredicateOperator[]> = { status: ["isAny"] };
-    const copy = copyCapabilities(declared({ filter }));
+    const copy = copyCapabilities(buildDeclared({ filter }));
     filter["status"]?.push("isSet");
     expect(copy.filter["status"]).toEqual(["isAny"]);
   });
 
   it("reads a field named for a prototype member as absent", () => {
-    const copy = copyCapabilities(declared({ filter: { status: ["isAny"] } }));
+    const copy = copyCapabilities(
+      buildDeclared({ filter: { status: ["isAny"] } }),
+    );
     expect(copy.filter.toString).toBeUndefined();
   });
 
   it("copies the searchable fields, and keeps no search as none", () => {
     const fields = ["name"];
-    const copy = copyCapabilities(declared({ search: { fields } }));
+    const copy = copyCapabilities(buildDeclared({ search: { fields } }));
     fields.push("owner");
     expect(copy.search).toEqual({ fields: ["name"] });
-    expect(copyCapabilities(declared()).search).toBeNull();
+    expect(copyCapabilities(buildDeclared()).search).toBeNull();
   });
 
   it("copies the whole ordering block, terms and all", () => {
@@ -45,7 +48,7 @@ describe("copyCapabilities", () => {
     const tiebreak: SortTerm[] = [{ field: "id", direction: "asc" }];
     const empties: Record<string, EmptyPlacement> = { cpu: "first" };
     const copy = copyCapabilities(
-      declared({
+      buildDeclared({
         sort: {
           fields,
           terms: 2,
@@ -77,7 +80,7 @@ describe("copyCapabilities", () => {
 
   it("keeps a named tiebreak as the word it was declared with", () => {
     expect(
-      copyCapabilities(declared({ sort: declareSort(["cpu"]) })).sort,
+      copyCapabilities(buildDeclared({ sort: declareSort(["cpu"]) })).sort,
     ).toEqual({
       fields: ["cpu"],
       terms: null,
@@ -91,7 +94,7 @@ describe("copyCapabilities", () => {
   it("copies the grouping block against a later mutation", () => {
     const fields = ["status"];
     const copy = copyCapabilities(
-      declared({
+      buildDeclared({
         group: { fields, levels: 2, summaries: "counts", collapse: true },
       }),
     );
@@ -106,7 +109,7 @@ describe("copyCapabilities", () => {
 
   it("copies the two counts", () => {
     const copy = copyCapabilities(
-      declared({
+      buildDeclared({
         counts: { pageable: "exact", matched: "at-least" },
       }),
     );
@@ -118,7 +121,7 @@ describe("copyCapabilities", () => {
 
   it("copies a cursor pagination block with its two flags", () => {
     const copy = copyCapabilities(
-      declared({
+      buildDeclared({
         pagination: { kind: "cursor", backward: true, durable: false },
       }),
     );
@@ -127,20 +130,22 @@ describe("copyCapabilities", () => {
       backward: true,
       durable: false,
     });
-    expect(copyCapabilities(declared()).pagination).toEqual({ kind: "offset" });
+    expect(copyCapabilities(buildDeclared()).pagination).toEqual({
+      kind: "offset",
+    });
   });
 
   it("copies each declared row operation", () => {
     const actions = { stop: { targets: "explicit" as const, limit: 10 } };
-    const copy = copyCapabilities(declared({ actions }));
+    const copy = copyCapabilities(buildDeclared({ actions }));
     expect(copy.actions["stop"]).toEqual({ targets: "explicit", limit: 10 });
     expect(Object.isFrozen(copy.actions["stop"])).toBe(true);
-    expect(copyCapabilities(declared()).actions).toEqual({});
+    expect(copyCapabilities(buildDeclared()).actions).toEqual({});
   });
 
   it("freezes every part of the copy", () => {
     const copy = copyCapabilities(
-      declared({
+      buildDeclared({
         filter: { status: ["isAny"] },
         search: { fields: ["name"] },
         sort: declareSort(["cpu"]),

@@ -12,9 +12,11 @@
 import { declareCapabilities } from "@canonical/dataviews-core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import { machines } from "../../../testing/machines.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  machines,
+} from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 afterEach(cleanup);
@@ -44,14 +46,14 @@ describe("regression 0001 — a resize past the declared bounds", () => {
       { id: "status", header: "Status" },
     ]);
     const handle = screen.getByRole("separator");
-    const tracks = (): string =>
+    const readTracks = (): string =>
       screen
         .getByRole("table", { name: "Machines" })
         .style.getPropertyValue("--data-table-columns");
     fireEvent.keyDown(handle, { key: "ArrowRight" });
     fireEvent.keyDown(handle, { key: "ArrowRight" });
     fireEvent.keyDown(handle, { key: "ArrowRight" });
-    expect(tracks()).toBe("80px 96px");
+    expect(readTracks()).toBe("80px 96px");
     expect(handle).toHaveAttribute("aria-valuenow", "80");
   });
 

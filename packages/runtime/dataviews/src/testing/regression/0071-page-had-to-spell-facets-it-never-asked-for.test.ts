@@ -8,8 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import declare from "../../../testing/declare.js";
-import readId from "../../../testing/readId.js";
+import { declare, readId } from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createQueryCoordinator } from "../../lib/coordinator/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";

@@ -20,6 +20,9 @@ const byName: Slice = {
 /**
  * Order named records by name through an array source declaring
  * `collation`, and answer their ids in the order the source delivers them.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function orderNodesByName(
   rows: readonly { readonly id: string; readonly name: string }[],

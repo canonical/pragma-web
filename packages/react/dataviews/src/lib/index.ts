@@ -3,7 +3,6 @@
 export type {
   DataTableColumn,
   DataTableProps,
-  DataTableVirtualization,
   DataViewsActionBarProps,
   DataViewsDataTableProps,
   DataViewsFiltersProps,
@@ -30,6 +29,7 @@ export {
   useDataViewsFilter,
 } from "./_work_in_progress/index.js";
 export type {
+  DataTableVirtualization,
   DisplayField,
   DisplayFieldCellProps,
 } from "./common/index.js";

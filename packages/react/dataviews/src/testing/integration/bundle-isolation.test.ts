@@ -13,7 +13,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "vite";
 import { describe, expect, it } from "vitest";
-import type { BundleOutput as Output } from "../../../testing/types.js";
+import type { BundleOutput as Output } from "../../../testing/index.js";
 
 /** The library folder, two levels up from `src/testing/integration`. */
 const lib = path.resolve(
@@ -141,6 +141,7 @@ export { virtualizeRows } from ${quotePath("virtualization/index.ts")};`,
     expect(
       modules.filter((id) => id.includes("/runtime/dataviews/src/")),
     ).toEqual([]);
-    expect(css).toContain("virtual");
+    // A virtualized table's root rules ship with the table's own sheet.
+    expect(css).toContain(".ds.data-table.bounded");
   }, 60_000);
 });

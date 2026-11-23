@@ -7,8 +7,7 @@
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { buildMachine, createMachineProvider } from "../../../testing/index.js";
 import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type { DisplayField } from "../../lib/common/index.js";
 
@@ -17,7 +16,7 @@ const fields: readonly DisplayField[] = [
   { id: "status", header: "Status" },
 ];
 
-describe("a card whose title holds no text", () => {
+describe("regression 0067 — a blank title named a card nothing", () => {
   it("is named by its identity, and so is its checkbox", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", ""), buildMachine("m-2", "beta")],

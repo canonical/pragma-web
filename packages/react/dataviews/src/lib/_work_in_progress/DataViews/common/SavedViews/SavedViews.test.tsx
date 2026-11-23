@@ -29,8 +29,10 @@ import {
 } from "@testing-library/react";
 import { StrictMode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
-import type { IdentifiedRecord as Row } from "../../../../../../testing/types.js";
+import {
+  createMemoryViewStore,
+  type IdentifiedRecord as Row,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import SavedViews from "./SavedViews.js";
 

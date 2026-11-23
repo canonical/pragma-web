@@ -8,9 +8,11 @@ import { createCollection } from "@canonical/dataviews-core";
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createFakeChannel from "../../../testing/createFakeChannel.js";
-import { machines } from "../../../testing/machines.js";
+import {
+  buildMachine,
+  createFakeChannel,
+  machines,
+} from "../../../testing/index.js";
 import { CellContext, type CellContextValue } from "../common/index.js";
 import useDataViewsCell from "./useDataViewsCell.js";
 

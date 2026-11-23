@@ -36,17 +36,17 @@ import {
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
-import answerFacetValues from "../../../../../../testing/answerFacetValues.js";
-import elementAt from "../../../../../../testing/elementAt.js";
-import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
-import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
-import toggleDisclosure from "../../../../../../testing/toggleDisclosure.js";
-import type {
-  FacetedRecord,
-  PlacedRecord,
-  RegionRecord,
-  IdentifiedRecord as Row,
-} from "../../../../../../testing/types.js";
+import {
+  answerFacetValues,
+  COUNTED_EXACTLY,
+  elementAt,
+  expectNoAxeViolations,
+  type FacetedRecord,
+  type PlacedRecord,
+  type RegionRecord,
+  type IdentifiedRecord as Row,
+  toggleDisclosure,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import Filters from "./Filters.js";
 

@@ -5,11 +5,13 @@ import {
 } from "@canonical/dataviews-core";
 import { HttpResponse } from "msw";
 import { describe, expect, it, vi } from "vitest";
-import answerLiveRequests from "../../../../testing/answerLiveRequests.js";
-import answerOverHttp2 from "../../../../testing/answerOverHttp2.js";
-import { DELIVERY_WAIT } from "../../../../testing/constants.js";
-import readFailureReason from "../../../../testing/readFailureReason.js";
-import serveMockApi from "../../../../testing/serveMockApi.js";
+import {
+  answerLiveRequests,
+  answerOverHttp2,
+  DELIVERY_WAIT,
+  readFailureReason,
+  serveMockApi,
+} from "../../../../testing/index.js";
 import type { Machine } from "../types.js";
 import createRestMachineSource from "./createRestMachineSource.js";
 

@@ -1,19 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
-import answerWith from "../../../testing/answerWith.js";
-import buildPage from "../../../testing/buildPage.js";
-import createCountingViewStore from "../../../testing/createCountingViewStore.js";
-import createManualSource from "../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
-import createStandInViewStore from "../../../testing/createStandInViewStore.js";
-import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
-import type {
-  ContainerInstance as Container,
-  Instance,
-  UuidRow as Keyed,
-  SparseMachine as Machine,
-  VirtualMachineInstance as VirtualMachine,
-} from "../../../testing/types.js";
+import {
+  answerWith,
+  buildPage,
+  type ContainerInstance as Container,
+  createCountingViewStore,
+  createManualSource,
+  createRecordingLocation,
+  createStandInPresentationStore,
+  createStandInViewStore,
+  type Instance,
+  type UuidRow as Keyed,
+  type SparseMachine as Machine,
+  NOTHING_DECLARED,
+  type VirtualMachineInstance as VirtualMachine,
+} from "../../../testing/index.js";
 import type { ActionOutcome } from "../action/index.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation } from "../location/index.js";

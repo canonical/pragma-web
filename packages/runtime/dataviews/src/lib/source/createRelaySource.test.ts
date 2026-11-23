@@ -11,16 +11,16 @@ import {
   type Variables,
 } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import countExactly from "../../../testing/countExactly.js";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
-import readId from "../../../testing/readId.js";
-import type {
-  RelayFetch as Fetch,
-  RelayMachine as Machine,
-  RelayMachinesData as MachinesData,
-  RelayMachinesOperation as MachinesOperation,
-} from "../../../testing/relayTypes.js";
+import {
+  countExactly,
+  declare,
+  declareSort,
+  type RelayFetch as Fetch,
+  type RelayMachine as Machine,
+  type RelayMachinesData as MachinesData,
+  type RelayMachinesOperation as MachinesOperation,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import {
   createDataViewsProvider,
@@ -180,7 +180,7 @@ const connectionMetadata = {
 };
 
 /** `MachinesQuery` with other normalization selections and parameters. */
-const withSelections = (
+const buildWithSelections = (
   selections: readonly unknown[],
   metadata: Record<string, unknown> = {},
 ): ConcreteRequest =>
@@ -264,7 +264,7 @@ const createRelay = () => {
   });
   /** The nth fetch, or a failure rather than a skipped assertion. */
   const fetchAt = (index: number): Fetch => {
-    const fetch = fetches[index];
+    const fetch = fetches.at(index);
     if (fetch === undefined) {
       throw new Error(`expected a fetch at index ${index}`);
     }
@@ -1176,21 +1176,21 @@ describe("createRelaySource", () => {
     it.each([
       [
         "on the query itself",
-        withSelections(
+        buildWithSelections(
           [...MachinesQuery.operation.selections, connectionHandle],
           connectionMetadata,
         ),
       ],
       [
         "through an unmasked fragment spread",
-        withSelections([
+        buildWithSelections([
           ...MachinesQuery.operation.selections,
           connectionHandle,
         ]),
       ],
       [
         "under a parent field",
-        withSelections(
+        buildWithSelections(
           [
             buildField("viewer", false, [
               ...MachinesQuery.operation.selections,
@@ -1224,7 +1224,7 @@ describe("createRelaySource", () => {
       // deleted record, a client field. Only `@connection` merges pages, so
       // only `@connection` is refused.
       const { environment, fetches } = createRelay();
-      const otherHandle = withSelections([
+      const otherHandle = buildWithSelections([
         ...MachinesQuery.operation.selections,
         { ...connectionHandle, handle: "deleteRecord", key: "" },
       ]);
@@ -1244,7 +1244,7 @@ describe("createRelaySource", () => {
 
     it("never refuses a query for a row's own @connection list", () => {
       const { environment, fetches } = createRelay();
-      const rowsWithLists = withSelections([
+      const rowsWithLists = buildWithSelections([
         buildField("machines", false, [
           buildField("edges", true, [
             buildField("node", false, [connectionHandle]),
@@ -1267,7 +1267,7 @@ describe("createRelaySource", () => {
 
     it("never lets a refused @connection query push another query's cursors out", () => {
       const { environment, fetchAt } = createRelay();
-      const merging = withSelections(
+      const merging = buildWithSelections(
         [...MachinesQuery.operation.selections, connectionHandle],
         connectionMetadata,
       );

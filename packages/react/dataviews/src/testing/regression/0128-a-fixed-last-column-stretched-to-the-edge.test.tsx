@@ -10,7 +10,7 @@
 
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 afterEach(() => {

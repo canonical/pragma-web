@@ -4,8 +4,10 @@
  * identity guards, the entry carry or the whole-model carry fails one.
  */
 import { describe, expect, it } from "vitest";
-import buildRowModel from "../../../testing/buildRowModel.js";
-import type { StatusMachine as Machine } from "../../../testing/types.js";
+import {
+  buildRowModel,
+  type StatusMachine as Machine,
+} from "../../../testing/index.js";
 import { assertInvariant } from "../assertion/index.js";
 import createRowModel from "./createRowModel.js";
 import type {

@@ -4,7 +4,7 @@ import {
 } from "@canonical/dataviews-core";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../../../../testing/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import DataViews from "../../Provider.js";
 import HiddenQueryFields from "./HiddenQueryFields.js";

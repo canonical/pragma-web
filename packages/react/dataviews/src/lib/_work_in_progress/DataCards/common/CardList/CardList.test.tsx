@@ -1,8 +1,10 @@
 import { createRowScopes } from "@canonical/dataviews-core/bindings";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import {
+  buildMachine,
+  createMachineProvider,
+} from "../../../../../../testing/index.js";
 import type { DisplayField } from "../../../../common/index.js";
 import CardList from "./CardList.js";
 

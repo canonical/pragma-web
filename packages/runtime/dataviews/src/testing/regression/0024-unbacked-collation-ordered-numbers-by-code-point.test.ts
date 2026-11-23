@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import orderNodesByName from "../../../testing/orderNodesByName.js";
+import { orderNodesByName } from "../../../testing/index.js";
 
 describe("regression 0024 — an unbacked collation ordered numbers by code point", () => {
   it("orders digit runs by the number they spell when the tag has no data", () => {

@@ -9,11 +9,13 @@
  */
 
 import { describe, expect, it } from "vitest";
-import answerWith from "../../../testing/answerWith.js";
-import createManualSource from "../../../testing/createManualSource.js";
-import declare from "../../../testing/declare.js";
-import observeUntilFinished from "../../../testing/observeUntilFinished.js";
-import readId from "../../../testing/readId.js";
+import {
+  answerWith,
+  createManualSource,
+  declare,
+  observeUntilFinished,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   createMemoryLocation,
@@ -30,7 +32,7 @@ const collection = createCollection({
 });
 
 /** A location whose subscription calls the listener at once. */
-const notifyingOnSubscribe = (href: string): QueryLocation => {
+const createNotifyingLocation = (href: string): QueryLocation => {
   const memory = createMemoryLocation({ href });
   return {
     ...memory,
@@ -50,7 +52,7 @@ describe("regression 0045 — a subscribe notification cleared kept refusals", (
         capabilities: declare({ filter: { status: ["isAny"] } }),
         answer: answerWith([]),
       }).source,
-      location: notifyingOnSubscribe("/machines"),
+      location: createNotifyingLocation("/machines"),
       snapshot: { query: "status=failed&owner__isSet=1", presentation: {} },
     });
     const release = provider.observe();

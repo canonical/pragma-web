@@ -6,35 +6,30 @@
  * new callback on every render — so a wide table paid a whole menu's hooks
  * per column per frame of the drag.
  *
- * The design system's menu is wrapped, not replaced: every render still
- * runs the real menu, and the wrapper only counts. React offers no
- * per-component render count to read otherwise, so this is the one module
- * mock in the registry, at the package boundary.
+ * The design system's menu is a pass-through counter: a spy that runs the
+ * real menu on every render and counts the calls. React offers no
+ * per-component render count to read otherwise, so the module is replaced
+ * at the package boundary with the real one, its menu spied.
  */
 
-import type * as DsGlobal from "@canonical/react-ds-global";
+import { ContextualMenu } from "@canonical/react-ds-global";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { createElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+} from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
-const renders = vi.hoisted(() => ({ count: 0 }));
-
-// The design system's menu, counted: each render of this wrapper is a
-// render of a column's menu.
+// Each call of the spied menu is a render of a column's menu.
 vi.mock("@canonical/react-ds-global", async (importOriginal) => {
-  const actual = await importOriginal<typeof DsGlobal>();
-  const CountedContextualMenu = (
-    props: Parameters<typeof actual.ContextualMenu>[0],
-  ) => {
-    renders.count += 1;
-    return createElement(actual.ContextualMenu, props);
-  };
-  return { ...actual, ContextualMenu: CountedContextualMenu };
+  const actual =
+    await importOriginal<typeof import("@canonical/react-ds-global")>();
+  return { ...actual, ContextualMenu: vi.fn(actual.ContextualMenu) };
 });
+
+const renders = vi.mocked(ContextualMenu);
 
 describe("regression 0014 — a resize preview re-rendered every header menu", () => {
   it("renders no opened menu again for a resize step", () => {
@@ -64,13 +59,13 @@ describe("regression 0014 — a resize preview re-rendered every header menu", (
       screen.getByRole("button", { name: "Column options for Status" }),
     );
     expect(screen.getByRole("menu", { hidden: true })).toBeInTheDocument();
-    expect(renders.count).toBeGreaterThan(0);
+    expect(renders).toHaveBeenCalled();
     const readTracks = () =>
       screen
         .getByRole("table", { name: "Machines" })
         .style.getPropertyValue("--data-table-columns");
     const before = readTracks();
-    renders.count = 0;
+    renders.mockClear();
     // The resize handle, named for its column: the open menu draws a
     // separator of its own between the sort and the column's place.
     fireEvent.keyDown(screen.getByRole("separator", { name: "Name" }), {
@@ -79,6 +74,6 @@ describe("regression 0014 — a resize preview re-rendered every header menu", (
     // The geometry moved, and not one menu rendered for it.
     expect(readTracks()).not.toBe(before);
     expect(screen.getByRole("menu", { hidden: true })).toBeInTheDocument();
-    expect(renders.count).toBe(0);
+    expect(renders).not.toHaveBeenCalled();
   });
 });

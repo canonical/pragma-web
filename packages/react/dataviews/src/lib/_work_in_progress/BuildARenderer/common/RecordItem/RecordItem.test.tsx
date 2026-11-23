@@ -8,8 +8,7 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import { machines } from "../../../../../../testing/machines.js";
+import { buildMachine, machines } from "../../../../../../testing/index.js";
 import RecordItem from "./RecordItem.js";
 
 const english = resolveMessages();

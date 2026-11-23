@@ -1,4 +1,5 @@
 import type { RowModel } from "@canonical/dataviews-core";
+import { assertInvariant } from "@canonical/dataviews-core/bindings";
 import {
   createVirtualRange,
   type MountedRange,
@@ -52,7 +53,9 @@ const listReplaced = (before: Snapshot, after: Snapshot): string[] => {
  * The mounted body, which a layout effect and every listener it installs
  * run with. An absent one is a hook driven outside its table.
  */
-const readMounted = (body: HTMLDivElement | null): HTMLDivElement => {
+const readMounted = (
+  body: HTMLTableSectionElement | null,
+): HTMLTableSectionElement => {
   if (body === null) {
     throw new Error("the virtualized body is not mounted");
   }
@@ -60,9 +63,12 @@ const readMounted = (body: HTMLDivElement | null): HTMLDivElement => {
 };
 
 /** The viewport a body measures against: the table root, its parent. */
-const readViewport = (body: HTMLDivElement | null): HTMLElement =>
+const readViewport = (body: HTMLTableSectionElement | null): HTMLElement =>
   // A mounted body is rendered inside the table's root, so it has a parent.
-  readMounted(body).parentElement as HTMLElement;
+  assertInvariant(
+    readMounted(body).parentElement,
+    "a table root over the body",
+  );
 
 /**
  * Mount one table's entries near its viewport: the range deciding which,
@@ -95,7 +101,7 @@ export default function useVirtualRows({
       }),
     [estimatedRowHeight],
   );
-  const body = useRef<HTMLDivElement>(null);
+  const body = useRef<HTMLTableSectionElement>(null);
   // The entry id of every mounted row element.
   const [measured] = useState(() => new Map<Element, string>());
   const observer = useRef<ResizeObserver | null>(null);
@@ -157,7 +163,7 @@ export default function useVirtualRows({
       if (known !== undefined) {
         return known;
       }
-      const attach = (node: HTMLDivElement): (() => void) => {
+      const attach = (node: HTMLTableRowElement): (() => void) => {
         refs.set(id, attach);
         measured.set(node, id);
         observer.current?.observe(node);
@@ -177,9 +183,13 @@ export default function useVirtualRows({
   }, [range, measured]);
 
   const handleFocus = useCallback(
-    (event: FocusEvent<HTMLDivElement>): void => {
-      // A focus event bubbling through the body targets an element of it.
-      const row = (event.target as Element).closest('[role="row"]');
+    (event: FocusEvent<HTMLTableSectionElement>): void => {
+      // The body's own row: the ancestor whose parent is the body, never a
+      // row of a table inside a cell.
+      let row = event.target as Element | null;
+      while (row !== null && row.parentElement !== event.currentTarget) {
+        row = row.parentElement;
+      }
       const id = row === null ? undefined : measured.get(row);
       if (id !== undefined) {
         range.retain(id);
@@ -191,7 +201,7 @@ export default function useVirtualRows({
   // Focus that leaves the body lets its row go. Focus that leaves the
   // window has not left the body, and the row waits for its return.
   const handleBlur = useCallback(
-    (event: FocusEvent<HTMLDivElement>): void => {
+    (event: FocusEvent<HTMLTableSectionElement>): void => {
       const group = event.currentTarget;
       if (
         !group.contains(event.relatedTarget) &&

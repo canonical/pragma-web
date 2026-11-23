@@ -15,8 +15,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fireEvent } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import readAnnouncements from "../../../testing/readAnnouncements.js";
-import renderRefusingTable from "../../../testing/renderRefusingTable.js";
+import {
+  readAnnouncements,
+  renderRefusingTable,
+} from "../../../testing/index.js";
 
 const REFUSED = "Sort unchanged: this source orders by at most 1 term.";
 
@@ -52,7 +54,7 @@ describe("regression 0010 — a repeated refusal not announced", () => {
     const sheet = readFileSync(
       path.join(
         path.dirname(fileURLToPath(import.meta.url)),
-        "../../lib/_work_in_progress/DataTable/styles.css",
+        "../../lib/_work_in_progress/common/ScopedDataTable/styles.css",
       ),
       "utf8",
     ).replace(/\/\*[\s\S]*?\*\//g, "");

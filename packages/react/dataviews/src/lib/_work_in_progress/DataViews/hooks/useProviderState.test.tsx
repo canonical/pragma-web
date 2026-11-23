@@ -16,8 +16,10 @@ import {
 } from "@canonical/dataviews-core/testing";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
-import type { IdentifiedRecord as Row } from "../../../../../testing/types.js";
+import {
+  COUNTED_EXACTLY,
+  type IdentifiedRecord as Row,
+} from "../../../../../testing/index.js";
 import { findFilterHandle } from "../common/utils/index.js";
 import useProviderState from "./useProviderState.js";
 

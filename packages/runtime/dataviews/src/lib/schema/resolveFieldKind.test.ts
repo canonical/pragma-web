@@ -12,7 +12,7 @@ const definitions: { readonly [TKind in FieldKind]: SchemaFieldDefinition } = {
 };
 
 /** The rules of one kind, with the definition the table's row is typed for. */
-const rulesOf = (kind: FieldKind) => ({
+const readRules = (kind: FieldKind) => ({
   rules: resolveFieldKind(kind),
   definition: definitions[kind],
 });
@@ -30,7 +30,7 @@ describe("resolveFieldKind", () => {
   });
 
   it("parses a text input through the kind, or says the kind takes none", () => {
-    const { rules, definition } = rulesOf("choices");
+    const { rules, definition } = readRules("choices");
     if (rules.input.kind !== "text") {
       throw new Error("choices edit through a text input");
     }
@@ -46,7 +46,7 @@ describe("resolveFieldKind", () => {
       kind: "none",
       reason: "presence fields edit through direct commands",
     });
-    const text = rulesOf("text");
+    const text = readRules("text");
     if (text.rules.input.kind !== "text") {
       throw new Error("text edits through a text input");
     }
@@ -58,19 +58,19 @@ describe("resolveFieldKind", () => {
   });
 
   it("rejects operands outside each kind's domain, and none for a kind with no domain", () => {
-    const number = rulesOf("number");
+    const number = readRules("number");
     expect(number.rules.rejectOperands(number.definition, [65])).toBe(
       "65 is above the maximum of 64",
     );
-    const date = rulesOf("date");
+    const date = readRules("date");
     expect(date.rules.rejectOperands(date.definition, ["yesterday"])).toBe(
       '"yesterday" is not an ISO-8601 calendar date (YYYY-MM-DD)',
     );
-    const presence = rulesOf("presence");
+    const presence = readRules("presence");
     expect(
       presence.rules.rejectOperands(presence.definition, [true]),
     ).toBeNull();
-    const text = rulesOf("text");
+    const text = readRules("text");
     expect(text.rules.rejectOperands(text.definition, ["web"])).toBeNull();
     expect(text.rules.rejectOperands(text.definition, [""])).toBe(
       '"" is not non-empty text',
@@ -122,7 +122,7 @@ describe("resolveFieldKind", () => {
   });
 
   it("orders each kind's values, with a text order through the collator given", () => {
-    const text = rulesOf("text");
+    const text = readRules("text");
     const collated = text.rules.createOrder(
       text.definition,
       new Intl.Collator("en-u-kn-true").compare,
@@ -134,7 +134,7 @@ describe("resolveFieldKind", () => {
     );
     expect(byCodePoint.compareText("item2", "item10")).toBeGreaterThan(0);
     expect(byCodePoint.readKey("")).toBeNull();
-    const choices = rulesOf("choices");
+    const choices = readRules("choices");
     const order = choices.rules.createOrder(
       choices.definition,
       compareByCodeUnit,

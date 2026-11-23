@@ -5,7 +5,7 @@
  * out.
  */
 import { describe, expect, it } from "vitest";
-import respellLink from "../../../testing/respellLink.js";
+import { respellLink } from "../../../testing/index.js";
 import { canonicalizeSlice, type Slice } from "../query/index.js";
 import { createSchema } from "../schema/index.js";
 import encodeCarryingQuery from "./encodeCarryingQuery.js";

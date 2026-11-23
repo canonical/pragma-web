@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import readId from "../../../testing/readId.js";
+import { readId } from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import type { ProviderHost } from "../provider/index.js";
-import type { Predicate, PredicateOperator } from "../query/index.js";
+import type { Predicate } from "../query/index.js";
 import type { SourceRefusal } from "../result/index.js";
 import createFilterInput from "./createFilterInput.js";
 
@@ -24,17 +24,15 @@ const refusal: SourceRefusal = {
 };
 
 /** A host that applies everything, or refuses everything, and records it. */
-const hostThat = (answer: readonly SourceRefusal[] = []) => ({
+const createHost = (answer: readonly SourceRefusal[] = []) => ({
   setPredicate: vi.fn<ProviderHost["setPredicate"]>(() => answer),
-  removePredicate: vi.fn<
-    (field: string, operator: PredicateOperator) => readonly SourceRefusal[]
-  >(() => answer),
+  removePredicate: vi.fn<ProviderHost["removePredicate"]>(() => answer),
 });
 
 /** No conjunct stands at the record's address. */
 const readNone = (): readonly Predicate[] => [];
 
-const cpuAtLeast = (host = hostThat(), readConjuncts = readNone) => ({
+const createCpuAtLeast = (host = createHost(), readConjuncts = readNone) => ({
   host,
   input: createFilterInput({
     schema: machines.schema,
@@ -52,14 +50,14 @@ describe("createFilterInput", () => {
         schema: machines.schema,
         field: "memory",
         operator: "gte",
-        host: hostThat(),
+        host: createHost(),
         readConjuncts: readNone,
       }),
     ).toThrow('the schema has no field "memory" to filter');
   });
 
   it("applies a valid edit through the host and publishes it", () => {
-    const { host, input } = cpuAtLeast();
+    const { host, input } = createCpuAtLeast();
     input.edit("4");
     expect(host.setPredicate).toHaveBeenCalledWith(
       { field: "cpu", operator: "gte", operands: [4] },
@@ -79,7 +77,7 @@ describe("createFilterInput", () => {
   });
 
   it("retains the applied predicate on an invalid edit and explains it", () => {
-    const { host, input } = cpuAtLeast();
+    const { host, input } = createCpuAtLeast();
     input.edit("4");
     input.edit("four");
     expect(host.setPredicate).toHaveBeenCalledTimes(1);
@@ -96,7 +94,7 @@ describe("createFilterInput", () => {
   });
 
   it("flags an invalid edit without a prior predicate as not retaining", () => {
-    const { input } = cpuAtLeast();
+    const { input } = createCpuAtLeast();
     input.edit("nope");
     expect(input.state.get().feedback).toMatchObject({
       status: "invalid",
@@ -106,14 +104,14 @@ describe("createFilterInput", () => {
   });
 
   it("keeps an incomplete edit out of the query", () => {
-    const { host, input } = cpuAtLeast();
+    const { host, input } = createCpuAtLeast();
     input.edit("");
     expect(host.setPredicate).not.toHaveBeenCalled();
     expect(input.state.get().feedback).toEqual({ status: "incomplete" });
   });
 
   it("keeps the predicate in force when the source refuses the edit", () => {
-    const { host, input } = cpuAtLeast(hostThat([refusal]));
+    const { host, input } = createCpuAtLeast(createHost([refusal]));
     input.edit("4");
     // Nothing applied: the host answered with what it refuses.
     expect(input.state.get()).toEqual({
@@ -138,7 +136,7 @@ describe("createFilterInput", () => {
   });
 
   it("sets operands directly and answers with the host's refusals", () => {
-    const { host, input } = cpuAtLeast(hostThat([refusal]));
+    const { host, input } = createCpuAtLeast(createHost([refusal]));
     expect(input.set([32])).toEqual([refusal]);
     host.setPredicate.mockReturnValueOnce([]);
     expect(input.set([32])).toEqual([]);
@@ -147,7 +145,7 @@ describe("createFilterInput", () => {
   });
 
   it("reports operands the kind rejects in the feedback and applies nothing", () => {
-    const { host, input } = cpuAtLeast();
+    const { host, input } = createCpuAtLeast();
     expect(input.set([128])).toEqual([]);
     expect(host.setPredicate).not.toHaveBeenCalled();
     expect(input.state.get().feedback).toMatchObject({
@@ -157,7 +155,7 @@ describe("createFilterInput", () => {
   });
 
   it("clears explicitly, distinct from invalid input", () => {
-    const { host, input } = cpuAtLeast();
+    const { host, input } = createCpuAtLeast();
     input.edit("4");
     expect(input.clear()).toEqual([]);
     expect(host.removePredicate).toHaveBeenCalledWith("cpu", "gte", 0);
@@ -172,7 +170,7 @@ describe("createFilterInput", () => {
   it("edits and clears the conjunct it holds, at its place among the others", () => {
     const four: Predicate = { field: "cpu", operator: "gte", operands: [4] };
     const eight: Predicate = { field: "cpu", operator: "gte", operands: [8] };
-    const { host, input } = cpuAtLeast(hostThat(), () => [four, eight]);
+    const { host, input } = createCpuAtLeast(createHost(), () => [four, eight]);
     input.setApplied(eight);
     input.edit("16");
     expect(host.setPredicate).toHaveBeenLastCalledWith(
@@ -187,7 +185,7 @@ describe("createFilterInput", () => {
 
   it("edits the first conjunct when the one it held no longer stands", () => {
     const four: Predicate = { field: "cpu", operator: "gte", operands: [4] };
-    const { host, input } = cpuAtLeast(hostThat(), () => [four]);
+    const { host, input } = createCpuAtLeast(createHost(), () => [four]);
     input.setApplied({ field: "cpu", operator: "gte", operands: [8] });
     input.edit("16");
     expect(host.setPredicate).toHaveBeenLastCalledWith(
@@ -198,8 +196,8 @@ describe("createFilterInput", () => {
   });
 
   it("reads as its predicate the one on its way while the host hears it", () => {
-    const host = hostThat();
-    const { input } = cpuAtLeast(host);
+    const host = createHost();
+    const { input } = createCpuAtLeast(host);
     const heard: (Predicate | null)[] = [];
     host.setPredicate.mockImplementation(() => {
       heard.push(input.predicate);
@@ -210,8 +208,8 @@ describe("createFilterInput", () => {
   });
 
   it("keeps a conjunct promoted to its place while the host hears a clear", () => {
-    const host = hostThat();
-    const { input } = cpuAtLeast(host);
+    const host = createHost();
+    const { input } = createCpuAtLeast(host);
     input.edit("4");
     host.removePredicate.mockImplementation(() => {
       input.setApplied({ field: "cpu", operator: "gte", operands: [8] });
@@ -223,7 +221,7 @@ describe("createFilterInput", () => {
   });
 
   it("adopts an external predicate and discards the stale input", () => {
-    const { input } = cpuAtLeast();
+    const { input } = createCpuAtLeast();
     input.edit("four");
     input.setApplied({ field: "cpu", operator: "gte", operands: [8] });
     expect(input.state.get()).toEqual({
@@ -241,7 +239,7 @@ describe("createFilterInput", () => {
   });
 
   it("shows no input for an adopted predicate that carries no operand", () => {
-    const host = hostThat();
+    const host = createHost();
     const owner = createFilterInput({
       schema: machines.schema,
       field: "owner",
@@ -255,7 +253,7 @@ describe("createFilterInput", () => {
   });
 
   it("rejects a misrouted external predicate without side effects", () => {
-    const { input } = cpuAtLeast();
+    const { input } = createCpuAtLeast();
     input.edit("4");
     const before = input.state.get();
     expect(() =>
@@ -267,7 +265,7 @@ describe("createFilterInput", () => {
   });
 
   it("publishes the applied value only when it moves", () => {
-    const { input } = cpuAtLeast();
+    const { input } = createCpuAtLeast();
     const seen = vi.fn();
     input.applied.subscribe(seen);
     input.edit("4");
@@ -278,7 +276,7 @@ describe("createFilterInput", () => {
   });
 
   it("compares applied sets by membership, not reference", () => {
-    const host = hostThat();
+    const host = createHost();
     const status = createFilterInput({
       schema: machines.schema,
       field: "status",
@@ -298,7 +296,7 @@ describe("createFilterInput", () => {
   });
 
   it("hands its channels out read-only at runtime", () => {
-    const { input } = cpuAtLeast();
+    const { input } = createCpuAtLeast();
     for (const channel of [input.state, input.applied]) {
       expect(Object.isFrozen(channel)).toBe(true);
       expect(channel).not.toHaveProperty("set");
@@ -319,7 +317,7 @@ describe("createFilterInput", () => {
     ];
 
     it("lets the first applied edit take the policy's mode, and replaces after it", () => {
-      const { host, input } = cpuAtLeast();
+      const { host, input } = createCpuAtLeast();
       input.edit("4");
       input.edit("4e");
       input.edit("48");
@@ -330,7 +328,7 @@ describe("createFilterInput", () => {
     });
 
     it("starts a new step once the session ends, by leaving or a discrete change", () => {
-      const { host, input } = cpuAtLeast();
+      const { host, input } = createCpuAtLeast();
       input.edit("4");
       input.endSession();
       input.edit("8");
@@ -351,7 +349,7 @@ describe("createFilterInput", () => {
     });
 
     it("keeps the session unstarted while its edits are refused", () => {
-      const { host, input } = cpuAtLeast(hostThat([refusal]));
+      const { host, input } = createCpuAtLeast(createHost([refusal]));
       input.edit("4");
       input.edit("8");
       expect(host.setPredicate.mock.calls).toEqual([
@@ -361,7 +359,7 @@ describe("createFilterInput", () => {
     });
 
     it("starts no session with an edit that reads as what is applied", () => {
-      const { host, input } = cpuAtLeast();
+      const { host, input } = createCpuAtLeast();
       input.setApplied(buildGte([4]));
       // "4.0" reads as the 4 already applied: nothing moves.
       input.edit("4.0");

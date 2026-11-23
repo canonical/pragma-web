@@ -8,8 +8,7 @@
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createFacetedManual from "../../../testing/createFacetedManual.js";
-import deliverFacets from "../../../testing/deliverFacets.js";
+import { createFacetedManual, deliverFacets } from "../../../testing/index.js";
 import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** The ends a source should never answer with, and once did. */
@@ -19,7 +18,7 @@ const unusable: readonly (readonly [number, number])[] = [
   [Number.NEGATIVE_INFINITY, 8],
 ];
 
-describe("a range whose ends are not finite", () => {
+describe("regression 0076 — a range of nothing drew an axis of nothing", () => {
   it("says no matching record holds a value, and draws no axis", () => {
     for (const [min, max] of unusable) {
       const { provider, source } = createFacetedManual();

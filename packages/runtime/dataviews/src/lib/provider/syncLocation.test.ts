@@ -10,14 +10,16 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import buildPage from "../../../testing/buildPage.js";
-import createManualSource from "../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
-import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
-import readId from "../../../testing/readId.js";
-import type { LocationSetUp as SetUp } from "../../../testing/types.js";
+import {
+  buildPage,
+  createManualSource,
+  createRecordingLocation,
+  declare,
+  declareSort,
+  NOTHING_DECLARED,
+  readId,
+  type LocationSetUp as SetUp,
+} from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import { createFilterInputs } from "../filter/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";

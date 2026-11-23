@@ -41,29 +41,27 @@ import { createRef, type ReactElement, StrictMode, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildMachine from "../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
-import deliverRows from "../../../../testing/deliverRows.js";
-import elementAt from "../../../../testing/elementAt.js";
-import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
-import fakeAnnouncerClock from "../../../../testing/fakeAnnouncerClock.js";
 import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+  deliverRows,
+  elementAt,
+  expectNoAxeViolations,
+  fakeAnnouncerClock,
   MACHINE_CAPABILITIES,
+  type Machine,
+  type MachineFields,
   machines,
-} from "../../../../testing/machines.js";
-import readAnnouncements from "../../../../testing/readAnnouncements.js";
-import type {
-  Machine,
-  MachineFields,
-  OddRecord,
-  MachineProvider as Provider,
-} from "../../../../testing/types.js";
+  type OddRecord,
+  type MachineProvider as Provider,
+  readAnnouncements,
+} from "../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";
-import type { DataTableColumn } from "./types.js";
+import type { DataTableColumn } from "./index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", sortable: true },
@@ -166,11 +164,20 @@ describe("DataTable", () => {
     );
   });
 
-  it("renders the table relationships as roles over div geometry", () => {
+  it("renders the table as native elements over grid geometry", () => {
     renderLoadedTable();
     const table = screen.getByRole("table", { name: "Machines" });
-    expect(table.tagName).toBe("DIV");
-    expect(within(table).getAllByRole("rowgroup")).toHaveLength(2);
+    expect(table.tagName).toBe("TABLE");
+    expect(table).not.toHaveAttribute("role");
+    expect(
+      within(table)
+        .getAllByRole("rowgroup")
+        .map((group) => group.tagName),
+    ).toEqual(["THEAD", "TBODY"]);
+    for (const header of screen.getAllByRole("columnheader")) {
+      expect(header.tagName).toBe("TH");
+      expect(header).toHaveAttribute("scope", "col");
+    }
     expect(
       screen
         .getAllByRole("columnheader")
@@ -195,10 +202,12 @@ describe("DataTable", () => {
     const table = screen.getByRole("table", { name: "Machines" });
     expect(table.style.getPropertyValue("--data-table-columns")).not.toBe("");
     for (const row of screen.getAllByRole("row")) {
-      expect(row.matches(".ds.data-table-row")).toBe(true);
+      expect(
+        row.matches(".ds.data-table-row, .ds.data-table > .header > .row"),
+      ).toBe(true);
       expect(row.getAttribute("style")).toBeNull();
     }
-    expect(table.querySelector('[role="cell"][style]')).toBeNull();
+    expect(table.querySelector("td[style]")).toBeNull();
   });
 
   it("merges the caller's class name and inline style onto the root", () => {
@@ -292,7 +301,7 @@ describe("DataTable", () => {
 
   it("fills and clears a caller's ref object", () => {
     const { provider } = createMachineProvider();
-    const ref = createRef<HTMLDivElement>();
+    const ref = createRef<HTMLTableElement>();
     const { unmount } = render(
       <DataTable
         provider={provider}
@@ -493,7 +502,7 @@ describe("DataTable", () => {
    */
   const findHeaderRow = (): HTMLElement => {
     const [row, ...rest] = document.querySelectorAll<HTMLElement>(
-      ".data-table-row-group.header [role='row']",
+      ".ds.data-table > .header tr",
     );
     if (row === undefined || rest.length > 0) {
       throw new Error("expected one table's header row");
@@ -507,7 +516,7 @@ describe("DataTable", () => {
    */
   const findHeader = (name: string): HTMLElement => {
     const headers = Array.from(
-      findHeaderRow().querySelectorAll<HTMLElement>("[role='columnheader']"),
+      findHeaderRow().querySelectorAll<HTMLElement>("th"),
     ).filter((header) => header.querySelector(".label")?.textContent === name);
     const [header, ...rest] = headers;
     if (header === undefined || rest.length > 0) {
@@ -699,9 +708,8 @@ describe("DataTable", () => {
       document.querySelector("[role='grid'], [role='treegrid']"),
     ).not.toBeInTheDocument();
     // No roving tab stop: every sort button is in the tab order.
-    const sortButtons = document.querySelectorAll<HTMLButtonElement>(
-      "[role='columnheader'] button.sort",
-    );
+    const sortButtons =
+      document.querySelectorAll<HTMLButtonElement>("th button.sort");
     expect(sortButtons.length).toBeGreaterThan(1);
     for (const sortButton of sortButtons) {
       expect(sortButton.tabIndex).toBe(0);
@@ -758,9 +766,7 @@ describe("DataTable", () => {
       // Plain attribute queries: 158 orderings through role queries would
       // spend seconds computing names the text content already states.
       const listClaimed = () => [
-        ...view.container.querySelectorAll<HTMLElement>(
-          "[role='columnheader'][aria-sort]",
-        ),
+        ...view.container.querySelectorAll<HTMLElement>("th[aria-sort]"),
       ];
       for (const ordering of orderings) {
         act(() => {
@@ -898,9 +904,7 @@ describe("DataTable", () => {
           });
           const first = (ordering.length > 0 ? ordering : defaultSort).at(0);
           const claimed = [
-            ...view.container.querySelectorAll<HTMLElement>(
-              "[role='columnheader'][aria-sort]",
-            ),
+            ...view.container.querySelectorAll<HTMLElement>("th[aria-sort]"),
           ];
           const label =
             first === undefined ? undefined : layout.claims[first.field];
@@ -922,8 +926,7 @@ describe("DataTable", () => {
     const name = findSortButton("Name");
     const status = findSortButton("Status");
     const findStatusReason = () =>
-      status.closest("[role='columnheader']")?.querySelector(".sort-reason") ??
-      null;
+      status.closest("th")?.querySelector(".sort-reason") ?? null;
     fireEvent.click(name);
     // A reader on the header, in a document that has focus: a blur with the
     // window's focus gone is the window's, not the column's.
@@ -1452,10 +1455,10 @@ describe("DataTable", () => {
     const listed = within(body).getAllByRole("row");
     const first = elementAt(listed, 0);
     const rows = listed.slice(1);
-    expect(first).toHaveClass("status");
+    expect(first).toHaveClass("ds", "data-table-status-row");
+    expect(first).toHaveAttribute("data-status", status);
     expect(within(body).getAllByRole("row", { name: text })).toHaveLength(1);
     const cell = within(first).getByRole("cell");
-    expect(cell).toHaveAttribute("data-status", status);
     expect(cell).toHaveTextContent(text);
     if (announced) {
       expect(within(cell).getByRole("status")).toHaveTextContent(text);
@@ -1620,7 +1623,7 @@ describe("DataTable", () => {
       "true",
     );
     expect(elementAt(screen.getAllByRole("row"), 1).className).toBe(
-      "ds data-table-row selected",
+      "ds data-table-row",
     );
     fireEvent.click(screen.getByRole("checkbox", { name: "Select alpha" }));
     expect(provider.selection.state.get().ids.size).toBe(0);
@@ -2263,7 +2266,7 @@ describe("DataTable", () => {
     expect(screen.getByRole("table", { name: "Machines" })).toBeInTheDocument();
     expect(
       container
-        .querySelector<HTMLElement>("[role='table']")
+        .querySelector<HTMLElement>("table")
         ?.style.getPropertyValue("--data-table-columns"),
     ).toBe("96px 96px");
   });

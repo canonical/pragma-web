@@ -14,10 +14,13 @@ import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import { MACHINE_CAPABILITIES, machines } from "../../../testing/machines.js";
-import type { Machine } from "../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  MACHINE_CAPABILITIES,
+  type Machine,
+  machines,
+} from "../../../testing/index.js";
 import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
 
 afterEach(cleanup);

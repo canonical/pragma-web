@@ -5,7 +5,7 @@
 
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import createFacetedFleet from "../../../../testing/createFacetedFleet.js";
+import { createFacetedFleet } from "../../../../testing/index.js";
 import DataChartWithTable from "./DataChartWithTable.js";
 
 describe("DataChartWithTable on the server", () => {

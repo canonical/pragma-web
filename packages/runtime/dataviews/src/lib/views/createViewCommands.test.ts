@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import buildStoredView from "../../../testing/buildStoredView.js";
-import createDeferred from "../../../testing/createDeferred.js";
-import createManualSource from "../../../testing/createManualSource.js";
-import createStandInViewStore from "../../../testing/createStandInViewStore.js";
-import declare from "../../../testing/declare.js";
-import readId from "../../../testing/readId.js";
+import {
+  buildStoredView,
+  createDeferred,
+  createManualSource,
+  createStandInViewStore,
+  declare,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import { createChannel } from "../observable/index.js";
 import { createPresentation } from "../presentation/index.js";

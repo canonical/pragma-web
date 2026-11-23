@@ -8,7 +8,7 @@
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../testing/index.js";
 import { PaginationBar } from "../../lib/_work_in_progress/PaginationBar/index.js";
 
 describe("regression 0060 — a colon was read into the page size name", () => {
@@ -21,6 +21,6 @@ describe("regression 0060 — a colon was read into the page size name", () => {
     expect(size).toHaveAccessibleName("Rows per page");
     // The label's own words: what a reader hears is the name above, and a
     // colon anywhere else in the bar is not this case's business.
-    expect(size.labels?.[0]?.textContent ?? "").not.toContain(":");
+    expect(size.labels?.item(0)?.textContent ?? "").not.toContain(":");
   });
 });

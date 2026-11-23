@@ -15,14 +15,16 @@ import { describe, expect, it } from "vitest";
 // Resolved from the package root, which is where the suite runs; the
 // comments are dropped, so prose about the fix is not taken for a rule.
 const sheet = readFileSync(
-  path.resolve("src/lib/_work_in_progress/DataTable/styles.css"),
+  path.resolve("src/lib/_work_in_progress/common/ScopedDataTable/styles.css"),
   "utf8",
 ).replace(/\/\*[\s\S]*?\*\//g, "");
 
 describe("regression 0003 — row groups sized by their content", () => {
   it("sizes a row group by min-content and writes max-content nowhere", () => {
-    const rule = sheet.match(/\.ds\.data-table-row-group\s*\{[^}]*\}/);
-    expect(rule?.[0]).toMatch(/min-inline-size:\s*min-content;/);
+    const rule = sheet.match(
+      /\.ds\.data-table > \.header,\s*\.ds\.data-table-body\s*\{[^}]*\}/,
+    );
+    expect(rule?.at(0)).toMatch(/min-inline-size:\s*min-content;/);
     expect(sheet).not.toMatch(/max-content/);
   });
 });

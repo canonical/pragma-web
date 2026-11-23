@@ -9,7 +9,7 @@
 
 import { act, fireEvent } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import renderRefusingTable from "../../../testing/renderRefusingTable.js";
+import { renderRefusingTable } from "../../../testing/index.js";
 
 describe("regression 0019 — a cleared sort reason came back", () => {
   it("keeps the reason gone when the ordering it was refused over returns", () => {

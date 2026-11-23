@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import renderDecorated from "../../../testing/renderDecorated.js";
+import { renderDecorated } from "../../../testing/index.js";
 import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
 import { machineCollection } from "../machines/index.js";
 import withMachineRoot from "./withMachineRoot.js";

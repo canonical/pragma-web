@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import readId from "../../../testing/readId.js";
+import { readId } from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import { DEFAULT_WINDOW, type Slice, type SortTerm } from "../query/index.js";
 import type { SourceDelivery } from "../result/index.js";
@@ -10,7 +10,9 @@ import type { SourceActionRunner, SourceRequest } from "./types.js";
 
 const emptySlice: Slice = { filter: [], search: null, sort: [], group: [] };
 
-const request = (overrides: Partial<SourceRequest> = {}): SourceRequest => ({
+const buildRequest = (
+  overrides: Partial<SourceRequest> = {},
+): SourceRequest => ({
   requestId: "i1:r1",
   slice: emptySlice,
   window: { ...DEFAULT_WINDOW, size: 2 },
@@ -18,7 +20,7 @@ const request = (overrides: Partial<SourceRequest> = {}): SourceRequest => ({
   ...overrides,
 });
 
-const exact = (value: number) => ({ kind: "exact", value });
+const buildExact = (value: number) => ({ kind: "exact", value });
 
 const rows = [
   { id: "a", name: "Alpha", cpu: 4 },
@@ -35,25 +37,26 @@ const collection = createCollection({
   ],
 });
 
-const source = () =>
+const createSource = () =>
   createArraySource<RowRecord>({
     rows,
     collection,
     searchFields: ["name"],
   });
 
-const delivery = () => vi.fn<(delivery: SourceDelivery) => void>();
+const createDeliverySpy = () => vi.fn<(delivery: SourceDelivery) => void>();
 
 /** The nth delivery, or a failure rather than a silently skipped assertion. */
-const deliveredAt = (
-  deliver: ReturnType<typeof delivery>,
+const readDeliveredAt = (
+  deliver: ReturnType<typeof createDeliverySpy>,
   index: number,
 ): SourceDelivery => {
-  const call = deliver.mock.calls[index];
+  const call = deliver.mock.calls.at(index);
   if (call === undefined) {
     throw new Error(`expected a delivery at index ${index}`);
   }
-  return call[0];
+  const [delivered] = call;
+  return delivered;
 };
 
 const readIds = (delivered: SourceDelivery) => {
@@ -67,7 +70,7 @@ const readIds = (delivered: SourceDelivery) => {
 
 describe("createArraySource", () => {
   it("declares complete input, and each field's own operators", () => {
-    expect({ ...source().capabilities }).toEqual({
+    expect({ ...createSource().capabilities }).toEqual({
       // Complete local input executes every operator each kind accepts.
       filter: {
         id: ["contains", "startsWith"],
@@ -122,9 +125,12 @@ describe("createArraySource", () => {
       collection,
       defaultSort: [{ field: "cpu", direction: "desc" }],
     });
-    const deliver = delivery();
-    live.execute(request({ window: { ...DEFAULT_WINDOW, size: 3 } }), deliver);
-    expect(readIds(deliveredAt(deliver, 0))).toEqual(["b", "c", "a"]);
+    const deliver = createDeliverySpy();
+    live.execute(
+      buildRequest({ window: { ...DEFAULT_WINDOW, size: 3 } }),
+      deliver,
+    );
+    expect(readIds(readDeliveredAt(deliver, 0))).toEqual(["b", "c", "a"]);
   });
 
   it("collates text at the root locale, numerically, unless told otherwise", () => {
@@ -133,28 +139,28 @@ describe("createArraySource", () => {
       { id: "n2", name: "node2" },
     ];
     const live = createArraySource({ rows: numbered, collection });
-    const deliver = delivery();
+    const deliver = createDeliverySpy();
     live.execute(
-      request({
+      buildRequest({
         slice: { ...emptySlice, sort: [{ field: "name", direction: "asc" }] },
       }),
       deliver,
     );
-    expect(readIds(deliveredAt(deliver, 0))).toEqual(["n2", "n10"]);
+    expect(readIds(readDeliveredAt(deliver, 0))).toEqual(["n2", "n10"]);
 
     const byCodePoint = createArraySource({
       rows: numbered,
       collection,
       collation: null,
     });
-    const other = delivery();
+    const other = createDeliverySpy();
     byCodePoint.execute(
-      request({
+      buildRequest({
         slice: { ...emptySlice, sort: [{ field: "name", direction: "asc" }] },
       }),
       other,
     );
-    expect(readIds(deliveredAt(other, 0))).toEqual(["n10", "n2"]);
+    expect(readIds(readDeliveredAt(other, 0))).toEqual(["n10", "n2"]);
   });
 
   it("places a field's empties first in both directions when told to", () => {
@@ -166,14 +172,14 @@ describe("createArraySource", () => {
     });
     expect(live.capabilities.sort.empties).toEqual({ cpu: "first" });
     for (const direction of ["asc", "desc"] as const) {
-      const deliver = delivery();
+      const deliver = createDeliverySpy();
       live.execute(
-        request({
+        buildRequest({
           slice: { ...emptySlice, sort: [{ field: "cpu", direction }] },
         }),
         deliver,
       );
-      expect(readIds(deliveredAt(deliver, 0)).at(0)).toBe("d");
+      expect(readIds(readDeliveredAt(deliver, 0)).at(0)).toBe("d");
     }
   });
 
@@ -209,15 +215,15 @@ describe("createArraySource", () => {
   });
 
   it("delivers the requested window synchronously with both counts", () => {
-    const deliver = delivery();
-    source().execute(request(), deliver);
+    const deliver = createDeliverySpy();
+    createSource().execute(buildRequest(), deliver);
     expect(deliver).toHaveBeenCalledTimes(1);
-    expect(deliveredAt(deliver, 0)).toEqual({
+    expect(readDeliveredAt(deliver, 0)).toEqual({
       status: "succeeded",
       page: {
-        rows: [rows[0], rows[1]],
+        rows: [rows.at(0), rows.at(1)],
         groups: null,
-        counts: { pageable: exact(3), matched: exact(3) },
+        counts: { pageable: buildExact(3), matched: buildExact(3) },
         facets: {},
         more: null,
         cursors: null,
@@ -226,12 +232,12 @@ describe("createArraySource", () => {
   });
 
   it("computes the facets a request asks for over the whole matching set", () => {
-    const deliver = delivery();
-    const executing = source();
-    executing.execute(request(), deliver);
+    const deliver = createDeliverySpy();
+    const executing = createSource();
+    executing.execute(buildRequest(), deliver);
     // The same query asking for a facet as well is computed again.
-    executing.execute(request({ facets: ["cpu"] }), deliver);
-    const answered = deliveredAt(deliver, 1);
+    executing.execute(buildRequest({ facets: ["cpu"] }), deliver);
+    const answered = readDeliveredAt(deliver, 1);
     if (answered.status !== "succeeded") {
       throw new Error("expected a page");
     }
@@ -242,31 +248,34 @@ describe("createArraySource", () => {
 
   it("fails a request for a facet it does not declare", () => {
     expect(() =>
-      source().execute(request({ facets: ["name"] }), delivery()),
+      createSource().execute(
+        buildRequest({ facets: ["name"] }),
+        createDeliverySpy(),
+      ),
     ).toThrow('this source declares no facet for "name"');
   });
 
   it("counts the matched set, not the loaded page, and the whole input", () => {
-    const deliver = delivery();
-    source().execute(
-      request({
+    const deliver = createDeliverySpy();
+    createSource().execute(
+      buildRequest({
         slice: { ...emptySlice, search: "a" },
         window: { ...DEFAULT_WINDOW, size: 1 },
       }),
       deliver,
     );
-    expect(deliveredAt(deliver, 0)).toMatchObject({
+    expect(readDeliveredAt(deliver, 0)).toMatchObject({
       page: {
-        rows: [rows[0]],
-        counts: { pageable: exact(3), matched: exact(3) },
+        rows: [rows.at(0)],
+        counts: { pageable: buildExact(3), matched: buildExact(3) },
       },
     });
   });
 
   it("counts the filtered set exactly", () => {
-    const deliver = delivery();
-    source().execute(
-      request({
+    const deliver = createDeliverySpy();
+    createSource().execute(
+      buildRequest({
         slice: {
           ...emptySlice,
           filter: [{ field: "cpu", operator: "gte", operands: [8] }],
@@ -274,20 +283,20 @@ describe("createArraySource", () => {
       }),
       deliver,
     );
-    expect(deliveredAt(deliver, 0)).toMatchObject({
+    expect(readDeliveredAt(deliver, 0)).toMatchObject({
       page: {
-        counts: { pageable: exact(2), matched: exact(2) },
+        counts: { pageable: buildExact(2), matched: buildExact(2) },
       },
     });
   });
 
   it("windows past the end of the result as an empty page", () => {
-    const deliver = delivery();
-    source().execute(
-      request({ window: { ...DEFAULT_WINDOW, page: 3, size: 2 } }),
+    const deliver = createDeliverySpy();
+    createSource().execute(
+      buildRequest({ window: { ...DEFAULT_WINDOW, page: 3, size: 2 } }),
       deliver,
     );
-    expect(deliveredAt(deliver, 0)).toMatchObject({ page: { rows: [] } });
+    expect(readDeliveredAt(deliver, 0)).toMatchObject({ page: { rows: [] } });
   });
 
   it("reuses one query's matched set across window changes", () => {
@@ -307,13 +316,13 @@ describe("createArraySource", () => {
       ...emptySlice,
       sort: [{ field: "cpu", direction: "asc" }],
     };
-    live.execute(request({ slice: query }), delivery());
+    live.execute(buildRequest({ slice: query }), createDeliverySpy());
     const afterFirst = reads;
     expect(afterFirst).toBeGreaterThan(0);
 
-    const second = delivery();
+    const second = createDeliverySpy();
     live.execute(
-      request({
+      buildRequest({
         requestId: "i1:r2",
         slice: query,
         window: { ...DEFAULT_WINDOW, page: 2, size: 2 },
@@ -321,29 +330,29 @@ describe("createArraySource", () => {
       second,
     );
     expect(reads).toBe(afterFirst);
-    expect(readIds(deliveredAt(second, 0))).toEqual(["b"]);
+    expect(readIds(readDeliveredAt(second, 0))).toEqual(["b"]);
   });
 
   it("re-executes a query the records changed under", () => {
-    const live = source();
-    const deliver = delivery();
+    const live = createSource();
+    const deliver = createDeliverySpy();
     const query: Slice = {
       ...emptySlice,
       sort: [{ field: "cpu", direction: "asc" }],
     };
-    live.execute(request({ slice: query }), deliver);
-    expect(readIds(deliveredAt(deliver, 0))).toEqual(["a", "c"]);
+    live.execute(buildRequest({ slice: query }), deliver);
+    expect(readIds(readDeliveredAt(deliver, 0))).toEqual(["a", "c"]);
     live.setRows([...rows, { id: "d", name: "delta", cpu: 1 }]);
-    expect(readIds(deliveredAt(deliver, 1))).toEqual(["d", "a"]);
+    expect(readIds(readDeliveredAt(deliver, 1))).toEqual(["d", "a"]);
   });
 
   it("re-executes every live request when the records change", () => {
-    const live = source();
-    const first = delivery();
-    const second = delivery();
-    live.execute(request(), first);
+    const live = createSource();
+    const first = createDeliverySpy();
+    const second = createDeliverySpy();
+    live.execute(buildRequest(), first);
     live.execute(
-      request({
+      buildRequest({
         requestId: "i1:r2",
         slice: { ...emptySlice, sort: [{ field: "cpu", direction: "desc" }] },
       }),
@@ -351,17 +360,17 @@ describe("createArraySource", () => {
     );
     live.setRows([...rows, { id: "d", name: "delta", cpu: 1 }]);
     expect(first).toHaveBeenCalledTimes(2);
-    expect(readIds(deliveredAt(first, 1))).toEqual(["a", "b"]);
-    expect(readIds(deliveredAt(second, 1))).toEqual(["b", "c"]);
+    expect(readIds(readDeliveredAt(first, 1))).toEqual(["a", "b"]);
+    expect(readIds(readDeliveredAt(second, 1))).toEqual(["b", "c"]);
   });
 
   it("computes the facets again over the records that replace its own", () => {
-    const live = source();
-    const deliver = delivery();
-    live.execute(request({ facets: ["cpu"] }), deliver);
+    const live = createSource();
+    const deliver = createDeliverySpy();
+    live.execute(buildRequest({ facets: ["cpu"] }), deliver);
     /** The facets of the nth delivery. */
     const readFacetsAt = (index: number) => {
-      const delivered = deliveredAt(deliver, index);
+      const delivered = readDeliveredAt(deliver, index);
       return delivered.status === "succeeded" ? delivered.page.facets : null;
     };
     expect(readFacetsAt(0)).toEqual({
@@ -374,20 +383,20 @@ describe("createArraySource", () => {
   });
 
   it("stops delivering to a released request", () => {
-    const live = source();
-    const deliver = delivery();
-    const release = live.execute(request(), deliver);
+    const live = createSource();
+    const deliver = createDeliverySpy();
+    const release = live.execute(buildRequest(), deliver);
     release();
     live.setRows([]);
     expect(deliver).toHaveBeenCalledTimes(1);
   });
 
   it("keeps the other requests attached when one is released", () => {
-    const live = source();
-    const kept = delivery();
-    const dropped = delivery();
-    live.execute(request(), kept);
-    live.execute(request({ requestId: "i1:r2" }), dropped)();
+    const live = createSource();
+    const kept = createDeliverySpy();
+    const dropped = createDeliverySpy();
+    live.execute(buildRequest(), kept);
+    live.execute(buildRequest({ requestId: "i1:r2" }), dropped)();
     live.setRows([]);
     expect(kept).toHaveBeenCalledTimes(2);
     expect(dropped).toHaveBeenCalledTimes(1);
@@ -397,20 +406,20 @@ describe("createArraySource", () => {
     const mutable = [{ id: "a" }];
     const live = createArraySource({ rows: mutable, collection });
     mutable.push({ id: "b" });
-    const deliver = delivery();
-    live.execute(request(), deliver);
-    expect(readIds(deliveredAt(deliver, 0))).toEqual(["a"]);
+    const deliver = createDeliverySpy();
+    live.execute(buildRequest(), deliver);
+    expect(readIds(readDeliveredAt(deliver, 0))).toEqual(["a"]);
   });
 
   it("copies the replacement records too", () => {
-    const live = source();
+    const live = createSource();
     const replacement = [{ id: "z" }];
     live.setRows(replacement);
     // The push is only observable through a delivery made after it.
     replacement.push({ id: "y" });
-    const later = delivery();
-    live.execute(request({ requestId: "i1:r9" }), later);
-    expect(readIds(deliveredAt(later, 0))).toEqual(["z"]);
+    const later = createDeliverySpy();
+    live.execute(buildRequest({ requestId: "i1:r9" }), later);
+    expect(readIds(readDeliveredAt(later, 0))).toEqual(["z"]);
   });
 
   it("carries the application's row operations", async () => {
@@ -438,6 +447,6 @@ describe("createArraySource", () => {
   });
 
   it("has no row operations unless the application supplies them", () => {
-    expect("runAction" in source()).toBe(false);
+    expect("runAction" in createSource()).toBe(false);
   });
 });

@@ -5,12 +5,15 @@
  * completed by hand with the page a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import buildSettledPage from "../../../testing/buildSettledPage.js";
-import countAtLeast from "../../../testing/countAtLeast.js";
-import countExactly from "../../../testing/countExactly.js";
-import { BY_NUMBER, FORWARD_CURSORS } from "../../../testing/fixtures.js";
-import readIssuedRequest from "../../../testing/readIssuedRequest.js";
-import type { SettledRow } from "../../../testing/types.js";
+import {
+  BY_NUMBER,
+  buildSettledPage,
+  countAtLeast,
+  countExactly,
+  FORWARD_CURSORS,
+  readIssuedRequest,
+  type SettledRow,
+} from "../../../testing/index.js";
 import {
   createQueryCoordinator,
   type QueryCoordinator,
@@ -23,14 +26,14 @@ import {
 import { UNKNOWN_COUNT } from "../result/index.js";
 import resolvePagination from "./resolvePagination.js";
 
-const on = (page: number, size: number): ResultWindow => ({
+const buildWindow = (page: number, size: number): ResultWindow => ({
   ...DEFAULT_WINDOW,
   page,
   size,
 });
 
 /** A coordinator on `window`, settled with `settled` when given. */
-const settled = (
+const createSettledCoordinator = (
   window: ResultWindow,
   page?: Parameters<typeof buildSettledPage>[0],
 ): QueryCoordinator<SettledRow> => {
@@ -46,7 +49,13 @@ const settled = (
 
 describe("resolvePagination", () => {
   it("claims nothing before the first results", () => {
-    expect(resolvePagination(settled(on(1, 5)).state, BY_NUMBER, [5])).toEqual({
+    expect(
+      resolvePagination(
+        createSettledCoordinator(buildWindow(1, 5)).state,
+        BY_NUMBER,
+        [5],
+      ),
+    ).toEqual({
       page: 1,
       size: 5,
       shown: null,
@@ -62,7 +71,10 @@ describe("resolvePagination", () => {
 
   it("counts the pages an exact pageable count makes", () => {
     const facts = resolvePagination(
-      settled(on(2, 5), { rows: 5, pageable: countExactly(12) }).state,
+      createSettledCoordinator(buildWindow(2, 5), {
+        rows: 5,
+        pageable: countExactly(12),
+      }).state,
       BY_NUMBER,
       [5],
     );
@@ -77,7 +89,10 @@ describe("resolvePagination", () => {
 
   it("offers no Next from the last page a count declares", () => {
     const facts = resolvePagination(
-      settled(on(3, 5), { rows: 2, pageable: countExactly(12) }).state,
+      createSettledCoordinator(buildWindow(3, 5), {
+        rows: 2,
+        pageable: countExactly(12),
+      }).state,
       BY_NUMBER,
       [5],
     );
@@ -90,7 +105,10 @@ describe("resolvePagination", () => {
     // shown for what it is, and no last page is invented from it.
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 5, pageable: countAtLeast(40) }).state,
+        createSettledCoordinator(buildWindow(1, 5), {
+          rows: 5,
+          pageable: countAtLeast(40),
+        }).state,
         BY_NUMBER,
         [5],
       ),
@@ -103,16 +121,22 @@ describe("resolvePagination", () => {
     // it proves nothing there and the weaker authorities answer.
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 5, pageable: countAtLeast(40), more: false })
-          .state,
+        createSettledCoordinator(buildWindow(1, 5), {
+          rows: 5,
+          pageable: countAtLeast(40),
+          more: false,
+        }).state,
         BY_NUMBER,
         [5],
       ).hasNext,
     ).toBe(true);
     expect(
       resolvePagination(
-        settled(on(8, 5), { rows: 5, pageable: countAtLeast(40), more: false })
-          .state,
+        createSettledCoordinator(buildWindow(8, 5), {
+          rows: 5,
+          pageable: countAtLeast(40),
+          more: false,
+        }).state,
         BY_NUMBER,
         [5],
       ).hasNext,
@@ -123,7 +147,7 @@ describe("resolvePagination", () => {
     // Forty at least, five to a page, and the page handed back no token:
     // the bound promises a page nothing can reach, so Next is not offered.
     const facts = resolvePagination(
-      settled(on(1, 5), {
+      createSettledCoordinator(buildWindow(1, 5), {
         rows: 5,
         pageable: countAtLeast(40),
         more: true,
@@ -140,7 +164,10 @@ describe("resolvePagination", () => {
   it("takes an unknown count for no total", () => {
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 5, pageable: UNKNOWN_COUNT }).state,
+        createSettledCoordinator(buildWindow(1, 5), {
+          rows: 5,
+          pageable: UNKNOWN_COUNT,
+        }).state,
         BY_NUMBER,
         [5],
       ),
@@ -150,7 +177,10 @@ describe("resolvePagination", () => {
   it("keeps one page for an empty collection", () => {
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 0, pageable: countExactly(0) }).state,
+        createSettledCoordinator(buildWindow(1, 5), {
+          rows: 0,
+          pageable: countExactly(0),
+        }).state,
         BY_NUMBER,
         [5],
       ).pages,
@@ -160,14 +190,16 @@ describe("resolvePagination", () => {
   it("takes the page's own word on a further page over a full page", () => {
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 5, more: false }).state,
+        createSettledCoordinator(buildWindow(1, 5), { rows: 5, more: false })
+          .state,
         BY_NUMBER,
         [5],
       ).hasNext,
     ).toBe(false);
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 4, more: true }).state,
+        createSettledCoordinator(buildWindow(1, 5), { rows: 4, more: true })
+          .state,
         BY_NUMBER,
         [5],
       ).hasNext,
@@ -177,14 +209,16 @@ describe("resolvePagination", () => {
   it("guesses from a full page only where the source says nothing", () => {
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 5, more: null }).state,
+        createSettledCoordinator(buildWindow(1, 5), { rows: 5, more: null })
+          .state,
         BY_NUMBER,
         [5],
       ).hasNext,
     ).toBe(true);
     expect(
       resolvePagination(
-        settled(on(1, 5), { rows: 4, more: null }).state,
+        createSettledCoordinator(buildWindow(1, 5), { rows: 4, more: null })
+          .state,
         BY_NUMBER,
         [5],
       ).hasNext,
@@ -194,7 +228,10 @@ describe("resolvePagination", () => {
   it("steps back from past the last page to the last one there is", () => {
     expect(
       resolvePagination(
-        settled(on(9, 5), { rows: 0, pageable: countExactly(12) }).state,
+        createSettledCoordinator(buildWindow(9, 5), {
+          rows: 0,
+          pageable: countExactly(12),
+        }).state,
         BY_NUMBER,
         [5],
       ).back,
@@ -205,7 +242,7 @@ describe("resolvePagination", () => {
     // The rows in flight are not counted as shown, but what the source
     // counted was the rows this query and size page over, which the next
     // page's rows still are: the page select keeps its list.
-    const coordinator = settled(on(1, 5), {
+    const coordinator = createSettledCoordinator(buildWindow(1, 5), {
       rows: 5,
       pageable: countExactly(12),
       more: true,
@@ -226,11 +263,11 @@ describe("resolvePagination", () => {
   it("keeps the count across a history step that respells the same query", () => {
     // Back or forward adopts the query as another object: the same query
     // by content keeps its count, and the pages it makes.
-    const coordinator = settled(on(1, 5), {
+    const coordinator = createSettledCoordinator(buildWindow(1, 5), {
       rows: 5,
       pageable: countExactly(12),
     });
-    coordinator.adopt({ slice: { ...EMPTY_SLICE }, window: on(2, 5) });
+    coordinator.adopt({ slice: { ...EMPTY_SLICE }, window: buildWindow(2, 5) });
     expect(resolvePagination(coordinator.state, BY_NUMBER, [5])).toMatchObject({
       page: 2,
       shown: null,
@@ -242,7 +279,7 @@ describe("resolvePagination", () => {
   it("offers no spent token while the page it reaches loads", () => {
     // The token the page handed back has been used: until the next page
     // answers, nothing says where a page after it starts.
-    const coordinator = settled(on(1, 5), {
+    const coordinator = createSettledCoordinator(buildWindow(1, 5), {
       rows: 5,
       cursors: { next: "c:m4", previous: null },
     });
@@ -253,7 +290,10 @@ describe("resolvePagination", () => {
   });
 
   it("guesses nothing from the page that left while its replacement loads", () => {
-    const coordinator = settled(on(1, 5), { rows: 5, more: true });
+    const coordinator = createSettledCoordinator(buildWindow(1, 5), {
+      rows: 5,
+      more: true,
+    });
     coordinator.dispatch({ kind: "navigateWindow", page: 2 });
     expect(resolvePagination(coordinator.state, BY_NUMBER, [5]).hasNext).toBe(
       false,
@@ -261,7 +301,7 @@ describe("resolvePagination", () => {
   });
 
   it("drops the count when the query moves", () => {
-    const coordinator = settled(on(1, 5), {
+    const coordinator = createSettledCoordinator(buildWindow(1, 5), {
       rows: 5,
       pageable: countExactly(12),
     });
@@ -277,7 +317,7 @@ describe("resolvePagination", () => {
     // Twelve rows make three pages of five and two of ten: the old count
     // still holds, the pages it made do not, so nothing is claimed until
     // the source answers for the new size.
-    const coordinator = settled(on(1, 5), {
+    const coordinator = createSettledCoordinator(buildWindow(1, 5), {
       rows: 5,
       pageable: countExactly(12),
     });
@@ -290,7 +330,7 @@ describe("resolvePagination", () => {
   it("keeps the count over rows a failed page move left in view", () => {
     // The rows are an earlier page's and are not summarised as this one's;
     // the count still describes the query they belong to.
-    const coordinator = settled(on(1, 5), {
+    const coordinator = createSettledCoordinator(buildWindow(1, 5), {
       rows: 5,
       pageable: countExactly(12),
     });
@@ -315,7 +355,10 @@ describe("resolvePagination", () => {
     // still reach no page but the next one, so the count is shown and the
     // page total, which would name destinations, is not.
     const facts = resolvePagination(
-      settled(on(1, 5), { rows: 5, pageable: countExactly(12) }).state,
+      createSettledCoordinator(buildWindow(1, 5), {
+        rows: 5,
+        pageable: countExactly(12),
+      }).state,
       FORWARD_CURSORS,
       [5],
     );
@@ -326,7 +369,7 @@ describe("resolvePagination", () => {
 
   it("takes Next from the token the page handed back, before any guess", () => {
     const withToken = resolvePagination(
-      settled(on(1, 5), {
+      createSettledCoordinator(buildWindow(1, 5), {
         rows: 5,
         more: false,
         cursors: { next: "c:m4", previous: null },
@@ -341,7 +384,7 @@ describe("resolvePagination", () => {
     expect(withToken.backCursor).toBe(null);
 
     const spent = resolvePagination(
-      settled(on(1, 5), {
+      createSettledCoordinator(buildWindow(1, 5), {
         rows: 5,
         more: true,
         cursors: { next: null, previous: "c:m0" },
@@ -358,7 +401,7 @@ describe("resolvePagination", () => {
     // The page may hand tokens back all the same; an offset source reaches
     // its pages by number, and would refuse one of its own tokens.
     const facts = resolvePagination(
-      settled(on(1, 5), {
+      createSettledCoordinator(buildWindow(1, 5), {
         rows: 5,
         pageable: countExactly(12),
         cursors: { next: "c:m4", previous: "c:m0" },
@@ -375,12 +418,18 @@ describe("resolvePagination", () => {
 
   it("offers each size once, the applied one always among them", () => {
     expect(
-      resolvePagination(settled(on(1, 25)).state, BY_NUMBER, [50, 10, 50])
-        .sizes,
+      resolvePagination(
+        createSettledCoordinator(buildWindow(1, 25)).state,
+        BY_NUMBER,
+        [50, 10, 50],
+      ).sizes,
     ).toEqual([10, 25, 50]);
     expect(
-      resolvePagination(settled(on(1, 25)).state, BY_NUMBER, [25, 50, 25])
-        .sizes,
+      resolvePagination(
+        createSettledCoordinator(buildWindow(1, 25)).state,
+        BY_NUMBER,
+        [25, 50, 25],
+      ).sizes,
     ).toEqual([25, 50]);
   });
 });

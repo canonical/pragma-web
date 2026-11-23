@@ -6,8 +6,10 @@
 import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import {
+  buildMachine,
+  createMachineProvider,
+} from "../../../../../../testing/index.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import DataTable from "./DataTable.js";

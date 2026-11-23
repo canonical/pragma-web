@@ -10,8 +10,10 @@ import { render, waitFor, within } from "@testing-library/react";
 import type { ComponentType } from "react";
 import { afterAll, describe, expect, it } from "vitest";
 import preview from "../../../.storybook/preview.js";
-import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
-import serveMockApi from "../../../testing/serveMockApi.js";
+import {
+  FACETED_FILTER_STORIES,
+  serveMockApi,
+} from "../../../testing/index.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
@@ -52,55 +54,61 @@ const renderFirstPage = async (
   return canvas;
 };
 
-describe("the filters' faceted stories behave", () => {
-  for (const [name, Story] of Object.entries(composeStories(filtersStories))) {
-    if (FACETED_FILTER_STORIES.has(name)) {
-      it(`Filters ${name}`, async () => {
-        await Story.run();
-      });
-    }
-  }
-});
-
 describe("server-backed stories behave", () => {
-  for (const [endpoint, stories] of Object.entries(endpoints)) {
-    for (const [name, Story] of Object.entries(stories)) {
-      it(`${endpoint} ${name}`, async () => {
-        await Story.run();
-      });
+  describe("the filters' faceted stories behave", () => {
+    for (const [name, Story] of Object.entries(
+      composeStories(filtersStories),
+    )) {
+      if (FACETED_FILTER_STORIES.has(name)) {
+        it(`Filters ${name}`, async () => {
+          await Story.run();
+        });
+      }
     }
-  }
-
-  // The "Show code" panel spells these parts; the screen must be what it says.
-  it("renders the parts its composition text names", async () => {
-    const { searchLabel, tableLabel, labels, sizes } = SERVER_BACKED_PARTS;
-    const rest = await renderFirstPage(endpoints["REST API"].Answered);
-    expect(rest.getByLabelText(searchLabel)).toBeInTheDocument();
-    expect(rest.getByRole("table", { name: tableLabel })).toBeInTheDocument();
-    expect(
-      rest.getByRole("group", { name: `${labels.status} is any of` }),
-    ).toBeInTheDocument();
-    expect(rest.getByLabelText(`${labels.cores} from`)).toBeInTheDocument();
-    expect(rest.getByLabelText(`${labels.name} contains`)).toBeInTheDocument();
-    expect(
-      rest.getByLabelText(`${labels.region} contains`),
-    ).toBeInTheDocument();
-    const pageSizes = within(rest.getByLabelText("Rows per page"));
-    for (const size of sizes) {
-      expect(
-        pageSizes.getByRole("option", { name: String(size) }),
-      ).toBeInTheDocument();
-    }
-    // Only this endpoint looks through the owner, so only it names its input.
-    const graphql = await renderFirstPage(endpoints["GraphQL API"].Answered);
-    expect(
-      graphql.getByLabelText(`${labels.owner} contains`),
-    ).toBeInTheDocument();
   });
 
-  // A story's run removes the one before it; the last is removed by no later
-  // one.
-  afterAll(() => {
-    document.body.innerHTML = "";
+  describe("the REST and GraphQL stories", () => {
+    for (const [endpoint, stories] of Object.entries(endpoints)) {
+      for (const [name, Story] of Object.entries(stories)) {
+        it(`${endpoint} ${name}`, async () => {
+          await Story.run();
+        });
+      }
+    }
+
+    // The "Show code" panel spells these parts; the screen must be what it says.
+    it("renders the parts its composition text names", async () => {
+      const { searchLabel, tableLabel, labels, sizes } = SERVER_BACKED_PARTS;
+      const rest = await renderFirstPage(endpoints["REST API"].Answered);
+      expect(rest.getByLabelText(searchLabel)).toBeInTheDocument();
+      expect(rest.getByRole("table", { name: tableLabel })).toBeInTheDocument();
+      expect(
+        rest.getByRole("group", { name: `${labels.status} is any of` }),
+      ).toBeInTheDocument();
+      expect(rest.getByLabelText(`${labels.cores} from`)).toBeInTheDocument();
+      expect(
+        rest.getByLabelText(`${labels.name} contains`),
+      ).toBeInTheDocument();
+      expect(
+        rest.getByLabelText(`${labels.region} contains`),
+      ).toBeInTheDocument();
+      const pageSizes = within(rest.getByLabelText("Rows per page"));
+      for (const size of sizes) {
+        expect(
+          pageSizes.getByRole("option", { name: String(size) }),
+        ).toBeInTheDocument();
+      }
+      // Only this endpoint looks through the owner, so only it names its input.
+      const graphql = await renderFirstPage(endpoints["GraphQL API"].Answered);
+      expect(
+        graphql.getByLabelText(`${labels.owner} contains`),
+      ).toBeInTheDocument();
+    });
+
+    // A story's run removes the one before it; the last is removed by no later
+    // one.
+    afterAll(() => {
+      document.body.innerHTML = "";
+    });
   });
 });

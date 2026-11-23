@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import answerWith from "../../../testing/answerWith.js";
-import createManualSource from "../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
-import readId from "../../../testing/readId.js";
+import {
+  answerWith,
+  createManualSource,
+  createRecordingLocation,
+  declare,
+  declareSort,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
 import {

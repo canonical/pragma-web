@@ -22,18 +22,31 @@ import type { LinkReading } from "./types.js";
  * A source declaring nothing executable: every request is refused. Built
  * the way a source builds its own, so the fixture and the refusing defaults
  * cannot drift apart; `declareCapabilities.test.ts` pins what they are.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export const NOTHING_DECLARED: SourceCapabilities = declareCapabilities(
   createCollection({ fields: [], identify: readId }),
   {},
 );
 
-/** An offset source: any page is reachable by number. */
+/**
+ * An offset source: any page is reachable by number.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export const BY_NUMBER: PaginationCapabilities = Object.freeze({
   kind: "offset",
 });
 
-/** A forward cursor source: pages are reached only through its tokens. */
+/**
+ * A forward cursor source: pages are reached only through its tokens.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export const FORWARD_CURSORS: PaginationCapabilities = Object.freeze({
   kind: "cursor",
   backward: false,
@@ -44,6 +57,9 @@ export const FORWARD_CURSORS: PaginationCapabilities = Object.freeze({
  * A schema with a field of every kind, and records holding each field's
  * values as a facet meets them: listed, unlisted, absent, null and of
  * another type, so each reader's rules for what it counts are exercised.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export const FACETED_SCHEMA = createSchema([
   {
@@ -57,7 +73,12 @@ export const FACETED_SCHEMA = createSchema([
   { field: "name", kind: "text" },
 ]);
 
-/** Records of the faceted schema, one of each case a facet reader meets. */
+/**
+ * Records of the faceted schema, one of each case a facet reader meets.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export const FACETED_ROWS: readonly RowRecord[] = [
   {
     id: "a",
@@ -99,6 +120,9 @@ export const FACETED_ROWS: readonly RowRecord[] = [
  * The collection the link corpus is read against: a field of every kind,
  * a set whose options are the server's, and two fields spelled with a dot
  * path.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export const LINKS_COLLECTION = createCollection({
   fields: [
@@ -127,6 +151,9 @@ export const LINKS_COLLECTION = createCollection({
  * What the corpus's source declares: every field filterable, but `tags`
  * only as any-of and `hostname` only by `contains`; search over the host
  * name; two sort terms over two fields; no grouping; pages by number.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export const LINKS_CAPABILITIES: SourceCapabilities = declareCapabilities(
   LINKS_COLLECTION,
@@ -152,6 +179,9 @@ export const LINKS_CAPABILITIES: SourceCapabilities = declareCapabilities(
  * decodes to against `LINKS_COLLECTION` and `LINKS_CAPABILITIES`, and the
  * parameters the location writes back over it, carrying what was refused.
  * Every entry keeps its reading while the grammar grows.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export const LINKS_VALID_TODAY: readonly LinkReading[] = [
   {

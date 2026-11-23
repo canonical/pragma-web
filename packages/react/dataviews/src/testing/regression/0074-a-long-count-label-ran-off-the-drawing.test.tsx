@@ -7,14 +7,13 @@
 import { createPage } from "@canonical/dataviews-core";
 import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createFacetedManual from "../../../testing/createFacetedManual.js";
+import { buildMachine, createFacetedManual } from "../../../testing/index.js";
 import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** The drawing's own width, as the chart's viewBox states it. */
 const WIDTH = 480;
 
-describe("a count label with no room at its bar's tip", () => {
+describe("regression 0074 — a long count label ran off the drawing", () => {
   it("is anchored to the drawing's far edge, not past it", () => {
     const { provider, source } = createFacetedManual();
     const { container } = render(

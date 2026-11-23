@@ -9,16 +9,16 @@ import { createRef, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildMachine from "../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../testing/createMachineProvider.js";
-import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
-import { machines } from "../../../../testing/machines.js";
-import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
-import type {
-  Machine,
-  MachineFields,
-  MachineProvider as Provider,
-} from "../../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  expectNoAxeViolations,
+  type Machine,
+  type MachineFields,
+  machines,
+  type MachineProvider as Provider,
+  silenceRenderErrors,
+} from "../../../../testing/index.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,

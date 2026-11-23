@@ -7,6 +7,9 @@ import {
 /**
  * The model of a build the case expects to succeed, so a case about
  * something else states its rows once and reads the model directly.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function buildRowModel<TRow extends object>(
   config: RowModelConfig<TRow>,

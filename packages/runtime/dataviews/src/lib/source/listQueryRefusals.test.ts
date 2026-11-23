@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
+import { declare, declareSort } from "../../../testing/index.js";
 import {
   DEFAULT_WINDOW,
   type Query,

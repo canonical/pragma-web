@@ -10,7 +10,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import orderNodesByName from "../../../testing/orderNodesByName.js";
+import { orderNodesByName } from "../../../testing/index.js";
 
 describe("regression 0027 — the fallback ordered other runs by code unit", () => {
   it("orders a fullwidth tilde before an emoji when the tag has no data", () => {

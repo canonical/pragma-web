@@ -14,7 +14,7 @@ import type {
   ManualSourceConfig,
 } from "@canonical/dataviews-core/testing";
 import type { RenderHookResult } from "@testing-library/react";
-import type { HeaderCellProps } from "../src/lib/_work_in_progress/DataTable/common/HeaderCell/types.js";
+import type { HeaderCellProps } from "../src/lib/_work_in_progress/common/ScopedDataTable/common/HeaderCell/types.js";
 import type { BoundFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/BoundFilter/types.js";
 import type { PresenceFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/PresenceFilter/types.js";
 import type { TextFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/TextFilter/types.js";

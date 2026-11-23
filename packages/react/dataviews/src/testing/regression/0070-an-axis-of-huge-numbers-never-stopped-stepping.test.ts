@@ -9,7 +9,7 @@
 import { describe, expect, it } from "vitest";
 import { listNiceTicks } from "../../lib/utils/index.js";
 
-describe("an axis of huge numbers", () => {
+describe("regression 0070 — an axis of huge numbers never stopped stepping", () => {
   it("answers a span past the exact integers with its own ends", () => {
     const axis = listNiceTicks(1e17, 1e17 + 16, 5);
     expect(axis).toEqual({

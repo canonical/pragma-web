@@ -1,8 +1,10 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  silenceRenderErrors,
+} from "../../../../../../testing/index.js";
 import type { DisplayField } from "../../../../common/index.js";
 import DataViews from "../../Provider.js";
 import DataCards from "./DataCards.js";

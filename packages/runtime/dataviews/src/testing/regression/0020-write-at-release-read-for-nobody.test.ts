@@ -9,8 +9,10 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
-import settleCalls from "../../../testing/settleCalls.js";
+import {
+  createStandInPresentationStore,
+  settleCalls,
+} from "../../../testing/index.js";
 import { createPresentation } from "../../lib/presentation/index.js";
 
 describe("regression 0020 — the write at release was read back for nobody", () => {

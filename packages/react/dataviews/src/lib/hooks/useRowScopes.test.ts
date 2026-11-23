@@ -1,9 +1,11 @@
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import deliverRows from "../../../testing/deliverRows.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  deliverRows,
+} from "../../../testing/index.js";
 import useRowScopes from "./useRowScopes.js";
 
 const FIELDS = ["name"] as const;

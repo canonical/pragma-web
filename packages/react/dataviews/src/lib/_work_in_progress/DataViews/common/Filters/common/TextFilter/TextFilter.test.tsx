@@ -18,11 +18,11 @@ import {
 } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
-import type {
-  TextFilterHarnessProps as HarnessProps,
-  IdentifiedRecord as Row,
-} from "../../../../../../../../testing/types.js";
+import {
+  COUNTED_EXACTLY,
+  type TextFilterHarnessProps as HarnessProps,
+  type IdentifiedRecord as Row,
+} from "../../../../../../../../testing/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
 import { findFilterHandle } from "../../../utils/index.js";

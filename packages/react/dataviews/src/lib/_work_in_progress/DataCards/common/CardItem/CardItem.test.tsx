@@ -1,9 +1,11 @@
 import { createRowScopes } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  silenceRenderErrors,
+} from "../../../../../../testing/index.js";
 import CardItem from "./CardItem.js";
 
 /**

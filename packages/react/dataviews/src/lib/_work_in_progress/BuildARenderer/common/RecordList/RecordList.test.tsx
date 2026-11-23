@@ -1,13 +1,13 @@
 import type { DataViewsProvider } from "@canonical/dataviews-core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
-import type {
-  Machine,
-  MachineFields,
-} from "../../../../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  type Machine,
+  type MachineFields,
+  silenceRenderErrors,
+} from "../../../../../../testing/index.js";
 import RecordList from "./RecordList.js";
 
 describe("RecordList", () => {

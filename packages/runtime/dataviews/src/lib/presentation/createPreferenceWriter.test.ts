@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import createDeferred from "../../../testing/createDeferred.js";
-import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
+import {
+  createDeferred,
+  createStandInPresentationStore,
+} from "../../../testing/index.js";
 import { WRITE_DEADLINE, WRITE_DELAY } from "./constants.js";
 import createPreferenceLayer from "./createPreferenceLayer.js";
 import createPreferenceWriter from "./createPreferenceWriter.js";

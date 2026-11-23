@@ -11,8 +11,7 @@ import {
 import { buildPage } from "@canonical/dataviews-core/testing";
 import { act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../testing/buildMachine.js";
-import renderInRoot from "../../../../../testing/renderInRoot.js";
+import { buildMachine, renderInRoot } from "../../../../../testing/index.js";
 import useAppliedSort from "./useAppliedSort.js";
 
 /** A root over the machine provider, and a hook reading its sort through it. */

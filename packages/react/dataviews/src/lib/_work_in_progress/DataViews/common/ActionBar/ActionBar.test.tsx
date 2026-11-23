@@ -5,8 +5,10 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import type { MachineProvider } from "../../../../../../testing/types.js";
+import {
+  createMachineProvider,
+  type MachineProvider,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import ActionBar from "./ActionBar.js";
 import type { DataViewsActionBarProps } from "./types.js";

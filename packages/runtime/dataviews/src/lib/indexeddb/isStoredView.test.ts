@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import buildStoredView from "../../../testing/buildStoredView.js";
+import { buildStoredView } from "../../../testing/index.js";
 import isStoredView from "./isStoredView.js";
 
 const { pinned: _pin, ...fields } = buildStoredView();

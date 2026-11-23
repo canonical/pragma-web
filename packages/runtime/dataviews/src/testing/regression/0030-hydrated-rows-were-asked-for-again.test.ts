@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import readId from "../../../testing/readId.js";
+import { readId } from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 import { createArraySource } from "../../lib/source/index.js";

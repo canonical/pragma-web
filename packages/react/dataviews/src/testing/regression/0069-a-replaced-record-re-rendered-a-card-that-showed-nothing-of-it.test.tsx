@@ -9,15 +9,14 @@
 import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { buildMachine, createMachineProvider } from "../../../testing/index.js";
 import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
 } from "../../lib/common/index.js";
 
-describe("a page of records replaced by equal ones", () => {
+describe("regression 0069 — a replaced record re-rendered a card that showed nothing of it", () => {
   it("re-renders no card that shows nothing of what changed", () => {
     const renders: string[] = [];
     const Probe = ({ rowId }: DisplayFieldCellProps) => {

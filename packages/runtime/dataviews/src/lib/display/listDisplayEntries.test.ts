@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import readDisplayStatus from "../../../testing/readDisplayStatus.js";
+import { readDisplayStatus } from "../../../testing/index.js";
 import { DISPLAY_STATUS_PHASES } from "./constants.js";
 import listDisplayEntries from "./listDisplayEntries.js";
 import type { DisplayStatus } from "./types.js";

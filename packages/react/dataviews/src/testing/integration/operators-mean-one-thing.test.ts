@@ -14,11 +14,15 @@ import {
   type SourceDelivery,
 } from "@canonical/dataviews-core";
 import { describe, expect, it } from "vitest";
-import { OPERATOR_CASES, OPERATOR_RECORDS } from "../../../testing/fixtures.js";
-import requestGraphQL from "../../../testing/requestGraphQL.js";
-import requestRest from "../../../testing/requestRest.js";
-import serveMockApi from "../../../testing/serveMockApi.js";
-import type { OperatorCase, OperatorRecord } from "../../../testing/types.js";
+import {
+  OPERATOR_CASES,
+  OPERATOR_RECORDS,
+  type OperatorCase,
+  type OperatorRecord,
+  requestGraphQL,
+  requestRest,
+  serveMockApi,
+} from "../../../testing/index.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,

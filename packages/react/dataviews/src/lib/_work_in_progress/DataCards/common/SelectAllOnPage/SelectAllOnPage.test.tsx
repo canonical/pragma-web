@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createFakeChannel from "../../../../../../testing/createFakeChannel.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import {
+  createFakeChannel,
+  createMachineProvider,
+} from "../../../../../../testing/index.js";
 import SelectAllOnPage from "./SelectAllOnPage.js";
 
 /** The control over a page of two identities, with the collection's selection. */

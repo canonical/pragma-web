@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
+import { createStandInPresentationStore } from "../../../testing/index.js";
 import {
   createPresentation,
   type JsonValue,

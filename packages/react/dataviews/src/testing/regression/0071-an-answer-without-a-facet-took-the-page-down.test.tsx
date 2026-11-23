@@ -9,8 +9,7 @@
 import { createPage } from "@canonical/dataviews-core";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createFacetedManual from "../../../testing/createFacetedManual.js";
+import { buildMachine, createFacetedManual } from "../../../testing/index.js";
 import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** Answer the source's latest request with a page carrying no facet at all. */
@@ -29,7 +28,7 @@ const answerWithoutFacets = (
   });
 };
 
-describe("a chart answered without its facet", () => {
+describe("regression 0071 — an answer without a facet took the page down", () => {
   it("says the source counted nothing, and does not throw", () => {
     const { provider, source } = createFacetedManual();
     render(

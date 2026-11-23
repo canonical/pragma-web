@@ -32,15 +32,15 @@ describe("resolveErrorDelivery", () => {
   });
 
   it("delivers a failure where the check answers anything but true", () => {
-    const truthy = () => 1 as unknown as boolean;
-    expect(resolveErrorDelivery(denied, truthy).status).toBe("failed");
+    const returnTruthy = () => 1 as unknown as boolean;
+    expect(resolveErrorDelivery(denied, returnTruthy).status).toBe("failed");
   });
 
   it("lets the error stand as a failure when the check throws", () => {
-    const broken = () => {
+    const throwBroken = () => {
       throw new Error("the check broke");
     };
-    expect(resolveErrorDelivery(denied, broken)).toMatchObject({
+    expect(resolveErrorDelivery(denied, throwBroken)).toMatchObject({
       status: "failed",
       failure: { reason: "403 Forbidden", cause: denied },
     });

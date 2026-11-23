@@ -6,12 +6,12 @@
  * index or the memory's prune fails one.
  */
 import { describe, expect, it } from "vitest";
-import buildRowModel from "../../../testing/buildRowModel.js";
-import type {
-  ContainerInstance as Container,
-  Instance,
-  VirtualMachineInstance as VirtualMachine,
-} from "../../../testing/types.js";
+import {
+  buildRowModel,
+  type ContainerInstance as Container,
+  type Instance,
+  type VirtualMachineInstance as VirtualMachine,
+} from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import { createChannel } from "../observable/index.js";
 import { EMPTY_ROW_MODEL, type RowModel } from "../rows/index.js";

@@ -7,10 +7,12 @@
  * completed by hand with what a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import buildFailedResult from "../../../testing/buildFailedResult.js";
-import buildPage from "../../../testing/buildPage.js";
-import buildRefusedResult from "../../../testing/buildRefusedResult.js";
-import readIssuedRequest from "../../../testing/readIssuedRequest.js";
+import {
+  buildFailedResult,
+  buildPage,
+  buildRefusedResult,
+  readIssuedRequest,
+} from "../../../testing/index.js";
 import {
   createQueryCoordinator,
   type DataViewsState,
@@ -30,23 +32,25 @@ import type { DisplayStatus } from "./types.js";
 
 type Machine = { readonly id: string; readonly name: string };
 
-const machine = (id: string, name: string): Machine => ({ id, name });
+const buildMachine = (id: string, name: string): Machine => ({ id, name });
 
 /** The rows a source delivers. */
-const delivery = (rows: readonly Machine[]): Completion<Machine> => ({
+const buildDelivery = (rows: readonly Machine[]): Completion<Machine> => ({
   status: "succeeded",
   page: buildPage(rows),
 });
 
 /** A coordinator whose first request was settled with `rows`. */
-const loaded = (rows: readonly Machine[]): QueryCoordinator<Machine> => {
+const createLoadedCoordinator = (
+  rows: readonly Machine[],
+): QueryCoordinator<Machine> => {
   const coordinator = createQueryCoordinator<Machine>();
-  coordinator.complete(coordinator.refresh(), delivery(rows));
+  coordinator.complete(coordinator.refresh(), buildDelivery(rows));
   return coordinator;
 };
 
 /** Search for `text` on a loaded coordinator, and settle the request with `completion`. */
-const searched = (
+const completeSearch = (
   coordinator: QueryCoordinator<Machine>,
   completion: Completion<Machine>,
 ): QueryCoordinator<Machine> => {
@@ -109,18 +113,18 @@ describe("resolveDisplayStatus", () => {
   });
 
   it("reports an unfiltered collection with nothing in it as no data", () => {
-    expect(resolveDisplayStatus(loaded([]).state)).toEqual({
+    expect(resolveDisplayStatus(createLoadedCoordinator([]).state)).toEqual({
       status: "no-data",
     });
   });
 
   it("reports a filtered query that matched nothing as no results", () => {
-    const coordinator = loaded([]);
+    const coordinator = createLoadedCoordinator([]);
     const { requestId } = coordinator.dispatch({
       kind: "setPredicate",
       predicate: { field: "status", operator: "isAny", operands: ["failed"] },
     });
-    coordinator.complete(readIssuedRequest(requestId), delivery([]));
+    coordinator.complete(readIssuedRequest(requestId), buildDelivery([]));
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "no-results",
     });
@@ -128,7 +132,9 @@ describe("resolveDisplayStatus", () => {
 
   it("reports a search that matched nothing as no results", () => {
     expect(
-      resolveDisplayStatus(searched(loaded([]), delivery([])).state),
+      resolveDisplayStatus(
+        completeSearch(createLoadedCoordinator([]), buildDelivery([])).state,
+      ),
     ).toEqual({ status: "no-results" });
   });
 
@@ -136,19 +142,22 @@ describe("resolveDisplayStatus", () => {
     // Nothing matched before the search; whether anything matches it is the
     // source's to say. The same when a filter that matched nothing is
     // cleared: the collection is not called empty before it answers.
-    const coordinator = loaded([]);
+    const coordinator = createLoadedCoordinator([]);
     coordinator.dispatch({ kind: "setSearch", search: "machine" });
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "pending",
     });
-    const filtered = searched(loaded([]), delivery([]));
+    const filtered = completeSearch(
+      createLoadedCoordinator([]),
+      buildDelivery([]),
+    );
     filtered.dispatch({ kind: "setSearch", search: "" });
     expect(resolveDisplayStatus(filtered.state)).toEqual({
       status: "pending",
     });
     // A refresh of the same query keeps its answer: the empty page is still
     // this query's while it is asked again.
-    const refreshed = loaded([]);
+    const refreshed = createLoadedCoordinator([]);
     refreshed.refresh();
     expect(resolveDisplayStatus(refreshed.state)).toEqual({
       status: "no-data",
@@ -161,14 +170,14 @@ describe("resolveDisplayStatus", () => {
     const coordinator = createQueryCoordinator<Machine>({
       start: { slice: { ...EMPTY_SLICE, search: "" } },
     });
-    coordinator.complete(coordinator.refresh(), delivery([]));
+    coordinator.complete(coordinator.refresh(), buildDelivery([]));
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "no-data",
     });
   });
 
   it("prefers the failure over emptiness when an empty result then failed", () => {
-    const coordinator = loaded([]);
+    const coordinator = createLoadedCoordinator([]);
     coordinator.complete(coordinator.refresh(), buildFailedResult("offline"));
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "failed",
@@ -177,8 +186,8 @@ describe("resolveDisplayStatus", () => {
   });
 
   it("reports rows an earlier query produced as stale, with the reason", () => {
-    const coordinator = searched(
-      loaded([machine("m-1", "alpha")]),
+    const coordinator = completeSearch(
+      createLoadedCoordinator([buildMachine("m-1", "alpha")]),
       buildFailedResult("search is unavailable"),
     );
     expect(coordinator.state.result.status).toBe("stale");
@@ -189,8 +198,8 @@ describe("resolveDisplayStatus", () => {
   });
 
   it("reports a failed query with no earlier rows to keep as a failure", () => {
-    const coordinator = searched(
-      loaded([]),
+    const coordinator = completeSearch(
+      createLoadedCoordinator([]),
       buildFailedResult("search is unavailable"),
     );
     expect(coordinator.state.result.status).toBe("stale");
@@ -201,7 +210,7 @@ describe("resolveDisplayStatus", () => {
   });
 
   it("reports rows kept through a failed refresh, with the reason", () => {
-    const coordinator = loaded([machine("m-1", "alpha")]);
+    const coordinator = createLoadedCoordinator([buildMachine("m-1", "alpha")]);
     coordinator.complete(coordinator.refresh(), buildFailedResult("offline"));
     expect(coordinator.state.result.status).toBe("refresh-failed");
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
@@ -211,10 +220,12 @@ describe("resolveDisplayStatus", () => {
   });
 
   it("reports nothing at all while rows are displayed", () => {
-    expect(resolveDisplayStatus(loaded([machine("m-1", "alpha")]).state)).toBe(
-      null,
-    );
-    const coordinator = loaded([machine("m-1", "alpha")]);
+    expect(
+      resolveDisplayStatus(
+        createLoadedCoordinator([buildMachine("m-1", "alpha")]).state,
+      ),
+    ).toBe(null);
+    const coordinator = createLoadedCoordinator([buildMachine("m-1", "alpha")]);
     coordinator.refresh();
     expect(resolveDisplayStatus(coordinator.state)).toBe(null);
   });
@@ -267,7 +278,7 @@ describe("resolveDisplayStatus", () => {
     const rowSets: readonly (readonly Machine[] | null)[] = [
       null,
       [],
-      [machine("m-1", "alpha")],
+      [buildMachine("m-1", "alpha")],
     ];
     const groupSets: readonly (readonly GroupSummary[] | null)[] = [
       null,
@@ -320,7 +331,7 @@ describe("resolveDisplayStatus", () => {
     const coordinator = createQueryCoordinator<Machine>();
     coordinator.complete(
       coordinator.refresh(),
-      delivery([machine("m-1", "alpha")]),
+      buildDelivery([buildMachine("m-1", "alpha")]),
     );
     coordinator.complete(coordinator.refresh(), {
       status: "forbidden",

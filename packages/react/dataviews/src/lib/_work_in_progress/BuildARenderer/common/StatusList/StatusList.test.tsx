@@ -2,9 +2,11 @@ import type { SourceDelivery } from "@canonical/dataviews-core";
 import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import type { Machine } from "../../../../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  type Machine,
+} from "../../../../../../testing/index.js";
 import StatusList from "./StatusList.js";
 
 const failure: SourceDelivery<Machine> = {

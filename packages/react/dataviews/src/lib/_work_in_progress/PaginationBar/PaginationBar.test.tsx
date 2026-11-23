@@ -17,15 +17,15 @@ import type { LinkComponentProps } from "@canonical/react-ds-global";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../testing/createMachineProvider.js";
-import { machines as collection } from "../../../../testing/machines.js";
-import type {
-  Machine,
-  MachineFields,
-  MachineFixture,
-  MachineProvider as Provider,
-} from "../../../../testing/types.js";
+import {
+  buildMachine,
+  machines as collection,
+  createMachineProvider,
+  type Machine,
+  type MachineFields,
+  type MachineFixture,
+  type MachineProvider as Provider,
+} from "../../../../testing/index.js";
 import { DataViews } from "../DataViews/index.js";
 import PaginationBar from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";

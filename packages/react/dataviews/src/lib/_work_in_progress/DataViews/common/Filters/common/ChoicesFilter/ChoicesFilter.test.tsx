@@ -18,12 +18,12 @@ import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../../../../../../testing/createMachineProvider.js";
 import {
+  createMachineProvider,
+  type IdentifiedRecord,
   MACHINE_DECLARATION,
   machines,
-} from "../../../../../../../../testing/machines.js";
-import type { IdentifiedRecord } from "../../../../../../../../testing/types.js";
+} from "../../../../../../../../testing/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
 import { findFilterHandle } from "../../../utils/index.js";

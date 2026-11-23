@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createMachineProvider from "../../../../../../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../../../../../../testing/index.js";
 import DataViews from "../../../../Provider.js";
 import Filters from "../../Filters.js";
 

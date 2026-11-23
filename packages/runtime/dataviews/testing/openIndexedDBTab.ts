@@ -10,6 +10,9 @@ import type { ViewStore } from "../src/lib/views/index.js";
  * Open one tab's store over a browser profile's IndexedDB — two stores on
  * one factory are two tabs — disposed when the test that opened it ends,
  * after every observation the test registered later.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function openIndexedDBTab(
   indexedDB: IndexedDBFactory,

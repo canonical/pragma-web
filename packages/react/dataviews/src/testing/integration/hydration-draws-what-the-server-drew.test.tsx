@@ -18,10 +18,12 @@ import { act } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildFleet from "../../../testing/buildFleet.js";
-import { SERVER_RENDER_HREF } from "../../../testing/fixtures.js";
-import MachineComposition from "../../../testing/MachineComposition.js";
-import { machines } from "../../../testing/machines.js";
+import {
+  buildFleet,
+  MachineComposition,
+  machines,
+  SERVER_RENDER_HREF,
+} from "../../../testing/index.js";
 
 /** The machine names a node's text carries, in document order. */
 const listHostNames = (node: Node): readonly string[] =>
@@ -131,9 +133,7 @@ describe("hydrating a server render", () => {
       container.querySelector<HTMLSelectElement>('select[name="page"]')?.value,
     ).toBe("2");
     expect(
-      [...container.querySelectorAll('[role="columnheader"]')].map(
-        (header) => header.textContent,
-      ),
+      [...container.querySelectorAll("th")].map((header) => header.textContent),
     ).not.toContain("Status");
     expect(client.state.get().window.page).toBe(2);
   });

@@ -7,9 +7,11 @@ import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
 import { render } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import preview from "../../../.storybook/preview.js";
-import expectNoAxeViolations from "../../../testing/expectNoAxeViolations.js";
-import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
-import serveMockApi from "../../../testing/serveMockApi.js";
+import {
+  expectNoAxeViolations,
+  FACETED_FILTER_STORIES,
+  serveMockApi,
+} from "../../../testing/index.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";

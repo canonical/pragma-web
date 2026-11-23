@@ -16,7 +16,7 @@ const request: SourceRequest = {
 };
 
 /** Every delivery one execution makes, in order. */
-const deliveries = (
+const listDeliveries = (
   source: Source<Machine>,
 ): readonly SourceDelivery<Machine>[] => {
   const delivered: SourceDelivery<Machine>[] = [];
@@ -28,7 +28,7 @@ const deliveries = (
 
 describe("createFailingSource", () => {
   it("fails every request, saying why", () => {
-    expect(deliveries(createFailingSource())).toEqual([
+    expect(listDeliveries(createFailingSource())).toEqual([
       {
         status: "failed",
         failure: {

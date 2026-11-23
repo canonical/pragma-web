@@ -5,7 +5,7 @@ import {
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import renderInRoot from "../../../../../testing/renderInRoot.js";
+import { renderInRoot } from "../../../../../testing/index.js";
 import useDestination from "./useDestination.js";
 
 /** The applied query, from the first page. */

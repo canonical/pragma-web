@@ -4,7 +4,12 @@ import {
   type Slice,
 } from "../src/lib/query/index.js";
 
-/** A slice filtering `status` to these operands and nothing else. */
+/**
+ * A slice filtering `status` to these operands and nothing else.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export default function filterStatusBy(
   operands: readonly PredicateOperand[],
 ): Slice {

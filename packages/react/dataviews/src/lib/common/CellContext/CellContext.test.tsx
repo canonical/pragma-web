@@ -1,9 +1,11 @@
 import { renderHook } from "@testing-library/react";
 import { useContext } from "react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../testing/buildMachine.js";
-import createFakeChannel from "../../../../testing/createFakeChannel.js";
-import { machines } from "../../../../testing/machines.js";
+import {
+  buildMachine,
+  createFakeChannel,
+  machines,
+} from "../../../../testing/index.js";
 import CellContext from "./CellContext.js";
 
 describe("CellContext", () => {
