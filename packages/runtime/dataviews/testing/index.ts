@@ -30,6 +30,7 @@ export {
   NOTHING_DECLARED,
 } from "./fixtures.js";
 export { default as flushPresentation } from "./flushPresentation.js";
+export { default as installFakeClock } from "./installFakeClock.js";
 export { default as listFileRuleFindings } from "./listFileRuleFindings.js";
 export { default as listUnmarkedNames } from "./listUnmarkedNames.js";
 export { default as observeUntilFinished } from "./observeUntilFinished.js";
@@ -40,5 +41,7 @@ export { default as readId } from "./readId.js";
 export { default as readIssuedRequest } from "./readIssuedRequest.js";
 export type * from "./relayTypes.js";
 export { default as respellLink } from "./respellLink.js";
+export { default as runFailureHandlers } from "./runFailureHandlers.js";
 export { default as settleCalls } from "./settleCalls.js";
 export type * from "./types.js";
+export { default as waitForState } from "./waitForState.js";
