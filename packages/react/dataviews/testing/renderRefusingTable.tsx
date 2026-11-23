@@ -32,6 +32,7 @@ export default function renderRefusingTable(): {
         { id: "status", header: "Status", sortable: true },
       ]}
       label="Machines"
+      settings={<DataTable.SettingsMenu />}
     />,
   );
   const table = within(screen.getByRole("table", { name: "Machines" }));

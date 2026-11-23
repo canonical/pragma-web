@@ -709,18 +709,18 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(trigger).toBeFocused();
   });
 
-  test("Sortable: a header's menu hides its column, and focus goes to the next heading's control", async ({
+  test("Settings Default: a header's menu hides its column, and focus goes to the next heading's control", async ({
     page,
   }) => {
-    await openStory(page, findStory(TABLE, "Sortable").id);
+    await openStory(page, findStory(SETTINGS, "Default").id);
     const trigger = page.getByRole("button", {
-      name: "Column options for Host",
+      name: "Column options for Status",
       exact: true,
     });
     await tabTo(page, trigger);
     await page.keyboard.press("Enter");
     const menu = page.getByRole("menu", {
-      name: "Column options for Host",
+      name: "Column options for Status",
       exact: true,
     });
     await expect(menu).toBeVisible();
@@ -750,11 +750,11 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await page.keyboard.press("Enter");
     await expect(menu).toBeHidden();
     await expect(
-      page.getByRole("columnheader", { name: "Host", exact: true }),
+      page.getByRole("columnheader", { name: "Status", exact: true }),
     ).toHaveCount(0);
     await expect(
       page.locator(".ds.data-views-announcer > *").last(),
-    ).toHaveText("Host hidden");
+    ).toHaveText("Status hidden");
     // The hidden column's controls are gone: focus stays in the header row.
     await expect(page.locator("th button:focus")).toHaveCount(1);
   });

@@ -60,6 +60,7 @@ describe("regression 0058 — a column change renewed every header's offers", ()
           { id: "owner", header: "Owner" },
         ]}
         label="Machines"
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await openMenuFrom(

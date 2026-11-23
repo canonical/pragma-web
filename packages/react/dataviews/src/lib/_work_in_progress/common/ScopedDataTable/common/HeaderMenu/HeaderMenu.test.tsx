@@ -138,6 +138,12 @@ describe("HeaderMenu", () => {
     expect(listItemNames()).toEqual(["Move column left", "Move column right"]);
   });
 
+  it("offers only the sort without offers", async () => {
+    mount({ offers: null });
+    await openMenu();
+    expect(listItemNames()).toEqual(["Sort ascending", "Sort descending"]);
+  });
+
   it("disables the changes a column does not take now, and chooses nothing from them", async () => {
     const { onChangeColumn } = mount({
       sortable: false,

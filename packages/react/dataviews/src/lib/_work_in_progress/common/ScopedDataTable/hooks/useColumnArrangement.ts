@@ -15,21 +15,25 @@ import type {
  * lowest layer — its order stands where nothing is stored, and every
  * column is shown — and a column declared `hideable: false` is never
  * hidden. Held at one reference while the visible columns are the same,
- * so a width change alone re-renders no header and re-mints no layout.
+ * so a width change alone re-renders no header and re-mints no layout. A
+ * table without settings draws its declared columns, whatever is shared.
  */
 export default function useColumnArrangement({
   presentation,
   columns,
+  arranged,
 }: UseColumnArrangementProps): UseColumnArrangementResult {
   // Rebuilt only with the declared columns, so it runs once per
   // publication of the presentation, and once per render that passes new
   // columns.
   const selectVisible = useCallback(
     (shown: PresentationState): readonly DataTableColumn[] =>
-      resolveColumnArrangement(columns, shown.presentation)
-        .filter(({ hidden }) => !hidden)
-        .map(({ column }) => column),
-    [columns],
+      arranged
+        ? resolveColumnArrangement(columns, shown.presentation)
+            .filter(({ hidden }) => !hidden)
+            .map(({ column }) => column)
+        : columns,
+    [columns, arranged],
   );
   return useDataViewsValue({
     channel: presentation.state,

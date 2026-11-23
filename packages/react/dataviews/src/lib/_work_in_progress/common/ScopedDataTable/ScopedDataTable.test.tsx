@@ -199,7 +199,7 @@ describe("ScopedDataTable", () => {
     ).toThrow("DataTable.SettingsMenu");
   });
 
-  it.fails("draws the declared columns without settings, whatever is shared", () => {
+  it("draws the declared columns without settings, whatever is shared", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });
@@ -242,7 +242,7 @@ describe("ScopedDataTable", () => {
     );
   });
 
-  it.fails("offers no column menu for hiding or moving without settings", () => {
+  it("offers no column menu for hiding or moving without settings", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });

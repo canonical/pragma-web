@@ -50,7 +50,12 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
 const composition = `<DataViews provider={provider}>
   <DataViews.SavedViews />
   <DataViews.Filters labels={{ status: "Status", cores: "Cores", name: "Host", region: "Region", owner: "Owner" }} />
-  <DataTable provider={provider} columns={columns} label="Machines" />
+  <DataTable
+    provider={provider}
+    columns={columns}
+    label="Machines"
+    settings={<DataTable.SettingsMenu />}
+  />
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`;
 
@@ -99,6 +104,7 @@ function Collection({
         provider={provider}
         columns={columns}
         label="Machines"
+        settings={<DataTable.SettingsMenu />}
         {...words}
       />
       <DataViews.Pagination sizes={[5, 10, 25]} />
@@ -334,7 +340,7 @@ export const AViewsArrangement: Story = {
     );
     // Each heading is named by its label alone, not its column menu's.
     const headers = canvas.getAllByRole("columnheader");
-    await expect(headers).toHaveLength(3);
+    await expect(headers).toHaveLength(4);
     for (const [index, header] of ["Owner", "Host", "Status"].entries()) {
       await expect(headers.at(index)).toHaveAccessibleName(header);
     }

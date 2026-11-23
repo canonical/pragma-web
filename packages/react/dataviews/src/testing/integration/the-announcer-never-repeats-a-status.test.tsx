@@ -21,7 +21,10 @@ import {
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
-import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 const columns: readonly DataTableColumn[] = [
@@ -38,7 +41,11 @@ const Composition = ({
   <DataViews provider={provider}>
     <DataViews.Filters />
     <DataViews.SavedViews />
-    <DataViews.DataTable columns={columns} label="Machines" />
+    <DataViews.DataTable
+      columns={columns}
+      label="Machines"
+      settings={<DataTable.SettingsMenu />}
+    />
     <DataViews.Pagination sizes={[1, 5]} />
   </DataViews>
 );

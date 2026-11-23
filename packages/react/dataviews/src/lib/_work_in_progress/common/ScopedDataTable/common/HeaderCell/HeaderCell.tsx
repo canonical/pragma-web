@@ -227,9 +227,8 @@ export default function HeaderCell({
       {/* Offered once scripts run, wherever the menu has something to do. */}
       {hydrated &&
       (sortable ||
-        offers.hide ||
-        offers["move-left"] ||
-        offers["move-right"]) ? (
+        (offers !== null &&
+          (offers.hide || offers["move-left"] || offers["move-right"]))) ? (
         <HeaderMenu
           columnId={column.id}
           header={column.header}

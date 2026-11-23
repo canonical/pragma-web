@@ -83,9 +83,10 @@ type OwnProps = {
   readonly onRemoveFromSort: (columnId: string) => void;
   /**
    * Which changes to its visibility and place the column takes now. The
-   * table's, one object per column while the arrangement holds.
+   * table's, one object per column while the arrangement holds; null
+   * without settings, when the menu offers no Hide or Move.
    */
-  readonly offers: HeaderColumnOffers;
+  readonly offers: HeaderColumnOffers | null;
   /** Hide or move a column, from its menu; one identity for every column. */
   readonly onChangeColumn: (
     columnId: string,

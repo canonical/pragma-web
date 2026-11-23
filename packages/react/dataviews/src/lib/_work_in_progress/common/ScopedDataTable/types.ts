@@ -24,8 +24,8 @@ type OwnProps<
   /** The provider owning this collection's query, result and selection. */
   readonly provider: DataViewsProvider<TFields, TRow>;
   /**
-   * The columns, in declared order; the presentation decides which show and
-   * where.
+   * The columns, in declared order; given `settings`, the presentation
+   * decides which show and where.
    */
   readonly columns: readonly DataTableColumn[];
   /** The table's accessible name. */

@@ -28,11 +28,11 @@ export type HeaderMenuProps = {
   readonly hideable: boolean;
   /**
    * Which changes the column takes now: the menu's Hide, Move left and Move
-   * right are disabled where the change would do nothing. One object while
-   * the arrangement holds, so a render of the header row renders no menu
-   * again.
+   * right are disabled where the change would do nothing, and left out where
+   * null, the table having no settings. One object while the arrangement
+   * holds, so a render of the header row renders no menu again.
    */
-  readonly offers: HeaderColumnOffers;
+  readonly offers: HeaderColumnOffers | null;
   /**
    * Sort by a column in a direction. One identity for every column, so a
    * render of the header row renders no menu again.

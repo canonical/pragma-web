@@ -1,5 +1,8 @@
 import type { ReactElement } from "react";
-import type { DataTableColumn } from "../src/lib/_work_in_progress/DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../src/lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../src/lib/_work_in_progress/DataViews/index.js";
 import type { MachineProvider } from "./types.js";
 
@@ -24,7 +27,11 @@ export default function MachineComposition({
     <DataViews provider={provider}>
       <DataViews.Search label="Search machines" />
       <DataViews.Filters />
-      <DataViews.DataTable columns={columns} label="Machines" />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        settings={<DataTable.SettingsMenu />}
+      />
       <DataViews.Pagination sizes={[25, 50, 100]} />
     </DataViews>
   );

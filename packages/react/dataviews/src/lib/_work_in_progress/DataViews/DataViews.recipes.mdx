@@ -22,6 +22,7 @@ import {
 } from "@canonical/dataviews-core";
 import { createIndexedDBViewStore } from "@canonical/dataviews-core/indexeddb";
 import {
+  DataTable,
   DataViews,
   type DataTableColumn,
 } from "@canonical/dataviews-react";
@@ -75,6 +76,7 @@ export function Machines() {
         label="Machines"
         selectable
         getRowLabel={nameMachine}
+        settings={<DataTable.SettingsMenu />}
       />
       <DataViews.ActionBar />
       <DataViews.Pagination sizes={[5, 10, 25]} />

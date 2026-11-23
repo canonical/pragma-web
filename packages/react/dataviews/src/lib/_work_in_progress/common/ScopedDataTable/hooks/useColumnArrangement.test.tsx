@@ -14,13 +14,17 @@ const STATUS: DataTableColumn = { id: "status", header: "Status" };
 const CORES: DataTableColumn = { id: "cores", header: "Cores" };
 
 /** A hook over a fresh provider's presentation, counting its renders. */
-const mount = (columns: readonly DataTableColumn[]) => {
+const mount = (columns: readonly DataTableColumn[], arranged = true) => {
   const { presentation } = createMachineProvider().provider;
   let renders = 0;
   const hook = renderHook(
     ({ declared }) => {
       renders += 1;
-      return useColumnArrangement({ presentation, columns: declared });
+      return useColumnArrangement({
+        presentation,
+        columns: declared,
+        arranged,
+      });
     },
     { initialProps: { declared: columns } },
   );
@@ -38,6 +42,17 @@ describe("useColumnArrangement", () => {
       });
     });
     expect(hook.result.current).toEqual([CORES, NAME]);
+  });
+
+  it("lists the declared columns without settings, whatever is stored", () => {
+    const { presentation, hook } = mount([NAME, STATUS, CORES], false);
+    act(() => {
+      presentation.arrange({
+        "table.order": ["cores", "name", "status"],
+        "table.hidden": ["status"],
+      });
+    });
+    expect(hook.result.current).toEqual([NAME, STATUS, CORES]);
   });
 
   it("keeps the list's reference when a width is written", () => {

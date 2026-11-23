@@ -41,6 +41,8 @@ export type UseColumnManagementProps<
   readonly messages: DataViewsMessages;
   /** Say, through the table's announcer, what a change to the columns did. */
   readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
+  /** Whether the table has settings; without, no change is offered. */
+  readonly arranged: boolean;
 };
 
 /** The table's column management, as its menus read it. */
@@ -51,9 +53,10 @@ export type UseColumnManagementResult = {
   readonly resettable: boolean;
   /**
    * The changes one declared column takes now, one object per column while
-   * those changes hold; throws for a column the table does not declare.
+   * those changes hold, or null without settings; throws for a column the
+   * table does not declare.
    */
-  readonly readOffers: (columnId: string) => ColumnSetting["offers"];
+  readonly readOffers: (columnId: string) => ColumnSetting["offers"] | null;
   /** Apply one change to one column; one identity for every column. */
   readonly changeColumn: (columnId: string, change: ColumnChange) => void;
   /** Return to the arrangement beneath the viewer's own changes. */
@@ -104,6 +107,11 @@ export type UseColumnArrangementProps = {
   readonly presentation: Presentation;
   /** The columns as declared, in their declared order. */
   readonly columns: readonly DataTableColumn[];
+  /**
+   * Whether the table has settings; without, the declared columns are drawn
+   * and the shared order and hidden list are not read.
+   */
+  readonly arranged: boolean;
 };
 
 /** The columns a table renders, in the arrangement's order, the hidden ones left out. */

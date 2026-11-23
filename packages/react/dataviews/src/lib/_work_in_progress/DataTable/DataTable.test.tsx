@@ -495,6 +495,7 @@ describe("DataTable", () => {
       { id: "status", header: "Status", sortable: true },
       { id: "cores", header: "Cores", sortable: true },
     ],
+    arranged = false,
   ) => {
     const { provider, source } = createMachineProvider({
       rows: [
@@ -508,6 +509,7 @@ describe("DataTable", () => {
         provider={provider}
         columns={columnsInView}
         label="Machines"
+        {...(arranged ? { settings: <DataTable.SettingsMenu /> } : {})}
       />,
     );
     return { provider, source, view };
@@ -907,6 +909,7 @@ describe("DataTable", () => {
           null,
           defaultSort,
           layout.columns,
+          true,
         );
         act(() => {
           provider.presentation.arrange({
@@ -1201,6 +1204,7 @@ describe("DataTable", () => {
         { id: "status", header: "Status" },
         { id: "cores", header: "Cores", hideable: false },
       ],
+      true,
     );
     expect(
       screen.getByRole("button", { name: "Column options for Name" }),
@@ -1226,13 +1230,14 @@ describe("DataTable", () => {
       3,
       [],
       [{ id: "name", header: "Name", hideable: false }],
+      true,
     );
     expect(
       screen.queryByRole("button", { name: "Column options for Name" }),
     ).toBeNull();
     cleanup();
     // The last column shown, hideable, with nowhere to move: nothing either.
-    renderOrderingTable(3, [], [{ id: "name", header: "Name" }]);
+    renderOrderingTable(3, [], [{ id: "name", header: "Name" }], true);
     expect(
       screen.queryByRole("button", { name: "Column options for Name" }),
     ).toBeNull();
@@ -1245,6 +1250,7 @@ describe("DataTable", () => {
         { id: "name", header: "Name", hideable: false },
         { id: "status", header: "Status", hideable: false },
       ],
+      true,
     );
     await openMenuOf("Name");
     expect(
@@ -1262,6 +1268,7 @@ describe("DataTable", () => {
         { id: "status", header: "Status" },
         { id: "cores", header: "Cores", sortable: true },
       ],
+      true,
     );
     const slice = provider.state.get().slice;
     const requests = source.calls.length;
@@ -1289,6 +1296,7 @@ describe("DataTable", () => {
         { id: "name", header: "Name", sortable: true },
         { id: "status", header: "Status" },
       ],
+      true,
     );
     act(() => {
       provider.presentation.arrange({ "table.hidden": ["status"] });
@@ -1331,6 +1339,7 @@ describe("DataTable", () => {
         { id: "status", header: "Status" },
         { id: "cores", header: "Cores" },
       ],
+      true,
     );
     const slice = provider.state.get().slice;
     const requests = source.calls.length;
@@ -1339,6 +1348,7 @@ describe("DataTable", () => {
     expect(
       screen
         .getAllByRole("columnheader")
+        .filter((header) => header.hasAttribute("aria-labelledby"))
         .map((header) => header.getAttribute("aria-labelledby"))
         .map((id) => document.getElementById(id ?? "")?.textContent),
     ).toEqual(["Status", "Name", "Cores"]);
@@ -1971,11 +1981,13 @@ describe("DataTable", () => {
           { id: "cores", header: "Cores" },
         ]}
         label="Machines"
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     const listHeaders = (): string[] =>
       screen
         .getAllByRole("columnheader")
+        .filter((header) => header.hasAttribute("aria-labelledby"))
         .map((header) => header.querySelector(".label")?.textContent ?? "");
     expect(listHeaders()).toEqual(["Name", "Status", "Cores"]);
     act(() => {
@@ -2016,13 +2028,24 @@ describe("DataTable", () => {
     });
     const { unmount } = render(
       <>
-        <DataTable provider={provider} columns={columns} label="Machines" />
-        <DataTable provider={provider} columns={columns} label="Elsewhere" />
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          settings={<DataTable.SettingsMenu />}
+        />
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Elsewhere"
+          settings={<DataTable.SettingsMenu />}
+        />
       </>,
     );
     const listHeaders = (name: string): string[] =>
       within(screen.getByRole("table", { name }))
         .getAllByRole("columnheader")
+        .filter((header) => header.hasAttribute("aria-labelledby"))
         .map((header) => header.querySelector(".label")?.textContent ?? "");
     await act(async () => {
       await provider.views?.open(view.id);

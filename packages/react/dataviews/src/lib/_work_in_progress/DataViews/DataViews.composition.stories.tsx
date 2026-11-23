@@ -13,7 +13,7 @@ import useMachineProvider from "../../../storybook/machines/useMachineProvider.j
 import useStoryViewStore from "../../../storybook/machines/useStoryViewStore.js";
 import pickStoryWords from "../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../storybook/types.js";
-import type { DataTableColumn } from "../DataTable/index.js";
+import { DataTable, type DataTableColumn } from "../DataTable/index.js";
 import Component from "./Provider.js";
 
 const meta = {
@@ -81,6 +81,7 @@ function Collection({
         // The connected table's records are the widest shape; a typed
         // label goes through the standalone table, or a cell's collection.
         getRowLabel={(row) => String(row["name"])}
+        settings={<DataTable.SettingsMenu />}
       />
       <Component.ActionBar />
       <Component.Pagination sizes={[5, 10, 25]} />
@@ -110,7 +111,7 @@ const failedMachines: ViewDraft = {
  */
 export const ConnectedParts: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     core: ["createPlatformLocation"],
     coreTypes: ["RowRecord"],
     imports: `import { machineCollection, machines } from "./machines.js";
@@ -130,6 +131,7 @@ const nameMachine = (row: RowRecord) => String(row["name"]);`,
     label="Machines"
     selectable
     getRowLabel={nameMachine}
+    settings={<DataTable.SettingsMenu />}
   />
   <DataViews.ActionBar />
   <DataViews.Pagination sizes={[5, 10, 25]} />
@@ -167,7 +169,7 @@ const nameMachine = (row: RowRecord) => String(row["name"]);`,
 
 /** The code the stories of a query in the URL show. */
 const queryInTheUrlCode = showConsumerCode({
-  parts: ["DataViews", "type DataTableColumn"],
+  parts: ["DataTable", "DataViews", "type DataTableColumn"],
   core: ["createPlatformLocation"],
   coreTypes: ["RowRecord"],
   imports: `import { machineCollection, machines } from "./machines.js";
@@ -187,6 +189,7 @@ const nameMachine = (row: RowRecord) => String(row["name"]);`,
     label="Machines"
     selectable
     getRowLabel={nameMachine}
+    settings={<DataTable.SettingsMenu />}
   />
   <DataViews.ActionBar />
   <DataViews.Pagination sizes={[5, 10, 25]} />

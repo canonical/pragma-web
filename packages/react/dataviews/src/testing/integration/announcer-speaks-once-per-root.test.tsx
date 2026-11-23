@@ -98,12 +98,20 @@ describe("the announcer speaks once per root", () => {
       <>
         <section aria-label="First root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="First" />
+            <DataViews.DataTable
+              columns={columns}
+              label="First"
+              settings={<DataTable.SettingsMenu />}
+            />
           </DataViews>
         </section>
         <section aria-label="Second root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="Second" />
+            <DataViews.DataTable
+              columns={columns}
+              label="Second"
+              settings={<DataTable.SettingsMenu />}
+            />
           </DataViews>
         </section>
       </>,
@@ -126,12 +134,20 @@ describe("the announcer speaks once per root", () => {
       <>
         <section aria-label="First root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="First" />
+            <DataViews.DataTable
+              columns={columns}
+              label="First"
+              settings={<DataTable.SettingsMenu />}
+            />
           </DataViews>
         </section>
         <section aria-label="Second root">
           <DataViews provider={provider}>
-            <DataViews.DataTable columns={columns} label="Second" />
+            <DataViews.DataTable
+              columns={columns}
+              label="Second"
+              settings={<DataTable.SettingsMenu />}
+            />
           </DataViews>
         </section>
       </>,
@@ -269,6 +285,7 @@ describe("the announcer speaks once per root", () => {
           },
         ]}
         label="Machines"
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await openMenuFrom(

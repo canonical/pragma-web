@@ -146,6 +146,7 @@ export default function ScopedDataTable<
   const rendered = useColumnArrangement({
     presentation: provider.presentation,
     columns,
+    arranged: hasSettings,
   });
   const model = useStableValue({
     value: rendered,
@@ -228,7 +229,14 @@ export default function ScopedDataTable<
     changeColumn,
     resetColumns,
     listDestinations,
-  } = useColumnManagement({ provider, columns, headerRow, messages, announce });
+  } = useColumnManagement({
+    provider,
+    columns,
+    headerRow,
+    messages,
+    announce,
+    arranged: hasSettings,
+  });
   // One value while none of it changes, so a frame of a resize re-renders
   // no settings menu.
   const menu = useMemo<SettingsMenuProps>(

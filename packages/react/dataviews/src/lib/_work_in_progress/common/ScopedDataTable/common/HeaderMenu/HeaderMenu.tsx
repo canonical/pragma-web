@@ -42,14 +42,17 @@ const listItems = (
         ...(removable
           ? [{ key: "remove", label: messages.removeFromSort }]
           : []),
-        { type: "separator", key: "separator" },
       ]
     : [];
+  if (offers === null) {
+    return sort;
+  }
   const hide: DropdownMenuEntry[] = hideable
     ? [{ key: "hide", label: messages.hideColumn, disabled: !offers.hide }]
     : [];
   return [
     ...sort,
+    ...(sortable ? [{ type: "separator" as const, key: "separator" }] : []),
     ...hide,
     {
       key: "move-left",

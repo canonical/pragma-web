@@ -406,7 +406,12 @@ describe("DataTable.SettingsMenu", () => {
         createMemoryLocation({ href: `/machines${destination}` }),
       );
       const view = render(
-        <DataTable provider={provider} columns={columns} label="Machines" />,
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          settings={<DataTable.SettingsMenu />}
+        />,
       );
       const shown = listShown();
       view.unmount();

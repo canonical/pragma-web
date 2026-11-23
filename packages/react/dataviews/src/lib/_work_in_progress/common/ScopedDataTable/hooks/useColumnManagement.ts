@@ -112,6 +112,7 @@ export default function useColumnManagement<
   headerRow,
   messages,
   announce,
+  arranged,
 }: UseColumnManagementProps<TFields, TRow>): UseColumnManagementResult {
   const { presentation } = provider;
   const declared = useStableValue({ value: columns, isEqual: areColumnsEqual });
@@ -143,14 +144,15 @@ export default function useColumnManagement<
     [settings],
   );
   const readOffers = useCallback(
-    (columnId: string): ColumnSetting["offers"] => {
+    (columnId: string): ColumnSetting["offers"] | null => {
       const offers = offersById.get(columnId);
       if (offers === undefined) {
         throw new Error(`no column "${columnId}" is declared`);
       }
-      return offers;
+      // Without settings a table offers no change to its columns.
+      return arranged ? offers : null;
     },
-    [offersById],
+    [offersById, arranged],
   );
   // The viewer's own changes where a change is written now: what a reset can
   // clear, so an open view's saved arrangement beneath never keeps it on.

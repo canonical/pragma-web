@@ -111,8 +111,9 @@ export const Default: Story = {
 };
 
 /**
- * Hide a column: choosing Hide Owner takes the column out of every table on
- * the provider, says so politely, and returns focus to the settings button.
+ * Hide a column: choosing Hide Owner takes the column out of every table with
+ * settings on the provider, says so politely, and returns focus to the
+ * settings button.
  * Nothing is asked of the source: the rows are the same rows.
  */
 export const HideAColumn: Story = {

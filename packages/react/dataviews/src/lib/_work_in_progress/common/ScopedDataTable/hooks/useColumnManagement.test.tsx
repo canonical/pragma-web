@@ -44,6 +44,7 @@ const mountHook = (
       headerRow,
       messages: resolveMessages(),
       announce,
+      arranged: true,
     }),
   );
   return { provider, hook, announce };
@@ -71,6 +72,23 @@ const buildHeaderRow = (
 };
 
 describe("useColumnManagement", () => {
+  it("offers no change without settings", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "a")],
+    });
+    const hook = renderHook(() =>
+      useColumnManagement({
+        provider,
+        columns,
+        headerRow: createRef<HTMLTableRowElement>(),
+        messages: resolveMessages(),
+        announce: vi.fn(),
+        arranged: false,
+      }),
+    );
+    expect(hook.result.current.readOffers("name")).toBeNull();
+  });
+
   it.fails("says why no column can change while the view a link opened is listed", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "a")],
@@ -85,6 +103,7 @@ describe("useColumnManagement", () => {
         headerRow: createRef<HTMLTableRowElement>(),
         messages: resolveMessages(),
         announce: vi.fn(),
+        arranged: true,
       }),
     );
     expect(provider.views?.state.get().listing.status).toBe("pending");
