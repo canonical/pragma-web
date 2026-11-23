@@ -7,17 +7,20 @@ import type { MachineProvider } from "../../../../../storybook/machines/types.js
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../storybook/types.js";
-import type { DataTableColumn } from "../../../DataTable/index.js";
-import DataViews from "../../Provider.js";
-import Component from "./Settings.js";
+import DataViews from "../../../DataViews/Provider.js";
+import type { DataTableColumn } from "../../index.js";
+import Component from "./SettingsMenu.js";
 
 /** The part's props, and the words the story's root speaks. */
 type StoryArgs = ComponentProps<typeof Component> & StoryWords;
 
 const meta = {
-  title: "_work_in_progress/DataViews/Settings",
+  title: "_work_in_progress/DataViews/Renderers/DataTable/SettingsMenu",
   component: Component,
   decorators: [withAppScope],
+  // The menu is a top-layer popover, so docs preview each story in its own
+  // frame, tall enough for the open menu.
+  parameters: { docs: { story: { inline: false, iframeHeight: "440px" } } },
 } satisfies Meta<StoryArgs>;
 
 export default meta;
@@ -38,7 +41,7 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
 ];`;
 
 const renderCode = `<DataViews provider={provider}>
-  <DataViews.DataTable columns={columns} label="Machines" settings={<DataViews.Settings />} />
+  <DataViews.DataTable columns={columns} label="Machines" settings={<DataTable.SettingsMenu />} />
 </DataViews>`;
 
 /** Close the open settings menu from its button, leaving the story at rest. */
@@ -89,7 +92,7 @@ function Collection({
  */
 export const Default: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -114,7 +117,7 @@ export const Default: Story = {
  */
 export const HideAColumn: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -145,7 +148,7 @@ export const HideAColumn: Story = {
  */
 export const ArrangedByTheViewer: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({
   "table.order": ["status", "name", "cores", "owner"],

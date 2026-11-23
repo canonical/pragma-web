@@ -1,11 +1,11 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
-import * as Stories from "./Settings.stories";
+import * as Stories from "./SettingsMenu.stories";
 
 <Meta of={Stories} name="Recipes" />
 
-# DataViews.Settings recipes
+# DataTable.SettingsMenu recipes
 
-`DataViews.Settings` is the table's column settings: a menu in the table header's settings cell with each column's visibility, its place, and a reset. It takes no props. Given to a table as its `settings`, it is put in the header's settings cell, and the table supplies the columns, their arrangement and the commands that change it; anywhere else it throws. It works the same inside a standalone `DataTable` and a `DataViews.DataTable`.
+`DataTable.SettingsMenu` is the table's column settings: a menu in the table header's settings cell with each column's visibility, its place, and a reset. It takes no props. Given to a table as its `settings`, it is put in the header's settings cell, and the table supplies the columns, their arrangement and the commands that change it; anywhere else it throws. It works the same inside a standalone `DataTable` and a `DataViews.DataTable`.
 
 ## Settings in a table
 
@@ -16,7 +16,11 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import { DataViews, type DataTableColumn } from "@canonical/dataviews-react";
+import {
+  DataTable,
+  DataViews,
+  type DataTableColumn,
+} from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 
@@ -39,7 +43,7 @@ export function Machines() {
       <DataViews.DataTable
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />
     </DataViews>
   );

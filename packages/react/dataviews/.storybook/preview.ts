@@ -30,7 +30,6 @@ const preview: Preview = {
               "Search",
               "Filters",
               "SortPanel",
-              "Settings",
               "ActionBar",
               "Pagination",
               "PaginationBar",

@@ -18,7 +18,10 @@ import type { ScopedDataTableProps } from "../common/index.js";
 export type DataTableProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = Omit<ScopedDataTableProps<TFields, TRow>, "messages" | "announce"> & {
+> = Omit<
+  ScopedDataTableProps<TFields, TRow>,
+  "messages" | "announce" | "settingsMenu"
+> & {
   /** The words the table renders and announces, over the English record. */
   readonly messages?: Partial<DataViewsMessages>;
 };

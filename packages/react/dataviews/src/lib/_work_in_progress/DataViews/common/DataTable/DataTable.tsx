@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { ScopedDataTable } from "../../../common/index.js";
+import { DataTable as Standalone } from "../../../DataTable/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import type { DataViewsDataTableProps } from "./types.js";
 
@@ -34,6 +35,7 @@ export default function DataTable(
       provider={provider}
       messages={messages}
       announce={announce}
+      settingsMenu={Standalone.SettingsMenu}
     />
   );
 }

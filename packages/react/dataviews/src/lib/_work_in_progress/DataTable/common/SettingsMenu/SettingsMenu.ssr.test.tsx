@@ -13,8 +13,8 @@ import {
   buildMachine,
   createMachineProvider,
 } from "../../../../../../testing/index.js";
-import type { DataTableColumn } from "../../../DataTable/index.js";
-import DataViews from "../../Provider.js";
+import DataViews from "../../../DataViews/Provider.js";
+import { DataTable, type DataTableColumn } from "../../index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", hideable: false },
@@ -36,7 +36,7 @@ const renderSettings = (href: string | null): string =>
       <DataViews.DataTable
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />
     </DataViews>,
   );
@@ -61,7 +61,7 @@ const listShownAt = (params: URLSearchParams): readonly string[] =>
     .filter((placed) => !placed.hidden)
     .map((placed) => String(placed.column.header));
 
-describe("DataViews.Settings SSR", () => {
+describe("DataTable.SettingsMenu SSR", () => {
   it("renders a closed popover of links keeping the query, before the menu's roles", () => {
     const markup = renderSettings("/machines?status=running&page=1&tab=a");
     expect(markup).toContain('popover="auto"');

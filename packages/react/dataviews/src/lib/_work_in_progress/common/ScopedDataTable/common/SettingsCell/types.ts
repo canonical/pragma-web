@@ -1,10 +1,16 @@
-import type { ComponentProps, ReactElement } from "react";
+import type {
+  ComponentProps,
+  JSXElementConstructor,
+  ReactElement,
+} from "react";
 import type { SettingsMenuProps } from "../SettingsMenu/index.js";
 
 type OwnProps = {
-  /** What the table was given as its `settings`, drawn in the cell. */
+  /** What the table was given as its `settings`. */
   readonly settings: ReactElement;
-  /** The menu's facts and commands, which what is drawn in the cell reads. */
+  /** `DataTable.SettingsMenu`, drawn as the menu when given as `settings`. */
+  readonly settingsMenu: JSXElementConstructor<never>;
+  /** The menu's facts and commands. */
   readonly menu: SettingsMenuProps;
   /**
    * Attaches this cell to the table's geometry. The stylesheet sizes the

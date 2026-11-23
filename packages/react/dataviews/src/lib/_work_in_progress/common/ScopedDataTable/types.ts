@@ -5,7 +5,12 @@ import type {
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { ComponentProps, ReactElement, ReactNode } from "react";
+import type {
+  ComponentProps,
+  JSXElementConstructor,
+  ReactElement,
+  ReactNode,
+} from "react";
 import type {
   AnnouncerTopic,
   DataTableVirtualization,
@@ -34,7 +39,8 @@ type OwnProps<
   /** Mounts only the rows near the viewport, from `virtualizeRows`. */
   readonly virtualization?: DataTableVirtualization;
   /**
-   * What the header's settings cell holds, such as `<DataViews.Settings />`.
+   * `<DataTable.SettingsMenu />`, the table's column settings; any other
+   * element throws.
    */
   readonly settings?: ReactElement | undefined;
 };
@@ -62,4 +68,6 @@ export type ScopedDataTableProps<
     readonly messages: DataViewsMessages;
     /** Say an outcome through the announcer of the table's UI scope. */
     readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
+    /** `DataTable.SettingsMenu`, drawn as the menu when given as `settings`. */
+    readonly settingsMenu: JSXElementConstructor<never>;
   };

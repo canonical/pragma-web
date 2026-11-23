@@ -14,7 +14,6 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { buildMachine, createMachineProvider } from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
-import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0056 — settings links spelled the query once per link", () => {
   it("spells the query once for every link the menu offers", () => {
@@ -32,7 +31,7 @@ describe("regression 0056 — settings links spelled the query once per link", (
           { id: "cores", header: "Cores" },
         ]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     expect(markup.match(/<a [^>]*href=/g)?.length).toBeGreaterThan(3);

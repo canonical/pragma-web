@@ -1,6 +1,5 @@
-import { assertInvariant } from "@canonical/dataviews-core/bindings";
 /**
- * DataViews.Settings in its table: the settings cell holding the menu, every
+ * DataTable.SettingsMenu in its table: the settings cell holding the menu, every
  * change written to the presentation and announced, nothing asked of the
  * source, at least one column always shown, and — without scripts — real
  * links whose destinations draw the arrangement the enhanced menu makes.
@@ -10,6 +9,7 @@ import {
   createMemoryLocation,
   type QueryLocation,
 } from "@canonical/dataviews-core";
+import { assertInvariant } from "@canonical/dataviews-core/bindings";
 import { createRecordingLocation } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { StrictMode } from "react";
@@ -35,11 +35,12 @@ import {
   type MachineProvider,
   openMenuFrom,
   readAnnouncements,
+  silenceRenderErrors,
   waitForFocus,
   waitForFrames,
 } from "../../../../../../testing/index.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
-import DataViews from "../../Provider.js";
+import DataViews from "../../../DataViews/Provider.js";
+import { DataTable, type DataTableColumn } from "../../index.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", hideable: false },
@@ -67,7 +68,7 @@ const Composition = ({
     <DataViews.DataTable
       columns={declared}
       label="Machines"
-      settings={<DataViews.Settings />}
+      settings={<DataTable.SettingsMenu />}
     />
   </DataViews>
 );
@@ -119,7 +120,7 @@ const choose = async (name: string): Promise<void> => {
 const readAnnouncement = async (): Promise<string | null> =>
   (await readAnnouncements()).at(-1) ?? null;
 
-describe("DataViews.Settings", () => {
+describe("DataTable.SettingsMenu", () => {
   let uninstallPopovers: () => void;
   beforeAll(() => {
     uninstallPopovers = installPopoverStandIn();
@@ -130,17 +131,16 @@ describe("DataViews.Settings", () => {
 
   it("throws outside a table's settings cell", () => {
     const { provider } = createProvider();
-    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
-    onTestFinished(() => {
-      errors.mockRestore();
-    });
+    silenceRenderErrors();
     expect(() =>
       render(
         <DataViews provider={provider}>
-          <DataViews.Settings />
+          <DataTable.SettingsMenu />
         </DataViews>,
       ),
-    ).toThrow("DataViews.Settings must be used as a DataTable's settings");
+    ).toThrow(
+      "DataTable.SettingsMenu must be given to a DataTable as its settings",
+    );
   });
 
   it("ends the header in a settings cell holding the menu, and a table without it has none", () => {
@@ -172,7 +172,7 @@ describe("DataViews.Settings", () => {
         provider={provider}
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await choose("Hide Cores");

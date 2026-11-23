@@ -1311,7 +1311,7 @@ describe("DataTable", () => {
         provider={provider}
         columns={[]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     expect(screen.getAllByRole("columnheader")).toHaveLength(1);

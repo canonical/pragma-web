@@ -33,7 +33,7 @@ describe("every public name is experimental", () => {
   });
 
   it("finds each DataViews member's documentation", () => {
-    expect(listMembers()).toHaveLength(8);
+    expect(listMembers()).toHaveLength(7);
   });
 
   it("tags every DataViews member", () => {
