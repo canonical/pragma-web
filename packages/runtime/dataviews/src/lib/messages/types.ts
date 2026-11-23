@@ -411,6 +411,58 @@ export type DataViewsMessages = {
    */
   readonly decimalSeparator: string;
 
+  // The query bar's narrow form: its summary button and its sheet.
+  /**
+   * How many filter chips apply, a range counting once, which the summary
+   * button's name gives after its visible label, `filters`: "2 applied".
+   */
+  readonly filtersApplied: (facts: { readonly applied: number }) => string;
+  /** The narrow form's search-only entry, by what the records are called. */
+  readonly searchEntry: (facts: { readonly noun: RecordNoun }) => string;
+  /** Shown in the narrow form's search-only entry while nothing is typed. */
+  readonly searchEntryPlaceholder: string;
+  /** The sheet's title, by what the collection's records are called. */
+  readonly filterSheet: (facts: { readonly noun: RecordNoun }) => string;
+  /** The sheet's close button. */
+  readonly closeFilters: string;
+  /** The sheet's command that starts a filter, step by step. */
+  readonly addFilter: string;
+  /** The step of "Add filter" that lists the fields. */
+  readonly chooseField: string;
+  /** The step of "Add filter" that lists a field's operators, by its label. */
+  readonly chooseOperator: (facts: { readonly label: string }) => string;
+  /** The step of "Add filter" that lists a field's values, by its label. */
+  readonly chooseValue: (facts: { readonly label: string }) => string;
+  /** The command that adds the filter "Add filter" has built. */
+  readonly addClause: string;
+  /** The command that returns to the previous step of "Add filter". */
+  readonly goBack: string;
+  /** The sheet's command that clears every filter, the search kept. */
+  readonly clearAllFilters: string;
+  /** Every filter cleared, the search kept, with the result count after it. */
+  readonly filtersCleared: (facts: {
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
+  /**
+   * A change made in the sheet's filters form, with the result count after
+   * it.
+   */
+  readonly resultsUpdated: (facts: {
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
+  /**
+   * The sheet's button that closes it, by the live result count, as
+   * exactly as the source counts it; no number while none is known.
+   */
+  readonly showResults: (facts: { readonly count: Count }) => string;
+  /** A step of "Add filter" taken: what was chosen, then the next step's name. */
+  readonly filterStepChosen: (facts: {
+    readonly chosen: string;
+    readonly step: string;
+  }) => string;
+
   // The pagination bar.
   /** The bar's name. */
   readonly pagination: string;

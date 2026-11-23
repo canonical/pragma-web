@@ -858,6 +858,47 @@ export const MESSAGE_SAMPLES: {
   numberFormat: [[[]], [[MESSAGE_MARK, MESSAGE_MARK]]],
   clauseInvalid: [[MESSAGE_MARK]],
   decimalSeparator: null,
+  filtersApplied: [[{ applied: 1 }], [{ applied: 3 }]],
+  searchEntry: [[{ noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK } }]],
+  searchEntryPlaceholder: null,
+  filterSheet: [[{ noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK } }]],
+  closeFilters: null,
+  addFilter: null,
+  chooseField: null,
+  chooseOperator: [[{ label: MESSAGE_MARK }]],
+  chooseValue: [[{ label: MESSAGE_MARK }]],
+  addClause: null,
+  goBack: null,
+  clearAllFilters: null,
+  filtersCleared: [
+    [
+      {
+        count: { kind: "exact", value: 7 },
+        noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+      },
+    ],
+    [
+      {
+        count: { kind: "unknown" },
+        noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+      },
+    ],
+  ],
+  resultsUpdated: [
+    [
+      {
+        count: { kind: "exact", value: 7 },
+        noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+      },
+    ],
+  ],
+  showResults: [
+    [{ count: { kind: "exact", value: 1 } }],
+    [{ count: { kind: "exact", value: 7 } }],
+    [{ count: { kind: "at-least", value: 7 } }],
+    [{ count: { kind: "unknown" } }],
+  ],
+  filterStepChosen: [[{ chosen: MESSAGE_MARK, step: MESSAGE_MARK }]],
   pagination: null,
   rowsPerPage: null,
   submitPageSize: null,

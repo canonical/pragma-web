@@ -613,4 +613,48 @@ describe("constants", () => {
     expect(m.clauseInvalid("not a number.")).toBe("Invalid: not a number");
     expect(m.decimalSeparator).toBe(".");
   });
+
+  it("words the query bar's narrow form", () => {
+    const noun = { singular: "machine", plural: "machines" };
+    expect(m.filtersApplied({ applied: 2 })).toBe("2 applied");
+    expect(m.filtersApplied({ applied: 1200 })).toBe("1,200 applied");
+    expect(m.searchEntry({ noun })).toBe("Search machines");
+    expect(m.searchEntryPlaceholder).toBe("Search");
+    expect(m.filterSheet({ noun })).toBe("Filter machines");
+    expect(m.closeFilters).toBe("Close filters");
+    expect(m.addFilter).toBe("Add filter");
+    expect(m.chooseField).toBe("Choose a field");
+    expect(m.chooseOperator({ label: "status" })).toBe(
+      "Choose an operator for status",
+    );
+    expect(m.chooseValue({ label: "status" })).toBe(
+      "Choose a value for status",
+    );
+    expect(m.addClause).toBe("Add");
+    expect(m.goBack).toBe("Back");
+    expect(m.clearAllFilters).toBe("Clear all");
+    expect(m.filtersCleared({ count: buildExact(12), noun })).toBe(
+      "Cleared the filters. 12 machines.",
+    );
+    expect(m.filtersCleared({ count: unknown, noun })).toBe(
+      "Cleared the filters.",
+    );
+    expect(m.resultsUpdated({ count: buildExact(12), noun })).toBe(
+      "Updated the results. 12 machines.",
+    );
+    expect(m.showResults({ count: buildExact(1) })).toBe("Show 1 result");
+    expect(m.showResults({ count: buildExact(1234) })).toBe(
+      "Show 1,234 results",
+    );
+    expect(m.showResults({ count: buildAtLeast(1000) })).toBe(
+      "Show 1,000+ results",
+    );
+    expect(m.showResults({ count: unknown })).toBe("Show results");
+    expect(
+      m.filterStepChosen({
+        chosen: "status",
+        step: "Choose an operator for status",
+      }),
+    ).toBe("status chosen. Choose an operator for status.");
+  });
 });

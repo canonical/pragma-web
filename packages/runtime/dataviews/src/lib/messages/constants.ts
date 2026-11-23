@@ -307,6 +307,30 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   clauseInvalid: (reason) => `Invalid: ${composeClause(reason)}`,
   decimalSeparator: ".",
 
+  filtersApplied: ({ applied }) => `${formatCount(applied)} applied`,
+  searchEntry: ({ noun }) => `Search ${noun.plural}`,
+  searchEntryPlaceholder: "Search",
+  filterSheet: ({ noun }) => `Filter ${noun.plural}`,
+  closeFilters: "Close filters",
+  addFilter: "Add filter",
+  chooseField: "Choose a field",
+  chooseOperator: ({ label }) => `Choose an operator for ${label}`,
+  chooseValue: ({ label }) => `Choose a value for ${label}`,
+  addClause: "Add",
+  goBack: "Back",
+  clearAllFilters: "Clear all",
+  filtersCleared: ({ count, noun }) =>
+    composeOutcome("Cleared the filters.", count, noun),
+  resultsUpdated: ({ count, noun }) =>
+    composeOutcome("Updated the results.", count, noun),
+  showResults: ({ count }) => {
+    if (count.kind === "unknown") return "Show results";
+    const shown = formatCount(count.value);
+    if (count.kind === "at-least") return `Show ${shown}+ results`;
+    return `Show ${shown} ${choosePlural(count.value, "result", "results")}`;
+  },
+  filterStepChosen: ({ chosen, step }) => `${chosen} chosen. ${step}.`,
+
   pagination: "Pagination",
   rowsPerPage: "Rows per page",
   submitPageSize: "Apply page size",
