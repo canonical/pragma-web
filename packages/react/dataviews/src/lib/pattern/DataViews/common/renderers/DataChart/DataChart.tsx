@@ -1,4 +1,5 @@
 import type {
+  DataViewsMessages,
   DisplayStatus,
   Facet,
   RowRecord,
@@ -30,6 +31,23 @@ import { resolveChartStatus } from "./utils/index.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-chart";
+
+/** A chart's status in the words it is given; a denial as the rows say it. */
+const describeChartStatus = (
+  status: DisplayStatus,
+  messages: DataViewsMessages,
+): string => {
+  switch (status.status) {
+    case "pending":
+      return messages.chartPending;
+    case "failed":
+      return messages.chartFailed({ reason: status.reason });
+    case "refresh-failed":
+      return messages.chartRefreshFailed({ reason: status.reason });
+    default:
+      return describeStatus(status, messages);
+  }
+};
 
 /**
  * A prototype chart of one field's facet: its values as bars, or its range
@@ -126,7 +144,8 @@ export default function DataChart<
   const hidden = status?.status === "pending" ? true : undefined;
   // The words' own text for the status, unless the caller renders its own.
   const showStatus =
-    renderStatus ?? ((shown: DisplayStatus) => describeStatus(shown, words));
+    renderStatus ??
+    ((shown: DisplayStatus) => describeChartStatus(shown, words));
   let drawing: ReactNode = null;
   if (drawn === undefined) {
     drawing = (
