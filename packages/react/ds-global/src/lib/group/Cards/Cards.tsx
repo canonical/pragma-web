@@ -12,7 +12,7 @@ const componentCssClassName = "ds cards subgrid";
  * @remarks
  * **Requires a top-level grid.** `Cards` is a `.subgrid`: it inherits the column
  * tracks of the nearest parent `.grid` rather than defining its own. Wrap it in
- * a `.grid` (e.g. the `grid()` storybook decorator or the `grid` addon param,
+ * a `.grid` (e.g. the `grid` addon param,
  * the same way Accordion or a form field opts in). Outside a grid it degrades to
  * a plain block — still renders, just without column alignment.
  *
