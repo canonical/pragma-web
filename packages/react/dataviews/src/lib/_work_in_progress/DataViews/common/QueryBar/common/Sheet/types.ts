@@ -9,6 +9,8 @@ type OwnProps = {
   readonly id: string;
   /** The query group the sheet reads and commits to. */
   readonly group: QueryGroupStandIn;
+  /** Whether the location spells addresses, which the baseline needs. */
+  readonly hasHref: boolean;
   /** Whether the dialog is open, so its body renders once scripts run. */
   readonly isOpen: boolean;
   /** Called as the dialog opens before scripts ran, or closes. */

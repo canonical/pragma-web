@@ -1757,6 +1757,7 @@ export default function QueryBar({
       <Sheet
         id={sheetId}
         group={group}
+        hasHref={hasHref}
         isOpen={isSheetOpen}
         onOpenChange={setSheetOpen}
         regionRef={regionRef}

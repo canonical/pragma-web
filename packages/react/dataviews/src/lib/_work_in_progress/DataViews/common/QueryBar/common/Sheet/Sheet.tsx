@@ -1,5 +1,9 @@
 import type { Predicate, QueryIssue } from "@canonical/dataviews-core";
-import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import {
+  isNarrowingIssue,
+  QUERY_KEYS,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import {
   type ReactElement,
@@ -31,6 +35,7 @@ import {
   readLabelsStandIn,
   runInvokerFallback,
   speakChip,
+  spellCommandHref,
   spellInvoker,
 } from "../../utils/index.js";
 import { AddFilterWalk } from "./common/AddFilterWalk/index.js";
@@ -80,10 +85,18 @@ const isSameChips = (
  * announcements, and those of every part inside it, go to its own atomic
  * status region, since the page behind it is inert. Its body renders while
  * it is open once scripts run, and always before they do.
+ *
+ * Before scripts, where the location spells addresses, each chip's remove
+ * control is a link to the query without its clause, Clear all a link to
+ * the query without its filters, and the footer's Apply submits the
+ * filters' GET form, which carries the search. Under the in-memory
+ * default there is no address: the chips render inert, no filters form
+ * renders, and the dialog still opens and closes.
  */
 export default function Sheet({
   id,
   group,
+  hasHref,
   isOpen,
   onOpenChange,
   regionRef,
@@ -98,6 +111,7 @@ export default function Sheet({
   const labels = readLabelsStandIn();
   const hydrated = useIsHydrated();
   const titleId = useId();
+  const formId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const chips = useDataViewsValue(group.state, listChipClauses, isSameChips);
@@ -237,6 +251,58 @@ export default function Sheet({
     onOpenChange(false);
   };
 
+  /**
+   * Where removing a chip leads before scripts: the query without its
+   * clause, or the address without a refused parameter.
+   */
+  const spellRemoveHref = (clause: QueryClause): string | null => {
+    switch (clause.kind) {
+      case "predicate":
+        return spellCommandHref(group, {
+          kind: "removePredicate",
+          ...clause.refs[0],
+        });
+      case "range":
+        return spellCommandHref(group, {
+          kind: "editPredicates",
+          remove: [...clause.refs],
+          add: [],
+        });
+      case "search":
+        return spellCommandHref(group, { kind: "setSearch", search: "" });
+      case "refused": {
+        const read = readProviderHost(provider).location?.read();
+        /* v8 ignore next -- unreachable: an address is spelled only where there is a location */
+        if (read === undefined) return null;
+        const params = new URLSearchParams(read);
+        params.delete(clause.issue.parameter);
+        return `?${params.toString()}`;
+      }
+    }
+  };
+
+  /**
+   * Where Clear all leads before scripts: the query without its filters,
+   * every refused filter the address carries dropped too, and the search
+   * kept.
+   */
+  const spellClearAllHref = (): string | null => {
+    const href = spellCommandHref(group, { kind: "clear", paths: ["filter"] });
+    /* v8 ignore next -- unreachable: drawn only where the location spells addresses */
+    if (href === null) return null;
+    const params = new URLSearchParams(href);
+    for (const issue of group.state.get().refused) {
+      if (isNarrowingIssue(issue) && issue.parameter !== QUERY_KEYS.search) {
+        params.delete(issue.parameter);
+      }
+    }
+    return `?${params.toString()}`;
+  };
+
+  // Before scripts, with an address: links, and the filters' GET form,
+  // which the footer's Apply submits.
+  const isBaseline = hasHref && !hydrated;
+  const clearAllHref = isBaseline ? spellClearAllHref() : null;
   const isBodyShown = isOpen || !hydrated;
   return (
     <dialog
@@ -273,6 +339,7 @@ export default function Sheet({
                       key={clause.id}
                       clause={clause}
                       onRemove={remove}
+                      removeHref={isBaseline ? spellRemoveHref(clause) : null}
                     />
                   ))}
                 </QueryChips>
@@ -286,7 +353,9 @@ export default function Sheet({
                   }
                 />
               )}
-              {hydrated && <Filters className="filters" />}
+              {(hydrated || hasHref) && (
+                <Filters id={formId} className="filters" />
+              )}
             </div>
           )}
           {isBodyShown && (
@@ -296,15 +365,32 @@ export default function Sheet({
                   {messages.clearAllFilters}
                 </Button>
               )}
-              <Button
-                {...spellInvoker("close", id)}
-                type="button"
-                importance="primary"
-                className="results"
-                onClick={runInvokerFallback}
-              >
-                {messages.showResults({ count })}
-              </Button>
+              {clearAllHref !== null && (
+                // Button's tertiary face, as the scripted route renders it.
+                <a className="ds button tertiary" href={clearAllHref}>
+                  {messages.clearAllFilters}
+                </a>
+              )}
+              {isBaseline ? (
+                <Button
+                  type="submit"
+                  form={formId}
+                  importance="primary"
+                  className="results"
+                >
+                  {messages.submitFilters}
+                </Button>
+              ) : (
+                <Button
+                  {...spellInvoker("close", id)}
+                  type="button"
+                  importance="primary"
+                  className="results"
+                  onClick={runInvokerFallback}
+                >
+                  {messages.showResults({ count })}
+                </Button>
+              )}
             </footer>
           )}
           {hydrated && isOpen && <Announcer ref={regionRef} atomic />}

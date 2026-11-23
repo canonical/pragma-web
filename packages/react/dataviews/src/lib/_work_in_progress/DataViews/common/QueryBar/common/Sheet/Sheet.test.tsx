@@ -71,6 +71,7 @@ const mount = ({ query, href, alter, dialogProps }: MountConfig = {}) => {
           {...dialogProps}
           id="sheet"
           group={alter === undefined ? group : alter(group)}
+          hasHref={href !== undefined}
           isOpen={isOpen}
           onOpenChange={(next) => {
             onOpenChange(next);
@@ -161,6 +162,7 @@ describe("Sheet", () => {
         <Sheet
           id="sheet"
           group={group}
+          hasHref={false}
           isOpen
           onOpenChange={() => {}}
           regionRef={regionRef}

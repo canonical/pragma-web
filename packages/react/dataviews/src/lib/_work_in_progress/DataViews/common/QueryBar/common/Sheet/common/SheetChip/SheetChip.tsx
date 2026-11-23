@@ -16,7 +16,8 @@ import type { SheetChipProps } from "./types.js";
 /**
  * One applied clause in the sheet, read-only: its parts are plain text,
  * so the chip's one tab stop is its remove control, which is named by the
- * clause and called with it. It stands in no toolbar, so it takes no id;
+ * clause and called with it, or, before scripts run, a link to where
+ * removing it leads. It stands in no toolbar, so it takes no id;
  * it carries its clause's id as `data-clause`, for focus to find it. A
  * refused filter or search is the error tone, its reason describing the
  * remove control, which it has only where the parameter can be cleared.
@@ -25,6 +26,7 @@ import type { SheetChipProps } from "./types.js";
 export default function SheetChip({
   clause,
   onRemove,
+  removeHref,
 }: SheetChipProps): ReactElement {
   const { provider, messages } = useDataViewsRoot("QueryBar");
   const { schema } = provider.collection;
@@ -36,6 +38,7 @@ export default function SheetChip({
   const removeProps = isRemovable
     ? {
         onRemove: () => onRemove(clause),
+        ...(removeHref == null ? {} : { removeHref }),
         // A refusal is cleared, as the bar's own chip says.
         removeLabel:
           clause.kind === "refused"

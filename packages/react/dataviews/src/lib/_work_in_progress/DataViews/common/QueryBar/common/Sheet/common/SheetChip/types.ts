@@ -6,4 +6,6 @@ export type SheetChipProps = {
   readonly clause: QueryClause;
   /** Called with the clause by the chip's remove control. */
   readonly onRemove: (clause: QueryClause) => void;
+  /** Before scripts run, where the remove control leads instead. */
+  readonly removeHref?: string | null | undefined;
 };
