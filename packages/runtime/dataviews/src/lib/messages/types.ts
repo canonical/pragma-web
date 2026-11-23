@@ -164,6 +164,11 @@ export type DataViewsMessages = {
   /** A column that cannot be hidden, in place of its toggle and when asked to hide. */
   readonly columnAlwaysShown: (name: string) => string;
   readonly resetTableSettings: string;
+  /**
+   * Why no column can change yet: the view a link opened is still being
+   * listed, and a change now would land beneath it.
+   */
+  readonly columnsPending: string;
 
   // What a change to the columns announces.
   readonly columnHidden: (name: string) => string;

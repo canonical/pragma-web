@@ -489,6 +489,7 @@ export const MESSAGE_SAMPLES: {
   moveNamedColumnRight: [[MESSAGE_MARK]],
   columnAlwaysShown: [[MESSAGE_MARK]],
   resetTableSettings: null,
+  columnsPending: null,
   columnHidden: [[MESSAGE_MARK]],
   columnShown: [[{ name: MESSAGE_MARK, position: 2, total: 3 }]],
   columnMoved: [[{ name: MESSAGE_MARK, position: 2, total: 3 }]],
