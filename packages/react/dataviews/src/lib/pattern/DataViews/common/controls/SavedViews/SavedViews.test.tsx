@@ -216,22 +216,22 @@ describe("DataViews.SavedViews", () => {
     expect(queryNotices()).toHaveTextContent("");
   });
 
-  it.fails("is busy while it lists the views", () => {
+  it("is busy while it lists the views", () => {
     mount(createMemoryViewStore([failed]).store);
     expect(queryControls()).toHaveAttribute("aria-busy", "true");
   });
 
-  it.fails("is not busy once the views are listed", async () => {
+  it("is not busy once the views are listed", async () => {
     await mountListed(createMemoryViewStore([failed]).store);
     expect(queryControls()).toHaveAttribute("aria-busy", "false");
   });
 
-  it.fails("is busy while a command waits on the store", async () => {
+  it("is busy while a command waits on the store", async () => {
     await mountSaving();
     expect(queryControls()).toHaveAttribute("aria-busy", "true");
   });
 
-  it.fails("keeps its statuses outside what is busy", async () => {
+  it("keeps its statuses outside what is busy", async () => {
     await mountSaving();
     expect(getSelect().closest('[aria-busy="true"]')).not.toBeNull();
     expect(queryStatus()?.closest('[aria-busy="true"]')).toBeNull();

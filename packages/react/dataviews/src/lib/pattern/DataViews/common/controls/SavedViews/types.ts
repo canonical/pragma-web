@@ -8,9 +8,8 @@ type OwnProps = {
 /**
  * Props of the connected saved-views control. The root is a `div` grouping
  * the collection's saved-view controls, so it extends native div props.
- * `children` is excluded, since the control renders its own contents, and so
- * is `role`, the group role being the control's own, and so are `aria-label`
- * and `aria-labelledby`, which would override the name it takes from
+ * `children` and `role` are the control's own; `aria-busy` would hide its
+ * statuses; `aria-label` and `aria-labelledby` would override the name from
  * `label`.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -19,5 +18,10 @@ type OwnProps = {
 export type DataViewsSavedViewsProps = OwnProps &
   Omit<
     ComponentProps<"div">,
-    keyof OwnProps | "children" | "role" | "aria-label" | "aria-labelledby"
+    | keyof OwnProps
+    | "children"
+    | "role"
+    | "aria-busy"
+    | "aria-label"
+    | "aria-labelledby"
   >;

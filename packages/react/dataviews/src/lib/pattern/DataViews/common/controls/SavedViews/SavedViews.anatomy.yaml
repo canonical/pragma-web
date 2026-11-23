@@ -12,6 +12,7 @@
 #
 # Names — one per part, the same in the DOM and here; the design has none yet:
 #   saved-views control  DOM `ds data-views-saved-views`
+#   controls          DOM `.controls`
 #   view picker       DOM `.picker`
 #   modified mark     DOM `.modified`
 #   label             DOM `.label` (the view picker's and the name dialog's)
@@ -61,6 +62,8 @@
 # Accessibility (DataViews component coverage, "Views/save/rename/delete":
 # 2.1.1, 2.4.6, 3.3.1, 3.3.4, 4.1.2-4.1.3):
 #   saved-views control  A named group ("Saved views").
+#   controls          Busy while the views first load or a command is
+#                     pending; the statuses stay outside.
 #   view picker       A labelled native select ("View") whose value is the
 #                     open view; the modified mark describes it. Choosing a
 #                     view opens it.
@@ -93,43 +96,54 @@ node:
     typography.weight: typography/text/primary/font-weight
   edges:
     - node:
-        role: view picker
+        role: controls
         styles:
           layout.type: stack
           layout.direction: row
           layout.align: center
-          spacing.gap: dimension/050
+          spacing.gap: dimension/100
         edges:
-          - uri: global.subcomponent.select_input
+          - node:
+              role: view picker
+              styles:
+                layout.type: stack
+                layout.direction: row
+                layout.align: center
+                spacing.gap: dimension/050
+              edges:
+                - uri: global.subcomponent.select_input
+                  relation:
+                    cardinality: "1"
+                - node:
+                    role: modified mark
+                    styles:
+                      typography.color: color/text/muted
+                  relation:
+                    cardinality: "0..1"
             relation:
               cardinality: "1"
+              slotName: picker
           - node:
-              role: modified mark
+              role: commands
               styles:
-                typography.color: color/text/muted
+                layout.type: stack
+                layout.direction: row
+                layout.align: center
+                spacing.gap: dimension/050
+              edges:
+                # Save, Revert, Save as…, Rename…, Delete…, and Try again while the
+                # views are unavailable or the arrangement is not being saved. After
+                # a conflict on save, Save reads "Overwrite" and Revert "Discard
+                # changes": the stored view is open.
+                - uri: global.component.button
+                  relation:
+                    cardinality: "5..6"
             relation:
-              cardinality: "0..1"
+              cardinality: "1"
+              slotName: commands
       relation:
         cardinality: "1"
-        slotName: picker
-    - node:
-        role: commands
-        styles:
-          layout.type: stack
-          layout.direction: row
-          layout.align: center
-          spacing.gap: dimension/050
-        edges:
-          # Save, Revert, Save as…, Rename…, Delete…, and Try again while the
-          # views are unavailable or the arrangement is not being saved. After
-          # a conflict on save, Save reads "Overwrite" and Revert "Discard
-          # changes": the stored view is open.
-          - uri: global.component.button
-            relation:
-              cardinality: "5..6"
-      relation:
-        cardinality: "1"
-        slotName: commands
+        slotName: controls
     # Save as's dialog always, and Rename's while a view is open.
     - node:
         role: name dialog
