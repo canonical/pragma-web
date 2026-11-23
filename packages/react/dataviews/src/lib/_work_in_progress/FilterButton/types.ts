@@ -1,9 +1,5 @@
 import type { ButtonProps } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode, Ref } from "react";
-import type {
-  DropdownPanelHandle,
-  WithDropdownTriggerProps,
-} from "../../common/withDropdownButtonStandIn/index.js";
 import type { QueryChipCondition } from "../QueryChip/index.js";
 
 /**
@@ -14,11 +10,21 @@ import type { QueryChipCondition } from "../QueryChip/index.js";
 export type FilterButtonCondition = QueryChipCondition;
 
 /**
- * The panel's imperative handle, which `panelRef` takes.
+ * The panel's imperative handle, which `panelRef` takes, after the Popover
+ * API's own verbs.
  *
  * @experimental Its block is a draft; the props may change.
  */
-export type FilterButtonPanelHandle = DropdownPanelHandle;
+export type FilterButtonPanelHandle = {
+  /** Opens the panel. Does nothing while it is open. */
+  show: () => void;
+  /** Closes the panel. Does nothing while it is closed. */
+  hide: () => void;
+  /** Opens a closed panel, or closes an open one. */
+  toggle: () => void;
+  /** The popover element, for anything the handle does not cover. */
+  readonly element: HTMLDivElement | null;
+};
 
 /**
  * The applied count and its words. A count above 0 needs `appliedLabel`,
@@ -62,21 +68,23 @@ type OwnProps = {
   panelRef?: Ref<FilterButtonPanelHandle> | undefined;
 } & AppliedProps;
 
+/** The trigger keys FilterButton sets to tie the trigger to its panel. */
+type PanelOwnedKeys =
+  | "popoverTarget"
+  | "popoverTargetAction"
+  | "aria-haspopup"
+  | "aria-expanded"
+  | "aria-controls";
+
 /**
  * FilterButton's props: its own, and Button's, less `importance` and
  * `anticipation`, since the face is fixed at Tertiary and neutral, and the
- * keys the dropdown owns. They reach the trigger.
+ * keys that tie the trigger to its panel. They reach the trigger.
  *
  * @experimental Its block is a draft; the props may change.
  */
 export type FilterButtonProps = OwnProps &
   Omit<
-    WithDropdownTriggerProps<ButtonProps>,
-    keyof OwnProps | "importance" | "anticipation" | "children"
+    ButtonProps,
+    keyof OwnProps | "importance" | "anticipation" | "children" | PanelOwnedKeys
   >;
-
-/** What FilterButton shares with its panel, which the dropdown renders. */
-export type FilterButtonContextValue = Pick<
-  OwnProps,
-  "children" | "onToggle" | "panelRef"
->;

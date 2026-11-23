@@ -5,20 +5,23 @@
    * FilterButton styles
    * @implements ds:global_dataviews.component.filter_button
    *
-   * The trigger is Button's tertiary face. While the panel is open it takes
-   * the hover step and the chevron turns; before scripts run, the open state
-   * is read from the panel beside it. No symbol declares an applied fill, so
-   * the Badge is the applied cue.
+   * The trigger is Button's tertiary face, with a chevron, and at least a
+   * 24 px target. While the panel is open it takes the hover step and the
+   * chevron turns; before scripts run, the open state is read from the panel
+   * beside it. No symbol declares an applied fill, so the Badge is the
+   * applied cue.
    */
   .ds.button.filter-button {
     --filter-button-mark-size: var(--dimension-200);
     --filter-button-gap: var(--dimension-050);
-    /* The label's gap already spaces the chevron: the two make
-       DropdownButton's 8 px. */
-    --dropdown-button-chevron-gap: calc(
+    /* The label's gap already spaces the chevron: the two make 8 px. */
+    --filter-button-chevron-gap: calc(
       var(--dimension-100) -
       var(--filter-button-gap)
     );
+    /* Through Button's variable, so a link variant keeps its own padding. */
+    --button-padding-inline-end: var(--dimension-100);
+    min-block-size: var(--dimension-300);
 
     & .label {
       display: inline-flex;
@@ -27,17 +30,13 @@
     }
 
     & .chevron {
-      transition: rotate 0.12s ease-in-out;
-
-      @media (prefers-reduced-motion: reduce) {
-        transition: none;
-      }
+      display: inline-flex;
+      margin-inline-start: var(--filter-button-chevron-gap);
+      transition: rotate var(--motion-duration-fast)
+        var(--motion-easing-standard);
     }
 
-    &:is(
-        [aria-expanded="true"],
-        :has(+ .ds.dropdown-button-panel:popover-open)
-      ) {
+    &:is([aria-expanded="true"], :has(+ .ds.filter-button-panel:popover-open)) {
       background-color: var(
         --modifier-surface-hover,
         var(--button-color-background-hover)
@@ -93,6 +92,55 @@
     }
   }
 
+  /* The panel: a raised surface, tethered under the trigger where the
+     browser has anchor positioning, and faded in as it opens. */
+  .ds.filter-button-panel {
+    min-inline-size: 12rem;
+    max-inline-size: 20rem;
+    max-block-size: calc(100dvh - 2 * var(--dimension-200));
+    overflow-y: auto;
+    padding: var(--dimension-200);
+    border: none;
+    background-color: var(--surface-color-background, var(--color-background));
+    color: var(--surface-color-text, var(--color-text));
+    /* ContextualMenu's shadow: the system has no elevation token. */
+    box-shadow:
+      0 1px 1px 0 rgba(0, 0, 0, 0.15),
+      0 2px 2px -1px rgba(0, 0, 0, 0.15),
+      0 0 3px 0 rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition:
+      opacity var(--motion-duration-fast) var(--motion-easing-standard),
+      display var(--motion-duration-fast) allow-discrete,
+      overlay var(--motion-duration-fast) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+    }
+  }
+
+  @starting-style {
+    .ds.filter-button-panel:popover-open {
+      opacity: 0;
+    }
+  }
+
+  @supports (anchor-name: --a) {
+    .ds.filter-button-panel {
+      inset: auto;
+      margin: var(--dimension-050) 0;
+      position-area: block-end span-inline-end;
+      position-try-fallbacks: flip-block, flip-inline;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds.button.filter-button .chevron,
+    .ds.filter-button-panel {
+      transition: none;
+    }
+  }
+
   /* Forced colours replace the mark's fill with the button's own: it keeps
      the button's text colour. */
   @media (forced-colors: active) {
@@ -106,7 +154,7 @@
     }
 
     /* Forced colours drop the panel's shadow, its only edge. */
-    .ds.button.filter-button + .ds.dropdown-button-panel {
+    .ds.filter-button-panel {
       border: var(--dimension-stroke-thickness-medium) solid CanvasText;
     }
   }

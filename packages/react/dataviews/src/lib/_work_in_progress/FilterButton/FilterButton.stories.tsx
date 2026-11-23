@@ -233,7 +233,7 @@ export const Disabled: Story = {
     await expect(trigger).toBeDisabled();
     await userEvent.click(trigger, { pointerEventsCheck: 0 });
     const panel = canvasElement.querySelector(
-      ".ds.dropdown-button-panel",
+      ".ds.filter-button-panel",
     ) as Element;
     await expect(panel.matches(":popover-open")).toBe(false);
   },

@@ -1,9 +1,10 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import installPopoverStandIn from "../../../../testing/installPopoverStandIn.js";
-import type { DropdownPanelHandle } from "../../common/withDropdownButtonStandIn/index.js";
 import FilterButton from "./FilterButton.js";
+import type { FilterButtonPanelHandle } from "./types.js";
 
 let uninstall: () => void;
 beforeAll(() => {
@@ -21,7 +22,7 @@ const options = (
 
 describe("FilterButton", () => {
   describe("the trigger", () => {
-    it("is Button's tertiary face, with the dropdown's chevron and the filter class", () => {
+    it("is Button's tertiary face, with a chevron and the filter class", () => {
       render(
         <FilterButton label="Status" className="extra">
           {options}
@@ -32,7 +33,6 @@ describe("FilterButton", () => {
         "ds",
         "button",
         "tertiary",
-        "dropdown-button",
         "filter-button",
         "extra",
       );
@@ -54,6 +54,56 @@ describe("FilterButton", () => {
       expect(trigger).toHaveClass("tertiary");
       expect(trigger).not.toHaveClass("primary");
       expect(trigger).not.toHaveClass("destructive");
+    });
+
+    it("is a plain button that names and controls its panel", () => {
+      render(
+        <FilterButton label="Status" id="status" type={undefined}>
+          {options}
+        </FilterButton>,
+      );
+      const trigger = screen.getByRole("button", { name: "Status" });
+      expect(trigger).toHaveAttribute("id", "status");
+      expect(trigger).toHaveAttribute("type", "button");
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+      const panelId = trigger.getAttribute("aria-controls") as string;
+      expect(trigger).toHaveAttribute("popovertarget", panelId);
+      expect(document.getElementById(panelId)).toHaveAttribute(
+        "aria-labelledby",
+        "status",
+      );
+    });
+
+    it("tethers the panel to the trigger through an anchor name", () => {
+      render(
+        <FilterButton label="Status" style={{ color: "red" }}>
+          {options}
+        </FilterButton>,
+      );
+      const trigger = screen.getByRole("button", { name: "Status" });
+      const anchor = trigger.style.getPropertyValue("anchor-name");
+      expect(anchor).toMatch(/^--/);
+      expect(trigger.style.color).toBe("red");
+      const panel = document.getElementById(
+        trigger.getAttribute("aria-controls") as string,
+      ) as HTMLElement;
+      expect(panel.style.getPropertyValue("position-anchor")).toBe(anchor);
+    });
+
+    it("names the anchor with only what a CSS ident holds", () => {
+      // A root's identifierPrefix can put a colon in every id.
+      const container = document.createElement("div");
+      document.body.append(container);
+      const root = createRoot(container, { identifierPrefix: "a:b" });
+      act(() =>
+        root.render(<FilterButton label="Status">{options}</FilterButton>),
+      );
+      const trigger = container.querySelector("button") as HTMLElement;
+      const anchor = trigger.style.getPropertyValue("anchor-name");
+      expect(anchor).toMatch(/^--[\w-]+$/);
+      expect(anchor).toContain("a_b");
+      act(() => root.unmount());
+      container.remove();
     });
 
     it("passes Button's other props to the trigger", () => {
@@ -173,7 +223,7 @@ describe("FilterButton", () => {
 
     it("tells onToggle of every opening and closing", async () => {
       const onToggle = vi.fn();
-      const panelRef = createRef<DropdownPanelHandle>();
+      const panelRef = createRef<FilterButtonPanelHandle>();
       render(
         <FilterButton label="Status" onToggle={onToggle} panelRef={panelRef}>
           {options}
@@ -212,7 +262,7 @@ describe("FilterButton", () => {
     });
 
     it("lets a host drive it through panelRef", async () => {
-      const panelRef = createRef<DropdownPanelHandle>();
+      const panelRef = createRef<FilterButtonPanelHandle>();
       render(
         <FilterButton label="Status" panelRef={panelRef}>
           {options}
@@ -225,6 +275,49 @@ describe("FilterButton", () => {
       act(() => panelRef.current?.toggle());
       await flushToggle();
       expect(trigger).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("moves focus in on opening and back to the trigger on Escape", async () => {
+      render(<FilterButton label="Status">{options}</FilterButton>);
+      const trigger = screen.getByRole("button", { name: "Status" });
+      trigger.focus();
+      fireEvent.click(trigger);
+      await flushToggle();
+      expect(screen.getByRole("checkbox", { hidden: true })).toHaveFocus();
+      fireEvent.keyDown(document, { key: "Escape" });
+      await flushToggle();
+      expect(trigger).toHaveFocus();
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("gives focus back to the trigger when the trigger closes it", async () => {
+      render(<FilterButton label="Status">{options}</FilterButton>);
+      const trigger = screen.getByRole("button", { name: "Status" });
+      // Opened by script, as Safari leaves a clicked button unfocused.
+      act(() => trigger.click());
+      await flushToggle();
+      expect(screen.getByRole("checkbox", { hidden: true })).toHaveFocus();
+      act(() => trigger.click());
+      await flushToggle();
+      expect(trigger).toHaveFocus();
+    });
+
+    it("closes on a press outside and leaves focus where it went", async () => {
+      render(
+        <>
+          <FilterButton label="Status">{options}</FilterButton>
+          <button type="button">Elsewhere</button>
+        </>,
+      );
+      const trigger = screen.getByRole("button", { name: "Status" });
+      fireEvent.click(trigger);
+      await flushToggle();
+      const elsewhere = screen.getByRole("button", { name: "Elsewhere" });
+      act(() => elsewhere.focus());
+      fireEvent.pointerUp(elsewhere);
+      await flushToggle();
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+      expect(elsewhere).toHaveFocus();
     });
 
     it("runs the consumer's onClick first, whose preventDefault cancels the toggle", async () => {
