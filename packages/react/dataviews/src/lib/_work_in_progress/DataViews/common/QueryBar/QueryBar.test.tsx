@@ -918,6 +918,44 @@ describe("QueryBar", () => {
   });
 
   describe("invalid input and refusals", () => {
+    it("shows below the field what cannot apply, and that what applied still does", async () => {
+      mount({ query: "memory__gte=65536" });
+      const readLine = () =>
+        document.querySelector(".ds.data-views-query-bar-message-line");
+      fireEvent.click(await screen.findByRole("button", { name: /^64.GiB$/ }));
+      type(findPart("Value for memory"), "16 GX");
+      press(findPart("Value for memory"), "Enter");
+      expect(readLine()).toHaveTextContent(
+        'Invalid: "GX" is not a unit; use MiB or GiB. The previous restriction still applies.',
+      );
+      expect(readLine()?.querySelector("[role=alert]")).toBeNull();
+      // Said as shown: the clause before still applies.
+      await waitFor(() =>
+        expect(readStatus()).toContain(
+          "The previous restriction still applies.",
+        ),
+      );
+      // Typing again clears it; a new clause has nothing standing before it.
+      type(findPart("Value for memory"), "16 G");
+      expect(readLine()).toBeNull();
+      press(findPart("Value for memory"), "Escape");
+      const operator = await startOn("seen");
+      type(operator, ">=");
+      type(findPart("Value for seen"), "soon");
+      press(findPart("Value for seen"), "Enter");
+      expect(readLine()).toHaveTextContent(/^Invalid: .+\.$/);
+      expect(readLine()).not.toHaveTextContent("still applies");
+      // The last thing said is the new clause's, with nothing standing.
+      await waitFor(() => {
+        const said = readStatus();
+        expect(said.slice(said.lastIndexOf("Invalid:"))).not.toContain("GX");
+      });
+      const said = readStatus();
+      expect(said.slice(said.lastIndexOf("Invalid:"))).not.toContain(
+        "still applies",
+      );
+    });
+
     it("marks a typed value that does not read, and keeps the Entry", async () => {
       const { provider } = mount();
       const operator = await startOn("memory");

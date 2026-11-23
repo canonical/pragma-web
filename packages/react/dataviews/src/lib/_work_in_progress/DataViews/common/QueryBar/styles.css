@@ -14,4 +14,16 @@
     position: relative;
     z-index: 2;
   }
+
+  /* The messages sit under the field; focused, they move below as far as
+     the field reaches, so it never covers them. */
+  .ds.data-views-query-bar > .messages {
+    margin-block-start: var(--dimension-100);
+  }
+
+  .ds.data-views-query-bar:focus-within > .messages {
+    position: relative;
+    translate: 0 var(--data-views-query-bar-field-overflow, 0px);
+    background-color: var(--surface-color-background, var(--color-background));
+  }
 }

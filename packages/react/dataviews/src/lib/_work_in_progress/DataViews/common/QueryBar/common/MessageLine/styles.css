@@ -1,0 +1,32 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* One message a line: its words, then the action resolving it. */
+  .ds.data-views-query-bar-message-line {
+    display: grid;
+    gap: var(--dimension-100);
+
+    & > .message {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--dimension-200);
+      margin: 0;
+    }
+
+    /* A link action, before scripts, is a 24px target as a button is. */
+    & > .message > a.action {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--dimension-300);
+    }
+
+    & > .message[data-criticality="error"] {
+      color: var(--color-text-error);
+    }
+
+    & > .message[data-criticality="warning"] {
+      color: var(--color-text-warning);
+    }
+  }
+}

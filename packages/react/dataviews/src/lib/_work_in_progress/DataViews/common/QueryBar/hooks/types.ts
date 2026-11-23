@@ -67,3 +67,8 @@ export type UseSuggestedFacetsProps = {
 
 /** The facets the values are suggested from; none while no field is. */
 export type UseSuggestedFacetsResult = UseFacetsResult;
+
+/** What the field's overflow reads: the bar's root. */
+export type UseFieldOverflowProps = {
+  readonly rootRef: RefObject<HTMLElement | null>;
+};

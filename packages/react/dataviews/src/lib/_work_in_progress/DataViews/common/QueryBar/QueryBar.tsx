@@ -17,6 +17,10 @@ import { QueryInput } from "../../../QueryInput/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import canTakeEntry from "./canTakeEntry.js";
 import { DraftChip } from "./common/DraftChip/index.js";
+import {
+  MessageLine,
+  type MessageLineEntry,
+} from "./common/MessageLine/index.js";
 import { QueryBarChip } from "./common/QueryBarChip/index.js";
 import { DRAFT_ID } from "./constants.js";
 import findMissingPart from "./findMissingPart.js";
@@ -24,6 +28,7 @@ import findNextPart from "./findNextPart.js";
 import {
   useAnnounceOutcome,
   useClauseIds,
+  useFieldOverflow,
   useQueryBarSession,
   useQueryGroup,
   useSuggestedFacets,
@@ -142,6 +147,7 @@ export default function QueryBar({
   const { session, dispatch } = useQueryBarSession({ provider, rootRef });
   const clauses = useClauseIds({ group });
   const announceOutcome = useAnnounceOutcome({ provider, announce });
+  useFieldOverflow({ rootRef });
   // The latest session, for what a task or a blur reads later.
   const sessionRef = useRef(session);
   sessionRef.current = session;
@@ -427,7 +433,14 @@ export default function QueryBar({
    */
   const markInvalid = (reason: string): void => {
     dispatch({ type: "invalid", reason });
-    announce(messages.clauseInvalid(reason));
+    // Said as the line below the field shows it: for an edit, that what
+    // applied before still does.
+    announce(
+      messages.filterRefused(
+        [messages.clauseInvalid(reason)],
+        sessionRef.current.draft?.origin != null,
+      ),
+    );
   };
 
   /** Say why the source refused a command, and that what applied stands. */
@@ -1049,6 +1062,22 @@ export default function QueryBar({
         }
       : {};
 
+  // What the open Entry holds that cannot apply, and that what applied
+  // before still does, for as long as the Entry stays open.
+  const entries: MessageLineEntry[] =
+    session.invalid === null || draft === null
+      ? []
+      : [
+          {
+            id: "invalid",
+            criticality: "error",
+            text: messages.filterRefused(
+              [messages.clauseInvalid(session.invalid)],
+              draft.origin !== null,
+            ),
+          },
+        ];
+
   const edit =
     draft !== null && draft.origin !== null && part !== null
       ? { draft, part, typed, invalid: session.invalid }
@@ -1117,6 +1146,7 @@ export default function QueryBar({
           </QueryChips>
         )}
       </QueryInput>
+      <MessageLine className="messages" entries={entries} />
     </div>
   );
 }
