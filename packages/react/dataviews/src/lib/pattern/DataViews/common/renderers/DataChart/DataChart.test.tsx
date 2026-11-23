@@ -333,7 +333,7 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be loaded: offline.",
+        "This chart could not be loaded: offline.",
       );
       expect(screen.queryByRole("img")).toBeNull();
     });
@@ -417,7 +417,7 @@ describe("DataChart", () => {
       );
     });
 
-    it("says a failure in place of the bars", () => {
+    it("says the chart, not the rows, could not be loaded", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -434,7 +434,7 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be loaded: offline.",
+        "This chart could not be loaded: offline.",
       );
       expect(screen.queryByRole("img")).toBeNull();
     });
@@ -466,7 +466,7 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be refreshed: offline.",
+        "This chart could not be refreshed: offline.",
       );
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
@@ -501,7 +501,7 @@ describe("DataChart", () => {
       // while the facets still answer the same filter and search.
       expect(provider.state.get().result.status).toBe("stale");
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be refreshed: offline.",
+        "This chart could not be refreshed: offline.",
       );
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
@@ -550,7 +550,7 @@ describe("DataChart", () => {
         reason: "offline",
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows could not be refreshed: offline.",
+        "This chart could not be refreshed: offline.",
       );
       expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
     });
