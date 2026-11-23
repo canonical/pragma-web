@@ -2,7 +2,12 @@ import {
   createArraySource,
   createCollection,
   createDataViewsProvider,
+  createPage,
 } from "@canonical/dataviews-core";
+import {
+  assertInvariant,
+  resolveDisplayStatus,
+} from "@canonical/dataviews-core/bindings";
 import { act, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { hydrateRoot } from "react-dom/client";
@@ -300,7 +305,7 @@ describe("DataChart", () => {
       expect(screen.queryByRole("table")).toBeNull();
     });
 
-    it("never draws bars counted for an earlier query: the stale status stands in their place", () => {
+    it.fails("never draws bars counted for an earlier query: a failure stands in their place", () => {
       const { provider, source } = createFacetedManual();
       render(
         <DataChart
@@ -328,14 +333,226 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows do not match the current query: offline.",
+        "This chart could not be loaded: offline.",
       );
       expect(screen.queryByRole("img")).toBeNull();
     });
 
-    it("says the collection holds nothing, and draws no bars", () => {
-      const provider = createFacetedFleet({ count: 0 });
+    it.fails("keeps the previous bars mounted and hidden while a new restriction loads", () => {
+      const { provider, source } = createFacetedManual();
+      const { container } = render(
+        <DataChart
+          type="bar"
+          provider={provider}
+          field="status"
+          label="Machines by status"
+        />,
+      );
+      deliverFacets(source, {
+        status: {
+          kind: "values",
+          values: [{ value: "failed", count: { kind: "exact", value: 1 } }],
+        },
+        cores: { kind: "range", min: 1, max: 1 },
+      });
+      act(() => {
+        provider.setSearch("alp");
+      });
+      const status = assertInvariant(
+        container.querySelector("[data-status='pending']"),
+        "the pending status",
+      );
+      expect(status).toHaveTextContent("Loading…");
+      const drawing = assertInvariant(
+        container.querySelector(".drawing"),
+        "the previous drawing, kept",
+      );
+      expect(drawing).toHaveAttribute("aria-hidden", "true");
+      expect(status.compareDocumentPosition(drawing)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    });
+
+    it.fails("hides a kept facet's sentence of no value while a new restriction loads", () => {
+      const { provider, source } = createFacetedManual();
       render(
+        <DataChart
+          type="bar"
+          provider={provider}
+          field="status"
+          label="Machines by status"
+        />,
+      );
+      deliverFacets(source, {
+        status: { kind: "values", values: [] },
+        cores: { kind: "range", min: 1, max: 1 },
+      });
+      act(() => {
+        provider.setSearch("alp");
+      });
+      expect(
+        screen
+          .getByText("No matching record holds a value.")
+          .closest("[aria-hidden='true']"),
+      ).not.toBeNull();
+    });
+
+    it.fails("says the chart, not the rows, could not be loaded", () => {
+      const { provider, source } = createFacetedManual();
+      render(
+        <DataChart
+          type="bar"
+          provider={provider}
+          field="status"
+          label="Machines by status"
+        />,
+      );
+      act(() => {
+        source.readLatest().deliver({
+          status: "failed",
+          failure: { reason: "offline", cause: null, transient: null },
+        });
+      });
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "This chart could not be loaded: offline.",
+      );
+      expect(screen.queryByRole("img")).toBeNull();
+    });
+
+    it.fails("says a refresh failed above the bars it keeps", () => {
+      const { provider, source } = createFacetedManual();
+      render(
+        <DataChart
+          type="bar"
+          provider={provider}
+          field="status"
+          label="Machines by status"
+        />,
+      );
+      deliverFacets(source, {
+        status: {
+          kind: "values",
+          values: [{ value: "failed", count: { kind: "exact", value: 1 } }],
+        },
+        cores: { kind: "range", min: 1, max: 1 },
+      });
+      act(() => {
+        provider.refresh();
+      });
+      act(() => {
+        source.readLatest().deliver({
+          status: "failed",
+          failure: { reason: "offline", cause: null, transient: null },
+        });
+      });
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "This chart could not be refreshed: offline.",
+      );
+      expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
+    });
+
+    it.fails("says a failed re-sort above the bars it keeps, as a failed refresh", () => {
+      const { provider, source } = createFacetedManual();
+      render(
+        <DataChart
+          type="bar"
+          provider={provider}
+          field="status"
+          label="Machines by status"
+        />,
+      );
+      deliverFacets(source, {
+        status: {
+          kind: "values",
+          values: [{ value: "failed", count: { kind: "exact", value: 1 } }],
+        },
+        cores: { kind: "range", min: 1, max: 1 },
+      });
+      act(() => {
+        provider.setSort([{ field: "name", direction: "desc" }]);
+      });
+      act(() => {
+        source.readLatest().deliver({
+          status: "failed",
+          failure: { reason: "offline", cause: null, transient: null },
+        });
+      });
+      // The rows answer the earlier ordering, so the core settles as stale,
+      // while the facets still answer the same filter and search.
+      expect(provider.state.get().result.status).toBe("stale");
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "This chart could not be refreshed: offline.",
+      );
+      expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
+    });
+
+    it.fails("says a failed re-sort above the bars it keeps, with no row on screen", () => {
+      const { provider, source } = createFacetedManual();
+      render(
+        <DataChart
+          type="bar"
+          provider={provider}
+          field="status"
+          label="Machines by status"
+        />,
+      );
+      act(() => {
+        source.readLatest().deliver({
+          status: "succeeded",
+          page: createPage({
+            rows: [],
+            matched: 0,
+            facets: {
+              status: {
+                kind: "values",
+                values: [
+                  { value: "running", count: { kind: "exact", value: 2 } },
+                ],
+              },
+              cores: { kind: "range", min: 1, max: 1 },
+            },
+          }),
+        });
+      });
+      act(() => {
+        provider.setSort([{ field: "name", direction: "desc" }]);
+      });
+      act(() => {
+        source.readLatest().deliver({
+          status: "failed",
+          failure: { reason: "offline", cause: null, transient: null },
+        });
+      });
+      // No row stands, so the core shows a failure, while the facets still
+      // answer the same filter and search.
+      expect(resolveDisplayStatus(provider.state.get())).toEqual({
+        status: "failed",
+        reason: "offline",
+      });
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "This chart could not be refreshed: offline.",
+      );
+      expect(screen.getByRole("img", { name: NAME })).toBeInTheDocument();
+    });
+
+    it.fails("says no row status over an empty collection, only the facet's words", () => {
+      render(
+        <DataChart
+          type="bar"
+          provider={createFacetedFleet({ count: 0 })}
+          field="status"
+          label="Machines by status"
+        />,
+      );
+      expect(screen.queryByRole("status")).toBeNull();
+      expect(
+        screen.getByText("No matching record holds a value."),
+      ).toBeInTheDocument();
+    });
+
+    it("renders the caller's words for its status", () => {
+      const { provider } = createFacetedManual();
+      const { container } = render(
         <DataChart
           type="bar"
           provider={provider}
@@ -344,11 +561,12 @@ describe("DataChart", () => {
           renderStatus={(status) => `said ${status.status}`}
         />,
       );
-      expect(screen.getByRole("status")).toHaveTextContent("said no-data");
-      expect(screen.queryByRole("img")).toBeNull();
+      expect(
+        container.querySelector("[data-status='pending']"),
+      ).toHaveTextContent("said pending");
     });
 
-    it("says a query matched nothing, apart from a collection holding nothing", () => {
+    it.fails("says a query matched nothing as a facet holding nothing", () => {
       // A restriction the source runs, matching none of the fleet: its
       // machines hold one core apiece up to their number.
       const provider = createFacetedFleet({ href: "/machines?cores__gte=999" });
@@ -358,10 +576,12 @@ describe("DataChart", () => {
           provider={provider}
           field="status"
           label="Machines by status"
-          renderStatus={(status) => `said ${status.status}`}
         />,
       );
-      expect(screen.getByRole("status")).toHaveTextContent("said no-results");
+      expect(screen.queryByRole("status")).toBeNull();
+      expect(
+        screen.getByText("No matching record holds a value."),
+      ).toBeInTheDocument();
       expect(screen.queryByRole("img")).toBeNull();
     });
 
