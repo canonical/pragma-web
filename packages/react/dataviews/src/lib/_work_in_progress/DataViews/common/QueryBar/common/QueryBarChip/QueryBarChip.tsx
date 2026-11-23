@@ -1,6 +1,10 @@
 import { listConjuncts } from "@canonical/dataviews-core/bindings";
 import { memo, type ReactElement, useMemo } from "react";
-import { useDataViewsValue } from "../../../../../../hooks/index.js";
+import {
+  useDataViewsValue,
+  useIsHydrated,
+} from "../../../../../../hooks/index.js";
+import spellCommandHref from "../../spellCommandHref.js";
 import type { QueryBarDraft, QueryStateStandIn } from "../../types.js";
 import { DraftChip } from "../DraftChip/index.js";
 import type { QueryBarChipProps } from "./types.js";
@@ -62,8 +66,18 @@ const QueryBarChip = ({
     };
   }, [clause]);
   const applied = useDataViewsValue(group.state, read, isSameReading);
+  const hydrated = useIsHydrated();
   // A clause removed reads nothing until the bar drops its chip.
   if (applied === null) return null;
+  // Before scripts, removal is a link to the query without the clause.
+  const removeHref = hydrated
+    ? null
+    : spellCommandHref(
+        group,
+        clause.kind === "search"
+          ? { kind: "setSearch", search: "" }
+          : { kind: "removePredicate", ...clause.refs[0] },
+      );
   return (
     <DraftChip
       id={clause.id}
@@ -73,6 +87,7 @@ const QueryBarChip = ({
       invalid={edit?.invalid ?? null}
       onActivate={(part) => onActivate(applied, part)}
       onRemove={() => onRemove(applied)}
+      {...(removeHref === null ? {} : { removeHref })}
       onTypedChange={onTypedChange}
       onEntryKeyDown={onEntryKeyDown}
     />

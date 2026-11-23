@@ -15,6 +15,21 @@
     z-index: 2;
   }
 
+  /* Before scripts, nothing moves the rows below the field as it wraps,
+     so it wraps in flow and pushes them down. */
+  .ds.data-views-query-bar:not([data-hydrated]) .ds.query-input {
+    block-size: auto;
+  }
+
+  .ds.data-views-query-bar:not([data-hydrated]) .ds.query-input > .field {
+    position: relative;
+  }
+
+  /* With an address, the field sits in its search form. */
+  .ds.data-views-query-bar > .search {
+    margin: 0;
+  }
+
   /* The messages sit under the field; focused, they move below as far as
      the field reaches, so it never covers them. */
   .ds.data-views-query-bar > .messages {

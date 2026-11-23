@@ -5,7 +5,9 @@ import type {
   SourceRefusal,
 } from "@canonical/dataviews-core";
 import {
+  isNarrowingIssue,
   listOfferedOperators,
+  QUERY_KEYS,
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import type {
@@ -14,9 +16,10 @@ import type {
   PointerEvent,
   ReactElement,
 } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   useDataViewsValue,
+  useIsHydrated,
   useStableCallback,
 } from "../../../../hooks/index.js";
 import { QueryChips } from "../../../QueryChips/index.js";
@@ -32,6 +35,7 @@ import {
 import { QueryBarChip } from "./common/QueryBarChip/index.js";
 import { RangeChip } from "./common/RangeChip/index.js";
 import { RefusedChip } from "./common/RefusedChip/index.js";
+import { SearchForm } from "./common/SearchForm/index.js";
 import { DRAFT_ID } from "./constants.js";
 import findContradictions from "./findContradictions.js";
 import findMissingPart from "./findMissingPart.js";
@@ -40,6 +44,7 @@ import {
   useAnnounceOutcome,
   useClauseIds,
   useFieldOverflow,
+  useLinkFocusHandoff,
   useQueryBarSession,
   useQueryGroup,
   useSuggestedFacets,
@@ -53,6 +58,7 @@ import readTypedOperator from "./readTypedOperator.js";
 import resolveTypedSymbol from "./resolveTypedSymbol.js";
 import speakClause from "./speakClause.js";
 import speakRange from "./speakRange.js";
+import spellCommandHref from "./spellCommandHref.js";
 import spellOperand from "./spellOperand.js";
 import suggestOptions from "./suggestOptions.js";
 import type {
@@ -235,13 +241,18 @@ export default function QueryBar({
   }
   const labels = readLabelsStandIn();
   const group = useQueryGroup({ provider });
+  const hydrated = useIsHydrated();
+  // Whether the location spells addresses, which every baseline link needs.
+  const hasHref = useMemo(
+    () => group.spellHref(group.state.get()) !== null,
+    [group],
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const entryRef = useRef<HTMLInputElement>(null);
   const { session, dispatch } = useQueryBarSession({ provider, rootRef });
   const clauses = useClauseIds({ group });
   const readContradictions = useMemo(
-    () => (state: ReturnType<typeof group.state.get>) =>
-      findContradictions(state.slice, schema),
+    () => (state: QueryStateStandIn) => findContradictions(state.slice, schema),
     [schema],
   );
   const refusedIssues = useDataViewsValue(
@@ -259,6 +270,17 @@ export default function QueryBar({
   const saidRef = useRef<ReadonlySet<string> | null>(null);
   const announceOutcome = useAnnounceOutcome({ provider, announce });
   useFieldOverflow({ rootRef });
+  useLinkFocusHandoff({ rootRef, hydrated });
+  // What was typed in the plain input before scripts ran is kept.
+  // @note Impure: reads the entry as the server drew it.
+  useLayoutEffect(() => {
+    const entry = entryRef.current;
+    /* v8 ignore next -- unreachable: the entry renders before its effects run */
+    if (entry === null) return;
+    if (entry.value !== (group.state.get().slice.search ?? "")) {
+      dispatch({ type: "typeText", text: entry.value });
+    }
+  }, [group, dispatch]);
   // @note Impure: says each contradiction a commit brings, once.
   useEffect(() => {
     const ids = new Set(contradictions.map(readContradictionId));
@@ -1356,6 +1378,24 @@ export default function QueryBar({
     document.addEventListener("pointercancel", end);
   };
 
+  const clearHref = hydrated ? null : spellClearHref();
+  /**
+   * Where the clear control leads before scripts: the query without its
+   * filters and search, every refused filter and search the address
+   * carries dropped too, as clearing them with scripts does.
+   */
+  function spellClearHref(): string | null {
+    const href = spellCommandHref(group, {
+      kind: "clear",
+      paths: ["filter", "search"],
+    });
+    if (href === null) return null;
+    const params = new URLSearchParams(href);
+    for (const issue of group.state.get().refused) {
+      if (isNarrowingIssue(issue)) params.delete(issue.parameter);
+    }
+    return `?${params.toString()}`;
+  }
   // The clear control shows only while there is something to clear.
   const clearProps =
     clauses.length > 0 || text !== ""
@@ -1375,6 +1415,8 @@ export default function QueryBar({
             entryRef.current?.focus();
           },
           clearLabel: messages.clearFiltersAndSearch,
+          // Before scripts, a link to the query without either.
+          ...(clearHref === null ? {} : { clearHref }),
         }
       : {};
 
@@ -1414,10 +1456,6 @@ export default function QueryBar({
     dispatch({ type: "close", item: id, focus: "field" });
   };
 
-  // What the open Entry holds that cannot apply, and that what applied
-  // before still does, for as long as the Entry stays open; then each
-  // field whose clauses cannot all hold, with its merge where one stands
-  // out.
   // Each refused filter or search, with its reason, for the eye: the
   // chip's clear control is described by it, and nothing says it twice.
   const refusedEntries = refusedIssues.map(
@@ -1431,6 +1469,25 @@ export default function QueryBar({
     }),
   );
 
+  /**
+   * Merge as the message line offers it: a button once scripts run; before
+   * they do, a link to the merged query where there is an address, and
+   * nothing where there is none.
+   */
+  const readMergeAction = (
+    contradiction: QueryContradiction,
+    label: string,
+  ): Pick<MessageLineEntry, "action"> => {
+    const { merge: edit } = contradiction;
+    if (edit === null) return {};
+    const name = messages.mergeClauses({ label });
+    if (hydrated) {
+      return { action: { label: name, onAction: () => merge(contradiction) } };
+    }
+    const href = spellCommandHref(group, { kind: "editPredicates", ...edit });
+    return href === null ? {} : { action: { label: name, href } };
+  };
+
   const contradictionEntries = contradictions.map(
     (contradiction): MessageLineEntry => {
       const label = labels.readFieldLabel(contradiction.field);
@@ -1438,17 +1495,14 @@ export default function QueryBar({
         id: readContradictionId(contradiction),
         criticality: "warning",
         text: messages.queryContradiction({ label }),
-        ...(contradiction.merge === null
-          ? {}
-          : {
-              action: {
-                label: messages.mergeClauses({ label }),
-                onAction: () => merge(contradiction),
-              },
-            }),
+        ...readMergeAction(contradiction, label),
       };
     },
   );
+  // What the open Entry holds that cannot apply, and that what applied
+  // before still does, for as long as the Entry stays open; each refused
+  // filter or search; then each field whose clauses cannot all hold, with
+  // its merge where one stands out.
   const entries: MessageLineEntry[] = [
     ...(session.invalid === null || draft === null
       ? []
@@ -1471,89 +1525,96 @@ export default function QueryBar({
       ? { draft, part, typed, invalid: session.invalid }
       : null;
 
+  const field = (
+    <QueryInput
+      ref={entryRef}
+      label={label ?? messages.queryBar(labels.recordNoun)}
+      description={messages.queryBarDescription}
+      placeholder={messages.queryBarPlaceholder}
+      // Before scripts, the plain input holds the applied search.
+      value={hydrated ? text : (group.state.get().slice.search ?? "")}
+      {...(hasHref ? { name: QUERY_KEYS.search } : {})}
+      onValueChange={(entered) => dispatch({ type: "typeText", text: entered })}
+      onKeyDown={handleEntryEnter}
+      options={[...options]}
+      onOptionSelect={handleOptionSelect}
+      onHighlightChange={setHighlighted}
+      emptyText={
+        takesSuggestions && !isLoading ? messages.noSuggestions : undefined
+      }
+      {...loadingProps}
+      footer={isListedValue ? messages.multipleValuesHint : undefined}
+      activeItem={session.activeItem}
+      onActiveItemChange={moveStop}
+      hiddenLabel={messages.hiddenChips}
+      {...clearProps}
+    >
+      {(clauses.length > 0 || draft?.origin === null) && (
+        <QueryChips label={messages.appliedFilters}>
+          {clauses.map((clause) =>
+            clause.kind === "refused" ? (
+              <RefusedChip
+                key={clause.id}
+                clause={clause}
+                group={group}
+                onClear={clearRefused}
+              />
+            ) : clause.kind === "range" ? (
+              <RangeChip
+                key={clause.id}
+                clause={clause}
+                group={group}
+                edit={edit?.draft.origin?.id === clause.id ? edit : null}
+                onActivate={activate}
+                onRemove={removeRange}
+                onTypedChange={handleTypedChange}
+                onEntryKeyDown={handleEntryKeyDown}
+              />
+            ) : (
+              <QueryBarChip
+                key={clause.id}
+                clause={clause}
+                group={group}
+                edit={edit?.draft.origin?.id === clause.id ? edit : null}
+                onActivate={activate}
+                onRemove={remove}
+                onTypedChange={handleTypedChange}
+                onEntryKeyDown={handleEntryKeyDown}
+              />
+            ),
+          )}
+          {draft !== null && draft.origin === null && (
+            <DraftChip
+              id={DRAFT_ID}
+              draft={draft}
+              part={part}
+              typed={typed}
+              invalid={session.invalid}
+              onActivate={(at) => activate(draft, at)}
+              onRemove={cancel}
+              onTypedChange={handleTypedChange}
+              onEntryKeyDown={handleEntryKeyDown}
+            />
+          )}
+        </QueryChips>
+      )}
+    </QueryInput>
+  );
+
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: the bar hears the keys that bubble from the toolbar's items
     <div
       {...rest}
       ref={rootRef}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      // Until scripts run, nothing moves the rows below the field, so the
+      // field stays in flow.
+      data-hydrated={hydrated || undefined}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
       onPointerDownCapture={handlePointerDownCapture}
     >
-      <QueryInput
-        ref={entryRef}
-        label={label ?? messages.queryBar(labels.recordNoun)}
-        description={messages.queryBarDescription}
-        placeholder={messages.queryBarPlaceholder}
-        value={text}
-        onValueChange={(entered) =>
-          dispatch({ type: "typeText", text: entered })
-        }
-        onKeyDown={handleEntryEnter}
-        options={[...options]}
-        onOptionSelect={handleOptionSelect}
-        onHighlightChange={setHighlighted}
-        emptyText={
-          takesSuggestions && !isLoading ? messages.noSuggestions : undefined
-        }
-        {...loadingProps}
-        footer={isListedValue ? messages.multipleValuesHint : undefined}
-        activeItem={session.activeItem}
-        onActiveItemChange={moveStop}
-        hiddenLabel={messages.hiddenChips}
-        {...clearProps}
-      >
-        {(clauses.length > 0 || draft?.origin === null) && (
-          <QueryChips label={messages.appliedFilters}>
-            {clauses.map((clause) =>
-              clause.kind === "refused" ? (
-                <RefusedChip
-                  key={clause.id}
-                  clause={clause}
-                  group={group}
-                  onClear={clearRefused}
-                />
-              ) : clause.kind === "range" ? (
-                <RangeChip
-                  key={clause.id}
-                  clause={clause}
-                  group={group}
-                  edit={edit?.draft.origin?.id === clause.id ? edit : null}
-                  onActivate={activate}
-                  onRemove={removeRange}
-                  onTypedChange={handleTypedChange}
-                  onEntryKeyDown={handleEntryKeyDown}
-                />
-              ) : (
-                <QueryBarChip
-                  key={clause.id}
-                  clause={clause}
-                  group={group}
-                  edit={edit?.draft.origin?.id === clause.id ? edit : null}
-                  onActivate={activate}
-                  onRemove={remove}
-                  onTypedChange={handleTypedChange}
-                  onEntryKeyDown={handleEntryKeyDown}
-                />
-              ),
-            )}
-            {draft !== null && draft.origin === null && (
-              <DraftChip
-                id={DRAFT_ID}
-                draft={draft}
-                part={part}
-                typed={typed}
-                invalid={session.invalid}
-                onActivate={(at) => activate(draft, at)}
-                onRemove={cancel}
-                onTypedChange={handleTypedChange}
-                onEntryKeyDown={handleEntryKeyDown}
-              />
-            )}
-          </QueryChips>
-        )}
-      </QueryInput>
+      <SearchForm hasHref={hasHref}>{field}</SearchForm>
       <MessageLine className="messages" entries={entries} />
     </div>
   );

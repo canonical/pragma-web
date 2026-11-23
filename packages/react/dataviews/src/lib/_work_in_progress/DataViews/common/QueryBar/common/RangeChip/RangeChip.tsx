@@ -1,12 +1,16 @@
 import type { Predicate } from "@canonical/dataviews-core";
 import { listConjuncts } from "@canonical/dataviews-core/bindings";
 import { memo, type ReactElement, useMemo } from "react";
-import { useDataViewsValue } from "../../../../../../hooks/index.js";
+import {
+  useDataViewsValue,
+  useIsHydrated,
+} from "../../../../../../hooks/index.js";
 import { QueryChip } from "../../../../../QueryChip/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import entryFormat from "../../entryFormat.js";
 import readRangeBound from "../../readRangeBound.js";
 import speakRange from "../../speakRange.js";
+import spellCommandHref from "../../spellCommandHref.js";
 import spellOperand from "../../spellOperand.js";
 import spellOperator from "../../spellOperator.js";
 import type { QueryStateStandIn } from "../../types.js";
@@ -59,12 +63,21 @@ const RangeChip = ({
     };
   }, [clause]);
   const bounds = useDataViewsValue(group.state, read, isSameBounds);
+  const hydrated = useIsHydrated();
   const editedOperator = edit?.draft.origin?.ref?.operator;
   if (bounds === null) return null;
   const [lower, upper] = bounds;
   const definition = schema.findField(clause.field);
   const label = labels.readFieldLabel(clause.field);
   const spoken = speakRange(lower, upper, schema, labels, messages);
+  // Before scripts, removal is a link to the query without either bound.
+  const removeHref = hydrated
+    ? null
+    : spellCommandHref(group, {
+        kind: "editPredicates",
+        remove: [...clause.refs],
+        add: [],
+      });
 
   const renderBound = (bound: Bound): ReactElement => {
     const predicate = bound === "lower" ? lower : upper;
@@ -120,6 +133,7 @@ const RangeChip = ({
       id={clause.id}
       label={spoken}
       onRemove={() => onRemove(clause)}
+      {...(removeHref === null ? {} : { removeHref })}
       removeLabel={messages.removeClause(spoken)}
     >
       {/* The field lands the stop, and edits the range from its lower bound. */}

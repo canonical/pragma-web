@@ -68,3 +68,9 @@ export type UseSuggestedFacetsResult = UseFacetsResult;
 export type UseFieldOverflowProps = {
   readonly rootRef: RefObject<HTMLElement | null>;
 };
+
+/** What the focus handoff reads: the bar's root, and whether scripts run. */
+export type UseLinkFocusHandoffProps = {
+  readonly rootRef: RefObject<HTMLElement | null>;
+  readonly hydrated: boolean;
+};

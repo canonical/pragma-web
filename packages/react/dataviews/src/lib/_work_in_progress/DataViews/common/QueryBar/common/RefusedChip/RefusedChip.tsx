@@ -1,7 +1,10 @@
 import type { QueryIssue } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { memo, type ReactElement, useMemo } from "react";
-import { useDataViewsValue } from "../../../../../../hooks/index.js";
+import {
+  useDataViewsValue,
+  useIsHydrated,
+} from "../../../../../../hooks/index.js";
 import { QueryChip } from "../../../../../QueryChip/index.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import listChipClauses from "../../listChipClauses.js";
@@ -39,15 +42,22 @@ const RefusedChip = ({
     [clause.id],
   );
   const issue = useDataViewsValue(group.state, read, isSameIssue);
+  const hydrated = useIsHydrated();
   // A refusal cleared reads nothing until the bar drops its chip.
   if (issue === null) return null;
   const name = nameRefused(issue, readLabelsStandIn(), messages);
+  const { location } = readProviderHost(provider);
+  // Before scripts, clearing is a link to the address less the parameter.
+  const cleared = hydrated || location === null ? null : location.read();
+  const href = cleared === null ? null : new URLSearchParams(cleared);
+  href?.delete(issue.parameter);
   const clearProps =
-    readProviderHost(provider).location === null
+    location === null
       ? {}
       : {
           onRemove: () => onClear(clause),
           removeLabel: messages.clearFilter(name),
+          ...(href === null ? {} : { removeHref: `?${href.toString()}` }),
         };
   return (
     <QueryChip id={clause.id} label={name} criticality="error" {...clearProps}>

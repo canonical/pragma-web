@@ -26,6 +26,7 @@ export default function DraftChip({
   invalid,
   onActivate,
   onRemove,
+  removeHref,
   onTypedChange,
   onEntryKeyDown,
 }: DraftChipProps): ReactElement {
@@ -122,6 +123,7 @@ export default function DraftChip({
       id={id}
       label={spoken}
       onRemove={onRemove}
+      {...(removeHref === undefined ? {} : { removeHref })}
       removeLabel={messages.removeClause(spoken)}
     >
       {listParts(draft).flatMap((at) => {

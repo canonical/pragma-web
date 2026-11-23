@@ -17,6 +17,8 @@ export type DraftChipProps = {
   readonly onActivate: (part: QueryBarPart) => void;
   /** Called by the remove control. */
   readonly onRemove: () => void;
+  /** Before scripts run, where the remove control leads instead. */
+  readonly removeHref?: string;
   /** Called with the Entry's text after each input. */
   readonly onTypedChange: (text: string) => void;
   /** The Entry's keys, which the bar handles. */

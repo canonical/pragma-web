@@ -21,7 +21,17 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+  vi,
+} from "vitest";
 import { installPopoverStandIn } from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import QueryBar from "./QueryBar.js";
@@ -1632,6 +1642,153 @@ describe("QueryBar", () => {
       expect(
         screen.queryByRole("option", { hidden: true, name: "Large" }),
       ).toBeNull();
+    });
+  });
+
+  describe("hydrating the server's markup", () => {
+    /** The bar over a location, drawn by the server, then hydrated. */
+    const hydrate = async (
+      href: string,
+      beforeHydrating: (container: HTMLElement) => void,
+    ) => {
+      const build = () =>
+        createDataViewsProvider({
+          collection,
+          source: createArraySource<Host>({
+            rows: hosts,
+            collection,
+            searchFields: ["name"],
+          }),
+          location: createMemoryLocation({ href }),
+        });
+      const container = document.createElement("div");
+      container.innerHTML = renderToString(
+        <DataViews provider={build()}>
+          <QueryBar />
+        </DataViews>,
+      );
+      document.body.append(container);
+      onTestFinished(() => container.remove());
+      beforeHydrating(container);
+      const error = vi.spyOn(console, "error");
+      const provider = build();
+      const root = await act(async () =>
+        hydrateRoot(
+          container,
+          <DataViews provider={provider}>
+            <QueryBar />
+          </DataViews>,
+        ),
+      );
+      onTestFinished(() => {
+        act(() => root.unmount());
+        error.mockRestore();
+      });
+      return { error, provider };
+    };
+
+    it("hands a removal link's focus to the button that takes its place", async () => {
+      const { error } = await hydrate("/hosts?status=deployed", (container) => {
+        const link = [...container.querySelectorAll("a")].find(
+          (anchor) =>
+            anchor.getAttribute("aria-label") === "Remove status is deployed",
+        );
+        link?.focus();
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "Remove status is deployed" }),
+        ).toHaveFocus(),
+      );
+      expect(error).not.toHaveBeenCalled();
+    });
+
+    it("hands Merge's focus on to its button, by its text", async () => {
+      await hydrate(
+        "/hosts?memory__gte=131072&memory__lte=65536",
+        (container) => {
+          const link = [...container.querySelectorAll("a")].find(
+            (anchor) => anchor.textContent === "Merge the memory filters",
+          );
+          link?.focus();
+        },
+      );
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "Merge the memory filters" }),
+        ).toHaveFocus(),
+      );
+    });
+
+    it("clears a refused filter with the filters, by its link before scripts and its button after", async () => {
+      // A refused sort narrows nothing: no clear is its to drop.
+      const href = "/hosts?status__isNone=melted&pool=gpu&sort=nope";
+      const markup = renderToString(
+        <DataViews
+          provider={createDataViewsProvider({
+            collection,
+            source: createArraySource<Host>({ rows: hosts, collection }),
+            location: createMemoryLocation({ href }),
+          })}
+        >
+          <QueryBar />
+        </DataViews>,
+      );
+      const link = markup
+        .match(/<a [^>]*aria-label="Clear filters and search"[^>]*>/)
+        ?.at(0)
+        ?.match(/href="([^"]*)"/)
+        ?.at(1)
+        ?.replaceAll("&amp;", "&");
+      expect(link).toBeDefined();
+      // Neither the refused filter nor the applied one; the refused sort,
+      // which narrows nothing, falls back and is not spelled.
+      expect([...new URLSearchParams(link).keys()]).toEqual(["page", "size"]);
+      // With scripts, the clear control removes the refusal too.
+      const location = createMemoryLocation({ href });
+      const { provider } = mount({ location });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "Clear filters and search" }),
+      );
+      await waitFor(() => expect(provider.issues.get()).toEqual([]));
+      expect(screen.queryByRole("button", { name: "Clear status" })).toBeNull();
+    });
+
+    it("moves no focus that no link held", async () => {
+      const before = document.activeElement;
+      await hydrate("/hosts?status=deployed", () => {});
+      await screen.findByRole("button", { name: "Remove status is deployed" });
+      expect(document.activeElement).toBe(before);
+    });
+
+    it("keeps what was typed in the plain input before scripts ran", async () => {
+      await hydrate("/hosts?q=web", (container) => {
+        const input = container.querySelector("input[name=q]");
+        if (input instanceof HTMLInputElement) input.value = "web db";
+      });
+      await waitFor(() => expect(findEntry()).toHaveValue("web db"));
+    });
+  });
+
+  describe("with an address", () => {
+    it("keeps the search form once scripts run, its submission held, its links now buttons", async () => {
+      const location = createMemoryLocation({
+        href: "/hosts?status=deployed",
+      });
+      mount({ location });
+      const form = await screen.findByRole("search");
+      expect(form).toHaveAttribute("method", "get");
+      expect(screen.getByTestId("bar")).toHaveAttribute(
+        "data-hydrated",
+        "true",
+      );
+      expect(findEntry()).toHaveAttribute("name", "q");
+      const before = location.read().toString();
+      expect(fireEvent.submit(form)).toBe(false);
+      expect(location.read().toString()).toBe(before);
+      expect(
+        screen.getByRole("button", { name: "Remove status is deployed" }),
+      ).toBeInTheDocument();
     });
   });
 
