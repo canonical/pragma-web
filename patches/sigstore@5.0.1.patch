@@ -1,8 +1,8 @@
 diff --git a/dist/config.js b/dist/config.js
-index e8b2392f97f2362a61ada39405e322f3881ae93d..d65c6adca132fbc5910266dcab0f4517e2b3dd21 100644
+index 373149fe22fb750faeefba5d20a0e432bb91df14..a3f048483f9a3b653405d32484f4197cfa848f75 100644
 --- a/dist/config.js
 +++ b/dist/config.js
-@@ -96,7 +96,16 @@ function initWitnesses(options) {
+@@ -102,7 +102,17 @@ function initWitnesses(options) {
          witnesses.push(new sign_1.RekorWitness({
              rekorBaseURL: options.rekorURL,
              entryType: options.legacyCompatibility ? 'intoto' : 'dsse',
@@ -13,9 +13,10 @@ index e8b2392f97f2362a61ada39405e322f3881ae93d..d65c6adca132fbc5910266dcab0f4517
 +            // response is retried by @sigstore/sign's fetchWithRetry; Rekor
 +            // then answers 409 for the identical resubmission and, with
 +            // fetchOnConflict disabled, the publish dies on its own success
-+            // (v0.36.0: 53/55 packages published). Upstream fix proposed in
-+            // sigstore/sigstore-js#1708 / #1709; drop this patch when a
-+            // release containing it reaches the lockfile.
++            // (v0.36.0: 53/55 packages published). @sigstore/sign 5.1.0 made
++            // fetchOnConflict default to true, but this explicit `false`
++            // still overrides that default. Drop this patch only when a
++            // sigstore release stops passing `false` here.
 +            fetchOnConflict: true,
              retry: options.retry ?? exports.DEFAULT_RETRY,
              timeout: options.timeout ?? exports.DEFAULT_TIMEOUT,
