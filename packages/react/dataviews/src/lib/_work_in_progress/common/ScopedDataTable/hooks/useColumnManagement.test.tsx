@@ -5,7 +5,9 @@
  * through the settings part.
  */
 
+import { createMemoryLocation } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
+import { createStandInViewStore } from "@canonical/dataviews-core/testing";
 import { act, renderHook } from "@testing-library/react";
 import { createRef, type ReactNode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
@@ -69,6 +71,29 @@ const buildHeaderRow = (
 };
 
 describe("useColumnManagement", () => {
+  it.fails("says why no column can change while the view a link opened is listed", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "a")],
+      location: createMemoryLocation({ href: "/machines?view=v1" }),
+      views: createStandInViewStore({ list: () => new Promise(() => {}) }),
+    });
+    onTestFinished(provider.observe());
+    const hook = renderHook(() =>
+      useColumnManagement({
+        provider,
+        columns,
+        headerRow: createRef<HTMLTableRowElement>(),
+        messages: resolveMessages(),
+        announce: vi.fn(),
+      }),
+    );
+    expect(provider.views?.state.get().listing.status).toBe("pending");
+    expect(hook.result.current).toHaveProperty(
+      "reason",
+      "Columns can change once the linked view has loaded.",
+    );
+  });
+
   it("changes nothing and announces nothing for a column it does not declare or a change that does nothing", () => {
     const { provider, hook, announce } = mountHook();
     act(() => {

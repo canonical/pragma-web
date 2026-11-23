@@ -3,13 +3,19 @@
  * given and through the announcer it is given, never resolving its own,
  * and takes its root's native props.
  */
-import { resolveMessages } from "@canonical/dataviews-core/bindings";
+import {
+  assertInvariant,
+  hideColumn,
+  moveColumn,
+  resolveMessages,
+} from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import {
   buildMachine,
   createMachineProvider,
+  silenceRenderErrors,
 } from "../../../../../testing/index.js";
 import type { DataTableColumn } from "./common/index.js";
 import ScopedDataTable from "./ScopedDataTable.js";
@@ -163,6 +169,83 @@ describe("ScopedDataTable", () => {
     expect(
       screen.getByRole("checkbox", { name: "Select machine m-1 (fr)" }),
     ).toBeInTheDocument();
+  });
+
+  it.fails("refuses a settings element other than the settings menu", () => {
+    const { provider } = createMachineProvider({ rows: [] });
+    silenceRenderErrors();
+    expect(() =>
+      render(
+        <ScopedDataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          settings={<span>Settings</span>}
+          messages={resolveMessages()}
+          announce={() => {}}
+        />,
+      ),
+    ).toThrow("DataTable.SettingsMenu");
+  });
+
+  it.fails("draws the declared columns without settings, whatever is shared", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    const { presentation } = provider;
+    presentation.arrange(
+      assertInvariant(
+        moveColumn({
+          columns,
+          presentation: presentation.state.get().presentation,
+          id: "status",
+          offset: -1,
+        }),
+        "Status moves left",
+      ),
+    );
+    presentation.arrange(
+      assertInvariant(
+        hideColumn({
+          columns,
+          presentation: presentation.state.get().presentation,
+          id: "name",
+        }),
+        "Name can be hidden",
+      ),
+    );
+    render(
+      <ScopedDataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    const name = screen.getByRole("columnheader", { name: "Name" });
+    const status = screen.getByRole("columnheader", { name: "Status" });
+    expect(name.compareDocumentPosition(status)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it.fails("offers no column menu for hiding or moving without settings", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    render(
+      <ScopedDataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        messages={resolveMessages()}
+        announce={() => {}}
+      />,
+    );
+    expect(
+      screen.queryByRole("button", { name: "Column options for Name" }),
+    ).toBeNull();
   });
 
   it("takes the native props of its root, merging the class name, style and ref", () => {

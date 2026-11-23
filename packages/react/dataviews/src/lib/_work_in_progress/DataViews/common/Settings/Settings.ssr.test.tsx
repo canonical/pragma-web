@@ -2,7 +2,7 @@
  * On the server the settings are a closed popover of real links, each to the
  * page its change leads to, keeping the rest of the query: the popover opens
  * with no script. A destination draws the arrangement its change names, read by
- * a provider standing on it, and nothing is offered without a location.
+ * a provider standing on it.
  */
 
 import { createMemoryLocation } from "@canonical/dataviews-core";
@@ -115,9 +115,12 @@ describe("DataViews.Settings SSR", () => {
     ).toBe(false);
   });
 
-  it("offers no link without a location to lead to", () => {
+  it.fails("offers no link, and a disabled button, without a location to lead to", () => {
     const markup = renderSettings(null);
     expect(markup).not.toContain("<a ");
-    expect(markup).not.toContain("popover");
+    // The button is drawn, disabled and named, holding the cell's place.
+    expect(markup).toMatch(
+      /<button[^>]* disabled=""[^>]* aria-label="Table settings"/,
+    );
   });
 });
