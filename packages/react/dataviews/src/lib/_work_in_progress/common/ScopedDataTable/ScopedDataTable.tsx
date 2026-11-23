@@ -247,16 +247,14 @@ export default function ScopedDataTable<
   // resize observer and re-measure the container on every frame of a drag.
   const attach = useMergedRef(ref, geometry.attach);
 
-  // Held behind one identity apiece: the README's own examples pass these
-  // as lambdas, and a new function per render would re-render every row
-  // and every cell of the body for nothing.
-  const nameRow = useStableCallback(getRowLabel);
   // The messages' words for a status, unless the caller renders its own.
   const describe = useCallback(
     (shown: DisplayStatus) => describeStatus(shown, messages),
     [messages],
   );
   const statusRenderer = renderStatus ?? describe;
+  // Held behind one identity: a status renderer written inline must not
+  // re-render every row.
   const showStatus = useStableCallback(statusRenderer);
   // While a status shows, the latest renderer, so a new one is shown at
   // once; otherwise the held one, which re-renders nothing.
@@ -287,10 +285,10 @@ export default function ScopedDataTable<
           channels={scopes.readRow(entry.rowId)}
           columns={rendered}
           selectable={selectable}
-          getRowLabel={nameRow}
+          getRowLabel={getRowLabel}
         />
       ),
-    [renderer, provider, scopes, rendered, selectable, nameRow, tracks],
+    [renderer, provider, scopes, rendered, selectable, getRowLabel, tracks],
   );
 
   // A custom property, which `CSSProperties` does not spell.

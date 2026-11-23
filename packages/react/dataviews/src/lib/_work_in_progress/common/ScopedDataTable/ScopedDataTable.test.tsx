@@ -133,7 +133,7 @@ describe("ScopedDataTable", () => {
     );
   });
 
-  it.fails("names rows anew once handed a new getRowLabel", () => {
+  it("names rows anew once handed a new getRowLabel", () => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
     });

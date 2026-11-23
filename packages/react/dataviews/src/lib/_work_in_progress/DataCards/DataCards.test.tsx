@@ -190,7 +190,7 @@ describe("DataCards", () => {
     ).toBeInTheDocument();
   });
 
-  it.fails("names a card anew once handed a new getRowLabel", () => {
+  it("names a card anew once handed a new getRowLabel", () => {
     const { provider, view } = renderLoadedCards(rows, {
       getRowLabel: (row) => `machine ${row.name}`,
     });

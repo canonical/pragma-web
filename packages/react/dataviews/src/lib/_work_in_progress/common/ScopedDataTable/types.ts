@@ -27,7 +27,7 @@ type OwnProps<
   readonly label: string;
   /** Render a leading selection column backed by the provider's selection. */
   readonly selectable?: boolean;
-  /** Names a record for its selection checkbox; defaults to its id. */
+  /** Names a record for its selection checkbox; defaults to its id. Read by identity. */
   readonly getRowLabel?: (row: TRow, rowId: string) => string;
   /** Replaces a status's message text. */
   readonly renderStatus?: (status: DisplayStatus) => ReactNode;

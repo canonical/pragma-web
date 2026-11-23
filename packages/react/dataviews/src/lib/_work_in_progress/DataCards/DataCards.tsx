@@ -16,7 +16,6 @@ import {
   useDataViewsValue,
   useMessages,
   useRowScopes,
-  useStableCallback,
   useStableValue,
 } from "../../hooks/index.js";
 import {
@@ -124,11 +123,12 @@ export default function DataCards<
     () => entries.flatMap((entry) => (entry.kind === "record" ? [entry] : [])),
     [entries],
   );
-  // Held behind one identity: a lambda must not re-render every card. Null
-  // until the caller names records, so a card names itself by its title.
-  const nameRecord = useStableCallback(
+  // Null until the caller names records, so a card names itself by its
+  // title. A new getRowLabel names every card anew.
+  const nameRecord = useCallback(
     (row: TRow, rowId: string): string | null =>
       getRowLabel === undefined ? null : getRowLabel(row, rowId),
+    [getRowLabel],
   );
   // The words' own text for a status, unless the caller renders its own.
   const describe = useCallback(
