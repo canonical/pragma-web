@@ -29,7 +29,7 @@ import {
   useStandingOperators,
 } from "../../../hooks/index.js";
 import { NO_RECORDS } from "../../constants.js";
-import { findFilterHandle, listFacetOptions } from "../../utils/index.js";
+import { findFilterHandle } from "../../utils/index.js";
 import { HiddenQueryFields } from "../HiddenQueryFields/index.js";
 import {
   BoundFilter,
@@ -40,6 +40,7 @@ import {
   TextFilter,
   type TextFilterOperator,
 } from "./common/index.js";
+import { useSeenServerOptions } from "./hooks/index.js";
 import type { DataViewsFiltersProps } from "./types.js";
 import "./styles.css";
 
@@ -68,7 +69,7 @@ type FilterContext = {
   readonly host: ProviderHost;
   /** The facets answering the applied filter and search, or null while none does. */
   readonly answered: UseFacetsResult["answered"];
-  /** The server's options for a field, as the latest facet lists them. */
+  /** The server's options for a field, as every facet seen lists them. */
   readonly listServerOptions: (field: string) => readonly string[];
   /** The operators the applied query holds a conjunct under, by field. */
   readonly standing: UseStandingOperatorsResult;
@@ -343,55 +344,8 @@ const renderControl = (
 };
 
 /**
- * The collection's query-editing controls.
- *
- * Which fields are on offer and which operators each accepts come from the
- * provider — its collection's schema, and what its source declares it can
- * execute — not from props: a restriction the source would refuse is never
- * offered, and there is no second query to keep in step with the applied
- * one. Edits go straight to the applied query through the root's own
- * filter records — an invalid, incomplete or refused edit keeps the
- * restriction that is already in force and says so beside the control, and
- * two roots over one provider never share a half-typed input.
- *
- * A followed link's refused clauses are listed after the controls, each with
- * its reason, under "Not applied from the link". A refused filter or search
- * withheld the query, so it has a Clear control that removes it: a link to
- * the URL without it before scripts run, a button after. The GET form
- * leaves refused parameters out, so submitting it removes them too.
- *
- * Where the provider asks its source for facets, the controls read them:
- * counts beside a choice's options and beside a presence field, the least
- * and greatest value beside a number or date bound, and the server's
- * options where the schema lists none — each computed by the source over
- * the whole matching set. Counts and ranges are shown only while the result answers the applied
- * query; the server's options stay from the latest result until a newer one
- * lists others.
- *
- * At baseline the controls are a GET form: each is named as the wire
- * grammar spells its clause, a number bound is a native number input with
- * the schema's bounds, or, where the field declares units, a text input
- * named with its base unit that reads a value typed in any display unit,
- * the text a field must match is a native text input
- * for each operator text stands under, or one while none does, a set
- * standing any-of or none-of moves to the other by a real link, hidden
- * controls carry the rest of the query, and the submit control leads to the
- * destination the provider would have written. Once scripting is enabled
- * every edit applies as it is made, the clear controls appear, a select
- * beside a text input chooses how it matches among the operators the source
- * declares, and a submission is intercepted. A typed value — text, a number
- * or a date — edits in one input session: its first change enters history
- * and the rest replace it, until the reader leaves the input or submits the
- * form.
- *
- * With `primary` fields marked, the controls shown by default are theirs, in
- * the order marked, then any other field's that carries a restriction; the
- * rest are a native disclosure, named by the messages' `moreFilters`, which
- * needs no script and
- * whose controls submit with the form. While the disclosure is open no
- * control moves in or out of it, so a control keeps focus while its field
- * gains or loses a restriction; closing it brings out what was restricted
- * inside.
+ * The collection's query-editing controls, offered as the provider's schema
+ * and source allow: a GET form before scripts, each edit applied after.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
@@ -410,6 +364,7 @@ export default function Filters({
   const { provider, filters, messages, endSessions } =
     useDataViewsRoot("Filters");
   const facets = useFacets({ provider });
+  const listSeenOptions = useSeenServerOptions(facets.latest);
   const restricted = useRestrictedFields({ provider });
   const standing = useStandingOperators({ provider });
   const issues = useDataViewsValue(provider.issues);
@@ -464,7 +419,7 @@ export default function Filters({
     if (listed !== undefined) {
       return listed;
     }
-    const read = listFacetOptions(facets.latest?.[field]);
+    const read = listSeenOptions(field);
     listedServerOptions.set(field, read);
     return read;
   };
@@ -522,7 +477,7 @@ export default function Filters({
     if (!Object.hasOwn(context.host.capabilities.filter, definition.field)) {
       return false;
     }
-    // Listed from the latest facet, as the control lists them.
+    // Listed as seen, as the control lists them.
     return !(
       definition.kind === "choices" &&
       definition.options === undefined &&
