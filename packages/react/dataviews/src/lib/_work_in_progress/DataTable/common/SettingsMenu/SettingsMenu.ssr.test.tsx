@@ -115,7 +115,7 @@ describe("DataTable.SettingsMenu SSR", () => {
     ).toBe(false);
   });
 
-  it.fails("offers no link, and a disabled button, without a location to lead to", () => {
+  it("offers no link, and a disabled button, without a location to lead to", () => {
     const markup = renderSettings(null);
     expect(markup).not.toContain("<a ");
     // The button is drawn, disabled and named, holding the cell's place.

@@ -30,8 +30,8 @@
 #
 # States:
 #   - before scripts run: the popover opens with no script, and each item a
-#     change can reach is a real link; nothing at all where the provider has
-#     no location to lead to.
+#     change can reach is a real link; a disabled Table settings button
+#     where the provider has no location.
 #   - once scripts run: closed (the button alone) or open (the menu).
 #
 # Accessibility (DataViews component coverage, "DataTable.SettingsMenu": 1.3.1,

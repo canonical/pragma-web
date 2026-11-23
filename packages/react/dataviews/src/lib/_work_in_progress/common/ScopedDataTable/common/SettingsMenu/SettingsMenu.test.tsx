@@ -234,7 +234,7 @@ describe("SettingsMenu", () => {
       ).not.toBeNull();
     });
 
-    it.fails("offers no link where no link leads anywhere", () => {
+    it("offers no link where no link leads anywhere", () => {
       const { view } = mount({
         hydrated: false,
         listDestinations: () => null,
