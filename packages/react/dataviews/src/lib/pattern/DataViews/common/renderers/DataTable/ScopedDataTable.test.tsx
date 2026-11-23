@@ -133,6 +133,38 @@ describe("ScopedDataTable", () => {
     );
   });
 
+  it.fails("names rows anew once handed a new getRowLabel", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    const messages = resolveMessages();
+    const { rerender } = render(
+      <ScopedDataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        selectable
+        getRowLabel={(_row, rowId) => `machine ${rowId}`}
+        messages={messages}
+        announce={() => {}}
+      />,
+    );
+    rerender(
+      <ScopedDataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        selectable
+        getRowLabel={(_row, rowId) => `machine ${rowId} (fr)`}
+        messages={messages}
+        announce={() => {}}
+      />,
+    );
+    expect(
+      screen.getByRole("checkbox", { name: "Select machine m-1 (fr)" }),
+    ).toBeInTheDocument();
+  });
+
   it("takes the native props of its root, merging the class name, style and ref", () => {
     const { provider } = createMachineProvider({ rows: [] });
     const ref = createRef<HTMLTableElement>();
