@@ -72,12 +72,8 @@
 # lead to, and the page controls are buttons only the enhancement drives,
 # marked `.scripted` and hidden until it runs.
 #
-# Icons: `chevron-left` and `chevron-right` as drawn. The design's
-# `skip-to-start` and `skip-to-end` are not in `@canonical/ds-assets`; until
-# they land, first and last show `back-to-top` turned a quarter-turn towards
-# their edge — a bar with an arrow meeting it. The DSL cannot express the
-# turn; the stylesheet does, on the control's own icon slot, and this note
-# records it. Icons take `1em` from the Icon component; the design draws
+# Icons: `skip-to-start`, `chevron-left`, `chevron-right` and `skip-to-end`
+# as drawn. Icons take `1em` from the Icon component; the design draws
 # 16px, and the package has no icon-size token.
 #
 # Deviations the DSL cannot express, recorded here:
@@ -250,7 +246,7 @@ node:
                     uri: global.component.icon_button
                     props:
                       importance: tertiary
-                      icon: back-to-top
+                      icon: skip-to-start
                   relation:
                     cardinality: "1"
                     slotName: first
@@ -274,7 +270,7 @@ node:
                     uri: global.component.icon_button
                     props:
                       importance: tertiary
-                      icon: back-to-top
+                      icon: skip-to-end
                   relation:
                     cardinality: "1"
                     slotName: last

@@ -125,18 +125,6 @@
       align-items: center;
     }
 
-    /* Until the design's skip icons ship: a bar with an arrow meeting it,
-       turned towards the edge the control goes to. The icon slot is the
-       control's own child, so the turn reaches it without descending into
-       the Icon. */
-    & > .paging > .navigation > .first > .icon {
-      rotate: -90deg;
-    }
-
-    & > .paging > .navigation > .last > .icon {
-      rotate: 90deg;
-    }
-
     /* A control only the enhancement can drive waits for scripting; the
        baseline's submit controls leave only once the page has hydrated, so
        a page whose script never runs keeps a way to page. */

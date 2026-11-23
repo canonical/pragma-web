@@ -257,6 +257,16 @@ describe("PaginationBar", () => {
     expect(readWindow(provider)).toEqual(buildWindow(1, 2));
   });
 
+  it("draws the page ends with the skip icons", () => {
+    const { provider, source } = makeProvider();
+    mount(provider);
+    load(source, buildMachines(2), 6);
+    const readIcon = (control: HTMLElement) =>
+      control.querySelector("use")?.getAttribute("href");
+    expect(readIcon(getFirst())).toMatch(/skip-to-start\.svg#skip-to-start$/);
+    expect(readIcon(getLast())).toMatch(/skip-to-end\.svg#skip-to-end$/);
+  });
+
   it("steps one page from wherever it is", () => {
     const { provider, source } = makeProvider();
     mount(provider);
