@@ -121,6 +121,7 @@ const getSelect = () =>
 const getButton = (name: string) => screen.getByRole("button", { name });
 const queryStatus = () => getGroup().querySelector('.status[role="status"]');
 const queryNotices = () => getGroup().querySelector('.notices[role="status"]');
+const queryControls = () => getGroup().querySelector(".controls");
 
 const choose = async (view: SavedView): Promise<void> => {
   // A view is offered once the store has listed it.
@@ -128,6 +129,22 @@ const choose = async (view: SavedView): Promise<void> => {
   fireEvent.change(getSelect(), { target: { value: view.id } });
   await waitFor(() => {
     expect(getSelect()).toHaveValue(view.id);
+  });
+};
+
+/** The control with a save waiting on the store, said as pending. */
+const mountSaving = async (): Promise<void> => {
+  const { store } = createMemoryViewStore([failed]);
+  const gated: ViewStore = {
+    ...store,
+    update: () => new Promise(() => {}),
+  };
+  const { provider } = await mountListed(gated);
+  await choose(failed);
+  setStatus(provider, ["running"]);
+  fireEvent.click(getButton("Save"));
+  await waitFor(() => {
+    expect(queryStatus()).toHaveTextContent("Saving…");
   });
 };
 
@@ -197,6 +214,28 @@ describe("DataViews.SavedViews", () => {
       expect(getSelect()).toBeEnabled();
     });
     expect(queryNotices()).toHaveTextContent("");
+  });
+
+  it.fails("is busy while it lists the views", () => {
+    mount(createMemoryViewStore([failed]).store);
+    expect(queryControls()).toHaveAttribute("aria-busy", "true");
+  });
+
+  it.fails("is not busy once the views are listed", async () => {
+    await mountListed(createMemoryViewStore([failed]).store);
+    expect(queryControls()).toHaveAttribute("aria-busy", "false");
+  });
+
+  it.fails("is busy while a command waits on the store", async () => {
+    await mountSaving();
+    expect(queryControls()).toHaveAttribute("aria-busy", "true");
+  });
+
+  it.fails("keeps its statuses outside what is busy", async () => {
+    await mountSaving();
+    expect(getSelect().closest('[aria-busy="true"]')).not.toBeNull();
+    expect(queryStatus()?.closest('[aria-busy="true"]')).toBeNull();
+    expect(queryNotices()?.closest('[aria-busy="true"]')).toBeNull();
   });
 
   it("offers every view, and shows none open until one is chosen", async () => {
