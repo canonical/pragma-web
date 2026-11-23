@@ -17,7 +17,6 @@ import {
   openMenuFrom,
 } from "../../../testing/index.js";
 import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
-import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 describe("regression 0055 — an open settings menu remounted its labels", () => {
   let uninstallPopovers: () => void;
@@ -41,7 +40,7 @@ describe("regression 0055 — an open settings menu remounted its labels", () =>
           { id: "cores", header: "Cores" },
         ]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     await openMenuFrom(screen.getByRole("button", { name: "Table settings" }));

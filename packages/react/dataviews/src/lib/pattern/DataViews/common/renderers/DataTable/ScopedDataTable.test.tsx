@@ -14,6 +14,9 @@ import {
 import type { DataTableColumn } from "./common/index.js";
 import ScopedDataTable from "./ScopedDataTable.js";
 
+/** Stands in for `DataTable.SettingsMenu`. */
+const Menu = (): null => null;
+
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", resizable: true },
   { id: "status", header: "Status" },
@@ -25,6 +28,7 @@ describe("ScopedDataTable", () => {
     expect(() =>
       render(
         <ScopedDataTable
+          settingsMenu={Menu}
           provider={{} as never}
           columns={columns}
           label="Machines"
@@ -44,6 +48,7 @@ describe("ScopedDataTable", () => {
     });
     render(
       <ScopedDataTable
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -75,11 +80,12 @@ describe("ScopedDataTable", () => {
     const { provider } = createMachineProvider({ rows: [] });
     render(
       <ScopedDataTable
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
         selectable
-        settings={<span>Settings</span>}
+        settings={<Menu />}
         messages={resolveMessages()}
         announce={() => {}}
       />,
@@ -97,6 +103,7 @@ describe("ScopedDataTable", () => {
     const { provider } = createMachineProvider({ rows: [] });
     render(
       <ScopedDataTable
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -116,6 +123,7 @@ describe("ScopedDataTable", () => {
     const announce = vi.fn();
     render(
       <ScopedDataTable
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -140,6 +148,7 @@ describe("ScopedDataTable", () => {
     const messages = resolveMessages();
     const { rerender } = render(
       <ScopedDataTable
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -151,6 +160,7 @@ describe("ScopedDataTable", () => {
     );
     rerender(
       <ScopedDataTable
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"
@@ -170,6 +180,7 @@ describe("ScopedDataTable", () => {
     const ref = createRef<HTMLTableElement>();
     render(
       <ScopedDataTable
+        settingsMenu={Menu}
         provider={provider}
         columns={columns}
         label="Machines"

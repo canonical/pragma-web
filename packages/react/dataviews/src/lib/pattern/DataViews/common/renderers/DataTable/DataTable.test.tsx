@@ -1248,7 +1248,7 @@ describe("DataTable", () => {
     ["a sortable column", { columns: [{ ...plainName, sortable: true }] }],
     ["a resizable column", { columns: [{ ...plainName, resizable: true }] }],
     ["selection", { selectable: true }],
-    ["settings and header menus", { settings: <DataViews.Settings /> }],
+    ["settings and header menus", { settings: <DataTable.SettingsMenu /> }],
   ])("is no tab stop with %s", (_, props) => {
     const { provider } = createMachineProvider({
       rows: [buildMachine("m-1", "alpha")],
@@ -1478,7 +1478,7 @@ describe("DataTable", () => {
         provider={provider}
         columns={[]}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />,
     );
     expect(screen.getAllByRole("columnheader")).toHaveLength(1);

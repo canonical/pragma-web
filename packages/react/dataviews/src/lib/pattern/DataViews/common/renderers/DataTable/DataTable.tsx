@@ -5,6 +5,7 @@ import type {
 import type { ReactElement } from "react";
 import { Announcer } from "../../../../../common/index.js";
 import { useAnnouncer, useMessages } from "../../../../../hooks/index.js";
+import { DataTableSettingsMenu } from "../../../../../subcomponent/DataTableSettingsMenu/index.js";
 import ScopedDataTable from "./ScopedDataTable.js";
 import type { DataTableProps } from "./types.js";
 
@@ -35,10 +36,17 @@ export default function DataTable<
   const { ref, announce } = useAnnouncer();
   return (
     <>
-      <ScopedDataTable {...props} messages={words} announce={announce} />
+      <ScopedDataTable
+        {...props}
+        messages={words}
+        announce={announce}
+        settingsMenu={DataTableSettingsMenu}
+      />
       {/* Beside the table rather than in it: a table's children are its row
           groups. */}
       <Announcer ref={ref} />
     </>
   );
 }
+
+DataTable.SettingsMenu = DataTableSettingsMenu;

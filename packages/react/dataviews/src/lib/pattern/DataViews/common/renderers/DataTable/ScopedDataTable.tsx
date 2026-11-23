@@ -107,6 +107,7 @@ export default function ScopedDataTable<
   settings,
   messages,
   announce,
+  settingsMenu,
   className,
   style,
   ref,
@@ -117,6 +118,7 @@ export default function ScopedDataTable<
       "DataTable requires a provider created by createDataViewsProvider",
     );
   }
+  const hasSettings = isValidElement(settings);
   // Observed for as long as the table is mounted: a standalone table is a
   // mount that reads the provider, and the ref-count makes a table inside
   // a root that already observes cost nothing.
@@ -271,12 +273,11 @@ export default function ScopedDataTable<
     headerRow,
     rendered,
     isSortable,
-    isValidElement(settings),
+    hasSettings,
   );
 
   // The tracks a row renders: selection, the columns, the settings cell.
-  const tracks =
-    Number(selectable) + rendered.length + Number(isValidElement(settings));
+  const tracks = Number(selectable) + rendered.length + Number(hasSettings);
 
   // One renderer for either body, held while what it closes over holds:
   // the bodies key, place and measure rows without knowing them.
@@ -388,13 +389,14 @@ export default function ScopedDataTable<
                 />
               );
             })}
-            {!isValidElement(settings) ? null : (
+            {hasSettings ? (
               <SettingsCell
                 settings={settings}
+                settingsMenu={settingsMenu}
                 menu={menu}
                 reserve={geometry.reserve}
               />
-            )}
+            ) : null}
           </tr>
         </thead>
         {virtualization === undefined ? (

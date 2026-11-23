@@ -14,7 +14,6 @@ import type {
   Pagination,
   SavedViews,
   Search,
-  Settings,
   SortPanel,
 } from "./common/index.js";
 
@@ -143,13 +142,6 @@ export type DataViewsComponent = (<
    * name may change or move before the first release.
    */
   readonly Search: typeof Search;
-  /**
-   * The table's column settings, given to a table as its `settings`.
-   *
-   * @experimental Pre-release: the whole surface is still settling, and this
-   * name may change or move before the first release.
-   */
-  readonly Settings: typeof Settings;
   /**
    * The connected sort panel, over the applied ordering.
    *

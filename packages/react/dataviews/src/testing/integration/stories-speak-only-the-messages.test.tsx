@@ -29,13 +29,13 @@ import * as queryBarQuickStories from "../../lib/pattern/DataViews/common/contro
 import * as queryBarStories from "../../lib/pattern/DataViews/common/controls/QueryBar/QueryBar.stories.js";
 import * as savedViewsStories from "../../lib/pattern/DataViews/common/controls/SavedViews/SavedViews.stories.js";
 import * as searchStories from "../../lib/pattern/DataViews/common/controls/Search/Search.stories.js";
-import * as settingsStories from "../../lib/pattern/DataViews/common/controls/Settings/Settings.stories.js";
 import * as sortPanelStories from "../../lib/pattern/DataViews/common/controls/SortPanel/SortPanel.stories.js";
 import * as dataCardsStories from "../../lib/pattern/DataViews/common/renderers/DataCards/DataCards.stories.js";
 import * as dataChartStories from "../../lib/pattern/DataViews/common/renderers/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/pattern/DataViews/common/renderers/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/pattern/DataViews/common/renderers/DataTable/DataTable.stories.js";
 import * as rootStories from "../../lib/pattern/DataViews/DataViews.stories.js";
+import * as settingsStories from "../../lib/subcomponent/DataTableSettingsMenu/DataTableSettingsMenu.stories.js";
 import * as barStories from "../../lib/subcomponent/PaginationBar/PaginationBar.stories.js";
 import {
   createGraphQLHandlers,

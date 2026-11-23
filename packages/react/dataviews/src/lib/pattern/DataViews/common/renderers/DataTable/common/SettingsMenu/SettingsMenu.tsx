@@ -133,18 +133,7 @@ const listItems = (
   return { items, actions, labels };
 };
 
-/**
- * Almost all configurable aspects of the table are available through the
- * table settings menu. This menu provides a centralized interface accessed
- * through a settings wheel (gear) icon button in the table header for
- * column reordering, column pinning, column visibility, and resetting user
- * customizations.
- *
- * This implementation covers each column's visibility and place and the
- * reset, as links before scripts run where the provider has a location.
- *
- * @implements ds:apps.subcomponent.data_table-settings_menu
- */
+/** What draws `DataTable.SettingsMenu` in the table's settings cell. */
 const SettingsMenu = ({
   settings,
   resettable,

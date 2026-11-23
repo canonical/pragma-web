@@ -23,7 +23,6 @@ import {
   machines,
 } from "../../../../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
-import { DataViews } from "../../../index.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./index.js";
 
@@ -137,7 +136,7 @@ describe("DataTable SSR", () => {
       "a sortable column",
       { columns: [{ id: "name", header: "Name", sortable: true }] },
     ],
-    ["settings", { settings: <DataViews.Settings /> }],
+    ["settings", { settings: <DataTable.SettingsMenu /> }],
   ])("is no tab stop before scripts run with a location and %s", (_, props) => {
     expect(renderLocated(props)).toMatch(/<table[^>]* tabindex="-1"/);
   });

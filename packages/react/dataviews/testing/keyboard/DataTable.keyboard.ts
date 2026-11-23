@@ -36,7 +36,7 @@ const SORT_PANEL = "patterns/DataViews/Controls/SortPanel";
 const FILTERS = "patterns/DataViews/Controls/Filters";
 
 /** The table settings' stories, the path to every arrangement without a drag. */
-const SETTINGS = "patterns/DataViews/Controls/Settings";
+const SETTINGS = "subcomponents/DataTableSettingsMenu";
 
 /** The cards' stories, a collection's records as the design system's cards. */
 const DATA_CARDS = "patterns/DataViews/Renderers/DataCards";

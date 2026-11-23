@@ -1,26 +1,29 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps, ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { withAppScope } from "../../../../../../storybook/decorators/index.js";
-import type { MachineProvider } from "../../../../../../storybook/machines/index.js";
+import { withAppScope } from "../../../storybook/decorators/index.js";
 import {
+  type MachineProvider,
   showConsumerCode,
   useMachineProvider,
-} from "../../../../../../storybook/machines/index.js";
-import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
-import type { StoryWords } from "../../../../../../storybook/types.js";
-import DataViews from "../../../Provider.js";
-import type { DataTableColumn } from "../../renderers/DataTable/index.js";
-import Component from "./Settings.js";
+} from "../../../storybook/machines/index.js";
+import pickStoryWords from "../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../storybook/types.js";
+import type { DataTableColumn } from "../../pattern/DataViews/common/renderers/DataTable/index.js";
+import { DataViews } from "../../pattern/DataViews/index.js";
+import Component from "./DataTableSettingsMenu.js";
 
 /** The part's props, and the words the story's root speaks. */
 type StoryArgs = ComponentProps<typeof Component> & StoryWords;
 
 const meta = {
-  title: "patterns/DataViews/Controls/Settings",
-  tags: ["experimental"],
+  title: "subcomponents/DataTableSettingsMenu",
   component: Component,
+  tags: ["experimental"],
   decorators: [withAppScope],
+  // The menu is a top-layer popover, so docs preview each story in its own
+  // frame, tall enough for the open menu.
+  parameters: { docs: { story: { inline: false, iframeHeight: "440px" } } },
 } satisfies Meta<StoryArgs>;
 
 export default meta;
@@ -41,7 +44,7 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
 ];`;
 
 const renderCode = `<DataViews provider={provider}>
-  <DataViews.DataTable columns={columns} label="Machines" settings={<DataViews.Settings />} />
+  <DataViews.DataTable columns={columns} label="Machines" settings={<DataTable.SettingsMenu />} />
 </DataViews>`;
 
 /** Close the open settings menu from its button, leaving the story at rest. */
@@ -92,7 +95,7 @@ function Collection({
  */
 export const Default: Story = {
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -118,7 +121,7 @@ export const Default: Story = {
 export const HideAColumn: Story = {
   name: "Hide a column",
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -150,7 +153,7 @@ export const HideAColumn: Story = {
 export const ArrangedByTheViewer: Story = {
   name: "Arranged by the viewer",
   parameters: showConsumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({
   "table.order": ["status", "name", "cores", "owner"],

@@ -37,7 +37,10 @@ import {
   type MachineProvider,
   openMenuFrom,
 } from "../../../testing/index.js";
-import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const english = resolveMessages();
@@ -83,7 +86,7 @@ const Composition = ({
       columns={columns}
       label="Machines"
       selectable
-      settings={<DataViews.Settings />}
+      settings={<DataTable.SettingsMenu />}
     />
     <DataViews.Pagination />
   </DataViews>

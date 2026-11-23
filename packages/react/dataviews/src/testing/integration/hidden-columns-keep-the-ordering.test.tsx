@@ -17,7 +17,10 @@ import {
   installPopoverStandIn,
   openMenuFrom,
 } from "../../../testing/index.js";
-import type { DataTableColumn } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 const columns: readonly DataTableColumn[] = [
@@ -75,7 +78,7 @@ const renderOrdered = (arrangement?: ViewPresentation) => {
       <DataViews.DataTable
         columns={columns}
         label="Machines"
-        settings={<DataViews.Settings />}
+        settings={<DataTable.SettingsMenu />}
       />
     </DataViews>,
   );

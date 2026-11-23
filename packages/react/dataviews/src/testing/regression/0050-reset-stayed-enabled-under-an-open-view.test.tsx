@@ -22,6 +22,7 @@ import {
   openMenuFrom,
   readAnnouncements,
 } from "../../../testing/index.js";
+import { DataTable } from "../../lib/pattern/DataViews/common/renderers/DataTable/index.js";
 import { DataViews } from "../../lib/pattern/DataViews/index.js";
 
 beforeEach(() => {
@@ -55,7 +56,7 @@ describe("regression 0050 — reset stayed enabled under an open view", () => {
             { id: "status", header: "Status" },
           ]}
           label="Machines"
-          settings={<DataViews.Settings />}
+          settings={<DataTable.SettingsMenu />}
         />
       </DataViews>,
     );
