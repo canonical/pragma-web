@@ -252,7 +252,8 @@ test.describe("QueryBar without scripts", () => {
     page,
     browser,
   }, info) => {
-    await page.setViewportSize({ width: 360, height: 720 });
+    // Wide enough to show the chips, which narrower gives way to the sheet.
+    await page.setViewportSize({ width: 640, height: 720 });
     await openWithoutScripts(
       page,
       browser,

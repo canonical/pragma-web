@@ -42,6 +42,7 @@ import {
   useClauseIds,
   useFieldOverflow,
   useLinkFocusHandoff,
+  useNarrowMode,
   useQueryBarSession,
   useQueryGroup,
   useSuggestedFacets,
@@ -89,6 +90,9 @@ const componentCssClassName = "ds data-views-query-bar";
 
 /** A field with no presets. */
 const NO_PRESETS: readonly DataViewsQueryBarPreset[] = Object.freeze([]);
+
+/** No suggestions: what the narrow, search-only entry offers. */
+const NO_OPTIONS: readonly QueryBarOption[] = Object.freeze([]);
 
 /** What a conjunct asks, its operator perhaps not yet chosen. */
 type AskedConjunct = Pick<PredicateDraft, "field" | "operator" | "operands">;
@@ -145,6 +149,10 @@ const findNextPartOf = (
   backward: boolean,
 ): QueryBarPart | null =>
   isRangeBound(draft) ? null : findNextPart(draft, part, backward);
+
+/** The search that applies, empty for none. */
+const readAppliedSearch = (state: QueryStateStandIn): string =>
+  state.slice.search ?? "";
 
 /** Each refused filter or search, by its chip's id. */
 const readRefusedIssues = (
@@ -275,6 +283,42 @@ export default function QueryBar({
   const announceOutcome = useAnnounceOutcome({ provider, announce });
   useFieldOverflow({ rootRef });
   useLinkFocusHandoff({ rootRef, hydrated });
+  // Narrow, the chips are hidden: the stop leaves them for the entry.
+  const isNarrow = useNarrowMode({
+    rootRef,
+    entryRef,
+    onNarrow: () => {
+      if (sessionRef.current.activeItem !== ENTRY) moveStop(ENTRY);
+      // The search chip is hidden too: an empty entry shows the search.
+      const applied = readAppliedSearch(group.state.get());
+      if (sessionRef.current.text === "" && applied !== "") {
+        dispatch({ type: "typeText", text: applied });
+      }
+    },
+    onWide: () => {
+      // The search chip shows the search again, so the entry gives it up.
+      const applied = readAppliedSearch(group.state.get());
+      if (applied !== "" && sessionRef.current.text === applied) {
+        dispatch({ type: "typeText", text: "" });
+      }
+    },
+  });
+  // Narrow, the entry holding the applied search follows it as it moves
+  // elsewhere, as the sheet's removal or Back does.
+  const appliedSearch = useDataViewsValue(group.state, readAppliedSearch);
+  const appliedSearchRef = useRef(appliedSearch);
+  // @note Impure: moves the entry's text with the applied search.
+  useEffect(() => {
+    const before = appliedSearchRef.current;
+    appliedSearchRef.current = appliedSearch;
+    if (
+      isNarrow &&
+      before !== appliedSearch &&
+      sessionRef.current.text === before
+    ) {
+      dispatch({ type: "typeText", text: appliedSearch });
+    }
+  }, [appliedSearch, isNarrow, dispatch]);
   // What was typed in the plain input before scripts ran is kept.
   // @note Impure: reads the entry as the server drew it.
   useLayoutEffect(() => {
@@ -361,23 +405,26 @@ export default function QueryBar({
     heldOperand === undefined || editedDefinition?.kind === "choices"
       ? ""
       : spellOperand(editedDefinition, heldOperand, messages.decimalSeparator);
-  const options = suggestOptions({
-    part: isEditing ? part : "field",
-    draft: isEditing ? draft : null,
-    typed: isEditing ? typed : text,
-    schema,
-    capabilities,
-    messages,
-    labels,
-    facets,
-    // A range's bound keeps its operator: it takes no preset.
-    presets:
-      isEditing && draft?.kind === "predicate" && !isRangeBound(draft)
-        ? (presets?.[draft.field] ?? NO_PRESETS)
-        : NO_PRESETS,
-    // The value an edit opens with narrows no preset; what is typed does.
-    presetFilter: typed === openingValue ? "" : typed,
-  });
+  // Narrow, the entry is search-only: clauses are added in the sheet.
+  const options = isNarrow
+    ? NO_OPTIONS
+    : suggestOptions({
+        part: isEditing ? part : "field",
+        draft: isEditing ? draft : null,
+        typed: isEditing ? typed : text,
+        schema,
+        capabilities,
+        messages,
+        labels,
+        facets,
+        // A range's bound keeps its operator: it takes no preset.
+        presets:
+          isEditing && draft?.kind === "predicate" && !isRangeBound(draft)
+            ? (presets?.[draft.field] ?? NO_PRESETS)
+            : NO_PRESETS,
+        // The value an edit opens with narrows no preset; what is typed does.
+        presetFilter: typed === openingValue ? "" : typed,
+      });
   // Only a chip's listed part says it has nothing to offer: a search typed
   // in the entry, or a typed value, says nothing of none. The server's
   // options load with the first result.
@@ -1004,6 +1051,21 @@ export default function QueryBar({
       return;
     }
     const typedText = text.trim();
+    const applied = readAppliedSearch(group.state.get());
+    // Narrow, the entry holds the search: emptied, Enter clears it.
+    if (typedText === "" && isNarrow && applied !== "") {
+      event.preventDefault();
+      const refusals = group.setSearch("");
+      if (refusals.length > 0) {
+        announceRefusals(refusals);
+        return;
+      }
+      const spoken = messages.searchClause(applied);
+      announceOutcome((count) =>
+        messages.clauseRemoved(spoken, count, labels.recordNoun),
+      );
+      return;
+    }
     if (typedText === "") return;
     event.preventDefault();
     const field = options.find(
@@ -1015,10 +1077,11 @@ export default function QueryBar({
       choose(field.choice);
       return;
     }
-    const applied = group.state.get().slice.search ?? "";
+    // Narrow, the chips are hidden: the entry keeps the search it applies.
+    const kept = isNarrow ? typedText : "";
     if (typedText === applied) {
       // The search already applies: nothing to write or say.
-      dispatch({ type: "typeText", text: "" });
+      dispatch({ type: "typeText", text: kept });
       return;
     }
     const isAdded = applied === "";
@@ -1033,7 +1096,7 @@ export default function QueryBar({
         ? messages.clauseAdded(spoken, count, labels.recordNoun)
         : messages.clauseChanged(spoken, count, labels.recordNoun),
     );
-    dispatch({ type: "typeText", text: "" });
+    dispatch({ type: "typeText", text: kept });
   };
 
   /**
@@ -1211,7 +1274,13 @@ export default function QueryBar({
         : target.closest<HTMLElement>(".ds.query-chip");
     const chipId = chip?.id;
     const last = clauses.filter(hasStop).at(-1);
-    if (item === ENTRY && event.key === "Backspace" && text === "" && last) {
+    if (
+      item === ENTRY &&
+      event.key === "Backspace" &&
+      text === "" &&
+      last &&
+      !isNarrow
+    ) {
       // Backspace in the empty entry selects the last chip.
       event.preventDefault();
       dispatch({ type: "moveStop", item: readStopItem(last) });
@@ -1257,7 +1326,8 @@ export default function QueryBar({
     }
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     // Only the toolbar's items rove; the clear control sits outside it.
-    if (!target.closest('[role="toolbar"]')) return;
+    // Narrow, the chips are hidden, and the entry is the only item.
+    if (!target.closest('[role="toolbar"]') || isNarrow) return;
     // In an open Entry, the arrows only move the caret.
     if (draft !== null && item === `${readDraftId(draft)}:entry`) return;
     if (target instanceof HTMLInputElement) {
@@ -1532,9 +1602,20 @@ export default function QueryBar({
   const field = (
     <QueryInput
       ref={entryRef}
-      label={label ?? messages.queryBar(labels.recordNoun)}
-      description={messages.queryBarDescription}
-      placeholder={messages.queryBarPlaceholder}
+      // Narrow, the entry only searches, and is named and prompted so.
+      label={
+        label ??
+        (isNarrow
+          ? messages.searchEntry({ noun: labels.recordNoun })
+          : messages.queryBar(labels.recordNoun))
+      }
+      // Narrow, the keys the description names reach no chip.
+      description={isNarrow ? undefined : messages.queryBarDescription}
+      placeholder={
+        isNarrow
+          ? messages.searchEntryPlaceholder
+          : messages.queryBarPlaceholder
+      }
       // Before scripts, the plain input holds the applied search.
       value={hydrated ? text : (group.state.get().slice.search ?? "")}
       {...(hasHref ? { name: QUERY_KEYS.search } : {})}
@@ -1553,7 +1634,9 @@ export default function QueryBar({
       hiddenLabel={messages.hiddenChips}
       {...clearProps}
     >
-      {(clauses.length > 0 || draft?.origin === null) && (
+      {/* Narrow, the chips are the sheet's: the entry holds none, so it
+          shows its prompt. Before scripts, the stylesheet hides them. */}
+      {!isNarrow && (clauses.length > 0 || draft?.origin === null) && (
         <QueryChips label={messages.appliedFilters}>
           {clauses.map((clause) =>
             clause.kind === "refused" ? (

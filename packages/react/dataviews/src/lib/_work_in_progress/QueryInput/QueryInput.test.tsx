@@ -328,6 +328,13 @@ describe("QueryInput", () => {
       expect(popover.matches(":popover-open")).toBe(false);
     });
 
+    it("control no list while focused with none to show", () => {
+      const { entry } = setup({ options: [] });
+      fireEvent.focus(entry);
+      expect(entry).toHaveAttribute("aria-expanded", "false");
+      expect(entry).not.toHaveAttribute("aria-controls");
+    });
+
     it("stay closed with nothing to show, and leave Down to the host", () => {
       const onKeyDown = vi.fn();
       const { entry } = setup({ onKeyDown });

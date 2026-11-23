@@ -324,12 +324,13 @@ export const OutsideChange: Story = {
 };
 
 /**
- * Overflow: seven chips in a narrow field hold one line while it is not
- * focused, with the count of those hidden; focusing it wraps them.
+ * Overflow: seven chips in a field just wider than the narrow form hold
+ * one line while it is not focused, with the count of those hidden;
+ * focusing it wraps them.
  */
 export const Overflow: Story = {
   render: renderWith({
-    inlineSize: "28rem",
+    inlineSize: "38rem",
     query:
       "status=deployed&tags=ex-gpu&tags__isAny__1=ex-nvme&memory__gte=8192&memory__lte=65536&owner__isSet=true&hostname__contains=node&deployed__gte=2026-01-01",
   }),

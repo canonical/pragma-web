@@ -25,14 +25,20 @@ import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import {
   afterAll,
+  afterEach,
   beforeAll,
+  beforeEach,
   describe,
   expect,
   it,
   onTestFinished,
   vi,
 } from "vitest";
-import { installPopoverStandIn } from "../../../../../../testing/index.js";
+import {
+  installPopoverStandIn,
+  installResizeObserverStandIn,
+  type ResizeObserverStandIn,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import QueryBar from "./QueryBar.js";
 import type { DataViewsQueryBarProps } from "./types.js";
@@ -171,8 +177,11 @@ const mount = ({
   return { provider, view };
 };
 
+/** The bar's own entry, named for filtering, or, narrow, for searching. */
 const findEntry = () =>
-  screen.getByRole<HTMLInputElement>("combobox", { name: "Filter records" });
+  screen.getByRole<HTMLInputElement>("combobox", {
+    name: /^(Filter|Search) records$/,
+  });
 const findPart = (name: string) =>
   screen.getByRole<HTMLInputElement>("combobox", { name });
 const queryPart = (name: string) => screen.queryByRole("combobox", { name });
@@ -2645,6 +2654,133 @@ describe("QueryBar", () => {
         readProviderHost(provider).removePredicate("pool", "isAny", 0);
       });
       await waitFor(() => expect(chipRenders).toContain("bar"));
+    });
+  });
+
+  describe("the narrow form", () => {
+    let resizer: ResizeObserverStandIn;
+    beforeEach(() => {
+      resizer = installResizeObserverStandIn();
+    });
+    afterEach(() => {
+      resizer.uninstall();
+    });
+
+    /** Report the bar's width, as its container lays it out. */
+    const resizeBar = (width: number) =>
+      act(() => {
+        resizer.resize(screen.getByTestId("bar"), width);
+      });
+
+    it("searches only, offering no field and naming no keys, while narrow", () => {
+      const { provider } = mount({ query: "status=deployed" });
+      resizeBar(320);
+      expect(screen.getByRole("toolbar")).not.toHaveAccessibleDescription();
+      // Search-only, the entry is named and prompted for searching.
+      expect(
+        screen.getByRole("combobox", { name: "Search records" }),
+      ).toHaveAttribute("placeholder", "Search");
+      act(() => findEntry().focus());
+      type(findEntry(), "status");
+      expect(screen.queryAllByRole("option", { hidden: true })).toHaveLength(0);
+      expect(findEntry()).toHaveAttribute("aria-expanded", "false");
+      expect(findEntry()).not.toHaveAttribute("aria-controls");
+      // Enter searches the text, though it names a field.
+      press(findEntry(), "Enter");
+      expect(provider.state.get().slice.search).toBe("status");
+      expect(queryPart("Operator for status")).toBeNull();
+      resizeBar(1024);
+      expect(screen.getByRole("toolbar")).toHaveAccessibleDescription(
+        "Left and Right to move between filters, Enter to edit, Backspace or Delete to remove",
+      );
+    });
+
+    it("keeps the search in the narrow entry, which gives it to its chip once wide", () => {
+      const { provider } = mount();
+      resizeBar(320);
+      act(() => findEntry().focus());
+      type(findEntry(), "web");
+      press(findEntry(), "Enter");
+      expect(provider.state.get().slice.search).toBe("web");
+      expect(findEntry()).toHaveValue("web");
+      // The same search again writes nothing, and keeps it.
+      press(findEntry(), "Enter");
+      expect(findEntry()).toHaveValue("web");
+      resizeBar(1024);
+      expect(findEntry()).toHaveValue("");
+      expect(findChip("Search for web")).toBeInTheDocument();
+      resizeBar(320);
+      expect(findEntry()).toHaveValue("web");
+      // Moved from elsewhere, the search the entry holds follows.
+      act(() => {
+        provider.setSearch("db");
+      });
+      expect(findEntry()).toHaveValue("db");
+      // Emptied, Enter clears it.
+      type(findEntry(), "");
+      press(findEntry(), "Enter");
+      expect(provider.state.get().slice.search).toBeNull();
+      expect(press(findEntry(), "Enter")).toBe(true);
+    });
+
+    it("leaves text being typed alone as the search moves, and keeps typed text as it widens", () => {
+      const { provider } = mount({ query: "q=web" });
+      resizeBar(320);
+      type(findEntry(), "draft");
+      act(() => {
+        provider.setSearch("db");
+      });
+      expect(findEntry()).toHaveValue("draft");
+      resizeBar(1024);
+      expect(findEntry()).toHaveValue("draft");
+    });
+
+    it("says why clearing the narrow search was refused", async () => {
+      const { provider } = mount({ query: "q=web" });
+      resizeBar(320);
+      const spy = vi
+        .spyOn(provider, "setSearch")
+        .mockReturnValue([{ reason: "the search is required" } as never]);
+      onTestFinished(() => spy.mockRestore());
+      type(findEntry(), "");
+      press(findEntry(), "Enter");
+      expect(provider.state.get().slice.search).toBe("web");
+      await waitFor(() =>
+        expect(readStatus()).toContain("The search is required"),
+      );
+    });
+
+    it("keeps the stop on the entry: Backspace and the arrows reach no hidden chip", async () => {
+      mount({ query: "status=deployed" });
+      const field = await screen.findByRole("button", { name: "status" });
+      resizeBar(320);
+      act(() => findEntry().focus());
+      expect(press(findEntry(), "Backspace")).toBe(true);
+      expect(press(findEntry(), "ArrowLeft")).toBe(true);
+      // The chips are the sheet's while narrow.
+      expect(field).not.toBeInTheDocument();
+      expect(findEntry()).toHaveFocus();
+    });
+
+    it("moves the stop and focus in a chip to the entry as it narrows", async () => {
+      mount({ query: "status=deployed" });
+      const field = await screen.findByRole("button", { name: "status" });
+      act(() => field.focus());
+      await waitFor(() => expect(field).toHaveAttribute("tabindex", "0"));
+      resizeBar(320);
+      await waitFor(() => expect(findEntry()).toHaveFocus());
+      expect(field).not.toBeInTheDocument();
+      resizeBar(1024);
+      expect(findChip("status is deployed")).toBeInTheDocument();
+    });
+
+    it("ends a clause being built as it narrows, an incomplete one dropped", async () => {
+      const { provider } = mount();
+      await startOn("status");
+      resizeBar(320);
+      await waitFor(() => expect(queryPart("Operator for status")).toBeNull());
+      await waitFor(() => expect(findEntry()).toHaveFocus());
+      expect(readFilter(provider)).toEqual([]);
     });
   });
 });

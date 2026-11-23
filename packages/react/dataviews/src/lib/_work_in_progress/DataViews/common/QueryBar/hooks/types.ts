@@ -82,3 +82,18 @@ export type UseAnswerCountStandInProps = {
 
 /** The count answering the applied query; unknown while none does. */
 export type UseAnswerCountStandInResult = Count;
+
+/** What narrow mode follows: the bar's root and entry, and the stop's move. */
+export type UseNarrowModeProps = {
+  /** The bar's root, whose inline size is observed. */
+  readonly rootRef: RefObject<HTMLElement | null>;
+  /** The free-text entry, which takes focus that was in a hidden chip. */
+  readonly entryRef: RefObject<HTMLInputElement | null>;
+  /** Called as the bar narrows, to move the stop off the hidden chips. */
+  readonly onNarrow: () => void;
+  /** Called as the bar widens again, the chips shown once more. */
+  readonly onWide: () => void;
+};
+
+/** Whether the bar is narrow. */
+export type UseNarrowModeResult = boolean;

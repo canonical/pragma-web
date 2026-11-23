@@ -616,8 +616,13 @@ test.describe("QueryBar, in Chromium", () => {
   test("F18b: Merge pressed by pointer while the chips wrap still merges", async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 360, height: 720 });
+    // Wider than the narrow form, which hides the chips; each chip is made
+    // wide, so the two wrap once the field takes focus.
+    await page.setViewportSize({ width: 640, height: 720 });
     await openStory(page, "contradiction");
+    await page.addStyleTag({
+      content: "#storybook-root .ds.query-chip { min-inline-size: 16rem; }",
+    });
     const field = page.locator("#storybook-root .ds.query-input .field");
     const resting = (await field.boundingBox())?.height ?? 0;
     await findEntry(page).focus();
