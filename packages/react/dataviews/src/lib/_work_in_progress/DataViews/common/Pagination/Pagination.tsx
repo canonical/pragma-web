@@ -14,6 +14,8 @@ import type { DataViewsPaginationProps } from "./types.js";
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
+ * @implements ds:apps.subcomponent.data_table-pagination_bar
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */

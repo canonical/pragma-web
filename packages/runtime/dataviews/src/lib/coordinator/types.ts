@@ -58,7 +58,7 @@ export type ResultState<TRow extends object = RowRecord> = {
   /**
    * The page's group summaries; null until a source declares summaries.
    *
-   * @seam grouping — read by the group header row's count
+   * The group header row reads its count from this.
    */
   readonly groups: readonly GroupSummary[] | null;
   readonly counts: SourceCounts | null;

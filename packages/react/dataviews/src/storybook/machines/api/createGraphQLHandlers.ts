@@ -1,6 +1,6 @@
 import { delay, HttpResponse, type RequestHandler } from "msw";
 import { type GraphQLResponseBody, graphql } from "msw/graphql";
-import { machines } from "../fixtures.js";
+import { storyMachines } from "../fixtures.js";
 import { API_SCENARIOS } from "./constants.js";
 import foldStoredText from "./foldStoredText.js";
 import readApiFacets from "./readApiFacets.js";
@@ -49,7 +49,7 @@ const fail = (message: string) => respond({ errors: [{ message }] });
  * @note Impure: its handlers wait on timers before they answer.
  */
 export default function createGraphQLHandlers({
-  records = machines,
+  records = storyMachines,
   latency = 0,
 }: MockApiConfig = {}): readonly RequestHandler[] {
   const answer = async (

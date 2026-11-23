@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_HISTORY, FIXED_HISTORY, PROVIDER_HOSTS } from "./constants.js";
+import { DEFAULT_HISTORY, FIXED_HISTORY } from "./constants.js";
 
 describe("the provider's constants", () => {
   it("pushes every transition by default, but the search, which replaces", () => {
@@ -22,9 +22,5 @@ describe("the provider's constants", () => {
       revert: "replace",
     });
     expect(Object.isFrozen(FIXED_HISTORY)).toBe(true);
-  });
-
-  it("holds each provider's host weakly", () => {
-    expect(PROVIDER_HOSTS).toBeInstanceOf(WeakMap);
   });
 });

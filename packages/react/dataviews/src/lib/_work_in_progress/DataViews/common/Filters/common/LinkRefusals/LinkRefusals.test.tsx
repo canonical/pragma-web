@@ -3,24 +3,24 @@
  * Clear for every clause that withheld the query, and where focus goes once
  * a clause is cleared.
  */
+
 import {
   createCollection,
   createDataViewsProvider,
   createMemoryLocation,
   declareCapabilities,
 } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
 import expectNoAxeViolations from "../../../../../../../../testing/expectNoAxeViolations.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
+import type { IdentifiedRecord as Row } from "../../../../../../../../testing/types.js";
 import DataViews from "../../../../Provider.js";
 import Filters from "../../Filters.js";
 import LinkRefusals from "./LinkRefusals.js";
-
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,

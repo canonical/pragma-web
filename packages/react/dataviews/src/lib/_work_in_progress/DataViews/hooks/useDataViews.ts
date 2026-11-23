@@ -26,7 +26,7 @@ export default function useDataViews<
   TRow extends object = RowRecord,
 >(collection: Collection<TFields, TRow>): UseDataViewsResult<TFields, TRow> {
   const root = useContext(Context);
-  if (root === null) {
+  if (root === undefined) {
     throw new Error("useDataViews must be used inside a DataViews root");
   }
   if (root.provider.collection !== collection) {
@@ -56,7 +56,7 @@ export default function useDataViews<
       setGroup: provider.setGroup,
       setCollapsed: provider.setCollapsed,
       refresh: provider.refresh,
-      refusals: provider.refusals,
+      listRefusals: provider.listRefusals,
       runAction: provider.runAction,
     }),
     [provider, filters],

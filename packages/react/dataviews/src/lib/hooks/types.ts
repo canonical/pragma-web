@@ -2,11 +2,14 @@
  * Hook domain types for the hooks every part shares: the value hook that
  * observes one channel, the cell hook a column's own renderer reads, whether
  * scripts have taken over, the focus a server's link hands to the button
- * replacing it, and the words a root speaks. Each hook declares its result
- * type, and its props type where it takes a config object, here.
+ * replacing it, the focus a disabled control strands, and the words a root
+ * speaks. Each hook declares its result type here, and its props type where
+ * it takes arguments: a config object, or a labelled tuple for a hook whose
+ * arguments are positional.
  */
 
 import type {
+  Collection,
   DataViewsMessages,
   DataViewsProvider,
   Facet,
@@ -16,8 +19,21 @@ import type {
   Selection,
 } from "@canonical/dataviews-core";
 import type { RowScopes } from "@canonical/dataviews-core/bindings";
-import type { ReactNode, RefObject } from "react";
+import type { FocusEvent, ReactNode, Ref, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
+
+/**
+ * What `useDataViewsValue` takes with a selector: the channel, the `select`
+ * that reads it, and an optional `isEqual` over what `select` returns.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type UseDataViewsValueProps<T, TSelected> = readonly [
+  channel: ReadonlyChannel<T>,
+  select: (value: T) => TSelected,
+  isEqual?: (previous: TSelected, next: TSelected) => boolean,
+];
 
 /**
  * What `useDataViewsValue` returns: the channel's current value, or the part
@@ -27,6 +43,18 @@ import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
  * name may change or move before the first release.
  */
 export type UseDataViewsValueResult<T> = T;
+
+/**
+ * What `useDataViewsCell` takes: the collection the enclosing table's
+ * provider was built over, the witness of the record's type.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type UseDataViewsCellProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = readonly [collection: Collection<TFields, TRow>];
 
 /**
  * The cell scope returned by useDataViewsCell. Its channels are read-only.
@@ -49,6 +77,7 @@ export type UseDataViewsCellResult<TRow extends object = RowRecord> = {
 
 /** What `useSelectAllOnPage` takes: the selection, and the page it acts on. */
 export type UseSelectAllOnPageProps = {
+  /** The collection's selection, which the toggle changes. */
   readonly selection: Selection;
   /** The identities on the page — the scope the control acts on. */
   readonly ids: readonly string[];
@@ -70,6 +99,7 @@ export type UseSelectAllOnPageResult = {
 
 /** What `useHydrationFocusHandoff` takes: whether scripts have taken over. */
 export type UseHydrationFocusHandoffProps = {
+  /** Whether scripts have taken over, from `useIsHydrated`. */
   readonly hydrated: boolean;
 };
 
@@ -84,6 +114,38 @@ export type UseHydrationFocusHandoffResult = {
   readonly button: RefObject<HTMLButtonElement | null>;
 };
 
+/** What `useFocusRescue` takes: the control stranded focus goes to. */
+export type UseFocusRescueProps = {
+  /** The control that takes the focus a disabled or removed control held. */
+  readonly fallback: RefObject<HTMLElement | null>;
+};
+
+/**
+ * What `useFocusRescue` returns: the handlers to spread on the group whose
+ * controls it watches.
+ */
+export type UseFocusRescueResult = {
+  /** Records the control that took the focus. */
+  readonly onFocus: (event: FocusEvent<HTMLElement>) => void;
+  /** Forgets it once the focus leaves. */
+  readonly onBlur: () => void;
+};
+
+/**
+ * What `useMergedRef` takes: the caller's ref, if any, and the part's own
+ * attach, which may answer its cleanup.
+ */
+export type UseMergedRefProps<TElement> = readonly [
+  ref: Ref<TElement> | undefined,
+  attach: (node: TElement) => (() => void) | undefined,
+];
+
+/**
+ * What `useMergedRef` returns: one callback ref, answering the cleanup that
+ * detaches the part and the caller.
+ */
+export type UseMergedRefResult<TElement> = (node: TElement) => () => void;
+
 /**
  * What `useIsHydrated` returns: whether scripts have taken over the page —
  * false on the server and while hydrating, true after.
@@ -96,6 +158,7 @@ export type UseAnsweredFacetsProps<
     readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = {
+  /** The provider whose result answers the applied query. */
   readonly provider: DataViewsProvider<TFields, TRow>;
 };
 
@@ -124,6 +187,9 @@ export type UseFacetsResult = {
   readonly latest: Readonly<Record<string, Facet>> | null;
 };
 
+/** What `useMessages` takes: the application's messages, if any. */
+export type UseMessagesProps = readonly [messages?: Partial<DataViewsMessages>];
+
 /**
  * What `useMessages` returns: every message a root speaks, the application's
  * over the English record.
@@ -131,17 +197,28 @@ export type UseFacetsResult = {
 export type UseMessagesResult = DataViewsMessages;
 
 /**
- * The row-scope registry `useRowScopes` mints for one renderer. Its inputs
- * are positional — a provider and the field names it observes — so it
- * declares no props type of its own.
+ * What `useRowScopes` takes: the provider whose rows are scoped, and the
+ * names of the fields each scope observes, held at one reference.
  */
+export type UseRowScopesProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object,
+> = readonly [
+  provider: DataViewsProvider<TFields, TRow>,
+  fields: readonly string[],
+];
+
+/** The row-scope registry `useRowScopes` mints for one renderer. */
 export type UseRowScopesResult<TRow extends object = RowRecord> =
   RowScopes<TRow>;
 
-/**
- * What `useStableCallback` answers: the caller's function behind one
- * identity. Positional, so it declares no props type of its own.
- */
+/** What `useStableCallback` takes: the caller's function, rebuilt or not. */
+export type UseStableCallbackProps<
+  TArgs extends readonly unknown[],
+  TResult,
+> = readonly [callback: (...args: TArgs) => TResult];
+
+/** What `useStableCallback` answers: the caller's function behind one identity. */
 export type UseStableCallbackResult<
   TArgs extends readonly unknown[],
   TResult,
@@ -160,7 +237,13 @@ export type UseAnnouncerResult = {
 };
 
 /**
- * What `useStableValue` answers: the value held at one reference while it
- * says the same. Positional, so it declares no props type of its own.
+ * What `useStableValue` takes: the value rebuilt every render, and whether
+ * it says the same as the one held.
  */
+export type UseStableValueProps<TValue> = readonly [
+  value: TValue,
+  equals: (held: TValue, next: TValue) => boolean,
+];
+
+/** What `useStableValue` answers: the value held at one reference while it says the same. */
 export type UseStableValueResult<TValue> = TValue;

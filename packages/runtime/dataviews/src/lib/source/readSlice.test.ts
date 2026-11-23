@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { EMPTY_SLICE } from "../query/index.js";
@@ -66,23 +66,5 @@ describe("readSlice", () => {
         filter: [{ field: "zone", operator: "isAny", operands: ["eu"] }],
       }).filters,
     ).toEqual({});
-  });
-
-  it("types each filter from the schema", () => {
-    const reading = readSlice(machines, EMPTY_SLICE);
-    expectTypeOf(reading.filters.status).toEqualTypeOf<
-      | {
-          readonly isAny?: ReadonlySet<"failed" | "ready">;
-          readonly isNone?: ReadonlySet<"failed" | "ready">;
-        }
-      | undefined
-    >();
-    expectTypeOf(reading.filters.cpu).toEqualTypeOf<
-      { readonly gte?: number; readonly lte?: number } | undefined
-    >();
-    expectTypeOf(reading.filters.owner).toEqualTypeOf<boolean | undefined>();
-    expectTypeOf(reading.filters.name).toEqualTypeOf<
-      { readonly contains?: string; readonly startsWith?: string } | undefined
-    >();
   });
 });

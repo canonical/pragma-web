@@ -88,6 +88,7 @@ export type {
   Completion,
   Count,
   Facet,
+  FacetValue,
   GroupSummary,
   PageCursors,
   QueryIssue,

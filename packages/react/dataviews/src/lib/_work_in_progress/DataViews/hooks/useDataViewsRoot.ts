@@ -9,7 +9,7 @@ import type { UseDataViewsRootResult } from "./types.js";
  */
 export default function useDataViewsRoot(part: string): UseDataViewsRootResult {
   const root = useContext(Context);
-  if (root === null) {
+  if (root === undefined) {
     throw new Error(`DataViews.${part} must be used inside a DataViews root`);
   }
   return root;

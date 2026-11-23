@@ -32,8 +32,6 @@ const OPERATOR_MESSAGES = {
  * because it is restricted. What the source refused, and why, is said beside
  * the input.
  *
- * `import { DataViews } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.subcomponent.data_views_filters-text_filter
  */
 export default function TextFilter({

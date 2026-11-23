@@ -3,7 +3,7 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
-import { RendererSwitch } from "../../common/index.js";
+import { RendererSwitch } from "../../common/RendererSwitch/index.js";
 import { useMessages } from "../../hooks/index.js";
 import { DataChart } from "../DataChart/index.js";
 import { DataTable } from "../DataTable/index.js";

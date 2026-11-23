@@ -118,4 +118,21 @@ describe("CardList", () => {
       screen.getByRole("checkbox", { name: "Select alpha" }),
     ).toBeInTheDocument();
   });
+
+  it("passes native props to its root", () => {
+    const { provider, scopes } = observeFleet();
+    const { container } = render(
+      <CardList
+        provider={provider}
+        records={[]}
+        readRow={scopes.readRow}
+        title={title}
+        details={details}
+        selectable={false}
+        nameRecord={() => null}
+        id="probe"
+      />,
+    );
+    expect(container.firstElementChild).toHaveAttribute("id", "probe");
+  });
 });

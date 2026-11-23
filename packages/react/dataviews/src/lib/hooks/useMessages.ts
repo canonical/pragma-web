@@ -1,7 +1,7 @@
 import type { DataViewsMessages } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { useMemo } from "react";
-import type { UseMessagesResult } from "./types.js";
+import type { UseMessagesProps, UseMessagesResult } from "./types.js";
 import useStableValue from "./useStableValue.js";
 
 /** What a root given no messages resolves: nothing over the English record. */
@@ -31,7 +31,7 @@ const areMessagesEqual = (
  * is one such comparison rather than two.
  */
 export default function useMessages(
-  messages: Partial<DataViewsMessages> = NO_MESSAGES,
+  ...[messages = NO_MESSAGES]: UseMessagesProps
 ): UseMessagesResult {
   const given = useStableValue(messages, areMessagesEqual);
   return useMemo(() => resolveMessages(given), [given]);

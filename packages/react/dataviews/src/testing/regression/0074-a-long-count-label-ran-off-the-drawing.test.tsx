@@ -26,7 +26,7 @@ describe("a count label with no room at its bar's tip", () => {
       />,
     );
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: createPage({
           rows: [buildMachine("m-1", "alpha")],

@@ -1,4 +1,3 @@
-import type { ReadonlyChannel } from "@canonical/dataviews-core";
 import { act, render, renderHook } from "@testing-library/react";
 import {
   StrictMode,
@@ -204,6 +203,23 @@ describe("useDataViewsValue", () => {
       act(() => channel.set(createListing({ page: 2 })));
       expect(result.current).toBe(first);
       expect(renders).toBe(1);
+    });
+
+    it("holds an inline selection while an inline isEqual says it is the same", () => {
+      const channel = createFakeChannel(createListing({ ids: [1, 2] }));
+      const { result } = renderHook(() =>
+        useDataViewsValue(
+          channel,
+          (listing) => [...listing.ids],
+          (previous, next) => previous.length === next.length,
+        ),
+      );
+      const first = result.current;
+      expect(first).toEqual([1, 2]);
+      act(() => channel.set(createListing({ ids: [3, 4] })));
+      expect(result.current).toBe(first);
+      act(() => channel.set(createListing({ ids: [5] })));
+      expect(result.current).toEqual([5]);
     });
 
     it("returns the next value once isEqual says it differs", () => {

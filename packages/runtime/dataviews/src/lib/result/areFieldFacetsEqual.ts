@@ -2,7 +2,13 @@ import { areListsEqual } from "../query/index.js";
 import areCountsEqual from "./areCountsEqual.js";
 import type { Facet } from "./types.js";
 
-/** Whether two facets claim the same: one kind, and the same values and counts, or range ends. */
+/**
+ * Whether two facets claim the same: one kind, and the same values and
+ * counts, or range ends.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export default function areFieldFacetsEqual(a: Facet, b: Facet): boolean {
   if (a.kind === "range" || b.kind === "range") {
     return (

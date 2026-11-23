@@ -7,22 +7,23 @@
  * jsdom lays nothing out, so the viewport's height, its scroll position
  * and every row's measured size are the test's to set.
  */
-import type { DataViewsProvider } from "@canonical/dataviews-core";
+
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import type { ManualSource } from "@canonical/dataviews-core/testing";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { type ReactElement, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import buildMachine from "../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../../testing/createMachineProvider.js";
 import deliverRows from "../../../../../testing/deliverRows.js";
 import elementAt from "../../../../../testing/elementAt.js";
 import type {
   Machine,
   MachineFields,
-  ManualSource,
+  MachineProvider as Provider,
 } from "../../../../../testing/types.js";
 import {
   DataTable,
@@ -32,10 +33,8 @@ import {
 import type { DisplayFieldCellProps } from "../../../common/index.js";
 import virtualizeRows from "../../virtualizeRows.js";
 
-type Provider = DataViewsProvider<MachineFields, Machine>;
-
 /** `count` machines from `m-<from>`, each named `host-<n>`. */
-const machines = (count: number, from = 0): Machine[] =>
+const buildMachines = (count: number, from = 0): Machine[] =>
   Array.from({ length: count }, (_, position) =>
     buildMachine(`m-${from + position}`, `host-${from + position}`),
   );
@@ -94,7 +93,7 @@ class FakeResizeObserver {
 }
 
 /** The observer measuring the rows. */
-const rowObserver = (): FakeResizeObserver => {
+const findRowObserver = (): FakeResizeObserver => {
   const observer = FakeResizeObserver.live.find((candidate) =>
     [...candidate.observed].some(
       (element) => element.getAttribute("role") === "row",
@@ -117,7 +116,7 @@ const report = (
   for (const [element, height] of sizes) {
     reported.set(element, height);
   }
-  const observer = rowObserver();
+  const observer = findRowObserver();
   act(() => {
     observer.report(sizes, width);
   });
@@ -133,14 +132,14 @@ const load = (
   rows: readonly Machine[],
 ): void => {
   act(() => {
-    source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
+    source.readLatest().deliver({ status: "succeeded", page: buildPage(rows) });
   });
 };
 
 /** Fail the source's live request. */
 const fail = (source: ManualSource<Machine>, reason: string): void => {
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "failed",
       failure: { reason, cause: null, transient: null },
     });
@@ -157,7 +156,7 @@ const preload = (provider: Provider, rows: readonly Machine[]): void => {
 };
 
 /** Give a table a scroll position the test can set, starting at the top. */
-const scrollable = (table: HTMLElement): HTMLElement => {
+const makeScrollable = (table: HTMLElement): HTMLElement => {
   Object.defineProperty(table, "scrollTop", {
     value: 0,
     writable: true,
@@ -167,8 +166,8 @@ const scrollable = (table: HTMLElement): HTMLElement => {
 };
 
 /** A virtualized table over `rows`, delivered by hand, scrolled to the top. */
-const virtualizedTable = (
-  rows: readonly Machine[] = machines(1000),
+const renderVirtualizedTable = (
+  rows: readonly Machine[] = buildMachines(1000),
   props: Partial<DataTableProps<MachineFields, Machine>> = {},
   wrap: (table: ReactElement) => ReactElement = (table) => table,
 ) => {
@@ -189,7 +188,7 @@ const virtualizedTable = (
     provider,
     source,
     view,
-    table: scrollable(screen.getByRole("table")),
+    table: makeScrollable(screen.getByRole("table")),
   };
 };
 
@@ -198,9 +197,9 @@ const virtualizedTable = (
  * page changes under it: its gaps and its mounted rows, each at the height
  * last reported for it, or 10px.
  */
-const pageBound = (table: HTMLElement): void => {
+const bindPageBounds = (table: HTMLElement): void => {
   let top = 0;
-  const bound = (value: number): number => {
+  const clampToPage = (value: number): number => {
     const page =
       [...table.querySelectorAll<HTMLElement>(".ds.data-table-gap")]
         .map((gap) => Number.parseFloat(gap.style.blockSize))
@@ -216,9 +215,9 @@ const pageBound = (table: HTMLElement): void => {
   };
   Object.defineProperty(table, "scrollTop", {
     configurable: true,
-    get: () => bound(top),
+    get: () => clampToPage(top),
     set: (value: number) => {
-      top = bound(value);
+      top = clampToPage(value);
     },
   });
 };
@@ -231,7 +230,7 @@ const scrollTo = (table: HTMLElement, top: number): void => {
 };
 
 /** The hosts of the mounted rows, in order. */
-const mountedHosts = (scope: HTMLElement = document.body): string[] =>
+const listMountedHosts = (scope: HTMLElement = document.body): string[] =>
   within(scope)
     .getAllByRole("row")
     .slice(1)
@@ -240,13 +239,13 @@ const mountedHosts = (scope: HTMLElement = document.body): string[] =>
     );
 
 /** The heights of the gaps, in order. */
-const gapHeights = (table: HTMLElement): string[] =>
+const listGapHeights = (table: HTMLElement): string[] =>
   [...table.querySelectorAll<HTMLElement>(".ds.data-table-gap")].map(
     (gap) => gap.style.blockSize,
   );
 
 /** The row showing one host. */
-const rowOf = (host: string): HTMLElement => {
+const getRow = (host: string): HTMLElement => {
   const row = screen.getByText(host).closest<HTMLElement>('[role="row"]');
   if (row === null) {
     throw new Error(`no row shows ${host}`);
@@ -273,26 +272,30 @@ afterEach(() => {
 
 describe("virtualized DataTable", () => {
   it("mounts the rows in view and a few past each edge, not the whole window", () => {
-    const { table } = virtualizedTable();
-    expect(mountedHosts()).toEqual(machines(15).map((row) => row.name));
-    expect(gapHeights(table)).toEqual(["9850px"]);
+    const { table } = renderVirtualizedTable();
+    expect(listMountedHosts()).toEqual(
+      buildMachines(15).map((row) => row.name),
+    );
+    expect(listGapHeights(table)).toEqual(["9850px"]);
   });
 
   it("counts every row and places each mounted one in logical order", () => {
-    const { table } = virtualizedTable();
+    const { table } = renderVirtualizedTable();
     expect(table).toHaveAttribute("aria-rowcount", "1001");
     const [header, first] = screen.getAllByRole("row");
     expect(header).toHaveAttribute("aria-rowindex", "1");
     expect(first).toHaveAttribute("aria-rowindex", "2");
     scrollTo(table, 5000);
-    expect(rowOf("host-500")).toHaveAttribute("aria-rowindex", "502");
+    expect(getRow("host-500")).toHaveAttribute("aria-rowindex", "502");
   });
 
   it("moves the mounted rows with the scroll", () => {
-    const { table } = virtualizedTable();
+    const { table } = renderVirtualizedTable();
     scrollTo(table, 5000);
-    expect(mountedHosts()).toEqual(machines(19, 496).map((row) => row.name));
-    expect(gapHeights(table)).toEqual(["4960px", "4850px"]);
+    expect(listMountedHosts()).toEqual(
+      buildMachines(19, 496).map((row) => row.name),
+    );
+    expect(listGapHeights(table)).toEqual(["4960px", "4850px"]);
   });
 
   it("shows its rows beneath the header, which the viewport keeps in view", () => {
@@ -307,20 +310,24 @@ describe("virtualized DataTable", () => {
         return this.classList.contains("body") ? 24 : 0;
       },
     );
-    const { table } = virtualizedTable();
-    expect(mountedHosts()).toEqual(machines(15).map((row) => row.name));
+    const { table } = renderVirtualizedTable();
+    expect(listMountedHosts()).toEqual(
+      buildMachines(15).map((row) => row.name),
+    );
     scrollTo(table, 5000);
-    expect(mountedHosts()).toEqual(machines(19, 496).map((row) => row.name));
+    expect(listMountedHosts()).toEqual(
+      buildMachines(19, 496).map((row) => row.name),
+    );
   });
 
   it("ends on the last row, with no gap after it", () => {
-    const { table } = virtualizedTable();
+    const { table } = renderVirtualizedTable();
     scrollTo(table, 9900);
-    expect(rowOf("host-999")).toHaveAttribute("aria-rowindex", "1001");
-    expect(gapHeights(table)).toEqual(["9860px"]);
+    expect(getRow("host-999")).toHaveAttribute("aria-rowindex", "1001");
+    expect(listGapHeights(table)).toEqual(["9860px"]);
     expect(
       table.querySelector(".ds.data-table-row-group.body")?.lastElementChild,
-    ).toBe(rowOf("host-999"));
+    ).toBe(getRow("host-999"));
   });
 
   it("renders nothing for a scroll that keeps the same rows mounted", () => {
@@ -329,7 +336,7 @@ describe("virtualized DataTable", () => {
       renders += 1;
       return <>{String(value)}</>;
     };
-    const { table } = virtualizedTable(machines(1000), {
+    const { table } = renderVirtualizedTable(buildMachines(1000), {
       columns: [{ id: "name", header: "Name", cell: Counted }],
     });
     scrollTo(table, 5000);
@@ -343,7 +350,9 @@ describe("virtualized DataTable", () => {
 
   describe("focus", () => {
     it("keeps the row holding focus mounted, with its neighbours, wherever the viewport goes", () => {
-      const { table } = virtualizedTable(machines(1000), { selectable: true });
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        selectable: true,
+      });
       const checkbox = screen.getByRole("checkbox", { name: "Select m-3" });
       act(() => {
         checkbox.focus();
@@ -351,17 +360,19 @@ describe("virtualized DataTable", () => {
       scrollTo(table, 5000);
       expect(checkbox).toBeInTheDocument();
       expect(document.activeElement).toBe(checkbox);
-      expect(mountedHosts().slice(0, 3)).toEqual([
+      expect(listMountedHosts().slice(0, 3)).toEqual([
         "host-2",
         "host-3",
         "host-4",
       ]);
-      expect(rowOf("host-3")).toHaveAttribute("aria-rowindex", "5");
-      expect(gapHeights(table)).toEqual(["20px", "4910px", "4850px"]);
+      expect(getRow("host-3")).toHaveAttribute("aria-rowindex", "5");
+      expect(listGapHeights(table)).toEqual(["20px", "4910px", "4850px"]);
     });
 
     it("follows focus from one row to the next", () => {
-      const { table } = virtualizedTable(machines(1000), { selectable: true });
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        selectable: true,
+      });
       act(() => {
         screen.getByRole("checkbox", { name: "Select m-3" }).focus();
       });
@@ -369,7 +380,7 @@ describe("virtualized DataTable", () => {
         screen.getByRole("checkbox", { name: "Select m-4" }).focus();
       });
       scrollTo(table, 5000);
-      expect(mountedHosts().slice(0, 3)).toEqual([
+      expect(listMountedHosts().slice(0, 3)).toEqual([
         "host-3",
         "host-4",
         "host-5",
@@ -377,9 +388,12 @@ describe("virtualized DataTable", () => {
     });
 
     it("keeps a row that already holds focus when a new range mounts it", () => {
-      const { provider, table, view } = virtualizedTable(machines(1000), {
-        selectable: true,
-      });
+      const { provider, table, view } = renderVirtualizedTable(
+        buildMachines(1000),
+        {
+          selectable: true,
+        },
+      );
       act(() => {
         screen.getByRole("checkbox", { name: "Select m-3" }).focus();
       });
@@ -399,7 +413,9 @@ describe("virtualized DataTable", () => {
     });
 
     it("ignores focus that lands on no row", () => {
-      const { table } = virtualizedTable(machines(1000), { selectable: true });
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        selectable: true,
+      });
       const group = table.querySelector<HTMLElement>(
         ".ds.data-table-row-group.body",
       );
@@ -408,11 +424,15 @@ describe("virtualized DataTable", () => {
       }
       fireEvent.focus(group);
       scrollTo(table, 5000);
-      expect(mountedHosts()).toEqual(machines(19, 496).map((row) => row.name));
+      expect(listMountedHosts()).toEqual(
+        buildMachines(19, 496).map((row) => row.name),
+      );
     });
 
     it("lets the row go once focus leaves the table", () => {
-      const { table } = virtualizedTable(machines(1000), { selectable: true });
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        selectable: true,
+      });
       const outside = document.createElement("button");
       document.body.append(outside);
       act(() => {
@@ -427,7 +447,9 @@ describe("virtualized DataTable", () => {
     });
 
     it("keeps the row while focus is only away with the window", () => {
-      const { table } = virtualizedTable(machines(1000), { selectable: true });
+      const { table } = renderVirtualizedTable(buildMachines(1000), {
+        selectable: true,
+      });
       const checkbox = screen.getByRole("checkbox", { name: "Select m-3" });
       act(() => {
         checkbox.focus();
@@ -443,63 +465,65 @@ describe("virtualized DataTable", () => {
 
   describe("measurement", () => {
     it("scrolls by what a row above the viewport grew, so the view holds still", () => {
-      const { table } = virtualizedTable();
+      const { table } = renderVirtualizedTable();
       scrollTo(table, 5000);
       report([
-        [rowOf("host-497"), 30],
-        [rowOf("host-505"), 30],
+        [getRow("host-497"), 30],
+        [getRow("host-505"), 30],
         [table, 100],
       ]);
       expect(table.scrollTop).toBe(5020);
     });
 
     it("ignores a report that carries no box", () => {
-      const { table } = virtualizedTable();
-      report([[rowOf("host-1"), 30]]);
+      const { table } = renderVirtualizedTable();
+      report([[getRow("host-1"), 30]]);
       const grown = table.scrollHeight;
       act(() => {
-        rowObserver().reportNoBox([rowOf("host-1")]);
+        findRowObserver().reportNoBox([getRow("host-1")]);
       });
       expect(table.scrollHeight).toBe(grown);
     });
 
     it("forgets the heights of rows not mounted when the rows' width changes", () => {
-      const { table } = virtualizedTable();
-      report(machines(5).map((row) => [rowOf(row.name), 20] as const));
+      const { table } = renderVirtualizedTable();
+      report(buildMachines(5).map((row) => [getRow(row.name), 20] as const));
       scrollTo(table, 5000);
       report(
-        mountedHosts().map((host) => [rowOf(host), 10] as const),
+        listMountedHosts().map((host) => [getRow(host), 10] as const),
         500,
       );
       // The five rows at the top are back to their estimate: the view
       // moves up by the 50px they had grown.
       expect(table.scrollTop).toBe(4950);
-      expect(gapHeights(table)[0]).toBe("4910px");
+      expect(listGapHeights(table).at(0)).toBe("4910px");
     });
 
     it("mounts more rows when the viewport grows", () => {
-      const { table } = virtualizedTable();
+      const { table } = renderVirtualizedTable();
       vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
         function (this: HTMLElement) {
           return this.getAttribute("role") === "table" ? 200 : 0;
         },
       );
       report([[table, 200]]);
-      expect(mountedHosts()).toHaveLength(25);
+      expect(listMountedHosts()).toHaveLength(25);
     });
 
     it("observes only the rows it has mounted, however far it scrolls", () => {
-      const { table } = virtualizedTable();
+      const { table } = renderVirtualizedTable();
       for (let top = 0; top <= 9000; top += 1000) {
         scrollTo(table, top);
       }
       // The mounted rows and the viewport itself, nothing that has left.
-      expect(rowObserver().observed.size).toBe(mountedHosts().length + 1);
+      expect(findRowObserver().observed.size).toBe(
+        listMountedHosts().length + 1,
+      );
     });
 
     it("forgets the heights of rows not mounted when a column is resized", () => {
-      const { table } = virtualizedTable();
-      report(machines(5).map((row) => [rowOf(row.name), 20] as const));
+      const { table } = renderVirtualizedTable();
+      report(buildMachines(5).map((row) => [getRow(row.name), 20] as const));
       scrollTo(table, 5000);
       // New tracks re-wrap cells, whatever the rows' own width does.
       fireEvent.keyDown(screen.getByRole("separator"), { key: "ArrowRight" });
@@ -507,28 +531,28 @@ describe("virtualized DataTable", () => {
     });
 
     it("holds the view at the bottom when forgotten heights grow the page", () => {
-      const { table } = virtualizedTable();
-      pageBound(table);
-      report(machines(5).map((row) => [rowOf(row.name), 5] as const));
+      const { table } = renderVirtualizedTable();
+      bindPageBounds(table);
+      report(buildMachines(5).map((row) => [getRow(row.name), 5] as const));
       // The very end of the page: 10,000px less 25, less the viewport.
       scrollTo(table, 9875);
       // A new width forgets the five short rows, far above: the page grows
       // by 25px and the view moves with its rows, past the page's old end.
       report(
-        mountedHosts().map((host) => [rowOf(host), 10] as const),
+        listMountedHosts().map((host) => [getRow(host), 10] as const),
         500,
       );
       expect(table.scrollTop).toBe(9900);
     });
 
     it("holds the view at the bottom when forgotten heights shrink the page", () => {
-      const { table } = virtualizedTable();
-      pageBound(table);
-      report(machines(5).map((row) => [rowOf(row.name), 20] as const));
+      const { table } = renderVirtualizedTable();
+      bindPageBounds(table);
+      report(buildMachines(5).map((row) => [getRow(row.name), 20] as const));
       // The very end of the page: 10,000px and 50, less the viewport.
       scrollTo(table, 9950);
       report(
-        mountedHosts().map((host) => [rowOf(host), 10] as const),
+        listMountedHosts().map((host) => [getRow(host), 10] as const),
         500,
       );
       // 50px up with its rows, which is the new end: not 50px past it.
@@ -536,34 +560,34 @@ describe("virtualized DataTable", () => {
     });
 
     it("holds the view at the bottom when forgotten heights grow some rows and shrink others", () => {
-      const { table } = virtualizedTable();
-      pageBound(table);
+      const { table } = renderVirtualizedTable();
+      bindPageBounds(table);
       // Forgetting them: two rows 10px shorter, three 5px taller, net -5.
       report([
-        [rowOf("host-0"), 20],
-        [rowOf("host-1"), 20],
-        [rowOf("host-2"), 5],
-        [rowOf("host-3"), 5],
-        [rowOf("host-4"), 5],
+        [getRow("host-0"), 20],
+        [getRow("host-1"), 20],
+        [getRow("host-2"), 5],
+        [getRow("host-3"), 5],
+        [getRow("host-4"), 5],
       ]);
       scrollTo(table, 9905);
       report(
-        mountedHosts().map((host) => [rowOf(host), 10] as const),
+        listMountedHosts().map((host) => [getRow(host), 10] as const),
         500,
       );
       expect(table.scrollTop).toBe(9900);
     });
 
     it("holds the view when a row grows in the batch that forgets heights", () => {
-      const { table } = virtualizedTable();
-      pageBound(table);
-      report(machines(5).map((row) => [rowOf(row.name), 5] as const));
+      const { table } = renderVirtualizedTable();
+      bindPageBounds(table);
+      report(buildMachines(5).map((row) => [getRow(row.name), 5] as const));
       scrollTo(table, 9875);
       // The five short rows forgotten (+25) and host-987 above the anchor
       // measured 10px taller (+10), in one report.
       report(
-        mountedHosts().map(
-          (host) => [rowOf(host), host === "host-987" ? 20 : 10] as const,
+        listMountedHosts().map(
+          (host) => [getRow(host), host === "host-987" ? 20 : 10] as const,
         ),
         500,
       );
@@ -571,25 +595,25 @@ describe("virtualized DataTable", () => {
     });
 
     it("holds the view at the bottom when a mounted row above it shrinks", () => {
-      const { table } = virtualizedTable();
-      pageBound(table);
+      const { table } = renderVirtualizedTable();
+      bindPageBounds(table);
       scrollTo(table, 9900);
-      report([[rowOf("host-987"), 5]]);
+      report([[getRow("host-987"), 5]]);
       expect(table.scrollTop).toBe(9895);
     });
 
     it("holds the view at the bottom when rows above it leave", () => {
-      const rows = machines(1000);
-      const { source, table } = virtualizedTable(rows);
-      pageBound(table);
+      const rows = buildMachines(1000);
+      const { source, table } = renderVirtualizedTable(rows);
+      bindPageBounds(table);
       scrollTo(table, 9900);
       load(source, rows.slice(5));
       expect(table.scrollTop).toBe(9850);
     });
 
     it("places a viewport that grew in the batch that forgot heights", () => {
-      const { table } = virtualizedTable();
-      report(machines(5).map((row) => [rowOf(row.name), 5] as const));
+      const { table } = renderVirtualizedTable();
+      report(buildMachines(5).map((row) => [getRow(row.name), 5] as const));
       scrollTo(table, 5000);
       vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
         function (this: HTMLElement) {
@@ -598,29 +622,29 @@ describe("virtualized DataTable", () => {
       );
       report(
         [
-          ...mountedHosts().map((host) => [rowOf(host), 10] as const),
+          ...listMountedHosts().map((host) => [getRow(host), 10] as const),
           [table, 200],
         ],
         500,
       );
       // Twenty rows in view, one partly, and four past each edge.
       expect(table.scrollTop).toBe(5025);
-      expect(mountedHosts()).toHaveLength(29);
+      expect(listMountedHosts()).toHaveLength(29);
     });
 
     it("holds the view at the bottom when a column resize grows the page", () => {
-      const { table } = virtualizedTable();
-      pageBound(table);
-      report(machines(5).map((row) => [rowOf(row.name), 5] as const));
+      const { table } = renderVirtualizedTable();
+      bindPageBounds(table);
+      report(buildMachines(5).map((row) => [getRow(row.name), 5] as const));
       scrollTo(table, 9875);
       fireEvent.keyDown(screen.getByRole("separator"), { key: "ArrowRight" });
       expect(table.scrollTop).toBe(9900);
     });
 
     it("forgets the height of a row whose record was replaced", () => {
-      const rows = machines(1000);
-      const { source, table } = virtualizedTable(rows);
-      report(machines(5).map((row) => [rowOf(row.name), 20] as const));
+      const rows = buildMachines(1000);
+      const { source, table } = renderVirtualizedTable(rows);
+      report(buildMachines(5).map((row) => [getRow(row.name), 20] as const));
       scrollTo(table, 5000);
       load(
         source,
@@ -634,27 +658,27 @@ describe("virtualized DataTable", () => {
 
   describe("new entries", () => {
     it("keeps the view on its rows when rows arrive above them", () => {
-      const rows = machines(1000);
-      const { source, table } = virtualizedTable(rows);
+      const rows = buildMachines(1000);
+      const { source, table } = renderVirtualizedTable(rows);
       scrollTo(table, 5000);
-      load(source, [...machines(5, 1000), ...rows]);
+      load(source, [...buildMachines(5, 1000), ...rows]);
       expect(table.scrollTop).toBe(5050);
-      expect(rowOf("host-500")).toHaveAttribute("aria-rowindex", "507");
+      expect(getRow("host-500")).toHaveAttribute("aria-rowindex", "507");
       // The correction is made once: the same rows again move nothing.
-      load(source, [...machines(5, 1000), ...rows]);
+      load(source, [...buildMachines(5, 1000), ...rows]);
       expect(table.scrollTop).toBe(5050);
     });
 
     it("shows rows arriving at the very top rather than scrolling past them", () => {
-      const rows = machines(1000);
-      const { source, table } = virtualizedTable(rows);
-      load(source, [...machines(5, 1000), ...rows]);
+      const rows = buildMachines(1000);
+      const { source, table } = renderVirtualizedTable(rows);
+      load(source, [...buildMachines(5, 1000), ...rows]);
       expect(table.scrollTop).toBe(0);
-      expect(mountedHosts()[0]).toBe("host-1000");
+      expect(listMountedHosts().at(0)).toBe("host-1000");
     });
 
     it("counts and places a stale status among the rows it stands above", () => {
-      const { provider, source, table } = virtualizedTable();
+      const { provider, source, table } = renderVirtualizedTable();
       act(() => {
         provider.setSearch("host-1");
       });
@@ -667,8 +691,8 @@ describe("virtualized DataTable", () => {
 
     it("renders an unchanged status once, however often the table renders", () => {
       const renderStatus = vi.fn(() => "Not current");
-      const { provider, source, table, view } = virtualizedTable(
-        machines(1000),
+      const { provider, source, table, view } = renderVirtualizedTable(
+        buildMachines(1000),
         {
           renderStatus,
         },
@@ -693,7 +717,9 @@ describe("virtualized DataTable", () => {
   });
 
   it("selects every displayed row from the header, mounted or not", () => {
-    const { provider } = virtualizedTable(machines(1000), { selectable: true });
+    const { provider } = renderVirtualizedTable(buildMachines(1000), {
+      selectable: true,
+    });
     fireEvent.click(
       screen.getByRole("checkbox", { name: "Select all displayed rows" }),
     );
@@ -701,7 +727,7 @@ describe("virtualized DataTable", () => {
   });
 
   it("resizes a column across the rows it mounts", () => {
-    const { table } = virtualizedTable();
+    const { table } = renderVirtualizedTable();
     const tracks = table.style.getPropertyValue("--data-table-columns");
     fireEvent.keyDown(screen.getByRole("separator"), { key: "ArrowRight" });
     expect(table.style.getPropertyValue("--data-table-columns")).not.toBe(
@@ -711,10 +737,10 @@ describe("virtualized DataTable", () => {
 
   it("keeps each table's own range, whatever descriptor they share", () => {
     const { provider: first } = createMachineProvider({
-      rows: machines(1000),
+      rows: buildMachines(1000),
     });
     const { provider: second } = createMachineProvider({
-      rows: machines(1000),
+      rows: buildMachines(1000),
     });
     render(
       <>
@@ -732,27 +758,27 @@ describe("virtualized DataTable", () => {
         />
       </>,
     );
-    const tables = screen.getAllByRole("table").map(scrollable);
+    const tables = screen.getAllByRole("table").map(makeScrollable);
     const one = elementAt(tables, 0);
     const two = elementAt(tables, 1);
     scrollTo(one, 5000);
-    expect(mountedHosts(one)).toContain("host-500");
-    expect(mountedHosts(two)[0]).toBe("host-0");
+    expect(listMountedHosts(one)).toContain("host-500");
+    expect(listMountedHosts(two).at(0)).toBe("host-0");
   });
 
   it("virtualizes by its estimates where nothing can measure", () => {
     vi.stubGlobal("ResizeObserver", undefined);
-    virtualizedTable();
-    expect(mountedHosts()).toHaveLength(15);
+    renderVirtualizedTable();
+    expect(listMountedHosts()).toHaveLength(15);
   });
 
   it("keeps its range, focus and anchor through StrictMode's double mount", () => {
-    const { table } = virtualizedTable(
-      machines(1000),
+    const { table } = renderVirtualizedTable(
+      buildMachines(1000),
       { selectable: true },
       (element) => <StrictMode>{element}</StrictMode>,
     );
-    expect(mountedHosts()).toHaveLength(15);
+    expect(listMountedHosts()).toHaveLength(15);
     act(() => {
       screen.getByRole("checkbox", { name: "Select m-3" }).focus();
     });
@@ -760,7 +786,7 @@ describe("virtualized DataTable", () => {
     expect(document.activeElement).toBe(
       screen.getByRole("checkbox", { name: "Select m-3" }),
     );
-    report([[rowOf("host-497"), 30]]);
+    report([[getRow("host-497"), 30]]);
     expect(table.scrollTop).toBe(5020);
   });
 
@@ -768,7 +794,7 @@ describe("virtualized DataTable", () => {
     // The rows are there before the first mount, as a host that already
     // holds them would have it.
     const { provider } = createMachineProvider();
-    preload(provider, machines(1000));
+    preload(provider, buildMachines(1000));
     render(
       <StrictMode>
         <DataTable
@@ -779,16 +805,16 @@ describe("virtualized DataTable", () => {
         />
       </StrictMode>,
     );
-    const table = scrollable(screen.getByRole("table"));
-    report([[rowOf("host-2"), 30]]);
+    const table = makeScrollable(screen.getByRole("table"));
+    report([[getRow("host-2"), 30]]);
     scrollTo(table, 5000);
     // host-2 measured 20px taller, so the rows in view start two rows
     // earlier than the estimates alone would put them.
-    expect(mountedHosts()[0]).toBe("host-494");
+    expect(listMountedHosts().at(0)).toBe("host-494");
   });
 
   it("starts a new range when the estimate changes", () => {
-    const { provider, view } = virtualizedTable();
+    const { provider, view } = renderVirtualizedTable();
     view.rerender(
       <DataTable
         provider={provider}
@@ -797,13 +823,13 @@ describe("virtualized DataTable", () => {
         virtualization={virtualizeRows({ estimatedRowHeight: 20 })}
       />,
     );
-    expect(mountedHosts()).toHaveLength(10);
+    expect(listMountedHosts()).toHaveLength(10);
   });
 
   it("leaves nothing observing or listening once unmounted", () => {
     const added = vi.spyOn(EventTarget.prototype, "addEventListener");
     const removed = vi.spyOn(EventTarget.prototype, "removeEventListener");
-    const { table, view } = virtualizedTable();
+    const { table, view } = renderVirtualizedTable();
     const ours = added.mock.calls.flatMap(([type, listener], call) => {
       const target = added.mock.contexts[call];
       return type === "scroll" &&
@@ -834,7 +860,7 @@ describe("virtualized DataTable", () => {
     // The server holds the rows before it renders; nothing observes the
     // provider there, and the client's first observer finds nothing pending.
     const { provider, source } = createMachineProvider();
-    preload(provider, machines(100));
+    preload(provider, buildMachines(100));
     const table = (
       <DataTable
         provider={provider}
@@ -854,7 +880,7 @@ describe("virtualized DataTable", () => {
     // client, is taken up under the request they answer — no new request,
     // so the table never turns busy.
     expect(source.calls).toHaveLength(1);
-    expect(source.latest().request.requestId).toBe(
+    expect(source.readLatest().request.requestId).toBe(
       provider.state.get().result.provenance?.requestId,
     );
     expect(provider.state.get().result.status).toBe("ready");

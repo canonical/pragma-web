@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { createStandInPresentationStore } from "../../../testing/createStandInStores.js";
+import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
 import settleCalls from "../../../testing/settleCalls.js";
 import { createPresentation } from "../../lib/presentation/index.js";
 

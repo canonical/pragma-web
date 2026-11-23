@@ -13,23 +13,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "vite";
 import { describe, expect, it } from "vitest";
+import type { BundleOutput as Output } from "../../../testing/types.js";
 
 /** The library folder, two levels up from `src/testing/integration`. */
 const lib = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../lib",
 );
-
-type Output = {
-  readonly output: readonly (
-    | { readonly type: "chunk"; readonly moduleIds: readonly string[] }
-    | {
-        readonly type: "asset";
-        readonly fileName: string;
-        readonly source: string | Uint8Array;
-      }
-  )[];
-};
 
 /** Bundle one consumer module; return its module graph and its CSS. */
 const bundle = async (
@@ -77,12 +67,13 @@ const bundle = async (
   };
 };
 
-const from = (module: string): string => JSON.stringify(path.join(lib, module));
+const quotePath = (module: string): string =>
+  JSON.stringify(path.join(lib, module));
 
 describe("bundle isolation", () => {
   it("stands the table alone: no virtualization, no composition", async () => {
     const { modules, css } = await bundle(
-      `export { DataTable } from ${from("index.ts")};`,
+      `export { DataTable } from ${quotePath("index.ts")};`,
     );
     // The table's own graph is there, down to the core modules it runs on.
     expect(modules.some((id) => id.endsWith("DataTable.tsx"))).toBe(true);
@@ -108,7 +99,7 @@ describe("bundle isolation", () => {
   }, 60_000);
 
   it("ships no mock endpoint, query client or story code from the root", async () => {
-    const { modules } = await bundle(`export * from ${from("index.ts")};`);
+    const { modules } = await bundle(`export * from ${quotePath("index.ts")};`);
     // The whole application surface, the connected filters among it.
     expect(modules.some((id) => id.endsWith("TextFilter.tsx"))).toBe(true);
     // The server-backed stories reach their endpoints through these; an
@@ -126,7 +117,7 @@ describe("bundle isolation", () => {
     // The entry point is named for its bytes: what it adds to a table is
     // the body, and a table's own graph is the table's to load.
     const { modules } = await bundle(
-      `export { virtualizeRows } from ${from("virtualization/index.ts")};`,
+      `export { virtualizeRows } from ${quotePath("virtualization/index.ts")};`,
     );
     expect(modules.some((id) => id.endsWith("VirtualBody.tsx"))).toBe(true);
     // Nothing of the table's own folder: the body renders rows through the
@@ -136,8 +127,8 @@ describe("bundle isolation", () => {
 
   it("ships the implementation over one copy of the shared core", async () => {
     const { modules, css } = await bundle(
-      `export { DataTable } from ${from("index.ts")};
-export { virtualizeRows } from ${from("virtualization/index.ts")};`,
+      `export { DataTable } from ${quotePath("index.ts")};
+export { virtualizeRows } from ${quotePath("virtualization/index.ts")};`,
     );
     expect(modules.some((id) => id.endsWith("VirtualBody.tsx"))).toBe(true);
     expect(

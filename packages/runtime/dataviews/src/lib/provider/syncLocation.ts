@@ -1,7 +1,7 @@
 import { readWithheld } from "../coordinator/index.js";
 import type { HistoryMode } from "../location/index.js";
 import { createChannel, protectChannel } from "../observable/index.js";
-import { areSlicesEqual, type Query } from "../query/index.js";
+import type { Query } from "../query/index.js";
 import type { QueryIssue } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
@@ -13,20 +13,11 @@ import {
   readOpenView,
 } from "../wire/index.js";
 import isCarryingQuery from "./isCarryingQuery.js";
+import isSameQuery from "./isSameQuery.js";
 import placeView from "./placeView.js";
+import shouldAdoptLocation from "./shouldAdoptLocation.js";
 import spellLocation from "./spellLocation.js";
 import type { LocationSync, LocationSyncConfig, Transition } from "./types.js";
-
-/**
- * Two queries the location cannot tell apart. Every window member the
- * grammar spells is compared; `collapsed` is not, because it has no spelling
- * — collapsing a group must not provoke a write of the same URL.
- */
-const isSameQuery = (a: Query, b: Query): boolean =>
-  (a.slice === b.slice || areSlicesEqual(a.slice, b.slice)) &&
-  a.window.page === b.window.page &&
-  a.window.size === b.window.size &&
-  a.window.cursor === b.window.cursor;
 
 /** The clauses of a decoding that narrow the result, which withhold it. */
 const listNarrowing = (decoded: DecodedQuery): readonly QueryIssue[] =>
@@ -171,6 +162,25 @@ export default function syncLocation<
   };
 
   /**
+   * Respell a clean location that is not canonical, replacing it. What the
+   * loop wrote itself is canonical by construction; only a spelling that
+   * arrived from elsewhere can need respelling.
+   */
+  const respellLocation = (
+    params: URLSearchParams,
+    decoded: DecodedQuery,
+    view: string | null,
+  ): void => {
+    if (decoded.issues.length > 0 || awaited.includes(params.toString())) {
+      return;
+    }
+    const canonical = spell(decoded, view, params);
+    if (canonical.toString() !== params.toString()) {
+      writeLocation(canonical, "replace");
+    }
+  };
+
+  /**
    * Read the location: report what it refuses, respell what is clean but not
    * canonical, and adopt what it carries when the host stands elsewhere. The
    * respelling replaces, since it is not a step the reader took, and comes
@@ -192,23 +202,16 @@ export default function syncLocation<
         ? keptIssues
         : decoded.issues,
     );
-    // What the loop wrote itself is canonical by construction; only a
-    // spelling that arrived from elsewhere can need respelling.
-    if (decoded.issues.length === 0 && !awaited.includes(params.toString())) {
-      const canonical = spell(decoded, view, params);
-      if (canonical.toString() !== params.toString()) {
-        writeLocation(canonical, "replace");
-      }
-    }
-    // The open view is the location's as the query is: a move of either is
-    // adopted, together. So are the refused clauses that narrow it, which
-    // withhold the query while they stand.
+    respellLocation(params, decoded, view);
     const narrowing = listNarrowing(decoded);
-    const state = host.state.get();
     if (
-      !isSameQuery(state, decoded) ||
-      view !== host.view.get() ||
-      !areQueryIssuesEqual(readWithheld(state), narrowing)
+      shouldAdoptLocation({
+        state: host.state.get(),
+        standingView: host.view.get(),
+        decoded,
+        view,
+        narrowing,
+      })
     ) {
       host.adopt(
         { slice: decoded.slice, window: decoded.window },

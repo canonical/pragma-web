@@ -22,6 +22,8 @@ import type { UseProviderStateProps, UseProviderStateResult } from "./types.js";
  * subscribes during render: the records are built in a memo and observed,
  * like the provider, from an effect, so a render React throws away leaves
  * nothing listening and a server render starts nothing.
+ *
+ * @note Impure: observes the provider and the filter records from effects.
  */
 export default function useProviderState<
   TFields extends readonly SchemaFieldDefinition[],
@@ -37,7 +39,7 @@ export default function useProviderState<
   }
   // The context stores the widest provider shape, schema and record type
   // alike; the hooks narrow it back after checking the collection.
-  const widest = provider as UseProviderStateResult["value"]["provider"];
+  const widest = provider as UseProviderStateResult["provider"];
   const inputs = useMemo(
     () => createFilterInputs({ host: readProviderHost(widest) }),
     [widest],
@@ -46,15 +48,15 @@ export default function useProviderState<
   const { ref, announce } = useAnnouncer();
   useEffect(() => provider.observe(), [provider]);
   useEffect(() => inputs.observe(), [inputs]);
-  const value = useMemo(
+  return useMemo(
     () => ({
       provider: widest,
       filters: inputs.handles,
       endSessions: inputs.endSessions,
       messages: words,
       announce,
+      announcer: ref,
     }),
-    [widest, inputs, words, announce],
+    [widest, inputs, words, announce, ref],
   );
-  return { value, announcer: ref };
 }

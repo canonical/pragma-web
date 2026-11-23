@@ -7,9 +7,9 @@
 # this file records what the spike draws rather than what a design specifies,
 # and is rewritten when one does.
 #
-# Anatomy DSL 0.3.0. No validator runs on this file yet. The root and the
-# cards reference the design system's own blocks; the parts added around and
-# inside them are role nodes.
+# Anatomy DSL. Checked in review against the DSL's JSON schema; no validator
+# runs on it in this repository. The root and the cards reference the design
+# system's own blocks; the parts added around and inside them are role nodes.
 #
 # Names — one per part, the same in the DOM and here:
 #   cards           DOM `ds data-cards`, a `section` named by `label`
@@ -33,22 +33,72 @@
 # a menu and status sit on a card), the card's span on the application grid
 # (the spike spans one intrinsic group of four columns), and whether a card
 # field list is a description list or a table of its own.
-anatomy:
-  root:
-    ref: ds:global.group.cards
-    name: cards
-    children:
-      - role: select-all
-      - role: status
-      - role: list
-        children:
-          - ref: ds:global.component.card
-            name: card
-            children:
-              - role: header
-                children:
-                  - role: checkbox
-                  - role: title
-              - role: details
-                children:
-                  - role: field
+node:
+  uri: global.group.cards
+  styles:
+    layout.type: stack
+    layout.direction: column
+    spacing.gap: dimension/200
+    typography.color: color/text
+    typography.family: typography/text/primary/font-family
+    typography.size: typography/text/primary/font-size
+    typography.weight: typography/text/primary/font-weight
+  edges:
+    - node:
+        role: select-all
+        styles:
+          layout.type: stack
+          layout.direction: row
+          layout.align: center
+          spacing.gap: dimension/050
+        edges:
+          - uri: global.subcomponent.checkbox_input
+            relation:
+              cardinality: "1"
+          - node:
+              role: label
+            relation:
+              cardinality: "1"
+      relation:
+        cardinality: "0..1"
+    - node:
+        role: status
+        styles:
+          spacing.internal.block: dimension/100
+      relation:
+        cardinality: "0..1"
+    - node:
+        role: list
+        edges:
+          - node:
+              uri: global.component.card
+              edges:
+                - node:
+                    role: header
+                    edges:
+                      - uri: global.subcomponent.checkbox_input
+                        relation:
+                          cardinality: "0..1"
+                      - node:
+                          role: title
+                        relation:
+                          cardinality: "1"
+                  relation:
+                    cardinality: "1"
+                - node:
+                    role: details
+                    styles:
+                      layout.type: grid
+                      spacing.gap.row: dimension/050
+                      spacing.gap.column: dimension/200
+                    edges:
+                      - node:
+                          role: field
+                        relation:
+                          cardinality: "1..*"
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "0..*"
+      relation:
+        cardinality: "1"

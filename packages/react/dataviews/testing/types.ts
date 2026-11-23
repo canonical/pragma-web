@@ -2,85 +2,32 @@ import type {
   Collection,
   DataViewsProvider,
   DataViewsProviderConfig,
-  Facet,
-  HistoryMode,
   PresentationStore,
-  Query,
   QueryLocation,
   ReadonlyChannel,
   SavedView,
-  Source,
-  SourceActionRunner,
   SourceCapabilities,
-  SourceDelivery,
-  SourcePage,
-  SourceRefusal,
-  SourceRequest,
   ViewStore,
 } from "@canonical/dataviews-core";
+import type {
+  ManualSource,
+  ManualSourceConfig,
+} from "@canonical/dataviews-core/testing";
 import type { RenderHookResult } from "@testing-library/react";
+import type { HeaderCellProps } from "../src/lib/_work_in_progress/DataTable/common/HeaderCell/types.js";
+import type { BoundFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/BoundFilter/types.js";
+import type { PresenceFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/PresenceFilter/types.js";
+import type { TextFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/TextFilter/types.js";
+import type { Machine } from "../src/storybook/machines/index.js";
 import type { machines } from "./machines.js";
 
-/** One value a values facet lists, with how many matching records hold it. */
-export type FacetValue = Extract<
-  Facet,
-  { readonly kind: "values" }
->["values"][number];
+export type { FacetValue } from "../src/storybook/machines/api/index.js";
+/** One machine record, the shape the stories and the tests share. */
+export type { Machine } from "../src/storybook/machines/index.js";
 
 /** A channel a test publishes on: the read side plus `set`. */
 export type FakeChannel<T> = ReadonlyChannel<T> & {
   readonly set: (next: T) => void;
-};
-
-/** One execution the manual source was asked for, and how to answer it. */
-export type ManualCall<TRow extends object> = {
-  readonly request: SourceRequest;
-  readonly deliver: (delivery: SourceDelivery<TRow>) => void;
-  /** How many times this execution's release has been called. */
-  releases: number;
-};
-
-/** Configuration of one manual source. */
-export type ManualSourceConfig<TRow extends object> = {
-  /** What the source declares. */
-  readonly capabilities: SourceCapabilities;
-  /** Refusals the declaration cannot express. */
-  readonly refusals?: ((query: Query) => readonly SourceRefusal[]) | undefined;
-  /** The action runner, when the declaration names actions. */
-  readonly runAction?: SourceActionRunner | undefined;
-  /**
-   * Answer every execution at once with this page. Left out, the test
-   * delivers by hand through `latest().deliver`.
-   */
-  readonly answer?: ((request: SourceRequest) => SourcePage<TRow>) | undefined;
-};
-
-/** A source whose deliveries the test drives by hand. */
-export type ManualSource<TRow extends object> = {
-  readonly source: Source<TRow>;
-  /** Every execution asked for, in order. */
-  readonly calls: readonly ManualCall<TRow>[];
-  /** The nth execution, or a failure rather than a skipped assertion. */
-  readonly callAt: (index: number) => ManualCall<TRow>;
-  /** The latest execution, or a failure when none was asked for. */
-  readonly latest: () => ManualCall<TRow>;
-};
-
-/**
- * One write a recording location received: the parameters, and the history
- * mode the writer asked for — null when it asked for none.
- */
-export type RecordedWrite = readonly [string, HistoryMode | null];
-
-/** A location port and the record of what passed through it. */
-export type RecordingLocation = {
-  readonly location: QueryLocation;
-  /** Every write, in order. */
-  readonly writes: RecordedWrite[];
-  /** What the location read at each notification its subscribers received. */
-  readonly notifications: string[];
-  /** Move the location from outside the loop, as the browser would. */
-  readonly move: (params: string) => void;
 };
 
 /** A view store kept in memory, with the ways another tab would change it. */
@@ -157,14 +104,6 @@ export type MockRequestWatch = {
   readonly stop: () => void;
 };
 
-/** One machine record, as a source would deliver it. */
-export type Machine = {
-  readonly id: string;
-  readonly name: string;
-  readonly status: "failed" | "running";
-  readonly cores: number;
-};
-
 /** The fields of the machine collection, for typed handles and providers. */
 export type MachineFields = typeof machines.schema.fields;
 
@@ -220,3 +159,104 @@ export type RootedHook<TResult> = MachineFixture & {
   /** How many times the hook has rendered so far. */
   readonly readRenders: () => number;
 };
+
+/** A record a case needs no field of but its identity. */
+export type IdentifiedRecord = { readonly id: string };
+
+/** What a bound filter case sets; the handle, label and definition follow the field. */
+export type BoundFilterHarnessProps = Partial<
+  Omit<BoundFilterProps, "handle" | "label" | "definition">
+> & { readonly field?: "cpu" | "updated" };
+
+/** What a presence filter case sets; the handle, label and field are the root's. */
+export type PresenceFilterHarnessProps = Partial<
+  Omit<PresenceFilterProps, "handle" | "label" | "field">
+>;
+
+/** What a text filter case sets; the handle, label and field are the root's. */
+export type TextFilterHarnessProps = Partial<
+  Omit<TextFilterProps, "handle" | "label" | "field">
+>;
+
+/** A record with an identity and a name. */
+export type NamedRecord = { readonly id: string; readonly name: string };
+
+/** A record with an identity and a count of cores. */
+export type CoredRecord = { readonly id: string; readonly cores: number };
+
+/** A record with an identity, a status and a spare flag. */
+export type SpareRecord = {
+  readonly id: string;
+  readonly status: string;
+  readonly spare: boolean;
+};
+
+/** A record with an identity and a status. */
+export type StatusRecord = { readonly id: string; readonly status: string };
+
+/** A record with an identity, a status and a CPU count. */
+export type CpuRecord = {
+  readonly id: string;
+  readonly status: string;
+  readonly cpu: number;
+};
+
+/** A record whose tag may be of any shape. */
+export type TaggedRecord = { readonly id: string; readonly tag: unknown };
+
+/** What a header cell case sets; the rest is a plain, unsorted column. */
+export type HeaderCellCaseProps = Partial<HeaderCellProps>;
+
+/** What a bundle of one consumer module writes: its chunks and assets. */
+export type BundleOutput = {
+  readonly output: readonly (
+    | { readonly type: "chunk"; readonly moduleIds: readonly string[] }
+    | {
+        readonly type: "asset";
+        readonly fileName: string;
+        readonly source: string | Uint8Array;
+      }
+  )[];
+};
+
+/** What a story's requests to the mock endpoints have come to so far. */
+export type RequestsRead = {
+  /** Requests sent to an endpoint that answers, still waiting on it. */
+  readonly waiting: number;
+  /**
+   * Whether the page shows what its answers say: no request was sent, or
+   * one waits on the endpoint that never answers, or nothing on the page
+   * is still busy.
+   */
+  readonly settled: boolean;
+};
+
+/** One rule of the sheet: the selectors it resolves to, and its declarations. */
+export type ResolvedRule = {
+  readonly selectors: readonly string[];
+  readonly declarations: string;
+};
+
+/** A host measured by its memory. */
+export type MemoryRecord = { readonly id: string; readonly memory: number };
+
+/** A record of the values a cell renders by its own rules. */
+export type OddRecord = {
+  readonly id: string;
+  readonly ready: boolean;
+  readonly big: bigint;
+  readonly shape: object;
+};
+
+/** A machine carrying the fields its facets are computed from. */
+export type FacetedRecord = IdentifiedRecord & {
+  readonly status: string;
+  readonly cpu: number;
+  readonly name: string;
+};
+
+/** A record that may be placed in a region. */
+export type PlacedRecord = { readonly id: string; readonly region?: string };
+
+/** A record placed in a region. */
+export type RegionRecord = { readonly id: string; readonly region: string };

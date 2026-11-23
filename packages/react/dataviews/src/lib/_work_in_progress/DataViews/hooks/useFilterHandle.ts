@@ -7,6 +7,8 @@ import type { UseFilterHandleResult } from "./types.js";
  * feedback, with edit, set and clear routed through the record. The
  * subscription is the handle's two channels and nothing else, so a control
  * re-renders for its own filter only.
+ *
+ * @note Impure: subscribes to the handle's two channels while mounted.
  */
 export default function useFilterHandle<TApplied>(
   handle: FilterHandle<TApplied>,

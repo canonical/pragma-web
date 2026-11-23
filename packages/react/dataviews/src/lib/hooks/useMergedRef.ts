@@ -1,5 +1,6 @@
-import { type Ref, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { applyRef } from "../utils/index.js";
+import type { UseMergedRefProps, UseMergedRefResult } from "./types.js";
 
 /**
  * One callback ref that serves the caller and the part at once: the node
@@ -13,9 +14,8 @@ import { applyRef } from "../utils/index.js";
  * own root merges the caller's ref, never drops it.
  */
 export default function useMergedRef<TElement>(
-  ref: Ref<TElement> | undefined,
-  attach: (node: TElement) => (() => void) | undefined,
-): (node: TElement) => () => void {
+  ...[ref, attach]: UseMergedRefProps<TElement>
+): UseMergedRefResult<TElement> {
   const callerRef = useRef(ref);
   callerRef.current = ref;
   return useCallback(

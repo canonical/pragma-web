@@ -147,7 +147,7 @@ export type EffectiveOrdering = {
  * `declareCapabilities` refuses it for every source, so a grouped or
  * collapsing request is refused rather than answered ungrouped.
  *
- * @seam grouping — read by the grouping work's array-source declaration
+ * The array source's grouping declaration reads this.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -289,7 +289,7 @@ export type Source<TRow extends object = RowRecord> = {
    * the request is executable. Required of a cursor source, which alone
    * knows which pages its tokens reach.
    */
-  readonly refusals?: (query: Query) => readonly SourceRefusal[];
+  readonly listRefusals?: (query: Query) => readonly SourceRefusal[];
   /**
    * Begin executing one request. `deliver` may be called synchronously and
    * more than once: every later call is an external change to the same
@@ -582,7 +582,9 @@ export type QuerySourceConfig<TRow extends object = RowRecord> = {
    * Refusals the declaration cannot express, such as a search this endpoint
    * cannot combine with a filter. Pure and synchronous; no round trip.
    */
-  readonly refusals?: ((query: Query) => readonly SourceRefusal[]) | undefined;
+  readonly listRefusals?:
+    | ((query: Query) => readonly SourceRefusal[])
+    | undefined;
   /** Stable prefix of the query key; the query's own key is appended. */
   readonly queryKey: readonly unknown[];
   /**
@@ -667,11 +669,14 @@ export type RelayConnection<TRow extends object = RowRecord> = {
     | readonly ({ readonly node: TRow | null | undefined } | null | undefined)[]
     | null
     | undefined;
-  readonly pageInfo: {
-    readonly endCursor?: string | null | undefined;
-    /** Whether a further page exists, as the connection spec defines it. */
-    readonly hasNextPage?: boolean | null | undefined;
-  };
+  readonly pageInfo:
+    | {
+        readonly endCursor?: string | null | undefined;
+        /** Whether a further page exists, as the connection spec defines it. */
+        readonly hasNextPage?: boolean | null | undefined;
+      }
+    | null
+    | undefined;
   /** The rows matching the query, when the schema counts them. */
   readonly totalCount?: number | null | undefined;
   /** The facets the operation selected, keyed by field, when it asked for any. */
@@ -699,9 +704,9 @@ export type RelaySourceConfig<
    * Build one page's operation, for example
    * `(page) => createOperationDescriptor(MachinesQuery, variablesOf(page))`.
    */
-  readonly operation: (page: RelayPageRequest) => RelayOperation;
+  readonly buildOperation: (page: RelayPageRequest) => RelayOperation;
   /** The connection within the query's data. */
-  readonly connection: (
+  readonly readConnection: (
     data: TQuery["response"],
   ) => RelayConnection<TRow> | null | undefined;
   /**

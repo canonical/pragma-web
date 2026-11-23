@@ -1,10 +1,6 @@
-/**
- * Props of the range drawing.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * drawing its figure from the facet, not forwarding a caller's native props.
- */
-export type RangeDrawingProps = {
+import type { ComponentProps } from "react";
+
+type OwnProps = {
   /** The chart's label, which captions the table and names the drawing. */
   readonly label: string;
   /** The least value any matching record holds. */
@@ -16,3 +12,10 @@ export type RangeDrawingProps = {
   /** The field's declared greatest value, where the schema declares one. */
   readonly upperBound: number | undefined;
 };
+
+/**
+ * Props of the range drawing. Its root is a `div` holding the drawing and its
+ * table, so it extends native div props, less `children`, which it draws.
+ */
+export type RangeDrawingProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps | "children">;

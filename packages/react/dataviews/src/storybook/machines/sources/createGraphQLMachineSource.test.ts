@@ -3,32 +3,28 @@ import {
   EMPTY_SLICE,
   type SourceDelivery,
 } from "@canonical/dataviews-core";
-import { HttpResponse, type HttpResponseResolver, http } from "msw";
+import { HttpResponse } from "msw";
 import { describe, expect, it, vi } from "vitest";
+import answerLiveRequests from "../../../../testing/answerLiveRequests.js";
 import answerOverHttp2 from "../../../../testing/answerOverHttp2.js";
 import { DELIVERY_WAIT } from "../../../../testing/constants.js";
 import readFailureReason from "../../../../testing/readFailureReason.js";
 import serveMockApi from "../../../../testing/serveMockApi.js";
-import { machines } from "../fixtures.js";
+import { storyMachines } from "../fixtures.js";
 import type { Machine } from "../types.js";
 import createGraphQLMachineSource from "./createGraphQLMachineSource.js";
 
 // Each test answers the one request its source sends its own way.
 const server = serveMockApi([]);
 
-/** Answer the live scenario's requests with one resolver. */
-const answerWith = (resolver: HttpResponseResolver): void => {
-  server.use(http.post("*/graphql/live", resolver));
-};
-
 describe("createGraphQLMachineSource", () => {
   it("publishes a partial answer's data rather than failing it", async () => {
-    const [machine] = machines;
+    const [machine] = storyMachines;
     if (machine === undefined) {
       throw new Error("the story fixtures hold a machine");
     }
     const { id, name, status, cores, region, owner } = machine;
-    answerWith(() =>
+    answerLiveRequests(server, "graphql", () =>
       HttpResponse.json({
         data: {
           machines: {
@@ -72,7 +68,7 @@ describe("createGraphQLMachineSource", () => {
 
   it("asks the endpoint for every clause of the query, by name", async () => {
     const bodies: unknown[] = [];
-    answerWith(async ({ request }) => {
+    answerLiveRequests(server, "graphql", async ({ request }) => {
       bodies.push(await request.json());
       return HttpResponse.json({
         data: {
@@ -138,7 +134,9 @@ describe("createGraphQLMachineSource", () => {
   it("names the status when a failed answer gives no error", async () => {
     // Status 599 has no standard text, and over HTTP/2 none is given.
     answerOverHttp2();
-    answerWith(() => HttpResponse.json({}, { status: 599 }));
+    answerLiveRequests(server, "graphql", () =>
+      HttpResponse.json({}, { status: 599 }),
+    );
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered 599",
     );
@@ -146,28 +144,36 @@ describe("createGraphQLMachineSource", () => {
 
   it("names the status when a failed answer is not JSON", async () => {
     answerOverHttp2();
-    answerWith(() => new HttpResponse("<html>", { status: 599 }));
+    answerLiveRequests(
+      server,
+      "graphql",
+      () => new HttpResponse("<html>", { status: 599 }),
+    );
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered 599",
     );
   });
 
   it("gives a failed answer's status text when it gives no error", async () => {
-    answerWith(() => HttpResponse.json({}, { status: 503 }));
+    answerLiveRequests(server, "graphql", () =>
+      HttpResponse.json({}, { status: 503 }),
+    );
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "Service Unavailable",
     );
   });
 
   it("fails an error with no message in a sentence of its own", async () => {
-    answerWith(() => HttpResponse.json({ errors: [null] }));
+    answerLiveRequests(server, "graphql", () =>
+      HttpResponse.json({ errors: [null] }),
+    );
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered with an error it did not describe",
     );
   });
 
   it("fails a connection answered as null in the endpoint's own words", async () => {
-    answerWith(() =>
+    answerLiveRequests(server, "graphql", () =>
       HttpResponse.json({
         data: { machines: null },
         errors: [{ message: "the inventory resolver failed" }],
@@ -179,21 +185,29 @@ describe("createGraphQLMachineSource", () => {
   });
 
   it("fails data that holds nothing in a sentence of its own", async () => {
-    answerWith(() => HttpResponse.json({ data: {} }));
+    answerLiveRequests(server, "graphql", () =>
+      HttpResponse.json({ data: {} }),
+    );
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered without data",
     );
   });
 
   it("fails an answer with no data in a sentence of its own", async () => {
-    answerWith(() => HttpResponse.json({ data: null }));
+    answerLiveRequests(server, "graphql", () =>
+      HttpResponse.json({ data: null }),
+    );
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered without data",
     );
   });
 
   it("fails an answer that is not JSON at all", async () => {
-    answerWith(() => new HttpResponse("<html>", { status: 200 }));
+    answerLiveRequests(
+      server,
+      "graphql",
+      () => new HttpResponse("<html>", { status: 200 }),
+    );
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered without a JSON object",
     );
@@ -201,7 +215,7 @@ describe("createGraphQLMachineSource", () => {
 
   it("fails JSON that is not an object, a list included", async () => {
     for (const body of ["oops", []]) {
-      answerWith(() => HttpResponse.json(body));
+      answerLiveRequests(server, "graphql", () => HttpResponse.json(body));
       expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
         "the endpoint answered without a JSON object",
       );

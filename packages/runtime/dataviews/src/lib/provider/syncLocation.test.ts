@@ -17,6 +17,7 @@ import declare from "../../../testing/declare.js";
 import declareSort from "../../../testing/declareSort.js";
 import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
 import readId from "../../../testing/readId.js";
+import type { LocationSetUp as SetUp } from "../../../testing/types.js";
 import { createCollection } from "../collection/index.js";
 import { createFilterInputs } from "../filter/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
@@ -101,7 +102,7 @@ const fleet: readonly RowRecord[] = [
 ];
 
 /** One exactly counted page of rows, as a source delivers it. */
-const delivered = (rows: readonly RowRecord[]): Completion => ({
+const buildDelivered = (rows: readonly RowRecord[]): Completion => ({
   status: "succeeded",
   page: buildPage(rows),
 });
@@ -110,8 +111,8 @@ const delivered = (rows: readonly RowRecord[]): Completion => ({
  * A manual source of the given declaration. It refuses nothing of its
  * own, which a cursor declaration requires it to say.
  */
-const sourceOf = (capabilities: SourceCapabilities = permissive) =>
-  createManualSource({ capabilities, refusals: () => [] });
+const createSource = (capabilities: SourceCapabilities = permissive) =>
+  createManualSource({ capabilities, listRefusals: () => [] });
 
 /** A provider over the machines, started from `query` when one is given. */
 const createMachinesProvider = (
@@ -121,19 +122,10 @@ const createMachinesProvider = (
 ) =>
   createDataViewsProvider({
     collection: machines,
-    source: sourceOf(capabilities).source,
+    source: createSource(capabilities).source,
     ...(query === undefined ? {} : { snapshot: { query, presentation: {} } }),
     ...(history === undefined ? {} : { history }),
   });
-
-type SetUp = {
-  readonly href?: string | undefined;
-  readonly location?: QueryLocation | undefined;
-  readonly capabilities?: SourceCapabilities | undefined;
-  /** The query the provider starts from, as a snapshot carries it. */
-  readonly query?: string | undefined;
-  readonly history?: HistoryPolicy | undefined;
-};
 
 /**
  * A provider, its host, a location and the loop over the two — built,
@@ -175,9 +167,9 @@ const adoptSearch = (
 };
 
 /** A recording port over the given href. */
-const recording = (href: string) => createRecordingLocation({ href });
+const createRecording = (href: string) => createRecordingLocation({ href });
 
-const windowAt = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
+const buildWindow = (overrides: Partial<ResultWindow> = {}): ResultWindow => ({
   ...DEFAULT_WINDOW,
   ...overrides,
 });
@@ -197,7 +189,7 @@ describe("syncLocation", () => {
     expect(provider.state.get().slice.filter).toEqual([
       { field: "status", operator: "isAny", operands: ["failed", "cancelled"] },
     ]);
-    expect(provider.state.get().window).toEqual(windowAt({ page: 2 }));
+    expect(provider.state.get().window).toEqual(buildWindow({ page: 2 }));
     release();
   });
 
@@ -256,7 +248,7 @@ describe("syncLocation", () => {
     });
     const release = sync.observe();
     expect(provider.state.get().window).toEqual(
-      windowAt({ page: 2, cursor: "after-page-one" }),
+      buildWindow({ page: 2, cursor: "after-page-one" }),
     );
     // Adopted verbatim, so a reload reaches the same page start.
     expect(location.read().toString()).toBe(
@@ -368,7 +360,7 @@ describe("syncLocation", () => {
     expect(provider.state.get().slice.filter).toEqual([
       { field: "status", operator: "isAny", operands: ["ready"] },
     ]);
-    expect(provider.state.get().window).toEqual(windowAt({ page: 2 }));
+    expect(provider.state.get().window).toEqual(buildWindow({ page: 2 }));
     // The authoritative query wins: the stale input session is discarded.
     expect(inputs.handles.cpu.gte.state.get().input).toBe("");
     stopInputs();
@@ -379,7 +371,7 @@ describe("syncLocation", () => {
     // Forward after Back lands on the very text the loop wrote earlier. The
     // echo guard forgets every write once the location moves elsewhere, so
     // the return is a move like any other.
-    const { location, writes, move } = recording("/machines");
+    const { location, writes, move } = createRecording("/machines");
     const { provider, sync } = setUp({ location });
     const release = sync.observe();
     provider.navigateWindow({ page: 2 });
@@ -402,7 +394,7 @@ describe("syncLocation", () => {
     const write = vi.spyOn(location, "write");
     const provider = createDataViewsProvider({
       collection: machines,
-      source: sourceOf().source,
+      source: createSource().source,
       location,
     });
     const release = provider.observe();
@@ -414,7 +406,7 @@ describe("syncLocation", () => {
 
     const pushing = createDataViewsProvider({
       collection: machines,
-      source: sourceOf().source,
+      source: createSource().source,
       location,
       history: { search: "push" },
     });
@@ -427,7 +419,7 @@ describe("syncLocation", () => {
   });
 
   it("enters history by the transition: search replaces, the rest push", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, host, sync } = setUp({ location });
     const release = sync.observe();
     writes.length = 0;
@@ -485,7 +477,7 @@ describe("syncLocation", () => {
   });
 
   it("follows a policy naming one mode for every transition", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, host, sync } = setUp({ location, history: "replace" });
     const release = sync.observe();
     writes.length = 0;
@@ -505,7 +497,7 @@ describe("syncLocation", () => {
   });
 
   it("pushes a saved view's query and writes nothing for the location's own", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { host, sync } = setUp({ location });
     const release = sync.observe();
     writes.length = 0;
@@ -539,7 +531,7 @@ describe("syncLocation", () => {
   });
 
   it("moves the open view with the query in one write: opened pushes, reverted and left replace", () => {
-    const { location, writes } = recording("/machines?status=ready");
+    const { location, writes } = createRecording("/machines?status=ready");
     const { host, sync } = setUp({ location });
     const release = sync.observe();
     writes.length = 0;
@@ -569,7 +561,7 @@ describe("syncLocation", () => {
   });
 
   it("adopts the view id a location carries and its absence, writing neither back", () => {
-    const { location, writes, move } = recording("/machines?view=v1");
+    const { location, writes, move } = createRecording("/machines?view=v1");
     const { host, sync } = setUp({ location });
     const release = sync.observe();
     // A name alone is a query carried: read, and respelt canonically.
@@ -738,7 +730,7 @@ describe("syncLocation", () => {
     // away and its report stands.
     expect(location.read().toString()).toBe("status=melted&page=2");
     expect(sync.issues.get()).toEqual([MELTED]);
-    expect(provider.state.get().window).toEqual(windowAt({ page: 2 }));
+    expect(provider.state.get().window).toEqual(buildWindow({ page: 2 }));
     release();
   });
 
@@ -762,7 +754,7 @@ describe("syncLocation", () => {
     const read = vi.spyOn(location, "read");
     for (let cycle = 0; cycle < 3; cycle += 1) {
       const requestId = host.refresh();
-      host.complete(requestId, delivered([{ id: "a" }]));
+      host.complete(requestId, buildDelivered([{ id: "a" }]));
     }
     expect(read).not.toHaveBeenCalled();
     // A query that does move is still written.
@@ -818,7 +810,7 @@ describe("syncLocation", () => {
   });
 
   it("lets a reset nothing observed win over the location, once", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, sync } = setUp({ location });
     const release = sync.observe();
     provider.setSort([{ field: "cpu", direction: "desc" }]);
@@ -841,7 +833,7 @@ describe("syncLocation", () => {
   });
 
   it("hears the reset it writes on observing, so a later move is the reader's", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, sync } = setUp({ location });
     // Reset while nothing observed: unheard, written on the next observe.
     provider.reset();
@@ -881,7 +873,7 @@ describe("syncLocation", () => {
   });
 
   it("leaves a location moved after a reset it heard to the reader", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, sync } = setUp({ location });
     const release = sync.observe();
     provider.setSort([{ field: "cpu", direction: "desc" }]);
@@ -954,7 +946,7 @@ describe("syncLocation", () => {
   });
 
   it("respells a location before adopting it, so a move the adoption provokes lands last", () => {
-    const { location, writes, move } = recording("/machines");
+    const { location, writes, move } = createRecording("/machines");
     const { provider, sync } = setUp({ location });
     const release = sync.observe();
     // Reacting to the adoption, something pages on.
@@ -1065,7 +1057,7 @@ describe("syncLocation", () => {
     // decode cannot see.
     const source: Source = {
       ...createArraySource({ rows: fleet, collection: machines }),
-      refusals: (query) =>
+      listRefusals: (query) =>
         query.slice.sort.some((term) => term.field === "cpu")
           ? [CPU_UNSORTABLE]
           : [],
@@ -1103,7 +1095,7 @@ describe("syncLocation", () => {
   });
 
   it("pushes a history entry for a sort command, by its own default", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, sync } = setUp({ location });
     const release = sync.observe();
     provider.setSort([{ field: "cpu", direction: "asc" }]);
@@ -1124,7 +1116,7 @@ describe("syncLocation", () => {
   });
 
   it("writes nothing when a sort command only respells the ordering in force", () => {
-    const { location, writes } = recording("/machines?sort=cpu__asc");
+    const { location, writes } = createRecording("/machines?sort=cpu__asc");
     const { provider, sync } = setUp({ location });
     const release = sync.observe();
     const before = writes.length;
@@ -1138,7 +1130,7 @@ describe("syncLocation", () => {
 
   it("replaces rather than pushes when a command leaves the ordering alone", () => {
     // A search beside a standing ordering is still a search: it replaces.
-    const { location, writes } = recording("/machines?sort=cpu__asc");
+    const { location, writes } = createRecording("/machines?sort=cpu__asc");
     const { provider, sync } = setUp({ location });
     const release = sync.observe();
     provider.setSearch("yak");
@@ -1152,7 +1144,7 @@ describe("syncLocation", () => {
   it("replaces when a location respells an ordering it already carries", () => {
     // The first occurrence is the ordering, so the duplicate is a
     // respelling rather than a step the reader took.
-    const { location, writes } = recording(
+    const { location, writes } = createRecording(
       "/machines?sort=cpu__asc&sort=cpu__desc",
     );
     const { provider, sync } = setUp({ location });
@@ -1207,7 +1199,7 @@ describe("syncLocation", () => {
     provider.navigateWindow({ page: 1, size: 25 });
     expect(location.read().toString()).toBe("page=1&size=25");
     location.write(new URLSearchParams("page=1&size=10"));
-    expect(provider.state.get().window).toEqual(windowAt({ size: 10 }));
+    expect(provider.state.get().window).toEqual(buildWindow({ size: 10 }));
     release();
   });
 
@@ -1233,7 +1225,7 @@ describe("syncLocation", () => {
   it("refuses a command the source cannot execute at the boundary, and writes nothing", () => {
     // Refused before it moves anything: the provider announces no
     // transition, so the loop hears nothing and the URL is left as it was.
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, sync } = setUp({
       location,
       capabilities: declare({
@@ -1269,7 +1261,7 @@ describe("syncLocation", () => {
   });
 
   it("writes nothing for a collapse, which has no spelling", () => {
-    const { location, writes } = recording("/machines");
+    const { location, writes } = createRecording("/machines");
     const { provider, host, sync } = setUp({
       location,
       capabilities: declare({
@@ -1473,7 +1465,7 @@ describe("syncLocation", () => {
   });
 
   it("owes a read-back respelling a replace, even in push mode", () => {
-    const { location, writes, move } = recording(
+    const { location, writes, move } = createRecording(
       "/machines?q=abc&page=1&size=50",
     );
     const { provider, host, sync } = setUp({
@@ -1499,7 +1491,9 @@ describe("syncLocation", () => {
   });
 
   it("owes a host move made during a read-back the transition's push", () => {
-    const { location, writes } = recording("/machines?q=abc&page=1&size=50");
+    const { location, writes } = createRecording(
+      "/machines?q=abc&page=1&size=50",
+    );
     const { provider, host, sync } = setUp({
       location,
       capabilities: NOTHING_DECLARED,
@@ -1521,7 +1515,7 @@ describe("syncLocation", () => {
   });
 
   it("lets a genuine move after a respelling in one read-back push", () => {
-    const { location, writes, move } = recording(
+    const { location, writes, move } = createRecording(
       "/machines?q=abc&page=1&size=50",
     );
     const { provider, host, sync } = setUp({
@@ -1558,7 +1552,7 @@ describe("syncLocation", () => {
   });
 
   it("keeps a read-back respelling a replace when the host republishes in place", () => {
-    const { location, writes, move } = recording(
+    const { location, writes, move } = createRecording(
       "/machines?q=abc&page=1&size=50",
     );
     const { provider, host, sync } = setUp({
@@ -1672,7 +1666,7 @@ describe("syncLocation", () => {
   });
 
   it("adopts the location before the source runs, so the first request carries its query", () => {
-    const manual = sourceOf();
+    const manual = createSource();
     const location = createMemoryLocation({ href: "/machines?status=failed" });
     const provider = createDataViewsProvider({
       collection: machines,
@@ -1688,7 +1682,7 @@ describe("syncLocation", () => {
     expect(manual.callAt(0).request.slice.filter).toEqual([
       { field: "status", operator: "isAny", operands: ["failed"] },
     ]);
-    expect(manual.callAt(0).request.window).toEqual(windowAt());
+    expect(manual.callAt(0).request.window).toEqual(buildWindow());
     expect(location.read().toString()).toBe("status=failed&page=1&size=50");
     expect(provider.issues.get()).toEqual([]);
     release();

@@ -33,6 +33,28 @@ const isFacetValue = (value: unknown): value is FacetValue =>
   "count" in value &&
   isCount(value.count);
 
+/** The type of each machine field. */
+const MACHINE_FIELD_TYPES = {
+  id: "string",
+  name: "string",
+  region: "string",
+  cores: "number",
+  owner: "string",
+  note: "string",
+} as const;
+
+/** The statuses a machine may have. */
+const MACHINE_STATUSES: readonly unknown[] = ["running", "failed", "pending"];
+
+/** Whether a value is a machine: every field of its type, a known status. */
+const isMachine = (value: unknown): value is Machine =>
+  typeof value === "object" &&
+  value !== null &&
+  MACHINE_STATUSES.includes(Reflect.get(value, "status")) &&
+  Object.entries(MACHINE_FIELD_TYPES).every(
+    ([field, type]) => typeof Reflect.get(value, field) === type,
+  );
+
 /** Whether a value is one end of a range facet. */
 const isRangeEnd = (value: unknown): value is string | number | null =>
   value === null || typeof value === "string" || typeof value === "number";
@@ -154,8 +176,8 @@ export default function createRestMachineSource(
         throw new Error("the endpoint answered without machines");
       }
       return createPage({
-        // The endpoint serves machines; its records are read as they come.
-        rows: body.items as readonly Machine[],
+        // Each machine read, never trusted: one of another shape is left out.
+        rows: body.items.filter(isMachine),
         matched:
           "matched" in body && typeof body.matched === "number"
             ? body.matched

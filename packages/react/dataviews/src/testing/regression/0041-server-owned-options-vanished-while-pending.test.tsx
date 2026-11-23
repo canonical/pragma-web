@@ -17,13 +17,12 @@ import {
   createPage,
   declareCapabilities,
 } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import type { FacetValue } from "../../../testing/types.js";
+import answerFacetValues from "../../../testing/answerFacetValues.js";
+import type { IdentifiedRecord as Placed } from "../../../testing/types.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
-
-type Placed = { readonly id: string };
 
 const places = createCollection({
   identify: (row: Placed) => row.id,
@@ -48,25 +47,13 @@ const mountManual = () => {
       <DataViews.Filters />
     </DataViews>,
   );
-  /** Answer the latest request with the region facet's values. */
-  const answerWith = (values: readonly FacetValue[]): void => {
-    act(() => {
-      manual.latest().deliver({
-        status: "succeeded",
-        page: createPage({
-          rows: [],
-          facets: { region: { kind: "values", values } },
-        }),
-      });
-    });
-  };
-  return { answerWith };
+  return { manual };
 };
 
 describe("regression 0041 — server-owned options vanished while pending", () => {
   it("keeps every option while a query is pending, and focus on the one unchecked", () => {
-    const { answerWith } = mountManual();
-    answerWith([
+    const { manual } = mountManual();
+    answerFacetValues(manual, "region", [
       { value: "eu", count: { kind: "exact", value: 2 } },
       { value: "us", count: { kind: "exact", value: 1 } },
     ]);
@@ -107,7 +94,7 @@ describe("regression 0041 — server-owned options vanished while pending", () =
       </DataViews>,
     );
     act(() => {
-      manual.latest().deliver({
+      manual.readLatest().deliver({
         status: "succeeded",
         page: createPage({
           rows: [],

@@ -50,15 +50,15 @@ export type RowModel<TRow extends object = RowRecord> = {
   readonly entries: readonly RowEntry<TRow>[];
   readonly ids: readonly string[];
   /** The record for one identity, or undefined when the row is not modelled. */
-  readonly byId: (id: string) => TRow | undefined;
+  readonly findRecord: (id: string) => TRow | undefined;
 };
 
 /**
  * Whether a schema field applies to a row, by the field's type scoping.
  * Value and empty are the field's own states; this is the third.
  *
- * @seam typed cells — read by the body cell, which draws a not-applicable
- * cell as a dash with the accessible text "not applicable"
+ * The body cell draws a not-applicable cell as a dash with the accessible
+ * text "not applicable".
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

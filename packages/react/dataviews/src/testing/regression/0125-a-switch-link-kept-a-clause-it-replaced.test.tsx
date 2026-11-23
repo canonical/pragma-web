@@ -17,9 +17,9 @@ import {
   createMemoryLocation,
   declareCapabilities,
 } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../testing/fixtures.js";
 import { machines } from "../../../testing/machines.js";
 import type { Machine } from "../../../testing/types.js";

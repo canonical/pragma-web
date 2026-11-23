@@ -7,5 +7,5 @@ import type { RowModel } from "./types.js";
 export const EMPTY_ROW_MODEL: RowModel<never> = Object.freeze({
   entries: Object.freeze([]),
   ids: Object.freeze([]),
-  byId: () => undefined,
+  findRecord: () => undefined,
 });

@@ -5,7 +5,7 @@ describe("createFacetedManual", () => {
   it("asks for the status and cores facets, and leaves the answer to the test", () => {
     const { provider, source } = createFacetedManual();
     onTestFinished(provider.observe());
-    expect(source.latest().request.facets).toEqual(["status", "cores"]);
+    expect(source.readLatest().request.facets).toEqual(["status", "cores"]);
     expect(provider.state.get().result.rows).toBeNull();
   });
 });

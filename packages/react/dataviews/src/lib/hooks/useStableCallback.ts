@@ -1,5 +1,8 @@
 import { useCallback, useRef } from "react";
-import type { UseStableCallbackResult } from "./types.js";
+import type {
+  UseStableCallbackProps,
+  UseStableCallbackResult,
+} from "./types.js";
 
 /**
  * Hold a caller's function behind one stable identity.
@@ -15,7 +18,7 @@ export default function useStableCallback<
   TArgs extends readonly unknown[],
   TResult,
 >(
-  callback: (...args: TArgs) => TResult,
+  ...[callback]: UseStableCallbackProps<TArgs, TResult>
 ): UseStableCallbackResult<TArgs, TResult> {
   // Written during render: the latest callback is what every reader
   // wants, so a render React discards writing it first is harmless.

@@ -13,6 +13,6 @@ export default function areListsEqual<T>(
 ): boolean {
   return (
     a.length === b.length &&
-    a.every((left, index) => equals(left, b[index] as T))
+    a.every((left, index) => equals(left, b.at(index) as T))
   );
 }

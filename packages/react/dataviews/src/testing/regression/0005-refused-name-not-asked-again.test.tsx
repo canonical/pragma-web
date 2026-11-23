@@ -9,6 +9,7 @@
  */
 
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -35,9 +36,12 @@ describe("regression 0005 — a refused name was not asked again", () => {
         initial=""
         pending={false}
         onSubmit={onSubmit}
-        onCancel={() => {}}
       />,
     );
+    // The form is a dialog, opened as its command opens it.
+    act(() => {
+      document.querySelector("dialog")?.showModal();
+    });
     const name = screen.getByRole<HTMLInputElement>("textbox", {
       name: "Name",
     });

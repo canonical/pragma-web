@@ -5,19 +5,20 @@
 #
 # Anatomy DSL 0.3.0. No validator runs on this file yet: it is checked in
 # review against the DSL's JSON schema. The design system's graph names no
-# block for saved views and the design draws none, so the root is a role node
-# rather than an IRI; a graph block is asked of the design owners. The
+# block for saved views and the design draws none, so the root's IRI is the
+# one the component's `@implements` drafts; a graph block is asked of the
+# design owners. The
 # controls are the design system's own Button, SelectInput and TextInput.
 #
 # Names — one per part, the same in the DOM and here; the design has none yet:
 #   saved-views control  DOM `ds data-views-saved-views`
 #   view picker       DOM `.picker`
 #   modified mark     DOM `.modified`
-#   label             DOM `.label` (the view picker's and the name form's)
+#   label             DOM `.label` (the view picker's and the name dialog's)
 #   commands          DOM `.commands`
-#   name form         DOM `ds data-views-saved-views-name-form`
+#   name dialog       DOM `ds data-views-saved-views-name-form`
 #   name error        DOM `.error`
-#   delete confirm    DOM `ds data-views-saved-views-confirm`
+#   delete dialog     DOM `ds data-views-saved-views-confirm`
 #   question          DOM `.message`
 #   command status    DOM `.status`
 #   notices           DOM `.notices`
@@ -38,9 +39,12 @@
 #
 # Deviations the DSL cannot express, recorded here:
 #   - Conditional display is deferred in the DSL. The modified mark shows only
-#     while the live query differs from the open view's. The name form and the
-#     delete confirmation replace nothing: each shows beneath the commands
-#     while it is open, and at most one is open.
+#     while the live query differs from the open view's. The rename and
+#     delete dialogs exist only while a view is open.
+#   - The dialogs are native modal `dialog`s, opened by their commands'
+#     invoker commands (`commandfor`, `command="show-modal"`) and closed by
+#     Cancel (`command="close"`) or Escape. The DSL has no relation for an
+#     invoker, so the link is recorded here.
 #   - Without JavaScript the part renders only the no-script notice, inside a
 #     `noscript`: views live in the browser's storage, which a server cannot
 #     read. Links to a full query still work, since the query is in the URL.
@@ -54,9 +58,10 @@
 #     opened or removed (shown while the query is unmodified), conflict (with
 #     its recovery: overwrite, save as a new view, discard the changes),
 #     missing, unreadable, refused, failed.
-#   - name form: valid, invalid (the browser's own report, and the error
-#     beside the input): a name is required, and one the collection refuses
-#     is set as the input's validity.
+#   - name dialog: valid, invalid (the browser's own report, and the error
+#     beside the input): a name is required and must not be only spaces
+#     (`pattern`), and one the collection refuses is set as the input's
+#     validity.
 #
 # Accessibility (DataViews component coverage, "Views/save/rename/delete":
 # 2.1.1, 2.4.6, 3.3.1, 3.3.4, 4.1.2-4.1.3):
@@ -68,19 +73,20 @@
 #                     that ask for more before acting. Disabled while a
 #                     command is pending, Try again aside, or while they have
 #                     nothing to act on.
-#   name form         A labelled input ("Name"). An empty or duplicate name is
-#                     refused before anything is written, and the error is
-#                     tied to the input (aria-invalid, aria-describedby).
-#                     Escape cancels; the focus returns to the command that
-#                     opened the form.
-#   delete confirm    Deleting asks first, naming the view; the focus starts on
-#                     Cancel. Escape cancels.
+#   name dialog       A modal dialog named for what the name is for, holding
+#                     a labelled input ("Name"). An empty, blank or duplicate
+#                     name is refused before anything is written, and the
+#                     error is tied to the input (aria-invalid,
+#                     aria-describedby). Escape cancels; the focus returns to
+#                     the command that opened the dialog.
+#   delete dialog     A modal dialog named by its question, which names the
+#                     view; the focus starts on Cancel. Escape cancels.
 #   command status    A polite status: what is in flight, then what happened —
 #                     a conflict or a failure is never reported as saved.
 #   notices           A polite status: views unavailable, records that cannot
 #                     be read, the arrangement not being saved.
 node:
-  role: saved-views control
+  uri: apps.subcomponent.data_views-saved_views
   styles:
     layout.type: stack
     layout.direction: row
@@ -129,9 +135,10 @@ node:
       relation:
         cardinality: "1"
         slotName: commands
-    - switch:
-        "on": internal
-        cases:
+    # Save as's dialog always, and Rename's while a view is open.
+    - node:
+        role: name dialog
+        edges:
           - node:
               role: name form
               styles:
@@ -152,20 +159,29 @@ node:
                 - uri: global.component.button
                   relation:
                     cardinality: "2"
+            relation:
+              cardinality: "1"
+      relation:
+        cardinality: "1..2"
+        slotName: name-dialogs
+    - node:
+        role: delete dialog
+        styles:
+          layout.type: stack
+          layout.direction: row
+          layout.align: center
+          spacing.gap: dimension/050
+        edges:
           - node:
-              role: delete confirm
-              styles:
-                layout.type: stack
-                layout.direction: row
-                layout.align: center
-                spacing.gap: dimension/050
-              edges:
-                - uri: global.component.button
-                  relation:
-                    cardinality: "2"
+              role: question
+            relation:
+              cardinality: "1"
+          - uri: global.component.button
+            relation:
+              cardinality: "2"
       relation:
         cardinality: "0..1"
-        slotName: panel
+        slotName: delete-dialog
     - node:
         role: command status
       relation:

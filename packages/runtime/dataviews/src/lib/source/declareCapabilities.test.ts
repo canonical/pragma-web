@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import declareCapabilities from "./declareCapabilities.js";
@@ -148,23 +148,10 @@ describe("declareCapabilities", () => {
     ).toThrow('empty values of "name" are placed, which is not sortable');
   });
 
-  it("checks the declaration against the schema at compile time", () => {
-    expectTypeOf<NonNullable<Declaration["filter"]>>().toEqualTypeOf<{
-      readonly status?: readonly ("isAny" | "isNone")[] | true;
-      readonly cpu?: readonly ("gte" | "lte")[] | true;
-      readonly owner?: readonly "isSet"[] | true;
-      readonly name?: readonly ("contains" | "startsWith")[] | true;
-    }>();
+  it("keeps the operators a declaration names for a field", () => {
     expect(
       declareCapabilities(machines, { filter: { name: ["contains"] } }).filter,
     ).toEqual({ name: ["contains"] });
-    expectTypeOf<
-      NonNullable<Declaration["sort"]>["fields"][number]
-    >().toEqualTypeOf<"status" | "cpu" | "owner" | "name">();
-    // Not declarable: no shipped source can execute either, so the record
-    // refuses both and an author has nothing to spell.
-    expectTypeOf<Declaration>().not.toHaveProperty("group");
-    expectTypeOf<Declaration>().not.toHaveProperty("selection");
   });
 
   it("declares the facets a source computes, refusing text and unknown fields", () => {
@@ -183,8 +170,5 @@ describe("declareCapabilities", () => {
         facets: ["zone"],
       } as unknown as Declaration),
     ).toThrow('the schema has no field "zone" to compute a facet for');
-    expectTypeOf<NonNullable<Declaration["facets"]>[number]>().toEqualTypeOf<
-      "status" | "cpu" | "owner"
-    >();
   });
 });

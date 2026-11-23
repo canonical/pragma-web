@@ -1,6 +1,9 @@
 import type { ReadonlyChannel } from "@canonical/dataviews-core";
 import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
-import type { UseDataViewsValueResult } from "./types.js";
+import type {
+  UseDataViewsValueProps,
+  UseDataViewsValueResult,
+} from "./types.js";
 
 /** The whole snapshot: the selector a call without one reads through, at one identity. */
 const selectWhole = (value: unknown): unknown => value;
@@ -38,12 +41,10 @@ const selectWhole = (value: unknown): unknown => value;
  * name may change or move before the first release.
  */
 export default function useDataViewsValue<T>(
-  channel: ReadonlyChannel<T>,
+  ...args: readonly [channel: UseDataViewsValueProps<T, T>[0]]
 ): UseDataViewsValueResult<T>;
 export default function useDataViewsValue<T, TSelected>(
-  channel: ReadonlyChannel<T>,
-  select: (value: T) => TSelected,
-  isEqual?: (previous: TSelected, next: TSelected) => boolean,
+  ...args: UseDataViewsValueProps<T, TSelected>
 ): UseDataViewsValueResult<TSelected>;
 export default function useDataViewsValue(
   channel: ReadonlyChannel<unknown>,

@@ -9,12 +9,15 @@ import type { UseDestinationProps, UseDestinationResult } from "./types.js";
  * it, following the applied state, the open view and the location's other
  * parameters. The value React reads is the spelled text, so a publication that
  * leaves the destination as it was re-renders nothing. Null without a location:
- * there is nowhere for a destination to lead. `destinationOf` is compared by
+ * there is nowhere for a destination to lead. `readDestination` is compared by
  * identity, so a caller keeps one at module scope.
+ *
+ * @note Impure: subscribes to the provider's state, its open view and its
+ * location while mounted.
  */
 export default function useDestination({
   provider,
-  destinationOf,
+  readDestination,
 }: UseDestinationProps): UseDestinationResult {
   const { spellQuery, location, view } = readProviderHost(provider);
   const { state } = provider;
@@ -39,8 +42,8 @@ export default function useDestination({
   );
   const spell = useCallback(
     (): string | null =>
-      spellQuery(destinationOf(state.get()))?.toString() ?? null,
-    [spellQuery, state, destinationOf],
+      spellQuery(readDestination(state.get()))?.toString() ?? null,
+    [spellQuery, state, readDestination],
   );
   return useSyncExternalStore(subscribe, spell, spell);
 }

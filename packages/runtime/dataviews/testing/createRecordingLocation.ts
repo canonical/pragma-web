@@ -1,4 +1,3 @@
-import { vi } from "vitest";
 import {
   createMemoryLocation,
   type MemoryLocationConfig,
@@ -14,11 +13,14 @@ import type { RecordingLocation } from "./types.js";
  * search replaced, a sort pushed, Back adopted and nothing was written
  * back" is read off the port's own calls, never off a browser.
  *
- * Its reads and subscriptions are spies, for a test that asserts "read once,
+ * It counts its reads and subscriptions, for a test that asserts "read once,
  * subscribed to never".
  *
  * @note Impure by design: it records every write, and the core's every
  * notification, into the lists it hands back for a test to read.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function createRecordingLocation(
   config: MemoryLocationConfig = {},
@@ -26,26 +28,31 @@ export default function createRecordingLocation(
   const memory = createMemoryLocation(config);
   const writes: RecordingLocation["writes"] = [];
   const notifications: string[] = [];
-  const read = vi.fn(() => memory.read());
-  const subscribe = vi.fn((listener: () => void) =>
-    memory.subscribe(() => {
-      notifications.push(memory.read().toString());
-      listener();
-    }),
-  );
+  let reads = 0;
+  let subscriptions = 0;
   const location: QueryLocation = {
-    read,
+    read() {
+      reads += 1;
+      return memory.read();
+    },
     write(next, options) {
       writes.push([next.toString(), options?.history ?? null]);
       memory.write(next, options);
     },
-    subscribe,
+    subscribe(listener) {
+      subscriptions += 1;
+      return memory.subscribe(() => {
+        notifications.push(memory.read().toString());
+        listener();
+      });
+    },
   };
   return {
     location,
     writes,
     notifications,
-    spies: { read, subscribe },
+    countReads: () => reads,
+    countSubscriptions: () => subscriptions,
     /** Move the location from outside, as Back, Forward or a pasted URL would. */
     move(params: string): void {
       memory.write(new URLSearchParams(params));

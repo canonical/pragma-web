@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, waitFor } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
-import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
-import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import {
+  withAppScope,
+  withMachineRoot,
+} from "../../../../../storybook/decorators/index.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
+import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Pagination.js";
 import type { DataViewsPaginationProps } from "./types.js";
@@ -39,22 +40,13 @@ const composition = `<DataViews provider={provider}>
   <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`;
 
-/** A composed collection: a root, its table and its pagination part. */
-function ComposedMachines({
-  options,
-  ...args
-}: DataViewsPaginationProps & {
-  readonly options?: MachineProviderConfig | undefined;
-}): ReactElement {
-  const provider = useMachineProvider({
-    query: "page=1&size=5",
-    ...options,
-  });
+/** A composed collection inside the story's root: its table and its pagination part. */
+function ComposedMachines(args: DataViewsPaginationProps): ReactElement {
   return (
-    <DataViews provider={provider}>
-      <DataTable provider={provider} columns={columns} label="Machines" />
+    <>
+      <DataViews.DataTable columns={columns} label="Machines" />
       <Component {...args} />
-    </DataViews>
+    </>
   );
 }
 
@@ -67,12 +59,13 @@ const onlyFailed = "status=failed&page=1&size=5";
  * provider.
  */
 export const InAComposition: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     query: "page=1&size=5",
     render: composition,
   }),
+  decorators: [withMachineRoot({ query: "page=1&size=5" })],
   render: (args) => <ComposedMachines {...args} />,
   play: async ({ canvas }) => {
     await waitFor(() =>
@@ -90,15 +83,14 @@ export const InAComposition: Story = {
  * fill. The total it shows is always the current query's.
  */
 export const AFilteredTotal: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts: ["DataTable", "DataViews", "type DataTableColumn"],
     declarations: columnsCode,
     query: onlyFailed,
     render: composition,
   }),
-  render: (args) => (
-    <ComposedMachines {...args} options={{ query: onlyFailed }} />
-  ),
+  decorators: [withMachineRoot({ query: onlyFailed })],
+  render: (args) => <ComposedMachines {...args} />,
   play: async ({ canvas }) => {
     await waitFor(() =>
       expect(canvas.getByRole("status")).toHaveTextContent(

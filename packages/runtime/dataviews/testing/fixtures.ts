@@ -57,6 +57,7 @@ export const FACETED_SCHEMA = createSchema([
   { field: "name", kind: "text" },
 ]);
 
+/** Records of the faceted schema, one of each case a facet reader meets. */
 export const FACETED_ROWS: readonly RowRecord[] = [
   {
     id: "a",

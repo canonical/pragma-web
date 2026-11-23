@@ -46,7 +46,7 @@ export default function createRequestCompleter<TRow extends object = RowRecord>(
       // holds the same records still, so there is nothing to read again
       // and nothing about to leave the display.
       if (built.status === "built" && built.model !== rows.get()) {
-        rejection = recordTyping?.rejectionOf(built.model) ?? null;
+        rejection = recordTyping?.readRejection(built.model) ?? null;
         model = rejection === null ? built.model : null;
       } else if (built.status === "rejected") {
         rejection = built.reason;

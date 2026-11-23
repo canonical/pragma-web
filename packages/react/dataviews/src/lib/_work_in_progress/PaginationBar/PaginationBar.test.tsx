@@ -5,13 +5,14 @@
  * it itself: the source's first request exists once the bar has rendered,
  * and each case answers it by hand.
  */
+
 import {
   type Count,
   createMemoryLocation,
-  type DataViewsProvider,
   DEFAULT_WINDOW,
   declareCapabilities,
 } from "@canonical/dataviews-core";
+import type { ManualSource } from "@canonical/dataviews-core/testing";
 import type { LinkComponentProps } from "@canonical/react-ds-global";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, StrictMode } from "react";
@@ -23,23 +24,21 @@ import type {
   Machine,
   MachineFields,
   MachineFixture,
-  ManualSource,
+  MachineProvider as Provider,
 } from "../../../../testing/types.js";
 import { DataViews } from "../DataViews/index.js";
 import PaginationBar from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
 
-type Provider = DataViewsProvider<MachineFields, Machine>;
-
 /** The default window on one page of one size, as every case reads it. */
-const at = (page: number, size: number) => ({
+const buildWindow = (page: number, size: number) => ({
   ...DEFAULT_WINDOW,
   page,
   size,
 });
 
 /** A provider started on `window`, over a source each case answers by hand. */
-const makeProvider = (window = at(1, 2)): MachineFixture =>
+const makeProvider = (window = buildWindow(1, 2)): MachineFixture =>
   createMachineProvider({
     snapshot: {
       query: new URLSearchParams({
@@ -50,7 +49,7 @@ const makeProvider = (window = at(1, 2)): MachineFixture =>
     },
   });
 
-const machines = (count: number): readonly Machine[] =>
+const buildMachines = (count: number): readonly Machine[] =>
   Array.from({ length: count }, (_unused, index) =>
     buildMachine(`m${index}`, `m${index}`),
   );
@@ -73,7 +72,7 @@ const load = (
         ? { kind: "exact", value: count }
         : count;
   act(() => {
-    source.latest().deliver({
+    source.readLatest().deliver({
       status: "succeeded",
       page: {
         rows,
@@ -92,17 +91,17 @@ const mount = (
   props: Omit<PaginationBarProps<MachineFields, Machine>, "provider"> = {},
 ) => render(<PaginationBar {...props} provider={provider} />);
 
-const summary = () => screen.getByRole("status");
-const pageSelect = () => screen.getByRole("combobox", { name: "Page" });
-const sizeSelect = () => screen.getByLabelText("Rows per page");
-const button = (name: string) => screen.getByRole("button", { name });
-const first = () => button("First page");
-const previous = () => button("Previous page");
-const next = () => button("Next page");
-const last = () => button("Last page");
-const values = (select: HTMLElement) =>
+const getSummary = () => screen.getByRole("status");
+const getPageSelect = () => screen.getByRole("combobox", { name: "Page" });
+const getSizeSelect = () => screen.getByLabelText("Rows per page");
+const getButton = (name: string) => screen.getByRole("button", { name });
+const getFirst = () => getButton("First page");
+const getPrevious = () => getButton("Previous page");
+const getNext = () => getButton("Next page");
+const getLast = () => getButton("Last page");
+const listValues = (select: HTMLElement) =>
   [...select.querySelectorAll("option")].map((option) => option.value);
-const windowOf = (provider: Provider) => provider.state.get().window;
+const readWindow = (provider: Provider) => provider.state.get().window;
 
 describe("PaginationBar", () => {
   it("refuses anything but a provider", () => {
@@ -117,6 +116,14 @@ describe("PaginationBar", () => {
     ).toThrow(
       "PaginationBar requires a provider created by createDataViewsProvider",
     );
+  });
+
+  it("marks its root once the page has hydrated", () => {
+    const { provider } = makeProvider();
+    mount(provider);
+    expect(
+      screen.getByRole("navigation", { name: "Pagination" }),
+    ).toHaveAttribute("data-hydrated");
   });
 
   it("observes its provider for as long as it is mounted", () => {
@@ -141,10 +148,10 @@ describe("PaginationBar", () => {
         <PaginationBar provider={own.provider} />
       </DataViews>,
     );
-    load(own.source, machines(2), 6);
-    fireEvent.click(next());
-    expect(windowOf(own.provider)).toEqual(at(2, 2));
-    expect(windowOf(outer.provider)).toEqual(at(1, 2));
+    load(own.source, buildMachines(2), 6);
+    fireEvent.click(getNext());
+    expect(readWindow(own.provider)).toEqual(buildWindow(2, 2));
+    expect(readWindow(outer.provider)).toEqual(buildWindow(1, 2));
   });
 
   it("is a navigation named by its label, in the drawn order", () => {
@@ -153,15 +160,15 @@ describe("PaginationBar", () => {
     // Page size first, then the summary; the page select, then the buttons.
     // The submit controls are the baseline's, beside the select they submit.
     expect([...nav.querySelectorAll("select, [role=status], button")]).toEqual([
-      sizeSelect(),
-      button("Apply page size"),
-      summary(),
-      pageSelect(),
-      button("Go to page"),
-      first(),
-      previous(),
-      next(),
-      last(),
+      getSizeSelect(),
+      getButton("Apply page size"),
+      getSummary(),
+      getPageSelect(),
+      getButton("Go to page"),
+      getFirst(),
+      getPrevious(),
+      getNext(),
+      getLast(),
     ]);
   });
 
@@ -174,10 +181,10 @@ describe("PaginationBar", () => {
 
   it("claims nothing before the first results arrive", () => {
     mount(makeProvider().provider);
-    expect(summary()).toBeEmptyDOMElement();
-    expect(values(pageSelect())).toEqual(["1"]);
-    expect(pageSelect()).not.toHaveAttribute("aria-describedby");
-    for (const control of [first(), previous(), next(), last()]) {
+    expect(getSummary()).toBeEmptyDOMElement();
+    expect(listValues(getPageSelect())).toEqual(["1"]);
+    expect(getPageSelect()).not.toHaveAttribute("aria-describedby");
+    for (const control of [getFirst(), getPrevious(), getNext(), getLast()]) {
       expect(control).toBeDisabled();
     }
   });
@@ -185,193 +192,195 @@ describe("PaginationBar", () => {
   it("summarises the rows on screen out of the filtered total", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 5);
-    expect(summary()).toHaveTextContent(/^Showing 1–2 out of 5 rows$/);
-    expect(values(pageSelect())).toEqual(["1", "2", "3"]);
+    load(source, buildMachines(2), 5);
+    expect(getSummary()).toHaveTextContent(/^Showing 1–2 out of 5 rows$/);
+    expect(listValues(getPageSelect())).toEqual(["1", "2", "3"]);
     // The total describes the select it sits beside.
     const total = screen.getByText("of 3 pages");
-    expect(pageSelect()).toHaveAttribute("aria-describedby", total.id);
-    expect(first()).toBeDisabled();
-    expect(previous()).toBeDisabled();
-    expect(next()).toBeEnabled();
-    expect(last()).toBeEnabled();
+    expect(getPageSelect()).toHaveAttribute("aria-describedby", total.id);
+    expect(getFirst()).toBeDisabled();
+    expect(getPrevious()).toBeDisabled();
+    expect(getNext()).toBeEnabled();
+    expect(getLast()).toBeEnabled();
   });
 
   it("counts one item and one page in the singular", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(1), 1);
-    expect(summary()).toHaveTextContent(/^Showing row 1 out of 1$/);
+    load(source, buildMachines(1), 1);
+    expect(getSummary()).toHaveTextContent(/^Showing row 1 out of 1$/);
     expect(screen.getByText("of 1 page")).toBeInTheDocument();
   });
 
   it("offers no last page when the source publishes no count", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), null);
-    expect(summary()).toHaveTextContent(/^Showing 1–2 rows$/);
+    load(source, buildMachines(2), null);
+    expect(getSummary()).toHaveTextContent(/^Showing 1–2 rows$/);
     expect(screen.queryByText(/^of /)).toBeNull();
-    expect(last()).toBeDisabled();
+    expect(getLast()).toBeDisabled();
     // A full page is evidence there may be another; a short one is not.
-    expect(next()).toBeEnabled();
-    fireEvent.click(next());
-    load(source, machines(1), null);
-    expect(next()).toBeDisabled();
-    expect(summary()).toHaveTextContent(/^Showing row 3$/);
+    expect(getNext()).toBeEnabled();
+    fireEvent.click(getNext());
+    load(source, buildMachines(1), null);
+    expect(getNext()).toBeDisabled();
+    expect(getSummary()).toHaveTextContent(/^Showing row 3$/);
     // Every page before this one is reachable from the select.
-    expect(values(pageSelect())).toEqual(["1", "2"]);
-    expect(pageSelect()).toHaveValue("2");
+    expect(listValues(getPageSelect())).toEqual(["1", "2"]);
+    expect(getPageSelect()).toHaveValue("2");
   });
 
   it("takes the page's own word on a further page over its own guess", () => {
     const { provider, source } = makeProvider();
     mount(provider);
     // A full page the source says is the last one.
-    load(source, machines(2), null, false);
-    expect(next()).toBeDisabled();
+    load(source, buildMachines(2), null, false);
+    expect(getNext()).toBeDisabled();
     act(() => {
       provider.refresh();
     });
     // A short page the source says has another behind it.
-    load(source, machines(1), null, true);
-    expect(next()).toBeEnabled();
+    load(source, buildMachines(1), null, true);
+    expect(getNext()).toBeEnabled();
   });
 
   it("goes to the first and last pages a count declares", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 6);
-    fireEvent.click(last());
-    expect(windowOf(provider)).toEqual(at(3, 2));
-    load(source, machines(2), 6);
-    expect(next()).toBeDisabled();
-    expect(last()).toBeDisabled();
-    fireEvent.click(first());
-    expect(windowOf(provider)).toEqual(at(1, 2));
+    load(source, buildMachines(2), 6);
+    fireEvent.click(getLast());
+    expect(readWindow(provider)).toEqual(buildWindow(3, 2));
+    load(source, buildMachines(2), 6);
+    expect(getNext()).toBeDisabled();
+    expect(getLast()).toBeDisabled();
+    fireEvent.click(getFirst());
+    expect(readWindow(provider)).toEqual(buildWindow(1, 2));
   });
 
   it("steps one page from wherever it is", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 6);
-    fireEvent.click(next());
-    load(source, machines(2), 6);
-    expect(pageSelect()).toHaveValue("2");
-    fireEvent.click(previous());
-    expect(windowOf(provider)).toEqual(at(1, 2));
-    load(source, machines(2), 6);
-    fireEvent.click(next());
-    expect(windowOf(provider)).toEqual(at(2, 2));
+    load(source, buildMachines(2), 6);
+    fireEvent.click(getNext());
+    load(source, buildMachines(2), 6);
+    expect(getPageSelect()).toHaveValue("2");
+    fireEvent.click(getPrevious());
+    expect(readWindow(provider)).toEqual(buildWindow(1, 2));
+    load(source, buildMachines(2), 6);
+    fireEvent.click(getNext());
+    expect(readWindow(provider)).toEqual(buildWindow(2, 2));
   });
 
   it("jumps to the page the select names", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 6);
-    fireEvent.change(pageSelect(), { target: { value: "3" } });
-    expect(windowOf(provider)).toEqual(at(3, 2));
+    load(source, buildMachines(2), 6);
+    fireEvent.change(getPageSelect(), { target: { value: "3" } });
+    expect(readWindow(provider)).toEqual(buildWindow(3, 2));
   });
 
   it("steps back from past the last page to the last one there is", () => {
-    const { provider, source } = makeProvider(at(9, 2));
+    const { provider, source } = makeProvider(buildWindow(9, 2));
     mount(provider);
     load(source, [], 4);
     // The select still says where the window is, after the pages there are.
-    expect(pageSelect()).toHaveValue("9");
-    expect(values(pageSelect())).toEqual(["1", "2", "9"]);
-    fireEvent.click(previous());
-    expect(windowOf(provider)).toEqual(at(2, 2));
+    expect(getPageSelect()).toHaveValue("9");
+    expect(listValues(getPageSelect())).toEqual(["1", "2", "9"]);
+    fireEvent.click(getPrevious());
+    expect(readWindow(provider)).toEqual(buildWindow(2, 2));
   });
 
   it("steps back one page from the last", () => {
-    const { provider, source } = makeProvider(at(3, 2));
+    const { provider, source } = makeProvider(buildWindow(3, 2));
     mount(provider);
-    load(source, machines(2), 6);
-    fireEvent.click(previous());
-    expect(windowOf(provider)).toEqual(at(2, 2));
+    load(source, buildMachines(2), 6);
+    fireEvent.click(getPrevious());
+    expect(readWindow(provider)).toEqual(buildWindow(2, 2));
   });
 
   it("goes to the last page from past it", () => {
-    const { provider, source } = makeProvider(at(9, 2));
+    const { provider, source } = makeProvider(buildWindow(9, 2));
     mount(provider);
     load(source, [], 4);
-    expect(last()).toBeEnabled();
-    fireEvent.click(last());
-    expect(windowOf(provider)).toEqual(at(2, 2));
+    expect(getLast()).toBeEnabled();
+    fireEvent.click(getLast());
+    expect(readWindow(provider)).toEqual(buildWindow(2, 2));
   });
 
   it("keeps one page when the collection is empty", () => {
     const { provider, source } = makeProvider();
     mount(provider);
     load(source, [], 0);
-    expect(summary()).toHaveTextContent(/^Showing 0 out of 0 rows$/);
+    expect(getSummary()).toHaveTextContent(/^Showing 0 out of 0 rows$/);
     expect(screen.getByText("of 1 page")).toBeInTheDocument();
-    expect(next()).toBeDisabled();
+    expect(getNext()).toBeDisabled();
   });
 
   it("summarises nothing while a replacement page is in flight", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 5);
+    load(source, buildMachines(2), 5);
     act(() => {
       provider.navigateWindow({ page: 2 });
     });
     // The rows still on screen are an earlier page's, so they are not
     // summarised as this one's; the count is this query's all the same, so
     // the pages it makes are still listed and still reachable.
-    expect(summary()).toBeEmptyDOMElement();
+    expect(getSummary()).toBeEmptyDOMElement();
     expect(screen.getByText(/^of /)).toHaveTextContent("of 3 pages");
-    expect(next()).toBeEnabled();
-    load(source, machines(2), 5);
-    expect(summary()).toHaveTextContent(/^Showing 3–4 out of 5 rows$/);
-    expect(next()).toBeEnabled();
+    expect(getNext()).toBeEnabled();
+    load(source, buildMachines(2), 5);
+    expect(getSummary()).toHaveTextContent(/^Showing 3–4 out of 5 rows$/);
+    expect(getNext()).toBeEnabled();
   });
 
   it("says a lower bound as one, and names no last page from it", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), { kind: "at-least", value: 7 });
-    expect(summary()).toHaveTextContent(/^Showing 1–2 out of at least 7 rows$/);
+    load(source, buildMachines(2), { kind: "at-least", value: 7 });
+    expect(getSummary()).toHaveTextContent(
+      /^Showing 1–2 out of at least 7 rows$/,
+    );
     expect(screen.queryByText(/^of /)).toBeNull();
-    expect(last()).toBeDisabled();
+    expect(getLast()).toBeDisabled();
     // Seven at least, two to a page: a second page is proven.
-    expect(next()).toBeEnabled();
-    fireEvent.click(next());
+    expect(getNext()).toBeEnabled();
+    fireEvent.click(getNext());
     // One row, and a bound the rows already exceed: said as the source
     // said it, and Next now rests on the page's own word, which is none.
-    load(source, machines(1), { kind: "at-least", value: 1 });
-    expect(summary()).toHaveTextContent(/^Showing row 3 out of at least 1$/);
-    expect(next()).toBeDisabled();
+    load(source, buildMachines(1), { kind: "at-least", value: 1 });
+    expect(getSummary()).toHaveTextContent(/^Showing row 3 out of at least 1$/);
+    expect(getNext()).toBeDisabled();
   });
 
   it("claims no total while a replacement query is in flight", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 5);
+    load(source, buildMachines(2), 5);
     act(() => {
       provider.setSearch("alpha");
     });
     // The previous query's total does not describe the pending one, and the
     // rows still on screen are not the ones Next would page past.
-    expect(summary()).toBeEmptyDOMElement();
+    expect(getSummary()).toBeEmptyDOMElement();
     expect(screen.queryByText(/^of /)).toBeNull();
-    expect(next()).toBeDisabled();
-    load(source, machines(2), 3);
-    expect(summary()).toHaveTextContent(/^Showing 1–2 out of 3 rows$/);
-    expect(next()).toBeEnabled();
+    expect(getNext()).toBeDisabled();
+    load(source, buildMachines(2), 3);
+    expect(getSummary()).toHaveTextContent(/^Showing 1–2 out of 3 rows$/);
+    expect(getNext()).toBeEnabled();
   });
 
   it("announces the rows a new page brings", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 5);
-    fireEvent.click(next());
-    load(source, machines(2), 5);
+    load(source, buildMachines(2), 5);
+    fireEvent.click(getNext());
+    load(source, buildMachines(2), 5);
     // The same count on another page: the range is what changes.
-    expect(summary()).toHaveTextContent(/^Showing 3–4 out of 5 rows$/);
-    fireEvent.click(last());
-    load(source, machines(1), 5);
-    expect(summary()).toHaveTextContent(/^Showing row 5 out of 5$/);
+    expect(getSummary()).toHaveTextContent(/^Showing 3–4 out of 5 rows$/);
+    fireEvent.click(getLast());
+    load(source, buildMachines(1), 5);
+    expect(getSummary()).toHaveTextContent(/^Showing row 5 out of 5$/);
   });
 
   it("lists the pages the core counts, through a page move and not past a new query", () => {
@@ -379,91 +388,91 @@ describe("PaginationBar", () => {
     // is handed and keeps it while a page of the same query loads.
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 6);
-    fireEvent.change(pageSelect(), { target: { value: "2" } });
+    load(source, buildMachines(2), 6);
+    fireEvent.change(getPageSelect(), { target: { value: "2" } });
     expect(screen.getByText(/^of /)).toHaveTextContent("of 3 pages");
-    expect(values(pageSelect())).toEqual(["1", "2", "3"]);
-    load(source, machines(2), 6);
+    expect(listValues(getPageSelect())).toEqual(["1", "2", "3"]);
+    load(source, buildMachines(2), 6);
     act(() => {
       provider.setSearch("m1");
     });
-    expect(values(pageSelect())).toEqual(["1"]);
+    expect(listValues(getPageSelect())).toEqual(["1"]);
     expect(screen.queryByText(/^of /)).toBeNull();
   });
 
   it("claims no total beside an earlier query's rows after the current one failed", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 5);
+    load(source, buildMachines(2), 5);
     act(() => {
       provider.setSearch("m1");
     });
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "failed",
         failure: { reason: "offline", cause: null, transient: null },
       });
     });
-    expect(summary()).toBeEmptyDOMElement();
-    expect(next()).toBeDisabled();
-    expect(last()).toBeDisabled();
+    expect(getSummary()).toBeEmptyDOMElement();
+    expect(getNext()).toBeDisabled();
+    expect(getLast()).toBeDisabled();
   });
 
   it("resets to the first page when the page size changes", () => {
     const { provider, source } = makeProvider();
     mount(provider, { sizes: [2, 25] });
-    load(source, machines(2), 40);
-    fireEvent.click(next());
-    load(source, machines(2), 40);
-    fireEvent.change(sizeSelect(), { target: { value: "25" } });
+    load(source, buildMachines(2), 40);
+    fireEvent.click(getNext());
+    load(source, buildMachines(2), 40);
+    fireEvent.change(getSizeSelect(), { target: { value: "25" } });
     // The old page number counted rows of a different size.
-    expect(windowOf(provider)).toEqual(at(1, 25));
+    expect(readWindow(provider)).toEqual(buildWindow(1, 25));
   });
 
   it("always offers the applied size, in order", () => {
     mount(makeProvider().provider);
-    expect(values(sizeSelect())).toEqual(["2", "50", "75", "100"]);
-    expect(sizeSelect()).toHaveValue("2");
+    expect(listValues(getSizeSelect())).toEqual(["2", "50", "75", "100"]);
+    expect(getSizeSelect()).toHaveValue("2");
   });
 
   it("offers each size once, and exactly the sizes given when one is applied", () => {
-    mount(makeProvider(at(1, 25)).provider, { sizes: [50, 25, 50] });
-    expect(values(sizeSelect())).toEqual(["50", "25"]);
+    mount(makeProvider(buildWindow(1, 25)).provider, { sizes: [50, 25, 50] });
+    expect(listValues(getSizeSelect())).toEqual(["50", "25"]);
   });
 
   it("moves focus to the page select when the focused button becomes unavailable", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 4);
-    next().focus();
-    fireEvent.click(next());
+    load(source, buildMachines(2), 4);
+    getNext().focus();
+    fireEvent.click(getNext());
     // Next waits for the page it asked for, so it cannot keep the focus.
-    expect(next()).toBeDisabled();
-    expect(pageSelect()).toHaveFocus();
+    expect(getNext()).toBeDisabled();
+    expect(getPageSelect()).toHaveFocus();
   });
 
   it("keeps focus on a button that stays available", () => {
-    const { provider, source } = makeProvider(at(3, 2));
+    const { provider, source } = makeProvider(buildWindow(3, 2));
     mount(provider);
-    load(source, machines(2), 6);
-    previous().focus();
-    fireEvent.click(previous());
-    load(source, machines(2), 6);
-    expect(previous()).toBeEnabled();
-    expect(previous()).toHaveFocus();
+    load(source, buildMachines(2), 6);
+    getPrevious().focus();
+    fireEvent.click(getPrevious());
+    load(source, buildMachines(2), 6);
+    expect(getPrevious()).toBeEnabled();
+    expect(getPrevious()).toHaveFocus();
   });
 
   it("leaves focus alone once it has left the buttons", () => {
     const { provider, source } = makeProvider();
     mount(provider);
-    load(source, machines(2), 4);
-    next().focus();
-    next().blur();
+    load(source, buildMachines(2), 4);
+    getNext().focus();
+    getNext().blur();
     act(() => {
       provider.navigateWindow({ page: 2 });
     });
-    expect(next()).toBeDisabled();
-    expect(pageSelect()).not.toHaveFocus();
+    expect(getNext()).toBeDisabled();
+    expect(getPageSelect()).not.toHaveFocus();
   });
 
   it("follows the window and pages under StrictMode", () => {
@@ -476,13 +485,13 @@ describe("PaginationBar", () => {
     // The rehearsal mount released its hold; the live execution is the
     // one the real mount started, for the same request.
     expect(source.callAt(0).releases).toBe(1);
-    expect(source.latest().releases).toBe(0);
-    load(source, machines(2), 5);
-    expect(summary()).toHaveTextContent(/^Showing 1–2 out of 5 rows$/);
-    fireEvent.click(next());
-    expect(windowOf(provider)).toEqual(at(2, 2));
-    load(source, machines(2), 5);
-    expect(pageSelect()).toHaveValue("2");
+    expect(source.readLatest().releases).toBe(0);
+    load(source, buildMachines(2), 5);
+    expect(getSummary()).toHaveTextContent(/^Showing 1–2 out of 5 rows$/);
+    fireEvent.click(getNext());
+    expect(readWindow(provider)).toEqual(buildWindow(2, 2));
+    load(source, buildMachines(2), 5);
+    expect(getPageSelect()).toHaveValue("2");
   });
 
   it("pages a cursor source by its tokens, and offers no jump", () => {
@@ -497,14 +506,14 @@ describe("PaginationBar", () => {
         counts: { pageable: "exact" },
         pagination: { kind: "cursor", backward: false, durable: false },
       }),
-      refusals: () => [],
+      listRefusals: () => [],
     });
     mount(provider);
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: {
-          rows: machines(2),
+          rows: buildMachines(2),
           groups: null,
           facets: {},
           counts: {
@@ -516,17 +525,17 @@ describe("PaginationBar", () => {
         },
       });
     });
-    expect(summary()).toHaveTextContent(/^Showing 1–2 out of 6 rows$/);
+    expect(getSummary()).toHaveTextContent(/^Showing 1–2 out of 6 rows$/);
     expect(screen.queryByText(/of \d+ pages?/)).toBe(null);
-    expect(values(pageSelect())).toEqual(["1"]);
-    expect(last()).toBeDisabled();
-    fireEvent.click(next());
-    expect(windowOf(provider)).toEqual({
-      ...at(2, 2),
+    expect(listValues(getPageSelect())).toEqual(["1"]);
+    expect(getLast()).toBeDisabled();
+    fireEvent.click(getNext());
+    expect(readWindow(provider)).toEqual({
+      ...buildWindow(2, 2),
       cursor: "c:m1",
     });
     // And the source is asked for the page the token names.
-    expect(source.latest().request.window.cursor).toBe("c:m1");
+    expect(source.readLatest().request.window.cursor).toBe("c:m1");
   });
 
   it("hides the controls only the enhancement can drive until scripting is enabled", () => {
@@ -534,7 +543,7 @@ describe("PaginationBar", () => {
     // the page controls are buttons the enhancement alone drives, marked
     // for the stylesheet to hold back until it runs.
     mount(makeProvider().provider);
-    for (const control of [first(), previous(), next(), last()]) {
+    for (const control of [getFirst(), getPrevious(), getNext(), getLast()]) {
       expect(control).toHaveClass("scripted");
     }
     expect(screen.queryByRole("link")).toBeNull();
@@ -546,21 +555,21 @@ describe("PaginationBar", () => {
     });
     const { provider, source } = createMachineProvider({ location });
     mount(provider);
-    load(source, machines(2), 6);
-    const hrefOf = (name: string) =>
+    load(source, buildMachines(2), 6);
+    const readHref = (name: string) =>
       screen.getByRole("link", { name }).getAttribute("href");
     // Each carries the whole query and the host's own parameter; only the
     // window moves.
-    expect(hrefOf("First page")).toBe(
+    expect(readHref("First page")).toBe(
       "?tab=overview&status=failed&page=1&size=2",
     );
-    expect(hrefOf("Previous page")).toBe(
+    expect(readHref("Previous page")).toBe(
       "?tab=overview&status=failed&page=1&size=2",
     );
-    expect(hrefOf("Next page")).toBe(
+    expect(readHref("Next page")).toBe(
       "?tab=overview&status=failed&page=3&size=2",
     );
-    expect(hrefOf("Last page")).toBe(
+    expect(readHref("Last page")).toBe(
       "?tab=overview&status=failed&page=3&size=2",
     );
     // A link is a link: nothing is marked for the enhancement alone.
@@ -576,23 +585,23 @@ describe("PaginationBar", () => {
     });
     const { provider, source } = createMachineProvider({ location });
     mount(provider);
-    load(source, machines(2), 6);
-    const hrefOf = (name: string) =>
+    load(source, buildMachines(2), 6);
+    const readHref = (name: string) =>
       screen.getByRole("link", { name }).getAttribute("href");
-    expect(hrefOf("Next page")).toBe("?tab=overview&page=2&size=2");
+    expect(readHref("Next page")).toBe("?tab=overview&page=2&size=2");
     // The host moves its own parameter; the query stands, so no state is
     // published — the bar redraws on the location itself.
     act(() => {
       location.write(new URLSearchParams("tab=details&page=1&size=2"));
     });
-    expect(hrefOf("Next page")).toBe("?tab=details&page=2&size=2");
+    expect(readHref("Next page")).toBe("?tab=details&page=2&size=2");
   });
 
   it("intercepts a plain click on a link and pages in place, leaving other clicks to the browser", () => {
     const location = createMemoryLocation({ href: "/machines?page=1&size=2" });
     const { provider, source } = createMachineProvider({ location });
     mount(provider);
-    load(source, machines(2), 6);
+    load(source, buildMachines(2), 6);
     const link = screen.getByRole("link", { name: "Next page" });
     // A modified click, or another button, asks the browser for something
     // else — a new tab, a saved link: not intercepted.
@@ -604,12 +613,12 @@ describe("PaginationBar", () => {
       { button: 1 },
     ]) {
       expect(fireEvent.click(link, other)).toBe(true);
-      expect(windowOf(provider).page).toBe(1);
+      expect(readWindow(provider).page).toBe(1);
     }
     // A plain click is the enhancement's: the window moves, the location
     // follows with a history entry, and the browser does not navigate.
     expect(fireEvent.click(link)).toBe(false);
-    expect(windowOf(provider).page).toBe(2);
+    expect(readWindow(provider).page).toBe(2);
     expect(location.read().get("page")).toBe("2");
   });
 
@@ -638,7 +647,7 @@ describe("PaginationBar", () => {
     const location = createMemoryLocation({ href: "/machines?page=1&size=2" });
     const { provider, source } = createMachineProvider({ location });
     mount(provider, { LinkComponent: RouterLink });
-    load(source, machines(2), 6);
+    load(source, buildMachines(2), 6);
     const next = screen.getByRole("link", { name: "Next page" });
     expect(next).toHaveAttribute("data-router-link");
     expect(next).toHaveAttribute("href", "?page=2&size=2");
@@ -646,20 +655,20 @@ describe("PaginationBar", () => {
     fireEvent.click(next);
     // The router's link saw the click; the bar moved nothing itself.
     expect(seen).toEqual(["?page=2&size=2"]);
-    expect(windowOf(provider).page).toBe(1);
+    expect(readWindow(provider).page).toBe(1);
   });
 
   it("disables the control to a page it cannot reach, named for where it would go", () => {
     const location = createMemoryLocation({ href: "/machines?page=1&size=2" });
     const { provider, source } = createMachineProvider({ location });
     mount(provider);
-    load(source, machines(2), 6);
+    load(source, buildMachines(2), 6);
     // From the first page there is no earlier one: a disabled button, not a
     // link to nowhere — and not one the enhancement alone drives, since a
     // destination exists.
-    expect(first()).toBeDisabled();
-    expect(first()).not.toHaveClass("scripted");
-    expect(previous()).toBeDisabled();
+    expect(getFirst()).toBeDisabled();
+    expect(getFirst()).not.toHaveClass("scripted");
+    expect(getPrevious()).toBeDisabled();
     expect(screen.queryByRole("link", { name: "First page" })).toBeNull();
     expect(screen.getByRole("link", { name: "Next page" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Last page" })).toBeInTheDocument();
@@ -669,16 +678,16 @@ describe("PaginationBar", () => {
     const location = createMemoryLocation({ href: "/machines?page=2&size=2" });
     const { provider, source } = createMachineProvider({ location });
     mount(provider);
-    load(source, machines(2), 6);
+    load(source, buildMachines(2), 6);
     const link = screen.getByRole("link", { name: "Previous page" });
     link.focus();
     expect(link).toHaveFocus();
     // The link was the way back to page one; there the way disappears, and
     // the disabled button that replaces it cannot hold focus.
     fireEvent.click(link);
-    load(source, machines(2), 6);
-    expect(previous()).toBeDisabled();
-    expect(pageSelect()).toHaveFocus();
+    load(source, buildMachines(2), 6);
+    expect(getPrevious()).toBeDisabled();
+    expect(getPageSelect()).toHaveFocus();
   });
 
   it("puts the page size and the page in GET forms carrying the rest of the query", () => {
@@ -687,13 +696,13 @@ describe("PaginationBar", () => {
     });
     const { provider, source } = createMachineProvider({ location });
     const { container } = mount(provider);
-    load(source, machines(2), 6);
+    load(source, buildMachines(2), 6);
     const forms = container.querySelectorAll("form");
     expect(forms).toHaveLength(2);
     for (const form of forms) {
       expect(form).toHaveAttribute("method", "get");
     }
-    const hiddenOf = (form: Element) =>
+    const listHidden = (form: Element) =>
       [...form.querySelectorAll<HTMLInputElement>("input[type=hidden]")].map(
         (input) => [input.name, input.value],
       );
@@ -703,16 +712,16 @@ describe("PaginationBar", () => {
     if (sizeForm === undefined || pageForm === undefined) {
       throw new Error("expected two forms");
     }
-    expect(sizeSelect()).toHaveAttribute("name", "size");
-    expect(sizeForm.contains(sizeSelect())).toBe(true);
-    expect(hiddenOf(sizeForm)).toEqual([
+    expect(getSizeSelect()).toHaveAttribute("name", "size");
+    expect(sizeForm.contains(getSizeSelect())).toBe(true);
+    expect(listHidden(sizeForm)).toEqual([
       ["tab", "overview"],
       ["status", "failed"],
     ]);
     // The page form supplies the page and keeps the size.
-    expect(pageSelect()).toHaveAttribute("name", "page");
-    expect(pageForm.contains(pageSelect())).toBe(true);
-    expect(hiddenOf(pageForm)).toEqual([
+    expect(getPageSelect()).toHaveAttribute("name", "page");
+    expect(pageForm.contains(getPageSelect())).toBe(true);
+    expect(listHidden(pageForm)).toEqual([
       ["tab", "overview"],
       ["status", "failed"],
       ["size", "2"],
@@ -753,7 +762,7 @@ describe("PaginationBar", () => {
         goToLastPage: "Dernière",
       },
     });
-    load(source, machines(2), 5);
+    load(source, buildMachines(2), 5);
     expect(
       screen.getByRole("navigation", { name: "Pages" }),
     ).toBeInTheDocument();
@@ -764,12 +773,12 @@ describe("PaginationBar", () => {
     );
     expect(screen.getByRole("combobox", { name: "Feuille" })).toHaveValue("1");
     expect(screen.getByText("sur 3")).toBeInTheDocument();
-    expect(summary()).toHaveTextContent(/^1 \+ 2$/);
+    expect(getSummary()).toHaveTextContent(/^1 \+ 2$/);
     for (const name of ["Première", "Précédente", "Suivante", "Dernière"]) {
       expect(screen.getByRole("button", { name })).toBeInTheDocument();
     }
     // A message left out is still English.
-    expect(button("Apply page size")).toHaveAttribute("type", "submit");
+    expect(getButton("Apply page size")).toHaveAttribute("type", "submit");
   });
 
   it("takes a label over the messages' name for the navigation", () => {

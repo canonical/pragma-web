@@ -34,7 +34,7 @@ describe("a number field answered with a facet of values", () => {
     draw();
     expect(() => {
       act(() => {
-        source.latest().deliver({
+        source.readLatest().deliver({
           status: "succeeded",
           page: createPage({
             rows: [buildMachine("m-1", "alpha")],

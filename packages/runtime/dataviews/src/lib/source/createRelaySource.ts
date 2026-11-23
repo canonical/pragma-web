@@ -1,13 +1,9 @@
 import { type Query, type Slice, spellSliceKey } from "../query/index.js";
-import {
-  type Count,
-  type SourceDelivery,
-  type SourceRefusal,
-  UNKNOWN_COUNT,
-} from "../result/index.js";
+import type { SourceDelivery, SourceRefusal } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import copyCapabilities from "./copyCapabilities.js";
 import describeError from "./describeError.js";
+import readRelayPage from "./readRelayPage.js";
 import resolveErrorDelivery from "./resolveErrorDelivery.js";
 import type {
   RelayConnection,
@@ -40,7 +36,7 @@ const mergesPages = (selections: readonly unknown[]): boolean =>
 const REMEMBERED_QUERIES = 32;
 
 /** Why a page beyond the trail cannot be reached. */
-const unreachable = (page: number): string =>
+const describeUnreachable = (page: number): string =>
   `a forward connection reaches page ${page} only from page ${page - 1}`;
 
 /**
@@ -61,6 +57,10 @@ const unreachable = (page: number): string =>
  * Relay merges its pages. A connection with no `totalCount` counts nothing
  * rather than counting zero; a page with a missing record fails rather than
  * delivering a shorter page.
+ *
+ * @note Impure: remembers each query's cursor trail and the pages a fetch
+ * was forbidden for, and each request retains, subscribes to and fetches
+ * from the Relay environment.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -84,11 +84,11 @@ export default function createRelaySource<
 
   /** The trail one query keeps its cursors under: what it asks for, and how
    * many rows at a time. */
-  const trailKey = (slice: Slice, size: number): string =>
+  const spellTrailKey = (slice: Slice, size: number): string =>
     `${size}:${spellSliceKey(slice)}`;
 
   /** The trail of one query, now the most recently used. */
-  const trailOf = (key: string): Map<number, string> => {
+  const touchTrail = (key: string): Map<number, string> => {
     const trail = trails.get(key) ?? new Map<number, string>();
     trails.delete(key);
     trails.set(key, trail);
@@ -102,7 +102,7 @@ export default function createRelaySource<
   };
 
   /** The cursor one page starts after, or undefined when none reaches it. */
-  const cursorFor = (query: Query): string | null | undefined => {
+  const findCursor = (query: Query): string | null | undefined => {
     const { slice, window } = query;
     if (window.cursor !== null) {
       return window.cursor;
@@ -110,13 +110,13 @@ export default function createRelaySource<
     if (window.page === 1) {
       return null;
     }
-    return trails.get(trailKey(slice, window.size))?.get(window.page);
+    return trails.get(spellTrailKey(slice, window.size))?.get(window.page);
   };
 
   return {
     capabilities,
-    refusals(query: Query): readonly SourceRefusal[] {
-      if (cursorFor(query) !== undefined) {
+    listRefusals(query: Query): readonly SourceRefusal[] {
+      if (findCursor(query) !== undefined) {
         return [];
       }
       return [
@@ -125,22 +125,22 @@ export default function createRelaySource<
           code: "unreachable-page",
           field: null,
           operator: null,
-          reason: unreachable(query.window.page),
+          reason: describeUnreachable(query.window.page),
         },
       ];
     },
     execute(request, deliver) {
       const { slice, window } = request;
-      const key = trailKey(slice, window.size);
+      const key = spellTrailKey(slice, window.size);
       /** The forbidden mark this request's page is kept under. */
       const mark = `${window.page}@${key}`;
-      const after = cursorFor(request);
+      const after = findCursor(request);
       if (after === undefined) {
         // The binding refuses this before it gets here; a caller executing
         // the source itself still gets a reason rather than a wrong page.
-        throw new Error(unreachable(window.page));
+        throw new Error(describeUnreachable(window.page));
       }
-      const operation = config.operation({
+      const operation = config.buildOperation({
         slice,
         first: window.size,
         after,
@@ -152,7 +152,7 @@ export default function createRelaySource<
         );
       }
       // Only a request that proceeds counts as using its query's cursors.
-      const trail = trailOf(key);
+      const trail = touchTrail(key);
       /** How to release what this request has acquired, newest first. */
       const acquired: (() => void)[] = [];
       const release = (): void => {
@@ -200,59 +200,22 @@ export default function createRelaySource<
         try {
           // The operation's fragment reads exactly the query's response,
           // as Relay's own hooks type it.
-          connection = config.connection(data as TQuery["response"]);
+          connection = config.readConnection(data as TQuery["response"]);
         } catch (error) {
           fail(data, describeError(error), error);
           return;
         }
-        if (connection === null || connection === undefined) {
-          fail(data, "the response carries no connection");
+        const reading = readRelayPage(connection);
+        if (reading.status === "failed") {
+          fail(data, reading.reason);
           return;
         }
-        const { edges } = connection;
-        if (edges === null || edges === undefined) {
-          fail(data, "the connection carries no edges");
-          return;
-        }
-        const rows: TRow[] = [];
-        for (const edge of edges) {
-          const node = edge?.node;
-          if (node === null || node === undefined) {
-            fail(data, "the connection carries an edge without a record");
-            return;
-          }
-          rows.push(node);
-        }
-        const { endCursor, hasNextPage } = connection.pageInfo;
-        // A page with no end cursor has no next page to reach any more.
-        if (typeof endCursor === "string") {
-          trail.set(window.page + 1, endCursor);
-        } else {
+        if (reading.endCursor === null) {
           trail.delete(window.page + 1);
+        } else {
+          trail.set(window.page + 1, reading.endCursor);
         }
-        const matched: Count =
-          typeof connection.totalCount === "number"
-            ? { kind: "exact", value: connection.totalCount }
-            : UNKNOWN_COUNT;
-        const more = typeof hasNextPage === "boolean" ? hasNextPage : null;
-        send(data, {
-          status: "succeeded",
-          page: {
-            rows,
-            groups: null,
-            // Nothing collapses, so the rows the window pages over are the
-            // rows that matched; the whole collection is never asked for.
-            counts: { pageable: matched, matched },
-            // What the operation selected; the provider holds it to what
-            // the request asked for.
-            facets: connection.facets ?? {},
-            more,
-            cursors: {
-              next: more === false ? null : (endCursor ?? null),
-              previous: null,
-            },
-          },
-        });
+        send(data, { status: "succeeded", page: reading.page });
       };
 
       try {

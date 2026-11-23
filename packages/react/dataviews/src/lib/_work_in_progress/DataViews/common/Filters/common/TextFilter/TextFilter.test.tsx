@@ -3,6 +3,7 @@
  * spells, the clear control and where focus goes after it, and typing as
  * one history step.
  */
+
 import {
   createCollection,
   createDataViewsProvider,
@@ -11,18 +12,21 @@ import {
   type QueryLocation,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import {
+  createManualSource,
+  createRecordingLocation,
+} from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
+import type {
+  TextFilterHarnessProps as HarnessProps,
+  IdentifiedRecord as Row,
+} from "../../../../../../../../testing/types.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
 import { findFilterHandle } from "../../../utils/index.js";
 import TextFilter from "./TextFilter.js";
-import type { TextFilterProps } from "./types.js";
-
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,
@@ -42,11 +46,6 @@ const makeProvider = (location?: QueryLocation) =>
   });
 
 type Provider = ReturnType<typeof makeProvider>;
-
-/** What a case sets; the handle, label and field are the harness's. */
-type HarnessProps = Partial<
-  Omit<TextFilterProps, "handle" | "label" | "field">
->;
 
 /** The filter at the root's own handle for the name. */
 const Harness = ({

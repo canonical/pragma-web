@@ -5,15 +5,20 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
-import { withAppScope } from "../../../../../storybook/decorators.js";
+import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
+import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
 import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
+import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
+import type { StoryWords } from "../../../../../storybook/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";
+
+/** The part's props, and the words the story's root speaks. */
+type StoryArgs = DataViewsSearchProps & StoryWords;
 
 const meta = {
   title: "_work_in_progress/DataViews/Search",
@@ -22,10 +27,10 @@ const meta = {
   args: {
     label: "Search machines",
   },
-} satisfies Meta<typeof Component>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof Component>;
+type Story = StoryObj<StoryArgs>;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
@@ -62,23 +67,30 @@ function QueryInTheLocation({
   );
 }
 
-/** A composed collection: a root, its search and its table. */
+/** A composed collection: a root, its search and its table, in its words. */
 function SearchedMachines({
   options,
   location,
+  messages,
   ...args
-}: DataViewsSearchProps & {
+}: StoryArgs & {
   readonly options?: MachineProviderConfig | undefined;
   readonly location?: QueryLocation | undefined;
 }): ReactElement {
   const provider = useMachineProvider({ ...options, location });
+  const words = pickStoryWords({ messages });
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <Component {...args} />
       {location === undefined ? null : (
         <QueryInTheLocation location={location} />
       )}
-      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...words}
+      />
     </DataViews>
   );
 }
@@ -101,7 +113,7 @@ const searchingAna = "q=ex:a";
  * every machine shows.
  */
 export const Default: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     render: composition,
@@ -125,7 +137,7 @@ export const Default: Story = {
  * it — there is no second query to apply or keep in step.
  */
 export const SearchApplied: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     declarations: columnsCode,
     query: searchingAna,
@@ -149,7 +161,7 @@ export const SearchApplied: Story = {
  * and nothing else.
  */
 export const SearchInTheUrl: Story = {
-  parameters: consumerCode({
+  parameters: showConsumerCode({
     parts,
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";

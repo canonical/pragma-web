@@ -3,7 +3,7 @@ import { MessagesContext } from "../../../../common/index.js";
 import { listNiceTicks } from "../../../../utils/index.js";
 import type { RangeDrawingProps } from "./types.js";
 
-const componentCssClassName = "chart";
+const componentCssClassName = "drawing";
 
 /**
  * The drawing's own units. It scales to the width it is given, text included:
@@ -30,13 +30,26 @@ const TEXT_SIZE = 12;
 /** A coordinate as the drawing writes it: rounded, so no float tail is drawn. */
 const place = (value: number): number => Number(value.toFixed(2));
 
-function RangeDrawing({
+/**
+ * A range as a band on a labelled axis, its two ends marked and named — and
+ * the same two values as a native table, so nothing is carried by the drawing
+ * alone.
+ *
+ * Memoised, and the chart holds its facet at one reference while it claims
+ * the same, so a result that moved another field's facet redraws nothing
+ * here.
+ *
+ * @implements ds:apps.subcomponent.data_chart-range_drawing
+ */
+const RangeDrawing = ({
   label,
   min,
   max,
   lowerBound,
   upperBound,
-}: RangeDrawingProps): ReactElement {
+  className,
+  ...rest
+}: RangeDrawingProps): ReactElement => {
   const messages = useContext(MessagesContext);
   const { ticks, low, high } = listNiceTicks(
     Math.min(lowerBound ?? min, min),
@@ -46,9 +59,12 @@ function RangeDrawing({
   const scale = (value: number): number =>
     place(INSET + ((value - low) / (high - low)) * (WIDTH - INSET * 2));
   return (
-    <>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <svg
-        className={componentCssClassName}
+        className="chart"
         role="img"
         aria-label={messages.rangeChartSummary(label, min, max)}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -130,17 +146,8 @@ function RangeDrawing({
           </tr>
         </tbody>
       </table>
-    </>
+    </div>
   );
-}
+};
 
-/**
- * A range as a band on a labelled axis, its two ends marked and named — and
- * the same two values as a native table, so nothing is carried by the drawing
- * alone.
- *
- * Memoised, and the chart holds its facet at one reference while it claims
- * the same, so a result that moved another field's facet redraws nothing
- * here.
- */
 export default memo(RangeDrawing);

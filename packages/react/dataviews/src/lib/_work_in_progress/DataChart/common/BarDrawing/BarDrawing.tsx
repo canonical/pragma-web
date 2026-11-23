@@ -1,9 +1,10 @@
+import type { FacetValue } from "@canonical/dataviews-core";
 import { memo, type ReactElement, useContext } from "react";
 import { MessagesContext } from "../../../../common/index.js";
 import { listNiceTicks, spellCount } from "../../../../utils/index.js";
-import type { BarDrawingProps, DrawnValue } from "./types.js";
+import type { BarDrawingProps } from "./types.js";
 
-const componentCssClassName = "chart";
+const componentCssClassName = "drawing";
 
 /**
  * The drawing's own units. It scales to the width it is given, text included:
@@ -49,10 +50,26 @@ const spellBarPath = (x0: number, x1: number, y: number): string => {
 };
 
 /** A value's count as a number to draw, where the source counted it. */
-const readDrawnCount = (entry: DrawnValue): number | null =>
+const readDrawnCount = (entry: FacetValue): number | null =>
   entry.count.kind === "unknown" ? null : entry.count.value;
 
-function BarDrawing({ label, values }: BarDrawingProps): ReactElement {
+/**
+ * One field's values as bars, each as long as the number of records holding
+ * it, on an axis of whole records — and the same numbers as a native table,
+ * so nothing is carried by the drawing alone.
+ *
+ * Memoised, and the chart holds its facet at one reference while it claims
+ * the same, so a result that moved another field's facet redraws nothing
+ * here.
+ *
+ * @implements ds:apps.subcomponent.data_chart-bar_drawing
+ */
+const BarDrawing = ({
+  label,
+  values,
+  className,
+  ...rest
+}: BarDrawingProps): ReactElement => {
   const messages = useContext(MessagesContext);
   const largest = Math.max(
     0,
@@ -69,9 +86,12 @@ function BarDrawing({ label, values }: BarDrawingProps): ReactElement {
     place(LABEL_WIDTH + (count / domain) * plot);
   const height = values.length * BAND + AXIS;
   return (
-    <>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <svg
-        className={componentCssClassName}
+        className="chart"
         role="img"
         aria-label={messages.barChartSummary(label)}
         viewBox={`0 0 ${WIDTH} ${height}`}
@@ -153,17 +173,8 @@ function BarDrawing({ label, values }: BarDrawingProps): ReactElement {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
-}
+};
 
-/**
- * One field's values as bars, each as long as the number of records holding
- * it, on an axis of whole records — and the same numbers as a native table,
- * so nothing is carried by the drawing alone.
- *
- * Memoised, and the chart holds its facet at one reference while it claims
- * the same, so a result that moved another field's facet redraws nothing
- * here.
- */
 export default memo(BarDrawing);

@@ -1,8 +1,8 @@
 import type { SourceDelivery } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { Machine } from "../../../../../../testing/types.js";
 import StatusList from "./StatusList.js";
@@ -38,7 +38,7 @@ describe("StatusList", () => {
     expect(region).toHaveAttribute("aria-busy", "true");
     expect(region).toHaveTextContent("Loading…");
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m-1", "alpha")]),
       });
@@ -58,7 +58,7 @@ describe("StatusList", () => {
   it("says a failure in place of the rows", () => {
     const { source } = renderList();
     act(() => {
-      source.latest().deliver(failure);
+      source.readLatest().deliver(failure);
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows could not be loaded: offline",
@@ -69,7 +69,7 @@ describe("StatusList", () => {
   it("keeps the rows under a failed refresh", () => {
     const { provider, source } = renderList();
     act(() => {
-      source.latest().deliver({
+      source.readLatest().deliver({
         status: "succeeded",
         page: buildPage([buildMachine("m-1", "alpha")]),
       });
@@ -78,7 +78,7 @@ describe("StatusList", () => {
       provider.refresh();
     });
     act(() => {
-      source.latest().deliver(failure);
+      source.readLatest().deliver(failure);
     });
     expect(screen.getByRole("status")).toHaveTextContent(
       "These rows could not be refreshed: offline",

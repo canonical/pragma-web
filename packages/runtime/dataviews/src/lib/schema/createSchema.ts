@@ -115,7 +115,7 @@ export default function createSchema<
       }
       return { status: "valid", operands };
     },
-    predicateFor(
+    buildPredicate(
       name: string,
       operator: PredicateOperator,
       operands: readonly PredicateOperand[],

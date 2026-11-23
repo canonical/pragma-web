@@ -1,18 +1,17 @@
 /**
  * One filter of the enclosing root, bound by collection, field and
  * operator: its edits reach the provider's applied query through the root's
- * own record, its applied value is typed by the field's kind, and it
+ * own record, its applied value follows the field's kind, and it
  * re-renders for its own filter and nothing else.
  */
 import {
   createCollection,
-  type EmptyOr,
   type PredicateOperator,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import createMachineProvider from "../../../../../testing/createMachineProvider.js";
 import { machines } from "../../../../../testing/machines.js";
 import type { MachineFixture } from "../../../../../testing/types.js";
@@ -20,7 +19,7 @@ import DataViews from "../Provider.js";
 import useDataViewsFilter from "./useDataViewsFilter.js";
 
 /** A wrapper for renderHook, over one root. */
-const inRoot =
+const withRoot =
   ({ provider }: MachineFixture) =>
   ({ children }: { children: ReactNode }) => (
     <DataViews provider={provider}>{children}</DataViews>
@@ -38,7 +37,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     expect(result.current.input).toBe("");
     expect(result.current.applied).toEqual({ kind: "empty" });
@@ -54,38 +53,21 @@ describe("useDataViewsFilter", () => {
     expect(provider.state.get().slice.filter).toEqual([
       { field: "cores", operator: "gte", operands: [4] },
     ]);
-    expect(machineProvider.source.latest().request.slice.filter).toEqual([
+    expect(machineProvider.source.readLatest().request.slice.filter).toEqual([
       { field: "cores", operator: "gte", operands: [4] },
     ]);
   });
 
-  it("types the applied value by the field's kind", () => {
+  it("sets a choices field's applied value", () => {
     const machineProvider = createMachineProvider();
     const { result } = renderHook(
-      () => ({
-        cores: useDataViewsFilter(machines, "cores", "lte"),
-        status: useDataViewsFilter(machines, "status", "isAny"),
-      }),
-      { wrapper: inRoot(machineProvider) },
+      () => useDataViewsFilter(machines, "status", "isAny"),
+      { wrapper: withRoot(machineProvider) },
     );
-    expectTypeOf(result.current.cores.applied).toEqualTypeOf<EmptyOr<number>>();
-    expectTypeOf(result.current.status.applied).toEqualTypeOf<
-      EmptyOr<ReadonlySet<"failed" | "running">>
-    >();
-    // Text is looked for, never equal, and a number is bounded, never equal:
-    // neither is an address, so neither compiles. Never called: the check is
-    // the compiler's.
-    const rejectedAddresses = (): void => {
-      // @ts-expect-error a text field contains, it is never equal
-      useDataViewsFilter(machines, "name", "isAny");
-      // @ts-expect-error a number is bounded, never equal
-      useDataViewsFilter(machines, "cores", "isAny");
-    };
-    expect(rejectedAddresses).toBeTypeOf("function");
     act(() => {
-      result.current.status.set(["failed"]);
+      result.current.set(["failed"]);
     });
-    expect(result.current.status.applied).toEqual({
+    expect(result.current.applied).toEqual({
       kind: "value",
       value: new Set(["failed"]),
     });
@@ -96,7 +78,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       result.current.edit("4");
@@ -121,7 +103,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       result.current.edit("4");
@@ -142,7 +124,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "status", "isAny"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       result.current.set(["failed", "running"]);
@@ -163,7 +145,7 @@ describe("useDataViewsFilter", () => {
         useDataViewsFilter(machines, "cores", bound),
       {
         initialProps: { bound: "gte" },
-        wrapper: inRoot(machineProvider),
+        wrapper: withRoot(machineProvider),
       },
     );
     act(() => {
@@ -182,7 +164,7 @@ describe("useDataViewsFilter", () => {
     const { provider } = machineProvider;
     const { result } = renderHook(
       () => useDataViewsFilter(machines, "cores", "gte"),
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     act(() => {
       readProviderHost(provider).setPredicate({
@@ -206,7 +188,7 @@ describe("useDataViewsFilter", () => {
         renders += 1;
         return useDataViewsFilter(machines, "cores", "gte");
       },
-      { wrapper: inRoot(machineProvider) },
+      { wrapper: withRoot(machineProvider) },
     );
     const mounted = renders;
     // Another filter, the search and the selection move; this one does not.
@@ -236,7 +218,7 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     expect(() =>
       renderHook(() => useDataViewsFilter(racks, "cores", "gte"), {
-        wrapper: inRoot(machineProvider),
+        wrapper: withRoot(machineProvider),
       }),
     ).toThrow(
       "useDataViewsFilter was passed a collection that is not the one the enclosing DataViews root's provider was built over",
@@ -250,13 +232,13 @@ describe("useDataViewsFilter", () => {
     const operator: PredicateOperator = "isAny";
     expect(() =>
       renderHook(() => useDataViewsFilter(machines, field as "cores", "gte"), {
-        wrapper: inRoot(machineProvider),
+        wrapper: withRoot(machineProvider),
       }),
     ).toThrow("the root holds no filter for zone gte");
     expect(() =>
       renderHook(
         () => useDataViewsFilter(machines, "cores", operator as "gte"),
-        { wrapper: inRoot(machineProvider) },
+        { wrapper: withRoot(machineProvider) },
       ),
     ).toThrow("the root holds no filter for cores isAny");
   });

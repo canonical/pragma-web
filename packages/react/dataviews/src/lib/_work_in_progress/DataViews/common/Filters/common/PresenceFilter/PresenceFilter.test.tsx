@@ -3,6 +3,7 @@
  * wire spells, the count beside it, and the control leaving with the last
  * restriction it removes.
  */
+
 import {
   type Count,
   createCollection,
@@ -11,17 +12,18 @@ import {
   declareCapabilities,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
+import type {
+  PresenceFilterHarnessProps as HarnessProps,
+  IdentifiedRecord as Row,
+} from "../../../../../../../../testing/types.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
 import { findFilterHandle } from "../../../utils/index.js";
 import PresenceFilter from "./PresenceFilter.js";
-import type { PresenceFilterProps } from "./types.js";
-
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,
@@ -40,11 +42,6 @@ const makeProvider = () =>
   });
 
 type Provider = ReturnType<typeof makeProvider>;
-
-/** What a case sets; the handle, label and field are the harness's. */
-type HarnessProps = Partial<
-  Omit<PresenceFilterProps, "handle" | "label" | "field">
->;
 
 /** The filter at the root's own `owner` presence handle. */
 const Harness = ({

@@ -16,7 +16,17 @@ const componentCssClassName = "grid intrinsic";
  */
 const CARD_SPAN = 4;
 
-function CardList<TRow extends object>({
+/**
+ * Every card the core displays, in its order, laid out by the design
+ * system's Cards group so each card's sections line up across the row.
+ *
+ * Memoised, and every prop it takes is held at one reference by the cards, so
+ * a publication that changes neither the records shown nor the fields
+ * re-renders no card at all.
+ *
+ * @implements ds:global.group.cards
+ */
+const CardList = <TRow extends object>({
   provider,
   records,
   readRow,
@@ -24,9 +34,14 @@ function CardList<TRow extends object>({
   details,
   selectable,
   nameRecord,
-}: CardListProps<TRow>): ReactElement {
+  className,
+  ...rest
+}: CardListProps<TRow>): ReactElement => {
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <CardGroup role="list" cardSpan={CARD_SPAN}>
         {records.map((entry) => (
           <CardItem
@@ -42,14 +57,6 @@ function CardList<TRow extends object>({
       </CardGroup>
     </div>
   );
-}
+};
 
-/**
- * Every card the core displays, in its order, laid out by the design
- * system's Cards group so each card's sections line up across the row.
- *
- * Memoised, and every prop it takes is held at one reference by the cards, so
- * a publication that changes neither the records shown nor the fields
- * re-renders no card at all.
- */
 export default memo(CardList) as typeof CardList;

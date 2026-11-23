@@ -11,7 +11,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createStandInPresentationStore } from "../../../testing/createStandInStores.js";
+import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
 import flushPresentation from "../../../testing/flushPresentation.js";
 import {
   createPresentation,
@@ -37,13 +37,13 @@ describe("regression 0017 — a read outran a failing write", () => {
           }),
       )
       .mockResolvedValue({ status: "saved" });
-    let changed = (): void => {};
+    let notifyChange = (): void => {};
     const presentation = createPresentation({
       store: createStandInPresentationStore({
         readPresentation: async () => ({ width: 90 }),
         patchPresentation,
         subscribe: (listener) => {
-          changed = listener;
+          notifyChange = listener;
           return () => {};
         },
       }),
@@ -57,7 +57,7 @@ describe("regression 0017 — a read outran a failing write", () => {
     expect(patchPresentation).toHaveBeenCalledTimes(1);
     // Another tab's notice: a read begun after the write was sent lands
     // first, still carrying the stored value.
-    changed();
+    notifyChange();
     await vi.advanceTimersByTimeAsync(0);
     expect(presentation.state.get().presentation).toEqual({ width: 120 });
     failWrite(new Error("500"));

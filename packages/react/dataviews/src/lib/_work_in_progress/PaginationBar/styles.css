@@ -2,16 +2,21 @@
 
 @layer ds.components.global {
   /**
-   * PaginationBar component tokens — each a binding to a design token, never
-   * a value of its own. The rules below read these and nothing else, so a
-   * theme or a host retunes the bar by setting them, and the anatomy beside
-   * the code names what each binds. The bindings that read a channel of
-   * @canonical/styles — density and surface — are declared on the bar
-   * itself, below: a custom property set here resolves its `var()` at the
-   * root, where no context class sets a channel, so it would freeze there
-   * rather than follow the nearest `.dense` or surface.
+   * PaginationBar styles
+   *
+   * The specification is the anatomy beside the code,
+   * `PaginationBar.anatomy.yaml`. Every value below is one it binds; what it
+   * could not bind is recorded there, never hardcoded here.
+   *
+   * The selects and buttons are the design system's own. The bar themes them
+   * through their channels — the form layer's input tokens and the Button's
+   * padding — and overrides only what a row of them needs: a select's width,
+   * and each icon-only button's square.
    */
-  :root {
+  .ds.data-table-pagination-bar {
+    /* The component tokens, each a binding to a design token, set on the
+       bar so no token leaks onto the page: a theme or a host retunes the
+       bar by setting them, and the anatomy names what each binds. */
     --data-table-pagination-bar-gap: var(--dimension-100);
     --data-table-pagination-bar-gap-control: var(--dimension-050);
     /* The inset a control keeps from the divider beside it. */
@@ -37,21 +42,7 @@
     --data-table-pagination-bar-control-padding-inline-end: var(
       --dimension-100
     );
-  }
 
-  /**
-   * PaginationBar styles
-   *
-   * The specification is the anatomy beside the code,
-   * `PaginationBar.anatomy.yaml`. Every value below is one it binds; what it
-   * could not bind is recorded there, never hardcoded here.
-   *
-   * The selects and buttons are the design system's own. The bar themes them
-   * through their channels — the form layer's input tokens and the Button's
-   * padding — and overrides only what a row of them needs: a select's width,
-   * and each icon-only button's square.
-   */
-  .ds.data-table-pagination-bar {
     /* The channel-bound tokens, resolved where the channels are set: the
        leading inset reads the density channel, as the table's cells do; the
        control size is one density line; the colours are the surface the bar
@@ -96,51 +87,51 @@
     --form-input-background: var(--color-foreground-ghost);
     --form-input-border-color: transparent;
 
-    & > .leading,
-    & > .trailing {
+    & > .sizing,
+    & > .paging {
       display: flex;
       align-items: center;
       gap: var(--data-table-pagination-bar-gap);
     }
 
-    & > .leading > .page-size,
-    & > .trailing > .page {
+    & > .sizing > .page-size,
+    & > .paging > .page {
       display: flex;
       align-items: center;
       gap: var(--data-table-pagination-bar-gap-control);
       white-space: nowrap;
     }
 
-    & > .trailing > .page {
+    & > .paging > .page {
       padding-inline-end: var(--data-table-pagination-bar-inset-inline);
     }
 
-    & > .leading > .summary {
+    & > .sizing > .summary {
       padding-inline-start: var(--data-table-pagination-bar-inset-inline);
       white-space: nowrap;
     }
 
-    & > .leading > .divider,
-    & > .trailing > .divider {
+    & > .sizing > .divider,
+    & > .paging > .divider {
       inline-size: var(--data-table-pagination-bar-divider-inline-size);
       block-size: var(--data-table-pagination-bar-divider-block-size);
       background-color: var(--data-table-pagination-bar-divider-color);
     }
 
     /* The input chrome fills its container; in a bar it takes its content. */
-    & > .leading > .page-size > .ds.input.select,
-    & > .trailing > .page > .ds.input.select {
+    & > .sizing > .page-size > .ds.input.select,
+    & > .paging > .page > .ds.input.select {
       inline-size: auto;
     }
 
-    & > .trailing > .navigation {
+    & > .paging > .navigation {
       display: flex;
       align-items: center;
     }
 
     /* Icon-only Buttons collapse without a label. Each is held to a square
        one row tall, its icon centred and its side padding equal. */
-    & > .trailing > .navigation > .ds.button {
+    & > .paging > .navigation > .ds.button {
       --button-padding-inline-end: var(
         --data-table-pagination-bar-control-padding-inline-end
       );
@@ -154,29 +145,30 @@
        turned towards the edge the control goes to. The icon slot is the
        control's own child, so the turn reaches it without descending into
        the Icon. */
-    & > .trailing > .navigation > .first > .icon {
+    & > .paging > .navigation > .first > .icon {
       rotate: -90deg;
     }
 
-    & > .trailing > .navigation > .last > .icon {
+    & > .paging > .navigation > .last > .icon {
       rotate: 90deg;
     }
 
-    /* A control only the enhancement can drive waits for it; the baseline's
-       submit controls leave once it is there. */
-    & > .trailing > .navigation > .scripted {
+    /* A control only the enhancement can drive waits for scripting; the
+       baseline's submit controls leave only once the page has hydrated, so
+       a page whose script never runs keeps a way to page. */
+    & > .paging > .navigation > .scripted {
       display: none;
     }
 
     @media (scripting: enabled) {
-      & > .leading > .page-size > .submit,
-      & > .trailing > .page > .submit {
-        display: none;
-      }
-
-      & > .trailing > .navigation > .scripted {
+      & > .paging > .navigation > .scripted {
         display: inline-flex;
       }
+    }
+
+    &[data-hydrated] > .sizing > .page-size > .submit,
+    &[data-hydrated] > .paging > .page > .submit {
+      display: none;
     }
   }
 }

@@ -42,8 +42,6 @@ const RANGE_MESSAGES = {
  * greatest for the upper ("Highest"), from the range computed over the whole
  * matching set with this field's bounds lifted.
  *
- * `import { DataViews } from "@canonical/dataviews-react";`
- *
  * @implements ds:apps.subcomponent.data_views_filters-bound_filter
  */
 export default function BoundFilter({

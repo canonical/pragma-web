@@ -90,7 +90,7 @@ export type Facet =
  * source declares summaries yet, so `groups` is null on every page this
  * release delivers.
  *
- * @seam grouping — read by the group header row's count
+ * The group header row reads its count from this.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

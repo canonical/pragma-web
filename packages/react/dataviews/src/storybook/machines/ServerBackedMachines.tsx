@@ -1,6 +1,7 @@
 import type { QueryLocation, Source } from "@canonical/dataviews-core";
 import type { ReactElement } from "react";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+import type { StoryWords } from "../types.js";
 import {
   SERVER_BACKED_COLUMNS,
   SERVER_BACKED_FACETS,
@@ -10,7 +11,7 @@ import type { Machine } from "./types.js";
 import useMachineProvider from "./useMachineProvider.js";
 
 /** How one server-backed screen is set up. Read once, when it mounts. */
-type ServerBackedMachinesProps = {
+type ServerBackedMachinesProps = StoryWords & {
   /** The source reaching the endpoint, built once for the screen. */
   readonly source: () => Source<Machine>;
   /** Where the applied query lives; in the provider alone by default. */
@@ -21,11 +22,13 @@ type ServerBackedMachinesProps = {
  * The screen the server-backed stories render: search, filters, the sortable
  * table and its pagination over one provider whose source reaches a mock
  * endpoint, asking it for the status and cores facets. The page holds five
- * machines, so paging reaches the endpoint too. Story-only.
+ * machines, so paging reaches the endpoint too. Its root speaks `messages`
+ * when given. Story-only.
  */
 export default function ServerBackedMachines({
   source,
   location,
+  ...words
 }: ServerBackedMachinesProps): ReactElement {
   const provider = useMachineProvider({
     source,
@@ -34,7 +37,7 @@ export default function ServerBackedMachines({
     facets: SERVER_BACKED_FACETS,
   });
   return (
-    <DataViews provider={provider}>
+    <DataViews provider={provider} {...words}>
       <DataViews.Search label={SERVER_BACKED_PARTS.searchLabel} />
       <DataViews.Filters labels={SERVER_BACKED_PARTS.labels} />
       <DataViews.DataTable

@@ -12,6 +12,8 @@ const selectSort = (state: DataViewsState): readonly SortTerm[] =>
  * is the provider's state channel, but the value is the ordering alone,
  * held at one identity while it reads the same, so a result arriving or a
  * page turning re-renders nothing that lists the terms.
+ *
+ * @note Impure: subscribes to the provider's state while mounted.
  */
 export default function useAppliedSort({
   provider,
