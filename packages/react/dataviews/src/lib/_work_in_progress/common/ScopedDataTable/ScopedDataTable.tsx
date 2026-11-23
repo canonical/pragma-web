@@ -117,6 +117,11 @@ export default function ScopedDataTable<
     );
   }
   const hasSettings = isValidElement(settings);
+  if (hasSettings && settings.type !== settingsMenu) {
+    throw new Error(
+      "DataTable takes <DataTable.SettingsMenu /> as its settings, and no other element",
+    );
+  }
   // Observed for as long as the table is mounted: a standalone table is a
   // mount that reads the provider, and the ref-count makes a table inside
   // a root that already observes cost nothing.
@@ -380,12 +385,7 @@ export default function ScopedDataTable<
               );
             })}
             {hasSettings ? (
-              <SettingsCell
-                settings={settings}
-                settingsMenu={settingsMenu}
-                menu={menu}
-                reserve={geometry.reserve}
-              />
+              <SettingsCell menu={menu} reserve={geometry.reserve} />
             ) : null}
           </tr>
         </thead>

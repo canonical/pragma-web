@@ -6,14 +6,11 @@ const componentCssClassName = "ds data-table-settings-cell";
 
 /**
  * The header's settings cell, ending the header row: it draws the table's
- * settings menu where the settings are `DataTable.SettingsMenu`, and any
- * other settings as given.
+ * settings menu over the menu's facts and commands.
  *
  * @implements ds:apps.subcomponent.data_table-settings_cell
  */
 export default function SettingsCell({
-  settings,
-  settingsMenu,
   menu,
   reserve,
   className,
@@ -26,7 +23,7 @@ export default function SettingsCell({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       ref={reserve}
     >
-      {settings.type === settingsMenu ? <SettingsMenu {...menu} /> : settings}
+      <SettingsMenu {...menu} />
     </th>
   );
 }

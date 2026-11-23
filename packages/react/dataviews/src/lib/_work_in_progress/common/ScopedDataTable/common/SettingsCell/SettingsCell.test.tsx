@@ -1,7 +1,6 @@
 /**
  * The settings cell, mounted on its own in a header row: it draws the
- * table's settings menu, or the settings it was given, and attaches to the
- * table's geometry.
+ * table's settings menu, and attaches to the table's geometry.
  */
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -19,9 +18,6 @@ const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
   </table>
 );
 
-/** Stands in for `DataTable.SettingsMenu`. */
-const Menu = (): null => null;
-
 /** A menu over no columns, every callback a spy. */
 const MENU: SettingsMenuProps = {
   settings: [],
@@ -38,24 +34,13 @@ const mount = (props: Partial<SettingsCellProps> = {}) => {
   const reserve = vi.fn((_cell: HTMLTableCellElement) => release);
   const view = render(
     <HeaderRow>
-      <SettingsCell
-        settings={<Menu />}
-        settingsMenu={Menu}
-        menu={MENU}
-        reserve={reserve}
-        {...props}
-      />
+      <SettingsCell menu={MENU} reserve={reserve} {...props} />
     </HeaderRow>,
   );
   return { ...view, reserve, release };
 };
 
 describe("SettingsCell", () => {
-  it("is a column header drawing the settings it was given", () => {
-    mount({ settings: <span>Arrange</span> });
-    expect(screen.getByRole("columnheader")).toHaveTextContent("Arrange");
-  });
-
   it("draws the table's menu", () => {
     mount();
     expect(screen.getByRole("columnheader")).toContainElement(

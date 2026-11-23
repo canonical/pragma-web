@@ -1,15 +1,7 @@
-import type {
-  ComponentProps,
-  JSXElementConstructor,
-  ReactElement,
-} from "react";
+import type { ComponentProps } from "react";
 import type { SettingsMenuProps } from "../SettingsMenu/index.js";
 
 type OwnProps = {
-  /** What the table was given as its `settings`. */
-  readonly settings: ReactElement;
-  /** `DataTable.SettingsMenu`, drawn as the menu when given as `settings`. */
-  readonly settingsMenu: JSXElementConstructor<never>;
   /** The menu's facts and commands. */
   readonly menu: SettingsMenuProps;
   /**

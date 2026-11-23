@@ -181,7 +181,7 @@ describe("ScopedDataTable", () => {
     ).toBeInTheDocument();
   });
 
-  it.fails("refuses a settings element other than the settings menu", () => {
+  it("refuses a settings element other than the settings menu", () => {
     const { provider } = createMachineProvider({ rows: [] });
     silenceRenderErrors();
     expect(() =>
