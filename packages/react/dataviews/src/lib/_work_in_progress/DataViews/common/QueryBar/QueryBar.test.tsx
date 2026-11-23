@@ -35,6 +35,7 @@ import {
   vi,
 } from "vitest";
 import {
+  installDialogStandIn,
   installPopoverStandIn,
   installResizeObserverStandIn,
   type ResizeObserverStandIn,
@@ -2679,8 +2680,60 @@ describe("QueryBar", () => {
       });
       expect(summary).toHaveClass("summary");
       expect(summary).toHaveAttribute("command", "show-modal");
-      expect(summary.getAttribute("commandfor")).not.toBe("");
-      fireEvent.click(summary);
+      expect(summary.getAttribute("commandfor")).toBe(
+        screen.getByRole("dialog", { hidden: true }).id,
+      );
+    });
+
+    it("opens the sheet, where the bar speaks while it is open", async () => {
+      const uninstallDialog = installDialogStandIn();
+      onTestFinished(uninstallDialog);
+      const { provider } = mount({ query: "status=deployed&pool=gpu" });
+      resizeBar(320);
+      fireEvent.click(
+        screen.getByRole("button", { name: "Filters, 2 applied" }),
+      );
+      const dialog = screen.getByRole("dialog", { name: "Filter records" });
+      expect(dialog).toHaveAttribute("open");
+      const sheet = within(dialog);
+      fireEvent.click(
+        sheet.getByRole("button", { name: "Remove status is deployed" }),
+      );
+      expect(readFilter(provider)).toEqual([
+        { field: "pool", operator: "isAny", operands: ["gpu"] },
+      ]);
+      await waitFor(() =>
+        expect(
+          dialog.querySelector(".ds.data-views-announcer")?.textContent,
+        ).toMatch(/^Removed status is deployed\./),
+      );
+      // The page's region, inert behind the dialog, says nothing.
+      expect(
+        document.querySelector("body > div > .ds.data-views-announcer")
+          ?.textContent,
+      ).toBe("");
+      fireEvent.click(sheet.getByRole("button", { name: "Close filters" }));
+      expect(dialog).not.toHaveAttribute("open");
+      expect(dialog.querySelector(".body")).toBeNull();
+    });
+
+    it("closes the sheet as the bar widens, focus on the entry", () => {
+      const uninstallDialog = installDialogStandIn();
+      onTestFinished(uninstallDialog);
+      mount({ query: "status=deployed" });
+      resizeBar(320);
+      fireEvent.click(
+        screen.getByRole("button", { name: "Filters, 1 applied" }),
+      );
+      const dialog = screen.getByRole("dialog", { name: "Filter records" });
+      resizeBar(1024);
+      expect(dialog).not.toHaveAttribute("open");
+      expect(findEntry()).toHaveFocus();
+      // Widening with the sheet closed moves nothing.
+      screen.getByRole("button", { name: "Elsewhere" }).focus();
+      resizeBar(320);
+      resizeBar(1024);
+      expect(screen.getByRole("button", { name: "Elsewhere" })).toHaveFocus();
     });
 
     it("moves focus on the summary to the entry as the bar widens", () => {

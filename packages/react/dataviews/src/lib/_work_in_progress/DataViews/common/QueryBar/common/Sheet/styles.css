@@ -1,0 +1,110 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The narrow form: a modal dialog filling the viewport, its frame on the
+     modal surface, its title and close button above a body that scrolls, and
+     its footer's two actions below. Unthemable geometry: the sheet takes
+     the whole viewport, whatever the user agent's dialog margins. */
+  .ds.data-views-query-bar-sheet {
+    box-sizing: border-box;
+    /* The whole viewport's width, the scrollbar's gutter the lock keeps
+       included. */
+    inline-size: 100vw;
+    max-inline-size: none;
+    block-size: 100%;
+    max-block-size: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    color: var(--surface-color-text, var(--color-text));
+    background-color: var(--surface-color-background, var(--color-background));
+
+    /* The frame carries the modal surface and paints it. */
+    & > .frame {
+      display: flex;
+      flex-direction: column;
+      block-size: 100%;
+      color: var(--surface-color-text, var(--color-text));
+      background-color: var(
+        --surface-color-background,
+        var(--color-background)
+      );
+    }
+
+    & > .frame > .header,
+    & > .frame > .footer {
+      display: flex;
+      flex: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--dimension-100);
+      padding-block: var(--dimension-100);
+      padding-inline: var(--dimension-200);
+    }
+
+    & > .frame > .header {
+      border-block-end: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+    }
+
+    & > .frame > .header > .title {
+      margin: 0;
+      font-size: var(--typography-text-primary-bold-font-size);
+      font-weight: var(--typography-text-primary-bold-font-weight);
+      line-height: var(--typography-text-primary-bold-line-height);
+    }
+
+    & > .frame > .body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: var(--dimension-200);
+      padding: var(--dimension-200);
+      overflow-y: auto;
+      /* A swipe past the list's end stays in the sheet. */
+      overscroll-behavior: contain;
+    }
+
+    /* The chips wrap, each its own row where the sheet is narrow. */
+    & > .frame > .body > .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--dimension-100);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* A touch's target: each box and radio of the filters at least 24 px. */
+    &
+      > .frame
+      > .body
+      > .filters
+      :is(input[type="checkbox"], input[type="radio"]) {
+      inline-size: var(--dimension-300);
+      block-size: var(--dimension-300);
+      margin-block: 0;
+    }
+
+    /* The filters' own Apply: the footer holds the sheet's. */
+    & > .frame > .body > .filters > .submit {
+      display: none;
+    }
+
+    & > .frame > .footer {
+      border-block-start: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+    }
+
+    /* The primary action keeps the end, alone or beside Clear all. */
+    & > .frame > .footer > .results {
+      margin-inline-start: auto;
+    }
+  }
+
+  /* The page behind the open sheet does not scroll. Its scrollbar's room
+     is kept, so the bar's width, and its narrow form, hold. */
+  :root:has(.ds.data-views-query-bar-sheet[open]) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+}

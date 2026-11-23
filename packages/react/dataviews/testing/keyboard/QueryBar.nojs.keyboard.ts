@@ -110,10 +110,10 @@ const openWithoutScripts = async (
 const readParams = (page: Page): URLSearchParams =>
   new URL(page.url()).searchParams;
 
-/** The chips' text, in order. */
+/** The bar's chips' text, in order; the sheet holds its own. */
 const readChips = (page: Page): Promise<string[]> =>
   page
-    .locator(".ds.query-chip .body")
+    .locator(".ds.query-input .ds.query-chip .body")
     .evaluateAll((bodies) =>
       bodies.map((body) =>
         (body.textContent ?? "").replace(/\s+/g, " ").trim(),

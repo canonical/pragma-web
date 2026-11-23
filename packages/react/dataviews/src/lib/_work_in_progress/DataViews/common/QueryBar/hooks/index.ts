@@ -8,4 +8,5 @@ export { default as useNarrowMode } from "./useNarrowMode.js";
 export { default as useQueryBarSession } from "./useQueryBarSession.js";
 export { default as useQueryGroup } from "./useQueryGroup.js";
 export { default as useQuickFilterPanels } from "./useQuickFilterPanels.js";
+export { default as useSheetAnnouncer } from "./useSheetAnnouncer.js";
 export { default as useSuggestedFacets } from "./useSuggestedFacets.js";

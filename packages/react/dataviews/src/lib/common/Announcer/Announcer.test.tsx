@@ -20,9 +20,9 @@ afterEach(() => {
 });
 
 /** The announcer mounted, with the way to speak and to read its region. */
-const mount = (strict = false) => {
+const mount = (strict = false, atomic = false) => {
   const handle = createRef<AnnouncerHandle>();
-  const announcer = <Announcer ref={handle} />;
+  const announcer = <Announcer ref={handle} atomic={atomic} />;
   const view = render(
     strict ? <StrictMode>{announcer}</StrictMode> : announcer,
   );
@@ -226,5 +226,22 @@ describe("Announcer", () => {
       <Announcer ref={createRef<AnnouncerHandle>()} id="probe" />,
     );
     expect(container.firstElementChild).toHaveAttribute("id", "probe");
+  });
+
+  it("atomic, is a status region holding only the latest announcement", () => {
+    const { view, say, wait, listSaid } = mount(false, true);
+    const region = view.container.querySelector(".ds.data-views-announcer");
+    expect(region).toHaveAttribute("role", "status");
+    expect(region).toHaveAttribute("aria-atomic", "true");
+    expect(region).not.toHaveAttribute("aria-live");
+    say("Added status is ready.");
+    wait(COALESCE_DELAY_MS);
+    say("Removed status is ready.", "Removed pool is gpu.");
+    wait(COALESCE_DELAY_MS);
+    expect(listSaid()).toEqual([
+      "Removed status is ready. Removed pool is gpu.",
+    ]);
+    wait(CLEAR_DELAY_MS);
+    expect(listSaid()).toEqual([]);
   });
 });

@@ -5,6 +5,7 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { Dispatch, RefCallback, RefObject } from "react";
+import type { AnnouncerHandle } from "../../../../../common/index.js";
 import type { UseFacetsResult } from "../../../../../hooks/index.js";
 import type { FilterButtonPanelHandle } from "../../../../FilterButton/index.js";
 import type { ContextOptions } from "../../../types.js";
@@ -98,6 +99,17 @@ export type UseNarrowModeProps = {
 
 /** Whether the bar is narrow. */
 export type UseNarrowModeResult = boolean;
+
+/** What the sheet's announcer redirects: the root's announcer. */
+export type UseSheetAnnouncerProps = {
+  readonly announce: ContextOptions["announce"];
+};
+
+/** The ref the sheet's status region takes, and the announcer over both. */
+export type UseSheetAnnouncerResult = {
+  readonly regionRef: RefObject<AnnouncerHandle | null>;
+  readonly announce: ContextOptions["announce"];
+};
 
 /**
  * The quick filters' panels, as the bar holds them: a ref for each field's

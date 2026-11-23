@@ -43,6 +43,7 @@ import { QueryBarChip } from "./common/QueryBarChip/index.js";
 import { RangeChip } from "./common/RangeChip/index.js";
 import { RefusedChip } from "./common/RefusedChip/index.js";
 import { SearchForm } from "./common/SearchForm/index.js";
+import { Sheet } from "./common/Sheet/index.js";
 import { SummaryButton } from "./common/SummaryButton/index.js";
 import { DRAFT_ID } from "./constants.js";
 import {
@@ -54,6 +55,7 @@ import {
   useQueryBarSession,
   useQueryGroup,
   useQuickFilterPanels,
+  useSheetAnnouncer,
   useSuggestedFacets,
 } from "./hooks/index.js";
 import type {
@@ -244,7 +246,15 @@ export default function QueryBar({
   onPointerDownCapture,
   ...rest
 }: DataViewsQueryBarProps): ReactElement {
-  const { provider, messages, announce } = useDataViewsRoot("QueryBar");
+  const {
+    provider,
+    messages,
+    announce: announceToRoot,
+  } = useDataViewsRoot("QueryBar");
+  // While the sheet is open, the bar speaks through the sheet's region.
+  const { regionRef, announce } = useSheetAnnouncer({
+    announce: announceToRoot,
+  });
   const { schema } = provider.collection;
   const { capabilities } = provider;
   for (const field of quickFilters ?? []) {
@@ -275,6 +285,7 @@ export default function QueryBar({
   const sheetId = useId();
   // The quick filters' panels, hidden as the sheet shows.
   const { hidePanels } = useQuickFilterPanels();
+  const [isSheetOpen, setSheetOpen] = useState(false);
   const { session, dispatch } = useQueryBarSession({ provider, rootRef });
   const clauses = useClauseIds({ group });
   const readContradictions = useMemo(
@@ -310,6 +321,13 @@ export default function QueryBar({
       }
     },
     onWide: () => {
+      // Widened with the sheet open, as a phone turned: the summary that
+      // opened it is gone, so the sheet closes and focus goes to the entry.
+      const sheet = rootRef.current?.ownerDocument.getElementById(sheetId);
+      if (sheet instanceof HTMLDialogElement && sheet.open) {
+        sheet.close();
+        entryRef.current?.focus();
+      }
       // The search chip shows the search again, so the entry gives it up.
       const applied = readAppliedSearch(group.state.get());
       if (applied !== "" && sessionRef.current.text === applied) {
@@ -1703,32 +1721,47 @@ export default function QueryBar({
   );
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: the bar hears the keys that bubble from the toolbar's items
-    <div
-      {...rest}
-      ref={rootRef}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      // Until scripts run, nothing moves the rows below the field, so the
-      // field stays in flow.
-      data-hydrated={hydrated || undefined}
-      onKeyDown={handleKeyDown}
-      onBlur={handleBlur}
-      onPointerDownCapture={handlePointerDownCapture}
-    >
-      <SearchForm hasHref={hasHref}>{field}</SearchForm>
-      <SummaryButton
-        className="summary"
-        sheetId={sheetId}
-        group={group}
-        onShow={hidePanels}
-      />
-      <MessageLine className="messages" entries={entries} />
-      {hasHref && !hydrated && (
-        <FiltersDisclosure
-          className="filters"
-          applied={countAppliedFilters(clauses)}
+    <>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: the bar hears the keys that bubble from the toolbar's items */}
+      <div
+        {...rest}
+        ref={rootRef}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+        // Until scripts run, nothing moves the rows below the field, so the
+        // field stays in flow.
+        data-hydrated={hydrated || undefined}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        onPointerDownCapture={handlePointerDownCapture}
+      >
+        <SearchForm hasHref={hasHref}>{field}</SearchForm>
+        <SummaryButton
+          className="summary"
+          sheetId={sheetId}
+          group={group}
+          onShow={() => {
+            hidePanels();
+            setSheetOpen(true);
+          }}
         />
-      )}
-    </div>
+        <MessageLine className="messages" entries={entries} />
+        {hasHref && !hydrated && (
+          <FiltersDisclosure
+            className="filters"
+            applied={countAppliedFilters(clauses)}
+          />
+        )}
+      </div>
+      {/* Beside the bar, not in it: the bar's keys and blur never hear the
+          sheet, and its modal dialog is drawn in the top layer anyway. */}
+      <Sheet
+        id={sheetId}
+        group={group}
+        isOpen={isSheetOpen}
+        onOpenChange={setSheetOpen}
+        regionRef={regionRef}
+        announce={announce}
+      />
+    </>
   );
 }
