@@ -55,7 +55,7 @@ const Harness = ({
   onLeave = () => {},
   ...rest
 }: HarnessProps) => {
-  const { filters } = useDataViewsRoot("TextFilter test");
+  const { filters } = useDataViewsRoot({ part: "TextFilter test" });
   return (
     <TextFilter
       {...rest}

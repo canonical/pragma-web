@@ -1,16 +1,14 @@
-/**
- * Hook domain types for the DataViews domain: every hook's result, and the
- * props of the hooks that take a config object. The witness hooks and the
- * value hook take their one input positionally — the collection, a channel,
- * a handle — so they declare no props type of their own.
- */
+/** Hook domain types for the DataViews domain: every hook's props and result. */
 import type {
+  Collection,
   DataViewsProvider,
   DataViewsState,
   EmptyOr,
   FilterFeedback,
+  FilterHandle,
   FilterHandles,
   PredicateOperand,
+  PredicateOperator,
   Query,
   RowRecord,
   SchemaFieldDefinition,
@@ -31,6 +29,12 @@ export type UseProviderStateProps<
 
 /** What the root's state hook hands the root: the value its context carries. */
 export type UseProviderStateResult = ContextOptions;
+
+/** What the root hook takes: the connected part, named if it is outside a root. */
+export type UseDataViewsRootProps = {
+  /** The part's name after `DataViews.`. */
+  readonly part: string;
+};
 
 /** What a connected part reads off the enclosing root: its value. */
 export type UseDataViewsRootResult = ContextOptions;
@@ -107,6 +111,20 @@ export type UseDestinationProps = {
 export type UseDestinationResult = string | null;
 
 /**
+ * What `useDataViews` takes: the collection, its type and identity witness.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type UseDataViewsProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
+  /** The module-scope collection the enclosing root's provider was built over. */
+  readonly collection: Collection<TFields, TRow>;
+};
+
+/**
  * The typed collection scope returned by useDataViews: the provider's own
  * members a child of a root may read and command, plus the root's filter
  * handles. Derived, so a signature is written once; `observe` and `reset`
@@ -143,6 +161,27 @@ export type UseDataViewsResult<
 };
 
 /**
+ * What `useDataViewsFilter` takes: the collection as witness, and the filter's
+ * field and operator.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type UseDataViewsFilterProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TField extends keyof FilterHandles<TFields> & string,
+  TOperator extends keyof FilterHandles<TFields>[TField] & PredicateOperator,
+  TRow extends object = RowRecord,
+> = {
+  /** The module-scope collection the enclosing root's provider was built over. */
+  readonly collection: Collection<TFields, TRow>;
+  /** The filtered field. */
+  readonly field: TField;
+  /** The filter's operator. */
+  readonly operator: TOperator;
+};
+
+/**
  * What `useDataViewsFilter` returns: one filter of the root, read and edited.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -163,6 +202,12 @@ export type UseDataViewsFilterResult<TApplied> = {
   ) => readonly SourceRefusal[];
   /** Remove the filter's predicate, distinct from an empty edit. */
   readonly clear: () => readonly SourceRefusal[];
+};
+
+/** What `useFilterHandle` takes: the handle it binds to. */
+export type UseFilterHandleProps<TApplied> = {
+  /** The filter handle. */
+  readonly handle: FilterHandle<TApplied>;
 };
 
 /** What `useFilterHandle` returns: one filter handle, read and edited. */

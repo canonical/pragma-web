@@ -1,5 +1,4 @@
 import type {
-  Collection,
   FilterHandle,
   FilterHandles,
   PredicateOperator,
@@ -9,7 +8,10 @@ import type {
 import { useContext } from "react";
 import Context from "../Context.js";
 import { findFilterHandle } from "../common/utils/index.js";
-import type { UseDataViewsFilterResult } from "./types.js";
+import type {
+  UseDataViewsFilterProps,
+  UseDataViewsFilterResult,
+} from "./types.js";
 import useFilterHandle from "./useFilterHandle.js";
 
 /** The applied type of one filter address, from the collection's fields. */
@@ -41,11 +43,16 @@ export default function useDataViewsFilter<
   TField extends keyof FilterHandles<TFields> & string,
   TOperator extends keyof FilterHandles<TFields>[TField] & PredicateOperator,
   TRow extends object = RowRecord,
->(
-  collection: Collection<TFields, TRow>,
-  field: TField,
-  operator: TOperator,
-): UseDataViewsFilterResult<AppliedAt<TFields, TField, TOperator>> {
+>({
+  collection,
+  field,
+  operator,
+}: UseDataViewsFilterProps<
+  TFields,
+  TField,
+  TOperator,
+  TRow
+>): UseDataViewsFilterResult<AppliedAt<TFields, TField, TOperator>> {
   const root = useContext(Context);
   if (root === undefined) {
     throw new Error("useDataViewsFilter must be used inside a DataViews root");
@@ -57,11 +64,11 @@ export default function useDataViewsFilter<
   }
   // Checked above: the root's handles are this collection's, so the one at
   // this address applies what the field's kind says it does.
-  return useFilterHandle(
-    findFilterHandle<AppliedAt<TFields, TField, TOperator>>(
+  return useFilterHandle({
+    handle: findFilterHandle<AppliedAt<TFields, TField, TOperator>>(
       root.filters,
       field,
       operator,
     ),
-  );
+  });
 }

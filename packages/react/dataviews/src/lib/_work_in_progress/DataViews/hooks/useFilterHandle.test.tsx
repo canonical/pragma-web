@@ -14,10 +14,10 @@ const mountHandle = <TApplied,>(field: string, operator: "gte" | "isAny") => {
   const hook = renderHook(
     () => {
       renders += 1;
-      const { filters } = useDataViewsRoot("useFilterHandle test");
-      return useFilterHandle(
-        findFilterHandle<TApplied>(filters, field, operator),
-      );
+      const { filters } = useDataViewsRoot({ part: "useFilterHandle test" });
+      return useFilterHandle({
+        handle: findFilterHandle<TApplied>(filters, field, operator),
+      });
     },
     {
       wrapper: ({ children }) => (

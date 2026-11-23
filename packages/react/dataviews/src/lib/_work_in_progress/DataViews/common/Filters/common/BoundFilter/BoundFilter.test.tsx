@@ -60,7 +60,7 @@ const Harness = ({
   onLeave = () => {},
   ...rest
 }: HarnessProps) => {
-  const { filters } = useDataViewsRoot("BoundFilter test");
+  const { filters } = useDataViewsRoot({ part: "BoundFilter test" });
   const definition = collection.schema.findField(field);
   if (definition?.kind !== "number" && definition?.kind !== "date") {
     throw new Error(`expected a bound field, not ${field}`);

@@ -67,7 +67,9 @@ export default function SortPanel({
   ref,
   ...rest
 }: DataViewsSortPanelProps): ReactElement {
-  const { provider, messages, announce } = useDataViewsRoot("SortPanel");
+  const { provider, messages, announce } = useDataViewsRoot({
+    part: "SortPanel",
+  });
   // The terms alone: a result arriving re-renders no panel.
   const sort = useAppliedSort({ provider });
   // Its buttons work only once scripts run: the server and the hydrating

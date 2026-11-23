@@ -48,9 +48,14 @@ const racks = createCollection({
 describe("useDataViewsCell", () => {
   it("reads the installed cell for the witnessed collection", () => {
     const cell = installCell();
-    const { result } = renderHook(() => useDataViewsCell(machines), {
-      wrapper: ({ children }) => <CellMount cell={cell}>{children}</CellMount>,
-    });
+    const { result } = renderHook(
+      () => useDataViewsCell({ collection: machines }),
+      {
+        wrapper: ({ children }) => (
+          <CellMount cell={cell}>{children}</CellMount>
+        ),
+      },
+    );
     expect(result.current.rowId).toBe("machine-1");
     expect(result.current.columnId).toBe("status");
     expect(result.current.record.get()).toEqual(alpha);
@@ -61,16 +66,23 @@ describe("useDataViewsCell", () => {
 
   it("serves the same scope while the installed cell stands", () => {
     const cell = installCell();
-    const { result, rerender } = renderHook(() => useDataViewsCell(machines), {
-      wrapper: ({ children }) => <CellMount cell={cell}>{children}</CellMount>,
-    });
+    const { result, rerender } = renderHook(
+      () => useDataViewsCell({ collection: machines }),
+      {
+        wrapper: ({ children }) => (
+          <CellMount cell={cell}>{children}</CellMount>
+        ),
+      },
+    );
     const first = result.current;
     rerender();
     expect(result.current).toBe(first);
   });
 
   it("throws outside an installed cell", () => {
-    expect(() => renderHook(() => useDataViewsCell(machines))).toThrow(
+    expect(() =>
+      renderHook(() => useDataViewsCell({ collection: machines })),
+    ).toThrow(
       "useDataViewsCell must be used inside a cell rendered by a DataViews table",
     );
   });
@@ -78,7 +90,7 @@ describe("useDataViewsCell", () => {
   it("throws on a witness mismatch", () => {
     const cell = installCell();
     expect(() =>
-      renderHook(() => useDataViewsCell(racks), {
+      renderHook(() => useDataViewsCell({ collection: racks }), {
         wrapper: ({ children }) => (
           <CellMount cell={cell}>{children}</CellMount>
         ),

@@ -38,7 +38,12 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     const { provider } = machineProvider;
     const { result } = renderHook(
-      () => useDataViewsFilter(machines, "cores", "gte"),
+      () =>
+        useDataViewsFilter({
+          collection: machines,
+          field: "cores",
+          operator: "gte",
+        }),
       { wrapper: withRoot(machineProvider) },
     );
     expect(result.current.input).toBe("");
@@ -63,7 +68,12 @@ describe("useDataViewsFilter", () => {
   it("sets a choices field's applied value", () => {
     const machineProvider = createMachineProvider();
     const { result } = renderHook(
-      () => useDataViewsFilter(machines, "status", "isAny"),
+      () =>
+        useDataViewsFilter({
+          collection: machines,
+          field: "status",
+          operator: "isAny",
+        }),
       { wrapper: withRoot(machineProvider) },
     );
     act(() => {
@@ -79,7 +89,12 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     const { provider } = machineProvider;
     const { result } = renderHook(
-      () => useDataViewsFilter(machines, "cores", "gte"),
+      () =>
+        useDataViewsFilter({
+          collection: machines,
+          field: "cores",
+          operator: "gte",
+        }),
       { wrapper: withRoot(machineProvider) },
     );
     act(() => {
@@ -104,7 +119,12 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     const { provider } = machineProvider;
     const { result } = renderHook(
-      () => useDataViewsFilter(machines, "cores", "gte"),
+      () =>
+        useDataViewsFilter({
+          collection: machines,
+          field: "cores",
+          operator: "gte",
+        }),
       { wrapper: withRoot(machineProvider) },
     );
     act(() => {
@@ -125,7 +145,12 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     const { provider } = machineProvider;
     const { result } = renderHook(
-      () => useDataViewsFilter(machines, "status", "isAny"),
+      () =>
+        useDataViewsFilter({
+          collection: machines,
+          field: "status",
+          operator: "isAny",
+        }),
       { wrapper: withRoot(machineProvider) },
     );
     act(() => {
@@ -144,7 +169,11 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     const { result, rerender } = renderHook(
       ({ bound }: { bound: "gte" | "lte" }) =>
-        useDataViewsFilter(machines, "cores", bound),
+        useDataViewsFilter({
+          collection: machines,
+          field: "cores",
+          operator: bound,
+        }),
       {
         initialProps: { bound: "gte" },
         wrapper: withRoot(machineProvider),
@@ -165,7 +194,12 @@ describe("useDataViewsFilter", () => {
     const machineProvider = createMachineProvider();
     const { provider } = machineProvider;
     const { result } = renderHook(
-      () => useDataViewsFilter(machines, "cores", "gte"),
+      () =>
+        useDataViewsFilter({
+          collection: machines,
+          field: "cores",
+          operator: "gte",
+        }),
       { wrapper: withRoot(machineProvider) },
     );
     act(() => {
@@ -188,7 +222,11 @@ describe("useDataViewsFilter", () => {
     const { result } = renderHook(
       () => {
         renders += 1;
-        return useDataViewsFilter(machines, "cores", "gte");
+        return useDataViewsFilter({
+          collection: machines,
+          field: "cores",
+          operator: "gte",
+        });
       },
       { wrapper: withRoot(machineProvider) },
     );
@@ -212,16 +250,30 @@ describe("useDataViewsFilter", () => {
 
   it("throws outside a DataViews root", () => {
     expect(() =>
-      renderHook(() => useDataViewsFilter(machines, "cores", "gte")),
+      renderHook(() =>
+        useDataViewsFilter({
+          collection: machines,
+          field: "cores",
+          operator: "gte",
+        }),
+      ),
     ).toThrow("useDataViewsFilter must be used inside a DataViews root");
   });
 
   it("throws on a witness mismatch", () => {
     const machineProvider = createMachineProvider();
     expect(() =>
-      renderHook(() => useDataViewsFilter(racks, "cores", "gte"), {
-        wrapper: withRoot(machineProvider),
-      }),
+      renderHook(
+        () =>
+          useDataViewsFilter({
+            collection: racks,
+            field: "cores",
+            operator: "gte",
+          }),
+        {
+          wrapper: withRoot(machineProvider),
+        },
+      ),
     ).toThrow(
       "useDataViewsFilter was passed a collection that is not the one the enclosing DataViews root's provider was built over",
     );
@@ -233,13 +285,26 @@ describe("useDataViewsFilter", () => {
     const field: string = "zone";
     const operator: PredicateOperator = "isAny";
     expect(() =>
-      renderHook(() => useDataViewsFilter(machines, field as "cores", "gte"), {
-        wrapper: withRoot(machineProvider),
-      }),
+      renderHook(
+        () =>
+          useDataViewsFilter({
+            collection: machines,
+            field: field as "cores",
+            operator: "gte",
+          }),
+        {
+          wrapper: withRoot(machineProvider),
+        },
+      ),
     ).toThrow("the root holds no filter for zone gte");
     expect(() =>
       renderHook(
-        () => useDataViewsFilter(machines, "cores", operator as "gte"),
+        () =>
+          useDataViewsFilter({
+            collection: machines,
+            field: "cores",
+            operator: operator as "gte",
+          }),
         { wrapper: withRoot(machineProvider) },
       ),
     ).toThrow("the root holds no filter for cores isAny");

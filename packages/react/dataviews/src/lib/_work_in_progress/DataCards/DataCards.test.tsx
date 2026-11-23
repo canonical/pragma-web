@@ -144,7 +144,7 @@ describe("DataCards", () => {
 
   it("renders a field's own content inside that value's cell scope", () => {
     const Badge = ({ value, rowId, columnId }: DisplayFieldCellProps) => {
-      const cell = useDataViewsCell(machines);
+      const cell = useDataViewsCell({ collection: machines });
       const record = useDataViewsValue(cell.record);
       return (
         <span data-testid={`${rowId}-${columnId}`}>

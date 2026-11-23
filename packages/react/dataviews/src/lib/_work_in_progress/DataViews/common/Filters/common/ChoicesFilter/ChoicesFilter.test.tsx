@@ -47,7 +47,9 @@ const StatusFilter = ({
   leavesWhenCleared = false,
   onLeave = () => {},
 }) => {
-  const { provider, filters } = useDataViewsRoot("ChoicesFilter test");
+  const { provider, filters } = useDataViewsRoot({
+    part: "ChoicesFilter test",
+  });
   const alternative = operator === "isAny" ? "isNone" : "isAny";
   return (
     <ChoicesFilter
@@ -134,7 +136,9 @@ const TagsFilter = ({
   ...native
 }: Pick<ChoicesFilterProps, "onLeave" | "className" | "id"> &
   Partial<Pick<ChoicesFilterProps, "options">>) => {
-  const { provider, filters } = useDataViewsRoot("ChoicesFilter test");
+  const { provider, filters } = useDataViewsRoot({
+    part: "ChoicesFilter test",
+  });
   return (
     <ChoicesFilter
       options={options}

@@ -29,7 +29,7 @@ export default function renderInRoot<TResult>(
   const hook = renderHook(
     () => {
       renders += 1;
-      const { provider } = useDataViewsRoot(part);
+      const { provider } = useDataViewsRoot({ part });
       return read(provider);
     },
     {

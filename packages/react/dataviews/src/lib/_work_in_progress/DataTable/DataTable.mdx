@@ -176,7 +176,9 @@ import { type Machine, machineCollection } from "./machines.js";
 
 function HostCell({ value }: DisplayFieldCellProps) {
   // The collection is the witness: the record is typed as a machine.
-  const { record, selected } = useDataViewsCell(machineCollection);
+  const { record, selected } = useDataViewsCell({
+    collection: machineCollection,
+  });
   const { owner } = useDataViewsValue(record);
   const isSelected = useDataViewsValue(selected);
   return (

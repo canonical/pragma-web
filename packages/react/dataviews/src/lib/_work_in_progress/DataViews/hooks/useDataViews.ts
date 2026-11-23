@@ -1,5 +1,4 @@
 import type {
-  Collection,
   DataViewsProvider,
   FilterHandles,
   RowRecord,
@@ -7,7 +6,7 @@ import type {
 } from "@canonical/dataviews-core";
 import { useContext, useMemo } from "react";
 import Context from "../Context.js";
-import type { UseDataViewsResult } from "./types.js";
+import type { UseDataViewsProps, UseDataViewsResult } from "./types.js";
 
 /**
  * Read the enclosing DataViews root's typed collection scope.
@@ -24,7 +23,9 @@ import type { UseDataViewsResult } from "./types.js";
 export default function useDataViews<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->(collection: Collection<TFields, TRow>): UseDataViewsResult<TFields, TRow> {
+>({
+  collection,
+}: UseDataViewsProps<TFields, TRow>): UseDataViewsResult<TFields, TRow> {
   const root = useContext(Context);
   if (root === undefined) {
     throw new Error("useDataViews must be used inside a DataViews root");

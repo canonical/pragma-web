@@ -45,8 +45,8 @@ export default function TextFilter({
   className,
   ...rest
 }: TextFilterProps): ReactElement | null {
-  const { messages, endSessions } = useDataViewsRoot("Filters");
-  const field = useFilterHandle(handle);
+  const { messages, endSessions } = useDataViewsRoot({ part: "Filters" });
+  const field = useFilterHandle({ handle });
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const retained = field.applied.kind === "value";

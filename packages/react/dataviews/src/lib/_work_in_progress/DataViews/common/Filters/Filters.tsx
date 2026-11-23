@@ -366,8 +366,9 @@ export default function Filters({
   className,
   ...rest
 }: DataViewsFiltersProps): ReactElement {
-  const { provider, filters, messages, endSessions } =
-    useDataViewsRoot("Filters");
+  const { provider, filters, messages, endSessions } = useDataViewsRoot({
+    part: "Filters",
+  });
   const facets = useFacets({ provider });
   const restricted = useRestrictedFields({ provider });
   const issues = useDataViewsValue(provider.issues);

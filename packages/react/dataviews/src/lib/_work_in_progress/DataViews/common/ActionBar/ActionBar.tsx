@@ -51,7 +51,7 @@ export default function ActionBar({
   ref,
   ...rest
 }: DataViewsActionBarProps): ReactElement | null {
-  const { provider, messages } = useDataViewsRoot("ActionBar");
+  const { provider, messages } = useDataViewsRoot({ part: "ActionBar" });
   const { selection } = provider;
   const count = useDataViewsValue(selection.state).ids.size;
 

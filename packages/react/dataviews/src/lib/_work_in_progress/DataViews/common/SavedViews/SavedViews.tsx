@@ -47,7 +47,7 @@ export default function SavedViews({
   onBlur,
   ...rest
 }: DataViewsSavedViewsProps): ReactElement {
-  const { provider, messages } = useDataViewsRoot("SavedViews");
+  const { provider, messages } = useDataViewsRoot({ part: "SavedViews" });
   const { views, presentation } = provider;
   if (views === null) {
     throw new Error(

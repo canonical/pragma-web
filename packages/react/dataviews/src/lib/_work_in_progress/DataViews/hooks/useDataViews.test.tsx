@@ -42,9 +42,12 @@ const racks = createCollection({
 describe("useDataViews", () => {
   it("returns the stable typed scope for the enclosing provider", () => {
     const { provider } = createMachineProvider();
-    const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: withRoot(provider),
-    });
+    const { result } = renderHook(
+      () => useDataViews({ collection: machines }),
+      {
+        wrapper: withRoot(provider),
+      },
+    );
     expect(result.current.collection).toBe(machines);
     expect(result.current.capabilities).toBe(provider.capabilities);
     expect(result.current.selection).toBe(provider.selection);
@@ -76,9 +79,12 @@ describe("useDataViews", () => {
 
   it("hands out channels that cannot be published on", () => {
     const { provider } = createMachineProvider();
-    const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: withRoot(provider),
-    });
+    const { result } = renderHook(
+      () => useDataViews({ collection: machines }),
+      {
+        wrapper: withRoot(provider),
+      },
+    );
     for (const channel of [
       result.current.state,
       result.current.rows,
@@ -94,24 +100,27 @@ describe("useDataViews", () => {
 
   it("serves the same scope across re-renders", () => {
     const { provider } = createMachineProvider();
-    const { result, rerender } = renderHook(() => useDataViews(machines), {
-      wrapper: withRoot(provider),
-    });
+    const { result, rerender } = renderHook(
+      () => useDataViews({ collection: machines }),
+      {
+        wrapper: withRoot(provider),
+      },
+    );
     const first = result.current;
     rerender();
     expect(result.current).toBe(first);
   });
 
   it("throws outside a DataViews root", () => {
-    expect(() => renderHook(() => useDataViews(machines))).toThrow(
-      "useDataViews must be used inside a DataViews root",
-    );
+    expect(() =>
+      renderHook(() => useDataViews({ collection: machines })),
+    ).toThrow("useDataViews must be used inside a DataViews root");
   });
 
   it("throws on a witness mismatch", () => {
     const { provider } = createMachineProvider();
     expect(() =>
-      renderHook(() => useDataViews(racks), {
+      renderHook(() => useDataViews({ collection: racks }), {
         wrapper: withRoot(provider),
       }),
     ).toThrow(
@@ -125,7 +134,7 @@ describe("useDataViews", () => {
       }).source,
     });
     expect(() =>
-      renderHook(() => useDataViews(machines), {
+      renderHook(() => useDataViews({ collection: machines }), {
         wrapper: ({ children }) => (
           <DataViews provider={rackProvider}>{children}</DataViews>
         ),
@@ -135,9 +144,12 @@ describe("useDataViews", () => {
 
   it("commands the shared query through the scope", () => {
     const { provider, source } = createMachineProvider();
-    const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: withRoot(provider),
-    });
+    const { result } = renderHook(
+      () => useDataViews({ collection: machines }),
+      {
+        wrapper: withRoot(provider),
+      },
+    );
     let refusals: readonly unknown[] = [];
     act(() => {
       refusals = result.current.setSearch("alpha");
@@ -178,9 +190,12 @@ describe("useDataViews", () => {
       }),
       runAction,
     });
-    const { result } = renderHook(() => useDataViews(machines), {
-      wrapper: withRoot(provider),
-    });
+    const { result } = renderHook(
+      () => useDataViews({ collection: machines }),
+      {
+        wrapper: withRoot(provider),
+      },
+    );
     act(() => {
       provider.selection.add(["m1", "m2"]);
     });
@@ -211,7 +226,7 @@ describe("useDataViews", () => {
   it("reads through StrictMode's double mount: one live execution, values that follow", () => {
     const { provider, source } = createMachineProvider();
     const { result } = renderHook(
-      () => useDataViewsValue(useDataViews(machines).state),
+      () => useDataViewsValue(useDataViews({ collection: machines }).state),
       {
         wrapper: ({ children }) => (
           <StrictMode>

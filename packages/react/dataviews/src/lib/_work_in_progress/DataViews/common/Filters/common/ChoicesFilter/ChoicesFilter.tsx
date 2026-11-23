@@ -65,9 +65,9 @@ export default function ChoicesFilter({
   className,
   ...rest
 }: ChoicesFilterProps): ReactElement | null {
-  const { messages } = useDataViewsRoot("Filters");
-  const field = useFilterHandle(handle);
-  const alternativeField = useFilterHandle(alternativeHandle);
+  const { messages } = useDataViewsRoot({ part: "Filters" });
+  const field = useFilterHandle({ handle });
+  const alternativeField = useFilterHandle({ handle: alternativeHandle });
   // The set the control shows may be any conjunct at its address, so the
   // move names the one it is.
   const nth = useDataViewsValue(handle.nth);

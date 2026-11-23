@@ -22,6 +22,6 @@ export default function ConnectedRecordList<
   collection,
   ...props
 }: ConnectedRecordListProps<TFields, TRow>): ReactElement {
-  const scope = useDataViews(collection);
+  const scope = useDataViews({ collection });
   return <ScopedRecordList {...props} scope={scope} />;
 }

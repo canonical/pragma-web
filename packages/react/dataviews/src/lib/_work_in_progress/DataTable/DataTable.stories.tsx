@@ -1016,7 +1016,7 @@ const columns: readonly DataTableColumn[] = [
  * module scope, for every table over the collection.
  */
 function HostCell({ value }: DisplayFieldCellProps): ReactElement {
-  const cell = useDataViewsCell(machineCollection);
+  const cell = useDataViewsCell({ collection: machineCollection });
   const { owner } = useDataViewsValue(cell.record);
   const selected = useDataViewsValue(cell.selected);
   return (
@@ -1060,7 +1060,9 @@ export const CellReadingItsScope: Story = {
     imports: typedMachineImports,
     declarations: `function HostCell({ value }: DisplayFieldCellProps) {
   // The collection is the witness: the record is typed as a machine.
-  const { record, selected } = useDataViewsCell(machineCollection);
+  const { record, selected } = useDataViewsCell({
+    collection: machineCollection,
+  });
   const { owner } = useDataViewsValue(record);
   const isSelected = useDataViewsValue(selected);
   return (

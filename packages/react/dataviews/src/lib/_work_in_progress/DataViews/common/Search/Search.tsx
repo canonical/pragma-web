@@ -52,7 +52,7 @@ export default function Search({
   id,
   ...rest
 }: DataViewsSearchProps): ReactElement {
-  const { provider, messages } = useDataViewsRoot("Search");
+  const { provider, messages } = useDataViewsRoot({ part: "Search" });
   if (provider.capabilities.search === null) {
     throw new Error(
       "DataViews.Search requires a source that declares search; this provider's declares none",

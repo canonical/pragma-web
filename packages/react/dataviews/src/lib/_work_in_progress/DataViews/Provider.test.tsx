@@ -32,7 +32,11 @@ const listLive = (source: ReturnType<typeof createMachineProvider>["source"]) =>
 
 /** A control over the `cores` lower bound, as a child of one root. */
 const CoresFilter = ({ name }: { name: string }): ReactElement => {
-  const filter = useDataViewsFilter(machines, "cores", "gte");
+  const filter = useDataViewsFilter({
+    collection: machines,
+    field: "cores",
+    operator: "gte",
+  });
   return (
     <div>
       <input

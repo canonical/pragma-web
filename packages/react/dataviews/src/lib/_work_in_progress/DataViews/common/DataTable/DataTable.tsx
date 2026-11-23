@@ -13,7 +13,7 @@ import type { DataViewsDataTableProps } from "./types.js";
  * than taking a provider or messages of its own, and says what its
  * activations did through the root's one announcer rather than one of its
  * own. Its records are the widest shape: a custom cell types them through
- * `useDataViewsCell(collection)`, with the collection as its witness.
+ * `useDataViewsCell({ collection })`, with the collection as its witness.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
@@ -25,7 +25,9 @@ import type { DataViewsDataTableProps } from "./types.js";
 export default function DataTable(
   props: DataViewsDataTableProps,
 ): ReactElement {
-  const { provider, messages, announce } = useDataViewsRoot("DataTable");
+  const { provider, messages, announce } = useDataViewsRoot({
+    part: "DataTable",
+  });
   return (
     <ScopedDataTable
       {...props}

@@ -406,7 +406,7 @@ describe("DataTable", () => {
     // The cell takes no provider: the collection is its witness, and the
     // record channel is typed as its records.
     const Badge = ({ value, rowId, columnId }: DisplayFieldCellProps) => {
-      const cell = useDataViewsCell(machines);
+      const cell = useDataViewsCell({ collection: machines });
       const record = useDataViewsValue(cell.record);
       return (
         <span data-testid={`${rowId}-${columnId}`}>
@@ -1732,7 +1732,7 @@ describe("DataTable", () => {
     const Probe = ({ rowId }: DisplayFieldCellProps) => {
       // Reads the row's membership, so this probe is notified exactly when
       // that row's selection channel publishes.
-      useDataViewsValue(useDataViewsCell(machines).selected);
+      useDataViewsValue(useDataViewsCell({ collection: machines }).selected);
       renders.push(rowId);
       return null;
     };
@@ -1777,7 +1777,7 @@ describe("DataTable", () => {
   it("mints one scope per row, shared by its cells and stable across renders", () => {
     const seen: { rowId: string; record: unknown }[] = [];
     const Probe = () => {
-      const cell = useDataViewsCell(machines);
+      const cell = useDataViewsCell({ collection: machines });
       seen.push({ rowId: cell.rowId, record: cell.record });
       return null;
     };

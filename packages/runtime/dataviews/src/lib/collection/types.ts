@@ -96,7 +96,7 @@ export type CollectionConfig<
 
 /**
  * One collection, declared at module scope: its schema, its record
- * identity and its record types. The witness `useDataViews(collection)`
+ * identity and its record types. The witness `useDataViews({ collection })`
  * and `createDataViewsProvider({ collection })` take, and the object the
  * runtime check compares by reference.
  *

@@ -11,7 +11,9 @@ export type {
   DataViewsSavedViewsProps,
   DataViewsSearchProps,
   DataViewsSortPanelProps,
+  UseDataViewsFilterProps,
   UseDataViewsFilterResult,
+  UseDataViewsProps,
   UseDataViewsResult,
 } from "./DataViews/index.js";
 export {

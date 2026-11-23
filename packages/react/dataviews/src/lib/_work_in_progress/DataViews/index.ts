@@ -9,7 +9,9 @@ export type { DataViewsSavedViewsProps } from "./common/SavedViews/index.js";
 export type { DataViewsSearchProps } from "./common/Search/index.js";
 export type { DataViewsSortPanelProps } from "./common/SortPanel/index.js";
 export type {
+  UseDataViewsFilterProps,
   UseDataViewsFilterResult,
+  UseDataViewsProps,
   UseDataViewsResult,
 } from "./hooks/index.js";
 export { useDataViews, useDataViewsFilter } from "./hooks/index.js";

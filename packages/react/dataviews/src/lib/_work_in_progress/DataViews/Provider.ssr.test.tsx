@@ -15,9 +15,13 @@ import DataViews from "./Provider.js";
 
 /** A consumer reading the scope, a value channel and a filter during SSR. */
 const ScopeProbe = ({ onRead }: { onRead: () => void }) => {
-  const scope = useDataViews(machines);
+  const scope = useDataViews({ collection: machines });
   const snapshot = useDataViewsValue(scope.state);
-  const cores = useDataViewsFilter(machines, "cores", "gte");
+  const cores = useDataViewsFilter({
+    collection: machines,
+    field: "cores",
+    operator: "gte",
+  });
   onRead();
   return (
     <>

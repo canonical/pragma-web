@@ -77,7 +77,7 @@ function SelectionAction({
 }: Omit<ButtonProps, "onClick"> & {
   readonly action: string;
 }): ReactElement {
-  const { runAction } = useDataViews(machineCollection);
+  const { runAction } = useDataViews({ collection: machineCollection });
   return (
     <Button
       {...button}
@@ -145,7 +145,7 @@ function SelectionAction({
   action,
   ...button
 }: Omit<ButtonProps, "onClick"> & { action: string }) {
-  const { runAction } = useDataViews(machineCollection);
+  const { runAction } = useDataViews({ collection: machineCollection });
   return (
     <Button
       {...button}
@@ -280,7 +280,7 @@ export const SelectedAcrossPages: Story = {
 
 /** A count that names what is selected, following the selection. */
 function MachinesSelected(): ReactElement {
-  const { selection } = useDataViews(machineCollection);
+  const { selection } = useDataViews({ collection: machineCollection });
   const count = useDataViewsValue(selection.state).ids.size;
   return (
     <span role="status" className="indicator">
@@ -293,7 +293,7 @@ const machinesSelectedCode = `
 
 // Follows the selection, and announces it as the default count does.
 function MachinesSelected() {
-  const { selection } = useDataViews(machineCollection);
+  const { selection } = useDataViews({ collection: machineCollection });
   const count = useDataViewsValue(selection.state).ids.size;
   return (
     <span role="status" className="indicator">

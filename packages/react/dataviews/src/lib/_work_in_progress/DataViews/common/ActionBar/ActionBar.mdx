@@ -11,7 +11,7 @@ It renders on the design system's contrasted surface — its root carries `.cont
 
 ## Actions over the selection
 
-The actions are your own components, placed as children. Each runs through the provider when it is pressed: `runAction({ action })` from `useDataViews(collection)` captures the selection as its targets — or the `targets` you name — calls the source's own `runAction`, and removes the targets that succeed from the selection. A failed target stays selected, for review and retry. An action the source did not declare, one addressing nothing, or one addressing more rows than it declared it can take at once, is rejected before anything runs.
+The actions are your own components, placed as children. Each runs through the provider when it is pressed: `runAction({ action })` from `useDataViews({ collection })` captures the selection as its targets — or the `targets` you name — calls the source's own `runAction`, and removes the targets that succeed from the selection. A failed target stays selected, for review and retry. An action the source did not declare, one addressing nothing, or one addressing more rows than it declared it can take at once, is rejected before anything runs.
 
 A destructive action is the design system's `Button` with `anticipation="destructive"`.
 
@@ -49,7 +49,7 @@ function SelectionAction({
   action,
   ...button
 }: Omit<ButtonProps, "onClick"> & { action: string }) {
-  const { runAction } = useDataViews(machineCollection);
+  const { runAction } = useDataViews({ collection: machineCollection });
   return (
     <Button
       {...button}
@@ -122,11 +122,11 @@ When an action succeeds for every target, the targets leave the selection, and w
 
 ## Your own indicator
 
-`indicator` replaces the count; `null` shows none. A replacement reads the selection itself, through `useDataViews(collection)`, and owns its own announcement: the default count is a polite status, so give yours `role="status"` if it stands in for it, and the class `indicator` to take the default's inset. When the persistent selection panel ships, its trigger takes this place.
+`indicator` replaces the count; `null` shows none. A replacement reads the selection itself, through `useDataViews({ collection })`, and owns its own announcement: the default count is a polite status, so give yours `role="status"` if it stands in for it, and the class `indicator` to take the default's inset. When the persistent selection panel ships, its trigger takes this place.
 
 ```tsx
 function MachinesSelected() {
-  const { selection } = useDataViews(machineCollection);
+  const { selection } = useDataViews({ collection: machineCollection });
   const count = useDataViewsValue(selection.state, (state) => state.ids.size);
   return (
     <span role="status" className="indicator">

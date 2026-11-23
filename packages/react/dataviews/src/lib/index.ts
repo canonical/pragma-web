@@ -16,7 +16,9 @@ export type {
   QueryChipProps,
   QueryChipSegmentProps,
   QueryChipsProps,
+  UseDataViewsFilterProps,
   UseDataViewsFilterResult,
+  UseDataViewsProps,
   UseDataViewsResult,
 } from "./_work_in_progress/index.js";
 export {

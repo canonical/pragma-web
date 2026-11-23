@@ -21,6 +21,6 @@ import type { DataViewsDataChartProps } from "./types.js";
 export default function DataChart(
   props: DataViewsDataChartProps,
 ): ReactElement {
-  const { provider, messages } = useDataViewsRoot("DataChart");
+  const { provider, messages } = useDataViewsRoot({ part: "DataChart" });
   return <Standalone {...props} provider={provider} messages={messages} />;
 }

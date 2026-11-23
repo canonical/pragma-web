@@ -22,9 +22,9 @@ import type { UseDataViewsCellProps, UseDataViewsCellResult } from "./types.js";
 export default function useDataViewsCell<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
->(
-  ...[collection]: UseDataViewsCellProps<TFields, TRow>
-): UseDataViewsCellResult<TRow> {
+>({
+  collection,
+}: UseDataViewsCellProps<TFields, TRow>): UseDataViewsCellResult<TRow> {
   const cell = useContext(CellContext);
   if (cell === null) {
     throw new Error(

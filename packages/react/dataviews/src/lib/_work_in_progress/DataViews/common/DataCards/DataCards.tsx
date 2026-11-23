@@ -23,6 +23,6 @@ import type { DataViewsDataCardsProps } from "./types.js";
 export default function DataCards(
   props: DataViewsDataCardsProps,
 ): ReactElement {
-  const { provider, messages } = useDataViewsRoot("DataCards");
+  const { provider, messages } = useDataViewsRoot({ part: "DataCards" });
   return <Standalone {...props} provider={provider} messages={messages} />;
 }

@@ -45,8 +45,8 @@ export type UseDataViewsValueProps<T, TSelected> = readonly [
 export type UseDataViewsValueResult<T> = T;
 
 /**
- * What `useDataViewsCell` takes: the collection the enclosing table's
- * provider was built over, the witness of the record's type.
+ * What `useDataViewsCell` takes: the collection, the witness of the
+ * record's type.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -54,7 +54,10 @@ export type UseDataViewsValueResult<T> = T;
 export type UseDataViewsCellProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
-> = readonly [collection: Collection<TFields, TRow>];
+> = {
+  /** The collection the enclosing table's provider was built over. */
+  readonly collection: Collection<TFields, TRow>;
+};
 
 /**
  * The cell scope returned by useDataViewsCell. Its channels are read-only.

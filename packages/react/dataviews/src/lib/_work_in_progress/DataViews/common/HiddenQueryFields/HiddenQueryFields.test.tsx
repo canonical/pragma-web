@@ -28,7 +28,7 @@ const listHidden = (): readonly (readonly [string, string])[] =>
 
 /** The hidden fields over the root's provider, in a search form. */
 const SearchForm = () => {
-  const { provider } = useDataViewsRoot("HiddenQueryFields test");
+  const { provider } = useDataViewsRoot({ part: "HiddenQueryFields test" });
   return (
     <form aria-label="Search" method="get">
       <HiddenQueryFields

@@ -73,7 +73,7 @@ export const Default: Story = {
 
 /** A child of the application's own, reading the rows the root holds. */
 function MachineCount(): ReactElement {
-  const { rows } = useDataViews(machineCollection);
+  const { rows } = useDataViews({ collection: machineCollection });
   const shown = useDataViewsValue(rows).entries.length;
   return <p>{`${shown} machines on this page`}</p>;
 }
@@ -95,7 +95,7 @@ export const OwnChild: Story = {
     declarations: `${columnsCode}
 
 function MachineCount() {
-  const { rows } = useDataViews(machineCollection);
+  const { rows } = useDataViews({ collection: machineCollection });
   const shown = useDataViewsValue(rows).entries.length;
   return <p>{\`\${shown} machines on this page\`}</p>;
 }`,

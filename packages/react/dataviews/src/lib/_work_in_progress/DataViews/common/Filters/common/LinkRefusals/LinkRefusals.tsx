@@ -80,7 +80,7 @@ export default function LinkRefusals({
   className,
   ...rest
 }: LinkRefusalsProps): ReactElement | null {
-  const { messages } = useDataViewsRoot("Filters");
+  const { messages } = useDataViewsRoot({ part: "Filters" });
   const hydrated = useIsHydrated();
   const labelId = useId();
   const root = useRef<HTMLDivElement>(null);

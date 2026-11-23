@@ -7,7 +7,7 @@ import useDataViewsRoot from "./useDataViewsRoot.js";
 describe("useDataViewsRoot", () => {
   it("reads the enclosing root's provider", () => {
     const { provider } = createMachineProvider();
-    const { result } = renderHook(() => useDataViewsRoot("Part"), {
+    const { result } = renderHook(() => useDataViewsRoot({ part: "Part" }), {
       wrapper: ({ children }) => (
         <DataViews provider={provider}>{children}</DataViews>
       ),
@@ -16,8 +16,8 @@ describe("useDataViewsRoot", () => {
   });
 
   it("throws outside a root, naming the part", () => {
-    expect(() => renderHook(() => useDataViewsRoot("Search"))).toThrow(
-      "DataViews.Search must be used inside a DataViews root",
-    );
+    expect(() =>
+      renderHook(() => useDataViewsRoot({ part: "Search" })),
+    ).toThrow("DataViews.Search must be used inside a DataViews root");
   });
 });

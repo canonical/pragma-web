@@ -30,8 +30,8 @@ export default function PresenceFilter({
   className,
   ...rest
 }: PresenceFilterProps): ReactElement | null {
-  const { messages } = useDataViewsRoot("Filters");
-  const field = useFilterHandle(handle);
+  const { messages } = useDataViewsRoot({ part: "Filters" });
+  const field = useFilterHandle({ handle });
   const countId = useId();
   const applied = field.applied.kind === "value";
   if (!declared && !applied) {

@@ -21,6 +21,8 @@ import type { DataViewsDataChartWithTableProps } from "./types.js";
 export default function DataChartWithTable(
   props: DataViewsDataChartWithTableProps,
 ): ReactElement {
-  const { provider, messages } = useDataViewsRoot("DataChartWithTable");
+  const { provider, messages } = useDataViewsRoot({
+    part: "DataChartWithTable",
+  });
   return <Standalone {...props} provider={provider} messages={messages} />;
 }
