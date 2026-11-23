@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createFacetedFleet from "../../../../../../testing/createFacetedFleet.js";
-import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
+import {
+  createFacetedFleet,
+  silenceRenderErrors,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import DataChart from "./DataChart.js";
 

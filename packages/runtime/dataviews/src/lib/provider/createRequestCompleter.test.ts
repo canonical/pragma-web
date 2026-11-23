@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import buildPage from "../../../testing/buildPage.js";
-import readId from "../../../testing/readId.js";
+import { buildPage, readId } from "../../../testing/index.js";
 import { createQueryCoordinator } from "../coordinator/index.js";
 import { createChannel } from "../observable/index.js";
 import type { Completion } from "../result/index.js";

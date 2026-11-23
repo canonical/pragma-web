@@ -10,6 +10,9 @@ import {
  * the writes, and the case waits for the writes, never for a duration.
  *
  * @note Impure: advances the faked clock.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default async function flushPresentation(
   writes: MockInstance<PresentationStore["patchPresentation"]>,

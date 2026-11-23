@@ -5,8 +5,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import declare from "../../../testing/declare.js";
-import respellLink from "../../../testing/respellLink.js";
+import { declare, respellLink } from "../../../testing/index.js";
 import listCarriedIssues from "../../lib/provider/listCarriedIssues.js";
 import { canonicalizeSlice, type Slice } from "../../lib/query/index.js";
 import type { QueryIssue } from "../../lib/result/index.js";

@@ -16,15 +16,15 @@ import { type ReactElement, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../testing/createMachineProvider.js";
-import deliverRows from "../../../../../testing/deliverRows.js";
-import elementAt from "../../../../../testing/elementAt.js";
-import type {
-  Machine,
-  MachineFields,
-  MachineProvider as Provider,
-} from "../../../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  deliverRows,
+  elementAt,
+  type Machine,
+  type MachineFields,
+  type MachineProvider as Provider,
+} from "../../../../../testing/index.js";
 import {
   DataTable,
   type DataTableColumn,

@@ -8,10 +8,12 @@
 import { createMemoryLocation, decodeQuery } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../../../../testing/declareMachineOrdering.js";
-import { machines } from "../../../../../../testing/machines.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+  machines,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import SortPanel from "./SortPanel.js";
 

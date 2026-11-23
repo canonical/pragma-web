@@ -6,8 +6,10 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import createFakeChannel from "../../../../../../../testing/createFakeChannel.js";
-import createMachineProvider from "../../../../../../../testing/createMachineProvider.js";
+import {
+  createFakeChannel,
+  createMachineProvider,
+} from "../../../../../../../testing/index.js";
 import SelectAllCell from "./SelectAllCell.js";
 import type { SelectAllCellProps } from "./types.js";
 

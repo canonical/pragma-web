@@ -5,9 +5,11 @@ import {
 import { act, render, screen, within } from "@testing-library/react";
 import { createRef, type ReactNode, type Ref } from "react";
 import { describe, expect, it, onTestFinished } from "vitest";
-import buildMachine from "../../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../../testing/createMachineProvider.js";
-import deliverRows from "../../../../../../../testing/deliverRows.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  deliverRows,
+} from "../../../../../../../testing/index.js";
 import Row from "./Row.js";
 
 const COLUMNS = [

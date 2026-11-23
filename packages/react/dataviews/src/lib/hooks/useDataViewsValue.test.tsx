@@ -11,10 +11,12 @@ import {
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import createFakeChannel from "../../../testing/createFakeChannel.js";
-import createListing from "../../../testing/createListing.js";
-import listIds from "../../../testing/listIds.js";
-import type { Listing } from "../../../testing/types.js";
+import {
+  createFakeChannel,
+  createListing,
+  type Listing,
+  listIds,
+} from "../../../testing/index.js";
 import useDataViewsValue from "./useDataViewsValue.js";
 
 /** Read the ids of a listing: a part of the snapshot, never a new list. */

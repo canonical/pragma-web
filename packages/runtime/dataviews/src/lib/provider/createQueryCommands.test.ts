@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import declare from "../../../testing/declare.js";
+import { createManualSource, declare } from "../../../testing/index.js";
 import { createQueryCoordinator } from "../coordinator/index.js";
 import { createChannel } from "../observable/index.js";
 import { DEFAULT_WINDOW, type Query, type Slice } from "../query/index.js";

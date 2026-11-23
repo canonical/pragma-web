@@ -13,8 +13,7 @@
 
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createFacetedManual from "../../../testing/createFacetedManual.js";
-import deliverFacets from "../../../testing/deliverFacets.js";
+import { createFacetedManual, deliverFacets } from "../../../testing/index.js";
 import BarDrawing from "../../lib/_work_in_progress/DataChart/common/BarDrawing/BarDrawing.js";
 import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 

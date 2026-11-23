@@ -5,7 +5,7 @@
  */
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../../../../testing/index.js";
 import type { DataTableColumn } from "../common/index.js";
 import useColumnArrangement from "./useColumnArrangement.js";
 

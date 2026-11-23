@@ -41,24 +41,22 @@ import { createRef, type ReactElement, StrictMode, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildMachine from "../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
-import deliverRows from "../../../../testing/deliverRows.js";
-import elementAt from "../../../../testing/elementAt.js";
-import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
-import fakeAnnouncerClock from "../../../../testing/fakeAnnouncerClock.js";
 import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+  deliverRows,
+  elementAt,
+  expectNoAxeViolations,
+  fakeAnnouncerClock,
   MACHINE_CAPABILITIES,
+  type Machine,
+  type MachineFields,
   machines,
-} from "../../../../testing/machines.js";
-import readAnnouncements from "../../../../testing/readAnnouncements.js";
-import type {
-  Machine,
-  MachineFields,
-  OddRecord,
-  MachineProvider as Provider,
-} from "../../../../testing/types.js";
+  type OddRecord,
+  type MachineProvider as Provider,
+  readAnnouncements,
+} from "../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";

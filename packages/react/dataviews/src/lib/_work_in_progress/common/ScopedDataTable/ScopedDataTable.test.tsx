@@ -7,8 +7,10 @@ import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../testing/createMachineProvider.js";
+import {
+  buildMachine,
+  createMachineProvider,
+} from "../../../../../testing/index.js";
 import type { DataTableColumn } from "./common/index.js";
 import ScopedDataTable from "./ScopedDataTable.js";
 

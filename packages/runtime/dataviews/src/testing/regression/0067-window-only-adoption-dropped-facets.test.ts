@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import buildPage from "../../../testing/buildPage.js";
+import { buildPage } from "../../../testing/index.js";
 import { createQueryCoordinator } from "../../lib/coordinator/index.js";
 import { DEFAULT_WINDOW, EMPTY_SLICE } from "../../lib/query/index.js";
 

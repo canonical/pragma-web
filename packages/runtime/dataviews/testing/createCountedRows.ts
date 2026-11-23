@@ -7,6 +7,9 @@ import type { CountedField, CountedRows } from "./types.js";
  * each pass it makes.
  *
  * @note Impure: each read of the counted field adds to the count.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function createCountedRows(
   count: number,

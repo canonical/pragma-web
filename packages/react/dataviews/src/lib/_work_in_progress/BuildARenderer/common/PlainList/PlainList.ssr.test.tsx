@@ -4,8 +4,7 @@ import {
 } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import { machines } from "../../../../../../testing/machines.js";
+import { buildMachine, machines } from "../../../../../../testing/index.js";
 import PlainList from "./PlainList.js";
 
 describe("PlainList on the server", () => {

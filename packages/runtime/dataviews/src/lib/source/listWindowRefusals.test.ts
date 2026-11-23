@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import declare from "../../../testing/declare.js";
+import { declare } from "../../../testing/index.js";
 import { DEFAULT_WINDOW } from "../query/index.js";
 import listWindowRefusals from "./listWindowRefusals.js";
 

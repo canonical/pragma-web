@@ -5,9 +5,11 @@ import {
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../../testing/createMachineProvider.js";
-import deliverRows from "../../../../../../../testing/deliverRows.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  deliverRows,
+} from "../../../../../../../testing/index.js";
 import type { DisplayFieldCellProps } from "../../../../../common/index.js";
 import { BodyCell } from "./index.js";
 

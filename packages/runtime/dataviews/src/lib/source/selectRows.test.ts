@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { FACETED_ROWS, FACETED_SCHEMA } from "../../../testing/fixtures.js";
-import readId from "../../../testing/readId.js";
+import {
+  FACETED_ROWS,
+  FACETED_SCHEMA,
+  readId,
+} from "../../../testing/index.js";
 import { EMPTY_SLICE, type Predicate, type Slice } from "../query/index.js";
 import { createSchema } from "../schema/index.js";
 import selectRows from "./selectRows.js";

@@ -11,8 +11,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import declareSort from "../../../testing/declareSort.js";
-import readId from "../../../testing/readId.js";
+import { declareSort, readId } from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { EMPTY_SLICE } from "../../lib/query/index.js";
 import { executeSlice, readFacets } from "../../lib/source/index.js";

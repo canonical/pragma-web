@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createMachineProvider from "../../../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../../../testing/index.js";
 import DataViews from "../Provider.js";
 import useDataViewsRoot from "./useDataViewsRoot.js";
 

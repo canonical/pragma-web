@@ -15,9 +15,11 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
-import expectNoAxeViolations from "../../../../../../../../testing/expectNoAxeViolations.js";
-import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
-import type { IdentifiedRecord as Row } from "../../../../../../../../testing/types.js";
+import {
+  COUNTED_EXACTLY,
+  expectNoAxeViolations,
+  type IdentifiedRecord as Row,
+} from "../../../../../../../../testing/index.js";
 import DataViews from "../../../../Provider.js";
 import Filters from "../../Filters.js";
 import LinkRefusals from "./LinkRefusals.js";

@@ -11,7 +11,7 @@ import {
 } from "@canonical/dataviews-core/testing";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import SavedViews from "./SavedViews.js";
 

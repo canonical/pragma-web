@@ -23,8 +23,11 @@ import {
 } from "@canonical/dataviews-core/testing";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import { MACHINE_CAPABILITIES, machines } from "../../../testing/machines.js";
+import {
+  buildMachine,
+  MACHINE_CAPABILITIES,
+  machines,
+} from "../../../testing/index.js";
 import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
 
 describe("regression 0124 — a refused link drew wider rows on the server", () => {

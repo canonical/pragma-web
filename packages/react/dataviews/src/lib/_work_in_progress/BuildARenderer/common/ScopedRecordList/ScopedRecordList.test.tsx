@@ -2,9 +2,11 @@ import type { Query, SourceRefusal } from "@canonical/dataviews-core";
 import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import type { MachineProvider } from "../../../../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  type MachineProvider,
+} from "../../../../../../testing/index.js";
 import ScopedRecordList from "./ScopedRecordList.js";
 import type { RecordListOwnProps } from "./types.js";
 

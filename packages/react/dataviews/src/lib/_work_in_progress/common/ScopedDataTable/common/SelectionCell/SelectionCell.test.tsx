@@ -9,10 +9,12 @@ import {
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../../testing/createMachineProvider.js";
-import deliverRows from "../../../../../../../testing/deliverRows.js";
-import type { Machine } from "../../../../../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  deliverRows,
+  type Machine,
+} from "../../../../../../../testing/index.js";
 import SelectionCell from "./SelectionCell.js";
 import type { SelectionCellProps } from "./types.js";
 

@@ -5,7 +5,7 @@
  * mutation-tested against that contract.
  */
 import { describe, expect, it, vi } from "vitest";
-import buildRowModel from "../../../testing/buildRowModel.js";
+import { buildRowModel } from "../../../testing/index.js";
 import { createChannel } from "../observable/index.js";
 import { createSelection } from "../selection/index.js";
 import createRowScopes from "./createRowScopes.js";

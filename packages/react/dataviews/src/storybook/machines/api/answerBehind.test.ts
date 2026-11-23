@@ -1,6 +1,6 @@
 import { delay, HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
-import serveMockApi from "../../../../testing/serveMockApi.js";
+import { serveMockApi } from "../../../../testing/index.js";
 import answerBehind from "./answerBehind.js";
 import { MACHINES_QUERY_TEXT } from "./constants.js";
 

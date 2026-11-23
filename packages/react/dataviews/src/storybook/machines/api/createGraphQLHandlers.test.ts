@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
-import requestGraphQL from "../../../../testing/requestGraphQL.js";
-import serveMockApi from "../../../../testing/serveMockApi.js";
-import watchMockRequest from "../../../../testing/watchMockRequest.js";
+import {
+  requestGraphQL,
+  serveMockApi,
+  watchMockRequest,
+} from "../../../../testing/index.js";
 import createGraphQLHandlers from "./createGraphQLHandlers.js";
 import type { MachinesData } from "./types.js";
 

@@ -1,6 +1,6 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import listUnmarkedNames from "../../../testing/listUnmarkedNames.js";
+import { listUnmarkedNames } from "../../../testing/index.js";
 
 /** The names one entry point's barrel exports without the tag. */
 const listUnmarked = (barrel: string): readonly string[] =>

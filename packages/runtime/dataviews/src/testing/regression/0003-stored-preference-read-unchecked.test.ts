@@ -12,8 +12,7 @@
 
 import { IDBFactory } from "fake-indexeddb";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import readId from "../../../testing/readId.js";
+import { createManualSource, readId } from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createIndexedDBViewStore } from "../../lib/indexeddb/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";

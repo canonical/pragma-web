@@ -11,8 +11,10 @@
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
-import flushPresentation from "../../../testing/flushPresentation.js";
+import {
+  createStandInPresentationStore,
+  flushPresentation,
+} from "../../../testing/index.js";
 import {
   createPresentation,
   type PreferenceResult,

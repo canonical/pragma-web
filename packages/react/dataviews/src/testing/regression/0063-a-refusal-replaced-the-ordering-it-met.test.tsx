@@ -10,10 +10,12 @@
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
-import readAnnouncements from "../../../testing/readAnnouncements.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+  readAnnouncements,
+} from "../../../testing/index.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { COALESCE_DELAY_MS } from "../../lib/common/index.js";

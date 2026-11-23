@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import filterStatusBy from "../../../testing/filterStatusBy.js";
+import { filterStatusBy } from "../../../testing/index.js";
 import { EMPTY_SLICE } from "./constants.js";
 import spellSliceKey from "./spellSliceKey.js";
 

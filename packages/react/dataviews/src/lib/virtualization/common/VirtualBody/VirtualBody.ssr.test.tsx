@@ -6,9 +6,11 @@
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../testing/createMachineProvider.js";
-import deliverRows from "../../../../../testing/deliverRows.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  deliverRows,
+} from "../../../../../testing/index.js";
 import { DataTable } from "../../../_work_in_progress/DataTable/index.js";
 import virtualizeRows from "../../virtualizeRows.js";
 

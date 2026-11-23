@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import readId from "../../../testing/readId.js";
+import { readId } from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import type { ProviderHost } from "../provider/index.js";
 import type { Predicate } from "../query/index.js";

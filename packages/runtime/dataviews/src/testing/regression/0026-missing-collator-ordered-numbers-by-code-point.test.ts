@@ -9,7 +9,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import orderNodesByName from "../../../testing/orderNodesByName.js";
+import { orderNodesByName } from "../../../testing/index.js";
 
 /** The ids of two nodes, ordered by name under a tag. */
 const orderUnder = (collation: string): readonly string[] =>

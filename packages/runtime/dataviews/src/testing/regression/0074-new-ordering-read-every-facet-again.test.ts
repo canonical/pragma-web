@@ -8,8 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import createCountedRows from "../../../testing/createCountedRows.js";
-import readId from "../../../testing/readId.js";
+import { createCountedRows, readId } from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   DEFAULT_WINDOW,

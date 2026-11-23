@@ -11,10 +11,12 @@
  */
 
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import createStandInViewStore from "../../../testing/createStandInViewStore.js";
-import declare from "../../../testing/declare.js";
-import readId from "../../../testing/readId.js";
+import {
+  createManualSource,
+  createStandInViewStore,
+  declare,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createMemoryLocation } from "../../lib/location/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";

@@ -4,9 +4,11 @@
  */
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import createFakeChannel from "../../../testing/createFakeChannel.js";
-import createListing from "../../../testing/createListing.js";
-import listIds from "../../../testing/listIds.js";
+import {
+  createFakeChannel,
+  createListing,
+  listIds,
+} from "../../../testing/index.js";
 import useDataViewsValue from "./useDataViewsValue.js";
 
 describe("useDataViewsValue on the server", () => {

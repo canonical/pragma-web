@@ -12,7 +12,7 @@ import {
   LINKS_CAPABILITIES,
   LINKS_COLLECTION,
   LINKS_VALID_TODAY,
-} from "../../../testing/fixtures.js";
+} from "../../../testing/index.js";
 import {
   decodeQuery,
   encodeCarryingQuery,

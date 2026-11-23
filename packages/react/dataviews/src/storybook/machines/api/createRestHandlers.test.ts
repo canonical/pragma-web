@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
-import requestRest from "../../../../testing/requestRest.js";
-import serveMockApi from "../../../../testing/serveMockApi.js";
-import watchMockRequest from "../../../../testing/watchMockRequest.js";
+import {
+  requestRest,
+  serveMockApi,
+  watchMockRequest,
+} from "../../../../testing/index.js";
 import createRestHandlers from "./createRestHandlers.js";
 
 const server = serveMockApi(createRestHandlers());

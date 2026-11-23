@@ -8,7 +8,7 @@
 
 import { act, fireEvent } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import renderRefusingTable from "../../../testing/renderRefusingTable.js";
+import { renderRefusingTable } from "../../../testing/index.js";
 
 describe("regression 0011 — a stale refusal outlived its ordering", () => {
   it("drops the reason once the ordering moves from outside the header", () => {

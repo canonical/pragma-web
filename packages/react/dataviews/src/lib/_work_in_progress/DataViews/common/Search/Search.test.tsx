@@ -20,11 +20,13 @@ import {
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Profiler, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
-import { machines } from "../../../../../../testing/machines.js";
-import type { MachineProvider } from "../../../../../../testing/types.js";
+import {
+  buildMachine,
+  COUNTED_EXACTLY,
+  createMachineProvider,
+  type MachineProvider,
+  machines,
+} from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import Search from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";

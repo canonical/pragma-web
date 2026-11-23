@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import createDeferred from "../../../testing/createDeferred.js";
+import { createDeferred } from "../../../testing/index.js";
 import createCommandQueue from "./createCommandQueue.js";
 import type { ViewsState } from "./types.js";
 

@@ -10,8 +10,10 @@ import {
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../../../../../testing/createMachineProvider.js";
-import type { HeaderCellCaseProps as CaseProps } from "../../../../../../../testing/types.js";
+import {
+  type HeaderCellCaseProps as CaseProps,
+  createMachineProvider,
+} from "../../../../../../../testing/index.js";
 import HeaderCell from "./HeaderCell.js";
 import type { HeaderCellProps } from "./types.js";
 

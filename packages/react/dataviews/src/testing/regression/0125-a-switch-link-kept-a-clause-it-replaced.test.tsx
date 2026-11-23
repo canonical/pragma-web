@@ -20,9 +20,11 @@ import {
 import { createManualSource } from "@canonical/dataviews-core/testing";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { COUNTED_EXACTLY } from "../../../testing/fixtures.js";
-import { machines } from "../../../testing/machines.js";
-import type { Machine } from "../../../testing/types.js";
+import {
+  COUNTED_EXACTLY,
+  type Machine,
+  machines,
+} from "../../../testing/index.js";
 import DataViews from "../../lib/_work_in_progress/DataViews/Provider.js";
 
 describe("regression 0125 — a switch link kept a clause it replaced", () => {

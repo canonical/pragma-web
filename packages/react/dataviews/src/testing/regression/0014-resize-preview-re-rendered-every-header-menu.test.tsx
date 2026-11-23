@@ -15,9 +15,11 @@
 import { ContextualMenu } from "@canonical/react-ds-global";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+} from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 // Each call of the spied menu is a render of a column's menu.

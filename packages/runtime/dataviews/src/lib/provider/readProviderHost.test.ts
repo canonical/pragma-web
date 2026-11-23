@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import readId from "../../../testing/readId.js";
+import { createManualSource, readId } from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import createDataViewsProvider from "./createDataViewsProvider.js";
 import readProviderHost from "./readProviderHost.js";

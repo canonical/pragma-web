@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import declareSort from "../../../testing/declareSort.js";
+import { declareSort } from "../../../testing/index.js";
 import listSortRefusals from "./listSortRefusals.js";
 
 const byCpu = { field: "cpu", direction: "asc" } as const;

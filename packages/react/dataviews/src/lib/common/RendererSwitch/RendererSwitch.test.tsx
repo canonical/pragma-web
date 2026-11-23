@@ -3,7 +3,7 @@ import { createRef } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
+import { silenceRenderErrors } from "../../../../testing/index.js";
 import RendererSwitch from "./RendererSwitch.js";
 import type { RendererChoice } from "./types.js";
 

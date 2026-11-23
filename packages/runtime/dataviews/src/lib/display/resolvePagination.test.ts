@@ -5,12 +5,15 @@
  * completed by hand with the page a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import buildSettledPage from "../../../testing/buildSettledPage.js";
-import countAtLeast from "../../../testing/countAtLeast.js";
-import countExactly from "../../../testing/countExactly.js";
-import { BY_NUMBER, FORWARD_CURSORS } from "../../../testing/fixtures.js";
-import readIssuedRequest from "../../../testing/readIssuedRequest.js";
-import type { SettledRow } from "../../../testing/types.js";
+import {
+  BY_NUMBER,
+  buildSettledPage,
+  countAtLeast,
+  countExactly,
+  FORWARD_CURSORS,
+  readIssuedRequest,
+  type SettledRow,
+} from "../../../testing/index.js";
 import {
   createQueryCoordinator,
   type QueryCoordinator,

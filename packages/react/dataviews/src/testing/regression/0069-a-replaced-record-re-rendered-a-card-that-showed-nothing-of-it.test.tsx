@@ -9,8 +9,7 @@
 import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { buildMachine, createMachineProvider } from "../../../testing/index.js";
 import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type {
   DisplayField,

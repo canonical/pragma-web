@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import buildStoredView from "../../../testing/buildStoredView.js";
-import declare from "../../../testing/declare.js";
-import readId from "../../../testing/readId.js";
+import { buildStoredView, declare, readId } from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import readStoredQuery from "./readStoredQuery.js";
 import type { SavedView } from "./types.js";

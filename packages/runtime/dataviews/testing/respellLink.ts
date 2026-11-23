@@ -11,6 +11,9 @@ import type { RespelledLink } from "./types.js";
  * A followed link written back over itself, its narrowing refusals carried
  * as the location loop carries them, and the written link read again,
  * against the source's capabilities when given.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function respellLink(
   schema: Schema<readonly SchemaFieldDefinition[]>,

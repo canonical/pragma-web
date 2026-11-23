@@ -16,10 +16,12 @@ import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, renderHook } from "@testing-library/react";
 import { type ReactNode, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../../../testing/createMachineProvider.js";
-import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
-import { machines } from "../../../../../testing/machines.js";
-import type { MachineProvider } from "../../../../../testing/types.js";
+import {
+  COUNTED_EXACTLY,
+  createMachineProvider,
+  type MachineProvider,
+  machines,
+} from "../../../../../testing/index.js";
 import { useDataViewsValue } from "../../../hooks/index.js";
 import DataViews from "../Provider.js";
 import useDataViews from "./useDataViews.js";

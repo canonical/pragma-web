@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import declare from "../../../testing/declare.js";
+import { createManualSource, declare } from "../../../testing/index.js";
 import { createSelection } from "../selection/index.js";
 import type { SourceActionRunner } from "../source/index.js";
 import createActionRunner from "./createActionRunner.js";

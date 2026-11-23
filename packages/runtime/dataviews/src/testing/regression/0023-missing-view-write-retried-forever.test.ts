@@ -12,7 +12,7 @@
 
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
-import flushPresentation from "../../../testing/flushPresentation.js";
+import { flushPresentation } from "../../../testing/index.js";
 import { createIndexedDBViewStore } from "../../lib/indexeddb/index.js";
 import {
   createPresentation,

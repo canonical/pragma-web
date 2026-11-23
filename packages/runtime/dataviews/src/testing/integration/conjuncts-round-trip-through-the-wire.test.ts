@@ -7,8 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import buildStoredView from "../../../testing/buildStoredView.js";
-import declare from "../../../testing/declare.js";
+import { buildStoredView, declare } from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   areSlicesEqual,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import renderDecorated from "../../../testing/renderDecorated.js";
+import { renderDecorated } from "../../../testing/index.js";
 import withFrame from "./withFrame.js";
 
 describe("withFrame", () => {

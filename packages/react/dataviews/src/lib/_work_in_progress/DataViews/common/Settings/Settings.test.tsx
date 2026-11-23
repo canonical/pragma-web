@@ -22,14 +22,16 @@ import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
-import declareMachineOrdering from "../../../../../../testing/declareMachineOrdering.js";
-import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
-import fakeAnnouncerClock from "../../../../../../testing/fakeAnnouncerClock.js";
-import readAnnouncements from "../../../../../../testing/readAnnouncements.js";
-import type { MachineProvider } from "../../../../../../testing/types.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  createMemoryViewStore,
+  declareMachineOrdering,
+  expectNoAxeViolations,
+  fakeAnnouncerClock,
+  type MachineProvider,
+  readAnnouncements,
+} from "../../../../../../testing/index.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 

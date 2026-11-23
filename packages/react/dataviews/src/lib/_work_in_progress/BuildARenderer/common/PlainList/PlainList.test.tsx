@@ -1,7 +1,9 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import {
+  buildMachine,
+  createMachineProvider,
+} from "../../../../../../testing/index.js";
 import PlainList from "./PlainList.js";
 
 const rows = [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")];

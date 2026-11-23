@@ -11,7 +11,7 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../../../../testing/index.js";
 import useTableGeometry from "./useTableGeometry.js";
 
 /** An element whose layout width is `width`, as jsdom measures nothing. */

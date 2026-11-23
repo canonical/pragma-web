@@ -10,8 +10,10 @@ import { render, waitFor, within } from "@testing-library/react";
 import type { ComponentType } from "react";
 import { afterAll, describe, expect, it } from "vitest";
 import preview from "../../../.storybook/preview.js";
-import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
-import serveMockApi from "../../../testing/serveMockApi.js";
+import {
+  FACETED_FILTER_STORIES,
+  serveMockApi,
+} from "../../../testing/index.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";

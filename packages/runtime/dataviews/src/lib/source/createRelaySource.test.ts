@@ -11,16 +11,16 @@ import {
   type Variables,
 } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import countExactly from "../../../testing/countExactly.js";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
-import readId from "../../../testing/readId.js";
-import type {
-  RelayFetch as Fetch,
-  RelayMachine as Machine,
-  RelayMachinesData as MachinesData,
-  RelayMachinesOperation as MachinesOperation,
-} from "../../../testing/relayTypes.js";
+import {
+  countExactly,
+  declare,
+  declareSort,
+  type RelayFetch as Fetch,
+  type RelayMachine as Machine,
+  type RelayMachinesData as MachinesData,
+  type RelayMachinesOperation as MachinesOperation,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import {
   createDataViewsProvider,

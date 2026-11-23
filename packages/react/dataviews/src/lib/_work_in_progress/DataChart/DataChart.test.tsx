@@ -8,16 +8,16 @@ import { createRef } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import createFacetedFleet from "../../../../testing/createFacetedFleet.js";
-import createFacetedManual from "../../../../testing/createFacetedManual.js";
-import createMachineProvider from "../../../../testing/createMachineProvider.js";
-import deliverFacets from "../../../../testing/deliverFacets.js";
-import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
-import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
-import type {
-  MemoryRecord,
-  MachineProvider as Provider,
-} from "../../../../testing/types.js";
+import {
+  createFacetedFleet,
+  createFacetedManual,
+  createMachineProvider,
+  deliverFacets,
+  expectNoAxeViolations,
+  type MemoryRecord,
+  type MachineProvider as Provider,
+  silenceRenderErrors,
+} from "../../../../testing/index.js";
 import DataChart from "./DataChart.js";
 
 /** The accessible name the status chart is given. */

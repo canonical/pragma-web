@@ -19,9 +19,11 @@ import {
   screen,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import { machines } from "../../../testing/machines.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  machines,
+} from "../../../testing/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 afterEach(() => {

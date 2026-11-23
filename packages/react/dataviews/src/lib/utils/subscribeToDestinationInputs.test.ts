@@ -1,7 +1,7 @@
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../testing/index.js";
 import subscribeToDestinationInputs from "./subscribeToDestinationInputs.js";
 
 describe("subscribeToDestinationInputs", () => {

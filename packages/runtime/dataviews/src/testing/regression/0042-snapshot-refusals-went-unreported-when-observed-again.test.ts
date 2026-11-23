@@ -10,12 +10,14 @@
  */
 
 import { describe, expect, it } from "vitest";
-import answerWith from "../../../testing/answerWith.js";
-import createManualSource from "../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import declare from "../../../testing/declare.js";
-import observeUntilFinished from "../../../testing/observeUntilFinished.js";
-import readId from "../../../testing/readId.js";
+import {
+  answerWith,
+  createManualSource,
+  createRecordingLocation,
+  declare,
+  observeUntilFinished,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   createDataViewsProvider,

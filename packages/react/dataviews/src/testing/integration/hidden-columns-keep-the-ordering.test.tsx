@@ -10,9 +10,11 @@ import type { ViewPresentation } from "@canonical/dataviews-core";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { act } from "react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+} from "../../../testing/index.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

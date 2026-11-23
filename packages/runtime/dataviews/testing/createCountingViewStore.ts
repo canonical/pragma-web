@@ -5,6 +5,9 @@ import type { CountingViewStore, CountingViewStoreConfig } from "./types.js";
  * A view store holding nothing that a test counts subscriptions on: what
  * the provider's ref-count tests read to see the views start and stop, and
  * what a test hands a provider that must not read real storage.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function createCountingViewStore(
   config: CountingViewStoreConfig = {},

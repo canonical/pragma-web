@@ -9,11 +9,13 @@
  */
 
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
-import readId from "../../../testing/readId.js";
+import {
+  createManualSource,
+  createRecordingLocation,
+  declare,
+  declareSort,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 

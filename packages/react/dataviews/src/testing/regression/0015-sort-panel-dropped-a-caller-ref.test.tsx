@@ -9,9 +9,11 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  declareMachineOrdering,
+} from "../../../testing/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0015 — the sort panel dropped a caller's ref", () => {

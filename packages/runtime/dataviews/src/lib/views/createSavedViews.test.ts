@@ -1,17 +1,19 @@
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import answerWith from "../../../testing/answerWith.js";
-import buildStoredView from "../../../testing/buildStoredView.js";
-import createDeferred from "../../../testing/createDeferred.js";
-import createManualSource from "../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import createStandInViewStore from "../../../testing/createStandInViewStore.js";
-import declare from "../../../testing/declare.js";
-import flushPresentation from "../../../testing/flushPresentation.js";
-import observeUntilFinished from "../../../testing/observeUntilFinished.js";
-import openIndexedDBTab from "../../../testing/openIndexedDBTab.js";
-import readId from "../../../testing/readId.js";
-import settleCalls from "../../../testing/settleCalls.js";
+import {
+  answerWith,
+  buildStoredView,
+  createDeferred,
+  createManualSource,
+  createRecordingLocation,
+  createStandInViewStore,
+  declare,
+  flushPresentation,
+  observeUntilFinished,
+  openIndexedDBTab,
+  readId,
+  settleCalls,
+} from "../../../testing/index.js";
 import { createCollection } from "../collection/index.js";
 import {
   createPresentation,

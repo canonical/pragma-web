@@ -13,7 +13,7 @@ import {
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { CSSProperties, ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import createMachineProvider from "../../../../../../../testing/createMachineProvider.js";
+import { createMachineProvider } from "../../../../../../../testing/index.js";
 import ResizeHandle from "./ResizeHandle.js";
 
 /** A layout over a fresh provider's presentation, kept in memory. */

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
-import countExactly from "../../../testing/countExactly.js";
-import { FACETED_ROWS, FACETED_SCHEMA } from "../../../testing/fixtures.js";
+import {
+  countExactly,
+  FACETED_ROWS,
+  FACETED_SCHEMA,
+} from "../../../testing/index.js";
 import { EMPTY_SLICE, type Slice } from "../query/index.js";
 import type { SchemaFieldDefinition } from "../schema/index.js";
 import readFacets from "./readFacets.js";

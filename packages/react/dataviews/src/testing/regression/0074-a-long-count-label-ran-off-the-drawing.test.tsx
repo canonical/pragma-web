@@ -7,8 +7,7 @@
 import { createPage } from "@canonical/dataviews-core";
 import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createFacetedManual from "../../../testing/createFacetedManual.js";
+import { buildMachine, createFacetedManual } from "../../../testing/index.js";
 import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** The drawing's own width, as the chart's viewBox states it. */

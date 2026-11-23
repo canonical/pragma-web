@@ -1,15 +1,15 @@
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import createDeferred from "../../../testing/createDeferred.js";
-import createStandInPresentationStore from "../../../testing/createStandInPresentationStore.js";
-import flushPresentation from "../../../testing/flushPresentation.js";
-import observeUntilFinished from "../../../testing/observeUntilFinished.js";
-import openIndexedDBTab from "../../../testing/openIndexedDBTab.js";
-import settleCalls from "../../../testing/settleCalls.js";
-import type {
-  Deferred,
-  ScriptedPresentation as Scripted,
-} from "../../../testing/types.js";
+import {
+  createDeferred,
+  createStandInPresentationStore,
+  type Deferred,
+  flushPresentation,
+  observeUntilFinished,
+  openIndexedDBTab,
+  type ScriptedPresentation as Scripted,
+  settleCalls,
+} from "../../../testing/index.js";
 import { WRITE_DEADLINE, WRITE_DELAY } from "./constants.js";
 import createMemoryPresentationStore from "./createMemoryPresentationStore.js";
 import createPresentation from "./createPresentation.js";

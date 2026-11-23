@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import declareSort from "../../../testing/declareSort.js";
+import { declareSort } from "../../../testing/index.js";
 import type { Slice, SortTerm } from "../query/index.js";
 import { createSchema } from "../schema/index.js";
 import executeSlice from "./executeSlice.js";

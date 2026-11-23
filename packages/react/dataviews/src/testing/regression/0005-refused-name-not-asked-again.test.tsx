@@ -17,9 +17,11 @@ import {
   within,
 } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import buildMachine from "../../../testing/buildMachine.js";
-import createMachineProvider from "../../../testing/createMachineProvider.js";
-import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
+import {
+  buildMachine,
+  createMachineProvider,
+  createMemoryViewStore,
+} from "../../../testing/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0005 — a refused name was not asked again", () => {

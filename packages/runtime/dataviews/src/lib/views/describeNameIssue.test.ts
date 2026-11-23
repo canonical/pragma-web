@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import buildStoredView from "../../../testing/buildStoredView.js";
+import { buildStoredView } from "../../../testing/index.js";
 import { INITIAL_VIEWS_STATE } from "./constants.js";
 import describeNameIssue from "./describeNameIssue.js";
 import type { SavedView, ViewsState } from "./types.js";

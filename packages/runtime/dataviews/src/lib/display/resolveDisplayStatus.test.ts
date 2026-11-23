@@ -7,10 +7,12 @@
  * completed by hand with what a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import buildFailedResult from "../../../testing/buildFailedResult.js";
-import buildPage from "../../../testing/buildPage.js";
-import buildRefusedResult from "../../../testing/buildRefusedResult.js";
-import readIssuedRequest from "../../../testing/readIssuedRequest.js";
+import {
+  buildFailedResult,
+  buildPage,
+  buildRefusedResult,
+  readIssuedRequest,
+} from "../../../testing/index.js";
 import {
   createQueryCoordinator,
   type DataViewsState,

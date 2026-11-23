@@ -7,7 +7,7 @@
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import expectNoAxeViolations from "../../../../../../../testing/expectNoAxeViolations.js";
+import { expectNoAxeViolations } from "../../../../../../../testing/index.js";
 import type { ColumnChange, ColumnSetting } from "../types.js";
 import SettingsMenu from "./SettingsMenu.js";
 import type { SettingsMenuProps } from "./types.js";

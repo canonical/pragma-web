@@ -12,7 +12,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import type { ResolvedRule } from "../../../testing/types.js";
+import type { ResolvedRule } from "../../../testing/index.js";
 
 const sheet = readFileSync(
   path.join(

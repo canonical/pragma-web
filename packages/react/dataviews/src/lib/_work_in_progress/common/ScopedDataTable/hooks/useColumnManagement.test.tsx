@@ -9,8 +9,10 @@ import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { createRef, type ReactNode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildMachine from "../../../../../../testing/buildMachine.js";
-import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import {
+  buildMachine,
+  createMachineProvider,
+} from "../../../../../../testing/index.js";
 import type { DataTableColumn } from "../common/index.js";
 import useColumnManagement from "./useColumnManagement.js";
 

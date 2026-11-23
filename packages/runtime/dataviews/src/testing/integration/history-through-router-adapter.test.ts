@@ -10,10 +10,12 @@
 
 import { createMemoryAdapter } from "@canonical/router-core";
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
-import declare from "../../../testing/declare.js";
-import declareSort from "../../../testing/declareSort.js";
-import readId from "../../../testing/readId.js";
+import {
+  createManualSource,
+  declare,
+  declareSort,
+  readId,
+} from "../../../testing/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createPlatformLocation } from "../../lib/location/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";

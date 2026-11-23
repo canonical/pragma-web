@@ -13,7 +13,12 @@ const buildPageableCounts = (pageable: Count): SourceCounts => ({
   matched: UNKNOWN_COUNT,
 });
 
-/** A page of `rows` records, counted and continued as the settled fields say. */
+/**
+ * A page of `rows` records, counted and continued as the settled fields say.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export default function buildSettledPage({
   rows,
   pageable = UNKNOWN_COUNT,
