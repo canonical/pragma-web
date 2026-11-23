@@ -2672,6 +2672,28 @@ describe("QueryBar", () => {
         resizer.resize(screen.getByTestId("bar"), width);
       });
 
+    it("summarises the filters that apply in a button that shows the sheet", () => {
+      mount({ query: "status=deployed&memory__gte=1024&memory__lte=4096" });
+      const summary = screen.getByRole("button", {
+        name: "Filters, 2 applied",
+      });
+      expect(summary).toHaveClass("summary");
+      expect(summary).toHaveAttribute("command", "show-modal");
+      expect(summary.getAttribute("commandfor")).not.toBe("");
+      fireEvent.click(summary);
+    });
+
+    it("moves focus on the summary to the entry as the bar widens", () => {
+      mount({ query: "status=deployed" });
+      resizeBar(320);
+      const summary = screen.getByRole("button", {
+        name: "Filters, 1 applied",
+      });
+      act(() => summary.focus());
+      resizeBar(1024);
+      expect(findEntry()).toHaveFocus();
+    });
+
     it("searches only, offering no field and naming no keys, while narrow", () => {
       const { provider } = mount({ query: "status=deployed" });
       resizeBar(320);

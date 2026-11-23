@@ -293,6 +293,9 @@ export type QueryBarSessionAction =
   | { readonly type: "moveStop"; readonly item: string }
   | { readonly type: "focused" };
 
+/** A command an invoker button runs on the sheet's dialog. */
+export type InvokerCommand = "show-modal" | "close";
+
 /** The query bar's own props. */
 type OwnProps = {
   /** The field's name; the messages' `queryBar` by default. */

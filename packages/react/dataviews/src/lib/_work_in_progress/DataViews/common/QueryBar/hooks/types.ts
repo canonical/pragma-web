@@ -4,8 +4,9 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { Dispatch, RefObject } from "react";
+import type { Dispatch, RefCallback, RefObject } from "react";
 import type { UseFacetsResult } from "../../../../../hooks/index.js";
+import type { FilterButtonPanelHandle } from "../../../../FilterButton/index.js";
 import type { ContextOptions } from "../../../types.js";
 import type {
   QueryBarSession,
@@ -97,3 +98,17 @@ export type UseNarrowModeProps = {
 
 /** Whether the bar is narrow. */
 export type UseNarrowModeResult = boolean;
+
+/**
+ * The quick filters' panels, as the bar holds them: a ref for each field's
+ * filter button, and one call that closes every open panel, for a part
+ * that takes the quick filters over.
+ */
+export type UseQuickFilterPanelsResult = {
+  /** The ref one field's filter button hands its panel to; one per field. */
+  readonly collectPanel: (
+    field: string,
+  ) => RefCallback<FilterButtonPanelHandle>;
+  /** Close every quick filter's open panel. */
+  readonly hidePanels: () => void;
+};

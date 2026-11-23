@@ -1,5 +1,6 @@
 export { default as canTakeEntry } from "./canTakeEntry.js";
 export { default as compareBounds } from "./compareBounds.js";
+export { default as countAppliedFilters } from "./countAppliedFilters.js";
 export { default as entryFormat } from "./entryFormat.js";
 export { default as findContradictions } from "./findContradictions.js";
 export { default as findMissingPart } from "./findMissingPart.js";
@@ -18,9 +19,11 @@ export { default as readRangeBound } from "./readRangeBound.js";
 export { default as readTypedOperator } from "./readTypedOperator.js";
 export { default as reduceSession } from "./reduceSession.js";
 export { default as resolveTypedSymbol } from "./resolveTypedSymbol.js";
+export { default as runInvokerFallback } from "./runInvokerFallback.js";
 export { default as speakClause } from "./speakClause.js";
 export { default as speakRange } from "./speakRange.js";
 export { default as spellCommandHref } from "./spellCommandHref.js";
+export { default as spellInvoker } from "./spellInvoker.js";
 export { default as spellNumberWithUnit } from "./spellNumberWithUnit.js";
 export { default as spellOperand } from "./spellOperand.js";
 export { default as spellOperator } from "./spellOperator.js";

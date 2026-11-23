@@ -1,0 +1,26 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* Button's secondary face, its label and Badge spaced apart, at least a
+     24 px target. */
+  .ds.button.data-views-query-bar-summary-button {
+    min-block-size: var(--dimension-300);
+
+    & .label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--dimension-050);
+    }
+
+    /* The count's words: text for assistive technology only. Unthemable
+       geometry. */
+    & .assistive {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+}

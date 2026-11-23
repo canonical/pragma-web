@@ -23,6 +23,14 @@
     & > .filters {
       grid-column: 1 / -1;
     }
+
+    /* The summary button shows only while narrow. */
+    & > .summary {
+      display: none;
+      grid-column: 2;
+      grid-row: 1;
+      margin-inline-start: var(--dimension-100);
+    }
   }
 
   /* Focused, the field wraps over what follows it, sticky table headers
@@ -67,6 +75,15 @@
     .ds.data-views-query-bar .ds.query-input .hidden-count,
     .ds.data-views-query-bar > .filters {
       display: none;
+    }
+
+    .ds.data-views-query-bar > .summary {
+      display: inline-flex;
+    }
+
+    /* The entry shrinks to leave the summary button its room. */
+    .ds.data-views-query-bar .ds.query-input {
+      min-inline-size: 0;
     }
   }
 }

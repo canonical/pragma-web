@@ -31,6 +31,7 @@ export {
   OPERATOR_RECORDS,
   SERVER_RENDER_HREF,
 } from "./fixtures.js";
+export { default as installDialogStandIn } from "./installDialogStandIn.js";
 export { default as installPopoverStandIn } from "./installPopoverStandIn.js";
 export { default as installResizeObserverStandIn } from "./installResizeObserverStandIn.js";
 export { default as listIds } from "./listIds.js";

@@ -30,6 +30,9 @@ function Bar({
         </li>
       </ul>
       <input ref={entryRef} aria-label="Entry" />
+      <button type="button" className="summary">
+        Filters
+      </button>
       <button type="button">Elsewhere</button>
     </div>
   );
@@ -174,5 +177,36 @@ describe("useNarrowMode", () => {
       standIn.resize(root, 320);
     });
     expect(document.body).toHaveFocus();
+  });
+
+  it("moves focus on the summary, or dropped from it, to the entry as the bar widens", () => {
+    render(<Bar onNarrow={() => {}} />);
+    const root = screen.getByTestId("root");
+    const summary = screen.getByRole("button", { name: "Filters" });
+    const entry = screen.getByRole("textbox", { name: "Entry" });
+    // Wide from the start, the summary's focus stays.
+    summary.focus();
+    act(() => {
+      standIn.resize(root, 1024);
+    });
+    expect(summary).toHaveFocus();
+    act(() => {
+      standIn.resize(root, 320);
+    });
+    summary.focus();
+    act(() => {
+      standIn.resize(root, 1024);
+    });
+    expect(entry).toHaveFocus();
+    act(() => {
+      standIn.resize(root, 320);
+    });
+    // Hidden by the container query, the summary drops focus to the page.
+    summary.focus();
+    summary.blur();
+    act(() => {
+      standIn.resize(root, 1024);
+    });
+    expect(entry).toHaveFocus();
   });
 });

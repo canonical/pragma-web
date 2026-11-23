@@ -16,7 +16,14 @@ import type {
   PointerEvent,
   ReactElement,
 } from "react";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   useDataViewsValue,
   useIsHydrated,
@@ -36,6 +43,7 @@ import { QueryBarChip } from "./common/QueryBarChip/index.js";
 import { RangeChip } from "./common/RangeChip/index.js";
 import { RefusedChip } from "./common/RefusedChip/index.js";
 import { SearchForm } from "./common/SearchForm/index.js";
+import { SummaryButton } from "./common/SummaryButton/index.js";
 import { DRAFT_ID } from "./constants.js";
 import {
   useAnnounceOutcome,
@@ -45,6 +53,7 @@ import {
   useNarrowMode,
   useQueryBarSession,
   useQueryGroup,
+  useQuickFilterPanels,
   useSuggestedFacets,
 } from "./hooks/index.js";
 import type {
@@ -65,6 +74,7 @@ import type {
 } from "./types.js";
 import {
   canTakeEntry,
+  countAppliedFilters,
   findContradictions,
   findMissingPart,
   findNextPart,
@@ -261,6 +271,10 @@ export default function QueryBar({
   );
   const rootRef = useRef<HTMLDivElement>(null);
   const entryRef = useRef<HTMLInputElement>(null);
+  // The narrow form's sheet, which the summary button shows.
+  const sheetId = useId();
+  // The quick filters' panels, hidden as the sheet shows.
+  const { hidePanels } = useQuickFilterPanels();
   const { session, dispatch } = useQueryBarSession({ provider, rootRef });
   const clauses = useClauseIds({ group });
   const readContradictions = useMemo(
@@ -1702,16 +1716,17 @@ export default function QueryBar({
       onPointerDownCapture={handlePointerDownCapture}
     >
       <SearchForm hasHref={hasHref}>{field}</SearchForm>
+      <SummaryButton
+        className="summary"
+        sheetId={sheetId}
+        group={group}
+        onShow={hidePanels}
+      />
       <MessageLine className="messages" entries={entries} />
       {hasHref && !hydrated && (
         <FiltersDisclosure
           className="filters"
-          // The filter chips shown: a range counts once.
-          applied={
-            clauses.filter(
-              ({ kind }) => kind === "predicate" || kind === "range",
-            ).length
-          }
+          applied={countAppliedFilters(clauses)}
         />
       )}
     </div>
