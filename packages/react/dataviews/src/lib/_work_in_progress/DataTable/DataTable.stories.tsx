@@ -149,6 +149,15 @@ const sizedColumns: readonly DataTableColumn[] = [
   },
 ];
 
+/** The sized columns under their plain headings. */
+const plainSizedColumns: readonly DataTableColumn[] = sizedColumns.map(
+  (column) => ({
+    ...column,
+    header:
+      plainColumns.find(({ id }) => id === column.id)?.header ?? column.header,
+  }),
+);
+
 /** Mark the named columns resizable, leaving the rest as they are. */
 const markResizable = (
   columns: readonly DataTableColumn[],
@@ -603,6 +612,13 @@ export const HorizontalScroll: Story = {
   render: renderMachines(sizedColumns),
 };
 
+/** The sized columns, with Host, Region and Owner marked resizable. */
+const resizableColumns = markResizable(plainSizedColumns, [
+  "name",
+  "region",
+  "owner",
+]);
+
 /** The code a resizable table's stories show. */
 const resizableCode = showConsumerCode({
   parts: tableParts,
@@ -634,9 +650,7 @@ const resizableCode = showConsumerCode({
 export const Resizable: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(
-    markResizable(sizedColumns, ["name", "region", "owner"]),
-  ),
+  render: renderMachines(resizableColumns),
   play: async ({ canvas }) => {
     const controls = await canvas.findAllByRole("separator");
     await expect(controls).toHaveLength(2);
@@ -687,9 +701,7 @@ export const MixedResizableColumns: Story = {
 export const ResizeWithoutDragging: Story = {
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(
-    markResizable(sizedColumns, ["name", "region", "owner"]),
-  ),
+  render: renderMachines(resizableColumns),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const before = Number(host.getAttribute("aria-valuenow"));
@@ -726,9 +738,7 @@ export const PlacingAColumnsEdge: Story = {
   name: "Placing a column's edge",
   parameters: resizableCode,
   decorators: [withFrame("48rem")],
-  render: renderMachines(
-    markResizable(sizedColumns, ["name", "region", "owner"]),
-  ),
+  render: renderMachines(resizableColumns),
   play: async ({ canvas }) => {
     const host = await canvas.findByRole("separator", { name: /^Host/ });
     const edge = host.getBoundingClientRect();
