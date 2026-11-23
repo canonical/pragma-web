@@ -9,19 +9,17 @@
  * none — and the element left with no toggle, keeping the pin. It came back
  * closed under a placement still pinned open, where a restriction could be
  * placed out of sight. The disclosure is now open exactly while pinned, and
- * kept while pinned.
+ * kept while pinned. A seen option now stays listed, so the test withdraws
+ * the region's filter instead.
  */
 
 import {
   createCollection,
   createDataViewsProvider,
-  DEFAULT_WINDOW,
   declareCapabilities,
-  EMPTY_SLICE,
 } from "@canonical/dataviews-core";
-import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { createManualSource } from "@canonical/dataviews-core/testing";
-import { act, render } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
   answerFacetValues,
@@ -44,43 +42,38 @@ const ONE_REGION: readonly FacetValue[] = [
   { value: "eu", count: { kind: "exact", value: 1 } },
 ];
 
+/** A provider over a source filtering `region` only if asked. */
+const buildProvider = (filtersRegion: boolean) => {
+  const manual = createManualSource<Placed>({
+    capabilities: declareCapabilities(places, {
+      filter: filtersRegion ? { status: true, region: true } : { status: true },
+      facets: ["region"],
+    }),
+  });
+  const provider = createDataViewsProvider({
+    collection: places,
+    source: manual.source,
+    facets: ["region"],
+  });
+  return { manual, provider };
+};
+
 describe("regression 0039 — pin outlived the More filters disclosure", () => {
   it("keeps the disclosure open while its placement is pinned, whatever is left inside", async () => {
-    const manual = createManualSource<Placed>({
-      capabilities: declareCapabilities(places, {
-        filter: { status: true, region: true },
-        facets: ["region"],
-      }),
-    });
-    const provider = createDataViewsProvider({
-      collection: places,
-      source: manual.source,
-      facets: ["region"],
-    });
-    const { container } = render(
+    const { manual, provider } = buildProvider(true);
+    const { container, rerender } = render(
       <DataViews provider={provider}>
         <DataViews.Filters primary={["status"]} />
       </DataViews>,
     );
     answerFacetValues(manual, "region", ONE_REGION);
     await toggleDisclosure(container, true);
-    act(() => {
-      readProviderHost(provider).adopt(
-        {
-          slice: {
-            ...EMPTY_SLICE,
-            filter: [
-              { field: "status", operator: "isAny", operands: ["failed"] },
-            ],
-          },
-          window: DEFAULT_WINDOW,
-        },
-        "adopt",
-        null,
-      );
-    });
-    answerFacetValues(manual, "region", []);
-    // No facet lists the region's options any more, so nothing is inside.
+    rerender(
+      <DataViews provider={buildProvider(false).provider}>
+        <DataViews.Filters primary={["status"]} />
+      </DataViews>,
+    );
+    // The region can no longer be filtered, so nothing is inside.
     expect(container.querySelector("details")?.open).toBe(true);
     // Closed, the pin is released, and a disclosure holding nothing leaves.
     await toggleDisclosure(container, false);

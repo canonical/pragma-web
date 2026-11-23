@@ -36,7 +36,7 @@ import {
   PresenceFilter,
   TextFilter,
 } from "./common/index.js";
-import { listFacetOptions } from "./common/utils/index.js";
+import { useSeenServerOptions } from "./hooks/index.js";
 import type { DataViewsFiltersProps } from "./types.js";
 import "./styles.css";
 
@@ -65,7 +65,7 @@ type FilterContext = {
   readonly host: ProviderHost;
   /** The facets answering the applied filter and search, or null while none does. */
   readonly answered: UseFacetsResult["answered"];
-  /** The server's options for a field, as the latest facet lists them. */
+  /** The server's options for a field, as every facet seen lists them. */
   readonly listServerOptions: (field: string) => readonly string[];
   /** Whether a field's control moves elsewhere once its last restriction is cleared. */
   readonly isShownOnlyWhileRestricted: (field: string) => boolean;
@@ -327,9 +327,9 @@ const renderControl = (
  * counts beside a choice's options and beside a presence field, the least
  * and greatest value beside a number or date bound, and the server's
  * options where the schema lists none — each computed by the source over
- * the whole matching set. Counts and ranges are shown only while the result answers the applied
- * query; the server's options stay from the latest result until a newer one
- * lists others.
+ * the whole matching set. Counts and ranges are shown only while the
+ * result answers the applied filter and search; the server's options stay
+ * listed once seen.
  *
  * At baseline the controls are a GET form: each is named as the wire
  * grammar spells its clause, a number bound is a native number input with
@@ -370,6 +370,9 @@ export default function Filters({
     part: "Filters",
   });
   const facets = useFacets({ provider });
+  const listSeenOptions = useSeenServerOptions({
+    latest: facets.latest,
+  });
   const restricted = useRestrictedFields({ provider });
   const issues = useDataViewsValue({ channel: provider.issues });
   // The controls submit every filter themselves, and the refused clauses
@@ -415,7 +418,7 @@ export default function Filters({
     if (listed !== undefined) {
       return listed;
     }
-    const read = listFacetOptions(facets.latest?.[field]);
+    const read = listSeenOptions(field);
     listedServerOptions.set(field, read);
     return read;
   };
@@ -456,7 +459,7 @@ export default function Filters({
     if (!Object.hasOwn(context.host.capabilities.filter, definition.field)) {
       return false;
     }
-    // Listed from the latest facet, as the control lists them.
+    // Listed as seen, as the control lists them.
     return !(
       definition.kind === "choices" &&
       definition.options === undefined &&

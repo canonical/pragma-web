@@ -1032,7 +1032,7 @@ describe("DataViews.Filters", () => {
       expect(container.querySelector("details")).toBeNull();
     });
 
-    it.fails("keeps a server's option listed once a later result drops it", () => {
+    it("keeps a server's option listed once a later result drops it", () => {
       const places = createCollection({
         identify: (row: Row) => row.id,
         fields: [{ field: "region", kind: "choices" }],
