@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DRAFT_ID, OPERATOR_SYMBOLS } from "./constants.js";
+import { DRAFT_ID, OPERATOR_SYMBOLS, UNCOUNTED } from "./constants.js";
 
 describe("OPERATOR_SYMBOLS", () => {
   it("gives each operator its typed symbols, widening the strict bounds", () => {
@@ -37,5 +37,12 @@ describe("OPERATOR_SYMBOLS", () => {
 describe("DRAFT_ID", () => {
   it("names the chip being built apart from every clause id", () => {
     expect(DRAFT_ID).toBe("draft");
+  });
+});
+
+describe("UNCOUNTED", () => {
+  it("is the count nobody has made, and cannot change", () => {
+    expect(UNCOUNTED).toEqual({ kind: "unknown" });
+    expect(Object.isFrozen(UNCOUNTED)).toBe(true);
   });
 });

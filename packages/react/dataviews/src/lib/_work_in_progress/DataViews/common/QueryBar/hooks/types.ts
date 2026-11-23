@@ -74,3 +74,11 @@ export type UseLinkFocusHandoffProps = {
   readonly rootRef: RefObject<HTMLElement | null>;
   readonly hydrated: boolean;
 };
+
+/** What the live count reads: the root's provider. */
+export type UseAnswerCountStandInProps = {
+  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[]>;
+};
+
+/** The count answering the applied query; unknown while none does. */
+export type UseAnswerCountStandInResult = Count;

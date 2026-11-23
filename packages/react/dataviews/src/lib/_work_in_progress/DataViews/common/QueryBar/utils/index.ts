@@ -10,6 +10,7 @@ export { default as listChipClauses } from "./listChipClauses.js";
 export { default as listParts } from "./listParts.js";
 export { default as nameRefused } from "./nameRefused.js";
 export { default as placeConjuncts } from "./placeConjuncts.js";
+export { default as readAnswerCount } from "./readAnswerCount.js";
 export { default as readClauses } from "./readClauses.js";
 export { default as readDraftId } from "./readDraftId.js";
 export { default as readLabelsStandIn } from "./readLabelsStandIn.js";

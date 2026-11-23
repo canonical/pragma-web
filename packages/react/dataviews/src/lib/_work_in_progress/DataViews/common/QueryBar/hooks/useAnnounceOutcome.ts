@@ -1,23 +1,10 @@
-import type { Count, DataViewsState } from "@canonical/dataviews-core";
+import type { Count } from "@canonical/dataviews-core";
 import { useCallback, useEffect, useRef } from "react";
+import { readAnswerCount } from "../utils/index.js";
 import type {
   UseAnnounceOutcomeProps,
   UseAnnounceOutcomeResult,
 } from "./types.js";
-
-/** What nobody has counted. */
-const UNCOUNTED: Count = Object.freeze({ kind: "unknown" });
-
-/** The count of the result answering the applied query, once it has landed. */
-const readSettledCount = (state: DataViewsState<object>): Count | null => {
-  if (state.pendingRequestId !== null) return null;
-  // A count that answers another query, as one kept beside a failure or a
-  // withheld query, says nothing of this one.
-  if (!state.resultMatchesQuery || state.result.status !== "ready") {
-    return UNCOUNTED;
-  }
-  return state.result.counts?.matched ?? UNCOUNTED;
-};
 
 /**
  * Say a commit's outcome through the root's announcer once its result
@@ -38,7 +25,7 @@ export default function useAnnounceOutcome({
   const sayIfSettled = useCallback((): void => {
     const words = waiting.current;
     if (words === null) return;
-    const count = readSettledCount(provider.state.get());
+    const count = readAnswerCount(provider.state.get());
     if (count === null) return;
     waiting.current = null;
     announce(words(count));
