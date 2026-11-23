@@ -1,9 +1,13 @@
 import type {
   Predicate,
   PredicateOperand,
+  QueryIssue,
   SourceRefusal,
 } from "@canonical/dataviews-core";
-import { listOfferedOperators } from "@canonical/dataviews-core/bindings";
+import {
+  listOfferedOperators,
+  readProviderHost,
+} from "@canonical/dataviews-core/bindings";
 import type {
   FocusEvent,
   KeyboardEvent,
@@ -27,6 +31,7 @@ import {
 } from "./common/MessageLine/index.js";
 import { QueryBarChip } from "./common/QueryBarChip/index.js";
 import { RangeChip } from "./common/RangeChip/index.js";
+import { RefusedChip } from "./common/RefusedChip/index.js";
 import { DRAFT_ID } from "./constants.js";
 import findContradictions from "./findContradictions.js";
 import findMissingPart from "./findMissingPart.js";
@@ -41,6 +46,7 @@ import {
 } from "./hooks/index.js";
 import isRangeBound from "./isRangeBound.js";
 import listChipClauses from "./listChipClauses.js";
+import nameRefused from "./nameRefused.js";
 import readDraftId from "./readDraftId.js";
 import readRangeBound from "./readRangeBound.js";
 import readTypedOperator from "./readTypedOperator.js";
@@ -55,10 +61,13 @@ import type {
   QueryBarDraft,
   QueryBarOption,
   QueryBarPart,
+  QueryClause,
   QueryContradiction,
   QueryPredicateClause,
   QueryRangeClause,
+  QueryRefusedClause,
   QuerySearchClause,
+  QueryStateStandIn,
   TypedSymbolReading,
 } from "./types.js";
 import { findTabbableBeyond, readLabelsStandIn } from "./utils/index.js";
@@ -123,6 +132,20 @@ const findNextPartOf = (
 ): QueryBarPart | null =>
   isRangeBound(draft) ? null : findNextPart(draft, part, backward);
 
+/** Each refused filter or search, by its chip's id. */
+const readRefusedIssues = (
+  state: QueryStateStandIn,
+): readonly { readonly id: string; readonly issue: QueryIssue }[] =>
+  listChipClauses(state).flatMap((clause) =>
+    clause.kind === "refused" ? [{ id: clause.id, issue: clause.issue }] : [],
+  );
+
+/** Two readings of the refusals that say the same. */
+const isSameRefusedIssues = (
+  a: ReturnType<typeof readRefusedIssues>,
+  b: ReturnType<typeof readRefusedIssues>,
+): boolean => JSON.stringify(a) === JSON.stringify(b);
+
 /** Two readings of the contradictions that say the same. */
 const isSameContradictions = (
   a: readonly QueryContradiction[],
@@ -132,6 +155,13 @@ const isSameContradictions = (
 /** A contradiction's key, stable while it stands. */
 const readContradictionId = (contradiction: QueryContradiction): string =>
   `${contradiction.field}__${contradiction.kind}`;
+
+/**
+ * The toolbar item a chip's stop rests on: its first Segment, under the
+ * chip's id, or a read-only chip's clear control.
+ */
+const readStopItem = (clause: QueryClause): string =>
+  clause.kind === "refused" ? `${clause.id}:remove` : clause.id;
 
 /** Whether an option can be chosen. */
 const isSelectable = (option: QueryBarOption): boolean =>
@@ -201,6 +231,11 @@ export default function QueryBar({
     () => (state: ReturnType<typeof group.state.get>) =>
       findContradictions(state.slice, schema),
     [schema],
+  );
+  const refusedIssues = useDataViewsValue(
+    group.state,
+    readRefusedIssues,
+    isSameRefusedIssues,
   );
   const contradictions = useDataViewsValue(
     group.state,
@@ -935,6 +970,14 @@ export default function QueryBar({
     return standing ?? pressed;
   };
 
+  // A refused chip holds a stop only where its parameter can be cleared.
+  const isClearable = readProviderHost(provider).location !== null;
+  const hasStop = (clause: QueryClause): boolean =>
+    clause.kind !== "refused" || isClearable;
+  /** The chips that hold a stop, in order, as the query now stands. */
+  const listStops = (): readonly QueryClause[] =>
+    listChipClauses(group.state.get()).filter(hasStop);
+
   /**
    * Remove a chip's clause by a write, and move the stop to the next chip,
    * else the previous, else the entry, by position, since ids renumber
@@ -946,20 +989,22 @@ export default function QueryBar({
     spoken: string,
     command: () => readonly SourceRefusal[],
   ): void => {
-    const index = listChipClauses(group.state.get()).findIndex(
-      (clause) => clause.id === id,
-    );
+    const index = listStops().findIndex((clause) => clause.id === id);
     const refusals = command();
     if (refusals.length > 0) {
       announceRefusals(refusals);
       return;
     }
-    const rest = listChipClauses(group.state.get());
+    const rest = listStops();
     const next = rest.at(index) ?? rest.at(index - 1);
     announceOutcome((count) =>
       messages.clauseRemoved(spoken, count, labels.recordNoun),
     );
-    dispatch({ type: "close", item: next?.id ?? ENTRY, focus: null });
+    dispatch({
+      type: "close",
+      item: next === undefined ? ENTRY : readStopItem(next),
+      focus: null,
+    });
   };
 
   /** Remove a clause, a complete open one applying first. */
@@ -1017,6 +1062,30 @@ export default function QueryBar({
   });
 
   /**
+   * Clear a refused parameter the link carried, an open clause applying
+   * first.
+   */
+  const clearRefused = useStableCallback(
+    (pressed: QueryRefusedClause): void => {
+      if (sessionRef.current.draft !== null) leave(highlighted, true);
+      // A clause on its field that applied first replaces the refusal: its
+      // own commit has said so.
+      const standing = listChipClauses(group.state.get()).some(
+        (clause) =>
+          clause.kind === "refused" &&
+          clause.id === pressed.id &&
+          clause.issue.parameter === pressed.issue.parameter,
+      );
+      if (!standing) return;
+      const name = nameRefused(pressed.issue, labels, messages);
+      removeChip(pressed.id, name, () => {
+        readProviderHost(provider).clearRefused(pressed.issue.parameter);
+        return [];
+      });
+    },
+  );
+
+  /**
    * A Segment activated: its part takes the Entry, if the chip keeps one.
    * The search is edited where it is typed: its text returns to the entry.
    */
@@ -1058,11 +1127,11 @@ export default function QueryBar({
         ? null
         : target.closest<HTMLElement>(".ds.query-chip");
     const chipId = chip?.id;
-    const last = clauses.at(-1);
+    const last = clauses.filter(hasStop).at(-1);
     if (item === ENTRY && event.key === "Backspace" && text === "" && last) {
       // Backspace in the empty entry selects the last chip.
       event.preventDefault();
-      dispatch({ type: "moveStop", item: last.id });
+      dispatch({ type: "moveStop", item: readStopItem(last) });
       return;
     }
     if (
@@ -1080,6 +1149,7 @@ export default function QueryBar({
       /* v8 ignore next -- unreachable: every chip but the draft is a clause */
       if (reading === undefined) return;
       if (reading.kind === "range") removeRange(reading);
+      else if (reading.kind === "refused") clearRefused(reading);
       else remove(readAppliedDraft(reading));
       return;
     }
@@ -1291,6 +1361,19 @@ export default function QueryBar({
   // before still does, for as long as the Entry stays open; then each
   // field whose clauses cannot all hold, with its merge where one stands
   // out.
+  // Each refused filter or search, with its reason, for the eye: the
+  // chip's clear control is described by it, and nothing says it twice.
+  const refusedEntries = refusedIssues.map(
+    ({ id, issue }): MessageLineEntry => ({
+      id,
+      criticality: "error",
+      text: messages.clauseRefused(
+        nameRefused(issue, labels, messages),
+        issue.reason,
+      ),
+    }),
+  );
+
   const contradictionEntries = contradictions.map(
     (contradiction): MessageLineEntry => {
       const label = labels.readFieldLabel(contradiction.field);
@@ -1322,6 +1405,7 @@ export default function QueryBar({
             ),
           } as const,
         ]),
+    ...refusedEntries,
     ...contradictionEntries,
   ];
 
@@ -1366,7 +1450,14 @@ export default function QueryBar({
         {(clauses.length > 0 || draft?.origin === null) && (
           <QueryChips label={messages.appliedFilters}>
             {clauses.map((clause) =>
-              clause.kind === "range" ? (
+              clause.kind === "refused" ? (
+                <RefusedChip
+                  key={clause.id}
+                  clause={clause}
+                  group={group}
+                  onClear={clearRefused}
+                />
+              ) : clause.kind === "range" ? (
                 <RangeChip
                   key={clause.id}
                   clause={clause}

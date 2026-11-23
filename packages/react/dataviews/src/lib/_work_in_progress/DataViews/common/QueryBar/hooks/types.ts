@@ -10,7 +10,7 @@ import type { ContextOptions } from "../../../types.js";
 import type {
   QueryBarSession,
   QueryBarSessionAction,
-  QueryChipClause,
+  QueryClause,
   QueryGroupStandIn,
 } from "../types.js";
 
@@ -41,7 +41,7 @@ export type UseClauseIdsProps = {
 };
 
 /** The chips' clauses, at one identity while their ids stay. */
-export type UseClauseIdsResult = readonly QueryChipClause[];
+export type UseClauseIdsResult = readonly QueryClause[];
 
 /** What says an outcome once its result lands: the provider and the root's announcer. */
 export type UseAnnounceOutcomeProps = {

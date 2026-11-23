@@ -93,12 +93,6 @@ export type QueryClause =
   | QuerySearchClause
   | QueryRefusedClause;
 
-/** A clause the bar shows as one of its chips. */
-export type QueryChipClause =
-  | QueryPredicateClause
-  | QueryRangeClause
-  | QuerySearchClause;
-
 /**
  * Why two or more conjuncts on one field cannot all hold:
  * - `disjoint-options`: a single-valued choice asked to be in sets that

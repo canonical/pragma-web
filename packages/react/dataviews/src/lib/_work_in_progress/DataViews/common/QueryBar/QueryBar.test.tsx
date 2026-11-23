@@ -1358,6 +1358,109 @@ describe("QueryBar", () => {
     });
   });
 
+  describe("refused clauses", () => {
+    it("shows a filter the link carried and the source refused, and clears it", async () => {
+      const location = createMemoryLocation({
+        href: "/hosts?status=melted&pool=gpu",
+      });
+      const { provider } = mount({ location });
+      const clear = await screen.findByRole("button", {
+        name: "Clear status",
+      });
+      expect(clear.closest(".ds.query-chip")).toHaveClass("error");
+      expect(clear).toHaveAccessibleDescription(/^status: .+\.$/);
+      // Backspace on the empty entry lands on its clear control.
+      act(() => findEntry().focus());
+      press(findEntry(), "Backspace");
+      await waitFor(() => expect(clear).toHaveAttribute("tabindex", "0"));
+      fireEvent.click(clear);
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("button", { name: "Clear status" }),
+        ).toBeNull(),
+      );
+      expect(provider.issues.get()).toEqual([]);
+      expect(location.read().toString()).toBe("pool=gpu");
+      await waitFor(() => expect(readStatus()).toContain("Removed status."));
+    });
+
+    it("shows a refused clause's reason below the field, said by nothing", async () => {
+      const location = createMemoryLocation({ href: "/hosts?status=melted" });
+      mount({ location });
+      const line = await waitFor(() => {
+        const found = document.querySelector(
+          ".ds.data-views-query-bar-message-line",
+        );
+        expect(found).not.toBeNull();
+        return found as HTMLElement;
+      });
+      expect(line).toHaveTextContent(/^status: .*melted.*\.$/);
+      expect(line.querySelector("[role=status], [aria-live]")).toBeNull();
+      expect(readStatus()).not.toContain("melted");
+    });
+
+    it("offers no clear in memory, where there is no parameter to remove", async () => {
+      mount({ query: "status=melted&pool=gpu" });
+      await waitFor(() =>
+        expect(document.querySelector(".ds.query-chip.error")).not.toBeNull(),
+      );
+      expect(screen.queryByRole("button", { name: "Clear status" })).toBeNull();
+      // Backspace on the empty entry lands on the last chip that holds a
+      // stop, and a removal hands it on past the refused chip.
+      act(() => findEntry().focus());
+      press(findEntry(), "Backspace");
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "pool" })).toHaveAttribute(
+          "tabindex",
+          "0",
+        ),
+      );
+      press(screen.getByRole("button", { name: "pool" }), "Delete");
+      await waitFor(() => expect(findEntry()).toHaveAttribute("tabindex", "0"));
+    });
+
+    it("says nothing more when an open clause on its field replaces it", async () => {
+      const location = createMemoryLocation({ href: "/hosts?status=melted" });
+      const { provider } = mount({ location });
+      const clear = await screen.findByRole("button", { name: "Clear status" });
+      const operator = await startOn("status");
+      press(operator, "Enter");
+      type(findPart("Value for status"), "ready");
+      press(findPart("Value for status"), "Enter");
+      fireEvent.click(clear);
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["ready"] },
+      ]);
+      await waitFor(() =>
+        expect(readStatus()).toContain("Added status is ready"),
+      );
+      expect(readStatus()).not.toContain("Removed status");
+    });
+
+    it("clears it by Delete, an open clause applying first", async () => {
+      const location = createMemoryLocation({ href: "/hosts?status=melted" });
+      const { provider } = mount({ location });
+      await screen.findByRole("button", { name: "Clear status" });
+      const operator = await startOn("pool");
+      press(operator, "Enter");
+      const value = await screen.findByRole("combobox", {
+        name: "Value for pool",
+      });
+      type(value as HTMLInputElement, "gpu");
+      press(value, "Enter");
+      press(screen.getByRole("button", { name: "Clear status" }), "Delete");
+      await waitFor(() =>
+        expect(
+          screen.queryByRole("button", { name: "Clear status" }),
+        ).toBeNull(),
+      );
+      expect(provider.issues.get()).toEqual([]);
+      expect(readFilter(provider)).toEqual([
+        { field: "pool", operator: "isAny", operands: ["gpu"] },
+      ]);
+    });
+  });
+
   describe("invalid input and refusals", () => {
     it("shows below the field what cannot apply, and that what applied still does", async () => {
       mount({ query: "memory__gte=65536" });
