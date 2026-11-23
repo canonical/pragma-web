@@ -555,6 +555,18 @@ describe("constants", () => {
     expect(m.queryClause({ phrase: "owner has a value", values: [] })).toBe(
       "owner has a value",
     );
+    expect(m.clauseBound({ label: "memory", bound: "lower" })).toBe(
+      "Lower bound for memory",
+    );
+    expect(m.clauseBound({ label: "memory", bound: "upper" })).toBe(
+      "Upper bound for memory",
+    );
+    expect(
+      m.rangeClause({
+        lower: "memory at least 8 GiB",
+        upper: "at most 64 GiB",
+      }),
+    ).toBe("memory at least 8 GiB and at most 64 GiB");
     expect(m.searchClause("ex web")).toBe("Search for ex web");
     expect(m.removeClause("status is ready")).toBe("Remove status is ready");
     expect(m.hiddenChips(3)).toBe("+3 more");

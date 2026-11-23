@@ -238,6 +238,9 @@ const fr: DataViewsMessages = {
     outcome("Filtres et recherche effacés.", counted, noun),
   queryClause: ({ phrase, values }) =>
     values.length === 0 ? phrase : `${phrase} ${values.join(", ")}`,
+  clauseBound: ({ label, bound }) =>
+    `Borne ${bound === "lower" ? "inférieure" : "supérieure"} de ${label}`,
+  rangeClause: ({ lower, upper }) => `${lower} et ${upper}`,
   searchClause: (text) => `Recherche de ${text}`,
   removeClause: (spoken) => `Retirer ${spoken}`,
   hiddenChips: (hidden) => `+${count(hidden)} de plus`,

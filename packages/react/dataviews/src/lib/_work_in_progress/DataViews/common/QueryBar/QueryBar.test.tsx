@@ -19,6 +19,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { installPopoverStandIn } from "../../../../../../testing/index.js";
@@ -914,6 +915,312 @@ describe("QueryBar", () => {
         operator: "isAny",
         operands: ["ready"],
       });
+    });
+  });
+
+  describe("ranges", () => {
+    const RANGE = "memory at least 8\u00a0GiB and at most 64\u00a0GiB";
+
+    it("shows a field's two bounds as one chip, and edits each bound's value", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      expect(await screen.findByRole("group", { name: RANGE })).toBeVisible();
+      fireEvent.click(
+        screen.getByRole("button", { name: "at most 64\u00a0GiB" }),
+      );
+      expect(findPart("Upper bound for memory")).toHaveValue("64\u00a0GiB");
+      type(findPart("Upper bound for memory"), "32 GiB");
+      press(findPart("Upper bound for memory"), "Enter");
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "lte",
+        operands: [32_768],
+      });
+      // The bound edited takes focus back once its Entry goes.
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "at most 32\u00a0GiB" }),
+        ).toHaveFocus(),
+      );
+      // Tab writes the lower bound and moves on; Shift+Tab before the lower
+      // commits and leaves.
+      fireEvent.click(
+        screen.getByRole("button", { name: "at least 8\u00a0GiB" }),
+      );
+      type(findPart("Lower bound for memory"), "16 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      await waitFor(() =>
+        expect(queryPart("Lower bound for memory")).toBeNull(),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [16_384],
+      });
+      fireEvent.click(screen.getByRole("button", { name: "memory" }));
+      press(findPart("Lower bound for memory"), "Tab", { shiftKey: true });
+      await waitFor(() =>
+        expect(queryPart("Lower bound for memory")).toBeNull(),
+      );
+      // A lower bound past the upper leaves two chips, the stop on the one
+      // edited.
+      fireEvent.click(
+        screen.getByRole("button", { name: "at least 16\u00a0GiB" }),
+      );
+      type(findPart("Lower bound for memory"), "128 GiB");
+      press(findPart("Lower bound for memory"), "Enter");
+      await waitFor(() =>
+        expect(findChip(/^memory at least 128.GiB$/)).toBeInTheDocument(),
+      );
+      expect(findChip(/^memory at most 32.GiB$/)).toBeInTheDocument();
+      const edited = findChip(/^memory at least 128.GiB$/) as HTMLElement;
+      expect(
+        within(edited).getByRole("button", { name: "memory" }),
+      ).toHaveAttribute("tabindex", "0");
+      // An added bound the range already holds adds nothing.
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: "Remove memory at least 128\u00a0GiB",
+        }),
+      );
+      await startOn("memory");
+      type(findPart("Operator for memory"), ">=");
+      type(findPart("Value for memory"), "1 GiB");
+      press(findPart("Value for memory"), "Enter");
+      await waitFor(() =>
+        expect(
+          findChip(/^memory at least 1.GiB and at most 32.GiB$/),
+        ).toBeInTheDocument(),
+      );
+      await startOn("memory");
+      type(findPart("Operator for memory"), "<=");
+      type(findPart("Value for memory"), "32 GiB");
+      press(findPart("Value for memory"), "Enter");
+      expect(readFilter(provider)).toHaveLength(2);
+    });
+
+    it("walks a range's bounds with Tab and Shift+Tab, writing each, and leaves past either end", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      fireEvent.click(await screen.findByRole("button", { name: "memory" }));
+      type(findPart("Lower bound for memory"), "16 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Upper bound for memory")).toHaveValue("64\u00a0GiB");
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [16_384],
+      });
+      // Back to the lower, the upper unchanged and unwritten.
+      const edit = vi.spyOn(readProviderHost(provider), "setPredicate");
+      press(findPart("Upper bound for memory"), "Tab", { shiftKey: true });
+      expect(findPart("Lower bound for memory")).toHaveValue("16\u00a0GiB");
+      expect(edit).not.toHaveBeenCalled();
+      edit.mockRestore();
+      // Text that does not read stays, marked.
+      type(findPart("Lower bound for memory"), "lots");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Lower bound for memory")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+      // Shift+Tab before the lower leaves the bar.
+      type(findPart("Lower bound for memory"), "");
+      press(findPart("Lower bound for memory"), "Tab", { shiftKey: true });
+      await waitFor(() =>
+        expect(queryPart("Lower bound for memory")).toBeNull(),
+      );
+      // A lower bound past the upper leaves two chips: Tab opens the other.
+      fireEvent.click(screen.getByRole("button", { name: "memory" }));
+      type(findPart("Lower bound for memory"), "128 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Value for memory")).toHaveValue("64\u00a0GiB");
+    });
+
+    it("says why a bound the source refuses was kept, and stays on it", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      vi.spyOn(readProviderHost(provider), "setPredicate").mockReturnValue([
+        {
+          part: "filter",
+          code: "undeclared-field",
+          field: null,
+          operator: null,
+          reason: "no",
+        },
+      ]);
+      fireEvent.click(await screen.findByRole("button", { name: "memory" }));
+      type(findPart("Lower bound for memory"), "16 GiB");
+      press(findPart("Lower bound for memory"), "Tab");
+      expect(findPart("Lower bound for memory")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+      vi.restoreAllMocks();
+    });
+
+    it("ends the open bound as a stop move does when the other bound or the field is pressed", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "at least 8\u00a0GiB" }),
+      );
+      type(findPart("Lower bound for memory"), "16 GiB");
+      fireEvent.click(
+        screen.getByRole("button", { name: "at most 64\u00a0GiB" }),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [16_384],
+      });
+      expect(findPart("Upper bound for memory")).toBeInTheDocument();
+      expect(queryPart("Lower bound for memory")).toBeNull();
+      // Text that does not read is cancelled, and the field opens the lower.
+      type(findPart("Upper bound for memory"), "lots");
+      fireEvent.click(screen.getByRole("button", { name: "memory" }));
+      expect(findPart("Lower bound for memory")).toBeInTheDocument();
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "lte",
+        operands: [65_536],
+      });
+    });
+
+    it("returns focus to the bound edited when an edit makes a range", async () => {
+      mount({ query: "memory__gte=131072&memory__lte=65536" });
+      fireEvent.click(await screen.findByRole("button", { name: /^64.GiB$/ }));
+      type(findPart("Value for memory"), "256 GiB");
+      press(findPart("Value for memory"), "Enter");
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "at most 256\u00a0GiB" }),
+        ).toHaveFocus(),
+      );
+      // Escape on a bound's edit returns focus to that bound.
+      fireEvent.click(
+        screen.getByRole("button", { name: "at most 256\u00a0GiB" }),
+      );
+      press(findPart("Upper bound for memory"), "Escape");
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "at most 256\u00a0GiB" }),
+        ).toHaveFocus(),
+      );
+    });
+
+    it("removes both bounds at once, by the remove control or Delete", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536&pool=gpu",
+      });
+      const edit = vi.spyOn(readProviderHost(provider), "editPredicates");
+      fireEvent.click(
+        await screen.findByRole("button", { name: `Remove ${RANGE}` }),
+      );
+      expect(readFilter(provider)).toEqual([
+        { field: "pool", operator: "isAny", operands: ["gpu"] },
+      ]);
+      // One write, so one step undoes it.
+      expect(edit).toHaveBeenCalledOnce();
+      expect(edit).toHaveBeenCalledWith(
+        [
+          { field: "memory", operator: "gte", nth: 0 },
+          { field: "memory", operator: "lte", nth: 0 },
+        ],
+        [],
+      );
+      edit.mockRestore();
+      await waitFor(() => expect(readStatus()).toContain(`Removed ${RANGE}.`));
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "gte",
+          operands: [8192],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [65_536],
+        });
+      });
+      press(await screen.findByRole("button", { name: "memory" }), "Delete");
+      expect(readFilter(provider)).toEqual([
+        { field: "pool", operator: "isAny", operands: ["gpu"] },
+      ]);
+    });
+
+    it("applies an open clause before removing a range, then removes the bounds that still stand", async () => {
+      const { provider } = mount({
+        query: "memory__gte=8192&memory__lte=65536",
+      });
+      // An incomplete draft is cancelled, and the range goes.
+      await startOn("pool");
+      fireEvent.click(screen.getByRole("button", { name: `Remove ${RANGE}` }));
+      expect(readFilter(provider)).toEqual([]);
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "gte",
+          operands: [8192],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [65_536],
+        });
+      });
+      // A second lower bound applied first splits the range: the pressed
+      // bounds still go, in one write, and the new one stays.
+      await startOn("memory");
+      type(findPart("Operator for memory"), ">=");
+      type(findPart("Value for memory"), "1 GiB");
+      const edit = vi.spyOn(readProviderHost(provider), "editPredicates");
+      fireEvent.click(
+        await screen.findByRole("button", { name: `Remove ${RANGE}` }),
+      );
+      expect(edit).toHaveBeenCalledOnce();
+      edit.mockRestore();
+      expect(readFilter(provider)).toEqual([
+        { field: "memory", operator: "gte", operands: [1024] },
+      ]);
+      await waitFor(() => expect(readStatus()).toContain(`Removed ${RANGE}.`));
+      // Where neither pressed bound stands, nothing is removed.
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [65_536],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).setPredicate(
+          { field: "memory", operator: "gte", operands: [8192] },
+          0,
+        );
+      });
+      const range = await screen.findByRole("button", {
+        name: `Remove ${RANGE}`,
+      });
+      await startOn("memory");
+      type(findPart("Operator for memory"), ">=");
+      type(findPart("Value for memory"), "2 GiB");
+      act(() => {
+        readProviderHost(provider).setPredicate({
+          field: "memory",
+          operator: "lte",
+          operands: [32_768],
+        });
+      });
+      fireEvent.click(range);
+      expect(readFilter(provider)).toHaveLength(3);
     });
   });
 

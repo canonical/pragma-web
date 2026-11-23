@@ -323,6 +323,19 @@ export type DataViewsMessages = {
     readonly phrase: string;
     readonly values: readonly string[];
   }) => string;
+  /** The Entry of one bound of a range chip, by the field's label. */
+  readonly clauseBound: (facts: {
+    readonly label: string;
+    readonly bound: "lower" | "upper";
+  }) => string;
+  /**
+   * A field's lower and upper bound read as one clause: each bound as
+   * `queryClause` speaks it, the upper without the field's label.
+   */
+  readonly rangeClause: (facts: {
+    readonly lower: string;
+    readonly upper: string;
+  }) => string;
   /** The search as a clause, by its text. */
   readonly searchClause: (text: string) => string;
   /** A clause's remove control, by the clause as spoken. */

@@ -27,19 +27,18 @@ const state: QueryStateStandIn = {
 };
 
 describe("listChipClauses", () => {
-  it("shows each conjunct, a range's bounds each on its own, then the search", () => {
+  it("shows each conjunct, a field's two bounds as one range, then the search", () => {
     expect(listChipClauses(state).map(({ id }) => id)).toEqual([
-      "cores__gte__0",
-      "cores__lte__0",
+      "cores__range",
       "status__isAny__0",
       "search",
     ]);
-    expect(listChipClauses(state).at(1)).toEqual({
-      kind: "predicate",
-      id: "cores__lte__0",
-      refs: [{ field: "cores", operator: "lte", nth: 0 }],
-      predicate: { field: "cores", operator: "lte", operands: [8] },
-      condition: "range",
+    expect(listChipClauses(state).at(0)).toMatchObject({
+      kind: "range",
+      refs: [
+        { field: "cores", operator: "gte", nth: 0 },
+        { field: "cores", operator: "lte", nth: 0 },
+      ],
     });
   });
 });

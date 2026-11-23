@@ -777,6 +777,11 @@ export const MESSAGE_SAMPLES: {
     [{ phrase: MESSAGE_MARK, values: [] }],
     [{ phrase: MESSAGE_MARK, values: [MESSAGE_MARK, MESSAGE_MARK] }],
   ],
+  clauseBound: [
+    [{ label: MESSAGE_MARK, bound: "lower" }],
+    [{ label: MESSAGE_MARK, bound: "upper" }],
+  ],
+  rangeClause: [[{ lower: MESSAGE_MARK, upper: MESSAGE_MARK }]],
   searchClause: [[MESSAGE_MARK]],
   removeClause: [[MESSAGE_MARK]],
   hiddenChips: [[3]],

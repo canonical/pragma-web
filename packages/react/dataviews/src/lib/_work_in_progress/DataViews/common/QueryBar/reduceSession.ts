@@ -72,7 +72,11 @@ export default function reduceSession(
         action.item,
         action.focus === null
           ? null
-          : { item: action.item, part: action.focus },
+          : {
+              item: action.item,
+              part: action.focus,
+              operator: action.operator ?? null,
+            },
       );
     case "moveStop":
       // A press on one of the chip's own parts claims its item first, before

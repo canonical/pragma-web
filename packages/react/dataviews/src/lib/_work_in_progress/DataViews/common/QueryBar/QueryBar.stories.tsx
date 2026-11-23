@@ -296,7 +296,7 @@ export const OutsideChange: Story = {
 };
 
 /**
- * Overflow: eight chips in a narrow field hold one line while it is not
+ * Overflow: seven chips in a narrow field hold one line while it is not
  * focused, with the count of those hidden; focusing it wraps them.
  */
 export const Overflow: Story = {

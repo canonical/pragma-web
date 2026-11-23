@@ -548,6 +548,7 @@ test.describe("QueryBar, in Chromium", () => {
         return top !== null && element.contains(top);
       }),
     ).toBe(true);
-    expect(await readChips(page)).toHaveLength(8);
+    // Seven chips: memory's two bounds read as one range.
+    expect(await readChips(page)).toHaveLength(7);
   });
 });

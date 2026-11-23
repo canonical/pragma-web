@@ -93,6 +93,12 @@ export type QueryClause =
   | QuerySearchClause
   | QueryRefusedClause;
 
+/** A clause the bar shows as one of its chips. */
+export type QueryChipClause =
+  | QueryPredicateClause
+  | QueryRangeClause
+  | QuerySearchClause;
+
 /**
  * Why two or more conjuncts on one field cannot all hold:
  * - `disjoint-options`: a single-valued choice asked to be in sets that
@@ -247,6 +253,8 @@ export type QueryBarSession = {
   readonly focus: {
     readonly item: string;
     readonly part: QueryBarPart;
+    /** The operator of the clause the part belongs to, where it tells parts apart. */
+    readonly operator: PredicateOperator | null;
   } | null;
 };
 
@@ -265,6 +273,8 @@ export type QueryBarSessionAction =
       readonly type: "close";
       readonly item: string;
       readonly focus: QueryBarPart | null;
+      /** The operator of the clause closed, which tells a range's bounds apart. */
+      readonly operator?: PredicateOperator | null;
     }
   | { readonly type: "moveStop"; readonly item: string }
   | { readonly type: "focused" };

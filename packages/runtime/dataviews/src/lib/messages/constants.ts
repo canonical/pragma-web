@@ -272,6 +272,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     composeOutcome("Cleared the filters and the search.", count, noun),
   queryClause: ({ phrase, values }) =>
     values.length === 0 ? phrase : `${phrase} ${values.join(", ")}`,
+  clauseBound: ({ label, bound }) =>
+    `${bound === "lower" ? "Lower" : "Upper"} bound for ${label}`,
+  rangeClause: ({ lower, upper }) => `${lower} and ${upper}`,
   searchClause: (text) => `Search for ${text}`,
   removeClause: (clause) => `Remove ${clause}`,
   hiddenChips: (count) => `+${formatCount(count)} more`,

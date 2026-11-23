@@ -10,9 +10,8 @@ import type { ContextOptions } from "../../../types.js";
 import type {
   QueryBarSession,
   QueryBarSessionAction,
+  QueryChipClause,
   QueryGroupStandIn,
-  QueryPredicateClause,
-  QuerySearchClause,
 } from "../types.js";
 
 /** What the query group's stand-in reads: the root's provider. */
@@ -42,10 +41,7 @@ export type UseClauseIdsProps = {
 };
 
 /** The chips' clauses, at one identity while their ids stay. */
-export type UseClauseIdsResult = readonly (
-  | QueryPredicateClause
-  | QuerySearchClause
-)[];
+export type UseClauseIdsResult = readonly QueryChipClause[];
 
 /** What says an outcome once its result lands: the provider and the root's announcer. */
 export type UseAnnounceOutcomeProps = {

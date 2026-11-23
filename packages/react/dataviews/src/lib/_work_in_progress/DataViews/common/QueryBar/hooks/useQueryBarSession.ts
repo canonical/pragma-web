@@ -111,11 +111,15 @@ export default function useQueryBarSession({
       /* v8 ignore next -- unreachable: the root renders before its effects run */
       if (root === null) return;
       if (isFocusHere(root)) {
-        // Looked up by id, which a field's name can make any text.
-        root.ownerDocument
-          .getElementById(focus.item)
-          ?.querySelector<HTMLElement>(`[data-part="${focus.part}"]`)
-          ?.focus();
+        // Looked up by id, which a field's name can make any text; a
+        // range's bound by its operator too.
+        const chip = root.ownerDocument.getElementById(focus.item);
+        const part = `[data-part="${focus.part}"]`;
+        (
+          chip?.querySelector<HTMLElement>(
+            `${part}[data-operator="${focus.operator}"]`,
+          ) ?? chip?.querySelector<HTMLElement>(part)
+        )?.focus();
       }
       dispatch({ type: "focused" });
     });

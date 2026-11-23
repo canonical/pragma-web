@@ -1,4 +1,5 @@
 import type {
+  Predicate,
   PredicateOperand,
   SourceRefusal,
 } from "@canonical/dataviews-core";
@@ -22,6 +23,7 @@ import {
   type MessageLineEntry,
 } from "./common/MessageLine/index.js";
 import { QueryBarChip } from "./common/QueryBarChip/index.js";
+import { RangeChip } from "./common/RangeChip/index.js";
 import { DRAFT_ID } from "./constants.js";
 import findMissingPart from "./findMissingPart.js";
 import findNextPart from "./findNextPart.js";
@@ -33,11 +35,14 @@ import {
   useQueryGroup,
   useSuggestedFacets,
 } from "./hooks/index.js";
+import isRangeBound from "./isRangeBound.js";
 import listChipClauses from "./listChipClauses.js";
 import readDraftId from "./readDraftId.js";
+import readRangeBound from "./readRangeBound.js";
 import readTypedOperator from "./readTypedOperator.js";
 import resolveTypedSymbol from "./resolveTypedSymbol.js";
 import speakClause from "./speakClause.js";
+import speakRange from "./speakRange.js";
 import spellOperand from "./spellOperand.js";
 import suggestOptions from "./suggestOptions.js";
 import type {
@@ -47,6 +52,7 @@ import type {
   QueryBarOption,
   QueryBarPart,
   QueryPredicateClause,
+  QueryRangeClause,
   QuerySearchClause,
   TypedSymbolReading,
 } from "./types.js";
@@ -55,6 +61,9 @@ import writeChoice from "./writeChoice.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-query-bar";
+
+/** What a conjunct asks, its operator perhaps not yet chosen. */
+type AskedConjunct = Pick<PredicateDraft, "field" | "operator" | "operands">;
 
 /** A clause on one field: what an Entry builds or edits. */
 type PredicateDraft = Extract<QueryBarDraft, { readonly kind: "predicate" }>;
@@ -88,6 +97,27 @@ const readAppliedDraft = (
         operands: clause.predicate.operands,
       };
 
+/**
+ * Whether two drafts stand for one clause: one chip, and, in a range's
+ * chip, one bound.
+ */
+const isSameClause = (a: QueryBarDraft, b: QueryBarDraft): boolean =>
+  readDraftId(a) === readDraftId(b) &&
+  (a.kind !== "predicate" ||
+    b.kind !== "predicate" ||
+    a.origin?.ref.operator === b.origin?.ref.operator);
+
+/**
+ * The next part an Entry moves to, or null past either end. A range's
+ * bound takes its value alone.
+ */
+const findNextPartOf = (
+  draft: QueryBarDraft,
+  part: QueryBarPart,
+  backward: boolean,
+): QueryBarPart | null =>
+  isRangeBound(draft) ? null : findNextPart(draft, part, backward);
+
 /** Whether an option can be chosen. */
 const isSelectable = (option: QueryBarOption): boolean =>
   option.disabled !== true && option.current !== true;
@@ -102,6 +132,12 @@ const isSameSet = (
   b: readonly PredicateOperand[],
 ): boolean =>
   a.length === b.length && a.every((operand) => b.includes(operand));
+
+/** Two conjuncts asking the same, their values in any order. */
+const isSameConjunct = (a: Predicate, b: AskedConjunct): boolean =>
+  a.field === b.field &&
+  a.operator === b.operator &&
+  isSameSet(a.operands, b.operands);
 
 /**
  * A query bar narrows a collection with typed clauses and free text in one
@@ -282,7 +318,10 @@ export default function QueryBar({
     const current = sessionRef.current;
     /* v8 ignore next -- unreachable: only an open Entry or draft is cancelled */
     if (current.draft === null) return;
-    const { origin } = current.draft;
+    const { draft: open } = current;
+    const { origin } = open;
+    /* v8 ignore next -- unreachable: the search is edited in the free-text entry, never in an Entry */
+    const operator = open.kind === "predicate" ? open.operator : null;
     dispatch(
       origin === null
         ? { type: "close", item: ENTRY, focus: null }
@@ -290,6 +329,7 @@ export default function QueryBar({
             type: "close",
             item: origin.id,
             focus: way === "enter" ? current.part : null,
+            operator,
           },
     );
   };
@@ -342,21 +382,35 @@ export default function QueryBar({
       : group.editPredicates({ remove: [origin.ref], add: [predicate] });
   };
 
-  /** The chip's clause that holds the same conjunct as a clause, if any. */
-  const findHeldClause = (next: PredicateDraft) =>
-    listChipClauses(group.state.get()).find(
-      (clause) =>
+  /**
+   * The applied clause holding a conjunct, as the draft an edit of it
+   * starts from: its own chip's, or one bound of a range's.
+   */
+  const findStanding = (held: AskedConjunct): QueryBarDraft | undefined => {
+    for (const clause of listChipClauses(group.state.get())) {
+      if (
         clause.kind === "predicate" &&
-        clause.predicate.field === next.field &&
-        clause.predicate.operator === next.operator &&
-        isSameSet(clause.predicate.operands, next.operands),
-    );
+        isSameConjunct(clause.predicate, held)
+      ) {
+        return readAppliedDraft(clause);
+      }
+      if (clause.kind === "range") {
+        if (isSameConjunct(clause.lower, held)) {
+          return readRangeBound(clause, 0, clause.lower);
+        }
+        if (isSameConjunct(clause.upper, held)) {
+          return readRangeBound(clause, 1, clause.upper);
+        }
+      }
+    }
+    return undefined;
+  };
 
   /** The id the clause stands under once it applies. */
   const findAppliedId = (next: PredicateDraft): string => {
-    const found = findHeldClause(next);
+    const found = findStanding(next)?.origin?.id;
     /* v8 ignore next -- unreachable: a clause that applied is in the query */
-    return found?.id ?? ENTRY;
+    return found ?? ENTRY;
   };
 
   /**
@@ -389,11 +443,12 @@ export default function QueryBar({
         type: "close",
         item: origin.id,
         focus: way === "enter" ? sessionRef.current.part : null,
+        operator: next.operator,
       });
       return;
     }
     // A clause the query already holds adds nothing, and says nothing.
-    if (origin === null && findHeldClause(next) !== undefined) {
+    if (origin === null && findStanding(next) !== undefined) {
       dispatch({ type: "close", item: ENTRY, focus: null });
       return;
     }
@@ -424,6 +479,7 @@ export default function QueryBar({
       type: "close",
       item: findAppliedId(next),
       focus: way === "enter" ? sessionRef.current.part : null,
+      operator: next.operator,
     });
   };
 
@@ -601,7 +657,7 @@ export default function QueryBar({
       ? options.find((option) => option.disabled !== true)
       : undefined;
     if (first?.current === true) {
-      const target = findNextPart(current.draft, at, false);
+      const target = findNextPartOf(current.draft, at, false);
       if (target === null) commit(current.draft, "enter");
       else {
         openPart(
@@ -669,7 +725,18 @@ export default function QueryBar({
           (narrowed !== undefined
             ? current.draft
             : readTypedInto(current.draft, at, current.typed)));
-    const target0 = findNextPart(current.draft, at, backward);
+    // In a range's chip, Tab moves from the lower bound to the upper, and
+    // Shift+Tab back; past either end the range commits.
+    const isLower = current.draft.origin?.ref.operator === "gte";
+    if (isRangeBound(current.draft) && isLower !== backward) {
+      if ("reason" in read) {
+        markInvalid(read.reason);
+        return;
+      }
+      moveToOtherBound(read, isLower);
+      return;
+    }
+    const target0 = findNextPartOf(current.draft, at, backward);
     // Text that does not read is not thrown away past either end.
     if ("reason" in read && target0 === null) {
       markInvalid(read.reason);
@@ -683,7 +750,7 @@ export default function QueryBar({
       if (first === undefined) return;
       written = writeChoice(written, first.choice, schema, capabilities);
     }
-    const target = findNextPart(written, at, backward);
+    const target = findNextPartOf(written, at, backward);
     if (target === null) {
       commit(written, backward ? "backward" : "forward");
       return;
@@ -697,6 +764,40 @@ export default function QueryBar({
       return;
     }
     openPart(target === "value" ? readValueEdit(written) : written, target);
+  };
+
+  /**
+   * Write a range's open bound, then open its other bound, read again from
+   * the query: the two may no longer make a range once one is written.
+   */
+  const moveToOtherBound = (
+    written: PredicateDraft,
+    toUpper: boolean,
+  ): void => {
+    const { origin } = written;
+    /* v8 ignore next -- unreachable: a range's bound edits an applied clause */
+    if (origin === null) return;
+    const range = listChipClauses(group.state.get()).find(
+      (clause): clause is QueryRangeClause => clause.id === origin.id,
+    );
+    /* v8 ignore next -- unreachable: an open bound's range stands until it is written */
+    if (range === undefined) return;
+    const other = toUpper ? range.upper : range.lower;
+    if (!isSameConjunct(origin.held, written)) {
+      const refusals = write(written);
+      if (refusals.length > 0) {
+        markInvalid(refusals.map(({ reason }) => reason).join("; "));
+        return;
+      }
+      const spoken = speakClause(written, schema, labels, messages);
+      announceOutcome((count) =>
+        messages.clauseChanged(spoken, count, labels.recordNoun),
+      );
+    }
+    const standing = findStanding(other);
+    /* v8 ignore next -- unreachable: writing one bound leaves the other standing */
+    if (standing === undefined || standing.kind !== "predicate") return;
+    openPart(standing, "value");
   };
 
   /** A chip's Entry: Escape cancels, Enter and Tab commit, Space picks. */
@@ -781,51 +882,94 @@ export default function QueryBar({
    */
   const endOtherClause = (pressed: QueryBarDraft): QueryBarDraft => {
     const { draft: open } = sessionRef.current;
-    if (open === null || readDraftId(open) === readDraftId(pressed)) {
-      return pressed;
-    }
+    if (open === null || isSameClause(open, pressed)) return pressed;
     leave(highlighted, true);
-    const standing = listChipClauses(group.state.get()).find((clause) =>
-      pressed.kind === "search"
-        ? clause.kind === "search"
-        : clause.kind === "predicate" &&
-          pressed.origin !== null &&
-          clause.predicate.field === pressed.origin.held.field &&
-          clause.predicate.operator === pressed.origin.held.operator &&
-          isSameSet(clause.predicate.operands, pressed.origin.held.operands),
-    );
+    if (pressed.kind === "search") return pressed;
+    /* v8 ignore next -- unreachable: an applied clause is pressed, never the draft */
+    const standing = pressed.origin && findStanding(pressed.origin.held);
     /* v8 ignore next -- unreachable: ending one clause leaves every other standing */
-    return standing === undefined ? pressed : readAppliedDraft(standing);
+    return standing ?? pressed;
   };
 
   /**
-   * Remove a clause, and move the stop to the next chip, else the previous,
-   * else the entry, by position, since ids renumber after a removal.
+   * Remove a chip's clause by a write, and move the stop to the next chip,
+   * else the previous, else the entry, by position, since ids renumber
+   * after a removal. The place is read before the write and after any open
+   * clause ended, since that may stand ahead.
    */
-  const remove = useStableCallback((pressed: QueryBarDraft): void => {
-    const applied = endOtherClause(pressed);
-    // Read the place after the open clause ends: it may stand ahead.
+  const removeChip = (
+    id: string,
+    spoken: string,
+    command: () => readonly SourceRefusal[],
+  ): void => {
     const index = listChipClauses(group.state.get()).findIndex(
-      ({ id }) => id === applied.origin?.id,
+      (clause) => clause.id === id,
     );
-    const { origin } = applied;
-    /* v8 ignore next -- unreachable: an applied clause has its place, and a draft is cancelled instead */
-    if (origin === null) return;
-    const refusals =
-      origin.ref === null
-        ? group.setSearch("")
-        : group.removePredicate(origin.ref);
+    const refusals = command();
     if (refusals.length > 0) {
       announceRefusals(refusals);
       return;
     }
     const rest = listChipClauses(group.state.get());
     const next = rest.at(index) ?? rest.at(index - 1);
-    const spoken = speakClause(applied, schema, labels, messages);
     announceOutcome((count) =>
       messages.clauseRemoved(spoken, count, labels.recordNoun),
     );
     dispatch({ type: "close", item: next?.id ?? ENTRY, focus: null });
+  };
+
+  /** Remove a clause, a complete open one applying first. */
+  const remove = useStableCallback((pressed: QueryBarDraft): void => {
+    const applied = endOtherClause(pressed);
+    const { origin } = applied;
+    /* v8 ignore next -- unreachable: an applied clause has its place, and a draft is cancelled instead */
+    if (origin === null) return;
+    removeChip(origin.id, speakClause(applied, schema, labels, messages), () =>
+      origin.ref === null
+        ? group.setSearch("")
+        : group.removePredicate(origin.ref),
+    );
+  });
+
+  /**
+   * Remove a range: both bounds in one write, so one step undoes it. An
+   * open clause on another chip applies first; where it splits the range,
+   * whichever pressed bounds still stand go, in one write.
+   */
+  const removeRange = useStableCallback((pressed: QueryRangeClause): void => {
+    const { draft: open } = sessionRef.current;
+    if (open !== null && readDraftId(open) !== pressed.id) {
+      leave(highlighted, true);
+    }
+    const standing = listChipClauses(group.state.get()).find(
+      (clause): clause is QueryRangeClause =>
+        clause.kind === "range" && clause.field === pressed.field,
+    );
+    if (standing !== undefined) {
+      removeChip(
+        standing.id,
+        speakRange(standing.lower, standing.upper, schema, labels, messages),
+        () => group.editPredicates({ remove: [...standing.refs], add: [] }),
+      );
+      return;
+    }
+    const bounds = [pressed.lower, pressed.upper].flatMap((bound) => {
+      const found = findStanding(bound);
+      return found?.kind === "predicate" && found.origin !== null
+        ? [found.origin]
+        : [];
+    });
+    const [first] = bounds;
+    if (first === undefined) return;
+    removeChip(
+      first.id,
+      speakRange(pressed.lower, pressed.upper, schema, labels, messages),
+      () =>
+        group.editPredicates({
+          remove: bounds.map(({ ref }) => ref),
+          add: [],
+        }),
+    );
   });
 
   /**
@@ -843,8 +987,7 @@ export default function QueryBar({
       }
       const current = sessionRef.current;
       const isSameChip =
-        current.draft !== null &&
-        readDraftId(current.draft) === readDraftId(applied);
+        current.draft !== null && isSameClause(current.draft, applied);
       // What is typed in the open part is read in first, as Tab does.
       let base: PredicateDraft = applied;
       if (isSameChip && current.draft?.kind === "predicate") {
@@ -891,7 +1034,9 @@ export default function QueryBar({
         ({ id }) => id === chipId,
       );
       /* v8 ignore next -- unreachable: every chip but the draft is a clause */
-      if (reading !== undefined) remove(readAppliedDraft(reading));
+      if (reading === undefined) return;
+      if (reading.kind === "range") removeRange(reading);
+      else remove(readAppliedDraft(reading));
       return;
     }
     if (chipId !== undefined && event.key === "Escape") {
@@ -1118,18 +1263,31 @@ export default function QueryBar({
       >
         {(clauses.length > 0 || draft?.origin === null) && (
           <QueryChips label={messages.appliedFilters}>
-            {clauses.map((clause) => (
-              <QueryBarChip
-                key={clause.id}
-                clause={clause}
-                group={group}
-                edit={edit?.draft.origin?.id === clause.id ? edit : null}
-                onActivate={activate}
-                onRemove={remove}
-                onTypedChange={handleTypedChange}
-                onEntryKeyDown={handleEntryKeyDown}
-              />
-            ))}
+            {clauses.map((clause) =>
+              clause.kind === "range" ? (
+                <RangeChip
+                  key={clause.id}
+                  clause={clause}
+                  group={group}
+                  edit={edit?.draft.origin?.id === clause.id ? edit : null}
+                  onActivate={activate}
+                  onRemove={removeRange}
+                  onTypedChange={handleTypedChange}
+                  onEntryKeyDown={handleEntryKeyDown}
+                />
+              ) : (
+                <QueryBarChip
+                  key={clause.id}
+                  clause={clause}
+                  group={group}
+                  edit={edit?.draft.origin?.id === clause.id ? edit : null}
+                  onActivate={activate}
+                  onRemove={remove}
+                  onTypedChange={handleTypedChange}
+                  onEntryKeyDown={handleEntryKeyDown}
+                />
+              ),
+            )}
             {draft !== null && draft.origin === null && (
               <DraftChip
                 id={DRAFT_ID}

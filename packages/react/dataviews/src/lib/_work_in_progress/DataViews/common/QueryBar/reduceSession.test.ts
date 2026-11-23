@@ -60,7 +60,11 @@ describe("reduceSession", () => {
     });
     // Moving on to the next part keeps the free text as it is.
     const moved = reduceSession(
-      { ...open, text: "kept", focus: { item: "x", part: "field" } },
+      {
+        ...open,
+        text: "kept",
+        focus: { item: "x", part: "field", operator: null },
+      },
       { type: "edit", draft: built, part: "value", typed: "6" },
     );
     expect(moved).toMatchObject({
@@ -99,8 +103,17 @@ describe("reduceSession", () => {
     ).toEqual({
       ...idle,
       activeItem: "status__isAny__0",
-      focus: { item: "status__isAny__0", part: "value" },
+      focus: { item: "status__isAny__0", part: "value", operator: null },
     });
+    // A range's bound is told apart by its operator.
+    expect(
+      reduceSession(open, {
+        type: "close",
+        item: "cores__range",
+        focus: "value",
+        operator: "lte",
+      }).focus,
+    ).toEqual({ item: "cores__range", part: "value", operator: "lte" });
     expect(
       reduceSession(open, { type: "close", item: "entry", focus: null }).focus,
     ).toBeNull();
@@ -125,7 +138,7 @@ describe("reduceSession", () => {
     });
     expect(
       reduceSession(
-        { ...idle, focus: { item: "a", part: "field" } },
+        { ...idle, focus: { item: "a", part: "field", operator: null } },
         { type: "moveStop", item: "a" },
       ),
     ).toEqual({ ...idle, activeItem: "a" });
@@ -134,7 +147,7 @@ describe("reduceSession", () => {
   it("forgets the Segment once it has focus", () => {
     expect(
       reduceSession(
-        { ...idle, focus: { item: "a", part: "value" } },
+        { ...idle, focus: { item: "a", part: "value", operator: null } },
         { type: "focused" },
       ).focus,
     ).toBeNull();
