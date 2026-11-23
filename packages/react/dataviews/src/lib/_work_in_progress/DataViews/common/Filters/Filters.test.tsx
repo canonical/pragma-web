@@ -1032,6 +1032,58 @@ describe("DataViews.Filters", () => {
       expect(container.querySelector("details")).toBeNull();
     });
 
+    it.fails("keeps a server's option listed once a later result drops it", () => {
+      const places = createCollection({
+        identify: (row: Row) => row.id,
+        fields: [{ field: "region", kind: "choices" }],
+      });
+      let regions: readonly string[] = ["eu", "us"];
+      let counted = 1;
+      const answering = createManualSource<Row>({
+        capabilities: declareCapabilities(places, {
+          filter: { region: true },
+          facets: ["region"],
+        }),
+        answer: () =>
+          createPage({
+            rows: [],
+            facets: {
+              region: {
+                kind: "values",
+                values: regions.map((value) => ({
+                  value,
+                  count: { kind: "exact", value: counted },
+                })),
+              },
+            },
+          }),
+      });
+      const provider = createDataViewsProvider({
+        collection: places,
+        source: answering.source,
+        facets: ["region"],
+      });
+      render(
+        <DataViews provider={provider}>
+          <Filters />
+        </DataViews>,
+      );
+      expect(screen.getByRole("checkbox", { name: "us" })).toBeInTheDocument();
+      regions = ["eu"];
+      counted = 2;
+      act(() => {
+        provider.refresh();
+      });
+      // The later answer landed: eu's count moved.
+      expect(
+        screen.getByRole("checkbox", { name: "eu" }),
+      ).toHaveAccessibleDescription("2");
+      // us stays listed, counted none, since the facet lists no record.
+      expect(
+        screen.getByRole("checkbox", { name: "us" }),
+      ).toHaveAccessibleDescription("0");
+    });
+
     it("keeps the server's options listed, without counts, once a request fails", () => {
       const places = createCollection({
         identify: (row: Row) => row.id,
