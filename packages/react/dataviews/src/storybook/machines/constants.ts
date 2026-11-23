@@ -66,7 +66,7 @@ ${Object.entries(SERVER_BACKED_PARTS.labels)
   <DataViews.DataTable
     columns={columns}
     label=${JSON.stringify(SERVER_BACKED_PARTS.tableLabel)}
-    getRowLabel={(row) => String(row["name"])}
+    getRowLabel={nameMachine}
   />
   <DataViews.Pagination sizes={[${SERVER_BACKED_PARTS.sizes.join(", ")}]} />
 </DataViews>`;
