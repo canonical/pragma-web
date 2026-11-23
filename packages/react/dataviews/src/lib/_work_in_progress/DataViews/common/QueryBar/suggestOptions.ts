@@ -13,6 +13,7 @@ import { listFacetOptions } from "../Filters/common/utils/index.js";
 import { OPERATOR_SYMBOLS } from "./constants.js";
 import spellOperator from "./spellOperator.js";
 import type {
+  DataViewsQueryBarPreset,
   QueryBarDraft,
   QueryBarLabelsStandIn,
   QueryBarOption,
@@ -32,6 +33,10 @@ type SuggestOptionsConfig = {
   readonly messages: DataViewsMessages;
   readonly labels: QueryBarLabelsStandIn;
   readonly facets: UseFacetsResult;
+  /** The draft's field's presets, offered first among its values. */
+  readonly presets: readonly DataViewsQueryBarPreset[];
+  /** What narrows the presets: what is typed, less the value an edit opens with. */
+  readonly presetFilter: string;
 };
 
 /** Whether a label holds what is typed, case aside. */
@@ -146,8 +151,9 @@ const suggestValues = (
 /**
  * The suggestions for the part being typed, as QueryInput's options: the
  * fields that offer an operator, the operators the source declares on the
- * draft's field, or the options of a choice. A typed value — a number, a
- * date, text — and the search take none. Each narrows to what is typed and
+ * draft's field, or its value's presets, then the options of a choice. A
+ * typed value — a number, a date, text — takes its presets alone, and the
+ * search takes none. Each narrows to what is typed and
  * carries what choosing it writes. Pure.
  *
  * @param config - The part, the draft, what is typed, and what the root knows.
@@ -162,7 +168,17 @@ export default function suggestOptions(
   const definition = schema.findField(draft.field);
   if (definition === undefined) return [];
   if (part === "operator") return suggestOperators(definition, draft, config);
-  return part === "value" && definition.kind === "choices"
-    ? suggestValues(definition, draft, config)
-    : [];
+  // A field's clause takes its value last: the search's part is its own.
+  const presets = config.presets
+    .map(
+      (preset, index): QueryBarOption => ({
+        id: `preset:${index}`,
+        label: preset.label,
+        choice: { kind: "preset", preset },
+      }),
+    )
+    .filter(({ label }) => isTyped(label, config.presetFilter));
+  return definition.kind === "choices"
+    ? [...presets, ...suggestValues(definition, draft, config)]
+    : presets;
 }

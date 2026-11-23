@@ -4,6 +4,7 @@ export * from "./Filters/index.js";
 export * from "./HiddenQueryFields/index.js";
 export * from "./Pagination/index.js";
 export {
+  type DataViewsQueryBarPreset,
   type DataViewsQueryBarProps,
   QueryBar,
 } from "./QueryBar/index.js";

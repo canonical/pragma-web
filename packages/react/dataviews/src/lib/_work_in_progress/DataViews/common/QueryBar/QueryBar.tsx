@@ -56,6 +56,7 @@ import speakRange from "./speakRange.js";
 import spellOperand from "./spellOperand.js";
 import suggestOptions from "./suggestOptions.js";
 import type {
+  DataViewsQueryBarPreset,
   DataViewsQueryBarProps,
   QueryBarChoice,
   QueryBarDraft,
@@ -75,6 +76,9 @@ import writeChoice from "./writeChoice.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-query-bar";
+
+/** A field with no presets. */
+const NO_PRESETS: readonly DataViewsQueryBarPreset[] = Object.freeze([]);
 
 /** What a conjunct asks, its operator perhaps not yet chosen. */
 type AskedConjunct = Pick<PredicateDraft, "field" | "operator" | "operands">;
@@ -205,6 +209,7 @@ const isSameConjunct = (a: Predicate, b: AskedConjunct): boolean =>
 export default function QueryBar({
   label,
   quickFilters,
+  presets,
   className,
   onKeyDown,
   onBlur,
@@ -218,6 +223,13 @@ export default function QueryBar({
     if (schema.findField(field) === undefined) {
       throw new Error(
         `DataViews.QueryBar: the schema has no field "${field}" to show as a quick filter`,
+      );
+    }
+  }
+  for (const field of Object.keys(presets ?? {})) {
+    if (schema.findField(field) === undefined) {
+      throw new Error(
+        `DataViews.QueryBar: the schema has no field "${field}" to offer presets for`,
       );
     }
   }
@@ -314,6 +326,15 @@ export default function QueryBar({
       : null;
   const isListedValue = listedField !== null;
   const facets = useSuggestedFacets({ provider, field: listedField });
+  // A typed value's text as its Entry opens on it: the held value spelled.
+  const heldOperand =
+    isEditing && part === "value" && draft?.kind === "predicate"
+      ? draft.operands.at(0)
+      : undefined;
+  const openingValue =
+    heldOperand === undefined || editedDefinition?.kind === "choices"
+      ? ""
+      : spellOperand(editedDefinition, heldOperand, messages.decimalSeparator);
   const options = suggestOptions({
     part: isEditing ? part : "field",
     draft: isEditing ? draft : null,
@@ -323,6 +344,13 @@ export default function QueryBar({
     messages,
     labels,
     facets,
+    // A range's bound keeps its operator: it takes no preset.
+    presets:
+      isEditing && draft?.kind === "predicate" && !isRangeBound(draft)
+        ? (presets?.[draft.field] ?? NO_PRESETS)
+        : NO_PRESETS,
+    // The value an edit opens with narrows no preset; what is typed does.
+    presetFilter: typed === openingValue ? "" : typed,
   });
   // Only a chip's listed part says it has nothing to offer: a search typed
   // in the entry, or a typed value, says nothing of none. The server's
@@ -438,14 +466,45 @@ export default function QueryBar({
     if (entered.trim() === "" || entered === readOpeningText(current, at)) {
       return current;
     }
+    // A preset's label typed whole takes the preset.
+    const presetOptions = options.filter(
+      ({ choice }) => choice.kind === "preset",
+    );
+    const named = presetOptions.find(
+      ({ label: name }) =>
+        name.toLocaleLowerCase() === entered.trim().toLocaleLowerCase(),
+    );
+    if (named !== undefined) {
+      return writeChoice(current, named.choice, schema, capabilities);
+    }
     const read = schema.validateInput(current.field, entered, decimalSeparator);
     if (read.status === "valid") return { ...current, operands: read.operands };
+    // Text that reads as no value but narrows to one preset takes it.
+    const [only, ...others] = presetOptions;
+    if (only !== undefined && others.length === 0) {
+      return writeChoice(current, only.choice, schema, capabilities);
+    }
     return {
       reason:
         read.status === "invalid"
           ? read.reason
           : messages.filterIncomplete(false),
     };
+  };
+
+  /**
+   * The option typed text narrows to: one whose label it spells whole,
+   * else the first value, a preset only where no value is left, so a
+   * preset never takes the place of the value typed.
+   */
+  const findNarrowed = (entered: string): QueryBarOption | undefined => {
+    const open = options.filter((option) => option.disabled !== true);
+    const wanted = entered.trim().toLocaleLowerCase();
+    return (
+      open.find((option) => option.label.toLocaleLowerCase() === wanted) ??
+      open.find(({ choice }) => choice.kind !== "preset") ??
+      open.at(0)
+    );
   };
 
   /** Write a clause to the query group: the one place the bar commits. */
@@ -730,11 +789,9 @@ export default function QueryBar({
     const isTakingFirst =
       isListedPart &&
       (isTyped || (at === "operator" && current.draft.origin === null));
-    // What is typed takes the first option it narrows to, the held one
-    // among them, which keeps the clause as it is.
-    const first = isTakingFirst
-      ? options.find((option) => option.disabled !== true)
-      : undefined;
+    // What is typed takes the option it narrows to, the held one among
+    // them, which keeps the clause as it is.
+    const first = isTakingFirst ? findNarrowed(current.typed) : undefined;
     if (first?.current === true) {
       const target = findNextPartOf(current.draft, at, false);
       if (target === null) commit(current.draft, "enter");
@@ -783,7 +840,7 @@ export default function QueryBar({
     // one among them, which keeps the clause.
     const narrowed =
       option === undefined && settled === null && isListedPart && isTyped
-        ? options.find((candidate) => candidate.disabled !== true)
+        ? findNarrowed(current.typed)
         : undefined;
     if (
       option === undefined &&

@@ -213,6 +213,25 @@ export type QueryBarDraft =
       readonly text: string;
     };
 
+/**
+ * A named value of one field, such as "Last 7 days", offered first among
+ * its value options. `resolve` is called when it is committed, and the
+ * clause it returns becomes the chip: a relative date resolves to the
+ * dates it names at that moment.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type DataViewsQueryBarPreset = {
+  /** What the preset is called among the suggestions. */
+  readonly label: string;
+  /** The clause's operator and operands, as they stand when committed. */
+  readonly resolve: () => {
+    readonly operator: PredicateOperator;
+    readonly operands: readonly PredicateOperand[];
+  };
+};
+
 /** What choosing one of the bar's suggestions writes into its draft. */
 export type QueryBarChoice =
   | { readonly kind: "field"; readonly field: string }
@@ -222,7 +241,8 @@ export type QueryBarChoice =
       /** The operands the operator brings, as presence's do; null keeps the draft's. */
       readonly operands: readonly PredicateOperand[] | null;
     }
-  | { readonly kind: "value"; readonly operand: PredicateOperand };
+  | { readonly kind: "value"; readonly operand: PredicateOperand }
+  | { readonly kind: "preset"; readonly preset: DataViewsQueryBarPreset };
 
 /** One of the bar's suggestions, with what choosing it writes. */
 export type QueryBarOption = QueryInputOption & {
@@ -279,6 +299,13 @@ type OwnProps = {
   readonly label?: string;
   /** The fields shown as quick filters beside the field; each must be in the schema. */
   readonly quickFilters?: readonly string[];
+  /**
+   * Named values per field name, offered first among its value options and
+   * resolved when committed; each field must be in the schema.
+   */
+  readonly presets?: {
+    readonly [field: string]: readonly DataViewsQueryBarPreset[];
+  };
 };
 
 /**

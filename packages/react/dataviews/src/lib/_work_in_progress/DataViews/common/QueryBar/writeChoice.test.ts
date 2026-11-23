@@ -2,7 +2,7 @@ import {
   createCollection,
   declareCapabilities,
 } from "@canonical/dataviews-core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import writeChoice from "./writeChoice.js";
 
 const collection = createCollection({
@@ -114,5 +114,20 @@ describe("writeChoice", () => {
         capabilities,
       ),
     ).toBe(ready);
+  });
+
+  it("writes a preset's clause as it resolves when chosen", () => {
+    const resolve = vi.fn(
+      () => ({ operator: "isAny", operands: ["broken", "ready"] }) as const,
+    );
+    expect(
+      writeChoice(
+        ready,
+        { kind: "preset", preset: { label: "Not deployed", resolve } },
+        schema,
+        capabilities,
+      ),
+    ).toEqual({ ...ready, operator: "isAny", operands: ["broken", "ready"] });
+    expect(resolve).toHaveBeenCalledOnce();
   });
 });

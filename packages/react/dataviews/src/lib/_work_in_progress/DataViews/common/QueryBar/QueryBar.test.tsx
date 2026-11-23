@@ -25,6 +25,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { installPopoverStandIn } from "../../../../../../testing/index.js";
 import DataViews from "../../Provider.js";
 import QueryBar from "./QueryBar.js";
+import type { DataViewsQueryBarProps } from "./types.js";
 
 /** Every render of a chip, by its id: the render-count test reads them. */
 const chipRenders = vi.hoisted(() => [] as string[]);
@@ -131,9 +132,11 @@ const hosts: readonly Host[] = [
 const mount = ({
   query,
   location,
+  presets,
 }: {
   readonly query?: string;
   readonly location?: QueryLocation;
+  readonly presets?: DataViewsQueryBarProps["presets"];
 } = {}) => {
   const provider = createDataViewsProvider({
     collection,
@@ -148,7 +151,10 @@ const mount = ({
   });
   const view = render(
     <DataViews provider={provider}>
-      <QueryBar data-testid="bar" />
+      <QueryBar
+        data-testid="bar"
+        {...(presets === undefined ? {} : { presets })}
+      />
       <button type="button">Elsewhere</button>
     </DataViews>,
   );
@@ -213,6 +219,13 @@ describe("QueryBar", () => {
           </DataViews>,
         ),
       ).toThrow('the schema has no field "flavour" to show as a quick filter');
+      expect(() =>
+        render(
+          <DataViews provider={provider}>
+            <QueryBar presets={{ flavour: [] }} />
+          </DataViews>,
+        ),
+      ).toThrow('the schema has no field "flavour" to offer presets for');
       vi.restoreAllMocks();
       render(
         <DataViews provider={provider}>
@@ -1458,6 +1471,167 @@ describe("QueryBar", () => {
       expect(readFilter(provider)).toEqual([
         { field: "pool", operator: "isAny", operands: ["gpu"] },
       ]);
+    });
+  });
+
+  describe("presets", () => {
+    it("offers a field's presets first, and commits the clause each resolves to", async () => {
+      const since = vi.fn(
+        () => ({ operator: "gte", operands: ["2026-02-01"] }) as const,
+      );
+      const { provider } = mount({
+        presets: {
+          seen: [{ label: "Since February", resolve: since }],
+          status: [
+            {
+              label: "Not deployed",
+              resolve: () => ({ operator: "isNone", operands: ["deployed"] }),
+            },
+          ],
+        },
+      });
+      await startOn("seen");
+      type(findPart("Operator for seen"), ">=");
+      const value = findPart("Value for seen");
+      act(() => value.focus());
+      expect(since).not.toHaveBeenCalled();
+      fireEvent.click(findOption("Since February"));
+      expect(since).toHaveBeenCalledOnce();
+      expect(readFilter(provider)).toEqual([
+        { field: "seen", operator: "gte", operands: ["2026-02-01"] },
+      ]);
+      // Among a choice's values, first; Enter on it commits it.
+      const operator = await startOn("status");
+      press(operator, "Enter");
+      const values = await screen.findByRole("combobox", {
+        name: "Value for status",
+      });
+      act(() => values.focus());
+      expect(
+        screen.getAllByRole("option", { hidden: true }).at(0),
+      ).toHaveTextContent("Not deployed");
+      fireEvent.click(findOption("Not deployed"));
+      expect(readFilter(provider)).toContainEqual({
+        field: "status",
+        operator: "isNone",
+        operands: ["deployed"],
+      });
+    });
+
+    it("takes a preset typed whole, or the one typed text narrows to, on a typed value", async () => {
+      const since = (day: string) => () =>
+        ({ operator: "gte", operands: [day] }) as const;
+      const { provider } = mount({
+        presets: {
+          seen: [
+            { label: "Since February", resolve: since("2026-02-01") },
+            { label: "Since March", resolve: since("2026-03-01") },
+          ],
+        },
+      });
+      await startOn("seen");
+      type(findPart("Operator for seen"), ">=");
+      type(findPart("Value for seen"), "since february");
+      press(findPart("Value for seen"), "Enter");
+      expect(readFilter(provider)).toEqual([
+        { field: "seen", operator: "gte", operands: ["2026-02-01"] },
+      ]);
+      await startOn("seen");
+      type(findPart("Operator for seen"), "<=");
+      type(findPart("Value for seen"), "mar");
+      press(findPart("Value for seen"), "Tab");
+      expect(readFilter(provider)).toContainEqual({
+        field: "seen",
+        operator: "gte",
+        operands: ["2026-03-01"],
+      });
+      // Text that narrows to both, or to none, is still marked invalid.
+      await startOn("seen");
+      type(findPart("Operator for seen"), "<=");
+      type(findPart("Value for seen"), "since");
+      press(findPart("Value for seen"), "Enter");
+      expect(findPart("Value for seen")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+    });
+
+    it("takes the value typed over a preset that only holds its text", async () => {
+      const { provider } = mount({
+        presets: {
+          status: [
+            {
+              label: "Not deployed",
+              resolve: () => ({ operator: "isNone", operands: ["deployed"] }),
+            },
+          ],
+        },
+      });
+      const operator = await startOn("status");
+      press(operator, "Enter");
+      const value = await screen.findByRole("combobox", {
+        name: "Value for status",
+      });
+      type(value as HTMLInputElement, "deployed");
+      press(value, "Enter");
+      press(findPart("Value for status"), "Enter");
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["deployed"] },
+      ]);
+      // Tab narrows the same way: a value first, the preset only after.
+      fireEvent.click(
+        screen.getByRole("button", { name: "Remove status is deployed" }),
+      );
+      expect(readFilter(provider)).toEqual([]);
+      const again = await startOn("status");
+      press(again, "Enter");
+      type(findPart("Value for status"), "deplo");
+      press(findPart("Value for status"), "Tab");
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["deployed"] },
+      ]);
+      expect(queryPart("Value for status")).toBeNull();
+    });
+
+    it("offers presets while an edit's held value stands untouched", async () => {
+      mount({
+        query: "seen__gte=2026-01-01",
+        presets: {
+          seen: [
+            {
+              label: "Since February",
+              resolve: () => ({ operator: "gte", operands: ["2026-02-01"] }),
+            },
+          ],
+        },
+      });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "2026-01-01" }),
+      );
+      act(() => findPart("Value for seen").focus());
+      expect(findPart("Value for seen")).toHaveValue("2026-01-01");
+      expect(findOption("Since February")).toBeInTheDocument();
+    });
+
+    it("offers a range's bound no preset, which would change its operator", async () => {
+      mount({
+        query: "memory__gte=8192&memory__lte=65536",
+        presets: {
+          memory: [
+            {
+              label: "Large",
+              resolve: () => ({ operator: "gte", operands: [131_072] }),
+            },
+          ],
+        },
+      });
+      fireEvent.click(
+        await screen.findByRole("button", { name: "at most 64\u00a0GiB" }),
+      );
+      act(() => findPart("Upper bound for memory").focus());
+      expect(
+        screen.queryByRole("option", { hidden: true, name: "Large" }),
+      ).toBeNull();
     });
   });
 

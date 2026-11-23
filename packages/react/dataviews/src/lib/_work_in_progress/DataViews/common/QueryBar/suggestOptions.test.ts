@@ -49,6 +49,8 @@ const base = {
   messages: resolveMessages(),
   labels: readLabelsStandIn(),
   facets: { answered: null, latest: null },
+  presets: [],
+  presetFilter: "",
 } as const;
 
 describe("suggestOptions", () => {
@@ -265,5 +267,50 @@ describe("suggestOptions", () => {
     expect(
       suggestOptions({ ...base, part: "operator", draft: draftOn("gone") }),
     ).toEqual([]);
+  });
+
+  it("offers a value's presets first, narrowed by what is typed", () => {
+    const lastWeek = {
+      label: "Last 7 days",
+      resolve: () => ({ operator: "gte", operands: ["2026-01-01"] }) as const,
+    };
+    const presets = [lastWeek, { ...lastWeek, label: "Today" }];
+    expect(
+      suggestOptions({
+        ...base,
+        part: "value",
+        presets,
+        draft: draftOn("memory", { operator: "gte" }),
+      }),
+    ).toEqual([
+      {
+        id: "preset:0",
+        label: "Last 7 days",
+        choice: { kind: "preset", preset: lastWeek },
+      },
+      {
+        id: "preset:1",
+        label: "Today",
+        choice: { kind: "preset", preset: presets[1] },
+      },
+    ]);
+    expect(
+      suggestOptions({
+        ...base,
+        part: "value",
+        typed: "tod",
+        presetFilter: "tod",
+        presets,
+        draft: draftOn("memory", { operator: "gte" }),
+      }).map(({ id }) => id),
+    ).toEqual(["preset:1"]);
+    const listed = suggestOptions({
+      ...base,
+      part: "value",
+      presets,
+      draft: draftOn("status", { operator: "isAny" }),
+    });
+    expect(listed.at(0)?.id).toBe("preset:0");
+    expect(listed.length).toBeGreaterThan(2);
   });
 });

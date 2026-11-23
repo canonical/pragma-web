@@ -59,6 +59,11 @@ export default function writeChoice(
         operands:
           choice.operands ?? (draft.operator === "isSet" ? [] : draft.operands),
       };
+    case "preset": {
+      // Resolved as it is chosen, which commits it.
+      const { operator, operands } = choice.preset.resolve();
+      return { ...draft, operator, operands };
+    }
     case "value": {
       if (draft.operands.some((held) => Object.is(held, choice.operand))) {
         return draft;
