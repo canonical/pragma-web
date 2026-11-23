@@ -29,7 +29,7 @@ describe("describeOrdering", () => {
   it("states the source's own order while the reader states none", () => {
     const defaults = [{ field: "cores", direction: "desc" }] as const;
     expect(describeOrdering([], defaults, nameOf, english)).toBe(
-      english.sortDefaulted([{ name: "Cores", direction: "desc" }]),
+      english.sortDefaulted(["Cores, descending"]),
     );
   });
 
@@ -45,12 +45,13 @@ describe("describeOrdering", () => {
         nameOf,
         english,
       ),
-    ).toBe(english.sortApplied([{ name: "region", direction: "asc" }]));
+    ).toBe(english.sortApplied(["region, ascending"]));
   });
 
   it("words the outcome in the messages it is given, not in English", () => {
     const messages = resolveMessages({
-      sortApplied: (terms) => `Trié par ${terms.at(0)?.name ?? ""}`,
+      sortTerm: ({ name }) => name,
+      sortApplied: (terms) => `Trié par ${terms.join(", ")}`,
     });
     expect(
       describeOrdering(
