@@ -13,10 +13,10 @@ const unknown = { kind: "unknown" } as const;
 
 describe("constants", () => {
   describe("DEFAULT_MESSAGES", () => {
-    it.fails("words an ordering from terms already worded", () => {
-      expect(
-        Reflect.apply(m.sortApplied, undefined, [["Name, descending"]]),
-      ).toBe("Sorted by Name, descending.");
+    it("words an ordering from terms already worded", () => {
+      expect(m.sortApplied(["Name, descending"])).toBe(
+        "Sorted by Name, descending.",
+      );
     });
 
     it.fails("ends each status with a full stop, and a blank reason plainly", () => {
@@ -127,9 +127,9 @@ describe("constants", () => {
 
     it("words an ordering, the reader's and the source's", () => {
       const terms = [
-        { name: "Name", direction: "asc" },
-        { name: "Cores", direction: "desc" },
-      ] as const;
+        m.sortTerm({ name: "Name", direction: "asc" }),
+        m.sortTerm({ name: "Cores", direction: "desc" }),
+      ];
       expect(m.sortApplied(terms)).toBe(
         "Sorted by Name, ascending; then Cores, descending.",
       );

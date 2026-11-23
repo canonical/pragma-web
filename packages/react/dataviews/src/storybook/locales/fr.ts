@@ -95,14 +95,9 @@ const fr: DataViewsMessages = {
     reasons.length === 0
       ? "Tri inchangé."
       : `Tri inchangé : ${reasons.map(trimClause).join(" ; ")}.`,
-  sortApplied: (terms) =>
-    `Trié par ${terms
-      .map(({ name, direction }) => `${name}, ${DIRECTIONS[direction]}`)
-      .join(" ; puis ")}.`,
+  sortApplied: (terms) => `Trié par ${terms.join(" ; puis ")}.`,
   sortDefaulted: (terms) =>
-    `Trié selon l’ordre de la source : ${terms
-      .map(({ name, direction }) => `${name}, ${DIRECTIONS[direction]}`)
-      .join(" ; ")}.`,
+    `Trié selon l’ordre de la source : ${terms.join(" ; ")}.`,
   sortAbsent: "Non trié : la source ne documente aucun ordre.",
 
   columnOptions: (name) => `Options de la colonne ${name}`,

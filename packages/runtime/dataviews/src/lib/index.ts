@@ -48,7 +48,6 @@ export {
 export type {
   DataViewsMessages,
   FacetCountWords,
-  SortTermWords,
 } from "./messages/index.js";
 export type { ReadonlyChannel } from "./observable/index.js";
 export type {

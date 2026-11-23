@@ -207,12 +207,7 @@ export default function SortPanel({
         <p>
           {ordering.length === 0
             ? messages.sortAbsent
-            : messages.sortDefaulted(
-                ordering.map(({ field, direction }) => ({
-                  name: field,
-                  direction,
-                })),
-              )}
+            : messages.sortDefaulted(ordering.map(describe))}
         </p>
       ) : (
         <ol {...trackFocus}>

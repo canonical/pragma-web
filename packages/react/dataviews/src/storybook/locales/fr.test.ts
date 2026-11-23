@@ -78,13 +78,10 @@ describe("fr", () => {
   it("states sort outcomes", () => {
     expect(fr.sortRefused([])).toBe("Tri inchangé.");
     expect(fr.sortRefused(["a.", "b"])).toBe("Tri inchangé : a ; b.");
-    expect(
-      fr.sortApplied([
-        { name: "Nom", direction: "asc" },
-        { name: "Cœurs", direction: "desc" },
-      ]),
-    ).toBe("Trié par Nom, croissant ; puis Cœurs, décroissant.");
-    expect(fr.sortDefaulted([{ name: "Nom", direction: "asc" }])).toBe(
+    expect(fr.sortApplied(["Nom, croissant", "Cœurs, décroissant"])).toBe(
+      "Trié par Nom, croissant ; puis Cœurs, décroissant.",
+    );
+    expect(fr.sortDefaulted(["Nom, croissant"])).toBe(
       "Trié selon l’ordre de la source : Nom, croissant.",
     );
     expect(fr.sortTerm({ name: "Nom", direction: "desc" })).toBe(

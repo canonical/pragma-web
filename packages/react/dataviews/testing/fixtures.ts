@@ -472,22 +472,8 @@ export const MESSAGE_SAMPLES: {
     [{ direction: "desc", position: 2, total: 3 }],
   ],
   sortRefused: [[[MESSAGE_MARK]]],
-  sortApplied: [
-    [
-      [
-        { name: MESSAGE_MARK, direction: "asc" },
-        { name: MESSAGE_MARK, direction: "desc" },
-      ],
-    ],
-  ],
-  sortDefaulted: [
-    [
-      [
-        { name: MESSAGE_MARK, direction: "asc" },
-        { name: MESSAGE_MARK, direction: "desc" },
-      ],
-    ],
-  ],
+  sortApplied: [[[MESSAGE_MARK, MESSAGE_MARK]]],
+  sortDefaulted: [[[MESSAGE_MARK, MESSAGE_MARK]]],
   sortAbsent: null,
   columnOptions: [[MESSAGE_MARK]],
   sortAscending: null,

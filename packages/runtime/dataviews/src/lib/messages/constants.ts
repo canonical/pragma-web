@@ -99,14 +99,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
       ? "Sort unchanged."
       : `Sort unchanged: ${clauses.join("; ")}.`;
   },
-  sortApplied: (terms) =>
-    `Sorted by ${terms
-      .map(({ name, direction }) => formatSortTerm(name, direction))
-      .join("; then ")}.`,
+  sortApplied: (terms) => `Sorted by ${terms.join("; then ")}.`,
   sortDefaulted: (terms) =>
-    `Sorted by the source's own order: ${terms
-      .map(({ name, direction }) => formatSortTerm(name, direction))
-      .join("; ")}.`,
+    `Sorted by the source's own order: ${terms.join("; ")}.`,
   sortAbsent: "Not sorted: the source documents no order.",
 
   columnOptions: (name) => `Column options for ${name}`,

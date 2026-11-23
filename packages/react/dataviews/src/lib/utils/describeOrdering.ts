@@ -1,9 +1,9 @@
 import type { DataViewsMessages, SortTerm } from "@canonical/dataviews-core";
 
 /**
- * What an ordering is announced as: the terms the reader states, each by the
- * name `nameOf` gives its field; the source's own order while the reader
- * states none; or that nothing orders the rows.
+ * What an ordering is announced as: each term the reader states, worded by
+ * `sortTerm` with the name `nameOf` gives its field; else the source's own
+ * order; or that nothing orders the rows.
  *
  * One derivation for every control that changes an ordering — a heading, its
  * menu, the sort panel — so the same outcome is never worded two ways.
@@ -15,10 +15,9 @@ export default function describeOrdering(
   messages: DataViewsMessages,
 ): string {
   const stated = applied.length > 0;
-  const terms = (stated ? applied : defaults).map(({ field, direction }) => ({
-    name: nameOf(field),
-    direction,
-  }));
+  const terms = (stated ? applied : defaults).map(({ field, direction }) =>
+    messages.sortTerm({ name: nameOf(field), direction }),
+  );
   if (terms.length === 0) {
     return messages.sortAbsent;
   }

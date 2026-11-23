@@ -12,18 +12,6 @@ import type { Count } from "../result/index.js";
 import type { ViewCommand } from "../views/index.js";
 
 /**
- * One term of an ordering, as a message words it: its name and direction.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type SortTermWords = {
-  /** The name the term is shown by: its column's heading, or its field. */
-  readonly name: string;
-  readonly direction: SortDirection;
-};
-
-/**
  * A count a facet reports beside the value it counts: exact, or a lower
  * bound. A count of nothing is not worded, so the unknown kind is not here.
  *
@@ -143,10 +131,16 @@ export type DataViewsMessages = {
    * source gave, as `filterRefused` takes them.
    */
   readonly sortRefused: (reasons: readonly string[]) => string;
-  /** The ordering the reader now states, announced once it applies. */
-  readonly sortApplied: (terms: readonly SortTermWords[]) => string;
-  /** The source's own ordering, which orders the rows while the reader states none. */
-  readonly sortDefaulted: (terms: readonly SortTermWords[]) => string;
+  /**
+   * The ordering the reader now states, announced once it applies: each
+   * term as `sortTerm` words it.
+   */
+  readonly sortApplied: (terms: readonly string[]) => string;
+  /**
+   * The source's own ordering, which orders the rows while the reader states
+   * none: each term as `sortTerm` words it.
+   */
+  readonly sortDefaulted: (terms: readonly string[]) => string;
   /** No ordering stands, and the source documents none. */
   readonly sortAbsent: string;
 
@@ -182,7 +176,10 @@ export type DataViewsMessages = {
   // The sort panel.
   /** The panel's name. */
   readonly sortPanel: string;
-  /** One term of the reader's ordering, by the name its field is shown by. */
+  /**
+   * One term of an ordering, by the name its field is shown by: a sort
+   * panel's item, and each term the ordering messages are handed.
+   */
   readonly sortTerm: (facts: {
     readonly name: string;
     readonly direction: SortDirection;
