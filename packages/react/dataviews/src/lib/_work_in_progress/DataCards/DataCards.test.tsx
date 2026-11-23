@@ -190,6 +190,24 @@ describe("DataCards", () => {
     ).toBeInTheDocument();
   });
 
+  it.fails("names a card anew once handed a new getRowLabel", () => {
+    const { provider, view } = renderLoadedCards(rows, {
+      getRowLabel: (row) => `machine ${row.name}`,
+    });
+    view.rerender(
+      <DataCards
+        provider={provider}
+        fields={fields}
+        title="name"
+        label="Machines"
+        getRowLabel={(row) => `machine ${row.name} (fr)`}
+      />,
+    );
+    expect(
+      within(readList()).getByRole("listitem", { name: "machine alpha (fr)" }),
+    ).toBeInTheDocument();
+  });
+
   it("names a card's checkbox by a title that is not a string, spelled", () => {
     const Blank = () => null;
     renderLoadedCards(rows, {
