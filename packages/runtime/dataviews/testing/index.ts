@@ -7,7 +7,6 @@ export { default as buildRefusedResult } from "./buildRefusedResult.js";
 export { default as buildRowModel } from "./buildRowModel.js";
 export { default as buildSettledPage } from "./buildSettledPage.js";
 export { default as buildStoredView } from "./buildStoredView.js";
-export { FILE_RULE_ALLOWLIST } from "./constants.js";
 export { default as countAtLeast } from "./countAtLeast.js";
 export { default as countExactly } from "./countExactly.js";
 export { default as createCountedRows } from "./createCountedRows.js";
