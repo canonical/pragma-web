@@ -48,4 +48,14 @@ describe("useAnsweredFacets", () => {
     });
     expect(hook.result.current).toBeNull();
   });
+
+  it.fails("keeps the facets while a re-sort is pending", () => {
+    const { provider, source, hook } = mountAnswered();
+    deliverFacets(source, { status: STATUS });
+    act(() => {
+      provider.setSort([{ field: "name", direction: "desc" }]);
+    });
+    expect(provider.state.get().pendingRequestId).not.toBeNull();
+    expect(hook.result.current).toEqual({ status: STATUS });
+  });
 });
