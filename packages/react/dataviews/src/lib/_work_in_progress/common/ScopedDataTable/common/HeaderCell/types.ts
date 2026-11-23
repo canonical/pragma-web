@@ -87,6 +87,8 @@ type OwnProps = {
    * without settings, when the menu offers no Hide or Move.
    */
   readonly offers: HeaderColumnOffers | null;
+  /** Why no column can change yet, or null; its menu says it first. */
+  readonly columnsReason: string | null;
   /** Hide or move a column, from its menu; one identity for every column. */
   readonly onChangeColumn: (
     columnId: string,

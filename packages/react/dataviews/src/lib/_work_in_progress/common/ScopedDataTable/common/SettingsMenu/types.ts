@@ -32,6 +32,11 @@ export type SettingsMenuProps = {
   readonly settings: readonly ColumnSetting[];
   /** Whether a reset would change the viewer's own layer. */
   readonly resettable: boolean;
+  /**
+   * Why no item can be chosen yet, shown first, every item disabled; null
+   * while the columns can change.
+   */
+  readonly reason: string | null;
   /** Whether scripts have taken over; before then the items are links. */
   readonly hydrated: boolean;
   /** Apply one change to one column. One identity while the table holds. */

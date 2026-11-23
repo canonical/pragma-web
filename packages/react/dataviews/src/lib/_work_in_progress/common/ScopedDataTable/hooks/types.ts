@@ -52,9 +52,14 @@ export type UseColumnManagementResult = {
   /** Whether a reset would change the viewer's own layer. */
   readonly resettable: boolean;
   /**
-   * The changes one declared column takes now, one object per column while
-   * those changes hold, or null without settings; throws for a column the
-   * table does not declare.
+   * Why no column can change yet — the view a link opened is still being
+   * listed — or null.
+   */
+  readonly reason: string | null;
+  /**
+   * The changes one declared column takes once `reason` is null, one object
+   * per column while those changes hold, or null without settings; throws
+   * for a column the table does not declare.
    */
   readonly readOffers: (columnId: string) => ColumnSetting["offers"] | null;
   /** Apply one change to one column; one identity for every column. */

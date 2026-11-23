@@ -22,6 +22,7 @@ const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
 const MENU: SettingsMenuProps = {
   settings: [],
   resettable: false,
+  reason: null,
   hydrated: true,
   onChange: () => {},
   onReset: () => {},

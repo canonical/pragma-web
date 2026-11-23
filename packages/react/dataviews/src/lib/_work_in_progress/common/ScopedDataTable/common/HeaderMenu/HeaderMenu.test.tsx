@@ -21,12 +21,14 @@ const mount = ({
   removable = false,
   hideable = true,
   offers = MIDDLE,
+  columnsReason = null,
 }: {
   readonly header?: ReactNode;
   readonly sortable?: boolean;
   readonly removable?: boolean;
   readonly hideable?: boolean;
   readonly offers?: HeaderMenuProps["offers"];
+  readonly columnsReason?: string | null;
 } = {}) => {
   const onPlace = vi.fn();
   const onRemoveFromSort = vi.fn();
@@ -39,6 +41,7 @@ const mount = ({
       removable={removable}
       hideable={hideable}
       offers={offers}
+      columnsReason={columnsReason}
       onPlace={onPlace}
       onRemoveFromSort={onRemoveFromSort}
       onChangeColumn={onChangeColumn}
@@ -142,6 +145,22 @@ describe("HeaderMenu", () => {
     mount({ offers: null });
     await openMenu();
     expect(listItemNames()).toEqual(["Sort ascending", "Sort descending"]);
+  });
+
+  it("puts the reason first and disables every column change while waiting", async () => {
+    mount({ columnsReason: "Not yet." });
+    await openMenu();
+    expect(listItemNames().at(0)).toBe("Not yet.");
+    const disabled = screen
+      .getAllByRole("menuitem")
+      .filter((item) => item.classList.contains("disabled"))
+      .map((item) => item.textContent);
+    expect(disabled).toEqual([
+      "Not yet.",
+      "Hide column",
+      "Move column left",
+      "Move column right",
+    ]);
   });
 
   it("disables the changes a column does not take now, and chooses nothing from them", async () => {

@@ -228,6 +228,7 @@ export default function ScopedDataTable<
     settings: columnSettings,
     readOffers,
     resettable,
+    reason,
     changeColumn,
     resetColumns,
     listDestinations,
@@ -245,6 +246,7 @@ export default function ScopedDataTable<
     () => ({
       settings: columnSettings,
       resettable,
+      reason,
       hydrated,
       onChange: changeColumn,
       onReset: resetColumns,
@@ -253,6 +255,7 @@ export default function ScopedDataTable<
     [
       columnSettings,
       resettable,
+      reason,
       hydrated,
       changeColumn,
       resetColumns,
@@ -394,6 +397,7 @@ export default function ScopedDataTable<
                   onPlace={headerSort.placeColumn}
                   onRemoveFromSort={headerSort.removeFromSort}
                   offers={readOffers(column.id)}
+                  columnsReason={reason}
                   onChangeColumn={changeColumn}
                   interaction={interaction}
                   resizable={isResizable(column, position)}

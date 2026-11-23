@@ -67,6 +67,7 @@ export default function HeaderCell({
   onPlace,
   onRemoveFromSort,
   offers,
+  columnsReason,
   onChangeColumn,
   onClearRefusal,
   interaction,
@@ -236,6 +237,7 @@ export default function HeaderCell({
           removable={removable}
           hideable={column.hideable !== false}
           offers={offers}
+          columnsReason={columnsReason}
           onPlace={onPlace}
           onRemoveFromSort={onRemoveFromSort}
           onChangeColumn={onChangeColumn}

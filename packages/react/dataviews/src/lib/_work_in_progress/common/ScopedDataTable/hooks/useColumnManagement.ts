@@ -1,9 +1,11 @@
 import type {
   JsonValue,
   PresentationPatch,
+  ReadonlyChannel,
   RowRecord,
   SchemaFieldDefinition,
   ViewPresentation,
+  ViewsState,
 } from "@canonical/dataviews-core";
 import {
   type ColumnCommandConfig,
@@ -70,6 +72,20 @@ const applyPatch = (
       (entry): entry is [string, JsonValue] => entry[1] !== undefined,
     ),
   );
+
+/** What a provider keeping no views is read as: nothing listed, ever. */
+const NO_VIEWS: ReadonlyChannel<ViewsState | null> = {
+  get: () => null,
+  subscribe: () => () => {},
+};
+
+/** Whether the view a link opened is still being listed, and not yet shown. */
+const isListingView = (views: ViewsState | null): boolean =>
+  views?.listing.status === "pending";
+
+/** The view shown, by its id, or null. */
+const readShownView = (views: ViewsState | null): string | null =>
+  views?.current?.id ?? null;
 
 /** The ids an arrangement shows, in its order. */
 const listShownIds = (
@@ -143,6 +159,20 @@ export default function useColumnManagement<
     () => new Map(settings.map(({ column, offers }) => [column.id, offers])),
     [settings],
   );
+  // The view a link opened, while the views are listed and it is not shown.
+  const opened = useDataViewsValue({
+    channel: readProviderHost(provider).view,
+  });
+  const viewsState = provider.views?.state ?? NO_VIEWS;
+  const listing = useDataViewsValue({
+    channel: viewsState,
+    select: isListingView,
+  });
+  const shownView = useDataViewsValue({
+    channel: viewsState,
+    select: readShownView,
+  });
+  const waiting = listing && opened !== null && shownView !== opened;
   const readOffers = useCallback(
     (columnId: string): ColumnSetting["offers"] | null => {
       const offers = offersById.get(columnId);
@@ -150,7 +180,10 @@ export default function useColumnManagement<
         throw new Error(`no column "${columnId}" is declared`);
       }
       // Without settings a table offers no change to its columns.
-      return arranged ? offers : null;
+      if (!arranged) {
+        return null;
+      }
+      return offers;
     },
     [offersById, arranged],
   );
@@ -315,6 +348,7 @@ export default function useColumnManagement<
     settings,
     readOffers,
     resettable,
+    reason: waiting ? messages.columnsPending : null,
     changeColumn,
     resetColumns,
     listDestinations,

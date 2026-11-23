@@ -56,7 +56,7 @@ export function Machines() {
 
 ## Hiding and moving are presentation
 
-What the menu changes is the provider's presentation, read by every table given settings. A column hidden or moved asks the source for nothing: the query, the rows and the URL's query stay as they were. Choosing an item closes the menu and returns focus to the settings button, and the table says what changed politely — "Owner hidden", "Cores moved to position 2 of 4". With a presentation store the arrangement is kept for the viewer; without one it lasts the session. A saved view remembers the arrangement it was saved with, hidden columns included, and resetting while it is open returns to that arrangement.
+What the menu changes is the provider's presentation, read by every table given settings. While a linked view loads, every change is disabled and the menu says why. A column hidden or moved asks the source for nothing: the query, the rows and the URL's query stay as they were. Choosing an item closes the menu and returns focus to the settings button, and the table says what changed politely — "Owner hidden", "Cores moved to position 2 of 4". With a presentation store the arrangement is kept for the viewer; without one it lasts the session. A saved view remembers the arrangement it was saved with, hidden columns included, and resetting while it is open returns to that arrangement.
 
 Hiding a sorted column keeps the ordering: the rows stay ordered by it, and `DataViews.SortPanel` still lists its term, where it can be moved or removed. The heading of the ordering's first term carries `aria-sort` wherever that column now stands; while it is hidden no heading does, and no later term's heading takes the claim over.
 

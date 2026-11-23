@@ -68,6 +68,7 @@ const mount = (props: CaseProps = {}) => {
         reason={null}
         removable={false}
         offers={NONE}
+        columnsReason={null}
         interaction={createGridInteraction(layout)}
         resizable={false}
         bounds={{ min: 50, max: Number.POSITIVE_INFINITY }}
@@ -249,6 +250,7 @@ describe("HeaderCell", () => {
             reason={null}
             removable={false}
             offers={NONE}
+            columnsReason={null}
             interaction={createGridInteraction(
               createColumnLayout({
                 columns: [],

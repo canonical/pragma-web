@@ -48,6 +48,7 @@ const mount = (overrides: Partial<SettingsMenuProps> = {}) => {
   const props: SettingsMenuProps = {
     settings,
     resettable: true,
+    reason: null,
     hydrated: true,
     onChange: vi.fn(),
     onReset: vi.fn(),
@@ -87,6 +88,16 @@ describe("SettingsMenu", () => {
   });
   afterAll(() => {
     uninstall();
+  });
+
+  it("shows why nothing can change yet, first, with every item disabled", async () => {
+    mount({ reason: "Not yet." });
+    const menu = await openMenu();
+    const items = Array.from(menu.querySelectorAll('[role="menuitem"]'));
+    expect(items.at(0)).toHaveTextContent("Not yet.");
+    for (const item of items) {
+      expect(item).toHaveClass("disabled");
+    }
   });
 
   it("holds a closed menu behind its button, named for what it opens", () => {
