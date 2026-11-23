@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="chevron-double-down">
+    <path d="M14.0303 3.03027L8 9.06055L1.96973 3.03027L3.03027 1.96973L8 6.93945L12.9697 1.96973L14.0303 3.03027Z" fill="currentColor"/>
+    <path d="M14.0303 8.03027L8 14.0605L1.96973 8.03027L3.03027 6.96973L8 11.9395L12.9697 6.96973L14.0303 8.03027Z" fill="currentColor"/>
+  </g>
+</svg>

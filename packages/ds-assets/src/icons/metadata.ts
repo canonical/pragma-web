@@ -237,6 +237,62 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     tags: ["arrow", "up", "top", "back", "scroll", "elevate", "return"],
     categories: ["navigation", "action"],
   },
+  bold: {
+    tags: [
+      "text",
+      "format",
+      "typography",
+      "font",
+      "weight",
+      "strong",
+      "b",
+      "editor",
+    ],
+    categories: ["action"],
+    description: "Capital letter B used to apply bold formatting to text.",
+  },
+  bot: {
+    tags: [
+      "robot",
+      "ai",
+      "automation",
+      "assistant",
+      "chatbot",
+      "artificial intelligence",
+      "machine",
+    ],
+    categories: ["object", "product"],
+    description:
+      "Minimalist robot head representing an automated bot or AI assistant.",
+  },
+  "branch-merge": {
+    tags: [
+      "git",
+      "branch",
+      "merge",
+      "pull request",
+      "version control",
+      "combine",
+      "development",
+    ],
+    categories: ["action", "object"],
+    description:
+      "Git branch with a directional arrow indicating the action of merging two branches.",
+  },
+  "branch-merged": {
+    tags: [
+      "git",
+      "merged",
+      "version control",
+      "development",
+      "code",
+      "repository",
+      "combined",
+    ],
+    categories: ["status", "object"],
+    description:
+      "Git branch showing two development branches already merged into one.",
+  },
   bug: {
     tags: [
       "insect",
@@ -417,6 +473,51 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["status"],
   },
+  "chevron-collapse": {
+    tags: [
+      "chevron",
+      "collapse",
+      "close",
+      "fold",
+      "minimize",
+      "shrink",
+      "compact",
+      "vertical",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Inward-pointing chevrons separated by a horizontal line indicating vertical collapse.",
+  },
+  "chevron-double-down": {
+    tags: [
+      "chevron",
+      "double",
+      "down",
+      "arrow",
+      "scroll",
+      "fast forward",
+      "bottom",
+      "direction",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Double downward-pointing chevron used for scrolling down or expanding content.",
+  },
+  "chevron-double-up": {
+    tags: [
+      "chevron",
+      "double",
+      "up",
+      "arrow",
+      "scroll top",
+      "back to top",
+      "direction",
+      "collapse",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Double upward-pointing chevron used for scrolling to the top or collapsing content.",
+  },
   "chevron-down": {
     tags: [
       "chevron",
@@ -430,6 +531,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
       "fold",
     ],
     categories: ["navigation"],
+  },
+  "chevron-expand": {
+    tags: [
+      "chevron",
+      "expand",
+      "open",
+      "unfold",
+      "vertical",
+      "resize",
+      "fullscreen",
+      "stretch",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Up and down chevrons separated by a horizontal line indicating vertical expansion.",
   },
   "chevron-left": {
     tags: [
@@ -566,6 +682,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
       "feedback",
     ],
     categories: ["object"],
+  },
+  confirmed: {
+    tags: [
+      "check",
+      "checkmark",
+      "verified",
+      "approved",
+      "done",
+      "complete",
+      "success",
+      "checkbox",
+    ],
+    categories: ["action", "status"],
+    description:
+      "Square box containing a checkmark indicating confirmation, approval, or completion.",
   },
   connected: {
     tags: [
@@ -766,6 +897,22 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["object"],
   },
+  "emoji-smile": {
+    tags: [
+      "emoji",
+      "smile",
+      "happy",
+      "face",
+      "emotion",
+      "reaction",
+      "positive",
+      "feedback",
+      "emoticon",
+    ],
+    categories: ["status", "object"],
+    description:
+      "Circular smiling face used to express happiness, positive feedback, or reactions.",
+  },
   error: {
     tags: [
       "wrong",
@@ -804,6 +951,51 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["status"],
     description: "Something needs attention.",
   },
+  "exit-fullscreen": {
+    tags: [
+      "exit",
+      "fullscreen",
+      "minimize",
+      "shrink",
+      "collapse",
+      "window",
+      "screen",
+      "restore",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Four inward-facing corner brackets indicating the action of exiting fullscreen mode.",
+  },
+  "expand-down": {
+    tags: [
+      "expand",
+      "down",
+      "arrow",
+      "unfold",
+      "open",
+      "extend",
+      "bottom",
+      "stretch",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Downward-pointing arrow beneath a horizontal line indicating downward expansion.",
+  },
+  "expand-right": {
+    tags: [
+      "expand",
+      "right",
+      "arrow",
+      "open",
+      "sidebar",
+      "panel",
+      "unfold",
+      "extend",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Rightward-pointing arrow next to a vertical line indicating rightward expansion.",
+  },
   "expand-side-nav": {
     tags: [
       "expand",
@@ -820,6 +1012,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["navigation", "action"],
     aliases: ["toggle-side-nav"],
     description: "Expand the side navigation panel.",
+  },
+  "expand-up": {
+    tags: [
+      "expand",
+      "up",
+      "arrow",
+      "unfold",
+      "open",
+      "extend",
+      "top",
+      "stretch",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Upward-pointing arrow above a horizontal line indicating upward expansion.",
   },
   export: {
     tags: [
@@ -930,9 +1137,54 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["action"],
     description: "Scale the view so all of it fits the available space.",
   },
+  "fix-committed": {
+    tags: [
+      "fix",
+      "committed",
+      "resolved",
+      "check",
+      "bugfix",
+      "git",
+      "complete",
+      "verified",
+      "done",
+    ],
+    categories: ["action", "status"],
+    description:
+      "Circle containing a checkmark with diagonal lines indicating a committed fix or resolved issue.",
+  },
+  flag: {
+    tags: [
+      "report",
+      "mark",
+      "bookmark",
+      "milestone",
+      "alert",
+      "priority",
+      "country",
+    ],
+    categories: ["action", "status", "object"],
+    description:
+      "Waving flag on a pole used to mark items, report content, or denote milestones.",
+  },
   folder: {
     tags: ["directory", "storage", "organize", "organise", "browse"],
     categories: ["object"],
+  },
+  "folder-closed": {
+    tags: [
+      "folder",
+      "closed",
+      "directory",
+      "file",
+      "storage",
+      "archive",
+      "document",
+      "organize",
+    ],
+    categories: ["navigation", "object"],
+    description:
+      "Closed file folder representing a directory or document storage.",
   },
   fork: {
     tags: [
@@ -974,6 +1226,38 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["object"],
   },
+  "git-commit": {
+    tags: [
+      "git",
+      "commit",
+      "horizontal",
+      "version control",
+      "node",
+      "history",
+      "repository",
+      "code",
+      "save",
+    ],
+    categories: ["status", "object"],
+    description:
+      "Circle intersected by a horizontal line representing a Git commit node in a repository history.",
+  },
+  "git-commit-vertical": {
+    tags: [
+      "git",
+      "commit",
+      "vertical",
+      "version control",
+      "node",
+      "history",
+      "timeline",
+      "repository",
+      "code",
+    ],
+    categories: ["status", "object"],
+    description:
+      "Circle intersected by a vertical line representing a Git commit node in a vertical timeline.",
+  },
   github: {
     tags: [
       "code",
@@ -991,6 +1275,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
       "brand",
     ],
     categories: ["social-brand"],
+  },
+  heading: {
+    tags: [
+      "title",
+      "header",
+      "h",
+      "text",
+      "format",
+      "typography",
+      "editor",
+      "structure",
+    ],
+    categories: ["action"],
+    description:
+      "Capital letter H used to format text as a heading or section title.",
   },
   help: {
     tags: [
@@ -1159,6 +1458,37 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["product"],
     description: "An ISO disc image.",
+  },
+  italic: {
+    tags: [
+      "text",
+      "format",
+      "typography",
+      "font",
+      "slant",
+      "emphasis",
+      "i",
+      "editor",
+    ],
+    categories: ["action"],
+    description:
+      "Slanted capital letter I used to apply italic formatting to text.",
+  },
+  "jump-to-element": {
+    tags: [
+      "jump",
+      "go to",
+      "element",
+      "focus",
+      "target",
+      "navigate",
+      "anchor",
+      "link",
+      "open",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Diagonal arrow pointing into an open square bracket representing jumping to or focusing on an element.",
   },
   keyboard: {
     tags: [
@@ -1506,6 +1836,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["action", "product"],
     description: "Attach a storage device to the filesystem.",
   },
+  "no-comments": {
+    tags: [
+      "disable comments",
+      "mute",
+      "chat",
+      "bubble",
+      "slash",
+      "off",
+      "disabled",
+      "feedback",
+    ],
+    categories: ["action", "status"],
+    description:
+      "Speech bubble crossed out by a diagonal slash indicating that comments are disabled.",
+  },
   notifications: {
     tags: ["bell", "alert", "reminder", "alarm", "message", "sound", "signal"],
     categories: ["object"],
@@ -1524,6 +1869,20 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["object"],
     aliases: ["turn-off-notification"],
   },
+  "numbered-list": {
+    tags: [
+      "ordered list",
+      "list",
+      "items",
+      "format",
+      "text",
+      "sequence",
+      "editor",
+    ],
+    categories: ["action"],
+    description:
+      "Number one next to three horizontal lines representing an ordered or numbered list.",
+  },
   "open-terminal": {
     tags: [
       "terminal",
@@ -1541,6 +1900,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
       "open",
     ],
     categories: ["action"],
+  },
+  "paint-brush": {
+    tags: [
+      "brush",
+      "theme",
+      "style",
+      "design",
+      "color",
+      "customize",
+      "appearance",
+      "art",
+    ],
+    categories: ["action", "object", "theme"],
+    description:
+      "Angled paintbrush used for styling, theming, or visual customization.",
   },
   paste: {
     tags: ["clipboard", "insert", "place", "duplicate", "document", "file"],
@@ -1777,6 +2151,36 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["status"],
     aliases: ["status-queued"],
   },
+  quote: {
+    tags: [
+      "quotation",
+      "citation",
+      "blockquote",
+      "text",
+      "format",
+      "marks",
+      "speech",
+      "editor",
+    ],
+    categories: ["action", "object"],
+    description:
+      "Double quotation marks used to format text as a quote or citation.",
+  },
+  reply: {
+    tags: [
+      "respond",
+      "back",
+      "arrow",
+      "left",
+      "message",
+      "email",
+      "comment",
+      "answer",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Curved left-pointing arrow used for replying to a message, email, or comment.",
+  },
   repository: {
     tags: [
       "storage",
@@ -1911,6 +2315,37 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["action"],
     description:
       "A camera inside capture corners: capture a still image of the screen.",
+  },
+  "scroll-to-bottom": {
+    tags: [
+      "scroll",
+      "bottom",
+      "down",
+      "chevron",
+      "end",
+      "page down",
+      "navigate",
+      "line",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Downward-pointing chevron above a horizontal line indicating scrolling to the bottom.",
+  },
+  "scroll-to-top": {
+    tags: [
+      "scroll",
+      "top",
+      "up",
+      "chevron",
+      "back to top",
+      "beginning",
+      "page up",
+      "navigate",
+      "line",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Upward-pointing chevron beneath a horizontal line indicating scrolling back to the top.",
   },
   search: {
     tags: [
@@ -2075,6 +2510,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["action"],
   },
+  "side-panel": {
+    tags: [
+      "sidebar",
+      "drawer",
+      "layout",
+      "arrow",
+      "right",
+      "frame",
+      "interface",
+      "view",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Right-pointing arrow entering a framed area representing opening or interacting with a side panel.",
+  },
   "single-host": {
     tags: [
       "host",
@@ -2088,6 +2538,101 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["product"],
     description: "A single host outside a cluster.",
+  },
+  skip: {
+    tags: [
+      "ignore",
+      "bypass",
+      "slash",
+      "circle",
+      "disabled",
+      "omit",
+      "status",
+      "pass",
+    ],
+    categories: ["action", "status"],
+    description:
+      "Circle containing a diagonal slash representing a skipped, bypassed, or omitted state.",
+  },
+  "skip-circle": {
+    tags: [
+      "skip",
+      "next",
+      "forward",
+      "circle",
+      "media",
+      "control",
+      "step",
+      "advance",
+      "track",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Circle containing a right-pointing chevron and vertical bar indicating skipping to the next item.",
+  },
+  "skip-to-bottom": {
+    tags: [
+      "skip",
+      "bottom",
+      "down",
+      "double chevron",
+      "end",
+      "jump",
+      "navigate",
+      "page down",
+      "line",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Double downward-pointing chevrons above a horizontal line indicating skipping directly to the bottom.",
+  },
+  "skip-to-end": {
+    tags: [
+      "skip",
+      "end",
+      "last",
+      "forward",
+      "double chevron",
+      "right",
+      "media",
+      "next",
+      "fast forward",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Double right-pointing chevrons next to a vertical bar indicating skipping to the end.",
+  },
+  "skip-to-start": {
+    tags: [
+      "skip",
+      "start",
+      "first",
+      "back",
+      "rewind",
+      "double chevron",
+      "left",
+      "media",
+      "beginning",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Double left-pointing chevrons next to a vertical bar indicating skipping back to the start.",
+  },
+  "skip-to-top": {
+    tags: [
+      "skip",
+      "top",
+      "up",
+      "double chevron",
+      "start",
+      "jump",
+      "navigate",
+      "back to top",
+      "line",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Double upward-pointing chevrons beneath a horizontal line indicating skipping directly to the top.",
   },
   snapshot: {
     tags: [
@@ -2106,6 +2651,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
   snooze: {
     tags: ["sleep", "nap", "rest", "tired", "zzz", "slumber"],
     categories: ["action"],
+  },
+  sort: {
+    tags: [
+      "order",
+      "arrange",
+      "up",
+      "down",
+      "arrows",
+      "filter",
+      "ascending",
+      "descending",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Opposing vertical up and down arrows used to sort or reorder items.",
   },
   spinner: {
     tags: [
@@ -2435,6 +2995,81 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["object"],
   },
+  "task-list": {
+    tags: [
+      "checklist",
+      "todo",
+      "tasks",
+      "check",
+      "checkbox",
+      "items",
+      "list",
+      "format",
+    ],
+    categories: ["action", "object"],
+    description:
+      "Square checkbox and checkmark next to horizontal lines representing a task list or to-do items.",
+  },
+  terminal: {
+    tags: [
+      "console",
+      "command line",
+      "cli",
+      "shell",
+      "bash",
+      "prompt",
+      "code",
+      "developer",
+    ],
+    categories: ["action", "object", "product"],
+    description:
+      "Outlined window frame containing a command prompt symbol representing a terminal or command-line interface.",
+  },
+  "terminal-fill": {
+    tags: [
+      "terminal",
+      "console",
+      "command line",
+      "cli",
+      "shell",
+      "bash",
+      "prompt",
+      "code",
+      "developer",
+    ],
+    categories: ["action", "object", "product"],
+    description:
+      "Filled window containing a command prompt symbol indicating opening a terminal or console.",
+  },
+  text: {
+    tags: [
+      "typography",
+      "paragraph",
+      "content",
+      "format",
+      "t",
+      "lines",
+      "editor",
+      "document",
+    ],
+    categories: ["action", "object"],
+    description:
+      "Capital letter T next to horizontal lines representing formatted text or paragraph content.",
+  },
+  "three-dots": {
+    tags: [
+      "more",
+      "options",
+      "menu",
+      "ellipsis",
+      "overflow",
+      "actions",
+      "settings",
+    ],
+    categories: ["navigation", "action"],
+    description:
+      "Three horizontal dots used to open an overflow menu or reveal additional options.",
+  },
   "thumbs-down": {
     tags: [
       "dislike",
@@ -2497,6 +3132,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
       "canceled",
     ],
     categories: ["status"],
+  },
+  triaged: {
+    tags: [
+      "check",
+      "reviewed",
+      "prioritized",
+      "queue",
+      "status",
+      "verified",
+      "organized",
+      "issue",
+    ],
+    categories: ["action", "status"],
+    description:
+      "Checkmark positioned between two horizontal lines indicating an issue or item has been reviewed and triaged.",
   },
   units: {
     tags: [

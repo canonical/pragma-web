@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="numbered-list">
+    <path d="M13 7.25V8.75H7V7.25H13Z" fill="currentColor"/>
+    <path d="M15 2V3.5H7V2H15Z" fill="currentColor"/>
+    <path d="M15 12.5V14H7V12.5H15Z" fill="currentColor"/>
+    <path d="M2.89599 9.25001V4.01051C2.75599 4.10151 2.60199 4.18901 2.43399 4.27301C2.27299 4.35701 2.10849 4.43401 1.94049 4.50401C1.77249 4.57401 1.60449 4.63701 1.43649 4.69301L0.963989 3.48551C1.37699 3.31751 1.80399 3.10401 2.24499 2.84501C2.69299 2.58601 3.06749 2.29551 3.36849 1.97351H4.46049V9.25001H2.89599Z" fill="currentColor"/>
+  </g>
+</svg>

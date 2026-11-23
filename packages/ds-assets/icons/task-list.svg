@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="task-list">
+    <path d="M13 7.25V8.75H8V7.25H13Z" fill="currentColor"/>
+    <path d="M15 2V3.5H8V2H15Z" fill="currentColor"/>
+    <path d="M15 12.5V14H8V12.5H15Z" fill="currentColor"/>
+    <path d="M6 2V7H1V2H6ZM2.5 5.5H4.5V3.5H2.5V5.5Z" fill="currentColor"/>
+    <path d="M6.53027 10.0303L3 13.5605L0.469727 11.0303L1.53027 9.96973L3 11.4395L5.46973 8.96973L6.53027 10.0303Z" fill="currentColor"/>
+  </g>
+</svg>

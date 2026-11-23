@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="chevron-collapse">
+    <path d="M3.96973 13.9697L8 9.93945L12.0303 13.9697L10.9697 15.0303L8 12.0605L5.03027 15.0303L3.96973 13.9697Z" fill="currentColor"/>
+    <path d="M12.0303 2.03027L8 6.06055L3.96973 2.03027L5.03027 0.969727L8 3.93945L10.9697 0.969727L12.0303 2.03027Z" fill="currentColor"/>
+    <path d="M15 7.25V8.75H1V7.25H15Z" fill="currentColor"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="side-panel">
+    <path d="M12.5 15C13.3284 15 14 14.3284 14 13.5V10.25H12.5V13.5H10.25V15H12.5Z" fill="currentColor"/>
+    <path d="M12.5 1C13.3284 1 14 1.67157 14 2.5V5.75H12.5V2.5H10.25V1L12.5 1Z" fill="currentColor"/>
+    <path d="M5.75 15C4.92157 15 4.25 14.3284 4.25 13.5V10.25H5.75V13.5H8V15H5.75Z" fill="currentColor"/>
+    <path d="M5.75 1C4.92157 1 4.25 1.67157 4.25 2.5V5.75H5.75V2.5H8V1L5.75 1Z" fill="currentColor"/>
+    <path d="M12.0605 8L8.53027 11.5303L7.46973 10.4697L9.18945 8.75H1V7.25H9.18945L7.46973 5.53027L8.53027 4.46973L12.0605 8Z" fill="currentColor"/>
+  </g>
+</svg>
