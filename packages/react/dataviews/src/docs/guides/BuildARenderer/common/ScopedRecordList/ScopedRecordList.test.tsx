@@ -137,7 +137,7 @@ describe("ScopedRecordList", () => {
       });
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows could not be refreshed: offline",
+      "These rows could not be refreshed: offline.",
     );
     expect(getRegion().getAllByRole("listitem")).toHaveLength(2);
   });

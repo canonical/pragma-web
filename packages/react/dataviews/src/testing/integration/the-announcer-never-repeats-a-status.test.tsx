@@ -128,7 +128,7 @@ describe("the announcer never repeats a status", () => {
     });
     expect(
       screen.getByText(
-        "These rows could not be refreshed: the server is offline",
+        "These rows could not be refreshed: the server is offline.",
       ),
     ).toBeInTheDocument();
     expect(await readAnnouncements()).toEqual([]);

@@ -9,19 +9,7 @@ describe("fr", () => {
     );
   });
 
-  it("states statuses without the reason's full stops", () => {
-    expect(fr.statusFailed("timeout.")).toBe(
-      "Ces lignes n’ont pas pu être chargées : timeout",
-    );
-    expect(fr.statusRefreshFailed("timeout")).toBe(
-      "Ces lignes n’ont pas pu être actualisées : timeout",
-    );
-    expect(fr.statusStale("moved")).toBe(
-      "Ces lignes ne correspondent pas à la requête actuelle : moved",
-    );
-  });
-
-  it.fails("ends each status with a full stop, and a blank reason plainly", () => {
+  it("ends each status with a full stop, and a blank reason plainly", () => {
     expect(fr.statusFailed("timeout.")).toBe(
       "Ces lignes n’ont pas pu être chargées : timeout.",
     );

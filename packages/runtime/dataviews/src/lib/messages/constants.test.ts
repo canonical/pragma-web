@@ -15,7 +15,7 @@ const unknown = { kind: "unknown" } as const;
 
 describe("constants", () => {
   describe("DEFAULT_MESSAGES", () => {
-    it.fails("ends each status with a full stop, and a blank reason plainly", () => {
+    it("ends each status with a full stop, and a blank reason plainly", () => {
       expect(m.statusRefreshFailed(" . ")).toBe(
         "These rows could not be refreshed.",
       );
@@ -27,13 +27,13 @@ describe("constants", () => {
     it("words the table's status row", () => {
       expect(m.statusPending).toBe("Loading…");
       expect(m.statusFailed("timeout")).toBe(
-        "These rows could not be loaded: timeout",
+        "These rows could not be loaded: timeout.",
       );
       expect(m.statusRefreshFailed("timeout")).toBe(
-        "These rows could not be refreshed: timeout",
+        "These rows could not be refreshed: timeout.",
       );
       expect(m.statusStale("offline")).toBe(
-        "These rows do not match the current query: offline",
+        "These rows do not match the current query: offline.",
       );
       expect(m.statusNoResults).toBe("No rows match this query.");
       expect(m.statusNoData).toBe("There is nothing here yet.");
@@ -102,13 +102,13 @@ describe("constants", () => {
 
     it("runs a status on from its reason, stripped of the stop it came with", () => {
       expect(m.statusFailed("timeout.")).toBe(
-        "These rows could not be loaded: timeout",
+        "These rows could not be loaded: timeout.",
       );
       expect(m.statusRefreshFailed("timeout.")).toBe(
-        "These rows could not be refreshed: timeout",
+        "These rows could not be refreshed: timeout.",
       );
       expect(m.statusStale("offline.")).toBe(
-        "These rows do not match the current query: offline",
+        "These rows do not match the current query: offline.",
       );
     });
 
