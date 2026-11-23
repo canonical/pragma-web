@@ -256,6 +256,11 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   clearSelection: (count) =>
     `Deselect ${formatCount(count)} ${choosePlural(count, "row", "rows")}`,
 
+  chartPending: "Loading…",
+  chartFailed: (reason) =>
+    composeStatus("This chart could not be loaded", reason),
+  chartRefreshFailed: (reason) =>
+    composeStatus("This chart could not be refreshed", reason),
   facetCountsAbsent: "The source answered no counts for this field.",
   facetRangeAbsent: "The source answered no range for this field.",
   facetValuesNone: "No matching record holds a value.",

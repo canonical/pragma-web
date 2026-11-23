@@ -193,6 +193,20 @@ describe("fr", () => {
     );
   });
 
+  it("states a chart's own status", () => {
+    expect(fr.chartPending).toBe("Chargement…");
+    expect(fr.chartFailed("hors ligne.")).toBe(
+      "Ce graphique n’a pas pu être chargé : hors ligne.",
+    );
+    expect(fr.chartFailed("")).toBe("Ce graphique n’a pas pu être chargé.");
+    expect(fr.chartRefreshFailed("hors ligne")).toBe(
+      "Ce graphique n’a pas pu être actualisé : hors ligne.",
+    );
+    expect(fr.chartRefreshFailed(" . ")).toBe(
+      "Ce graphique n’a pas pu être actualisé.",
+    );
+  });
+
   it("summarises charts", () => {
     expect(fr.barChartSummary("Statut")).toBe(
       "Statut : un diagramme en barres du nombre d’enregistrements par valeur",

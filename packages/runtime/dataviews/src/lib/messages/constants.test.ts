@@ -423,6 +423,17 @@ describe("constants", () => {
       );
     });
 
+    it("words a chart's own status, never its rows", () => {
+      expect(m.chartPending).toBe("Loading…");
+      expect(m.chartFailed("offline.")).toBe(
+        "This chart could not be loaded: offline.",
+      );
+      expect(m.chartFailed(" ")).toBe("This chart could not be loaded.");
+      expect(m.chartRefreshFailed("offline")).toBe(
+        "This chart could not be refreshed: offline.",
+      );
+    });
+
     it("words the facet charts, naming each drawing by its caption", () => {
       expect(m.facetCountsAbsent).toBe(
         "The source answered no counts for this field.",

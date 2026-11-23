@@ -359,6 +359,12 @@ export type DataViewsMessages = {
   readonly clearSelection: (count: number) => string;
 
   // The facet charts.
+  /** A chart's facet is on its way. */
+  readonly chartPending: string;
+  /** A chart's facet could not be loaded, and why. */
+  readonly chartFailed: (reason: string) => string;
+  /** A chart's facet could not be refreshed, and why; the drawing stays. */
+  readonly chartRefreshFailed: (reason: string) => string;
   /** The source answered a result, but counted nothing for the field drawn. */
   readonly facetCountsAbsent: string;
   /** The source answered a result, but measured no range for the field drawn. */

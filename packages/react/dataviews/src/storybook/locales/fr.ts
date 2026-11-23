@@ -247,6 +247,15 @@ const fr: DataViewsMessages = {
   clearSelection: (rows) =>
     `Désélectionner ${count(rows)} ${choosePlural(rows, "ligne", "lignes")}`,
 
+  chartPending: "Chargement…",
+  chartFailed: (reason) =>
+    trimClause(reason) === ""
+      ? "Ce graphique n’a pas pu être chargé."
+      : `Ce graphique n’a pas pu être chargé : ${trimClause(reason)}.`,
+  chartRefreshFailed: (reason) =>
+    trimClause(reason) === ""
+      ? "Ce graphique n’a pas pu être actualisé."
+      : `Ce graphique n’a pas pu être actualisé : ${trimClause(reason)}.`,
   facetCountsAbsent: "La source n’a fourni aucun décompte pour ce champ.",
   facetRangeAbsent: "La source n’a fourni aucune plage pour ce champ.",
   facetValuesNone: "Aucun enregistrement correspondant n’a de valeur.",
