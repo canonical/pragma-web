@@ -16,11 +16,10 @@ function Detached(): ReactElement {
 
 /** A host that mounts its one row, marking the body busy while measuring. */
 function Attached(): ReactElement {
-  const virtual = useVirtualRows(entries, 32, model);
-  const { body, readRowRef } = virtual;
+  const { body, readRowRef, measuring } = useVirtualRows(entries, 32, model);
   return (
     <table>
-      <tbody ref={body} aria-busy={Reflect.get(virtual, "measuring")}>
+      <tbody ref={body} aria-busy={measuring}>
         {entries.map((entry) => (
           <tr key={entry.id} ref={readRowRef(entry.id)}>
             <td>{entry.id}</td>
@@ -42,7 +41,7 @@ describe("useVirtualRows", () => {
     );
   });
 
-  it.fails("is measuring while a mounted row awaits its first measurement", () => {
+  it("is measuring while a mounted row awaits its first measurement", () => {
     render(<Attached />);
     expect(screen.getAllByRole("rowgroup").at(0)).toHaveAttribute(
       "aria-busy",
@@ -50,7 +49,7 @@ describe("useVirtualRows", () => {
     );
   });
 
-  it.fails("is never measuring where nothing can measure", () => {
+  it("is never measuring where nothing can measure", () => {
     vi.stubGlobal("ResizeObserver", undefined);
     onTestFinished(() => {
       vi.unstubAllGlobals();

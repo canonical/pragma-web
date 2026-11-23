@@ -13,6 +13,8 @@ import type { EntryPlacement } from "../types.js";
 export type UseVirtualRowsResult = {
   /** The entries to mount, as runs, and the space of the rest. */
   readonly mounted: MountedRange;
+  /** A mounted row awaits its first measurement, or a correction is due. */
+  readonly measuring: boolean;
   /** The body row group; its parent is the scroll viewport. */
   readonly body: RefObject<HTMLTableSectionElement | null>;
   /**

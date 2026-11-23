@@ -739,7 +739,7 @@ describe("virtualized DataTable", () => {
       expect(table.scrollTop).toBe(4990);
     });
 
-    it.fails("is busy until each mounted row is measured", () => {
+    it("is busy until each mounted row is measured", () => {
       const { table } = renderVirtualizedTable();
       const body = getBody(table);
       expect(body).toHaveAttribute("aria-busy", "true");
@@ -754,7 +754,7 @@ describe("virtualized DataTable", () => {
       expect(body).toHaveAttribute("aria-busy", "false");
     });
 
-    it.fails("is busy again for the rows a scroll mounts", () => {
+    it("is busy again for the rows a scroll mounts", () => {
       const { table } = renderVirtualizedTable();
       const body = getBody(table);
       report(listMountedHosts().map((host) => [getRow(host), 10] as const));
@@ -764,7 +764,7 @@ describe("virtualized DataTable", () => {
       expect(body).toHaveAttribute("aria-busy", "false");
     });
 
-    it.fails("is not busy once a correction lands", () => {
+    it("is not busy once a correction lands", () => {
       const { table } = renderVirtualizedTable();
       report(buildMachines(5).map((row) => [getRow(row.name), 20] as const));
       scrollTo(table, 5000);
@@ -776,7 +776,7 @@ describe("virtualized DataTable", () => {
       expect(getBody(table)).toHaveAttribute("aria-busy", "false");
     });
 
-    it.fails("is never busy where nothing can measure", () => {
+    it("is never busy where nothing can measure", () => {
       vi.stubGlobal("ResizeObserver", undefined);
       const { table } = renderVirtualizedTable();
       expect(getBody(table)).toHaveAttribute("aria-busy", "false");

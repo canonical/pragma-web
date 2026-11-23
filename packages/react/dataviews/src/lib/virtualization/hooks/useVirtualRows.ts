@@ -105,6 +105,9 @@ export default function useVirtualRows(
   const body = useRef<HTMLTableSectionElement>(null);
   // The entry id of every mounted row element.
   const [measured] = useState(() => new Map<Element, string>());
+  // The mounted rows not measured since they were attached.
+  const [awaiting] = useState(() => new Set<Element>());
+  const [measuring, setMeasuring] = useState(false);
   const observer = useRef<ResizeObserver | null>(null);
   const shift = useRef(0);
   const previous = useRef<Snapshot>({ entries, model, tracks });
@@ -167,6 +170,7 @@ export default function useVirtualRows(
       const attach = (node: HTMLTableRowElement): (() => void) => {
         refs.set(id, attach);
         measured.set(node, id);
+        awaiting.add(node);
         observer.current?.observe(node);
         // A row can hold focus before it is attached: a control focused
         // while hydrating, or a row a new range mounts again.
@@ -176,12 +180,20 @@ export default function useVirtualRows(
         return () => {
           observer.current?.unobserve(node);
           measured.delete(node);
+          awaiting.delete(node);
           refs.delete(id);
         };
       };
       return attach;
     };
-  }, [range, measured]);
+  }, [range, measured, awaiting]);
+
+  // Set from the commit and from each report.
+  const updateMeasuring = useCallback((): void => {
+    setMeasuring(
+      observer.current !== null && (awaiting.size > 0 || reassert.current),
+    );
+  }, [awaiting]);
 
   const handleFocus = useCallback(
     (event: FocusEvent<HTMLTableSectionElement>): void => {
@@ -231,6 +243,7 @@ export default function useVirtualRows(
               if (id !== undefined && box !== undefined) {
                 sizes.push([id, box.blockSize]);
                 rowWidth = box.inlineSize;
+                awaiting.delete(record.target);
               }
             }
             // The rows share one width: a new one outdates every row not
@@ -249,6 +262,7 @@ export default function useVirtualRows(
             if (!reassert.current) {
               place();
             }
+            updateMeasuring();
           });
     observer.current = resizes;
     resizes?.observe(viewport);
@@ -268,7 +282,7 @@ export default function useVirtualRows(
       resizes?.disconnect();
       observer.current = null;
     };
-  }, [range, measured, place, correct]);
+  }, [range, measured, awaiting, place, correct, updateMeasuring]);
 
   // After the rows commit: make the scroll the entries asked for, and
   // forget the heights the change outdated — every row's not mounted when
@@ -299,10 +313,12 @@ export default function useVirtualRows(
       readViewport(body.current).scrollTop = expected.current;
       place();
     }
+    updateMeasuring();
   });
 
   return {
     mounted,
+    measuring,
     body,
     readRowRef,
     onFocus: handleFocus,
