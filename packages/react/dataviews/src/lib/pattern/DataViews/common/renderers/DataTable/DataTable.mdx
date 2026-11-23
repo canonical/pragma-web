@@ -116,6 +116,7 @@ To open on an order, issue it once the provider is built, before anything observ
 
 ```tsx
 import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+import type { Machine } from "./machines.js";
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host" },
@@ -123,12 +124,14 @@ const columns: readonly DataTableColumn[] = [
   { id: "owner", header: "Owner" },
 ];
 
+const nameMachine = (machine: Machine) => machine.name;
+
 <DataTable
   provider={provider}
   columns={columns}
   label="Machines"
   selectable
-  getRowLabel={(row) => row.name}
+  getRowLabel={nameMachine}
 />;
 ```
 
@@ -169,7 +172,7 @@ import {
   useDataViewsCell,
   useDataViewsValue,
 } from "@canonical/dataviews-react";
-import { machineCollection } from "./machines.js";
+import { type Machine, machineCollection } from "./machines.js";
 
 function HostCell({ value }: DisplayFieldCellProps) {
   // The collection is the witness: the record is typed as a machine.
@@ -195,12 +198,14 @@ const columns: readonly DataTableColumn[] = [
   { id: "status", header: "Status" },
 ];
 
+const nameMachine = (machine: Machine) => machine.name;
+
 <DataTable
   provider={provider}
   columns={columns}
   label="Machines"
   selectable
-  getRowLabel={(row) => row.name}
+  getRowLabel={nameMachine}
 />;
 ```
 
