@@ -824,6 +824,7 @@ export const MESSAGE_SAMPLES: {
       { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
     ],
   ],
+  filtersDisclosure: [[{ applied: 0 }], [{ applied: 3 }]],
   queryContradiction: [[{ label: MESSAGE_MARK }]],
   mergeClauses: [[{ label: MESSAGE_MARK }]],
   clausesMerged: [

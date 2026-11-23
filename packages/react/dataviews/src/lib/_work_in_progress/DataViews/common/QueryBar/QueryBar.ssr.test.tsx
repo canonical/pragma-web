@@ -73,6 +73,11 @@ describe("DataViews.QueryBar SSR", () => {
     expect(readKeys("Remove Search for alder")).not.toContain("q");
     // Clearing the filters replaces the refused one too.
     expect(readKeys("Clear filters and search")).toEqual(["page", "size"]);
+    // The filters form, disclosed; two filter chips, cores' range once.
+    expect(html).toContain(
+      '<details class="ds data-views-query-bar-filters-disclosure filters">',
+    );
+    expect(html).toContain("Filters (2)");
     // Only the refused chip's own clear removes its parameter.
     expect(readHref(html, "Clear status")).toBe(
       "?status=failed&cores__gte=2&cores__lte=8&q=alder",
@@ -103,6 +108,7 @@ describe("DataViews.QueryBar SSR", () => {
     });
     const html = renderBar(provider);
     expect(html).not.toContain("<form");
+    expect(html).not.toContain("<details");
     expect(html).not.toContain("name=");
     expect(html).not.toMatch(/<a [^>]*href=/);
     expect(html).toContain('value="alder"');

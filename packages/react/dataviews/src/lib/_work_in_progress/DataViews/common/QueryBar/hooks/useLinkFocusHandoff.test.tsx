@@ -48,6 +48,40 @@ describe("useLinkFocusHandoff", () => {
     expect(document.activeElement).toBe(root.querySelectorAll("button")[1]);
   });
 
+  it("hands focus in the filters' disclosure to its match, or else the entry", () => {
+    const root = document.createElement("div");
+    root.innerHTML =
+      '<details class="ds data-views-query-bar-filters-disclosure" open><summary>Filters (1)</summary><input type="checkbox" aria-label="ready"></details>';
+    document.body.append(root);
+    onTestFinished(() => root.remove());
+    root.querySelector("summary")?.setAttribute("tabindex", "0");
+    root.querySelector<HTMLElement>("summary")?.focus();
+    const { rerender } = renderHook(
+      ({ hydrated }) =>
+        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      { initialProps: { hydrated: false } },
+    );
+    root.innerHTML = '<input data-roving-item="entry" aria-label="Filter">';
+    rerender({ hydrated: true });
+    expect(document.activeElement).toBe(root.querySelector("input"));
+  });
+
+  it("leaves focus on a control that stays", () => {
+    const root = document.createElement("div");
+    root.innerHTML = '<input aria-label="Filter">';
+    document.body.append(root);
+    onTestFinished(() => root.remove());
+    const input = root.querySelector("input");
+    input?.focus();
+    const { rerender } = renderHook(
+      ({ hydrated }) =>
+        useLinkFocusHandoff({ rootRef: { current: root }, hydrated }),
+      { initialProps: { hydrated: false } },
+    );
+    rerender({ hydrated: true });
+    expect(document.activeElement).toBe(input);
+  });
+
   it("moves nothing when no button takes the name, or no link held focus", () => {
     const root = createRoot();
     const { rerender } = renderHook(

@@ -288,6 +288,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     composeOutcome(`Added ${clause}.`, count, noun),
   clauseChanged: (clause, count, noun) =>
     composeOutcome(`Changed to ${clause}.`, count, noun),
+  filtersDisclosure: ({ applied }) =>
+    applied === 0 ? "Filters" : `Filters (${formatCount(applied)})`,
   queryContradiction: ({ label }) =>
     `The ${label} filters cannot all hold, so nothing matches.`,
   mergeClauses: ({ label }) => `Merge the ${label} filters`,

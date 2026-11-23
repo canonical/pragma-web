@@ -367,6 +367,11 @@ export type DataViewsMessages = {
     noun: RecordNoun,
   ) => string;
   /**
+   * The query bar's disclosure of the filters form before scripts run, by
+   * how many filter chips the bar shows, a range counting once.
+   */
+  readonly filtersDisclosure: (facts: { readonly applied: number }) => string;
+  /**
    * A warning that a field's clauses cannot all hold, so the query matches
    * nothing, by the field's label.
    */

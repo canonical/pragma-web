@@ -1754,6 +1754,16 @@ describe("QueryBar", () => {
       expect(screen.queryByRole("button", { name: "Clear status" })).toBeNull();
     });
 
+    it("hands focus in the filters' disclosure to the entry once it goes", async () => {
+      await hydrate("/hosts?status=deployed", (container) => {
+        const summary = container.querySelector<HTMLElement>(
+          ".ds.data-views-query-bar-filters-disclosure summary",
+        );
+        summary?.focus();
+      });
+      await waitFor(() => expect(findEntry()).toHaveFocus());
+    });
+
     it("moves no focus that no link held", async () => {
       const before = document.activeElement;
       await hydrate("/hosts?status=deployed", () => {});

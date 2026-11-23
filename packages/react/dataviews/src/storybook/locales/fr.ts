@@ -255,6 +255,8 @@ const fr: DataViewsMessages = {
     outcome(`${spoken} ajouté.`, counted, noun),
   clauseChanged: (spoken, counted, noun) =>
     outcome(`Remplacé par ${spoken}.`, counted, noun),
+  filtersDisclosure: ({ applied }) =>
+    applied === 0 ? "Filtres" : `Filtres (${count(applied)})`,
   queryContradiction: ({ label }) =>
     `Les filtres ${label} ne peuvent pas tous être vrais : rien ne correspond.`,
   mergeClauses: ({ label }) => `Fusionner les filtres ${label}`,

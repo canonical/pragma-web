@@ -16,7 +16,8 @@ const readChipId = (control: Element): string | null =>
  * Hand focus from a link drawn before scripts to the button that takes its
  * place once they run: a reader who tabbed to a Remove or Clear link stays
  * on its control. Matched by name and chip within the bar, not by a
- * selector built from a field's name.
+ * selector built from a field's name. Focus in the filters' disclosure,
+ * which goes once scripts run, goes to its match, or else to the entry.
  *
  * @param props - The bar's root, and whether scripts have taken over.
  */
@@ -25,10 +26,12 @@ export default function useLinkFocusHandoff({
   rootRef,
   hydrated,
 }: UseLinkFocusHandoffProps): void {
-  // The name and chip of the link that held focus as scripts took over.
+  // What held focus as scripts took over: a link's name and chip, and
+  // whether it sat in the filters' disclosure, which goes once they run.
   const handed = useRef<{
     readonly name: string | null;
     readonly chipId: string | null;
+    readonly isInDisclosure: boolean;
   } | null>(null);
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -36,10 +39,17 @@ export default function useLinkFocusHandoff({
     if (root === null) return;
     const active = root.ownerDocument.activeElement;
     if (!hydrated) {
-      handed.current =
-        active instanceof HTMLAnchorElement && root.contains(active)
-          ? { name: readName(active), chipId: readChipId(active) }
-          : null;
+      handed.current = null;
+      if (active === null || !root.contains(active)) return;
+      const isInDisclosure =
+        active.closest(".ds.data-views-query-bar-filters-disclosure") !== null;
+      if (active instanceof HTMLAnchorElement || isInDisclosure) {
+        handed.current = {
+          name: readName(active),
+          chipId: readChipId(active),
+          isInDisclosure,
+        };
+      }
       return;
     }
     const held = handed.current;
@@ -53,6 +63,10 @@ export default function useLinkFocusHandoff({
         button.focus();
         return;
       }
+    }
+    // A control of the disclosure with no match hands focus to the entry.
+    if (held.isInDisclosure) {
+      root.querySelector<HTMLElement>('[data-roving-item="entry"]')?.focus();
     }
   }, [hydrated, rootRef]);
 }

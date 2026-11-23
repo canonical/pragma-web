@@ -28,6 +28,7 @@ import { QueryInput } from "../../../QueryInput/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
 import canTakeEntry from "./canTakeEntry.js";
 import { DraftChip } from "./common/DraftChip/index.js";
+import { FiltersDisclosure } from "./common/FiltersDisclosure/index.js";
 import {
   MessageLine,
   type MessageLineEntry,
@@ -1616,6 +1617,17 @@ export default function QueryBar({
     >
       <SearchForm hasHref={hasHref}>{field}</SearchForm>
       <MessageLine className="messages" entries={entries} />
+      {hasHref && !hydrated && (
+        <FiltersDisclosure
+          className="filters"
+          // The filter chips shown: a range counts once.
+          applied={
+            clauses.filter(
+              ({ kind }) => kind === "predicate" || kind === "range",
+            ).length
+          }
+        />
+      )}
     </div>
   );
 }

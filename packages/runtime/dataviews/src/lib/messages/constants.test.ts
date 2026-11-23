@@ -567,6 +567,8 @@ describe("constants", () => {
         upper: "at most 64 GiB",
       }),
     ).toBe("memory at least 8 GiB and at most 64 GiB");
+    expect(m.filtersDisclosure({ applied: 0 })).toBe("Filters");
+    expect(m.filtersDisclosure({ applied: 1200 })).toBe("Filters (1,200)");
     expect(m.queryContradiction({ label: "memory" })).toBe(
       "The memory filters cannot all hold, so nothing matches.",
     );
