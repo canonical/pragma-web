@@ -216,7 +216,7 @@ export default function SavedViews({
                   presentation.refresh();
                 }}
               >
-                {messages.retryViews}
+                {messages.refreshViews}
               </Button>
             ) : null}
           </div>
@@ -274,7 +274,7 @@ export default function SavedViews({
               <p>{messages.viewsUnreadable(unreadable)}</p>
             ) : null}
             {presentationReason === null ? null : (
-              <p>{messages.arrangementUnsaved(presentationReason)}</p>
+              <p>{messages.presentationUnsaved(presentationReason)}</p>
             )}
           </div>
         </>

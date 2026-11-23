@@ -204,7 +204,7 @@ const fr: DataViewsMessages = {
   saveViewAs: "Enregistrer sous…",
   renameView: "Renommer…",
   deleteView: "Supprimer…",
-  retryViews: "Réessayer",
+  refreshViews: "Réessayer",
   saveAsForm: "Enregistrer comme nouvelle vue",
   submitSaveAs: "Enregistrer la vue",
   renameForm: (name) => `Renommer « ${name} »`,
@@ -218,7 +218,7 @@ const fr: DataViewsMessages = {
     `Les vues enregistrées sont indisponibles : ${trimClause(reason)}.`,
   viewsUnreadable: (views) =>
     `${count(views)} ${choosePlural(views, "vue enregistrée est illisible", "vues enregistrées sont illisibles")}.`,
-  arrangementUnsaved: (reason) =>
+  presentationUnsaved: (reason) =>
     `La disposition n’est pas enregistrée : ${trimClause(reason)}.`,
   viewNameRefused: (reason) => `${trimClause(reason)}.`,
   viewPending: (command) => PENDING[command],
@@ -240,10 +240,10 @@ const fr: DataViewsMessages = {
   viewFailed: ({ command, reason }) =>
     `${NOT_DONE[command]} : ${trimClause(reason)}.`,
 
-  selectionActions: "Actions sur la sélection",
+  actionBar: "Actions sur la sélection",
   rowsSelected: (rows) =>
     `${count(rows)} ${choosePlural(rows, "sélectionnée", "sélectionnées")}`,
-  deselectRows: (rows) =>
+  clearSelection: (rows) =>
     `Désélectionner ${count(rows)} ${choosePlural(rows, "ligne", "lignes")}`,
 
   facetCountsAbsent: "La source n’a fourni aucun décompte pour ce champ.",

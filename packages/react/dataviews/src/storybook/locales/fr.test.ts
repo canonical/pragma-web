@@ -57,8 +57,8 @@ describe("fr", () => {
     expect(fr.pageCount(3)).toBe("sur 3 pages");
     expect(fr.rowsSelected(1)).toBe("1 sélectionnée");
     expect(fr.rowsSelected(2)).toBe("2 sélectionnées");
-    expect(fr.deselectRows(1)).toBe("Désélectionner 1 ligne");
-    expect(fr.deselectRows(2)).toBe("Désélectionner 2 lignes");
+    expect(fr.clearSelection(1)).toBe("Désélectionner 1 ligne");
+    expect(fr.clearSelection(2)).toBe("Désélectionner 2 lignes");
     expect(fr.viewsUnreadable(1)).toBe("1 vue enregistrée est illisible.");
     expect(fr.viewsUnreadable(2)).toBe("2 vues enregistrées sont illisibles.");
   });
@@ -182,7 +182,7 @@ describe("fr", () => {
     expect(fr.viewsUnavailable("hors ligne.")).toBe(
       "Les vues enregistrées sont indisponibles : hors ligne.",
     );
-    expect(fr.arrangementUnsaved("plein")).toBe(
+    expect(fr.presentationUnsaved("plein")).toBe(
       "La disposition n’est pas enregistrée : plein.",
     );
     expect(fr.viewNameRefused("déjà pris")).toBe("déjà pris.");

@@ -318,7 +318,7 @@ describe("constants", () => {
         m.saveViewAs,
         m.renameView,
         m.deleteView,
-        m.retryViews,
+        m.refreshViews,
         m.saveAsForm,
         m.submitSaveAs,
         m.submitRename,
@@ -357,7 +357,7 @@ describe("constants", () => {
       );
       expect(m.viewsUnreadable(1)).toBe("1 saved view cannot be read.");
       expect(m.viewsUnreadable(2)).toBe("2 saved views cannot be read.");
-      expect(m.arrangementUnsaved("quota")).toBe(
+      expect(m.presentationUnsaved("quota")).toBe(
         "The arrangement is not being saved: quota.",
       );
       expect(m.viewNameRefused("name is taken")).toBe("Name is taken.");
@@ -367,7 +367,7 @@ describe("constants", () => {
       expect(m.viewsUnavailable("blocked.")).toBe(
         "Saved views are unavailable: blocked.",
       );
-      expect(m.arrangementUnsaved("quota.")).toBe(
+      expect(m.presentationUnsaved("quota.")).toBe(
         "The arrangement is not being saved: quota.",
       );
       expect(m.viewFailed({ command: "save", reason: "quota exceeded." })).toBe(
@@ -456,10 +456,10 @@ describe("constants", () => {
     });
 
     it("words the action bar, counting rows", () => {
-      expect(m.selectionActions).toBe("Selection actions");
+      expect(m.actionBar).toBe("Selection actions");
       expect(m.rowsSelected(3)).toBe("3 selected");
-      expect(m.deselectRows(1)).toBe("Deselect 1 row");
-      expect(m.deselectRows(3)).toBe("Deselect 3 rows");
+      expect(m.clearSelection(1)).toBe("Deselect 1 row");
+      expect(m.clearSelection(3)).toBe("Deselect 3 rows");
     });
   });
 

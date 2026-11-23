@@ -218,7 +218,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   saveViewAs: "Save as…",
   renameView: "Rename…",
   deleteView: "Delete…",
-  retryViews: "Try again",
+  refreshViews: "Try again",
   saveAsForm: "Save as a new view",
   submitSaveAs: "Save view",
   renameForm: (name) => `Rename "${name}"`,
@@ -232,7 +232,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     `Saved views are unavailable: ${composeClause(reason)}.`,
   viewsUnreadable: (count) =>
     `${formatCount(count)} saved ${choosePlural(count, "view", "views")} cannot be read.`,
-  arrangementUnsaved: (reason) =>
+  presentationUnsaved: (reason) =>
     `The arrangement is not being saved: ${composeClause(reason)}.`,
   viewNameRefused: composeSentence,
   viewPending: (command) => PENDING[command],
@@ -260,9 +260,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   viewFailed: ({ command, reason }) =>
     `${NOT_DONE[command]}: ${composeClause(reason)}.`,
 
-  selectionActions: "Selection actions",
+  actionBar: "Selection actions",
   rowsSelected: (count) => `${formatCount(count)} selected`,
-  deselectRows: (count) =>
+  clearSelection: (count) =>
     `Deselect ${formatCount(count)} ${choosePlural(count, "row", "rows")}`,
 
   facetCountsAbsent: "The source answered no counts for this field.",

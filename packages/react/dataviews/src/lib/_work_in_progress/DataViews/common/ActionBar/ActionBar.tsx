@@ -90,7 +90,7 @@ export default function ActionBar({
     <fieldset
       {...rest}
       ref={attach}
-      aria-label={label ?? messages.selectionActions}
+      aria-label={label ?? messages.actionBar}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       onFocus={handleFocus}
     >
@@ -102,13 +102,13 @@ export default function ActionBar({
         indicator
       )}
       {children}
-      <TooltipEngine Message={messages.deselectRows(count)}>
+      <TooltipEngine Message={messages.clearSelection(count)}>
         <IconButtonStandIn
           type="button"
           importance="tertiary"
           icon="close"
           className="deselect"
-          aria-label={messages.deselectRows(count)}
+          aria-label={messages.clearSelection(count)}
           onClick={() => {
             selection.clear();
           }}

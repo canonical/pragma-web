@@ -20,7 +20,7 @@ describe("regression 0080 — a reason ended a message in two full stops", () =>
       expect(english.viewsUnavailable(reason)).toBe(
         "Saved views are unavailable: quota exceeded.",
       );
-      expect(english.arrangementUnsaved(reason)).toBe(
+      expect(english.presentationUnsaved(reason)).toBe(
         "The arrangement is not being saved: quota exceeded.",
       );
       expect(english.viewFailed({ command: "save", reason })).toBe(

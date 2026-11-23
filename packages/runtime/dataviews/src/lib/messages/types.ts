@@ -89,12 +89,6 @@ type ViewCommandFacts = {
  * object, a list as an array. Place names unaltered; word plurals and
  * ordinals yourself.
  *
- * Message keys are noun phrases rather than verbs: a message is named for
- * what it says, and the name must not change when a message stops being
- * text and becomes a function of one fact. The code standards' verb rule for
- * function names exempts every member of a word record, whatever its value;
- * that exemption is canonical/pragma-core#127.
- *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
@@ -313,7 +307,7 @@ export type DataViewsMessages = {
   readonly renameView: string;
   readonly deleteView: string;
   /** Ask the store for the views, or the arrangement, again. */
-  readonly retryViews: string;
+  readonly refreshViews: string;
   /** The form naming a new view. */
   readonly saveAsForm: string;
   readonly submitSaveAs: string;
@@ -332,7 +326,7 @@ export type DataViewsMessages = {
   /** How many stored views cannot be read. */
   readonly viewsUnreadable: (count: number) => string;
   /** The arrangement is not being saved, and why. */
-  readonly arrangementUnsaved: (reason: string) => string;
+  readonly presentationUnsaved: (reason: string) => string;
   /** A name the collection refused, and why. */
   readonly viewNameRefused: (reason: string) => string;
   /** A command in flight. */
@@ -361,11 +355,11 @@ export type DataViewsMessages = {
 
   // The action bar.
   /** The action bar's name. */
-  readonly selectionActions: string;
+  readonly actionBar: string;
   /** How many rows are selected, across pages. */
   readonly rowsSelected: (count: number) => string;
   /** The button clearing the selection, by how many rows it clears. */
-  readonly deselectRows: (count: number) => string;
+  readonly clearSelection: (count: number) => string;
 
   // The facet charts.
   /** The source answered a result, but counted nothing for the field drawn. */
