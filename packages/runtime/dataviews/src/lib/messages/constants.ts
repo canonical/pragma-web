@@ -81,7 +81,7 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   selectAllRows: "Select all displayed rows",
   selectRow: (name) => `Select ${name}`,
   columnWidth: (pixels) =>
-    `${formatCount(pixels)} ${pixels === 1 ? "pixel" : "pixels"}`,
+    `${formatCount(pixels)} ${choosePlural(pixels, "pixel", "pixels")}`,
   columnEndPlacement: (name) =>
     `Click or tap in the header row where the ${name} column should end. Press the edge again or Escape to cancel.`,
 
