@@ -22,6 +22,7 @@ import pickStoryWords from "../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../storybook/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
+import { ActionBar } from "../ActionBar/index.js";
 import Component from "./QueryBar.js";
 import type { DataViewsQueryBarProps } from "./types.js";
 
@@ -69,6 +70,8 @@ type BarConfig = {
   readonly withHistory?: boolean;
   /** A location at this address, which spells addresses for links. */
   readonly href?: string;
+  /** Rows selected as the story starts, with the action bar over them. */
+  readonly selected?: readonly string[];
 };
 
 /**
@@ -115,12 +118,13 @@ function BarMachines({
   withHistory = false,
   href,
   messages,
+  selected,
   ...args
 }: StoryArgs & BarConfig): ReactElement {
   const words = pickStoryWords({ messages });
   const [provider] = useState<BarProvider>(() => {
     if (withHistory) startFrameAt(query ?? "");
-    return createDataViewsProvider({
+    const built = createDataViewsProvider({
       collection: barMachineCollection,
       source: createArraySource<BarMachine>({
         rows: barMachines,
@@ -136,9 +140,16 @@ function BarMachines({
         : { location: createMemoryLocation({ href }) }),
       ...(query === undefined ? {} : { snapshot: { query, presentation: {} } }),
     });
+    if (selected !== undefined) built.selection.add(selected);
+    return built;
   });
   return (
     <DataViews provider={provider} {...words}>
+      {selected !== undefined && (
+        <ActionBar>
+          <button type="button">Tag</button>
+        </ActionBar>
+      )}
       {withOutsideChange && (
         <button
           type="button"
@@ -165,6 +176,7 @@ function BarMachines({
         columns={columns}
         label="Machines"
         {...words}
+        selectable={selected !== undefined}
       />
     </DataViews>
   );
@@ -545,6 +557,80 @@ export const Presets: Story = {
   },
 };
 
+/** The query the narrow stories start on: two filter chips, a range once. */
+const NARROW_QUERY = "status=deployed&memory__gte=8192&memory__lte=65536";
+
+/** A phone's width, or the frame's where it is narrower still. */
+const PHONE_SIZE = "min(22.5rem, 100%)";
+
+/**
+ * Mobile: below a container width of 37.5rem the chips give way to the
+ * search-only entry and a summary button, "Filters, 2 applied", which
+ * opens the sheet: the applied chips, "Add filter" and the filters form,
+ * every change applying at once, behind which the rows update. The bar
+ * stands at a phone's width.
+ */
+export const Mobile: Story = {
+  render: renderWith({ query: NARROW_QUERY, inlineSize: PHONE_SIZE }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const summary = await canvas.findByRole("button", {
+      name: "Filters, 2 applied",
+    });
+    await expect(summary).toBeVisible();
+    await expect(summary).toHaveAttribute("command", "show-modal");
+  },
+};
+
+/**
+ * Mobile, the sheet open: the summary button pressed, then "Add filter",
+ * and a field chosen, so the sheet shows its operator step.
+ */
+export const MobileSheetOpen: Story = {
+  name: "Mobile: the sheet open",
+  render: renderWith({ query: NARROW_QUERY, inlineSize: PHONE_SIZE }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const summary = await canvas.findByRole("button", {
+      name: "Filters, 2 applied",
+    });
+    await expect(summary).toBeVisible();
+    await userEvent.click(summary);
+    const sheet = within(
+      await waitFor(() =>
+        within(canvasElement.ownerDocument.body).getByRole("dialog", {
+          name: "Filter records",
+        }),
+      ),
+    );
+    await userEvent.click(sheet.getByRole("button", { name: "Add filter" }));
+    await userEvent.click(sheet.getByRole("option", { name: "status" }));
+    await expect(
+      sheet.getByRole("listbox", { name: "Choose an operator for status" }),
+    ).toBeVisible();
+  },
+};
+
+/**
+ * Mobile, rows selected: the action bar over the selection stands above
+ * the narrow bar, and neither pushes the page wider than the frame.
+ */
+export const MobileRowsSelected: Story = {
+  name: "Mobile, rows selected",
+  render: renderWith({
+    query: NARROW_QUERY,
+    inlineSize: PHONE_SIZE,
+    selected: ["bm-01", "bm-02"],
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText("2 selected")).toBeVisible();
+    await expect(
+      await canvas.findByRole("button", { name: "Filters, 2 applied" }),
+    ).toBeVisible();
+  },
+};
+
 /** The address a no-scripts story renders, from the frame's own `query`. */
 const readFrameQuery = (fallback: string): string =>
   new URLSearchParams(window.location.search).get("query") ?? fallback;
@@ -555,9 +641,13 @@ const readFrameQuery = (fallback: string): string =>
  */
 function ServerRenderedBar({
   href,
+  inlineSize,
   messages,
   ...args
-}: StoryArgs & { readonly href?: string }): ReactElement {
+}: StoryArgs & {
+  readonly href?: string;
+  readonly inlineSize?: string;
+}): ReactElement {
   const words = pickStoryWords({ messages });
   const [markup] = useState(() => {
     const provider = createDataViewsProvider({
@@ -582,6 +672,7 @@ function ServerRenderedBar({
     // biome-ignore lint/a11y/useKeyWithClickEvents: a link followed by keys fires the same click
     <div
       className="no-scripts"
+      style={inlineSize === undefined ? undefined : { inlineSize }}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: the story shows the server's own markup, before any script takes it over
       dangerouslySetInnerHTML={{ __html: markup }}
       onClick={(event) => {
@@ -654,5 +745,28 @@ export const NoJavaScriptMemory: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.queryByRole("search")).toBeNull();
     await expect(canvas.queryAllByRole("link")).toHaveLength(0);
+  },
+};
+
+/**
+ * No JavaScript, with an address, narrow: the server's markup at 22.5rem.
+ * The summary button opens the sheet through its invoker command, with no
+ * script; inside, each chip's remove control and Clear all are links, and
+ * Apply submits the filters' GET form, which keeps the search.
+ */
+export const NoJavaScriptNarrow: Story = {
+  name: "No JavaScript, with an address, narrow",
+  render: (args) => (
+    <ServerRenderedBar
+      {...args}
+      inlineSize="22.5rem"
+      href={`/machines?${readFrameQuery(`${NARROW_QUERY}&q=web`)}`}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("button", { name: "Filters, 2 applied" }),
+    ).toHaveAttribute("command", "show-modal");
   },
 };

@@ -10,6 +10,7 @@ import preview from "../../../.storybook/preview.js";
 import {
   expectNoAxeViolations,
   FACETED_FILTER_STORIES,
+  installDialogStandIn,
   installPopoverStandIn,
   serveMockApi,
 } from "../../../testing/index.js";
@@ -116,13 +117,17 @@ describe("stories have no axe violations", () => {
 });
 
 describe("the query controls' played stories have no axe violations", () => {
-  // The plays open native popovers, which jsdom does not have.
+  // The plays open native popovers and the sheet's modal dialog, which
+  // jsdom does not have.
   let uninstall: () => void;
+  let uninstallDialog: () => void;
   beforeAll(() => {
     uninstall = installPopoverStandIn();
+    uninstallDialog = installDialogStandIn();
   });
   afterAll(() => {
     uninstall();
+    uninstallDialog();
     document.body.innerHTML = "";
   });
 
