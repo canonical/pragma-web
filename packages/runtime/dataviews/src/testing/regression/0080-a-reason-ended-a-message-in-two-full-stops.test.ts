@@ -38,7 +38,7 @@ describe("regression 0080 — a reason ended a message in two full stops", () =>
 
   it("ends a message once however many stops or spaces a reason carried", () => {
     expect(english.statusFailed("offline. ")).toBe(
-      "These rows could not be loaded: offline",
+      "These rows could not be loaded: offline.",
     );
     expect(english.sortRefused(["quota exceeded.. "])).toBe(
       "Sort unchanged: quota exceeded.",

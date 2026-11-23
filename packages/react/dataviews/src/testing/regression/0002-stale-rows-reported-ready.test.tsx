@@ -73,7 +73,7 @@ describe("regression 0002 — stale rows reported ready", () => {
     });
     const table = screen.getByRole("table", { name: "Machines" });
     expect(within(table).getByRole("status")).toHaveTextContent(
-      "These rows do not match the current query: the inventory is unreachable",
+      "These rows do not match the current query: the inventory is unreachable.",
     );
     expect(
       within(table).getByRole("cell", { name: "alpha" }),

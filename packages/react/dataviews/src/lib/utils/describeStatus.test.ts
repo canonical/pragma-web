@@ -9,15 +9,15 @@ describe("describeStatus", () => {
     expect(describeStatus({ status: "pending" }, english)).toBe("Loading…");
     expect(
       describeStatus({ status: "failed", reason: "offline" }, english),
-    ).toBe("These rows could not be loaded: offline");
+    ).toBe("These rows could not be loaded: offline.");
     // A failed refresh keeps its rows, so the words say what could not be
     // done rather than what is missing.
     expect(
       describeStatus({ status: "refresh-failed", reason: "offline" }, english),
-    ).toBe("These rows could not be refreshed: offline");
+    ).toBe("These rows could not be refreshed: offline.");
     expect(
       describeStatus({ status: "stale", reason: "offline" }, english),
-    ).toBe("These rows do not match the current query: offline");
+    ).toBe("These rows do not match the current query: offline.");
     expect(describeStatus({ status: "no-results" }, english)).toBe(
       "No rows match this query.",
     );

@@ -1118,7 +1118,7 @@ export const Failed: Story = {
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByText(
-        "These rows could not be loaded: the machine inventory could not be reached",
+        "These rows could not be loaded: the machine inventory could not be reached.",
       ),
     ).toBeInTheDocument();
     await expect(canvas.getByRole("table")).toHaveAttribute(

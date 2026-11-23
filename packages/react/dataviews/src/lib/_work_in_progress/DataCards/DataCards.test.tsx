@@ -306,7 +306,7 @@ describe("DataCards", () => {
       source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows could not be loaded: the inventory is unreachable",
+      "These rows could not be loaded: the inventory is unreachable.",
     );
     expect(within(readList()).queryAllByRole("listitem")).toEqual([]);
     expect(screen.getByRole("region", { name: "Machines" })).toHaveAttribute(
@@ -337,7 +337,7 @@ describe("DataCards", () => {
       source.readLatest().deliver(buildFailure("the inventory is unreachable"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows do not match the current query: the inventory is unreachable",
+      "These rows do not match the current query: the inventory is unreachable.",
     );
     expect(
       within(readList())
@@ -396,7 +396,7 @@ describe("DataCards", () => {
     });
     // The cards still answer the query the reader asked, so they stay.
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows could not be refreshed: the inventory is unreachable",
+      "These rows could not be refreshed: the inventory is unreachable.",
     );
     expect(
       within(readList())

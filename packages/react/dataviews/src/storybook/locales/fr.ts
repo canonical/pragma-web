@@ -67,15 +67,21 @@ const spellTotal = (
 const fr: DataViewsMessages = {
   statusPending: "Chargement…",
   statusFailed: (reason) =>
-    `Ces lignes n’ont pas pu être chargées : ${trimClause(reason)}`,
+    trimClause(reason) === ""
+      ? "Ces lignes n’ont pas pu être chargées."
+      : `Ces lignes n’ont pas pu être chargées : ${trimClause(reason)}.`,
   statusRefused: (reason) =>
     trimClause(reason) === ""
       ? "Ce lien n’a pas pu être suivi."
       : `Ce lien n’a pas pu être suivi : ${trimClause(reason)}.`,
   statusRefreshFailed: (reason) =>
-    `Ces lignes n’ont pas pu être actualisées : ${trimClause(reason)}`,
+    trimClause(reason) === ""
+      ? "Ces lignes n’ont pas pu être actualisées."
+      : `Ces lignes n’ont pas pu être actualisées : ${trimClause(reason)}.`,
   statusStale: (reason) =>
-    `Ces lignes ne correspondent pas à la requête actuelle : ${trimClause(reason)}`,
+    trimClause(reason) === ""
+      ? "Ces lignes ne correspondent pas à la requête actuelle."
+      : `Ces lignes ne correspondent pas à la requête actuelle : ${trimClause(reason)}.`,
   statusNoAccess: "Vous n’avez pas l’autorisation de voir ces lignes.",
   statusNoResults: "Aucune ligne ne correspond à cette requête.",
   statusNoData: "Il n’y a encore rien ici.",

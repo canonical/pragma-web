@@ -328,7 +328,7 @@ describe("DataChart", () => {
         });
       });
       expect(screen.getByRole("status")).toHaveTextContent(
-        "These rows do not match the current query: offline",
+        "These rows do not match the current query: offline.",
       );
       expect(screen.queryByRole("img")).toBeNull();
     });

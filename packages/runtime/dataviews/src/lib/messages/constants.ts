@@ -11,6 +11,7 @@ import type { ViewCommand } from "../views/index.js";
 import choosePlural from "./choosePlural.js";
 import composeClause from "./composeClause.js";
 import composeSentence from "./composeSentence.js";
+import composeStatus from "./composeStatus.js";
 import spellOrdinal from "./spellOrdinal.js";
 import type { DataViewsMessages } from "./types.js";
 
@@ -62,18 +63,13 @@ const formatSortTerm = (name: string, direction: SortDirection): string =>
 export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   statusPending: "Loading…",
   statusFailed: (reason) =>
-    `These rows could not be loaded: ${composeClause(reason)}`,
-  statusRefused: (reason) => {
-    // A blank reason says nothing: the plain statement, not a bare colon.
-    const clause = composeClause(reason);
-    return clause === ""
-      ? "This link could not be followed."
-      : `This link could not be followed: ${clause}.`;
-  },
+    composeStatus("These rows could not be loaded", reason),
+  statusRefused: (reason) =>
+    composeStatus("This link could not be followed", reason),
   statusRefreshFailed: (reason) =>
-    `These rows could not be refreshed: ${composeClause(reason)}`,
+    composeStatus("These rows could not be refreshed", reason),
   statusStale: (reason) =>
-    `These rows do not match the current query: ${composeClause(reason)}`,
+    composeStatus("These rows do not match the current query", reason),
   statusNoAccess: "You do not have permission to see these rows.",
   statusNoResults: "No rows match this query.",
   statusNoData: "There is nothing here yet.",

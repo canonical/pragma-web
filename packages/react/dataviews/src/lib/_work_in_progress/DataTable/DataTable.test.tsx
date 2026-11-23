@@ -1519,7 +1519,7 @@ describe("DataTable", () => {
     expect(
       expectAnnouncedStatusRow(
         "failed",
-        "These rows could not be loaded: the inventory is unreachable",
+        "These rows could not be loaded: the inventory is unreachable.",
       ),
     ).toEqual([]);
     expect(screen.getByRole("table")).toHaveAttribute("aria-busy", "false");
@@ -1557,7 +1557,7 @@ describe("DataTable", () => {
     // The status row leads, and the retained rows follow it unblanked.
     const rows = expectAnnouncedStatusRow(
       "stale",
-      "These rows do not match the current query: the inventory is unreachable",
+      "These rows do not match the current query: the inventory is unreachable.",
     );
     expect(rows.map((row) => row.textContent)).toEqual([
       "alpharunning",
@@ -1582,7 +1582,7 @@ describe("DataTable", () => {
     // failure is said above them rather than shown nowhere at all.
     const rows = expectAnnouncedStatusRow(
       "refresh-failed",
-      "These rows could not be refreshed: the inventory is unreachable",
+      "These rows could not be refreshed: the inventory is unreachable.",
     );
     expect(rows.map((row) => row.textContent)).toEqual([
       "alpharunning",
@@ -2770,7 +2770,7 @@ describe("DataTable", () => {
     });
     expect(screen.getByRole("status")).toBe(statusMessage);
     expect(statusMessage).toHaveTextContent(
-      "These rows do not match the current query: offline",
+      "These rows do not match the current query: offline.",
     );
   });
 
@@ -2814,7 +2814,7 @@ describe("DataTable", () => {
       source.readLatest().deliver(buildFailure("timed out"));
     });
     expect(screen.getByRole("status")).toHaveTextContent(
-      "These rows do not match the current query: timed out",
+      "These rows do not match the current query: timed out.",
     );
   });
 

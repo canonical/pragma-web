@@ -164,7 +164,7 @@ export const Failed: Story = {
   play: async ({ canvas }) => {
     await expect(
       await canvas.findByText(
-        "These rows could not be loaded: the machine inventory is unavailable",
+        "These rows could not be loaded: the machine inventory is unavailable.",
       ),
     ).toBeVisible();
   },
