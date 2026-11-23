@@ -299,3 +299,10 @@ export type QuickFilterProviderConfig = {
     | readonly Exclude<keyof QuickHost, "id" | "name">[]
     | undefined;
 };
+
+/** A workload whose type decides which fields apply to it. */
+export type Workload = {
+  readonly id: string;
+  readonly type: "container" | "vm";
+  readonly host: string;
+};
