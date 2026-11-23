@@ -296,7 +296,10 @@ export default {
       Once(root, { AtRule }) {
         if (!vanillaEra.test(root.source?.input.file ?? "")) return;
         const layer = new AtRule({ name: "layer", params: "vanilla" });
-        layer.append(root.nodes);
+        for (const node of [...root.nodes]) {
+          if (node.type === "atrule" && node.name === "charset") continue;
+          layer.append(node);
+        }
         root.append(layer);
       },
     },
