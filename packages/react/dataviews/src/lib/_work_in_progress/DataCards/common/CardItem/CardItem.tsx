@@ -1,3 +1,4 @@
+import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { Card } from "@canonical/react-ds-global";
 import { CheckboxInput } from "@canonical/react-ds-global-form";
 import { memo, type ReactElement, useContext, useId } from "react";
@@ -34,26 +35,35 @@ const CardItem = <TRow extends object>({
   const selected = useDataViewsValue({ channel: channels.selected });
   // The name the caller gives the record, read from the record channel as
   // the name itself: a record replaced without changing what it is called
-  // re-renders no card, and a card named by its title reads nothing of the
-  // record at all. The selector mints its value, which the channel hook
+  // re-renders no card. The selector mints its value, which the channel hook
   // allows only because a name is a string: React compares the reads by
   // identity, and equal strings are identical.
   const named = useDataViewsValue({
     channel: channels.record,
     select: (record) => nameRecord(record, channels.id),
   });
-  const titleChannel = channels.fields[readFieldName(title)];
+  const titleField = readFieldName(title);
+  const titleChannel = channels.fields[titleField];
   if (titleChannel === undefined) {
     // The scopes observe every field the cards show, the title's included.
-    throw new Error(`no channel observes the field "${readFieldName(title)}"`);
+    throw new Error(`no channel observes the field "${titleField}"`);
   }
+  // A title the record's type does not carry names nothing.
+  const applies = useDataViewsValue({
+    channel: channels.record,
+    select: (record) =>
+      readProviderHost(provider).readApplicability(titleField, record) ===
+      "applies",
+  });
   const titleValue = useDataViewsValue({ channel: titleChannel });
   const spelled = spellPrimitiveValue(titleValue);
   const titleId = useId();
-  // Blank is no name at all: a title holding empty text, or none, leaves the
-  // card named by its identity rather than by nothing.
-  const shown = spelled !== null && spelled.trim() !== "";
-  const name = named ?? (shown ? spelled : channels.id);
+  // Blank is no name at all: a label or a title holding empty text, or
+  // none, leaves the card named by its identity rather than by nothing.
+  const shown = applies && spelled !== null && spelled.trim() !== "";
+  const titled = shown ? spelled : channels.id;
+  const name =
+    named === null ? titled : named.trim() === "" ? channels.id : named;
   return (
     <Card
       {...rest}
