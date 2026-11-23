@@ -13,6 +13,7 @@ export { default as createListing } from "./createListing.js";
 export { default as createMachineProvider } from "./createMachineProvider.js";
 export { default as createMemoryViewStore } from "./createMemoryViewStore.js";
 export { default as createTokenMessages } from "./createTokenMessages.js";
+export { default as createWorkloadProvider } from "./createWorkloadProvider.js";
 export { default as declareMachineOrdering } from "./declareMachineOrdering.js";
 export { default as deliverFacets } from "./deliverFacets.js";
 export { default as deliverRows } from "./deliverRows.js";

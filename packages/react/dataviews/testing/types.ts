@@ -260,3 +260,10 @@ export type PlacedRecord = { readonly id: string; readonly region?: string };
 
 /** A record placed in a region. */
 export type RegionRecord = { readonly id: string; readonly region: string };
+
+/** A workload whose type decides which fields apply to it. */
+export type Workload = {
+  readonly id: string;
+  readonly type: "container" | "vm";
+  readonly host: string;
+};
