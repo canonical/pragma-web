@@ -102,7 +102,7 @@ describe("CardItem", () => {
     expect(checkbox).not.toBeChecked();
   });
 
-  it.fails("names a card by its identity where the caller's label is blank", () => {
+  it("names a card by its identity where the caller's label is blank", () => {
     const { provider, channels } = observeRow({
       fields: ["name"],
       provider: createAlpha(),
@@ -122,7 +122,7 @@ describe("CardItem", () => {
     expect(screen.getByRole("listitem", { name: "m-1" })).toBeInTheDocument();
   });
 
-  it.fails("names a card by its identity where its title does not apply", () => {
+  it("names a card by its identity where its title does not apply", () => {
     const { provider, channels } = observeRow({
       fields: ["host"],
       provider: createWorkloadProvider([

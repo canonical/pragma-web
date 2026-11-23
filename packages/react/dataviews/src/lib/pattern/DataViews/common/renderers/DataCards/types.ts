@@ -34,8 +34,8 @@ type OwnProps<
   readonly selectable?: boolean;
   /**
    * Names one record, for its card and checkbox. Defaults to its title's
-   * text, or its identity where that is blank. Read by identity: a new
-   * function renames every card.
+   * text; a blank name, or a blank or inapplicable title, falls back to its
+   * identity. Read by identity: a new function renames every card.
    */
   readonly getRowLabel?: (row: TRow, rowId: string) => string;
   /**
