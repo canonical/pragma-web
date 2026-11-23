@@ -10,8 +10,11 @@
  * to the view the link named, written to the store, which no read undoes.
  */
 
-import { describe, expect, it, onTestFinished, vi } from "vitest";
-import { createStandInPresentationStore } from "../../../testing/index.js";
+import { describe, expect, it, vi } from "vitest";
+import {
+  createStandInPresentationStore,
+  installFakeClock,
+} from "../../../testing/index.js";
 import {
   createPresentation,
   type JsonValue,
@@ -51,10 +54,7 @@ describe("regression 0076 — a linked arrangement lost under an open view", () 
   });
 
   it("writes the link's columns to the store, and keeps them through its first read and a later one", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
-    onTestFinished(() => {
-      vi.useRealTimers();
-    });
+    installFakeClock();
     // A store holding Status hidden and a width of its own, which takes what
     // is written to it.
     let stored: ViewPresentation = {

@@ -1,18 +1,15 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   type PresentationStore,
   WRITE_DELAY,
 } from "../src/lib/presentation/index.js";
 import createDeferred from "./createDeferred.js";
 import flushPresentation from "./flushPresentation.js";
-
-afterEach(() => {
-  vi.useRealTimers();
-});
+import installFakeClock from "./installFakeClock.js";
 
 describe("flushPresentation", () => {
   it("sends the gathering writes and waits for each to settle", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    installFakeClock(["setTimeout", "clearTimeout"]);
     const answer = createDeferred<{ readonly status: "saved" }>();
     const writes = vi
       .fn<PresentationStore["patchPresentation"]>()

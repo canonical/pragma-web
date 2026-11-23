@@ -9,6 +9,7 @@ import {
   createStandInViewStore,
   declare,
   flushPresentation,
+  installFakeClock,
   observeUntilFinished,
   openIndexedDBTab,
   readId,
@@ -60,7 +61,6 @@ const capabilities = declare({
 
 afterEach(() => {
   vi.restoreAllMocks();
-  vi.useRealTimers();
 });
 
 /**
@@ -1300,7 +1300,7 @@ describe("createSavedViews", () => {
     });
 
     it("carries a change made while saving as into the new view", async () => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+      installFakeClock();
       const indexedDB = new IDBFactory();
       const real = openIndexedDBTab(indexedDB);
       const writes = vi.spyOn(real, "patchPresentation");
@@ -1428,7 +1428,7 @@ describe("createSavedViews", () => {
     });
 
     it("writes a key removed while saving as null into the new view", async () => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+      installFakeClock();
       const indexedDB = new IDBFactory();
       const real = openIndexedDBTab(indexedDB);
       const writes = vi.spyOn(real, "patchPresentation");
@@ -1466,7 +1466,7 @@ describe("createSavedViews", () => {
     });
 
     it("saves the arrangement in force with a new view, and only the query into an open one", async () => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+      installFakeClock();
       const { provider, host, views, store } = await observeFreshProvider();
       const writes = vi.spyOn(store, "patchPresentation");
       provider.presentation.arrange({ "table.t.width.name": 120 });
@@ -1499,7 +1499,7 @@ describe("createSavedViews", () => {
     });
 
     it("keeps the view's saved arrangement and the viewer's own when the stored view becomes the open one after a conflict", async () => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+      installFakeClock();
       const { indexedDB, provider, host, views, store } =
         await observeFreshProvider();
       const writes = vi.spyOn(store, "patchPresentation");

@@ -5,6 +5,7 @@ import {
   createStandInPresentationStore,
   type Deferred,
   flushPresentation,
+  installFakeClock,
   observeUntilFinished,
   openIndexedDBTab,
   type ScriptedPresentation as Scripted,
@@ -29,7 +30,6 @@ import type {
 
 afterEach(() => {
   vi.restoreAllMocks();
-  vi.useRealTimers();
 });
 
 const readArrangement = (presentation: OwnedPresentation) =>
@@ -75,7 +75,7 @@ describe("createPresentation", () => {
   });
 
   it("layers the default arrangement, the view's saved presentation and the viewer's changes to it", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const store = openIndexedDBTab(new IDBFactory());
     await store.create({
       id: "v1",
@@ -143,7 +143,7 @@ describe("createPresentation", () => {
   });
 
   it("saves a change to the default arrangement while no view is shown, removals included", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const store = openIndexedDBTab(new IDBFactory());
     const writes = vi.spyOn(store, "patchPresentation");
     const presentation = createPresentation({ store });
@@ -159,7 +159,7 @@ describe("createPresentation", () => {
   });
 
   it("saves a change to the shown view's own preferences, never the default arrangement", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const store = openIndexedDBTab(new IDBFactory());
     await store.create({
       id: "v1",
@@ -182,7 +182,7 @@ describe("createPresentation", () => {
   });
 
   it("shows a change another tab makes to the arrangement", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const indexedDB = new IDBFactory();
     const store = openIndexedDBTab(indexedDB);
     const writes = vi.spyOn(store, "patchPresentation");
@@ -200,7 +200,7 @@ describe("createPresentation", () => {
   });
 
   it("keeps both changes when two tabs change different keys", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const indexedDB = new IDBFactory();
     const mineStore = openIndexedDBTab(indexedDB);
     const theirsStore = openIndexedDBTab(indexedDB);
@@ -240,7 +240,7 @@ describe("createPresentation", () => {
   });
 
   it("keeps a change a read began before, once the write it went out in has landed", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const read = createDeferred<Record<string, number>>();
     const presentation = createPresentation({
       store: createStandInPresentationStore({
@@ -259,7 +259,7 @@ describe("createPresentation", () => {
   });
 
   it("keeps a newer change through a read that lands after the older write succeeded", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const older = createDeferred<PreferenceResult>();
     const newer = createDeferred<PreferenceResult>();
     const patchPresentation = vi
@@ -457,7 +457,7 @@ describe("createPresentation", () => {
   });
 
   it("drops a change to a view the store no longer has: nothing reported, nothing retried", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi.fn<PresentationStore["patchPresentation"]>(
       async () => ({ status: "missing" }),
     );
@@ -514,7 +514,7 @@ describe("createPresentation", () => {
   });
 
   it("keeps a change it could not save, reported, through later reads, until retried", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi
       .fn<PresentationStore["patchPresentation"]>()
       .mockRejectedValueOnce(new Error("view storage failed: quota exceeded"))
@@ -555,7 +555,7 @@ describe("createPresentation", () => {
   });
 
   it("writes again the shown view's preferences whose write failed", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi
       .fn<PresentationStore["patchPresentation"]>()
       .mockRejectedValueOnce(new Error("view storage failed"))
@@ -579,7 +579,7 @@ describe("createPresentation", () => {
   });
 
   it("lets a later change own its key: an older write failing late reports nothing", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const older = createDeferred<PreferenceResult>();
     const patchPresentation = vi
       .fn<PresentationStore["patchPresentation"]>()
@@ -607,7 +607,7 @@ describe("createPresentation", () => {
   });
 
   it("writes a burst of changes to one target once, merged", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi.fn<PresentationStore["patchPresentation"]>(
       async () => ({ status: "saved" }),
     );
@@ -628,7 +628,7 @@ describe("createPresentation", () => {
   });
 
   it("writes a burst that keeps coming at the deadline, then the rest when it stops", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi.fn<PresentationStore["patchPresentation"]>(
       async () => ({ status: "saved" }),
     );
@@ -650,7 +650,7 @@ describe("createPresentation", () => {
   });
 
   it("writes a burst held past its deadline on the next turn, never after a negative delay", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi.fn<PresentationStore["patchPresentation"]>(
       async () => ({ status: "saved" }),
     );
@@ -668,7 +668,7 @@ describe("createPresentation", () => {
   });
 
   it("writes the changes still gathering when the last observer releases, once", async () => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    installFakeClock();
     const patchPresentation = vi.fn<PresentationStore["patchPresentation"]>(
       async () => ({ status: "saved" }),
     );
@@ -729,7 +729,7 @@ describe("createPresentation", () => {
 
   describe("without a store", () => {
     it("resizes and removes widths in memory, exactly as over a store, and claims nothing saved", async () => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+      installFakeClock();
       const presentation = createPresentation();
       observeUntilFinished(presentation);
       presentation.arrange({ "table.t.width.name": 120 });
@@ -788,7 +788,7 @@ describe("createPresentation", () => {
         },
       ],
     ])("runs one script to the same states %s", async (_where, make) => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+      installFakeClock();
       const { store, presentation } = await make();
       const writes = vi.spyOn(store, "patchPresentation");
       const states: PresentationState[] = [];
@@ -825,7 +825,7 @@ describe("createPresentation", () => {
     });
 
     it("keeps the arrangement for the session, across observations", async () => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+      installFakeClock();
       const presentation = createPresentation();
       const release = presentation.observe();
       presentation.arrange({ density: "dense" });
