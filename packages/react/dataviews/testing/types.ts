@@ -7,7 +7,9 @@ import type {
   QueryLocation,
   ReadonlyChannel,
   SavedView,
+  Source,
   SourceCapabilities,
+  SourceDelivery,
   ViewStore,
 } from "@canonical/dataviews-core";
 import type {
@@ -15,6 +17,7 @@ import type {
   ManualSourceConfig,
 } from "@canonical/dataviews-core/testing";
 import type { RenderHookResult } from "@testing-library/react";
+import type { Mock } from "vitest";
 import type { BoundFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/BoundFilter/types.js";
 import type { PresenceFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/PresenceFilter/types.js";
 import type { TextFilterProps } from "../src/lib/pattern/DataViews/common/controls/Filters/common/TextFilter/types.js";
@@ -305,4 +308,12 @@ export type Workload = {
   readonly id: string;
   readonly type: "container" | "vm";
   readonly host: string;
+};
+
+/** A source that hands each delivery on cue, counting its stops. */
+export type CuedSource = {
+  readonly source: Source<Machine>;
+  /** Hand `delivery` to every request executed so far. */
+  readonly send: (delivery: SourceDelivery<Machine>) => void;
+  readonly stop: Mock<() => void>;
 };
