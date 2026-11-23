@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="terminal">
+    <path d="M8.26074 8L4.73047 11.5303L3.66992 10.4697L6.13965 8L3.66992 5.53027L4.73047 4.46973L8.26074 8Z" fill="currentColor"/>
+    <path d="M11.9004 11.5H8.40039V10H11.9004V11.5Z" fill="currentColor"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M13.6533 2.00781C14.3593 2.07949 14.9205 2.64069 14.9922 3.34668L15 3.5V12.5L14.9922 12.6533C14.9205 13.3593 14.3593 13.9205 13.6533 13.9922L13.5 14H2.5C1.72334 14 1.08461 13.4097 1.00781 12.6533L1 12.5V3.5C1 2.67157 1.67157 2 2.5 2H13.5L13.6533 2.00781ZM2.5 12.5H13.5V3.5H2.5V12.5Z" fill="currentColor"/>
+  </g>
+</svg>

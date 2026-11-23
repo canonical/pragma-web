@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="scroll-to-top">
+    <path d="M13.9697 14.0303L8 8.06055L2.03027 14.0303L0.969727 12.9697L8 5.93945L15.0303 12.9697L13.9697 14.0303Z" fill="currentColor"/>
+    <path d="M1 2.5L1 1L15 1V2.5L1 2.5Z" fill="currentColor"/>
+  </g>
+</svg>

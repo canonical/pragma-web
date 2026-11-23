@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="triaged">
+    <path d="M12.0303 6.03027L7 11.0605L3.96973 8.03027L5.03027 6.96973L7 8.93945L10.9697 4.96973L12.0303 6.03027Z" fill="currentColor"/>
+    <path d="M15 1V2.5H1V1H15Z" fill="currentColor"/>
+    <path d="M15 13.45V14.95H1V13.45H15Z" fill="currentColor"/>
+  </g>
+</svg>

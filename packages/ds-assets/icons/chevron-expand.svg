@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="chevron-expand">
+    <path d="M12.0303 11.0303L8 15.0605L3.96973 11.0303L5.03027 9.96973L8 12.9395L10.9697 9.96973L12.0303 11.0303Z" fill="currentColor"/>
+    <path d="M3.96973 4.96973L8 0.939453L12.0303 4.96973L10.9697 6.03027L8 3.06055L5.03027 6.03027L3.96973 4.96973Z" fill="currentColor"/>
+    <path d="M15 7.25V8.75H1V7.25H15Z" fill="currentColor"/>
+  </g>
+</svg>
