@@ -6,16 +6,16 @@
 
 import type { DataViewsMessages } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
+import { waitForState } from "@canonical/dataviews-core/testing";
 import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
-import { act, cleanup, render, waitFor } from "@testing-library/react";
+import { act, cleanup, getConfig, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import preview from "../../../.storybook/preview.js";
 import {
   createTokenMessages,
-  DELIVERY_WAIT,
   findEnglish,
-  type RequestsRead,
   serveMockApi,
+  subscribeToBusy,
 } from "../../../testing/index.js";
 import * as graphqlStories from "../../docs/data-sources/Graphql.stories.js";
 import * as restStories from "../../docs/data-sources/Rest.stories.js";
@@ -117,6 +117,12 @@ const tokenMessages = createTokenMessages(english);
  */
 const watchRequests = () => {
   const send = globalThis.fetch;
+  const listeners = new Set<() => void>();
+  const notify = () => {
+    for (const listener of listeners) {
+      listener();
+    }
+  };
   let sent = 0;
   let unanswered = 0;
   let waiting = 0;
@@ -132,19 +138,29 @@ const watchRequests = () => {
         waiting += 1;
         const markAnswered = () => {
           waiting -= 1;
+          notify();
         };
         request.then(markAnswered, markAnswered);
       }
+      notify();
       return request;
     });
   return {
-    read: (): RequestsRead => ({
-      waiting,
-      settled:
-        sent === 0 ||
+    /** Hear each request and each change to what the page marks busy. */
+    subscribe: (listener: () => void) => {
+      listeners.add(listener);
+      const unsubscribeBusy = subscribeToBusy(document.body)(listener);
+      return () => {
+        listeners.delete(listener);
+        unsubscribeBusy();
+      };
+    },
+    /** Every answer has arrived, and the page shows what it says. */
+    checkAtRest: () =>
+      waiting === 0 &&
+      (sent === 0 ||
         unanswered > 0 ||
-        document.querySelector('[aria-busy="true"]') === null,
-    }),
+        document.querySelector('[aria-busy="true"]') === null),
     restore: () => {
       spy.mockRestore();
     },
@@ -172,15 +188,20 @@ describe("stories speak only the messages", () => {
         const errors = vi.spyOn(console, "error").mockImplementation(() => {});
         const requests = watchRequests();
         try {
-          await act(async () => {
-            render(<Story messages={tokenMessages} />);
-          });
+          const { container } = await act(async () =>
+            render(<Story messages={tokenMessages} />),
+          );
           // The page is read once every answer it waits on has arrived and
           // shows, so the words of the rows, the failures and the counts are
-          // read too, not only the loading render's.
-          await waitFor(() => {
-            expect(requests.read()).toEqual({ waiting: 0, settled: true });
-          }, DELIVERY_WAIT);
+          // read too, not only the loading render's. Cleanup removes the
+          // container, and an emptied page is not at rest.
+          await getConfig().asyncWrapper(() =>
+            waitForState(
+              requests.subscribe,
+              () => container.isConnected && requests.checkAtRest(),
+              "every answer shown",
+            ),
+          );
           expect(
             findEnglish(document.body, english, listAuthoredIn(part)),
           ).toEqual([]);

@@ -226,18 +226,6 @@ export type BundleOutput = {
   )[];
 };
 
-/** What a story's requests to the mock endpoints have come to so far. */
-export type RequestsRead = {
-  /** Requests sent to an endpoint that answers, still waiting on it. */
-  readonly waiting: number;
-  /**
-   * Whether the page shows what its answers say: no request was sent, or
-   * one waits on the endpoint that never answers, or nothing on the page
-   * is still busy.
-   */
-  readonly settled: boolean;
-};
-
 /** One rule of the sheet: the selectors it resolves to, and its declarations. */
 export type ResolvedRule = {
   readonly selectors: readonly string[];
