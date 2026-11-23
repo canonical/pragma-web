@@ -1,5 +1,6 @@
 import {
   createArraySource,
+  createCollection,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -12,9 +13,13 @@ import createSourceWithoutCores from "../../../../../../storybook/machines/creat
 import {
   spareMachineCollection,
   spareMachines,
+  storyMachines,
 } from "../../../../../../storybook/machines/fixtures.js";
 import showConsumerCode from "../../../../../../storybook/machines/showConsumerCode.js";
-import type { MachineProviderConfig } from "../../../../../../storybook/machines/types.js";
+import type {
+  Machine,
+  MachineProviderConfig,
+} from "../../../../../../storybook/machines/types.js";
 import useMachineProvider from "../../../../../../storybook/machines/useMachineProvider.js";
 import pickStoryWords from "../../../../../../storybook/pickStoryWords.js";
 import type { StoryWords } from "../../../../../../storybook/types.js";
@@ -584,5 +589,115 @@ export const NoJavaScriptMemoryFilters: Story = {
     await expect(
       canvas.getByRole("button", { name: "Apply filters" }),
     ).toBeVisible();
+  },
+};
+
+/**
+ * The machines with their regions as a choice whose options are the
+ * server's: the schema lists none, so the facet lists them.
+ */
+const regionCollection = createCollection({
+  identify: (machine: Machine) => machine.id,
+  fields: [
+    {
+      field: "status",
+      kind: "choices",
+      options: ["running", "failed", "pending"],
+    },
+    { field: "region", kind: "choices" },
+  ],
+});
+
+/** The regions story's filters and table, over a provider built once. */
+function RegionMachines({ messages, ...args }: StoryArgs): ReactElement {
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: regionCollection,
+      source: createArraySource({
+        rows: storyMachines,
+        collection: regionCollection,
+      }),
+      facets: ["status", "region"],
+    }),
+  );
+  const words = pickStoryWords({ messages });
+  return (
+    <DataViews provider={provider} {...words}>
+      <Component {...args} />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        {...words}
+      />
+    </DataViews>
+  );
+}
+
+/**
+ * The server's options, kept once seen: regions are a choice the schema
+ * lists no options for, so the region facet lists them. Choosing the
+ * failed machines leaves no failed machine in us-east-2, and the facet
+ * drops it; the filter keeps listing it, so it can still be chosen.
+ */
+export const ServerOptionsKept: Story = {
+  parameters: showConsumerCode({
+    parts,
+    core: ["createCollection"],
+    imports: `import { type Machine, machines } from "./machines.js";`,
+    declarations: `${columnsCode}
+
+// Regions are a choice whose options the server lists.
+const machineCollection = createCollection({
+  identify: (machine: Machine) => machine.id,
+  fields: [
+    { field: "status", kind: "choices", options: ["running", "failed", "pending"] },
+    { field: "region", kind: "choices" },
+  ],
+});`,
+    facets: ["status", "region"],
+    render: composition,
+  }),
+  render: (args) => <RegionMachines {...args} />,
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(
+        canvas.getByRole("checkbox", { name: "us-east-2" }),
+      ).toHaveAccessibleDescription("4"),
+    );
+    await userEvent.click(canvas.getByRole("checkbox", { name: "failed" }));
+    await waitFor(() => expect(recordRows(canvas)).toBe(3));
+    await expect(
+      canvas.getByRole("checkbox", { name: "us-east-2" }),
+    ).toBeInTheDocument();
+  },
+};
+
+/**
+ * The More filters pin: while the disclosure is open, a field restricted
+ * inside it stays inside, where the reader is typing; once it closes, the
+ * restricted field shows beside the primary ones.
+ */
+export const MoreFiltersPinned: Story = {
+  args: { primary: ["status"] },
+  parameters: showConsumerCode({
+    parts,
+    declarations: columnsCode,
+    render: primaryComposition,
+  }),
+  render: renderWith(),
+  play: async ({ canvas }) => {
+    await userEvent.click(canvas.getByText("More filters"));
+    await userEvent.type(canvas.getByLabelText("Host contains"), "alder");
+    await waitFor(() => expect(recordRows(canvas)).toBe(1));
+    await expect(
+      canvas.getByLabelText("Host contains").closest("details"),
+    ).not.toBeNull();
+    await userEvent.click(canvas.getByText("More filters"));
+    await waitFor(() =>
+      expect(
+        canvas.getByLabelText("Host contains").closest("details"),
+      ).toBeNull(),
+    );
   },
 };
