@@ -567,6 +567,15 @@ describe("constants", () => {
         upper: "at most 64 GiB",
       }),
     ).toBe("memory at least 8 GiB and at most 64 GiB");
+    expect(m.queryContradiction({ label: "memory" })).toBe(
+      "The memory filters cannot all hold, so nothing matches.",
+    );
+    expect(m.mergeClauses({ label: "memory" })).toBe(
+      "Merge the memory filters",
+    );
+    expect(
+      m.clausesMerged({ label: "memory", count: buildExact(4), noun }),
+    ).toBe("Merged the memory filters. 4 machines.");
     expect(m.searchClause("ex web")).toBe("Search for ex web");
     expect(m.removeClause("status is ready")).toBe("Remove status is ready");
     expect(m.hiddenChips(3)).toBe("+3 more");

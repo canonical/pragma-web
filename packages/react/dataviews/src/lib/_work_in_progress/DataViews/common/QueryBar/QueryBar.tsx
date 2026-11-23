@@ -10,8 +10,11 @@ import type {
   PointerEvent,
   ReactElement,
 } from "react";
-import { useEffect, useRef, useState } from "react";
-import { useStableCallback } from "../../../../hooks/index.js";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useDataViewsValue,
+  useStableCallback,
+} from "../../../../hooks/index.js";
 import { QueryChips } from "../../../QueryChips/index.js";
 import { ENTRY_ITEM_ID as ENTRY } from "../../../QueryInput/common/constants.js";
 import { QueryInput } from "../../../QueryInput/index.js";
@@ -25,6 +28,7 @@ import {
 import { QueryBarChip } from "./common/QueryBarChip/index.js";
 import { RangeChip } from "./common/RangeChip/index.js";
 import { DRAFT_ID } from "./constants.js";
+import findContradictions from "./findContradictions.js";
 import findMissingPart from "./findMissingPart.js";
 import findNextPart from "./findNextPart.js";
 import {
@@ -51,6 +55,7 @@ import type {
   QueryBarDraft,
   QueryBarOption,
   QueryBarPart,
+  QueryContradiction,
   QueryPredicateClause,
   QueryRangeClause,
   QuerySearchClause,
@@ -118,6 +123,16 @@ const findNextPartOf = (
 ): QueryBarPart | null =>
   isRangeBound(draft) ? null : findNextPart(draft, part, backward);
 
+/** Two readings of the contradictions that say the same. */
+const isSameContradictions = (
+  a: readonly QueryContradiction[],
+  b: readonly QueryContradiction[],
+): boolean => JSON.stringify(a) === JSON.stringify(b);
+
+/** A contradiction's key, stable while it stands. */
+const readContradictionId = (contradiction: QueryContradiction): string =>
+  `${contradiction.field}__${contradiction.kind}`;
+
 /** Whether an option can be chosen. */
 const isSelectable = (option: QueryBarOption): boolean =>
   option.disabled !== true && option.current !== true;
@@ -182,8 +197,37 @@ export default function QueryBar({
   const entryRef = useRef<HTMLInputElement>(null);
   const { session, dispatch } = useQueryBarSession({ provider, rootRef });
   const clauses = useClauseIds({ group });
+  const readContradictions = useMemo(
+    () => (state: ReturnType<typeof group.state.get>) =>
+      findContradictions(state.slice, schema),
+    [schema],
+  );
+  const contradictions = useDataViewsValue(
+    group.state,
+    readContradictions,
+    isSameContradictions,
+  );
+  // The contradictions already said, so each new one is said once; those
+  // a link arrived with are shown, not said.
+  const saidRef = useRef<ReadonlySet<string> | null>(null);
   const announceOutcome = useAnnounceOutcome({ provider, announce });
   useFieldOverflow({ rootRef });
+  // @note Impure: says each contradiction a commit brings, once.
+  useEffect(() => {
+    const ids = new Set(contradictions.map(readContradictionId));
+    const said = saidRef.current;
+    saidRef.current = ids;
+    if (said === null) return;
+    for (const contradiction of contradictions) {
+      if (!said.has(readContradictionId(contradiction))) {
+        announce(
+          messages.queryContradiction({
+            label: labels.readFieldLabel(contradiction.field),
+          }),
+        );
+      }
+    }
+  }, [contradictions, announce, messages, labels]);
   // The latest session, for what a task or a blur reads later.
   const sessionRef = useRef(session);
   sessionRef.current = session;
@@ -1207,10 +1251,66 @@ export default function QueryBar({
         }
       : {};
 
+  /**
+   * Merge a contradiction's clauses into what was likely meant, in one
+   * write, and move focus to the chip they became. An open clause applies
+   * first, as before any other chip's action; the contradiction is read
+   * again after it, since a commit can resolve it or move its clauses.
+   */
+  const merge = (pressed: QueryContradiction): void => {
+    if (sessionRef.current.draft !== null) leave(highlighted, true);
+    const contradiction = findContradictions(
+      group.state.get().slice,
+      schema,
+    ).find(
+      ({ field, kind }) => field === pressed.field && kind === pressed.kind,
+    );
+    const edit = contradiction?.merge;
+    // Resolved, or left with no one reading, by the clause that applied.
+    if (contradiction === undefined || edit === null || edit === undefined) {
+      return;
+    }
+    const refusals = group.editPredicates(edit);
+    if (refusals.length > 0) {
+      announceRefusals(refusals);
+      return;
+    }
+    const label = labels.readFieldLabel(contradiction.field);
+    announceOutcome((count) =>
+      messages.clausesMerged({ label, count, noun: labels.recordNoun }),
+    );
+    const [merged] = edit.add;
+    /* v8 ignore next -- unreachable: a merge adds the clause it becomes */
+    const id = merged && findStanding(merged)?.origin?.id;
+    /* v8 ignore next -- unreachable: the clause a merge adds applies */
+    if (id === undefined) return;
+    dispatch({ type: "close", item: id, focus: "field" });
+  };
+
   // What the open Entry holds that cannot apply, and that what applied
-  // before still does, for as long as the Entry stays open.
-  const entries: MessageLineEntry[] =
-    session.invalid === null || draft === null
+  // before still does, for as long as the Entry stays open; then each
+  // field whose clauses cannot all hold, with its merge where one stands
+  // out.
+  const contradictionEntries = contradictions.map(
+    (contradiction): MessageLineEntry => {
+      const label = labels.readFieldLabel(contradiction.field);
+      return {
+        id: readContradictionId(contradiction),
+        criticality: "warning",
+        text: messages.queryContradiction({ label }),
+        ...(contradiction.merge === null
+          ? {}
+          : {
+              action: {
+                label: messages.mergeClauses({ label }),
+                onAction: () => merge(contradiction),
+              },
+            }),
+      };
+    },
+  );
+  const entries: MessageLineEntry[] = [
+    ...(session.invalid === null || draft === null
       ? []
       : [
           {
@@ -1220,8 +1320,10 @@ export default function QueryBar({
               [messages.clauseInvalid(session.invalid)],
               draft.origin !== null,
             ),
-          },
-        ];
+          } as const,
+        ]),
+    ...contradictionEntries,
+  ];
 
   const edit =
     draft !== null && draft.origin !== null && part !== null

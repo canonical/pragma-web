@@ -1224,6 +1224,140 @@ describe("QueryBar", () => {
     });
   });
 
+  describe("contradictions", () => {
+    const readLine = () =>
+      document.querySelector(".ds.data-views-query-bar-message-line");
+    const WARNING = "The memory filters cannot all hold, so nothing matches.";
+
+    it("warns once when a commit brings clauses that cannot all hold, and merges them", async () => {
+      const { provider } = mount({ query: "memory__gte=131072" });
+      await startOn("memory");
+      type(findPart("Operator for memory"), "<=");
+      type(findPart("Value for memory"), "64 GiB");
+      press(findPart("Value for memory"), "Enter");
+      expect(readLine()).toHaveTextContent(WARNING);
+      await waitFor(() => expect(readStatus()).toContain(WARNING));
+      // Said once: what the bar draws next says nothing more of it.
+      type(findEntry(), "x");
+      expect(readStatus().split(WARNING)).toHaveLength(2);
+      type(findEntry(), "");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the memory filters" }),
+      );
+      expect(readFilter(provider)).toEqual([
+        { field: "memory", operator: "gte", operands: [65_536] },
+        { field: "memory", operator: "lte", operands: [131_072] },
+      ]);
+      expect(readLine()).toBeNull();
+      await waitFor(() =>
+        expect(readStatus()).toContain("Merged the memory filters."),
+      );
+      // The chip they became takes focus.
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "memory" })).toHaveFocus(),
+      );
+    });
+
+    it("shows what a link arrived with without saying it, and offers no merge where none stands out", async () => {
+      const { provider } = mount({
+        query: "status=deployed&status__isAny__1=ready",
+      });
+      const line = await waitFor(() => {
+        const found = readLine();
+        expect(found).not.toBeNull();
+        return found;
+      });
+      expect(line).toHaveTextContent(
+        "The status filters cannot all hold, so nothing matches.",
+      );
+      expect(readStatus()).not.toContain("cannot all hold");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the status filters" }),
+      );
+      expect(readFilter(provider)).toEqual([
+        { field: "status", operator: "isAny", operands: ["deployed", "ready"] },
+      ]);
+      act(() => {
+        readProviderHost(provider).addPredicate({
+          field: "owner",
+          operator: "isSet",
+          operands: [true],
+        });
+      });
+      act(() => {
+        readProviderHost(provider).addPredicate({
+          field: "owner",
+          operator: "isSet",
+          operands: [false],
+        });
+      });
+      expect(readLine()).toHaveTextContent(
+        "The owner filters cannot all hold, so nothing matches.",
+      );
+      expect(
+        screen.queryByRole("button", { name: "Merge the owner filters" }),
+      ).toBeNull();
+    });
+
+    it("applies an open clause before Merge, and merges what then stands", async () => {
+      const { provider } = mount({
+        query:
+          "status=deployed&status__isAny__1=ready&memory__gte=131072&memory__lte=65536",
+      });
+      // An edit that resolves the contradiction leaves nothing to merge.
+      fireEvent.click(await screen.findByRole("button", { name: /^128.GiB$/ }));
+      type(findPart("Value for memory"), "32 GiB");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the memory filters" }),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "gte",
+        operands: [32_768],
+      });
+      expect(readFilter(provider)).toContainEqual({
+        field: "memory",
+        operator: "lte",
+        operands: [65_536],
+      });
+      // An open draft applies first; the merge then takes what stands.
+      await startOn("pool");
+      fireEvent.click(
+        screen.getByRole("button", { name: "Merge the status filters" }),
+      );
+      expect(readFilter(provider)).toContainEqual({
+        field: "status",
+        operator: "isAny",
+        operands: ["deployed", "ready"],
+      });
+    });
+
+    it("says why a merge is refused, and keeps the clauses", async () => {
+      const { provider } = mount({
+        query: "status=deployed&status__isAny__1=ready",
+      });
+      vi.spyOn(readProviderHost(provider), "editPredicates").mockReturnValue([
+        {
+          part: "filter",
+          code: "undeclared-field",
+          field: null,
+          operator: null,
+          reason: "no",
+        },
+      ]);
+      fireEvent.click(
+        await screen.findByRole("button", { name: "Merge the status filters" }),
+      );
+      await waitFor(() =>
+        expect(readStatus()).toContain(
+          "No. The previous restriction still applies.",
+        ),
+      );
+      expect(readFilter(provider)).toHaveLength(2);
+      vi.restoreAllMocks();
+    });
+  });
+
   describe("invalid input and refusals", () => {
     it("shows below the field what cannot apply, and that what applied still does", async () => {
       mount({ query: "memory__gte=65536" });

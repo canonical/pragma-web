@@ -255,6 +255,11 @@ const fr: DataViewsMessages = {
     outcome(`${spoken} ajouté.`, counted, noun),
   clauseChanged: (spoken, counted, noun) =>
     outcome(`Remplacé par ${spoken}.`, counted, noun),
+  queryContradiction: ({ label }) =>
+    `Les filtres ${label} ne peuvent pas tous être vrais : rien ne correspond.`,
+  mergeClauses: ({ label }) => `Fusionner les filtres ${label}`,
+  clausesMerged: ({ label, count: counted, noun }) =>
+    outcome(`Filtres ${label} fusionnés.`, counted, noun),
   clauseRemoved: (spoken, counted, noun) =>
     outcome(`${spoken} retiré.`, counted, noun),
   readAsAtLeast: "Lu comme au moins",

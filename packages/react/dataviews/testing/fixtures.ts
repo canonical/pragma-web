@@ -824,6 +824,24 @@ export const MESSAGE_SAMPLES: {
       { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
     ],
   ],
+  queryContradiction: [[{ label: MESSAGE_MARK }]],
+  mergeClauses: [[{ label: MESSAGE_MARK }]],
+  clausesMerged: [
+    [
+      {
+        label: MESSAGE_MARK,
+        count: { kind: "exact", value: 7 },
+        noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+      },
+    ],
+    [
+      {
+        label: MESSAGE_MARK,
+        count: { kind: "unknown" },
+        noun: { singular: MESSAGE_MARK, plural: MESSAGE_MARK },
+      },
+    ],
+  ],
   clauseRemoved: [
     [
       MESSAGE_MARK,

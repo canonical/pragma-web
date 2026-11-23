@@ -366,6 +366,19 @@ export type DataViewsMessages = {
     count: Count,
     noun: RecordNoun,
   ) => string;
+  /**
+   * A warning that a field's clauses cannot all hold, so the query matches
+   * nothing, by the field's label.
+   */
+  readonly queryContradiction: (facts: { readonly label: string }) => string;
+  /** The action merging a field's clauses into what was likely meant. */
+  readonly mergeClauses: (facts: { readonly label: string }) => string;
+  /** A field's clauses merged, with the result count after it. */
+  readonly clausesMerged: (facts: {
+    readonly label: string;
+    readonly count: Count;
+    readonly noun: RecordNoun;
+  }) => string;
   /** A clause removed, with the result count after it. */
   readonly clauseRemoved: (
     clause: string,
