@@ -1,4 +1,4 @@
-import type { QueryIssue } from "@canonical/dataviews-core";
+import type { Predicate, QueryIssue } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
 import {
@@ -33,6 +33,7 @@ import {
   speakChip,
   spellInvoker,
 } from "../../utils/index.js";
+import { AddFilterWalk } from "./common/AddFilterWalk/index.js";
 import { SheetChip } from "./common/SheetChip/index.js";
 import type { SheetProps } from "./types.js";
 import "./styles.css";
@@ -42,6 +43,7 @@ const componentCssClassName = "ds data-views-query-bar-sheet";
 /** Where focus goes once the chips show what a commit left. */
 type FocusTarget =
   | { readonly kind: "removed"; readonly index: number }
+  | { readonly kind: "added"; readonly id: string }
   | { readonly kind: "filters" };
 
 /**
@@ -133,23 +135,42 @@ export default function Sheet({
     });
   }, [isOpen, hydrated, group, announceOutcome, messages, recordNoun]);
 
+  // The query group as "Add filter" writes to it: its addition is the
+  // sheet's own commit, which says its own outcome.
+  const ownGroup = useMemo(
+    () => ({
+      ...group,
+      addPredicate: (predicate: Predicate) =>
+        writeFlagged(ownRef, () => group.addPredicate(predicate)),
+    }),
+    [group],
+  );
+
   /** Write a commit of the sheet's own, which says its own outcome. */
   const writeOwn = <TResult,>(write: () => TResult): TResult =>
     writeFlagged(ownRef, write);
 
   // Once the chips show what a commit left, focus moves on: after a
   // removal, to the next chip's remove control, else the previous one's,
-  // else the first filters control; after Clear all, to that control.
+  // else the first filters control; after "Add filter", to the new chip's
+  // remove control; after Clear all, to the first filters control.
   // @note Impure: moves focus.
   useEffect(() => {
     const body = bodyRef.current;
     if (focusTarget === null || body === null) return;
     setFocusTarget(null);
     const removes = [...body.querySelectorAll<HTMLElement>(".chips .remove")];
+    // Escaped, as a field's name can make the id any text.
+    const findAdded = (id: string): HTMLElement | null =>
+      body.querySelector<HTMLElement>(
+        `[data-clause="${CSS.escape(id)}"] .remove`,
+      );
     const chip =
       focusTarget.kind === "removed"
         ? (removes.at(focusTarget.index) ?? removes.at(focusTarget.index - 1))
-        : undefined;
+        : focusTarget.kind === "added"
+          ? findAdded(focusTarget.id)
+          : undefined;
     const filters = body.querySelector(".filters");
     (chip ?? (filters && findFirstControl(filters)))?.focus();
   }, [focusTarget]);
@@ -255,6 +276,15 @@ export default function Sheet({
                     />
                   ))}
                 </QueryChips>
+              )}
+              {hydrated && (
+                <AddFilterWalk
+                  group={ownGroup}
+                  announceOutcome={announceOutcome}
+                  onAdded={(added) =>
+                    setFocusTarget({ kind: "added", id: added })
+                  }
+                />
               )}
               {hydrated && <Filters className="filters" />}
             </div>

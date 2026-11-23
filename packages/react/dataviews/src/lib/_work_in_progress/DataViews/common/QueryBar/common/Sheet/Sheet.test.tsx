@@ -217,6 +217,34 @@ describe("Sheet", () => {
     expect(sheet.queryByRole("list", { name: "Applied filters" })).toBeNull();
   });
 
+  it("adds a filter by the walk, focus moving to its new chip's remove control", async () => {
+    const { provider, open, readRegion } = mount({ query: "cores__gte=2" });
+    const sheet = open();
+    fireEvent.click(sheet.getByRole("button", { name: "Add filter" }));
+    fireEvent.keyDown(sheet.getByRole("option", { name: "status" }), {
+      key: "Enter",
+    });
+    fireEvent.keyDown(sheet.getByRole("option", { name: /^is any of/ }), {
+      key: "Enter",
+    });
+    fireEvent.keyDown(sheet.getByRole("option", { name: "failed" }), {
+      key: " ",
+    });
+    fireEvent.click(sheet.getByRole("button", { name: "Add" }));
+    expect(provider.state.get().slice.filter).toHaveLength(2);
+    await waitFor(() =>
+      expect(
+        sheet.getByRole("button", { name: "Remove status is failed" }),
+      ).toHaveFocus(),
+    );
+    await waitFor(() =>
+      // Said together with the steps, all taken in one moment.
+      expect(readRegion()).toContain("Added status is failed."),
+    );
+    // The sheet's own commit says its own outcome, not the results'.
+    expect(readRegion()).not.toContain("Updated the results");
+  });
+
   it("says the results a change in the filters form brings, and nothing once closed", async () => {
     const { provider, open, readRegion, dialog } = mount();
     const sheet = open();
